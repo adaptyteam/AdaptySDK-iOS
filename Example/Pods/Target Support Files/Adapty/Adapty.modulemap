@@ -1,0 +1,6 @@
+framework module Adapty {
+  umbrella header "Adapty-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,27 @@
+PODS:
+  - Adapty (0.1.0):
+    - AWSKinesis (~> 2.12.1)
+  - AWSCore (2.12.1)
+  - AWSKinesis (2.12.1):
+    - AWSCore (= 2.12.1)
+
+DEPENDENCIES:
+  - Adapty (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - AWSCore
+    - AWSKinesis
+
+EXTERNAL SOURCES:
+  Adapty:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Adapty: f659da90e3dc117c7cd4794ce105e164603a6128
+  AWSCore: 0a4431f74d9dbf084d420b887a6a21042b423c5c
+  AWSKinesis: 4e2100c2b829af18c3f5beb72c73dab35611fc37
+
+PODFILE CHECKSUM: 933991194d02a260bd3069ea3d0a1daf8447a25a
+
+COCOAPODS: 1.8.4

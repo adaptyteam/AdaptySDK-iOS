@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Adapty_Example' do
+  pod 'Adapty', :path => '../'
+
+  target 'Adapty_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

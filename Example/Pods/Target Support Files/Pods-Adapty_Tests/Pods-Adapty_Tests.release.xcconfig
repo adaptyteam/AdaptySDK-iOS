@@ -1,0 +1,9 @@
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/AWSCore" "${PODS_CONFIGURATION_BUILD_DIR}/AWSKinesis" "${PODS_CONFIGURATION_BUILD_DIR}/Adapty"
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/AWSCore/AWSCore.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/AWSKinesis/AWSKinesis.framework/Headers" "${PODS_CONFIGURATION_BUILD_DIR}/Adapty/Adapty.framework/Headers"
+OTHER_LDFLAGS = $(inherited) -l"sqlite3" -l"z" -framework "AWSCore" -framework "AWSKinesis" -framework "AdSupport" -framework "Adapty" -framework "CoreGraphics" -framework "Foundation" -framework "Security" -framework "SystemConfiguration" -framework "UIKit"
+PODS_BUILD_DIR = ${BUILD_DIR}
+PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
+PODS_PODFILE_DIR_PATH = ${SRCROOT}/.
+PODS_ROOT = ${SRCROOT}/Pods
+USE_RECURSIVE_SCRIPT_INPUTS_IN_SCRIPT_PHASES = YES
