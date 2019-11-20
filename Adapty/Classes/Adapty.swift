@@ -37,8 +37,7 @@ public class Adapty {
     private func configure() {
         apiManager = ApiManager()
         
-        kinesisManager = KinesisManager(accessKey: Constants.Kinesis.accessKey,
-                                        secretAccessKey: Constants.Kinesis.secretKey,
+        kinesisManager = KinesisManager(identityPoolId: Constants.Kinesis.identityPoolId,
                                         region: Constants.Kinesis.region,
                                         streamName: Constants.Kinesis.streamName)
 

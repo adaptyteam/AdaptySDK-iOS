@@ -16,10 +16,9 @@ struct Constants {
     }
 
     struct Kinesis {
-        static let streamName = "AWS_STREAM_NAME"
-        static let accessKey = "AWS_ACCESS_KEY"
-        static let secretKey = "AWS_SECRET_KEY"
-        static let region = AWSRegionType.Unknown
+        static let streamName = "adapty-sdk-test"
+        static let identityPoolId = "us-east-1:f479318d-b226-417d-982a-18f9d87c7f8a"
+        static let region = AWSRegionType.USEast1
     }
     
     struct UserDefaults {

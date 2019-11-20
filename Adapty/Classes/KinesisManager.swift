@@ -20,9 +20,8 @@ class KinesisManager {
     let streamName: String
     let sessionID = UUID().uuidString
 
-    init(accessKey: String, secretAccessKey: String, region: AWSRegionType, streamName: String) {
-
-        let credentialsProvider = AWSStaticCredentialsProvider(accessKey: accessKey, secretKey: secretAccessKey)
+    init(identityPoolId: String, region: AWSRegionType, streamName: String) {
+        let credentialsProvider = AWSCognitoCredentialsProvider(regionType: region, identityPoolId: identityPoolId)
         let configuration = AWSServiceConfiguration(region: region, credentialsProvider: credentialsProvider)
         AWSServiceManager.default().defaultServiceConfiguration = configuration
 
