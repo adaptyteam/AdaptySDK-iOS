@@ -24,9 +24,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
 
 ## Usage
 
-### Configure your app and create profile first
-
-#### Step 1: Configure your app
+### Configure your app
 
 In your AppDelegate class:
 
@@ -39,26 +37,6 @@ And add the following to `application(_:didFinishLaunchingWithOptions:)`:
 ```Swift
 Adapty.activate("YOUR_APP_KEY")
 ```
-
-#### Step 2: Register your user
-
-```Swift
-Adapty.shared.createProfile(customerUserId: "<id-in-your-system>",
-                            email: "example@email.com",
-                            phoneNumber: "+1-###-###-####",
-                            facebookUserId: "###############",
-                            firstName: "Test",
-                            lastName: "Test",
-                            gender: "",
-                            birthday: Date) { (error) in
-                                if error == nil {
-                                    // successful registration
-                                }
-}
-```
-
-All properties are optional.  
-For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.
 
 ### Update your user
 
@@ -79,7 +57,8 @@ Adapty.shared.updateProfile(customerUserId: "<id-in-your-system>",
 }
 ```
 
-All properties are optional.
+All properties are optional.  
+For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.
 
 ### AdjustSDK integration
 

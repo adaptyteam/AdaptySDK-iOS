@@ -13,7 +13,7 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var customerUserIdLabel: UILabel!
     @IBOutlet weak var customerUserIdTextField: UITextField!
-    @IBOutlet weak var createProfileButton: UIButton!
+    @IBOutlet weak var updateProfileButton: UIButton!
     @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
     @IBOutlet weak var infoLabel: UILabel!
     
@@ -39,18 +39,18 @@ class ViewController: UIViewController {
         infoLabel.text = "User logged out successfully"
     }
     
-    @IBAction func createProfileButtonAction(_ sender: Any) {
+    @IBAction func updateProfileButtonAction(_ sender: Any) {
         guard let customerUserId = customerUserIdTextField.text else {
             return
         }
         
         setLoader(true)
-        Adapty.shared.createProfile(customerUserId: customerUserId) { (error) in
+        Adapty.shared.updateProfile(customerUserId: customerUserId) { (error) in
             self.setLoader(false)
             if let error = error {
-                self.infoLabel.text = "Failed to create user: \(error)"
+                self.infoLabel.text = "Failed to update user: \(error)"
             } else {
-                self.infoLabel.text = "User created successfully"
+                self.infoLabel.text = "User updated successfully"
             }
             
             self.updateCustomerUserIdLabel()

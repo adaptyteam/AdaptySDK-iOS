@@ -41,32 +41,27 @@ public class Adapty {
                                         region: Constants.Kinesis.region,
                                         streamName: Constants.Kinesis.streamName)
 
-        if installation != nil {
-            // found existing installation -> re-send it updated info to backend
-            updateInstallation { _, _ in
-                self.trackSessionStart()
+        if profile == nil {
+            // didn't find existing profile, create a new one
+            createProfile()
+        } else {
+            if installation == nil {
+                // didn't find existing installation, but found existing user -> create installation on backend
+                createInstallation()
+            } else {
+                // found existing installation -> re-send it updated info to backend
+                updateInstallation { _, _ in
+                    self.trackSessionStart()
+                }
             }
-        } else if profile != nil {
-            // didn't find existing installation, but found existing user -> create installation on backend
-            createInstallation()
-        } // otherwise do nothing, wait for user to create profile
+        }
         
         NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.trackSessionEnd()
         }
     }
     
-    public func createProfile(
-        customerUserId: String? = nil,
-        email: String? = nil,
-        phoneNumber: String? = nil,
-        facebookUserId: String? = nil,
-        firstName: String? = nil,
-        lastName: String? = nil,
-        gender: String? = nil,
-        birthday: Date? = nil,
-        completion: ErrorCompletion? = nil)
-    {
+    private func createProfile(_ completion: ErrorCompletion? = nil) {
         if profile != nil {
             completion?(NetworkResponse.alreadyAuthenticatedError)
             return
@@ -74,14 +69,6 @@ public class Adapty {
         
         var params = Parameters()
         
-        if let customerUserId = customerUserId { params["customer_user_id"] = customerUserId }
-        if let email = email { params["email"] = email }
-        if let phoneNumber = phoneNumber { params["phone_number"] = phoneNumber }
-        if let facebookUserId = facebookUserId { params["facebook_user_id"] = facebookUserId }
-        if let firstName = firstName { params["first_name"] = firstName }
-        if let lastName = lastName { params["last_name"] = lastName }
-        if let gender = gender { params["gender"] = gender }
-        if let birthday = birthday { params["birthday"] = birthday.stringValue }
         if let idfa = idfa { params["idfa"] = idfa }
         params["profile_id"] = uuid
         
@@ -124,7 +111,10 @@ public class Adapty {
         if let idfa = idfa { params["idfa"] = idfa }
         
         apiManager.updateProfile(id: profileId, params: params) { (profile, error) in
-            self.profile = profile
+            if let profile = profile {
+                // do not overwrite in case of error
+                self.profile = profile
+            }
             completion?(error)
         }
     }
@@ -182,7 +172,10 @@ public class Adapty {
         #warning("Handle Adjust params")
         
         apiManager.updateInstallation(id: installationMetaId, params: params) { (installation, error) in
-            self.installation = installation
+            if let installation = installation {
+                // do not overwrite in case of error
+                self.installation = installation
+            }
             completion?(installation, error)
         }
     }
@@ -239,6 +232,9 @@ public class Adapty {
         profile = nil
         installation = nil
         DefaultsManager.shared.clean()
+        
+        // automatically create new profile
+        createProfile()
     }
     
     //MARK: - Sessions

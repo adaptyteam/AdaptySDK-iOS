@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vXZ-lx-hvc">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15509"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -30,37 +29,36 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Customer user id" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Dqk-ax-mk2">
-                                        <rect key="frame" x="16" y="175" width="229" height="30"/>
-                                        <nil key="textColor"/>
+                                        <rect key="frame" x="16" y="175" width="229" height="34"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bty-ga-wsk">
-                                        <rect key="frame" x="255" y="175" width="104" height="30"/>
-                                        <state key="normal" title="Create Profile"/>
+                                        <rect key="frame" x="255" y="177" width="104" height="30"/>
+                                        <state key="normal" title="Update Profile"/>
                                         <connections>
-                                            <action selector="createProfileButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="aWu-g9-Tbc"/>
+                                            <action selector="updateProfileButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="RKa-r4-dh0"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BQf-FP-kpk">
-                                        <rect key="frame" x="101" y="241" width="173" height="30"/>
+                                        <rect key="frame" x="101" y="245" width="173" height="30"/>
                                         <state key="normal" title="Update Adjust attribution"/>
                                         <connections>
                                             <action selector="updateAdjustAttributionButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="GMv-M8-hob"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aXZ-ih-45X">
-                                        <rect key="frame" x="134" y="307" width="107" height="30"/>
+                                        <rect key="frame" x="134" y="311" width="107" height="30"/>
                                         <state key="normal" title="Validate receipt"/>
                                         <connections>
                                             <action selector="validateReceiptButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="hMQ-LS-byU"/>
                                         </connections>
                                     </button>
                                     <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="DuT-hy-bhf">
-                                        <rect key="frame" x="177.5" y="373" width="20" height="20"/>
+                                        <rect key="frame" x="177.5" y="377" width="20" height="20"/>
                                     </activityIndicatorView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WUN-tp-bs6">
-                                        <rect key="frame" x="16" y="385" width="343" height="0.0"/>
+                                        <rect key="frame" x="16" y="389" width="343" height="0.0"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <color key="textColor" white="0.34789465962441307" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
@@ -109,10 +107,10 @@
                     </view>
                     <connections>
                         <outlet property="activityIndicatorView" destination="DuT-hy-bhf" id="a0i-6a-Fhw"/>
-                        <outlet property="createProfileButton" destination="bty-ga-wsk" id="gB5-8z-aGi"/>
                         <outlet property="customerUserIdLabel" destination="N4V-2p-TUc" id="QFk-hD-ssN"/>
                         <outlet property="customerUserIdTextField" destination="Dqk-ax-mk2" id="GBp-Gd-lwh"/>
                         <outlet property="infoLabel" destination="WUN-tp-bs6" id="fg0-t0-h8v"/>
+                        <outlet property="updateProfileButton" destination="bty-ga-wsk" id="ROn-of-7rU"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
