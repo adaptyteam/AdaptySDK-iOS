@@ -11,8 +11,7 @@ import AWSCore
 import AWSKinesis
 
 enum EventType: String {
-    case sessionStart = "session_start"
-    case sessionEnd = "session_end"
+    case live = "live"
 }
 
 class KinesisManager {
@@ -34,7 +33,7 @@ class KinesisManager {
         self.streamName = streamName
     }
 
-    func trackEvent(_ eventType: EventType, profileID: String, profileInstallationMetaID: String) {
+    func trackEvent(_ eventType: EventType, profileID: String, profileInstallationMetaID: String, completion: ((Error?) -> Void)? = nil) {
 
         let kinesisRecorder = AWSKinesisRecorder.default()
 
@@ -51,6 +50,9 @@ class KinesisManager {
 
         kinesisRecorder.saveRecord(eventData, streamName: streamName, partitionKey: profileInstallationMetaID)?.continueOnSuccessWith(block: { task -> Any? in
             return kinesisRecorder.submitAllRecords()
+        }).continueWith(block: { task -> Any? in
+            completion?(task.error)
+            return nil
         })
     }
     

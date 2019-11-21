@@ -49,12 +49,12 @@ public class Adapty {
         } else {
             // sync installation data and receive cognito credentials
             syncInstallation { _, _ in
-                self.trackSessionStart()
+                self.startTrackingLiveEvent()
             }
         }
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
-            self?.trackSessionEnd()
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
+            self?.trackLiveEventInBackground()
         }
     }
     
@@ -75,7 +75,7 @@ public class Adapty {
             
             if error == nil {
                 self.syncInstallation { _, _ in
-                    self.trackSessionStart()
+                    self.startTrackingLiveEvent()
                 }
             }
         }
@@ -202,7 +202,7 @@ public class Adapty {
     }
     
     public func logout() {
-        trackSessionEnd()
+        invalidateLiveTrackerTimer()
         profile = nil
         installation = nil
         DefaultsManager.shared.clean()
@@ -213,15 +213,50 @@ public class Adapty {
     
     //MARK: - Sessions
     
-    private func trackSessionStart() {
-        if let installationID = self.installation?.profileInstallationMetaId, let profileID = self.profile?.profileId {
-            kinesisManager.trackEvent(.sessionStart, profileID: profileID, profileInstallationMetaID: installationID)
+    private var liveTrackerTimer: Timer?
+    
+    private func startTrackingLiveEvent() {
+        guard liveTrackerTimer == nil else {
+            return
+        }
+        
+        trackLiveEvent()
+        
+        liveTrackerTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] (_) in
+            self?.trackLiveEvent()
         }
     }
     
-    private func trackSessionEnd() {
-        if let installationID = self.installation?.profileInstallationMetaId, let profileID = self.profile?.profileId {
-            kinesisManager.trackEvent(.sessionEnd, profileID: profileID, profileInstallationMetaID: installationID)
+    private func invalidateLiveTrackerTimer() {
+        liveTrackerTimer?.invalidate()
+        liveTrackerTimer = nil
+    }
+    
+    private func trackLiveEvent(completion: ((Error?) -> Void)? = nil) {
+        guard let profileId = profile?.profileId, let profileInstallationMetaId = installation?.profileInstallationMetaId else {
+            completion?(NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid profileId or profileInstallationMetaId"]))
+            return
+        }
+        
+        kinesisManager.trackEvent(.live, profileID: profileId, profileInstallationMetaID: profileInstallationMetaId, completion: completion)
+    }
+    
+    private func trackLiveEventInBackground() {
+        var eventBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
+        eventBackgroundTaskID = UIApplication.shared.beginBackgroundTask (withName: "AdaptyTrackLiveBackgroundTask") {
+            // End the task if time expires.
+            UIApplication.shared.endBackgroundTask(eventBackgroundTaskID)
+            eventBackgroundTaskID = .invalid
+        }
+        
+        assert(eventBackgroundTaskID != .invalid)
+        
+        DispatchQueue.global().async {
+            self.trackLiveEvent() { (error) in
+                // End the task assertion.
+                UIApplication.shared.endBackgroundTask(eventBackgroundTaskID)
+                eventBackgroundTaskID = .invalid
+            }
         }
     }
     
