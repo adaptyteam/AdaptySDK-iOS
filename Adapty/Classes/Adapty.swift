@@ -25,7 +25,13 @@ public class Adapty {
         }
     }
     private var apiManager: ApiManager!
-    private var kinesisManager: KinesisManager!
+    private lazy var kinesisManager: KinesisManager = {
+        guard let installation = installation else {
+            return KinesisManager(identityPoolId: Constants.Kinesis.identityPoolId, region: Constants.Kinesis.region, identityId: "", cognitoToken: "", streamName: Constants.Kinesis.streamName)
+        }
+        
+        return KinesisManager(identityPoolId: Constants.Kinesis.identityPoolId, region: Constants.Kinesis.region, identityId: installation.cognitoId, cognitoToken: installation.cognitoToken, streamName: Constants.Kinesis.streamName)
+    }()
     
     private init() { }
     
@@ -36,23 +42,14 @@ public class Adapty {
     
     private func configure() {
         apiManager = ApiManager()
-        
-        kinesisManager = KinesisManager(identityPoolId: Constants.Kinesis.identityPoolId,
-                                        region: Constants.Kinesis.region,
-                                        streamName: Constants.Kinesis.streamName)
 
         if profile == nil {
             // didn't find existing profile, create a new one
             createProfile()
         } else {
-            if installation == nil {
-                // didn't find existing installation, but found existing user -> create installation on backend
-                createInstallation()
-            } else {
-                // found existing installation -> re-send it updated info to backend
-                updateInstallation { _, _ in
-                    self.trackSessionStart()
-                }
+            // sync installation data and receive cognito credentials
+            syncInstallation { _, _ in
+                self.trackSessionStart()
             }
         }
         
@@ -77,7 +74,9 @@ public class Adapty {
             completion?(error)
             
             if error == nil {
-                self.createInstallation()
+                self.syncInstallation { _, _ in
+                    self.trackSessionStart()
+                }
             }
         }
     }
@@ -119,7 +118,7 @@ public class Adapty {
         }
     }
     
-    private func createInstallation(_ completion: InstallationCompletion? = nil) {
+    private func syncInstallation(_ completion: InstallationCompletion? = nil) {
         guard let profileId = profile?.profileId else {
             completion?(nil, NetworkResponse.missingRequiredParams)
             return
@@ -128,7 +127,7 @@ public class Adapty {
         var params = Parameters()
         
         params["profile_id"] = profileId
-        params["profile_installation_meta_id"] = uuid
+        params["profile_installation_meta_id"] = installation?.profileInstallationMetaId ?? uuid
         if let sdkVersion = sdkVersion { params["adapty_sdk_version"] = sdkVersion }
         params["adapty_sdk_version_build"] = sdkVersionBuild
         if let appBuild = appBuild { params["app_build"] = appBuild }
@@ -142,36 +141,7 @@ public class Adapty {
         
         #warning("Handle Adjust params")
         
-        apiManager.createInstallation(params: params) { (installation, error) in
-            self.installation = installation
-            completion?(installation, error)
-            
-            self.trackSessionStart()
-        }
-    }
-    
-    private func updateInstallation(_ completion: InstallationCompletion? = nil) {
-        guard let installationMetaId = installation?.profileInstallationMetaId, let profileId = profile?.profileId else {
-            completion?(nil, NetworkResponse.missingRequiredParams)
-            return
-        }
-        
-        var params = Parameters()
-        
-        params["profile_id"] = profileId
-        if let sdkVersion = sdkVersion { params["adapty_sdk_version"] = sdkVersion }
-        params["adapty_sdk_version_build"] = sdkVersionBuild
-        if let appBuild = appBuild { params["app_build"] = appBuild }
-        if let appVersion = appVersion { params["app_version"] = appVersion }
-        params["device"] = device
-        params["locale"] = locale
-        params["os"] = OS
-        params["platform"] = platform
-        params["timezone"] = timezone
-        
-        #warning("Handle Adjust params")
-        
-        apiManager.updateInstallation(id: installationMetaId, params: params) { (installation, error) in
+        apiManager.syncInstallation(params: params) { (installation, error) in
             if let installation = installation {
                 // do not overwrite in case of error
                 self.installation = installation
@@ -200,7 +170,7 @@ public class Adapty {
         adid: String? = nil,
         completion: ErrorCompletion? = nil)
     {
-        guard let installationMetaId = installation?.profileInstallationMetaId, let profileId = profile?.profileId else {
+        guard let profileId = profile?.profileId, let installationMetaId = installation?.profileInstallationMetaId else {
             completion?(NetworkResponse.missingRequiredParams)
             return
         }
@@ -208,6 +178,7 @@ public class Adapty {
         var params = Parameters()
         
         params["profile_id"] = profileId
+        params["profile_installation_meta_id"] = installationMetaId
         if let trackerToken = trackerToken { params["attribution_tracker_token"] = trackerToken }
         if let trackerName = trackerName { params["attribution_tracker_name"] = trackerName }
         if let network = network { params["attribution_network"] = network }
@@ -217,8 +188,11 @@ public class Adapty {
         if let clickLabel = clickLabel { params["attribution_click_label"] = clickLabel }
         if let adid = adid { params["attribution_adid"] = adid }
         
-        apiManager.updateInstallation(id: installationMetaId, params: params) { (installation, error) in
-            self.installation = installation
+        apiManager.syncInstallation(params: params) { (installation, error) in
+            if let installation = installation {
+                // do not overwrite in case of error
+                self.installation = installation
+            }
             completion?(error)
         }
     }

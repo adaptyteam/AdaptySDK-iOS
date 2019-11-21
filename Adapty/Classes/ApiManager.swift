@@ -38,19 +38,8 @@ class ApiManager {
         }
     }
     
-    func createInstallation(params: Parameters, completion: @escaping InstallationCompletion) {
-        RequestManager.request(router: Router.createInstallation(params: params)) { (result: Result<InstallationModel, Error>, response) in
-            switch result {
-            case .success(let installation):
-                completion(installation, nil)
-            case .failure(let error):
-                completion(nil, error)
-            }
-        }
-    }
-    
-    func updateInstallation(id: String, params: Parameters, completion: @escaping InstallationCompletion) {
-        RequestManager.request(router: Router.updateInstallation(id: id, params: params)) { (result: Result<InstallationModel, Error>, response) in
+    func syncInstallation(params: Parameters, completion: @escaping InstallationCompletion) {
+        RequestManager.request(router: Router.syncInstallation(params: params)) { (result: Result<InstallationModel, Error>, response) in
             switch result {
             case .success(let installation):
                 completion(installation, nil)

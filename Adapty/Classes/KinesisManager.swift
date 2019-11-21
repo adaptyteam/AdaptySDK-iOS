@@ -20,8 +20,9 @@ class KinesisManager {
     let streamName: String
     let sessionID = UUID().uuidString
 
-    init(identityPoolId: String, region: AWSRegionType, streamName: String) {
-        let credentialsProvider = AWSCognitoCredentialsProvider(regionType: region, identityPoolId: identityPoolId)
+    init(identityPoolId: String, region: AWSRegionType, identityId: String, cognitoToken: String, streamName: String) {
+        let provider = CognitoProvider(regionType: region, identityPoolId: identityPoolId, useEnhancedFlow: true, identityProviderManager: nil, token: cognitoToken, identityId: identityId)
+        let credentialsProvider = AWSCognitoCredentialsProvider(regionType: region, identityProvider: provider)
         let configuration = AWSServiceConfiguration(region: region, credentialsProvider: credentialsProvider)
         AWSServiceManager.default().defaultServiceConfiguration = configuration
 
@@ -51,6 +52,27 @@ class KinesisManager {
         kinesisRecorder.saveRecord(eventData, streamName: streamName, partitionKey: profileInstallationMetaID)?.continueOnSuccessWith(block: { task -> Any? in
             return kinesisRecorder.submitAllRecords()
         })
+    }
+    
+}
+
+class CognitoProvider: AWSCognitoCredentialsProviderHelper {
+    
+    var token: String?
+    
+    init(regionType: AWSRegionType, identityPoolId: String, useEnhancedFlow: Bool, identityProviderManager: AWSIdentityProviderManager?, token: String, identityId: String) {
+        super.init(regionType: regionType, identityPoolId: identityPoolId, useEnhancedFlow: useEnhancedFlow, identityProviderManager: identityProviderManager)
+        
+        self.token = token
+        self.identityId = identityId
+    }
+    
+    override func logins() -> AWSTask<NSDictionary> {
+        if let token = token {
+            return AWSTask(result: [AWSIdentityProviderAmazonCognitoIdentity: token])
+        }
+        
+        return AWSTask(error:NSError(domain: "Cognito Login", code: -1 , userInfo: ["Cognito" : "No current Congito access token"]))
     }
     
 }

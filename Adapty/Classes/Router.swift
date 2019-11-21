@@ -12,8 +12,7 @@ enum Router {
     
     case createProfile(Parameters)
     case updateProfile(id: String, params: Parameters)
-    case createInstallation(params: Parameters)
-    case updateInstallation(id: String, params: Parameters)
+    case syncInstallation(params: Parameters)
     case validateReceipt(params: Parameters)
     
     var scheme: String {
@@ -31,11 +30,10 @@ enum Router {
     var method: HTTPMethod {
         switch self {
         case .createProfile,
-             .createInstallation,
+             .syncInstallation,
              .validateReceipt:
             return .post
-        case .updateProfile,
-             .updateInstallation:
+        case .updateProfile:
             return .patch
         }
     }
@@ -46,10 +44,8 @@ enum Router {
             return "/sdk/analytics/profile/"
         case .updateProfile(let id, _):
             return "/sdk/analytics/profile/\(id)/"
-        case .createInstallation:
-            return "/sdk/analytics/profile/installation/meta/"
-        case .updateInstallation(let id, _):
-            return "/sdk/analytics/profile/installation/meta/\(id)/"
+        case .syncInstallation:
+            return "/sdk/analytics/profile/installation/meta/sync/"
         case .validateReceipt:
             return "/sdk/in-apps/apple/validate/"
         }
@@ -74,8 +70,7 @@ enum Router {
         switch self {
         case .createProfile(let params),
              .updateProfile(_, let params),
-             .createInstallation(let params),
-             .updateInstallation(_, let params),
+             .syncInstallation(let params),
              .validateReceipt(let params):
             requestParams = params
         }
