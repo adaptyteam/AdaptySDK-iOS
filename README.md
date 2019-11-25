@@ -62,25 +62,17 @@ For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass cu
 
 ### AdjustSDK integration
 
-To integrate with AdjustSDK, just pass it's attribution to Adapty.
+To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attribution you receive from delegate method of Adjust iOS SDK `- (void)adjustAttributionChanged:(ADJAttribution *)attribution` to Adapty method.
 
 ```Swift
-Adapty.shared.updateAdjustAttribution(trackerToken: "", // the tracker token of the current attribution.
-                                      trackerName: "", // the tracker name of the current attribution.
-                                      network: "", // the network grouping level of the current attribution.
-                                      campaign: "", // the campaign grouping level of the current attribution.
-                                      adgroup: "", // the ad group grouping level of the current attribution.
-                                      creative: "", // the creative grouping level of the current attribution.
-                                      clickLabel: "", // the click label of the current attribution.
-                                      adid: "") // the unique device identifier provided by attribution.
-{ (error) in
+Adapty.shared.updateAdjustAttribution("<attribution>") { (error) in
     if error == nil {
         // successful update
     }
 }
 ```
 
-All properties are optional.
+**`attribution`** is `ADJAttribution?` object.
 
 ### Validate your receipt
 

@@ -5,7 +5,7 @@
   "description": "Win back churned subscribers in your iOS app.\nAdapty helps you track business metrics, and lets you run ad campaigns targeted at churned users faster",
   "homepage": "https://adapty.io/",
   "license": {
-    "type": "MIT",
+    "type": "GNU",
     "file": "LICENSE"
   },
   "authors": {

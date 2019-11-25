@@ -159,17 +159,7 @@ public class Adapty {
         apiManager.validateReceipt(params: ["profile_id": id, "receipt_encoded": receiptEncoded], completion: completion)
     }
     
-    public func updateAdjustAttribution(
-        trackerToken: String? = nil,
-        trackerName: String? = nil,
-        network: String? = nil,
-        campaign: String? = nil,
-        adgroup: String? = nil,
-        creative: String? = nil,
-        clickLabel: String? = nil,
-        adid: String? = nil,
-        completion: ErrorCompletion? = nil)
-    {
+    public func updateAdjustAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
         guard let profileId = profile?.profileId, let installationMetaId = installation?.profileInstallationMetaId else {
             completion?(NetworkResponse.missingRequiredParams)
             return
@@ -179,14 +169,14 @@ public class Adapty {
         
         params["profile_id"] = profileId
         params["profile_installation_meta_id"] = installationMetaId
-        if let trackerToken = trackerToken { params["attribution_tracker_token"] = trackerToken }
-        if let trackerName = trackerName { params["attribution_tracker_name"] = trackerName }
-        if let network = network { params["attribution_network"] = network }
-        if let campaign = campaign { params["attribution_campaign"] = campaign }
-        if let adgroup = adgroup { params["attribution_adgroup"] = adgroup }
-        if let creative = creative { params["attribution_creative"] = creative }
-        if let clickLabel = clickLabel { params["attribution_click_label"] = clickLabel }
-        if let adid = adid { params["attribution_adid"] = adid }
+        if let trackerToken = attribution?.value(forKey: "trackerToken") { params["attribution_tracker_token"] = trackerToken }
+        if let trackerName = attribution?.value(forKey: "trackerName") { params["attribution_tracker_name"] = trackerName }
+        if let network = attribution?.value(forKey: "network") { params["attribution_network"] = network }
+        if let campaign = attribution?.value(forKey: "campaign") { params["attribution_campaign"] = campaign }
+        if let adgroup = attribution?.value(forKey: "adgroup") { params["attribution_adgroup"] = adgroup }
+        if let creative = attribution?.value(forKey: "creative") { params["attribution_creative"] = creative }
+        if let clickLabel = attribution?.value(forKey: "clickLabel") { params["attribution_click_label"] = clickLabel }
+        if let adid = attribution?.value(forKey: "adid") { params["attribution_adid"] = adid }
         
         apiManager.syncInstallation(params: params) { (installation, error) in
             if let installation = installation {

@@ -8,16 +8,19 @@
 
 import UIKit
 import Adapty
+import Adjust
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        Adapty.activate("YOUR_APP_KEY")
+        Adapty.activate("YOUR_ADAPTY_APP_TOKEN")
+        
+        let config = ADJConfig(appToken: "YOUR_ADJUST_APP_TOKEN", environment: ADJEnvironmentProduction)
+        config?.delegate = self
+        Adjust.appDidLaunch(config)
 
         return true
     }
@@ -44,6 +47,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
 }
 
+extension AppDelegate: AdjustDelegate {
+    
+    func adjustAttributionChanged(_ attribution: ADJAttribution?) {
+        // Just pass Adjust attribution to Adapty SDK
+        Adapty.shared.updateAdjustAttribution(attribution)
+    }
+    
+}

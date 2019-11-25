@@ -2,6 +2,8 @@ use_frameworks!
 
 target 'Adapty_Example' do
   pod 'Adapty', :path => '../'
+  
+  pod 'Adjust', '~> 4.18.3'
 
   target 'Adapty_Tests' do
     inherit! :search_paths

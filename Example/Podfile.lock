@@ -1,15 +1,20 @@
 PODS:
   - Adapty (0.1.0):
     - AWSKinesis (~> 2.12.1)
+  - Adjust (4.18.3):
+    - Adjust/Core (= 4.18.3)
+  - Adjust/Core (4.18.3)
   - AWSCore (2.12.1)
   - AWSKinesis (2.12.1):
     - AWSCore (= 2.12.1)
 
 DEPENDENCIES:
   - Adapty (from `../`)
+  - Adjust (~> 4.18.3)
 
 SPEC REPOS:
   trunk:
+    - Adjust
     - AWSCore
     - AWSKinesis
 
@@ -18,10 +23,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Adapty: f659da90e3dc117c7cd4794ce105e164603a6128
+  Adapty: 3f677ec4a2189805c8830b53d6bf72c2c467b78d
+  Adjust: fef133f0bf610d439953b50306372c68c625d7e9
   AWSCore: 0a4431f74d9dbf084d420b887a6a21042b423c5c
   AWSKinesis: 4e2100c2b829af18c3f5beb72c73dab35611fc37
 
-PODFILE CHECKSUM: 933991194d02a260bd3069ea3d0a1daf8447a25a
+PODFILE CHECKSUM: b6d590b844a4f762c78d3a5084548262263f6bdf
 
 COCOAPODS: 1.8.4

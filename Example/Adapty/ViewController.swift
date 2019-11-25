@@ -8,6 +8,7 @@
 
 import UIKit
 import Adapty
+import Adjust
 
 class ViewController: UIViewController {
 
@@ -59,7 +60,8 @@ class ViewController: UIViewController {
     
     @IBAction func updateAdjustAttributionButtonAction(_ sender: Any) {
         setLoader(true)
-        Adapty.shared.updateAdjustAttribution(trackerToken: "test_trackerToken", trackerName: "test_trackerName", network: "test_network", campaign: "test_campaign", adgroup: "test_adgroup", creative: "test_creative", clickLabel: "test_clickLabel", adid: "test_adid") { (error) in
+        let attribution = ADJAttribution(jsonDict: ["trackerToken": "test_trackerToken", "trackerName": "test_trackerName", "network": "test_network", "campaign": "test_campaign", "adgroup": "test_adgroup", "creative": "test_creative", "clickLabel": "test_clickLabel"], adid: "test_adid")
+        Adapty.shared.updateAdjustAttribution(attribution) { (error) in
             self.setLoader(false)
             if let error = error {
                 self.infoLabel.text = "Failed to update attribution: \(error)"
