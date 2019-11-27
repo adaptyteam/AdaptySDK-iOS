@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Adapty'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'Adapty SDK for iOS.'
 
   s.description      = <<-DESC
@@ -28,5 +28,5 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.source_files = 'Adapty/Classes/**/*'
 
   s.frameworks = 'Foundation', 'AdSupport', 'UIKit'
-  s.dependency "AWSKinesis", "~> 2.12.1"
+  s.dependency "AWSKinesis", ">= 2.6.0"
 end

@@ -1,12 +1,12 @@
 PODS:
-  - Adapty (0.1.0):
-    - AWSKinesis (~> 2.12.1)
+  - Adapty (0.1.1):
+    - AWSKinesis (>= 2.6.0)
   - Adjust (4.18.3):
     - Adjust/Core (= 4.18.3)
   - Adjust/Core (4.18.3)
-  - AWSCore (2.12.1)
-  - AWSKinesis (2.12.1):
-    - AWSCore (= 2.12.1)
+  - AWSCore (2.12.2)
+  - AWSKinesis (2.12.2):
+    - AWSCore (= 2.12.2)
 
 DEPENDENCIES:
   - Adapty (from `../`)
@@ -23,10 +23,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Adapty: 3f677ec4a2189805c8830b53d6bf72c2c467b78d
+  Adapty: 6a6775618b05ffd38a6f9b779cd1fdb50ff1d52c
   Adjust: fef133f0bf610d439953b50306372c68c625d7e9
-  AWSCore: 0a4431f74d9dbf084d420b887a6a21042b423c5c
-  AWSKinesis: 4e2100c2b829af18c3f5beb72c73dab35611fc37
+  AWSCore: bdc0933bcb1aca4a9af3352a9e6ec75b339faf71
+  AWSKinesis: 3763e8fbb791ae7ade9764fad5137283a826dc6a
 
 PODFILE CHECKSUM: b6d590b844a4f762c78d3a5084548262263f6bdf
 
