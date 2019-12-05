@@ -13,7 +13,7 @@ import AWSCore
 
 public class Adapty {
     
-    public static let shared = Adapty()
+    private static let shared = Adapty()
     private var profile: ProfileModel? = DefaultsManager.shared.profile {
         didSet {
             DefaultsManager.shared.profile = profile
@@ -24,7 +24,9 @@ public class Adapty {
             DefaultsManager.shared.installation = installation
         }
     }
-    private var apiManager: ApiManager!
+    private lazy var apiManager: ApiManager = {
+        return ApiManager()
+    }()
     private lazy var kinesisManager: KinesisManager = {
         guard let installation = installation else {
             return KinesisManager(identityPoolId: Constants.Kinesis.identityPoolId, region: Constants.Kinesis.region, identityId: "", cognitoToken: "", streamName: Constants.Kinesis.streamName)
@@ -41,8 +43,6 @@ public class Adapty {
     }
     
     private func configure() {
-        apiManager = ApiManager()
-
         if profile == nil {
             // didn't find existing profile, create a new one
             createProfile()
@@ -81,7 +81,7 @@ public class Adapty {
         }
     }
     
-    public func updateProfile(
+    public class func updateProfile(
         customerUserId: String? = nil,
         email: String? = nil,
         phoneNumber: String? = nil,
@@ -92,7 +92,7 @@ public class Adapty {
         birthday: Date? = nil,
         completion: ErrorCompletion? = nil)
     {
-        guard let profileId = profile?.profileId else {
+        guard let profileId = shared.profile?.profileId else {
             completion?(NetworkResponse.missingRequiredParams)
             return
         }
@@ -107,12 +107,12 @@ public class Adapty {
         if let lastName = lastName { params["last_name"] = lastName }
         if let gender = gender { params["gender"] = gender }
         if let birthday = birthday { params["birthday"] = birthday.stringValue }
-        if let idfa = idfa { params["idfa"] = idfa }
+        if let idfa = shared.idfa { params["idfa"] = idfa }
         
-        apiManager.updateProfile(id: profileId, params: params) { (profile, error) in
+        shared.apiManager.updateProfile(id: profileId, params: params) { (profile, error) in
             if let profile = profile {
                 // do not overwrite in case of error
-                self.profile = profile
+                shared.profile = profile
             }
             completion?(error)
         }
@@ -150,17 +150,17 @@ public class Adapty {
         }
     }
     
-    public func validateReceipt(_ receiptEncoded: String, completion: @escaping JSONCompletion) {
-        guard let id = profile?.profileId else {
+    public class func validateReceipt(_ receiptEncoded: String, completion: @escaping JSONCompletion) {
+        guard let id = shared.profile?.profileId else {
             completion(nil, NetworkResponse.missingRequiredParams)
             return
         }
         
-        apiManager.validateReceipt(params: ["profile_id": id, "receipt_encoded": receiptEncoded], completion: completion)
+        shared.apiManager.validateReceipt(params: ["profile_id": id, "receipt_encoded": receiptEncoded], completion: completion)
     }
     
-    public func updateAdjustAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
-        guard let profileId = profile?.profileId, let installationMetaId = installation?.profileInstallationMetaId else {
+    public class func updateAdjustAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
+        guard let profileId = shared.profile?.profileId, let installationMetaId = shared.installation?.profileInstallationMetaId else {
             completion?(NetworkResponse.missingRequiredParams)
             return
         }
@@ -178,27 +178,27 @@ public class Adapty {
         if let clickLabel = attribution?.value(forKey: "clickLabel") { params["attribution_click_label"] = clickLabel }
         if let adid = attribution?.value(forKey: "adid") { params["attribution_adid"] = adid }
         
-        apiManager.syncInstallation(params: params) { (installation, error) in
+        shared.apiManager.syncInstallation(params: params) { (installation, error) in
             if let installation = installation {
                 // do not overwrite in case of error
-                self.installation = installation
+                shared.installation = installation
             }
             completion?(error)
         }
     }
     
-    public var customerUserId: String? {
-        return profile?.customerUserId
+    public class var customerUserId: String? {
+        return shared.profile?.customerUserId
     }
     
-    public func logout() {
-        invalidateLiveTrackerTimer()
-        profile = nil
-        installation = nil
+    public class func logout() {
+        shared.invalidateLiveTrackerTimer()
+        shared.profile = nil
+        shared.installation = nil
         DefaultsManager.shared.clean()
         
         // automatically create new profile
-        createProfile()
+        shared.createProfile()
     }
     
     //MARK: - Sessions
