@@ -84,6 +84,18 @@ Adapty.shared.validateReceipt("<receiptEncoded>") { (response, error) in
 
 **`receiptEncoded`** is required and can't be empty.
 
+### Method swizzling in Adapty
+
+The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag AdaptyAppDelegateProxyEnabled in the app’s Info.plist file and setting it to NO (boolean value).
+
+If you have disabled method swizzling, you'll need to explicitly send your APNs to Adapty. Override the methods didRegisterForRemoteNotificationsWithDeviceToken to retrieve the APNs token, and then set Adapty's apnsToken property:
+
+```Swift
+func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+    Adapty.apnsToken = deviceToken
+}
+```
+
 ## License
 
 Adapty is available under the GNU license. [See LICENSE](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.

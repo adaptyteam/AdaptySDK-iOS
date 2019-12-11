@@ -43,6 +43,8 @@ public class Adapty {
     }
     
     private func configure() {
+        AppDelegateSwizzler.startSwizzlingIfPossible(self)
+        
         if profile == nil {
             // didn't find existing profile, create a new one
             createProfile()
@@ -138,6 +140,7 @@ public class Adapty {
         params["platform"] = platform
         params["timezone"] = timezone
         if let deviceIdentifier = deviceIdentifier { params["device_identifier"] = deviceIdentifier }
+        if let apnsTokenString = apnsTokenString { params["device_token"] = apnsTokenString }
         
         #warning("Handle Adjust params")
         
@@ -184,6 +187,18 @@ public class Adapty {
                 shared.installation = installation
             }
             completion?(error)
+        }
+    }
+    
+    public static var apnsToken: Data? {
+        didSet {
+            shared.apnsTokenString = apnsToken?.map { String(format: "%02.2hhx", $0) }.joined()
+        }
+    }
+    
+    private var apnsTokenString: String? {
+        didSet {
+            syncInstallation()
         }
     }
     
@@ -249,6 +264,18 @@ public class Adapty {
             }
         }
     }
+    
+}
+
+extension Adapty: AppDelegateSwizzlerDelegate {
+    
+    func didReceiveAPNSToken(_ deviceToken: Data) {
+        Self.apnsToken = deviceToken
+    }
+    
+}
+
+private extension Adapty {
     
     //MARK: - Helpers
     

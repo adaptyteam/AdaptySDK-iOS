@@ -29,4 +29,8 @@ struct Constants {
     struct Versions {
         static let SDKBuild = 1
     }
+    
+    struct BundleKeys {
+        static let appDelegateProxyEnabled = "AdaptyAppDelegateProxyEnabled"
+    }
 }
