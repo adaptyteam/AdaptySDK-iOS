@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import AWSCore
 
 struct Constants {
     struct APIKeys {
@@ -17,13 +16,18 @@ struct Constants {
 
     struct Kinesis {
         static let streamName = "adapty-sdk-test"
-        static let identityPoolId = "us-east-1:f479318d-b226-417d-982a-18f9d87c7f8a"
-        static let region = AWSRegionType.USEast1
+        static let region = "us-east-1"
+        static let hmacShaTypeString = "AWS4-HMAC-SHA256"
+        static let serviceType = "kinesis"
+        static let aws4Request = "aws4_request"
+        static let amzTarget = "Kinesis_20131202.PutRecords"
+        static let contentType = "application/x-amz-json-1.1"
     }
     
     struct UserDefaults {
         static let profile = "AdaptySDK_Profile"
         static let installation = "AdaptySDK_Installation"
+        static let cachedEvents = "AdaptySDK_Cached_Events"
     }
     
     struct Versions {

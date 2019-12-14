@@ -40,25 +40,38 @@ class RequestManager {
     
     @discardableResult
     class func request<T: JSONCodable>(router: Router, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
+
         do {
             let urlRequest = try router.asURLRequest()
-            let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-                DispatchQueue.main.async {
-                    self.handleResponseFor(router, data: data, response: response, error: error, completion: completion)
-                }
-            }
-            
-            dataTask.resume()
-            
-            return dataTask
+            return request(urlRequest: urlRequest, router: router, completion: completion)
         } catch {
             completion(.failure(error), nil)
         }
         
         return nil
     }
+
+    @discardableResult
+    class func request<T: JSONCodable>(urlRequest: URLRequest, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
+
+        return request(urlRequest: urlRequest, router: nil, completion: completion)
+    }
+
+    @discardableResult
+    private class func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
+
+        let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            DispatchQueue.main.async {
+                self.handleResponse(data: data, response: response, error: error, router: router, completion: completion)
+            }
+        }
+
+        dataTask.resume()
+
+        return dataTask
+    }
     
-    private class func handleResponseFor<T: JSONCodable>(_ router: Router, data: Data?, response: URLResponse?, error: Error?, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) {
+    private class func handleResponse<T: JSONCodable>(data: Data?, response: URLResponse?, error: Error?, router: Router?, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) {
         if let error = error {
             completion(.failure(error), nil)
             return
@@ -90,7 +103,7 @@ class RequestManager {
             }
             
             #warning("Think of better way to handle keyPaths")
-            if let keyPath = router.keyPath {
+            if let keyPath = router?.keyPath {
                 let statusModel = try ResponseStatusModel(json: json)
                 if statusModel?.status == .failure {
                     completion(.failure(NetworkResponse.statusError), nil)

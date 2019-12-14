@@ -14,28 +14,6 @@
 		</dict>
 		<dict>
 			<key>FooterText</key>
-			<string>The AWS Mobile SDK for iOS is generally licensed under the Apache 2.0 License, with the AWSLex/Bluefront folder under the AWS Customer Agreement (https://aws.amazon.com/agreement/ ). 
-</string>
-			<key>License</key>
-			<string>Apache License, Version 2.0</string>
-			<key>Title</key>
-			<string>AWSCore</string>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-		</dict>
-		<dict>
-			<key>FooterText</key>
-			<string>The AWS Mobile SDK for iOS is generally licensed under the Apache 2.0 License, with the AWSLex/Bluefront folder under the AWS Customer Agreement (https://aws.amazon.com/agreement/ ). 
-</string>
-			<key>License</key>
-			<string>Apache License, Version 2.0</string>
-			<key>Title</key>
-			<string>AWSKinesis</string>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-		</dict>
-		<dict>
-			<key>FooterText</key>
 			<string>                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
@@ -746,6 +724,27 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			<string>MIT</string>
 			<key>Title</key>
 			<string>Adjust</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>FooterText</key>
+			<string>Copyright (C) 2014-2017 Marcin Krzyżanowski &lt;marcin.krzyzanowski@gmail.com&gt;
+This software is provided 'as-is', without any express or implied warranty.
+
+In no event will the authors be held liable for any damages arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+
+- The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation is required.
+- Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+- This notice may not be removed or altered from any source or binary distribution.
+- Redistributions of any form whatsoever must retain the following acknowledgment: 'This product includes software developed by the "Marcin Krzyzanowski" (http://krzyzanowskim.com/).'
+</string>
+			<key>License</key>
+			<string>Attribution</string>
+			<key>Title</key>
+			<string>CryptoSwift</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>

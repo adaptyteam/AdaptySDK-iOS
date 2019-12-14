@@ -7,8 +7,7 @@
 //
 
 import Foundation
-import AWSCore
-import AWSKinesis
+import CryptoSwift
 
 enum EventType: String {
     case live = "live"
@@ -16,29 +15,21 @@ enum EventType: String {
 
 class KinesisManager {
 
-    let streamName: String
-    let sessionID = UUID().uuidString
+    private let sessionID = UUID().uuidString
 
-    init(identityPoolId: String, region: AWSRegionType, identityId: String, cognitoToken: String, streamName: String) {
-        let provider = CognitoProvider(regionType: region, identityPoolId: identityPoolId, useEnhancedFlow: true, identityProviderManager: nil, token: cognitoToken, identityId: identityId)
-        let credentialsProvider = AWSCognitoCredentialsProvider(regionType: region, identityProvider: provider)
-        let configuration = AWSServiceConfiguration(region: region, credentialsProvider: credentialsProvider)
-        AWSServiceManager.default().defaultServiceConfiguration = configuration
-
-        let kinesisRecorder = AWSKinesisRecorder.default()
-        kinesisRecorder.diskAgeLimit = TimeInterval(30 * 24 * 60 * 60); // 30 days
-        kinesisRecorder.diskByteLimit = UInt(10 * 1024 * 1024); // 10MB
-        kinesisRecorder.notificationByteThreshold = UInt(5 * 1024 * 1024); // 5MB
-
-        self.streamName = streamName
+    private var cachedEvents: [[String: String]] {
+        get {
+            return DefaultsManager.shared.cachedEvents
+        }
+        set {
+            DefaultsManager.shared.cachedEvents = newValue
+        }
     }
 
-    func trackEvent(_ eventType: EventType, profileID: String, profileInstallationMetaID: String, completion: ((Error?) -> Void)? = nil) {
+    func trackEvent(_ eventType: EventType, profileID: String, profileInstallationMetaID: String, secretSigningKey: String, accessKeyId: String, sessionToken: String, completion: ((Error?) -> Void)? = nil) {
 
-        let kinesisRecorder = AWSKinesisRecorder.default()
-
+        // Event parameters
         var eventParams = [String: String]()
-
         eventParams["event_name"] = eventType.rawValue
         eventParams["event_id"] = UUID().uuidString
         eventParams["profile_id"] = profileID
@@ -46,35 +37,110 @@ class KinesisManager {
         eventParams["session_id"] = sessionID
         eventParams["created_at"] = Date().description
 
-        let eventData = try! JSONEncoder().encode(eventParams)
+        cachedEvents.append(eventParams)
 
-        kinesisRecorder.saveRecord(eventData, streamName: streamName, partitionKey: profileInstallationMetaID)?.continueOnSuccessWith(block: { task -> Any? in
-            return kinesisRecorder.submitAllRecords()
-        }).continueWith(block: { task -> Any? in
-            completion?(task.error)
-            return nil
-        })
+        syncEvents(profileInstallationMetaID: profileInstallationMetaID, secretSigningKey: secretSigningKey, accessKeyId: accessKeyId, sessionToken: sessionToken, completion: completion)
     }
-    
+
+    private func syncEvents(profileInstallationMetaID: String, secretSigningKey: String, accessKeyId: String, sessionToken: String, completion: ((Error?) -> Void)? = nil) {
+
+        let currentCachedEvents = cachedEvents
+
+        let eventsDataBase64 = currentCachedEvents.map { try! JSONEncoder().encode($0).base64EncodedString() }
+
+        // Kinesis request parameters
+        var requestParams = [String: Any]()
+        let kinesisRecords = eventsDataBase64.map { ["Data": $0, "PartitionKey": profileInstallationMetaID] }
+        requestParams["Records"] = kinesisRecords
+        requestParams["StreamName"] = Constants.Kinesis.streamName
+
+        var urlRequest = try! Router.trackEvent(params: requestParams).asURLRequest()
+
+        urlRequest = KinesisManager.sign(request: urlRequest, secretSigningKey: secretSigningKey, accessKeyId: accessKeyId, sessionToken: sessionToken)!
+
+        RequestManager.request(urlRequest: urlRequest) { (result: Result<JSONModel, Error>, response) in
+            switch result {
+            case .success:
+                let updatedCachedEvents = Set(self.cachedEvents).subtracting(currentCachedEvents)
+                self.cachedEvents = Array(updatedCachedEvents)
+            case .failure: break
+            }
+        }
+    }
 }
 
-class CognitoProvider: AWSCognitoCredentialsProviderHelper {
+private extension KinesisManager {
     
-    var token: String?
+    private static let iso8601DateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyyMMdd'T'HHmmssXXXXX"
+        return formatter
+    }()
     
-    init(regionType: AWSRegionType, identityPoolId: String, useEnhancedFlow: Bool, identityProviderManager: AWSIdentityProviderManager?, token: String, identityId: String) {
-        super.init(regionType: regionType, identityPoolId: identityPoolId, useEnhancedFlow: useEnhancedFlow, identityProviderManager: identityProviderManager)
-        
-        self.token = token
-        self.identityId = identityId
+    private static func iso8601Date() -> (full: String, short: String) {
+        let date = iso8601DateFormatter.string(from: Date())
+        let index = date.index(date.startIndex, offsetBy: 8)
+        let shortDate = String(date[..<index])
+        return (full: date, short: shortDate)
     }
     
-    override func logins() -> AWSTask<NSDictionary> {
-        if let token = token {
-            return AWSTask(result: [AWSIdentityProviderAmazonCognitoIdentity: token])
+    private static func hmacStringToSign(stringToSign: String, secretSigningKey: String, shortDateString: String) -> String? {
+        let k1 = "AWS4" + secretSigningKey
+        guard let sk1 = try? HMAC(key: [UInt8](k1.utf8), variant: .sha256).authenticate([UInt8](shortDateString.utf8)),
+            let sk2 = try? HMAC(key: sk1, variant: .sha256).authenticate([UInt8](Constants.Kinesis.region.utf8)),
+            let sk3 = try? HMAC(key: sk2, variant: .sha256).authenticate([UInt8](Constants.Kinesis.serviceType.utf8)),
+            let sk4 = try? HMAC(key: sk3, variant: .sha256).authenticate([UInt8](Constants.Kinesis.aws4Request.utf8)),
+            let signature = try? HMAC(key: sk4, variant: .sha256).authenticate([UInt8](stringToSign.utf8)) else { return .none }
+        return signature.toHexString()
+    }
+    
+    private static func sign(request: URLRequest, secretSigningKey: String, accessKeyId: String, sessionToken: String) -> URLRequest? {
+
+        var signedRequest = request
+        let date = iso8601Date()
+        var body: String = ""
+        if let httpBody = signedRequest.httpBody, let stringBody = String(data: httpBody, encoding: .utf8) {
+            body = stringBody
         }
+
+        guard let url = signedRequest.url, let host = url.host else { return .none }
         
-        return AWSTask(error:NSError(domain: "Cognito Login", code: -1 , userInfo: ["Cognito" : "No current Congito access token"]))
+        signedRequest.setValue(sessionToken, forHTTPHeaderField: "X-Amz-Security-Token")
+        signedRequest.setValue(host, forHTTPHeaderField: "Host")
+        signedRequest.setValue(date.full, forHTTPHeaderField: "X-Amz-Date")
+        signedRequest.setValue(Constants.Kinesis.amzTarget, forHTTPHeaderField: "X-Amz-Target")
+        signedRequest.setValue(Constants.Kinesis.contentType, forHTTPHeaderField: "Content-Type")
+
+        // ************* TASK 1: CREATE A CANONICAL REQUEST *************
+
+        guard let headers = signedRequest.allHTTPHeaderFields, let method = signedRequest.httpMethod
+            else { return .none }
+        
+        let signedHeaders = headers.map{ $0.key.lowercased() }.sorted().joined(separator: ";")
+        let canonicalPath = url.path.isEmpty ? "/" : url.path
+        let canonicalQuery = url.query ?? ""
+        let canonicalHeaders = headers.map{ $0.key.lowercased() + ":" + $0.value }.sorted().joined(separator: "\n")
+        let canonicalRequest = [method, canonicalPath, canonicalQuery, canonicalHeaders, "", signedHeaders, body.sha256()].joined(separator: "\n")
+
+        // ************* TASK 2: CREATE THE STRING TO SIGN *************
+
+        let credential = [date.short, Constants.Kinesis.region, Constants.Kinesis.serviceType, Constants.Kinesis.aws4Request].joined(separator: "/")
+
+        let stringToSign = [Constants.Kinesis.hmacShaTypeString, date.full, credential, canonicalRequest.sha256()].joined(separator: "\n")
+
+        // ************* TASK 3: CALCULATE THE SIGNATURE *************
+        
+        guard let signature = hmacStringToSign(stringToSign: stringToSign, secretSigningKey: secretSigningKey, shortDateString: date.short)
+            else { return .none }
+
+        // ************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
+
+        let authorization = Constants.Kinesis.hmacShaTypeString + " Credential=" + accessKeyId + "/" + credential + ", SignedHeaders=" + signedHeaders + ", Signature=" + signature
+        signedRequest.addValue(authorization, forHTTPHeaderField: "Authorization")
+        
+        return signedRequest
     }
-    
 }

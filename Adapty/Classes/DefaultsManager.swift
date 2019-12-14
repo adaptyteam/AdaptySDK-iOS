@@ -42,6 +42,16 @@ class DefaultsManager {
             defaults.set(data, forKey: Constants.UserDefaults.installation)
         }
     }
+
+    var cachedEvents: [[String: String]] {
+        get {
+            let events = defaults.array(forKey: Constants.UserDefaults.cachedEvents) as? [[String: String]]
+            return events ?? []
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.cachedEvents)
+        }
+    }
     
     func clean() {
         let appDomain = Bundle.main.bundleIdentifier!

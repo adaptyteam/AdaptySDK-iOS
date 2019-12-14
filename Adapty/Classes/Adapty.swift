@@ -9,7 +9,6 @@
 import Foundation
 import AdSupport
 import UIKit
-import AWSCore
 
 public class Adapty {
     
@@ -28,11 +27,7 @@ public class Adapty {
         return ApiManager()
     }()
     private lazy var kinesisManager: KinesisManager = {
-        guard let installation = installation else {
-            return KinesisManager(identityPoolId: Constants.Kinesis.identityPoolId, region: Constants.Kinesis.region, identityId: "", cognitoToken: "", streamName: Constants.Kinesis.streamName)
-        }
-        
-        return KinesisManager(identityPoolId: Constants.Kinesis.identityPoolId, region: Constants.Kinesis.region, identityId: installation.cognitoId, cognitoToken: installation.cognitoToken, streamName: Constants.Kinesis.streamName)
+        return KinesisManager()
     }()
     
     private init() { }
@@ -238,12 +233,18 @@ public class Adapty {
     }
     
     private func trackLiveEvent(completion: ((Error?) -> Void)? = nil) {
-        guard let profileId = profile?.profileId, let profileInstallationMetaId = installation?.profileInstallationMetaId else {
+        guard let profileId = profile?.profileId, let installation = installation else {
             completion?(NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid profileId or profileInstallationMetaId"]))
             return
         }
         
-        kinesisManager.trackEvent(.live, profileID: profileId, profileInstallationMetaID: profileInstallationMetaId, completion: completion)
+        kinesisManager.trackEvent(.live,
+                                  profileID: profileId,
+                                  profileInstallationMetaID: installation.profileInstallationMetaId,
+                                  secretSigningKey: installation.iamSecretKey,
+                                  accessKeyId: installation.iamAccessKeyId,
+                                  sessionToken: installation.iamSessionToken,
+                                  completion: completion)
     }
     
     private func trackLiveEventInBackground() {

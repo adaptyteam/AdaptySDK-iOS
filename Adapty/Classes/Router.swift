@@ -14,24 +14,36 @@ enum Router {
     case updateProfile(id: String, params: Parameters)
     case syncInstallation(params: Parameters)
     case validateReceipt(params: Parameters)
+    case trackEvent(params: Parameters)
     
     var scheme: String {
         return "https"
     }
     
     var host: String {
-        return "api-dev.adapty.io/api"
+        switch self {
+        case .trackEvent:
+            return "kinesis.us-east-1.amazonaws.com"
+        default:
+            return "api-dev.adapty.io/api"
+        }
     }
     
     var stage: String {
-        return "v1"
+        switch self {
+        case .trackEvent:
+            return ""
+        default:
+            return "/v1"
+        }
     }
     
     var method: HTTPMethod {
         switch self {
         case .createProfile,
              .syncInstallation,
-             .validateReceipt:
+             .validateReceipt,
+             .trackEvent:
             return .post
         case .updateProfile:
             return .patch
@@ -48,6 +60,8 @@ enum Router {
             return "/sdk/analytics/profile/installation/meta/sync/"
         case .validateReceipt:
             return "/sdk/in-apps/apple/validate/"
+        case .trackEvent:
+            return ""
         }
     }
     
@@ -59,10 +73,24 @@ enum Router {
             return "data"
         }
     }
+
+    var authorizationHeader: (key: String, value: String)? {
+        switch self {
+        case .trackEvent:
+            return nil
+        default:
+            return ("Authorization", "Api-Key \(Constants.APIKeys.secretKey)")
+        }
+    }
     
     func asURLRequest() throws -> URLRequest {
-        var request = URLRequest(url: URL(string: "\(scheme)://\(host)/\(stage)\(path)")!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10.0)
-        request.setValue("Api-Key \(Constants.APIKeys.secretKey)", forHTTPHeaderField: "Authorization")
+
+        var request = URLRequest(url: URL(string: "\(scheme)://\(host)\(stage)\(path)")!,
+                                 cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
+                                 timeoutInterval: 10.0)
+        if let authorizationHeader = authorizationHeader {
+            request.setValue(authorizationHeader.value, forHTTPHeaderField: authorizationHeader.key)
+        }
         request.httpMethod = method.rawValue
         
         var requestParams: Parameters = [:]
@@ -71,7 +99,8 @@ enum Router {
         case .createProfile(let params),
              .updateProfile(_, let params),
              .syncInstallation(let params),
-             .validateReceipt(let params):
+             .validateReceipt(let params),
+             .trackEvent(let params):
             requestParams = params
         }
         

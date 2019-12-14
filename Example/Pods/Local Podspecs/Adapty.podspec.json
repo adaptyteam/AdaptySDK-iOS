@@ -1,6 +1,6 @@
 {
   "name": "Adapty",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "summary": "Adapty SDK for iOS.",
   "description": "Win back churned subscribers in your iOS app.\nAdapty helps you track business metrics, and lets you run ad campaigns targeted at churned users faster",
   "homepage": "https://adapty.io/",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/adaptyteam/AdaptySDK-iOS.git",
-    "tag": "0.1.1"
+    "tag": "0.1.2"
   },
   "platforms": {
     "ios": "12.0"
@@ -29,8 +29,8 @@
     "UIKit"
   ],
   "dependencies": {
-    "AWSKinesis": [
-      ">= 2.6.0"
+    "CryptoSwift": [
+
     ]
   },
   "swift_version": "5.1"
