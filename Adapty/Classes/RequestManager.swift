@@ -141,9 +141,9 @@ class RequestManager {
     }
     
     private class func logJSON(_ data: Data?) {
-        if let data = data, let jsonString = String(data: data, encoding: .utf8) {
-            print("Response : \(jsonString)")
-        }
+//        if let data = data, let jsonString = String(data: data, encoding: .utf8) {
+//            print("Response : \(jsonString)")
+//        }
     }
     
 }
