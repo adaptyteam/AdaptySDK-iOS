@@ -10,7 +10,7 @@ import Foundation
 import AdSupport
 import UIKit
 
-public class Adapty {
+@objc public class Adapty: NSObject {
     
     private static let shared = Adapty()
     private var profile: ProfileModel? = DefaultsManager.shared.profile {
@@ -30,9 +30,11 @@ public class Adapty {
         return KinesisManager()
     }()
     
-    private init() { }
+    override private init() {
+        super.init()
+    }
     
-    public class func activate(_ apiKey: String) {
+    @objc public class func activate(_ apiKey: String) {
         Constants.APIKeys.secretKey = apiKey
         shared.configure()
     }
@@ -78,7 +80,7 @@ public class Adapty {
         }
     }
     
-    public class func updateProfile(
+    @objc public class func updateProfile(
         customerUserId: String? = nil,
         email: String? = nil,
         phoneNumber: String? = nil,
@@ -148,7 +150,7 @@ public class Adapty {
         }
     }
     
-    public class func validateReceipt(_ receiptEncoded: String, completion: @escaping JSONCompletion) {
+    @objc public class func validateReceipt(_ receiptEncoded: String, completion: @escaping JSONCompletion) {
         guard let id = shared.profile?.profileId else {
             completion(nil, NetworkResponse.missingRequiredParams)
             return
@@ -157,7 +159,7 @@ public class Adapty {
         shared.apiManager.validateReceipt(params: ["profile_id": id, "receipt_encoded": receiptEncoded], completion: completion)
     }
     
-    public class func updateAdjustAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
+    @objc public class func updateAdjustAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
         guard let profileId = shared.profile?.profileId, let installationMetaId = shared.installation?.profileInstallationMetaId else {
             completion?(NetworkResponse.missingRequiredParams)
             return
@@ -185,7 +187,7 @@ public class Adapty {
         }
     }
     
-    public static var apnsToken: Data? {
+    @objc public static var apnsToken: Data? {
         didSet {
             shared.apnsTokenString = apnsToken?.map { String(format: "%02.2hhx", $0) }.joined()
         }
@@ -197,11 +199,11 @@ public class Adapty {
         }
     }
     
-    public class var customerUserId: String? {
+    @objc public class var customerUserId: String? {
         return shared.profile?.customerUserId
     }
     
-    public class func logout() {
+    @objc public class func logout() {
         shared.invalidateLiveTrackerTimer()
         shared.profile = nil
         shared.installation = nil
