@@ -13,6 +13,11 @@ struct Constants {
         // ApiKey will be replaced during SDK active method
         static var secretKey = ""
     }
+    
+    struct Headers {
+        static let authorization = "Authorization"
+        static let profileId = "ADAPTY-SDK-PROFILE-ID"
+    }
 
     struct Kinesis {
         static let streamName = "adapty-sdk-test"
@@ -28,6 +33,7 @@ struct Constants {
         static let profile = "AdaptySDK_Profile"
         static let installation = "AdaptySDK_Installation"
         static let cachedEvents = "AdaptySDK_Cached_Events"
+        static let cachedTransactionsIds = "AdaptySDK_Cached_Transactions_Ids"
     }
     
     struct Versions {

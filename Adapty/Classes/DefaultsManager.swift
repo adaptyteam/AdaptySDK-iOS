@@ -45,11 +45,19 @@ class DefaultsManager {
 
     var cachedEvents: [[String: String]] {
         get {
-            let events = defaults.array(forKey: Constants.UserDefaults.cachedEvents) as? [[String: String]]
-            return events ?? []
+            return defaults.array(forKey: Constants.UserDefaults.cachedEvents) as? [[String: String]] ?? []
         }
         set {
             defaults.set(newValue, forKey: Constants.UserDefaults.cachedEvents)
+        }
+    }
+    
+    var cachedTransactionsIds: [String: String] {
+        get {
+            return defaults.dictionary(forKey: Constants.UserDefaults.cachedTransactionsIds) as? [String: String] ?? [:]
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.cachedTransactionsIds)
         }
     }
     

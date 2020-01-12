@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import AdSupport
 import UIKit
 
 @objc public class Adapty: NSObject {
@@ -24,10 +23,13 @@ import UIKit
         }
     }
     private lazy var apiManager: ApiManager = {
-        return ApiManager()
+        return ApiManager.shared
     }()
-    private lazy var kinesisManager: KinesisManager = {
-        return KinesisManager()
+    private lazy var sessionsManager: SessionsManager = {
+        return SessionsManager()
+    }()
+    private lazy var iapManager: IAPManager = {
+        return IAPManager()
     }()
     
     override private init() {
@@ -42,20 +44,33 @@ import UIKit
     private func configure() {
         AppDelegateSwizzler.startSwizzlingIfPossible(self)
         
+        iapManager.startObservingPurchases()
+        
         if profile == nil {
-            // didn't find existing profile, create a new one
+            // didn't find existing profile, create a new one and perform initial requests right after
             createProfile()
         } else {
-            // sync installation data and receive cognito credentials
-            syncInstallation { _, _ in
-                self.startTrackingLiveEvent()
-            }
+            // already have a profile, just perform initial requests
+            performInitialRequests()
         }
         
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
-            self?.trackLiveEventInBackground()
+            self?.sessionsManager.trackLiveEventInBackground()
         }
     }
+    
+    private func performInitialRequests() {
+        // sync installation data and receive cognito credentials
+        syncInstallation { _, _ in
+            // start live tracking
+            self.sessionsManager.startTrackingLiveEvent()
+        }
+        
+        // sync latest receipt to server and obtain eligibility criteria for introductory and promotional offers
+        syncTransactionsHistory()
+    }
+    
+    //MARK: - REST
     
     private func createProfile(_ completion: ErrorCompletion? = nil) {
         if profile != nil {
@@ -65,17 +80,15 @@ import UIKit
         
         var params = Parameters()
         
-        if let idfa = idfa { params["idfa"] = idfa }
-        params["profile_id"] = uuid
+        if let idfa = UserProperties.idfa { params["idfa"] = idfa }
+        params["profile_id"] = UserProperties.staticUuid
         
         apiManager.createProfile(params: params) { (profile, error, isNew) in
             self.profile = profile
             completion?(error)
             
             if error == nil {
-                self.syncInstallation { _, _ in
-                    self.startTrackingLiveEvent()
-                }
+                self.performInitialRequests()
             }
         }
     }
@@ -106,7 +119,7 @@ import UIKit
         if let lastName = lastName { params["last_name"] = lastName }
         if let gender = gender { params["gender"] = gender }
         if let birthday = birthday { params["birthday"] = birthday.stringValue }
-        if let idfa = shared.idfa { params["idfa"] = idfa }
+        if let idfa = UserProperties.idfa { params["idfa"] = idfa }
         
         shared.apiManager.updateProfile(id: profileId, params: params) { (profile, error) in
             if let profile = profile {
@@ -126,17 +139,17 @@ import UIKit
         var params = Parameters()
         
         params["profile_id"] = profileId
-        params["profile_installation_meta_id"] = installation?.profileInstallationMetaId ?? uuid
-        if let sdkVersion = sdkVersion { params["adapty_sdk_version"] = sdkVersion }
-        params["adapty_sdk_version_build"] = sdkVersionBuild
-        if let appBuild = appBuild { params["app_build"] = appBuild }
-        if let appVersion = appVersion { params["app_version"] = appVersion }
-        params["device"] = device
-        params["locale"] = locale
-        params["os"] = OS
-        params["platform"] = platform
-        params["timezone"] = timezone
-        if let deviceIdentifier = deviceIdentifier { params["device_identifier"] = deviceIdentifier }
+        params["profile_installation_meta_id"] = installation?.profileInstallationMetaId ?? UserProperties.uuid
+        if let sdkVersion = UserProperties.sdkVersion { params["adapty_sdk_version"] = sdkVersion }
+        params["adapty_sdk_version_build"] = UserProperties.sdkVersionBuild
+        if let appBuild = UserProperties.appBuild { params["app_build"] = appBuild }
+        if let appVersion = UserProperties.appVersion { params["app_version"] = appVersion }
+        params["device"] = UserProperties.device
+        params["locale"] = UserProperties.locale
+        params["os"] = UserProperties.OS
+        params["platform"] = UserProperties.platform
+        params["timezone"] = UserProperties.timezone
+        if let deviceIdentifier = UserProperties.deviceIdentifier { params["device_identifier"] = deviceIdentifier }
         if let apnsTokenString = apnsTokenString { params["device_token"] = apnsTokenString }
         
         #warning("Handle Adjust params")
@@ -148,15 +161,6 @@ import UIKit
             }
             completion?(installation, error)
         }
-    }
-    
-    @objc public class func validateReceipt(_ receiptEncoded: String, completion: @escaping JSONCompletion) {
-        guard let id = shared.profile?.profileId else {
-            completion(nil, NetworkResponse.missingRequiredParams)
-            return
-        }
-        
-        shared.apiManager.validateReceipt(params: ["profile_id": id, "receipt_encoded": receiptEncoded], completion: completion)
     }
     
     @objc public class func updateAdjustAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
@@ -187,6 +191,33 @@ import UIKit
         }
     }
     
+    @objc public class func getPurchaseContainers(_ completion: @escaping PurchaseContainersCompletion) {
+        shared.iapManager.getPurchaseContainers(completion)
+    }
+    
+    @objc public class func makePurchase(product: ProductModel, offerId: String? = nil, completion: @escaping BuyProductCompletion) {
+        shared.iapManager.makePurchase(product: product, offerId: offerId, completion: completion)
+    }
+    
+    @objc public class func restorePurchases(completion: @escaping ErrorCompletion) {
+        shared.iapManager.restorePurchases(completion)
+    }
+    
+    @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping JSONCompletion) {
+        guard let id = shared.profile?.profileId else {
+            completion(nil, NetworkResponse.missingRequiredParams)
+            return
+        }
+        
+        var params = ["profile_id": id, "receipt_encoded": receiptEncoded]
+        if let variationId = variationId { params["variation_id"] = variationId }
+        if let originalPrice = originalPrice { params["original_price"] = originalPrice.stringValue }
+        if let discountPrice = discountPrice { params["discount_price"] = discountPrice.stringValue }
+        if let priceLocale = priceLocale { params["price_locale"] = priceLocale.currencyCode }
+        
+        shared.apiManager.validateReceipt(params: params, completion: completion)
+    }
+    
     @objc public static var apnsToken: Data? {
         didSet {
             shared.apnsTokenString = apnsToken?.map { String(format: "%02.2hhx", $0) }.joined()
@@ -203,8 +234,18 @@ import UIKit
         return shared.profile?.customerUserId
     }
     
+    private func syncTransactionsHistory() {
+        guard let receipt = iapManager.latestReceipt else {
+            return
+        }
+        
+        Self.validateReceipt(receipt) { _,_  in
+#warning("sync eligibility criteria for user")
+        }
+    }
+    
     @objc public class func logout() {
-        shared.invalidateLiveTrackerTimer()
+        shared.sessionsManager.invalidateLiveTrackerTimer()
         shared.profile = nil
         shared.installation = nil
         DefaultsManager.shared.clean()
@@ -213,127 +254,12 @@ import UIKit
         shared.createProfile()
     }
     
-    //MARK: - Sessions
-    
-    private var liveTrackerTimer: Timer?
-    
-    private func startTrackingLiveEvent() {
-        guard liveTrackerTimer == nil else {
-            return
-        }
-        
-        trackLiveEvent()
-        
-        liveTrackerTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] (_) in
-            self?.trackLiveEvent()
-        }
-    }
-    
-    private func invalidateLiveTrackerTimer() {
-        liveTrackerTimer?.invalidate()
-        liveTrackerTimer = nil
-    }
-    
-    private func trackLiveEvent(completion: ((Error?) -> Void)? = nil) {
-        guard let profileId = profile?.profileId, let installation = installation else {
-            completion?(NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid profileId or profileInstallationMetaId"]))
-            return
-        }
-        
-        kinesisManager.trackEvent(.live,
-                                  profileID: profileId,
-                                  profileInstallationMetaID: installation.profileInstallationMetaId,
-                                  secretSigningKey: installation.iamSecretKey,
-                                  accessKeyId: installation.iamAccessKeyId,
-                                  sessionToken: installation.iamSessionToken,
-                                  completion: completion)
-    }
-    
-    private func trackLiveEventInBackground() {
-        var eventBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
-        eventBackgroundTaskID = UIApplication.shared.beginBackgroundTask (withName: "AdaptyTrackLiveBackgroundTask") {
-            // End the task if time expires.
-            UIApplication.shared.endBackgroundTask(eventBackgroundTaskID)
-            eventBackgroundTaskID = .invalid
-        }
-        
-        assert(eventBackgroundTaskID != .invalid)
-        
-        DispatchQueue.global().async {
-            self.trackLiveEvent() { (error) in
-                // End the task assertion.
-                UIApplication.shared.endBackgroundTask(eventBackgroundTaskID)
-                eventBackgroundTaskID = .invalid
-            }
-        }
-    }
-    
 }
 
 extension Adapty: AppDelegateSwizzlerDelegate {
     
     func didReceiveAPNSToken(_ deviceToken: Data) {
         Self.apnsToken = deviceToken
-    }
-    
-}
-
-private extension Adapty {
-    
-    //MARK: - Helpers
-    
-    private var uuid: String {
-        return UUID().uuidString
-    }
-    
-    private var idfa: String? {
-        // Check whether advertising tracking is enabled
-        guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
-            return nil
-        }
-        
-        // Get and return IDFA
-        return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-    }
-    
-    private var sdkVersion: String? {
-        return Bundle(for: type(of: self)).object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
-    }
-    
-    private var sdkVersionBuild: Int {
-        return Constants.Versions.SDKBuild
-    }
-    
-    private var appBuild: String? {
-        return Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-    }
-
-    private var appVersion: String? {
-        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    }
-    
-    private var device: String {
-        return UIDevice.modelName
-    }
-    
-    private var locale: String {
-        return Locale.current.identifier
-    }
-    
-    private var OS: String {
-        return "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
-    }
-    
-    private var platform: String {
-        return UIDevice.current.systemName
-    }
-    
-    private var timezone: String {
-        return TimeZone.current.identifier
-    }
-    
-    private var deviceIdentifier: String? {
-        return UIDevice.current.identifierForVendor?.uuidString
     }
     
 }

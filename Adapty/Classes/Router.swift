@@ -15,6 +15,8 @@ enum Router {
     case syncInstallation(params: Parameters)
     case validateReceipt(params: Parameters)
     case trackEvent(params: Parameters)
+    case getPurchaseContainers
+    case signSubscriptionOffer(params: Parameters)
     
     var scheme: String {
         return "https"
@@ -47,6 +49,9 @@ enum Router {
             return .post
         case .updateProfile:
             return .patch
+        case .getPurchaseContainers,
+             .signSubscriptionOffer:
+            return .get
         }
     }
     
@@ -62,24 +67,29 @@ enum Router {
             return "/sdk/in-apps/apple/validate/"
         case .trackEvent:
             return ""
+        case .getPurchaseContainers:
+            return "/sdk/in-apps/purchase-container/"
+        case .signSubscriptionOffer:
+            return "/sdk/in-apps/apple/subscription/offer/sign/"
         }
     }
     
     var keyPath: String? {
         switch self {
-        case .validateReceipt:
+        case .validateReceipt,
+             .getPurchaseContainers:
             return nil
         default:
             return "data"
         }
     }
 
-    var authorizationHeader: (key: String, value: String)? {
+    var authorizationHeader: String? {
         switch self {
         case .trackEvent:
             return nil
         default:
-            return ("Authorization", "Api-Key \(Constants.APIKeys.secretKey)")
+            return "Api-Key \(Constants.APIKeys.secretKey)"
         }
     }
     
@@ -89,8 +99,14 @@ enum Router {
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
                                  timeoutInterval: 10.0)
         if let authorizationHeader = authorizationHeader {
-            request.setValue(authorizationHeader.value, forHTTPHeaderField: authorizationHeader.key)
+            request.setValue(authorizationHeader, forHTTPHeaderField: Constants.Headers.authorization)
         }
+        if let profileId = DefaultsManager.shared.profile?.profileId {
+            request.setValue(profileId, forHTTPHeaderField: Constants.Headers.profileId)
+        } else {
+            request.setValue(UserProperties.staticUuid, forHTTPHeaderField: Constants.Headers.profileId)
+        }
+
         request.httpMethod = method.rawValue
         
         var requestParams: Parameters = [:]
@@ -100,8 +116,11 @@ enum Router {
              .updateProfile(_, let params),
              .syncInstallation(let params),
              .validateReceipt(let params),
-             .trackEvent(let params):
+             .trackEvent(let params),
+             .signSubscriptionOffer(let params):
             requestParams = params
+        case .getPurchaseContainers:
+            break
         }
         
         if self.method == .get {

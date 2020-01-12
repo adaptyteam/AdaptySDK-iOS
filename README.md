@@ -43,17 +43,17 @@ Adapty.activate("YOUR_APP_KEY")
 Later you might want to update your user.
 
 ```Swift
-Adapty.shared.updateProfile(customerUserId: "<id-in-your-system>",
-                            email: "example@email.com",
-                            phoneNumber: "+1-###-###-####",
-                            facebookUserId: "###############",
-                            firstName: "Test",
-                            lastName: "Test",
-                            gender: "",
-                            birthday: Date) { (error) in
-                                if error == nil {
-                                    // successful update
-                                }
+Adapty.updateProfile(customerUserId: "<id-in-your-system>",
+                     email: "example@email.com",
+                     phoneNumber: "+1-###-###-####",
+                     facebookUserId: "###############",
+                     firstName: "Test",
+                     lastName: "Test",
+                     gender: "",
+                     birthday: Date) { (error) in
+                        if error == nil {
+                            // successful update                              
+                        }
 }
 ```
 
@@ -65,7 +65,7 @@ For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass cu
 To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attribution you receive from delegate method of Adjust iOS SDK `- (void)adjustAttributionChanged:(ADJAttribution *)attribution` to Adapty method.
 
 ```Swift
-Adapty.shared.updateAdjustAttribution("<attribution>") { (error) in
+Adapty.updateAdjustAttribution("<attribution>") { (error) in
     if error == nil {
         // successful update
     }
@@ -74,10 +74,44 @@ Adapty.shared.updateAdjustAttribution("<attribution>") { (error) in
 
 **`attribution`** is `ADJAttribution?` object.
 
+### Get purchase containers (paywalls)
+
+```Swift
+Adapty.getPurchaseContainers { (containers, error) in
+    // if error is empty, containers should contain info about your paywalls
+}
+```
+
+### Make purchase
+
+```Swift
+Adapty.makePurchase(product: <product>, offerId: <offerId>) { (receipt, response, error) in
+    if error == nil {
+        // successful purchase
+    }
+    
+    // response is a Dictionary, containing all info about receipt from AppStore
+}
+```
+
+**`product`** is `ProductModel` object, it's required and can't be empty. You can get one from any available container. 
+**`offerId`** is `String?` object, optional.
+Adapty handles subscription offers signing for you as well.
+
+### Restore purchases
+
+```Swift
+Adapty.restorePurchases { (error) in
+    if error == nil {
+        // successful restore
+    }
+}
+```
+
 ### Validate your receipt
 
 ```Swift
-Adapty.shared.validateReceipt("<receiptEncoded>") { (response, error) in
+Adapty.validateReceipt("<receiptEncoded>") { (response, error) in
     // response is a Dictionary, containing all info about receipt from AppStore
 }
 ```

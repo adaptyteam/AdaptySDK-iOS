@@ -11,10 +11,13 @@ import Foundation
 public typealias ProfileCreateCompletion = (ProfileModel?, Error?, Bool?) -> Void
 public typealias ProfileCompletion = (ProfileModel?, Error?) -> Void
 public typealias InstallationCompletion = (InstallationModel?, Error?) -> Void
+public typealias PurchaseContainersCompletion = ([PurchaseContainerModel]?, Error?) -> Void
 public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void
 
 class ApiManager {
+    
+    static let shared = ApiManager()
     
     func createProfile(params: Parameters, completion: @escaping ProfileCreateCompletion) {
         RequestManager.request(router: Router.createProfile(params)) { (result: Result<ProfileModel, Error>, response) in
@@ -51,6 +54,28 @@ class ApiManager {
     
     func validateReceipt(params: Parameters, completion: @escaping JSONCompletion) {
         RequestManager.request(router: Router.validateReceipt(params: params)) { (result: Result<JSONModel, Error>, response) in
+            switch result {
+            case .success(let response):
+                completion(response.data, nil)
+            case .failure(let error):
+                completion(nil, error)
+            }
+        }
+    }
+    
+    func getPurchaseContainers(_ completion: @escaping PurchaseContainersCompletion) {
+        RequestManager.request(router: Router.getPurchaseContainers) { (result: Result<PurchaseContainersArray, Error>, response) in
+            switch result {
+            case .success(let containers):
+                completion(containers.containers, nil)
+            case .failure(let error):
+                completion(nil, error)
+            }
+        }
+    }
+    
+    func signSubscriptionOffer(params: Parameters, completion: @escaping JSONCompletion) {
+        RequestManager.request(router: Router.signSubscriptionOffer(params: params)) { (result: Result<JSONModel, Error>, response) in
             switch result {
             case .success(let response):
                 completion(response.data, nil)
