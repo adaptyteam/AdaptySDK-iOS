@@ -16,19 +16,26 @@ public class PurchaseContainerModel: NSObject, JSONCodable {
     public var products: [ProductModel] = []
     
     required init?(json: Parameters) throws {
+        let attributes: Parameters?
+        do {
+            attributes = try json.attributes()
+        } catch {
+            throw error
+        }
+        
         guard
-            let developerId = json["purchase_container_developer_id"] as? String,
-            let variationId = json["variation_id"] as? String
+            let developerId = attributes?["developer_id"] as? String,
+            let variationId = attributes?["variation_id"] as? String
         else {
-            throw SerializationError.missing("purchase_container_developer_id, variation_id")
+            throw SerializationError.missing("developer_id, variation_id")
         }
         
         self.developerId = developerId
         self.variationId = variationId
-        self.revision = json["purchase_container_revision"] as? Int
-        self.isWinback = json["is_winback"] as? Bool
+        self.revision = attributes?["revision"] as? Int
+        self.isWinback = attributes?["is_winback"] as? Bool
         
-        guard let products = json["products"] as? [Parameters] else {
+        guard let products = attributes?["products"] as? [Parameters] else {
             throw SerializationError.missing("products")
         }
         

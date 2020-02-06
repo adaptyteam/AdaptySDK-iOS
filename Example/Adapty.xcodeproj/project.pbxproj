@@ -224,7 +224,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
 				LastUpgradeCheck = 1120;
-				ORGANIZATIONNAME = CocoaPods;
+				ORGANIZATIONNAME = Adapty;
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;

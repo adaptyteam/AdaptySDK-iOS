@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -26,7 +26,7 @@ struct JSONParameterEncoder: ParameterEncoder {
             let jsonAsData = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)
             urlRequest.httpBody = jsonAsData
             if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
-                urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                urlRequest.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
             }
         } catch {
             throw EncoderError.encodingFailed

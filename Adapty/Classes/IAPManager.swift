@@ -41,6 +41,9 @@ private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment
 
 class IAPManager: NSObject {
     
+    private var profile: ProfileModel? {
+        DefaultsManager.shared.profile
+    }
     private var containers: [PurchaseContainerModel]?
     private var productIDs: Set<String>? {
         if let ids = containers?.flatMap({ $0.products.map({ $0.vendorProductId }) }) {
@@ -94,7 +97,9 @@ class IAPManager: NSObject {
     }
     
     private func getContainersAndSyncProducts() {
-        apiManager.getPurchaseContainers { (containers, error) in
+        var params = Parameters()
+        if let profileId = profile?.profileId { params["profile_id"] = profileId }
+        apiManager.getPurchaseContainers(params: params) { (containers, error) in
             if let error = error {
                 // call completion and clear it
                 self.callPurchaseContainersCompletionAndCleanCallback(.failure(error))
@@ -188,7 +193,12 @@ class IAPManager: NSObject {
     
     @available(iOS 12.2, *)
     private func createPayment(from product: ProductModel, discountId: String, skProduct: SKProduct, completion: BuyProductCompletion? = nil) {
-        ApiManager.shared.signSubscriptionOffer(params: ["product": product.vendorProductId, "offer_code": discountId]) { (params, error) in
+        guard let profileId = profile?.profileId else {
+            completion?(nil, nil, IAPManagerError.missingOfferSigningParams)
+            return
+        }
+        
+        ApiManager.shared.signSubscriptionOffer(params: ["product": product.vendorProductId, "offer_code": discountId, "profile_id": profileId]) { (params, error) in
             guard error == nil else {
                 completion?(nil, nil, error)
                 return
@@ -358,10 +368,10 @@ extension IAPManager: SKPaymentTransactionObserver {
         }
         
         Adapty.validateReceipt(receipt, variationId: variationId, originalPrice: skProduct?.price, discountPrice: discountPrice, priceLocale: skProduct?.priceLocale) { (json, error) in
-            if let error = error {
-                self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(error))
-            } else {
-                self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .success((receipt, json)))
+            // return successful response in any case, sync transaction later once more in case of error
+            self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .success((receipt, json)))
+            
+            if error == nil {
                 if let transactionIdentifier = transaction.transactionIdentifier {
                     // clear successfully synced transaction
                     self.cachedTransactionsIds[transactionIdentifier] = nil

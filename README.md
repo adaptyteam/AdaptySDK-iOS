@@ -118,6 +118,14 @@ Adapty.validateReceipt("<receiptEncoded>") { (response, error) in
 
 **`receiptEncoded`** is required and can't be empty.
 
+### Get user purchases info
+
+```Swift
+Adapty.getPurchaserInfo { (purchaserInfo, error) in
+    // you can access info about specific purchase like this: purchaserInfo.paidAccessLevels?["product_id"]
+}
+```
+
 ### Method swizzling in Adapty
 
 The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag AdaptyAppDelegateProxyEnabled in the app’s Info.plist file and setting it to NO (boolean value).

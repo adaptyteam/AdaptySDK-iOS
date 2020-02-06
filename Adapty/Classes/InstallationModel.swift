@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 01/11/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -18,15 +18,22 @@ public class InstallationModel: JSONCodable, Codable {
     var iamExpiration: String
     
     required init?(json: Parameters) throws {
+        let attributes: Parameters?
+        do {
+            attributes = try json.attributes()
+        } catch {
+            throw error
+        }
+        
         guard
-            let profileId = json["profile_id"] as? String,
-            let profileInstallationMetaId = json["profile_installation_meta_id"] as? String,
-            let iamAccessKeyId = json["iam_access_key_id"] as? String,
-            let iamSecretKey = json["iam_secret_key"] as? String,
-            let iamSessionToken = json["iam_session_token"] as? String,
-            let iamExpiration = json["iam_expiration"] as? String
+            let profileInstallationMetaId = attributes?["id"] as? String,
+            let profileId = attributes?["profile_id"] as? String,
+            let iamAccessKeyId = attributes?["iam_access_key_id"] as? String,
+            let iamSecretKey = attributes?["iam_secret_key"] as? String,
+            let iamSessionToken = attributes?["iam_session_token"] as? String,
+            let iamExpiration = attributes?["iam_expiration"] as? String
         else {
-            throw SerializationError.missing("profileId, profileInstallationMetaId, iam_access_key_id, iam_secret_key, iam_session_token, iam_expiration")
+            throw SerializationError.missing("id, profileId, iam_access_key_id, iam_secret_key, iam_session_token, iam_expiration")
         }
         
         self.profileId = profileId

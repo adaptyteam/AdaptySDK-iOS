@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -44,8 +44,6 @@ import UIKit
     private func configure() {
         AppDelegateSwizzler.startSwizzlingIfPossible(self)
         
-        iapManager.startObservingPurchases()
-        
         if profile == nil {
             // didn't find existing profile, create a new one and perform initial requests right after
             createProfile()
@@ -66,6 +64,9 @@ import UIKit
             self.sessionsManager.startTrackingLiveEvent()
         }
         
+        // start observing purchases
+        iapManager.startObservingPurchases()
+        
         // sync latest receipt to server and obtain eligibility criteria for introductory and promotional offers
         syncTransactionsHistory()
     }
@@ -78,12 +79,13 @@ import UIKit
             return
         }
         
-        var params = Parameters()
+        var attributes = Parameters()
         
-        if let idfa = UserProperties.idfa { params["idfa"] = idfa }
-        params["profile_id"] = UserProperties.staticUuid
+        if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         
-        apiManager.createProfile(params: params) { (profile, error, isNew) in
+        let params = Parameters.formatData(with: UserProperties.staticUuid, type: Constants.TypeNames.profile, attributes: attributes)
+        
+        apiManager.createProfile(id: UserProperties.staticUuid, params: params) { (profile, error, isNew) in
             self.profile = profile
             completion?(error)
             
@@ -109,17 +111,19 @@ import UIKit
             return
         }
         
-        var params = Parameters()
+        var attributes = Parameters()
         
-        if let customerUserId = customerUserId { params["customer_user_id"] = customerUserId }
-        if let email = email { params["email"] = email }
-        if let phoneNumber = phoneNumber { params["phone_number"] = phoneNumber }
-        if let facebookUserId = facebookUserId { params["facebook_user_id"] = facebookUserId }
-        if let firstName = firstName { params["first_name"] = firstName }
-        if let lastName = lastName { params["last_name"] = lastName }
-        if let gender = gender { params["gender"] = gender }
-        if let birthday = birthday { params["birthday"] = birthday.stringValue }
-        if let idfa = UserProperties.idfa { params["idfa"] = idfa }
+        if let customerUserId = customerUserId { attributes["customer_user_id"] = customerUserId }
+        if let email = email { attributes["email"] = email }
+        if let phoneNumber = phoneNumber { attributes["phone_number"] = phoneNumber }
+        if let facebookUserId = facebookUserId { attributes["facebook_user_id"] = facebookUserId }
+        if let firstName = firstName { attributes["first_name"] = firstName }
+        if let lastName = lastName { attributes["last_name"] = lastName }
+        if let gender = gender { attributes["gender"] = gender }
+        if let birthday = birthday { attributes["birthday"] = birthday.stringValue }
+        if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
+        
+        let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         
         shared.apiManager.updateProfile(id: profileId, params: params) { (profile, error) in
             if let profile = profile {
@@ -136,25 +140,27 @@ import UIKit
             return
         }
         
-        var params = Parameters()
+        let installationMetaId = installation?.profileInstallationMetaId ?? UserProperties.uuid
+
+        var attributes = Parameters()
         
-        params["profile_id"] = profileId
-        params["profile_installation_meta_id"] = installation?.profileInstallationMetaId ?? UserProperties.uuid
-        if let sdkVersion = UserProperties.sdkVersion { params["adapty_sdk_version"] = sdkVersion }
-        params["adapty_sdk_version_build"] = UserProperties.sdkVersionBuild
-        if let appBuild = UserProperties.appBuild { params["app_build"] = appBuild }
-        if let appVersion = UserProperties.appVersion { params["app_version"] = appVersion }
-        params["device"] = UserProperties.device
-        params["locale"] = UserProperties.locale
-        params["os"] = UserProperties.OS
-        params["platform"] = UserProperties.platform
-        params["timezone"] = UserProperties.timezone
-        if let deviceIdentifier = UserProperties.deviceIdentifier { params["device_identifier"] = deviceIdentifier }
-        if let apnsTokenString = apnsTokenString { params["device_token"] = apnsTokenString }
+        if let sdkVersion = UserProperties.sdkVersion { attributes["adapty_sdk_version"] = sdkVersion }
+        attributes["adapty_sdk_version_build"] = UserProperties.sdkVersionBuild
+        if let appBuild = UserProperties.appBuild { attributes["app_build"] = appBuild }
+        if let appVersion = UserProperties.appVersion { attributes["app_version"] = appVersion }
+        attributes["device"] = UserProperties.device
+        attributes["locale"] = UserProperties.locale
+        attributes["os"] = UserProperties.OS
+        attributes["platform"] = UserProperties.platform
+        attributes["timezone"] = UserProperties.timezone
+        if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["device_identifier"] = deviceIdentifier }
+        if let apnsTokenString = apnsTokenString { attributes["device_token"] = apnsTokenString }
         
         #warning("Handle Adjust params")
         
-        apiManager.syncInstallation(params: params) { (installation, error) in
+        let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
+        
+        apiManager.syncInstallation(id: installationMetaId, profileId: profileId, params: params) { (installation, error) in
             if let installation = installation {
                 // do not overwrite in case of error
                 self.installation = installation
@@ -169,20 +175,20 @@ import UIKit
             return
         }
         
-        var params = Parameters()
+        var attributes = Parameters()
+
+        if let network = attribution?.value(forKey: "network") { attributes["attribution_network"] = network }
+        if let campaign = attribution?.value(forKey: "campaign") { attributes["attribution_campaign"] = campaign }
+        if let trackerToken = attribution?.value(forKey: "trackerToken") { attributes["attribution_tracker_token"] = trackerToken }
+        if let trackerName = attribution?.value(forKey: "trackerName") { attributes["attribution_tracker_name"] = trackerName }
+        if let adgroup = attribution?.value(forKey: "adgroup") { attributes["attribution_adgroup"] = adgroup }
+        if let creative = attribution?.value(forKey: "creative") { attributes["attribution_creative"] = creative }
+        if let clickLabel = attribution?.value(forKey: "clickLabel") { attributes["attribution_click_label"] = clickLabel }
+        if let adid = attribution?.value(forKey: "adid") { attributes["attribution_adid"] = adid }
         
-        params["profile_id"] = profileId
-        params["profile_installation_meta_id"] = installationMetaId
-        if let trackerToken = attribution?.value(forKey: "trackerToken") { params["attribution_tracker_token"] = trackerToken }
-        if let trackerName = attribution?.value(forKey: "trackerName") { params["attribution_tracker_name"] = trackerName }
-        if let network = attribution?.value(forKey: "network") { params["attribution_network"] = network }
-        if let campaign = attribution?.value(forKey: "campaign") { params["attribution_campaign"] = campaign }
-        if let adgroup = attribution?.value(forKey: "adgroup") { params["attribution_adgroup"] = adgroup }
-        if let creative = attribution?.value(forKey: "creative") { params["attribution_creative"] = creative }
-        if let clickLabel = attribution?.value(forKey: "clickLabel") { params["attribution_click_label"] = clickLabel }
-        if let adid = attribution?.value(forKey: "adid") { params["attribution_adid"] = adid }
+        let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
         
-        shared.apiManager.syncInstallation(params: params) { (installation, error) in
+        shared.apiManager.syncInstallation(id: installationMetaId, profileId: profileId, params: params) { (installation, error) in
             if let installation = installation {
                 // do not overwrite in case of error
                 shared.installation = installation
@@ -204,16 +210,24 @@ import UIKit
     }
     
     @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping JSONCompletion) {
-        guard let id = shared.profile?.profileId else {
+        guard let profileId = shared.profile?.profileId else {
             completion(nil, NetworkResponse.missingRequiredParams)
             return
         }
         
-        var params = ["profile_id": id, "receipt_encoded": receiptEncoded]
-        if let variationId = variationId { params["variation_id"] = variationId }
-        if let originalPrice = originalPrice { params["original_price"] = originalPrice.stringValue }
-        if let discountPrice = discountPrice { params["discount_price"] = discountPrice.stringValue }
-        if let priceLocale = priceLocale { params["price_locale"] = priceLocale.currencyCode }
+        var attributes = Parameters()
+        
+        attributes["profile_id"] = profileId
+        attributes["receipt_encoded"] = receiptEncoded
+        if let variationId = variationId { attributes["variation_id"] = variationId }
+        if let originalPrice = originalPrice { attributes["original_price"] = originalPrice.stringValue }
+        if let discountPrice = discountPrice { attributes["discount_price"] = discountPrice.stringValue }
+        if let priceLocale = priceLocale {
+            attributes["price_locale"] = priceLocale.currencyCode
+            attributes["store_country"] = priceLocale.regionCode
+        }
+        
+        let params = Parameters.formatData(with: "", type: Constants.TypeNames.appleReceipt, attributes: attributes)
         
         shared.apiManager.validateReceipt(params: params, completion: completion)
     }
@@ -242,6 +256,15 @@ import UIKit
         Self.validateReceipt(receipt) { _,_  in
 #warning("sync eligibility criteria for user")
         }
+    }
+    
+    @objc public class func getPurchaserInfo(_ completion: @escaping PurchaserInfoCompletion) {
+        guard let profileId = shared.profile?.profileId else {
+            completion(nil, NetworkResponse.missingRequiredParams)
+            return
+        }
+        
+        shared.apiManager.getPurchaserInfo(id: profileId, completion: completion)
     }
     
     @objc public class func logout() {

@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 29/10/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation

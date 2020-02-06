@@ -85,6 +85,26 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func getPurchaserInfoButtonAction(_ sender: Any) {
+        setLoader(true)
+        Adapty.getPurchaserInfo { (purchaserInfo, error) in
+            self.setLoader(false)
+            if let error = error {
+                self.infoLabel.text = "Failed to get purchaser info: \(error)"
+            }
+            if let purchaserInfo = purchaserInfo {
+                self.infoLabel.text =
+                """
+                Is eligible for promotional: \(purchaserInfo.promotionalOfferEligibility)
+                Is eligible for introductory: \(purchaserInfo.introductoryOfferEligibility)
+                Paid access levels:\n\(purchaserInfo.paidAccessLevels ?? Parameters())
+                subscriptions:\n\(purchaserInfo.subscriptions ?? Parameters())
+                Non subscriptions:\n\(purchaserInfo.nonSubscriptions ?? Parameters())
+                """
+            }
+        }
+    }
+    
     func setLoader(_ visible: Bool) {
         if visible {
             activityIndicatorView.startAnimating()

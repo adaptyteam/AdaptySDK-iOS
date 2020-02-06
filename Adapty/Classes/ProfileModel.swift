@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -14,9 +14,18 @@ public class ProfileModel: JSONCodable, Codable {
     var customerUserId: String
 
     required init?(json: Parameters) throws {
-        guard let profileId = json["profile_id"] as? String,
-            let customerUserId = json["customer_user_id"] as? String else {
-                throw SerializationError.missing("profileId, customerUserId")
+        let attributes: Parameters?
+        do {
+            attributes = try json.attributes()
+        } catch {
+            throw error
+        }
+        
+        guard
+            let profileId = attributes?["id"] as? String,
+            let customerUserId = attributes?["customer_user_id"] as? String
+        else {
+            throw SerializationError.missing("id, customerUserId")
         }
         
         self.profileId = profileId

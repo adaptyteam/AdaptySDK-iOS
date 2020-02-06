@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -95,4 +95,36 @@ extension UIDevice {
         return mapToDevice(identifier: identifier)
     }()
 
+}
+
+extension Dictionary {
+    
+    func attributes() throws -> Parameters  {
+        guard let json = self as? Parameters else {
+            throw SerializationError.invalid("self", self)
+        }
+        
+        guard var attributes = json["attributes"] as? Parameters else {
+            throw SerializationError.missing("attributes")
+        }
+        
+        if let id = json["id"] as? String {
+            attributes["id"] = id
+        }
+        
+        return attributes
+    }
+    
+    static func formatData(with id: Any, type: String, attributes: Parameters) -> Parameters {
+        return ["data": ["id": id, "type": type, "attributes": attributes]]
+    }
+    
+}
+
+extension UUID {
+    
+    var stringValue: String {
+        return self.uuidString.lowercased()
+    }
+    
 }

@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import UIKit
@@ -40,7 +40,6 @@ class RequestManager {
     
     @discardableResult
     class func request<T: JSONCodable>(router: Router, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
-
         do {
             let urlRequest = try router.asURLRequest()
             return request(urlRequest: urlRequest, router: router, completion: completion)
@@ -53,13 +52,11 @@ class RequestManager {
 
     @discardableResult
     class func request<T: JSONCodable>(urlRequest: URLRequest, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
-
         return request(urlRequest: urlRequest, router: nil, completion: completion)
     }
 
     @discardableResult
     private class func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
-
         let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             DispatchQueue.main.async {
                 self.handleResponse(data: data, response: response, error: error, router: router, completion: completion)
@@ -84,32 +81,36 @@ class RequestManager {
         
         logJSON(data)
         
-        if let error = self.handleNetworkResponse(response) {
-            completion(.failure(error), response)
-            return
-        }
-        
         guard let data = data else {
             completion(.failure(NetworkResponse.emptyData), response)
             return
         }
         
-        var responseObject: T?
+        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+            completion(.failure(NetworkResponse.unableToDecode), nil)
+            return
+        }
         
-        do {
-            guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                completion(.failure(NetworkResponse.unableToDecode), nil)
-                return
-            }
-            
-            #warning("Think of better way to handle keyPaths")
-            if let keyPath = router?.keyPath {
-                let statusModel = try ResponseStatusModel(json: json)
-                if statusModel?.status == .failure {
-                    completion(.failure(NetworkResponse.statusError), nil)
+        if let error = self.handleNetworkResponse(response) {
+            do {
+                let errors = try ResponseErrorsArray(json: json)
+                if let error = errors?.errors.first {
+                    completion(.failure(NSError(domain: "", code: error.code, userInfo: [NSLocalizedDescriptionKey: error.description])), nil)
                     return
                 }
                 
+                completion(.failure(error), response)
+                return
+            } catch {
+                completion(.failure(error), response)
+                return
+            }
+        }
+        
+        var responseObject: T?
+        
+        do {
+            if let keyPath = router?.keyPath {
                 guard let json = json[keyPath] as? [String: Any] else {
                     completion(.failure(NetworkResponse.unableToDecode), nil)
                     return
@@ -121,6 +122,7 @@ class RequestManager {
             }
         } catch {
             completion(.failure(error), nil)
+            return
         }
         
         if let responseObject = responseObject {

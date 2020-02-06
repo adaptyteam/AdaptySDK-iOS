@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by sugaroff on 11/5/19.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -15,7 +15,7 @@ enum EventType: String {
 
 class KinesisManager {
 
-    private let sessionID = UUID().uuidString
+    private let sessionID = UUID().stringValue
 
     private var cachedEvents: [[String: String]] {
         get {
@@ -31,7 +31,7 @@ class KinesisManager {
         // Event parameters
         var eventParams = [String: String]()
         eventParams["event_name"] = eventType.rawValue
-        eventParams["event_id"] = UUID().uuidString
+        eventParams["event_id"] = UUID().stringValue
         eventParams["profile_id"] = profileID
         eventParams["profile_installation_meta_id"] = profileInstallationMetaID
         eventParams["session_id"] = sessionID
@@ -63,7 +63,8 @@ class KinesisManager {
             case .success:
                 let updatedCachedEvents = Set(self.cachedEvents).subtracting(currentCachedEvents)
                 self.cachedEvents = Array(updatedCachedEvents)
-            case .failure: break
+            case .failure(let error):
+                print(error)
             }
         }
     }

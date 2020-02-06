@@ -3,7 +3,7 @@
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 4Taps. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -17,10 +17,11 @@ struct Constants {
     struct Headers {
         static let authorization = "Authorization"
         static let profileId = "ADAPTY-SDK-PROFILE-ID"
+        static let platform = "ADAPTY-SDK-PLATFORM"
     }
 
     struct Kinesis {
-        static let streamName = "adapty-sdk-test"
+        static let streamName = "adapty-data-pipeline-prod"
         static let region = "us-east-1"
         static let hmacShaTypeString = "AWS4-HMAC-SHA256"
         static let serviceType = "kinesis"
@@ -42,5 +43,12 @@ struct Constants {
     
     struct BundleKeys {
         static let appDelegateProxyEnabled = "AdaptyAppDelegateProxyEnabled"
+    }
+    
+    struct TypeNames {
+        static let profile = "adapty_analytics_profile"
+        static let installation = "adapty_analytics_profile_installation_meta"
+        static let appleReceipt = "adapty_inapps_apple_receipt_validation_result"
+        static let appleSubscriptionOffer = "adapty_inapps_apple_subscription_offer_signing_result"
     }
 }
