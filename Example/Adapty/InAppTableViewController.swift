@@ -3,7 +3,7 @@
 //  Adapty_Example
 //
 //  Created by Andrey Kyashkin on 23/12/2019.
-//  Copyright © 2019 CocoaPods. All rights reserved.
+//  Copyright © 2019 Adapty. All rights reserved.
 //
 
 import UIKit

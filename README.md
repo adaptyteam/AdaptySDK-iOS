@@ -19,7 +19,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
 ### CocoaPods
 
 1. Create a Podfile if you don't have one: `pod init`
-2. Add Adapty to your Podfile: `pod 'Adapty', '~> 0.1.0'`
+2. Add Adapty to your Podfile: `pod 'Adapty', '~> 1.0.0'`
 3. Save the file and run: `pod install`. This creates an `.xcworkspace` file for your app. Use this file for all future development on your application.
 
 ## Usage
@@ -117,6 +117,14 @@ Adapty.validateReceipt("<receiptEncoded>") { (response, error) in
 ```
 
 **`receiptEncoded`** is required and can't be empty.
+
+### Get user purchases info
+
+```Swift
+Adapty.getPurchaserInfo { (purchaserInfo, error) in
+    // you can access info about specific purchase like this: purchaserInfo.paidAccessLevels?["product_id"]
+}
+```
 
 ### Method swizzling in Adapty
 

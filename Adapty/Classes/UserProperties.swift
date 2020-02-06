@@ -10,10 +10,10 @@ import AdSupport
 
 class UserProperties {
     
-    static let staticUuid = UUID().uuidString
+    static let staticUuid = UUID().stringValue
     
     static var uuid: String {
-        return UUID().uuidString
+        return UUID().stringValue
     }
     
     static var idfa: String? {
