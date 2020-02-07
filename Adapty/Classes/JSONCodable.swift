@@ -16,7 +16,7 @@ enum SerializationError: Error {
 extension SerializationError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .missing(let params): return "Missing required params: \(params)"
+        case .missing(let params): return "Missing some of the required params: \(params)"
         case .invalid(let property, let data): return "Received invalid \(property): \(data)"
         }
     }

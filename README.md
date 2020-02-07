@@ -47,6 +47,8 @@ Adapty.updateProfile(customerUserId: "<id-in-your-system>",
                      email: "example@email.com",
                      phoneNumber: "+1-###-###-####",
                      facebookUserId: "###############",
+                     amplitudeUserId: "###",
+                     mixpanelUserId: "###",
                      firstName: "Test",
                      lastName: "Test",
                      gender: "",
@@ -60,19 +62,31 @@ Adapty.updateProfile(customerUserId: "<id-in-your-system>",
 All properties are optional.  
 For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.
 
-### AdjustSDK integration
+### Attribution tracker integration
 
-To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attribution you receive from delegate method of Adjust iOS SDK `- (void)adjustAttributionChanged:(ADJAttribution *)attribution` to Adapty method.
+To integrate with attribution system, just pass attribution you receive to Adapty method.
 
 ```Swift
-Adapty.updateAdjustAttribution("<attribution>") { (error) in
+Adapty.updateAttribution("<attribution>") { (error) in
     if error == nil {
         // successful update
     }
 }
 ```
 
-**`attribution`** is `ADJAttribution?` object.
+**`attribution`** is `Dictionary?` object.
+
+Supported keys in **`attribution`** are the following:
+**`network`**
+**`campaign`**
+**`trackerToken`**
+**`trackerName`**
+**`adgroup`**
+**`creative`**
+**`clickLabel`**
+**`adid`**
+
+To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attribution you receive from delegate method of Adjust iOS SDK `- (void)adjustAttributionChanged:(ADJAttribution *)attribution` to Adapty `updateAttribution` method.
 
 ### Get purchase containers (paywalls)
 
@@ -85,7 +99,7 @@ Adapty.getPurchaseContainers { (containers, error) in
 ### Make purchase
 
 ```Swift
-Adapty.makePurchase(product: <product>, offerId: <offerId>) { (receipt, response, error) in
+Adapty.makePurchase(product: <product>, offerId: <offerId>) { (purchaserInfo, receipt, appleValidationResult, product, error) in
     if error == nil {
         // successful purchase
     }
@@ -122,7 +136,7 @@ Adapty.validateReceipt("<receiptEncoded>") { (response, error) in
 
 ```Swift
 Adapty.getPurchaserInfo { (purchaserInfo, error) in
-    // you can access info about specific purchase like this: purchaserInfo.paidAccessLevels?["product_id"]
+    // you can access info about specific purchase like this: purchaserInfo.paidAccessLevels["level_configured_in_dashboard"]?.isActive
 }
 ```
 

@@ -14,6 +14,11 @@ struct Constants {
         static var secretKey = ""
     }
     
+    struct URLs {
+        static let api = "api.adapty.io/api"
+        static let kinesis = "kinesis.us-east-1.amazonaws.com"
+    }
+    
     struct Headers {
         static let authorization = "Authorization"
         static let profileId = "ADAPTY-SDK-PROFILE-ID"

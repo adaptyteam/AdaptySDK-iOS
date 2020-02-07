@@ -128,3 +128,13 @@ extension UUID {
     }
     
 }
+
+extension String {
+    
+    var dateValue: Date? {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return dateFormatter.date(from: self)
+    }
+    
+}

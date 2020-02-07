@@ -12,6 +12,7 @@ public typealias ProfileCreateCompletion = (ProfileModel?, Error?, Bool?) -> Voi
 public typealias ProfileCompletion = (ProfileModel?, Error?) -> Void
 public typealias InstallationCompletion = (InstallationModel?, Error?) -> Void
 public typealias PurchaseContainersCompletion = ([PurchaseContainerModel]?, Error?) -> Void
+public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, Error?) -> Void
 public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void
 public typealias PurchaserInfoCompletion = (PurchaserInfoModel?, Error?) -> Void
@@ -53,13 +54,13 @@ class ApiManager {
         }
     }
     
-    func validateReceipt(params: Parameters, completion: @escaping JSONCompletion) {
-        RequestManager.request(router: Router.validateReceipt(params: params)) { (result: Result<JSONModel, Error>, response) in
+    func validateReceipt(params: Parameters, completion: @escaping ValidateReceiptCompletion) {
+        RequestManager.request(router: Router.validateReceipt(params: params)) { (result: Result<PurchaserInfoModel, Error>, response) in
             switch result {
             case .success(let response):
-                completion(response.data, nil)
+                completion(response, response.appleValidationResult, nil)
             case .failure(let error):
-                completion(nil, error)
+                completion(nil, nil, error)
             }
         }
     }

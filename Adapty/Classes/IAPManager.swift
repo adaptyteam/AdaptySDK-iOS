@@ -36,7 +36,7 @@ extension IAPManagerError: LocalizedError {
     }
 }
 
-public typealias BuyProductCompletion = (_ receipt: String?, _ response: Parameters?, _ error: Error?) -> Void
+public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: Error?) -> Void
 private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, container: PurchaseContainerModel?, completion: BuyProductCompletion?)
 
 class IAPManager: NSObject {
@@ -138,12 +138,12 @@ class IAPManager: NSObject {
     
     func makePurchase(product: ProductModel, offerId: String? = nil, completion: BuyProductCompletion? = nil) {
         guard canMakePayments else {
-            completion?(nil, nil, IAPManagerError.cantMakePayments)
+            completion?(nil, nil, nil, product, IAPManagerError.cantMakePayments)
             return
         }
         
         guard let skProduct = product.skProduct else {
-            completion?(nil, nil, IAPManagerError.noProductsFound)
+            completion?(nil, nil, nil, product, IAPManagerError.noProductsFound)
             return
         }
         
@@ -194,13 +194,13 @@ class IAPManager: NSObject {
     @available(iOS 12.2, *)
     private func createPayment(from product: ProductModel, discountId: String, skProduct: SKProduct, completion: BuyProductCompletion? = nil) {
         guard let profileId = profile?.profileId else {
-            completion?(nil, nil, IAPManagerError.missingOfferSigningParams)
+            completion?(nil, nil, nil, product, IAPManagerError.missingOfferSigningParams)
             return
         }
         
         ApiManager.shared.signSubscriptionOffer(params: ["product": product.vendorProductId, "offer_code": discountId, "profile_id": profileId]) { (params, error) in
             guard error == nil else {
-                completion?(nil, nil, error)
+                completion?(nil, nil, nil, product, error)
                 return
             }
             
@@ -212,7 +212,7 @@ class IAPManager: NSObject {
                 let timestampString = params?["timestamp"] as? String,
                 let timestampInt64 = Int64(timestampString)
             else {
-                completion?(nil, nil, IAPManagerError.missingOfferSigningParams)
+                completion?(nil, nil, nil, product, IAPManagerError.missingOfferSigningParams)
                 return
             }
             
@@ -251,14 +251,14 @@ private extension IAPManager {
         }
     }
     
-    private func callBuyProductCompletionAndCleanCallback(for purchaseInfo: PurchaseInfoTuple?, result: Result<(receipt: String, response: Parameters?), Error>) {
+    private func callBuyProductCompletionAndCleanCallback(for purchaseInfo: PurchaseInfoTuple?, result: Result<(purchaserInfo: PurchaserInfoModel?, receipt: String, response: Parameters?), Error>) {
         DispatchQueue.main.async {
             switch result {
             case .success(let result):
-                purchaseInfo?.completion?(result.receipt, result.response, nil)
+                purchaseInfo?.completion?(result.purchaserInfo, result.receipt, result.response, purchaseInfo?.product, nil)
             case .failure(let error):
                 print("Failed to buy product. Error: \(error.localizedDescription)")
-                purchaseInfo?.completion?(nil, nil, error)
+                purchaseInfo?.completion?(nil, nil, nil, purchaseInfo?.product, error)
             }
             
             if let purchaseInfo = purchaseInfo {
@@ -367,9 +367,9 @@ extension IAPManager: SKPaymentTransactionObserver {
             discountPrice = skProduct?.discounts.filter({ $0.identifier == transaction.payment.paymentDiscount?.identifier }).first?.price
         }
         
-        Adapty.validateReceipt(receipt, variationId: variationId, originalPrice: skProduct?.price, discountPrice: discountPrice, priceLocale: skProduct?.priceLocale) { (json, error) in
+        Adapty.validateReceipt(receipt, variationId: variationId, originalPrice: skProduct?.price, discountPrice: discountPrice, priceLocale: skProduct?.priceLocale) { (purchaserInfo, appleValidationResult, error) in
             // return successful response in any case, sync transaction later once more in case of error
-            self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .success((receipt, json)))
+            self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .success((purchaserInfo, receipt, appleValidationResult)))
             
             if error == nil {
                 if let transactionIdentifier = transaction.transactionIdentifier {
@@ -414,7 +414,7 @@ extension IAPManager: SKPaymentTransactionObserver {
             return
         }
         
-        Adapty.validateReceipt(receipt) { (_, error) in
+        Adapty.validateReceipt(receipt) { (_, _, error) in
             if let error = error {
                 self.callRestoreCompletionAndCleanCallback(.failure(error))
             } else {

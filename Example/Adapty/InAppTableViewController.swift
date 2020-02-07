@@ -57,7 +57,7 @@ extension InAppTableViewController: InAppTableViewCellDelegate {
         }
         
         setUI(enabled: false)
-        Adapty.makePurchase(product: product, offerId: discountsIds?.first) { (receipt, response, error) in
+        Adapty.makePurchase(product: product, offerId: discountsIds?.first) { (purchaserInfo, receipt, response, product, error) in
             self.setUI(enabled: true)
             
             guard error == nil else {

@@ -53,7 +53,7 @@ extension AppDelegate: AdjustDelegate {
     
     func adjustAttributionChanged(_ attribution: ADJAttribution?) {
         // Just pass Adjust attribution to Adapty SDK
-        Adapty.updateAdjustAttribution(attribution)
+        Adapty.updateAttribution(attribution)
     }
     
 }

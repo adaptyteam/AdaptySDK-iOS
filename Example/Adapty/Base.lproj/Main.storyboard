@@ -59,10 +59,10 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BQf-FP-kpk">
-                                        <rect key="frame" x="101" y="245" width="173" height="30"/>
-                                        <state key="normal" title="Update Adjust attribution"/>
+                                        <rect key="frame" x="125" y="245" width="125" height="30"/>
+                                        <state key="normal" title="Update attribution"/>
                                         <connections>
-                                            <action selector="updateAdjustAttributionButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="GMv-M8-hob"/>
+                                            <action selector="updateAttributionButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="B8d-bK-uBk"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aXZ-ih-45X">

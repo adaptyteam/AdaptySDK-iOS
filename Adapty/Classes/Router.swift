@@ -26,9 +26,9 @@ enum Router {
     var host: String {
         switch self {
         case .trackEvent:
-            return "kinesis.us-east-1.amazonaws.com"
+            return Constants.URLs.kinesis
         default:
-            return "api.adapty.io/api"
+            return Constants.URLs.api
         }
     }
     
@@ -78,8 +78,7 @@ enum Router {
     
     var keyPath: String? {
         switch self {
-        case .validateReceipt,
-             .trackEvent,
+        case .trackEvent,
              .getPurchaseContainers:
             return nil
         default:

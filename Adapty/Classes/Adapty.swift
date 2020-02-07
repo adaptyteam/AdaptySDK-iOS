@@ -100,6 +100,8 @@ import UIKit
         email: String? = nil,
         phoneNumber: String? = nil,
         facebookUserId: String? = nil,
+        amplitudeUserId: String? = nil,
+        mixpanelUserId: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
         gender: String? = nil,
@@ -117,6 +119,8 @@ import UIKit
         if let email = email { attributes["email"] = email }
         if let phoneNumber = phoneNumber { attributes["phone_number"] = phoneNumber }
         if let facebookUserId = facebookUserId { attributes["facebook_user_id"] = facebookUserId }
+        if let amplitudeUserId = amplitudeUserId { attributes["amplitude_user_id"] = amplitudeUserId }
+        if let mixpanelUserId = mixpanelUserId { attributes["mixpanel_user_id"] = mixpanelUserId }
         if let firstName = firstName { attributes["first_name"] = firstName }
         if let lastName = lastName { attributes["last_name"] = lastName }
         if let gender = gender { attributes["gender"] = gender }
@@ -169,7 +173,7 @@ import UIKit
         }
     }
     
-    @objc public class func updateAdjustAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
+    @objc public class func updateAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
         guard let profileId = shared.profile?.profileId, let installationMetaId = shared.installation?.profileInstallationMetaId else {
             completion?(NetworkResponse.missingRequiredParams)
             return
@@ -209,9 +213,9 @@ import UIKit
         shared.iapManager.restorePurchases(completion)
     }
     
-    @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping JSONCompletion) {
+    @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping ValidateReceiptCompletion) {
         guard let profileId = shared.profile?.profileId else {
-            completion(nil, NetworkResponse.missingRequiredParams)
+            completion(nil, nil, NetworkResponse.missingRequiredParams)
             return
         }
         
@@ -253,8 +257,7 @@ import UIKit
             return
         }
         
-        Self.validateReceipt(receipt) { _,_  in
-#warning("sync eligibility criteria for user")
+        Self.validateReceipt(receipt) { _, _, _  in
         }
     }
     
