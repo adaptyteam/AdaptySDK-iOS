@@ -77,14 +77,16 @@ Adapty.updateAttribution("<attribution>") { (error) in
 **`attribution`** is `Dictionary?` object.
 
 Supported keys in **`attribution`** are the following:
-**`network`**
-**`campaign`**
-**`trackerToken`**
-**`trackerName`**
-**`adgroup`**
-**`creative`**
-**`clickLabel`**
-**`adid`**
+```
+network
+campaign
+trackerToken
+trackerName
+adgroup
+creative
+clickLabel
+adid
+```
 
 To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attribution you receive from delegate method of Adjust iOS SDK `- (void)adjustAttributionChanged:(ADJAttribution *)attribution` to Adapty `updateAttribution` method.
 
