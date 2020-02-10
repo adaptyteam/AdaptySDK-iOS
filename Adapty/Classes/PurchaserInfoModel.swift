@@ -85,10 +85,11 @@ public class PurchaserInfoModel: NSObject, JSONCodable {
 
 public class PaidAccessLevelsInfoModel: JSONCodable {
     
+    public var id: String
     public var isActive: Bool
     public var vendorProductId: String
     public var store: String
-    public var purchasedAt: Date
+    public var activatedAt: Date
     public var renewedAt: Date?
     public var expiresAt: Date?
     public var isLifetime: Bool
@@ -101,21 +102,23 @@ public class PaidAccessLevelsInfoModel: JSONCodable {
     
     required init?(json: Parameters) throws {
         guard
+            let id = json["id"] as? String,
             let isActive = json["is_active"] as? Bool,
             let vendorProductId = json["vendor_product_id"] as? String,
             let store = json["store"] as? String,
-            let purchasedAt = (json["purchased_at"] as? String)?.dateValue,
+            let activatedAt = (json["activated_at"] as? String)?.dateValue,
             let isLifetime = json["is_lifetime"] as? Bool,
             let willRenew = json["will_renew"] as? Bool,
             let isInGracePeriod = json["is_in_grace_period"] as? Bool
         else {
-            throw SerializationError.missing("is_active, vendor_product_id, store, purchased_at, is_lifetime, will_renew, is_in_grace_period")
+            throw SerializationError.missing("id, is_active, vendor_product_id, store, activated_at, is_lifetime, will_renew, is_in_grace_period")
         }
         
+        self.id = id
         self.isActive = isActive
         self.vendorProductId = vendorProductId
         self.store = store
-        self.purchasedAt = purchasedAt
+        self.activatedAt = activatedAt
         self.renewedAt = (json["renewed_at"] as? String)?.dateValue
         self.expiresAt = (json["expires_at"] as? String)?.dateValue
         self.isLifetime = isLifetime
@@ -134,7 +137,7 @@ public class SubscriptionsInfoModel: JSONCodable {
     public var isActive: Bool
     public var vendorProductId: String
     public var store: String
-    public var purchasedAt: Date
+    public var activatedAt: Date
     public var renewedAt: Date?
     public var expiresAt: Date?
     public var isLifetime: Bool
@@ -151,19 +154,19 @@ public class SubscriptionsInfoModel: JSONCodable {
             let isActive = json["is_active"] as? Bool,
             let vendorProductId = json["vendor_product_id"] as? String,
             let store = json["store"] as? String,
-            let purchasedAt = (json["purchased_at"] as? String)?.dateValue,
+            let activatedAt = (json["activated_at"] as? String)?.dateValue,
             let isLifetime = json["is_lifetime"] as? Bool,
             let willRenew = json["will_renew"] as? Bool,
             let isInGracePeriod = json["is_in_grace_period"] as? Bool,
             let isSandbox = json["is_sandbox"] as? Bool
         else {
-            throw SerializationError.missing("is_active, vendor_product_id, store, purchased_at, is_lifetime, will_renew, is_in_grace_period, is_sandbox")
+            throw SerializationError.missing("is_active, vendor_product_id, store, activated_at, is_lifetime, will_renew, is_in_grace_period, is_sandbox")
         }
         
         self.isActive = isActive
         self.vendorProductId = vendorProductId
         self.store = store
-        self.purchasedAt = purchasedAt
+        self.activatedAt = activatedAt
         self.renewedAt = (json["renewed_at"] as? String)?.dateValue
         self.expiresAt = (json["expires_at"] as? String)?.dateValue
         self.isLifetime = isLifetime
