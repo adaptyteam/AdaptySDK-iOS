@@ -148,6 +148,8 @@ public class SubscriptionsInfoModel: JSONCodable {
     public var unsubscribedAt: Date?
     public var billingIssueDetectedAt: Date?
     public var isSandbox: Bool
+    public var vendorTransactionId: String?
+    public var vendorOriginalTransactionId: String?
     
     required init?(json: Parameters) throws {
         guard
@@ -177,6 +179,8 @@ public class SubscriptionsInfoModel: JSONCodable {
         self.unsubscribedAt = (json["unsubscribed_at"] as? String)?.dateValue
         self.billingIssueDetectedAt = (json["billing_issue_detected_at"] as? String)?.dateValue
         self.isSandbox = isSandbox
+        self.vendorTransactionId = json["vendor_transaction_id"] as? String
+        self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
     }
 
 }
@@ -189,6 +193,8 @@ public class NonSubscriptionsInfoModel: JSONCodable {
     public var purchasedAt: Date
     public var isOneTime: Bool
     public var isSandbox: Bool
+    public var vendorTransactionId: String?
+    public var vendorOriginalTransactionId: String?
     
     required init?(json: Parameters) throws {
         guard
@@ -208,6 +214,8 @@ public class NonSubscriptionsInfoModel: JSONCodable {
         self.purchasedAt = purchasedAt
         self.isOneTime = isOneTime
         self.isSandbox = isSandbox
+        self.vendorTransactionId = json["vendor_transaction_id"] as? String
+        self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
     }
 
 }

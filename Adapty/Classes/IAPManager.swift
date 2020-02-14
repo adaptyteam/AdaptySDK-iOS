@@ -376,13 +376,18 @@ extension IAPManager: SKPaymentTransactionObserver {
                     // clear successfully synced transaction
                     self.cachedTransactionsIds[transactionIdentifier] = nil
                 }
-                SKPaymentQueue.default().finishTransaction(transaction)
+                
+                if !Adapty.observerMode {
+                    SKPaymentQueue.default().finishTransaction(transaction)
+                }
             }
         }
     }
     
     private func failed(_ transaction: SKPaymentTransaction) {
-        SKPaymentQueue.default().finishTransaction(transaction)
+        if !Adapty.observerMode {
+            SKPaymentQueue.default().finishTransaction(transaction)
+        }
         
         let purchaseInfo = self.purchaseInfo(for: transaction)
         
@@ -400,7 +405,9 @@ extension IAPManager: SKPaymentTransactionObserver {
     
     private func restored(_ transaction: SKPaymentTransaction) {
         totalRestoredPurchases += 1
-        SKPaymentQueue.default().finishTransaction(transaction)
+        if !Adapty.observerMode {
+            SKPaymentQueue.default().finishTransaction(transaction)
+        }
     }
     
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {

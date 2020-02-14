@@ -31,17 +31,37 @@ import UIKit
     private lazy var iapManager: IAPManager = {
         return IAPManager()
     }()
+    private var isConfigured = false
+    private static var initialCustomerUserId: String?
+    static var observerMode = false
     
     override private init() {
         super.init()
     }
     
     @objc public class func activate(_ apiKey: String) {
+        activate(apiKey, observerMode: false, customerUserId: nil)
+    }
+    
+    @objc public class func activate(_ apiKey: String, observerMode: Bool) {
+        activate(apiKey, observerMode: observerMode, customerUserId: nil)
+    }
+    
+    @objc public class func activate(_ apiKey: String, customerUserId: String?) {
+        activate(apiKey, observerMode: false, customerUserId: customerUserId)
+    }
+    
+    @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) {
         Constants.APIKeys.secretKey = apiKey
+        self.observerMode = observerMode
+        self.initialCustomerUserId = customerUserId
         shared.configure()
     }
     
     private func configure() {
+        if isConfigured { return }
+        isConfigured = true
+        
         AppDelegateSwizzler.startSwizzlingIfPossible(self)
         
         if profile == nil {
@@ -82,6 +102,7 @@ import UIKit
         var attributes = Parameters()
         
         if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
+        if let customerUserId = Self.initialCustomerUserId { attributes["customer_user_id"] = customerUserId }
         
         let params = Parameters.formatData(with: UserProperties.staticUuid, type: Constants.TypeNames.profile, attributes: attributes)
         
