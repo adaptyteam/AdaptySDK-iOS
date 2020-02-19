@@ -158,65 +158,65 @@ The **`purchaserInfo`** object gives you access to the following information abo
 
 | Name  | Description |
 | -------- | ------------- |
-| promotionalOfferEligibility | Property which shows if user is eligible for introductory offer for App Store/Play Store. |
-| introductoryOfferEligibility | Property which shows if user is eligible for promotional offer for App Store/Play Store. |
-| paidAccessLevels | Dicionary, where keys – paid levels identifiers, configured in admin panel, values – PaidAccessLevelsInfoModel objects. |
-| subscriptions | Dicionary, where keys – vendor products identifiers, values – SubscriptionsInfoModel objects. |
-| nonSubscriptions | Dicionary, where keys – vendor products identifiers, values – array of NonSubscriptionsInfoModel objects. |
+| promotionalOfferEligibility | Boolean indicating whether the promotional offer is available for the customer. |
+| introductoryOfferEligibility | Boolean indicating whether the introductory offer is available for the customer. |
+| paidAccessLevels | Dictionary where the keys are paid access level identifiers configured by developer in Adapty dashboard. Values are PaidAccessLevelsInfoModel objects. Can be null if the customer has no access levels. |
+| subscriptions | Dictionary where the keys are vendor product ids. Values are SubscriptionsInfoModel objects. Can be null if the customer has no subscriptions. |
+| nonSubscriptions | Dictionary where the keys are vendor product ids. Values are array[] of NonSubscriptionsInfoModel objects. Can be null if the customer has no purchases. |
 | appleValidationResult | Info received from Apple receipt validation. |
 
 **`paidAccessLevels`** stores info about current users access level.
 
 | Name  | Description |
 | -------- | ------------- |
-| id | Id of paid level access. |
-| isActive | Whether or not the user has access to this level. |
-| vendorProductId | The underlying product identifier that unlocked this level. |
-| store | The store that unlocked this subscription, can be one of: app_store, play_store & adapty. |
-| activatedAt | The first date this product was purchased. |
-| renewedAt | The date of the last renewal. |
-| expiresAt | The expiration date for the subscription, can be null for lifetime access. |
-| isLifetime | This property says if subscription is infinite, which means it doesn't have an expiration date. |
-| activeIntroductoryOfferType | Type of active intro offer, can be one of: free_trial, pay_as_you_go & pay_up_front. If it's not null, that means it's active for now. |
-| activePromotionalOfferType | Type of active promo offer, can be one of: free_trial, pay_as_you_go & pay_up_front. If it's not null, that means it's active for now. |
-| willRenew | Whether or not the subscription is set to renew at the end of the current period. |
-| isInGracePeriod | If subscription is under grace period. |
-| unsubscribedAt | The date an unsubscribe was detected. An unsubscribe does not mean that the level is inactive. Note there may be a multiple hour delay between the value of this property and the actual state in the App Store / Play Store. |
-| billingIssueDetectedAt | The date a billing issue was detected, will be null again once billing issue resolved. A billing issue does not mean that the entitlement is inactive. Note there may be a multiple hour delay between the value of this property and the actual state in the App Store / Play Store. |
+| id | Paid Access Level identifier configured by developer in Adapty dashboard. |
+| isActive | Boolean indicating whether the paid access level is active. |
+| vendorProductId | Identifier of the product in vendor system (App Store/Google Play etc.) that unlocked this access level. |
+| store | The store that unlocked this subscription, can be one of: **app_store**, **play_store** & **adapty**. |
+| activatedAt | The ISO 8601 datetime when access level was activated (may be in the future). |
+| renewedAt | The ISO 8601 datetime when access level was renewed. |
+| expiresAt | The ISO 8601 datetime when access level will expire (may be in the past and may be null for lifetime access). |
+| isLifetime | Boolean indicating whether the paid access level is active for lifetime (no expiration date). If set to true you shouldn't use **expires_at**. |
+| activeIntroductoryOfferType | The type of active introductory offer. Possible values are: **free_trial**, **pay_as_you_go** & **pay_up_front**. If the value is not null it means that offer was applied during the current subscription period. |
+| activePromotionalOfferType | The type of active promotional offer. Possible values are: **free_trial**, **pay_as_you_go** & **pay_up_front**. If the value is not null it means that offer was applied during the current subscription period. |
+| willRenew | Boolean indicating whether auto renewable subscription is set to renew. |
+| isInGracePeriod | Boolean indicating whether auto renewable subscription is in grace period. |
+| unsubscribedAt | The ISO 8601 datetime when auto renewable subscription was cancelled. Subscription can still be active, it just means that auto renewal turned off. Will set to null if the user reactivates subscription. |
+| billingIssueDetectedAt | The ISO 8601 datetime when billing issue was detected (vendor was not able to charge the card). Subscription can still be active. Will set to null if the charge was successful. |
 
 **`subscriptions`** stores info about vendor subscription.
 
 | Name  | Description |
 | -------- | ------------- |
-| isActive | description |
-| vendorProductId | description |
-| store | description |
-| activatedAt | description |
-| renewedAt | description |
-| expiresAt | description |
-| isLifetime | description |
-| activeIntroductoryOfferType | description |
-| activePromotionalOfferType | description |
-| willRenew | description |
-| isInGracePeriod | description |
-| unsubscribedAt | description |
-| billingIssueDetectedAt | description |
-| isSandbox | description |
-| vendorTransactionId | description |
-| vendorOriginalTransactionId | description |
+| isActive | Boolean indicating whether the subscription is active. |
+| vendorProductId | Identifier of the product in vendor system (App Store/Google Play etc.). |
+| store | Store where the product was purchased. Possible values are: **app_store**, **play_store** & **adapty**. |
+| activatedAt | The ISO 8601 datetime when access level was activated (may be in the future). |
+| renewedAt | The ISO 8601 datetime when access level was renewed. |
+| expiresAt | The ISO 8601 datetime when access level will expire (may be in the past and may be null for lifetime access). |
+| isLifetime | Boolean indicating whether the subscription is active for lifetime (no expiration date). If set to true you shouldn't use **expires_at**. |
+| activeIntroductoryOfferType | The type of active introductory offer. Possible values are: **free_trial**, **pay_as_you_go** & **pay_up_front**. If the value is not null it means that offer was applied during the current subscription period. |
+| activePromotionalOfferType | The type of active promotional offer. Possible values are: **free_trial**, **pay_as_you_go** & **pay_up_front**. If the value is not null it means that offer was applied during the current subscription period. |
+| willRenew | Boolean indicating whether auto renewable subscription is set to renew. |
+| isInGracePeriod | Boolean indicating whether auto renewable subscription is in grace period. |
+| unsubscribedAt | The ISO 8601 datetime when auto renewable subscription was cancelled. Subscription can still be active, it just means that auto renewal turned off. Will set to null if the user reactivates subscription. |
+| billingIssueDetectedAt | The ISO 8601 datetime when billing issue was detected (vendor was not able to charge the card). Subscription can still be active. Will set to null if the charge was successful. |
+| isSandbox | Boolean indicating whether the product was purchased in sandbox or production environment. |
+| vendorTransactionId | Transaction id in vendor system. |
+| vendorOriginalTransactionId | Original transaction id in vendor system. For auto renewable subscription this will be id of the first transaction in the subscription. |
 
 **`nonSubscriptions `** stores info about purchases that are not subscriptions.
 
 | Name  | Description |
 | -------- | ------------- |
-| purchaseId | description |
-| vendorProductId | description |
-| store | description |
-| purchasedAt | description |
-| isOneTime | description |
-| isSandbox | description |
-| vendorTransactionId | description |
-| vendorOriginalTransactionId | description |
+| purchaseId | Identifier of the purchase in Adapty. You can use it to unsure that you've already processed this purchase (for example tracking one time products). |
+| vendorProductId | Identifier of the product in vendor system (App Store/Google Play etc.). |
+| store | Store where the product was purchased. Possible values are: **app_store**, **play_store** & **adapty**. |
+| purchasedAt | The ISO 8601 datetime when the product was purchased. |
+| isOneTime | Boolean indicating whether the product should only be processed once. If true, the purchase will be returned by Adapty API one time only. |
+| isSandbox | Boolean indicating whether the product was purchased in sandbox or production environment. |
+| vendorTransactionId | Transaction id in vendor system. |
+| vendorOriginalTransactionId | Original transaction id in vendor system. For auto renewable subscription this will be id of the first transaction in the subscription. |
 
 ### Checking if a user is subscribed 
 
