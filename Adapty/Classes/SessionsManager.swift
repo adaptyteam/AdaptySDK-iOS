@@ -27,14 +27,16 @@ class SessionsManager {
         
         trackLiveEvent()
         
-        liveTrackerTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] (_) in
-            self?.trackLiveEvent()
-        }
+        liveTrackerTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(fireTrackLiveEvent), userInfo: nil, repeats: true)
     }
     
     func invalidateLiveTrackerTimer() {
         liveTrackerTimer?.invalidate()
         liveTrackerTimer = nil
+    }
+    
+    @objc private func fireTrackLiveEvent() {
+        trackLiveEvent()
     }
     
     private func trackLiveEvent(completion: ((Error?) -> Void)? = nil) {

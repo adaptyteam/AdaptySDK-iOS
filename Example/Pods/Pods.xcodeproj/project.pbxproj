@@ -1702,7 +1702,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Adapty/Adapty-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Adapty/Adapty-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Adapty/Adapty.modulemap";
 				PRODUCT_MODULE_NAME = Adapty;
@@ -1736,7 +1736,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Adapty/Adapty-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Adapty/Adapty-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Adapty/Adapty.modulemap";
 				PRODUCT_MODULE_NAME = Adapty;

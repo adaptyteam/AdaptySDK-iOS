@@ -132,8 +132,9 @@ extension UUID {
 extension String {
     
     var dateValue: Date? {
-        let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         return dateFormatter.date(from: self)
     }
     
