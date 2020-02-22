@@ -9,12 +9,12 @@ import Foundation
 
 public class PurchaserInfoModel: NSObject, JSONCodable {
 
-    public var promotionalOfferEligibility: Bool
-    public var introductoryOfferEligibility: Bool
-    public var paidAccessLevels: [String: PaidAccessLevelsInfoModel]
-    public var subscriptions: [String: SubscriptionsInfoModel]
-    public var nonSubscriptions: [String: [NonSubscriptionsInfoModel]]
-    var appleValidationResult: Parameters?
+    @objc public var promotionalOfferEligibility: Bool
+    @objc public var introductoryOfferEligibility: Bool
+    @objc public var paidAccessLevels: [String: PaidAccessLevelsInfoModel]
+    @objc public var subscriptions: [String: SubscriptionsInfoModel]
+    @objc public var nonSubscriptions: [String: [NonSubscriptionsInfoModel]]
+    @objc var appleValidationResult: Parameters?
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -83,22 +83,22 @@ public class PurchaserInfoModel: NSObject, JSONCodable {
 
 }
 
-public class PaidAccessLevelsInfoModel: JSONCodable {
+public class PaidAccessLevelsInfoModel: NSObject, JSONCodable {
     
-    public var id: String
-    public var isActive: Bool
-    public var vendorProductId: String
-    public var store: String
-    public var activatedAt: Date
-    public var renewedAt: Date?
-    public var expiresAt: Date?
-    public var isLifetime: Bool
-    public var activeIntroductoryOfferType: String?
-    public var activePromotionalOfferType: String?
-    public var willRenew: Bool
-    public var isInGracePeriod: Bool
-    public var unsubscribedAt: Date?
-    public var billingIssueDetectedAt: Date?
+    @objc public var id: String
+    @objc public var isActive: Bool
+    @objc public var vendorProductId: String
+    @objc public var store: String
+    @objc public var activatedAt: Date
+    @objc public var renewedAt: Date?
+    @objc public var expiresAt: Date?
+    @objc public var isLifetime: Bool
+    @objc public var activeIntroductoryOfferType: String?
+    @objc public var activePromotionalOfferType: String?
+    @objc public var willRenew: Bool
+    @objc public var isInGracePeriod: Bool
+    @objc public var unsubscribedAt: Date?
+    @objc public var billingIssueDetectedAt: Date?
     
     required init?(json: Parameters) throws {
         guard
@@ -132,24 +132,24 @@ public class PaidAccessLevelsInfoModel: JSONCodable {
 
 }
 
-public class SubscriptionsInfoModel: JSONCodable {
+public class SubscriptionsInfoModel: NSObject, JSONCodable {
     
-    public var isActive: Bool
-    public var vendorProductId: String
-    public var store: String
-    public var activatedAt: Date
-    public var renewedAt: Date?
-    public var expiresAt: Date?
-    public var isLifetime: Bool
-    public var activeIntroductoryOfferType: String?
-    public var activePromotionalOfferType: String?
-    public var willRenew: Bool
-    public var isInGracePeriod: Bool
-    public var unsubscribedAt: Date?
-    public var billingIssueDetectedAt: Date?
-    public var isSandbox: Bool
-    public var vendorTransactionId: String?
-    public var vendorOriginalTransactionId: String?
+    @objc public var isActive: Bool
+    @objc public var vendorProductId: String
+    @objc public var store: String
+    @objc public var activatedAt: Date
+    @objc public var renewedAt: Date?
+    @objc public var expiresAt: Date?
+    @objc public var isLifetime: Bool
+    @objc public var activeIntroductoryOfferType: String?
+    @objc public var activePromotionalOfferType: String?
+    @objc public var willRenew: Bool
+    @objc public var isInGracePeriod: Bool
+    @objc public var unsubscribedAt: Date?
+    @objc public var billingIssueDetectedAt: Date?
+    @objc public var isSandbox: Bool
+    @objc public var vendorTransactionId: String?
+    @objc public var vendorOriginalTransactionId: String?
     
     required init?(json: Parameters) throws {
         guard
@@ -185,16 +185,16 @@ public class SubscriptionsInfoModel: JSONCodable {
 
 }
 
-public class NonSubscriptionsInfoModel: JSONCodable {
+public class NonSubscriptionsInfoModel: NSObject, JSONCodable {
     
-    public var purchaseId: String
-    public var vendorProductId: String
-    public var store: String
-    public var purchasedAt: Date
-    public var isOneTime: Bool
-    public var isSandbox: Bool
-    public var vendorTransactionId: String?
-    public var vendorOriginalTransactionId: String?
+    @objc public var purchaseId: String
+    @objc public var vendorProductId: String
+    @objc public var store: String
+    @objc public var purchasedAt: Date
+    @objc public var isOneTime: Bool
+    @objc public var isSandbox: Bool
+    @objc public var vendorTransactionId: String?
+    @objc public var vendorOriginalTransactionId: String?
     
     required init?(json: Parameters) throws {
         guard

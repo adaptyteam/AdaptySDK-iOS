@@ -10,9 +10,9 @@ import StoreKit
 
 public class ProductModel: NSObject, JSONCodable {
     
-    public var vendorProductId: String
-    public var title: String
-    public var skProduct: SKProduct?
+    @objc public var vendorProductId: String
+    @objc public var title: String
+    @objc public var skProduct: SKProduct?
     
     required init?(json: Parameters) throws {
         guard

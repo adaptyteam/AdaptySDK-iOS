@@ -9,11 +9,11 @@ import Foundation
 
 public class PurchaseContainerModel: NSObject, JSONCodable {
     
-    public var developerId: String
-    public var variationId: String
-    public var revision: Int?
-    public var isWinback: Bool?
-    public var products: [ProductModel] = []
+    @objc public var developerId: String
+    @objc public var variationId: String
+    @objc public var revision: Int = 0
+    @objc public var isWinback: Bool = false
+    @objc public var products: [ProductModel] = []
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -32,8 +32,8 @@ public class PurchaseContainerModel: NSObject, JSONCodable {
         
         self.developerId = developerId
         self.variationId = variationId
-        self.revision = attributes?["revision"] as? Int
-        self.isWinback = attributes?["is_winback"] as? Bool
+        if let revision = attributes?["revision"] as? Int { self.revision = revision }
+        if let isWinback = attributes?["is_winback"] as? Bool { self.isWinback = isWinback }
         
         guard let products = attributes?["products"] as? [Parameters] else {
             throw SerializationError.missing("products")
