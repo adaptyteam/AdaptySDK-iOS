@@ -234,7 +234,7 @@ import UIKit
         shared.iapManager.restorePurchases(completion)
     }
     
-    @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping ValidateReceiptCompletion) {
+    @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, vendorProductId: String? = nil, transactionId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping ValidateReceiptCompletion) {
         guard let profileId = shared.profile?.profileId else {
             completion(nil, nil, NetworkResponse.missingRequiredParams)
             return
@@ -245,6 +245,8 @@ import UIKit
         attributes["profile_id"] = profileId
         attributes["receipt_encoded"] = receiptEncoded
         if let variationId = variationId { attributes["variation_id"] = variationId }
+        if let vendorProductId = vendorProductId { attributes["vendor_product_id"] = vendorProductId }
+        if let transactionId = transactionId { attributes["transaction_id"] = transactionId }
         if let originalPrice = originalPrice { attributes["original_price"] = originalPrice.stringValue }
         if let discountPrice = discountPrice { attributes["discount_price"] = discountPrice.stringValue }
         if let priceLocale = priceLocale {

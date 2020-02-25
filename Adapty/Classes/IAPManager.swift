@@ -367,7 +367,7 @@ extension IAPManager: SKPaymentTransactionObserver {
             discountPrice = skProduct?.discounts.filter({ $0.identifier == transaction.payment.paymentDiscount?.identifier }).first?.price
         }
         
-        Adapty.validateReceipt(receipt, variationId: variationId, originalPrice: skProduct?.price, discountPrice: discountPrice, priceLocale: skProduct?.priceLocale) { (purchaserInfo, appleValidationResult, error) in
+        Adapty.validateReceipt(receipt, variationId: variationId, vendorProductId: transaction.payment.productIdentifier, transactionId: transaction.transactionIdentifier, originalPrice: skProduct?.price, discountPrice: discountPrice, priceLocale: skProduct?.priceLocale) { (purchaserInfo, appleValidationResult, error) in
             // return successful response in any case, sync transaction later once more in case of error
             self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .success((purchaserInfo, receipt, appleValidationResult)))
             
