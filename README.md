@@ -14,6 +14,8 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
 - Xcode 10.2+
 - Swift 5+
 
+You can also use Adapty SDK in Objective-C applications.
+
 ## Installation
 
 ### CocoaPods
@@ -35,10 +37,10 @@ import Adapty
 And add the following to `application(_:didFinishLaunchingWithOptions:)`:
 
 ```Swift
-Adapty.activate("YOUR_APP_KEY", customerUserId: "YOUR_USER_ID")
+Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID")
 ```
 
-If your app doesn't have user IDs, you can use **`.activate("YOUR_APP_KEY")`** or pass nil for the **`customerUserId`**. Anyway, you can update **`customerUserId`** later within user update request.
+If your app doesn't have user IDs, you can use **`.activate("PUBLIC_SDK_KEY")`** or pass nil for the **`customerUserId`**. Anyway, you can update **`customerUserId`** later within user update request.
 
 ### Convert anonymous user to identifiable user
 
@@ -59,7 +61,7 @@ In some cases, if you have already built a functioning subscription system, it m
 Just configure Adapty SDK in Observer Mode – update **`.activate`** method:
 
 ```Swift
-Adapty.activate("YOUR_APP_KEY", customerUserId: "YOUR_USER_ID", observerMode: true)
+Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID", observerMode: true)
 ```
 
 ### Update your user
