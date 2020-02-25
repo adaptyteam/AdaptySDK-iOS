@@ -36,10 +36,12 @@ enum NetworkResponse: String, Error {
     case statusError = "Received 'failure' status."
 }
 
+typealias RequestCompletion <T: JSONCodable> = (Result<T, Error>, HTTPURLResponse?) -> Void
+
 class RequestManager {
     
     @discardableResult
-    class func request<T: JSONCodable>(router: Router, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
+    class func request<T: JSONCodable>(router: Router, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         do {
             let urlRequest = try router.asURLRequest()
             return request(urlRequest: urlRequest, router: router, completion: completion)
@@ -51,14 +53,14 @@ class RequestManager {
     }
 
     @discardableResult
-    class func request<T: JSONCodable>(urlRequest: URLRequest, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
+    class func request<T: JSONCodable>(urlRequest: URLRequest, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         return request(urlRequest: urlRequest, router: nil, completion: completion)
     }
 
     @discardableResult
-    private class func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) -> URLSessionDataTask? {
+    private class func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            DispatchQueue.main.async {
+            DispatchQueue.global(qos: .background).async {
                 self.handleResponse(data: data, response: response, error: error, router: router, completion: completion)
             }
         }
@@ -68,26 +70,26 @@ class RequestManager {
         return dataTask
     }
     
-    private class func handleResponse<T: JSONCodable>(data: Data?, response: URLResponse?, error: Error?, router: Router?, completion: @escaping (Result<T, Error>, HTTPURLResponse?) -> ()) {
+    private class func handleResponse<T: JSONCodable>(data: Data?, response: URLResponse?, error: Error?, router: Router?, completion: @escaping RequestCompletion<T>) {
         if let error = error {
-            completion(.failure(error), nil)
+            handleResult(result: .failure(error), response: nil, completion: completion)
             return
         }
         
         guard let response = response as? HTTPURLResponse else {
-            completion(.failure(NetworkResponse.emptyResponse), nil)
+            handleResult(result: .failure(NetworkResponse.emptyResponse), response: nil, completion: completion)
             return
         }
         
         logJSON(data)
         
         guard let data = data else {
-            completion(.failure(NetworkResponse.emptyData), response)
+            handleResult(result: .failure(NetworkResponse.emptyData), response: response, completion: completion)
             return
         }
         
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-            completion(.failure(NetworkResponse.unableToDecode), nil)
+            handleResult(result: .failure(NetworkResponse.unableToDecode), response: nil, completion: completion)
             return
         }
         
@@ -95,14 +97,14 @@ class RequestManager {
             do {
                 let errors = try ResponseErrorsArray(json: json)
                 if let error = errors?.errors.first {
-                    completion(.failure(NSError(domain: "", code: error.code, userInfo: [NSLocalizedDescriptionKey: error.description])), nil)
+                    handleResult(result: .failure(NSError(domain: "", code: error.code, userInfo: [NSLocalizedDescriptionKey: error.description])), response: nil, completion: completion)
                     return
                 }
                 
-                completion(.failure(error), response)
+                handleResult(result: .failure(error), response: response, completion: completion)
                 return
             } catch {
-                completion(.failure(error), response)
+                handleResult(result: .failure(error), response: response, completion: completion)
                 return
             }
         }
@@ -112,7 +114,7 @@ class RequestManager {
         do {
             if let keyPath = router?.keyPath {
                 guard let json = json[keyPath] as? [String: Any] else {
-                    completion(.failure(NetworkResponse.unableToDecode), nil)
+                    handleResult(result: .failure(NetworkResponse.unableToDecode), response: nil, completion: completion)
                     return
                 }
                 
@@ -121,14 +123,25 @@ class RequestManager {
                 responseObject = try T(json: json)
             }
         } catch {
-            completion(.failure(error), nil)
+            handleResult(result: .failure(error), response: nil, completion: completion)
             return
         }
         
         if let responseObject = responseObject {
-            completion(.success(responseObject), response)
+            handleResult(result: .success(responseObject), response: response, completion: completion)
         } else {
-            completion(.failure(NetworkResponse.unableToDecode), response)
+            handleResult(result: .failure(NetworkResponse.unableToDecode), response: response, completion: completion)
+        }
+    }
+    
+    private class func handleResult<T: JSONCodable>(result: Result<T, Error>, response: HTTPURLResponse?, completion: @escaping RequestCompletion<T>) {
+        DispatchQueue.main.async {
+            switch result {
+            case .success(let result):
+                completion(.success(result), response)
+            case .failure(let error):
+                completion(.failure(error), response)
+            }
         }
     }
     
