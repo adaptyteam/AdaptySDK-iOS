@@ -116,6 +116,12 @@ import UIKit
         }
     }
     
+    @objc public class func identify(_ customerUserId: String, completion: ErrorCompletion? = nil) {
+        initialCustomerUserId = customerUserId
+        shared.softLogout()
+        shared.createProfile(completion)
+    }
+    
     @objc public class func updateProfile(
         customerUserId: String? = nil,
         email: String? = nil,
@@ -293,11 +299,15 @@ import UIKit
         shared.apiManager.getPurchaserInfo(id: profileId, completion: completion)
     }
     
-    @objc public class func logout(_ completion: ErrorCompletion? = nil) {
-        shared.sessionsManager.invalidateLiveTrackerTimer()
-        shared.profile = nil
-        shared.installation = nil
+    private func softLogout() {
+        sessionsManager.invalidateLiveTrackerTimer()
+        profile = nil
+        installation = nil
         DefaultsManager.shared.clean()
+    }
+    
+    @objc public class func logout(_ completion: ErrorCompletion? = nil) {
+        shared.softLogout()
         
         // automatically create new profile
         shared.createProfile(completion)

@@ -40,6 +40,18 @@ Adapty.activate("YOUR_APP_KEY", customerUserId: "YOUR_USER_ID")
 
 If your app doesn't have user IDs, you can use **`.activate("YOUR_APP_KEY")`** or pass nil for the **`customerUserId`**. Anyway, you can update **`customerUserId`** later within user update request.
 
+### Convert anonymous user to identifiable user
+
+If you don't have an customerUserId on instantiation, you can set it later at any time with the .identify() method. The most common cases are after registration, when a user switches from being an anonymous user (with a undefined customerUserId) to an authenticated user with some ID.
+
+```Swift
+Adapty.identify("YOUR_USER_ID") { (error) in
+    if error == nil {
+        // successful identify
+    }
+}
+```
+
 ### Observer Mode
 
 In some cases, if you have already built a functioning subscription system, it may not be possible or feasible to use the Adapty SDK to make purchases. However, you can still use the SDK to get access to the data.
@@ -243,6 +255,8 @@ func application(application: UIApplication, didRegisterForRemoteNotificationsWi
 ```
 
 ### Logout user
+
+Makes your user anonymous.
 
 ```Swift
 Adapty.logout { (error) in
