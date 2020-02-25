@@ -67,8 +67,7 @@ Adapty.activate("YOUR_APP_KEY", customerUserId: "YOUR_USER_ID", observerMode: tr
 Later you might want to update your user.
 
 ```Swift
-Adapty.updateProfile(customerUserId: "<id-in-your-system>",
-                     email: "example@email.com",
+Adapty.updateProfile(email: "example@email.com",
                      phoneNumber: "+1-###-###-####",
                      facebookUserId: "###############",
                      amplitudeUserId: "###",

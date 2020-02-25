@@ -53,7 +53,7 @@
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bty-ga-wsk">
                                         <rect key="frame" x="255" y="177" width="104" height="30"/>
-                                        <state key="normal" title="Update Profile"/>
+                                        <state key="normal" title="Identify user"/>
                                         <connections>
                                             <action selector="updateProfileButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="RKa-r4-dh0"/>
                                         </connections>

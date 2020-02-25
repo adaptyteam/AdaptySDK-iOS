@@ -48,12 +48,12 @@ class ViewController: UIViewController {
         }
         
         setLoader(true)
-        Adapty.updateProfile(customerUserId: customerUserId) { (error) in
+        Adapty.identify(customerUserId) { (error) in
             self.setLoader(false)
             if let error = error {
-                self.infoLabel.text = "Failed to update user: \(error)"
+                self.infoLabel.text = "Failed to identify user: \(error)"
             } else {
-                self.infoLabel.text = "User updated successfully"
+                self.infoLabel.text = "Successfully identified user"
             }
             
             self.updateCustomerUserIdLabel()

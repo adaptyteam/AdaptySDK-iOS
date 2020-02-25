@@ -123,7 +123,6 @@ import UIKit
     }
     
     @objc public class func updateProfile(
-        customerUserId: String? = nil,
         email: String? = nil,
         phoneNumber: String? = nil,
         facebookUserId: String? = nil,
@@ -142,7 +141,6 @@ import UIKit
         
         var attributes = Parameters()
         
-        if let customerUserId = customerUserId { attributes["customer_user_id"] = customerUserId }
         if let email = email { attributes["email"] = email }
         if let phoneNumber = phoneNumber { attributes["phone_number"] = phoneNumber }
         if let facebookUserId = facebookUserId { attributes["facebook_user_id"] = facebookUserId }
