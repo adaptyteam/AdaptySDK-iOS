@@ -34,10 +34,12 @@ class ViewController: UIViewController {
     }
 
     @IBAction func logOutButtonAction(_ sender: Any) {
-        Adapty.logout()
-        
-        updateCustomerUserIdLabel()
-        infoLabel.text = "User logged out successfully"
+        Adapty.logout { (error) in
+            if error == nil {
+                self.updateCustomerUserIdLabel()
+                self.infoLabel.text = "User logged out successfully"
+            }
+        }
     }
     
     @IBAction func updateProfileButtonAction(_ sender: Any) {

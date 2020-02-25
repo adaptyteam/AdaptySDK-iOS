@@ -291,14 +291,14 @@ import UIKit
         shared.apiManager.getPurchaserInfo(id: profileId, completion: completion)
     }
     
-    @objc public class func logout() {
+    @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         shared.sessionsManager.invalidateLiveTrackerTimer()
         shared.profile = nil
         shared.installation = nil
         DefaultsManager.shared.clean()
         
         // automatically create new profile
-        shared.createProfile()
+        shared.createProfile(completion)
     }
     
 }

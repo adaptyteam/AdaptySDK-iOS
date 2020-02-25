@@ -242,6 +242,16 @@ func application(application: UIApplication, didRegisterForRemoteNotificationsWi
 }
 ```
 
+### Logout user
+
+```Swift
+Adapty.logout { (error) in
+    if error == nil {
+        // successful logout
+    }
+}
+```
+
 ## License
 
 Adapty is available under the GNU license. [See LICENSE](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.

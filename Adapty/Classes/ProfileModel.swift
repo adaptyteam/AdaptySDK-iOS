@@ -11,7 +11,7 @@ import Foundation
 public class ProfileModel: JSONCodable, Codable {
     
     var profileId: String
-    var customerUserId: String
+    var customerUserId: String?
 
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -22,14 +22,13 @@ public class ProfileModel: JSONCodable, Codable {
         }
         
         guard
-            let profileId = attributes?["id"] as? String,
-            let customerUserId = attributes?["customer_user_id"] as? String
+            let profileId = attributes?["id"] as? String
         else {
-            throw SerializationError.missing("id, customerUserId")
+            throw SerializationError.missing("id")
         }
         
         self.profileId = profileId
-        self.customerUserId = customerUserId
+        self.customerUserId = attributes?["customer_user_id"] as? String
     }
     
 }
