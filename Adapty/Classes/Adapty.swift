@@ -52,13 +52,17 @@ import UIKit
     }
     
     @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) {
+        activate(apiKey, observerMode: observerMode, customerUserId: customerUserId, completion: nil)
+    }
+    
+    @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?, completion: ErrorCompletion? = nil) {
         Constants.APIKeys.secretKey = apiKey
         self.observerMode = observerMode
         self.initialCustomerUserId = customerUserId
-        shared.configure()
+        shared.configure(completion)
     }
     
-    private func configure() {
+    private func configure(_ completion: ErrorCompletion? = nil) {
         if isConfigured { return }
         isConfigured = true
         
@@ -66,10 +70,11 @@ import UIKit
         
         if profile == nil {
             // didn't find existing profile, create a new one and perform initial requests right after
-            createProfile()
+            createProfile(completion)
         } else {
             // already have a profile, just perform initial requests
             performInitialRequests()
+            completion?(nil)
         }
         
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
