@@ -57,6 +57,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable {
 class PurchaseContainersArray: JSONCodable {
     
     var containers: [PurchaseContainerModel] = []
+    var products: [ProductModel] = []
     
     required init?(json: Parameters) throws {
         guard let containers = json["data"] as? [Parameters] else {
@@ -71,6 +72,20 @@ class PurchaseContainersArray: JSONCodable {
             }
         } catch {
             throw SerializationError.invalid("purchase_containers", containers)
+        }
+        
+        guard let meta = json["meta"] as? Parameters, let products = meta["products"] as? [Parameters] else {
+            return
+        }
+        
+        do {
+            try products.forEach { (params) in
+                if let product = try ProductModel(json: params) {
+                    self.products.append(product)
+                }
+            }
+        } catch {
+            throw SerializationError.invalid("products in meta", meta)
         }
     }
     

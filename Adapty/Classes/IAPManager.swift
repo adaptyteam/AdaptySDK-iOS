@@ -45,8 +45,9 @@ class IAPManager: NSObject {
         DefaultsManager.shared.profile
     }
     private var containers: [PurchaseContainerModel]?
+    private var products: [ProductModel]?
     private var productIDs: Set<String>? {
-        if let ids = containers?.flatMap({ $0.products.map({ $0.vendorProductId }) }) {
+        if let ids = products?.map({ $0.vendorProductId }) {
             return Set(ids)
         }
         return nil
@@ -99,7 +100,7 @@ class IAPManager: NSObject {
     private func getContainersAndSyncProducts() {
         var params = Parameters()
         if let profileId = profile?.profileId { params["profile_id"] = profileId }
-        apiManager.getPurchaseContainers(params: params) { (containers, error) in
+        apiManager.getPurchaseContainers(params: params) { (containers, products, error) in
             if let error = error {
                 // call completion and clear it
                 self.callPurchaseContainersCompletionAndCleanCallback(.failure(error))
@@ -107,6 +108,7 @@ class IAPManager: NSObject {
             }
             
             self.containers = containers
+            self.products = products
             self.requestProducts()
         }
     }
@@ -296,6 +298,10 @@ extension IAPManager: SKProductsRequestDelegate {
             if let products = containers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }) {
                 products.forEach({ $0.skProduct = skProduct })
             }
+            
+            products?.filter({ $0.vendorProductId == skProduct.productIdentifier }).forEach({ (product) in
+                product.skProduct = skProduct
+            })
         }
         
         if response.products.count > 0, let containers = containers, containers.count > 0 {
@@ -338,7 +344,7 @@ extension IAPManager: SKPaymentTransactionObserver {
     }
     
     private func skProduct(for transaction: SKPaymentTransaction) -> SKProduct? {
-        return containers?.flatMap({ $0.products }).filter({ $0.vendorProductId == transaction.payment.productIdentifier }).first?.skProduct
+        return products?.filter({ $0.vendorProductId == transaction.payment.productIdentifier }).first?.skProduct
     }
     
     private func purchased(_ transaction: SKPaymentTransaction) {

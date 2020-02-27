@@ -14,7 +14,7 @@ public class PurchaserInfoModel: NSObject, JSONCodable {
     @objc public var paidAccessLevels: [String: PaidAccessLevelsInfoModel]
     @objc public var subscriptions: [String: SubscriptionsInfoModel]
     @objc public var nonSubscriptions: [String: [NonSubscriptionsInfoModel]]
-    @objc var appleValidationResult: Parameters?
+    var appleValidationResult: Parameters?
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
