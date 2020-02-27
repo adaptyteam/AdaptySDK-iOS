@@ -6,13 +6,10 @@
 
 ![Adapty: Win back churned subscribers in your iOS app](https://raw.githubusercontent.com/adaptyteam/AdaptySDK-iOS/master/adapty.png)
 
-Adapty helps you track business metrics, and lets you run ad campaigns targeted at churned users faster, written in Swift. https://adapty.io/
-
 ## Requirements
 
-- iOS 12.0+
+- iOS 9.0+
 - Xcode 10.2+
-- Swift 5+
 
 You can also use Adapty SDK in Objective-C applications.
 
