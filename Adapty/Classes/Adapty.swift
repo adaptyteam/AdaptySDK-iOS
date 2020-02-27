@@ -86,9 +86,6 @@ import UIKit
         
         // start observing purchases
         iapManager.startObservingPurchases()
-        
-        // sync latest receipt to server and obtain eligibility criteria for introductory and promotional offers
-        syncTransactionsHistory()
     }
     
     //MARK: - REST
@@ -112,6 +109,9 @@ import UIKit
             
             if error == nil {
                 self.performInitialRequests()
+                
+                // sync latest receipt to server and obtain eligibility criteria for introductory and promotional offers
+                self.syncTransactionsHistory()
             }
         }
     }
