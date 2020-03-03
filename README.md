@@ -18,7 +18,7 @@ You can also use Adapty SDK in Objective-C applications.
 ### CocoaPods
 
 1. Create a Podfile if you don't have one: `pod init`
-2. Add Adapty to your Podfile: `pod 'Adapty', '~> 1.1.0'`
+2. Add Adapty to your Podfile: `pod 'Adapty', '~> 1.2.0'`
 3. Save the file and run: `pod install`. This creates an `.xcworkspace` file for your app. Use this file for all future development on your application.
 
 ## Usage
