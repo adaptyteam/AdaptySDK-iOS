@@ -62,8 +62,8 @@ class DefaultsManager {
     }
     
     func clean() {
-        let appDomain = Bundle.main.bundleIdentifier!
-        defaults.removePersistentDomain(forName: appDomain)
+        defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
+        defaults.removeObject(forKey: Constants.UserDefaults.cachedTransactionsIds)
     }
     
 }

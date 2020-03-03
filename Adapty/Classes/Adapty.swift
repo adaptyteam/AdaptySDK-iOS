@@ -70,7 +70,7 @@ import UIKit
         
         if profile == nil {
             // didn't find existing profile, create a new one and perform initial requests right after
-            createProfile(completion)
+            createProfile(Self.initialCustomerUserId, completion)
         } else {
             // already have a profile, just perform initial requests
             performInitialRequests()
@@ -95,20 +95,16 @@ import UIKit
     
     //MARK: - REST
     
-    private func createProfile(_ completion: ErrorCompletion? = nil) {
-        if profile != nil {
-            completion?(NetworkResponse.alreadyAuthenticatedError)
-            return
-        }
-        
+    private func createProfile(_ customerUserId: String?, _ completion: ErrorCompletion? = nil) {
         var attributes = Parameters()
         
+        let profileId = profile?.profileId ?? UserProperties.staticUuid
         if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
-        if let customerUserId = Self.initialCustomerUserId { attributes["customer_user_id"] = customerUserId }
+        if let customerUserId = customerUserId { attributes["customer_user_id"] = customerUserId }
         
-        let params = Parameters.formatData(with: UserProperties.staticUuid, type: Constants.TypeNames.profile, attributes: attributes)
+        let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         
-        apiManager.createProfile(id: UserProperties.staticUuid, params: params) { (profile, error, isNew) in
+        apiManager.createProfile(id: profileId, params: params) { (profile, error, isNew) in
             self.profile = profile
             completion?(error)
             
@@ -122,9 +118,7 @@ import UIKit
     }
     
     @objc public class func identify(_ customerUserId: String, completion: ErrorCompletion? = nil) {
-        initialCustomerUserId = customerUserId
-        shared.softLogout()
-        shared.createProfile(completion)
+        shared.createProfile(customerUserId, completion)
     }
     
     @objc public class func updateProfile(
@@ -302,18 +296,14 @@ import UIKit
         shared.apiManager.getPurchaserInfo(id: profileId, completion: completion)
     }
     
-    private func softLogout() {
-        sessionsManager.invalidateLiveTrackerTimer()
-        profile = nil
-        installation = nil
-        DefaultsManager.shared.clean()
-    }
-    
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
-        shared.softLogout()
+        shared.sessionsManager.invalidateLiveTrackerTimer()
+        shared.profile = nil
+        shared.installation = nil
+        DefaultsManager.shared.clean()
         
         // automatically create new profile
-        shared.createProfile(completion)
+        shared.createProfile(nil, completion)
     }
     
 }

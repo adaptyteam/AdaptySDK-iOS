@@ -37,7 +37,7 @@ And add the following to `application(_:didFinishLaunchingWithOptions:)`:
 Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID")
 ```
 
-If your app doesn't have user IDs, you can use **`.activate("PUBLIC_SDK_KEY")`** or pass nil for the **`customerUserId`**. Anyway, you can update **`customerUserId`** later within user update request.
+If your app doesn't have user IDs, you can use **`.activate("PUBLIC_SDK_KEY")`** or pass nil for the **`customerUserId`**. Anyway, you can update **`customerUserId`** later within **`.identify()`** request.
 
 ### Convert anonymous user to identifiable user
 
