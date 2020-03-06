@@ -41,8 +41,8 @@ private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment
 
 class IAPManager: NSObject {
     
-    private var profile: ProfileModel? {
-        DefaultsManager.shared.profile
+    private var profileId: String {
+        DefaultsManager.shared.profileId
     }
     private var containers: [PurchaseContainerModel]?
     private var products: [ProductModel]?
@@ -69,11 +69,13 @@ class IAPManager: NSObject {
     private var totalRestoredPurchases = 0
     private var restorePurchasesCompletion: ErrorCompletion?
     
-    private lazy var apiManager: ApiManager = {
-        return ApiManager.shared
-    }()
+    private var apiManager: ApiManager
     
     // MARK:- Public
+    
+    init(apiManager: ApiManager) {
+        self.apiManager = apiManager
+    }
     
     func startObservingPurchases() {
         startObserving()
@@ -98,9 +100,7 @@ class IAPManager: NSObject {
     }
     
     private func getContainersAndSyncProducts() {
-        var params = Parameters()
-        if let profileId = profile?.profileId { params["profile_id"] = profileId }
-        apiManager.getPurchaseContainers(params: params) { (containers, products, error) in
+        apiManager.getPurchaseContainers(params: ["profile_id": profileId]) { (containers, products, error) in
             if let error = error {
                 // call completion and clear it
                 self.callPurchaseContainersCompletionAndCleanCallback(.failure(error))
@@ -195,12 +195,7 @@ class IAPManager: NSObject {
     
     @available(iOS 12.2, *)
     private func createPayment(from product: ProductModel, discountId: String, skProduct: SKProduct, completion: BuyProductCompletion? = nil) {
-        guard let profileId = profile?.profileId else {
-            completion?(nil, nil, nil, product, IAPManagerError.missingOfferSigningParams)
-            return
-        }
-        
-        ApiManager.shared.signSubscriptionOffer(params: ["product": product.vendorProductId, "offer_code": discountId, "profile_id": profileId]) { (params, error) in
+        apiManager.signSubscriptionOffer(params: ["product": product.vendorProductId, "offer_code": discountId, "profile_id": profileId]) { (params, error) in
             guard error == nil else {
                 completion?(nil, nil, nil, product, error)
                 return

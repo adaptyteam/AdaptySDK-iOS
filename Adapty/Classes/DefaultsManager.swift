@@ -15,6 +15,28 @@ class DefaultsManager {
     
     private init() {}
     
+    var profileId: String {
+        get {
+            if let profileId = defaults.string(forKey: Constants.UserDefaults.profileId) {
+                return profileId
+            }
+            
+            // try to restore profileId from cached profile
+            // basically, backward compatibility only
+            if let profileId = profile?.profileId {
+                self.profileId = profileId
+                return profileId
+            }
+            
+            // generate new profileId
+            let profileId = UserProperties.uuid
+            self.profileId = profileId
+            return profileId
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.profileId)
+        }
+    }
     var profile: ProfileModel? {
         get {
             if let data = defaults.object(forKey: Constants.UserDefaults.profile) as? Data, let profile = try? JSONDecoder().decode(ProfileModel.self, from: data) {

@@ -9,8 +9,8 @@ import Foundation
 
 class SessionsManager {
     
-    private var profile: ProfileModel? {
-        DefaultsManager.shared.profile
+    private var profileId: String {
+        DefaultsManager.shared.profileId
     }
     private var installation: InstallationModel? {
         DefaultsManager.shared.installation
@@ -40,8 +40,8 @@ class SessionsManager {
     }
     
     private func trackLiveEvent(completion: ((Error?) -> Void)? = nil) {
-        guard let profileId = profile?.profileId, let installation = installation else {
-            completion?(NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid profileId or profileInstallationMetaId"]))
+        guard let installation = installation else {
+            completion?(NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid installation"]))
             return
         }
         

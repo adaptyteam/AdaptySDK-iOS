@@ -36,6 +36,7 @@ struct Constants {
     }
     
     struct UserDefaults {
+        static let profileId = "AdaptySDK_Profile_Id"
         static let profile = "AdaptySDK_Profile"
         static let installation = "AdaptySDK_Installation"
         static let cachedEvents = "AdaptySDK_Cached_Events"

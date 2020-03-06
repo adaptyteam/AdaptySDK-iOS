@@ -40,11 +40,19 @@ typealias RequestCompletion <T: JSONCodable> = (Result<T, Error>, HTTPURLRespons
 
 class RequestManager {
     
+    static let shared = RequestManager()
+    private var tasksQueue: [URLSessionDataTask] = [] {
+        didSet {
+            startNewRequestIfPossible()
+        }
+    }
+    private var currentTask: URLSessionDataTask?
+    
     @discardableResult
     class func request<T: JSONCodable>(router: Router, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         do {
             let urlRequest = try router.asURLRequest()
-            return request(urlRequest: urlRequest, router: router, completion: completion)
+            return shared.performRequest(urlRequest, router: router, completion: completion)
         } catch {
             completion(.failure(error), nil)
         }
@@ -54,23 +62,32 @@ class RequestManager {
 
     @discardableResult
     class func request<T: JSONCodable>(urlRequest: URLRequest, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
-        return request(urlRequest: urlRequest, router: nil, completion: completion)
+        return shared.performRequest(urlRequest, router: nil, completion: completion)
     }
 
     @discardableResult
-    private class func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
+    private func performRequest<T: JSONCodable>(_ urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             DispatchQueue.global(qos: .background).async {
                 self.handleResponse(data: data, response: response, error: error, router: router, completion: completion)
             }
         }
 
-        dataTask.resume()
+        tasksQueue.append(dataTask)
 
         return dataTask
     }
     
-    private class func handleResponse<T: JSONCodable>(data: Data?, response: URLResponse?, error: Error?, router: Router?, completion: @escaping RequestCompletion<T>) {
+    private func startNewRequestIfPossible() {
+        guard currentTask == nil else {
+            return
+        }
+        
+        currentTask = tasksQueue.first
+        currentTask?.resume()
+    }
+    
+    private func handleResponse<T: JSONCodable>(data: Data?, response: URLResponse?, error: Error?, router: Router?, completion: @escaping RequestCompletion<T>) {
         if let error = error {
             handleResult(result: .failure(error), response: nil, completion: completion)
             return
@@ -134,7 +151,7 @@ class RequestManager {
         }
     }
     
-    private class func handleResult<T: JSONCodable>(result: Result<T, Error>, response: HTTPURLResponse?, completion: @escaping RequestCompletion<T>) {
+    private func handleResult<T: JSONCodable>(result: Result<T, Error>, response: HTTPURLResponse?, completion: @escaping RequestCompletion<T>) {
         DispatchQueue.main.async {
             switch result {
             case .success(let result):
@@ -143,9 +160,12 @@ class RequestManager {
                 completion(.failure(error), response)
             }
         }
+        
+        currentTask = nil
+        tasksQueue.removeFirst()
     }
     
-    private class func handleNetworkResponse(_ response: HTTPURLResponse) -> Error? {
+    private func handleNetworkResponse(_ response: HTTPURLResponse) -> Error? {
         switch response.statusCode {
         case 200...299: return nil
         case 401...499: return NetworkResponse.authenticationError
@@ -155,7 +175,7 @@ class RequestManager {
         }
     }
     
-    private class func logJSON(_ data: Data?) {
+    private func logJSON(_ data: Data?) {
 //        if let data = data, let jsonString = String(data: data, encoding: .utf8) {
 //            print("Response : \(jsonString)")
 //        }

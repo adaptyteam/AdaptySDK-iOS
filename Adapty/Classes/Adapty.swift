@@ -12,8 +12,19 @@ import UIKit
 @objc public class Adapty: NSObject {
     
     private static let shared = Adapty()
+    private var profileId: String = DefaultsManager.shared.profileId {
+        didSet {
+            DefaultsManager.shared.profileId = profileId
+        }
+    }
     private var profile: ProfileModel? = DefaultsManager.shared.profile {
         didSet {
+            if let profileId = profile?.profileId {
+                self.profileId = profileId
+            } else {
+                self.profileId = UserProperties.uuid
+            }
+            
             DefaultsManager.shared.profile = profile
         }
     }
@@ -23,13 +34,13 @@ import UIKit
         }
     }
     private lazy var apiManager: ApiManager = {
-        return ApiManager.shared
+        return ApiManager()
     }()
     private lazy var sessionsManager: SessionsManager = {
         return SessionsManager()
     }()
     private lazy var iapManager: IAPManager = {
-        return IAPManager()
+        return IAPManager(apiManager: apiManager)
     }()
     private var isConfigured = false
     private static var initialCustomerUserId: String?
@@ -66,16 +77,16 @@ import UIKit
         if isConfigured { return }
         isConfigured = true
         
-        AppDelegateSwizzler.startSwizzlingIfPossible(self)
-        
         if profile == nil {
-            // didn't find existing profile, create a new one and perform initial requests right after
+            // didn't find synced profile, sync a local one and perform initial requests right after
             createProfile(Self.initialCustomerUserId, completion)
         } else {
-            // already have a profile, just perform initial requests
+            // already have a synced profile, just perform initial requests
             performInitialRequests()
             completion?(nil)
         }
+        
+        AppDelegateSwizzler.startSwizzlingIfPossible(self)
         
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.sessionsManager.trackLiveEventInBackground()
@@ -98,14 +109,17 @@ import UIKit
     private func createProfile(_ customerUserId: String?, _ completion: ErrorCompletion? = nil) {
         var attributes = Parameters()
         
-        let profileId = profile?.profileId ?? UserProperties.staticUuid
         if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         if let customerUserId = customerUserId { attributes["customer_user_id"] = customerUserId }
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         
         apiManager.createProfile(id: profileId, params: params) { (profile, error, isNew) in
-            self.profile = profile
+            if let profile = profile {
+                // do not overwrite in case of error
+                self.profile = profile
+            }
+            
             completion?(error)
             
             if error == nil {
@@ -133,10 +147,7 @@ import UIKit
         birthday: Date? = nil,
         completion: ErrorCompletion? = nil)
     {
-        guard let profileId = shared.profile?.profileId else {
-            completion?(NetworkResponse.missingRequiredParams)
-            return
-        }
+        let profileId = shared.profileId
         
         var attributes = Parameters()
         
@@ -163,12 +174,7 @@ import UIKit
     }
     
     private func syncInstallation(_ completion: InstallationCompletion? = nil) {
-        guard let profileId = profile?.profileId else {
-            completion?(nil, NetworkResponse.missingRequiredParams)
-            return
-        }
-        
-        let installationMetaId = installation?.profileInstallationMetaId ?? UserProperties.uuid
+        let installationMetaId = installation?.profileInstallationMetaId ?? UserProperties.staticUuid
 
         var attributes = Parameters()
         
@@ -198,10 +204,7 @@ import UIKit
     }
     
     @objc public class func updateAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
-        guard let profileId = shared.profile?.profileId, let installationMetaId = shared.installation?.profileInstallationMetaId else {
-            completion?(NetworkResponse.missingRequiredParams)
-            return
-        }
+        let installationMetaId = shared.installation?.profileInstallationMetaId ?? UserProperties.staticUuid
         
         var attributes = Parameters()
 
@@ -216,7 +219,7 @@ import UIKit
         
         let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
         
-        shared.apiManager.syncInstallation(id: installationMetaId, profileId: profileId, params: params) { (installation, error) in
+        shared.apiManager.syncInstallation(id: installationMetaId, profileId: shared.profileId, params: params) { (installation, error) in
             if let installation = installation {
                 // do not overwrite in case of error
                 shared.installation = installation
@@ -238,14 +241,9 @@ import UIKit
     }
     
     @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, vendorProductId: String? = nil, transactionId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping ValidateReceiptCompletion) {
-        guard let profileId = shared.profile?.profileId else {
-            completion(nil, nil, NetworkResponse.missingRequiredParams)
-            return
-        }
-        
         var attributes = Parameters()
         
-        attributes["profile_id"] = profileId
+        attributes["profile_id"] = shared.profileId
         attributes["receipt_encoded"] = receiptEncoded
         if let variationId = variationId { attributes["variation_id"] = variationId }
         if let vendorProductId = vendorProductId { attributes["vendor_product_id"] = vendorProductId }
@@ -288,12 +286,7 @@ import UIKit
     }
     
     @objc public class func getPurchaserInfo(_ completion: @escaping PurchaserInfoCompletion) {
-        guard let profileId = shared.profile?.profileId else {
-            completion(nil, NetworkResponse.missingRequiredParams)
-            return
-        }
-        
-        shared.apiManager.getPurchaserInfo(id: profileId, completion: completion)
+        shared.apiManager.getPurchaserInfo(id: shared.profileId, completion: completion)
     }
     
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {

@@ -96,18 +96,13 @@ enum Router {
     }
     
     func asURLRequest() throws -> URLRequest {
-
         var request = URLRequest(url: URL(string: "\(scheme)://\(host)\(stage)\(path)")!,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
                                  timeoutInterval: 10.0)
         if let authorizationHeader = authorizationHeader {
             request.setValue(authorizationHeader, forHTTPHeaderField: Constants.Headers.authorization)
         }
-        if let profileId = DefaultsManager.shared.profile?.profileId {
-            request.setValue(profileId, forHTTPHeaderField: Constants.Headers.profileId)
-        } else {
-            request.setValue(UserProperties.staticUuid, forHTTPHeaderField: Constants.Headers.profileId)
-        }
+        request.setValue(DefaultsManager.shared.profileId, forHTTPHeaderField: Constants.Headers.profileId)
         request.setValue("iOS", forHTTPHeaderField: Constants.Headers.platform)
 
         request.httpMethod = method.rawValue

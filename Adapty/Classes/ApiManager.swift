@@ -20,8 +20,6 @@ public typealias PurchaserInfoCompletion = (PurchaserInfoModel?, Error?) -> Void
 
 class ApiManager {
     
-    static let shared = ApiManager()
-    
     func createProfile(id: String, params: Parameters, completion: @escaping ProfileCreateCompletion) {
         RequestManager.request(router: Router.createProfile(id: id, params: params)) { (result: Result<ProfileModel, Error>, response) in
             switch result {
