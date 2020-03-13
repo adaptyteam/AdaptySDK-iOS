@@ -27,7 +27,7 @@ class InAppContainersTableViewController: UIViewController {
     }
     
     @objc private func loadData() {
-        Adapty.getPurchaseContainers { (containers, error) in
+        Adapty.getPurchaseContainers { (containers, products, error) in
             self.tableView.refreshControl?.endRefreshing()
             self.containers = containers ?? []
             self.tableView.reloadData()

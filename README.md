@@ -115,8 +115,8 @@ To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attr
 ### Get purchase containers (paywalls)
 
 ```Swift
-Adapty.getPurchaseContainers { (containers, error) in
-    // if error is empty, containers should contain info about your paywalls
+Adapty.getPurchaseContainers { (containers, products, error) in
+    // if error is empty, containers should contain info about your paywalls, products contains info about all your products
 }
 ```
 

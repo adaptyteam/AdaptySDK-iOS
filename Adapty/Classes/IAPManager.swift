@@ -233,14 +233,14 @@ private extension IAPManager {
     
     // MARK:- Callbacks handling
     
-    private func callPurchaseContainersCompletionAndCleanCallback(_ result: Result<[PurchaseContainerModel], Error>) {
+    private func callPurchaseContainersCompletionAndCleanCallback(_ result: Result<(containers: [PurchaseContainerModel], products: [ProductModel]), Error>) {
         DispatchQueue.main.async {
             switch result {
-            case .success(let containers):
-                self.purchaseContainersRequestCompletion?(containers, nil)
+            case .success(let data):
+                self.purchaseContainersRequestCompletion?(data.containers, data.products, nil)
             case .failure(let error):
                 print("Failed to load list of products. Error: \(error.localizedDescription)")
-                self.purchaseContainersRequestCompletion?(nil, error)
+                self.purchaseContainersRequestCompletion?(nil, nil, error)
             }
             
             self.productsRequest = nil
@@ -299,8 +299,8 @@ extension IAPManager: SKProductsRequestDelegate {
             })
         }
         
-        if response.products.count > 0, let containers = containers, containers.count > 0 {
-            callPurchaseContainersCompletionAndCleanCallback(.success(containers))
+        if response.products.count > 0, let containers = containers, containers.count > 0, let products = products {
+            callPurchaseContainersCompletionAndCleanCallback(.success((containers: containers, products: products)))
         } else {
             callPurchaseContainersCompletionAndCleanCallback(.failure(IAPManagerError.noProductsFound))
         }
