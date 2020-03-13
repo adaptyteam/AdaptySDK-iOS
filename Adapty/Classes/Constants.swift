@@ -41,6 +41,7 @@ struct Constants {
         static let installation = "AdaptySDK_Installation"
         static let cachedEvents = "AdaptySDK_Cached_Events"
         static let cachedTransactionsIds = "AdaptySDK_Cached_Transactions_Ids"
+        static let purchaserInfo = "AdaptySDK_Purchaser_Info"
     }
     
     struct Versions {

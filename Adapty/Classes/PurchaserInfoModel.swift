@@ -7,14 +7,13 @@
 
 import Foundation
 
-public class PurchaserInfoModel: NSObject, JSONCodable {
+public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
 
     @objc public var promotionalOfferEligibility: Bool
     @objc public var introductoryOfferEligibility: Bool
     @objc public var paidAccessLevels: [String: PaidAccessLevelsInfoModel]
     @objc public var subscriptions: [String: SubscriptionsInfoModel]
     @objc public var nonSubscriptions: [String: [NonSubscriptionsInfoModel]]
-    var appleValidationResult: Parameters?
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -78,12 +77,19 @@ public class PurchaserInfoModel: NSObject, JSONCodable {
         self.paidAccessLevels = paidAccessLevels
         self.subscriptions = subscriptions
         self.nonSubscriptions = nonSubscriptions
-        self.appleValidationResult = attributes?["apple_validation_result"] as? Parameters
+    }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? PurchaserInfoModel else {
+            return false
+        }
+        
+        return self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.paidAccessLevels == object.paidAccessLevels && self.subscriptions == object.subscriptions && self.nonSubscriptions == object.nonSubscriptions
     }
 
 }
 
-public class PaidAccessLevelsInfoModel: NSObject, JSONCodable {
+public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
     
     @objc public var id: String
     @objc public var isActive: Bool
@@ -129,10 +135,18 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable {
         self.unsubscribedAt = (json["unsubscribed_at"] as? String)?.dateValue
         self.billingIssueDetectedAt = (json["billing_issue_detected_at"] as? String)?.dateValue
     }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? PaidAccessLevelsInfoModel else {
+            return false
+        }
+        
+        return self.id == object.id && self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt
+    }
 
 }
 
-public class SubscriptionsInfoModel: NSObject, JSONCodable {
+public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     
     @objc public var isActive: Bool
     @objc public var vendorProductId: String
@@ -140,6 +154,7 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable {
     @objc public var activatedAt: Date
     @objc public var renewedAt: Date?
     @objc public var expiresAt: Date?
+    @objc public var startsAt: Date?
     @objc public var isLifetime: Bool
     @objc public var activeIntroductoryOfferType: String?
     @objc public var activePromotionalOfferType: String?
@@ -171,6 +186,7 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable {
         self.activatedAt = activatedAt
         self.renewedAt = (json["renewed_at"] as? String)?.dateValue
         self.expiresAt = (json["expires_at"] as? String)?.dateValue
+        self.startsAt = (json["starts_at"] as? String)?.dateValue
         self.isLifetime = isLifetime
         self.activeIntroductoryOfferType = json["active_introductory_offer_type"] as? String
         self.activePromotionalOfferType = json["active_promotional_offer_type"] as? String
@@ -182,10 +198,18 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable {
         self.vendorTransactionId = json["vendor_transaction_id"] as? String
         self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
     }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? SubscriptionsInfoModel else {
+            return false
+        }
+        
+        return self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.startsAt == object.startsAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId
+    }
 
 }
 
-public class NonSubscriptionsInfoModel: NSObject, JSONCodable {
+public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     
     @objc public var purchaseId: String
     @objc public var vendorProductId: String
@@ -217,5 +241,37 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable {
         self.vendorTransactionId = json["vendor_transaction_id"] as? String
         self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
     }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? NonSubscriptionsInfoModel else {
+            return false
+        }
+        
+        return self.purchaseId == object.purchaseId && self.vendorProductId == object.vendorProductId && self.store == object.store && self.purchasedAt == object.purchasedAt && self.isOneTime == object.isOneTime && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId
+    }
 
+}
+
+class PurchaserInfoMeta: JSONCodable {
+    
+    var purchaserInfo: PurchaserInfoModel?
+    var appleValidationResult: Parameters?
+    
+    required init?(json: Parameters) throws {
+        do {
+            self.purchaserInfo = try PurchaserInfoModel(json: json)
+        } catch {
+            throw SerializationError.invalid("purchaser_info", json)
+        }
+        
+        let attributes: Parameters?
+        do {
+            attributes = try json.attributes()
+        } catch {
+            throw error
+        }
+        
+        self.appleValidationResult = attributes?["apple_validation_result"] as? Parameters
+    }
+    
 }

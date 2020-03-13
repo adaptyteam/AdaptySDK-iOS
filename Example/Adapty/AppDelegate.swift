@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Adapty.activate("YOUR_ADAPTY_APP_TOKEN")
+        Adapty.delegate = self
         
         let config = ADJConfig(appToken: "YOUR_ADJUST_APP_TOKEN", environment: ADJEnvironmentProduction)
         config?.delegate = self
@@ -54,6 +55,14 @@ extension AppDelegate: AdjustDelegate {
     func adjustAttributionChanged(_ attribution: ADJAttribution?) {
         // Just pass Adjust attribution to Adapty SDK
         Adapty.updateAttribution(attribution)
+    }
+    
+}
+
+extension AppDelegate: AdaptyDelegate {
+    
+    func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel) {
+        // handle any changes to purchaserInfo
     }
     
 }

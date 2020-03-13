@@ -89,7 +89,7 @@ class ViewController: UIViewController {
     
     @IBAction func getPurchaserInfoButtonAction(_ sender: Any) {
         setLoader(true)
-        Adapty.getPurchaserInfo { (purchaserInfo, error) in
+        Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
             self.setLoader(false)
             if let error = error {
                 self.infoLabel.text = "Failed to get purchaser info: \(error)"

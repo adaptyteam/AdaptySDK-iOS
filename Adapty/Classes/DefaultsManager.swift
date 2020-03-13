@@ -8,6 +8,11 @@
 
 import Foundation
 
+@objc public enum DataState: Int {
+    case cached
+    case synced
+}
+
 class DefaultsManager {
     
     static let shared = DefaultsManager()
@@ -37,6 +42,7 @@ class DefaultsManager {
             defaults.set(newValue, forKey: Constants.UserDefaults.profileId)
         }
     }
+    
     var profile: ProfileModel? {
         get {
             if let data = defaults.object(forKey: Constants.UserDefaults.profile) as? Data, let profile = try? JSONDecoder().decode(ProfileModel.self, from: data) {
@@ -83,9 +89,24 @@ class DefaultsManager {
         }
     }
     
+    var purchaserInfo: PurchaserInfoModel? {
+        get {
+            if let data = defaults.object(forKey: Constants.UserDefaults.purchaserInfo) as? Data, let purchaserInfo = try? JSONDecoder().decode(PurchaserInfoModel.self, from: data) {
+                return purchaserInfo
+            }
+            
+            return nil
+        }
+        set {
+            let data = try? JSONEncoder().encode(newValue)
+            defaults.set(data, forKey: Constants.UserDefaults.purchaserInfo)
+        }
+    }
+    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedTransactionsIds)
+        defaults.removeObject(forKey: Constants.UserDefaults.purchaserInfo)
     }
     
 }

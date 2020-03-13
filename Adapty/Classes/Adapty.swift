@@ -9,6 +9,12 @@
 import Foundation
 import UIKit
 
+@objc public protocol AdaptyDelegate: class {
+    
+    func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel)
+    
+}
+
 @objc public class Adapty: NSObject {
     
     private static let shared = Adapty()
@@ -45,6 +51,8 @@ import UIKit
     private var isConfigured = false
     private static var initialCustomerUserId: String?
     static var observerMode = false
+    
+    @objc public static weak var delegate: AdaptyDelegate?
     
     override private init() {
         super.init()
@@ -286,7 +294,23 @@ import UIKit
     }
     
     @objc public class func getPurchaserInfo(_ completion: @escaping PurchaserInfoCompletion) {
-        shared.apiManager.getPurchaserInfo(id: shared.profileId, completion: completion)
+        let cachedPurchaserInfo = DefaultsManager.shared.purchaserInfo
+        
+        if cachedPurchaserInfo != nil {
+            completion(cachedPurchaserInfo, .cached, nil)
+        }
+        
+        shared.apiManager.getPurchaserInfo(id: shared.profileId) { (purchaserInfo, error) in
+            if let purchaserInfo = purchaserInfo {
+                DefaultsManager.shared.purchaserInfo = purchaserInfo
+                
+                if purchaserInfo != cachedPurchaserInfo {
+                    delegate?.didReceiveUpdatedPurchaserInfo(purchaserInfo)
+                }
+            }
+            
+            completion(purchaserInfo, .synced, error)
+        }
     }
     
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {

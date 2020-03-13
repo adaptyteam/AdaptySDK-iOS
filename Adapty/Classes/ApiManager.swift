@@ -16,7 +16,8 @@ public typealias PurchaseContainersAndProductsCompletion = ([PurchaseContainerMo
 public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, Error?) -> Void
 public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void
-public typealias PurchaserInfoCompletion = (PurchaserInfoModel?, Error?) -> Void
+public typealias PurchaserInfoCompletion = (PurchaserInfoModel?, DataState, Error?) -> Void
+typealias PurchaserInfoInternalCompletion = (PurchaserInfoModel?, Error?) -> Void
 
 class ApiManager {
     
@@ -54,10 +55,10 @@ class ApiManager {
     }
     
     func validateReceipt(params: Parameters, completion: @escaping ValidateReceiptCompletion) {
-        RequestManager.request(router: Router.validateReceipt(params: params)) { (result: Result<PurchaserInfoModel, Error>, response) in
+        RequestManager.request(router: Router.validateReceipt(params: params)) { (result: Result<PurchaserInfoMeta, Error>, response) in
             switch result {
             case .success(let response):
-                completion(response, response.appleValidationResult, nil)
+                completion(response.purchaserInfo, response.appleValidationResult, nil)
             case .failure(let error):
                 completion(nil, nil, error)
             }
@@ -86,7 +87,7 @@ class ApiManager {
         }
     }
     
-    func getPurchaserInfo(id: String, completion: @escaping PurchaserInfoCompletion) {
+    func getPurchaserInfo(id: String, completion: @escaping PurchaserInfoInternalCompletion) {
         RequestManager.request(router: Router.getPurchaserInfo(id: id)) { (result: Result<PurchaserInfoModel, Error>, response) in
             switch result {
             case .success(let purchaserInfo):

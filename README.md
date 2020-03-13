@@ -203,6 +203,7 @@ The **`purchaserInfo`** object gives you access to the following information abo
 | activatedAt | The ISO 8601 datetime when access level was activated (may be in the future). |
 | renewedAt | The ISO 8601 datetime when access level was renewed. |
 | expiresAt | The ISO 8601 datetime when access level will expire (may be in the past and may be null for lifetime access). |
+| startsAt | The ISO 8601 datetime when access level stared. |
 | isLifetime | Boolean indicating whether the subscription is active for lifetime (no expiration date). If set to true you shouldn't use **expires_at**. |
 | activeIntroductoryOfferType | The type of active introductory offer. Possible values are: **free_trial**, **pay_as_you_go** & **pay_up_front**. If the value is not null it means that offer was applied during the current subscription period. |
 | activePromotionalOfferType | The type of active promotional offer. Possible values are: **free_trial**, **pay_as_you_go** & **pay_up_front**. If the value is not null it means that offer was applied during the current subscription period. |
@@ -236,6 +237,20 @@ Adapty.getPurchaserInfo { (purchaserInfo, error) in
     if purchaserInfo?.paidAccessLevels["level_configured_in_dashboard"]?.isActive == true {
     
     }
+}
+```
+
+### Listening For Purchaser Info Updates
+
+You can respond to any changes in purchaser info by conforming to an optional delegate method, didReceivePurchaserInfo. This will fire whenever we receive a change in purchaser info.
+
+```Swift
+extension AppDelegate: AdaptyDelegate {
+    
+    func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel) {
+        // handle any changes to purchaserInfo
+    }
+    
 }
 ```
 
