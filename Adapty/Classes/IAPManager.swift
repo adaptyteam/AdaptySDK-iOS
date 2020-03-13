@@ -239,7 +239,7 @@ private extension IAPManager {
             case .success(let data):
                 self.purchaseContainersRequestCompletion?(data.containers, data.products, nil)
             case .failure(let error):
-                print("Failed to load list of products. Error: \(error.localizedDescription)")
+//                print("Failed to load list of products. Error: \(error.localizedDescription)")
                 self.purchaseContainersRequestCompletion?(nil, nil, error)
             }
             
@@ -254,7 +254,7 @@ private extension IAPManager {
             case .success(let result):
                 purchaseInfo?.completion?(result.purchaserInfo, result.receipt, result.response, purchaseInfo?.product, nil)
             case .failure(let error):
-                print("Failed to buy product. Error: \(error.localizedDescription)")
+//                print("Failed to buy product. Error: \(error.localizedDescription)")
                 purchaseInfo?.completion?(nil, nil, nil, purchaseInfo?.product, error)
             }
             
@@ -270,7 +270,7 @@ private extension IAPManager {
             case .success:
                 self.restorePurchasesCompletion?(nil)
             case .failure(let error):
-                print("Failed to restore purchases. Error: \(error.localizedDescription)")
+//                print("Failed to restore purchases. Error: \(error.localizedDescription)")
                 self.restorePurchasesCompletion?(error)
             }
             
@@ -285,9 +285,9 @@ extension IAPManager: SKProductsRequestDelegate {
     // MARK:- Products list
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        for p in response.products {
-            print("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
-        }
+//        for p in response.products {
+//            print("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
+//        }
         
         response.products.forEach { skProduct in
             if let products = containers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }) {
