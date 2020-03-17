@@ -219,7 +219,7 @@ The **`purchaserInfo`** object gives you access to the following information abo
 
 | Name  | Description |
 | -------- | ------------- |
-| purchaseId | Identifier of the purchase in Adapty. You can use it to unsure that you've already processed this purchase (for example tracking one time products). |
+| purchaseId | Identifier of the purchase in Adapty. You can use it to ensure that you've already processed this purchase (for example tracking one time products). |
 | vendorProductId | Identifier of the product in vendor system (App Store/Google Play etc.). |
 | store | Store where the product was purchased. Possible values are: **app_store**, **play_store** & **adapty**. |
 | purchasedAt | The ISO 8601 datetime when the product was purchased. |
