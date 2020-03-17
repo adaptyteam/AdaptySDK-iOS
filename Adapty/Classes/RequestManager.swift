@@ -6,8 +6,6 @@
 //  Copyright © 2019 Adapty. All rights reserved.
 //
 
-import UIKit
-
 enum HTTPMethod: String {
     case options = "OPTIONS"
     case get     = "GET"

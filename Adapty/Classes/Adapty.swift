@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 
 @objc public protocol AdaptyDelegate: class {
     
@@ -95,10 +94,12 @@ import UIKit
         }
         
         AppDelegateSwizzler.startSwizzlingIfPossible(self)
-        
+
+        #if os(iOS)
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.sessionsManager.trackLiveEventInBackground()
         }
+        #endif
     }
     
     private func performInitialRequests() {

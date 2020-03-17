@@ -43,7 +43,11 @@ class UserProperties {
     }
     
     static var device: String {
+        #if os(iOS)
         return UIDevice.modelName
+        #elseif os(macOS)
+        return "TODO: implement"
+        #endif
     }
     
     static var locale: String {
@@ -51,11 +55,19 @@ class UserProperties {
     }
     
     static var OS: String {
+        #if os(iOS)
         return "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
+        #elseif os(macOS)
+        return "TODO: implement"
+        #endif
     }
     
     static var platform: String {
+        #if os(iOS)
         return UIDevice.current.systemName
+        #elseif os(macOS)
+        return "TODO: implement"
+        #endif
     }
     
     static var timezone: String {
@@ -63,7 +75,11 @@ class UserProperties {
     }
     
     static var deviceIdentifier: String? {
+        #if os(iOS)
         return UIDevice.current.identifierForVendor?.uuidString
+        #elseif os(macOS)
+        return "TODO: implement"
+        #endif
     }
     
 }

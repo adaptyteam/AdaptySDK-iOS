@@ -82,7 +82,7 @@ class IAPManager: NSObject {
         
         getContainersAndSyncProducts()
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
+        NotificationCenter.default.addObserver(forName: Application.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.stopObserving()
         }
     }
@@ -364,7 +364,7 @@ extension IAPManager: SKPaymentTransactionObserver {
         
         let skProduct = self.skProduct(for: transaction)
         var discountPrice: NSDecimalNumber?
-        if #available(iOS 12.2, *) {
+        if #available(iOS 12.2, *, OSX 10.14.4, *) {
             discountPrice = skProduct?.discounts.filter({ $0.identifier == transaction.payment.paymentDiscount?.identifier }).first?.price
         }
         

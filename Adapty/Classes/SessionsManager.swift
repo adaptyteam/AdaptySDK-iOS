@@ -54,6 +54,7 @@ class SessionsManager {
                                   completion: completion)
     }
     
+    #if os(iOS)
     func trackLiveEventInBackground() {
         var eventBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
         eventBackgroundTaskID = UIApplication.shared.beginBackgroundTask (withName: "AdaptyTrackLiveBackgroundTask") {
@@ -72,5 +73,6 @@ class SessionsManager {
             }
         }
     }
+    #endif
     
 }
