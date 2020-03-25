@@ -274,7 +274,14 @@ import UIKit
         
         let params = Parameters.formatData(with: "", type: Constants.TypeNames.appleReceipt, attributes: attributes)
         
-        shared.apiManager.validateReceipt(params: params, completion: completion)
+        shared.apiManager.validateReceipt(params: params) { (purchaserInfo, appleValidationResult, error) in
+            if let purchaserInfo = purchaserInfo {
+                // do not overwrite in case of error
+                shared.purchaserInfo = purchaserInfo
+            }
+            
+            completion(purchaserInfo, appleValidationResult, error)
+        }
     }
     
     @objc public static var apnsToken: Data? {
