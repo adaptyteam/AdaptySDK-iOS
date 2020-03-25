@@ -9,12 +9,12 @@
 import Foundation
 
 public typealias ProfileCreateCompletion = (PurchaserInfoModel?, Error?, Bool?) -> Void
-public typealias PurchaserCompletion = (PurchaserInfoModel?, Error?) -> Void
 public typealias InstallationCompletion = (InstallationModel?, Error?) -> Void
 public typealias PurchaseContainersCompletion = ([PurchaseContainerModel]?, [ProductModel]?, Error?) -> Void
 public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, Error?) -> Void
 public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void
+public typealias PurchaserCompletion = (PurchaserInfoModel?, Error?) -> Void
 public typealias CahcedPurchaserCompletion = (PurchaserInfoModel?, DataState, Error?) -> Void
 
 class ApiManager {
@@ -30,11 +30,11 @@ class ApiManager {
         }
     }
     
-    func updateProfile(id: String, params: Parameters, completion: @escaping PurchaserCompletion) {
-        RequestManager.request(router: Router.updateProfile(id: id, params: params)) { (result: Result<PurchaserInfoModel, Error>, response) in
+    func updateProfile(id: String, params: Parameters, completion: @escaping JSONCompletion) {
+        RequestManager.request(router: Router.updateProfile(id: id, params: params)) { (result: Result<JSONAttributedModel, Error>, response) in
             switch result {
-            case .success(let purchaserInfo):
-                completion(purchaserInfo, nil)
+            case .success(let response):
+                completion(response.data, nil)
             case .failure(let error):
                 completion(nil, error)
             }

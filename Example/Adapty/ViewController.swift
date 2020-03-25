@@ -97,9 +97,8 @@ class ViewController: UIViewController {
             if let purchaserInfo = purchaserInfo {
                 self.infoLabel.text =
                 """
-                Is eligible for promotional: \(purchaserInfo.promotionalOfferEligibility)
-                Is eligible for introductory: \(purchaserInfo.introductoryOfferEligibility)
                 Paid access standart is active: \(purchaserInfo.paidAccessLevels["standart"]?.isActive ?? false)\n
+                paidAccessLevels:\n\(purchaserInfo.paidAccessLevels)
                 subscriptions:\n\(purchaserInfo.subscriptions)
                 Non subscriptions:\n\(purchaserInfo.nonSubscriptions)
                 """

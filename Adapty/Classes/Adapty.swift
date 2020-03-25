@@ -93,7 +93,10 @@ import UIKit
             // didn't find synced profile, sync a local one and perform initial requests right after
             createProfile(Self.initialCustomerUserId, completion)
         } else {
-            // already have a synced profile, just perform initial requests
+            // already have a synced profile
+            // update local cache for purchaser info
+            Self.getPurchaserInfo { (_, _, _) in }
+            // perform initial requests
             performInitialRequests()
             completion?(nil)
         }
@@ -181,11 +184,7 @@ import UIKit
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         
-        shared.apiManager.updateProfile(id: profileId, params: params) { (purchaserInfo, error) in
-            if let purchaserInfo = purchaserInfo {
-                // do not overwrite in case of error
-                shared.purchaserInfo = purchaserInfo
-            }
+        shared.apiManager.updateProfile(id: profileId, params: params) { (params, error) in
             completion?(error)
         }
     }

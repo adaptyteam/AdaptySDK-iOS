@@ -168,8 +168,6 @@ The **`purchaserInfo`** object gives you access to the following information abo
 
 | Name  | Description |
 | -------- | ------------- |
-| promotionalOfferEligibility | Boolean indicating whether the promotional offer is available for the customer. |
-| introductoryOfferEligibility | Boolean indicating whether the introductory offer is available for the customer. |
 | paidAccessLevels | Dictionary where the keys are paid access level identifiers configured by developer in Adapty dashboard. Values are PaidAccessLevelsInfoModel objects. Can be null if the customer has no access levels. |
 | subscriptions | Dictionary where the keys are vendor product ids. Values are SubscriptionsInfoModel objects. Can be null if the customer has no subscriptions. |
 | nonSubscriptions | Dictionary where the keys are vendor product ids. Values are array[] of NonSubscriptionsInfoModel objects. Can be null if the customer has no purchases. |
