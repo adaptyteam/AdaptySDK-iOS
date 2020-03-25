@@ -140,6 +140,11 @@ import UIKit
     }
     
     @objc public class func identify(_ customerUserId: String, completion: ErrorCompletion? = nil) {
+        if shared.profile?.customerUserId == customerUserId {
+            completion?(nil)
+            return
+        }
+        
         shared.createProfile(customerUserId, completion)
     }
     
