@@ -116,7 +116,6 @@
 		A04BF4EF05201D2E8E63288B67FACB74 /* ADJSessionParameters.h in Headers */ = {isa = PBXBuildFile; fileRef = F5532449CCFC17B6D05D968187A22637 /* ADJSessionParameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A1B6F310B1FDFCC78C94F5CAD7658CAD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D12E8DF55922095C78A5B07F64E6040 /* Foundation.framework */; };
 		A2696237C7BDF2A95E2F206CBCA14FB6 /* ADJLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 7883BB4C99F8306B917681909BBEE6F4 /* ADJLogger.m */; };
-		A3FDAFB47CFAF809B83A4895606D8DB9 /* ProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C5628BADB4A3196E3328EF9CA6061 /* ProfileModel.swift */; };
 		A57D2D6360F8D0C1F7C4A8880BDD7A2A /* ADJReachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 0E9811CA64B1448B34F438DD31BCB4B6 /* ADJReachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA181A5983FB078D021F297DD96F0A9A /* AppDelegateSwizzler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312783857901E3D31E379B9EE53221D0 /* AppDelegateSwizzler.swift */; };
 		AB11B7B22B8F5220A1AD408BE75B4ED7 /* Digest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1353D114780F4D8D01FAA9BC45DFF821 /* Digest.swift */; };
@@ -380,7 +379,6 @@
 		B665FAFC8147E05523F263759256FB3F /* ADJActivityPackage.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ADJActivityPackage.m; path = Adjust/ADJActivityPackage.m; sourceTree = "<group>"; };
 		B7A7DF84EE734E3207523BB1D917CAF4 /* Pods-Adapty_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Adapty_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		B8090653BB3B5573E21E52C1F2E94E6A /* Pods-Adapty_Tests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-Adapty_Tests-acknowledgements.markdown"; sourceTree = "<group>"; };
-		BA4C5628BADB4A3196E3328EF9CA6061 /* ProfileModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProfileModel.swift; path = Adapty/Classes/ProfileModel.swift; sourceTree = "<group>"; };
 		BBF3D5FCD1AB8AEABA4878147CCD8A6B /* AES.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AES.swift; path = Sources/CryptoSwift/AES.swift; sourceTree = "<group>"; };
 		BDF7CD9E140C8555CAC8237BD9F96D79 /* Cipher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Cipher.swift; path = Sources/CryptoSwift/Cipher.swift; sourceTree = "<group>"; };
 		BE5FB81A5E75265247CFD5D32967DD21 /* ADJAttribution.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ADJAttribution.m; path = Adjust/ADJAttribution.m; sourceTree = "<group>"; };
@@ -678,7 +676,6 @@
 				D6F8D52F23ABBBEB00CB719A /* SessionsManager.swift */,
 				1506615DE426D5B5A022406859077837 /* KinesisManager.swift */,
 				8CC615BD212587871BC9ABAE2F8384FC /* ParameterEncoder.swift */,
-				BA4C5628BADB4A3196E3328EF9CA6061 /* ProfileModel.swift */,
 				D629385E23E9D3390085C8BC /* PurchaserInfoModel.swift */,
 				576BF30521D077C922B5A7055E24C716 /* RequestManager.swift */,
 				380286C5D3CBDA03F3ACAF418E3336F4 /* ResponseErrorModel.swift */,
@@ -1188,7 +1185,6 @@
 				08D803F96E2D181FA16B099DEEBB086C /* JSONModel.swift in Sources */,
 				07917AE7B1634FDDA5D29FD5564906AF /* KinesisManager.swift in Sources */,
 				0A1B4A41B7866693FA49F75005D4338E /* ParameterEncoder.swift in Sources */,
-				A3FDAFB47CFAF809B83A4895606D8DB9 /* ProfileModel.swift in Sources */,
 				27E5F57090D78207942738989C84666E /* RequestManager.swift in Sources */,
 				D629385F23E9D3390085C8BC /* PurchaserInfoModel.swift in Sources */,
 				F0AD0E680F9894FA73990CC8B369A41C /* ResponseErrorModel.swift in Sources */,

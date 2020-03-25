@@ -9,6 +9,8 @@ import Foundation
 
 public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
 
+    var profileId: String
+    var customerUserId: String?
     @objc public var promotionalOfferEligibility: Bool
     @objc public var introductoryOfferEligibility: Bool
     @objc public var paidAccessLevels: [String: PaidAccessLevelsInfoModel]
@@ -24,12 +26,15 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
         }
         
         guard
+            let profileId = attributes?["id"] as? String,
             let promotionalOfferEligibility = attributes?["promotional_offer_eligibility"] as? Bool,
             let introductoryOfferEligibility = attributes?["introductory_offer_eligibility"] as? Bool
         else {
-            throw SerializationError.missing("promotional_offer_eligibility, introductory_offer_eligibility")
+            throw SerializationError.missing("id, promotional_offer_eligibility, introductory_offer_eligibility")
         }
         
+        self.profileId = profileId
+        self.customerUserId = attributes?["customer_user_id"] as? String
         self.promotionalOfferEligibility = promotionalOfferEligibility
         self.introductoryOfferEligibility = introductoryOfferEligibility
         
@@ -84,7 +89,7 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.paidAccessLevels == object.paidAccessLevels && self.subscriptions == object.subscriptions && self.nonSubscriptions == object.nonSubscriptions
+        return self.profileId == object.profileId && self.customerUserId == object.customerUserId && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.paidAccessLevels == object.paidAccessLevels && self.subscriptions == object.subscriptions && self.nonSubscriptions == object.nonSubscriptions
     }
 
 }

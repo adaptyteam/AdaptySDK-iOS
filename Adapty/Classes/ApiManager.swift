@@ -8,34 +8,33 @@
 
 import Foundation
 
-public typealias ProfileCreateCompletion = (ProfileModel?, Error?, Bool?) -> Void
-public typealias ProfileCompletion = (ProfileModel?, Error?) -> Void
+public typealias ProfileCreateCompletion = (PurchaserInfoModel?, Error?, Bool?) -> Void
+public typealias PurchaserCompletion = (PurchaserInfoModel?, Error?) -> Void
 public typealias InstallationCompletion = (InstallationModel?, Error?) -> Void
 public typealias PurchaseContainersCompletion = ([PurchaseContainerModel]?, [ProductModel]?, Error?) -> Void
 public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, Error?) -> Void
 public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void
-public typealias PurchaserInfoCompletion = (PurchaserInfoModel?, DataState, Error?) -> Void
-typealias PurchaserInfoInternalCompletion = (PurchaserInfoModel?, Error?) -> Void
+public typealias CahcedPurchaserCompletion = (PurchaserInfoModel?, DataState, Error?) -> Void
 
 class ApiManager {
     
     func createProfile(id: String, params: Parameters, completion: @escaping ProfileCreateCompletion) {
-        RequestManager.request(router: Router.createProfile(id: id, params: params)) { (result: Result<ProfileModel, Error>, response) in
+        RequestManager.request(router: Router.createProfile(id: id, params: params)) { (result: Result<PurchaserInfoModel, Error>, response) in
             switch result {
-            case .success(let profile):
-                completion(profile, nil, response?.statusCode == 201 ? true : false)
+            case .success(let purchaserInfo):
+                completion(purchaserInfo, nil, response?.statusCode == 201 ? true : false)
             case .failure(let error):
                 completion(nil, error, nil)
             }
         }
     }
     
-    func updateProfile(id: String, params: Parameters, completion: @escaping ProfileCompletion) {
-        RequestManager.request(router: Router.updateProfile(id: id, params: params)) { (result: Result<ProfileModel, Error>, response) in
+    func updateProfile(id: String, params: Parameters, completion: @escaping PurchaserCompletion) {
+        RequestManager.request(router: Router.updateProfile(id: id, params: params)) { (result: Result<PurchaserInfoModel, Error>, response) in
             switch result {
-            case .success(let profile):
-                completion(profile, nil)
+            case .success(let purchaserInfo):
+                completion(purchaserInfo, nil)
             case .failure(let error):
                 completion(nil, error)
             }
@@ -86,7 +85,7 @@ class ApiManager {
         }
     }
     
-    func getPurchaserInfo(id: String, completion: @escaping PurchaserInfoInternalCompletion) {
+    func getPurchaserInfo(id: String, completion: @escaping PurchaserCompletion) {
         RequestManager.request(router: Router.getPurchaserInfo(id: id)) { (result: Result<PurchaserInfoModel, Error>, response) in
             switch result {
             case .success(let purchaserInfo):

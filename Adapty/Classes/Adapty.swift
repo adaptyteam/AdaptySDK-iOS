@@ -23,15 +23,19 @@ import UIKit
             DefaultsManager.shared.profileId = profileId
         }
     }
-    private var profile: ProfileModel? = DefaultsManager.shared.profile {
+    private var purchaserInfo: PurchaserInfoModel? = DefaultsManager.shared.purchaserInfo {
         didSet {
-            if let profileId = profile?.profileId {
+            if let profileId = purchaserInfo?.profileId {
                 self.profileId = profileId
             } else {
                 self.profileId = UserProperties.uuid
             }
             
-            DefaultsManager.shared.profile = profile
+            DefaultsManager.shared.purchaserInfo = purchaserInfo
+            
+            if let purchaserInfo = purchaserInfo, purchaserInfo != oldValue {
+                Self.delegate?.didReceiveUpdatedPurchaserInfo(purchaserInfo)
+            }
         }
     }
     private var installation: InstallationModel? = DefaultsManager.shared.installation {
@@ -85,7 +89,7 @@ import UIKit
         if isConfigured { return }
         isConfigured = true
         
-        if profile == nil {
+        if purchaserInfo == nil {
             // didn't find synced profile, sync a local one and perform initial requests right after
             createProfile(Self.initialCustomerUserId, completion)
         } else {
@@ -122,10 +126,10 @@ import UIKit
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         
-        apiManager.createProfile(id: profileId, params: params) { (profile, error, isNew) in
-            if let profile = profile {
+        apiManager.createProfile(id: profileId, params: params) { (purchaserInfo, error, isNew) in
+            if let purchaserInfo = purchaserInfo {
                 // do not overwrite in case of error
-                self.profile = profile
+                self.purchaserInfo = purchaserInfo
             }
             
             completion?(error)
@@ -140,7 +144,7 @@ import UIKit
     }
     
     @objc public class func identify(_ customerUserId: String, completion: ErrorCompletion? = nil) {
-        if shared.profile?.customerUserId == customerUserId {
+        if shared.purchaserInfo?.customerUserId == customerUserId {
             completion?(nil)
             return
         }
@@ -177,10 +181,10 @@ import UIKit
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         
-        shared.apiManager.updateProfile(id: profileId, params: params) { (profile, error) in
-            if let profile = profile {
+        shared.apiManager.updateProfile(id: profileId, params: params) { (purchaserInfo, error) in
+            if let purchaserInfo = purchaserInfo {
                 // do not overwrite in case of error
-                shared.profile = profile
+                shared.purchaserInfo = purchaserInfo
             }
             completion?(error)
         }
@@ -286,7 +290,7 @@ import UIKit
     }
     
     @objc public class var customerUserId: String? {
-        return shared.profile?.customerUserId
+        return shared.purchaserInfo?.customerUserId
     }
     
     private func syncTransactionsHistory() {
@@ -298,8 +302,8 @@ import UIKit
         }
     }
     
-    @objc public class func getPurchaserInfo(_ completion: @escaping PurchaserInfoCompletion) {
-        let cachedPurchaserInfo = DefaultsManager.shared.purchaserInfo
+    @objc public class func getPurchaserInfo(_ completion: @escaping CahcedPurchaserCompletion) {
+        let cachedPurchaserInfo = shared.purchaserInfo
         
         if cachedPurchaserInfo != nil {
             completion(cachedPurchaserInfo, .cached, nil)
@@ -307,11 +311,7 @@ import UIKit
         
         shared.apiManager.getPurchaserInfo(id: shared.profileId) { (purchaserInfo, error) in
             if let purchaserInfo = purchaserInfo {
-                DefaultsManager.shared.purchaserInfo = purchaserInfo
-                
-                if purchaserInfo != cachedPurchaserInfo {
-                    delegate?.didReceiveUpdatedPurchaserInfo(purchaserInfo)
-                }
+                shared.purchaserInfo = purchaserInfo
             }
             
             completion(purchaserInfo, .synced, error)
@@ -320,7 +320,7 @@ import UIKit
     
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         shared.sessionsManager.invalidateLiveTrackerTimer()
-        shared.profile = nil
+        shared.purchaserInfo = nil
         shared.installation = nil
         DefaultsManager.shared.clean()
         

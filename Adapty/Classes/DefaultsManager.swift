@@ -28,7 +28,7 @@ class DefaultsManager {
             
             // try to restore profileId from cached profile
             // basically, backward compatibility only
-            if let profileId = profile?.profileId {
+            if let profileId = purchaserInfo?.profileId {
                 self.profileId = profileId
                 return profileId
             }
@@ -43,17 +43,17 @@ class DefaultsManager {
         }
     }
     
-    var profile: ProfileModel? {
+    var purchaserInfo: PurchaserInfoModel? {
         get {
-            if let data = defaults.object(forKey: Constants.UserDefaults.profile) as? Data, let profile = try? JSONDecoder().decode(ProfileModel.self, from: data) {
-                return profile
+            if let data = defaults.object(forKey: Constants.UserDefaults.purchaserInfo) as? Data, let purchaserInfo = try? JSONDecoder().decode(PurchaserInfoModel.self, from: data) {
+                return purchaserInfo
             }
             
             return nil
         }
         set {
             let data = try? JSONEncoder().encode(newValue)
-            defaults.set(data, forKey: Constants.UserDefaults.profile)
+            defaults.set(data, forKey: Constants.UserDefaults.purchaserInfo)
         }
     }
     
@@ -89,24 +89,9 @@ class DefaultsManager {
         }
     }
     
-    var purchaserInfo: PurchaserInfoModel? {
-        get {
-            if let data = defaults.object(forKey: Constants.UserDefaults.purchaserInfo) as? Data, let purchaserInfo = try? JSONDecoder().decode(PurchaserInfoModel.self, from: data) {
-                return purchaserInfo
-            }
-            
-            return nil
-        }
-        set {
-            let data = try? JSONEncoder().encode(newValue)
-            defaults.set(data, forKey: Constants.UserDefaults.purchaserInfo)
-        }
-    }
-    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedTransactionsIds)
-        defaults.removeObject(forKey: Constants.UserDefaults.purchaserInfo)
     }
     
 }
