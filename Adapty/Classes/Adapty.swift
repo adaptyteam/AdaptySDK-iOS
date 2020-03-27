@@ -124,7 +124,6 @@ import UIKit
     private func createProfile(_ customerUserId: String?, _ completion: ErrorCompletion? = nil) {
         var attributes = Parameters()
         
-        if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         if let customerUserId = customerUserId { attributes["customer_user_id"] = customerUserId }
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
@@ -180,7 +179,6 @@ import UIKit
         if let lastName = lastName { attributes["last_name"] = lastName }
         if let gender = gender { attributes["gender"] = gender }
         if let birthday = birthday { attributes["birthday"] = birthday.stringValue }
-        if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         
@@ -205,6 +203,7 @@ import UIKit
         attributes["timezone"] = UserProperties.timezone
         if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["device_identifier"] = deviceIdentifier }
         if let apnsTokenString = apnsTokenString { attributes["device_token"] = apnsTokenString }
+        if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         
         #warning("Handle Adjust params")
         
