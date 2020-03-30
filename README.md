@@ -159,11 +159,12 @@ Adapty.validateReceipt("<receiptEncoded>") { (response, error) in
 ### Get user purchases info
 
 ```Swift
-Adapty.getPurchaserInfo { (purchaserInfo, error) in
+Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
     // purchaserInfo object contains all of the purchase and subscription data available about the user
 }
 ```
 
+For **`state`** possible values are: **`cached`**, **`synced`**. First means that data was taken from local cache, second means that data was updated from remote server. 
 The **`purchaserInfo`** object gives you access to the following information about a user:
 
 | Name  | Description |
@@ -231,7 +232,7 @@ The **`purchaserInfo`** object gives you access to the following information abo
 The subscription status for a user can easily be determined from **`paidAccessLevels`** property of **`purchaserInfo`** object by **`isActive`** property inside.
 
 ```Swift
-Adapty.getPurchaserInfo { (purchaserInfo, error) in
+Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
     if purchaserInfo?.paidAccessLevels["level_configured_in_dashboard"]?.isActive == true {
     
     }
