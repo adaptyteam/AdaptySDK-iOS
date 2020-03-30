@@ -393,7 +393,11 @@ extension IAPManager: SKPaymentTransactionObserver {
         let purchaseInfo = self.purchaseInfo(for: transaction)
         
         guard let error = transaction.error as? SKError else {
-            callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(IAPManagerError.productPurchaseFailed))
+            if let error = transaction.error {
+                callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(error))
+            } else {
+                callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(IAPManagerError.productPurchaseFailed))
+            }
             return
         }
         
