@@ -98,7 +98,7 @@ enum Router {
     func asURLRequest() throws -> URLRequest {
         var request = URLRequest(url: URL(string: "\(scheme)://\(host)\(stage)\(path)")!,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-                                 timeoutInterval: 10.0)
+                                 timeoutInterval: 15.0)
         if let authorizationHeader = authorizationHeader {
             request.setValue(authorizationHeader, forHTTPHeaderField: Constants.Headers.authorization)
         }
