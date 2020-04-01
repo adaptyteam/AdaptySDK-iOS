@@ -116,7 +116,11 @@ extension Dictionary {
     }
     
     static func formatData(with id: Any, type: String, attributes: Parameters) -> Parameters {
-        return ["data": ["id": id, "type": type, "attributes": attributes]]
+        var data = ["id": id, "type": type]
+        if attributes.count > 0 {
+            data["attributes"] = attributes
+        }
+        return ["data": data]
     }
     
 }
