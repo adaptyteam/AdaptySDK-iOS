@@ -143,6 +143,7 @@
 		D4754369A1E587E4553C0456F34295F8 /* ADJTimerCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C63ABBACFAF1646F0A94CD153614BA5 /* ADJTimerCycle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4BCBB7FC8A812EBA8AA014327A3CAE8 /* ADJSdkClickHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E7F24BF76F7518B2F2AD420E11C983C0 /* ADJSdkClickHandler.m */; };
 		D629385F23E9D3390085C8BC /* PurchaserInfoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D629385E23E9D3390085C8BC /* PurchaserInfoModel.swift */; };
+		D6F612DA2434BEAD00A0D961 /* LoggerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F612D92434BEAD00A0D961 /* LoggerManager.swift */; };
 		D6F8D52823AB9F1900CB719A /* PurchaseContainerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D52723AB9F1900CB719A /* PurchaseContainerModel.swift */; };
 		D6F8D52A23ABA9EB00CB719A /* ProductModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D52923ABA9EB00CB719A /* ProductModel.swift */; };
 		D6F8D52C23ABB83F00CB719A /* UserProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D52B23ABB83F00CB719A /* UserProperties.swift */; };
@@ -394,6 +395,7 @@
 		D5A20B943873D98CC7D3D58873AD8D45 /* ADJSessionSuccess.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ADJSessionSuccess.h; path = Adjust/ADJSessionSuccess.h; sourceTree = "<group>"; };
 		D5F80F50290FA428CAE41A6E658B6D0D /* AES+Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "AES+Foundation.swift"; path = "Sources/CryptoSwift/Foundation/AES+Foundation.swift"; sourceTree = "<group>"; };
 		D629385E23E9D3390085C8BC /* PurchaserInfoModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PurchaserInfoModel.swift; path = Adapty/Classes/PurchaserInfoModel.swift; sourceTree = "<group>"; };
+		D6F612D92434BEAD00A0D961 /* LoggerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LoggerManager.swift; path = Adapty/Classes/LoggerManager.swift; sourceTree = "<group>"; };
 		D6F8D52723AB9F1900CB719A /* PurchaseContainerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PurchaseContainerModel.swift; path = Adapty/Classes/PurchaseContainerModel.swift; sourceTree = "<group>"; };
 		D6F8D52923ABA9EB00CB719A /* ProductModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProductModel.swift; path = Adapty/Classes/ProductModel.swift; sourceTree = "<group>"; };
 		D6F8D52B23ABB83F00CB719A /* UserProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UserProperties.swift; path = Adapty/Classes/UserProperties.swift; sourceTree = "<group>"; };
@@ -683,6 +685,7 @@
 				D6F8D52723AB9F1900CB719A /* PurchaseContainerModel.swift */,
 				D6F8D52923ABA9EB00CB719A /* ProductModel.swift */,
 				D6F8D52B23ABB83F00CB719A /* UserProperties.swift */,
+				D6F612D92434BEAD00A0D961 /* LoggerManager.swift */,
 				03ABE53608C4775BE56E4D51128CEBAB /* Pod */,
 				2F02F94901FA9281C42B845C68FB63CF /* Support Files */,
 			);
@@ -1185,6 +1188,7 @@
 				08D803F96E2D181FA16B099DEEBB086C /* JSONModel.swift in Sources */,
 				07917AE7B1634FDDA5D29FD5564906AF /* KinesisManager.swift in Sources */,
 				0A1B4A41B7866693FA49F75005D4338E /* ParameterEncoder.swift in Sources */,
+				D6F612DA2434BEAD00A0D961 /* LoggerManager.swift in Sources */,
 				27E5F57090D78207942738989C84666E /* RequestManager.swift in Sources */,
 				D629385F23E9D3390085C8BC /* PurchaserInfoModel.swift in Sources */,
 				F0AD0E680F9894FA73990CC8B369A41C /* ResponseErrorModel.swift in Sources */,

@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Adapty.logLevel = .verbose
         Adapty.activate("YOUR_ADAPTY_APP_TOKEN")
         Adapty.delegate = self
         

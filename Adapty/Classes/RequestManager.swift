@@ -54,6 +54,7 @@ class RequestManager {
             let urlRequest = try router.asURLRequest()
             return shared.performRequest(urlRequest, router: router, completion: completion)
         } catch {
+            LoggerManager.logError(error)
             completion(.failure(error), nil)
         }
         
@@ -69,7 +70,16 @@ class RequestManager {
     private func performRequest<T: JSONCodable>(_ urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             DispatchQueue.global(qos: .background).async {
-                self.handleResponse(data: data, response: response, error: error, router: router, completion: completion)
+                self.handleResponse(data: data, response: response, error: error, router: router) { (result: Result<T, Error>, response) in
+                    switch result {
+                    case .failure(let error):
+                        LoggerManager.logError(error)
+                    default:
+                        break
+                    }
+                    
+                    completion(result, response)
+                }
             }
         }
 
@@ -88,6 +98,8 @@ class RequestManager {
     }
     
     private func handleResponse<T: JSONCodable>(data: Data?, response: URLResponse?, error: Error?, router: Router?, completion: @escaping RequestCompletion<T>) {
+        logResponse(data, response)
+        
         if let error = error {
             handleResult(result: .failure(error), response: nil, completion: completion)
             return
@@ -97,8 +109,6 @@ class RequestManager {
             handleResult(result: .failure(NetworkResponse.emptyResponse), response: nil, completion: completion)
             return
         }
-        
-        logJSON(data)
         
         guard let data = data else {
             handleResult(result: .failure(NetworkResponse.emptyData), response: response, completion: completion)
@@ -175,10 +185,15 @@ class RequestManager {
         }
     }
     
-    private func logJSON(_ data: Data?) {
-//        if let data = data, let jsonString = String(data: data, encoding: .utf8) {
-//            print("Response : \(jsonString)")
-//        }
+    private func logResponse(_ data: Data?, _ response: URLResponse?) {
+        var message = "Received response: \(response?.url?.absoluteString ?? "")\n"
+        if let data = data, let jsonString = String(data: data, encoding: .utf8) {
+            message.append("\(jsonString)\n")
+        }
+        if let response = response as? HTTPURLResponse {
+            message.append("Headers: \(response.allHeaderFields)")
+        }
+        LoggerManager.logMessage(message)
     }
     
 }

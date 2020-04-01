@@ -25,6 +25,8 @@ import UIKit
     }
     private var purchaserInfo: PurchaserInfoModel? = DefaultsManager.shared.purchaserInfo {
         didSet {
+            LoggerManager.logMessage("Updating local purchaserInfo: \(String(describing: purchaserInfo)), with profileId: \(String(describing: purchaserInfo?.profileId)), customerUserId: \(String(describing: purchaserInfo?.customerUserId))")
+            
             if let profileId = purchaserInfo?.profileId {
                 self.profileId = profileId
             } else {
@@ -57,6 +59,11 @@ import UIKit
     static var observerMode = false
     
     @objc public static weak var delegate: AdaptyDelegate?
+    @objc public static var logLevel: AdaptyLogLevel = LoggerManager.logLevel {
+        didSet {
+            LoggerManager.logLevel = logLevel
+        }
+    }
     
     override private init() {
         super.init()
@@ -122,6 +129,8 @@ import UIKit
     //MARK: - REST
     
     private func createProfile(_ customerUserId: String?, _ completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         var attributes = Parameters()
         
         if let customerUserId = customerUserId { attributes["customer_user_id"] = customerUserId }
@@ -151,6 +160,8 @@ import UIKit
             return
         }
         
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         shared.createProfile(customerUserId, completion)
     }
     
@@ -166,6 +177,8 @@ import UIKit
         birthday: Date? = nil,
         completion: ErrorCompletion? = nil)
     {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         let profileId = shared.profileId
         
         var attributes = Parameters()
@@ -188,6 +201,8 @@ import UIKit
     }
     
     private func syncInstallation(_ completion: InstallationCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         let installationMetaId = installation?.profileInstallationMetaId ?? UserProperties.staticUuid
 
         var attributes = Parameters()
@@ -219,6 +234,8 @@ import UIKit
     }
     
     @objc public class func updateAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         let installationMetaId = shared.installation?.profileInstallationMetaId ?? UserProperties.staticUuid
         
         var attributes = Parameters()
@@ -244,18 +261,34 @@ import UIKit
     }
     
     @objc public class func getPurchaseContainers(_ completion: @escaping PurchaseContainersCompletion) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         shared.iapManager.getPurchaseContainers(completion)
     }
     
     @objc public class func makePurchase(product: ProductModel, offerId: String? = nil, completion: @escaping BuyProductCompletion) {
-        shared.iapManager.makePurchase(product: product, offerId: offerId, completion: completion)
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
+        shared.iapManager.makePurchase(product: product, offerId: offerId) { (purchaserInfo, receipt, appleValidationResult, product, error) in
+            if let error = error {
+                LoggerManager.logError("Failed to purchase product: \(product?.vendorProductId ?? "")\n\(error.localizedDescription)")
+            } else {
+                LoggerManager.logMessage("Successfully purchased product: \(product?.vendorProductId ?? "")")
+            }
+            
+            completion(purchaserInfo, receipt, appleValidationResult, product, error)
+        }
     }
     
     @objc public class func restorePurchases(completion: @escaping ErrorCompletion) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         shared.iapManager.restorePurchases(completion)
     }
     
     @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, vendorProductId: String? = nil, transactionId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping ValidateReceiptCompletion) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         var attributes = Parameters()
         
         attributes["profile_id"] = shared.profileId
@@ -284,6 +317,7 @@ import UIKit
     
     @objc public static var apnsToken: Data? {
         didSet {
+            LoggerManager.logMessage("Setting APNS token.")
             shared.apnsTokenString = apnsToken?.map { String(format: "%02.2hhx", $0) }.joined()
         }
     }
@@ -299,6 +333,8 @@ import UIKit
     }
     
     private func syncTransactionsHistory() {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         guard let receipt = iapManager.latestReceipt else {
             return
         }
@@ -308,6 +344,8 @@ import UIKit
     }
     
     @objc public class func getPurchaserInfo(_ completion: @escaping CahcedPurchaserCompletion) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         let cachedPurchaserInfo = shared.purchaserInfo
         
         if cachedPurchaserInfo != nil {
@@ -324,6 +362,8 @@ import UIKit
     }
     
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         shared.sessionsManager.invalidateLiveTrackerTimer()
         shared.purchaserInfo = nil
         shared.installation = nil

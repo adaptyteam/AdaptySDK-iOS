@@ -128,6 +128,8 @@ enum Router {
             request = try JSONParameterEncoder().encode(request, with: requestParams)
         }
         
+        LoggerManager.logMessage("Starting new request: \(request.url?.absoluteString ?? "")\nParams: \(requestParams)\nHeaders: \(request.allHTTPHeaderFields ?? [:])")
+        
         return request
     }
     

@@ -171,11 +171,11 @@ class IAPManager: NSObject {
         do {
             receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
         } catch {
-            print("Couldn't read receipt data. Error: \(error)")
+            LoggerManager.logError("Couldn't read receipt data.\n\(error)")
         }
         
         guard let receipt = receiptData?.base64EncodedString(options: []) else {
-            print("No valid local receipt")
+            LoggerManager.logError("No valid local receipt")
             return nil
         }
         
@@ -237,9 +237,10 @@ private extension IAPManager {
         DispatchQueue.main.async {
             switch result {
             case .success(let data):
+                LoggerManager.logMessage("Successfully loaded list of products: [\(self.productIDs?.joined(separator: ",") ?? "")]")
                 self.purchaseContainersRequestCompletion?(data.containers, data.products, nil)
             case .failure(let error):
-//                print("Failed to load list of products. Error: \(error.localizedDescription)")
+                LoggerManager.logError("Failed to load list of products.\n\(error.localizedDescription)")
                 self.purchaseContainersRequestCompletion?(nil, nil, error)
             }
             
@@ -250,11 +251,11 @@ private extension IAPManager {
     
     private func callBuyProductCompletionAndCleanCallback(for purchaseInfo: PurchaseInfoTuple?, result: Result<(purchaserInfo: PurchaserInfoModel?, receipt: String, response: Parameters?), Error>) {
         DispatchQueue.main.async {
+            // additional logs for success / error were moved to higher level because of the multiple calls in parent methods
             switch result {
             case .success(let result):
                 purchaseInfo?.completion?(result.purchaserInfo, result.receipt, result.response, purchaseInfo?.product, nil)
             case .failure(let error):
-//                print("Failed to buy product. Error: \(error.localizedDescription)")
                 purchaseInfo?.completion?(nil, nil, nil, purchaseInfo?.product, error)
             }
             
@@ -268,9 +269,10 @@ private extension IAPManager {
         DispatchQueue.main.async {
             switch result {
             case .success:
+                LoggerManager.logMessage("Successfully restored purchases.")
                 self.restorePurchasesCompletion?(nil)
             case .failure(let error):
-//                print("Failed to restore purchases. Error: \(error.localizedDescription)")
+                LoggerManager.logError("Failed to restore purchases.\n\(error.localizedDescription)")
                 self.restorePurchasesCompletion?(error)
             }
             
@@ -285,9 +287,9 @@ extension IAPManager: SKProductsRequestDelegate {
     // MARK:- Products list
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-//        for p in response.products {
-//            print("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
-//        }
+        for p in response.products {
+            LoggerManager.logMessage("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
+        }
         
         response.products.forEach { skProduct in
             if let products = containers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }) {

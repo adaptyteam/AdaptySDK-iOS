@@ -63,8 +63,8 @@ class KinesisManager {
             case .success:
                 let updatedCachedEvents = Set(self.cachedEvents).subtracting(currentCachedEvents)
                 self.cachedEvents = Array(updatedCachedEvents)
-            case .failure(let error):
-                print(error)
+            case .failure:
+                break
             }
         }
     }

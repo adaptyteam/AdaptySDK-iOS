@@ -61,6 +61,15 @@ Just configure Adapty SDK in Observer Mode – update **`.activate`** method:
 Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID", observerMode: true)
 ```
 
+### Debugging
+
+Adapty will log errors and other important information to help you understand what is going on. There are three levels available: **`verbose`**, **`errors`** and **`none`** in case you want a bit of a silence.
+You can set this immediately in your app while testing, before you configure Adapty.
+
+```Swift
+Adapty.logLevel = .verbose
+```
+
 ### Update your user
 
 Later you might want to update your user.
