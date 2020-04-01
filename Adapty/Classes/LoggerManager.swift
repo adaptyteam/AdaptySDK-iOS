@@ -22,7 +22,7 @@ class LoggerManager {
             return
         }
         
-        NSLog("\(prefix) ERROR.\n\(error)")
+        print("\(prefix) - ERROR.\n\(error)")
     }
     
     class func logMessage(_  message: String) {
@@ -30,7 +30,7 @@ class LoggerManager {
             return
         }
         
-        NSLog("\(prefix) INFO.\n\(message)")
+        print("\(prefix) - INFO.\n\(message)")
     }
     
     private class func isAllowedToLog(_ level: AdaptyLogLevel) -> Bool {
@@ -38,7 +38,16 @@ class LoggerManager {
     }
     
     private class var prefix: String {
-        return "[Adapty v\(UserProperties.sdkVersion ?? "")(\(UserProperties.sdkVersionBuild))]"
+        return "\(dateTime) [Adapty v\(UserProperties.sdkVersion ?? "")(\(UserProperties.sdkVersionBuild))]"
+    }
+    
+    private static var formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSZ"
+        return formatter
+    }()
+    private class var dateTime: String {
+        return formatter.string(from: Date())
     }
     
 }
