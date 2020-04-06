@@ -218,7 +218,7 @@ import UIKit
         attributes["os"] = UserProperties.OS
         attributes["platform"] = UserProperties.platform
         attributes["timezone"] = UserProperties.timezone
-        if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["device_identifier"] = deviceIdentifier }
+        if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["idfv"] = deviceIdentifier }
         if let apnsTokenString = apnsTokenString { attributes["device_token"] = apnsTokenString }
         if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         
