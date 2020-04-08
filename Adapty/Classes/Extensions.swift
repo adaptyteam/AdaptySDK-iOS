@@ -156,3 +156,14 @@ extension DateFormatter {
     }()
     
 }
+
+extension NSDecimalNumber {
+    
+    func localizedPrice(for locale: Locale) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = locale
+        return formatter.string(from: self)
+    }
+    
+}
