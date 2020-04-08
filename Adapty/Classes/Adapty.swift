@@ -82,30 +82,25 @@ import UIKit
     }
     
     @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) {
-        activate(apiKey, observerMode: observerMode, customerUserId: customerUserId, completion: nil)
-    }
-    
-    @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?, completion: ErrorCompletion? = nil) {
         Constants.APIKeys.secretKey = apiKey
         self.observerMode = observerMode
         self.initialCustomerUserId = customerUserId
-        shared.configure(completion)
+        shared.configure()
     }
     
-    private func configure(_ completion: ErrorCompletion? = nil) {
+    private func configure() {
         if isConfigured { return }
         isConfigured = true
         
         if purchaserInfo == nil {
             // didn't find synced profile, sync a local one and perform initial requests right after
-            createProfile(Self.initialCustomerUserId, completion)
+            createProfile(Self.initialCustomerUserId)
         } else {
             // already have a synced profile
             // update local cache for purchaser info
             Self.getPurchaserInfo { (_, _, _) in }
             // perform initial requests
             performInitialRequests()
-            completion?(nil)
         }
         
         AppDelegateSwizzler.startSwizzlingIfPossible(self)

@@ -16,6 +16,10 @@ extension Date {
         return formatter.string(from: self)
     }
     
+    var iso8601Value: String {
+        return DateFormatter.iso8601Formatter.string(from: self)
+    }
+    
 }
 
 extension UIDevice {
@@ -136,10 +140,19 @@ extension UUID {
 extension String {
     
     var dateValue: Date? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        return dateFormatter.date(from: self)
+        return DateFormatter.iso8601Formatter.date(from: self)
     }
+    
+}
+
+extension DateFormatter {
+    
+    static var iso8601Formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return formatter
+    }()
     
 }

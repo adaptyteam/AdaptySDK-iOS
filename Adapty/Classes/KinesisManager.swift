@@ -35,7 +35,7 @@ class KinesisManager {
         eventParams["profile_id"] = profileID
         eventParams["profile_installation_meta_id"] = profileInstallationMetaID
         eventParams["session_id"] = sessionID
-        eventParams["created_at"] = Date().description
+        eventParams["created_at"] = Date().iso8601Value
 
         cachedEvents.append(eventParams)
 
