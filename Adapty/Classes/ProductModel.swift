@@ -8,9 +8,24 @@
 import Foundation
 import StoreKit
 
-public class ProductModel: NSObject, JSONCodable {
+public class ProductModel: NSObject, JSONCodable, Codable {
     
-    @objc public enum PeriodUnit : UInt {
+    enum CodingKeys: String, CodingKey {
+        case vendorProductId
+        case localizedDescription
+        case localizedTitle
+        case price
+        case currencyCode
+        case currencySymbol
+        case subscriptionPeriod
+        case introductoryDiscount
+        case subscriptionGroupIdentifier
+        case discounts
+        case localizedPriceString
+        case localizedIntroductoryPriceString
+    }
+    
+    @objc public enum PeriodUnit : UInt, Codable {
         case day
         case week
         case month
@@ -22,7 +37,7 @@ public class ProductModel: NSObject, JSONCodable {
     
     @objc public var localizedDescription: String = ""
     @objc public var localizedTitle: String = ""
-    @objc public var price: NSDecimalNumber = 0
+    @objc public var price: Decimal = 0
     @objc public var currencyCode: String?
     @objc public var currencySymbol: String?
     @objc public var subscriptionPeriod: ProductSubscriptionPeriodModel?
@@ -40,7 +55,7 @@ public class ProductModel: NSObject, JSONCodable {
             
             localizedDescription = skProduct.localizedDescription
             localizedTitle = skProduct.localizedTitle
-            price = skProduct.price
+            price = skProduct.price.decimalValue
             currencyCode = skProduct.priceLocale.currencyCode
             currencySymbol = skProduct.priceLocale.currencySymbol
             
@@ -78,7 +93,7 @@ public class ProductModel: NSObject, JSONCodable {
     
 }
 
-public class ProductSubscriptionPeriodModel: NSObject {
+public class ProductSubscriptionPeriodModel: NSObject, Codable {
     
     @objc public var unit: ProductModel.PeriodUnit
     @objc public var numberOfUnits: Int
@@ -91,16 +106,16 @@ public class ProductSubscriptionPeriodModel: NSObject {
     
 }
 
-public class ProductDiscountModel: NSObject {
+public class ProductDiscountModel: NSObject, Codable {
     
-    @objc public enum PaymentMode: UInt {
+    @objc public enum PaymentMode: UInt, Codable {
         case payAsYouGo
         case payUpFront
         case freeTrial
         case unknown
     }
     
-    @objc public var price: NSDecimalNumber
+    @objc public var price: Decimal
     @objc public var identifier: String?
     @objc public var subscriptionPeriod: ProductSubscriptionPeriodModel
     @objc public var numberOfPeriods: Int
@@ -109,7 +124,7 @@ public class ProductDiscountModel: NSObject {
     
     @available(iOS 11.2, *)
     init(discount: SKProductDiscount, locale: Locale) {
-        self.price = discount.price
+        self.price = discount.price.decimalValue
         if #available(iOS 12.2, *) {
             self.identifier = discount.identifier
         }

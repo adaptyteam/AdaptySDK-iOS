@@ -44,10 +44,20 @@ class IAPManager: NSObject {
     private var profileId: String {
         DefaultsManager.shared.profileId
     }
-    private var containers: [PurchaseContainerModel]?
-    private var products: [ProductModel]?
+    private(set) var containers = DefaultsManager.shared.cachedPurchaseContainers {
+        didSet {
+            DefaultsManager.shared.cachedPurchaseContainers = containers
+        }
+    }
+    private var shortContainers: [PurchaseContainerModel]?
+    private(set) var products = DefaultsManager.shared.cachedProducts {
+        didSet {
+            DefaultsManager.shared.cachedProducts = products
+        }
+    }
+    private var shortProducts: [ProductModel]?
     private var productIDs: Set<String>? {
-        if let ids = products?.map({ $0.vendorProductId }) {
+        if let ids = shortProducts?.map({ $0.vendorProductId }) {
             return Set(ids)
         }
         return nil
@@ -107,8 +117,8 @@ class IAPManager: NSObject {
                 return
             }
             
-            self.containers = containers
-            self.products = products
+            self.shortContainers = containers
+            self.shortProducts = products
             self.requestProducts()
         }
     }
@@ -292,14 +302,17 @@ extension IAPManager: SKProductsRequestDelegate {
         }
         
         response.products.forEach { skProduct in
-            if let products = containers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }) {
+            if let products = shortContainers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }) {
                 products.forEach({ $0.skProduct = skProduct })
             }
             
-            products?.filter({ $0.vendorProductId == skProduct.productIdentifier }).forEach({ (product) in
+            shortProducts?.filter({ $0.vendorProductId == skProduct.productIdentifier }).forEach({ (product) in
                 product.skProduct = skProduct
             })
         }
+        
+        containers = shortContainers
+        products = shortProducts
         
         if response.products.count > 0, let containers = containers, containers.count > 0, let products = products {
             callPurchaseContainersCompletionAndCleanCallback(.success((containers: containers, products: products)))

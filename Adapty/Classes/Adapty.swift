@@ -257,10 +257,18 @@ import UIKit
         }
     }
     
-    @objc public class func getPurchaseContainers(_ completion: @escaping PurchaseContainersCompletion) {
+    @objc public class func getPurchaseContainers(_ completion: @escaping CachedPurchaseContainersCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        shared.iapManager.getPurchaseContainers(completion)
+        let containers = shared.iapManager.containers
+        let products = shared.iapManager.products
+        if containers != nil || products != nil {
+            completion(containers, products, .cached, nil)
+        }
+        
+        shared.iapManager.getPurchaseContainers { (containers, products, error) in
+            completion(containers, products, .synced, error)
+        }
     }
     
     @objc public class func makePurchase(product: ProductModel, offerId: String? = nil, completion: @escaping BuyProductCompletion) {

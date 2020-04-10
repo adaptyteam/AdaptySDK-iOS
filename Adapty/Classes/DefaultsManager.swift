@@ -89,9 +89,39 @@ class DefaultsManager {
         }
     }
     
+    var cachedPurchaseContainers: [PurchaseContainerModel]? {
+        get {
+            if let data = defaults.object(forKey: Constants.UserDefaults.cachedPurchaseContainers) as? Data, let containers = try? JSONDecoder().decode([PurchaseContainerModel].self, from: data) {
+                return containers
+            }
+            
+            return nil
+        }
+        set {
+            let data = try? JSONEncoder().encode(newValue)
+            defaults.set(data, forKey: Constants.UserDefaults.cachedPurchaseContainers)
+        }
+    }
+    
+    var cachedProducts: [ProductModel]? {
+        get {
+            if let data = defaults.object(forKey: Constants.UserDefaults.cachedProducts) as? Data, let products = try? JSONDecoder().decode([ProductModel].self, from: data) {
+                return products
+            }
+            
+            return nil
+        }
+        set {
+            let data = try? JSONEncoder().encode(newValue)
+            defaults.set(data, forKey: Constants.UserDefaults.cachedProducts)
+        }
+    }
+    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedTransactionsIds)
+        defaults.removeObject(forKey: Constants.UserDefaults.cachedPurchaseContainers)
+        defaults.removeObject(forKey: Constants.UserDefaults.cachedProducts)
     }
     
 }

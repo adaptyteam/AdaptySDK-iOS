@@ -125,10 +125,12 @@ To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attr
 ### Get purchase containers (paywalls)
 
 ```Swift
-Adapty.getPurchaseContainers { (containers, products, error) in
+Adapty.getPurchaseContainers { (containers, products, state, error) in
     // if error is empty, containers should contain info about your paywalls, products contains info about all your products
 }
 ```
+
+For **`state`** possible values are: **`cached`**, **`synced`**. First means that data was taken from local cache, second means that data was updated from remote server.
 
 ### Make purchase
 

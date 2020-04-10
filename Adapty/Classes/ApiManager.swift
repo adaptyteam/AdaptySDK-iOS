@@ -11,6 +11,7 @@ import Foundation
 public typealias ProfileCreateCompletion = (PurchaserInfoModel?, Error?, Bool?) -> Void
 public typealias InstallationCompletion = (InstallationModel?, Error?) -> Void
 public typealias PurchaseContainersCompletion = ([PurchaseContainerModel]?, [ProductModel]?, Error?) -> Void
+public typealias CachedPurchaseContainersCompletion = ([PurchaseContainerModel]?, [ProductModel]?, DataState, Error?) -> Void
 public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, Error?) -> Void
 public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void

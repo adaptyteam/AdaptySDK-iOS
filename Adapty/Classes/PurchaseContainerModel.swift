@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PurchaseContainerModel: NSObject, JSONCodable {
+public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
     
     @objc public var developerId: String
     @objc public var variationId: String
