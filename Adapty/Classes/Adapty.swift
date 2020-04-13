@@ -372,6 +372,7 @@ import UIKit
         shared.sessionsManager.invalidateLiveTrackerTimer()
         shared.purchaserInfo = nil
         shared.installation = nil
+        UserProperties.resetStaticUuid()
         DefaultsManager.shared.clean()
         
         // automatically create new profile

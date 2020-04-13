@@ -10,7 +10,10 @@ import AdSupport
 
 class UserProperties {
     
-    static let staticUuid = UUID().stringValue
+    private(set) static var staticUuid = UUID().stringValue
+    class func resetStaticUuid() {
+        staticUuid = UUID().stringValue
+    }
     
     static var uuid: String {
         return UUID().stringValue
