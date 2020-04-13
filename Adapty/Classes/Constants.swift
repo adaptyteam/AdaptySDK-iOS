@@ -23,6 +23,8 @@ struct Constants {
         static let authorization = "Authorization"
         static let profileId = "ADAPTY-SDK-PROFILE-ID"
         static let platform = "ADAPTY-SDK-PLATFORM"
+        static let version = "ADAPTY-SDK-VERSION"
+        static let build = "ADAPTY-SDK-VERSION-BUILD"
     }
 
     struct Kinesis {

@@ -98,12 +98,14 @@ enum Router {
     func asURLRequest() throws -> URLRequest {
         var request = URLRequest(url: URL(string: "\(scheme)://\(host)\(stage)\(path)")!,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-                                 timeoutInterval: 15.0)
+                                 timeoutInterval: 30.0)
         if let authorizationHeader = authorizationHeader {
             request.setValue(authorizationHeader, forHTTPHeaderField: Constants.Headers.authorization)
         }
         request.setValue(DefaultsManager.shared.profileId, forHTTPHeaderField: Constants.Headers.profileId)
         request.setValue("iOS", forHTTPHeaderField: Constants.Headers.platform)
+        request.setValue(UserProperties.sdkVersion, forHTTPHeaderField: Constants.Headers.version)
+        request.setValue(String(UserProperties.sdkVersionBuild), forHTTPHeaderField: Constants.Headers.build)
 
         request.httpMethod = method.rawValue
         
@@ -128,7 +130,7 @@ enum Router {
             request = try JSONParameterEncoder().encode(request, with: requestParams)
         }
         
-        LoggerManager.logMessage("Starting new request: \(request.url?.absoluteString ?? "")\nParams: \(requestParams)\nHeaders: \(request.allHTTPHeaderFields ?? [:])")
+        LoggerManager.logMessage("Starting new request: \(self.method.rawValue.uppercased()) \(request.url?.absoluteString ?? "")\nParams: \(requestParams)\nHeaders: \(request.allHTTPHeaderFields ?? [:])")
         
         return request
     }
