@@ -704,6 +704,10 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+## AppsFlyerFramework
+
+Copyright 2019 AppsFlyer Ltd. All rights reserved.
+
 ## CryptoSwift
 
 Copyright (C) 2014-2017 Marcin Krzyżanowski <marcin.krzyzanowski@gmail.com>

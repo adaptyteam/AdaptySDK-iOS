@@ -15,6 +15,11 @@ import UIKit
     
 }
 
+@objc public enum AttributionNetwork: UInt {
+    case adjust
+    case appsflyer
+}
+
 @objc public class Adapty: NSObject {
     
     private static let shared = Adapty()
@@ -230,29 +235,24 @@ import UIKit
         }
     }
     
-    @objc public class func updateAttribution(_ attribution: NSObject?, completion: ErrorCompletion? = nil) {
+    @objc public class func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionNetwork, networkUserId: String? = nil, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        let installationMetaId = shared.installation?.profileInstallationMetaId ?? UserProperties.staticUuid
-        
         var attributes = Parameters()
-
-        if let network = attribution?.value(forKey: "network") { attributes["attribution_network"] = network }
-        if let campaign = attribution?.value(forKey: "campaign") { attributes["attribution_campaign"] = campaign }
-        if let trackerToken = attribution?.value(forKey: "trackerToken") { attributes["attribution_tracker_token"] = trackerToken }
-        if let trackerName = attribution?.value(forKey: "trackerName") { attributes["attribution_tracker_name"] = trackerName }
-        if let adgroup = attribution?.value(forKey: "adgroup") { attributes["attribution_adgroup"] = adgroup }
-        if let creative = attribution?.value(forKey: "creative") { attributes["attribution_creative"] = creative }
-        if let clickLabel = attribution?.value(forKey: "clickLabel") { attributes["attribution_click_label"] = clickLabel }
-        if let adid = attribution?.value(forKey: "adid") { attributes["attribution_adid"] = adid }
         
-        let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
+        switch source {
+        case .adjust:
+            attributes["source"] = "adjust"
+        case .appsflyer:
+            attributes["source"] = "appsflyer"
+        }
         
-        shared.apiManager.syncInstallation(id: installationMetaId, profileId: shared.profileId, params: params) { (installation, error) in
-            if let installation = installation {
-                // do not overwrite in case of error
-                shared.installation = installation
-            }
+        if let networkUserId = networkUserId { attributes["network_user_id"] = networkUserId }
+        attributes["attribution"] = attribution
+        
+        let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAttribution, attributes: attributes)
+        
+        shared.apiManager.updateAttribution(id: shared.profileId, params: params) { (_, error) in
             completion?(error)
         }
     }

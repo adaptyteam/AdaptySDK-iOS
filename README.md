@@ -99,28 +99,43 @@ For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass cu
 To integrate with attribution system, just pass attribution you receive to Adapty method.
 
 ```Swift
-Adapty.updateAttribution("<attribution>") { (error) in
+Adapty.updateAttribution("<attribution>", source: "<source>", networkUserId: "<networkUserId>") { (error) in
     if error == nil {
         // successful update
     }
 }
 ```
 
-**`attribution`** is `Dictionary?` object.
+**`attribution`** is `Dictionary` object.
+For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**.
+**`networkUserId`** is `String?` object.
 
-Supported keys in **`attribution`** are the following:
-```
-network
-campaign
-trackerToken
-trackerName
-adgroup
-creative
-clickLabel
-adid
+To integrate with [Adjust](https://www.adjust.com/), just pass attribution you receive from delegate method of Adjust iOS SDK.
+
+```Swift
+import Adjust
+
+extension AppDelegate: AdjustDelegate {
+    func adjustAttributionChanged(_ attribution: ADJAttribution?) {
+        if let attribution = attribution?.dictionary() {
+            Adapty.updateAttribution(attribution, source: .adjust)
+        }
+    }
+}
 ```
 
-To integrate with [AdjustSDK](https://github.com/adjust/ios_sdk), just pass attribution you receive from delegate method of Adjust iOS SDK `- (void)adjustAttributionChanged:(ADJAttribution *)attribution` to Adapty `updateAttribution` method.
+To integrate with [AppsFlyer](https://www.appsflyer.com/), just pass attribution you receive from delegate method of Adjust iOS SDK.
+
+```Swift
+import AppsFlyerLib
+
+extension AppDelegate: AppsFlyerTrackerDelegate {
+    func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
+        // It's important to include the network user ID
+        Adapty.updateAttribution(conversionInfo, source: .appsflyer, networkUserId: AppsFlyerTracker.shared().getAppsFlyerUID())
+    }
+}
+```
 
 ### Get purchase containers (paywalls)
 

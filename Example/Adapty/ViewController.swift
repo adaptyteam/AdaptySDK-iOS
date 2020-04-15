@@ -62,8 +62,8 @@ class ViewController: UIViewController {
     
     @IBAction func updateAttributionButtonAction(_ sender: Any) {
         setLoader(true)
-        let attribution = ADJAttribution(jsonDict: ["trackerToken": "test_trackerToken", "trackerName": "test_trackerName", "network": "test_network", "campaign": "test_campaign", "adgroup": "test_adgroup", "creative": "test_creative", "clickLabel": "test_clickLabel"], adid: "test_adid")
-        Adapty.updateAttribution(attribution) { (error) in
+        let attribution = ["trackerToken": "test_trackerToken", "trackerName": "test_trackerName", "network": "test_network", "campaign": "test_campaign", "adgroup": "test_adgroup", "creative": "test_creative", "clickLabel": "test_clickLabel", "adid": "test_adid"]
+        Adapty.updateAttribution(attribution, source: .adjust) { (error) in
             self.setLoader(false)
             if let error = error {
                 self.infoLabel.text = "Failed to update attribution: \(error)"

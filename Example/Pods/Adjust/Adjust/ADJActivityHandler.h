@@ -82,8 +82,7 @@
 
 - (BOOL)updateAttributionI:(id<ADJActivityHandler>)selfI attribution:(ADJAttribution *)attribution;
 - (void)setAttributionDetails:(NSDictionary *)attributionDetails
-                        error:(NSError *)error
-                  retriesLeft:(int)retriesLeft;
+                        error:(NSError *)error;
 
 - (void)setOfflineMode:(BOOL)offline;
 - (void)sendFirstPackages;
@@ -97,6 +96,7 @@
 - (void)resetSessionCallbackParameters;
 - (void)resetSessionPartnerParameters;
 - (void)trackAdRevenue:(NSString *)soruce payload:(NSData *)payload;
+- (void)disableThirdPartySharing;
 - (NSString *)getBasePath;
 - (NSString *)getGdprPath;
 

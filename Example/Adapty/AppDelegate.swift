@@ -9,6 +9,7 @@
 import UIKit
 import Adapty
 import Adjust
+import AppsFlyerLib
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,9 +21,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Adapty.activate("YOUR_ADAPTY_APP_TOKEN")
         Adapty.delegate = self
         
-        let config = ADJConfig(appToken: "YOUR_ADJUST_APP_TOKEN", environment: ADJEnvironmentProduction)
-        config?.delegate = self
-        Adjust.appDidLaunch(config)
+        // Configure Adjust
+        
+        // Configure AppsFlyer
 
         return true
     }
@@ -55,9 +56,22 @@ extension AppDelegate: AdjustDelegate {
     
     func adjustAttributionChanged(_ attribution: ADJAttribution?) {
         // Just pass Adjust attribution to Adapty SDK
-        Adapty.updateAttribution(attribution)
+        if let attribution = attribution?.dictionary() {
+            Adapty.updateAttribution(attribution, source: .adjust)
+        }
     }
     
+}
+
+extension AppDelegate: AppsFlyerTrackerDelegate {
+    func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
+        // It's important to include the network user ID
+        Adapty.updateAttribution(conversionInfo, source: .appsflyer, networkUserId: AppsFlyerTracker.shared().getAppsFlyerUID())
+    }
+
+    func onConversionDataFail(_ error: Error) {
+        
+    }
 }
 
 extension AppDelegate: AdaptyDelegate {

@@ -95,6 +95,8 @@
  */
 @property (nonatomic, copy, nullable) NSString *defaultTracker;
 
+@property (nonatomic, copy, nullable) NSString *externalDeviceId;
+
 /**
  * @brief Adjust app token.
  */
@@ -140,6 +142,16 @@
  * @brief Enables sending in the background.
  */
 @property (nonatomic, assign) BOOL sendInBackground;
+
+/**
+ * @brief Enables/disables reading of iAd framework data needed for ASA tracking.
+ */
+@property (nonatomic, assign) BOOL allowiAdInfoReading;
+
+/**
+ * @brief Enables/disables reading of IDFA parameter.
+ */
+@property (nonatomic, assign) BOOL allowIdfaReading;
 
 /**
  * @brief Enables delayed start of the SDK.

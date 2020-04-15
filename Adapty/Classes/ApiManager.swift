@@ -97,4 +97,15 @@ class ApiManager {
         }
     }
     
+    func updateAttribution(id: String, params: Parameters, completion: @escaping JSONCompletion) {
+        RequestManager.request(router: Router.updateAttribution(id: id, params: params)) { (result: Result<JSONModel, Error>, response) in
+            switch result {
+            case .success(let response):
+                completion(response.data, nil)
+            case .failure(let error):
+                completion(nil, error)
+            }
+        }
+    }
+    
 }

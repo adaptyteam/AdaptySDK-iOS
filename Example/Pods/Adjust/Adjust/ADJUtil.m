@@ -19,10 +19,13 @@
 #import "UIDevice+ADJAdditions.h"
 #import "NSString+ADJAdditions.h"
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
 #import <CoreTelephony/CTCarrier.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #endif
+
+// https://stackoverflow.com/a/5337804/1498352
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 static const double kRequestTimeout = 60;   // 60 seconds
 
@@ -35,12 +38,12 @@ static NSRegularExpression *shortUniversalLinkRegex = nil;
 static NSRegularExpression *excludedDeeplinkRegex = nil;
 static NSURLSessionConfiguration *urlSessionConfiguration = nil;
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
 static CTCarrier *carrier = nil;
 static CTTelephonyNetworkInfo *networkInfo = nil;
 #endif
 
-static NSString * const kClientSdk                  = @"ios4.18.3";
+static NSString * const kClientSdk                  = @"ios4.21.1";
 static NSString * const kDeeplinkParam              = @"deep_link=";
 static NSString * const kSchemeDelimiter            = @"://";
 static NSString * const kDefaultScheme              = @"AdjustUniversalScheme";
@@ -64,7 +67,7 @@ static NSString * const kDateFormat                 = @"yyyy-MM-dd'T'HH:mm:ss.SS
     [self initializeExcludedDeeplinkRegex];
     [self initializeUrlSessionConfiguration];
     [self initializeReachability];
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
     [self initializeNetworkInfoAndCarrier];
 #endif
 }
@@ -76,7 +79,7 @@ static NSString * const kDateFormat                 = @"yyyy-MM-dd'T'HH:mm:ss.SS
     optionalRedirectRegex = nil;
     shortUniversalLinkRegex = nil;
     urlSessionConfiguration = nil;
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
     networkInfo = nil;
     carrier = nil;
 #endif
@@ -148,7 +151,7 @@ static NSString * const kDateFormat                 = @"yyyy-MM-dd'T'HH:mm:ss.SS
     urlSessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
 }
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
 + (void)initializeNetworkInfoAndCarrier {
     networkInfo = [[CTTelephonyNetworkInfo alloc] init];
     carrier = [networkInfo subscriberCellularProvider];
@@ -285,78 +288,126 @@ static NSString * const kDateFormat                 = @"yyyy-MM-dd'T'HH:mm:ss.SS
 
 + (id)readObject:(NSString *)fileName
       objectName:(NSString *)objectName
-           class:(Class)classToRead {
-    // Try to read from Application Support directory first.
-    NSString *documentsFilePath = [ADJUtil getFilePathInDocumentsDir:fileName];
-    NSString *appSupportFilePath = [ADJUtil getFilePathInAppSupportDir:fileName];
+           class:(Class)classToRead
+{
+    @synchronized([ADJUtil class]) {
+        NSString *documentsFilePath = [ADJUtil getFilePathInDocumentsDir:fileName];
+        NSString *appSupportFilePath = [ADJUtil getFilePathInAppSupportDir:fileName];
 
-    @try {
-        id appSupportObject = [NSKeyedUnarchiver unarchiveObjectWithFile:appSupportFilePath];
-        if ([appSupportObject isKindOfClass:classToRead]) {
-            // Successfully read object from Application Support folder, return it.
-            if ([appSupportObject isKindOfClass:[NSArray class]]) {
-                [[ADJAdjustFactory logger] debug:@"Package handler read %d packages", [appSupportObject count]];
+        // Try to read from Application Support directory first.
+        @try {
+            id appSupportObject;
+            if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+                NSData *data = [NSData dataWithContentsOfFile:appSupportFilePath];
+                NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+                [unarchiver setRequiresSecureCoding:NO];
+                appSupportObject = [unarchiver decodeObjectOfClass:classToRead forKey:NSKeyedArchiveRootObjectKey];
             } else {
-                [[ADJAdjustFactory logger] debug:@"Read %@: %@", objectName, appSupportObject];
+                appSupportObject = [NSKeyedUnarchiver unarchiveObjectWithFile:appSupportFilePath];
             }
-            // Just in case check if old file exists in Documents folder and if yes, remove it.
-            [ADJUtil deleteFileInPath:documentsFilePath];
-            return appSupportObject;
-        } else if (appSupportObject == nil) {
-            // [[ADJAdjustFactory logger] verbose:@"%@ file not found", appSupportFilePath];
-            [[ADJAdjustFactory logger] verbose:@"%@ file not found in \"Application Support/Adjust\" folder", fileName];
-        } else {
-            // [[ADJAdjustFactory logger] error:@"Failed to read %@ file", appSupportFilePath];
-            [[ADJAdjustFactory logger] error:@"Failed to read %@ file from \"Application Support/Adjust\" folder", fileName];
-        }
-    } @catch (NSException *ex) {
-        // [[ADJAdjustFactory logger] error:@"Failed to read %@ file  (%@)", appSupportFilePath, ex];
-        [[ADJAdjustFactory logger] error:@"Failed to read %@ file from \"Application Support/Adjust\" folder (%@)", fileName, ex];
-    }
 
-    // If in here, for some reason, reading of file from Application Support folder failed.
-    // Let's check the Documents folder.
-    @try {
-        id documentsObject = [NSKeyedUnarchiver unarchiveObjectWithFile:documentsFilePath];
-        if (documentsObject != nil) {
-            // Successfully read object from Documents folder.
-            if ([documentsObject isKindOfClass:[NSArray class]]) {
-                [[ADJAdjustFactory logger] debug:@"Package handler read %d packages", [documentsObject count]];
+            if (appSupportObject != nil) {
+                if ([appSupportObject isKindOfClass:classToRead]) {
+                    // Successfully read object from Application Support folder, return it.
+                    if ([appSupportObject isKindOfClass:[NSArray class]]) {
+                        [[ADJAdjustFactory logger] debug:@"Package handler read %d packages", [appSupportObject count]];
+                    } else {
+                        [[ADJAdjustFactory logger] debug:@"Read %@: %@", objectName, appSupportObject];
+                    }
+
+                    // Just in case check if old file exists in Documents folder and if yes, remove it.
+                    [ADJUtil deleteFileInPath:documentsFilePath];
+
+                    return appSupportObject;
+                }
             } else {
-                [[ADJAdjustFactory logger] debug:@"Read %@: %@", objectName, documentsObject];
+                // [[ADJAdjustFactory logger] error:@"Failed to read %@ file", appSupportFilePath];
+                [[ADJAdjustFactory logger] debug:@"File %@ not found in \"Application Support/Adjust\" folder", fileName];
             }
-            // Do the file migration.
-            [[ADJAdjustFactory logger] verbose:@"Migrating %@ file from Documents to \"Application Support/Adjust\" folder", fileName];
-            [ADJUtil migrateFileFromPath:documentsFilePath toPath:appSupportFilePath];
-            return documentsObject;
-        } else if (documentsObject == nil) {
-            // [[ADJAdjustFactory logger] verbose:@"%@ file not found", documentsFilePath];
-            [[ADJAdjustFactory logger] verbose:@"%@ file not found in Documents folder", fileName];
-        } else {
-            // [[ADJAdjustFactory logger] error:@"Failed to read %@ file", documentsFilePath];
-            [[ADJAdjustFactory logger] error:@"Failed to read %@ file from Documents folder", fileName];
+        } @catch (NSException *ex) {
+            // [[ADJAdjustFactory logger] error:@"Failed to read %@ file  (%@)", appSupportFilePath, ex];
+            [[ADJAdjustFactory logger] error:@"Failed to read %@ file from \"Application Support/Adjust\" folder (%@)", fileName, ex];
         }
-    } @catch (NSException *ex) {
-        // [[ADJAdjustFactory logger] error:@"Failed to read %@ file (%@)", documentsFilePath, ex];
-        [[ADJAdjustFactory logger] error:@"Failed to read %@ file from Documents folder (%@)", fileName, ex];
+
+        // If in here, for some reason, reading of file from Application Support folder failed.
+        // Let's check the Documents folder.
+        @try {
+            id documentsObject;
+            if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+                NSData *data = [NSData dataWithContentsOfFile:documentsFilePath];
+                NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+                [unarchiver setRequiresSecureCoding:NO];
+                documentsObject = [unarchiver decodeObjectOfClass:classToRead forKey:NSKeyedArchiveRootObjectKey];
+            } else {
+                documentsObject = [NSKeyedUnarchiver unarchiveObjectWithFile:documentsFilePath];
+            }
+
+            if (documentsObject != nil) {
+                // Successfully read object from Documents folder.
+                if ([documentsObject isKindOfClass:[NSArray class]]) {
+                    [[ADJAdjustFactory logger] debug:@"Package handler read %d packages", [documentsObject count]];
+                } else {
+                    [[ADJAdjustFactory logger] debug:@"Read %@: %@", objectName, documentsObject];
+                }
+
+                // Do the file migration.
+                [[ADJAdjustFactory logger] verbose:@"Migrating %@ file from Documents to \"Application Support/Adjust\" folder", fileName];
+                [ADJUtil migrateFileFromPath:documentsFilePath toPath:appSupportFilePath];
+
+                return documentsObject;
+            } else {
+                // [[ADJAdjustFactory logger] error:@"Failed to read %@ file", documentsFilePath];
+                [[ADJAdjustFactory logger] debug:@"File %@ not found in Documents folder", fileName];
+            }
+        } @catch (NSException *ex) {
+            // [[ADJAdjustFactory logger] error:@"Failed to read %@ file (%@)", documentsFilePath, ex];
+            [[ADJAdjustFactory logger] error:@"Failed to read %@ file from Documents folder (%@)", fileName, ex];
+        }
+
+        return nil;
     }
-    return nil;
 }
 
 + (void)writeObject:(id)object
            fileName:(NSString *)fileName
-         objectName:(NSString *)objectName {
-    NSString *filePath = [ADJUtil getFilePathInAppSupportDir:fileName];
-    BOOL result = (filePath != nil) && [NSKeyedArchiver archiveRootObject:object toFile:filePath];
-    if (result == YES) {
-        [ADJUtil excludeFromBackup:filePath];
-        if ([object isKindOfClass:[NSArray class]]) {
-            [[ADJAdjustFactory logger] debug:@"Package handler wrote %d packages", [object count]];
-        } else {
-            [[ADJAdjustFactory logger] debug:@"Wrote %@: %@", objectName, object];
+         objectName:(NSString *)objectName
+{
+    @synchronized([ADJUtil class]) {
+        BOOL result;
+        NSString *filePath = [ADJUtil getFilePathInAppSupportDir:fileName];
+
+        if (!filePath) {
+            [[ADJAdjustFactory logger] error:@"Cannot get filepath from filename: %@, to write %@ file", fileName, objectName];
+            return;
         }
-    } else {
-        [[ADJAdjustFactory logger] error:@"Failed to write %@ file", objectName];
+
+        if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+            NSError *errorArchiving = nil;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+            NSData *data = [NSKeyedArchiver archivedDataWithRootObject:object requiringSecureCoding:NO error:&errorArchiving];
+#pragma clang diagnostic pop
+            if (data && errorArchiving == nil) {
+                NSError *errorWriting = nil;
+                result = [data writeToFile:filePath options:NSDataWritingAtomic error:&errorWriting];
+                result = result && (errorWriting == nil);
+            } else {
+                result = NO;
+            }
+        } else {
+            result = [NSKeyedArchiver archiveRootObject:object toFile:filePath];
+        }
+        if (result == YES) {
+            [ADJUtil excludeFromBackup:filePath];
+            if ([object isKindOfClass:[NSArray class]]) {
+                [[ADJAdjustFactory logger] debug:@"Package handler wrote %d packages", [object count]];
+            } else {
+                [[ADJAdjustFactory logger] debug:@"Wrote %@: %@", objectName, object];
+            }
+        } else {
+            [[ADJAdjustFactory logger] error:@"Failed to write %@ file", objectName];
+        }
+
     }
 }
 
@@ -473,9 +524,9 @@ static NSString * const kDateFormat                 = @"yyyy-MM-dd'T'HH:mm:ss.SS
     NSMutableDictionary *parametersCopy = [[NSMutableDictionary alloc] initWithCapacity:[activityPackage.parameters count]];
     [parametersCopy addEntriesFromDictionary:activityPackage.parameters];
 
-    NSString *appSecret = [ADJUtil extractAppSecret:parametersCopy];
-    NSString *secretId = [ADJUtil extractSecretId:parametersCopy];
     [ADJUtil extractEventCallbackId:parametersCopy];
+
+    NSString * authorizationHeader = [ADJUtil buildAuthorizationHeader:parametersCopy activityKind:activityPackage.activityKind];
 
     NSMutableURLRequest *request = [ADJUtil requestForGetPackage:activityPackage.path
                                                        clientSdk:activityPackage.clientSdk
@@ -485,22 +536,19 @@ static NSString * const kDateFormat                 = @"yyyy-MM-dd'T'HH:mm:ss.SS
     [ADJUtil sendRequest:request
       prefixErrorMessage:prefixErrorMessage
          activityPackage:activityPackage
-                secretId:secretId
-               appSecret:appSecret
+     authorizationHeader:authorizationHeader
      responseDataHandler:responseDataHandler];
 }
 
 + (void)sendRequest:(NSMutableURLRequest *)request
  prefixErrorMessage:(NSString *)prefixErrorMessage
     activityPackage:(ADJActivityPackage *)activityPackage
-           secretId:(NSString *)secretId
-          appSecret:(NSString *)appSecret
+authorizationHeader:(NSString *)authorizationHeader
 responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler {
     [ADJUtil sendRequest:request
       prefixErrorMessage:prefixErrorMessage
       suffixErrorMessage:nil
-                secretId:secretId
-               appSecret:appSecret
+     authorizationHeader:authorizationHeader
          activityPackage:activityPackage
      responseDataHandler:responseDataHandler];
 }
@@ -510,13 +558,14 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
      prefixErrorMessage:(NSString *)prefixErrorMessage
      suffixErrorMessage:(NSString *)suffixErrorMessage
         activityPackage:(ADJActivityPackage *)activityPackage
-    responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler {
+    responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
+{
     NSMutableDictionary *parametersCopy = [[NSMutableDictionary alloc] initWithCapacity:[activityPackage.parameters count]];
     [parametersCopy addEntriesFromDictionary:activityPackage.parameters];
 
-    NSString *appSecret = [ADJUtil extractAppSecret:parametersCopy];
-    NSString *secretId = [ADJUtil extractSecretId:parametersCopy];
     [ADJUtil extractEventCallbackId:parametersCopy];
+
+    NSString * authorizationHeader = [ADJUtil buildAuthorizationHeader:parametersCopy activityKind:activityPackage.activityKind];
 
     NSMutableURLRequest *request = [ADJUtil requestForPostPackage:activityPackage.path
                                                         clientSdk:activityPackage.clientSdk
@@ -525,8 +574,7 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
     [ADJUtil sendRequest:request
       prefixErrorMessage:prefixErrorMessage
       suffixErrorMessage:suffixErrorMessage
-                secretId:secretId
-               appSecret:appSecret
+     authorizationHeader:authorizationHeader
          activityPackage:activityPackage
      responseDataHandler:responseDataHandler];
 }
@@ -534,15 +582,13 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
 + (void)sendRequest:(NSMutableURLRequest *)request
  prefixErrorMessage:(NSString *)prefixErrorMessage
  suffixErrorMessage:(NSString *)suffixErrorMessage
-           secretId:(NSString *)secretId
-          appSecret:(NSString *)appSecret
+authorizationHeader:(NSString *)authorizationHeader
     activityPackage:(ADJActivityPackage *)activityPackage
-responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler {
-    NSString *authHeader = [ADJUtil buildAuthorizationHeader:appSecret
-                                                    secretId:secretId
-                                             activityPackage:activityPackage];
-    if (authHeader != nil) {
-        [request setValue:authHeader forHTTPHeaderField:@"Authorization"];
+responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
+{
+    if (authorizationHeader != nil) {
+        [ADJAdjustFactory.logger debug:@"authorizationHeader %@", authorizationHeader];
+        [request setValue:authorizationHeader forHTTPHeaderField:@"Authorization"];
     }
     if (userAgent != nil) {
         [request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
@@ -564,22 +610,68 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
     }
 }
 
-+ (NSString *)extractAppSecret:(NSMutableDictionary *)parameters {
-    NSString *appSecret = [parameters objectForKey:@"app_secret"];
-    if (appSecret == nil) {
-        return nil;
++ (NSString *)buildAuthorizationHeader:(NSMutableDictionary *)parameters
+                          activityKind:(ADJActivityKind)activityKind
+{
+    NSString *secretId = [ADJUtil extractEntry:parameters
+                                           key:@"secret_id"];
+    NSString *signature = [ADJUtil extractEntry:parameters
+                                            key:@"signature"];
+    NSString *headersId = [ADJUtil extractEntry:parameters
+                                            key:@"headers_id"];
+    NSString *nativeVersion = [ADJUtil extractEntry:parameters
+                                                key:@"native_version"];
+    NSString *algorithm = [ADJUtil extractEntry:parameters
+                                                 key:@"algorithm"];
+    NSString *authorizationHeader = [ADJUtil buildAuthorizationHeaderV2:signature
+                                                                secretId:secretId
+                                                               headersId:headersId
+                                                          nativeVersion:nativeVersion
+                                                              algorithm:algorithm];
+    if (authorizationHeader != nil) {
+        return authorizationHeader;
     }
-    [parameters removeObjectForKey:@"app_secret"];
-    return appSecret;
+
+    NSString * appSecret = [ADJUtil extractEntry:parameters key:@"app_secret"];
+    return [ADJUtil buildAuthorizationHeaderV1:appSecret
+                                      secretId:secretId
+                                    parameters:parameters
+                                  activityKind:activityKind];
 }
 
-+ (NSString *)extractSecretId:(NSMutableDictionary *)parameters {
-    NSString *appSecret = [parameters objectForKey:@"secret_id"];
-    if (appSecret == nil) {
++ (NSString *)extractEntry:(NSMutableDictionary *)parameters
+                       key:(NSString *)key
+{
+    NSString *stringValue = [parameters objectForKey:key];
+    if (stringValue == nil) {
         return nil;
     }
-    [parameters removeObjectForKey:@"secret_id"];
-    return appSecret;
+    [parameters removeObjectForKey:key];
+    return stringValue;
+}
+
++ (NSString *)buildAuthorizationHeaderV2:(NSString *)signature
+                                secretId:(NSString *)secretId
+                                headersId:(NSString *)headersId
+                           nativeVersion:(NSString *)nativeVersion
+                               algorithm:(NSString *)algorithm
+{
+    if (secretId == nil || signature == nil || headersId == nil) {
+        return nil;
+    }
+
+    NSString * signatureHeader = [NSString stringWithFormat:@"signature=\"%@\"", signature];
+    NSString * secretIdHeader  = [NSString stringWithFormat:@"secret_id=\"%@\"", secretId];
+    NSString * idHeader        = [NSString stringWithFormat:@"headers_id=\"%@\"", headersId];
+    NSString * algorithmHeader = [NSString stringWithFormat:@"algorithm=\"%@\"", algorithm != nil ? algorithm : @"adj1"];
+
+    NSString * authorizationHeader = [NSString stringWithFormat:@"Signature %@,%@,%@,%@",
+            signatureHeader, secretIdHeader, algorithmHeader, idHeader];
+
+    if (nativeVersion == nil) {
+        return [authorizationHeader stringByAppendingFormat:@",native_version=\"\""];
+    }
+    return [authorizationHeader stringByAppendingFormat:@",native_version=\"%@\"", nativeVersion];
 }
 
 + (void)extractEventCallbackId:(NSMutableDictionary *)parameters {
@@ -629,15 +721,16 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
     return request;
 }
 
-+ (NSString *)buildAuthorizationHeader:(NSString *)appSecret
++ (NSString *)buildAuthorizationHeaderV1:(NSString *)appSecret
                               secretId:(NSString *)secretId
-                       activityPackage:(ADJActivityPackage *)activityPackage {
+                              parameters:(NSMutableDictionary *)parameters
+                       activityKind:(ADJActivityKind)activityKind
+{
     if (appSecret == nil) {
         return nil;
     }
 
-    NSMutableDictionary *parameters = activityPackage.parameters;
-    NSString *activityKindS = [ADJActivityKindUtil activityKindToString:activityPackage.activityKind];
+    NSString *activityKindS = [ADJActivityKindUtil activityKindToString:activityKind];
     NSDictionary *signatureParameters = [ADJUtil buildSignatureParameters:parameters
                                                                 appSecret:appSecret
                                                             activityKindS:activityKindS];
@@ -670,7 +763,6 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
                                      signatureHeader,
                                      algorithmHeader,
                                      fieldsHeader];
-    [ADJAdjustFactory.logger debug:@"authorizationHeader %@", authorizationHeader];
     return authorizationHeader;
 }
 
@@ -1233,7 +1325,7 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
 
     NSMutableString *hexString  = [NSMutableString stringWithCapacity:(dataLength * 2)];
 
-    for (int i = 0; i < dataLength; ++i) {
+    for (NSUInteger i = 0; i < dataLength; ++i) {
         [hexString appendString:[NSString stringWithFormat:@"%02lx", (unsigned long)dataBuffer[i]]];
     }
 
@@ -1321,7 +1413,7 @@ responseDataHandler:(void (^)(ADJResponseData *responseData))responseDataHandler
     return kClientSdk;
 }
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
 + (NSString *)readMCC {
     if (carrier == nil) {
         return nil;

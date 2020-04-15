@@ -60,6 +60,9 @@
     sessionPackage.activityKind = ADJActivityKindSession;
     sessionPackage.suffix = @"";
     sessionPackage.parameters = parameters;
+
+    [self signWithSigV2Plugin:sessionPackage];
+
     return sessionPackage;
 }
 
@@ -77,6 +80,8 @@
         eventPackage.partnerParameters = event.partnerParameters;
     }
 
+    [self signWithSigV2Plugin:eventPackage];
+
     return eventPackage;
 }
 
@@ -87,6 +92,9 @@
     infoPackage.activityKind = ADJActivityKindInfo;
     infoPackage.suffix = @"";
     infoPackage.parameters = parameters;
+
+    [self signWithSigV2Plugin:infoPackage];
+
     return infoPackage;
 }
 
@@ -97,6 +105,9 @@
     adRevenuePackage.activityKind = ADJActivityKindAdRevenue;
     adRevenuePackage.suffix = @"";
     adRevenuePackage.parameters = parameters;
+
+    [self signWithSigV2Plugin:adRevenuePackage];
+
     return adRevenuePackage;
 }
 
@@ -107,6 +118,9 @@
     clickPackage.activityKind = ADJActivityKindClick;
     clickPackage.suffix = @"";
     clickPackage.parameters = parameters;
+
+    [self signWithSigV2Plugin:clickPackage];
+
     return clickPackage;
 }
 
@@ -117,6 +131,9 @@
     attributionPackage.activityKind = ADJActivityKindAttribution;
     attributionPackage.suffix = @"";
     attributionPackage.parameters = parameters;
+
+    [self signWithSigV2Plugin:attributionPackage];
+
     return attributionPackage;
 }
 
@@ -127,7 +144,23 @@
     gdprPackage.activityKind = ADJActivityKindGdpr;
     gdprPackage.suffix = @"";
     gdprPackage.parameters = parameters;
+
+    [self signWithSigV2Plugin:gdprPackage];
+
     return gdprPackage;
+}
+
+- (ADJActivityPackage *)buildDisableThirdPartySharingPackage {
+    NSMutableDictionary *parameters = [self getDisableThirdPartySharingParameters];
+    ADJActivityPackage *dtpsPackage = [self defaultActivityPackage];
+    dtpsPackage.path = @"/disable_third_party_sharing";
+    dtpsPackage.activityKind = ADJActivityKindDisableThirdPartySharing;
+    dtpsPackage.suffix = @"";
+    dtpsPackage.parameters = parameters;
+
+    [self signWithSigV2Plugin:dtpsPackage];
+
+    return dtpsPackage;
 }
 
 + (void)parameters:(NSMutableDictionary *)parameters setDictionary:(NSDictionary *)dictionary forKey:(NSString *)key {
@@ -154,6 +187,63 @@
 
 #pragma mark - Private & helper methods
 
+- (void)signWithSigV2Plugin:(ADJActivityPackage *)activityPackage {
+    Class signerClass = NSClassFromString(@"ADJSigner");
+    if (signerClass == nil) {
+        return;
+    }
+
+    SEL signSEL = NSSelectorFromString(@"sign:withActivityKind:withSdkVersion:");
+    if (![signerClass respondsToSelector:signSEL]) {
+        return;
+    }
+
+    NSMutableDictionary * parameters = activityPackage.parameters;
+    const char * activityKindChar = [[ADJActivityKindUtil activityKindToString:activityPackage.activityKind] UTF8String];
+    const char * sdkVersionChar = [activityPackage.clientSdk UTF8String];
+    /*
+     [ADJSigner sign:parameters
+     withActivityKind:activityKindChar
+       withSdkVersion:sdkVersionChar];
+     */
+    NSMethodSignature *signMethodSignature = [signerClass methodSignatureForSelector:signSEL];
+    NSInvocation *signInvocation = [NSInvocation invocationWithMethodSignature:signMethodSignature];
+    [signInvocation setSelector: signSEL];
+    [signInvocation setTarget:signerClass];
+
+    [signInvocation setArgument:&parameters atIndex: 2];
+    [signInvocation setArgument:&activityKindChar atIndex: 3];
+    [signInvocation setArgument:&sdkVersionChar atIndex: 4];
+
+    [signInvocation invoke];
+
+    SEL getVersionSEL = NSSelectorFromString(@"getVersion");
+    if (![signerClass respondsToSelector:getVersionSEL]) {
+        return;
+    }
+    /*
+    NSString *signerVersion = [ADJSigner getVersion];
+     */
+    IMP getVersionIMP = [signerClass methodForSelector:getVersionSEL];
+    if (!getVersionIMP) {
+        return;
+    }
+
+    id (*getVersionFunc)(id, SEL) = (void *)getVersionIMP;
+
+    id signerVersion = getVersionFunc(signerClass, getVersionSEL);
+
+    if (![signerVersion isKindOfClass:[NSString class]]) {
+        return;
+    }
+
+    NSString *signerVersionString = (NSString *)signerVersion;
+    [ADJPackageBuilder parameters:parameters
+                           setString:signerVersionString
+                           forKey:@"native_version"];
+
+}
+
 - (NSMutableDictionary *)getSessionParameters:(BOOL)isInDelay {
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
 
@@ -173,9 +263,12 @@
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceType forKey:@"device_type"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.environment forKey:@"environment"];
     [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.fbAnonymousId forKey:@"fb_anon_id"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.machineModel forKey:@"hardware_name"];
-    [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.installReceiptBase64 forKey:@"install_receipt"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil getInstallTime] forKey:@"installed_at"];
@@ -210,7 +303,7 @@
         [ADJPackageBuilder parameters:parameters setDictionary:self.sessionParameters.partnerParameters forKey:@"partner_params"];
     }
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMCC] forKey:@"mcc"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMNC] forKey:@"mnc"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readCurrentRadioAccessTechnology] forKey:@"network_type"];
@@ -239,9 +332,12 @@
     [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
     [ADJPackageBuilder parameters:parameters setString:event.callbackId forKey:@"event_callback_id"];
     [ADJPackageBuilder parameters:parameters setString:event.eventToken forKey:@"event_token"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.fbAnonymousId forKey:@"fb_anon_id"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.machineModel forKey:@"hardware_name"];
-    [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.installReceiptBase64 forKey:@"install_receipt"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.languageCode forKey:@"language"];
@@ -293,7 +389,7 @@
         [ADJPackageBuilder parameters:parameters setString:event.transactionId forKey:@"transaction_id"];
     }
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMCC] forKey:@"mcc"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMNC] forKey:@"mnc"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readCurrentRadioAccessTechnology] forKey:@"network_type"];
@@ -311,7 +407,10 @@
     [ADJPackageBuilder parameters:parameters setDate1970:self.createdAt forKey:@"created_at"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.environment forKey:@"environment"];
     [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
-    [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
     [ADJPackageBuilder parameters:parameters setBool:YES forKey:@"needs_response_details"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.secretId forKey:@"secret_id"];
@@ -336,31 +435,63 @@
 - (NSMutableDictionary *)getAdRevenueParameters:(NSString *)source payload:(NSData *)payload {
     NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
 
-    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.appToken forKey:@"app_token"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.appSecret forKey:@"app_secret"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.appToken forKey:@"app_token"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.bundleVersion forKey:@"app_version"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.bundleShortVersion forKey:@"app_version_short"];
     [ADJPackageBuilder parameters:parameters setBool:YES forKey:@"attribution_deeplink"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.bundeIdentifier forKey:@"bundle_id"];
+    [ADJPackageBuilder parameters:parameters setNumberInt:[ADJUtil readReachabilityFlags] forKey:@"connectivity_type"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.countryCode forKey:@"country"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.cpuSubtype forKey:@"cpu_type"];
     [ADJPackageBuilder parameters:parameters setDate1970:self.createdAt forKey:@"created_at"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.defaultTracker forKey:@"default_tracker"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceName forKey:@"device_name"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceType forKey:@"device_type"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.environment forKey:@"environment"];
     [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
-    [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.fbAnonymousId forKey:@"fb_anon_id"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.machineModel forKey:@"hardware_name"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.installReceiptBase64 forKey:@"install_receipt"];
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil getInstallTime] forKey:@"installed_at"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.languageCode forKey:@"language"];
     [ADJPackageBuilder parameters:parameters setBool:YES forKey:@"needs_response_details"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.osBuild forKey:@"os_build"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.osName forKey:@"os_name"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.systemVersion forKey:@"os_version"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.secretId forKey:@"secret_id"];
     [ADJPackageBuilder parameters:parameters setString:source forKey:@"source"];
     [ADJPackageBuilder parameters:parameters setData:payload forKey:@"payload"];
+    [ADJPackageBuilder parameters:parameters setInt:UIDevice.currentDevice.adjTrackingEnabled forKey:@"tracking_enabled"];
 
     if (self.adjustConfig.isDeviceKnown) {
         [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.isDeviceKnown forKey:@"device_known"];
     }
 
     if (self.activityState != nil) {
+        [ADJPackageBuilder parameters:parameters setDuration:self.activityState.lastInterval forKey:@"last_interval"];
         [ADJPackageBuilder parameters:parameters setString:self.activityState.deviceToken forKey:@"push_token"];
+        [ADJPackageBuilder parameters:parameters setInt:self.activityState.sessionCount forKey:@"session_count"];
+        [ADJPackageBuilder parameters:parameters setDuration:self.activityState.sessionLength forKey:@"session_length"];
+        [ADJPackageBuilder parameters:parameters setInt:self.activityState.subsessionCount forKey:@"subsession_count"];
+        [ADJPackageBuilder parameters:parameters setDuration:self.activityState.timeSpent forKey:@"time_spent"];
         if (self.activityState.isPersisted) {
             [ADJPackageBuilder parameters:parameters setString:self.activityState.uuid forKey:@"persistent_ios_uuid"];
         } else {
             [ADJPackageBuilder parameters:parameters setString:self.activityState.uuid forKey:@"ios_uuid"];
         }
     }
+
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMCC] forKey:@"mcc"];
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMNC] forKey:@"mnc"];
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil readCurrentRadioAccessTechnology] forKey:@"network_type"];
+#endif
 
     return parameters;
 }
@@ -389,9 +520,12 @@
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceType forKey:@"device_type"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.environment forKey:@"environment"];
     [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.fbAnonymousId forKey:@"fb_anon_id"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.machineModel forKey:@"hardware_name"];
-    [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.installReceiptBase64 forKey:@"install_receipt"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil getInstallTime] forKey:@"installed_at"];
@@ -432,7 +566,7 @@
         [ADJPackageBuilder parameters:parameters setString:self.attribution.trackerName forKey:@"tracker"];
     }
 
-#if !TARGET_OS_TV
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMCC] forKey:@"mcc"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMNC] forKey:@"mnc"];
     [ADJPackageBuilder parameters:parameters setString:[ADJUtil readCurrentRadioAccessTechnology] forKey:@"network_type"];
@@ -455,7 +589,10 @@
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceType forKey:@"device_type"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.environment forKey:@"environment"];
     [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
-    [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
     [ADJPackageBuilder parameters:parameters setString:initiatedBy forKey:@"initiated_by"];
     [ADJPackageBuilder parameters:parameters setBool:YES forKey:@"needs_response_details"];
@@ -493,7 +630,10 @@
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceType forKey:@"device_type"];
     [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.environment forKey:@"environment"];
     [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
-    [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
     [ADJPackageBuilder parameters:parameters setBool:YES forKey:@"needs_response_details"];
     [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.osBuild forKey:@"os_build"];
@@ -515,6 +655,77 @@
 
     return parameters;
 }
+
+- (NSMutableDictionary *)getDisableThirdPartySharingParameters {
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.appSecret forKey:@"app_secret"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.appToken forKey:@"app_token"];
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil getUpdateTime] forKey:@"app_updated_at"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.bundleVersion forKey:@"app_version"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.bundleShortVersion forKey:@"app_version_short"];
+    [ADJPackageBuilder parameters:parameters setBool:YES forKey:@"attribution_deeplink"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.bundeIdentifier forKey:@"bundle_id"];
+    [ADJPackageBuilder parameters:parameters setDictionary:self.sessionParameters.callbackParameters forKey:@"callback_params"];
+    [ADJPackageBuilder parameters:parameters setDate:self.clickTime forKey:@"click_time"];
+    [ADJPackageBuilder parameters:parameters setNumberInt:[ADJUtil readReachabilityFlags] forKey:@"connectivity_type"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.countryCode forKey:@"country"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.cpuSubtype forKey:@"cpu_type"];
+    [ADJPackageBuilder parameters:parameters setDate1970:self.createdAt forKey:@"created_at"];
+    [ADJPackageBuilder parameters:parameters setString:self.deeplink forKey:@"deeplink"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.defaultTracker forKey:@"default_tracker"];
+    [ADJPackageBuilder parameters:parameters setDictionary:self.attributionDetails forKey:@"details"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceName forKey:@"device_name"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.deviceType forKey:@"device_type"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.environment forKey:@"environment"];
+    [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.eventBufferingEnabled forKey:@"event_buffering_enabled"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.externalDeviceId forKey:@"external_device_id"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.fbAnonymousId forKey:@"fb_anon_id"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.machineModel forKey:@"hardware_name"];
+    if (self.adjustConfig.allowIdfaReading == YES) {
+        [ADJPackageBuilder parameters:parameters setString:UIDevice.currentDevice.adjIdForAdvertisers forKey:@"idfa"];
+    }
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.vendorId forKey:@"idfv"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.installReceiptBase64 forKey:@"install_receipt"];
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil getInstallTime] forKey:@"installed_at"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.languageCode forKey:@"language"];
+    [ADJPackageBuilder parameters:parameters setBool:YES forKey:@"needs_response_details"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.osBuild forKey:@"os_build"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.osName forKey:@"os_name"];
+    [ADJPackageBuilder parameters:parameters setString:self.deviceInfo.systemVersion forKey:@"os_version"];
+    [ADJPackageBuilder parameters:parameters setDictionary:self.deeplinkParameters forKey:@"params"];
+    [ADJPackageBuilder parameters:parameters setDictionary:self.sessionParameters.partnerParameters forKey:@"partner_params"];
+    [ADJPackageBuilder parameters:parameters setDate:self.purchaseTime forKey:@"purchase_time"];
+    [ADJPackageBuilder parameters:parameters setString:self.adjustConfig.secretId forKey:@"secret_id"];
+    [ADJPackageBuilder parameters:parameters setInt:UIDevice.currentDevice.adjTrackingEnabled forKey:@"tracking_enabled"];
+    
+    if (self.adjustConfig.isDeviceKnown) {
+        [ADJPackageBuilder parameters:parameters setBool:self.adjustConfig.isDeviceKnown forKey:@"device_known"];
+    }
+    
+    if (self.activityState != nil) {
+        [ADJPackageBuilder parameters:parameters setDuration:self.activityState.lastInterval forKey:@"last_interval"];
+        [ADJPackageBuilder parameters:parameters setString:self.activityState.deviceToken forKey:@"push_token"];
+        [ADJPackageBuilder parameters:parameters setInt:self.activityState.sessionCount forKey:@"session_count"];
+        [ADJPackageBuilder parameters:parameters setDuration:self.activityState.sessionLength forKey:@"session_length"];
+        [ADJPackageBuilder parameters:parameters setInt:self.activityState.subsessionCount forKey:@"subsession_count"];
+        [ADJPackageBuilder parameters:parameters setDuration:self.activityState.timeSpent forKey:@"time_spent"];
+        if (self.activityState.isPersisted) {
+            [ADJPackageBuilder parameters:parameters setString:self.activityState.uuid forKey:@"persistent_ios_uuid"];
+        } else {
+            [ADJPackageBuilder parameters:parameters setString:self.activityState.uuid forKey:@"ios_uuid"];
+        }
+    }
+
+#if !TARGET_OS_TV && !TARGET_OS_MACCATALYST
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMCC] forKey:@"mcc"];
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil readMNC] forKey:@"mnc"];
+    [ADJPackageBuilder parameters:parameters setString:[ADJUtil readCurrentRadioAccessTechnology] forKey:@"network_type"];
+#endif
+
+    return parameters;
+}
+
 
 - (ADJActivityPackage *)defaultActivityPackage {
     ADJActivityPackage *activityPackage = [[ADJActivityPackage alloc] init];

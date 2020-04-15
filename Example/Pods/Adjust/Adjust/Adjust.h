@@ -2,7 +2,7 @@
 //  Adjust.h
 //  Adjust
 //
-//  V4.18.3
+//  V4.21.1
 //  Created by Christian Wellenbrock (wellle) on 23rd July 2013.
 //  Copyright © 2012-2017 Adjust GmbH. All rights reserved.
 //
@@ -25,6 +25,8 @@
 @property (nonatomic, assign) BOOL deleteState;
 @property (nonatomic, assign) BOOL noBackoffWait;
 @property (nonatomic, assign) BOOL iAdFrameworkEnabled;
+@property (nonatomic, assign) BOOL enableSigning;
+@property (nonatomic, assign) BOOL disableSigning;
 
 @end
 
@@ -258,6 +260,11 @@ extern NSString * __nonnull const ADJAdRevenueSourceTapdaq;
  * @param payload Ad revenue payload.
  */
 + (void)trackAdRevenue:(nonnull NSString *)source payload:(nonnull NSData *)payload;
+
+/**
+ * @brief Give right user to disable sharing data to any third-party.
+ */
++ (void)disableThirdPartySharing;
 
 /**
  * Obtain singleton Adjust object.
