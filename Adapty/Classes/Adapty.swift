@@ -171,7 +171,6 @@ import UIKit
         facebookUserId: String? = nil,
         amplitudeUserId: String? = nil,
         mixpanelUserId: String? = nil,
-        appsflyerId: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
         gender: String? = nil,
@@ -189,7 +188,6 @@ import UIKit
         if let facebookUserId = facebookUserId { attributes["facebook_user_id"] = facebookUserId }
         if let amplitudeUserId = amplitudeUserId { attributes["amplitude_user_id"] = amplitudeUserId }
         if let mixpanelUserId = mixpanelUserId { attributes["mixpanel_user_id"] = mixpanelUserId }
-        if let appsflyerId = appsflyerId { attributes["appsflyer_id"] = appsflyerId }
         if let firstName = firstName { attributes["first_name"] = firstName }
         if let lastName = lastName { attributes["last_name"] = lastName }
         if let gender = gender { attributes["gender"] = gender }
