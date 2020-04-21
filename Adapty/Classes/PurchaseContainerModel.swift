@@ -27,7 +27,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
             let developerId = attributes?["developer_id"] as? String,
             let variationId = attributes?["variation_id"] as? String
         else {
-            throw SerializationError.missing("developer_id, variation_id")
+            throw SerializationError.missing("PurchaseContainerModel - developer_id, variation_id")
         }
         
         self.developerId = developerId
@@ -36,7 +36,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
         if let isWinback = attributes?["is_winback"] as? Bool { self.isWinback = isWinback }
         
         guard let products = attributes?["products"] as? [Parameters] else {
-            throw SerializationError.missing("products")
+            throw SerializationError.missing("PurchaseContainerModel - products")
         }
         
         var productsArray: [ProductModel] = []
@@ -47,7 +47,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("products", products)
+            throw SerializationError.invalid("PurchaseContainerModel - products", products)
         }
         self.products = productsArray
     }
@@ -71,7 +71,7 @@ class PurchaseContainersArray: JSONCodable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("purchase_containers", containers)
+            throw SerializationError.invalid("PurchaseContainersArray - purchase_containers", containers)
         }
         
         guard let meta = json["meta"] as? Parameters, let products = meta["products"] as? [Parameters] else {
@@ -85,7 +85,7 @@ class PurchaseContainersArray: JSONCodable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("products in meta", meta)
+            throw SerializationError.invalid("PurchaseContainersArray - products in meta", meta)
         }
     }
     

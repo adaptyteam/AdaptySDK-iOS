@@ -10,12 +10,10 @@ import Foundation
 
 public class InstallationModel: JSONCodable, Codable {
     
-    var profileId: String
     var profileInstallationMetaId: String
     var iamAccessKeyId: String
     var iamSecretKey: String
     var iamSessionToken: String
-    var iamExpiration: String
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -26,22 +24,25 @@ public class InstallationModel: JSONCodable, Codable {
         }
         
         guard
-            let profileInstallationMetaId = attributes?["id"] as? String,
-            let profileId = attributes?["profile_id"] as? String,
-            let iamAccessKeyId = attributes?["iam_access_key_id"] as? String,
-            let iamSecretKey = attributes?["iam_secret_key"] as? String,
-            let iamSessionToken = attributes?["iam_session_token"] as? String,
-            let iamExpiration = attributes?["iam_expiration"] as? String
+            let profileInstallationMetaId = attributes?["id"] as? String
         else {
-            throw SerializationError.missing("id, profileId, iam_access_key_id, iam_secret_key, iam_session_token, iam_expiration")
+            throw SerializationError.missing("InstallationModel - id")
         }
         
-        self.profileId = profileId
         self.profileInstallationMetaId = profileInstallationMetaId
-        self.iamAccessKeyId = iamAccessKeyId
-        self.iamSecretKey = iamSecretKey
-        self.iamSessionToken = iamSessionToken
-        self.iamExpiration = iamExpiration
+        self.iamAccessKeyId = attributes?["iam_access_key_id"] as? String ?? ""
+        self.iamSecretKey = attributes?["iam_secret_key"] as? String ?? ""
+        self.iamSessionToken = attributes?["iam_session_token"] as? String ?? ""
+        
+        logMissingRequiredParams()
+    }
+    
+    private func logMissingRequiredParams() {
+        var missingParams = ""
+        if self.iamAccessKeyId.isEmpty { missingParams.append("iam_access_key_id") }
+        if self.iamSecretKey.isEmpty { missingParams.append("iam_secret_key") }
+        if self.iamSessionToken.isEmpty { missingParams.append("iam_session_token") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of InstallationModel: \(missingParams)") }
     }
     
 }

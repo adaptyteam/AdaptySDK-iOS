@@ -94,7 +94,7 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
     @objc public var isActive: Bool
     @objc public var vendorProductId: String
     @objc public var store: String
-    @objc public var activatedAt: Date
+    @objc public var activatedAt: Date?
     @objc public var renewedAt: Date?
     @objc public var expiresAt: Date?
     @objc public var isLifetime: Bool
@@ -108,29 +108,23 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
     required init?(json: Parameters) throws {
         guard
             let id = json["id"] as? String,
-            let isActive = json["is_active"] as? Bool,
-            let vendorProductId = json["vendor_product_id"] as? String,
-            let store = json["store"] as? String,
-            let activatedAt = (json["activated_at"] as? String)?.dateValue,
-            let isLifetime = json["is_lifetime"] as? Bool,
-            let willRenew = json["will_renew"] as? Bool,
-            let isInGracePeriod = json["is_in_grace_period"] as? Bool
+            let isActive = json["is_active"] as? Bool
         else {
-            throw SerializationError.missing("id, is_active, vendor_product_id, store, activated_at, is_lifetime, will_renew, is_in_grace_period")
+            throw SerializationError.missing("PaidAccessLevelsInfoModel - id, is_active")
         }
         
         self.id = id
         self.isActive = isActive
-        self.vendorProductId = vendorProductId
-        self.store = store
-        self.activatedAt = activatedAt
+        self.vendorProductId = json["vendor_product_id"] as? String ?? ""
+        self.store = json["store"] as? String ?? ""
+        self.activatedAt = (json["activated_at"] as? String)?.dateValue
         self.renewedAt = (json["renewed_at"] as? String)?.dateValue
         self.expiresAt = (json["expires_at"] as? String)?.dateValue
-        self.isLifetime = isLifetime
+        self.isLifetime = json["is_lifetime"] as? Bool ?? false
         self.activeIntroductoryOfferType = json["active_introductory_offer_type"] as? String
         self.activePromotionalOfferType = json["active_promotional_offer_type"] as? String
-        self.willRenew = willRenew
-        self.isInGracePeriod = isInGracePeriod
+        self.willRenew = json["will_renew"] as? Bool ?? false
+        self.isInGracePeriod = json["is_in_grace_period"] as? Bool ?? false
         self.unsubscribedAt = (json["unsubscribed_at"] as? String)?.dateValue
         self.billingIssueDetectedAt = (json["billing_issue_detected_at"] as? String)?.dateValue
     }
@@ -142,6 +136,14 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
         
         return self.id == object.id && self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt
     }
+    
+    private func logMissingRequiredParams() {
+        var missingParams = ""
+        if self.vendorProductId.isEmpty { missingParams.append("vendor_product_id") }
+        if self.store.isEmpty { missingParams.append("store") }
+        if self.activatedAt == nil { missingParams.append("activated_at") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of PaidAccessLevelsInfoModel: \(missingParams)") }
+    }
 
 }
 
@@ -150,7 +152,7 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     @objc public var isActive: Bool
     @objc public var vendorProductId: String
     @objc public var store: String
-    @objc public var activatedAt: Date
+    @objc public var activatedAt: Date?
     @objc public var renewedAt: Date?
     @objc public var expiresAt: Date?
     @objc public var startsAt: Date?
@@ -168,32 +170,26 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     required init?(json: Parameters) throws {
         guard
             let isActive = json["is_active"] as? Bool,
-            let vendorProductId = json["vendor_product_id"] as? String,
-            let store = json["store"] as? String,
-            let activatedAt = (json["activated_at"] as? String)?.dateValue,
-            let isLifetime = json["is_lifetime"] as? Bool,
-            let willRenew = json["will_renew"] as? Bool,
-            let isInGracePeriod = json["is_in_grace_period"] as? Bool,
-            let isSandbox = json["is_sandbox"] as? Bool
+            let vendorProductId = json["vendor_product_id"] as? String
         else {
-            throw SerializationError.missing("is_active, vendor_product_id, store, activated_at, is_lifetime, will_renew, is_in_grace_period, is_sandbox")
+            throw SerializationError.missing("SubscriptionsInfoModel - is_active, vendor_product_id")
         }
         
         self.isActive = isActive
         self.vendorProductId = vendorProductId
-        self.store = store
-        self.activatedAt = activatedAt
+        self.store = json["store"] as? String ?? ""
+        self.activatedAt = (json["activated_at"] as? String)?.dateValue
         self.renewedAt = (json["renewed_at"] as? String)?.dateValue
         self.expiresAt = (json["expires_at"] as? String)?.dateValue
         self.startsAt = (json["starts_at"] as? String)?.dateValue
-        self.isLifetime = isLifetime
+        self.isLifetime = json["is_lifetime"] as? Bool ?? false
         self.activeIntroductoryOfferType = json["active_introductory_offer_type"] as? String
         self.activePromotionalOfferType = json["active_promotional_offer_type"] as? String
-        self.willRenew = willRenew
-        self.isInGracePeriod = isInGracePeriod
+        self.willRenew = json["will_renew"] as? Bool ?? false
+        self.isInGracePeriod = json["is_in_grace_period"] as? Bool ?? false
         self.unsubscribedAt = (json["unsubscribed_at"] as? String)?.dateValue
         self.billingIssueDetectedAt = (json["billing_issue_detected_at"] as? String)?.dateValue
-        self.isSandbox = isSandbox
+        self.isSandbox = json["is_sandbox"] as? Bool ?? false
         self.vendorTransactionId = json["vendor_transaction_id"] as? String
         self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
     }
@@ -205,6 +201,13 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
         
         return self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.startsAt == object.startsAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId
     }
+    
+    private func logMissingRequiredParams() {
+        var missingParams = ""
+        if self.store.isEmpty { missingParams.append("store") }
+        if self.activatedAt == nil { missingParams.append("activated_at") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of SubscriptionsInfoModel: \(missingParams)") }
+    }
 
 }
 
@@ -213,7 +216,7 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     @objc public var purchaseId: String
     @objc public var vendorProductId: String
     @objc public var store: String
-    @objc public var purchasedAt: Date
+    @objc public var purchasedAt: Date?
     @objc public var isOneTime: Bool
     @objc public var isSandbox: Bool
     @objc public var vendorTransactionId: String?
@@ -222,21 +225,17 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     required init?(json: Parameters) throws {
         guard
             let purchaseId = json["purchase_id"] as? String,
-            let vendorProductId = json["vendor_product_id"] as? String,
-            let store = json["store"] as? String,
-            let purchasedAt = (json["purchased_at"] as? String)?.dateValue,
-            let isOneTime = json["is_one_time"] as? Bool,
-            let isSandbox = json["is_sandbox"] as? Bool
+            let vendorProductId = json["vendor_product_id"] as? String
         else {
-            throw SerializationError.missing("purchase_id, vendor_product_id, store, purchased_at, is_consumable, is_sandbox")
+            throw SerializationError.missing("NonSubscriptionsInfoModel - purchase_id, vendor_product_id")
         }
         
         self.purchaseId = purchaseId
         self.vendorProductId = vendorProductId
-        self.store = store
-        self.purchasedAt = purchasedAt
-        self.isOneTime = isOneTime
-        self.isSandbox = isSandbox
+        self.store = json["store"] as? String ?? ""
+        self.purchasedAt = (json["purchased_at"] as? String)?.dateValue
+        self.isOneTime = json["is_one_time"] as? Bool ?? false
+        self.isSandbox = json["is_sandbox"] as? Bool ?? false
         self.vendorTransactionId = json["vendor_transaction_id"] as? String
         self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
     }
@@ -247,6 +246,13 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
         }
         
         return self.purchaseId == object.purchaseId && self.vendorProductId == object.vendorProductId && self.store == object.store && self.purchasedAt == object.purchasedAt && self.isOneTime == object.isOneTime && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId
+    }
+    
+    private func logMissingRequiredParams() {
+        var missingParams = ""
+        if self.store.isEmpty { missingParams.append("store") }
+        if self.purchasedAt == nil { missingParams.append("purchased_at") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of NonSubscriptionsInfoModel: \(missingParams)") }
     }
 
 }
@@ -260,7 +266,7 @@ class PurchaserInfoMeta: JSONCodable {
         do {
             self.purchaserInfo = try PurchaserInfoModel(json: json)
         } catch {
-            throw SerializationError.invalid("purchaser_info", json)
+            throw SerializationError.invalid("PurchaserInfoMeta - purchaser_info", json)
         }
         
         let attributes: Parameters?

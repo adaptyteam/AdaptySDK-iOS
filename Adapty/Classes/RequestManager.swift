@@ -124,7 +124,7 @@ class RequestManager {
             do {
                 let errors = try ResponseErrorsArray(json: json)
                 if let error = errors?.errors.first {
-                    handleResult(result: .failure(NSError(domain: "", code: error.code, userInfo: [NSLocalizedDescriptionKey: error.description])), response: nil, completion: completion)
+                    handleResult(result: .failure(NSError(domain: "", code: error.status, userInfo: [NSLocalizedDescriptionKey: error.description])), response: nil, completion: completion)
                     return
                 }
                 

@@ -11,29 +11,34 @@ import Foundation
 struct ResponseErrorModel: JSONCodable {
     
     let detail: String
-    let status: String
+    let status: Int
     let source: Parameters
-    let code: Int
+    let code: String
     
     init?(json: Parameters) throws {
-        guard
-            let detail = json["detail"] as? String,
-            let status = json["code"] as? String,
-            let source = json["source"] as? Parameters,
-            let codeString = json["status"] as? String,
-            let code = Int(codeString)
-        else {
-            throw SerializationError.missing("detail, status, source, code")
+        self.detail = json["detail"] as? String ?? ""
+        if let statusString = json["status"] as? String, let status = Int(statusString) {
+            self.status = status
+        } else {
+            self.status = 0
         }
+        self.source = json["source"] as? Parameters ?? Parameters()
+        self.code = json["code"] as? String ?? ""
         
-        self.detail = detail
-        self.status = status
-        self.source = source
-        self.code = code
+        logMissingRequiredParams()
     }
     
     var description: String {
-        return "Status: \(status). Details: \(detail)"
+        return "Status: \(code). Details: \(detail)"
+    }
+    
+    private func logMissingRequiredParams() {
+        var missingParams = ""
+        if self.detail.isEmpty { missingParams.append("detail") }
+        if self.status == 0 { missingParams.append("status") }
+        if self.source.count == 0 { missingParams.append("source") }
+        if self.code.isEmpty { missingParams.append("code") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of ResponseErrorModel: \(missingParams)") }
     }
     
 }
@@ -54,7 +59,7 @@ struct ResponseErrorsArray: JSONCodable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("errors", errors)
+            throw SerializationError.invalid("ResponseErrors – errors", errors)
         }
     }
     
