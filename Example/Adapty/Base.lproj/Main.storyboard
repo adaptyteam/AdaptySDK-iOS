@@ -79,11 +79,18 @@
                                             <action selector="getPurchaserInfoButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="qoe-Hn-Zes"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wEX-NS-i9y">
+                                        <rect key="frame" x="151" y="443" width="73" height="30"/>
+                                        <state key="normal" title="Get promo"/>
+                                        <connections>
+                                            <action selector="getPromoButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Yw9-8W-6hs"/>
+                                        </connections>
+                                    </button>
                                     <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="DuT-hy-bhf">
-                                        <rect key="frame" x="177.5" y="443" width="20" height="20"/>
+                                        <rect key="frame" x="177.5" y="509" width="20" height="20"/>
                                     </activityIndicatorView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WUN-tp-bs6">
-                                        <rect key="frame" x="16" y="455" width="343" height="0.0"/>
+                                        <rect key="frame" x="16" y="521" width="343" height="0.0"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <color key="textColor" white="0.34789465962441307" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
@@ -100,7 +107,9 @@
                                     <constraint firstItem="N4V-2p-TUc" firstAttribute="width" secondItem="3OJ-c2-CnN" secondAttribute="width" id="0xJ-AU-Niy"/>
                                     <constraint firstItem="DuT-hy-bhf" firstAttribute="top" secondItem="WUN-tp-bs6" secondAttribute="top" constant="-12" id="1mH-v9-EqD"/>
                                     <constraint firstAttribute="trailing" secondItem="N4V-2p-TUc" secondAttribute="trailing" id="2W0-qK-Y3V"/>
-                                    <constraint firstItem="WUN-tp-bs6" firstAttribute="top" secondItem="eg6-Vm-0r5" secondAttribute="bottom" constant="48" id="2sx-mz-dex"/>
+                                    <constraint firstItem="wEX-NS-i9y" firstAttribute="centerX" secondItem="3OJ-c2-CnN" secondAttribute="centerX" id="3Mt-2N-Sa0"/>
+                                    <constraint firstItem="wEX-NS-i9y" firstAttribute="top" secondItem="eg6-Vm-0r5" secondAttribute="bottom" constant="36" id="L3W-JQ-7Z6"/>
+                                    <constraint firstItem="WUN-tp-bs6" firstAttribute="top" secondItem="wEX-NS-i9y" secondAttribute="bottom" constant="48" id="Rob-t8-WtF"/>
                                     <constraint firstItem="U81-Xy-q2G" firstAttribute="centerX" secondItem="3OJ-c2-CnN" secondAttribute="centerX" id="Yac-un-VvB"/>
                                     <constraint firstAttribute="bottom" secondItem="WUN-tp-bs6" secondAttribute="bottom" constant="44" id="ZIK-op-e7Y"/>
                                     <constraint firstItem="eg6-Vm-0r5" firstAttribute="centerX" secondItem="3OJ-c2-CnN" secondAttribute="centerX" id="bFY-lu-vbm"/>

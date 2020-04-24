@@ -106,6 +106,24 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func getPromoButtonAction(_ sender: Any) {
+        setLoader(true)
+        Adapty.getPromo { (promo, error) in
+            self.setLoader(false)
+            if let error = error {
+                self.infoLabel.text = "Failed to get promo: \(error)"
+                return
+            }
+            if promo == nil {
+                self.infoLabel.text = "There is no activeavailable promo"
+                return
+            }
+            if let promo = promo {
+                self.infoLabel.text = "promoType: \(promo.promoType), variationId: \(promo.variationId), container: \(String(describing: promo.container))"
+            }
+        }
+    }
+    
     func setLoader(_ visible: Bool) {
         if visible {
             activityIndicatorView.startAnimating()
