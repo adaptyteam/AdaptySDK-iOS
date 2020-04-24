@@ -11,12 +11,15 @@ import CryptoSwift
 
 enum EventType: String {
     case live = "live"
+    case promoPushOpened = "promo_push_opened"
 }
 
 class KinesisManager {
+    
+    static let shared = KinesisManager()
+    private init() {}
 
     private let sessionID = UUID().stringValue
-
     private var cachedEvents: [[String: String]] {
         get {
             return DefaultsManager.shared.cachedEvents
@@ -25,21 +28,38 @@ class KinesisManager {
             DefaultsManager.shared.cachedEvents = newValue
         }
     }
+    private var profileId: String {
+        DefaultsManager.shared.profileId
+    }
+    private var installation: InstallationModel? {
+        DefaultsManager.shared.installation
+    }
 
-    func trackEvent(_ eventType: EventType, profileID: String, profileInstallationMetaID: String, secretSigningKey: String, accessKeyId: String, sessionToken: String, completion: ((Error?) -> Void)? = nil) {
+    func trackEvent(_ eventType: EventType, params: [String: String]? = nil, completion: ((Error?) -> Void)? = nil) {
+        guard let installation = installation else {
+            let error = NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid installation"])
+            LoggerManager.logError(error)
+            completion?(error)
+            return
+        }
 
         // Event parameters
         var eventParams = [String: String]()
         eventParams["event_name"] = eventType.rawValue
         eventParams["event_id"] = UUID().stringValue
-        eventParams["profile_id"] = profileID
-        eventParams["profile_installation_meta_id"] = profileInstallationMetaID
+        eventParams["profile_id"] = profileId
+        eventParams["profile_installation_meta_id"] = installation.profileInstallationMetaId
         eventParams["session_id"] = sessionID
         eventParams["created_at"] = Date().iso8601Value
+        if let params = params {
+            for (key, value) in params {
+                eventParams[key] = value
+            }
+        }
 
         cachedEvents.append(eventParams)
 
-        syncEvents(profileInstallationMetaID: profileInstallationMetaID, secretSigningKey: secretSigningKey, accessKeyId: accessKeyId, sessionToken: sessionToken, completion: completion)
+        syncEvents(profileInstallationMetaID: installation.profileInstallationMetaId, secretSigningKey: installation.iamSecretKey, accessKeyId: installation.iamAccessKeyId, sessionToken: installation.iamSessionToken, completion: completion)
     }
 
     private func syncEvents(profileInstallationMetaID: String, secretSigningKey: String, accessKeyId: String, sessionToken: String, completion: ((Error?) -> Void)? = nil) {

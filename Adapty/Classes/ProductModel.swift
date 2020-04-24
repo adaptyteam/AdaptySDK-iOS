@@ -34,12 +34,17 @@ public class ProductModel: NSObject, JSONCodable, Codable {
     }
     
     @objc public var vendorProductId: String
+    @objc public var introductoryOfferEligibility: Bool = false
+    @objc public var promotionalOfferEligibility: Bool = false
+    @objc public var promotionalOfferId: String?
+    var variationId: String?
     
     @objc public var localizedDescription: String = ""
     @objc public var localizedTitle: String = ""
     @objc public var price: Decimal = 0
     @objc public var currencyCode: String?
     @objc public var currencySymbol: String?
+    @objc public var regionCode: String?
     @objc public var subscriptionPeriod: ProductSubscriptionPeriodModel?
     @objc public var introductoryDiscount: ProductDiscountModel?
     @objc public var subscriptionGroupIdentifier: String?
@@ -58,6 +63,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
             price = skProduct.price.decimalValue
             currencyCode = skProduct.priceLocale.currencyCode
             currencySymbol = skProduct.priceLocale.currencySymbol
+            regionCode = skProduct.priceLocale.regionCode
             
             if #available(iOS 11.2, *) {
                 if let subscriptionPeriod = skProduct.subscriptionPeriod {
@@ -89,6 +95,17 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         }
         
         self.vendorProductId = vendorProductId
+        if let introductoryOfferEligibility = json["introductory_offer_eligibility"] as? Bool { self.introductoryOfferEligibility = introductoryOfferEligibility }
+        if let promotionalOfferEligibility = json["promotional_offer_eligibility"] as? Bool { self.promotionalOfferEligibility = promotionalOfferEligibility }
+        self.promotionalOfferId = json["promotional_offer_id"] as? String
+    }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? ProductModel else {
+            return false
+        }
+        
+        return self.vendorProductId == object.vendorProductId && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.promotionalOfferId == object.promotionalOfferId && self.variationId == object.variationId && self.localizedDescription == object.localizedDescription && self.localizedTitle == object.localizedTitle && self.price == object.price && self.currencyCode == object.currencyCode && self.currencySymbol == object.currencySymbol && self.regionCode == object.regionCode && self.subscriptionPeriod == object.subscriptionPeriod && self.introductoryDiscount == object.introductoryDiscount && self.subscriptionGroupIdentifier == object.subscriptionGroupIdentifier && self.discounts == object.discounts && self.localizedPriceString == object.localizedPriceString && self.localizedIntroductoryPriceString == object.localizedIntroductoryPriceString
     }
     
 }
@@ -102,6 +119,29 @@ public class ProductSubscriptionPeriodModel: NSObject, Codable {
     init(subscriptionPeriod: SKProductSubscriptionPeriod) {
         self.unit = ProductModel.PeriodUnit(rawValue: subscriptionPeriod.unit.rawValue) ?? .unknown
         self.numberOfUnits = subscriptionPeriod.numberOfUnits
+    }
+    
+    func unitString() -> String? {
+        switch unit {
+        case .day:
+            return "day"
+        case .week:
+            return "week"
+        case .month:
+            return "month"
+        case .year:
+            return "year"
+        case .unknown:
+            return nil
+        }
+    }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? ProductSubscriptionPeriodModel else {
+            return false
+        }
+        
+        return self.unit == object.unit && self.numberOfUnits == object.numberOfUnits
     }
     
 }
@@ -132,6 +172,27 @@ public class ProductDiscountModel: NSObject, Codable {
         self.numberOfPeriods = discount.numberOfPeriods
         self.paymentMode = PaymentMode(rawValue: discount.paymentMode.rawValue) ?? .unknown
         self.localizedPriceString = price.localizedPrice(for: locale)
+    }
+    
+    func paymentModeString() -> String? {
+        switch paymentMode {
+        case .payAsYouGo:
+            return "pay_as_you_go"
+        case .payUpFront:
+            return "pay_up_front"
+        case .freeTrial:
+            return "free_trial"
+        case .unknown:
+            return nil
+        }
+    }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? ProductDiscountModel else {
+            return false
+        }
+        
+        return self.price == object.price && self.identifier == object.identifier && self.subscriptionPeriod == object.subscriptionPeriod && self.numberOfPeriods == object.numberOfPeriods && self.paymentMode == object.paymentMode && self.localizedPriceString == object.localizedPriceString
     }
     
 }

@@ -9,15 +9,9 @@ import Foundation
 
 class SessionsManager {
     
-    private var profileId: String {
-        DefaultsManager.shared.profileId
-    }
-    private var installation: InstallationModel? {
-        DefaultsManager.shared.installation
-    }
     private var liveTrackerTimer: Timer?
     private lazy var kinesisManager: KinesisManager = {
-        return KinesisManager()
+        return KinesisManager.shared
     }()
     
     func startTrackingLiveEvent() {
@@ -40,18 +34,7 @@ class SessionsManager {
     }
     
     private func trackLiveEvent(completion: ((Error?) -> Void)? = nil) {
-        guard let installation = installation else {
-            completion?(NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid installation"]))
-            return
-        }
-        
-        kinesisManager.trackEvent(.live,
-                                  profileID: profileId,
-                                  profileInstallationMetaID: installation.profileInstallationMetaId,
-                                  secretSigningKey: installation.iamSecretKey,
-                                  accessKeyId: installation.iamAccessKeyId,
-                                  sessionToken: installation.iamSessionToken,
-                                  completion: completion)
+        kinesisManager.trackEvent(.live, completion: completion)
     }
     
     func trackLiveEventInBackground() {

@@ -17,6 +17,7 @@ public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void
 public typealias PurchaserCompletion = (PurchaserInfoModel?, Error?) -> Void
 public typealias CahcedPurchaserCompletion = (PurchaserInfoModel?, DataState, Error?) -> Void
+public typealias PromoCompletion = (PromoModel?, Error?) -> Void
 
 class ApiManager {
     
@@ -102,6 +103,17 @@ class ApiManager {
             switch result {
             case .success(let response):
                 completion(response.data, nil)
+            case .failure(let error):
+                completion(nil, error)
+            }
+        }
+    }
+    
+    func getPromo(id: String, completion: @escaping PromoCompletion) {
+        RequestManager.request(router: Router.getPromo(id: id)) { (result: Result<PromoModel, Error>, response) in
+            switch result {
+            case .success(let promo):
+                completion(promo, nil)
             case .failure(let error):
                 completion(nil, error)
             }

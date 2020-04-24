@@ -37,7 +37,7 @@ extension IAPManagerError: LocalizedError {
 }
 
 public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: Error?) -> Void
-private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, container: PurchaseContainerModel?, completion: BuyProductCompletion?)
+private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, completion: BuyProductCompletion?)
 
 class IAPManager: NSObject {
     
@@ -87,17 +87,17 @@ class IAPManager: NSObject {
         self.apiManager = apiManager
     }
     
-    func startObservingPurchases() {
+    func startObservingPurchases(_ completion: PurchaseContainersCompletion? = nil) {
         startObserving()
         
-        getContainersAndSyncProducts()
+        getPurchaseContainers(completion)
         
         NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.stopObserving()
         }
     }
     
-    func getPurchaseContainers(_ completion: @escaping PurchaseContainersCompletion) {
+    func getPurchaseContainers(_ completion: PurchaseContainersCompletion? = nil) {
         purchaseContainersRequestCompletion = completion
         
         // syncing already in progress
@@ -197,7 +197,6 @@ class IAPManager: NSObject {
         
         productsToBuy.append((product: product,
                               payment: payment,
-                              container: containers?.filter({ $0.products.contains(product) }).first,
                               completion: completion))
         
         SKPaymentQueue.default().add(payment)
@@ -230,7 +229,6 @@ class IAPManager: NSObject {
             
             self.productsToBuy.append((product: product,
                                        payment: payment,
-                                       container: self.containers?.filter({ $0.products.contains(product) }).first,
                                        completion: completion))
             
             SKPaymentQueue.default().add(payment)
@@ -353,15 +351,15 @@ extension IAPManager: SKPaymentTransactionObserver {
         return productsToBuy.filter({ $0.payment.productIdentifier == transaction.payment.productIdentifier }).first
     }
     
-    private func skProduct(for transaction: SKPaymentTransaction) -> SKProduct? {
-        return products?.filter({ $0.vendorProductId == transaction.payment.productIdentifier }).first?.skProduct
+    private func product(for transaction: SKPaymentTransaction) -> ProductModel? {
+        return products?.filter({ $0.vendorProductId == transaction.payment.productIdentifier }).first
     }
     
     private func purchased(_ transaction: SKPaymentTransaction) {
         let purchaseInfo = self.purchaseInfo(for: transaction)
         
         // try to get variationId from local array
-        var variationId: String? = purchaseInfo?.container?.variationId
+        var variationId: String? = purchaseInfo?.product.variationId
         if let transactionIdentifier = transaction.transactionIdentifier {
             if let variationId = variationId {
                 // store variationId / transactionIdentifier in case of failed receipt validation
@@ -376,14 +374,33 @@ extension IAPManager: SKPaymentTransactionObserver {
             callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(IAPManagerError.cantReadReceipt))
             return
         }
+
+        let product = self.product(for: transaction)
         
-        let skProduct = self.skProduct(for: transaction)
-        var discountPrice: NSDecimalNumber?
+        var discount: ProductDiscountModel?
         if #available(iOS 12.2, *) {
-            discountPrice = skProduct?.discounts.filter({ $0.identifier == transaction.payment.paymentDiscount?.identifier }).first?.price
+            // trying to extract promotional offer from transaction
+            discount = product?.discounts.filter({ $0.identifier == transaction.payment.paymentDiscount?.identifier }).first
+        }
+        if discount == nil {
+            // fill with introductory offer details by default if possible
+            // server handles introductory price application
+            discount = product?.introductoryDiscount
         }
         
-        Adapty.validateReceipt(receipt, variationId: variationId, vendorProductId: transaction.payment.productIdentifier, transactionId: transaction.transactionIdentifier, originalPrice: skProduct?.price, discountPrice: discountPrice, priceLocale: skProduct?.priceLocale) { (purchaserInfo, appleValidationResult, error) in
+        Adapty.extendedValidateReceipt(receipt,
+                                       variationId: variationId,
+                                       vendorProductId: transaction.payment.productIdentifier,
+                                       transactionId: transaction.transactionIdentifier,
+                                       originalPrice: product?.price,
+                                       discountPrice: discount?.price,
+                                       currencyCode: product?.currencyCode,
+                                       regionCode: product?.regionCode,
+                                       promotionalOfferId: discount?.identifier,
+                                       unit: discount?.subscriptionPeriod.unitString(),
+                                       numberOfUnits: discount?.subscriptionPeriod.numberOfUnits,
+                                       paymentMode: discount?.paymentModeString())
+        { (purchaserInfo, appleValidationResult, error) in
             // return successful response in any case, sync transaction later once more in case of error
             self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .success((purchaserInfo, receipt, appleValidationResult)))
             

@@ -51,7 +51,7 @@ Adapty.identify("YOUR_USER_ID") { (error) in
 }
 ```
 
-### Observer Mode
+### Observer mode
 
 In some cases, if you have already built a functioning subscription system, it may not be possible or feasible to use the Adapty SDK to make purchases. However, you can still use the SDK to get access to the data.
 
@@ -265,7 +265,7 @@ Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
 }
 ```
 
-### Listening For Purchaser Info Updates
+### Listening for purchaser info updates
 
 You can respond to any changes in purchaser info by conforming to an optional delegate method, didReceivePurchaserInfo. This will fire whenever we receive a change in purchaser info.
 
@@ -276,6 +276,41 @@ extension AppDelegate: AdaptyDelegate {
         // handle any changes to purchaserInfo
     }
     
+}
+```
+
+### Listening for promo container updates
+
+You can respond to any changes in promo container by conforming to an optional delegate method, didReceivePromo. This will fire whenever we receive a change in promo container.
+
+```Swift
+extension AppDelegate: AdaptyDelegate {
+    
+    func didReceivePromo(_ promo: PromoModel) {
+        // handle available promo
+    }
+    
+}
+```
+
+### Manually get promo container
+
+You can still trigger manual promo container update by calling method getPromo.
+
+```Swift
+Adapty.getPromo { (promo, error) in
+    // promo object contains info about container with any promotional offer available 
+}
+```
+
+### Handle Adapty push notifications
+
+You can check and validate Adapty promo push notifications like this. This will allow us to handle such notifications and respond accordingly. 
+
+```Swift
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    Adapty.handlePushNotification(userInfo)
+    completionHandler(UIBackgroundFetchResult.newData)
 }
 ```
 

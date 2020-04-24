@@ -19,6 +19,7 @@ enum Router {
     case signSubscriptionOffer(params: Parameters)
     case getPurchaserInfo(id: String)
     case updateAttribution(id: String, params: Parameters)
+    case getPromo(id: String)
     
     var scheme: String {
         return "https"
@@ -54,7 +55,8 @@ enum Router {
             return .patch
         case .getPurchaseContainers,
              .signSubscriptionOffer,
-             .getPurchaserInfo:
+             .getPurchaserInfo,
+             .getPromo:
             return .get
         }
     }
@@ -77,6 +79,8 @@ enum Router {
             return "/sdk/in-apps/apple/subscription-offer/sign/"
         case .updateAttribution(let id, _):
             return "/sdk/analytics/profiles/\(id)/attribution/"
+        case .getPromo(let id):
+            return "/sdk/analytics/profiles/\(id)/promo/"
         }
     }
     
@@ -125,7 +129,8 @@ enum Router {
              .getPurchaseContainers(let params),
              .updateAttribution(_, let params):
             requestParams = params
-        case .getPurchaserInfo:
+        case .getPurchaserInfo,
+             .getPromo:
             break
         }
         

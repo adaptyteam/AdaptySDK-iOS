@@ -12,6 +12,7 @@ import UIKit
 @objc public protocol AdaptyDelegate: class {
     
     func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel)
+    func didReceivePromo(_ promo: PromoModel)
     
 }
 
@@ -50,11 +51,21 @@ import UIKit
             DefaultsManager.shared.installation = installation
         }
     }
+    private var promo: PromoModel? {
+        didSet {
+            if let promo = promo, promo != oldValue {
+                Self.delegate?.didReceivePromo(promo)
+            }
+        }
+    }
     private lazy var apiManager: ApiManager = {
         return ApiManager()
     }()
     private lazy var sessionsManager: SessionsManager = {
         return SessionsManager()
+    }()
+    private lazy var kinesisManager: KinesisManager = {
+        return KinesisManager.shared
     }()
     private lazy var iapManager: IAPManager = {
         return IAPManager(apiManager: apiManager)
@@ -123,7 +134,10 @@ import UIKit
         }
         
         // start observing purchases
-        iapManager.startObservingPurchases()
+        iapManager.startObservingPurchases { (_, _, _) in
+            // get current existing promo
+            Self.getPromo()
+        }
     }
     
     //MARK: - REST
@@ -289,7 +303,11 @@ import UIKit
         shared.iapManager.restorePurchases(completion)
     }
     
-    @objc public class func validateReceipt(_ receiptEncoded: String, variationId: String? = nil, vendorProductId: String? = nil, transactionId: String? = nil, originalPrice: NSDecimalNumber? = nil, discountPrice: NSDecimalNumber? = nil, priceLocale: Locale? = nil, completion: @escaping ValidateReceiptCompletion) {
+    @objc public class func validateReceipt(_ receiptEncoded: String, completion: @escaping ValidateReceiptCompletion) {
+        extendedValidateReceipt(receiptEncoded, completion: completion)
+    }
+    
+    class func extendedValidateReceipt(_ receiptEncoded: String, variationId: String? = nil, vendorProductId: String? = nil, transactionId: String? = nil, originalPrice: Decimal? = nil, discountPrice: Decimal? = nil, currencyCode: String? = nil, regionCode: String? = nil, promotionalOfferId: String? = nil, unit: String? = nil, numberOfUnits: Int? = nil, paymentMode: String? = nil, completion: @escaping ValidateReceiptCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
         var attributes = Parameters()
@@ -299,12 +317,17 @@ import UIKit
         if let variationId = variationId { attributes["variation_id"] = variationId }
         if let vendorProductId = vendorProductId { attributes["vendor_product_id"] = vendorProductId }
         if let transactionId = transactionId { attributes["transaction_id"] = transactionId }
-        if let originalPrice = originalPrice { attributes["original_price"] = originalPrice.stringValue }
-        if let discountPrice = discountPrice { attributes["discount_price"] = discountPrice.stringValue }
-        if let priceLocale = priceLocale {
-            attributes["price_locale"] = priceLocale.currencyCode
-            attributes["store_country"] = priceLocale.regionCode
-        }
+        if let originalPrice = originalPrice { attributes["original_price"] = originalPrice }
+        if let discountPrice = discountPrice { attributes["discount_price"] = discountPrice }
+        if let currencyCode = currencyCode { attributes["price_locale"] = currencyCode }
+        if let regionCode = regionCode { attributes["store_country"] = regionCode }
+        
+        if let promotionalOfferId = promotionalOfferId { attributes["promotional_offer_id"] = promotionalOfferId }
+        var offer = Parameters()
+        if let unit = unit { offer["period_unit"] = unit }
+        if let numberOfUnits = numberOfUnits { offer["number_of_units"] = numberOfUnits }
+        if let paymentMode = paymentMode { offer["type"] = paymentMode }
+        if offer.count > 0 { attributes["offer"] = offer }
         
         let params = Parameters.formatData(with: "", type: Constants.TypeNames.appleReceipt, attributes: attributes)
         
@@ -361,6 +384,61 @@ import UIKit
             }
             
             completion(purchaserInfo, .synced, error)
+        }
+    }
+    
+    @objc public class func getPromo(_ completion: PromoCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
+        shared.apiManager.getPromo(id: shared.profileId) { (promo, error) in
+            // match with locally stored container
+            promo?.container = shared.iapManager.containers?.filter({ $0.variationId == promo?.variationId }).first
+            
+            // if there is no such container, re-sync them from server
+            if let promo = promo, promo.container == nil {
+                getPurchaseContainers { (_, _, state, error) in
+                    promo.container = shared.iapManager.containers?.filter({ $0.variationId == promo.variationId }).first
+                    
+                    shared.promo = promo
+                    completion?(promo, error)
+                }
+                
+                return
+            }
+            
+            shared.promo = promo
+            
+            if let error = error {
+                switch error {
+                case SerializationError.missing:
+                    // do not return error in case of just empty response
+                    completion?(nil, nil)
+                    return
+                default:
+                    break
+                }
+            }
+            
+            completion?(promo, error)
+        }
+    }
+    
+    @objc public class func handlePushNotification(_ userInfo: [AnyHashable : Any]) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
+        guard let source = userInfo[Constants.NotificationPayload.source] as? String, source == "adapty" else {
+            return
+        }
+        
+        var params = [String: String]()
+        if let promoDeliveryId = userInfo[Constants.NotificationPayload.promoDeliveryId] as? String {
+            params[Constants.NotificationPayload.promoDeliveryId] = promoDeliveryId
+        }
+        
+        shared.kinesisManager.trackEvent(.promoPushOpened, params: params)
+        
+        getPromo { (_, _) in
+            
         }
     }
     
