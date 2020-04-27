@@ -94,26 +94,24 @@ enum Router {
         }
     }
 
-    var authorizationHeader: String? {
-        switch self {
-        case .trackEvent:
-            return nil
-        default:
-            return "Api-Key \(Constants.APIKeys.secretKey)"
-        }
+    var authorizationHeader: String {
+        return "Api-Key \(Constants.APIKeys.secretKey)"
     }
     
     func asURLRequest() throws -> URLRequest {
         var request = URLRequest(url: URL(string: "\(scheme)://\(host)\(stage)\(path)")!,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
                                  timeoutInterval: 30.0)
-        if let authorizationHeader = authorizationHeader {
+        switch self {
+        case .trackEvent:
+            break
+        default:
             request.setValue(authorizationHeader, forHTTPHeaderField: Constants.Headers.authorization)
+            request.setValue(DefaultsManager.shared.profileId, forHTTPHeaderField: Constants.Headers.profileId)
+            request.setValue("iOS", forHTTPHeaderField: Constants.Headers.platform)
+            request.setValue(UserProperties.sdkVersion, forHTTPHeaderField: Constants.Headers.version)
+            request.setValue(String(UserProperties.sdkVersionBuild), forHTTPHeaderField: Constants.Headers.build)
         }
-        request.setValue(DefaultsManager.shared.profileId, forHTTPHeaderField: Constants.Headers.profileId)
-        request.setValue("iOS", forHTTPHeaderField: Constants.Headers.platform)
-        request.setValue(UserProperties.sdkVersion, forHTTPHeaderField: Constants.Headers.version)
-        request.setValue(String(UserProperties.sdkVersionBuild), forHTTPHeaderField: Constants.Headers.build)
 
         request.httpMethod = method.rawValue
         
