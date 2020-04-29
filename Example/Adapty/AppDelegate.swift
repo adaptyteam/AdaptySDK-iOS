@@ -87,6 +87,7 @@ extension AppDelegate: AdaptyDelegate {
     
     func didReceivePromo(_ promo: PromoModel) {
         // handle available promo
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "PromoUpdated"), object: promo)
     }
     
 }

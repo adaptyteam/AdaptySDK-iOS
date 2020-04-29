@@ -86,6 +86,12 @@
                                             <action selector="getPromoButtonAction:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Yw9-8W-6hs"/>
                                         </connections>
                                     </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current promo: none" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="leS-Fo-rDy">
+                                        <rect key="frame" x="124.5" y="473" width="126" height="16"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                     <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="DuT-hy-bhf">
                                         <rect key="frame" x="177.5" y="509" width="20" height="20"/>
                                     </activityIndicatorView>
@@ -104,6 +110,7 @@
                                     </button>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="leS-Fo-rDy" firstAttribute="centerX" secondItem="3OJ-c2-CnN" secondAttribute="centerX" id="07z-MG-Axj"/>
                                     <constraint firstItem="N4V-2p-TUc" firstAttribute="width" secondItem="3OJ-c2-CnN" secondAttribute="width" id="0xJ-AU-Niy"/>
                                     <constraint firstItem="DuT-hy-bhf" firstAttribute="top" secondItem="WUN-tp-bs6" secondAttribute="top" constant="-12" id="1mH-v9-EqD"/>
                                     <constraint firstAttribute="trailing" secondItem="N4V-2p-TUc" secondAttribute="trailing" id="2W0-qK-Y3V"/>
@@ -129,6 +136,7 @@
                                     <constraint firstItem="aXZ-ih-45X" firstAttribute="top" secondItem="BQf-FP-kpk" secondAttribute="bottom" constant="36" id="ss0-yK-hQN"/>
                                     <constraint firstItem="bty-ga-wsk" firstAttribute="leading" secondItem="Dqk-ax-mk2" secondAttribute="trailing" constant="10" id="vJd-0c-jjq"/>
                                     <constraint firstItem="U81-Xy-q2G" firstAttribute="top" secondItem="N4V-2p-TUc" secondAttribute="bottom" constant="12" id="x44-8h-Wgh"/>
+                                    <constraint firstItem="leS-Fo-rDy" firstAttribute="top" secondItem="wEX-NS-i9y" secondAttribute="bottom" id="yF1-Kv-biR"/>
                                     <constraint firstItem="WUN-tp-bs6" firstAttribute="leading" secondItem="3OJ-c2-CnN" secondAttribute="leading" constant="16" id="zPY-qJ-RnE"/>
                                 </constraints>
                             </scrollView>
@@ -145,6 +153,7 @@
                     <navigationItem key="navigationItem" id="WDH-9F-UTn"/>
                     <connections>
                         <outlet property="activityIndicatorView" destination="DuT-hy-bhf" id="a0i-6a-Fhw"/>
+                        <outlet property="currentPromoLabel" destination="leS-Fo-rDy" id="nIZ-yO-djy"/>
                         <outlet property="customerUserIdLabel" destination="N4V-2p-TUc" id="QFk-hD-ssN"/>
                         <outlet property="customerUserIdTextField" destination="Dqk-ax-mk2" id="GBp-Gd-lwh"/>
                         <outlet property="infoLabel" destination="WUN-tp-bs6" id="fg0-t0-h8v"/>

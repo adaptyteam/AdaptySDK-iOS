@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var customerUserIdLabel: UILabel!
     @IBOutlet weak var customerUserIdTextField: UITextField!
     @IBOutlet weak var updateProfileButton: UIButton!
+    @IBOutlet weak var currentPromoLabel: UILabel!
     @IBOutlet weak var activityIndicatorView: UIActivityIndicatorView!
     @IBOutlet weak var infoLabel: UILabel!
     
@@ -23,6 +24,10 @@ class ViewController: UIViewController {
         
         updateCustomerUserIdLabel()
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard)))
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "PromoUpdated"), object: nil, queue: OperationQueue.main) { (notification) in
+            self.updateCurrentPromoLabel(from: notification.object)
+        }
     }
     
     func updateCustomerUserIdLabel() {
@@ -110,17 +115,26 @@ class ViewController: UIViewController {
         setLoader(true)
         Adapty.getPromo { (promo, error) in
             self.setLoader(false)
+            self.updateCurrentPromoLabel(from: promo)
             if let error = error {
                 self.infoLabel.text = "Failed to get promo: \(error)"
                 return
             }
             if promo == nil {
-                self.infoLabel.text = "There is no activeavailable promo"
+                self.infoLabel.text = "There is no active/available promo"
                 return
             }
             if let promo = promo {
-                self.infoLabel.text = "promoType: \(promo.promoType), variationId: \(promo.variationId), container: \(String(describing: promo.container))"
+                self.infoLabel.text = "promoType: \(promo.promoType), variationId: \(promo.variationId), container name: \(promo.container?.developerId ?? "none"), container: \(String(describing: promo.container))"
             }
+        }
+    }
+    
+    func updateCurrentPromoLabel(from promo: Any?) {
+        if let promo = promo as? PromoModel, let developerId = promo.container?.developerId {
+            currentPromoLabel.text = "Current promo: \(developerId)"
+        } else {
+            currentPromoLabel.text = "Current promo: none"
         }
     }
     

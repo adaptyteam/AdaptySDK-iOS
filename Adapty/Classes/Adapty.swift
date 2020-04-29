@@ -448,6 +448,7 @@ import UIKit
         shared.sessionsManager.invalidateLiveTrackerTimer()
         shared.purchaserInfo = nil
         shared.installation = nil
+        shared.promo = nil
         UserProperties.resetStaticUuid()
         DefaultsManager.shared.clean()
         
