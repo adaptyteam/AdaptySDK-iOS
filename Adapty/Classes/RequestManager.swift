@@ -6,8 +6,6 @@
 //  Copyright © 2019 Adapty. All rights reserved.
 //
 
-import UIKit
-
 enum HTTPMethod: String {
     case options = "OPTIONS"
     case get     = "GET"
@@ -47,6 +45,7 @@ class RequestManager {
         }
     }
     private var currentTask: URLSessionDataTask?
+    private var concurrentQueue = DispatchQueue(label: "com.Adapty.AdaptyConcurrentQueue", attributes: .concurrent)
     
     @discardableResult
     class func request<T: JSONCodable>(router: Router, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
@@ -83,7 +82,7 @@ class RequestManager {
             }
         }
 
-        tasksQueue.append(dataTask)
+        concurrentQueue.async(flags: .barrier) { self.tasksQueue.append(dataTask) }
 
         return dataTask
     }
@@ -171,8 +170,10 @@ class RequestManager {
             }
         }
         
-        currentTask = nil
-        tasksQueue.removeFirst()
+        concurrentQueue.async(flags: .barrier) {
+            self.currentTask = nil
+            self.tasksQueue.removeFirst()
+        }
     }
     
     private func handleNetworkResponse(_ response: HTTPURLResponse) -> Error? {
