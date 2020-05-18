@@ -19,6 +19,7 @@ import UIKit
 @objc public enum AttributionNetwork: UInt {
     case adjust
     case appsflyer
+    case branch
 }
 
 @objc public class Adapty: NSObject {
@@ -257,6 +258,8 @@ import UIKit
             attributes["source"] = "adjust"
         case .appsflyer:
             attributes["source"] = "appsflyer"
+        case .branch:
+            attributes["source"] = "branch"
         }
         
         if let networkUserId = networkUserId { attributes["network_user_id"] = networkUserId }

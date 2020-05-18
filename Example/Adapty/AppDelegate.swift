@@ -27,6 +27,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Configure AppsFlyer
         
         // Configure Branch
+        
+        Branch.getInstance().setIdentity("YOUR_USER_ID")
+        Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) in
+            if let data = data {
+                Adapty.updateAttribution(data, source: .branch)
+            }
+        }
 
         return true
     }

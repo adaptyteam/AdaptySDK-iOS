@@ -106,7 +106,7 @@ Adapty.updateAttribution("<attribution>", source: "<source>", networkUserId: "<n
 ```
 
 **`attribution`** is `Dictionary` object.
-For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**.
+For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**, **`.branch`**.
 **`networkUserId`** is `String?` object.
 
 To integrate with [Adjust](https://www.adjust.com/), just pass attribution you receive from delegate method of Adjust iOS SDK.
@@ -132,6 +132,31 @@ extension AppDelegate: AppsFlyerTrackerDelegate {
     func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
         // It's important to include the network user ID
         Adapty.updateAttribution(conversionInfo, source: .appsflyer, networkUserId: AppsFlyerTracker.shared().getAppsFlyerUID())
+    }
+}
+```
+
+[Branch](https://branch.io/) integration example.
+
+To connect Branch user and Adapty user, make sure you provide your customerUserId as Branch Identity id.
+If you prefer to not use customerUserId in Branch, user networkUserId param in attribution method to specify the Branch user ID to attach to.
+
+```Swift
+// login
+Branch.getInstance().setIdentity("YOUR_USER_ID")
+
+// logout
+Branch.getInstance().logout()
+```
+
+Next, pass attribution you receive from initialize method of Branch iOS SDK to Adapty.
+
+```Swift
+import Branch
+
+Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) in
+    if let data = data {
+        Adapty.updateAttribution(data, source: .branch)
     }
 }
 ```
