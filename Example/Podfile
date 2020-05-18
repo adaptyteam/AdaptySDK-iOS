@@ -5,6 +5,7 @@ target 'Adapty_Example' do
   
   pod 'Adjust', '~> 4.21.1'
   pod 'AppsFlyerFramework'
+  pod 'Branch'
 
   target 'Adapty_Tests' do
     inherit! :search_paths

@@ -10,6 +10,7 @@ import UIKit
 import Adapty
 import Adjust
 import AppsFlyerLib
+import Branch
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,6 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Configure Adjust
         
         // Configure AppsFlyer
+        
+        // Configure Branch
 
         return true
     }
