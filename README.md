@@ -105,8 +105,8 @@ Adapty.updateAttribution("<attribution>", source: "<source>", networkUserId: "<n
 }
 ```
 
-**`attribution`** is `Dictionary` object.
-For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**, **`.branch`**.
+**`attribution`** is `Dictionary` object.  
+For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**, **`.branch`**.  
 **`networkUserId`** is `String?` object.
 
 To integrate with [Adjust](https://www.adjust.com/), just pass attribution you receive from delegate method of Adjust iOS SDK.
