@@ -365,4 +365,4 @@ Adapty.logout { (error) in
 
 ## License
 
-Adapty is available under the GNU license. [See LICENSE](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.
+Adapty is available under the MIT license. [See LICENSE](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.
