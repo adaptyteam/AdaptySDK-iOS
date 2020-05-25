@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Adapty'
-  s.version          = '1.4.0'
+  s.version          = '1.4.1'
   s.summary          = 'Adapty SDK for iOS.'
 
   s.description      = <<-DESC
@@ -17,7 +17,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
                        DESC
 
   s.homepage         = 'https://adapty.io/'
-  s.license          = { :type => 'GNU', :file => 'LICENSE' }
+  s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Adapty' => 'contact@adapty.io' }
   s.source           = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
 
