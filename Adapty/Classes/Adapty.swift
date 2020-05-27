@@ -190,6 +190,7 @@ import UIKit
         lastName: String? = nil,
         gender: String? = nil,
         birthday: Date? = nil,
+        amplitudeDeviceId: String? = nil,
         completion: ErrorCompletion? = nil)
     {
         LoggerManager.logMessage("Calling now: \(#function)")
@@ -207,6 +208,7 @@ import UIKit
         if let lastName = lastName { attributes["last_name"] = lastName }
         if let gender = gender { attributes["gender"] = gender }
         if let birthday = birthday { attributes["birthday"] = birthday.stringValue }
+        if let amplitudeDeviceId = amplitudeDeviceId { attributes["amplitude_device_id"] = amplitudeDeviceId }
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         

@@ -83,7 +83,8 @@ Adapty.updateProfile(email: "example@email.com",
                      firstName: "Test",
                      lastName: "Test",
                      gender: "",
-                     birthday: Date) { (error) in
+                     birthday: Date,
+                     amplitudeDeviceId: "") { (error) in
                         if error == nil {
                             // successful update                              
                         }
