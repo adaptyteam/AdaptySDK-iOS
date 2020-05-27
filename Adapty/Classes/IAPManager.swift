@@ -312,7 +312,7 @@ extension IAPManager: SKProductsRequestDelegate {
         containers = shortContainers
         products = shortProducts
         
-        if response.products.count > 0, let containers = containers, containers.count > 0, let products = products {
+        if response.products.count > 0, let containers = containers, let products = products {
             callPurchaseContainersCompletionAndCleanCallback(.success((containers: containers, products: products)))
         } else {
             callPurchaseContainersCompletionAndCleanCallback(.failure(IAPManagerError.noProductsFound))
