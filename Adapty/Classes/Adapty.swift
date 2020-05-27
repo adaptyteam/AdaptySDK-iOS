@@ -185,12 +185,12 @@ import UIKit
         phoneNumber: String? = nil,
         facebookUserId: String? = nil,
         amplitudeUserId: String? = nil,
+        amplitudeDeviceId: String? = nil,
         mixpanelUserId: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
         gender: String? = nil,
         birthday: Date? = nil,
-        amplitudeDeviceId: String? = nil,
         completion: ErrorCompletion? = nil)
     {
         LoggerManager.logMessage("Calling now: \(#function)")
@@ -203,12 +203,12 @@ import UIKit
         if let phoneNumber = phoneNumber { attributes["phone_number"] = phoneNumber }
         if let facebookUserId = facebookUserId { attributes["facebook_user_id"] = facebookUserId }
         if let amplitudeUserId = amplitudeUserId { attributes["amplitude_user_id"] = amplitudeUserId }
+        if let amplitudeDeviceId = amplitudeDeviceId { attributes["amplitude_device_id"] = amplitudeDeviceId }
         if let mixpanelUserId = mixpanelUserId { attributes["mixpanel_user_id"] = mixpanelUserId }
         if let firstName = firstName { attributes["first_name"] = firstName }
         if let lastName = lastName { attributes["last_name"] = lastName }
         if let gender = gender { attributes["gender"] = gender }
         if let birthday = birthday { attributes["birthday"] = birthday.stringValue }
-        if let amplitudeDeviceId = amplitudeDeviceId { attributes["amplitude_device_id"] = amplitudeDeviceId }
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         

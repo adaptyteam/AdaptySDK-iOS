@@ -79,12 +79,12 @@ Adapty.updateProfile(email: "example@email.com",
                      phoneNumber: "+1-###-###-####",
                      facebookUserId: "###############",
                      amplitudeUserId: "###",
+                     amplitudeDeviceId: "###",
                      mixpanelUserId: "###",
                      firstName: "Test",
                      lastName: "Test",
                      gender: "",
-                     birthday: Date,
-                     amplitudeDeviceId: "") { (error) in
+                     birthday: Date) { (error) in
                         if error == nil {
                             // successful update                              
                         }
