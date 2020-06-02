@@ -65,8 +65,9 @@ class ApiManager {
         }
     }
     
-    func getPurchaseContainers(params: Parameters, completion: @escaping PurchaseContainersCompletion) {
-        RequestManager.request(router: Router.getPurchaseContainers(params: params)) { (result: Result<PurchaseContainersArray, Error>, response) in
+    @discardableResult
+    func getPurchaseContainers(params: Parameters, completion: @escaping PurchaseContainersCompletion) -> URLSessionDataTask? {
+        return RequestManager.request(router: Router.getPurchaseContainers(params: params)) { (result: Result<PurchaseContainersArray, Error>, response) in
             switch result {
             case .success(let containers):
                 completion(containers.containers, containers.products, nil)

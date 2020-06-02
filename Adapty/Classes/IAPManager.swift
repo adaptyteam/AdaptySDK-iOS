@@ -71,8 +71,9 @@ class IAPManager: NSObject {
         }
     }
     
+    private var purchaseContainersRequest: URLSessionDataTask?
     private var productsRequest: SKProductsRequest?
-    private var purchaseContainersRequestCompletion: PurchaseContainersCompletion?
+    private var purchaseContainersRequestCompletions: [PurchaseContainersCompletion] = []
 
     private var productsToBuy: [PurchaseInfoTuple] = []
 
@@ -98,10 +99,10 @@ class IAPManager: NSObject {
     }
     
     func getPurchaseContainers(_ completion: PurchaseContainersCompletion? = nil) {
-        purchaseContainersRequestCompletion = completion
+        if let completion = completion { purchaseContainersRequestCompletions.append(completion) }
         
         // syncing already in progress
-        if productsRequest != nil {
+        if purchaseContainersRequest != nil || productsRequest != nil {
             return
         }
         
@@ -110,6 +111,7 @@ class IAPManager: NSObject {
     }
     
     private func getContainersAndSyncProducts() {
+        purchaseContainersRequest =
         apiManager.getPurchaseContainers(params: ["profile_id": profileId]) { (containers, products, error) in
             if let error = error {
                 // call completion and clear it
@@ -246,14 +248,19 @@ private extension IAPManager {
             switch result {
             case .success(let data):
                 LoggerManager.logMessage("Successfully loaded list of products: [\(self.productIDs?.joined(separator: ",") ?? "")]")
-                self.purchaseContainersRequestCompletion?(data.containers, data.products, nil)
+                self.purchaseContainersRequestCompletions.forEach { (completion) in
+                    completion(data.containers, data.products, nil)
+                }
             case .failure(let error):
                 LoggerManager.logError("Failed to load list of products.\n\(error.localizedDescription)")
-                self.purchaseContainersRequestCompletion?(nil, nil, error)
+                self.purchaseContainersRequestCompletions.forEach { (completion) in
+                    completion(nil, nil, error)
+                }
             }
             
+            self.purchaseContainersRequest = nil
             self.productsRequest = nil
-            self.purchaseContainersRequestCompletion = nil
+            self.purchaseContainersRequestCompletions.removeAll()
         }
     }
     
@@ -295,8 +302,8 @@ extension IAPManager: SKProductsRequestDelegate {
     // MARK:- Products list
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-        for p in response.products {
-            LoggerManager.logMessage("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
+        for product in response.products {
+            LoggerManager.logMessage("Found product: \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
         }
         
         response.products.forEach { skProduct in
@@ -309,8 +316,10 @@ extension IAPManager: SKProductsRequestDelegate {
             })
         }
         
-        containers = shortContainers
-        products = shortProducts
+        if response.products.count != 0 {
+            containers = shortContainers
+            products = shortProducts
+        }
         
         if response.products.count > 0, let containers = containers, let products = products {
             callPurchaseContainersCompletionAndCleanCallback(.success((containers: containers, products: products)))
