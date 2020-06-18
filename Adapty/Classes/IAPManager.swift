@@ -307,9 +307,7 @@ extension IAPManager: SKProductsRequestDelegate {
         }
         
         response.products.forEach { skProduct in
-            if let products = shortContainers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }) {
-                products.forEach({ $0.skProduct = skProduct })
-            }
+            shortContainers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }).forEach({ $0.skProduct = skProduct })
             
             shortProducts?.filter({ $0.vendorProductId == skProduct.productIdentifier }).forEach({ (product) in
                 product.skProduct = skProduct
@@ -320,6 +318,14 @@ extension IAPManager: SKProductsRequestDelegate {
             containers = shortContainers
             products = shortProducts
         }
+        
+        // fill missing properties in meta from the same properties in containers products
+        let containersProducts = containers?.flatMap({ $0.products })
+        products?.forEach({ (product) in
+            if let containerProduct = containersProducts?.filter({ $0.vendorProductId == product.vendorProductId }).first {
+                product.fillMissingProperties(from: containerProduct)
+            }
+        })
         
         if response.products.count > 0, let containers = containers, let products = products {
             callPurchaseContainersCompletionAndCleanCallback(.success((containers: containers, products: products)))

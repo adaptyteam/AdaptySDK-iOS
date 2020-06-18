@@ -21,8 +21,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         case introductoryDiscount
         case subscriptionGroupIdentifier
         case discounts
-        case localizedPriceString
-        case localizedIntroductoryPriceString
+        case localizedPrice
     }
     
     @objc public enum PeriodUnit : UInt, Codable {
@@ -39,6 +38,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
     @objc public var promotionalOfferId: String?
     var variationId: String?
     
+    // filled from SKProduct
     @objc public var localizedDescription: String = ""
     @objc public var localizedTitle: String = ""
     @objc public var price: Decimal = 0
@@ -49,8 +49,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
     @objc public var introductoryDiscount: ProductDiscountModel?
     @objc public var subscriptionGroupIdentifier: String?
     @objc public var discounts: [ProductDiscountModel] = []
-    @objc public var localizedPriceString: String?
-    @objc public var localizedIntroductoryPriceString: String?
+    @objc public var localizedPrice: String?
     
     @objc public var skProduct: SKProduct? {
         didSet {
@@ -82,8 +81,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
                 }
             }
 
-            localizedPriceString = price.localizedPrice(for: skProduct.priceLocale)
-            localizedIntroductoryPriceString = introductoryDiscount?.price.localizedPrice(for: skProduct.priceLocale)
+            localizedPrice = skProduct.price.localizedPrice(for: skProduct.priceLocale)
         }
     }
     
@@ -100,12 +98,18 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         self.promotionalOfferId = json["promotional_offer_id"] as? String
     }
     
+    func fillMissingProperties(from product: ProductModel) {
+        self.introductoryOfferEligibility = product.introductoryOfferEligibility
+        self.promotionalOfferEligibility = product.promotionalOfferEligibility
+        self.promotionalOfferId = product.promotionalOfferId
+    }
+    
     public override func isEqual(_ object: Any?) -> Bool {
         guard let object = object as? ProductModel else {
             return false
         }
         
-        return self.vendorProductId == object.vendorProductId && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.promotionalOfferId == object.promotionalOfferId && self.variationId == object.variationId && self.localizedDescription == object.localizedDescription && self.localizedTitle == object.localizedTitle && self.price == object.price && self.currencyCode == object.currencyCode && self.currencySymbol == object.currencySymbol && self.regionCode == object.regionCode && self.subscriptionPeriod == object.subscriptionPeriod && self.introductoryDiscount == object.introductoryDiscount && self.subscriptionGroupIdentifier == object.subscriptionGroupIdentifier && self.discounts == object.discounts && self.localizedPriceString == object.localizedPriceString && self.localizedIntroductoryPriceString == object.localizedIntroductoryPriceString
+        return self.vendorProductId == object.vendorProductId && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.promotionalOfferId == object.promotionalOfferId && self.variationId == object.variationId && self.localizedDescription == object.localizedDescription && self.localizedTitle == object.localizedTitle && self.price == object.price && self.currencyCode == object.currencyCode && self.currencySymbol == object.currencySymbol && self.regionCode == object.regionCode && self.subscriptionPeriod == object.subscriptionPeriod && self.introductoryDiscount == object.introductoryDiscount && self.subscriptionGroupIdentifier == object.subscriptionGroupIdentifier && self.discounts == object.discounts && self.localizedPrice == object.localizedPrice
     }
     
 }
@@ -160,7 +164,7 @@ public class ProductDiscountModel: NSObject, Codable {
     @objc public var subscriptionPeriod: ProductSubscriptionPeriodModel
     @objc public var numberOfPeriods: Int
     @objc public var paymentMode: PaymentMode
-    @objc public var localizedPriceString: String?
+    @objc public var localizedPrice: String?
     
     @available(iOS 11.2, *)
     init(discount: SKProductDiscount, locale: Locale) {
@@ -171,7 +175,7 @@ public class ProductDiscountModel: NSObject, Codable {
         self.subscriptionPeriod = ProductSubscriptionPeriodModel(subscriptionPeriod: discount.subscriptionPeriod)
         self.numberOfPeriods = discount.numberOfPeriods
         self.paymentMode = PaymentMode(rawValue: discount.paymentMode.rawValue) ?? .unknown
-        self.localizedPriceString = price.localizedPrice(for: locale)
+        self.localizedPrice = discount.price.localizedPrice(for: locale)
     }
     
     func paymentModeString() -> String? {
@@ -192,7 +196,7 @@ public class ProductDiscountModel: NSObject, Codable {
             return false
         }
         
-        return self.price == object.price && self.identifier == object.identifier && self.subscriptionPeriod == object.subscriptionPeriod && self.numberOfPeriods == object.numberOfPeriods && self.paymentMode == object.paymentMode && self.localizedPriceString == object.localizedPriceString
+        return self.price == object.price && self.identifier == object.identifier && self.subscriptionPeriod == object.subscriptionPeriod && self.numberOfPeriods == object.numberOfPeriods && self.paymentMode == object.paymentMode && self.localizedPrice == object.localizedPrice
     }
     
 }
