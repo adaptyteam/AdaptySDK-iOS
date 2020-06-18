@@ -428,10 +428,11 @@ import UIKit
         }
     }
     
-    @objc public class func handlePushNotification(_ userInfo: [AnyHashable : Any]) {
+    @objc public class func handlePushNotification(_ userInfo: [AnyHashable : Any], completion: @escaping ErrorCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
         guard let source = userInfo[Constants.NotificationPayload.source] as? String, source == "adapty" else {
+            completion(nil)
             return
         }
         
@@ -442,8 +443,8 @@ import UIKit
         
         shared.kinesisManager.trackEvent(.promoPushOpened, params: params)
         
-        getPromo { (_, _) in
-            
+        getPromo { (_, error) in
+            completion(error)
         }
     }
     

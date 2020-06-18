@@ -335,8 +335,9 @@ You can check and validate Adapty promo push notifications like this. This will 
 
 ```Swift
 func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-    Adapty.handlePushNotification(userInfo)
-    completionHandler(UIBackgroundFetchResult.newData)
+    Adapty.handlePushNotification(userInfo) { (_) in
+        completionHandler(UIBackgroundFetchResult.newData)
+    }
 }
 ```
 
