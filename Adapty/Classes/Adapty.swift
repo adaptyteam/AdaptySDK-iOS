@@ -187,6 +187,8 @@ import UIKit
         amplitudeUserId: String? = nil,
         amplitudeDeviceId: String? = nil,
         mixpanelUserId: String? = nil,
+        appmetricaProfileId: String? = nil,
+        appmetricaDeviceId: String? = nil,
         firstName: String? = nil,
         lastName: String? = nil,
         gender: String? = nil,
@@ -205,6 +207,8 @@ import UIKit
         if let amplitudeUserId = amplitudeUserId { attributes["amplitude_user_id"] = amplitudeUserId }
         if let amplitudeDeviceId = amplitudeDeviceId { attributes["amplitude_device_id"] = amplitudeDeviceId }
         if let mixpanelUserId = mixpanelUserId { attributes["mixpanel_user_id"] = mixpanelUserId }
+        if let appmetricaProfileId = appmetricaProfileId { attributes["appmetrica_profile_id"] = appmetricaProfileId }
+        if let appmetricaDeviceId = appmetricaDeviceId { attributes["appmetrica_device_id"] = appmetricaDeviceId }
         if let firstName = firstName { attributes["first_name"] = firstName }
         if let lastName = lastName { attributes["last_name"] = lastName }
         if let gender = gender { attributes["gender"] = gender }
