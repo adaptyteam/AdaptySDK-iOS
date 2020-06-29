@@ -111,6 +111,7 @@ enum Router {
             request.setValue("iOS", forHTTPHeaderField: Constants.Headers.platform)
             request.setValue(UserProperties.sdkVersion, forHTTPHeaderField: Constants.Headers.version)
             request.setValue(String(UserProperties.sdkVersionBuild), forHTTPHeaderField: Constants.Headers.build)
+            request.setValue(String(UserProperties.locale), forHTTPHeaderField: Constants.Headers.locale)
         }
 
         request.httpMethod = method.rawValue

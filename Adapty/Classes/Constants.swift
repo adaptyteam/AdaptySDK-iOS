@@ -25,6 +25,7 @@ struct Constants {
         static let platform = "ADAPTY-SDK-PLATFORM"
         static let version = "ADAPTY-SDK-VERSION"
         static let build = "ADAPTY-SDK-VERSION-BUILD"
+        static let locale = "ADAPTY_SDK_LOCALE"
     }
 
     struct Kinesis {

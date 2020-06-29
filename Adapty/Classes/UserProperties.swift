@@ -50,7 +50,7 @@ class UserProperties {
     }
     
     static var locale: String {
-        return Locale.current.identifier
+        return Locale.preferredLanguages.first ?? Locale.current.identifier
     }
     
     static var OS: String {
