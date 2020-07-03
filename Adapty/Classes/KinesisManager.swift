@@ -51,6 +51,7 @@ class KinesisManager {
         eventParams["profile_installation_meta_id"] = installation.profileInstallationMetaId
         eventParams["session_id"] = sessionID
         eventParams["created_at"] = Date().iso8601Value
+        eventParams["platform"] = "iOS"
         if let params = params {
             for (key, value) in params {
                 eventParams[key] = value
