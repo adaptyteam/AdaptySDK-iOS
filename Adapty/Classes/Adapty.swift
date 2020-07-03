@@ -452,6 +452,16 @@ import UIKit
         }
     }
     
+    @discardableResult @objc
+    public class func showPaywall(for container: PurchaseContainerModel, from viewController: UIViewController, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
+        let paywallViewController = PaywallViewController()
+        paywallViewController.container = container
+        paywallViewController.delegate = delegate
+        paywallViewController.modalPresentationStyle = .fullScreen
+        viewController.present(paywallViewController, animated: true)
+        return paywallViewController
+    }
+    
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         

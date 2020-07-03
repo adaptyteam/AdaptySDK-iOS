@@ -15,6 +15,7 @@
 			dependencies = (
 			);
 			name = AppsFlyerFramework;
+			productName = AppsFlyerFramework;
 		};
 /* End PBXAggregateTarget section */
 
@@ -289,6 +290,7 @@
 		D3671634F0E0F028E24725ACB4F288AB /* ADJPackageBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D8BC55E57E5D91217C217B572292EA0 /* ADJPackageBuilder.m */; };
 		D4754369A1E587E4553C0456F34295F8 /* ADJTimerCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A78551496AA9D3297154A0647552F8 /* ADJTimerCycle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4BCBB7FC8A812EBA8AA014327A3CAE8 /* ADJSdkClickHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A78B6904F0B9A9C8B599CBA0D9494EE /* ADJSdkClickHandler.m */; };
+		D65757C32481276B0055A431 /* PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65757C22481276B0055A431 /* PaywallViewController.swift */; };
 		D85C329C4C1FED340DED6119AF14F36F /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28724D78F4ECC9CA41462124FFB2077 /* String+Extension.swift */; };
 		D86D0A6E97F4D1FDA92BEC36A27AF823 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 497F89AEE85175FDBDB4F853FF518D57 /* AdSupport.framework */; };
 		D87330F0F0AE7B1680D5335F637A3FDC /* ADJReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 04F1F8EAE68F5C1BF1AF38399B930C43 /* ADJReachability.m */; };
@@ -440,7 +442,7 @@
 		0C080911569C2C3B5A5C66990D1AA9F6 /* NSData+ADJAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSData+ADJAdditions.m"; path = "Adjust/ADJAdditions/NSData+ADJAdditions.m"; sourceTree = "<group>"; };
 		0C58DEDA42795FFED845B19E9D82D365 /* Pods-Adapty_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Adapty_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		0D4359095B4D910E7B98438B0735F202 /* BNCURLBlackList.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BNCURLBlackList.h; path = "Branch-SDK/Branch-SDK/BNCURLBlackList.h"; sourceTree = "<group>"; };
-		0E470257DD434E0D418AC94DAF10C7EA /* Adapty.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Adapty.framework; path = Adapty.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E470257DD434E0D418AC94DAF10C7EA /* Adapty.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Adapty.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		105DFE5395D438C8651BE652FC69E593 /* BlockModeOptions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BlockModeOptions.swift; path = Sources/CryptoSwift/BlockMode/BlockModeOptions.swift; sourceTree = "<group>"; };
 		11A6605F252BABDB8C027FAD8793D0A0 /* ParameterEncoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ParameterEncoder.swift; path = Adapty/Classes/ParameterEncoder.swift; sourceTree = "<group>"; };
 		1219E4C80367E0A4F36FD700D43BE1ED /* DigestType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DigestType.swift; path = Sources/CryptoSwift/DigestType.swift; sourceTree = "<group>"; };
@@ -535,8 +537,8 @@
 		4E98B89EFCDACE52932A39B182AACC4A /* CryptoSwift-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "CryptoSwift-Info.plist"; sourceTree = "<group>"; };
 		4FAA86B4EA6CE1F05FFE4E3340DA005B /* BranchCPIDRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BranchCPIDRequest.h; path = "Branch-SDK/Branch-SDK/Networking/Requests/BranchCPIDRequest.h"; sourceTree = "<group>"; };
 		50164CDF6122D36BEA367A5460A23350 /* BranchCreditHistoryRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BranchCreditHistoryRequest.m; path = "Branch-SDK/Branch-SDK/Networking/Requests/BranchCreditHistoryRequest.m"; sourceTree = "<group>"; };
-		50466679031AFFDEC718950031906D26 /* Branch.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Branch.framework; path = Branch.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		5090AA778CA28E5AE495330B71E0915B /* Pods_Adapty_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_Adapty_Example.framework; path = "Pods-Adapty_Example.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		50466679031AFFDEC718950031906D26 /* Branch.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Branch.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5090AA778CA28E5AE495330B71E0915B /* Pods_Adapty_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adapty_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		518FF0C6BFA15AB95052001FC1D652D6 /* BranchLogoutRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BranchLogoutRequest.h; path = "Branch-SDK/Branch-SDK/Networking/Requests/BranchLogoutRequest.h"; sourceTree = "<group>"; };
 		5298C29D4A79A18CA51A3BDABB2FC913 /* Pods-Adapty_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Adapty_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		52A5DF9976DB74DC9176432E0A2CBB7C /* HKDF.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HKDF.swift; path = Sources/CryptoSwift/HKDF.swift; sourceTree = "<group>"; };
@@ -600,12 +602,12 @@
 		7A78B6904F0B9A9C8B599CBA0D9494EE /* ADJSdkClickHandler.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ADJSdkClickHandler.m; path = Adjust/ADJSdkClickHandler.m; sourceTree = "<group>"; };
 		7B20599F37F3D1E2153AFAD6C0ACF7B2 /* SHA2.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SHA2.swift; path = Sources/CryptoSwift/SHA2.swift; sourceTree = "<group>"; };
 		7C095BBA534C5DB4EEFFB7B8ADFC68EA /* ChaCha20+Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "ChaCha20+Foundation.swift"; path = "Sources/CryptoSwift/Foundation/ChaCha20+Foundation.swift"; sourceTree = "<group>"; };
-		7C3AFD3F44CC55E9861DD419DC04D445 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE; sourceTree = "<group>"; };
+		7C3AFD3F44CC55E9861DD419DC04D445 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		7D7B163346153C9CC970AC62BDFB6346 /* ADJActivityKind.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ADJActivityKind.m; path = Adjust/ADJActivityKind.m; sourceTree = "<group>"; };
 		7D833C4C4788F195F8DD0567E510AF5A /* Adjust-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Adjust-dummy.m"; sourceTree = "<group>"; };
 		7E7AE7532729A98E8460E90558CD515D /* BNCLocalization.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BNCLocalization.h; path = "Branch-SDK/Branch-SDK/BNCLocalization.h"; sourceTree = "<group>"; };
 		7FD793DF297C142438563C41E5918359 /* UIDevice+ADJAdditions.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIDevice+ADJAdditions.m"; path = "Adjust/ADJAdditions/UIDevice+ADJAdditions.m"; sourceTree = "<group>"; };
-		7FF5C62DF1E2D492F272FD7D2A1EF4A3 /* Adjust.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Adjust.framework; path = Adjust.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7FF5C62DF1E2D492F272FD7D2A1EF4A3 /* Adjust.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Adjust.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		82288BFA19A003F11667984C2D1282C9 /* BNCReachability.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCReachability.m; path = "Branch-SDK/Branch-SDK/BNCReachability.m"; sourceTree = "<group>"; };
 		823B2A0DB92005D8D7A881D7F08A0FA6 /* BranchContentDiscoveryManifest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BranchContentDiscoveryManifest.h; path = "Branch-SDK/Branch-SDK/BranchContentDiscoveryManifest.h"; sourceTree = "<group>"; };
 		827890034BB6418D1DE426FF24EED45F /* ADJSessionParameters.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ADJSessionParameters.h; path = Adjust/ADJSessionParameters.h; sourceTree = "<group>"; };
@@ -625,7 +627,7 @@
 		91939AA7839D9039EA7858408E0B73B7 /* BranchSpotlightUrlRequest.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BranchSpotlightUrlRequest.h; path = "Branch-SDK/Branch-SDK/Networking/Requests/BranchSpotlightUrlRequest.h"; sourceTree = "<group>"; };
 		91CE0A08D66D592F23CA85159928A9D0 /* ADJDeviceInfo.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ADJDeviceInfo.h; path = Adjust/ADJDeviceInfo.h; sourceTree = "<group>"; };
 		927F836F70C3B060F9373809B5388595 /* Pods-Adapty_Tests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-Adapty_Tests-dummy.m"; sourceTree = "<group>"; };
-		929912A99566860C118FC2119B7B6E0C /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		929912A99566860C118FC2119B7B6E0C /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		949324FCC8DFF5FD4555436437C8E162 /* ADJAdjustFactory.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ADJAdjustFactory.m; path = Adjust/ADJAdjustFactory.m; sourceTree = "<group>"; };
 		9523E9F6E1D7A3EE71FB3F8CB06409B5 /* Updatable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Updatable.swift; path = Sources/CryptoSwift/Updatable.swift; sourceTree = "<group>"; };
 		95B7A829DA4CAA46CF78CCBA12F0554B /* BNCCallbackMap.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BNCCallbackMap.h; path = "Branch-SDK/Branch-SDK/BNCCallbackMap.h"; sourceTree = "<group>"; };
@@ -640,7 +642,7 @@
 		9C72CBF5D5FE7C840B39E453657A21F9 /* UIViewController+Branch.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+Branch.m"; path = "Branch-SDK/Branch-SDK/UIViewController+Branch.m"; sourceTree = "<group>"; };
 		9CD26AAEBB21DCF0C9943685C98D4341 /* Branch.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Branch.h; path = "Branch-SDK/Branch-SDK/Branch.h"; sourceTree = "<group>"; };
 		9D1D0BF971F9B6A1B37ACD463A2FCC14 /* BNCAppleAdClient.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCAppleAdClient.m; path = "Branch-SDK/Branch-SDK/BNCAppleAdClient.m"; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9DA2B18B9E1D943DA40F311424787587 /* UIViewController+Branch.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIViewController+Branch.h"; path = "Branch-SDK/Branch-SDK/UIViewController+Branch.h"; sourceTree = "<group>"; };
 		9DB8D5FF109272CCB53C81CDCA7CC959 /* InstallationModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = InstallationModel.swift; path = Adapty/Classes/InstallationModel.swift; sourceTree = "<group>"; };
 		9EA96CCFBAD33F54DE09882421124F2E /* BatchedCollection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BatchedCollection.swift; path = Sources/CryptoSwift/BatchedCollection.swift; sourceTree = "<group>"; };
@@ -711,7 +713,7 @@
 		CCD917E5928D53A79DEE5EE1718B1E7A /* SecureBytes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SecureBytes.swift; path = Sources/CryptoSwift/SecureBytes.swift; sourceTree = "<group>"; };
 		CDA30BAC82B5AB4964AC981D8A3C4175 /* BNCDeviceSystem.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCDeviceSystem.m; path = "Branch-SDK/Branch-SDK/BNCDeviceSystem.m"; sourceTree = "<group>"; };
 		CDF0D524110043FF5709138CEEC9CA0F /* PKCS7.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PKCS7.swift; path = Sources/CryptoSwift/PKCS/PKCS7.swift; sourceTree = "<group>"; };
-		CDF0D56FB4ED56407C6EA04191DA2005 /* Adapty.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; path = Adapty.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		CDF0D56FB4ED56407C6EA04191DA2005 /* Adapty.podspec */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; path = Adapty.podspec; sourceTree = "<group>"; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		CEAB81CAC92FE27554E0B8B8657837D4 /* HMAC+Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "HMAC+Foundation.swift"; path = "Sources/CryptoSwift/Foundation/HMAC+Foundation.swift"; sourceTree = "<group>"; };
 		CEB03157704569827B5C12DF79AB0D75 /* BNCPreferenceHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCPreferenceHelper.m; path = "Branch-SDK/Branch-SDK/BNCPreferenceHelper.m"; sourceTree = "<group>"; };
 		CFC69023D753ACC38961FD14A9F34EEB /* BranchLastAttributedTouchData.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BranchLastAttributedTouchData.m; path = "Branch-SDK/Branch-SDK/BranchLastAttributedTouchData.m"; sourceTree = "<group>"; };
@@ -723,6 +725,7 @@
 		D4E018A2FE92A36EEF9116A1F1CBFC3A /* BranchContentDiscoveryManifest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BranchContentDiscoveryManifest.m; path = "Branch-SDK/Branch-SDK/BranchContentDiscoveryManifest.m"; sourceTree = "<group>"; };
 		D52350024803A66F81DC08C1D90A4B47 /* BNCCommerceEvent.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCCommerceEvent.m; path = "Branch-SDK/Branch-SDK/BNCCommerceEvent.m"; sourceTree = "<group>"; };
 		D65460AD52789CEA500680ED8E2B3222 /* Adjust-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Adjust-umbrella.h"; sourceTree = "<group>"; };
+		D65757C22481276B0055A431 /* PaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PaywallViewController.swift; path = Adapty/Classes/PaywallViewController.swift; sourceTree = "<group>"; };
 		D66DC84FFCF042B00D96BBF9A684E2C1 /* BNCServerInterface.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCServerInterface.m; path = "Branch-SDK/Branch-SDK/Networking/BNCServerInterface.m"; sourceTree = "<group>"; };
 		D6F1E72830B18ECB1B9C36E936A09E7A /* NSString+Branch.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSString+Branch.h"; path = "Branch-SDK/Branch-SDK/NSString+Branch.h"; sourceTree = "<group>"; };
 		D6F7C2F9DC5959176B5EA68989087294 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
@@ -765,7 +768,7 @@
 		EE398F3472EFE94D1D16280F1709D1BD /* PurchaserInfoModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PurchaserInfoModel.swift; path = Adapty/Classes/PurchaserInfoModel.swift; sourceTree = "<group>"; };
 		EFB47E4D7A6053086F91349A0013616A /* MD5.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MD5.swift; path = Sources/CryptoSwift/MD5.swift; sourceTree = "<group>"; };
 		EFC54BD67019A66520E8899638331D17 /* BNCFacebookAppLinks.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCFacebookAppLinks.m; path = "Branch-SDK/Branch-SDK/BNCFacebookAppLinks.m"; sourceTree = "<group>"; };
-		F066F4E078102C0EDCD8F6DE16E541F0 /* Pods_Adapty_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_Adapty_Tests.framework; path = "Pods-Adapty_Tests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F066F4E078102C0EDCD8F6DE16E541F0 /* Pods_Adapty_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adapty_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F09A2BAEBACDAD7BD2F67EA74A91965F /* ADJBackoffStrategy.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ADJBackoffStrategy.h; path = Adjust/ADJBackoffStrategy.h; sourceTree = "<group>"; };
 		F0A78551496AA9D3297154A0647552F8 /* ADJTimerCycle.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ADJTimerCycle.h; path = Adjust/ADJTimerCycle.h; sourceTree = "<group>"; };
 		F19D4F1D0B56B5C8765AD5AD9C0EC6EC /* Adapty.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Adapty.swift; path = Adapty/Classes/Adapty.swift; sourceTree = "<group>"; };
@@ -780,7 +783,7 @@
 		F7D9952285F861D5671C2A7258B06A5E /* Poly1305.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Poly1305.swift; path = Sources/CryptoSwift/Poly1305.swift; sourceTree = "<group>"; };
 		F7E367714C915E6353FC7E9057AE8BBE /* BNCFacebookAppLinks.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = BNCFacebookAppLinks.h; path = "Branch-SDK/Branch-SDK/BNCFacebookAppLinks.h"; sourceTree = "<group>"; };
 		F805C7DEF3A742CB512BE1A1132CFCDA /* NSData+ADJAdditions.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSData+ADJAdditions.h"; path = "Adjust/ADJAdditions/NSData+ADJAdditions.h"; sourceTree = "<group>"; };
-		F81274EDB681F11E7CB05F7DCA2BB33C /* CryptoSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = CryptoSwift.framework; path = CryptoSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F81274EDB681F11E7CB05F7DCA2BB33C /* CryptoSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CryptoSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8A133D3D25C27C35C07097146032CDF /* ChaCha20.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChaCha20.swift; path = Sources/CryptoSwift/ChaCha20.swift; sourceTree = "<group>"; };
 		F95E0F45C358A9EF2A6B0A1183396F4E /* Scrypt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Scrypt.swift; path = Sources/CryptoSwift/Scrypt.swift; sourceTree = "<group>"; };
 		F9A2B7640849F19479383B6F819AA633 /* BranchRedeemRewardsRequest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BranchRedeemRewardsRequest.m; path = "Branch-SDK/Branch-SDK/Networking/Requests/BranchRedeemRewardsRequest.m"; sourceTree = "<group>"; };
@@ -896,7 +899,6 @@
 				767F077A19137E3DB6D69CFE972D41F3 /* Core */,
 				34DDEF7F29C044880BB8EF6E97A11A9C /* Support Files */,
 			);
-			name = Branch;
 			path = Branch;
 			sourceTree = "<group>";
 		};
@@ -925,6 +927,7 @@
 				4A6C5CB1D95294CBCF2EEF9749B1F615 /* Router.swift */,
 				B5BF756FBB681D92402068CDBF5ABCE5 /* SessionsManager.swift */,
 				88F7A37FB9DA5030C808EDB6922D8DE4 /* UserProperties.swift */,
+				D65757C22481276B0055A431 /* PaywallViewController.swift */,
 				C249332C66475E798EA62A0C19B0E5C0 /* Pod */,
 				6AF9969850B1D51048B7F3EF67A3B175 /* Support Files */,
 			);
@@ -1184,7 +1187,6 @@
 				C3DFAAA6DC0B1AA2A80CF256A5542ED5 /* ZeroPadding.swift */,
 				90D1DF1435A5D36FFB3974835C3F2F65 /* Support Files */,
 			);
-			name = CryptoSwift;
 			path = CryptoSwift;
 			sourceTree = "<group>";
 		};
@@ -1314,7 +1316,6 @@
 				0B9E9F6A6A458FA1C20BD19FB8D547FD /* Frameworks */,
 				8FE7055BF6EF41A53FFB3D929D5D386D /* Support Files */,
 			);
-			name = AppsFlyerFramework;
 			path = AppsFlyerFramework;
 			sourceTree = "<group>";
 		};
@@ -1400,7 +1401,6 @@
 				8ACC3FD5DCEEF2FD58339C059B4F26BE /* Core */,
 				F16663AECD18C87A3C602954E8042242 /* Support Files */,
 			);
-			name = Adjust;
 			path = Adjust;
 			sourceTree = "<group>";
 		};
@@ -1815,6 +1815,7 @@
 				3B98F0A1D92EB7D2EDD5A334B69D994C /* Router.swift in Sources */,
 				9D56641B2215713363C7B15ABAAE5123 /* SessionsManager.swift in Sources */,
 				3404E70D56C559836447E792D1E94E72 /* UserProperties.swift in Sources */,
+				D65757C32481276B0055A431 /* PaywallViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2603,8 +2604,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 				SYMROOT = "${SRCROOT}/../build";
 			};

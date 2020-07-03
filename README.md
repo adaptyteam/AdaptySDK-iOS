@@ -343,6 +343,41 @@ func application(_ application: UIApplication, didReceiveRemoteNotification user
 }
 ```
 
+### Custom paywalls
+
+You can build your own paywall through the dashboard and show it inside the app with just one line of code.
+
+```Swift
+Adapty.showPaywall(for: container, from: controller, delegate: delegate)
+```
+
+**`container`** is **`PurchaseContainerModel`** object, related to your paywall.
+**`controller`** is controller used to show a paywall controller.
+**`delegate`** is someone who applies to **`AdaptyPaywallDelegate`** protocol.
+
+To apply to **`AdaptyPaywallDelegate`** protocol implement such methods:
+
+```Swift
+extension ViewController: AdaptyPaywallDelegate {
+    
+    func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController) {
+        // just call paywall.close() to close paywall if needed and do related calls you need
+    }
+    
+    func didFailPurchase(product: ProductModel, error: Error, paywall: PaywallViewController) {
+        // handle error
+        
+        // error can also be just a cancellation, to check that simply compare error with IAPManagerError.paymentWasCancelled 
+        // (error as? IAPManagerError) == IAPManagerError.paymentWasCancelled
+    }
+    
+    func didClose(paywall: PaywallViewController) {
+        // paywall was closed by user without any purchases
+    }
+    
+}
+```
+
 ### Method swizzling in Adapty
 
 The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag AdaptyAppDelegateProxyEnabled in the app’s Info.plist file and setting it to NO (boolean value).

@@ -16,6 +16,7 @@
 		75E09E001FF56A10F9975314 /* Pods_Adapty_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6933B2657041857BD974C893 /* Pods_Adapty_Tests.framework */; };
 		9A0AF094E860226F6230BAA9 /* Pods_Adapty_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAE9CF399A8493F9C5027242 /* Pods_Adapty_Example.framework */; };
 		D613205023A385A900402998 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D613204F23A385A900402998 /* StoreKit.framework */; };
+		D65757C5248FE2740055A431 /* InAppContainersTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65757C4248FE2730055A431 /* InAppContainersTableViewCell.swift */; };
 		D6F8D53223B0E1CE00CB719A /* InAppTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D53123B0E1CE00CB719A /* InAppTableViewCell.swift */; };
 		D6F8D53423B0E22300CB719A /* InAppTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D53323B0E22300CB719A /* InAppTableViewController.swift */; };
 		D6F8D53C23BFBC8100CB719A /* InAppContainersTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D53B23BFBC8100CB719A /* InAppContainersTableViewController.swift */; };
@@ -52,6 +53,7 @@
 		B3A0F805975930A3344E36CB /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		BAE9CF399A8493F9C5027242 /* Pods_Adapty_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adapty_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D613204F23A385A900402998 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		D65757C4248FE2730055A431 /* InAppContainersTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppContainersTableViewCell.swift; sourceTree = "<group>"; };
 		D6F8D53123B0E1CE00CB719A /* InAppTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppTableViewCell.swift; sourceTree = "<group>"; };
 		D6F8D53323B0E22300CB719A /* InAppTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppTableViewController.swift; sourceTree = "<group>"; };
 		D6F8D53B23BFBC8100CB719A /* InAppContainersTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppContainersTableViewController.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				D6F8D53D23BFBE4A00CB719A /* UIViewControllerExtension.swift */,
 				D6F8D53B23BFBC8100CB719A /* InAppContainersTableViewController.swift */,
+				D65757C4248FE2730055A431 /* InAppContainersTableViewCell.swift */,
 				D6F8D53323B0E22300CB719A /* InAppTableViewController.swift */,
 				D6F8D53123B0E1CE00CB719A /* InAppTableViewCell.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -357,6 +360,7 @@
 				D6F8D53223B0E1CE00CB719A /* InAppTableViewCell.swift in Sources */,
 				D6F8D53E23BFBE4A00CB719A /* UIViewControllerExtension.swift in Sources */,
 				D6F8D53C23BFBC8100CB719A /* InAppContainersTableViewController.swift in Sources */,
+				D65757C5248FE2740055A431 /* InAppContainersTableViewCell.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 			);

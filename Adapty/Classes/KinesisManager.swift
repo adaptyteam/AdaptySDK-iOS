@@ -12,6 +12,11 @@ import CryptoSwift
 enum EventType: String {
     case live = "live"
     case promoPushOpened = "promo_push_opened"
+    case paywallShowed = "paywall_showed"
+    case paywallClosed = "paywall_closed"
+    case inAppClicked = "in_app_clicked"
+    case purchaseStarted = "purchase_started"
+    case purchaseCancelled = "purchase_cancelled"
 }
 
 class KinesisManager {

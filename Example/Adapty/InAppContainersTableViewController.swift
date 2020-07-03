@@ -47,10 +47,12 @@ class InAppContainersTableViewController: UIViewController {
 extension InAppContainersTableViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "BasicCell", for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "\(InAppContainersTableViewCell.self)", for: indexPath) as? InAppContainersTableViewCell else {
+            return UITableViewCell()
+        }
         
-        cell.textLabel?.text = containers[indexPath.row].developerId
-        cell.accessoryType = .disclosureIndicator
+        cell.container = containers[indexPath.row]
+        cell.delegate = self
         
         return cell
     }
@@ -71,6 +73,30 @@ extension InAppContainersTableViewController: UITableViewDelegate {
         
         vc.containerToShow = containers[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+}
+
+extension InAppContainersTableViewController: InAppContainersTableViewCellDelegate {
+    
+    func didShowPaywall(for container: PurchaseContainerModel) {
+        Adapty.showPaywall(for: container, from: self, delegate: self)
+    }
+    
+}
+
+extension InAppContainersTableViewController: AdaptyPaywallDelegate {
+    
+    func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController) {
+        paywall.close()
+    }
+    
+    func didFailPurchase(product: ProductModel, error: Error, paywall: PaywallViewController) {
+        paywall.showAlert(for: error)
+    }
+    
+    func didClose(paywall: PaywallViewController) {
+        
     }
     
 }

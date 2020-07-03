@@ -111,8 +111,13 @@ class IAPManager: NSObject {
     }
     
     private func getContainersAndSyncProducts() {
+        var topOffset: CGFloat = UIApplication.shared.statusBarFrame.height
+        if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
+            topOffset = safeAreaInsetsTop
+        }
+        
         purchaseContainersRequest =
-        apiManager.getPurchaseContainers(params: ["profile_id": profileId]) { (containers, products, error) in
+            apiManager.getPurchaseContainers(params: ["profile_id": profileId, "paywall_padding_top": topOffset]) { (containers, products, error) in
             if let error = error {
                 // call completion and clear it
                 self.callPurchaseContainersCompletionAndCleanCallback(.failure(error))

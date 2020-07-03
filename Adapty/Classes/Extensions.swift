@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import StoreKit
 
 extension Date {
     
@@ -166,6 +167,66 @@ extension NSDecimalNumber {
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 2
         return formatter.string(from: self)
+    }
+    
+}
+
+@available(iOS 11.2, *)
+extension SKProductSubscriptionPeriod {
+    
+    func localizedPeriod(for locale: Locale) -> String? {
+        switch unit {
+        case .day:
+            return locale.localizedComponents(day: numberOfUnits)
+        case .week:
+            return locale.localizedComponents(weekOfMonth: numberOfUnits)
+        case .month:
+            return locale.localizedComponents(month: numberOfUnits)
+        case .year:
+            return locale.localizedComponents(year: numberOfUnits)
+        @unknown default:
+            return nil
+        }
+    }
+    
+}
+
+@available(iOS 11.2, *)
+extension SKProductDiscount {
+    
+    func localizedNumberOfPeriods(for locale: Locale) -> String? {
+        // ignore one period strings
+        if numberOfPeriods <= 1 { return nil }
+        
+        switch subscriptionPeriod.unit {
+        case .day:
+            return locale.localizedComponents(day: numberOfPeriods)
+        case .week:
+            return locale.localizedComponents(weekOfMonth: numberOfPeriods)
+        case .month:
+            return locale.localizedComponents(month: numberOfPeriods)
+        case .year:
+            return locale.localizedComponents(year: numberOfPeriods)
+        @unknown default:
+            return nil
+        }
+    }
+    
+}
+
+extension Locale {
+    
+    func localizedComponents(day: Int? = nil, weekOfMonth: Int? = nil, month: Int? = nil, year: Int? = nil) -> String? {
+        var calendar = Calendar.current
+        calendar.locale = self
+        
+        var components = DateComponents(calendar: calendar)
+        components.day = day
+        components.weekOfMonth = weekOfMonth
+        components.month = month
+        components.year = year
+        
+        return DateComponentsFormatter.localizedString(from: components, unitsStyle: .full)
     }
     
 }

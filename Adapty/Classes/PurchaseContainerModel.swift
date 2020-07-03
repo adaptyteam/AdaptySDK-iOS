@@ -14,6 +14,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
     @objc public var revision: Int = 0
     @objc public var isPromo: Bool = false
     @objc public var products: [ProductModel] = []
+    @objc public var visualPaywall: String = ""
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -34,6 +35,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
         self.variationId = variationId
         if let revision = attributes?["revision"] as? Int { self.revision = revision }
         if let isPromo = attributes?["is_promo"] as? Bool { self.isPromo = isPromo }
+        if let visualPaywall = attributes?["visual_paywall"] as? String { self.visualPaywall = visualPaywall }
         
         guard let products = attributes?["products"] as? [Parameters] else {
             throw SerializationError.missing("PurchaseContainerModel - products")
