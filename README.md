@@ -351,8 +351,8 @@ You can build your own paywall through the dashboard and show it inside the app 
 Adapty.showPaywall(for: container, from: controller, delegate: delegate)
 ```
 
-**`container`** is **`PurchaseContainerModel`** object, related to your paywall.
-**`controller`** is controller used to show a paywall controller.
+**`container`** is **`PurchaseContainerModel`** object, related to your paywall.  
+**`controller`** is controller used to show a paywall controller.  
 **`delegate`** is someone who applies to **`AdaptyPaywallDelegate`** protocol.
 
 To apply to **`AdaptyPaywallDelegate`** protocol implement such methods:
