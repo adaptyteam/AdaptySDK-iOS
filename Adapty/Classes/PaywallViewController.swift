@@ -126,12 +126,12 @@ import WebKit
 extension PaywallViewController: WKNavigationDelegate {
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if navigationAction.request.url?.absoluteString == "about:blank" {
+        if navigationAction.navigationType == .linkActivated {
+            decisionHandler(WKNavigationActionPolicy.cancel)
+        } else {
             decisionHandler(WKNavigationActionPolicy.allow)
             return
         }
-        
-        decisionHandler(WKNavigationActionPolicy.cancel)
         
         guard let URL = navigationAction.request.url else {
             return
