@@ -1,5 +1,5 @@
 //
-//  PurchaseContainerModel.swift
+//  PaywallModel.swift
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 19/12/2019.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
+public class PaywallModel: NSObject, JSONCodable, Codable {
     
     @objc public var developerId: String
     @objc public var variationId: String
@@ -28,7 +28,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
             let developerId = attributes?["developer_id"] as? String,
             let variationId = attributes?["variation_id"] as? String
         else {
-            throw SerializationError.missing("PurchaseContainerModel - developer_id, variation_id")
+            throw SerializationError.missing("PaywallModel - developer_id, variation_id")
         }
         
         self.developerId = developerId
@@ -38,7 +38,7 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
         if let visualPaywall = attributes?["visual_paywall"] as? String { self.visualPaywall = visualPaywall }
         
         guard let products = attributes?["products"] as? [Parameters] else {
-            throw SerializationError.missing("PurchaseContainerModel - products")
+            throw SerializationError.missing("PaywallModel - products")
         }
         
         var productsArray: [ProductModel] = []
@@ -50,13 +50,13 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("PurchaseContainerModel - products", products)
+            throw SerializationError.invalid("PaywallModel - products", products)
         }
         self.products = productsArray
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? PurchaseContainerModel else {
+        guard let object = object as? PaywallModel else {
             return false
         }
         
@@ -65,24 +65,24 @@ public class PurchaseContainerModel: NSObject, JSONCodable, Codable {
     
 }
 
-class PurchaseContainersArray: JSONCodable {
+class PaywallsArray: JSONCodable {
     
-    var containers: [PurchaseContainerModel] = []
+    var paywalls: [PaywallModel] = []
     var products: [ProductModel] = []
     
     required init?(json: Parameters) throws {
-        guard let containers = json["data"] as? [Parameters] else {
+        guard let paywalls = json["data"] as? [Parameters] else {
             return
         }
         
         do {
-            try containers.forEach { (params) in
-                if let container = try PurchaseContainerModel(json: params) {
-                    self.containers.append(container)
+            try paywalls.forEach { (params) in
+                if let paywall = try PaywallModel(json: params) {
+                    self.paywalls.append(paywall)
                 }
             }
         } catch {
-            throw SerializationError.invalid("PurchaseContainersArray - purchase_containers", containers)
+            throw SerializationError.invalid("PaywallsArray - paywalls", paywalls)
         }
         
         guard let meta = json["meta"] as? Parameters, let products = meta["products"] as? [Parameters] else {
@@ -96,7 +96,7 @@ class PurchaseContainersArray: JSONCodable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("PurchaseContainersArray - products in meta", meta)
+            throw SerializationError.invalid("PaywallsArray - products in meta", meta)
         }
     }
     

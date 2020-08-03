@@ -13,15 +13,15 @@ class InAppTableViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
-    var containerToShow: PurchaseContainerModel?
+    var paywallToShow: PaywallModel?
     private var products: [ProductModel] {
-        return containerToShow?.products ?? []
+        return paywallToShow?.products ?? []
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = containerToShow?.developerId
+        title = paywallToShow?.developerId
         tableView.tableFooterView = UIView(frame: .zero)
     }
     

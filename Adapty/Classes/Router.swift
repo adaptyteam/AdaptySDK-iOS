@@ -15,7 +15,7 @@ enum Router {
     case syncInstallation(id: String, profileId: String, params: Parameters)
     case validateReceipt(params: Parameters)
     case trackEvent(params: Parameters)
-    case getPurchaseContainers(params: Parameters)
+    case getPaywalls(params: Parameters)
     case signSubscriptionOffer(params: Parameters)
     case getPurchaserInfo(id: String)
     case updateAttribution(id: String, params: Parameters)
@@ -53,7 +53,7 @@ enum Router {
             return .post
         case .updateProfile:
             return .patch
-        case .getPurchaseContainers,
+        case .getPaywalls,
              .signSubscriptionOffer,
              .getPurchaserInfo,
              .getPromo:
@@ -73,7 +73,7 @@ enum Router {
             return "/sdk/in-apps/apple/receipt/validate/"
         case .trackEvent:
             return ""
-        case .getPurchaseContainers:
+        case .getPaywalls:
             return "/sdk/in-apps/purchase-containers/"
         case .signSubscriptionOffer:
             return "/sdk/in-apps/apple/subscription-offer/sign/"
@@ -87,7 +87,7 @@ enum Router {
     var keyPath: String? {
         switch self {
         case .trackEvent,
-             .getPurchaseContainers:
+             .getPaywalls:
             return nil
         default:
             return "data"
@@ -125,7 +125,7 @@ enum Router {
              .validateReceipt(let params),
              .trackEvent(let params),
              .signSubscriptionOffer(let params),
-             .getPurchaseContainers(let params),
+             .getPaywalls(let params),
              .updateAttribution(_, let params):
             requestParams = params
         case .getPurchaserInfo,

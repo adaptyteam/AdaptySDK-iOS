@@ -18,7 +18,7 @@ import WebKit
 
 @objc public class PaywallViewController: UIViewController {
     
-    var container: PurchaseContainerModel!
+    var paywall: PaywallModel!
     weak var delegate: AdaptyPaywallDelegate?
     
     private var webView: WebView!
@@ -38,7 +38,7 @@ import WebKit
         webView.backgroundColor = UIColor.white
         view.addSubview(webView)
         
-        fulfillDataFromContainer()
+        fulfillDataFromPaywall()
         configureLoader()
         
         logKinesisEvent(.paywallShowed)
@@ -50,11 +50,11 @@ import WebKit
         delegate?.didClose(paywall: self)
     }
     
-    private func fulfillDataFromContainer() {
-        var htmlString = container.visualPaywall
+    private func fulfillDataFromPaywall() {
+        var htmlString = paywall.visualPaywall
         let placeholder = ""
         
-        container.products.forEach { (product) in
+        paywall.products.forEach { (product) in
             htmlString = htmlString.replacingOccurrences(of: "%adapty_title_\(product.vendorProductId)%", with: product.localizedTitle)
             htmlString = htmlString.replacingOccurrences(of: "%adapty_price_\(product.vendorProductId)%", with: (product.localizedPrice ?? placeholder))
             htmlString = htmlString.replacingOccurrences(of: "%adapty_duration_\(product.vendorProductId)%", with: (product.localizedSubscriptionPeriod ?? placeholder))
@@ -114,7 +114,7 @@ import WebKit
     }
     
     private func logKinesisEvent(_ name: EventType, vendorProductId: String? = nil) {
-        var params = ["is_promo": container.isPromo.description, "variation_id": container.variationId]
+        var params = ["is_promo": paywall.isPromo.description, "variation_id": paywall.variationId]
         if let vendorProductId = vendorProductId {
             params["vendor_product_id"] = vendorProductId
         }
@@ -152,7 +152,7 @@ extension PaywallViewController: WKNavigationDelegate {
             close()
         }
         
-        container.products.forEach { (product) in
+        paywall.products.forEach { (product) in
             if url == "adapty://in_app/\(product.vendorProductId)" {
                 logKinesisEvent(.inAppClicked, vendorProductId: product.vendorProductId)
             }

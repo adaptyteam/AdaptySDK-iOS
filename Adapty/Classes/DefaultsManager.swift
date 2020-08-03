@@ -89,17 +89,17 @@ class DefaultsManager {
         }
     }
     
-    var cachedPurchaseContainers: [PurchaseContainerModel]? {
+    var cachedPaywalls: [PaywallModel]? {
         get {
-            if let data = defaults.object(forKey: Constants.UserDefaults.cachedPurchaseContainers) as? Data, let containers = try? JSONDecoder().decode([PurchaseContainerModel].self, from: data) {
-                return containers
+            if let data = defaults.object(forKey: Constants.UserDefaults.cachedPaywalls) as? Data, let paywalls = try? JSONDecoder().decode([PaywallModel].self, from: data) {
+                return paywalls
             }
             
             return nil
         }
         set {
             let data = try? JSONEncoder().encode(newValue)
-            defaults.set(data, forKey: Constants.UserDefaults.cachedPurchaseContainers)
+            defaults.set(data, forKey: Constants.UserDefaults.cachedPaywalls)
         }
     }
     
@@ -120,7 +120,7 @@ class DefaultsManager {
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedTransactionsIds)
-        defaults.removeObject(forKey: Constants.UserDefaults.cachedPurchaseContainers)
+        defaults.removeObject(forKey: Constants.UserDefaults.cachedPaywalls)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedProducts)
     }
     

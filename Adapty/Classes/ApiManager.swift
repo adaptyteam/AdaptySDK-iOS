@@ -10,8 +10,8 @@ import Foundation
 
 public typealias ProfileCreateCompletion = (PurchaserInfoModel?, Error?, Bool?) -> Void
 public typealias InstallationCompletion = (InstallationModel?, Error?) -> Void
-public typealias PurchaseContainersCompletion = ([PurchaseContainerModel]?, [ProductModel]?, Error?) -> Void
-public typealias CachedPurchaseContainersCompletion = ([PurchaseContainerModel]?, [ProductModel]?, DataState, Error?) -> Void
+public typealias PaywallsCompletion = ([PaywallModel]?, [ProductModel]?, Error?) -> Void
+public typealias CachedPaywallsCompletion = ([PaywallModel]?, [ProductModel]?, DataState, Error?) -> Void
 public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, Error?) -> Void
 public typealias JSONCompletion = (Parameters?, Error?) -> Void
 public typealias ErrorCompletion = (Error?) -> Void
@@ -66,11 +66,11 @@ class ApiManager {
     }
     
     @discardableResult
-    func getPurchaseContainers(params: Parameters, completion: @escaping PurchaseContainersCompletion) -> URLSessionDataTask? {
-        return RequestManager.request(router: Router.getPurchaseContainers(params: params)) { (result: Result<PurchaseContainersArray, Error>, response) in
+    func getPaywalls(params: Parameters, completion: @escaping PaywallsCompletion) -> URLSessionDataTask? {
+        return RequestManager.request(router: Router.getPaywalls(params: params)) { (result: Result<PaywallsArray, Error>, response) in
             switch result {
-            case .success(let containers):
-                completion(containers.containers, containers.products, nil)
+            case .success(let paywalls):
+                completion(paywalls.paywalls, paywalls.products, nil)
             case .failure(let error):
                 completion(nil, nil, error)
             }

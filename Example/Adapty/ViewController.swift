@@ -125,13 +125,13 @@ class ViewController: UIViewController {
                 return
             }
             if let promo = promo {
-                self.infoLabel.text = "promoType: \(promo.promoType), variationId: \(promo.variationId), container name: \(promo.container?.developerId ?? "none"), container: \(String(describing: promo.container))"
+                self.infoLabel.text = "promoType: \(promo.promoType), variationId: \(promo.variationId), paywall name: \(promo.paywall?.developerId ?? "none"), paywall: \(String(describing: promo.paywall))"
             }
         }
     }
     
     func updateCurrentPromoLabel(from promo: Any?) {
-        if let promo = promo as? PromoModel, let developerId = promo.container?.developerId {
+        if let promo = promo as? PromoModel, let developerId = promo.paywall?.developerId {
             currentPromoLabel.text = "Current promo: \(developerId)"
         } else {
             currentPromoLabel.text = "Current promo: none"

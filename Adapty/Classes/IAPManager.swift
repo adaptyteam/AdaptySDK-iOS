@@ -44,12 +44,12 @@ class IAPManager: NSObject {
     private var profileId: String {
         DefaultsManager.shared.profileId
     }
-    private(set) var containers = DefaultsManager.shared.cachedPurchaseContainers {
+    private(set) var paywalls = DefaultsManager.shared.cachedPaywalls {
         didSet {
-            DefaultsManager.shared.cachedPurchaseContainers = containers
+            DefaultsManager.shared.cachedPaywalls = paywalls
         }
     }
-    private var shortContainers: [PurchaseContainerModel]?
+    private var shortPaywalls: [PaywallModel]?
     private(set) var products = DefaultsManager.shared.cachedProducts {
         didSet {
             DefaultsManager.shared.cachedProducts = products
@@ -71,9 +71,9 @@ class IAPManager: NSObject {
         }
     }
     
-    private var purchaseContainersRequest: URLSessionDataTask?
+    private var paywallsRequest: URLSessionDataTask?
     private var productsRequest: SKProductsRequest?
-    private var purchaseContainersRequestCompletions: [PurchaseContainersCompletion] = []
+    private var paywallsRequestCompletions: [PaywallsCompletion] = []
 
     private var productsToBuy: [PurchaseInfoTuple] = []
 
@@ -88,43 +88,43 @@ class IAPManager: NSObject {
         self.apiManager = apiManager
     }
     
-    func startObservingPurchases(_ completion: PurchaseContainersCompletion? = nil) {
+    func startObservingPurchases(_ completion: PaywallsCompletion? = nil) {
         startObserving()
         
-        getPurchaseContainers(completion)
+        getPaywalls(completion)
         
         NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.stopObserving()
         }
     }
     
-    func getPurchaseContainers(_ completion: PurchaseContainersCompletion? = nil) {
-        if let completion = completion { purchaseContainersRequestCompletions.append(completion) }
+    func getPaywalls(_ completion: PaywallsCompletion? = nil) {
+        if let completion = completion { paywallsRequestCompletions.append(completion) }
         
         // syncing already in progress
-        if purchaseContainersRequest != nil || productsRequest != nil {
+        if paywallsRequest != nil || productsRequest != nil {
             return
         }
         
-        // get containers and all product infos
-        getContainersAndSyncProducts()
+        // get paywalls and all product infos
+        getPaywallsAndSyncProducts()
     }
     
-    private func getContainersAndSyncProducts() {
+    private func getPaywallsAndSyncProducts() {
         var topOffset: CGFloat = UIApplication.shared.statusBarFrame.height
         if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
             topOffset = safeAreaInsetsTop
         }
         
-        purchaseContainersRequest =
-            apiManager.getPurchaseContainers(params: ["profile_id": profileId, "paywall_padding_top": topOffset]) { (containers, products, error) in
+        paywallsRequest =
+            apiManager.getPaywalls(params: ["profile_id": profileId, "paywall_padding_top": topOffset]) { (paywalls, products, error) in
             if let error = error {
                 // call completion and clear it
-                self.callPurchaseContainersCompletionAndCleanCallback(.failure(error))
+                self.callPaywallsCompletionAndCleanCallback(.failure(error))
                 return
             }
             
-            self.shortContainers = containers
+            self.shortPaywalls = paywalls
             self.shortProducts = products
             self.requestProducts()
         }
@@ -134,7 +134,7 @@ class IAPManager: NSObject {
         productsRequest?.cancel()
         
         guard let productIDs = productIDs else {
-            callPurchaseContainersCompletionAndCleanCallback(.failure(IAPManagerError.noProductIDsFound))
+            callPaywallsCompletionAndCleanCallback(.failure(IAPManagerError.noProductIDsFound))
             return
         }
 
@@ -248,24 +248,24 @@ private extension IAPManager {
     
     // MARK:- Callbacks handling
     
-    private func callPurchaseContainersCompletionAndCleanCallback(_ result: Result<(containers: [PurchaseContainerModel], products: [ProductModel]), Error>) {
+    private func callPaywallsCompletionAndCleanCallback(_ result: Result<(paywalls: [PaywallModel], products: [ProductModel]), Error>) {
         DispatchQueue.main.async {
             switch result {
             case .success(let data):
                 LoggerManager.logMessage("Successfully loaded list of products: [\(self.productIDs?.joined(separator: ",") ?? "")]")
-                self.purchaseContainersRequestCompletions.forEach { (completion) in
-                    completion(data.containers, data.products, nil)
+                self.paywallsRequestCompletions.forEach { (completion) in
+                    completion(data.paywalls, data.products, nil)
                 }
             case .failure(let error):
                 LoggerManager.logError("Failed to load list of products.\n\(error.localizedDescription)")
-                self.purchaseContainersRequestCompletions.forEach { (completion) in
+                self.paywallsRequestCompletions.forEach { (completion) in
                     completion(nil, nil, error)
                 }
             }
             
-            self.purchaseContainersRequest = nil
+            self.paywallsRequest = nil
             self.productsRequest = nil
-            self.purchaseContainersRequestCompletions.removeAll()
+            self.paywallsRequestCompletions.removeAll()
         }
     }
     
@@ -312,7 +312,7 @@ extension IAPManager: SKProductsRequestDelegate {
         }
         
         response.products.forEach { skProduct in
-            shortContainers?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }).forEach({ $0.skProduct = skProduct })
+            shortPaywalls?.flatMap({ $0.products.filter({ $0.vendorProductId == skProduct.productIdentifier }) }).forEach({ $0.skProduct = skProduct })
             
             shortProducts?.filter({ $0.vendorProductId == skProduct.productIdentifier }).forEach({ (product) in
                 product.skProduct = skProduct
@@ -320,27 +320,27 @@ extension IAPManager: SKProductsRequestDelegate {
         }
         
         if response.products.count != 0 {
-            containers = shortContainers
+            paywalls = shortPaywalls
             products = shortProducts
         }
         
-        // fill missing properties in meta from the same properties in containers products
-        let containersProducts = containers?.flatMap({ $0.products })
+        // fill missing properties in meta from the same properties in paywalls products
+        let paywallsProducts = paywalls?.flatMap({ $0.products })
         products?.forEach({ (product) in
-            if let containerProduct = containersProducts?.filter({ $0.vendorProductId == product.vendorProductId }).first {
-                product.fillMissingProperties(from: containerProduct)
+            if let paywallProduct = paywallsProducts?.filter({ $0.vendorProductId == product.vendorProductId }).first {
+                product.fillMissingProperties(from: paywallProduct)
             }
         })
         
-        if response.products.count > 0, let containers = containers, let products = products {
-            callPurchaseContainersCompletionAndCleanCallback(.success((containers: containers, products: products)))
+        if response.products.count > 0, let paywalls = paywalls, let products = products {
+            callPaywallsCompletionAndCleanCallback(.success((paywalls: paywalls, products: products)))
         } else {
-            callPurchaseContainersCompletionAndCleanCallback(.failure(IAPManagerError.noProductsFound))
+            callPaywallsCompletionAndCleanCallback(.failure(IAPManagerError.noProductsFound))
         }
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        callPurchaseContainersCompletionAndCleanCallback(.failure(IAPManagerError.productRequestFailed))
+        callPaywallsCompletionAndCleanCallback(.failure(IAPManagerError.productRequestFailed))
     }
     
 }
@@ -385,7 +385,7 @@ extension IAPManager: SKPaymentTransactionObserver {
                 // store variationId / transactionIdentifier in case of failed receipt validation
                 cachedTransactionsIds[transactionIdentifier] = variationId
             } else {
-                // try to get variationId from storage in case of missing related container
+                // try to get variationId from storage in case of missing related paywall
                 variationId = cachedTransactionsIds[transactionIdentifier]
             }
         }

@@ -1,0 +1,364 @@
+* [Observer mode](#observer-mode)
+* [Convert anonymous user to identifiable user](#convert-anonymous-user-to-identifiable-user)
+* [Logout user](#logout-user)
+* [Attribution tracker integration](#attribution-tracker-integration)
+  + [Adjust integration](#adjust-integration)
+  + [AppsFlyer integration](#appsflyer-integration)
+  + [Branch integration](#branch-integration)
+* [Update your user attributes](#update-your-user-attributes)
+* [Displaying products](#displaying-products)
+  + [Get paywalls](#get-paywalls)
+  + [Custom dashboard paywalls](#custom-dashboard-paywalls)
+* [Working with purchases](#working-with-purchases)
+  + [Making purchases](#making-purchases)
+  + [Restoring purchases](#restoring-purchases)
+  + [Receipt validation](#receipt-validation)
+* [Subscription status](#subscription-status)
+  + [Getting user purchases info](#getting-user-purchases-info)
+  + [Checking if a user is subscribed](#checking-if-a-user-is-subscribed)
+  + [Listening for purchaser info updates](#listening-for-purchaser-info-updates)
+* [Promo campaigns](#promo-campaigns)
+  + [Listening for promo paywall updates](#listening-for-promo-paywall-updates)
+  + [Getting promo paywall manually](#getting-promo-paywall-manually)
+  + [Handle Adapty promo push notifications](#handle-adapty-promo-push-notifications)
+* [Method swizzling in Adapty](#method-swizzling-in-adapty)
+
+# Advanced usage
+
+## Observer mode
+
+In some cases, if you have already built a functioning subscription system, it may not be possible or feasible to use the Adapty SDK to make purchases. However, you can still use the SDK to get access to the data.
+
+Just configure Adapty SDK in Observer Mode – update **`.activate`** method:
+
+```Swift
+Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID", observerMode: true)
+```
+
+## Convert anonymous user to identifiable user
+
+If you don't have an customerUserId on instantiation, you can set it later at any time with the .identify() method. The most common cases are after registration, when a user switches from being an anonymous user (with a undefined customerUserId) to an authenticated user with some ID.
+
+```Swift
+Adapty.identify("YOUR_USER_ID") { (error) in
+    if error == nil {
+        // successful identify
+    }
+}
+```
+
+## Logout user
+
+Makes your user anonymous.
+
+```Swift
+Adapty.logout { (error) in
+    if error == nil {
+        // successful logout
+    }
+}
+```
+
+## Attribution tracker integration
+
+Adapty has support for most popular attribution systems which allows you to track how much revenue was driven by each source and ad network.  
+To integrate with attribution system, just pass attribution you receive to Adapty method.
+
+```Swift
+Adapty.updateAttribution("<attribution>", source: "<source>", networkUserId: "<networkUserId>") { (error) in
+    if error == nil {
+        // successful update
+    }
+}
+```
+
+**`attribution`** is a `Dictionary` object.  
+For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**, **`.branch`**.  
+**`networkUserId`** is a `String?` object.
+
+### Adjust integration 
+
+To integrate with [Adjust](https://www.adjust.com/), just pass attribution you receive from delegate method of Adjust iOS SDK.
+
+```Swift
+import Adjust
+
+extension AppDelegate: AdjustDelegate {
+    func adjustAttributionChanged(_ attribution: ADJAttribution?) {
+        if let attribution = attribution?.dictionary() {
+            Adapty.updateAttribution(attribution, source: .adjust)
+        }
+    }
+}
+```
+
+### AppsFlyer integration
+
+To integrate with [AppsFlyer](https://www.appsflyer.com/), just pass attribution you receive from delegate method of Adjust iOS SDK.
+
+```Swift
+import AppsFlyerLib
+
+extension AppDelegate: AppsFlyerTrackerDelegate {
+    func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
+        // It's important to include the network user ID
+        Adapty.updateAttribution(conversionInfo, source: .appsflyer, networkUserId: AppsFlyerTracker.shared().getAppsFlyerUID())
+    }
+}
+```
+
+### Branch integration
+
+[Branch](https://branch.io/) integration example.
+
+To connect Branch user and Adapty user, make sure you provide your customerUserId as Branch Identity id.
+If you prefer to not use customerUserId in Branch, user networkUserId param in attribution method to specify the Branch user ID to attach to.
+
+```Swift
+// login
+Branch.getInstance().setIdentity("YOUR_USER_ID")
+
+// logout
+Branch.getInstance().logout()
+```
+
+Next, pass the attribution you receive from initialize method of Branch iOS SDK to Adapty.
+
+```Swift
+import Branch
+
+Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) in
+    if let data = data {
+        Adapty.updateAttribution(data, source: .branch)
+    }
+}
+```
+
+## Update your user attributes
+
+You can add optional information to your user, such as email, phone number, etc. or even update it with analytics ids to make tracking even more precise.
+
+```Swift
+Adapty.updateProfile(email: "example@email.com",
+                     phoneNumber: "+1-###-###-####",
+                     facebookUserId: "###############",
+                     amplitudeUserId: "###",
+                     amplitudeDeviceId: "###",
+                     mixpanelUserId: "###",
+                     appmetricaProfileId: "###",
+                     appmetricaDeviceId: "###",
+                     firstName: "Test",
+                     lastName: "Test",
+                     gender: "",
+                     birthday: Date) { (error) in
+                        if error == nil {
+                            // successful update                              
+                        }
+}
+```
+
+All properties are optional.  
+For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.
+
+## Displaying products
+
+### Get paywalls
+
+Paywalls are fetched through the SDK based on their configuration in the Adapty dashboard.  
+As soon as you get your paywalls info, you can build your own.
+
+```Swift
+Adapty.getPaywalls { (paywalls, products, state, error) in
+
+}
+```
+
+**`paywalls`** is an array of [`PaywallModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#paywallmodel) objects, containing info about your paywalls.  
+**`products`** is an array [`ProductModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#productmodel) objects, containing info about all your products.  
+For **`state`** possible values are: **`cached`**, **`synced`**. First means that data was taken from a local cache, second means that data was updated from a remote server.
+
+### Custom dashboard paywalls
+
+You can build your own paywall through the dashboard and show it inside the app with just one line of code.
+
+```Swift
+Adapty.showPaywall(for: paywall, from: controller, delegate: delegate)
+```
+
+**`paywall`** is a [`PaywallModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#paywallmodel) object, related to your paywall.  
+**`controller`** is a controller used to show a paywall controller.  
+**`delegate`** is someone who applies to **`AdaptyPaywallDelegate`** protocol.
+
+To apply to **`AdaptyPaywallDelegate`** protocol implement such methods:
+
+```Swift
+extension ViewController: AdaptyPaywallDelegate {
+    
+    func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController) {
+        // just call paywall.close() to close paywall if needed and do related calls you need
+    }
+    
+    func didFailPurchase(product: ProductModel, error: Error, paywall: PaywallViewController) {
+        // handle error
+        
+        // error can also be just a cancellation, to check that simply compare error with IAPManagerError.paymentWasCancelled 
+        // (error as? IAPManagerError) == IAPManagerError.paymentWasCancelled
+    }
+    
+    func didClose(paywall: PaywallViewController) {
+        // paywall was closed by user without any purchases
+    }
+    
+}
+```
+
+## Working with purchases
+
+### Making purchases
+
+To make a purchase, pass product you received from [your paywall](#get-paywalls) to `.makePurchase()` method.
+
+```Swift
+Adapty.makePurchase(product: <product>, offerId: <offerId>) { (purchaserInfo, receipt, appleValidationResult, product, error) in
+    if error == nil {
+        // successful purchase
+    }
+}
+```
+
+**`product`** is a [`ProductModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#productmodel) object, it's required and can't be empty. You can get one from any available paywall.  
+**`offerId`** is a `String?` object, optional.
+Adapty handles subscription offers signing for you as well.
+
+**`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.  
+**`receipt`** is a `String?` representation of the Apple's receipt.  
+**`appleValidationResult`** is a `Dictionary?` object, containing data, returned by Apple's receipt validation services.  
+**`product`** is a [`ProductModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#productmodel) object you've passed to this method.
+
+### Restoring purchases
+
+You can restore user's purchases and if there is some, it will appear in her [purchases info](#subscription-status).
+
+```Swift
+Adapty.restorePurchases { (error) in
+    if error == nil {
+        // successful restore
+    }
+}
+```
+
+### Receipt validation
+
+You can also validate your receipt through SDK without any backend implementation on your side. 
+
+```Swift
+Adapty.validateReceipt("<receiptEncoded>") { (purchaserInfo, response, error) in
+    if error == nil {
+        // successful validation
+    }
+}
+```
+
+**`receiptEncoded`** is required and can't be empty.
+
+**`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.  
+**`response`** is a `Dictionary?`, containing all info about receipt from AppStore.
+
+## Subscription status
+
+### Getting user purchases info
+
+It's super easy to fetch user purchases info – there is a one-liner for this: 
+
+```Swift
+Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
+
+}
+```
+
+**`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.  
+For **`state`** possible values are: **`cached`**, **`synced`**. First means that data was taken from a local cache, second means that data was updated from a remote server. 
+
+### Checking if a user is subscribed 
+
+The subscription status for a user can easily be determined from **`paidAccessLevels`** property of **`purchaserInfo`** object by **`isActive`** property inside.
+
+```Swift
+Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
+    if purchaserInfo?.paidAccessLevels["level_configured_in_dashboard"]?.isActive == true {
+    
+    }
+}
+```
+
+### Listening for purchaser info updates
+
+You can respond to any changes in purchaser info by conforming to an optional delegate method, didReceivePurchaserInfo. This will fire whenever we receive a change in purchaser info.
+
+```Swift
+extension AppDelegate: AdaptyDelegate {
+    
+    func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel) {
+        // handle any changes to purchaserInfo
+    }
+    
+}
+```
+
+**`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.
+
+## Promo campaigns
+
+Promo Campaigns designed for upselling in your app. Send promo offers with automated campaigns in push notifications.
+
+### Listening for promo paywall updates
+
+You can respond to any changes in the promo paywall by conforming to an optional delegate method, didReceivePromo. This will fire whenever we receive a change in the promo paywall.
+
+```Swift
+extension AppDelegate: AdaptyDelegate {
+    
+    func didReceivePromo(_ promo: PromoModel) {
+        // handle available promo
+    }
+    
+}
+```
+
+**`promo`** is a [`PromoModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#promomodel) object, containing information about available promotional (if so) offer for current user.
+
+### Getting promo paywall manually
+
+You can still trigger manual promo paywall update by calling method getPromo.
+
+```Swift
+Adapty.getPromo { (promo, error) in
+
+}
+```
+
+**`promo`** is a [`PromoModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#promomodel) object, containing information about available promotional (if so) offer for current user.
+
+### Handle Adapty promo push notifications
+
+You can check and validate Adapty promo push notifications like this. This will allow us to handle such notifications and respond accordingly. 
+
+```Swift
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    Adapty.handlePushNotification(userInfo) { (_) in
+        completionHandler(UIBackgroundFetchResult.newData)
+    }
+}
+```
+
+## Method swizzling in Adapty
+
+The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag AdaptyAppDelegateProxyEnabled in the app’s Info.plist file and setting it to NO (boolean value).
+
+If you have disabled method swizzling, you'll need to explicitly send your APNs to Adapty. Override the methods didRegisterForRemoteNotificationsWithDeviceToken to retrieve the APNs token, and then set Adapty's apnsToken property:
+
+```Swift
+func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+    Adapty.apnsToken = deviceToken
+}
+```

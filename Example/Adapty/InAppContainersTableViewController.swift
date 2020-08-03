@@ -12,7 +12,7 @@ import Adapty
 class InAppContainersTableViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    private var containers: [PurchaseContainerModel] = []
+    private var paywalls: [PaywallModel] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,9 +27,9 @@ class InAppContainersTableViewController: UIViewController {
     }
     
     @objc private func loadData() {
-        Adapty.getPurchaseContainers { (containers, products, state, error) in
+        Adapty.getPaywalls { (paywalls, products, state, error) in
             self.tableView.refreshControl?.endRefreshing()
-            self.containers = containers ?? []
+            self.paywalls = paywalls ?? []
             self.tableView.reloadData()
         }
     }
@@ -51,7 +51,7 @@ extension InAppContainersTableViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        cell.container = containers[indexPath.row]
+        cell.paywall = paywalls[indexPath.row]
         cell.delegate = self
         
         return cell
@@ -59,7 +59,7 @@ extension InAppContainersTableViewController: UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return containers.count
+        return paywalls.count
     }
     
 }
@@ -71,7 +71,7 @@ extension InAppContainersTableViewController: UITableViewDelegate {
             return
         }
         
-        vc.containerToShow = containers[indexPath.row]
+        vc.paywallToShow = paywalls[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -79,8 +79,8 @@ extension InAppContainersTableViewController: UITableViewDelegate {
 
 extension InAppContainersTableViewController: InAppContainersTableViewCellDelegate {
     
-    func didShowPaywall(for container: PurchaseContainerModel) {
-        Adapty.showPaywall(for: container, from: self, delegate: self)
+    func didShowPaywall(for paywall: PaywallModel) {
+        Adapty.showPaywall(for: paywall, from: self, delegate: self)
     }
     
 }

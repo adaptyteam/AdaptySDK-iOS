@@ -10,26 +10,26 @@ import UIKit
 import Adapty
 
 protocol InAppContainersTableViewCellDelegate: class {
-    func didShowPaywall(for container: PurchaseContainerModel)
+    func didShowPaywall(for paywall: PaywallModel)
 }
 
 class InAppContainersTableViewCell: UITableViewCell {
 
     weak var delegate: InAppContainersTableViewCellDelegate?
-    var container: PurchaseContainerModel? {
+    var paywall: PaywallModel? {
         didSet {
-            titleLabel.text = container?.developerId
+            titleLabel.text = paywall?.developerId
         }
     }
     
     @IBOutlet weak var titleLabel: UILabel!
     
     @IBAction func showPaywallButtonAction(_ sender: Any) {
-        guard let container = container else {
+        guard let paywall = paywall else {
             return
         }
         
-        delegate?.didShowPaywall(for: container)
+        delegate?.didShowPaywall(for: paywall)
     }
     
 

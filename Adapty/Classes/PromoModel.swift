@@ -12,7 +12,7 @@ public class PromoModel: NSObject, JSONCodable {
     @objc public var promoType: String
     @objc public var variationId: String
     @objc public var expiresAt: Date?
-    @objc public var container: PurchaseContainerModel?
+    @objc public var paywall: PaywallModel?
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -39,7 +39,7 @@ public class PromoModel: NSObject, JSONCodable {
             return false
         }
         
-        return self.promoType == object.promoType && self.variationId == object.variationId && self.expiresAt == object.expiresAt && self.container == object.container
+        return self.promoType == object.promoType && self.variationId == object.variationId && self.expiresAt == object.expiresAt && self.paywall == object.paywall
     }
     
 }

@@ -278,17 +278,17 @@ import UIKit
         }
     }
     
-    @objc public class func getPurchaseContainers(_ completion: @escaping CachedPurchaseContainersCompletion) {
+    @objc public class func getPaywalls(_ completion: @escaping CachedPaywallsCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        let containers = shared.iapManager.containers
+        let paywalls = shared.iapManager.paywalls
         let products = shared.iapManager.products
-        if containers != nil || products != nil {
-            completion(containers, products, .cached, nil)
+        if paywalls != nil || products != nil {
+            completion(paywalls, products, .cached, nil)
         }
         
-        shared.iapManager.getPurchaseContainers { (containers, products, error) in
-            completion(containers, products, .synced, error)
+        shared.iapManager.getPaywalls { (paywalls, products, error) in
+            completion(paywalls, products, .synced, error)
         }
     }
     
@@ -400,13 +400,13 @@ import UIKit
         LoggerManager.logMessage("Calling now: \(#function)")
         
         shared.apiManager.getPromo(id: shared.profileId) { (promo, error) in
-            // match with locally stored container
-            promo?.container = shared.iapManager.containers?.filter({ $0.variationId == promo?.variationId }).first
+            // match with locally stored paywall
+            promo?.paywall = shared.iapManager.paywalls?.filter({ $0.variationId == promo?.variationId }).first
             
-            // if there is no such container, re-sync them from server
-            if let promo = promo, promo.container == nil {
-                getPurchaseContainers { (_, _, state, error) in
-                    promo.container = shared.iapManager.containers?.filter({ $0.variationId == promo.variationId }).first
+            // if there is no such paywall, re-sync them from server
+            if let promo = promo, promo.paywall == nil {
+                getPaywalls { (_, _, state, error) in
+                    promo.paywall = shared.iapManager.paywalls?.filter({ $0.variationId == promo.variationId }).first
                     
                     shared.promo = promo
                     completion?(promo, error)
@@ -453,9 +453,9 @@ import UIKit
     }
     
     @discardableResult @objc
-    public class func showPaywall(for container: PurchaseContainerModel, from viewController: UIViewController, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
+    public class func showPaywall(for paywall: PaywallModel, from viewController: UIViewController, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
         let paywallViewController = PaywallViewController()
-        paywallViewController.container = container
+        paywallViewController.paywall = paywall
         paywallViewController.delegate = delegate
         paywallViewController.modalPresentationStyle = .fullScreen
         viewController.present(paywallViewController, animated: true)
