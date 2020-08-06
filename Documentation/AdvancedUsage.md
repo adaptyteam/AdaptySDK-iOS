@@ -74,7 +74,7 @@ Adapty.updateAttribution("<attribution>", source: "<source>", networkUserId: "<n
 ```
 
 **`attribution`** is a `Dictionary` object.  
-For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**, **`.branch`**.  
+For **`source`** possible values are: **`.adjust`**, **`.appsflyer`**, **`.branch`** and **`.custom`**.  
 **`networkUserId`** is a `String?` object.
 
 ### Adjust integration 

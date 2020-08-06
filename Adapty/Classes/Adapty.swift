@@ -20,6 +20,7 @@ import UIKit
     case adjust
     case appsflyer
     case branch
+    case custom
 }
 
 @objc public class Adapty: NSObject {
@@ -266,6 +267,8 @@ import UIKit
             attributes["source"] = "appsflyer"
         case .branch:
             attributes["source"] = "branch"
+        case .custom:
+            attributes["source"] = "custom"
         }
         
         if let networkUserId = networkUserId { attributes["network_user_id"] = networkUserId }
