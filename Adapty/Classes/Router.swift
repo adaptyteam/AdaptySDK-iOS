@@ -93,6 +93,15 @@ enum Router {
             return "data"
         }
     }
+    
+    var timeoutInterval: TimeInterval {
+        switch self {
+        case .getPaywalls:
+            return DefaultsManager.shared.cachedPaywalls != nil ? 10 : 30
+        default:
+            return 5
+        }
+    }
 
     var authorizationHeader: String {
         return "Api-Key \(Constants.APIKeys.secretKey)"
@@ -101,7 +110,7 @@ enum Router {
     func asURLRequest() throws -> URLRequest {
         var request = URLRequest(url: URL(string: "\(scheme)://\(host)\(stage)\(path)")!,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-                                 timeoutInterval: 30.0)
+                                 timeoutInterval: timeoutInterval)
         switch self {
         case .trackEvent:
             break

@@ -18,6 +18,7 @@ public enum IAPManagerError: Error {
     case cantReadReceipt
     case productPurchaseFailed
     case missingOfferSigningParams
+    case fallbackPaywallsNotRequired
 }
 
 extension IAPManagerError: LocalizedError {
@@ -32,6 +33,7 @@ extension IAPManagerError: LocalizedError {
         case .cantReadReceipt: return "Can't find purchases receipt."
         case .productPurchaseFailed: return "Product purchase failed."
         case .missingOfferSigningParams: return "Missing offer signing required params."
+        case .fallbackPaywallsNotRequired: return "Fallback paywalls are not required."
         }
     }
 }
@@ -102,7 +104,7 @@ class IAPManager: NSObject {
         if let completion = completion { paywallsRequestCompletions.append(completion) }
         
         // syncing already in progress
-        if paywallsRequest != nil || productsRequest != nil {
+        if paywallsRequest != nil {
             return
         }
         
@@ -128,6 +130,38 @@ class IAPManager: NSObject {
             self.shortProducts = products
             self.requestProducts()
         }
+    }
+    
+    func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
+        // either already have cached paywalls or appstore request is in progress, which means real paywalls were successfully received
+        if self.paywalls != nil || productsRequest != nil {
+            completion?(IAPManagerError.fallbackPaywallsNotRequired)
+            return
+        }
+        
+        var paywallsArray: PaywallsArray?
+        do {
+            guard
+                let paywallsData = paywalls.data(using: .utf8),
+                let paywallsJSON = try JSONSerialization.jsonObject(with: paywallsData, options: []) as? Parameters else
+            {
+                completion?(NetworkResponse.unableToDecode)
+                return
+            }
+            
+            paywallsArray = try PaywallsArray(json: paywallsJSON)
+        } catch {
+            completion?(error)
+            return
+        }
+        
+        paywallsRequestCompletions.append { (_, _, error) in
+            completion?(error)
+        }
+        
+        shortPaywalls = paywallsArray?.paywalls
+        shortProducts = paywallsArray?.products
+        requestProducts()
     }
     
     private func requestProducts() {

@@ -462,6 +462,10 @@ import UIKit
         return paywallViewController
     }
     
+    @objc public class func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
+        shared.iapManager.setFallbackPaywalls(paywalls, completion: completion)
+    }
+    
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         

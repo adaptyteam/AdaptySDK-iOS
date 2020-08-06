@@ -9,6 +9,7 @@
 * [Displaying products](#displaying-products)
   + [Get paywalls](#get-paywalls)
   + [Custom dashboard paywalls](#custom-dashboard-paywalls)
+  + [Fallback paywalls](#fallback-paywalls)
 * [Working with purchases](#working-with-purchases)
   + [Making purchases](#making-purchases)
   + [Restoring purchases](#restoring-purchases)
@@ -211,6 +212,20 @@ extension ViewController: AdaptyPaywallDelegate {
     
 }
 ```
+
+### Fallback paywalls
+
+In case you have an imported dashboard JSON file with your paywalls, you can provide it to SDK as a fallback scenario for user.  
+So if Adapty backend will be offline for some unexpected reason, you can still show user paywall and operate through it. You can later get it later through [Get paywalls](#get-paywalls) method.
+
+```Swift
+if let path = Bundle.main.path(forResource: "fallback_paywalls", ofType: "json"), let paywalls = try? String(contentsOfFile: path, encoding: .utf8) {
+    // you can get paywalls string in any other way as well
+    Adapty.setFallbackPaywalls(paywalls)
+}
+```
+
+**`paywalls`** is a string representationof your paywalls JSON list. 
 
 ## Working with purchases
 

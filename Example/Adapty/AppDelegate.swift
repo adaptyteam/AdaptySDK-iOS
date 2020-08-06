@@ -21,6 +21,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Adapty.logLevel = .verbose
         Adapty.activate("YOUR_ADAPTY_APP_TOKEN")
         Adapty.delegate = self
+        // in case you have / want to use fallback paywalls
+        if let path = Bundle.main.path(forResource: "fallback_paywalls", ofType: "json"), let paywalls = try? String(contentsOfFile: path, encoding: .utf8) {
+            Adapty.setFallbackPaywalls(paywalls)
+        }
         
         // Configure Adjust
         
