@@ -194,6 +194,7 @@ import UIKit
         lastName: String? = nil,
         gender: String? = nil,
         birthday: Date? = nil,
+        customAttributes: Parameters? = nil,
         completion: ErrorCompletion? = nil)
     {
         LoggerManager.logMessage("Calling now: \(#function)")
@@ -214,6 +215,7 @@ import UIKit
         if let lastName = lastName { attributes["last_name"] = lastName }
         if let gender = gender { attributes["gender"] = gender }
         if let birthday = birthday { attributes["birthday"] = birthday.stringValue }
+        if let customAttributes = customAttributes { attributes["custom_attributes"] = customAttributes }
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         

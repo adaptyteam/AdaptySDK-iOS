@@ -151,6 +151,7 @@ Adapty.updateProfile(email: "example@email.com",
                      firstName: "Test",
                      lastName: "Test",
                      gender: "",
+                     customAttributes: ["foo": "bar"],
                      birthday: Date) { (error) in
                         if error == nil {
                             // successful update                              
@@ -159,7 +160,8 @@ Adapty.updateProfile(email: "example@email.com",
 ```
 
 All properties are optional.  
-For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.
+For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.  
+**`customAttributes`** is a `Dictionary?` object.
 
 ## Displaying products
 
