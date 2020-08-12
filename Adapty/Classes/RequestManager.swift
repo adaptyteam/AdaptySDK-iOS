@@ -22,15 +22,67 @@ enum HTTPMethod: String {
 
 typealias RequestCompletion <T: JSONCodable> = (Result<T, AdaptyError>, HTTPURLResponse?) -> Void
 
+fileprivate class SessionDataTask: Equatable {
+    
+    var task: URLSessionDataTask?
+    var router: Router?
+    private var retriesCount = 0
+    private var maxRetriesCount: Int
+    private var retriesDelay: TimeInterval
+    
+    init(task: URLSessionDataTask? = nil, router: Router?, maxRetriesCount: Int = 3, retriesDelay: TimeInterval = 2) {
+        self.task = task
+        self.router = router
+        self.maxRetriesCount = maxRetriesCount
+        self.retriesDelay = retriesDelay
+    }
+    
+    func retry(completion: @escaping (Data?, URLResponse?, Error?) -> Void) {
+        retriesCount += 1
+        if retriesCount > maxRetriesCount {
+            completion(nil, nil, AdaptyError.badRequest)
+            return
+        }
+        
+        guard let request = task?.originalRequest else {
+            completion(nil, nil, AdaptyError.badRequest)
+            return
+        }
+        
+        task = URLSession.shared.dataTask(with: request) { data, response, error in
+            DispatchQueue.global(qos: .background).async {
+                completion(data, response, error)
+            }
+        }
+        
+        DispatchQueue.main.async {
+            Timer.scheduledTimer(timeInterval: self.retriesDelay, target: self, selector: #selector(self.resumeTaks), userInfo: nil, repeats: false)
+        }
+    }
+    
+    @objc private func resumeTaks() {
+        task?.resume()
+    }
+    
+    static func == (lhs: SessionDataTask, rhs: SessionDataTask) -> Bool {
+        return lhs.task == rhs.task && lhs.retriesCount == rhs.retriesCount && lhs.maxRetriesCount == rhs.maxRetriesCount && lhs.retriesDelay == rhs.retriesDelay
+    }
+    
+}
+
 class RequestManager {
     
     static let shared = RequestManager()
-    private var tasksQueue: [URLSessionDataTask] = [] {
+    
+    private var runningTasksLimit: Int {
+        return 1
+    }
+    private var waitingTasksQueue: [SessionDataTask] = [] {
         didSet {
             startNewRequestIfPossible()
         }
     }
-    private var currentTask: URLSessionDataTask?
+    private var runningTasksQueue: [SessionDataTask] = []
     private var concurrentQueue = DispatchQueue(label: "com.Adapty.AdaptyConcurrentQueue", attributes: .concurrent)
     
     // MARK:- Public methods
@@ -60,9 +112,10 @@ class RequestManager {
 
     @discardableResult
     private func performRequest<T: JSONCodable>(_ urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
+        let task = SessionDataTask(router: router)
         let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             DispatchQueue.global(qos: .background).async {
-                self.handleResponse(data: data, response: response, error: error, router: router) { (result: Result<T, AdaptyError>, response) in
+                self.handleResponse(task: task, data: data, response: response, error: error) { (result: Result<T, AdaptyError>, response) in
                     switch result {
                     case .failure(let error):
                         if error.adaptyErrorCode == .missingParam, T.self is PromoModel.Type {
@@ -78,41 +131,50 @@ class RequestManager {
                 }
             }
         }
+        task.task = dataTask
 
-        concurrentQueue.async(flags: .barrier) { self.tasksQueue.append(dataTask) }
+        concurrentQueue.async(flags: .barrier) { self.waitingTasksQueue.append(task) }
 
         return dataTask
     }
     
     private func startNewRequestIfPossible() {
-        guard currentTask == nil else {
+        guard let task = waitingTasksQueue.first, runningTasksQueue.count < runningTasksLimit else {
             return
         }
         
-        currentTask = tasksQueue.first
-        currentTask?.resume()
+        runningTasksQueue.append(task)
+        waitingTasksQueue.removeFirst()
+        task.task?.resume()
     }
     
-    private func handleResponse<T: JSONCodable>(data: Data?, response: URLResponse?, error: Error?, router: Router?, completion: @escaping RequestCompletion<T>) {
+    private func handleResponse<T: JSONCodable>(task: SessionDataTask, data: Data?, response: URLResponse?, error: Error?, completion: @escaping RequestCompletion<T>) {
         logResponse(data, response)
         
         if let error = error {
-            handleResult(result: .failure(AdaptyError(with: error)), response: nil, router: router, completion: completion)
+            handleResult(task: task, result: .failure(AdaptyError(with: error)), response: nil, completion: completion)
             return
         }
         
         guard let response = response as? HTTPURLResponse else {
-            handleResult(result: .failure(AdaptyError.emptyResponse), response: nil, router: router, completion: completion)
+            handleResult(task: task, result: .failure(AdaptyError.emptyResponse), response: nil, completion: completion)
             return
         }
         
         guard let data = data else {
-            handleResult(result: .failure(AdaptyError.emptyData), response: response, router: router, completion: completion)
+            handleResult(task: task, result: .failure(AdaptyError.emptyData), response: response, completion: completion)
+            return
+        }
+        
+        if handleNetworkStatusCode(response.statusCode)?.adaptyErrorCode == .serverError {
+            task.retry(completion: { data, response, error in
+                self.handleResponse(task: task, data: data, response: response, error: error, completion: completion)
+            })
             return
         }
         
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? Parameters else {
-            handleResult(result: .failure(AdaptyError.unableToDecode), response: nil, router: router, completion: completion)
+            handleResult(task: task, result: .failure(AdaptyError.unableToDecode), response: nil, completion: completion)
             return
         }
         
@@ -120,30 +182,30 @@ class RequestManager {
             do {
                 let responseErrors = try ResponseErrorsArray(json: json)
                 if let responseError = responseErrors?.errors.first {
-                    handleResult(result: .failure(AdaptyError(code: responseError.status, adaptyCode: error.adaptyErrorCode, message: responseError.description)), response: nil, router: router, completion: completion)
+                    handleResult(task: task, result: .failure(AdaptyError(code: responseError.status, adaptyCode: error.adaptyErrorCode, message: responseError.description)), response: nil, completion: completion)
                     return
                 }
                 
-                handleResult(result: .failure(error), response: response, router: router, completion: completion)
+                handleResult(task: task, result: .failure(error), response: response, completion: completion)
                 return
             } catch let error as AdaptyError {
-                handleResult(result: .failure(error), response: response, router: router, completion: completion)
+                handleResult(task: task, result: .failure(error), response: response, completion: completion)
                 return
             } catch {
-                handleResult(result: .failure(AdaptyError(with: error)), response: response, router: router, completion: completion)
+                handleResult(task: task, result: .failure(AdaptyError(with: error)), response: response, completion: completion)
                 return
             }
         }
         
         // trying to get cached response instead of empty server response
-        let jsonObject = RequestHashManager.shared.tryToGetCachedJSONObject(for: data, response: response, router: router) ?? json
+        let jsonObject = RequestHashManager.shared.tryToGetCachedJSONObject(for: data, response: response, router: task.router) ?? json
         
         var responseObject: T?
         
         do {
-            if let keyPath = router?.keyPath {
+            if let keyPath = task.router?.keyPath {
                 guard let jsonObject = jsonObject[keyPath] as? Parameters else {
-                    handleResult(result: .failure(AdaptyError.unableToDecode), response: nil, router: router, completion: completion)
+                    handleResult(task: task, result: .failure(AdaptyError.unableToDecode), response: nil, completion: completion)
                     return
                 }
                 
@@ -152,37 +214,48 @@ class RequestManager {
                 responseObject = try T(json: jsonObject)
             }
         } catch let error as AdaptyError {
-            handleResult(result: .failure(error), response: nil, router: router, completion: completion)
+            handleResult(task: task, result: .failure(error), response: nil, completion: completion)
             return
         } catch {
-            handleResult(result: .failure(AdaptyError(with: error)), response: nil, router: router, completion: completion)
+            handleResult(task: task, result: .failure(AdaptyError(with: error)), response: nil, completion: completion)
             return
         }
         
         if let responseObject = responseObject {
-            handleResult(result: .success(responseObject), response: response, router: router, completion: completion)
+            handleResult(task: task, result: .success(responseObject), response: response, completion: completion)
         } else {
-            handleResult(result: .failure(AdaptyError.unableToDecode), response: response, router: router, completion: completion)
+            handleResult(task: task, result: .failure(AdaptyError.unableToDecode), response: response, completion: completion)
         }
     }
     
-    private func handleResult<T: JSONCodable>(result: Result<T, AdaptyError>, response: HTTPURLResponse?, router: Router?, completion: @escaping RequestCompletion<T>) {
-        if case .createProfile = router, case .failure = result, let request = tasksQueue.first?.originalRequest {
+    private func handleResult<T: JSONCodable>(task: SessionDataTask, result: Result<T, AdaptyError>, response: HTTPURLResponse?, completion: @escaping RequestCompletion<T>) {
+        
+        func removeCurrentTask() {
+            runningTasksQueue.removeAll { (dataTask) -> Bool in
+                return dataTask == task
+            }
+        }
+        
+        func startNextTask() {
+            removeCurrentTask()
+            startNewRequestIfPossible()
+        }
+        
+        if case .createProfile = task.router,
+           case .failure = result,
+           let request = runningTasksQueue.first?.task?.originalRequest {
             // re-create createProfile request and put it into the end of the queue
-            performRequest(request, router: router, completion: completion)
+            performRequest(request, router: task.router, completion: completion)
             
             concurrentQueue.async(flags: .barrier) {
-                if self.tasksQueue.count == 2 {
-                    // don't need to start cycling request, so don't nullify `currentTask` before `taskQueue` changes
-                    self.tasksQueue.removeFirst()
-                    self.currentTask = nil
+                if self.waitingTasksQueue.count == 1 {
+                    // don't need to start cycling request, so don't start next create profile request
+                    removeCurrentTask()
                 } else {
                     // regular logic
-                    self.currentTask = nil
-                    self.tasksQueue.removeFirst()
+                    startNextTask()
                 }
             }
-            
             return
         }
         
@@ -196,8 +269,7 @@ class RequestManager {
         }
         
         concurrentQueue.async(flags: .barrier) {
-            self.currentTask = nil
-            self.tasksQueue.removeFirst()
+            startNextTask()
         }
     }
     
