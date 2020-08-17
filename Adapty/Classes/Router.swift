@@ -97,10 +97,13 @@ enum Router {
     var timeoutInterval: TimeInterval {
         switch self {
         case .getPaywalls:
-            return DefaultsManager.shared.cachedPaywalls != nil ? 10 : 30
+            if DefaultsManager.shared.cachedPaywalls != nil { return 10 }
+            else { break }
         default:
-            return 5
+            break
         }
+        
+        return 30
     }
 
     var authorizationHeader: String {
