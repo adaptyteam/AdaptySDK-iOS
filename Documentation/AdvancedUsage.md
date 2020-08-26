@@ -227,7 +227,7 @@ if let path = Bundle.main.path(forResource: "fallback_paywalls", ofType: "json")
 }
 ```
 
-**`paywalls`** is a string representationof your paywalls JSON list. 
+**`paywalls`** is a string representation of your paywalls JSON list. 
 
 ## Working with purchases
 
