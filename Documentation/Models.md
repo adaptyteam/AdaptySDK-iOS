@@ -42,7 +42,7 @@ Name  | Description |
 | identifier | A string used to uniquely identify a discount offer for a product. |
 | subscriptionPeriod | A [`ProductSubscriptionPeriodModel`](#productsubscriptionperiodmodel) object that defines the period for the product discount. |
 | numberOfPeriods | An integer that indicates the number of periods the product discount is available. |
-| paymentMode | The payment mode for this product discount. |
+| paymentMode | The payment mode for this product discount. Possible values: `payAsYouGo`/`PayUpFront`/`freeTrial`, see details in [`Official docs`](https://developer.apple.com/documentation/storekit/in-app_purchase/subscriptions_and_offers/implementing_introductory_offers_in_your_app)|
 | localizedPrice | Localized price of the discount. |
 | localizedSubscriptionPeriod | Localized subscription period of the discount. |
 | localizedNumberOfPeriods | Localized number of periods of the discount. |
