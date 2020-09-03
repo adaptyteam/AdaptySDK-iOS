@@ -195,6 +195,7 @@ import UIKit
         gender: String? = nil,
         birthday: Date? = nil,
         customAttributes: Parameters? = nil,
+        appTrackingTransparencyStatus: UInt = 0,
         completion: ErrorCompletion? = nil)
     {
         LoggerManager.logMessage("Calling now: \(#function)")
@@ -216,6 +217,7 @@ import UIKit
         if let gender = gender { attributes["gender"] = gender }
         if let birthday = birthday { attributes["birthday"] = birthday.stringValue }
         if let customAttributes = customAttributes { attributes["custom_attributes"] = customAttributes }
+        attributes["att_status"] = appTrackingTransparencyStatus
         
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
         

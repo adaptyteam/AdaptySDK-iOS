@@ -151,8 +151,9 @@ Adapty.updateProfile(email: "example@email.com",
                      firstName: "Test",
                      lastName: "Test",
                      gender: "",
+                     birthday: Date,
                      customAttributes: ["foo": "bar"],
-                     birthday: Date) { (error) in
+                     appTrackingTransparencyStatus: 0) { (error) in
                         if error == nil {
                             // successful update                              
                         }
@@ -161,7 +162,9 @@ Adapty.updateProfile(email: "example@email.com",
 
 All properties are optional.  
 For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.  
-**`customAttributes`** is a `Dictionary?` object.
+**`customAttributes`** is a `Dictionary?` object.  
+
+**`appTrackingTransparencyStatus`** is a [app tracking transparency status](https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus/) you can receive starting from iOS 14. To receive it just call `let status = ATTrackingManager.AuthorizationStatus` – you should send this specific property to Adapty as soon as it changes, after you request it from user `Adapty.updateProfile(appTrackingTransparencyStatus: status.rawValue)` . 
 
 ## Displaying products
 
