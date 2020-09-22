@@ -14,6 +14,7 @@
   + [Making purchases](#making-purchases)
   + [Restoring purchases](#restoring-purchases)
   + [Receipt validation](#receipt-validation)
+  + [Making deferred purchases](#making-deferred-purchases)
 * [Subscription status](#subscription-status)
   + [Getting user purchases info](#getting-user-purchases-info)
   + [Checking if a user is subscribed](#checking-if-a-user-is-subscribed)
@@ -283,6 +284,27 @@ Adapty.validateReceipt("<receiptEncoded>") { (purchaserInfo, response, error) in
 
 **`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.  
 **`response`** is a `Dictionary?`, containing all info about receipt from AppStore.
+
+### Making deferred purchases
+
+For deferred purchases Adapty SDK has an optional delegate method, which is called when the user starts an in-app purchase in the App Store, and the transaction continues in your app.    
+Just store **`makeDeferredPurchase`** and call it later if you want to hold your purchase for now and show paywall to your user first as said in Apple's guidelines.    
+If you want to continue purchase, call **`makeDeferredPurchase`** at the same moment you got it.
+
+```Swift
+extension AppDelegate: AdaptyDelegate {
+
+    func paymentQueue(shouldAddStorePaymentFor product: ProductModel, defermentCompletion makeDeferredPurchase: @escaping DeferredPurchaseCompletion) {
+        // you can store makeDeferredPurchase callback and call it later as well
+        
+        // or you can call it right away
+        makeDeferredPurchase { (purchaserInfo, receipt, response, product, error) in
+            // check your purchase
+        }
+    }
+    
+}
+```
 
 ## Subscription status
 
