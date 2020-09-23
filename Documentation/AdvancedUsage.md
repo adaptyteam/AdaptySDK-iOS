@@ -138,34 +138,37 @@ Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) i
 
 ## Update your user attributes
 
-You can add optional information to your user, such as email, phone number, etc. or even update it with analytics ids to make tracking even more precise.
+You can add optional information to your user, such as email, phone number, etc. or update it with analytics ids to make tracking even more precise.
 
 ```Swift
-Adapty.updateProfile(email: "example@email.com",
-                     phoneNumber: "+1-###-###-####",
-                     facebookUserId: "###############",
-                     amplitudeUserId: "###",
-                     amplitudeDeviceId: "###",
-                     mixpanelUserId: "###",
-                     appmetricaProfileId: "###",
-                     appmetricaDeviceId: "###",
-                     firstName: "Test",
-                     lastName: "Test",
-                     gender: "",
-                     birthday: Date,
-                     customAttributes: ["foo": "bar"],
-                     appTrackingTransparencyStatus: 0) { (error) in
-                        if error == nil {
-                            // successful update                              
-                        }
+Adapty.updateProfile(attributes: [AdaptyProfileKey.email: "example@email.com",
+                                  AdaptyProfileKey.phoneNumber: "+1-###-###-####",
+                                  ...
+                                  AdaptyProfileKey.<key>: <value>]) { (error) in
+                                    if error == nil {
+                                        // successful update                              
+                                    }
 }
 ```
 
-All properties are optional.  
-For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.  
-**`customAttributes`** is a `Dictionary?` object.  
+Possible keys `.<key>` and their possible values described below:
 
-**`appTrackingTransparencyStatus`** is a [app tracking transparency status](https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus/) you can receive starting from iOS 14. To receive it just call `let status = ATTrackingManager.AuthorizationStatus` – you should send this specific property to Adapty as soon as it changes, after you request it from user `Adapty.updateProfile(appTrackingTransparencyStatus: status.rawValue)` . 
+| Key  | Possible value |
+| -------- | ------------- |
+| email | String |
+| phoneNumber | String |
+| facebookUserId | String |
+| amplitudeUserId | String |
+| amplitudeDeviceId | String |
+| mixpanelUserId | String |
+| appmetricaProfileId | String|
+| appmetricaDeviceId | String |
+| firstName | String |
+| lastName | String |
+| gender | String, possible values are: **`m`**, **`f`**, but you can also pass custom string value |
+| birthday | Date |
+| customAttributes | Dictionary |
+| appTrackingTransparencyStatus | UInt, [app tracking transparency status](https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus/) you can receive starting from iOS 14. To receive it just call `let status = ATTrackingManager.AuthorizationStatus` – you should send this specific property to Adapty as soon as it changes, after you request it from user `Adapty.updateProfile(attributes: [AdaptyProfileKey.appTrackingTransparencyStatus: status.rawValue])`  |
 
 ## Displaying products
 
