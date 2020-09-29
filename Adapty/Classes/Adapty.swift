@@ -134,6 +134,11 @@ import UIKit
             // get current existing promo
             Self.getPromo()
         }
+        
+        // check if user enabled apple search ads attribution collection
+        if let appleSearchAdsAttributionCollectionEnabled = Bundle.main.infoDictionary?[Constants.BundleKeys.appleSearchAdsAttributionCollectionEnabled] as? Bool, appleSearchAdsAttributionCollectionEnabled {
+            updateAppleSearchAdsAttribution()
+        }
     }
     
     //MARK: - REST
@@ -229,6 +234,21 @@ import UIKit
         }
     }
     
+    private func updateAppleSearchAdsAttribution() {
+        UserProperties.appleSearchAdsAttribution { (attribution, error) in
+            if let attribution = attribution,
+                let values = attribution.values.map({ $0 }).first as? Parameters,
+                let iAdAttribution = values["iad-attribution"] as? NSString,
+                // check if the user clicked an Apple Search Ads impression up to 30 days before app download
+                iAdAttribution.boolValue == true,
+                // check if this is an actual first sync
+                DefaultsManager.shared.appleSearchAdsSyncDate == nil
+            {
+                Self.updateAttribution(attribution, source: .appleSearchAds)
+            }
+        }
+    }
+    
     @objc public class func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionNetwork, networkUserId: String? = nil, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
@@ -241,6 +261,8 @@ import UIKit
             attributes["source"] = "appsflyer"
         case .branch:
             attributes["source"] = "branch"
+        case .appleSearchAds:
+            attributes["source"] = "apple_search_ads"
         case .custom:
             attributes["source"] = "custom"
         }
@@ -251,6 +273,10 @@ import UIKit
         let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAttribution, attributes: attributes)
         
         shared.apiManager.updateAttribution(id: shared.profileId, params: params) { (_, error) in
+            if source == .appleSearchAds && error == nil {
+                // mark appleSearchAds attribution data as synced
+                DefaultsManager.shared.appleSearchAdsSyncDate = Date()
+            }
             completion?(error)
         }
     }

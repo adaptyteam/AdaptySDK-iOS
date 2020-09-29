@@ -136,6 +136,10 @@ Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) i
 }
 ```
 
+### Apple Search Ads
+
+The AdaptySDK can automatically collect Apple Search Ad attribution data. All you need is to add `AdaptyAppleSearchAdsAttributionCollectionEnabled` in the app’s Info.plist file and set it to `YES` (boolean value).
+
 ## Update your user attributes
 
 You can add optional information to your user, such as email, phone number, etc. or update it with analytics ids to make tracking even more precise.
@@ -398,9 +402,9 @@ func application(_ application: UIApplication, didReceiveRemoteNotification user
 
 ## Method swizzling in Adapty
 
-The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag AdaptyAppDelegateProxyEnabled in the app’s Info.plist file and setting it to NO (boolean value).
+The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag `AdaptyAppDelegateProxyEnabled` in the app’s Info.plist file and setting it to `NO` (boolean value).
 
-If you have disabled method swizzling, you'll need to explicitly send your APNs to Adapty. Override the methods didRegisterForRemoteNotificationsWithDeviceToken to retrieve the APNs token, and then set Adapty's apnsToken property:
+If you have disabled method swizzling, you'll need to explicitly send your APNs to Adapty. Override the methods `didRegisterForRemoteNotificationsWithDeviceToken` to retrieve the APNs token, and then set Adapty's `apnsToken` property:
 
 ```Swift
 func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {

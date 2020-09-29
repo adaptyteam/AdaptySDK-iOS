@@ -47,6 +47,7 @@ struct Constants {
         static let purchaserInfo = "AdaptySDK_Purchaser_Info"
         static let cachedPaywalls = "AdaptySDK_Cached_Purchase_Containers"
         static let cachedProducts = "AdaptySDK_Cached_Products"
+        static let appleSearchAdsSyncDate = "AdaptySDK_Apple_Search_Ads_Sync_Date"
     }
     
     struct Versions {
@@ -55,6 +56,7 @@ struct Constants {
     
     struct BundleKeys {
         static let appDelegateProxyEnabled = "AdaptyAppDelegateProxyEnabled"
+        static let appleSearchAdsAttributionCollectionEnabled = "AdaptyAppleSearchAdsAttributionCollectionEnabled"
     }
     
     struct TypeNames {
@@ -76,6 +78,7 @@ struct Constants {
     case adjust
     case appsflyer
     case branch
+    case appleSearchAds
     case custom
 }
 
