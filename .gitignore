@@ -37,3 +37,4 @@ Carthage/Build
 # Pods/
 
 .swiftpm/
+.build/
