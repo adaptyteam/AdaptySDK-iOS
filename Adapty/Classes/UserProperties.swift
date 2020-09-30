@@ -8,6 +8,7 @@
 import AdSupport
 import Foundation
 import UIKit
+import iAd
 
 class UserProperties {
     
@@ -68,6 +69,10 @@ class UserProperties {
     
     static var deviceIdentifier: String? {
         return UIDevice.current.identifierForVendor?.uuidString
+    }
+    
+    class func appleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
+        ADClient.shared().requestAttributionDetails(completion)
     }
     
 }

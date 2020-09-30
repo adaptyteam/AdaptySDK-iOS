@@ -66,7 +66,7 @@ Adapty.logLevel = .verbose
 
 ## Advanced usage
 
-To get up and running with subscriptions and Adadty SDK follow our [Advanced usage section](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/AdvancedUsage.md).
+To get up and running with subscriptions and Adapty SDK follow our [Advanced usage section](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/AdvancedUsage.md).
 
 ## License
 

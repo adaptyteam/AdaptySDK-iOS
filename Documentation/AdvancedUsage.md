@@ -14,6 +14,7 @@
   + [Making purchases](#making-purchases)
   + [Restoring purchases](#restoring-purchases)
   + [Receipt validation](#receipt-validation)
+  + [Making deferred purchases](#making-deferred-purchases)
 * [Subscription status](#subscription-status)
   + [Getting user purchases info](#getting-user-purchases-info)
   + [Checking if a user is subscribed](#checking-if-a-user-is-subscribed)
@@ -135,33 +136,43 @@ Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) i
 }
 ```
 
+### Apple Search Ads
+
+The AdaptySDK can automatically collect Apple Search Ad attribution data. All you need is to add `AdaptyAppleSearchAdsAttributionCollectionEnabled` in the app’s Info.plist file and set it to `YES` (boolean value).
+
 ## Update your user attributes
 
-You can add optional information to your user, such as email, phone number, etc. or even update it with analytics ids to make tracking even more precise.
+You can add optional information to your user, such as email, phone number, etc. or update it with analytics ids to make tracking even more precise.
 
 ```Swift
-Adapty.updateProfile(email: "example@email.com",
-                     phoneNumber: "+1-###-###-####",
-                     facebookUserId: "###############",
-                     amplitudeUserId: "###",
-                     amplitudeDeviceId: "###",
-                     mixpanelUserId: "###",
-                     appmetricaProfileId: "###",
-                     appmetricaDeviceId: "###",
-                     firstName: "Test",
-                     lastName: "Test",
-                     gender: "",
-                     customAttributes: ["foo": "bar"],
-                     birthday: Date) { (error) in
-                        if error == nil {
-                            // successful update                              
-                        }
+Adapty.updateProfile(attributes: [AdaptyProfileKey.email: "example@email.com",
+                                  AdaptyProfileKey.phoneNumber: "+1-###-###-####",
+                                  ...
+                                  AdaptyProfileKey.<key>: <value>]) { (error) in
+                                    if error == nil {
+                                        // successful update                              
+                                    }
 }
 ```
 
-All properties are optional.  
-For **`gender`** possible values are: **`m`**, **`f`**, but you can also pass custom string value.  
-**`customAttributes`** is a `Dictionary?` object.
+Possible keys `.<key>` and their possible values described below:
+
+| Key  | Possible value |
+| -------- | ------------- |
+| email | String |
+| phoneNumber | String |
+| facebookUserId | String |
+| amplitudeUserId | String |
+| amplitudeDeviceId | String |
+| mixpanelUserId | String |
+| appmetricaProfileId | String|
+| appmetricaDeviceId | String |
+| firstName | String |
+| lastName | String |
+| gender | String, possible values are: **`m`**, **`f`**, but you can also pass custom string value |
+| birthday | Date |
+| customAttributes | Dictionary |
+| appTrackingTransparencyStatus | UInt, [app tracking transparency status](https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus/) you can receive starting from iOS 14. To receive it just call `let status = ATTrackingManager.AuthorizationStatus` – you should send this specific property to Adapty as soon as it changes, after you request it from user `Adapty.updateProfile(attributes: [AdaptyProfileKey.appTrackingTransparencyStatus: status.rawValue])`  |
 
 ## Displaying products
 
@@ -227,7 +238,7 @@ if let path = Bundle.main.path(forResource: "fallback_paywalls", ofType: "json")
 }
 ```
 
-**`paywalls`** is a string representationof your paywalls JSON list. 
+**`paywalls`** is a string representation of your paywalls JSON list. 
 
 ## Working with purchases
 
@@ -281,6 +292,27 @@ Adapty.validateReceipt("<receiptEncoded>") { (purchaserInfo, response, error) in
 **`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.  
 **`response`** is a `Dictionary?`, containing all info about receipt from AppStore.
 
+### Making deferred purchases
+
+For deferred purchases Adapty SDK has an optional delegate method, which is called when the user starts an in-app purchase in the App Store, and the transaction continues in your app.    
+Just store **`makeDeferredPurchase`** and call it later if you want to hold your purchase for now and show paywall to your user first as said in Apple's guidelines.    
+If you want to continue purchase, call **`makeDeferredPurchase`** at the same moment you got it.
+
+```Swift
+extension AppDelegate: AdaptyDelegate {
+
+    func paymentQueue(shouldAddStorePaymentFor product: ProductModel, defermentCompletion makeDeferredPurchase: @escaping DeferredPurchaseCompletion) {
+        // you can store makeDeferredPurchase callback and call it later as well
+        
+        // or you can call it right away
+        makeDeferredPurchase { (purchaserInfo, receipt, response, product, error) in
+            // check your purchase
+        }
+    }
+    
+}
+```
+
 ## Subscription status
 
 ### Getting user purchases info
@@ -326,7 +358,7 @@ extension AppDelegate: AdaptyDelegate {
 
 ## Promo campaigns
 
-Promo Campaigns designed for upselling in your app. Send promo offers with automated campaigns in push notifications.
+Promo Campaigns designed for upselling and win back lapsed customers in your app. Send promo offers with automated campaigns in push notifications.
 
 ### Listening for promo paywall updates
 
@@ -370,9 +402,9 @@ func application(_ application: UIApplication, didReceiveRemoteNotification user
 
 ## Method swizzling in Adapty
 
-The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag AdaptyAppDelegateProxyEnabled in the app’s Info.plist file and setting it to NO (boolean value).
+The Adapty SDK performs method swizzling for receiving your APNs token. Developers who prefer not to use swizzling can disable it by adding the flag `AdaptyAppDelegateProxyEnabled` in the app’s Info.plist file and setting it to `NO` (boolean value).
 
-If you have disabled method swizzling, you'll need to explicitly send your APNs to Adapty. Override the methods didRegisterForRemoteNotificationsWithDeviceToken to retrieve the APNs token, and then set Adapty's apnsToken property:
+If you have disabled method swizzling, you'll need to explicitly send your APNs to Adapty. Override the methods `didRegisterForRemoteNotificationsWithDeviceToken` to retrieve the APNs token, and then set Adapty's `apnsToken` property:
 
 ```Swift
 func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {

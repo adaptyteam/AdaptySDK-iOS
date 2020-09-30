@@ -65,6 +65,31 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func updateProfileAttributesButtonAction(_ sender: Any) {
+        setLoader(true)
+        Adapty.updateProfile(attributes: [AdaptyProfileKey.email: "email@email.com",
+                                          AdaptyProfileKey.phoneNumber: "+78888888888",
+                                          AdaptyProfileKey.facebookUserId: "facebookUserId-test",
+                                          AdaptyProfileKey.amplitudeUserId: "amplitudeUserId-test",
+                                          AdaptyProfileKey.amplitudeDeviceId: "amplitudeDeviceId-test",
+                                          AdaptyProfileKey.mixpanelUserId: "mixpanelUserId-test",
+                                          AdaptyProfileKey.appmetricaProfileId: "appmetricaProfileId-test",
+                                          AdaptyProfileKey.appmetricaDeviceId: "appmetricaDeviceId-test",
+                                          AdaptyProfileKey.firstName: "First Name",
+                                          AdaptyProfileKey.lastName: "Last Name",
+                                          AdaptyProfileKey.gender: "o",
+                                          AdaptyProfileKey.birthday: Date(),
+                                          AdaptyProfileKey.customAttributes: ["key1": "value1", "key2": "value2"],
+                                          AdaptyProfileKey.appTrackingTransparencyStatus: 1]) { (error) in
+                                            self.setLoader(false)
+                                            if let error = error {
+                                                self.infoLabel.text = "Failed to update user: \(error)"
+                                            } else {
+                                                self.infoLabel.text = "Successfully updated user"
+                                            }
+        }
+    }
+    
     @IBAction func updateAttributionButtonAction(_ sender: Any) {
         setLoader(true)
         let attribution = ["trackerToken": "test_trackerToken", "trackerName": "test_trackerName", "network": "test_network", "campaign": "test_campaign", "adgroup": "test_adgroup", "creative": "test_creative", "clickLabel": "test_clickLabel", "adid": "test_adid"]

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Adapty'
-  s.version          = '1.6.1'
+  s.version          = '1.6.3'
   s.summary          = 'Adapty SDK for iOS.'
 
   s.description      = <<-DESC
@@ -27,6 +27,6 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   
   s.source_files = 'Adapty/Classes/**/*'
 
-  s.frameworks = 'Foundation', 'AdSupport', 'UIKit', 'StoreKit'
-  s.dependency "CryptoSwift"
+  s.frameworks = 'Foundation', 'AdSupport', 'UIKit', 'StoreKit', 'iAd'
+  s.dependency 'CryptoSwift', '1.3.2'
 end

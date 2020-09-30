@@ -105,4 +105,13 @@ extension AppDelegate: AdaptyDelegate {
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "PromoUpdated"), object: promo)
     }
     
+    func paymentQueue(shouldAddStorePaymentFor product: ProductModel, defermentCompletion makeDeferredPurchase: @escaping DeferredPurchaseCompletion) {
+        // you can store makeDeferredPurchase callback and call it later as well
+        
+        // or you can call it right away in case you just want to continue purchase
+        makeDeferredPurchase { (purchaserInfo, receipt, response, product, error) in
+            // check your purchase
+        }
+    }
+    
 }

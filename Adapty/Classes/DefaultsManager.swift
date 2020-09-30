@@ -117,11 +117,21 @@ class DefaultsManager {
         }
     }
     
+    var appleSearchAdsSyncDate: Date? {
+        get {
+            return defaults.object(forKey: Constants.UserDefaults.appleSearchAdsSyncDate) as? Date
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.appleSearchAdsSyncDate)
+        }
+    }
+    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedTransactionsIds)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedPaywalls)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedProducts)
+        defaults.removeObject(forKey: Constants.UserDefaults.appleSearchAdsSyncDate)
     }
     
 }

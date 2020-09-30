@@ -39,6 +39,7 @@ extension IAPManagerError: LocalizedError {
 }
 
 public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: Error?) -> Void
+public typealias DeferredPurchaseCompletion = (BuyProductCompletion?) -> Void
 private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, completion: BuyProductCompletion?)
 
 class IAPManager: NSObject {
@@ -113,9 +114,13 @@ class IAPManager: NSObject {
     }
     
     private func getPaywallsAndSyncProducts() {
-        var topOffset: CGFloat = UIApplication.shared.statusBarFrame.height
-        if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
-            topOffset = safeAreaInsetsTop
+        var topOffset: CGFloat = 0
+        DispatchQueue.main.async {
+            if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
+                topOffset = safeAreaInsetsTop
+            } else {
+                topOffset = UIApplication.shared.statusBarFrame.height
+            }
         }
         
         paywallsRequest =
@@ -429,7 +434,7 @@ extension IAPManager: SKPaymentTransactionObserver {
             return
         }
 
-        let product = self.product(for: transaction)
+        let product = purchaseInfo?.product ?? self.product(for: transaction)
         
         var discount: ProductDiscountModel?
         if #available(iOS 12.2, *) {
@@ -532,6 +537,28 @@ extension IAPManager: SKPaymentTransactionObserver {
         } else {
             callRestoreCompletionAndCleanCallback(.failure(IAPManagerError.paymentWasCancelled))
         }
+    }
+    
+    func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
+        var json = ["vendor_product_id": product.productIdentifier]
+        if #available(iOS 12.2, *), let promotionalOfferId = payment.paymentDiscount?.identifier {
+            json["promotional_offer_id"] = promotionalOfferId
+        }
+        
+        guard let productModel = try? ProductModel(json: json) else {
+            return false
+        }
+        
+        productModel.skProduct = product
+        
+        Adapty.delegate?.paymentQueue?(shouldAddStorePaymentFor: productModel, defermentCompletion: { (completion) in
+            self.productsToBuy.append((product: productModel,
+                                       payment: payment,
+                                       completion: completion))
+            SKPaymentQueue.default().add(payment)
+        })
+        
+        return false
     }
     
 }

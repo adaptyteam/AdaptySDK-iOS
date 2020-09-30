@@ -13,14 +13,8 @@ import UIKit
     
     func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel)
     func didReceivePromo(_ promo: PromoModel)
+    @objc optional func paymentQueue(shouldAddStorePaymentFor product: ProductModel, defermentCompletion makeDeferredPurchase: @escaping DeferredPurchaseCompletion)
     
-}
-
-@objc public enum AttributionNetwork: UInt {
-    case adjust
-    case appsflyer
-    case branch
-    case custom
 }
 
 @objc public class Adapty: NSObject {
@@ -140,6 +134,11 @@ import UIKit
             // get current existing promo
             Self.getPromo()
         }
+        
+        // check if user enabled apple search ads attribution collection
+        if let appleSearchAdsAttributionCollectionEnabled = Bundle.main.infoDictionary?[Constants.BundleKeys.appleSearchAdsAttributionCollectionEnabled] as? Bool, appleSearchAdsAttributionCollectionEnabled {
+            updateAppleSearchAdsAttribution()
+        }
     }
     
     //MARK: - REST
@@ -181,43 +180,21 @@ import UIKit
         shared.createProfile(customerUserId, completion)
     }
     
-    @objc public class func updateProfile(
-        email: String? = nil,
-        phoneNumber: String? = nil,
-        facebookUserId: String? = nil,
-        amplitudeUserId: String? = nil,
-        amplitudeDeviceId: String? = nil,
-        mixpanelUserId: String? = nil,
-        appmetricaProfileId: String? = nil,
-        appmetricaDeviceId: String? = nil,
-        firstName: String? = nil,
-        lastName: String? = nil,
-        gender: String? = nil,
-        birthday: Date? = nil,
-        customAttributes: Parameters? = nil,
-        completion: ErrorCompletion? = nil)
-    {
+    @objc public class func updateProfile(attributes: [String: Any], completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
         let profileId = shared.profileId
         
-        var attributes = Parameters()
-        
-        if let email = email { attributes["email"] = email }
-        if let phoneNumber = phoneNumber { attributes["phone_number"] = phoneNumber }
-        if let facebookUserId = facebookUserId { attributes["facebook_user_id"] = facebookUserId }
-        if let amplitudeUserId = amplitudeUserId { attributes["amplitude_user_id"] = amplitudeUserId }
-        if let amplitudeDeviceId = amplitudeDeviceId { attributes["amplitude_device_id"] = amplitudeDeviceId }
-        if let mixpanelUserId = mixpanelUserId { attributes["mixpanel_user_id"] = mixpanelUserId }
-        if let appmetricaProfileId = appmetricaProfileId { attributes["appmetrica_profile_id"] = appmetricaProfileId }
-        if let appmetricaDeviceId = appmetricaDeviceId { attributes["appmetrica_device_id"] = appmetricaDeviceId }
-        if let firstName = firstName { attributes["first_name"] = firstName }
-        if let lastName = lastName { attributes["last_name"] = lastName }
-        if let gender = gender { attributes["gender"] = gender }
-        if let birthday = birthday { attributes["birthday"] = birthday.stringValue }
-        if let customAttributes = customAttributes { attributes["custom_attributes"] = customAttributes }
-        
-        let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: attributes)
+        var validatedAttributes = Parameters()
+        attributes.forEach {
+            if let value = $0.value as? Date {
+                validatedAttributes[$0.key] = value.stringValue
+            } else {
+                validatedAttributes[$0.key] = $0.value
+            }
+        }
+
+        let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: validatedAttributes)
         
         shared.apiManager.updateProfile(id: profileId, params: params) { (params, error) in
             completion?(error)
@@ -257,6 +234,21 @@ import UIKit
         }
     }
     
+    private func updateAppleSearchAdsAttribution() {
+        UserProperties.appleSearchAdsAttribution { (attribution, error) in
+            if let attribution = attribution,
+                let values = attribution.values.map({ $0 }).first as? Parameters,
+                let iAdAttribution = values["iad-attribution"] as? NSString,
+                // check if the user clicked an Apple Search Ads impression up to 30 days before app download
+                iAdAttribution.boolValue == true,
+                // check if this is an actual first sync
+                DefaultsManager.shared.appleSearchAdsSyncDate == nil
+            {
+                Self.updateAttribution(attribution, source: .appleSearchAds)
+            }
+        }
+    }
+    
     @objc public class func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionNetwork, networkUserId: String? = nil, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
@@ -269,6 +261,8 @@ import UIKit
             attributes["source"] = "appsflyer"
         case .branch:
             attributes["source"] = "branch"
+        case .appleSearchAds:
+            attributes["source"] = "apple_search_ads"
         case .custom:
             attributes["source"] = "custom"
         }
@@ -279,6 +273,10 @@ import UIKit
         let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAttribution, attributes: attributes)
         
         shared.apiManager.updateAttribution(id: shared.profileId, params: params) { (_, error) in
+            if source == .appleSearchAds && error == nil {
+                // mark appleSearchAds attribution data as synced
+                DefaultsManager.shared.appleSearchAdsSyncDate = Date()
+            }
             completion?(error)
         }
     }

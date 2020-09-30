@@ -9,6 +9,7 @@
 import Foundation
 
 struct Constants {
+    
     struct APIKeys {
         // ApiKey will be replaced during SDK active method
         static var secretKey = ""
@@ -46,6 +47,7 @@ struct Constants {
         static let purchaserInfo = "AdaptySDK_Purchaser_Info"
         static let cachedPaywalls = "AdaptySDK_Cached_Purchase_Containers"
         static let cachedProducts = "AdaptySDK_Cached_Products"
+        static let appleSearchAdsSyncDate = "AdaptySDK_Apple_Search_Ads_Sync_Date"
     }
     
     struct Versions {
@@ -54,6 +56,7 @@ struct Constants {
     
     struct BundleKeys {
         static let appDelegateProxyEnabled = "AdaptyAppDelegateProxyEnabled"
+        static let appleSearchAdsAttributionCollectionEnabled = "AdaptyAppleSearchAdsAttributionCollectionEnabled"
     }
     
     struct TypeNames {
@@ -68,4 +71,32 @@ struct Constants {
         static let source = "source"
         static let promoDeliveryId = "promo_delivery_id"
     }
+    
+}
+
+@objc public enum AttributionNetwork: UInt {
+    case adjust
+    case appsflyer
+    case branch
+    case appleSearchAds
+    case custom
+}
+
+public class AdaptyProfileKey: NSObject {
+    
+    @objc public static let email = "email"
+    @objc public static let phoneNumber = "phone_number"
+    @objc public static let facebookUserId = "facebook_user_id"
+    @objc public static let amplitudeUserId = "amplitude_user_id"
+    @objc public static let amplitudeDeviceId = "amplitude_device_id"
+    @objc public static let mixpanelUserId = "mixpanel_user_id"
+    @objc public static let appmetricaProfileId = "appmetrica_profile_id"
+    @objc public static let appmetricaDeviceId = "appmetrica_device_id"
+    @objc public static let firstName = "first_name"
+    @objc public static let lastName = "last_name"
+    @objc public static let gender = "gender"
+    @objc public static let birthday = "birthday"
+    @objc public static let customAttributes = "custom_attributes"
+    @objc public static let appTrackingTransparencyStatus = "att_status"
+    
 }
