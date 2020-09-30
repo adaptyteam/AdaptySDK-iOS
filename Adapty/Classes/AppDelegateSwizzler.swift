@@ -29,21 +29,21 @@ class AppDelegateSwizzler {
     }
     
     private init() {
-        if UIApplication.shared.isRegisteredForRemoteNotifications {
-            DispatchQueue.main.async {
+        DispatchQueue.main.async {
+            if UIApplication.shared.isRegisteredForRemoteNotifications {
                 UIApplication.shared.registerForRemoteNotifications()
             }
+            
+            guard
+                let originalClass = object_getClass(UIApplication.shared.delegate),
+                let swizzledClass = object_getClass(self)
+            else { return }
+            
+            let originalSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
+            let swizzledSelector = #selector(self.swizzled_application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
+            
+            self.swizzle(originalClass, swizzledClass, originalSelector, swizzledSelector)
         }
-        
-        guard
-            let originalClass = object_getClass(UIApplication.shared.delegate),
-            let swizzledClass = object_getClass(self)
-        else { return }
-        
-        let originalSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
-        let swizzledSelector = #selector(swizzled_application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
-        
-        swizzle(originalClass, swizzledClass, originalSelector, swizzledSelector)
     }
     
     private func swizzle(_ originalClass: AnyClass, _ swizzledClass: AnyClass, _ originalSelector: Selector, _ swizzledSelector: Selector) {

@@ -114,9 +114,13 @@ class IAPManager: NSObject {
     }
     
     private func getPaywallsAndSyncProducts() {
-        var topOffset: CGFloat = UIApplication.shared.statusBarFrame.height
-        if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
-            topOffset = safeAreaInsetsTop
+        var topOffset: CGFloat = 0
+        DispatchQueue.main.async {
+            if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
+                topOffset = safeAreaInsetsTop
+            } else {
+                topOffset = UIApplication.shared.statusBarFrame.height
+            }
         }
         
         paywallsRequest =
