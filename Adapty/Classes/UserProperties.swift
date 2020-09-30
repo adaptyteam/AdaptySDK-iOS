@@ -5,8 +5,9 @@
 //  Created by Andrey Kyashkin on 19/12/2019.
 //
 
-import Foundation
 import AdSupport
+import Foundation
+import UIKit
 import iAd
 
 class UserProperties {

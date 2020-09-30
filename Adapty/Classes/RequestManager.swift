@@ -6,6 +6,8 @@
 //  Copyright © 2019 Adapty. All rights reserved.
 //
 
+import Foundation
+
 enum HTTPMethod: String {
     case options = "OPTIONS"
     case get     = "GET"
