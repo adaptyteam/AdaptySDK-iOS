@@ -358,7 +358,7 @@ extension AppDelegate: AdaptyDelegate {
 
 ## Promo campaigns
 
-Promo Campaigns designed for upselling in your app. Send promo offers with automated campaigns in push notifications.
+Promo Campaigns designed for upselling and win back lapsed customers in your app. Send promo offers with automated campaigns in push notifications.
 
 ### Listening for promo paywall updates
 
