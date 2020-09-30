@@ -8,6 +8,7 @@
 
 * [Requirements](#requirements)
 * [Installation](#installation)
+  + [Swift Package Manager](#swift-package-manager)
   + [CocoaPods](#cocoapods)
 * [Configure your app](#configure-your-app)
 * [Debugging](#debugging)
@@ -29,9 +30,15 @@
 - iOS 9.0+
 - Xcode 10.2+
 
-You can also use Adapty SDK in Objective-C applications.
+You can also use Adapty SDK in Swift and Objective-C applications.
 
 ## Installation
+
+### Swift Package Manager
+
+1. In Xcode go to `File` > `Swift Packages` > `Add Package Dependency...`
+2. Enter `https://github.com/adaptyteam/AdaptySDK-iOS.git` 
+3. Choose a version and click `Next` and Xcode will add the package dependency to your project.
 
 ### CocoaPods
 
