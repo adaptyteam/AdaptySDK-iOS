@@ -290,6 +290,7 @@
 		D3671634F0E0F028E24725ACB4F288AB /* ADJPackageBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D8BC55E57E5D91217C217B572292EA0 /* ADJPackageBuilder.m */; };
 		D4754369A1E587E4553C0456F34295F8 /* ADJTimerCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = F0A78551496AA9D3297154A0647552F8 /* ADJTimerCycle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D4BCBB7FC8A812EBA8AA014327A3CAE8 /* ADJSdkClickHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A78B6904F0B9A9C8B599CBA0D9494EE /* ADJSdkClickHandler.m */; };
+		D656CA5A2526326D00163BDA /* ProfileParameterBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D656CA592526326D00163BDA /* ProfileParameterBuilder.swift */; };
 		D65757C32481276B0055A431 /* PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65757C22481276B0055A431 /* PaywallViewController.swift */; };
 		D85C329C4C1FED340DED6119AF14F36F /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28724D78F4ECC9CA41462124FFB2077 /* String+Extension.swift */; };
 		D86D0A6E97F4D1FDA92BEC36A27AF823 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 497F89AEE85175FDBDB4F853FF518D57 /* AdSupport.framework */; };
@@ -725,6 +726,7 @@
 		D4E018A2FE92A36EEF9116A1F1CBFC3A /* BranchContentDiscoveryManifest.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BranchContentDiscoveryManifest.m; path = "Branch-SDK/Branch-SDK/BranchContentDiscoveryManifest.m"; sourceTree = "<group>"; };
 		D52350024803A66F81DC08C1D90A4B47 /* BNCCommerceEvent.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCCommerceEvent.m; path = "Branch-SDK/Branch-SDK/BNCCommerceEvent.m"; sourceTree = "<group>"; };
 		D65460AD52789CEA500680ED8E2B3222 /* Adjust-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Adjust-umbrella.h"; sourceTree = "<group>"; };
+		D656CA592526326D00163BDA /* ProfileParameterBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProfileParameterBuilder.swift; path = Adapty/Classes/ProfileParameterBuilder.swift; sourceTree = "<group>"; };
 		D65757C22481276B0055A431 /* PaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PaywallViewController.swift; path = Adapty/Classes/PaywallViewController.swift; sourceTree = "<group>"; };
 		D65DC95424D03397009A3D53 /* Models.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = Models.md; path = Documentation/Models.md; sourceTree = "<group>"; };
 		D65DC95524D03416009A3D53 /* AdvancedUsage.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = AdvancedUsage.md; path = Documentation/AdvancedUsage.md; sourceTree = "<group>"; };
@@ -928,6 +930,7 @@
 				AF2DD325A358D73BF048C914598F18B5 /* ResponseErrorModel.swift */,
 				4A6C5CB1D95294CBCF2EEF9749B1F615 /* Router.swift */,
 				B5BF756FBB681D92402068CDBF5ABCE5 /* SessionsManager.swift */,
+				D656CA592526326D00163BDA /* ProfileParameterBuilder.swift */,
 				88F7A37FB9DA5030C808EDB6922D8DE4 /* UserProperties.swift */,
 				D65757C22481276B0055A431 /* PaywallViewController.swift */,
 				D65DC95324D02CD0009A3D53 /* Documentation */,
@@ -1814,6 +1817,7 @@
 				6C55D070C1B6A7D94C2A0C6EB54D6A8A /* IAPManager.swift in Sources */,
 				2E17E9D5B24947FEF56C566F15C8B44A /* InstallationModel.swift in Sources */,
 				8043011242FA1DD0A234D168EDF50F67 /* JSONCodable.swift in Sources */,
+				D656CA5A2526326D00163BDA /* ProfileParameterBuilder.swift in Sources */,
 				86E2EBEC13B920D734E43AF92B0421DA /* JSONModel.swift in Sources */,
 				028B401AB094673B61C2CE14791988AA /* KinesisManager.swift in Sources */,
 				E331960141CC145A483A96AE4DAD79D4 /* LoggerManager.swift in Sources */,

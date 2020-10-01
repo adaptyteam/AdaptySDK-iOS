@@ -81,22 +81,3 @@ struct Constants {
     case appleSearchAds
     case custom
 }
-
-public class AdaptyProfileKey: NSObject {
-    
-    @objc public static let email = "email"
-    @objc public static let phoneNumber = "phone_number"
-    @objc public static let facebookUserId = "facebook_user_id"
-    @objc public static let amplitudeUserId = "amplitude_user_id"
-    @objc public static let amplitudeDeviceId = "amplitude_device_id"
-    @objc public static let mixpanelUserId = "mixpanel_user_id"
-    @objc public static let appmetricaProfileId = "appmetrica_profile_id"
-    @objc public static let appmetricaDeviceId = "appmetrica_device_id"
-    @objc public static let firstName = "first_name"
-    @objc public static let lastName = "last_name"
-    @objc public static let gender = "gender"
-    @objc public static let birthday = "birthday"
-    @objc public static let customAttributes = "custom_attributes"
-    @objc public static let appTrackingTransparencyStatus = "att_status"
-    
-}

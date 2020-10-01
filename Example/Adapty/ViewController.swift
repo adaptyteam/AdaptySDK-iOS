@@ -67,26 +67,15 @@ class ViewController: UIViewController {
     
     @IBAction func updateProfileAttributesButtonAction(_ sender: Any) {
         setLoader(true)
-        Adapty.updateProfile(attributes: [AdaptyProfileKey.email: "email@email.com",
-                                          AdaptyProfileKey.phoneNumber: "+78888888888",
-                                          AdaptyProfileKey.facebookUserId: "facebookUserId-test",
-                                          AdaptyProfileKey.amplitudeUserId: "amplitudeUserId-test",
-                                          AdaptyProfileKey.amplitudeDeviceId: "amplitudeDeviceId-test",
-                                          AdaptyProfileKey.mixpanelUserId: "mixpanelUserId-test",
-                                          AdaptyProfileKey.appmetricaProfileId: "appmetricaProfileId-test",
-                                          AdaptyProfileKey.appmetricaDeviceId: "appmetricaDeviceId-test",
-                                          AdaptyProfileKey.firstName: "First Name",
-                                          AdaptyProfileKey.lastName: "Last Name",
-                                          AdaptyProfileKey.gender: "o",
-                                          AdaptyProfileKey.birthday: Date(),
-                                          AdaptyProfileKey.customAttributes: ["key1": "value1", "key2": "value2"],
-                                          AdaptyProfileKey.appTrackingTransparencyStatus: 1]) { (error) in
-                                            self.setLoader(false)
-                                            if let error = error {
-                                                self.infoLabel.text = "Failed to update user: \(error)"
-                                            } else {
-                                                self.infoLabel.text = "Successfully updated user"
-                                            }
+        let params =
+            ProfileParameterBuilder().withEmail("email@email.com").withPhoneNumber("+78888888888").withFacebookUserId("facebookUserId-test").withAmplitudeUserId("amplitudeUserId-test").withAmplitudeDeviceId("amplitudeDeviceId-test").withMixpanelUserId("mixpanelUserId-test").withAppmetricaProfileId("appmetricaProfileId-test").withAppmetricaDeviceId("appmetricaDeviceId-test").withFirstName("First Name").withLastName("Last Name").withGender(.other).withBirthday(Date()).withCustomAttributes(["key1": "value1", "key2": "value2"]).withAppTrackingTransparencyStatus(1)
+        Adapty.updateProfile(params: params) { (error) in
+            self.setLoader(false)
+            if let error = error {
+                self.infoLabel.text = "Failed to update user: \(error)"
+            } else {
+                self.infoLabel.text = "Successfully updated user"
+            }
         }
     }
     

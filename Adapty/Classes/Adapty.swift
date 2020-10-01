@@ -180,21 +180,12 @@ import UIKit
         shared.createProfile(customerUserId, completion)
     }
     
-    @objc public class func updateProfile(attributes: [String: Any], completion: ErrorCompletion? = nil) {
+    @objc public class func updateProfile(params: ProfileParameterBuilder, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
         let profileId = shared.profileId
-        
-        var validatedAttributes = Parameters()
-        attributes.forEach {
-            if let value = $0.value as? Date {
-                validatedAttributes[$0.key] = value.stringValue
-            } else {
-                validatedAttributes[$0.key] = $0.value
-            }
-        }
 
-        let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: validatedAttributes)
+        let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: params.toDictionary())
         
         shared.apiManager.updateProfile(id: profileId, params: params) { (params, error) in
             completion?(error)

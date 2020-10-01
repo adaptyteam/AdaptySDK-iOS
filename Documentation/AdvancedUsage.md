@@ -145,13 +145,11 @@ The AdaptySDK can automatically collect Apple Search Ad attribution data. All yo
 You can add optional information to your user, such as email, phone number, etc. or update it with analytics ids to make tracking even more precise.
 
 ```Swift
-Adapty.updateProfile(attributes: [AdaptyProfileKey.email: "example@email.com",
-                                  AdaptyProfileKey.phoneNumber: "+1-###-###-####",
-                                  ...
-                                  AdaptyProfileKey.<key>: <value>]) { (error) in
-                                    if error == nil {
-                                        // successful update                              
-                                    }
+let params = ProfileParameterBuilder().withEmail("example@email.com").withPhoneNumber("+1-###-###-####")...with<Key>(<value>)
+Adapty.updateProfile(params: params) { (error) in
+    if error == nil {
+        // successful update                              
+    }
 }
 ```
 
@@ -169,7 +167,7 @@ Possible keys `.<key>` and their possible values described below:
 | appmetricaDeviceId | String |
 | firstName | String |
 | lastName | String |
-| gender | String, possible values are: **`m`**, **`f`**, but you can also pass custom string value |
+| gender | enum Gender, possible values are: **`female`**, **`male`** and **`other`** |
 | birthday | Date |
 | customAttributes | Dictionary |
 | appTrackingTransparencyStatus | UInt, [app tracking transparency status](https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus/) you can receive starting from iOS 14. To receive it just call `let status = ATTrackingManager.AuthorizationStatus` – you should send this specific property to Adapty as soon as it changes, after you request it from user `Adapty.updateProfile(attributes: [AdaptyProfileKey.appTrackingTransparencyStatus: status.rawValue])`  |
