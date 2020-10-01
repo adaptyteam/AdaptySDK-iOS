@@ -9,12 +9,29 @@ import Foundation
 
 public class PaywallModel: NSObject, JSONCodable, Codable {
     
+    enum CodingKeys: String, CodingKey {
+        case developerId
+        case variationId
+        case revision
+        case isPromo
+        case products
+        case visualPaywall
+        case internalCustomPayload
+    }
+    
     @objc public var developerId: String
     @objc public var variationId: String
     @objc public var revision: Int = 0
     @objc public var isPromo: Bool = false
     @objc public var products: [ProductModel] = []
     @objc public var visualPaywall: String = ""
+    private var internalCustomPayload: String = ""
+    @objc public lazy var customPayload: Parameters = {
+        if let data = self.internalCustomPayload.data(using: .utf8), let customPayload = try? JSONSerialization.jsonObject(with: data, options: []) as? Parameters {
+            return customPayload
+        }
+        return Parameters()
+    }()
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -36,6 +53,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         if let revision = attributes?["revision"] as? Int { self.revision = revision }
         if let isPromo = attributes?["is_promo"] as? Bool { self.isPromo = isPromo }
         if let visualPaywall = attributes?["visual_paywall"] as? String { self.visualPaywall = visualPaywall }
+        if let internalCustomPayload = attributes?["custom_payload"] as? String { self.internalCustomPayload = internalCustomPayload }
         
         guard let products = attributes?["products"] as? [Parameters] else {
             throw SerializationError.missing("PaywallModel - products")
@@ -60,7 +78,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.developerId == object.developerId && self.variationId == object.variationId && self.revision == object.revision && self.isPromo == object.isPromo && self.products == object.products
+        return self.developerId == object.developerId && self.variationId == object.variationId && self.revision == object.revision && self.isPromo == object.isPromo && self.products == object.products && self.visualPaywall == object.visualPaywall && self.internalCustomPayload == object.internalCustomPayload
     }
     
 }

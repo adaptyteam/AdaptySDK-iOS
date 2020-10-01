@@ -136,6 +136,7 @@ This model contains info about paywall.
 | isPromo | If this paywall is actually related to [`PromoModel`](#promomodel). |
 | products | An array of [`ProductModel`](#productmodel) related to this paywall. |
 | visualPaywall | HTML representation of the paywall. |
+| customPayload | Dictionary of paywall's custom properties. |
 
 ## `PromoModel`
 

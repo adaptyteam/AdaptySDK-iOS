@@ -12,11 +12,16 @@ public class ProductModel: NSObject, JSONCodable, Codable {
     
     enum CodingKeys: String, CodingKey {
         case vendorProductId
+        case introductoryOfferEligibility
+        case promotionalOfferEligibility
+        case promotionalOfferId
+        case variationId
         case localizedDescription
         case localizedTitle
         case price
         case currencyCode
         case currencySymbol
+        case regionCode
         case subscriptionPeriod
         case introductoryDiscount
         case subscriptionGroupIdentifier
