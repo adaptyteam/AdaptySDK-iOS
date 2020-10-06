@@ -11,21 +11,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- AppsFlyer allows you to track and attribute installs originating
+ AppsFlyer allows you to log and attribute installs originating
  from cross promotion campaigns of your existing apps.
  Afterwards, you can optimize on your cross-promotion traffic to get even better results.
  */
 @interface AppsFlyerCrossPromotionHelper : NSObject
 
 /**
- To track an impression use the following API call.
+ To log an impression use the following API call.
  Make sure to use the promoted App ID as it appears within the AppsFlyer dashboard.
- 
+
  @param appID Promoted App ID
  @param campaign A campaign name
- */
-+ (void)trackCrossPromoteImpression:(nonnull NSString *)appID
-                           campaign:(nullable NSString *)campaign;
+ @param parameters Additional params like `@{@"af_sub1": @"val", @"custom_param": @"val2" }`
+*/
++ (void)logCrossPromoteImpression:(nonnull NSString *)appID
+                         campaign:(nullable NSString *)campaign
+                       parameters:(nullable NSDictionary *)parameters;
 
 /**
  iOS allows you to utilize the StoreKit component to open
@@ -37,10 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
  @param parameters Additional params like `@{@"af_sub1": @"val", @"custom_param": @"val2" }`
  @param openStoreBlock Contains promoted `clickURL`
  */
-+ (void)trackAndOpenStore:(nonnull NSString *)appID
-                 campaign:(nullable NSString *)campaign
-                paramters:(nullable NSDictionary *)parameters
-                openStore:(void (^)(NSURLSession *urlSession, NSURL *clickURL))openStoreBlock;
++ (void)logAndOpenStore:(nonnull NSString *)appID
+               campaign:(nullable NSString *)campaign
+             parameters:(nullable NSDictionary *)parameters
+              openStore:(void (^)(NSURLSession *urlSession, NSURL *clickURL))openStoreBlock;
 
 @end
 

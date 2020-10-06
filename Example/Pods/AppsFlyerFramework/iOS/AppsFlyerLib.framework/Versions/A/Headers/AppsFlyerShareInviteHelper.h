@@ -25,10 +25,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)generateInviteUrlWithLinkGenerator:(AppsFlyerLinkGenerator *(^)(AppsFlyerLinkGenerator *generator))generatorCreator completionHandler:(void (^)(NSURL *_Nullable url))completionHandler;
 
 /**
- *  It is recommended to generate an in-app event after the invite is sent to track the invites from the senders' perspective. 
+ *  It is recommended to generate an in-app event after the invite is sent to log the invites from the senders' perspective. 
  *  This enables you to find the users that tend most to invite friends, and the media sources that get you these users.
  */
-+ (void)trackInvite:(nullable NSString *)channel parameters:(nullable NSDictionary *)parameters;
++ (void)logInvite:(nullable NSString *)channel parameters:(nullable NSDictionary *)parameters;
 
 @end
 

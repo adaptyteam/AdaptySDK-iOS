@@ -80,6 +80,7 @@ Good mood
   PKCS#5
 | [PKCS#7](http://tools.ietf.org/html/rfc5652#section-6.3)
 | [Zero padding](https://en.wikipedia.org/wiki/Padding_(cryptography)#Zero_padding)
+| [ISO78164](http://www.embedx.com/pdfs/ISO_STD_7816/info_isoiec7816-4%7Bed21.0%7Den.pdf)
 | No padding
 
 #### Authenticated Encryption with Associated Data (AEAD)
@@ -159,7 +160,7 @@ Run `carthage` to build the framework and drag the built CryptoSwift.framework i
 You can use [Swift Package Manager](https://swift.org/package-manager/) and specify dependency in `Package.swift` by adding this:
 
 ```swift
-.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMinor(from: "1.0"))
+.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMinor(from: "1.3.1"))
 ```
 
 See: [Package.swift - manual](http://blog.krzyzanowskim.com/2016/08/09/package-swift-manual/)
@@ -437,7 +438,7 @@ do {
     let aes = try AES(key: key, blockMode: gcm, padding: .noPadding)
     let encrypted = try aes.encrypt(plaintext)
     let tag = gcm.authenticationTag
-catch {
+} catch {
     // failed
 }
 ```
