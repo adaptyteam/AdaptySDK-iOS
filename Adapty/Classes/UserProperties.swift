@@ -22,11 +22,6 @@ class UserProperties {
     }
     
     static var idfa: String? {
-        // Check whether advertising tracking is enabled
-        guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
-            return nil
-        }
-        
         // Get and return IDFA
         return ASIdentifierManager.shared().advertisingIdentifier.uuidString
     }
