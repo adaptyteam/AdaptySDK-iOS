@@ -18,10 +18,13 @@ import Foundation
 extension Data {
   /// Two octet checksum as defined in RFC-4880. Sum of all octets, mod 65536
   public func checksum() -> UInt16 {
-    let s = self.withUnsafeBytes { buf in
-        return buf.lazy.map(UInt32.init).reduce(UInt32(0), +)
+    var s: UInt32 = 0
+    let bytesArray = bytes
+    for i in 0 ..< bytesArray.count {
+      s = s + UInt32(bytesArray[i])
     }
-    return UInt16(s % 65535)
+    s = s % 65536
+    return UInt16(s)
   }
 
   public func md5() -> Data {

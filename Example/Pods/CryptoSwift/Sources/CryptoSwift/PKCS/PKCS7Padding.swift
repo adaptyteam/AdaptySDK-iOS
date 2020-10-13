@@ -30,10 +30,14 @@ struct PKCS7Padding: PaddingProtocol {
     var withPadding = bytes
     if padding == 0 {
       // If the original data is a multiple of N bytes, then an extra block of bytes with value N is added.
-      withPadding += Array<UInt8>(repeating: UInt8(blockSize), count: Int(blockSize))
+      for _ in 0..<blockSize {
+        withPadding += Array<UInt8>(arrayLiteral: UInt8(blockSize))
+      }
     } else {
       // The value of each added byte is the number of bytes that are added
-      withPadding += Array<UInt8>(repeating: padding, count: Int(padding))
+      for _ in 0..<padding {
+        withPadding += Array<UInt8>(arrayLiteral: UInt8(padding))
+      }
     }
     return withPadding
   }

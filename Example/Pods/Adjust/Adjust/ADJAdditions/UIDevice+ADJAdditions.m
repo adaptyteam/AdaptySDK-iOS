@@ -158,7 +158,9 @@
     return @"";
 }
 
-- (void)adjCheckForiAd:(ADJActivityHandler *)activityHandler {
+- (void)adjCheckForiAd:(ADJActivityHandler *)activityHandler
+       iAdTimeoutTimer:(ADJTimerOnce *)iAdTimeoutTimer
+{
     // if no tries for iad v3 left, stop trying
     id<ADJLogger> logger = [ADJAdjustFactory logger];
 
@@ -190,7 +192,8 @@
     [logger debug:@"iAd framework successfully found in user's app"];
 
     BOOL iAdInformationAvailable = [self setiAdWithDetails:activityHandler
-                                   adcClientSharedInstance:ADClientSharedClientInstance];
+                                   adcClientSharedInstance:ADClientSharedClientInstance
+                                           iAdTimeoutTimer:iAdTimeoutTimer];
 
     if (!iAdInformationAvailable) {
         [logger warn:@"iAd information not available"];
@@ -201,7 +204,9 @@
 }
 
 - (BOOL)setiAdWithDetails:(ADJActivityHandler *)activityHandler
-  adcClientSharedInstance:(id)ADClientSharedClientInstance {
+  adcClientSharedInstance:(id)ADClientSharedClientInstance
+          iAdTimeoutTimer:(ADJTimerOnce *)iAdTimeoutTimer
+{
     SEL iAdDetailsSelector = NSSelectorFromString(@"requestAttributionDetailsWithBlock:");
     if (![ADClientSharedClientInstance respondsToSelector:iAdDetailsSelector]) {
         return NO;
@@ -215,6 +220,8 @@
                                                                             error:error];
                                        }];
 #pragma clang diagnostic pop
+    [iAdTimeoutTimer startIn:5.0];
+
     return YES;
 }
 

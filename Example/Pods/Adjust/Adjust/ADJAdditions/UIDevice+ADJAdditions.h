@@ -20,5 +20,6 @@
 - (NSString *)adjDeviceName;
 - (NSString *)adjCreateUuid;
 - (NSString *)adjVendorId;
-- (void)adjCheckForiAd:(ADJActivityHandler *)activityHandler;
+- (void)adjCheckForiAd:(ADJActivityHandler *)activityHandler
+       iAdTimeoutTimer:(ADJTimerOnce *)iAdTimeoutTimer;
 @end
