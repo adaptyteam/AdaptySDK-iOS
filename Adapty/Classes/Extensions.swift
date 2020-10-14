@@ -230,3 +230,15 @@ extension Locale {
     }
     
 }
+
+extension UIApplication {
+    
+    static var topOffset: CGFloat {
+        if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
+            return safeAreaInsetsTop
+        } else {
+            return UIApplication.shared.statusBarFrame.height
+        }
+    }
+    
+}
