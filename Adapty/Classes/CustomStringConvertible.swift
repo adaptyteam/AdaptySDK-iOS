@@ -47,7 +47,6 @@ extension ProductModel {
             "subscriptionGroupIdentifier": subscriptionGroupIdentifier,
             "discounts": discounts,
             "localizedPrice": localizedPrice,
-            "discounts": discounts,
             "localizedSubscriptionPeriod": localizedSubscriptionPeriod
         ]
 
