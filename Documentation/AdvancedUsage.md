@@ -101,7 +101,7 @@ To integrate with [AppsFlyer](https://www.appsflyer.com/), just pass attribution
 ```Swift
 import AppsFlyerLib
 
-# AppsFlyer v5 (AppsFlyerTrackerDelegate)
+// AppsFlyer v5 (AppsFlyerTrackerDelegate)
 extension AppDelegate: AppsFlyerTrackerDelegate {
     func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
         // It's important to include the network user ID
@@ -109,7 +109,7 @@ extension AppDelegate: AppsFlyerTrackerDelegate {
     }
 }
 
-# AppsFlyer v6 (AppsFlyerLibDelegate)
+// AppsFlyer v6 (AppsFlyerLibDelegate)
 extension AppDelegate: AppsFlyerLibDelegate {
     func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
         // It's important to include the network user ID
