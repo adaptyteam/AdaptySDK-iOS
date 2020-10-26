@@ -96,7 +96,7 @@ extension AppDelegate: AdjustDelegate {
 
 ### AppsFlyer integration
 
-To integrate with [AppsFlyer](https://www.appsflyer.com/), just pass attribution you receive from delegate method of Adjust iOS SDK.
+To integrate with [AppsFlyer](https://www.appsflyer.com/), just pass attribution you receive from delegate method of AppsFlyer iOS SDK.
 
 ```Swift
 import AppsFlyerLib

@@ -379,7 +379,7 @@ extension IAPManager: SKProductsRequestDelegate {
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        callPaywallsCompletionAndCleanCallback(.failure(IAPManagerError.productRequestFailed))
+        callPaywallsCompletionAndCleanCallback(.failure(error))
     }
     
 }
