@@ -275,7 +275,7 @@ Adapty handles subscription offers signing for you as well.
 You can restore user's purchases and if there is some, it will appear in her [purchases info](#subscription-status).
 
 ```Swift
-Adapty.restorePurchases { (error) in
+Adapty.restorePurchases { (purchaserInfo, receipt, appleValidationResult, error) in
     if error == nil {
         // successful restore
     }

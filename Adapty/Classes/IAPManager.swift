@@ -39,6 +39,7 @@ extension IAPManagerError: LocalizedError {
 }
 
 public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: Error?) -> Void
+public typealias RestorePurchasesCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ error: Error?) -> Void
 public typealias DeferredPurchaseCompletion = (BuyProductCompletion?) -> Void
 private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, completion: BuyProductCompletion?)
 
@@ -81,7 +82,7 @@ class IAPManager: NSObject {
     private var productsToBuy: [PurchaseInfoTuple] = []
 
     private var totalRestoredPurchases = 0
-    private var restorePurchasesCompletion: ErrorCompletion?
+    private var restorePurchasesCompletion: RestorePurchasesCompletion?
     
     private var apiManager: ApiManager
     
@@ -212,7 +213,7 @@ class IAPManager: NSObject {
         }
     }
     
-    func restorePurchases(_ completion: ErrorCompletion? = nil) {
+    func restorePurchases(_ completion: RestorePurchasesCompletion? = nil) {
         restorePurchasesCompletion = completion
         totalRestoredPurchases = 0
         SKPaymentQueue.default().restoreCompletedTransactions()
@@ -324,15 +325,15 @@ private extension IAPManager {
         }
     }
     
-    private func callRestoreCompletionAndCleanCallback(_ result: Result<Bool, Error>) {
+    private func callRestoreCompletionAndCleanCallback(_ result: Result<(purchaserInfo: PurchaserInfoModel?, receipt: String, response: Parameters?), Error>) {
         DispatchQueue.main.async {
             switch result {
-            case .success:
+            case .success(let result):
                 LoggerManager.logMessage("Successfully restored purchases.")
-                self.restorePurchasesCompletion?(nil)
+                self.restorePurchasesCompletion?(result.purchaserInfo, result.receipt, result.response, nil)
             case .failure(let error):
                 LoggerManager.logError("Failed to restore purchases.\n\(error.localizedDescription)")
-                self.restorePurchasesCompletion?(error)
+                self.restorePurchasesCompletion?(nil, nil, nil, error)
             }
             
             self.restorePurchasesCompletion = nil
@@ -517,11 +518,11 @@ extension IAPManager: SKPaymentTransactionObserver {
             return
         }
         
-        Adapty.validateReceipt(receipt) { (_, _, error) in
+        Adapty.validateReceipt(receipt) { (purchaserInfo, appleValidationResult, error) in
             if let error = error {
                 self.callRestoreCompletionAndCleanCallback(.failure(error))
             } else {
-                self.callRestoreCompletionAndCleanCallback(.success(true))
+                self.callRestoreCompletionAndCleanCallback(.success((purchaserInfo, receipt, appleValidationResult)))
             }
         }
     }

@@ -300,7 +300,7 @@ import UIKit
         }
     }
     
-    @objc public class func restorePurchases(completion: @escaping ErrorCompletion) {
+    @objc public class func restorePurchases(completion: @escaping RestorePurchasesCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
         shared.iapManager.restorePurchases(completion)

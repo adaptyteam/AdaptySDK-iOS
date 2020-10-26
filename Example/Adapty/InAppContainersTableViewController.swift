@@ -36,7 +36,7 @@ class InAppContainersTableViewController: UIViewController {
     
     @IBAction func restoreButtonAction(_ sender: Any) {
         setUI(enabled: false)
-        Adapty.restorePurchases { (error) in
+        Adapty.restorePurchases { (purchaserInfo, receipt, appleValidationResult, error) in
             self.setUI(enabled: true)
             self.showAlert(for: error)
         }
