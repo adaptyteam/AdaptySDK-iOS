@@ -18,7 +18,7 @@ class InAppTableViewCell: UITableViewCell {
     weak var delegate: InAppTableViewCellDelegate?
     var product: ProductModel? {
         didSet {
-            titleLabel.text = "\(product?.localizedTitle ?? "[Missing title in AppStore connect]") for \(product?.localizedPrice ?? "[Missing price]")"
+            titleLabel.text = "\(product?.localizedTitle ?? "[Missing title in AppStore connect]") for \(product?.localizedPrice ?? "[Missing price]") / \(product?.localizedSubscriptionPeriod ?? "[Missing subscription period]")"
             
             if product?.discounts.count != 0 {
                 discountLabel.text = "Use discount"
