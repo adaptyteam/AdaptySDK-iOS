@@ -177,6 +177,7 @@ extension SKProductSubscriptionPeriod {
     func localizedPeriod(for locale: Locale) -> String? {
         switch unit {
         case .day:
+            if numberOfUnits == 7 { return locale.localizedComponents(weekOfMonth: 1) }
             return locale.localizedComponents(day: numberOfUnits)
         case .week:
             return locale.localizedComponents(weekOfMonth: numberOfUnits)
