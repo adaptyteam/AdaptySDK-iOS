@@ -364,12 +364,7 @@ import UIKit
     private func syncTransactionsHistory() {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        guard let receipt = iapManager.latestReceipt else {
-            return
-        }
-        
-        Self.validateReceipt(receipt) { _, _, _  in
-        }
+        iapManager.syncTransactionsHistory()
     }
     
     @objc public class func getPurchaserInfo(_ completion: @escaping CahcedPurchaserCompletion) {
@@ -457,6 +452,8 @@ import UIKit
     }
     
     @objc public class func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
         shared.iapManager.setFallbackPaywalls(paywalls, completion: completion)
     }
     

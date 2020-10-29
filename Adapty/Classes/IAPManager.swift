@@ -239,6 +239,15 @@ class IAPManager: NSObject {
         return receipt
     }
     
+    func syncTransactionsHistory() {
+        guard let receipt = latestReceipt else {
+            return
+        }
+        
+        Adapty.validateReceipt(receipt) { _, _, _  in
+        }
+    }
+    
     private func createPayment(from product: ProductModel, skProduct: SKProduct, completion: BuyProductCompletion? = nil) {
         let payment = SKPayment(product: skProduct)
         
@@ -560,6 +569,10 @@ extension IAPManager: SKPaymentTransactionObserver {
         })
         
         return false
+    }
+    
+    func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
+        syncTransactionsHistory()
     }
     
 }
