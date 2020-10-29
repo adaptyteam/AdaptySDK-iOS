@@ -84,6 +84,11 @@ This model contains information about user and his payment status.
 | isInGracePeriod | Boolean indicating whether auto renewable subscription is in grace period. |
 | unsubscribedAt | The ISO 8601 datetime when auto renewable subscription was cancelled. Subscription can still be active, it just means that auto renewal turned off. Will set to null if the user reactivates subscription. |
 | billingIssueDetectedAt | The ISO 8601 datetime when billing issue was detected (vendor was not able to charge the card). Subscription can still be active. Will set to null if the charge was successful. |
+| vendorTransactionId | Transaction id of the purchase that unlocked this access level. |
+| vendorOriginalTransactionId | Original transaction id of the purchase that unlocked this access level. For auto-renewable subscription, this will be the id of the first transaction in the subscription. |
+| startsAt | The ISO 8601 datetime when the access level has started (could be in the future). |
+| cancellationReason | The reason why the subscription was cancelled. Possible values are: **voluntarily_cancelled**, **billing_error**, **refund**, **price_increase**, **product_was_not_available**, **unknown**. |
+| isRefund | Whether the purchase was refunded. |
 
 ### `SubscriptionsInfoModel`
 
@@ -108,6 +113,8 @@ This model contains information about user and his payment status.
 | isSandbox | Boolean indicating whether the product was purchased in sandbox or production environment. |
 | vendorTransactionId | Transaction id in vendor system. |
 | vendorOriginalTransactionId | Original transaction id in vendor system. For auto renewable subscription this will be id of the first transaction in the subscription. |
+| cancellationReason | The reason why the subscription was cancelled. Possible values are: **voluntarily_cancelled**, **billing_error**, **refund**, **price_increase**, **product_was_not_available**, **unknown**. |
+| isRefund | Whether the purchase was refunded. |
 
 ### `NonSubscriptionsInfoModel`
 
@@ -123,6 +130,7 @@ This model contains information about user and his payment status.
 | isSandbox | Boolean indicating whether the product was purchased in sandbox or production environment. |
 | vendorTransactionId | Transaction id in vendor system. |
 | vendorOriginalTransactionId | Original transaction id in vendor system. For auto renewable subscription this will be id of the first transaction in the subscription. |
+| isRefund | Whether the purchase was refunded. |
 
 ## `PaywallModel`
 

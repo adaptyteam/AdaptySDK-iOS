@@ -179,7 +179,7 @@ Possible keys `.<key>` and their possible values described below:
 | gender | enum Gender, possible values are: **`female`**, **`male`** and **`other`** |
 | birthday | Date |
 | customAttributes | Dictionary |
-| appTrackingTransparencyStatus | UInt, [app tracking transparency status](https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus/) you can receive starting from iOS 14. To receive it just call `let status = ATTrackingManager.AuthorizationStatus` – you should send this specific property to Adapty as soon as it changes, after you request it from user `Adapty.updateProfile(attributes: [AdaptyProfileKey.appTrackingTransparencyStatus: status.rawValue])`  |
+| appTrackingTransparencyStatus | UInt, [app tracking transparency status](https://developer.apple.com/documentation/apptrackingtransparency/attrackingmanager/authorizationstatus/) you can receive starting from iOS 14. To receive it just call `let status = ATTrackingManager.AuthorizationStatus` – you should send this specific property to Adapty as soon as it changes, after you request it from user `Adapty.updateProfile(params: ProfileParameterBuilder().withAppTrackingTransparencyStatus(status.rawValue))`  |
 
 ## Displaying products
 

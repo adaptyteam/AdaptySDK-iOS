@@ -104,6 +104,11 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
     @objc public var isInGracePeriod: Bool
     @objc public var unsubscribedAt: Date?
     @objc public var billingIssueDetectedAt: Date?
+    @objc public var vendorTransactionId: String?
+    @objc public var vendorOriginalTransactionId: String?
+    @objc public var startsAt: Date?
+    @objc public var cancellationReason: String?
+    @objc public var isRefund: Bool
     
     required init?(json: Parameters) throws {
         guard
@@ -127,6 +132,11 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
         self.isInGracePeriod = json["is_in_grace_period"] as? Bool ?? false
         self.unsubscribedAt = (json["unsubscribed_at"] as? String)?.dateValue
         self.billingIssueDetectedAt = (json["billing_issue_detected_at"] as? String)?.dateValue
+        self.vendorTransactionId = json["vendor_transaction_id"] as? String
+        self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
+        self.startsAt = (json["starts_at"] as? String)?.dateValue
+        self.cancellationReason = json["cancellation_reason"] as? String
+        self.isRefund = json["is_refund"] as? Bool ?? false
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
@@ -134,7 +144,7 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.id == object.id && self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt
+        return self.id == object.id && self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId && self.startsAt == object.startsAt && self.cancellationReason == object.cancellationReason && self.isRefund == object.isRefund
     }
     
     private func logMissingRequiredParams() {
@@ -166,6 +176,8 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     @objc public var isSandbox: Bool
     @objc public var vendorTransactionId: String?
     @objc public var vendorOriginalTransactionId: String?
+    @objc public var cancellationReason: String?
+    @objc public var isRefund: Bool
     
     required init?(json: Parameters) throws {
         guard
@@ -192,6 +204,8 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
         self.isSandbox = json["is_sandbox"] as? Bool ?? false
         self.vendorTransactionId = json["vendor_transaction_id"] as? String
         self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
+        self.cancellationReason = json["cancellation_reason"] as? String
+        self.isRefund = json["is_refund"] as? Bool ?? false
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
@@ -199,7 +213,7 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.startsAt == object.startsAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId
+        return self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.startsAt == object.startsAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId && self.cancellationReason == object.cancellationReason && self.isRefund == object.isRefund
     }
     
     private func logMissingRequiredParams() {
@@ -221,6 +235,7 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     @objc public var isSandbox: Bool
     @objc public var vendorTransactionId: String?
     @objc public var vendorOriginalTransactionId: String?
+    @objc public var isRefund: Bool
     
     required init?(json: Parameters) throws {
         guard
@@ -238,6 +253,7 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
         self.isSandbox = json["is_sandbox"] as? Bool ?? false
         self.vendorTransactionId = json["vendor_transaction_id"] as? String
         self.vendorOriginalTransactionId = json["vendor_original_transaction_id"] as? String
+        self.isRefund = json["is_refund"] as? Bool ?? false
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
@@ -245,7 +261,7 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.purchaseId == object.purchaseId && self.vendorProductId == object.vendorProductId && self.store == object.store && self.purchasedAt == object.purchasedAt && self.isOneTime == object.isOneTime && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId
+        return self.purchaseId == object.purchaseId && self.vendorProductId == object.vendorProductId && self.store == object.store && self.purchasedAt == object.purchasedAt && self.isOneTime == object.isOneTime && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId && self.isRefund == object.isRefund
     }
     
     private func logMissingRequiredParams() {
