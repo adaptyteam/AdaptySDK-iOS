@@ -337,11 +337,11 @@ For **`state`** possible values are: **`cached`**, **`synced`**. First means tha
 
 ### Checking if a user is subscribed 
 
-The subscription status for a user can easily be determined from **`paidAccessLevels`** property of **`purchaserInfo`** object by **`isActive`** property inside.
+The subscription status for a user can easily be determined from **`accessLevels`** property of **`purchaserInfo`** object by **`isActive`** property inside.
 
 ```Swift
 Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
-    if purchaserInfo?.paidAccessLevels["level_configured_in_dashboard"]?.isActive == true {
+    if purchaserInfo?.accessLevels["level_configured_in_dashboard"]?.isActive == true {
     
     }
 }

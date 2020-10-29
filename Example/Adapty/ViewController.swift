@@ -116,8 +116,8 @@ class ViewController: UIViewController {
             if let purchaserInfo = purchaserInfo {
                 self.infoLabel.text =
                 """
-                Paid access standart is active: \(purchaserInfo.paidAccessLevels["standart"]?.isActive ?? false)\n
-                paidAccessLevels:\n\(purchaserInfo.paidAccessLevels)
+                Paid access standart is active: \(purchaserInfo.accessLevels["standart"]?.isActive ?? false)\n
+                accessLevels:\n\(purchaserInfo.accessLevels)
                 subscriptions:\n\(purchaserInfo.subscriptions)
                 Non subscriptions:\n\(purchaserInfo.nonSubscriptions)
                 """

@@ -146,7 +146,7 @@ extension PromoModel {
 extension PurchaserInfoModel {
     public override var description: String {
         let keysAndValues: [String: Any?] = [
-            "paidAccessLevels": paidAccessLevels,
+            "accessLevels": accessLevels,
             "subscriptions": subscriptions,
             "nonSubscriptions": nonSubscriptions
         ]
@@ -158,7 +158,7 @@ extension PurchaserInfoModel {
     }
 }
 
-extension PaidAccessLevelsInfoModel {
+extension AccessLevelInfoModel {
     public override var description: String {
         let keysAndValues: [String: Any?] = [
             "id": id,
@@ -174,7 +174,12 @@ extension PaidAccessLevelsInfoModel {
             "willRenew": willRenew,
             "isInGracePeriod": isInGracePeriod,
             "unsubscribedAt": unsubscribedAt,
-            "billingIssueDetectedAt": billingIssueDetectedAt
+            "billingIssueDetectedAt": billingIssueDetectedAt,
+            "vendorTransactionId": vendorTransactionId,
+            "vendorOriginalTransactionId": vendorOriginalTransactionId,
+            "startsAt": startsAt,
+            "cancellationReason": cancellationReason,
+            "isRefund": isRefund
         ]
 
         return keysAndValues
@@ -184,7 +189,7 @@ extension PaidAccessLevelsInfoModel {
     }
 }
 
-extension SubscriptionsInfoModel {
+extension SubscriptionInfoModel {
     public override var description: String {
         let keysAndValues: [String: Any?] = [
             "isActive": isActive,
@@ -203,7 +208,9 @@ extension SubscriptionsInfoModel {
             "billingIssueDetectedAt": billingIssueDetectedAt,
             "isSandbox": isSandbox,
             "vendorTransactionId": vendorTransactionId,
-            "vendorOriginalTransactionId": vendorOriginalTransactionId
+            "vendorOriginalTransactionId": vendorOriginalTransactionId,
+            "cancellationReason": cancellationReason,
+            "isRefund": isRefund
         ]
 
         return keysAndValues
@@ -213,7 +220,7 @@ extension SubscriptionsInfoModel {
     }
 }
 
-extension NonSubscriptionsInfoModel {
+extension NonSubscriptionInfoModel {
     public override var description: String {
         let keysAndValues: [String: Any?] = [
             "purchaseId": purchaseId,
@@ -223,7 +230,8 @@ extension NonSubscriptionsInfoModel {
             "isOneTime": isOneTime,
             "isSandbox": isSandbox,
             "vendorTransactionId": vendorTransactionId,
-            "vendorOriginalTransactionId": vendorOriginalTransactionId
+            "vendorOriginalTransactionId": vendorOriginalTransactionId,
+            "isRefund": isRefund
         ]
 
         return keysAndValues

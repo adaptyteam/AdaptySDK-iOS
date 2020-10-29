@@ -11,9 +11,9 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
 
     var profileId: String
     var customerUserId: String?
-    @objc public var paidAccessLevels: [String: PaidAccessLevelsInfoModel]
-    @objc public var subscriptions: [String: SubscriptionsInfoModel]
-    @objc public var nonSubscriptions: [String: [NonSubscriptionsInfoModel]]
+    @objc public var accessLevels: [String: AccessLevelInfoModel]
+    @objc public var subscriptions: [String: SubscriptionInfoModel]
+    @objc public var nonSubscriptions: [String: [NonSubscriptionInfoModel]]
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -32,9 +32,9 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
         self.profileId = profileId
         self.customerUserId = attributes?["customer_user_id"] as? String
         
-        var paidAccessLevels = [String: PaidAccessLevelsInfoModel]()
-        var subscriptions = [String: SubscriptionsInfoModel]()
-        var nonSubscriptions = [String: [NonSubscriptionsInfoModel]]()
+        var accessLevels = [String: AccessLevelInfoModel]()
+        var subscriptions = [String: SubscriptionInfoModel]()
+        var nonSubscriptions = [String: [NonSubscriptionInfoModel]]()
         do {
             if let data = attributes?["paid_access_levels"] as? Parameters {
                 for (key, value) in data {
@@ -42,7 +42,7 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
                         continue
                     }
                     
-                    paidAccessLevels[key] = try PaidAccessLevelsInfoModel(json: value)
+                    accessLevels[key] = try AccessLevelInfoModel(json: value)
                 }
             }
             
@@ -52,7 +52,7 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
                         continue
                     }
                     
-                    subscriptions[key] = try SubscriptionsInfoModel(json: value)
+                    subscriptions[key] = try SubscriptionInfoModel(json: value)
                 }
             }
             
@@ -62,9 +62,9 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
                         continue
                     }
                     
-                    var valuesArray = [NonSubscriptionsInfoModel]()
+                    var valuesArray = [NonSubscriptionInfoModel]()
                     try value.forEach { (params) in
-                        if let nonSubscriptionsInfoModel = try NonSubscriptionsInfoModel(json: params) { valuesArray.append(nonSubscriptionsInfoModel) }
+                        if let nonSubscriptionInfoModel = try NonSubscriptionInfoModel(json: params) { valuesArray.append(nonSubscriptionInfoModel) }
                     }
                     nonSubscriptions[key] = valuesArray
                 }
@@ -73,7 +73,7 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
             throw error
         }
         
-        self.paidAccessLevels = paidAccessLevels
+        self.accessLevels = accessLevels
         self.subscriptions = subscriptions
         self.nonSubscriptions = nonSubscriptions
     }
@@ -83,12 +83,12 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.profileId == object.profileId && self.customerUserId == object.customerUserId && self.paidAccessLevels == object.paidAccessLevels && self.subscriptions == object.subscriptions && self.nonSubscriptions == object.nonSubscriptions
+        return self.profileId == object.profileId && self.customerUserId == object.customerUserId && self.accessLevels == object.accessLevels && self.subscriptions == object.subscriptions && self.nonSubscriptions == object.nonSubscriptions
     }
 
 }
 
-public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
+public class AccessLevelInfoModel: NSObject, JSONCodable, Codable {
     
     @objc public var id: String
     @objc public var isActive: Bool
@@ -115,7 +115,7 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
             let id = json["id"] as? String,
             let isActive = json["is_active"] as? Bool
         else {
-            throw SerializationError.missing("PaidAccessLevelsInfoModel - id, is_active")
+            throw SerializationError.missing("AccessLevelInfoModel - id, is_active")
         }
         
         self.id = id
@@ -140,7 +140,7 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? PaidAccessLevelsInfoModel else {
+        guard let object = object as? AccessLevelInfoModel else {
             return false
         }
         
@@ -152,12 +152,12 @@ public class PaidAccessLevelsInfoModel: NSObject, JSONCodable, Codable {
         if self.vendorProductId.isEmpty { missingParams.append("vendor_product_id") }
         if self.store.isEmpty { missingParams.append("store") }
         if self.activatedAt == nil { missingParams.append("activated_at") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of PaidAccessLevelsInfoModel: \(missingParams)") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of AccessLevelInfoModel: \(missingParams)") }
     }
 
 }
 
-public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
+public class SubscriptionInfoModel: NSObject, JSONCodable, Codable {
     
     @objc public var isActive: Bool
     @objc public var vendorProductId: String
@@ -184,7 +184,7 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
             let isActive = json["is_active"] as? Bool,
             let vendorProductId = json["vendor_product_id"] as? String
         else {
-            throw SerializationError.missing("SubscriptionsInfoModel - is_active, vendor_product_id")
+            throw SerializationError.missing("SubscriptionInfoModel - is_active, vendor_product_id")
         }
         
         self.isActive = isActive
@@ -209,7 +209,7 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? SubscriptionsInfoModel else {
+        guard let object = object as? SubscriptionInfoModel else {
             return false
         }
         
@@ -220,12 +220,12 @@ public class SubscriptionsInfoModel: NSObject, JSONCodable, Codable {
         var missingParams = ""
         if self.store.isEmpty { missingParams.append("store") }
         if self.activatedAt == nil { missingParams.append("activated_at") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of SubscriptionsInfoModel: \(missingParams)") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of SubscriptionInfoModel: \(missingParams)") }
     }
 
 }
 
-public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
+public class NonSubscriptionInfoModel: NSObject, JSONCodable, Codable {
     
     @objc public var purchaseId: String
     @objc public var vendorProductId: String
@@ -242,7 +242,7 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
             let purchaseId = json["purchase_id"] as? String,
             let vendorProductId = json["vendor_product_id"] as? String
         else {
-            throw SerializationError.missing("NonSubscriptionsInfoModel - purchase_id, vendor_product_id")
+            throw SerializationError.missing("NonSubscriptionInfoModel - purchase_id, vendor_product_id")
         }
         
         self.purchaseId = purchaseId
@@ -257,7 +257,7 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? NonSubscriptionsInfoModel else {
+        guard let object = object as? NonSubscriptionInfoModel else {
             return false
         }
         
@@ -268,7 +268,7 @@ public class NonSubscriptionsInfoModel: NSObject, JSONCodable, Codable {
         var missingParams = ""
         if self.store.isEmpty { missingParams.append("store") }
         if self.purchasedAt == nil { missingParams.append("purchased_at") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of NonSubscriptionsInfoModel: \(missingParams)") }
+        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of NonSubscriptionInfoModel: \(missingParams)") }
     }
 
 }

@@ -2,9 +2,9 @@
   + [`ProductDiscountModel`](#productdiscountmodel)
   + [`ProductSubscriptionPeriodModel`](#productsubscriptionperiodmodel)
 * [`PurchaserInfoModel`](#purchaserinfomodel)
-  + [`PaidAccessLevelsInfoModel`](#paidaccesslevelsinfomodel)
-  + [`SubscriptionsInfoModel`](#subscriptionsinfomodel)
-  + [`NonSubscriptionsInfoModel`](#nonsubscriptionsinfomodel)
+  + [`AccessLevelInfoModel`](#accesslevelinfomodel)
+  + [`SubscriptionInfoModel`](#subscriptioninfomodel)
+  + [`NonSubscriptionInfoModel`](#nonsubscriptioninfomodel)
 * [`PaywallModel`](#paywallmodel)
 * [`PromoModel`](#promomodel)
 
@@ -60,13 +60,13 @@ This model contains information about user and his payment status.
 
 | Name  | Description |
 | -------- | ------------- |
-| paidAccessLevels | Dictionary where the keys are paid access level identifiers configured by developer in Adapty dashboard. Values are [`PaidAccessLevelsInfoModel`](#paidaccesslevelsinfomodel) objects. Can be null if the customer has no access levels. |
-| subscriptions | Dictionary where the keys are vendor product ids. Values are [`SubscriptionsInfoModel`](#subscriptionsinfomodel) objects. Can be null if the customer has no subscriptions. |
-| nonSubscriptions | Dictionary where the keys are vendor product ids. Values are array[] of [`NonSubscriptionsInfoModel`](#nonsubscriptionsinfomodel) objects. Can be null if the customer has no purchases. |
+| accessLevels | Dictionary where the keys are paid access level identifiers configured by developer in Adapty dashboard. Values are [`AccessLevelInfoModel`](#accesslevelinfomodel) objects. Can be null if the customer has no access levels. |
+| subscriptions | Dictionary where the keys are vendor product ids. Values are [`SubscriptionInfoModel`](#subscriptioninfomodel) objects. Can be null if the customer has no subscriptions. |
+| nonSubscriptions | Dictionary where the keys are vendor product ids. Values are array[] of [`NonSubscriptionInfoModel`](#nonsubscriptioninfomodel) objects. Can be null if the customer has no purchases. |
 
-### `PaidAccessLevelsInfoModel`
+### `AccessLevelInfoModel`
 
-`PaidAccessLevelsInfoModel` stores info about current users access level.
+`AccessLevelInfoModel` stores info about current users access level.
 
 | Name  | Description |
 | -------- | ------------- |
@@ -90,9 +90,9 @@ This model contains information about user and his payment status.
 | cancellationReason | The reason why the subscription was cancelled. Possible values are: **voluntarily_cancelled**, **billing_error**, **refund**, **price_increase**, **product_was_not_available**, **unknown**. |
 | isRefund | Whether the purchase was refunded. |
 
-### `SubscriptionsInfoModel`
+### `SubscriptionInfoModel`
 
-`SubscriptionsInfoModel` stores info about vendor subscription.
+`SubscriptionInfoModel` stores info about vendor subscription.
 
 | Name  | Description |
 | -------- | ------------- |
@@ -116,9 +116,9 @@ This model contains information about user and his payment status.
 | cancellationReason | The reason why the subscription was cancelled. Possible values are: **voluntarily_cancelled**, **billing_error**, **refund**, **price_increase**, **product_was_not_available**, **unknown**. |
 | isRefund | Whether the purchase was refunded. |
 
-### `NonSubscriptionsInfoModel`
+### `NonSubscriptionInfoModel`
 
-`NonSubscriptionsInfoModel` stores info about purchases that are not subscriptions.
+`NonSubscriptionInfoModel` stores info about purchases that are not subscriptions.
 
 | Name  | Description |
 | -------- | ------------- |
