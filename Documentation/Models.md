@@ -60,6 +60,7 @@ This model contains information about user and his payment status.
 
 | Name  | Description |
 | -------- | ------------- |
+| customerUserId | Id of the user in your system. |
 | accessLevels | Dictionary where the keys are paid access level identifiers configured by developer in Adapty dashboard. Values are [`AccessLevelInfoModel`](#accesslevelinfomodel) objects. Can be null if the customer has no access levels. |
 | subscriptions | Dictionary where the keys are vendor product ids. Values are [`SubscriptionInfoModel`](#subscriptioninfomodel) objects. Can be null if the customer has no subscriptions. |
 | nonSubscriptions | Dictionary where the keys are vendor product ids. Values are array[] of [`NonSubscriptionInfoModel`](#nonsubscriptioninfomodel) objects. Can be null if the customer has no purchases. |
