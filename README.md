@@ -23,6 +23,7 @@
   + [Subscription status](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/AdvancedUsage.md#subscription-status)
   + [Promo campaigns](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/AdvancedUsage.md#promo-campaigns)
   + [Method swizzling in Adapty](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/AdvancedUsage.md#method-swizzling-in-adapty)
+  + [SwiftUI App Lifecycle](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/AdvancedUsage.md#swiftui-app-lifecycle)
 * [License](#license)
 
 ## Requirements

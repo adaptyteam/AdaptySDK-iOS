@@ -24,6 +24,7 @@
   + [Getting promo paywall manually](#getting-promo-paywall-manually)
   + [Handle Adapty promo push notifications](#handle-adapty-promo-push-notifications)
 * [Method swizzling in Adapty](#method-swizzling-in-adapty)
+* [SwiftUI App Lifecycle](#swiftui-app-lifecycle)
 
 # Advanced usage
 
@@ -416,5 +417,52 @@ If you have disabled method swizzling, you'll need to explicitly send your APNs 
 ```Swift
 func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
     Adapty.apnsToken = deviceToken
+}
+```
+
+## SwiftUI App Lifecycle
+
+Since Xcode 12 and new SwiftUI, app can be created without AppDelegate at all.
+
+So you can put your configuration code inside `init` method.
+
+```Swift
+import Adapty
+
+@main
+struct SwiftUISampleApp: App {
+    init() {
+        Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID")
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+Or you can still do it through AppDelegate, but it requires you to create your own `@UIApplicationDelegateAdaptor`.
+
+```Swift
+import Adapty
+
+@main
+struct SwiftUISampleApp: App {
+    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+    
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID")
+        return true
+    }
 }
 ```
