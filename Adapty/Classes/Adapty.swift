@@ -443,11 +443,16 @@ import UIKit
     
     @discardableResult @objc
     public class func showPaywall(for paywall: PaywallModel, from viewController: UIViewController, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
+        let paywallViewController = getPaywall(for: paywall, delegate: delegate)
+        viewController.present(paywallViewController, animated: true)
+        return paywallViewController
+    }
+    
+    @objc public class func getPaywall(for paywall: PaywallModel, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
         let paywallViewController = PaywallViewController()
         paywallViewController.paywall = paywall
         paywallViewController.delegate = delegate
         paywallViewController.modalPresentationStyle = .fullScreen
-        viewController.present(paywallViewController, animated: true)
         return paywallViewController
     }
     

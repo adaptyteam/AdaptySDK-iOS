@@ -24,7 +24,9 @@
   + [Getting promo paywall manually](#getting-promo-paywall-manually)
   + [Handle Adapty promo push notifications](#handle-adapty-promo-push-notifications)
 * [Method swizzling in Adapty](#method-swizzling-in-adapty)
-* [SwiftUI App Lifecycle](#swiftui-app-lifecycle)
+* [SwiftUI](#swiftui)
+  + [SwiftUI App Lifecycle](#swiftui-app-lifecycle)
+  + [Custom dashboard paywalls with SwiftUI](#custom-dashboard-paywalls-with-swiftui)
 
 # Advanced usage
 
@@ -234,6 +236,12 @@ extension ViewController: AdaptyPaywallDelegate {
 }
 ```
 
+You can also get your `PaywallViewController` to present it in a way you want.
+
+```Swift
+let paywallViewController = Adapty.getPaywall(for: paywall, delegate: delegate)
+```
+
 ### Fallback paywalls
 
 In case you have an imported dashboard JSON file with your paywalls, you can provide it to SDK as a fallback scenario for user.  
@@ -420,7 +428,9 @@ func application(application: UIApplication, didRegisterForRemoteNotificationsWi
 }
 ```
 
-## SwiftUI App Lifecycle
+## SwiftUI 
+
+### SwiftUI App Lifecycle
 
 Since Xcode 12 and new SwiftUI, app can be created without AppDelegate at all.
 
@@ -464,5 +474,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID")
         return true
     }
+}
+```
+
+### Custom dashboard paywalls with SwiftUI
+
+It can be complicated how to present `PaywallViewController` via SwiftUI. Here is an example of a very basic implementation.
+
+```Swift
+import SwiftUI
+import Adapty
+
+struct SwiftUISampleView: View {
+    @ObservedObject var subscriptionInteractor = SubscriptionInteractor()
+    
+    var body: some View {
+        Text("Sample")
+            // bind "isPresented" property and present our controller when needed
+            .fullScreenCover(isPresented: $subscriptionInteractor.isPresented) {
+                PaywallViewControllerRepresentation(paywallModel: subscriptionInteractor.paywall!, delegate: subscriptionInteractor)
+            }
+    }
+}
+
+class SubscriptionInteractor: ObservableObject {
+    var paywall: PaywallModel? = nil
+    @Published var isPresented = false
+    
+    init() {
+        Adapty.getPaywalls { (paywalls, products, state, error) in
+            if state == .synced, let paywall = paywalls?.first {
+                // receive needed synced paywall
+                self.paywall = paywall
+                self.isPresented = true
+            }
+        }
+    }
+}
+
+extension SubscriptionInteractor: AdaptyPaywallDelegate { ... }
+
+struct PaywallViewControllerRepresentation: UIViewControllerRepresentable {
+    let paywallModel: PaywallModel
+    let delegate: AdaptyPaywallDelegate
+    
+    // wrapper over our controller for SwiftUI
+    func makeUIViewController(context: Context) -> PaywallViewController {
+        return Adapty.getPaywall(for: paywallModel, delegate: delegate)
+    }
+    
+    func updateUIViewController(_ uiViewController: PaywallViewController, context: Context) { }
 }
 ```
