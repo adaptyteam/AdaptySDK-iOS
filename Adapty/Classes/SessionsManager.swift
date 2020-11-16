@@ -34,7 +34,7 @@ class SessionsManager {
         trackLiveEvent()
     }
     
-    private func trackLiveEvent(completion: ((Error?) -> Void)? = nil) {
+    private func trackLiveEvent(completion: ErrorCompletion? = nil) {
         kinesisManager.trackEvent(.live, completion: completion)
     }
     

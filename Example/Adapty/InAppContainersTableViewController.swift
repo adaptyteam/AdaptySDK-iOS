@@ -91,7 +91,7 @@ extension InAppContainersTableViewController: AdaptyPaywallDelegate {
         paywall.close()
     }
     
-    func didFailPurchase(product: ProductModel, error: Error, paywall: PaywallViewController) {
+    func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController) {
         paywall.showAlert(for: error)
     }
     

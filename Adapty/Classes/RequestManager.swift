@@ -20,23 +20,7 @@ enum HTTPMethod: String {
     case connect = "CONNECT"
 }
 
-#warning("Improve error handling")
-enum NetworkResponse: String, Error {
-    case success
-    case emptyResponse = "Response is empty."
-    case emptyData = "Request data is empty."
-    case authenticationError = "You need to be authenticated first."
-    case alreadyAuthenticatedError = "User is already authenticated. Logout first."
-    case badRequest = "Bad request."
-    case outdated = "The url you requested is outdated."
-    case failed = "Network request failed."
-    case noData = "Response returned with no data to decode."
-    case unableToDecode = "We could not decode the response."
-    case missingRequiredParams = "Missing required params."
-    case statusError = "Received 'failure' status."
-}
-
-typealias RequestCompletion <T: JSONCodable> = (Result<T, Error>, HTTPURLResponse?) -> Void
+typealias RequestCompletion <T: JSONCodable> = (Result<T, AdaptyError>, HTTPURLResponse?) -> Void
 
 class RequestManager {
     
@@ -54,9 +38,12 @@ class RequestManager {
         do {
             let urlRequest = try router.asURLRequest()
             return shared.performRequest(urlRequest, router: router, completion: completion)
-        } catch {
+        } catch let error as AdaptyError {
             LoggerManager.logError(error)
             completion(.failure(error), nil)
+        } catch {
+            LoggerManager.logError(error)
+            completion(.failure(AdaptyError(with: error)), nil)
         }
         
         return nil
@@ -71,7 +58,7 @@ class RequestManager {
     private func performRequest<T: JSONCodable>(_ urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             DispatchQueue.global(qos: .background).async {
-                self.handleResponse(data: data, response: response, error: error, router: router) { (result: Result<T, Error>, response) in
+                self.handleResponse(data: data, response: response, error: error, router: router) { (result: Result<T, AdaptyError>, response) in
                     switch result {
                     case .failure(let error):
                         LoggerManager.logError(error)
@@ -102,37 +89,40 @@ class RequestManager {
         logResponse(data, response)
         
         if let error = error {
-            handleResult(result: .failure(error), response: nil, completion: completion)
+            handleResult(result: .failure(AdaptyError(with: error)), response: nil, completion: completion)
             return
         }
         
         guard let response = response as? HTTPURLResponse else {
-            handleResult(result: .failure(NetworkResponse.emptyResponse), response: nil, completion: completion)
+            handleResult(result: .failure(AdaptyError.emptyResponse), response: nil, completion: completion)
             return
         }
         
         guard let data = data else {
-            handleResult(result: .failure(NetworkResponse.emptyData), response: response, completion: completion)
+            handleResult(result: .failure(AdaptyError.emptyData), response: response, completion: completion)
             return
         }
         
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-            handleResult(result: .failure(NetworkResponse.unableToDecode), response: nil, completion: completion)
+            handleResult(result: .failure(AdaptyError.unableToDecode), response: nil, completion: completion)
             return
         }
         
-        if let error = self.handleNetworkResponse(response) {
+        if let error = self.handleNetworkStatusCode(response.statusCode) {
             do {
-                let errors = try ResponseErrorsArray(json: json)
-                if let error = errors?.errors.first {
-                    handleResult(result: .failure(NSError(domain: "", code: error.status, userInfo: [NSLocalizedDescriptionKey: error.description])), response: nil, completion: completion)
+                let responseErrors = try ResponseErrorsArray(json: json)
+                if let responseError = responseErrors?.errors.first {
+                    handleResult(result: .failure(AdaptyError(code: responseError.status, networkCode: error.networkErrorCode, message: responseError.description)), response: nil, completion: completion)
                     return
                 }
                 
                 handleResult(result: .failure(error), response: response, completion: completion)
                 return
-            } catch {
+            } catch let error as AdaptyError {
                 handleResult(result: .failure(error), response: response, completion: completion)
+                return
+            } catch {
+                handleResult(result: .failure(AdaptyError(with: error)), response: response, completion: completion)
                 return
             }
         }
@@ -142,7 +132,7 @@ class RequestManager {
         do {
             if let keyPath = router?.keyPath {
                 guard let json = json[keyPath] as? [String: Any] else {
-                    handleResult(result: .failure(NetworkResponse.unableToDecode), response: nil, completion: completion)
+                    handleResult(result: .failure(AdaptyError.unableToDecode), response: nil, completion: completion)
                     return
                 }
                 
@@ -150,19 +140,22 @@ class RequestManager {
             } else {
                 responseObject = try T(json: json)
             }
-        } catch {
+        } catch let error as AdaptyError {
             handleResult(result: .failure(error), response: nil, completion: completion)
+            return
+        } catch {
+            handleResult(result: .failure(AdaptyError(with: error)), response: nil, completion: completion)
             return
         }
         
         if let responseObject = responseObject {
             handleResult(result: .success(responseObject), response: response, completion: completion)
         } else {
-            handleResult(result: .failure(NetworkResponse.unableToDecode), response: response, completion: completion)
+            handleResult(result: .failure(AdaptyError.unableToDecode), response: response, completion: completion)
         }
     }
     
-    private func handleResult<T: JSONCodable>(result: Result<T, Error>, response: HTTPURLResponse?, completion: @escaping RequestCompletion<T>) {
+    private func handleResult<T: JSONCodable>(result: Result<T, AdaptyError>, response: HTTPURLResponse?, completion: @escaping RequestCompletion<T>) {
         DispatchQueue.main.async {
             switch result {
             case .success(let result):
@@ -178,13 +171,13 @@ class RequestManager {
         }
     }
     
-    private func handleNetworkResponse(_ response: HTTPURLResponse) -> Error? {
-        switch response.statusCode {
+    private func handleNetworkStatusCode(_ statusCode: Int) -> AdaptyError? {
+        switch statusCode {
         case 200...299: return nil
-        case 401...499: return NetworkResponse.authenticationError
-        case 500...599: return NetworkResponse.badRequest
-        case 600: return NetworkResponse.outdated
-        default: return NetworkResponse.failed
+        case 400,404,408...599: return AdaptyError.badRequest
+        case 401...403,405...407: return AdaptyError.authenticationError
+        case 600: return AdaptyError.outdated
+        default: return AdaptyError.failed
         }
     }
     

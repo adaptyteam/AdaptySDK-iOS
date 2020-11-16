@@ -10,11 +10,6 @@ import Foundation
 
 public typealias Parameters = [String: Any]
 
-enum EncoderError : String, Error {
-    case encodingFailed = "Parameter encoding failed."
-    case missingURL = "URL is nil."
-}
-
 protocol ParameterEncoder {
     func encode(_ urlRequest: URLRequest, with parameters: Parameters) throws -> URLRequest
 }
@@ -29,7 +24,7 @@ struct JSONParameterEncoder: ParameterEncoder {
                 urlRequest.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
             }
         } catch {
-            throw EncoderError.encodingFailed
+            throw AdaptyError.encodingFailed
         }
         
         return urlRequest
@@ -40,7 +35,7 @@ struct URLParameterEncoder: ParameterEncoder {
     func encode(_ urlRequest: URLRequest, with parameters: Parameters) throws -> URLRequest {
         var urlRequest = urlRequest
         
-        guard let url = urlRequest.url else { throw EncoderError.missingURL }
+        guard let url = urlRequest.url else { throw AdaptyError.missingURL }
         
         if var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false), !parameters.isEmpty {
             urlComponents.queryItems = [URLQueryItem]()

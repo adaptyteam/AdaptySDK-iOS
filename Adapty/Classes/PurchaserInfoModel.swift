@@ -26,7 +26,7 @@ public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
         guard
             let profileId = attributes?["id"] as? String
         else {
-            throw SerializationError.missing("id")
+            throw AdaptyError.missingParam("PurchaserInfoModel - id")
         }
         
         self.profileId = profileId
@@ -115,7 +115,7 @@ public class AccessLevelInfoModel: NSObject, JSONCodable, Codable {
             let id = json["id"] as? String,
             let isActive = json["is_active"] as? Bool
         else {
-            throw SerializationError.missing("AccessLevelInfoModel - id, is_active")
+            throw AdaptyError.missingParam("AccessLevelInfoModel - id, is_active")
         }
         
         self.id = id
@@ -145,14 +145,6 @@ public class AccessLevelInfoModel: NSObject, JSONCodable, Codable {
         }
         
         return self.id == object.id && self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId && self.startsAt == object.startsAt && self.cancellationReason == object.cancellationReason && self.isRefund == object.isRefund
-    }
-    
-    private func logMissingRequiredParams() {
-        var missingParams = ""
-        if self.vendorProductId.isEmpty { missingParams.append("vendor_product_id") }
-        if self.store.isEmpty { missingParams.append("store") }
-        if self.activatedAt == nil { missingParams.append("activated_at") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of AccessLevelInfoModel: \(missingParams)") }
     }
 
 }
@@ -184,7 +176,7 @@ public class SubscriptionInfoModel: NSObject, JSONCodable, Codable {
             let isActive = json["is_active"] as? Bool,
             let vendorProductId = json["vendor_product_id"] as? String
         else {
-            throw SerializationError.missing("SubscriptionInfoModel - is_active, vendor_product_id")
+            throw AdaptyError.missingParam("SubscriptionInfoModel - is_active, vendor_product_id")
         }
         
         self.isActive = isActive
@@ -215,13 +207,6 @@ public class SubscriptionInfoModel: NSObject, JSONCodable, Codable {
         
         return self.isActive == object.isActive && self.vendorProductId == object.vendorProductId && self.store == object.store && self.activatedAt == object.activatedAt && self.renewedAt == object.renewedAt && self.expiresAt == object.expiresAt && self.startsAt == object.startsAt && self.isLifetime == object.isLifetime && self.activeIntroductoryOfferType == object.activeIntroductoryOfferType && self.activePromotionalOfferType == object.activePromotionalOfferType && self.willRenew == object.willRenew && self.isInGracePeriod == object.isInGracePeriod && self.unsubscribedAt == object.unsubscribedAt && self.billingIssueDetectedAt == object.billingIssueDetectedAt && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId && self.cancellationReason == object.cancellationReason && self.isRefund == object.isRefund
     }
-    
-    private func logMissingRequiredParams() {
-        var missingParams = ""
-        if self.store.isEmpty { missingParams.append("store") }
-        if self.activatedAt == nil { missingParams.append("activated_at") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of SubscriptionInfoModel: \(missingParams)") }
-    }
 
 }
 
@@ -242,7 +227,7 @@ public class NonSubscriptionInfoModel: NSObject, JSONCodable, Codable {
             let purchaseId = json["purchase_id"] as? String,
             let vendorProductId = json["vendor_product_id"] as? String
         else {
-            throw SerializationError.missing("NonSubscriptionInfoModel - purchase_id, vendor_product_id")
+            throw AdaptyError.missingParam("NonSubscriptionInfoModel - purchase_id, vendor_product_id")
         }
         
         self.purchaseId = purchaseId
@@ -263,13 +248,6 @@ public class NonSubscriptionInfoModel: NSObject, JSONCodable, Codable {
         
         return self.purchaseId == object.purchaseId && self.vendorProductId == object.vendorProductId && self.store == object.store && self.purchasedAt == object.purchasedAt && self.isOneTime == object.isOneTime && self.isSandbox == object.isSandbox && self.vendorTransactionId == object.vendorTransactionId && self.vendorOriginalTransactionId == object.vendorOriginalTransactionId && self.isRefund == object.isRefund
     }
-    
-    private func logMissingRequiredParams() {
-        var missingParams = ""
-        if self.store.isEmpty { missingParams.append("store") }
-        if self.purchasedAt == nil { missingParams.append("purchased_at") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of NonSubscriptionInfoModel: \(missingParams)") }
-    }
 
 }
 
@@ -282,7 +260,7 @@ class PurchaserInfoMeta: JSONCodable {
         do {
             self.purchaserInfo = try PurchaserInfoModel(json: json)
         } catch {
-            throw SerializationError.invalid("PurchaserInfoMeta - purchaser_info", json)
+            throw AdaptyError.invalidProperty("PurchaserInfoMeta - purchaser_info", json)
         }
         
         let attributes: Parameters?

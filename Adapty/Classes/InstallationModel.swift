@@ -26,7 +26,7 @@ public class InstallationModel: JSONCodable, Codable {
         guard
             let profileInstallationMetaId = attributes?["id"] as? String
         else {
-            throw SerializationError.missing("InstallationModel - id")
+            throw AdaptyError.missingParam("InstallationModel - id")
         }
         
         self.profileInstallationMetaId = profileInstallationMetaId
@@ -38,11 +38,11 @@ public class InstallationModel: JSONCodable, Codable {
     }
     
     private func logMissingRequiredParams() {
-        var missingParams = ""
+        var missingParams: [String] = []
         if self.iamAccessKeyId.isEmpty { missingParams.append("iam_access_key_id") }
         if self.iamSecretKey.isEmpty { missingParams.append("iam_secret_key") }
         if self.iamSessionToken.isEmpty { missingParams.append("iam_session_token") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of InstallationModel: \(missingParams)") }
+        if !missingParams.isEmpty { LoggerManager.logError(AdaptyError.missingParam("InstallationModel - \(missingParams.joined(separator: ", "))")) }
     }
     
 }

@@ -26,7 +26,7 @@ public class PromoModel: NSObject, JSONCodable {
             let promoType = attributes?["promo_type"] as? String,
             let variationId = attributes?["variation_id"] as? String
         else {
-            throw SerializationError.missing("PromoModel - promo_type, variation_id")
+            throw AdaptyError.missingParam("PromoModel - promo_type, variation_id")
         }
         
         self.promoType = promoType

@@ -293,6 +293,7 @@
 		D656CA5A2526326D00163BDA /* ProfileParameterBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D656CA592526326D00163BDA /* ProfileParameterBuilder.swift */; };
 		D65757C32481276B0055A431 /* PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65757C22481276B0055A431 /* PaywallViewController.swift */; };
 		D65E4966253766B700CF9F00 /* CustomStringConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65E4965253766B700CF9F00 /* CustomStringConvertible.swift */; };
+		D6ACCAAE255D6BEC005B9FC7 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ACCAAD255D6BEC005B9FC7 /* Errors.swift */; };
 		D85C329C4C1FED340DED6119AF14F36F /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28724D78F4ECC9CA41462124FFB2077 /* String+Extension.swift */; };
 		D86D0A6E97F4D1FDA92BEC36A27AF823 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 497F89AEE85175FDBDB4F853FF518D57 /* AdSupport.framework */; };
 		D87330F0F0AE7B1680D5335F637A3FDC /* ADJReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 04F1F8EAE68F5C1BF1AF38399B930C43 /* ADJReachability.m */; };
@@ -733,6 +734,7 @@
 		D65DC95524D03416009A3D53 /* AdvancedUsage.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = AdvancedUsage.md; path = Documentation/AdvancedUsage.md; sourceTree = "<group>"; };
 		D65E4965253766B700CF9F00 /* CustomStringConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomStringConvertible.swift; path = Adapty/Classes/CustomStringConvertible.swift; sourceTree = "<group>"; };
 		D66DC84FFCF042B00D96BBF9A684E2C1 /* BNCServerInterface.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCServerInterface.m; path = "Branch-SDK/Branch-SDK/Networking/BNCServerInterface.m"; sourceTree = "<group>"; };
+		D6ACCAAD255D6BEC005B9FC7 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = Adapty/Classes/Errors.swift; sourceTree = "<group>"; };
 		D6F1E72830B18ECB1B9C36E936A09E7A /* NSString+Branch.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSString+Branch.h"; path = "Branch-SDK/Branch-SDK/NSString+Branch.h"; sourceTree = "<group>"; };
 		D6F7C2F9DC5959176B5EA68989087294 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		D7185E275D372A45E23E7470AA98B77B /* NSError+Branch.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSError+Branch.h"; path = "Branch-SDK/Branch-SDK/NSError+Branch.h"; sourceTree = "<group>"; };
@@ -931,6 +933,7 @@
 				79C83706EFBDFC48714E69338F60E7DB /* RequestManager.swift */,
 				AF2DD325A358D73BF048C914598F18B5 /* ResponseErrorModel.swift */,
 				4A6C5CB1D95294CBCF2EEF9749B1F615 /* Router.swift */,
+				D6ACCAAD255D6BEC005B9FC7 /* Errors.swift */,
 				B5BF756FBB681D92402068CDBF5ABCE5 /* SessionsManager.swift */,
 				D656CA592526326D00163BDA /* ProfileParameterBuilder.swift */,
 				88F7A37FB9DA5030C808EDB6922D8DE4 /* UserProperties.swift */,
@@ -1817,6 +1820,7 @@
 				F9F67849AEFC8EAC867DD39A80E375A3 /* Constants.swift in Sources */,
 				9EC3D96130C3D5285EA60341780CBE91 /* DefaultsManager.swift in Sources */,
 				57044BBA74C11F24F7A2733982D69F18 /* Extensions.swift in Sources */,
+				D6ACCAAE255D6BEC005B9FC7 /* Errors.swift in Sources */,
 				6C55D070C1B6A7D94C2A0C6EB54D6A8A /* IAPManager.swift in Sources */,
 				2E17E9D5B24947FEF56C566F15C8B44A /* InstallationModel.swift in Sources */,
 				8043011242FA1DD0A234D168EDF50F67 /* JSONCodable.swift in Sources */,

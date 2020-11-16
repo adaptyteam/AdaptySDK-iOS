@@ -8,19 +8,19 @@
 
 import Foundation
 
-struct Constants {
+enum Constants {
     
-    struct APIKeys {
+    enum APIKeys {
         // ApiKey will be replaced during SDK active method
         static var secretKey = ""
     }
     
-    struct URLs {
+    enum URLs {
         static let api = "api.adapty.io/api"
         static let kinesis = "kinesis.us-east-1.amazonaws.com"
     }
     
-    struct Headers {
+    enum Headers {
         static let authorization = "Authorization"
         static let profileId = "ADAPTY-SDK-PROFILE-ID"
         static let platform = "ADAPTY-SDK-PLATFORM"
@@ -29,7 +29,7 @@ struct Constants {
         static let locale = "ADAPTY_SDK_LOCALE"
     }
 
-    struct Kinesis {
+    enum Kinesis {
         static let streamName = "adapty-data-pipeline-prod"
         static let region = "us-east-1"
         static let hmacShaTypeString = "AWS4-HMAC-SHA256"
@@ -39,7 +39,7 @@ struct Constants {
         static let contentType = "application/x-amz-json-1.1"
     }
     
-    struct UserDefaults {
+    enum UserDefaults {
         static let profileId = "AdaptySDK_Profile_Id"
         static let installation = "AdaptySDK_Installation"
         static let cachedEvents = "AdaptySDK_Cached_Events"
@@ -50,16 +50,16 @@ struct Constants {
         static let appleSearchAdsSyncDate = "AdaptySDK_Apple_Search_Ads_Sync_Date"
     }
     
-    struct Versions {
+    enum Versions {
         static let SDKBuild = 1
     }
     
-    struct BundleKeys {
+    enum BundleKeys {
         static let appDelegateProxyEnabled = "AdaptyAppDelegateProxyEnabled"
         static let appleSearchAdsAttributionCollectionEnabled = "AdaptyAppleSearchAdsAttributionCollectionEnabled"
     }
     
-    struct TypeNames {
+    enum TypeNames {
         static let profile = "adapty_analytics_profile"
         static let installation = "adapty_analytics_profile_installation_meta"
         static let appleReceipt = "adapty_inapps_apple_receipt_validation_result"
@@ -67,7 +67,7 @@ struct Constants {
         static let profileAttribution = "adapty_analytics_profile_attribution"
     }
     
-    struct NotificationPayload {
+    enum NotificationPayload {
         static let source = "source"
         static let promoDeliveryId = "promo_delivery_id"
     }

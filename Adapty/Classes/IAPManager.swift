@@ -8,38 +8,8 @@
 import Foundation
 import StoreKit
 
-public enum IAPManagerError: Error {
-    case noProductIDsFound
-    case noProductsFound
-    case paymentWasCancelled
-    case productRequestFailed
-    case cantMakePayments
-    case noPurchasesToRestore
-    case cantReadReceipt
-    case productPurchaseFailed
-    case missingOfferSigningParams
-    case fallbackPaywallsNotRequired
-}
-
-extension IAPManagerError: LocalizedError {
-    public var errorDescription: String? {
-        switch self {
-        case .noProductIDsFound: return "No In-App Purchase product identifiers were found."
-        case .noProductsFound: return "No In-App Purchases were found."
-        case .productRequestFailed: return "Unable to fetch available In-App Purchase products at the moment."
-        case .paymentWasCancelled: return "In-App Purchase process was cancelled."
-        case .cantMakePayments: return "In-App Purchases are not allowed on this device."
-        case .noPurchasesToRestore: return "No purchases to restore."
-        case .cantReadReceipt: return "Can't find purchases receipt."
-        case .productPurchaseFailed: return "Product purchase failed."
-        case .missingOfferSigningParams: return "Missing offer signing required params."
-        case .fallbackPaywallsNotRequired: return "Fallback paywalls are not required."
-        }
-    }
-}
-
-public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: Error?) -> Void
-public typealias RestorePurchasesCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ error: Error?) -> Void
+public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: AdaptyError?) -> Void
+public typealias RestorePurchasesCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ error: AdaptyError?) -> Void
 public typealias DeferredPurchaseCompletion = (BuyProductCompletion?) -> Void
 private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, completion: BuyProductCompletion?)
 
@@ -141,7 +111,7 @@ class IAPManager: NSObject {
     func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
         // either already have cached paywalls or appstore request is in progress, which means real paywalls were successfully received
         if self.paywalls != nil || productsRequest != nil {
-            completion?(IAPManagerError.fallbackPaywallsNotRequired)
+            completion?(AdaptyError.fallbackPaywallsNotRequired)
             return
         }
         
@@ -151,13 +121,16 @@ class IAPManager: NSObject {
                 let paywallsData = paywalls.data(using: .utf8),
                 let paywallsJSON = try JSONSerialization.jsonObject(with: paywallsData, options: []) as? Parameters else
             {
-                completion?(NetworkResponse.unableToDecode)
+                completion?(AdaptyError.unableToDecode)
                 return
             }
             
             paywallsArray = try PaywallsArray(json: paywallsJSON)
-        } catch {
+        } catch let error as AdaptyError {
             completion?(error)
+            return
+        } catch {
+            completion?(AdaptyError(with: error))
             return
         }
         
@@ -174,7 +147,7 @@ class IAPManager: NSObject {
         productsRequest?.cancel()
         
         guard let productIDs = productIDs else {
-            callPaywallsCompletionAndCleanCallback(.failure(IAPManagerError.noProductIDsFound))
+            callPaywallsCompletionAndCleanCallback(.failure(AdaptyError.noProductIDsFound))
             return
         }
 
@@ -197,12 +170,12 @@ class IAPManager: NSObject {
     
     func makePurchase(product: ProductModel, offerId: String? = nil, completion: BuyProductCompletion? = nil) {
         guard canMakePayments else {
-            completion?(nil, nil, nil, product, IAPManagerError.cantMakePayments)
+            completion?(nil, nil, nil, product, AdaptyError.cantMakePayments)
             return
         }
         
         guard let skProduct = product.skProduct else {
-            completion?(nil, nil, nil, product, IAPManagerError.noProductsFound)
+            completion?(nil, nil, nil, product, AdaptyError.noProductsFound)
             return
         }
         
@@ -232,7 +205,7 @@ class IAPManager: NSObject {
         }
         
         guard let receipt = receiptData?.base64EncodedString(options: []) else {
-            LoggerManager.logError("No valid local receipt")
+            LoggerManager.logError(AdaptyError.cantReadReceipt)
             return nil
         }
         
@@ -274,7 +247,7 @@ class IAPManager: NSObject {
                 let timestampString = params?["timestamp"] as? String,
                 let timestampInt64 = Int64(timestampString)
             else {
-                completion?(nil, nil, nil, product, IAPManagerError.missingOfferSigningParams)
+                completion?(nil, nil, nil, product, AdaptyError.missingOfferSigningParams)
                 return
             }
             
@@ -297,7 +270,7 @@ private extension IAPManager {
     
     // MARK:- Callbacks handling
     
-    private func callPaywallsCompletionAndCleanCallback(_ result: Result<(paywalls: [PaywallModel], products: [ProductModel]), Error>) {
+    private func callPaywallsCompletionAndCleanCallback(_ result: Result<(paywalls: [PaywallModel], products: [ProductModel]), AdaptyError>) {
         DispatchQueue.main.async {
             switch result {
             case .success(let data):
@@ -318,7 +291,7 @@ private extension IAPManager {
         }
     }
     
-    private func callBuyProductCompletionAndCleanCallback(for purchaseInfo: PurchaseInfoTuple?, result: Result<(purchaserInfo: PurchaserInfoModel?, receipt: String, response: Parameters?), Error>) {
+    private func callBuyProductCompletionAndCleanCallback(for purchaseInfo: PurchaseInfoTuple?, result: Result<(purchaserInfo: PurchaserInfoModel?, receipt: String, response: Parameters?), AdaptyError>) {
         DispatchQueue.main.async {
             // additional logs for success / error were moved to higher level because of the multiple calls in parent methods
             switch result {
@@ -334,7 +307,7 @@ private extension IAPManager {
         }
     }
     
-    private func callRestoreCompletionAndCleanCallback(_ result: Result<(purchaserInfo: PurchaserInfoModel?, receipt: String, response: Parameters?), Error>) {
+    private func callRestoreCompletionAndCleanCallback(_ result: Result<(purchaserInfo: PurchaserInfoModel?, receipt: String, response: Parameters?), AdaptyError>) {
         DispatchQueue.main.async {
             switch result {
             case .success(let result):
@@ -384,12 +357,12 @@ extension IAPManager: SKProductsRequestDelegate {
         if response.products.count > 0, let paywalls = paywalls, let products = products {
             callPaywallsCompletionAndCleanCallback(.success((paywalls: paywalls, products: products)))
         } else {
-            callPaywallsCompletionAndCleanCallback(.failure(IAPManagerError.noProductsFound))
+            callPaywallsCompletionAndCleanCallback(.failure(AdaptyError.noProductsFound))
         }
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        callPaywallsCompletionAndCleanCallback(.failure(error))
+        callPaywallsCompletionAndCleanCallback(.failure(AdaptyError(with: error)))
     }
     
 }
@@ -440,7 +413,7 @@ extension IAPManager: SKPaymentTransactionObserver {
         }
         
         guard let receipt = latestReceipt else {
-            callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(IAPManagerError.cantReadReceipt))
+            callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(AdaptyError.cantReadReceipt))
             return
         }
 
@@ -495,18 +468,14 @@ extension IAPManager: SKPaymentTransactionObserver {
         
         guard let error = transaction.error as? SKError else {
             if let error = transaction.error {
-                callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(error))
+                callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(AdaptyError(with: error)))
             } else {
-                callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(IAPManagerError.productPurchaseFailed))
+                callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(AdaptyError.productPurchaseFailed))
             }
             return
         }
         
-        if error.code != .paymentCancelled {
-            callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(error))
-        } else {
-            callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(IAPManagerError.paymentWasCancelled))
-        }
+        callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .failure(AdaptyError(with: error)))
     }
     
     private func restored(_ transaction: SKPaymentTransaction) {
@@ -518,12 +487,12 @@ extension IAPManager: SKPaymentTransactionObserver {
     
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         guard totalRestoredPurchases != 0 else {
-            callRestoreCompletionAndCleanCallback(.failure(IAPManagerError.noPurchasesToRestore))
+            callRestoreCompletionAndCleanCallback(.failure(AdaptyError.noPurchasesToRestore))
             return
         }
         
         guard let receipt = latestReceipt else {
-            callRestoreCompletionAndCleanCallback(.failure(IAPManagerError.cantReadReceipt))
+            callRestoreCompletionAndCleanCallback(.failure(AdaptyError.cantReadReceipt))
             return
         }
         
@@ -538,15 +507,11 @@ extension IAPManager: SKPaymentTransactionObserver {
     
     func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
         guard let skError = error as? SKError else {
-            callRestoreCompletionAndCleanCallback(.failure(error))
+            callRestoreCompletionAndCleanCallback(.failure(AdaptyError(with: error)))
             return
         }
         
-        if skError.code != .paymentCancelled {
-            callRestoreCompletionAndCleanCallback(.failure(skError))
-        } else {
-            callRestoreCompletionAndCleanCallback(.failure(IAPManagerError.paymentWasCancelled))
-        }
+        callRestoreCompletionAndCleanCallback(.failure(AdaptyError(with: skError)))
     }
     
     func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {

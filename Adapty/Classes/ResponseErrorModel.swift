@@ -33,12 +33,12 @@ struct ResponseErrorModel: JSONCodable {
     }
     
     private func logMissingRequiredParams() {
-        var missingParams = ""
+        var missingParams: [String] = []
         if self.detail.isEmpty { missingParams.append("detail") }
         if self.status == 0 { missingParams.append("status") }
         if self.source.count == 0 { missingParams.append("source") }
         if self.code.isEmpty { missingParams.append("code") }
-        if !missingParams.isEmpty { LoggerManager.logError("Missing some of the required params of ResponseErrorModel: \(missingParams)") }
+        if !missingParams.isEmpty { LoggerManager.logError(AdaptyError.missingParam("ResponseErrorModel - \(missingParams.joined(separator: ", "))")) }
     }
     
 }
@@ -59,7 +59,7 @@ struct ResponseErrorsArray: JSONCodable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("ResponseErrors – errors", errors)
+            throw AdaptyError.invalidProperty("ResponseErrors – errors", errors)
         }
     }
     

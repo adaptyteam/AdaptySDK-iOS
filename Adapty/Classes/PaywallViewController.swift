@@ -11,7 +11,7 @@ import WebKit
 @objc public protocol AdaptyPaywallDelegate: class {
     
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController)
-    func didFailPurchase(product: ProductModel, error: Error, paywall: PaywallViewController)
+    func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController)
     func didClose(paywall: PaywallViewController)
     
 }
@@ -102,7 +102,7 @@ import WebKit
             self.setLoaderVisible(false, animated: true)
             
             if let error = error {
-                if (error as? IAPManagerError) == IAPManagerError.paymentWasCancelled {
+                if error.storeErrorCode == .paymentCancelled {
                     self.logKinesisEvent(.purchaseCancelled, vendorProductId: product.vendorProductId)
                 }
                 

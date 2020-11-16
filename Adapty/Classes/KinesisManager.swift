@@ -40,9 +40,9 @@ class KinesisManager {
         DefaultsManager.shared.installation
     }
 
-    func trackEvent(_ eventType: EventType, params: [String: String]? = nil, completion: ((Error?) -> Void)? = nil) {
+    func trackEvent(_ eventType: EventType, params: [String: String]? = nil, completion: ErrorCompletion? = nil) {
         guard let installation = installation else {
-            let error = NSError(domain: "Adapty Event", code: -1 , userInfo: ["Adapty" : "Can't find valid installation"])
+            let error = AdaptyError.missingParam("AdaptySDK – can't find cached installation")
             LoggerManager.logError(error)
             completion?(error)
             return
@@ -68,7 +68,7 @@ class KinesisManager {
         syncEvents(profileInstallationMetaID: installation.profileInstallationMetaId, secretSigningKey: installation.iamSecretKey, accessKeyId: installation.iamAccessKeyId, sessionToken: installation.iamSessionToken, completion: completion)
     }
 
-    private func syncEvents(profileInstallationMetaID: String, secretSigningKey: String, accessKeyId: String, sessionToken: String, completion: ((Error?) -> Void)? = nil) {
+    private func syncEvents(profileInstallationMetaID: String, secretSigningKey: String, accessKeyId: String, sessionToken: String, completion: ErrorCompletion? = nil) {
 
         let currentCachedEvents = cachedEvents
 
@@ -84,7 +84,7 @@ class KinesisManager {
 
         urlRequest = KinesisManager.sign(request: urlRequest, secretSigningKey: secretSigningKey, accessKeyId: accessKeyId, sessionToken: sessionToken)!
 
-        RequestManager.request(urlRequest: urlRequest) { (result: Result<JSONModel, Error>, response) in
+        RequestManager.request(urlRequest: urlRequest) { (result: Result<JSONModel, AdaptyError>, response) in
             switch result {
             case .success:
                 let updatedCachedEvents = Set(self.cachedEvents).subtracting(currentCachedEvents)

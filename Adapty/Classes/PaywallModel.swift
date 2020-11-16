@@ -45,7 +45,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
             let developerId = attributes?["developer_id"] as? String,
             let variationId = attributes?["variation_id"] as? String
         else {
-            throw SerializationError.missing("PaywallModel - developer_id, variation_id")
+            throw AdaptyError.missingParam("PaywallModel - developer_id, variation_id")
         }
         
         self.developerId = developerId
@@ -56,7 +56,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         if let internalCustomPayload = attributes?["custom_payload"] as? String { self.internalCustomPayload = internalCustomPayload }
         
         guard let products = attributes?["products"] as? [Parameters] else {
-            throw SerializationError.missing("PaywallModel - products")
+            throw AdaptyError.missingParam("PaywallModel - products")
         }
         
         var productsArray: [ProductModel] = []
@@ -68,7 +68,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("PaywallModel - products", products)
+            throw AdaptyError.invalidProperty("PaywallModel - products", products)
         }
         self.products = productsArray
     }
@@ -100,7 +100,7 @@ class PaywallsArray: JSONCodable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("PaywallsArray - paywalls", paywalls)
+            throw AdaptyError.invalidProperty("PaywallsArray - paywalls", paywalls)
         }
         
         guard let meta = json["meta"] as? Parameters, let products = meta["products"] as? [Parameters] else {
@@ -114,7 +114,7 @@ class PaywallsArray: JSONCodable {
                 }
             }
         } catch {
-            throw SerializationError.invalid("PaywallsArray - products in meta", meta)
+            throw AdaptyError.invalidProperty("PaywallsArray - products in meta", meta)
         }
     }
     

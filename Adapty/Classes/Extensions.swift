@@ -106,11 +106,11 @@ extension Dictionary {
     
     func attributes() throws -> Parameters  {
         guard let json = self as? Parameters else {
-            throw SerializationError.invalid("self", self)
+            throw AdaptyError.invalidProperty("JSON response", self)
         }
         
         guard var attributes = json["attributes"] as? Parameters else {
-            throw SerializationError.missing("attributes")
+            throw AdaptyError.missingParam("JSON response - attributes")
         }
         
         if let id = json["id"] as? String {

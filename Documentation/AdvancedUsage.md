@@ -222,11 +222,11 @@ extension ViewController: AdaptyPaywallDelegate {
         // just call paywall.close() to close paywall if needed and do related calls you need
     }
     
-    func didFailPurchase(product: ProductModel, error: Error, paywall: PaywallViewController) {
+    func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController) {
         // handle error
         
-        // error can also be just a cancellation, to check that simply compare error with IAPManagerError.paymentWasCancelled 
-        // (error as? IAPManagerError) == IAPManagerError.paymentWasCancelled
+        // error can also be just a cancellation, you can check that pretty easy with `storeErrorCode` property:
+        // error.storeErrorCode == .paymentCancelled
     }
     
     func didClose(paywall: PaywallViewController) {

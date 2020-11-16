@@ -212,8 +212,6 @@ import UIKit
         if let apnsTokenString = apnsTokenString { attributes["device_token"] = apnsTokenString }
         if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         
-        #warning("Handle Adjust params")
-        
         let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
         
         apiManager.syncInstallation(id: installationMetaId, profileId: profileId, params: params) { (installation, error) in
@@ -406,15 +404,10 @@ import UIKit
             
             shared.promo = promo
             
-            if let error = error {
-                switch error {
-                case SerializationError.missing:
-                    // do not return error in case of just empty response
-                    completion?(nil, nil)
-                    return
-                default:
-                    break
-                }
+            if let error = error, error.networkErrorCode == AdaptyError.NetworkErrorCode.missingParam {
+                // do not return error in case of just empty response
+                completion?(nil, nil)
+                return
             }
             
             completion?(promo, error)

@@ -97,7 +97,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         guard
             let vendorProductId = json["vendor_product_id"] as? String
         else {
-            throw SerializationError.missing("ProductModel - vendorProductId")
+            throw AdaptyError.missingParam("ProductModel - vendorProductId")
         }
         
         self.vendorProductId = vendorProductId
