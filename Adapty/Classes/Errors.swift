@@ -85,14 +85,14 @@ public class AdaptyError: NSError {
         case emptyResponse = 0 //Response is empty
         case emptyData = 1 // Request data is empty
         case authenticationError = 2 // You need to be authenticated first
-        case badRequest = 4 // Bad request
-        case outdated = 5 // The url you requested is outdated
-        case failed = 6 // Network request failed
-        case unableToDecode = 8 // We could not decode the response
-        case missingParam = 10 // Missing some of the required params
-        case invalidProperty = 11 // Received invalid property data
-        case encodingFailed = 12 // Parameters encoding failed
-        case missingURL = 13 // Request url is nil
+        case badRequest = 3 // Bad request
+        case outdated = 4 // The url you requested is outdated
+        case failed = 5 // Network request failed
+        case unableToDecode = 6 // We could not decode the response
+        case missingParam = 7 // Missing some of the required params
+        case invalidProperty = 8 // Received invalid property data
+        case encodingFailed = 9 // Parameters encoding failed
+        case missingURL = 10 // Request url is nil
     }
     
     // network shortcuts
