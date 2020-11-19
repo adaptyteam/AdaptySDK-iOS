@@ -112,7 +112,7 @@ class RequestManager {
             do {
                 let responseErrors = try ResponseErrorsArray(json: json)
                 if let responseError = responseErrors?.errors.first {
-                    handleResult(result: .failure(AdaptyError(code: responseError.status, networkCode: error.networkErrorCode, message: responseError.description)), response: nil, completion: completion)
+                    handleResult(result: .failure(AdaptyError(code: responseError.status, adaptyCode: error.adaptyErrorCode, message: responseError.description)), response: nil, completion: completion)
                     return
                 }
                 

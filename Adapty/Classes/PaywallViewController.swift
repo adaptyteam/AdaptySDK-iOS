@@ -102,7 +102,7 @@ import WebKit
             self.setLoaderVisible(false, animated: true)
             
             if let error = error {
-                if error.storeErrorCode == .paymentCancelled {
+                if error.adaptyErrorCode == .paymentCancelled {
                     self.logKinesisEvent(.purchaseCancelled, vendorProductId: product.vendorProductId)
                 }
                 

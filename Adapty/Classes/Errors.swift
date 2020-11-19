@@ -11,8 +11,7 @@ import StoreKit
 public class AdaptyError: NSError {
     
     @objc public var originalError: Error?
-    @objc public var storeErrorCode: StoreErrorCode = .none
-    @objc public var networkErrorCode: NetworkErrorCode = .none
+    @objc public var adaptyErrorCode: AdaptyErrorCode = .none
     
     private let adaptyDomain = "com.adapty.AdaptySDK"
     
@@ -20,26 +19,20 @@ public class AdaptyError: NSError {
         self.originalError = error
         
         if let error = error as? SKError {
-            self.storeErrorCode = StoreErrorCode(rawValue: error.code.rawValue) ?? .none
+            self.adaptyErrorCode = AdaptyErrorCode(rawValue: error.code.rawValue) ?? .none
         }
         
         let error = error as NSError
         super.init(domain: error.domain, code: error.code, userInfo: error.userInfo)
     }
     
-    init(code: Int, storeCode: StoreErrorCode = .none, networkCode: NetworkErrorCode = .none, message: String) {
-        self.storeErrorCode = storeCode
-        self.networkErrorCode = networkCode
+    init(code: Int, adaptyCode: AdaptyErrorCode = .none, message: String) {
+        self.adaptyErrorCode = adaptyCode
         super.init(domain: adaptyDomain, code: code, userInfo: [NSLocalizedDescriptionKey: message])
     }
     
-    init(code: StoreErrorCode, message: String) {
-        self.storeErrorCode = code
-        super.init(domain: adaptyDomain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: message])
-    }
-    
-    init(code: NetworkErrorCode, message: String) {
-        self.networkErrorCode = code
+    init(code: AdaptyErrorCode, message: String) {
+        self.adaptyErrorCode = code
         super.init(domain: adaptyDomain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: message])
     }
     
@@ -47,10 +40,10 @@ public class AdaptyError: NSError {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc public enum StoreErrorCode: Int {
+    @objc public enum AdaptyErrorCode: Int {
         case none = -1
         
-        // system
+        // system storekit codes
         case unknown = 0
         case clientInvalid = 1 // client is not allowed to issue the request, etc.
         case paymentCancelled = 2 // user cancelled the request, etc.
@@ -67,7 +60,7 @@ public class AdaptyError: NSError {
         case missingOfferParams = 13 // One or more parameters from SKPaymentDiscount is missing
         case invalidOfferPrice = 14
         
-        // custom
+        // custom storekit codes
         case noProductIDsFound = 1000 // No In-App Purchase product identifiers were found
         case noProductsFound = 1001 // No In-App Purchases were found
         case productRequestFailed = 1002 // Unable to fetch available In-App Purchase products at the moment
@@ -77,50 +70,47 @@ public class AdaptyError: NSError {
         case productPurchaseFailed = 1006 // Product purchase failed
         case missingOfferSigningParams = 1007 // Missing offer signing required params
         case fallbackPaywallsNotRequired = 1008 // Fallback paywalls are not required
-    }
-    
-    @objc public enum NetworkErrorCode: Int {
-        case none = -1
         
-        case emptyResponse = 0 //Response is empty
-        case emptyData = 1 // Request data is empty
-        case authenticationError = 2 // You need to be authenticated first
-        case badRequest = 3 // Bad request
-        case outdated = 4 // The url you requested is outdated
-        case failed = 5 // Network request failed
-        case unableToDecode = 6 // We could not decode the response
-        case missingParam = 7 // Missing some of the required params
-        case invalidProperty = 8 // Received invalid property data
-        case encodingFailed = 9 // Parameters encoding failed
-        case missingURL = 10 // Request url is nil
+        // custom network codes
+        case emptyResponse = 2000 //Response is empty
+        case emptyData = 2001 // Request data is empty
+        case authenticationError = 2002 // You need to be authenticated first
+        case badRequest = 2003 // Bad request
+        case outdated = 2004 // The url you requested is outdated
+        case failed = 2005 // Network request failed
+        case unableToDecode = 2006 // We could not decode the response
+        case missingParam = 2007 // Missing some of the required params
+        case invalidProperty = 2008 // Received invalid property data
+        case encodingFailed = 2009 // Parameters encoding failed
+        case missingURL = 2010 // Request url is nil
     }
     
     // network shortcuts
-    class var emptyResponse: AdaptyError { return AdaptyError(code: NetworkErrorCode.emptyResponse, message: "Response is empty.") }
-    class var emptyData: AdaptyError { return AdaptyError(code: NetworkErrorCode.emptyData, message: "Request data is empty.") }
-    class var authenticationError: AdaptyError { return AdaptyError(code: NetworkErrorCode.authenticationError, message: "You need to be authenticated first.") }
-    class var badRequest: AdaptyError { return AdaptyError(code: NetworkErrorCode.badRequest, message: "Bad request.") }
-    class var outdated: AdaptyError { return AdaptyError(code: NetworkErrorCode.outdated, message: "The url you requested is outdated.") }
-    class var failed: AdaptyError { return AdaptyError(code: NetworkErrorCode.failed, message: "Network request failed.") }
-    class var unableToDecode: AdaptyError { return AdaptyError(code: NetworkErrorCode.unableToDecode, message: "We could not decode the response.") }
+    class var emptyResponse: AdaptyError { return AdaptyError(code: .emptyResponse, message: "Response is empty.") }
+    class var emptyData: AdaptyError { return AdaptyError(code: .emptyData, message: "Request data is empty.") }
+    class var authenticationError: AdaptyError { return AdaptyError(code: .authenticationError, message: "You need to be authenticated first.") }
+    class var badRequest: AdaptyError { return AdaptyError(code: .badRequest, message: "Bad request.") }
+    class var outdated: AdaptyError { return AdaptyError(code: .outdated, message: "The url you requested is outdated.") }
+    class var failed: AdaptyError { return AdaptyError(code: .failed, message: "Network request failed.") }
+    class var unableToDecode: AdaptyError { return AdaptyError(code: .unableToDecode, message: "We could not decode the response.") }
     class func missingParam(_ params: String) -> AdaptyError {
-        return AdaptyError(code: NetworkErrorCode.missingParam, message: "Missing some of the required params: `\(params)`")
+        return AdaptyError(code: .missingParam, message: "Missing some of the required params: `\(params)`")
     }
     class func invalidProperty(_ property: String, _ data: Any) -> AdaptyError {
-        return AdaptyError(code: NetworkErrorCode.invalidProperty, message: "Received invalid `\(property)`: `\(data)`")
+        return AdaptyError(code: .invalidProperty, message: "Received invalid `\(property)`: `\(data)`")
     }
-    class var encodingFailed: AdaptyError { return AdaptyError(code: NetworkErrorCode.encodingFailed, message: "Parameters encoding failed.") }
-    class var missingURL: AdaptyError { return AdaptyError(code: NetworkErrorCode.missingURL, message: "Request url is nil.") }
+    class var encodingFailed: AdaptyError { return AdaptyError(code: .encodingFailed, message: "Parameters encoding failed.") }
+    class var missingURL: AdaptyError { return AdaptyError(code: .missingURL, message: "Request url is nil.") }
     
     // store shortcuts
-    class var noProductIDsFound: AdaptyError { return AdaptyError(code: StoreErrorCode.noProductIDsFound, message: "No In-App Purchase product identifiers were found.") }
-    class var noProductsFound: AdaptyError { return AdaptyError(code: StoreErrorCode.noProductsFound, message: "No In-App Purchases were found.") }
-    class var productRequestFailed: AdaptyError { return AdaptyError(code: StoreErrorCode.productRequestFailed, message: "Unable to fetch available In-App Purchase products at the moment.") }
-    class var cantMakePayments: AdaptyError { return AdaptyError(code: StoreErrorCode.cantMakePayments, message: "In-App Purchases are not allowed on this device.") }
-    class var noPurchasesToRestore: AdaptyError { return AdaptyError(code: StoreErrorCode.noPurchasesToRestore, message: "No purchases to restore.") }
-    class var cantReadReceipt: AdaptyError { return AdaptyError(code: StoreErrorCode.cantReadReceipt, message: "Can't find a valid receipt.") }
-    class var productPurchaseFailed: AdaptyError { return AdaptyError(code: StoreErrorCode.productPurchaseFailed, message: "Product purchase failed.") }
-    class var missingOfferSigningParams: AdaptyError { return AdaptyError(code: StoreErrorCode.missingOfferSigningParams, message: "Missing offer signing required params.") }
-    class var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: StoreErrorCode.fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
+    class var noProductIDsFound: AdaptyError { return AdaptyError(code: .noProductIDsFound, message: "No In-App Purchase product identifiers were found.") }
+    class var noProductsFound: AdaptyError { return AdaptyError(code: .noProductsFound, message: "No In-App Purchases were found.") }
+    class var productRequestFailed: AdaptyError { return AdaptyError(code: .productRequestFailed, message: "Unable to fetch available In-App Purchase products at the moment.") }
+    class var cantMakePayments: AdaptyError { return AdaptyError(code: .cantMakePayments, message: "In-App Purchases are not allowed on this device.") }
+    class var noPurchasesToRestore: AdaptyError { return AdaptyError(code: .noPurchasesToRestore, message: "No purchases to restore.") }
+    class var cantReadReceipt: AdaptyError { return AdaptyError(code: .cantReadReceipt, message: "Can't find a valid receipt.") }
+    class var productPurchaseFailed: AdaptyError { return AdaptyError(code: .productPurchaseFailed, message: "Product purchase failed.") }
+    class var missingOfferSigningParams: AdaptyError { return AdaptyError(code: .missingOfferSigningParams, message: "Missing offer signing required params.") }
+    class var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
     
 }

@@ -404,7 +404,7 @@ import UIKit
             
             shared.promo = promo
             
-            if let error = error, error.networkErrorCode == AdaptyError.NetworkErrorCode.missingParam {
+            if let error = error, error.adaptyErrorCode == .missingParam {
                 // do not return error in case of just empty response
                 completion?(nil, nil)
                 return
