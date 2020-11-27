@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PromoModel: NSObject, JSONCodable {
+public class PromoModel: NSObject, JSONCodable, Codable {
     
     @objc public var promoType: String
     @objc public var variationId: String

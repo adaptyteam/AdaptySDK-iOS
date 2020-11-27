@@ -8,7 +8,7 @@
 
 import Foundation
 
-@objc public enum DataState: Int {
+@objc public enum DataState: Int, Codable {
     case cached
     case synced
 }
