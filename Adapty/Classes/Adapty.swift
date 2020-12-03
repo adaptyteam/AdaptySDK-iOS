@@ -344,13 +344,19 @@ import UIKit
     
     @objc public static var apnsToken: Data? {
         didSet {
-            LoggerManager.logMessage("Setting APNS token.")
             shared.apnsTokenString = apnsToken?.map { String(format: "%02.2hhx", $0) }.joined()
+        }
+    }
+    
+    @objc public static var apnsTokenString: String? {
+        didSet {
+            shared.apnsTokenString = apnsTokenString
         }
     }
     
     private var apnsTokenString: String? {
         didSet {
+            LoggerManager.logMessage("Setting APNS token.")
             syncInstallation()
         }
     }
