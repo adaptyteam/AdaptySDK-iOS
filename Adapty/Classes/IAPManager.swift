@@ -111,7 +111,8 @@ class IAPManager: NSObject {
     func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
         // either already have cached paywalls or appstore request is in progress, which means real paywalls were successfully received
         if self.paywalls != nil || productsRequest != nil {
-            completion?(AdaptyError.fallbackPaywallsNotRequired)
+            LoggerManager.logMessage("Tried to set Fallback Paywalls but it's unnecessary, since we already have a real paywalls data.")
+            completion?(nil)
             return
         }
         
