@@ -31,7 +31,7 @@ public class PromoModel: NSObject, JSONCodable, Codable {
         
         self.promoType = promoType
         self.variationId = variationId
-        self.expiresAt = (json["expires_at"] as? String)?.dateValue
+        self.expiresAt = (attributes?["expires_at"] as? String)?.dateValue
     }
     
     public override func isEqual(_ object: Any?) -> Bool {

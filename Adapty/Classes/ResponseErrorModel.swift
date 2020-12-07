@@ -49,7 +49,7 @@ struct ResponseErrorsArray: JSONCodable {
     
     init?(json: Parameters) throws {
         guard let errors = json["errors"] as? [Parameters] else {
-            return
+            return nil
         }
         
         do {
