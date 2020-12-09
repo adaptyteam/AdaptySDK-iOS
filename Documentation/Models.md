@@ -146,6 +146,7 @@ This model contains info about paywall.
 | products | An array of [`ProductModel`](#productmodel) related to this paywall. |
 | visualPaywall | HTML representation of the paywall. |
 | customPayload | Dictionary of paywall's custom properties. |
+| customPayloadString | String representation of paywall's custom properties. |
 
 ## `PromoModel`
 

@@ -16,7 +16,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         case isPromo
         case products
         case visualPaywall
-        case internalCustomPayload
+        case customPayloadString
     }
     
     @objc public var developerId: String
@@ -25,9 +25,9 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
     @objc public var isPromo: Bool = false
     @objc public var products: [ProductModel] = []
     @objc public var visualPaywall: String = ""
-    private var internalCustomPayload: String = ""
+    @objc public var customPayloadString: String = ""
     @objc public lazy var customPayload: Parameters = {
-        if let data = self.internalCustomPayload.data(using: .utf8), let customPayload = try? JSONSerialization.jsonObject(with: data, options: []) as? Parameters {
+        if let data = self.customPayloadString.data(using: .utf8), let customPayload = try? JSONSerialization.jsonObject(with: data, options: []) as? Parameters {
             return customPayload
         }
         return Parameters()
@@ -53,7 +53,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         if let revision = attributes?["revision"] as? Int { self.revision = revision }
         if let isPromo = attributes?["is_promo"] as? Bool { self.isPromo = isPromo }
         if let visualPaywall = attributes?["visual_paywall"] as? String { self.visualPaywall = visualPaywall }
-        if let internalCustomPayload = attributes?["custom_payload"] as? String { self.internalCustomPayload = internalCustomPayload }
+        if let customPayloadString = attributes?["custom_payload"] as? String { self.customPayloadString = customPayloadString }
         
         guard let products = attributes?["products"] as? [Parameters] else {
             throw AdaptyError.missingParam("PaywallModel - products")
@@ -78,7 +78,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.developerId == object.developerId && self.variationId == object.variationId && self.revision == object.revision && self.isPromo == object.isPromo && self.products == object.products && self.visualPaywall == object.visualPaywall && self.internalCustomPayload == object.internalCustomPayload
+        return self.developerId == object.developerId && self.variationId == object.variationId && self.revision == object.revision && self.isPromo == object.isPromo && self.products == object.products && self.visualPaywall == object.visualPaywall && self.customPayloadString == object.customPayloadString
     }
     
 }
