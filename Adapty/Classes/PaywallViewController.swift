@@ -51,7 +51,7 @@ import WebKit
     }
     
     private func fulfillDataFromPaywall() {
-        var htmlString = paywall.visualPaywall
+        var htmlString = paywall.visualPaywall ?? ""
         let placeholder = ""
         
         paywall.products.forEach { (product) in

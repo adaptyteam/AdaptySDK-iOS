@@ -17,6 +17,7 @@ extension PaywallModel {
             "isPromo": isPromo,
             "products": products,
             "visualPaywall": visualPaywall,
+            "customPayloadString": customPayloadString,
             "customPayload": customPayload
         ]
 

@@ -24,13 +24,13 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
     @objc public var revision: Int = 0
     @objc public var isPromo: Bool = false
     @objc public var products: [ProductModel] = []
-    @objc public var visualPaywall: String = ""
-    @objc public var customPayloadString: String = ""
-    @objc public lazy var customPayload: Parameters = {
-        if let data = self.customPayloadString.data(using: .utf8), let customPayload = try? JSONSerialization.jsonObject(with: data, options: []) as? Parameters {
+    @objc public var visualPaywall: String?
+    @objc public var customPayloadString: String?
+    @objc public lazy var customPayload: Parameters? = {
+        if let data = customPayloadString?.data(using: .utf8), let customPayload = try? JSONSerialization.jsonObject(with: data, options: []) as? Parameters {
             return customPayload
         }
-        return Parameters()
+        return nil
     }()
     
     required init?(json: Parameters) throws {
