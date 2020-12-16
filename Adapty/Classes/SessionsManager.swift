@@ -15,6 +15,23 @@ class SessionsManager {
         return KinesisManager.shared
     }()
     
+    private var purchaserInfoTimer: Timer?
+    
+    init() {
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
+            self?.trackLiveEventInBackground()
+        }
+    }
+    
+    deinit {
+        invalidateTimers()
+    }
+    
+    func invalidateTimers() {
+        invalidateLiveTrackerTimer()
+        invalidatePurchaserInfoTimer()
+    }
+    
     func startTrackingLiveEvent() {
         guard liveTrackerTimer == nil else {
             return
@@ -38,7 +55,7 @@ class SessionsManager {
         kinesisManager.trackEvent(.live, completion: completion)
     }
     
-    func trackLiveEventInBackground() {
+    private func trackLiveEventInBackground() {
         var eventBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
         eventBackgroundTaskID = UIApplication.shared.beginBackgroundTask (withName: "AdaptyTrackLiveBackgroundTask") {
             // End the task if time expires.
@@ -55,6 +72,23 @@ class SessionsManager {
                 eventBackgroundTaskID = .invalid
             }
         }
+    }
+    
+    func startUpdatingPurchaserInfo() {
+        guard purchaserInfoTimer == nil else {
+            return
+        }
+        
+        purchaserInfoTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(fireUpdatePurchaserInfo), userInfo: nil, repeats: true)
+    }
+    
+    func invalidatePurchaserInfoTimer() {
+        purchaserInfoTimer?.invalidate()
+        purchaserInfoTimer = nil
+    }
+    
+    @objc private func fireUpdatePurchaserInfo() {
+        Adapty.getPurchaserInfo { (_, _) in }
     }
     
 }

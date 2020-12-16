@@ -110,16 +110,12 @@ import UIKit
         } else {
             // already have a synced profile
             // update local cache for purchaser info
-            Self.getPurchaserInfo { (_, _, _) in }
+            Self.getPurchaserInfo { (_, _) in }
             // perform initial requests
             performInitialRequests()
         }
         
         AppDelegateSwizzler.startSwizzlingIfPossible(self)
-        
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
-            self?.sessionsManager.trackLiveEventInBackground()
-        }
     }
     
     private func performInitialRequests() {
@@ -134,6 +130,9 @@ import UIKit
             // get current existing promo
             Self.getPromo()
         }
+        
+        // start refreshing purchaser info in background
+        sessionsManager.startUpdatingPurchaserInfo()
         
         // check if user enabled apple search ads attribution collection
         if let appleSearchAdsAttributionCollectionEnabled = Bundle.main.infoDictionary?[Constants.BundleKeys.appleSearchAdsAttributionCollectionEnabled] as? Bool, appleSearchAdsAttributionCollectionEnabled {
@@ -371,21 +370,26 @@ import UIKit
         iapManager.syncTransactionsHistory()
     }
     
-    @objc public class func getPurchaserInfo(_ completion: @escaping CahcedPurchaserCompletion) {
+    @objc public class func getPurchaserInfo(_ completion: @escaping PurchaserCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
         let cachedPurchaserInfo = shared.purchaserInfo
         
+        // call callback instantly with cached data
         if cachedPurchaserInfo != nil {
-            completion(cachedPurchaserInfo, .cached, nil)
+            completion(cachedPurchaserInfo, nil)
         }
         
+        // re-sync purchaserInfo in backgroun in any case
         shared.apiManager.getPurchaserInfo(id: shared.profileId) { (purchaserInfo, error) in
             if let purchaserInfo = purchaserInfo {
                 shared.purchaserInfo = purchaserInfo
             }
             
-            completion(purchaserInfo, .synced, error)
+            // call callback in case of missing cached data
+            if cachedPurchaserInfo == nil {
+                completion(purchaserInfo, error)
+            }
         }
     }
     
@@ -464,7 +468,7 @@ import UIKit
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        shared.sessionsManager.invalidateLiveTrackerTimer()
+        shared.sessionsManager.invalidateTimers()
         shared.purchaserInfo = nil
         shared.installation = nil
         shared.promo = nil

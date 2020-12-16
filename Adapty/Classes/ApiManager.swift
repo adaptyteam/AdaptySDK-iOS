@@ -16,7 +16,6 @@ public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, 
 public typealias JSONCompletion = (Parameters?, AdaptyError?) -> Void
 public typealias ErrorCompletion = (AdaptyError?) -> Void
 public typealias PurchaserCompletion = (PurchaserInfoModel?, AdaptyError?) -> Void
-public typealias CahcedPurchaserCompletion = (PurchaserInfoModel?, DataState, AdaptyError?) -> Void
 public typealias PromoCompletion = (PromoModel?, AdaptyError?) -> Void
 
 class ApiManager {
