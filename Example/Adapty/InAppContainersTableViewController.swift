@@ -27,7 +27,7 @@ class InAppContainersTableViewController: UIViewController {
     }
     
     @objc private func loadData() {
-        Adapty.getPaywalls { (paywalls, products, state, error) in
+        Adapty.getPaywalls { (paywalls, products, error) in
             self.tableView.refreshControl?.endRefreshing()
             self.paywalls = paywalls ?? []
             self.tableView.reloadData()

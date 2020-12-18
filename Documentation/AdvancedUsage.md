@@ -192,14 +192,15 @@ Paywalls are fetched through the SDK based on their configuration in the Adapty 
 As soon as you get your paywalls info, you can build your own.
 
 ```Swift
-Adapty.getPaywalls { (paywalls, products, state, error) in
+Adapty.getPaywalls(forceUpdate: Bool) { (paywalls, products, error) in
 
 }
 ```
 
+Adapty mostly takes this info from cache and tries to keep it up to date.  
+**`forceUpdate`** means you want your paywalls to be synced from server in any way. You can skip this param by default and give it to an SDK.  
 **`paywalls`** is an array of [`PaywallModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#paywallmodel) objects, containing info about your paywalls.  
 **`products`** is an array [`ProductModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#productmodel) objects, containing info about all your products.  
-For **`state`** possible values are: **`cached`**, **`synced`**. First means that data was taken from a local cache, second means that data was updated from a remote server.
 
 ### Custom dashboard paywalls
 
@@ -336,20 +337,20 @@ extension AppDelegate: AdaptyDelegate {
 It's super easy to fetch user purchases info – there is a one-liner for this: 
 
 ```Swift
-Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
+Adapty.getPurchaserInfo { (purchaserInfo, error) in
 
 }
 ```
 
 **`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.  
-For **`state`** possible values are: **`cached`**, **`synced`**. First means that data was taken from a local cache, second means that data was updated from a remote server. 
+Adapty mostly takes this info from cache and tries to keep it up to date. You'll also get any `purchaserInfo` updates in [`delegate`](#listening-for-purchaser-info-updates) method.  
 
 ### Checking if a user is subscribed 
 
 The subscription status for a user can easily be determined from **`accessLevels`** property of **`purchaserInfo`** object by **`isActive`** property inside.
 
 ```Swift
-Adapty.getPurchaserInfo { (purchaserInfo, state, error) in
+Adapty.getPurchaserInfo { (purchaserInfo, error) in
     if purchaserInfo?.accessLevels["level_configured_in_dashboard"]?.isActive == true {
     
     }
@@ -502,8 +503,8 @@ class SubscriptionInteractor: ObservableObject {
     @Published var isPresented = false
     
     init() {
-        Adapty.getPaywalls { (paywalls, products, state, error) in
-            if state == .synced, let paywall = paywalls?.first {
+        Adapty.getPaywalls { (paywalls, products, error) in
+            if let paywall = paywalls?.first {
                 // receive needed synced paywall
                 self.paywall = paywall
                 self.isPresented = true

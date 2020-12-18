@@ -269,18 +269,10 @@ import UIKit
         }
     }
     
-    @objc public class func getPaywalls(_ completion: @escaping CachedPaywallsCompletion) {
+    @objc public class func getPaywalls(forceUpdate: Bool = false, _ completion: @escaping PaywallsCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        let paywalls = shared.iapManager.paywalls
-        let products = shared.iapManager.products
-        if paywalls != nil || products != nil {
-            completion(paywalls, products, .cached, nil)
-        }
-        
-        shared.iapManager.getPaywalls { (paywalls, products, error) in
-            completion(paywalls, products, .synced, error)
-        }
+        shared.iapManager.getPaywalls(forceUpdate: forceUpdate, completion)
     }
     
     @objc public class func makePurchase(product: ProductModel, offerId: String? = nil, completion: @escaping BuyProductCompletion) {
@@ -380,7 +372,7 @@ import UIKit
             completion(cachedPurchaserInfo, nil)
         }
         
-        // re-sync purchaserInfo in backgroun in any case
+        // re-sync purchaserInfo in background in any case
         shared.apiManager.getPurchaserInfo(id: shared.profileId) { (purchaserInfo, error) in
             if let purchaserInfo = purchaserInfo {
                 shared.purchaserInfo = purchaserInfo
@@ -402,7 +394,7 @@ import UIKit
             
             // if there is no such paywall, re-sync them from server
             if let promo = promo, promo.paywall == nil {
-                getPaywalls { (_, _, state, error) in
+                getPaywalls(forceUpdate: true) { (_, _, error) in
                     promo.paywall = shared.iapManager.paywalls?.filter({ $0.variationId == promo.variationId }).first
                     
                     shared.promo = promo

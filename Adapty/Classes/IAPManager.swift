@@ -48,6 +48,8 @@ class IAPManager: NSObject {
     private var paywallsRequest: URLSessionDataTask?
     private var productsRequest: SKProductsRequest?
     private var paywallsRequestCompletions: [PaywallsCompletion] = []
+    
+    private var isSyncedAtLeastOnce: Bool = false
 
     private var productsToBuy: [PurchaseInfoTuple] = []
 
@@ -65,14 +67,31 @@ class IAPManager: NSObject {
     func startObservingPurchases(_ completion: PaywallsCompletion? = nil) {
         startObserving()
         
-        getPaywalls(completion)
+        internalGetPaywalls(completion)
         
         NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.stopObserving()
         }
     }
     
-    func getPaywalls(_ completion: PaywallsCompletion? = nil) {
+    func getPaywalls(forceUpdate: Bool = false, _ completion: @escaping PaywallsCompletion) {
+        if forceUpdate {
+            // re-sync paywalls and get an actual response
+            internalGetPaywalls(completion)
+            return
+        }
+        
+        // check for synced and cached data
+        if (paywalls != nil || products != nil) && isSyncedAtLeastOnce {
+            // call callback instantly with freshly cached data if there are such
+            completion(paywalls, products, nil)
+        } else {
+            // sync paywalls and return data in case of missing cached data
+            internalGetPaywalls(completion)
+        }
+    }
+    
+    private func internalGetPaywalls(_ completion: PaywallsCompletion? = nil) {
         if let completion = completion { paywallsRequestCompletions.append(completion) }
         
         // syncing already in progress
@@ -174,6 +193,24 @@ class IAPManager: NSObject {
             return
         }
         
+        // try to fill SKProduct for cached product
+        product.skProduct = self.skProduct(for: product)
+        if product.skProduct != nil {
+            // procceed to payment in case of a valid SKProduct
+            internalMakePurchase(product: product, offerId: offerId, completion: completion)
+            return
+        }
+        
+        // re-sync paywalls to get an actual data
+        internalGetPaywalls { (_, _, _) in
+            product.skProduct = self.skProduct(for: product)
+            self.internalMakePurchase(product: product, offerId: offerId, completion: completion)
+        }
+    }
+    
+    
+    
+    private func internalMakePurchase(product: ProductModel, offerId: String? = nil, completion: BuyProductCompletion? = nil) {
         guard let skProduct = product.skProduct else {
             completion?(nil, nil, nil, product, AdaptyError.noProductsFound)
             return
@@ -354,6 +391,8 @@ extension IAPManager: SKProductsRequestDelegate {
             }
         })
         
+        isSyncedAtLeastOnce = true
+        
         if response.products.count > 0, let paywalls = paywalls, let products = products {
             callPaywallsCompletionAndCleanCallback(.success((paywalls: paywalls, products: products)))
         } else {
@@ -399,6 +438,10 @@ extension IAPManager: SKPaymentTransactionObserver {
     
     private func product(for transaction: SKPaymentTransaction) -> ProductModel? {
         return products?.filter({ $0.vendorProductId == transaction.payment.productIdentifier }).first
+    }
+    
+    private func skProduct(for product: ProductModel) -> SKProduct? {
+        return products?.filter({ $0.vendorProductId == product.vendorProductId }).first?.skProduct
     }
     
     private func purchased(_ transaction: SKPaymentTransaction) {

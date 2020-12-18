@@ -50,14 +50,10 @@ extension InAppTableViewController: UITableViewDataSource {
 extension InAppTableViewController: InAppTableViewCellDelegate {
     
     func didBuyProduct(_ product: ProductModel, useDiscount: Bool) {
-        let skProduct = product.skProduct
-        var discountsIds: [String]?
-        if #available(iOS 12.2, *), useDiscount {
-            discountsIds = skProduct?.discounts.map({ $0.identifier ?? "" })
-        }
+        let discountId: String? = useDiscount ? product.discounts.first?.identifier : nil
         
         setUI(enabled: false)
-        Adapty.makePurchase(product: product, offerId: discountsIds?.first) { (purchaserInfo, receipt, response, product, error) in
+        Adapty.makePurchase(product: product, offerId: discountId) { (purchaserInfo, receipt, response, product, error) in
             self.setUI(enabled: true)
             
             guard error == nil else {
