@@ -457,6 +457,12 @@ import UIKit
         shared.iapManager.setFallbackPaywalls(paywalls, completion: completion)
     }
     
+    @objc public class func logShowPaywall(_ paywall: PaywallModel, completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
+        shared.kinesisManager.trackEvent(.paywallShowed, params: ["is_promo": paywall.isPromo.description, "variation_id": paywall.variationId], completion: completion)
+    }
+    
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         

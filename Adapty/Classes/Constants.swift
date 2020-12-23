@@ -57,6 +57,7 @@ enum Constants {
     enum BundleKeys {
         static let appDelegateProxyEnabled = "AdaptyAppDelegateProxyEnabled"
         static let appleSearchAdsAttributionCollectionEnabled = "AdaptyAppleSearchAdsAttributionCollectionEnabled"
+        static let automaticPaywallsScreenReportingEnabled = "AdaptyAutomaticPaywallsScreenReportingEnabled"
     }
     
     enum TypeNames {

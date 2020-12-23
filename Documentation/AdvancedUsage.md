@@ -202,6 +202,46 @@ Adapty mostly takes this info from cache and tries to keep it up to date.
 **`paywalls`** is an array of [`PaywallModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#paywallmodel) objects, containing info about your paywalls.  
 **`products`** is an array [`ProductModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#productmodel) objects, containing info about all your products.  
 
+### A/B tests
+
+Simple showcase of how to work with A/B tests on the app side.
+
+First, receive your needed paywall:  
+
+```Swift
+var paywall: PaywallModel?
+Adapty.getPaywalls { (paywalls, _, error) in
+    paywall = paywalls?.first
+    
+    // or search for exact `paywall`: 
+    // paywall = paywalls?.first(where: { $0.developerId == "your_paywall_id" })
+}
+```
+
+Next, build your paywall view by using `paywall.products` and show it to user.
+
+Later on, when user try to buy `product`, simply call `Adapty.makePurchase` with related product from your `paywall`:
+
+```Swift
+let product = paywall?.products.first(where: { $0.vendorProductId == <product_id> })
+// or get the original `product`, the one you built your paywall view from if it's easier for you
+
+Adapty.makePurchase(product: product) { (purchaserInfo, receipt, response, product, error) in
+    // check error and alert user about success or failure
+}
+```
+
+### Paywalls screen reporting
+
+By default, we treat any `getPaywalls` request call from user's side as `paywallShow` event for convertion calculations during A/B tests.  
+It's not correct, since user may not even see it. That's why you need to use manual screen tracking.  
+
+First, disable automatic screen tracking by adding the flag `AdaptyAutomaticPaywallsScreenReportingEnabled` in the app’s Info.plist file and setting it to `NO` (boolean value).  
+Next, whenever you show paywall to your user, call `Adapty.logShowPaywall(paywall)` to log `paywallShow` event, related to your paywall.
+```Swift
+Adapty.logShowPaywall(paywall)
+```
+
 ### Custom dashboard paywalls
 
 You can build your own paywall through the dashboard and show it inside the app with just one line of code.
