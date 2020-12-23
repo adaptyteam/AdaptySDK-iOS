@@ -8,6 +8,8 @@
 * [Update your user attributes](#update-your-user-attributes)
 * [Displaying products](#displaying-products)
   + [Get paywalls](#get-paywalls)
+  + [A/B tests](#a/b-tests)
+  + [Paywalls screen reporting](#paywalls-screen-reporting)
   + [Custom dashboard paywalls](#custom-dashboard-paywalls)
   + [Fallback paywalls](#fallback-paywalls)
 * [Working with purchases](#working-with-purchases)
