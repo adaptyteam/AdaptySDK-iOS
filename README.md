@@ -30,8 +30,10 @@
 
 - iOS 9.0+
 - Xcode 10.2+
+- Swift 5.0+
 
-You can also use Adapty SDK in Swift and Objective-C applications.
+You can also use Adapty SDK in Swift and Objective-C applications.  
+Make sure you forced Swift 5.0+ for Adapty pod in case your app is written in older version.
 
 ## Installation
 
