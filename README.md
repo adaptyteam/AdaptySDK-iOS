@@ -40,7 +40,7 @@ Make sure you forced Swift 5.0+ for Adapty pod in case your app is written in ol
 ### CocoaPods
 
 1. Create a Podfile if you don't have one: `pod init`
-2. Add Adapty to your Podfile: `pod 'Adapty', '~> 1.10.0'`
+2. Add Adapty to your Podfile: `pod 'Adapty', '~> 1.11.0'`
 3. Save the file and run: `pod install`. This creates an `.xcworkspace` file for your app. Use this file for all future development on your application.
 
 ### Swift Package Manager
