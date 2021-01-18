@@ -20,14 +20,18 @@ class InAppContainersTableViewController: UIViewController {
         loadData()
         
         let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(loadData), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
         tableView.refreshControl = refreshControl
         
         tableView.tableFooterView = UIView(frame: .zero)
     }
     
-    @objc private func loadData() {
-        Adapty.getPaywalls { (paywalls, products, error) in
+    @objc private func refreshData() {
+        loadData(forceUpdate: true)
+    }
+    
+    private func loadData(forceUpdate: Bool = false) {
+        Adapty.getPaywalls(forceUpdate: forceUpdate) { (paywalls, products, error) in
             self.tableView.refreshControl?.endRefreshing()
             self.paywalls = paywalls ?? []
             self.tableView.reloadData()
