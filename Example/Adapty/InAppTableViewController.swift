@@ -23,6 +23,10 @@ class InAppTableViewController: UIViewController {
         
         title = paywallToShow?.developerId
         tableView.tableFooterView = UIView(frame: .zero)
+        
+        if let paywallToShow = paywallToShow {
+            Adapty.logShowPaywall(paywallToShow)
+        }
     }
     
 }
