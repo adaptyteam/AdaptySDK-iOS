@@ -362,13 +362,13 @@ import UIKit
         iapManager.syncTransactionsHistory()
     }
     
-    @objc public class func getPurchaserInfo(_ completion: @escaping PurchaserCompletion) {
+    @objc public class func getPurchaserInfo(forceUpdate: Bool = false, _ completion: @escaping PurchaserCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
         let cachedPurchaserInfo = shared.purchaserInfo
         
         // call callback instantly with cached data
-        if cachedPurchaserInfo != nil {
+        if !forceUpdate, cachedPurchaserInfo != nil {
             completion(cachedPurchaserInfo, nil)
         }
         
@@ -379,7 +379,7 @@ import UIKit
             }
             
             // call callback in case of missing cached data
-            if cachedPurchaserInfo == nil {
+            if forceUpdate || cachedPurchaserInfo == nil {
                 completion(purchaserInfo, error)
             }
         }

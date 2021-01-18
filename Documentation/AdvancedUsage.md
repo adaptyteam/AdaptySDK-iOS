@@ -379,11 +379,12 @@ extension AppDelegate: AdaptyDelegate {
 It's super easy to fetch user purchases info – there is a one-liner for this: 
 
 ```Swift
-Adapty.getPurchaserInfo { (purchaserInfo, error) in
+Adapty.getPurchaserInfo(forceUpdate: Bool) { (purchaserInfo, error) in
 
 }
 ```
 
+**`forceUpdate`** means you want your purchaserInfo to be synced from server in any way. You can skip this param by default and give it to an SDK – it does background syncing for this piece of data. 
 **`purchaserInfo`** is a [`PurchaserInfoModel?`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#purchaserinfomodel) object, containing information about user and his payment status.  
 Adapty mostly takes this info from cache and tries to keep it up to date. You'll also get any `purchaserInfo` updates in [`delegate`](#listening-for-purchaser-info-updates) method.  
 
