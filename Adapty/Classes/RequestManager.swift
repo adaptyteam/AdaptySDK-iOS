@@ -61,7 +61,11 @@ class RequestManager {
                 self.handleResponse(data: data, response: response, error: error, router: router) { (result: Result<T, AdaptyError>, response) in
                     switch result {
                     case .failure(let error):
-                        LoggerManager.logError(error)
+                        if error.adaptyErrorCode == .missingParam, T.self is PromoModel.Type {
+                            // Ignore empty response from getPromo request
+                        } else {
+                            LoggerManager.logError(error)
+                        }
                     default:
                         break
                     }
