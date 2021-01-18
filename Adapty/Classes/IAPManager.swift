@@ -259,6 +259,8 @@ class IAPManager: NSObject {
         }
         
         Adapty.validateReceipt(receipt) { _, _, _  in
+            // re-sync paywalls so user'll get updated eligibility properties
+            self.internalGetPaywalls()
         }
     }
     
