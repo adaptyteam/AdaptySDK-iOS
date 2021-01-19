@@ -25,6 +25,7 @@ import UIKit
             DefaultsManager.shared.profileId = profileId
         }
     }
+    private var isPurchaserInfoDelegateNotifiedAtLeastOnce = false
     private var purchaserInfo: PurchaserInfoModel? = DefaultsManager.shared.purchaserInfo {
         didSet {
             LoggerManager.logMessage("Updating local purchaserInfo: \(String(describing: purchaserInfo)), with profileId: \(String(describing: purchaserInfo?.profileId)), customerUserId: \(String(describing: purchaserInfo?.customerUserId))")
@@ -37,8 +38,12 @@ import UIKit
             
             DefaultsManager.shared.purchaserInfo = purchaserInfo
             
-            if let purchaserInfo = purchaserInfo, purchaserInfo != oldValue {
-                Self.delegate?.didReceiveUpdatedPurchaserInfo(purchaserInfo)
+            // notify delegate in case of a data change or at least once at launch
+            if let purchaserInfo = purchaserInfo {
+                if !isPurchaserInfoDelegateNotifiedAtLeastOnce || purchaserInfo != oldValue {
+                    isPurchaserInfoDelegateNotifiedAtLeastOnce = true
+                    Self.delegate?.didReceiveUpdatedPurchaserInfo(purchaserInfo)
+                }
             }
         }
     }

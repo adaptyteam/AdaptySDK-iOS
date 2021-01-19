@@ -402,7 +402,7 @@ Adapty.getPurchaserInfo { (purchaserInfo, error) in
 
 ### Listening for purchaser info updates
 
-You can respond to any changes in purchaser info by conforming to an optional delegate method, didReceivePurchaserInfo. This will fire whenever we receive a change in purchaser info.
+You can respond to any changes in purchaser info by conforming to an optional delegate method, didReceivePurchaserInfo. This will fire on every app launch and whenever we receive a change in purchaser info.
 
 ```Swift
 extension AppDelegate: AdaptyDelegate {
