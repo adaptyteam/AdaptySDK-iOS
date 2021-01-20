@@ -36,12 +36,12 @@ class IAPManager: NSObject {
         }
         return nil
     }
-    private var cachedTransactionsIds: [String: String] {
+    private var cachedVariationsIds: [String: String] {
         get {
-            return DefaultsManager.shared.cachedTransactionsIds
+            return DefaultsManager.shared.cachedVariationsIds
         }
         set {
-            DefaultsManager.shared.cachedTransactionsIds = newValue
+            DefaultsManager.shared.cachedVariationsIds = newValue
         }
     }
     
@@ -270,6 +270,7 @@ class IAPManager: NSObject {
         productsToBuy.append((product: product,
                               payment: payment,
                               completion: completion))
+        cachedVariationsIds[product.vendorProductId] = product.variationId
         
         SKPaymentQueue.default().add(payment)
     }
@@ -302,6 +303,7 @@ class IAPManager: NSObject {
             self.productsToBuy.append((product: product,
                                        payment: payment,
                                        completion: completion))
+            self.cachedVariationsIds[product.vendorProductId] = product.variationId
             
             SKPaymentQueue.default().add(payment)
         }
@@ -455,14 +457,9 @@ extension IAPManager: SKPaymentTransactionObserver {
         
         // try to get variationId from local array
         var variationId: String? = purchaseInfo?.product.variationId
-        if let transactionIdentifier = transaction.transactionIdentifier {
-            if let variationId = variationId {
-                // store variationId / transactionIdentifier in case of failed receipt validation
-                cachedTransactionsIds[transactionIdentifier] = variationId
-            } else {
-                // try to get variationId from storage in case of missing related paywall
-                variationId = cachedTransactionsIds[transactionIdentifier]
-            }
+        if variationId == nil {
+            // try to get variationId from storage in case of missing related local data
+            variationId = cachedVariationsIds[transaction.payment.productIdentifier]
         }
         
         guard let receipt = latestReceipt else {
@@ -500,10 +497,8 @@ extension IAPManager: SKPaymentTransactionObserver {
             self.callBuyProductCompletionAndCleanCallback(for: purchaseInfo, result: .success((purchaserInfo, receipt, appleValidationResult)))
             
             if error == nil {
-                if let transactionIdentifier = transaction.transactionIdentifier {
-                    // clear successfully synced transaction
-                    self.cachedTransactionsIds[transactionIdentifier] = nil
-                }
+                // clear successfully synced transaction
+                self.cachedVariationsIds[transaction.payment.productIdentifier] = nil
                 
                 if !Adapty.observerMode {
                     SKPaymentQueue.default().finishTransaction(transaction)

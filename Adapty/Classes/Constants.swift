@@ -43,7 +43,7 @@ enum Constants {
         static let profileId = "AdaptySDK_Profile_Id"
         static let installation = "AdaptySDK_Installation"
         static let cachedEvents = "AdaptySDK_Cached_Events"
-        static let cachedTransactionsIds = "AdaptySDK_Cached_Transactions_Ids"
+        static let cachedVariationsIds = "AdaptySDK_Cached_Variations_Ids"
         static let purchaserInfo = "AdaptySDK_Purchaser_Info"
         static let cachedPaywalls = "AdaptySDK_Cached_Purchase_Containers"
         static let cachedProducts = "AdaptySDK_Cached_Products"
