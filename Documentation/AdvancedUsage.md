@@ -29,6 +29,7 @@
 * [SwiftUI](#swiftui)
   + [SwiftUI App Lifecycle](#swiftui-app-lifecycle)
   + [Custom dashboard paywalls with SwiftUI](#custom-dashboard-paywalls-with-swiftui)
+  * [Opt-out from external analytics](#opt-out-from-external-analytics)
 
 # Advanced usage
 
@@ -569,4 +570,16 @@ struct PaywallViewControllerRepresentation: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: PaywallViewController, context: Context) { }
 }
+```
+
+## Opt-out from external analytics
+
+You can disable (and enable back) sending data to external analytics services by using method below.
+
+```Swift
+// disable external analytics
+Adapty.setExternalAnalyticsEnabled(false)
+
+// enable external analytics
+Adapty.setExternalAnalyticsEnabled(true)
 ```

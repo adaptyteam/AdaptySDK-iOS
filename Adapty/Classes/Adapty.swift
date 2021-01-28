@@ -468,6 +468,14 @@ import UIKit
         shared.kinesisManager.trackEvent(.paywallShowed, params: ["is_promo": paywall.isPromo.description, "variation_id": paywall.variationId], completion: completion)
     }
     
+    @objc public class func setExternalAnalyticsEnabled(_ enabled: Bool, completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
+        let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAnalytics, attributes: ["enabled": enabled])
+        
+        shared.apiManager.enableAnalytics(id: shared.profileId, params: params, completion: completion)
+    }
+    
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         

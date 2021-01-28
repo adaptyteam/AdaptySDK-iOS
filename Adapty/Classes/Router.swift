@@ -20,6 +20,7 @@ enum Router {
     case getPurchaserInfo(id: String)
     case updateAttribution(id: String, params: Parameters)
     case getPromo(id: String)
+    case enableAnalytics(id: String, params: Parameters)
     
     var scheme: String {
         return "https"
@@ -49,7 +50,8 @@ enum Router {
              .syncInstallation,
              .validateReceipt,
              .trackEvent,
-             .updateAttribution:
+             .updateAttribution,
+             .enableAnalytics:
             return .post
         case .updateProfile:
             return .patch
@@ -81,6 +83,8 @@ enum Router {
             return "/sdk/analytics/profiles/\(id)/attribution/"
         case .getPromo(let id):
             return "/sdk/analytics/profiles/\(id)/promo/"
+        case .enableAnalytics(let id, _):
+            return "/sdk/analytics/profiles/\(id)/analytics-enabled/"
         }
     }
     
@@ -138,7 +142,8 @@ enum Router {
              .trackEvent(let params),
              .signSubscriptionOffer(let params),
              .getPaywalls(let params),
-             .updateAttribution(_, let params):
+             .updateAttribution(_, let params),
+             .enableAnalytics(_, let params):
             requestParams = params
         case .getPurchaserInfo,
              .getPromo:

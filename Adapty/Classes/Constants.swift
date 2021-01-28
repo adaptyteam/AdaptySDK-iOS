@@ -66,6 +66,7 @@ enum Constants {
         static let appleReceipt = "adapty_inapps_apple_receipt_validation_result"
         static let appleSubscriptionOffer = "adapty_inapps_apple_subscription_offer_signing_result"
         static let profileAttribution = "adapty_analytics_profile_attribution"
+        static let profileAnalytics = "adapty_analytics_profile_analytics_enabled"
     }
     
     enum NotificationPayload {
