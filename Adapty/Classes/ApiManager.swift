@@ -129,4 +129,14 @@ class ApiManager {
         }
     }
     
+    func setTransactionVariationId(params: Parameters, completion: ErrorCompletion?) {
+        RequestManager.request(router: Router.setTransactionVariationId(params: params)) { (result: Result<JSONModel, AdaptyError>, response) in
+            if case let .failure(error) = result {
+                completion?(error)
+            } else {
+                completion?(nil)
+            }
+        }
+    }
+    
 }

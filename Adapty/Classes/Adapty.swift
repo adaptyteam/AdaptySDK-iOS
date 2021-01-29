@@ -471,9 +471,18 @@ import UIKit
     @objc public class func setExternalAnalyticsEnabled(_ enabled: Bool, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAnalytics, attributes: ["enabled": enabled])
+        let params = Parameters.formatData(with: "", type: Constants.TypeNames.profileAnalytics, attributes: ["enabled": enabled])
         
         shared.apiManager.enableAnalytics(id: shared.profileId, params: params, completion: completion)
+    }
+    
+    @objc public class func setTransactionId(_ transactionId: String, forVariationId variationId: String, completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
+        let attributes: Parameters = ["profile_id": shared.profileId, "transaction_id": transactionId, "variation_id": variationId]
+        let params = Parameters.formatData(with: "", type: Constants.TypeNames.transactionVariationId, attributes: attributes)
+        
+        shared.apiManager.setTransactionVariationId(params: params, completion: completion)
     }
     
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {

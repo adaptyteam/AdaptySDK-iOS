@@ -43,6 +43,19 @@ Just configure Adapty SDK in Observer Mode – update **`.activate`** method:
 Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID", observerMode: true)
 ```
 
+If you want to work wiith Adapty A/B test properly while doing everything else in observer mode, just pass `transactionIdentifier` of your `SKPaymentTransaction` and `variationId` of your [`PaywallModel`](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/Documentation/Models.md#paywallmodel) you purchased from to method below. This will allow us connect your purchase with related `paywall`.
+
+```Swift
+let transactionId = transaction.transactionIdentifier
+let variationId = paywall.variationId
+
+Adapty.setTransactionId(transactionId, forVariationId: variationId) { (error) in
+    if error == nil {
+        // successful binding
+    }
+}
+```
+
 ## Convert anonymous user to identifiable user
 
 If you don't have an customerUserId on instantiation, you can set it later at any time with the .identify() method. The most common cases are after registration, when a user switches from being an anonymous user (with a undefined customerUserId) to an authenticated user with some ID.
