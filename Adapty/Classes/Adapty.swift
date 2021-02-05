@@ -175,7 +175,9 @@ import UIKit
     
     @objc public class func identify(_ customerUserId: String, completion: ErrorCompletion? = nil) {
         if shared.purchaserInfo?.customerUserId == customerUserId {
-            completion?(nil)
+            DispatchQueue.main.async {
+                completion?(nil)
+            }
             return
         }
         
@@ -374,7 +376,9 @@ import UIKit
         
         // call callback instantly with cached data
         if !forceUpdate, cachedPurchaserInfo != nil {
-            completion(cachedPurchaserInfo, nil)
+            DispatchQueue.main.async {
+                completion(cachedPurchaserInfo, nil)
+            }
         }
         
         // re-sync purchaserInfo in background in any case
@@ -425,7 +429,9 @@ import UIKit
         LoggerManager.logMessage("Calling now: \(#function)")
         
         guard let source = userInfo[Constants.NotificationPayload.source] as? String, source == "adapty" else {
-            completion(nil)
+            DispatchQueue.main.async {
+                completion(nil)
+            }
             return
         }
         

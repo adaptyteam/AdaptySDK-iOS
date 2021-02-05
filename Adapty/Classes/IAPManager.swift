@@ -84,7 +84,9 @@ class IAPManager: NSObject {
         // check for synced and cached data
         if (paywalls != nil || products != nil) && isSyncedAtLeastOnce {
             // call callback instantly with freshly cached data if there are such
-            completion(paywalls, products, nil)
+            DispatchQueue.main.async {
+                completion(self.paywalls, self.products, nil)
+            }
         } else {
             // sync paywalls and return data in case of missing cached data
             internalGetPaywalls(completion)
@@ -134,7 +136,7 @@ class IAPManager: NSObject {
         // either already have cached paywalls or appstore request is in progress, which means real paywalls were successfully received
         if self.paywalls != nil || productsRequest != nil {
             LoggerManager.logMessage("Tried to set Fallback Paywalls but it's unnecessary, since we already have a real paywalls data.")
-            completion?(nil)
+            handleSetFallbackPaywallsError(nil, completion: completion)
             return
         }
         
@@ -144,26 +146,32 @@ class IAPManager: NSObject {
                 let paywallsData = paywalls.data(using: .utf8),
                 let paywallsJSON = try JSONSerialization.jsonObject(with: paywallsData, options: []) as? Parameters else
             {
-                completion?(AdaptyError.unableToDecode)
+                handleSetFallbackPaywallsError(AdaptyError.unableToDecode, completion: completion)
                 return
             }
             
             paywallsArray = try PaywallsArray(json: paywallsJSON)
         } catch let error as AdaptyError {
-            completion?(error)
+            handleSetFallbackPaywallsError(error, completion: completion)
             return
         } catch {
-            completion?(AdaptyError(with: error))
+            handleSetFallbackPaywallsError(AdaptyError(with: error), completion: completion)
             return
         }
         
-        paywallsRequestCompletions.append { (_, _, error) in
-            completion?(error)
+        paywallsRequestCompletions.append { [weak self] (_, _, error) in
+            self?.handleSetFallbackPaywallsError(error, completion: completion)
         }
         
         shortPaywalls = paywallsArray?.paywalls
         shortProducts = paywallsArray?.products
         requestProducts()
+    }
+    
+    private func handleSetFallbackPaywallsError(_ error: AdaptyError?, completion: ErrorCompletion? = nil) {
+        DispatchQueue.main.async {
+            completion?(error)
+        }
     }
     
     private func requestProducts() {
@@ -193,7 +201,9 @@ class IAPManager: NSObject {
     
     func makePurchase(product: ProductModel, offerId: String? = nil, completion: BuyProductCompletion? = nil) {
         guard canMakePayments else {
-            completion?(nil, nil, nil, product, AdaptyError.cantMakePayments)
+            DispatchQueue.main.async {
+                completion?(nil, nil, nil, product, AdaptyError.cantMakePayments)
+            }
             return
         }
         
@@ -216,7 +226,9 @@ class IAPManager: NSObject {
     
     private func internalMakePurchase(product: ProductModel, offerId: String? = nil, completion: BuyProductCompletion? = nil) {
         guard let skProduct = product.skProduct else {
-            completion?(nil, nil, nil, product, AdaptyError.noProductsFound)
+            DispatchQueue.main.async {
+                completion?(nil, nil, nil, product, AdaptyError.noProductsFound)
+            }
             return
         }
         

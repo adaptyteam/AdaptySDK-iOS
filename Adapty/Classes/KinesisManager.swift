@@ -44,7 +44,9 @@ class KinesisManager {
         guard let installation = installation else {
             let error = AdaptyError.missingParam("AdaptySDK – can't find cached installation")
             LoggerManager.logError(error)
-            completion?(error)
+            DispatchQueue.main.async {
+                completion?(error)
+            }
             return
         }
 
@@ -65,7 +67,9 @@ class KinesisManager {
 
         cachedEvents.append(eventParams)
 
-        syncEvents(profileInstallationMetaID: installation.profileInstallationMetaId, secretSigningKey: installation.iamSecretKey, accessKeyId: installation.iamAccessKeyId, sessionToken: installation.iamSessionToken, completion: completion)
+        DispatchQueue.global(qos: .background).async {
+            self.syncEvents(profileInstallationMetaID: installation.profileInstallationMetaId, secretSigningKey: installation.iamSecretKey, accessKeyId: installation.iamAccessKeyId, sessionToken: installation.iamSessionToken, completion: completion)
+        }
     }
 
     private func syncEvents(profileInstallationMetaID: String, secretSigningKey: String, accessKeyId: String, sessionToken: String, completion: ErrorCompletion? = nil) {

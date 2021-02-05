@@ -8,7 +8,6 @@
 
 import UIKit
 import Adapty
-import Adjust
 
 class ViewController: UIViewController {
 
