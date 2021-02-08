@@ -49,7 +49,7 @@ If you want to work wiith Adapty A/B test properly while doing everything else i
 let transactionId = transaction.transactionIdentifier
 let variationId = paywall.variationId
 
-Adapty.setTransactionId(transactionId, forVariationId: variationId) { (error) in
+Adapty.setVariationId(variationId, forTransactionId: transactionId) { (error) in
     if error == nil {
         // successful binding
     }

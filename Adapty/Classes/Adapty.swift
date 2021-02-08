@@ -482,10 +482,10 @@ import UIKit
         shared.apiManager.enableAnalytics(id: shared.profileId, params: params, completion: completion)
     }
     
-    @objc public class func setTransactionId(_ transactionId: String, forVariationId variationId: String, completion: ErrorCompletion? = nil) {
+    @objc public class func setVariationId(_ variationId: String, forTransactionId transactionId: String, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        let attributes: Parameters = ["profile_id": shared.profileId, "transaction_id": transactionId, "variation_id": variationId]
+        let attributes: Parameters = ["profile_id": shared.profileId, "variation_id": variationId, "transaction_id": transactionId]
         let params = Parameters.formatData(with: "", type: Constants.TypeNames.transactionVariationId, attributes: attributes)
         
         shared.apiManager.setTransactionVariationId(params: params, completion: completion)
