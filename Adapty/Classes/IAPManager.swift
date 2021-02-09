@@ -115,10 +115,8 @@ class IAPManager: NSObject {
             topOffset = UIApplication.topOffset
         }
         
-        var params: Parameters = ["profile_id": profileId, "paywall_padding_top": topOffset]
-        if let automaticPaywallsScreenReportingEnabled = Bundle.main.infoDictionary?[Constants.BundleKeys.automaticPaywallsScreenReportingEnabled] as? Bool, !automaticPaywallsScreenReportingEnabled {
-            params["automatic_paywalls_screen_reporting_enabled"] = automaticPaywallsScreenReportingEnabled
-        }
+        let params: Parameters = ["profile_id": profileId, "paywall_padding_top": topOffset, "automatic_paywalls_screen_reporting_enabled": false]
+
         paywallsRequest = apiManager.getPaywalls(params: params) { (paywalls, products, error) in
             if let error = error {
                 // call completion and clear it

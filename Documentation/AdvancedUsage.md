@@ -251,9 +251,8 @@ Adapty.makePurchase(product: product) { (purchaserInfo, receipt, response, produ
 
 By default, we treat any `getPaywalls` request call from user's side as `paywallShow` event for convertion calculations during A/B tests.  
 It's not correct, since user may not even see it. That's why you need to use manual screen tracking.  
-
-First, disable automatic screen tracking by adding the flag `AdaptyAutomaticPaywallsScreenReportingEnabled` in the app’s Info.plist file and setting it to `NO` (boolean value).  
-Next, whenever you show paywall to your user, call `Adapty.logShowPaywall(paywall)` to log `paywallShow` event, related to your paywall.
+  
+Whenever you show paywall to your user, call `Adapty.logShowPaywall(paywall)` to log `paywallShow` event, related to your paywall.
 ```Swift
 Adapty.logShowPaywall(paywall)
 ```

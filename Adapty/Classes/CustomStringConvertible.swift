@@ -18,7 +18,9 @@ extension PaywallModel {
             "products": products,
             "visualPaywall": visualPaywall,
             "customPayloadString": customPayloadString,
-            "customPayload": customPayload
+            "customPayload": customPayload,
+            "abTestName": abTestName,
+            "name": name
         ]
 
         return keysAndValues

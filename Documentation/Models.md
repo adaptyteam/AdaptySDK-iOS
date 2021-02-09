@@ -147,6 +147,8 @@ This model contains info about paywall.
 | visualPaywall | HTML representation of the paywall. |
 | customPayload | Dictionary of paywall's custom properties. |
 | customPayloadString | String representation of paywall's custom properties. |
+| abTestName | Name of the current test |
+| name | Paywall name |
 
 ## `PromoModel`
 
