@@ -17,6 +17,8 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         case products
         case visualPaywall
         case customPayloadString
+        case abTestName
+        case name
     }
     
     @objc public var developerId: String
@@ -32,6 +34,8 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         }
         return nil
     }()
+    @objc public var abTestName: String?
+    @objc public var name: String?
     
     required init?(json: Parameters) throws {
         let attributes: Parameters?
@@ -54,6 +58,8 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         if let isPromo = attributes?["is_promo"] as? Bool { self.isPromo = isPromo }
         if let visualPaywall = attributes?["visual_paywall"] as? String { self.visualPaywall = visualPaywall }
         if let customPayloadString = attributes?["custom_payload"] as? String { self.customPayloadString = customPayloadString }
+        self.abTestName = attributes?["ab_test_name"] as? String
+        self.name = attributes?["paywall_name"] as? String
         
         guard let products = attributes?["products"] as? [Parameters] else {
             throw AdaptyError.missingParam("PaywallModel - products")
@@ -63,7 +69,6 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         do {
             try products.forEach { (params) in
                 if let product = try ProductModel(json: params) {
-                    product.variationId = variationId
                     productsArray.append(product)
                 }
             }
@@ -71,6 +76,11 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
             throw AdaptyError.invalidProperty("PaywallModel - products", products)
         }
         self.products = productsArray
+        for product in self.products {
+            product.variationId = self.variationId
+            product.paywallABTestName = self.abTestName
+            product.paywallName = self.name
+        }
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
@@ -78,7 +88,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.developerId == object.developerId && self.variationId == object.variationId && self.revision == object.revision && self.isPromo == object.isPromo && self.products == object.products && self.visualPaywall == object.visualPaywall && self.customPayloadString == object.customPayloadString
+        return self.developerId == object.developerId && self.variationId == object.variationId && self.revision == object.revision && self.isPromo == object.isPromo && self.products == object.products && self.visualPaywall == object.visualPaywall && self.customPayloadString == object.customPayloadString && self.abTestName == object.abTestName && self.name == object.name
     }
     
 }

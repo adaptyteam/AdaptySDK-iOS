@@ -16,6 +16,8 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         case promotionalOfferEligibility
         case promotionalOfferId
         case variationId
+        case paywallABTestName
+        case paywallName
         case localizedDescription
         case localizedTitle
         case price
@@ -43,6 +45,8 @@ public class ProductModel: NSObject, JSONCodable, Codable {
     @objc public var promotionalOfferEligibility: Bool = false
     @objc public var promotionalOfferId: String?
     var variationId: String?
+    @objc public var paywallABTestName: String?
+    @objc public var paywallName: String?
     
     // filled from SKProduct
     @objc public var localizedDescription: String = ""
@@ -117,7 +121,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.vendorProductId == object.vendorProductId && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.promotionalOfferId == object.promotionalOfferId && self.variationId == object.variationId && self.localizedDescription == object.localizedDescription && self.localizedTitle == object.localizedTitle && self.price == object.price && self.currencyCode == object.currencyCode && self.currencySymbol == object.currencySymbol && self.regionCode == object.regionCode && self.subscriptionPeriod == object.subscriptionPeriod && self.introductoryDiscount == object.introductoryDiscount && self.subscriptionGroupIdentifier == object.subscriptionGroupIdentifier && self.discounts == object.discounts && self.localizedPrice == object.localizedPrice && self.localizedSubscriptionPeriod == object.localizedSubscriptionPeriod
+        return self.vendorProductId == object.vendorProductId && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.promotionalOfferId == object.promotionalOfferId && self.variationId == object.variationId && self.localizedDescription == object.localizedDescription && self.localizedTitle == object.localizedTitle && self.price == object.price && self.currencyCode == object.currencyCode && self.currencySymbol == object.currencySymbol && self.regionCode == object.regionCode && self.subscriptionPeriod == object.subscriptionPeriod && self.introductoryDiscount == object.introductoryDiscount && self.subscriptionGroupIdentifier == object.subscriptionGroupIdentifier && self.discounts == object.discounts && self.localizedPrice == object.localizedPrice && self.localizedSubscriptionPeriod == object.localizedSubscriptionPeriod && self.paywallABTestName == object.paywallABTestName && self.paywallName == object.paywallName
     }
     
 }
