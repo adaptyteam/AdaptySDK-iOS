@@ -27,7 +27,7 @@ class UserProperties {
     }
     
     static var sdkVersion: String? {
-        return Bundle(for: Self.self).object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+        return Constants.Versions.SDKVersion
     }
     
     static var sdkVersionBuild: Int {
