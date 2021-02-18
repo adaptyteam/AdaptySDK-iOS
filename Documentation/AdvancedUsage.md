@@ -188,6 +188,7 @@ Possible keys `.<key>` and their possible values described below:
 | email | String |
 | phoneNumber | String |
 | facebookUserId | String |
+| facebookAnonymousId | String |
 | amplitudeUserId | String |
 | amplitudeDeviceId | String |
 | mixpanelUserId | String |

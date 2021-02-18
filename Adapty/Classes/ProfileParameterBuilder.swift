@@ -32,6 +32,11 @@ public class ProfileParameterBuilder: NSObject {
         return self
     }
     
+    @objc public func withFacebookAnonymousId(_ facebookAnonymousId: String) -> Self {
+        params["facebook_anonymous_id"] = facebookAnonymousId
+        return self
+    }
+    
     @objc public func withAmplitudeUserId(_ amplitudeUserId: String) -> Self {
         params["amplitude_user_id"] = amplitudeUserId
         return self

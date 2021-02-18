@@ -52,7 +52,7 @@ class KinesisManager {
         
         if DefaultsManager.shared.externalAnalyticsDisabled {
             let error = AdaptyError.analyticsDisabled
-            if eventType == .promoPushOpened || eventType == .paywallShowed {
+            if eventType == .paywallShowed {
                 LoggerManager.logMessage(error.localizedDescription)
             }
             

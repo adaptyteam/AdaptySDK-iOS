@@ -67,7 +67,7 @@ class ViewController: UIViewController {
     @IBAction func updateProfileAttributesButtonAction(_ sender: Any) {
         setLoader(true)
         let params =
-            ProfileParameterBuilder().withEmail("email@email.com").withPhoneNumber("+78888888888").withFacebookUserId("facebookUserId-test").withAmplitudeUserId("amplitudeUserId-test").withAmplitudeDeviceId("amplitudeDeviceId-test").withMixpanelUserId("mixpanelUserId-test").withAppmetricaProfileId("appmetricaProfileId-test").withAppmetricaDeviceId("appmetricaDeviceId-test").withFirstName("First Name").withLastName("Last Name").withGender(.other).withBirthday(Date()).withCustomAttributes(["key1": "value1", "key2": "value2"]).withAppTrackingTransparencyStatus(1)
+            ProfileParameterBuilder().withEmail("email@email.com").withPhoneNumber("+78888888888").withFacebookUserId("facebookUserId-test").withAmplitudeUserId("amplitudeUserId-test").withAmplitudeDeviceId("amplitudeDeviceId-test").withMixpanelUserId("mixpanelUserId-test").withAppmetricaProfileId("appmetricaProfileId-test").withAppmetricaDeviceId("appmetricaDeviceId-test").withFirstName("First Name").withLastName("Last Name").withGender(.other).withBirthday(Date()).withCustomAttributes(["key1": "value1", "key2": "value2"]).withAppTrackingTransparencyStatus(1).withFacebookAnonymousId("facebookAnonymousId-test")
         Adapty.updateProfile(params: params) { (error) in
             self.setLoader(false)
             if let error = error {
