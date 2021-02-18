@@ -126,12 +126,22 @@ class DefaultsManager {
         }
     }
     
+    var externalAnalyticsDisabled: Bool {
+        get {
+            return defaults.bool(forKey: Constants.UserDefaults.externalAnalyticsDisabled)
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.externalAnalyticsDisabled)
+        }
+    }
+    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedVariationsIds)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedPaywalls)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedProducts)
         defaults.removeObject(forKey: Constants.UserDefaults.appleSearchAdsSyncDate)
+        defaults.removeObject(forKey: Constants.UserDefaults.externalAnalyticsDisabled)
     }
     
 }

@@ -479,7 +479,13 @@ import UIKit
         
         let params = Parameters.formatData(with: "", type: Constants.TypeNames.profileAnalytics, attributes: ["enabled": enabled])
         
-        shared.apiManager.enableAnalytics(id: shared.profileId, params: params, completion: completion)
+        shared.apiManager.enableAnalytics(id: shared.profileId, params: params) { (error) in
+            if error == nil {
+                DefaultsManager.shared.externalAnalyticsDisabled = !enabled
+            }
+            
+            completion?(error)
+        }
     }
     
     @objc public class func setVariationId(_ variationId: String, forTransactionId transactionId: String, completion: ErrorCompletion? = nil) {

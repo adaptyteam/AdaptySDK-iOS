@@ -72,7 +72,7 @@ public class AdaptyError: NSError {
         case fallbackPaywallsNotRequired = 1008 // Fallback paywalls are not required
         
         // custom network codes
-        case emptyResponse = 2000 //Response is empty
+        case emptyResponse = 2000 // Response is empty
         case emptyData = 2001 // Request data is empty
         case authenticationError = 2002 // You need to be authenticated first
         case badRequest = 2003 // Bad request
@@ -83,6 +83,9 @@ public class AdaptyError: NSError {
         case invalidProperty = 2008 // Received invalid property data
         case encodingFailed = 2009 // Parameters encoding failed
         case missingURL = 2010 // Request url is nil
+        
+        // general
+        case analyticsDisabled = 3000 // We can't handle analytics events, since you've opt it out
     }
     
     // network shortcuts
@@ -112,5 +115,8 @@ public class AdaptyError: NSError {
     class var productPurchaseFailed: AdaptyError { return AdaptyError(code: .productPurchaseFailed, message: "Product purchase failed.") }
     class var missingOfferSigningParams: AdaptyError { return AdaptyError(code: .missingOfferSigningParams, message: "Missing offer signing required params.") }
     class var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
+    
+    // general
+    class var analyticsDisabled: AdaptyError { return AdaptyError(code: .analyticsDisabled, message: "We can't handle analytics events, since you've opt it out.") }
     
 }

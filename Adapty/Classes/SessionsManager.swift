@@ -66,7 +66,7 @@ class SessionsManager {
         assert(eventBackgroundTaskID != .invalid)
         
         DispatchQueue.global().async {
-            self.trackLiveEvent() { (error) in
+            self.trackLiveEvent() { (_) in
                 // End the task assertion.
                 UIApplication.shared.endBackgroundTask(eventBackgroundTaskID)
                 eventBackgroundTaskID = .invalid

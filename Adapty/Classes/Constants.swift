@@ -48,6 +48,7 @@ enum Constants {
         static let cachedPaywalls = "AdaptySDK_Cached_Purchase_Containers"
         static let cachedProducts = "AdaptySDK_Cached_Products"
         static let appleSearchAdsSyncDate = "AdaptySDK_Apple_Search_Ads_Sync_Date"
+        static let externalAnalyticsDisabled = "AdaptySDK_External_Analytics_Disabled"
     }
     
     enum Versions {

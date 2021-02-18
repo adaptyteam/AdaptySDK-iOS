@@ -49,6 +49,18 @@ class KinesisManager {
             }
             return
         }
+        
+        if DefaultsManager.shared.externalAnalyticsDisabled {
+            let error = AdaptyError.analyticsDisabled
+            if eventType == .promoPushOpened || eventType == .paywallShowed {
+                LoggerManager.logMessage(error.localizedDescription)
+            }
+            
+            DispatchQueue.main.async {
+                completion?(error)
+            }
+            return
+        }
 
         // Event parameters
         var eventParams = [String: String]()
