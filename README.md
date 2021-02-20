@@ -22,7 +22,7 @@ Adapty receives info about your customer behavior and converts it into events, l
 - [Cloud purchases infrastructure](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro)  
 Server-side receipt validation, offers signature generation and more.
 - [Analytics](https://docs.adapty.io/analytics/basic-analytics)  
-Start analyzing real-time metrics of your app with advanced filters, such as ad network, ad campaign, country, A/B test, and more
+Start analyzing real-time metrics of your app with advanced filters, such as ad network, ad campaign, country, A/B test, etc.
 - 24/7 support
 - and much more :fire:
 
