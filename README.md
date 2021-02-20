@@ -11,15 +11,19 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 
 ## SDK unlocks all features of Adapty:
 
-- [A/B testing](https://docs.adapty.io/purchase-infrastructure/ab-tests)  
-Increase the revenue by testing different offers, messages, and designs simultaneously, all without new app releases.
-- [Promo campaigns](https://docs.adapty.io/profiles-and-promo-campaigns/promo-campaigns)  
-Help you to increase revenue with targeted offers for your customers. You can use them to upsell, convert freemium users to paid ones, and win back churned subscribers.
-- [Subscribers CRM](https://docs.adapty.io/profiles-and-promo-campaigns/profiles)  
-With Profiles CRM you can explore the full payment path of a user including billing issues, grace periods, and other events. You can also analyze users properties such as subscription state, total revenue/proceeds, last seen, and more.
-- [Subscription events](https://docs.adapty.io/analytics/integrations)  
-Adapty receives info about your customer behavior and converts it into 16 human-readable events, like **`subscription_initial_purchase`**, **`trial_converted`**, **`subscription_cancelled`**, etc.
-- Purchase infrastructure
+- [Test your paywalls on the fly](https://docs.adapty.io/purchase-infrastructure/ab-tests)  
+Test different offers, messages, and designs simultaneously, all without new app releases.
+- [Increase revenue with targeted offers](https://docs.adapty.io/profiles-and-promo-campaigns/promo-campaigns)  
+You can use them to upsell, convert freemium users to paid ones, and win back churned subscribers.
+- [Get insights on your customer's payment paths](https://docs.adapty.io/profiles-and-promo-campaigns/profiles)  
+With Profiles CRM you can explore user's billing issues, grace periods, and other events.
+- [Subscription status tracking](https://docs.adapty.io/analytics/integrations)  
+Adapty receives info about your customer behavior and converts it into events, like **`subscription_initial_purchase`**, **`trial_converted`**, **`subscription_cancelled`**, etc.
+- [Cloud purchases infrastructure](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro)  
+Server-side receipt validation, offers signature generation and more.
+- [Analytics](https://docs.adapty.io/analytics/basic-analytics)  
+Start analyzing real-time metrics of your app with advanced filters, such as ad network, ad campaign, country, A/B test, and more
+- 24/7 support
 - and much more :fire:
 
 ## Getting Started
