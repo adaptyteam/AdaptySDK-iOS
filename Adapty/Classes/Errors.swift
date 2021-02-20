@@ -85,7 +85,7 @@ public class AdaptyError: NSError {
         case missingURL = 2010 // Request url is nil
         
         // general
-        case analyticsDisabled = 3000 // We can't handle analytics events, since you've opt it out
+        case analyticsDisabled = 3000 // We can't handle analytics events, since you've opted it out
     }
     
     // network shortcuts
@@ -117,6 +117,6 @@ public class AdaptyError: NSError {
     class var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
     
     // general
-    class var analyticsDisabled: AdaptyError { return AdaptyError(code: .analyticsDisabled, message: "We can't handle analytics events, since you've opt it out.") }
+    class var analyticsDisabled: AdaptyError { return AdaptyError(code: .analyticsDisabled, message: "We can't handle analytics events, since you've opted it out.") }
     
 }
