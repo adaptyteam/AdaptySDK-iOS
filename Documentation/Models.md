@@ -14,7 +14,7 @@
 
 This model contains information about the product.
 
- Name  | Description |
+| Name  | Description |
 | -------- | ------------- |
 | vendorProductId | Unique identifier of the product. |
 | introductoryOfferEligibility | Eligibility of user for introductory offer. |
@@ -36,7 +36,7 @@ This model contains information about the product.
 
 ### `ProductDiscountModel`
 
-Name  | Description |
+| Name  | Description |
 | -------- | ------------- |
 | price | The discount price of the product in the local currency. |
 | identifier | A string used to uniquely identify a discount offer for a product. |
@@ -49,7 +49,7 @@ Name  | Description |
 
 ### `ProductSubscriptionPeriodModel`
 
-Name  | Description |
+| Name  | Description |
 | -------- | ------------- |
 | unit | The increment of time that a subscription period is specified in. |
 | numberOfUnits | The number of units per subscription period. |
