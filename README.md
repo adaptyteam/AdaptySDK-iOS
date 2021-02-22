@@ -1,4 +1,4 @@
-# Adapty iOS SDK
+# [Adapty](https://adapty.io) iOS SDK — in-app purchases start here
 
 [![Version](https://img.shields.io/cocoapods/v/Adapty.svg?style=flat)](https://cocoapods.org/pods/Adapty)
 [![License](https://img.shields.io/cocoapods/l/Adapty.svg?style=flat)](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE)
@@ -9,27 +9,46 @@
 
 Adapty SDK is an open-source framework that makes implementing in-app subscriptions in iOS fast and easy. It’s 100% open-source, native and lightweight.
 
-## SDK unlocks all features of Adapty:
+## Install SDK to grow subscriptions:
 
-- [Test your paywalls on the fly](https://docs.adapty.io/purchase-infrastructure/ab-tests)  
-Test different offers, messages, and designs simultaneously, all without new app releases.
-- [Increase revenue with targeted offers](https://docs.adapty.io/profiles-and-promo-campaigns/promo-campaigns)  
-You can use them to upsell, convert freemium users to paid ones, and win back churned subscribers.
-- [Get insights on your customer's payment paths](https://docs.adapty.io/profiles-and-promo-campaigns/profiles)  
-With Profiles CRM you can explore user's billing issues, grace periods, and other events.
-- [Subscription status tracking](https://docs.adapty.io/analytics/integrations)  
-Adapty receives info about your customer behavior and converts it into events, like **`subscription_initial_purchase`**, **`trial_converted`**, **`subscription_cancelled`**, etc.
-- [Cloud purchases infrastructure](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro)  
-Server-side receipt validation, offers signature generation and more.
-- [Analytics](https://docs.adapty.io/analytics/basic-analytics)  
+- [Price testig for paywalls on the fly](https://docs.adapty.io/purchase-infrastructure/ab-tests)
+Test different prices, durations, offers, messages, and designs simultaneously, all without new app releases.
+- [Win back subscribers](https://docs.adapty.io/profiles-and-promo-campaigns/promo-campaigns)
+Return churned subscribers with promotional trigger-based push notifications.
+- [Get your customer's payment history](https://docs.adapty.io/profiles-and-promo-campaigns/profiles)
+Explore user's payments events from starting trial and up to subscription cancellation.
+- [Forward in-app purchases events](https://docs.adapty.io/analytics/integrations)
+Send subscription events to 3rd party analytics, attribution and ad services with no coding. Even in a user uninstalled an app.
+- [Implement in-app purchases with no server code](https://docs.adapty.io/sdk/integrating-adapty-sdk)
+In-app purchases with server-side receipt validation in minutes. Apple Promotional Offer are out-of-the-box supported.
+- [Analytics](https://docs.adapty.io/analytics/basic-analytics)
 Start analyzing real-time metrics of your app with advanced filters, such as ad network, ad campaign, country, A/B test, etc.
 - 24/7 support
-- and much more :fire:
 
 ## Getting Started
 
-Please refer to our [documentation](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro/ios-sdk-installation) to install and configure Adapty SDK. Set up purchases in hours instead of weeks :rocket:
+Read the [documentation](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro/ios-sdk-installation) to install and configure Adapty SDK. Set up purchases in hours instead of weeks :rocket:
 
 ## License
 
 Adapty is available under the MIT license. [See LICENSE](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.
+
+---
+
+## Found a bug?
+
+Feel free to open an Issue. We check all of them.
+
+## Want to reach us?
+
+Drop us email at contact@adapty.io and tell us everything you want.
+
+## Want to suggest a feature?
+
+Just drop us an email or open an Issue in a repo.
+
+## Promo
+
+Like Adapty SDK? ❤️
+
+We too, feel free to Star a repo ⭐️⭐️⭐️ and make our developers happy.
