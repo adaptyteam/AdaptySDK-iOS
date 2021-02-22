@@ -5,7 +5,7 @@
 [![Platform](https://img.shields.io/cocoapods/p/Adapty.svg?style=flat)](https://cocoapods.org/pods/Adapty)
 [![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-orange.svg)](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro/ios-sdk-installation#install-via-swift-package-manager)
 
-![Adapty: CRM for mobile apps with subscriptions](/adapty.png)
+![Adapty: CRM for mobile apps with subscriptions](/adapty-schema.png)
 
 Adapty SDK is an open-source framework that makes implementing in-app subscriptions in iOS fast and easy. It’s 100% open-source, native and lightweight.
 
