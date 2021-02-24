@@ -420,7 +420,7 @@ extension IAPManager: SKProductsRequestDelegate {
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
         if #available(iOS 14.0, *), let error = error as? SKError, SKError.Code(rawValue: error.errorCode) == SKError.unknown {
-            LoggerManager.logError("Can't fetch products from Store. Please, make sure you run simulator under iOS 14 or if you want to continue using iOS 14 make sure you run it on a real deivce.")
+            LoggerManager.logError("Can't fetch products from Store. Please, make sure you run simulator under iOS 14 or if you want to continue using iOS 14 make sure you run it on a real device.")
         }
         
         callPaywallsCompletionAndCleanCallback(.failure(AdaptyError(with: error)))
