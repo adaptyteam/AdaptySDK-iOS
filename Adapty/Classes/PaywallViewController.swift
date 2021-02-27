@@ -5,6 +5,7 @@
 //  Created by Andrey Kyashkin on 29/05/2020.
 //
 
+#if os(iOS)
 import UIKit
 import WebKit
 
@@ -190,3 +191,4 @@ class WebView: WKWebView {
     
 }
 
+#endif

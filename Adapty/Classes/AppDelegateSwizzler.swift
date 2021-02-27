@@ -6,13 +6,12 @@
 //
 
 import Foundation
-import UIKit
 
 protocol AppDelegateSwizzlerDelegate: class {
     func didReceiveAPNSToken(_ deviceToken: Data)
 }
 
-private typealias RegisterForNotificationsClosureType = @convention(c) (AnyObject, Selector, UIApplication, Data) -> Void
+private typealias RegisterForNotificationsClosureType = @convention(c) (AnyObject, Selector, Application, Data) -> Void
 
 class AppDelegateSwizzler {
     
@@ -31,16 +30,16 @@ class AppDelegateSwizzler {
     
     private init() {
         DispatchQueue.main.async {
-            if UIApplication.shared.isRegisteredForRemoteNotifications {
-                UIApplication.shared.registerForRemoteNotifications()
+            if Application.shared.isRegisteredForRemoteNotifications {
+                Application.shared.registerForRemoteNotifications()
             }
             
             guard
-                let originalClass = object_getClass(UIApplication.shared.delegate),
+                let originalClass = object_getClass(Application.shared.delegate),
                 let swizzledClass = object_getClass(self)
             else { return }
             
-            let originalSelector = #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
+            let originalSelector = #selector(ApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
             let swizzledSelector = #selector(self.swizzled_application(_:didRegisterForRemoteNotificationsWithDeviceToken:))
             
             self.swizzle(originalClass, swizzledClass, originalSelector, swizzledSelector)
@@ -64,9 +63,9 @@ class AppDelegateSwizzler {
         }
     }
     
-    @objc private func swizzled_application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    @objc private func swizzled_application(_ application: Application, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         // call parent method
-        AppDelegateSwizzler.registerForNotificationsOriginalImp?(UIApplication.shared.delegate!, #selector(UIApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:)), application, deviceToken)
+        AppDelegateSwizzler.registerForNotificationsOriginalImp?(Application.shared.delegate!, #selector(ApplicationDelegate.application(_:didRegisterForRemoteNotificationsWithDeviceToken:)), application, deviceToken)
         
         // sync token to Adapty
         Self.shared.delegate?.didReceiveAPNSToken(deviceToken)

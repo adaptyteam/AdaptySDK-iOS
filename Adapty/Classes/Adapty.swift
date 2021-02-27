@@ -7,7 +7,9 @@
 //
 
 import Foundation
+#if os(iOS)
 import UIKit
+#endif
 
 @objc public protocol AdaptyDelegate: class {
     
@@ -142,10 +144,12 @@ import UIKit
         // start refreshing purchaser info in background
         sessionsManager.startUpdatingPurchaserInfo()
         
+        #if os(iOS)
         // check if user enabled apple search ads attribution collection
         if let appleSearchAdsAttributionCollectionEnabled = Bundle.main.infoDictionary?[Constants.BundleKeys.appleSearchAdsAttributionCollectionEnabled] as? Bool, appleSearchAdsAttributionCollectionEnabled {
             updateAppleSearchAdsAttribution()
         }
+        #endif
     }
     
     //MARK: - REST
@@ -253,6 +257,7 @@ import UIKit
         }
     }
     
+    #if os(iOS)
     private func updateAppleSearchAdsAttribution() {
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
             if let attribution = attribution,
@@ -267,6 +272,7 @@ import UIKit
             }
         }
     }
+    #endif
     
     @objc public class func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionNetwork, networkUserId: String? = nil, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
@@ -472,13 +478,18 @@ import UIKit
         }
     }
     
+    #if os(iOS)
     @discardableResult @objc
     public class func showPaywall(for paywall: PaywallModel, from viewController: UIViewController, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
         let paywallViewController = getPaywall(for: paywall, delegate: delegate)
         viewController.present(paywallViewController, animated: true)
         return paywallViewController
     }
+    #elseif os(macOS)
+    // TODO: implement macOS
+    #endif
     
+    #if os(iOS)
     @objc public class func getPaywall(for paywall: PaywallModel, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
         let paywallViewController = PaywallViewController()
         paywallViewController.paywall = paywall
@@ -486,6 +497,10 @@ import UIKit
         paywallViewController.modalPresentationStyle = .fullScreen
         return paywallViewController
     }
+    #elseif os(macOS)
+    // TODO: implement macOS
+    #endif
+    
     
     @objc public class func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
