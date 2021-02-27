@@ -7,8 +7,12 @@
 
 import AdSupport
 import Foundation
+#if os(iOS)
 import UIKit
 import iAd
+#elseif os(macOS)
+import AppKit
+#endif
 
 class UserProperties {
     
@@ -43,7 +47,21 @@ class UserProperties {
     }
     
     static var device: String {
+        #if os(iOS)
         return UIDevice.modelName
+        
+        #elseif os(macOS)
+        let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        defer { IOObjectRelease(service) }
+        
+        if let modelData = IORegistryEntryCreateCFProperty(service, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data,
+           let cString = modelData.withUnsafeBytes({ $0.baseAddress?.assumingMemoryBound(to: UInt8.self) })
+        {
+            return String(cString: cString)
+        }
+        
+        return "unknown macOS device"
+        #endif
     }
     
     static var locale: String {
@@ -51,11 +69,21 @@ class UserProperties {
     }
     
     static var OS: String {
+        #if os(iOS)
         return "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
+        
+        #elseif os(macOS)
+        return "macOS \(ProcessInfo().operatingSystemVersionString)"
+        #endif
     }
     
     static var platform: String {
+        #if os(iOS)
         return UIDevice.current.systemName
+        
+        #elseif os(macOS)
+        return "macOS"
+        #endif
     }
     
     static var timezone: String {
@@ -63,11 +91,22 @@ class UserProperties {
     }
     
     static var deviceIdentifier: String? {
+        #if os(iOS)
         return UIDevice.current.identifierForVendor?.uuidString
+        
+        #elseif os(macOS)
+        let matchingDict = IOServiceMatching("IOPlatformExpertDevice")
+        let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict)
+        defer{ IOObjectRelease(platformExpert) }
+        
+        guard platformExpert != 0 else { return nil }
+        return IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformUUIDKey as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? String
+        #endif
     }
     
+    #if os(iOS)
     class func appleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
         ADClient.shared().requestAttributionDetails(completion)
     }
-    
+    #endif
 }

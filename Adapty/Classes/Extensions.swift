@@ -23,6 +23,7 @@ extension Date {
     
 }
 
+#if os(iOS)
 extension UIDevice {
 
     static let modelName: String = {
@@ -101,6 +102,7 @@ extension UIDevice {
     }()
 
 }
+#endif
 
 extension Dictionary {
     
@@ -232,6 +234,7 @@ extension Locale {
     
 }
 
+#if os(iOS)
 extension UIApplication {
     
     static var topOffset: CGFloat {
@@ -243,3 +246,4 @@ extension UIApplication {
     }
     
 }
+#endif

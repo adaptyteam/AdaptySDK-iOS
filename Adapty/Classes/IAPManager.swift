@@ -69,7 +69,7 @@ class IAPManager: NSObject {
         
         internalGetPaywalls(completion)
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
+        NotificationCenter.default.addObserver(forName: Application.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.stopObserving()
         }
     }
@@ -107,6 +107,8 @@ class IAPManager: NSObject {
     
     private func getPaywallsAndSyncProducts() {
         var topOffset: CGFloat = 0
+        
+        #if os(iOS)
         if !Thread.isMainThread {
             DispatchQueue.main.sync {
                 topOffset = UIApplication.topOffset
@@ -114,6 +116,7 @@ class IAPManager: NSObject {
         } else {
             topOffset = UIApplication.topOffset
         }
+        #endif
         
         let params: Parameters = ["profile_id": profileId, "paywall_padding_top": topOffset, "automatic_paywalls_screen_reporting_enabled": false]
 
