@@ -483,7 +483,7 @@ extension IAPManager: SKPaymentTransactionObserver {
         let product = purchaseInfo?.product ?? self.product(for: transaction)
         
         var discount: ProductDiscountModel?
-        if #available(iOS 12.2, *) {
+        if #available(iOS 12.2, OSX 10.14.4, *) {
             // trying to extract promotional offer from transaction
             discount = product?.discounts.filter({ $0.identifier == transaction.payment.paymentDiscount?.identifier }).first
         }
