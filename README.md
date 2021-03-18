@@ -1,9 +1,9 @@
-# [Adapty](https://adapty.io) iOS SDK — in-app purchases start here
+# [Adapty](https://adapty.io/?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS) iOS SDK — in-app purchases start here
 
-[![Version](https://img.shields.io/cocoapods/v/Adapty.svg?style=flat)](https://cocoapods.org/pods/Adapty)
+[![Version](https://img.shields.io/cocoapods/v/Adapty.svg?style=flat)](http://bit.ly/3qXy7cf)
 [![License](https://img.shields.io/cocoapods/l/Adapty.svg?style=flat)](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE)
-[![Platform](https://img.shields.io/cocoapods/p/Adapty.svg?style=flat)](https://cocoapods.org/pods/Adapty)
-[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-orange.svg)](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro/ios-sdk-installation#install-via-swift-package-manager)
+[![Platform](https://img.shields.io/cocoapods/p/Adapty.svg?style=flat)](http://bit.ly/3qXy7cf2)
+[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-orange.svg)](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro/ios-sdk-installation#install-via-swift-package-manager?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 
 ![Adapty: CRM for mobile apps with subscriptions](/adapty-schema.png)
 
@@ -11,23 +11,23 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 
 ## Install SDK to grow subscriptions:
 
-- [Price testing for paywalls on the fly](https://docs.adapty.io/purchase-infrastructure/ab-tests)
+- [Price testing for paywalls on the fly](https://docs.adapty.io/purchase-infrastructure/ab-tests?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 Test different prices, durations, offers, messages, and designs simultaneously, all without new app releases.
-- [Win back subscribers](https://docs.adapty.io/profiles-and-promo-campaigns/promo-campaigns)
+- [Win back subscribers](https://docs.adapty.io/profiles-and-promo-campaigns/promo-campaigns?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 Return churned subscribers with promotional trigger-based push notifications.
-- [Get your customer's payment history](https://docs.adapty.io/profiles-and-promo-campaigns/profiles)
+- [Get your customer's payment history](https://docs.adapty.io/profiles-and-promo-campaigns/profiles?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 Explore user's payment events from starting the trial to subscription cancellation or billing issues.
-- [Forward in-app purchases events](https://docs.adapty.io/analytics/integrations)
+- [Forward in-app purchases events](https://docs.adapty.io/analytics/integrations?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 Send subscription events to 3rd party analytics, attribution, and ad services with no coding. Even if a user uninstalled an app.
-- [Implement in-app purchases with no server code](https://docs.adapty.io/sdk/integrating-adapty-sdk)
+- [Implement in-app purchases with no server code](https://docs.adapty.io/sdk/integrating-adapty-sdk?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 In-app purchases with server-side receipt validation in minutes. Apple Promotional Offers supported out-of-the-box.
-- [Analytics](https://docs.adapty.io/analytics/basic-analytics)
+- [Analytics](https://docs.adapty.io/analytics/basic-analytics?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 Start analyzing real-time metrics of your app with advanced filters, such as ad network, ad campaign, country, A/B test, etc.
 - 24/7 support
 
 ## Getting Started
 
-Read the [documentation](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro/ios-sdk-installation) to install and configure Adapty SDK. Set up purchases in hours instead of weeks :rocket:
+Read the [documentation](https://docs.adapty.io/sdk/integrating-adapty-sdk/ios-sdk-intro/ios-sdk-installation?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS) to install and configure Adapty SDK. Set up purchases in hours instead of weeks :rocket:
 
 ## License
 
