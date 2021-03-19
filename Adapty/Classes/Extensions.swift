@@ -23,7 +23,7 @@ extension Date {
     
 }
 
-#if os(iOS)
+#if canImport(UIKit)
 extension UIDevice {
 
     static let modelName: String = {

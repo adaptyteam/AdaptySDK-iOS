@@ -7,7 +7,7 @@
 //
 
 import Foundation
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
 #endif
 
@@ -485,8 +485,6 @@ import UIKit
         viewController.present(paywallViewController, animated: true)
         return paywallViewController
     }
-    #elseif os(macOS)
-    // TODO: implement macOS
     #endif
     
     #if os(iOS)
@@ -497,8 +495,6 @@ import UIKit
         paywallViewController.modalPresentationStyle = .fullScreen
         return paywallViewController
     }
-    #elseif os(macOS)
-    // TODO: implement macOS
     #endif
     
     
