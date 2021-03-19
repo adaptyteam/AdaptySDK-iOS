@@ -575,6 +575,7 @@ extension IAPManager: SKPaymentTransactionObserver {
         callRestoreCompletionAndCleanCallback(.failure(AdaptyError(with: skError)))
     }
     
+    #if os(iOS) && !targetEnvironment(macCatalyst)
     func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
         var json = ["vendor_product_id": product.productIdentifier]
         if #available(iOS 12.2, *), let promotionalOfferId = payment.paymentDiscount?.identifier {
@@ -596,6 +597,7 @@ extension IAPManager: SKPaymentTransactionObserver {
         
         return false
     }
+    #endif
     
     func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
         syncTransactionsHistory()

@@ -4,7 +4,7 @@
 //
 //  Created by Dmitry Obukhov on 3/17/20.
 //
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
 
 typealias Application = UIApplication

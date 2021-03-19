@@ -7,7 +7,7 @@
 
 import AdSupport
 import Foundation
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
 import iAd
 #elseif os(macOS)
@@ -47,7 +47,7 @@ class UserProperties {
     }
     
     static var device: String {
-        #if os(iOS)
+        #if canImport(UIKit)
         return UIDevice.modelName
         
         #elseif os(macOS)
@@ -69,7 +69,7 @@ class UserProperties {
     }
     
     static var OS: String {
-        #if os(iOS)
+        #if canImport(UIKit)
         return "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
         
         #elseif os(macOS)
@@ -78,11 +78,11 @@ class UserProperties {
     }
     
     static var platform: String {
-        #if os(iOS)
-        return UIDevice.current.systemName
-        
-        #elseif os(macOS)
+        #if os(macOS) || targetEnvironment(macCatalyst)
         return "macOS"
+        
+        #else
+        return UIDevice.current.systemName
         #endif
     }
     
@@ -91,13 +91,13 @@ class UserProperties {
     }
     
     static var deviceIdentifier: String? {
-        #if os(iOS)
+        #if canImport(UIKit)
         return UIDevice.current.identifierForVendor?.uuidString
         
         #elseif os(macOS)
         let matchingDict = IOServiceMatching("IOPlatformExpertDevice")
         let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict)
-        defer{ IOObjectRelease(platformExpert) }
+        defer { IOObjectRelease(platformExpert) }
         
         guard platformExpert != 0 else { return nil }
         return IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformUUIDKey as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? String

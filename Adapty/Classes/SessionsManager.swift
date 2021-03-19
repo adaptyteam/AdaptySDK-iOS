@@ -6,7 +6,7 @@
 //
 
 import Foundation
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
 #endif
 
@@ -20,12 +20,10 @@ class SessionsManager {
     private var purchaserInfoTimer: Timer?
     
     init() {
-        #if os(iOS)
+        #if canImport(UIKit)
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.trackLiveEventInBackground()
         }
-        #elseif os(macOS)
-        // TODO: implement macOS
         #endif
     }
     
@@ -62,7 +60,7 @@ class SessionsManager {
     }
     
     private func trackLiveEventInBackground() {
-        #if os(iOS)
+        #if canImport(UIKit)
         var eventBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
         eventBackgroundTaskID = UIApplication.shared.beginBackgroundTask (withName: "AdaptyTrackLiveBackgroundTask") {
             // End the task if time expires.
@@ -79,8 +77,6 @@ class SessionsManager {
                 eventBackgroundTaskID = .invalid
             }
         }
-        #elseif os(macOS)
-        // TODO: implement macOS
         #endif
     }
     
