@@ -21,7 +21,7 @@ Explore user's payment events from starting the trial to subscription cancellati
 Send subscription events to 3rd party analytics, attribution, and ad services with no coding. Even if a user uninstalled an app.
 - [Implement in-app purchases with no server code](https://doc.adapty.io/docs/ios-sdk-configuration?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 In-app purchases with server-side receipt validation in minutes. Apple Promotional Offers supported out-of-the-box.
-- [Analytics](https://doc.adapty.io/docs/app-store-analytics?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+- [Analytics](https://doc.adapty.io/docs/analytics-charts?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
 Start analyzing real-time metrics of your app with advanced filters, such as ad network, ad campaign, country, A/B test, etc.
 - 24/7 support
 
