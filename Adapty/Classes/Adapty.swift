@@ -214,9 +214,11 @@ import UIKit
         attributes["os"] = UserProperties.OS
         attributes["platform"] = UserProperties.platform
         attributes["timezone"] = UserProperties.timezone
-        if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["idfv"] = deviceIdentifier }
         if let apnsTokenString = apnsTokenString { attributes["device_token"] = apnsTokenString }
-        if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
+        if DefaultsManager.shared.externalAnalyticsDisabled != true {
+            if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["idfv"] = deviceIdentifier }
+            if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
+        }
         
         let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
         
@@ -482,6 +484,10 @@ import UIKit
         shared.apiManager.enableAnalytics(id: shared.profileId, params: params) { (error) in
             if error == nil {
                 DefaultsManager.shared.externalAnalyticsDisabled = !enabled
+                
+                if enabled {
+                    shared.syncInstallation()
+                }
             }
             
             completion?(error)
