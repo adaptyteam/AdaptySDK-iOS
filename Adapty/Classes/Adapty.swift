@@ -218,9 +218,11 @@ import UIKit
         attributes["os"] = UserProperties.OS
         attributes["platform"] = UserProperties.platform
         attributes["timezone"] = UserProperties.timezone
-        if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["idfv"] = deviceIdentifier }
         if let apnsTokenString = apnsTokenString { attributes["device_token"] = apnsTokenString }
-        if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
+        if DefaultsManager.shared.externalAnalyticsDisabled != true {
+            if let deviceIdentifier = UserProperties.deviceIdentifier { attributes["idfv"] = deviceIdentifier }
+            if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
+        }
         
         let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
         
@@ -260,6 +262,7 @@ import UIKit
             attributes["source"] = "adjust"
         case .appsflyer:
             attributes["source"] = "appsflyer"
+            assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attributon, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         case .branch:
             attributes["source"] = "branch"
         case .appleSearchAds:
@@ -493,6 +496,10 @@ import UIKit
         shared.apiManager.enableAnalytics(id: shared.profileId, params: params) { (error) in
             if error == nil {
                 DefaultsManager.shared.externalAnalyticsDisabled = !enabled
+                
+                if enabled {
+                    shared.syncInstallation()
+                }
             }
             
             completion?(error)
