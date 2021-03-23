@@ -293,6 +293,7 @@
 		D656CA5A2526326D00163BDA /* ProfileParameterBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D656CA592526326D00163BDA /* ProfileParameterBuilder.swift */; };
 		D65757C32481276B0055A431 /* PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65757C22481276B0055A431 /* PaywallViewController.swift */; };
 		D65E4966253766B700CF9F00 /* CustomStringConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65E4965253766B700CF9F00 /* CustomStringConvertible.swift */; };
+		D69B8E84260A33E70063C118 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D69B8E83260A33E70063C118 /* Platform.swift */; };
 		D6ACCAAE255D6BEC005B9FC7 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ACCAAD255D6BEC005B9FC7 /* Errors.swift */; };
 		D85C329C4C1FED340DED6119AF14F36F /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28724D78F4ECC9CA41462124FFB2077 /* String+Extension.swift */; };
 		D86D0A6E97F4D1FDA92BEC36A27AF823 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 497F89AEE85175FDBDB4F853FF518D57 /* AdSupport.framework */; };
@@ -734,6 +735,7 @@
 		D65DC95524D03416009A3D53 /* AdvancedUsage.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = AdvancedUsage.md; path = Documentation/AdvancedUsage.md; sourceTree = "<group>"; };
 		D65E4965253766B700CF9F00 /* CustomStringConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CustomStringConvertible.swift; path = Adapty/Classes/CustomStringConvertible.swift; sourceTree = "<group>"; };
 		D66DC84FFCF042B00D96BBF9A684E2C1 /* BNCServerInterface.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = BNCServerInterface.m; path = "Branch-SDK/Branch-SDK/Networking/BNCServerInterface.m"; sourceTree = "<group>"; };
+		D69B8E83260A33E70063C118 /* Platform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Platform.swift; path = Adapty/Classes/Platform.swift; sourceTree = "<group>"; };
 		D6ACCAAD255D6BEC005B9FC7 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = Adapty/Classes/Errors.swift; sourceTree = "<group>"; };
 		D6F1E72830B18ECB1B9C36E936A09E7A /* NSString+Branch.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSString+Branch.h"; path = "Branch-SDK/Branch-SDK/NSString+Branch.h"; sourceTree = "<group>"; };
 		D6F7C2F9DC5959176B5EA68989087294 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
@@ -939,6 +941,7 @@
 				88F7A37FB9DA5030C808EDB6922D8DE4 /* UserProperties.swift */,
 				D65757C22481276B0055A431 /* PaywallViewController.swift */,
 				D65E4965253766B700CF9F00 /* CustomStringConvertible.swift */,
+				D69B8E83260A33E70063C118 /* Platform.swift */,
 				D65DC95324D02CD0009A3D53 /* Documentation */,
 				C249332C66475E798EA62A0C19B0E5C0 /* Pod */,
 				6AF9969850B1D51048B7F3EF67A3B175 /* Support Files */,
@@ -1827,6 +1830,7 @@
 				D656CA5A2526326D00163BDA /* ProfileParameterBuilder.swift in Sources */,
 				D65E4966253766B700CF9F00 /* CustomStringConvertible.swift in Sources */,
 				86E2EBEC13B920D734E43AF92B0421DA /* JSONModel.swift in Sources */,
+				D69B8E84260A33E70063C118 /* Platform.swift in Sources */,
 				028B401AB094673B61C2CE14791988AA /* KinesisManager.swift in Sources */,
 				E331960141CC145A483A96AE4DAD79D4 /* LoggerManager.swift in Sources */,
 				ADD7F9CAB9CDADB5334A77AC4D53A670 /* ParameterEncoder.swift in Sources */,
