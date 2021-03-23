@@ -256,6 +256,7 @@ import UIKit
             attributes["source"] = "adjust"
         case .appsflyer:
             attributes["source"] = "appsflyer"
+            assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attributon, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         case .branch:
             attributes["source"] = "branch"
         case .appleSearchAds:
