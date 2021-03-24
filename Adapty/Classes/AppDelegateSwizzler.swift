@@ -30,8 +30,14 @@ class AppDelegateSwizzler {
     
     private init() {
         DispatchQueue.main.async {
-            if Application.shared.isRegisteredForRemoteNotifications {
-                Application.shared.registerForRemoteNotifications()
+            if #available(iOS 9.0, macOS 10.14, *) {
+                if Application.shared.isRegisteredForRemoteNotifications {
+                    Application.shared.registerForRemoteNotifications()
+                }
+            } else {
+                #if os(macOS)
+                NSApp.registerForRemoteNotifications(matching: [.alert, .badge, .sound])
+                #endif
             }
             
             guard

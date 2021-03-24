@@ -173,7 +173,7 @@ extension NSDecimalNumber {
     
 }
 
-@available(iOS 11.2, *)
+@available(iOS 11.2, macOS 10.13.2, *)
 extension SKProductSubscriptionPeriod {
     
     func localizedPeriod(for locale: Locale) -> String? {
@@ -194,7 +194,7 @@ extension SKProductSubscriptionPeriod {
     
 }
 
-@available(iOS 11.2, *)
+@available(iOS 11.2, macOS 10.13.2, *)
 extension SKProductDiscount {
     
     func localizedNumberOfPeriods(for locale: Locale) -> String? {
