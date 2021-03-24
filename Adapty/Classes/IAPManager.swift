@@ -233,7 +233,7 @@ class IAPManager: NSObject {
             return
         }
         
-        if #available(iOS 12.2, *), let offerId = offerId {
+        if #available(iOS 12.2, macOS 10.14.4, *), let offerId = offerId {
             createPayment(from: product, discountId: offerId, skProduct: skProduct, completion: completion)
         } else {
             createPayment(from: product, skProduct: skProduct, completion: completion)
@@ -288,7 +288,7 @@ class IAPManager: NSObject {
         SKPaymentQueue.default().add(payment)
     }
     
-    @available(iOS 12.2, *)
+    @available(iOS 12.2, macOS 10.14.4, *)
     private func createPayment(from product: ProductModel, discountId: String, skProduct: SKProduct, completion: BuyProductCompletion? = nil) {
         apiManager.signSubscriptionOffer(params: ["product": product.vendorProductId, "offer_code": discountId, "profile_id": profileId]) { (params, error) in
             guard error == nil else {

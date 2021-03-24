@@ -27,7 +27,11 @@ class UserProperties {
     
     static var idfa: String? {
         // Get and return IDFA
-        return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+        if #available(iOS 9.0, macOS 10.14, *) {
+            return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+        } else {
+            return nil
+        }
     }
     
     static var sdkVersion: String? {

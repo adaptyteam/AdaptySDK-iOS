@@ -82,7 +82,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
                 isFamilyShareable = skProduct.isFamilyShareable
             }
             #endif
-            if #available(iOS 11.2, *) {
+            if #available(iOS 11.2, macOS 10.14.4, *) {
                 if let subscriptionPeriod = skProduct.subscriptionPeriod {
                     self.subscriptionPeriod = ProductSubscriptionPeriodModel(subscriptionPeriod: subscriptionPeriod)
                     self.localizedSubscriptionPeriod = subscriptionPeriod.localizedPeriod(for: skProduct.priceLocale)
@@ -91,10 +91,10 @@ public class ProductModel: NSObject, JSONCodable, Codable {
                     self.introductoryDiscount = ProductDiscountModel(discount: introductoryDiscount, locale: skProduct.priceLocale)
                 }
             }
-            if #available(iOS 12.0, *) {
+            if #available(iOS 12.0, macOS 10.14, *) {
                 subscriptionGroupIdentifier = skProduct.subscriptionGroupIdentifier
             }
-            if #available(iOS 12.2, *) {
+            if #available(iOS 12.2, macOS 10.14.4, *) {
                 skProduct.discounts.forEach { (discount) in
                     discounts.append(ProductDiscountModel(discount: discount, locale: skProduct.priceLocale))
                 }
@@ -138,7 +138,7 @@ public class ProductSubscriptionPeriodModel: NSObject, Codable {
     @objc public var unit: ProductModel.PeriodUnit
     @objc public var numberOfUnits: Int
     
-    @available(iOS 11.2, *)
+    @available(iOS 11.2, macOS 10.13.2, *)
     init(subscriptionPeriod: SKProductSubscriptionPeriod) {
         self.unit = ProductModel.PeriodUnit(rawValue: subscriptionPeriod.unit.rawValue) ?? .unknown
         self.numberOfUnits = subscriptionPeriod.numberOfUnits
@@ -187,7 +187,7 @@ public class ProductDiscountModel: NSObject, Codable {
     @objc public var localizedSubscriptionPeriod: String?
     @objc public var localizedNumberOfPeriods: String?
     
-    @available(iOS 11.2, *)
+    @available(iOS 11.2, macOS 10.14.4, *)
     init(discount: SKProductDiscount, locale: Locale) {
         self.price = discount.price.decimalValue
         if #available(iOS 12.2, *) {
