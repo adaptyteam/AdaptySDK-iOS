@@ -319,6 +319,12 @@ class IAPManager: NSObject {
         }
     }
     
+    func presentCodeRedemptionSheet() {
+        #if __IPHONE_14_0
+        SKPaymentQueue.default().presentCodeRedemptionSheet()
+        #endif
+    }
+    
 }
 
 private extension IAPManager {

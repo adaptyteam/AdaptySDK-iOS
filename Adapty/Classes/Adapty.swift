@@ -504,6 +504,12 @@ import UIKit
         shared.apiManager.setTransactionVariationId(params: params, completion: completion)
     }
     
+    @objc public class func presentCodeRedemptionSheet() {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        
+        shared.iapManager.presentCodeRedemptionSheet()
+    }
+    
     @objc public class func logout(_ completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
