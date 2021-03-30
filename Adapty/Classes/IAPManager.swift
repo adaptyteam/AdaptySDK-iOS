@@ -320,8 +320,12 @@ class IAPManager: NSObject {
     }
     
     func presentCodeRedemptionSheet() {
-        #if __IPHONE_14_0
-        SKPaymentQueue.default().presentCodeRedemptionSheet()
+        #if swift(>=5.3) && os(iOS) && !targetEnvironment(macCatalyst)
+        if #available(iOS 14.0, *) {
+            SKPaymentQueue.default().presentCodeRedemptionSheet()
+        } else {
+            LoggerManager.logError("Presenting code redemption sheet is available only for iOS 14 and higher.")
+        }
         #endif
     }
     
