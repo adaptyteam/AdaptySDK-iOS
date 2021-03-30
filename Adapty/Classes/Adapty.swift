@@ -54,7 +54,7 @@ import UIKit
     }
     private var promo: PromoModel? {
         didSet {
-            if let promo = promo, promo != oldValue {
+            if let promo = promo {
                 Self.delegate?.didReceivePromo(promo)
             }
         }
