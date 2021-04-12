@@ -24,6 +24,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         case currencyCode
         case currencySymbol
         case regionCode
+        case isFamilyShareable
         case subscriptionPeriod
         case introductoryDiscount
         case subscriptionGroupIdentifier
@@ -55,6 +56,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
     @objc public var currencyCode: String?
     @objc public var currencySymbol: String?
     @objc public var regionCode: String?
+    @objc public var isFamilyShareable: Bool = false
     @objc public var subscriptionPeriod: ProductSubscriptionPeriodModel?
     @objc public var introductoryDiscount: ProductDiscountModel?
     @objc public var subscriptionGroupIdentifier: String?
@@ -75,6 +77,11 @@ public class ProductModel: NSObject, JSONCodable, Codable {
             currencySymbol = skProduct.priceLocale.currencySymbol
             regionCode = skProduct.priceLocale.regionCode
             
+            #if swift(>=5.3)
+            if #available(iOS 14.0, *) {
+                isFamilyShareable = skProduct.isFamilyShareable
+            }
+            #endif
             if #available(iOS 11.2, *) {
                 if let subscriptionPeriod = skProduct.subscriptionPeriod {
                     self.subscriptionPeriod = ProductSubscriptionPeriodModel(subscriptionPeriod: subscriptionPeriod)
@@ -121,7 +128,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
             return false
         }
         
-        return self.vendorProductId == object.vendorProductId && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.promotionalOfferId == object.promotionalOfferId && self.variationId == object.variationId && self.localizedDescription == object.localizedDescription && self.localizedTitle == object.localizedTitle && self.price == object.price && self.currencyCode == object.currencyCode && self.currencySymbol == object.currencySymbol && self.regionCode == object.regionCode && self.subscriptionPeriod == object.subscriptionPeriod && self.introductoryDiscount == object.introductoryDiscount && self.subscriptionGroupIdentifier == object.subscriptionGroupIdentifier && self.discounts == object.discounts && self.localizedPrice == object.localizedPrice && self.localizedSubscriptionPeriod == object.localizedSubscriptionPeriod && self.paywallABTestName == object.paywallABTestName && self.paywallName == object.paywallName
+        return self.vendorProductId == object.vendorProductId && self.introductoryOfferEligibility == object.introductoryOfferEligibility && self.promotionalOfferEligibility == object.promotionalOfferEligibility && self.promotionalOfferId == object.promotionalOfferId && self.variationId == object.variationId && self.localizedDescription == object.localizedDescription && self.localizedTitle == object.localizedTitle && self.price == object.price && self.currencyCode == object.currencyCode && self.currencySymbol == object.currencySymbol && self.regionCode == object.regionCode && self.isFamilyShareable == object.isFamilyShareable && self.subscriptionPeriod == object.subscriptionPeriod && self.introductoryDiscount == object.introductoryDiscount && self.subscriptionGroupIdentifier == object.subscriptionGroupIdentifier && self.discounts == object.discounts && self.localizedPrice == object.localizedPrice && self.localizedSubscriptionPeriod == object.localizedSubscriptionPeriod && self.paywallABTestName == object.paywallABTestName && self.paywallName == object.paywallName
     }
     
 }
