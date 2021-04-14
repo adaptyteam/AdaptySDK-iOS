@@ -107,7 +107,7 @@ class RequestManager {
             return
         }
         
-        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+        guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? Parameters else {
             handleResult(result: .failure(AdaptyError.unableToDecode), response: nil, router: router, completion: completion)
             return
         }
@@ -131,18 +131,21 @@ class RequestManager {
             }
         }
         
+        // trying to get cached response instead of empty server response
+        let jsonObject = ResponseHashManager.shared.tryToGetCachedJSONObject(for: data, response: response, router: router) ?? json
+        
         var responseObject: T?
         
         do {
             if let keyPath = router?.keyPath {
-                guard let json = json[keyPath] as? [String: Any] else {
+                guard let jsonObject = jsonObject[keyPath] as? Parameters else {
                     handleResult(result: .failure(AdaptyError.unableToDecode), response: nil, router: router, completion: completion)
                     return
                 }
                 
-                responseObject = try T(json: json)
+                responseObject = try T(json: jsonObject)
             } else {
-                responseObject = try T(json: json)
+                responseObject = try T(json: jsonObject)
             }
         } catch let error as AdaptyError {
             handleResult(result: .failure(error), response: nil, router: router, completion: completion)

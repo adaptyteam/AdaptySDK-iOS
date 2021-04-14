@@ -27,6 +27,8 @@ enum Constants {
         static let version = "ADAPTY-SDK-VERSION"
         static let build = "ADAPTY-SDK-VERSION-BUILD"
         static let locale = "ADAPTY_SDK_LOCALE"
+        static let previousResponseHash = "ADAPTY-SDK-PREVIOUS-RESPONSE-HASH"
+        static let xResponseHash = "x-response-hash"
     }
 
     enum Kinesis {
@@ -49,6 +51,8 @@ enum Constants {
         static let cachedProducts = "AdaptySDK_Cached_Products"
         static let appleSearchAdsSyncDate = "AdaptySDK_Apple_Search_Ads_Sync_Date"
         static let externalAnalyticsDisabled = "AdaptySDK_External_Analytics_Disabled"
+        static let previousResponseHashes = "AdaptySDK_Previous_Response_Hashes"
+        static let responseJSONCaches = "AdaptySDK_Response_JSON_Caches"
     }
     
     enum Versions {

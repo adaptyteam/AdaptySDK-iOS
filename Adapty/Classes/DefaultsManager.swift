@@ -135,6 +135,26 @@ class DefaultsManager {
         }
     }
     
+    // [%requestType: %hash]
+    var previousResponseHashes: [String: String] {
+        get {
+            return (defaults.dictionary(forKey: Constants.UserDefaults.previousResponseHashes) as? [String: String]) ?? [:]
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.previousResponseHashes)
+        }
+    }
+    
+    // [%requestType: [%hash: data]]
+    var responseJSONCaches: [String: [String: Data]] {
+        get {
+            return (defaults.dictionary(forKey: Constants.UserDefaults.responseJSONCaches) as? [String: [String: Data]]) ?? [:]
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.responseJSONCaches)
+        }
+    }
+    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedVariationsIds)
@@ -142,6 +162,8 @@ class DefaultsManager {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedProducts)
         defaults.removeObject(forKey: Constants.UserDefaults.appleSearchAdsSyncDate)
         defaults.removeObject(forKey: Constants.UserDefaults.externalAnalyticsDisabled)
+        defaults.removeObject(forKey: Constants.UserDefaults.previousResponseHashes)
+        defaults.removeObject(forKey: Constants.UserDefaults.responseJSONCaches)
     }
     
 }
