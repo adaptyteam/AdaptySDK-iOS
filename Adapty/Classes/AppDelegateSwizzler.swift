@@ -6,6 +6,10 @@
 //
 
 import Foundation
+#if os(macOS)
+import AppKit
+#endif
+
 
 protocol AppDelegateSwizzlerDelegate: class {
     func didReceiveAPNSToken(_ deviceToken: Data)

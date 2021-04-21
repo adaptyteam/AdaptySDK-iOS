@@ -5,6 +5,8 @@
 //  Created by Andrey Kyashkin on 01.10.2020.
 //
 
+import Foundation
+
 @objc public enum Gender: Int {
     case female
     case male
