@@ -51,20 +51,21 @@ class UserProperties {
     }
     
     static var device: String {
-        #if canImport(UIKit)
-        return UIDevice.modelName
-        
-        #elseif os(macOS)
-        let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        #if os(macOS) || targetEnvironment(macCatalyst)
+        let matchingDict = IOServiceMatching("IOPlatformExpertDevice")
+        let service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict)
         defer { IOObjectRelease(service) }
         
-        if let modelData = IORegistryEntryCreateCFProperty(service, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data,
-           let cString = modelData.withUnsafeBytes({ $0.baseAddress?.assumingMemoryBound(to: UInt8.self) })
-        {
+        if let modelData = IORegistryEntryCreateCFProperty(service,
+                                                           "model" as CFString,
+                                                           kCFAllocatorDefault, 0).takeRetainedValue() as? Data,
+           let cString = modelData.withUnsafeBytes({ $0.baseAddress?.assumingMemoryBound(to: UInt8.self) }) {
             return String(cString: cString)
+        } else {
+            return "unknown device"
         }
-        
-        return "unknown macOS device"
+        #else
+        return UIDevice.modelName
         #endif
     }
     
@@ -73,18 +74,16 @@ class UserProperties {
     }
     
     static var OS: String {
-        #if canImport(UIKit)
-        return "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
-        
-        #elseif os(macOS)
+        #if os(macOS) || targetEnvironment(macCatalyst)
         return "macOS \(ProcessInfo().operatingSystemVersionString)"
+        #else
+        return "\(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
         #endif
     }
     
     static var platform: String {
         #if os(macOS) || targetEnvironment(macCatalyst)
         return "macOS"
-        
         #else
         return UIDevice.current.systemName
         #endif
@@ -95,16 +94,17 @@ class UserProperties {
     }
     
     static var deviceIdentifier: String? {
-        #if canImport(UIKit)
-        return UIDevice.current.identifierForVendor?.uuidString
-        
-        #elseif os(macOS)
+        #if os(macOS) || targetEnvironment(macCatalyst)
         let matchingDict = IOServiceMatching("IOPlatformExpertDevice")
         let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict)
         defer { IOObjectRelease(platformExpert) }
         
         guard platformExpert != 0 else { return nil }
-        return IORegistryEntryCreateCFProperty(platformExpert, kIOPlatformUUIDKey as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? String
+        return IORegistryEntryCreateCFProperty(platformExpert,
+                                               kIOPlatformUUIDKey as CFString,
+                                               kCFAllocatorDefault, 0).takeRetainedValue() as? String
+        #else
+        return UIDevice.current.identifierForVendor?.uuidString
         #endif
     }
     
