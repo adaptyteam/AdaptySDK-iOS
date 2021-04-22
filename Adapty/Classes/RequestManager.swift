@@ -136,7 +136,7 @@ class RequestManager {
         }
         
         // trying to get cached response instead of empty server response
-        let jsonObject = ResponseHashManager.shared.tryToGetCachedJSONObject(for: data, response: response, router: router) ?? json
+        let jsonObject = RequestHashManager.shared.tryToGetCachedJSONObject(for: data, response: response, router: router) ?? json
         
         var responseObject: T?
         

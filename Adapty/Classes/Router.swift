@@ -161,7 +161,7 @@ enum Router {
             request = try JSONParameterEncoder().encode(request, with: requestParams)
         }
         
-        ResponseHashManager.shared.tryToAddHashHeader(for: self, in: &request)
+        RequestHashManager.shared.tryToAddHashHeader(for: self, in: &request)
         
         LoggerManager.logMessage("Starting new request: \(self.method.rawValue.uppercased()) \(request.url?.absoluteString ?? "")\nParams: \(requestParams)\nHeaders: \(request.allHTTPHeaderFields ?? [:])")
         

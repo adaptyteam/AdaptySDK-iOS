@@ -71,8 +71,8 @@ import UIKit
     private lazy var iapManager: IAPManager = {
         return IAPManager(apiManager: apiManager)
     }()
-    private lazy var responseHashManager: ResponseHashManager = {
-        return ResponseHashManager.shared
+    private lazy var requestHashManager: RequestHashManager = {
+        return RequestHashManager.shared
     }()
     private var isConfigured = false
     private static var initialCustomerUserId: String?
@@ -197,14 +197,14 @@ import UIKit
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: params.toDictionary())
         
         #warning("Think of a way how to move cache checker to the request manager")
-        if shared.responseHashManager.isPostHashExists(for: .updateProfile, params: params) {
+        if shared.requestHashManager.isPostHashExists(for: .updateProfile, params: params) {
             completion?(nil)
             return
         }
         
         shared.apiManager.updateProfile(id: profileId, params: params) { (_, error) in
             if error == nil {
-                shared.responseHashManager.storePostHash(for: .updateProfile, params: params)
+                shared.requestHashManager.storePostHash(for: .updateProfile, params: params)
             }
             completion?(error)
         }
@@ -274,14 +274,14 @@ import UIKit
         let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAttribution, attributes: attributes)
         
         #warning("Think of a way how to move cache checker to the request manager")
-        if shared.responseHashManager.isPostHashExists(for: .updateAttribution, source: source, params: params) {
+        if shared.requestHashManager.isPostHashExists(for: .updateAttribution, source: source, params: params) {
             completion?(nil)
             return
         }
         
         shared.apiManager.updateAttribution(id: shared.profileId, params: params) { (_, error) in
             if error == nil {
-                shared.responseHashManager.storePostHash(for: .updateAttribution, source: source, params: params)
+                shared.requestHashManager.storePostHash(for: .updateAttribution, source: source, params: params)
             }
             if source == .appleSearchAds && error == nil {
                 // mark appleSearchAds attribution data as synced

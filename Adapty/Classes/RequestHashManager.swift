@@ -1,5 +1,5 @@
 //
-//  ResponseHashManager.swift
+//  RequestHashManager.swift
 //  Adapty
 //
 //  Created by Andrey Kyashkin on 09.04.2021.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ResponseHashManager {
+class RequestHashManager {
     
     enum RouterGETType: String {
         case none
@@ -22,7 +22,7 @@ class ResponseHashManager {
         case updateProfile
     }
     
-    static let shared = ResponseHashManager()
+    static let shared = RequestHashManager()
     
     private var previousResponseHashes: [String: String] {
         get {
@@ -117,7 +117,7 @@ fileprivate extension Parameters {
 
 fileprivate extension Router {
     
-    var routerGETType: ResponseHashManager.RouterGETType {
+    var routerGETType: RequestHashManager.RouterGETType {
         switch self {
         case .getPaywalls:
             return .getPaywalls
