@@ -71,6 +71,9 @@ import UIKit
     private lazy var iapManager: IAPManager = {
         return IAPManager(apiManager: apiManager)
     }()
+    private lazy var responseHashManager: ResponseHashManager = {
+        return ResponseHashManager.shared
+    }()
     private var isConfigured = false
     private static var initialCustomerUserId: String?
     static var observerMode = false
@@ -193,7 +196,16 @@ import UIKit
 
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: params.toDictionary())
         
-        shared.apiManager.updateProfile(id: profileId, params: params) { (params, error) in
+        #warning("Think of a way how to move cache checker to the request manager")
+        if shared.responseHashManager.isPostHashExists(for: .updateProfile, params: params) {
+            completion?(nil)
+            return
+        }
+        
+        shared.apiManager.updateProfile(id: profileId, params: params) { (_, error) in
+            if error == nil {
+                shared.responseHashManager.storePostHash(for: .updateProfile, params: params)
+            }
             completion?(error)
         }
     }
@@ -251,18 +263,9 @@ import UIKit
         
         var attributes = Parameters()
         
-        switch source {
-        case .adjust:
-            attributes["source"] = "adjust"
-        case .appsflyer:
-            attributes["source"] = "appsflyer"
+        attributes["source"] = source.rawSource
+        if source == .appsflyer {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attributon, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
-        case .branch:
-            attributes["source"] = "branch"
-        case .appleSearchAds:
-            attributes["source"] = "apple_search_ads"
-        case .custom:
-            attributes["source"] = "custom"
         }
         
         if let networkUserId = networkUserId { attributes["network_user_id"] = networkUserId }
@@ -270,7 +273,16 @@ import UIKit
         
         let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAttribution, attributes: attributes)
         
+        #warning("Think of a way how to move cache checker to the request manager")
+        if shared.responseHashManager.isPostHashExists(for: .updateAttribution, source: source, params: params) {
+            completion?(nil)
+            return
+        }
+        
         shared.apiManager.updateAttribution(id: shared.profileId, params: params) { (_, error) in
+            if error == nil {
+                shared.responseHashManager.storePostHash(for: .updateAttribution, source: source, params: params)
+            }
             if source == .appleSearchAds && error == nil {
                 // mark appleSearchAds attribution data as synced
                 DefaultsManager.shared.appleSearchAdsSyncDate = Date()

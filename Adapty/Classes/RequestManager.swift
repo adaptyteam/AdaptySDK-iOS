@@ -33,6 +33,8 @@ class RequestManager {
     private var currentTask: URLSessionDataTask?
     private var concurrentQueue = DispatchQueue(label: "com.Adapty.AdaptyConcurrentQueue", attributes: .concurrent)
     
+    // MARK:- Public methods
+    
     @discardableResult
     class func request<T: JSONCodable>(router: Router, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         do {
@@ -53,6 +55,8 @@ class RequestManager {
     class func request<T: JSONCodable>(urlRequest: URLRequest, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         return shared.performRequest(urlRequest, router: nil, completion: completion)
     }
+    
+    // MARK:- Private methods
 
     @discardableResult
     private func performRequest<T: JSONCodable>(_ urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {

@@ -155,6 +155,15 @@ class DefaultsManager {
         }
     }
     
+    var postRequestParamsHashes: [String: String] {
+        get {
+            return (defaults.dictionary(forKey: Constants.UserDefaults.postRequestParamsHashes) as? [String: String]) ?? [:]
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.postRequestParamsHashes)
+        }
+    }
+    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedVariationsIds)
@@ -164,6 +173,7 @@ class DefaultsManager {
         defaults.removeObject(forKey: Constants.UserDefaults.externalAnalyticsDisabled)
         defaults.removeObject(forKey: Constants.UserDefaults.previousResponseHashes)
         defaults.removeObject(forKey: Constants.UserDefaults.responseJSONCaches)
+        defaults.removeObject(forKey: Constants.UserDefaults.postRequestParamsHashes)
     }
     
 }

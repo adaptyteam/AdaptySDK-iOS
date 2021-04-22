@@ -53,6 +53,7 @@ enum Constants {
         static let externalAnalyticsDisabled = "AdaptySDK_External_Analytics_Disabled"
         static let previousResponseHashes = "AdaptySDK_Previous_Response_Hashes"
         static let responseJSONCaches = "AdaptySDK_Response_JSON_Caches"
+        static let postRequestParamsHashes = "AdaptySDK_Post_Request_Params_Hashes"
     }
     
     enum Versions {
@@ -88,4 +89,19 @@ enum Constants {
     case branch
     case appleSearchAds
     case custom
+    
+    var rawSource: String {
+        switch self {
+        case .adjust:
+            return "adjust"
+        case .appsflyer:
+            return "appsflyer"
+        case .branch:
+            return "branch"
+        case .appleSearchAds:
+            return "apple_search_ads"
+        case .custom:
+            return "custom"
+        }
+    }
 }
