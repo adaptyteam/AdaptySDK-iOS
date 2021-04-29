@@ -20,6 +20,7 @@ class RequestHashManager {
         case none
         case updateAttribution
         case updateProfile
+        case syncInstallation
     }
     
     static let shared = RequestHashManager()

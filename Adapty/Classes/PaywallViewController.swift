@@ -13,7 +13,7 @@ import WebKit
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController)
     func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController)
     func didClose(paywall: PaywallViewController)
-    
+    func didRestore(purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, error: AdaptyError?, paywall: PaywallViewController)
 }
 
 @objc public class PaywallViewController: UIViewController {
@@ -53,6 +53,9 @@ import WebKit
     private func fulfillDataFromPaywall() {
         var htmlString = paywall.visualPaywall ?? ""
         let placeholder = ""
+        
+        htmlString = htmlString.replacingOccurrences(of: "%adapty_paywall_padding_top%", with: "\(UIApplication.topOffset)")
+        htmlString = htmlString.replacingOccurrences(of: "%adapty_paywall_padding_bottom%", with: "\(UIApplication.bottomOffset)")
         
         paywall.products.forEach { (product) in
             htmlString = htmlString.replacingOccurrences(of: "%adapty_title_\(product.vendorProductId)%", with: product.localizedTitle)
@@ -113,6 +116,15 @@ import WebKit
         }
     }
     
+    private func restorePurchases() {
+        setLoaderVisible(true, animated: true)
+        Adapty.restorePurchases { purchaserInfo, receipt, appleValidationResult, error in
+            self.setLoaderVisible(false, animated: true)
+            
+            self.delegate?.didRestore(purchaserInfo: purchaserInfo, receipt: receipt, appleValidationResult: appleValidationResult, error: error, paywall: self)
+        }
+    }
+    
     private func logKinesisEvent(_ name: EventType, vendorProductId: String? = nil) {
         var params = ["is_promo": paywall.isPromo.description, "variation_id": paywall.variationId]
         if let vendorProductId = vendorProductId {
@@ -150,6 +162,10 @@ extension PaywallViewController: WKNavigationDelegate {
         
         if url == "adapty://action/close_paywall" {
             close()
+        }
+        
+        if url == "adapty://action/restore_purchases" {
+            restorePurchases()
         }
         
         paywall.products.forEach { (product) in

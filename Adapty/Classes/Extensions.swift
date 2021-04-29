@@ -242,4 +242,12 @@ extension UIApplication {
         }
     }
     
+    static var bottomOffset: CGFloat {
+        if #available(iOS 11.0, *), let safeAreaInsetsBottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom {
+            return safeAreaInsetsBottom
+        } else {
+            return 0
+        }
+    }
+    
 }

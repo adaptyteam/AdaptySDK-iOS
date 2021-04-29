@@ -103,4 +103,8 @@ extension InAppContainersTableViewController: AdaptyPaywallDelegate {
         
     }
     
+    func didRestore(purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, error: AdaptyError?, paywall: PaywallViewController) {
+        paywall.showAlert(for: error)
+    }
+    
 }
