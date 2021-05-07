@@ -78,7 +78,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
             regionCode = skProduct.priceLocale.regionCode
             
             #if swift(>=5.3)
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.0, macOS 11.0, *) {
                 isFamilyShareable = skProduct.isFamilyShareable
             }
             #endif
