@@ -99,7 +99,7 @@ import WebKit
     }
     
     private func buyProduct(_ product: ProductModel) {
-        self.logKinesisEvent(.purchaseStarted, vendorProductId: product.vendorProductId)
+        logKinesisEvent(.purchaseStarted, vendorProductId: product.vendorProductId)
         
         setLoaderVisible(true, animated: true)
         Adapty.makePurchase(product: product, offerId: product.promotionalOfferId) { (purchaserInfo, receipt, appleValidationResult, _, error) in
@@ -118,6 +118,8 @@ import WebKit
     }
     
     private func restorePurchases() {
+        logKinesisEvent(.purchaseRestore)
+        
         setLoaderVisible(true, animated: true)
         Adapty.restorePurchases { purchaserInfo, receipt, appleValidationResult, error in
             self.setLoaderVisible(false, animated: true)
@@ -171,7 +173,7 @@ extension PaywallViewController: WKNavigationDelegate {
         
         paywall.products.forEach { (product) in
             if url == "adapty://in_app/\(product.vendorProductId)" {
-                logKinesisEvent(.inAppClicked, vendorProductId: product.vendorProductId)
+                self.logKinesisEvent(.inAppClicked, vendorProductId: product.vendorProductId)
             }
             
             if url == "adapty://action/subscribe/\(product.vendorProductId)" {

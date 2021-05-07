@@ -17,6 +17,7 @@ enum EventType: String {
     case inAppClicked = "in_app_clicked"
     case purchaseStarted = "purchase_started"
     case purchaseCancelled = "purchase_cancelled"
+    case purchaseRestore = "purchase_restore"
 }
 
 class KinesisManager {

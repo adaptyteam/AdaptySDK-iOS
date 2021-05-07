@@ -236,22 +236,12 @@ import UIKit
             if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         }
         
-        var params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
-        let originalParams = params
-        
-        #warning("Think of a way how to move cache checker to the request manager")
-        if requestHashManager.isPostHashExists(for: .syncInstallation, params: params) {
-            // send empty body in case of unchanged data
-            params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: Parameters())
-        }
+        let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
         
         apiManager.syncInstallation(id: installationMetaId, profileId: profileId, params: params) { (installation, error) in
             if let installation = installation {
                 // do not overwrite in case of error
                 self.installation = installation
-                
-                // save original params to post request body cache
-                self.requestHashManager.storePostHash(for: .syncInstallation, params: originalParams)
             }
             completion?(installation, error)
         }
