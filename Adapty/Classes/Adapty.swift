@@ -323,7 +323,7 @@ import UIKit
         shared.iapManager.restorePurchases(completion)
     }
     
-    @objc public class func validateReceipt(_ receiptEncoded: String, completion: @escaping ValidateReceiptCompletion) {
+    @objc class func validateReceipt(_ receiptEncoded: String, completion: @escaping ValidateReceiptCompletion) {
         extendedValidateReceipt(receiptEncoded, completion: completion)
     }
     
