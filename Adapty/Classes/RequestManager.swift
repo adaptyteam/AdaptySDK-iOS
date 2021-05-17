@@ -204,9 +204,9 @@ class RequestManager {
     private func handleNetworkStatusCode(_ statusCode: Int) -> AdaptyError? {
         switch statusCode {
         case 200...299: return nil
-        case 400,404,408...599: return AdaptyError.badRequest
-        case 401...403,405...407: return AdaptyError.authenticationError
-        case 600: return AdaptyError.outdated
+        case 401, 403: return AdaptyError.authenticationError
+        case 429, 500...599: return AdaptyError.serverError
+        case 400...499: return AdaptyError.badRequest
         default: return AdaptyError.failed
         }
     }

@@ -76,7 +76,7 @@ public class AdaptyError: NSError {
         case emptyData = 2001 // Request data is empty
         case authenticationError = 2002 // You need to be authenticated first
         case badRequest = 2003 // Bad request
-        case outdated = 2004 // The url you requested is outdated
+        case serverError = 2004 // Server error
         case failed = 2005 // Network request failed
         case unableToDecode = 2006 // We could not decode the response
         case missingParam = 2007 // Missing some of the required params
@@ -93,7 +93,7 @@ public class AdaptyError: NSError {
     class var emptyData: AdaptyError { return AdaptyError(code: .emptyData, message: "Request data is empty.") }
     class var authenticationError: AdaptyError { return AdaptyError(code: .authenticationError, message: "You need to be authenticated first.") }
     class var badRequest: AdaptyError { return AdaptyError(code: .badRequest, message: "Bad request.") }
-    class var outdated: AdaptyError { return AdaptyError(code: .outdated, message: "The url you requested is outdated.") }
+    class var serverError: AdaptyError { return AdaptyError(code: .serverError, message: "Server error.") }
     class var failed: AdaptyError { return AdaptyError(code: .failed, message: "Network request failed.") }
     class var unableToDecode: AdaptyError { return AdaptyError(code: .unableToDecode, message: "We could not decode the response.") }
     class func missingParam(_ params: String) -> AdaptyError {
