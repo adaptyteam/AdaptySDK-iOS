@@ -121,15 +121,21 @@ class IAPManager: NSObject {
         let params: Parameters = ["profile_id": profileId, "paywall_padding_top": topOffset, "automatic_paywalls_screen_reporting_enabled": false]
 
         paywallsRequest = apiManager.getPaywalls(params: params) { (paywalls, products, error) in
-            if let error = error {
-                // call completion and clear it
-                self.callPaywallsCompletionAndCleanCallback(.failure(error))
+            guard let error = error else {
+                self.shortPaywalls = paywalls
+                self.shortProducts = products
+                self.requestProducts()
                 return
             }
             
-            self.shortPaywalls = paywalls
-            self.shortProducts = products
-            self.requestProducts()
+            if error.adaptyErrorCode == .serverError,
+               let paywalls = self.paywalls,
+               let products = self.products {
+                // call completions with cached paywalls
+                self.callPaywallsCompletionAndCleanCallback(.success((paywalls: paywalls, products: products)))
+            } else {
+                self.callPaywallsCompletionAndCleanCallback(.failure(error))
+            }
         }
     }
     
