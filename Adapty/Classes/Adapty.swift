@@ -374,9 +374,13 @@ import UIKit
     }
     
     private var apnsTokenString: String? {
-        didSet {
+        set {
             LoggerManager.logMessage("Setting APNS token.")
+            DefaultsManager.shared.apnsTokenString = newValue
             syncInstallation()
+        }
+        get {
+            return DefaultsManager.shared.apnsTokenString
         }
     }
     
