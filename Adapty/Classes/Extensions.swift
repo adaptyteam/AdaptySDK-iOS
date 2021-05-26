@@ -255,3 +255,13 @@ extension UIApplication {
     
 }
 #endif
+
+private let noInternetNetworkErrors = [NSURLErrorNotConnectedToInternet, NSURLErrorNetworkConnectionLost,
+                                       NSURLErrorDNSLookupFailed, NSURLErrorResourceUnavailable,
+                                       NSURLErrorCannotFindHost, NSURLErrorCannotConnectToHost]
+
+extension NSError {
+    var isNetworkConnectionError: Bool {
+        return noInternetNetworkErrors.contains(code)
+    }
+}

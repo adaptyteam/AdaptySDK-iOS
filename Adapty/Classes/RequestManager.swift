@@ -151,8 +151,14 @@ class RequestManager {
     private func handleResponse<T: JSONCodable>(task: SessionDataTask, data: Data?, response: URLResponse?, error: Error?, completion: @escaping RequestCompletion<T>) {
         logResponse(data, response)
         
-        if let error = error {
-            handleResult(task: task, result: .failure(AdaptyError(with: error)), response: nil, completion: completion)
+        if let error = error as NSError? {
+            if error.isNetworkConnectionError {
+                task.retry(completion: { data, response, error in
+                    self.handleResponse(task: task, data: data, response: response, error: error, completion: completion)
+                })
+            } else {
+                handleResult(task: task, result: .failure(AdaptyError(with: error)), response: nil, completion: completion)
+            }
             return
         }
         
@@ -243,7 +249,7 @@ class RequestManager {
         
         if case .createProfile = task.router,
            case .failure = result,
-           let request = runningTasksQueue.first?.task?.originalRequest {
+           let request = task.task?.originalRequest {
             // re-create createProfile request and put it into the end of the queue
             performRequest(request, router: task.router, completion: completion)
             
