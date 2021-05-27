@@ -92,7 +92,7 @@ class KinesisManager {
         let eventsDataBase64 = currentCachedEvents.map { try! JSONEncoder().encode($0).base64EncodedString() }
 
         // Kinesis request parameters
-        var requestParams = [String: Any]()
+        var requestParams = Parameters()
         let kinesisRecords = eventsDataBase64.map { ["Data": $0, "PartitionKey": profileInstallationMetaID] }
         requestParams["Records"] = kinesisRecords
         requestParams["StreamName"] = Constants.Kinesis.streamName
