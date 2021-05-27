@@ -70,6 +70,15 @@ class DefaultsManager {
             defaults.set(data, forKey: Constants.UserDefaults.installation)
         }
     }
+    
+    var apnsTokenString: String? {
+        get {
+            return defaults.string(forKey: Constants.UserDefaults.apnsTokenString)
+        }
+        set {
+            defaults.set(newValue, forKey: Constants.UserDefaults.apnsTokenString)
+        }
+    }
 
     var cachedEvents: [[String: String]] {
         get {

@@ -44,6 +44,7 @@ enum Constants {
     enum UserDefaults {
         static let profileId = "AdaptySDK_Profile_Id"
         static let installation = "AdaptySDK_Installation"
+        static let apnsTokenString = "AdaptySDK_APNS_Token_String"
         static let cachedEvents = "AdaptySDK_Cached_Events"
         static let cachedVariationsIds = "AdaptySDK_Cached_Variations_Ids"
         static let purchaserInfo = "AdaptySDK_Purchaser_Info"

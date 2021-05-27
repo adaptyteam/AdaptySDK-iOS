@@ -236,12 +236,30 @@ import UIKit
             if let idfa = UserProperties.idfa { attributes["idfa"] = idfa }
         }
         
-        let params = Parameters.formatData(with: installationMetaId, type: Constants.TypeNames.installation, attributes: attributes)
+        let formattedParameters: (_ attributes: Parameters) -> Parameters = { attributes in
+            return Parameters.formatData(with: installationMetaId,
+                                         type: Constants.TypeNames.installation,
+                                         attributes: attributes)
+        }
+        
+        let params: Parameters
+        let originalParams = formattedParameters(attributes)
+        
+        #warning("Think of a way how to move cache checker to the request manager")
+        if requestHashManager.isPostHashExists(for: .syncInstallation, params: originalParams) {
+            // send empty body in case of unchanged data
+            params = formattedParameters(Parameters())
+        } else {
+            params = originalParams
+        }
         
         apiManager.syncInstallation(id: installationMetaId, profileId: profileId, params: params) { (installation, error) in
             if let installation = installation {
                 // do not overwrite in case of error
                 self.installation = installation
+                
+                // save original params to post request body cache
+                self.requestHashManager.storePostHash(for: .syncInstallation, params: originalParams)
             }
             completion?(installation, error)
         }
@@ -374,9 +392,13 @@ import UIKit
     }
     
     private var apnsTokenString: String? {
-        didSet {
+        set {
             LoggerManager.logMessage("Setting APNS token.")
+            DefaultsManager.shared.apnsTokenString = newValue
             syncInstallation()
+        }
+        get {
+            return DefaultsManager.shared.apnsTokenString
         }
     }
     
