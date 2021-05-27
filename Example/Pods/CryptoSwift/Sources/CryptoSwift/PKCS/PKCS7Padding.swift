@@ -25,23 +25,21 @@ struct PKCS7Padding: PaddingProtocol {
   init() {
   }
 
+  @inlinable
   func add(to bytes: Array<UInt8>, blockSize: Int) -> Array<UInt8> {
     let padding = UInt8(blockSize - (bytes.count % blockSize))
     var withPadding = bytes
     if padding == 0 {
       // If the original data is a multiple of N bytes, then an extra block of bytes with value N is added.
-      for _ in 0..<blockSize {
-        withPadding += Array<UInt8>(arrayLiteral: UInt8(blockSize))
-      }
+      withPadding += Array<UInt8>(repeating: UInt8(blockSize), count: Int(blockSize))
     } else {
       // The value of each added byte is the number of bytes that are added
-      for _ in 0..<padding {
-        withPadding += Array<UInt8>(arrayLiteral: UInt8(padding))
-      }
+      withPadding += Array<UInt8>(repeating: padding, count: Int(padding))
     }
     return withPadding
   }
 
+  @inlinable
   func remove(from bytes: Array<UInt8>, blockSize _: Int?) -> Array<UInt8> {
     guard !bytes.isEmpty, let lastByte = bytes.last else {
       return bytes
