@@ -128,11 +128,11 @@ class IAPManager: NSObject {
                 return
             }
             
-            if error.adaptyErrorCode == .serverError,
-               let paywalls = self.paywalls,
-               let products = self.products {
-                // call completions with cached paywalls
-                self.callPaywallsCompletionAndCleanCallback(.success((paywalls: paywalls, products: products)))
+            if error.adaptyErrorCode == .serverError, let paywalls = self.paywalls, let products = self.products {
+                // request products with cached data
+                self.shortPaywalls = paywalls
+                self.shortProducts = products
+                self.requestProducts()
             } else {
                 self.callPaywallsCompletionAndCleanCallback(.failure(error))
             }
