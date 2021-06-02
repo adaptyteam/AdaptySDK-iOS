@@ -525,12 +525,14 @@ import UIKit
     @objc public class func setExternalAnalyticsEnabled(_ enabled: Bool, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        let params = Parameters.formatData(with: "", type: Constants.TypeNames.profileAnalytics, attributes: ["enabled": enabled])
+        DefaultsManager.shared.externalAnalyticsDisabled = !enabled
+        
+        let params = Parameters.formatData(with: "",
+                                           type: Constants.TypeNames.profileAnalytics,
+                                           attributes: ["enabled": enabled])
         
         shared.apiManager.enableAnalytics(id: shared.profileId, params: params) { (error) in
             if error == nil {
-                DefaultsManager.shared.externalAnalyticsDisabled = !enabled
-                
                 if enabled {
                     shared.syncInstallation()
                 }
