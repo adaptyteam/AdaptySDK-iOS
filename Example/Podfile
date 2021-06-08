@@ -1,15 +1,26 @@
 use_frameworks!
+inhibit_all_warnings!
 
 target 'Adapty_Example' do
   pod 'Adapty', :path => '../'
   
   pod 'Adjust', '~> 4.21.1'
-  pod 'AppsFlyerFramework'
-  pod 'Branch'
+  pod 'AppsFlyerFramework', '~> 5.2.0'
+  pod 'Branch', '~> 0.33.1'
 
   target 'Adapty_Tests' do
     inherit! :search_paths
 
     
   end
+end
+
+post_install do |installer|
+    installer.pods_project.targets.each do |target|
+        target.build_configurations.each do |config|
+          if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 9.0
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
+          end
+        end
+    end
 end

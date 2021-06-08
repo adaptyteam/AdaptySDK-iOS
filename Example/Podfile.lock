@@ -13,8 +13,8 @@ PODS:
 DEPENDENCIES:
   - Adapty (from `../`)
   - Adjust (~> 4.21.1)
-  - AppsFlyerFramework
-  - Branch
+  - AppsFlyerFramework (~> 5.2.0)
+  - Branch (~> 0.33.1)
 
 SPEC REPOS:
   trunk:
@@ -34,6 +34,6 @@ SPEC CHECKSUMS:
   Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
   CryptoSwift: 7cc902df1784de3b389a387756c7d710f197730c
 
-PODFILE CHECKSUM: 0790ec62b9bb76f5fd79a8f44d6f2ab0c9cda3bf
+PODFILE CHECKSUM: ec60d7121af39ffb2da6bda664377f41dbdfc6e7
 
 COCOAPODS: 1.9.3
