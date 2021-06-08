@@ -1,10 +1,10 @@
 PODS:
-  - Adapty (1.13.0):
+  - Adapty (1.13.2):
     - CryptoSwift (= 1.4.0)
   - Adjust (4.21.1):
     - Adjust/Core (= 4.21.1)
   - Adjust/Core (4.21.1)
-  - AppsFlyerFramework (5.2.0)
+  - AppsFlyerFramework (6.0.8)
   - Branch (0.33.1):
     - Branch/Core (= 0.33.1)
   - Branch/Core (0.33.1)
@@ -13,7 +13,7 @@ PODS:
 DEPENDENCIES:
   - Adapty (from `../`)
   - Adjust (~> 4.21.1)
-  - AppsFlyerFramework (~> 5.2.0)
+  - AppsFlyerFramework (~> 6.0.5)
   - Branch (~> 0.33.1)
 
 SPEC REPOS:
@@ -28,12 +28,12 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Adapty: 55771eb29a9f0ed33010c29996c16df3f50d557a
+  Adapty: 2971c104f441034bd7d30206eedae64878af4b69
   Adjust: f723f2643a04435d1bfa19a27cc2b547100a6654
-  AppsFlyerFramework: 9b2a932d826a278413dab7d59ffbe104a972132b
+  AppsFlyerFramework: 57fb1fc68a5b8103353ce94d6e57861cbc4a55c3
   Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
   CryptoSwift: 7cc902df1784de3b389a387756c7d710f197730c
 
-PODFILE CHECKSUM: ec60d7121af39ffb2da6bda664377f41dbdfc6e7
+PODFILE CHECKSUM: 8c7ca6fecc5dad99cef5adf78fe7454718adc55c
 
 COCOAPODS: 1.9.3
