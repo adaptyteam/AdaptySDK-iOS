@@ -1,6 +1,0 @@
-framework module Pods_Adapty_Example {
-  umbrella header "Pods-Adapty_Example-umbrella.h"
-
-  export *
-  module * { export * }
-}
