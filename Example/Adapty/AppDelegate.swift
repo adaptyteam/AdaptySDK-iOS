@@ -83,10 +83,10 @@ extension AppDelegate: AdjustDelegate {
     
 }
 
-extension AppDelegate: AppsFlyerTrackerDelegate {
+extension AppDelegate: AppsFlyerLibDelegate {
     func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
         // It's important to include the network user ID
-        Adapty.updateAttribution(conversionInfo, source: .appsflyer, networkUserId: AppsFlyerTracker.shared().getAppsFlyerUID())
+        Adapty.updateAttribution(conversionInfo, source: .appsflyer, networkUserId: AppsFlyerLib.shared().getAppsFlyerUID())
     }
 
     func onConversionDataFail(_ error: Error) {
