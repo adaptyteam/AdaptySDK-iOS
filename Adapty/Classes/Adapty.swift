@@ -491,15 +491,19 @@ import UIKit
     }
     
     #if os(iOS)
+    
+    private var paywallControllers: [PaywallViewController] = []
+    
     @discardableResult @objc
-    public class func showPaywall(for paywall: PaywallModel, from viewController: UIViewController, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
+    public class func showPaywall(for paywall: PaywallModel,
+                                  from viewController: UIViewController,
+                                  delegate: AdaptyPaywallDelegate) -> PaywallViewController {
         let paywallViewController = getPaywall(for: paywall, delegate: delegate)
+        shared.paywallControllers.append(paywallViewController)
         viewController.present(paywallViewController, animated: true)
         return paywallViewController
     }
-    #endif
     
-    #if os(iOS)
     @objc public class func getPaywall(for paywall: PaywallModel, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
         let paywallViewController = PaywallViewController()
         paywallViewController.paywall = paywall
@@ -507,8 +511,17 @@ import UIKit
         paywallViewController.modalPresentationStyle = .fullScreen
         return paywallViewController
     }
-    #endif
     
+    @objc public class func closePaywall(_ paywall: PaywallViewController?) {
+        if let paywall = paywall {
+            shared.paywallControllers.removeAll(where: { $0 == paywall })
+            paywall.close()
+        } else if let lastPaywall = shared.paywallControllers.last {
+            shared.paywallControllers.removeLast()
+            lastPaywall.close()
+        }
+    }
+    #endif
     
     @objc public class func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")

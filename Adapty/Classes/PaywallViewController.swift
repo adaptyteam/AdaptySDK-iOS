@@ -45,7 +45,7 @@ import WebKit
         logKinesisEvent(.paywallShowed)
     }
     
-    @objc public func close() {
+    private func close() {
         logKinesisEvent(.paywallClosed)
         dismiss(animated: true)
         delegate?.didClose(paywall: self)
