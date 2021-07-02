@@ -13,7 +13,7 @@ import WebKit
     
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController)
     func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController)
-    func didClose(paywall: PaywallViewController)
+    func didСancel(paywall: PaywallViewController)
     func didRestore(purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, error: AdaptyError?, paywall: PaywallViewController)
 }
 
@@ -45,10 +45,16 @@ import WebKit
         logKinesisEvent(.paywallShowed)
     }
     
-    private func close() {
-        logKinesisEvent(.paywallClosed)
+    internal func close() {
         dismiss(animated: true)
-        delegate?.didClose(paywall: self)
+    }
+    
+    private func cancel() {
+        delegate?.didСancel(paywall: self)
+    }
+    
+    deinit {
+        logKinesisEvent(.paywallClosed)
     }
     
     private func fulfillDataFromPaywall() {
@@ -164,7 +170,7 @@ extension PaywallViewController: WKNavigationDelegate {
         }
         
         if url == "adapty://action/close_paywall" {
-            close()
+            cancel()
         }
         
         if url == "adapty://action/restore_purchases" {

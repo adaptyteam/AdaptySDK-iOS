@@ -92,15 +92,15 @@ extension InAppContainersTableViewController: InAppContainersTableViewCellDelega
 extension InAppContainersTableViewController: AdaptyPaywallDelegate {
     
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController) {
-        paywall.close()
+        Adapty.closePaywall(paywall)
     }
     
     func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController) {
         paywall.showAlert(for: error)
     }
     
-    func didClose(paywall: PaywallViewController) {
-        
+    func didСancel(paywall: PaywallViewController) {
+        Adapty.closePaywall(paywall)
     }
     
     func didRestore(purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, error: AdaptyError?, paywall: PaywallViewController) {
