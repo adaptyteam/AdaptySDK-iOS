@@ -495,16 +495,17 @@ import UIKit
     private var paywallControllers: [PaywallViewController] = []
     
     @discardableResult @objc
-    public class func showPaywall(for paywall: PaywallModel,
-                                  from viewController: UIViewController,
-                                  delegate: AdaptyPaywallDelegate) -> PaywallViewController {
-        let paywallViewController = getPaywall(for: paywall, delegate: delegate)
+    public class func showVisualPaywall(for paywall: PaywallModel,
+                                        from viewController: UIViewController,
+                                        delegate: AdaptyVisualPaywallDelegate) -> PaywallViewController {
+        let paywallViewController = getVisualPaywall(for: paywall, delegate: delegate)
         shared.paywallControllers.append(paywallViewController)
         viewController.present(paywallViewController, animated: true)
         return paywallViewController
     }
     
-    @objc public class func getPaywall(for paywall: PaywallModel, delegate: AdaptyPaywallDelegate) -> PaywallViewController {
+    @objc public class func getVisualPaywall(for paywall: PaywallModel,
+                                             delegate: AdaptyVisualPaywallDelegate) -> PaywallViewController {
         let paywallViewController = PaywallViewController()
         paywallViewController.paywall = paywall
         paywallViewController.delegate = delegate
@@ -512,7 +513,7 @@ import UIKit
         return paywallViewController
     }
     
-    @objc public class func closePaywall(_ paywall: PaywallViewController?) {
+    @objc public class func closeVisualPaywall(_ paywall: PaywallViewController?) {
         if let paywall = paywall {
             shared.paywallControllers.removeAll(where: { $0 == paywall })
             paywall.close()

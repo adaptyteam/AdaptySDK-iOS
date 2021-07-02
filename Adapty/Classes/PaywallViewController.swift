@@ -9,18 +9,18 @@
 import UIKit
 import WebKit
 
-@objc public protocol AdaptyPaywallDelegate: class {
+@objc public protocol AdaptyVisualPaywallDelegate: class {
     
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController)
     func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController)
-    func didСancel(paywall: PaywallViewController)
+    func didFinish(paywall: PaywallViewController)
     func didRestore(purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, error: AdaptyError?, paywall: PaywallViewController)
 }
 
 @objc public class PaywallViewController: UIViewController {
     
     var paywall: PaywallModel!
-    weak var delegate: AdaptyPaywallDelegate?
+    weak var delegate: AdaptyVisualPaywallDelegate?
     
     private var webView: WebView!
     private var loaderView: UIView!
@@ -50,7 +50,7 @@ import WebKit
     }
     
     private func cancel() {
-        delegate?.didСancel(paywall: self)
+        delegate?.didFinish(paywall: self)
     }
     
     deinit {
