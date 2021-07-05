@@ -13,7 +13,7 @@ import WebKit
     
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController)
     func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController)
-    func didFinish(paywall: PaywallViewController)
+    func didCancel(paywall: PaywallViewController)
     func didRestore(purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, error: AdaptyError?, paywall: PaywallViewController)
 }
 
@@ -50,7 +50,7 @@ import WebKit
     }
     
     private func cancel() {
-        delegate?.didFinish(paywall: self)
+        delegate?.didCancel(paywall: self)
     }
     
     deinit {

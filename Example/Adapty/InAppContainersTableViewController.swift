@@ -99,7 +99,7 @@ extension InAppContainersTableViewController: AdaptyVisualPaywallDelegate {
         paywall.showAlert(for: error)
     }
     
-    func didFinish(paywall: PaywallViewController) {
+    func didCancel(paywall: PaywallViewController) {
         Adapty.closeVisualPaywall(paywall)
     }
     
