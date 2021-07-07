@@ -50,11 +50,8 @@ import WebKit
     }
     
     private func cancel() {
-        delegate?.didCancel(paywall: self)
-    }
-    
-    deinit {
         logKinesisEvent(.paywallClosed)
+        delegate?.didCancel(paywall: self)
     }
     
     private func fulfillDataFromPaywall() {
