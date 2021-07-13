@@ -9,18 +9,18 @@
 import UIKit
 import WebKit
 
-@objc public protocol AdaptyPaywallDelegate: class {
+@objc public protocol AdaptyVisualPaywallDelegate: class {
     
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController)
     func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController)
-    func didClose(paywall: PaywallViewController)
+    func didCancel(paywall: PaywallViewController)
     func didRestore(purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, error: AdaptyError?, paywall: PaywallViewController)
 }
 
 @objc public class PaywallViewController: UIViewController {
     
     var paywall: PaywallModel!
-    weak var delegate: AdaptyPaywallDelegate?
+    weak var delegate: AdaptyVisualPaywallDelegate?
     
     private var webView: WebView!
     private var loaderView: UIView!
@@ -45,10 +45,13 @@ import WebKit
         logKinesisEvent(.paywallShowed)
     }
     
-    private func close() {
-        logKinesisEvent(.paywallClosed)
+    internal func close() {
         dismiss(animated: true)
-        delegate?.didClose(paywall: self)
+    }
+    
+    private func cancel() {
+        logKinesisEvent(.paywallClosed)
+        delegate?.didCancel(paywall: self)
     }
     
     private func fulfillDataFromPaywall() {
@@ -164,7 +167,7 @@ extension PaywallViewController: WKNavigationDelegate {
         }
         
         if url == "adapty://action/close_paywall" {
-            close()
+            cancel()
         }
         
         if url == "adapty://action/restore_purchases" {
