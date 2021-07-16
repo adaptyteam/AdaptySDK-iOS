@@ -537,6 +537,8 @@ extension IAPManager: SKPaymentTransactionObserver {
     }
     
     private func failed(_ transaction: SKPaymentTransaction) {
+        cachedVariationsIds[transaction.payment.productIdentifier] = nil
+        
         if !Adapty.observerMode {
             SKPaymentQueue.default().finishTransaction(transaction)
         }
