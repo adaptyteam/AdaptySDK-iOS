@@ -120,9 +120,19 @@ import UIKit
         } else {
             // already have a synced profile
             // update local cache for purchaser info
-            Self.getPurchaserInfo { (_, _) in }
-            // perform initial requests
-            performInitialRequests()
+            func updateLocalCache() {
+                Self.getPurchaserInfo { (_, _) in }
+                // perform initial requests
+                performInitialRequests()
+            }
+            
+            if let customerId = Self.initialCustomerUserId {
+                Self.identify(customerId, completion: { _ in
+                    updateLocalCache()
+                })
+            } else {
+                updateLocalCache()
+            }
         }
         
         AppDelegateSwizzler.startSwizzlingIfPossible(self)
