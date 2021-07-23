@@ -120,18 +120,13 @@ import UIKit
         } else {
             // already have a synced profile
             // update local cache for purchaser info
-            func updateLocalCache() {
+            // or create new profile 
+            if let customerId = Self.initialCustomerUserId, purchaserInfo?.customerUserId != customerId {
+                Self.identify(customerId)
+            } else {
                 Self.getPurchaserInfo { (_, _) in }
                 // perform initial requests
                 performInitialRequests()
-            }
-            
-            if let customerId = Self.initialCustomerUserId {
-                Self.identify(customerId, completion: { _ in
-                    updateLocalCache()
-                })
-            } else {
-                updateLocalCache()
             }
         }
         
