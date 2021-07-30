@@ -95,7 +95,7 @@ public class ProfileParameterBuilder: NSObject {
     }
     
     #if swift(>=5.3)
-    @available(iOS 14, *)
+    @available(iOS 14, macOS 11.0, *)
     @objc public func withAppTrackingTransparencyStatus(_ appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus) -> Self {
         params["att_status"] = appTrackingTransparencyStatus.rawValue
         return self
