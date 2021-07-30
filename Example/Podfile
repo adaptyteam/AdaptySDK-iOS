@@ -2,6 +2,7 @@ use_frameworks!
 inhibit_all_warnings!
 
 target 'Adapty_Example' do
+  project 'Adapty.xcodeproj'
   pod 'Adapty', :path => '../'
   
   pod 'Adjust', '~> 4.21.1'
