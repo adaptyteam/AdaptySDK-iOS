@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if swift(>=5.3)
+import AppTrackingTransparency
+#endif
 
 @objc public enum Gender: Int {
     case female
@@ -91,10 +94,13 @@ public class ProfileParameterBuilder: NSObject {
         return self
     }
     
-    @objc public func withAppTrackingTransparencyStatus(_ appTrackingTransparencyStatus: UInt) -> Self {
-        params["att_status"] = appTrackingTransparencyStatus
+    #if swift(>=5.3)
+    @available(iOS 14, *)
+    @objc public func withAppTrackingTransparencyStatus(_ appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus) -> Self {
+        params["att_status"] = appTrackingTransparencyStatus.rawValue
         return self
     }
+    #endif
     
     func toDictionary() -> Parameters {
         return params
