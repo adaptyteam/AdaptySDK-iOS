@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CryptoSwift
+import CommonCrypto
 
 enum EventType: String {
     case live = "live"
@@ -134,11 +134,12 @@ private extension KinesisManager {
     
     private static func hmacStringToSign(stringToSign: String, secretSigningKey: String, shortDateString: String) -> String? {
         let k1 = "AWS4" + secretSigningKey
-        guard let sk1 = try? HMAC(key: [UInt8](k1.utf8), variant: .sha256).authenticate([UInt8](shortDateString.utf8)),
-            let sk2 = try? HMAC(key: sk1, variant: .sha256).authenticate([UInt8](Constants.Kinesis.region.utf8)),
-            let sk3 = try? HMAC(key: sk2, variant: .sha256).authenticate([UInt8](Constants.Kinesis.serviceType.utf8)),
-            let sk4 = try? HMAC(key: sk3, variant: .sha256).authenticate([UInt8](Constants.Kinesis.aws4Request.utf8)),
-            let signature = try? HMAC(key: sk4, variant: .sha256).authenticate([UInt8](stringToSign.utf8)) else { return .none }
+        let signature = HMAC(secret: k1, algorithm: .sha256)
+            .authenticatedChain(with: shortDateString)
+            .authenticatedChain(with: Constants.Kinesis.region)
+            .authenticatedChain(with: Constants.Kinesis.serviceType)
+            .authenticatedChain(with: Constants.Kinesis.aws4Request)
+            .authenticate(with: stringToSign)
         return signature.toHexString()
     }
     

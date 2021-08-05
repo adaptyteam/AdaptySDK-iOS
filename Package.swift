@@ -19,9 +19,7 @@ let package = Package(
     targets: [
         .target(
             name: "Adapty",
-            dependencies: [
-                "CryptoSwift"
-            ],
+            dependencies: [],
             path: "Adapty"
         ),
     ]

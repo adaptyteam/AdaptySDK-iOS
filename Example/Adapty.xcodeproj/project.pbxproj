@@ -35,6 +35,7 @@
 
 /* Begin PBXFileReference section */
 		0B77B02FCC407C887AADA018 /* Pods-Adapty_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adapty_Tests.release.xcconfig"; path = "Target Support Files/Pods-Adapty_Tests/Pods-Adapty_Tests.release.xcconfig"; sourceTree = "<group>"; };
+		4AE005B626BC7B3800FE4D12 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
 		53AD3D6D363A126F96F974FE /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		588DF37E8E29D1227EDF23E6 /* Pods-Adapty_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adapty_Example.release.xcconfig"; path = "Target Support Files/Pods-Adapty_Example/Pods-Adapty_Example.release.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* Adapty_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adapty_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -150,6 +151,7 @@
 		607FACF51AFB993E008FA782 /* Podspec Metadata */ = {
 			isa = PBXGroup;
 			children = (
+				4AE005B626BC7B3800FE4D12 /* Package.swift */,
 				DFA601172CBA9631C0545B32 /* Adapty.podspec */,
 				53AD3D6D363A126F96F974FE /* README.md */,
 				B3A0F805975930A3344E36CB /* LICENSE */,
