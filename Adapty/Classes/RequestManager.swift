@@ -104,8 +104,8 @@ class RequestManager {
     }
 
     @discardableResult
-    class func request<T: JSONCodable>(urlRequest: URLRequest, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
-        return shared.performRequest(urlRequest, router: nil, completion: completion)
+    class func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
+        return shared.performRequest(urlRequest, router: router, completion: completion)
     }
     
     // MARK:- Private methods
@@ -149,7 +149,7 @@ class RequestManager {
     }
     
     private func handleResponse<T: JSONCodable>(task: SessionDataTask, data: Data?, response: URLResponse?, error: Error?, completion: @escaping RequestCompletion<T>) {
-        logResponse(data, response)
+        logResponse(data, response, task)
         
         if let error = error as NSError? {
             if error.isNetworkConnectionError {
@@ -289,7 +289,7 @@ class RequestManager {
         }
     }
     
-    private func logResponse(_ data: Data?, _ response: URLResponse?) {
+    private func logResponse(_ data: Data?, _ response: URLResponse?, _ task: SessionDataTask) {
         var message = "Received response: \(response?.url?.absoluteString ?? "")\n"
         if let data = data, let jsonString = String(data: data, encoding: .utf8) {
             message.append("\(jsonString)\n")
@@ -297,7 +297,12 @@ class RequestManager {
         if let response = response as? HTTPURLResponse {
             message.append("Headers: \(response.allHeaderFields)")
         }
-        LoggerManager.logMessage(message)
+        switch task.router {
+        case .trackEvent:
+            LoggerManager.logAnalyticsMessage(message)
+        default:
+            LoggerManager.logMessage(message)
+        }
     }
     
 }

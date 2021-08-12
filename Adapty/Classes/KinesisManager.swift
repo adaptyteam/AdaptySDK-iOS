@@ -97,11 +97,12 @@ class KinesisManager {
         requestParams["Records"] = kinesisRecords
         requestParams["StreamName"] = Constants.Kinesis.streamName
 
-        var urlRequest = try! Router.trackEvent(params: requestParams).asURLRequest()
+        let router = Router.trackEvent(params: requestParams)
+        var urlRequest = try! router.asURLRequest()
 
         urlRequest = KinesisManager.sign(request: urlRequest, secretSigningKey: secretSigningKey, accessKeyId: accessKeyId, sessionToken: sessionToken)!
 
-        RequestManager.request(urlRequest: urlRequest) { (result: Result<JSONModel, AdaptyError>, response) in
+        RequestManager.request(urlRequest: urlRequest, router: router) { (result: Result<JSONModel, AdaptyError>, response) in
             switch result {
             case .success:
                 let updatedCachedEvents = Set(self.cachedEvents).subtracting(currentCachedEvents)

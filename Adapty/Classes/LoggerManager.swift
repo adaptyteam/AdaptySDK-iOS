@@ -11,6 +11,7 @@ import Foundation
     case none
     case errors
     case verbose
+    case all
 }
 
 class LoggerManager {
@@ -31,6 +32,14 @@ class LoggerManager {
         }
         
         print("\(prefix) - INFO.\n\(message)")
+    }
+    
+    class func logAnalyticsMessage(_  message: String) {
+        guard isAllowedToLog(.all) else {
+            return
+        }
+        
+        print("\(prefix) - ANALYTICS INFO.\n\(message)")
     }
     
     private class func isAllowedToLog(_ level: AdaptyLogLevel) -> Bool {
