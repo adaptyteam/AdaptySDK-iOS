@@ -11,6 +11,7 @@ import Foundation
     case none
     case errors
     case verbose
+    case all
 }
 
 class LoggerManager {
@@ -27,6 +28,14 @@ class LoggerManager {
     
     class func logMessage(_  message: String) {
         guard isAllowedToLog(.verbose) else {
+            return
+        }
+        
+        print("\(prefix) - INFO.\n\(message)")
+    }
+    
+    class func logGlobalMessage(_  message: String) {
+        guard isAllowedToLog(.all) else {
             return
         }
         

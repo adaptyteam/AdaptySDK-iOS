@@ -163,7 +163,17 @@ enum Router {
         
         RequestHashManager.shared.tryToAddHashHeader(for: self, in: &request)
         
-        LoggerManager.logMessage("Starting new request: \(self.method.rawValue.uppercased()) \(request.url?.absoluteString ?? "")\nParams: \(requestParams)\nHeaders: \(request.allHTTPHeaderFields ?? [:])")
+        let message = """
+        Starting new request: \(self.method.rawValue.uppercased()) \(request.url?.absoluteString ?? "")
+        Params: \(requestParams)
+        Headers: \(request.allHTTPHeaderFields ?? [:])
+        """
+        switch self {
+        case .trackEvent:
+            LoggerManager.logGlobalMessage(message)
+        default:
+            LoggerManager.logMessage(message)
+        }
         
         return request
     }
