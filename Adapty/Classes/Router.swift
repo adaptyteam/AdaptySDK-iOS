@@ -164,8 +164,8 @@ enum Router {
         RequestHashManager.shared.tryToAddHashHeader(for: self, in: &request)
         
         let message = """
-        Starting new request: \(self.method.rawValue.uppercased()) \(request.url?.absoluteString ?? "")\n
-        Params: \(requestParams)\n
+        Starting new request: \(self.method.rawValue.uppercased()) \(request.url?.absoluteString ?? "")
+        Params: \(requestParams)
         Headers: \(request.allHTTPHeaderFields ?? [:])
         """
         switch self {
