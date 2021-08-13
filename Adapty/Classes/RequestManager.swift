@@ -299,7 +299,7 @@ class RequestManager {
         }
         switch task.router {
         case .trackEvent:
-            LoggerManager.logAnalyticsMessage(message)
+            LoggerManager.logGlobalMessage(message)
         default:
             LoggerManager.logMessage(message)
         }

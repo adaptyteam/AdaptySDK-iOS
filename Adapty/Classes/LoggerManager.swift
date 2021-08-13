@@ -34,12 +34,12 @@ class LoggerManager {
         print("\(prefix) - INFO.\n\(message)")
     }
     
-    class func logAnalyticsMessage(_  message: String) {
+    class func logGlobalMessage(_  message: String) {
         guard isAllowedToLog(.all) else {
             return
         }
         
-        print("\(prefix) - ANALYTICS INFO.\n\(message)")
+        print("\(prefix) - INFO.\n\(message)")
     }
     
     private class func isAllowedToLog(_ level: AdaptyLogLevel) -> Bool {
