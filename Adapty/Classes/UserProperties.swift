@@ -5,7 +5,10 @@
 //  Created by Andrey Kyashkin on 19/12/2019.
 //
 
+#if canImport(AdSupport)
 import AdSupport
+#endif
+
 import Foundation
 #if canImport(UIKit)
 import UIKit
