@@ -128,7 +128,7 @@ class IAPManager: NSObject {
                 return
             }
             
-            if error.adaptyErrorCode == .serverError, let paywalls = self.paywalls, let products = self.products {
+            if let paywalls = self.paywalls, let products = self.products {
                 // request products with cached data
                 self.shortPaywalls = paywalls
                 self.shortProducts = products
