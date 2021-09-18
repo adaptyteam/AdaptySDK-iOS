@@ -86,6 +86,7 @@ import UIKit
             LoggerManager.logLevel = logLevel
         }
     }
+    @objc public static var idfaCollectionDisabled: Bool = false
     
     override private init() {
         super.init()

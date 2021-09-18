@@ -30,7 +30,7 @@ class UserProperties {
     
     static var idfa: String? {
         // Get and return IDFA
-        if #available(iOS 9.0, macOS 10.14, *) {
+        if Adapty.idfaCollectionDisabled == false, #available(iOS 9.0, macOS 10.14, *) {
             return ASIdentifierManager.shared().advertisingIdentifier.uuidString
         } else {
             return nil
