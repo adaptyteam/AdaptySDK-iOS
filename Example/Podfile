@@ -5,7 +5,7 @@ target 'Adapty_Example' do
   project 'Adapty.xcodeproj'
   pod 'Adapty', :path => '../'
   
-  pod 'Adjust', '~> 4.21.1'
+  pod 'Adjust', '~> 4.29.6'
   pod 'AppsFlyerFramework', '~> 6.0.5'
   pod 'Branch', '~> 0.33.1'
 

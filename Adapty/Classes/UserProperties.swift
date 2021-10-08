@@ -9,6 +9,10 @@
 import AdSupport
 #endif
 
+#if canImport(AdServices)
+import AdServices
+#endif
+
 import Foundation
 #if canImport(UIKit)
 import UIKit
@@ -113,7 +117,42 @@ class UserProperties {
     
     #if os(iOS)
     class func appleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
-        ADClient.shared().requestAttributionDetails(completion)
+        ADClient.shared().requestAttributionDetails { (attribution, error) in
+            if let attribution = attribution {
+                completion(attribution, error)
+            } else {
+                modernAppleSearchAdsAttribution(completion: completion)
+            }
+        }
+    }
+    
+    private class func modernAppleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
+        if #available(iOS 14.3, *) {
+            do {
+                let attributionToken = try AAAttribution.attributionToken()
+                let request = NSMutableURLRequest(url: URL(string:"https://api-adservices.apple.com/api/v1/")!)
+                request.httpMethod = "POST"
+                request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+                request.httpBody = Data(attributionToken.utf8)
+                let task = URLSession.shared.dataTask(with: request as URLRequest) { (data, _, error) in
+                    guard let data = data else {
+                        completion(nil, error)
+                        return
+                    }
+                    do {
+                        let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Parameters
+                        completion(result, nil)
+                    } catch {
+                        completion(nil, error)
+                    }
+                }
+                task.resume()
+            } catch  {
+                completion(nil, error)
+            }
+        } else {
+            completion(nil, nil)
+        }
     }
     #endif
 }

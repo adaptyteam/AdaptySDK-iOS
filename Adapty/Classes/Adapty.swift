@@ -274,15 +274,23 @@ import UIKit
     #if os(iOS)
     private func updateAppleSearchAdsAttribution() {
         UserProperties.appleSearchAdsAttribution { (attribution, error) in
-            if let attribution = attribution,
-                let values = attribution.values.map({ $0 }).first as? Parameters,
-                let iAdAttribution = values["iad-attribution"] as? NSString,
-                // check if the user clicked an Apple Search Ads impression up to 30 days before app download
-                iAdAttribution.boolValue == true,
-                // check if this is an actual first sync
-                DefaultsManager.shared.appleSearchAdsSyncDate == nil
-            {
+            // check if this is an actual first sync
+            guard let attribution = attribution, DefaultsManager.shared.appleSearchAdsSyncDate == nil else { return }
+            
+            func update(attribution: Parameters, asa: Bool) {
+                var attribution = attribution
+                attribution["asa-attribution"] = asa
                 Self.updateAttribution(attribution, source: .appleSearchAds)
+            }
+            
+            if let values = attribution.values.map({ $0 }).first as? Parameters,
+               let iAdAttribution = values["iad-attribution"] as? NSString {
+                // check if the user clicked an Apple Search Ads impression up to 30 days before app download
+                if iAdAttribution.boolValue == true {
+                    update(attribution: attribution, asa: false)
+                }
+            } else {
+                update(attribution: attribution, asa: true)
             }
         }
     }
