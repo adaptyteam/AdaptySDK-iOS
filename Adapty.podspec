@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Adapty'
-  s.version          = '1.16.2'
+  s.version          = '1.16.3'
   s.summary          = 'Adapty SDK for iOS.'
 
   s.description      = <<-DESC
