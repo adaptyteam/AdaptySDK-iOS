@@ -565,10 +565,12 @@ extension IAPManager: SKPaymentTransactionObserver {
     }
     
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+        #if os(iOS)
         guard totalRestoredPurchases != 0 else {
             callRestoreCompletionAndCleanCallback(.failure(AdaptyError.noPurchasesToRestore))
             return
         }
+        #endif
         
         guard let receipt = latestReceipt else {
             callRestoreCompletionAndCleanCallback(.failure(AdaptyError.cantReadReceipt))
