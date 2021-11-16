@@ -15,7 +15,10 @@ import UIKit
     
     func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel)
     func didReceivePromo(_ promo: PromoModel)
-    @objc optional func paymentQueue(shouldAddStorePaymentFor product: ProductModel, defermentCompletion makeDeferredPurchase: @escaping DeferredPurchaseCompletion)
+    @objc optional func paymentQueue(shouldAddStorePaymentFor
+                                     product: ProductModel,
+                                     defermentCompletion makeDeferredPurchase: @escaping DeferredPurchaseCompletion)
+    @objc optional func didReceivePaywallsForConfig(paywalls: [PaywallModel])
     
 }
 

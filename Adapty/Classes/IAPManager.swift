@@ -121,18 +121,23 @@ class IAPManager: NSObject {
         let params: Parameters = ["profile_id": profileId, "paywall_padding_top": topOffset, "automatic_paywalls_screen_reporting_enabled": false]
 
         paywallsRequest = apiManager.getPaywalls(params: params) { (paywalls, products, error) in
-            guard let error = error else {
+            func handlePaywalls(_ paywalls: [PaywallModel]?, products: [ProductModel]?) {
                 self.shortPaywalls = paywalls
                 self.shortProducts = products
                 self.requestProducts()
+                if let paywalls = paywalls {
+                    Adapty.delegate?.didReceivePaywallsForConfig?(paywalls: paywalls)
+                }
+            }
+            
+            guard let error = error else {
+                handlePaywalls(paywalls, products: products)
                 return
             }
             
             if let paywalls = self.paywalls, let products = self.products {
                 // request products with cached data
-                self.shortPaywalls = paywalls
-                self.shortProducts = products
-                self.requestProducts()
+                handlePaywalls(paywalls, products: products)
             } else {
                 self.callPaywallsCompletionAndCleanCallback(.failure(error))
             }
