@@ -1,0 +1,26 @@
+{
+    "developer_id": "main_paywall",
+    "variation_id": "23b3f5e7-5490-49e7-ad45-33e8ae3a3e97",
+    "revision": 3,
+    "custom_payload": null,
+    "ab_test_name": "Main Paywall",
+    "paywall_name": "Basic Subs WIth Annual",
+    "is_promo": 0,
+    "visual_paywall": null,
+    "products": [
+        {
+            "promotional_offer_eligibility": 1,
+            "title": "Basic Subscription 1 Month",
+            "promotional_offer_id": 123,
+            "introductory_offer_eligibility": 0,
+            "vendor_product_id": "basic_subscription_1_month"
+        },
+        {
+            "promotional_offer_eligibility": 1,
+            "title": "Basic Subscription 1 Year",
+            "promotional_offer_id": null,
+            "introductory_offer_eligibility": 0,
+            "vendor_product_id": "basic_subscription_1_year"
+        }
+    ],
+}

@@ -16,9 +16,12 @@ import Foundation
 class DefaultsManager {
     
     static let shared = DefaultsManager()
-    private let defaults = UserDefaults.standard
+    private var defaults = UserDefaults.standard
     
     private init() {}
+    init(with defaults: UserDefaults) {
+        self.defaults = defaults
+    }
     
     var profileId: String {
         get {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class InstallationModel: JSONCodable, Codable {
+class InstallationModel: JSONCodable, Codable {
     
     var profileInstallationMetaId: String
     var iamAccessKeyId: String
@@ -44,5 +44,14 @@ public class InstallationModel: JSONCodable, Codable {
         if self.iamSessionToken.isEmpty { missingParams.append("iam_session_token") }
         if !missingParams.isEmpty { LoggerManager.logError(AdaptyError.missingParam("InstallationModel - \(missingParams.joined(separator: ", "))")) }
     }
+}
+
+extension InstallationModel: Equatable { }
+
+func == (lhs: InstallationModel, rhs: InstallationModel) -> Bool {
+    if lhs.profileInstallationMetaId == rhs.profileInstallationMetaId, lhs.iamAccessKeyId == rhs.iamAccessKeyId, lhs.iamSecretKey == rhs.iamSecretKey, lhs.iamSessionToken == rhs.iamSessionToken {
+        return true
+    }
     
+    return false
 }

@@ -9,7 +9,7 @@
 import Foundation
 
 public typealias ProfileCreateCompletion = (PurchaserInfoModel?, AdaptyError?, Bool?) -> Void
-public typealias InstallationCompletion = (InstallationModel?, AdaptyError?) -> Void
+typealias InstallationCompletion = (InstallationModel?, AdaptyError?) -> Void
 public typealias PaywallsCompletion = ([PaywallModel]?, [ProductModel]?, AdaptyError?) -> Void
 public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, AdaptyError?) -> Void
 public typealias JSONCompletion = (Parameters?, AdaptyError?) -> Void
