@@ -12,7 +12,7 @@ target 'Adapty_Example' do
   target 'Adapty_Tests' do
     inherit! :search_paths
 
-    
+    pod 'Nimble'
   end
 end
 
