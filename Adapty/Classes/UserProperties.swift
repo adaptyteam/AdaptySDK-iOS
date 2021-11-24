@@ -13,10 +13,13 @@ import AdSupport
 import AdServices
 #endif
 
+#if canImport(iAd)
+import iAd
+#endif
+
 import Foundation
 #if canImport(UIKit)
 import UIKit
-import iAd
 #elseif os(macOS)
 import AppKit
 #endif
