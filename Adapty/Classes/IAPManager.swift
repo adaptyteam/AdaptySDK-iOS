@@ -8,7 +8,9 @@
 import Foundation
 import StoreKit
 
+public typealias PurchaseProductResult = (purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, product: ProductModel?)
 public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: AdaptyError?) -> Void
+public typealias RestorePurchasesResult = (purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?)
 public typealias RestorePurchasesCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ error: AdaptyError?) -> Void
 public typealias DeferredPurchaseCompletion = (BuyProductCompletion?) -> Void
 private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, completion: BuyProductCompletion?)
