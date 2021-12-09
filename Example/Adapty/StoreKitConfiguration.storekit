@@ -1,0 +1,69 @@
+{
+  "identifier" : "2F72209A",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "C76D64AA",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "coins_pack_100",
+      "referenceName" : "Coins Pack 100",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "FAB46265",
+      "localizations" : [
+
+      ],
+      "name" : "AutoRenewable",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "5.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "515747CB",
+          "introductoryOffer" : {
+            "displayPrice" : "",
+            "internalID" : "32524E3C",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "payAsYouGo",
+            "subscriptionPeriod" : "P1Y"
+          },
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "basic_subscription_1_year",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Basic Subscription 1 Year",
+          "subscriptionGroupID" : "FAB46265",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 1,
+    "minor" : 1
+  }
+}
