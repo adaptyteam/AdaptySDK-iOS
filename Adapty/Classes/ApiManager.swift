@@ -20,8 +20,14 @@ public typealias PromoCompletion = (PromoModel?, AdaptyError?) -> Void
 
 class ApiManager {
     
+    private let requestManager: RequestManager
+    
+    init(requestManager: RequestManager = .shared) {
+        self.requestManager = requestManager
+    }
+    
     func createProfile(id: String, params: Parameters, completion: @escaping ProfileCreateCompletion) {
-        RequestManager.request(router: Router.createProfile(id: id, params: params)) { (result: Result<PurchaserInfoModel, AdaptyError>, response) in
+        requestManager.request(router: Router.createProfile(id: id, params: params)) { (result: Result<PurchaserInfoModel, AdaptyError>, response) in
             switch result {
             case .success(let purchaserInfo):
                 completion(purchaserInfo, nil, response?.statusCode == 201 ? true : false)
@@ -32,7 +38,7 @@ class ApiManager {
     }
     
     func updateProfile(id: String, params: Parameters, completion: @escaping JSONCompletion) {
-        RequestManager.request(router: Router.updateProfile(id: id, params: params)) { (result: Result<JSONAttributedModel, AdaptyError>, response) in
+        requestManager.request(router: Router.updateProfile(id: id, params: params)) { (result: Result<JSONAttributedModel, AdaptyError>, response) in
             switch result {
             case .success(let response):
                 completion(response.data, nil)
@@ -43,7 +49,7 @@ class ApiManager {
     }
     
     func syncInstallation(id: String, profileId: String, params: Parameters, completion: @escaping InstallationCompletion) {
-        RequestManager.request(router: Router.syncInstallation(id: id, profileId: profileId, params: params)) { (result: Result<InstallationModel, AdaptyError>, response) in
+        requestManager.request(router: Router.syncInstallation(id: id, profileId: profileId, params: params)) { (result: Result<InstallationModel, AdaptyError>, response) in
             switch result {
             case .success(let installation):
                 completion(installation, nil)
@@ -54,7 +60,7 @@ class ApiManager {
     }
     
     func validateReceipt(params: Parameters, completion: @escaping ValidateReceiptCompletion) {
-        RequestManager.request(router: Router.validateReceipt(params: params)) { (result: Result<PurchaserInfoMeta, AdaptyError>, response) in
+        requestManager.request(router: Router.validateReceipt(params: params)) { (result: Result<PurchaserInfoMeta, AdaptyError>, response) in
             switch result {
             case .success(let response):
                 completion(response.purchaserInfo, response.appleValidationResult, nil)
@@ -66,7 +72,7 @@ class ApiManager {
     
     @discardableResult
     func getPaywalls(params: Parameters, completion: @escaping PaywallsCompletion) -> URLSessionDataTask? {
-        return RequestManager.request(router: Router.getPaywalls(params: params)) { (result: Result<PaywallsArray, AdaptyError>, response) in
+        return requestManager.request(router: Router.getPaywalls(params: params)) { (result: Result<PaywallsArray, AdaptyError>, response) in
             switch result {
             case .success(let paywalls):
                 completion(paywalls.paywalls, paywalls.products, nil)
@@ -77,7 +83,7 @@ class ApiManager {
     }
     
     func signSubscriptionOffer(params: Parameters, completion: @escaping JSONCompletion) {
-        RequestManager.request(router: Router.signSubscriptionOffer(params: params)) { (result: Result<JSONAttributedModel, AdaptyError>, response) in
+        requestManager.request(router: Router.signSubscriptionOffer(params: params)) { (result: Result<JSONAttributedModel, AdaptyError>, response) in
             switch result {
             case .success(let response):
                 completion(response.data, nil)
@@ -88,7 +94,7 @@ class ApiManager {
     }
     
     func getPurchaserInfo(id: String, completion: @escaping PurchaserCompletion) {
-        RequestManager.request(router: Router.getPurchaserInfo(id: id)) { (result: Result<PurchaserInfoModel, AdaptyError>, response) in
+        requestManager.request(router: Router.getPurchaserInfo(id: id)) { (result: Result<PurchaserInfoModel, AdaptyError>, response) in
             switch result {
             case .success(let purchaserInfo):
                 completion(purchaserInfo, nil)
@@ -99,7 +105,7 @@ class ApiManager {
     }
     
     func updateAttribution(id: String, params: Parameters, completion: @escaping JSONCompletion) {
-        RequestManager.request(router: Router.updateAttribution(id: id, params: params)) { (result: Result<JSONModel, AdaptyError>, response) in
+        requestManager.request(router: Router.updateAttribution(id: id, params: params)) { (result: Result<JSONModel, AdaptyError>, response) in
             switch result {
             case .success(let response):
                 completion(response.data, nil)
@@ -110,7 +116,7 @@ class ApiManager {
     }
     
     func getPromo(id: String, completion: @escaping PromoCompletion) {
-        RequestManager.request(router: Router.getPromo(id: id)) { (result: Result<PromoModel, AdaptyError>, response) in
+        requestManager.request(router: Router.getPromo(id: id)) { (result: Result<PromoModel, AdaptyError>, response) in
             switch result {
             case .success(let promo):
                 completion(promo, nil)
@@ -121,7 +127,7 @@ class ApiManager {
     }
     
     func enableAnalytics(id: String, params: Parameters, completion: ErrorCompletion?) {
-        RequestManager.request(router: Router.enableAnalytics(id: id, params: params)) { (result: Result<JSONModel, AdaptyError>, response) in
+        requestManager.request(router: Router.enableAnalytics(id: id, params: params)) { (result: Result<JSONModel, AdaptyError>, response) in
             if case let .failure(error) = result {
                 completion?(error)
             } else {
@@ -131,7 +137,7 @@ class ApiManager {
     }
     
     func setTransactionVariationId(params: Parameters, completion: ErrorCompletion?) {
-        RequestManager.request(router: Router.setTransactionVariationId(params: params)) { (result: Result<JSONModel, AdaptyError>, response) in
+        requestManager.request(router: Router.setTransactionVariationId(params: params)) { (result: Result<JSONModel, AdaptyError>, response) in
             if case let .failure(error) = result {
                 completion?(error)
             } else {
