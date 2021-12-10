@@ -52,6 +52,8 @@ class PurchasesTests: XCTestCase {
             iapManager.makePurchase(product: product, offerId: nil, completion: {
                 purchaserInfo, receipt, appleValidationResult, product, error in
                 expect(purchaserInfo).notTo(beNil())
+                expect(purchaserInfo?.subscriptions.first?.value.vendorProductId)
+                    .to(equal(product?.vendorProductId))
                 done()
             })
         }
@@ -92,6 +94,8 @@ class PurchasesTests: XCTestCase {
             iapManager.makePurchase(product: product, offerId: nil, completion: {
                 purchaserInfo, receipt, appleValidationResult, product, error in
                 expect(purchaserInfo).notTo(beNil())
+                expect(purchaserInfo?.nonSubscriptions.first?.value.first?.vendorProductId)
+                    .to(equal(product?.vendorProductId))
                 done()
             })
         }

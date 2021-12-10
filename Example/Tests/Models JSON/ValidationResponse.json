@@ -53,11 +53,11 @@
             }
          },
          "non_subscriptions":{
-            "coins_pack_100":[
+            "coins_pack_200":[
                {
                   "purchase_id":"a1ce1943-29ff-4fa0-9c55-09a38c4c5228",
                   "purchased_at":"2021-12-09T12:41:22.000000+0000",
-                  "vendor_product_id":"coins_pack_100",
+                  "vendor_product_id":"coins_pack_200",
                   "vendor_transaction_id":"1000000927546222",
                   "vendor_original_transaction_id":"1000000927546222",
                   "store":"app_store",
