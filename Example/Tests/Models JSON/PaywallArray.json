@@ -42,6 +42,13 @@
                 "promotional_offer_id": null,
                 "introductory_offer_eligibility": 0,
                 "vendor_product_id": "basic_subscription_1_year"
+            },
+            {
+                "promotional_offer_eligibility": 0,
+                "title": "Coins Pack 200",
+                "promotional_offer_id": null,
+                "introductory_offer_eligibility": 0,
+                "vendor_product_id": "coins_pack_200"
             }
         ]
     }

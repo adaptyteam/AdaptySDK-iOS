@@ -9,10 +9,11 @@
 /* Begin PBXBuildFile section */
 		4A19B9C2275D0ABE003B4532 /* PurchasesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A19B9C1275D0ABE003B4532 /* PurchasesTests.swift */; };
 		4A19B9C4275D170C003B4532 /* StoreKitConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 4A19B9C3275D170C003B4532 /* StoreKitConfiguration.storekit */; };
-		4A19B9C6275F9B6E003B4532 /* Product_coins.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A19B9C5275F9B6E003B4532 /* Product_coins.json */; };
+		4A19B9C6275F9B6E003B4532 /* Product_coins_100.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A19B9C5275F9B6E003B4532 /* Product_coins_100.json */; };
 		4A19B9CA276150C1003B4532 /* RequestManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A19B9C9276150C1003B4532 /* RequestManagerMock.swift */; };
 		4A19B9D02762357B003B4532 /* ValidationResponse.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A19B9CF2762357B003B4532 /* ValidationResponse.json */; };
 		4A19B9D227625456003B4532 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A19B9D127625456003B4532 /* DataProvider.swift */; };
+		4A19B9D42763A306003B4532 /* Product_coins_200.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A19B9D32763A306003B4532 /* Product_coins_200.json */; };
 		4A9C8BFE274695DA00392217 /* PurchaserInfo.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8BFC274694DB00392217 /* PurchaserInfo.json */; };
 		4A9C8C00274697CA00392217 /* Paywall.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8BFF274697CA00392217 /* Paywall.json */; };
 		4A9C8C0427469A5A00392217 /* Product_subscription.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8C0327469A5A00392217 /* Product_subscription.json */; };
@@ -52,10 +53,11 @@
 		0B77B02FCC407C887AADA018 /* Pods-Adapty_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adapty_Tests.release.xcconfig"; path = "Target Support Files/Pods-Adapty_Tests/Pods-Adapty_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		4A19B9C1275D0ABE003B4532 /* PurchasesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasesTests.swift; sourceTree = "<group>"; };
 		4A19B9C3275D170C003B4532 /* StoreKitConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = StoreKitConfiguration.storekit; sourceTree = "<group>"; };
-		4A19B9C5275F9B6E003B4532 /* Product_coins.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Product_coins.json; sourceTree = "<group>"; };
+		4A19B9C5275F9B6E003B4532 /* Product_coins_100.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Product_coins_100.json; sourceTree = "<group>"; };
 		4A19B9C9276150C1003B4532 /* RequestManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestManagerMock.swift; sourceTree = "<group>"; };
 		4A19B9CF2762357B003B4532 /* ValidationResponse.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ValidationResponse.json; sourceTree = "<group>"; };
 		4A19B9D127625456003B4532 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
+		4A19B9D32763A306003B4532 /* Product_coins_200.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Product_coins_200.json; sourceTree = "<group>"; };
 		4A9C8BFC274694DB00392217 /* PurchaserInfo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = PurchaserInfo.json; sourceTree = "<group>"; };
 		4A9C8BFF274697CA00392217 /* Paywall.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Paywall.json; sourceTree = "<group>"; };
 		4A9C8C0327469A5A00392217 /* Product_subscription.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Product_subscription.json; sourceTree = "<group>"; };
@@ -119,8 +121,9 @@
 				4A9C8BFC274694DB00392217 /* PurchaserInfo.json */,
 				4A9C8BFF274697CA00392217 /* Paywall.json */,
 				4A9C8C0327469A5A00392217 /* Product_subscription.json */,
+				4A19B9C5275F9B6E003B4532 /* Product_coins_100.json */,
+				4A19B9D32763A306003B4532 /* Product_coins_200.json */,
 				4A9C8C052747B78100392217 /* PaywallArray.json */,
-				4A19B9C5275F9B6E003B4532 /* Product_coins.json */,
 				4A19B9CF2762357B003B4532 /* ValidationResponse.json */,
 				4A19B9D127625456003B4532 /* DataProvider.swift */,
 			);
@@ -351,10 +354,11 @@
 			files = (
 				4A9C8C0427469A5A00392217 /* Product_subscription.json in Resources */,
 				4A9C8C062747B78100392217 /* PaywallArray.json in Resources */,
-				4A19B9C6275F9B6E003B4532 /* Product_coins.json in Resources */,
+				4A19B9C6275F9B6E003B4532 /* Product_coins_100.json in Resources */,
 				4A9C8C00274697CA00392217 /* Paywall.json in Resources */,
 				4A19B9C4275D170C003B4532 /* StoreKitConfiguration.storekit in Resources */,
 				4A19B9D02762357B003B4532 /* ValidationResponse.json in Resources */,
+				4A19B9D42763A306003B4532 /* Product_coins_200.json in Resources */,
 				4A9C8BFE274695DA00392217 /* PurchaserInfo.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

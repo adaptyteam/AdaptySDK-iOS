@@ -178,7 +178,7 @@ class ModelsTests: XCTestCase {
         
         let paywallsArray = try PaywallsArray(json: json)
         expect(paywallsArray?.paywalls.count).to(equal(1))
-        expect(paywallsArray?.products.count).to(equal(2))
+        expect(paywallsArray?.products.count).to(equal(3))
     }
     
     func testPromoModel() {

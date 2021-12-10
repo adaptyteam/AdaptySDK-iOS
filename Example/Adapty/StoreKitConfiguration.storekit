@@ -18,6 +18,21 @@
       "productID" : "coins_pack_100",
       "referenceName" : "Coins Pack 100",
       "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "74A52D44",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "coins_pack_200",
+      "referenceName" : "Coins Pack 200",
+      "type" : "Consumable"
     }
   ],
   "settings" : {

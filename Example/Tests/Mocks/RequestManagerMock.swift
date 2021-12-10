@@ -30,6 +30,10 @@ class MockURLProtocol: URLProtocol {
         return stubs.filter({ request.url?.absoluteString.contains($0.urlMatcher) ?? false }).first
     }
     
+    static func removeAllStubs() {
+        stubs.removeAll()
+    }
+    
     // MARK: URLProtocol
     
     override class func canInit(with request: URLRequest) -> Bool {
