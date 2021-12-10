@@ -101,4 +101,52 @@ class PurchasesTests: XCTestCase {
         expect(transaction.autoRenewingEnabled).to(beFalse())
         expect(transaction.state).to(equal(.purchased))
     }
+    
+    func testRestorePurchase() throws {
+        let session = try SKTestSession(configurationFileNamed: "StoreKitConfiguration")
+        session.resetToDefaultState()
+        session.disableDialogs = true
+        session.clearTransactions()
+        
+        let requestManager = RequestManager(session: .mock)
+        let apiManager = ApiManager(requestManager:requestManager)
+        let iapManager = IAPManager(apiManager: apiManager)
+        iapManager.startObservingPurchases(nil)
+        waitUntil(timeout: .seconds(10)) { done in
+            iapManager.restorePurchases { purchaserInfo, receipt, appleValidationResult, error in
+                expect(error).to(equal(AdaptyError.noPurchasesToRestore))
+                done()
+            }
+        }
+    }
+    
+    func testTransactionsHistory() throws {
+        let session = try SKTestSession(configurationFileNamed: "StoreKitConfiguration")
+        session.resetToDefaultState()
+        session.disableDialogs = true
+        session.clearTransactions()
+        
+        let productIdentifier = "coins_pack_100"
+        expect(try session.buyProduct(productIdentifier: productIdentifier)).notTo(throwError())
+        
+        let validationStub = Stub(statusCode: 200, jsonFileName: "ValidationResponse",
+                                  error: nil, urlMatcher: "validate")
+        MockURLProtocol.addStab(validationStub)
+        
+        let requestManager = RequestManager(session: .mock)
+        let apiManager = ApiManager(requestManager:requestManager)
+        let iapManager = IAPManager(apiManager: apiManager)
+        iapManager.startObservingPurchases(nil)
+        iapManager.syncTransactionsHistory()
+        
+        expect(iapManager.paywalls?.count).to(equal(1))
+        expect(iapManager.products?.count).to(equal(2))
+        
+        waitUntil(timeout: .seconds(10)) { done in
+            Adapty.getPurchaserInfo(forceUpdate: false) { purchaserInfo, error in
+                expect(purchaserInfo).notTo(beNil())
+                done()
+            }
+        }
+    }
 }
