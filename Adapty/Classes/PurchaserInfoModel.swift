@@ -9,7 +9,7 @@ import Foundation
 
 public class PurchaserInfoModel: NSObject, JSONCodable, Codable {
 
-    var profileId: String
+    @objc public var profileId: String
     @objc public var customerUserId: String?
     @objc public var accessLevels: [String: AccessLevelInfoModel]
     @objc public var subscriptions: [String: SubscriptionInfoModel]
