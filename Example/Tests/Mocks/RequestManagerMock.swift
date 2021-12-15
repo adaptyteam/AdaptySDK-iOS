@@ -30,14 +30,17 @@ class MockURLProtocol: URLProtocol {
         return stubs.filter({ request.url?.absoluteString.contains($0.urlMatcher) ?? false }).first
     }
     
-    static func removeAllStubs() {
+    static func removeAllStubs(function: String = #function) {
+        testName = function
         stubs.removeAll()
     }
+    
+    private static var testName: String = ""
     
     // MARK: URLProtocol
     
     override class func canInit(with request: URLRequest) -> Bool {
-        return stub(for: request) != nil
+        return true
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
@@ -46,7 +49,8 @@ class MockURLProtocol: URLProtocol {
 
     override func startLoading() {
         guard let stub = MockURLProtocol.stub(for: request) else {
-            fatalError("No stubs")
+            let testName = MockURLProtocol.testName
+            fatalError("No stubs for request: \(request.httpMethod!) \(request) in test: \(testName)")
         }
             
         let response = HTTPURLResponse(url: request.url!,
@@ -65,7 +69,8 @@ class MockURLProtocol: URLProtocol {
         } else if let error = stub.error {
             client?.urlProtocol(self, didFailWithError: error)
         } else {
-            fatalError()
+            client?.urlProtocol(self, didLoad: Data())
+            client?.urlProtocolDidFinishLoading(self)
         }
     }
 

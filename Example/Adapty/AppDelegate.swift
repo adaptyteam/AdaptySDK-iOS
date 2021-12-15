@@ -18,6 +18,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        if let _ = NSClassFromString("XCTest") {
+            // If we're running tests, don't launch the main storyboard
+            let viewController = UIViewController()
+            let label = UILabel()
+            label.text = "Running tests..."
+            label.frame = viewController.view.frame
+            label.textAlignment = .center
+            label.textColor = .white
+            viewController.view.addSubview(label)
+            window?.rootViewController = viewController
+            return true
+        }
+        
         Adapty.logLevel = .verbose
         Adapty.activate("YOUR_ADAPTY_APP_TOKEN")
         Adapty.delegate = self

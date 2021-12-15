@@ -108,6 +108,44 @@ class PurchasesTests: XCTestCase {
         expect(transaction?.state).to(equal(.purchased))
     }
     
+    func testMakeFailedTransactionConsumablePurchase() throws {
+        let session = try SKTestSession(configurationFileNamed: "StoreKitConfiguration")
+        session.resetToDefaultState()
+        session.disableDialogs = true
+        session.interruptedPurchasesEnabled = true
+        session.clearTransactions()
+
+        let productData = try DataProvider().jsonDataNamed("Product_coins_200")
+        let json = try JSONSerialization.jsonObject(with: productData, options: []) as! [String: Any]
+        let product = try ProductModel(json: json)!
+
+        MockURLProtocol.removeAllStubs()
+        let paywallsStub = Stub(statusCode: 200, jsonFileName: "PaywallArray",
+                                error: nil, urlMatcher: "purchase-containers")
+        MockURLProtocol.addStab(paywallsStub)
+        let validationStub = Stub(statusCode: 400, jsonFileName: nil,
+                                  error: AdaptyError.badRequest, urlMatcher: "validate")
+        MockURLProtocol.addStab(validationStub)
+
+        let requestManager = RequestManager(session: .mock)
+        let apiManager = ApiManager(requestManager:requestManager)
+        let iapManager = IAPManager(apiManager: apiManager)
+        iapManager.startObservingPurchases(nil)
+
+        waitUntil(timeout: .seconds(10)) { done in
+            iapManager.makePurchase(product: product, offerId: nil, completion: {
+                purchaserInfo, receipt, appleValidationResult, product, error in
+                expect(receipt).to(beNil())
+                expect(purchaserInfo).to(beNil())
+                expect(error?.adaptyErrorCode).to(equal(AdaptyError.AdaptyErrorCode.unknown))
+                done()
+            })
+        }
+
+        expect(session.allTransactions().count).to(equal(1))
+        expect(session.allTransactions().first?.state).to(equal(.failed))
+    }
+
     func testMakeFailedValidationConsumablePurchase() throws {
         let session = try SKTestSession(configurationFileNamed: "StoreKitConfiguration")
         session.resetToDefaultState()
@@ -122,6 +160,9 @@ class PurchasesTests: XCTestCase {
         let paywallsStub = Stub(statusCode: 200, jsonFileName: "PaywallArray",
                                 error: nil, urlMatcher: "purchase-containers")
         MockURLProtocol.addStab(paywallsStub)
+        let validationStub = Stub(statusCode: 400, jsonFileName: nil,
+                                  error: AdaptyError.badRequest, urlMatcher: "validate")
+        MockURLProtocol.addStab(validationStub)
         
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
@@ -157,6 +198,9 @@ class PurchasesTests: XCTestCase {
         iapManager.startObservingPurchases(nil)
         
         MockURLProtocol.removeAllStubs()
+        let paywallsStub = Stub(statusCode: 200, jsonFileName: "PaywallArray",
+                                error: nil, urlMatcher: "purchase-containers")
+        MockURLProtocol.addStab(paywallsStub)
         
         waitUntil(timeout: .seconds(10)) { done in
             iapManager.restorePurchases { purchaserInfo, receipt, appleValidationResult, error in
@@ -179,6 +223,9 @@ class PurchasesTests: XCTestCase {
         let validationStub = Stub(statusCode: 200, jsonFileName: "ValidationResponse",
                                   error: nil, urlMatcher: "validate")
         MockURLProtocol.addStab(validationStub)
+        let paywallsStub = Stub(statusCode: 200, jsonFileName: "PaywallArray",
+                                error: nil, urlMatcher: "purchase-containers")
+        MockURLProtocol.addStab(paywallsStub)
         
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
@@ -189,11 +236,6 @@ class PurchasesTests: XCTestCase {
         expect(iapManager.paywalls?.count).to(equal(1))
         expect(iapManager.products?.count).to(equal(3))
         
-        waitUntil(timeout: .seconds(10)) { done in
-            Adapty.getPurchaserInfo(forceUpdate: false) { purchaserInfo, error in
-                expect(purchaserInfo).notTo(beNil())
-                done()
-            }
-        }
+        expect(DefaultsManager.shared.purchaserInfo).notTo(beNil())
     }
 }
