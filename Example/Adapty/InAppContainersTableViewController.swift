@@ -71,11 +71,21 @@ extension InAppContainersTableViewController: UITableViewDataSource {
 extension InAppContainersTableViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let paywall = paywalls[indexPath.row]
+        
+        if paywall.developerId.contains("main_paywall") {
+            // simple showcase for paywall ui managed by remote config
+            let vc = PaywallViewController(paywall: paywall)
+            vc.modalPresentationStyle = .fullScreen
+            self.present(vc, animated: true)
+            return
+        }
+        
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "\(InAppTableViewController.self)") as? InAppTableViewController else {
             return
         }
         
-        vc.paywallToShow = paywalls[indexPath.row]
+        vc.paywallToShow = paywall
         navigationController?.pushViewController(vc, animated: true)
     }
     
