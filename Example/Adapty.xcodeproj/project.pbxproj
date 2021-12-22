@@ -24,8 +24,8 @@
 		D664B0B42571100C00962C23 /* UserDefaultsMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D664B0B32571100C00962C23 /* UserDefaultsMock.swift */; };
 		D664B0B6257110A000962C23 /* DefaultsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D664B0B5257110A000962C23 /* DefaultsManagerTests.swift */; };
 		D67A1911257E33A700A680B0 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D67A1910257E33A700A680B0 /* ModelsTests.swift */; };
-		D6C7F084276CCF9100672755 /* PaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6C7F082276CCF9100672755 /* PaywallViewController.swift */; };
-		D6C7F085276CCF9100672755 /* PaywallViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D6C7F083276CCF9100672755 /* PaywallViewController.xib */; };
+		D6C7F084276CCF9100672755 /* ShowcasePaywallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6C7F082276CCF9100672755 /* ShowcasePaywallViewController.swift */; };
+		D6C7F085276CCF9100672755 /* ShowcasePaywallViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D6C7F083276CCF9100672755 /* ShowcasePaywallViewController.xib */; };
 		D6F8D53223B0E1CE00CB719A /* InAppTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D53123B0E1CE00CB719A /* InAppTableViewCell.swift */; };
 		D6F8D53423B0E22300CB719A /* InAppTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D53323B0E22300CB719A /* InAppTableViewController.swift */; };
 		D6F8D53C23BFBC8100CB719A /* InAppContainersTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F8D53B23BFBC8100CB719A /* InAppContainersTableViewController.swift */; };
@@ -71,8 +71,8 @@
 		D664B0B32571100C00962C23 /* UserDefaultsMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsMock.swift; sourceTree = "<group>"; };
 		D664B0B5257110A000962C23 /* DefaultsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsManagerTests.swift; sourceTree = "<group>"; };
 		D67A1910257E33A700A680B0 /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
-		D6C7F082276CCF9100672755 /* PaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewController.swift; sourceTree = "<group>"; };
-		D6C7F083276CCF9100672755 /* PaywallViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PaywallViewController.xib; sourceTree = "<group>"; };
+		D6C7F082276CCF9100672755 /* ShowcasePaywallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowcasePaywallViewController.swift; sourceTree = "<group>"; };
+		D6C7F083276CCF9100672755 /* ShowcasePaywallViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShowcasePaywallViewController.xib; sourceTree = "<group>"; };
 		D6F8D53123B0E1CE00CB719A /* InAppTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppTableViewCell.swift; sourceTree = "<group>"; };
 		D6F8D53323B0E22300CB719A /* InAppTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppTableViewController.swift; sourceTree = "<group>"; };
 		D6F8D53B23BFBC8100CB719A /* InAppContainersTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppContainersTableViewController.swift; sourceTree = "<group>"; };
@@ -196,8 +196,8 @@
 			isa = PBXGroup;
 			children = (
 				D61FFE2E2770C80A008FF7D3 /* remote_config_example.json */,
-				D6C7F082276CCF9100672755 /* PaywallViewController.swift */,
-				D6C7F083276CCF9100672755 /* PaywallViewController.xib */,
+				D6C7F082276CCF9100672755 /* ShowcasePaywallViewController.swift */,
+				D6C7F083276CCF9100672755 /* ShowcasePaywallViewController.xib */,
 			);
 			name = "Paywall UI Example";
 			sourceTree = "<group>";
@@ -323,7 +323,7 @@
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
-				D6C7F085276CCF9100672755 /* PaywallViewController.xib in Resources */,
+				D6C7F085276CCF9100672755 /* ShowcasePaywallViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,7 +439,7 @@
 				D65757C5248FE2740055A431 /* InAppContainersTableViewCell.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
-				D6C7F084276CCF9100672755 /* PaywallViewController.swift in Sources */,
+				D6C7F084276CCF9100672755 /* ShowcasePaywallViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

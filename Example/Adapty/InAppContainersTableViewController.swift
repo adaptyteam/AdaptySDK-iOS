@@ -75,7 +75,7 @@ extension InAppContainersTableViewController: UITableViewDelegate {
         
         if paywall.developerId.contains("main_paywall") {
             // simple showcase for paywall ui managed by remote config
-            let vc = PaywallViewController(paywall: paywall)
+            let vc = ShowcasePaywallViewController(paywall: paywall)
             vc.modalPresentationStyle = .fullScreen
             self.present(vc, animated: true)
             return

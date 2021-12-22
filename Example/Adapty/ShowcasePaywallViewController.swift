@@ -1,5 +1,5 @@
 //
-//  PaywallViewController.swift
+//  ShowcasePaywallViewController.swift
 //  Adapty_Example
 //
 //  Created by Andrey Kyashkin on 17.12.2021.
@@ -9,7 +9,7 @@
 import UIKit
 import Adapty
 
-class PaywallViewController: UIViewController {
+class ShowcasePaywallViewController: UIViewController {
     
     var paywall: PaywallModel
     private var activeProduct: ProductModel?
@@ -150,7 +150,7 @@ class PaywallViewController: UIViewController {
     
 }
 
-extension PaywallViewController: PlanViewDelegate {
+extension ShowcasePaywallViewController: PlanViewDelegate {
     
     func didSelect(product: ProductModel?) {
         firstPlanView.isActive = firstPlanView.product == product
