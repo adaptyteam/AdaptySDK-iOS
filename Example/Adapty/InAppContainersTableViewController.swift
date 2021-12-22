@@ -86,14 +86,14 @@ extension InAppContainersTableViewController: UITableViewDelegate {
 extension InAppContainersTableViewController: InAppContainersTableViewCellDelegate {
     
     func didShowRemotePaywall(for paywall: PaywallModel) {
-        Adapty.showVisualPaywall(for: paywall, from: self, delegate: self)
-    }
-    
-    func didShowVisualPaywall(for paywall: PaywallModel) {
         // simple showcase for paywall ui managed by remote config
         let vc = ShowcasePaywallViewController(paywall: paywall)
         vc.modalPresentationStyle = .fullScreen
         present(vc, animated: true)
+    }
+    
+    func didShowVisualPaywall(for paywall: PaywallModel) {
+        Adapty.showVisualPaywall(for: paywall, from: self, delegate: self)
     }
 }
 
