@@ -73,14 +73,6 @@ extension InAppContainersTableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let paywall = paywalls[indexPath.row]
         
-        if paywall.developerId.contains("main_paywall") {
-            // simple showcase for paywall ui managed by remote config
-            let vc = ShowcasePaywallViewController(paywall: paywall)
-            vc.modalPresentationStyle = .fullScreen
-            self.present(vc, animated: true)
-            return
-        }
-        
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "\(InAppTableViewController.self)") as? InAppTableViewController else {
             return
         }
@@ -93,10 +85,16 @@ extension InAppContainersTableViewController: UITableViewDelegate {
 
 extension InAppContainersTableViewController: InAppContainersTableViewCellDelegate {
     
-    func didShowPaywall(for paywall: PaywallModel) {
+    func didShowRemotePaywall(for paywall: PaywallModel) {
         Adapty.showVisualPaywall(for: paywall, from: self, delegate: self)
     }
     
+    func didShowVisualPaywall(for paywall: PaywallModel) {
+        // simple showcase for paywall ui managed by remote config
+        let vc = ShowcasePaywallViewController(paywall: paywall)
+        vc.modalPresentationStyle = .fullScreen
+        present(vc, animated: true)
+    }
 }
 
 extension InAppContainersTableViewController: AdaptyVisualPaywallDelegate {

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vVf-dF-YDC">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vVf-dF-YDC">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -190,7 +190,7 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="InAppTableViewCell" rowHeight="70" id="xW5-5N-cxp" customClass="InAppTableViewCell" customModule="Adapty_Example" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="70"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="375" height="70"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="xW5-5N-cxp" id="y6T-VD-JhG">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="70"/>
@@ -280,41 +280,55 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="66" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="EDZ-1N-nEv">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="106" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="EDZ-1N-nEv">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="InAppContainersTableViewCell" id="4tQ-3j-Vg5" customClass="InAppContainersTableViewCell" customModule="Adapty_Example" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="66"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="InAppContainersTableViewCell" rowHeight="106" id="4tQ-3j-Vg5" customClass="InAppContainersTableViewCell" customModule="Adapty_Example" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="44.5" width="375" height="106"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="4tQ-3j-Vg5" id="8L2-DS-zdO">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="66"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="106"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AsP-dZ-Nw1">
-                                                    <rect key="frame" x="16" y="22.5" width="232" height="21"/>
+                                                    <rect key="frame" x="16" y="22.5" width="343" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LxH-Ku-yL5">
-                                                    <rect key="frame" x="248" y="0.0" width="127" height="66"/>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Eae-4T-y7X">
+                                                    <rect key="frame" x="0.0" y="40" width="187.5" height="66"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="width" constant="127" id="Vfs-ce-t02"/>
+                                                        <constraint firstAttribute="height" constant="66" id="BCt-8x-Ey1"/>
                                                     </constraints>
-                                                    <state key="normal" title="Show Paywall"/>
+                                                    <inset key="titleEdgeInsets" minX="16" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                                    <state key="normal" title="Show Visual Paywall"/>
                                                     <connections>
-                                                        <action selector="showPaywallButtonAction:" destination="4tQ-3j-Vg5" eventType="touchUpInside" id="3K1-d9-f5W"/>
+                                                        <action selector="showVisualPaywallButtonAction:" destination="4tQ-3j-Vg5" eventType="touchUpInside" id="61o-Ld-Ecr"/>
+                                                    </connections>
+                                                </button>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LxH-Ku-yL5">
+                                                    <rect key="frame" x="187.5" y="40" width="187.5" height="66"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="66" id="bMF-vh-xnL"/>
+                                                    </constraints>
+                                                    <state key="normal" title="Show Remote Paywall"/>
+                                                    <connections>
+                                                        <action selector="showRemotePaywallButtonAction:" destination="4tQ-3j-Vg5" eventType="touchUpInside" id="M89-hO-aVn"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="LxH-Ku-yL5" firstAttribute="leading" secondItem="AsP-dZ-Nw1" secondAttribute="trailing" id="HKr-JH-U2k"/>
-                                                <constraint firstAttribute="bottom" secondItem="LxH-Ku-yL5" secondAttribute="bottom" id="IZm-tZ-veD"/>
-                                                <constraint firstAttribute="trailing" secondItem="LxH-Ku-yL5" secondAttribute="trailing" id="MvM-Id-xcf"/>
-                                                <constraint firstItem="AsP-dZ-Nw1" firstAttribute="centerY" secondItem="8L2-DS-zdO" secondAttribute="centerY" id="Y90-95-Q1j"/>
-                                                <constraint firstItem="LxH-Ku-yL5" firstAttribute="top" secondItem="8L2-DS-zdO" secondAttribute="top" id="oGW-39-eEQ"/>
+                                                <constraint firstItem="LxH-Ku-yL5" firstAttribute="leading" secondItem="Eae-4T-y7X" secondAttribute="trailing" id="2PK-yX-EeC"/>
+                                                <constraint firstAttribute="trailing" secondItem="LxH-Ku-yL5" secondAttribute="trailing" id="3ma-f1-qaj"/>
+                                                <constraint firstItem="LxH-Ku-yL5" firstAttribute="width" secondItem="Eae-4T-y7X" secondAttribute="width" id="6yv-T9-HYm"/>
+                                                <constraint firstAttribute="trailing" secondItem="AsP-dZ-Nw1" secondAttribute="trailing" constant="16" id="7on-sJ-NMT"/>
+                                                <constraint firstItem="Eae-4T-y7X" firstAttribute="leading" secondItem="8L2-DS-zdO" secondAttribute="leading" id="F7U-UD-jJZ"/>
+                                                <constraint firstItem="AsP-dZ-Nw1" firstAttribute="top" secondItem="8L2-DS-zdO" secondAttribute="top" constant="22.5" id="shq-RJ-pq0"/>
+                                                <constraint firstAttribute="bottom" secondItem="LxH-Ku-yL5" secondAttribute="bottom" id="txF-Xa-iab"/>
                                                 <constraint firstItem="AsP-dZ-Nw1" firstAttribute="leading" secondItem="8L2-DS-zdO" secondAttribute="leading" constant="16" id="yFl-IG-Env"/>
+                                                <constraint firstAttribute="bottom" secondItem="Eae-4T-y7X" secondAttribute="bottom" id="zdX-Uf-KTf"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>

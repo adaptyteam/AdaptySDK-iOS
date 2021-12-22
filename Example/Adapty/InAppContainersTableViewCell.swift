@@ -9,8 +9,9 @@
 import UIKit
 import Adapty
 
-protocol InAppContainersTableViewCellDelegate: class {
-    func didShowPaywall(for paywall: PaywallModel)
+protocol InAppContainersTableViewCellDelegate: AnyObject {
+    func didShowRemotePaywall(for paywall: PaywallModel)
+    func didShowVisualPaywall(for paywall: PaywallModel)
 }
 
 class InAppContainersTableViewCell: UITableViewCell {
@@ -22,15 +23,21 @@ class InAppContainersTableViewCell: UITableViewCell {
         }
     }
     
-    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet private weak var titleLabel: UILabel!
     
-    @IBAction func showPaywallButtonAction(_ sender: Any) {
+    @IBAction private func showRemotePaywallButtonAction(_ sender: Any) {
         guard let paywall = paywall else {
             return
         }
         
-        delegate?.didShowPaywall(for: paywall)
+        delegate?.didShowRemotePaywall(for: paywall)
     }
     
-
+    @IBAction private func showVisualPaywallButtonAction(_ sender: Any) {
+        guard let paywall = paywall else {
+            return
+        }
+        
+        delegate?.didShowVisualPaywall(for: paywall)
+    }
 }
