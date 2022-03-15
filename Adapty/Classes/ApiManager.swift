@@ -12,6 +12,7 @@ public typealias ProfileCreateCompletion = (PurchaserInfoModel?, AdaptyError?, B
 typealias InstallationCompletion = (InstallationModel?, AdaptyError?) -> Void
 public typealias PaywallsCompletion = ([PaywallModel]?, [ProductModel]?, AdaptyError?) -> Void
 public typealias ValidateReceiptCompletion = (PurchaserInfoModel?, Parameters?, AdaptyError?) -> Void
+public typealias SyncTransactionsHistoryCompletion = (Parameters?, [PaywallModel]?, [ProductModel]?, AdaptyError?) -> Void
 public typealias JSONCompletion = (Parameters?, AdaptyError?) -> Void
 public typealias ErrorCompletion = (AdaptyError?) -> Void
 public typealias PurchaserCompletion = (PurchaserInfoModel?, AdaptyError?) -> Void

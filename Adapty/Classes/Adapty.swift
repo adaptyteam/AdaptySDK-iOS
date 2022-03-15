@@ -423,10 +423,14 @@ import UIKit
         return shared.purchaserInfo?.customerUserId
     }
     
-    private func syncTransactionsHistory() {
+    @objc public static func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
+        shared.syncTransactionsHistory(completion: completion)
+    }
+    
+    private func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        iapManager.syncTransactionsHistory()
+        iapManager.syncTransactionsHistory(completion: completion)
     }
     
     @objc public class func getPurchaserInfo(forceUpdate: Bool = false, _ completion: @escaping PurchaserCompletion) {
