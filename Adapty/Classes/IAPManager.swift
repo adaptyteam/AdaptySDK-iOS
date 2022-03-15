@@ -279,6 +279,7 @@ class IAPManager: NSObject {
     
     func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
         guard let receipt = latestReceipt else {
+            completion?(nil, nil, nil, AdaptyError.cantReadReceipt)
             return
         }
         
