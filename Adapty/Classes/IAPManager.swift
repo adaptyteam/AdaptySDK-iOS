@@ -277,14 +277,20 @@ class IAPManager: NSObject {
         return receipt
     }
     
-    func syncTransactionsHistory() {
+    func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
         guard let receipt = latestReceipt else {
             return
         }
         
-        Adapty.validateReceipt(receipt) { _, _, _  in
+        Adapty.validateReceipt(receipt) { _, validationResult, validationError in
+            guard validationError == nil else {
+                completion?(nil, nil, nil, validationError)
+                return
+            }
             // re-sync paywalls so user'll get updated eligibility properties
-            self.internalGetPaywalls()
+            self.internalGetPaywalls { paywalls, products, paywallsError in
+                completion?(validationResult, paywalls, products, paywallsError)
+            }
         }
     }
     
