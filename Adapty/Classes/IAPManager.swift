@@ -278,8 +278,14 @@ class IAPManager: NSObject {
     }
     
     func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
+        func getPaywalls(with validationResult: Parameters?) {
+            self.internalGetPaywalls { paywalls, products, paywallsError in
+                completion?(validationResult, paywalls, products, paywallsError)
+            }
+        }
+        
         guard let receipt = latestReceipt else {
-            completion?(nil, nil, nil, AdaptyError.cantReadReceipt)
+            getPaywalls(with: nil)
             return
         }
         
@@ -289,9 +295,7 @@ class IAPManager: NSObject {
                 return
             }
             // re-sync paywalls so user'll get updated eligibility properties
-            self.internalGetPaywalls { paywalls, products, paywallsError in
-                completion?(validationResult, paywalls, products, paywallsError)
-            }
+            getPaywalls(with: validationResult)
         }
     }
     
