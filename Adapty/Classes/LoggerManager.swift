@@ -23,7 +23,7 @@ class LoggerManager {
             return
         }
         
-        print("\(prefix) - ERROR.\n\(error)")
+        print("\n\(prefix) - ERROR.\n\(error)")
     }
     
     class func logMessage(_  message: String) {
@@ -31,7 +31,7 @@ class LoggerManager {
             return
         }
         
-        print("\(prefix) - INFO.\n\(message)")
+        print("\n\(prefix) - INFO.\n\(message)")
     }
     
     class func logGlobalMessage(_  message: String) {
@@ -39,7 +39,7 @@ class LoggerManager {
             return
         }
         
-        print("\(prefix) - INFO.\n\(message)")
+        print("\n\(prefix) - INFO.\n\(message)")
     }
     
     private class func isAllowedToLog(_ level: AdaptyLogLevel) -> Bool {
