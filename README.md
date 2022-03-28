@@ -1,9 +1,24 @@
-# [Adapty](https://adapty.io/?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS) iOS SDK — in-app purchases start here
+<h1 align="center" style="border-bottom: none">
+    <b>
+        <a href="https://adapty.io/?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS">Adapty</a> iOS SDK<br>
+    </b>
+    ⭐️  In-app purchases start here  ⭐️ <br>
+</h1>
 
-[![Version](https://img.shields.io/cocoapods/v/Adapty.svg?style=flat)](http://bit.ly/3qXy7cf)
-[![License](https://img.shields.io/cocoapods/l/Adapty.svg?style=flat)](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE)
-[![Platform](https://img.shields.io/cocoapods/p/Adapty.svg?style=flat)](http://bit.ly/3qXy7cf2)
-[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-orange.svg)](https://docs.adapty.io/docs/ios-sdk-installation#install-via-swift-package-manager?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+<p align="center">
+<a href="https://go.adapty.io/subhub-community-ios-rep"><img src="https://img.shields.io/badge/Adapty-discord-purple"></a>
+<a href="http://bit.ly/3qXy7cf"><img src="https://img.shields.io/cocoapods/v/Adapty.svg?style=flat"></a>
+<a href="https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE"><img src="https://img.shields.io/cocoapods/l/Adapty.svg?style=flat"></a>
+<a href="http://bit.ly/3qXy7cf2"><img src="https://img.shields.io/cocoapods/p/Adapty.svg?style=flat"></a>
+<a href="https://docs.adapty.io/docs/ios-sdk-installation#install-via-swift-package-manager?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg"></a>
+</p>
+
+
+<p align="center">
+    <a href="https://adapty.io"><b>Website</b></a> •
+    <a href="https://go.adapty.io/subhub-community-ios-rep"><b>Discord</b></a> •
+    <a href="https://twitter.com/AdaptyTeam"><b>Twitter</b></a>
+</p>
 
 ![Adapty: CRM for mobile apps with subscriptions](/adapty-schema.png)
 
