@@ -15,7 +15,7 @@
 
 
 <p align="center">
-    <a href="https://adapty.io"><b>Website</b></a> •
+    <a href="https://adapty.io/?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS"><b>Website</b></a> •
     <a href="https://go.adapty.io/subhub-community-ios-rep"><b>Discord</b></a> •
     <a href="https://twitter.com/AdaptyTeam"><b>Twitter</b></a>
 </p>
