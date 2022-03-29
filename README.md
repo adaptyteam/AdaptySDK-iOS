@@ -1,6 +1,6 @@
 <h1 align="center" style="border-bottom: none">
     <b>
-        <a href="https://adapty.io/?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS">Adapty</a> iOS SDK<br>
+        <a href="https://adapty.io/?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS">Adapty</a> iOS SDK<br>
     </b>
     ⭐️  In-app purchases start here  ⭐️ <br>
 </h1>
@@ -10,7 +10,7 @@
 <a href="http://bit.ly/3qXy7cf"><img src="https://img.shields.io/cocoapods/v/Adapty.svg?style=flat"></a>
 <a href="https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE"><img src="https://img.shields.io/cocoapods/l/Adapty.svg?style=flat"></a>
 <a href="http://bit.ly/3qXy7cf2"><img src="https://img.shields.io/cocoapods/p/Adapty.svg?style=flat"></a>
-<a href="https://docs.adapty.io/docs/ios-sdk-installation#install-via-swift-package-manager?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg"></a>
+<a href="https://docs.adapty.io/docs/ios-sdk-installation#install-via-swift-package-manager?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg"></a>
 </p>
 
 
@@ -26,23 +26,23 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 
 ## Install SDK to grow subscriptions:
 
-- [Price testing for paywalls on the fly](https://docs.adapty.io/docs/ab-test?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+- [Price testing for paywalls on the fly](https://docs.adapty.io/docs/ab-test?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS)
 Test different prices, durations, offers, messages, and designs simultaneously, all without new app releases.
-- [Win back subscribers](https://docs.adapty.io/docs/promo-campaigns?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+- [Win back subscribers](https://docs.adapty.io/docs/promo-campaigns?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS)
 Return churned subscribers with promotional trigger-based push notifications.
-- [Get your customer's payment history](https://docs.adapty.io/docs/profiles-crm?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+- [Get your customer's payment history](https://docs.adapty.io/docs/profiles-crm?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS)
 Explore user's payment events from starting the trial to subscription cancellation or billing issues.
-- [Forward in-app purchases events](https://docs.adapty.io/docs/events?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+- [Forward in-app purchases events](https://docs.adapty.io/docs/events?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS)
 Send subscription events to 3rd party analytics, attribution, and ad services with no coding. Even if a user uninstalled an app.
-- [Implement in-app purchases with no server code](https://docs.adapty.io/docs/ios-sdk-configuration?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+- [Implement in-app purchases with no server code](https://docs.adapty.io/docs/ios-sdk-configuration?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS)
 In-app purchases with server-side receipt validation in minutes. Apple Promotional Offers supported out-of-the-box.
-- [Analytics](https://docs.adapty.io/docs/analytics-charts?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS)
+- [Analytics](https://docs.adapty.io/docs/analytics-charts?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS)
 Start analyzing real-time metrics of your app with advanced filters, such as ad network, ad campaign, country, A/B test, etc.
 - 24/7 support
 
 ## Getting Started
 
-Read the [documentation](https://docs.adapty.io/docs/ios-sdk-installation?utm_source=github&utm_medium=content&utm_campaign=AdaptySDK-iOS) to install and configure Adapty SDK. Set up purchases in hours instead of weeks :rocket:
+Read the [documentation](https://docs.adapty.io/docs/ios-sdk-installation?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS) to install and configure Adapty SDK. Set up purchases in hours instead of weeks :rocket:
 
 ## [Join our Discord community](https://go.adapty.io/subhub-community-ios-rep)
 
