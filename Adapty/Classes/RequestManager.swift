@@ -62,6 +62,7 @@ fileprivate class SessionDataTask: Equatable {
     
     @objc private func resumeTaks() {
         task?.resume()
+        router?.logRequestRetry()
     }
     
     static func == (lhs: SessionDataTask, rhs: SessionDataTask) -> Bool {
@@ -146,6 +147,7 @@ class RequestManager {
         runningTasksQueue.append(task)
         waitingTasksQueue.removeFirst()
         task.task?.resume()
+        task.router?.logRequestStart()
     }
     
     private func handleResponse<T: JSONCodable>(task: SessionDataTask, data: Data?, response: URLResponse?, error: Error?, completion: @escaping RequestCompletion<T>) {

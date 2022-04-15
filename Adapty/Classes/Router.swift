@@ -119,25 +119,28 @@ enum Router {
     }
     
     func asURLRequest() throws -> URLRequest {
-        var request = URLRequest(url: URL(string: "\(scheme)://\(host)\(stage)\(path)")!,
+        var request = URLRequest(url: requestURL,
                                  cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
                                  timeoutInterval: timeoutInterval)
-        switch self {
-        case .trackEvent:
-            break
-        default:
-            request.setValue(authorizationHeader, forHTTPHeaderField: Constants.Headers.authorization)
-            request.setValue(DefaultsManager.shared.profileId, forHTTPHeaderField: Constants.Headers.profileId)
-            request.setValue(UserProperties.platform, forHTTPHeaderField: Constants.Headers.platform)
-            request.setValue(UserProperties.sdkVersion, forHTTPHeaderField: Constants.Headers.version)
-            request.setValue(String(UserProperties.sdkVersionBuild), forHTTPHeaderField: Constants.Headers.build)
-            request.setValue(String(UserProperties.locale), forHTTPHeaderField: Constants.Headers.locale)
+        
+        requestHeaders.forEach { header in
+            request.setValue(header.value, forHTTPHeaderField: header.key)
         }
 
         request.httpMethod = method.rawValue
         
-        var requestParams: Parameters = [:]
+        if self.method == .get {
+            request = try URLParameterEncoder().encode(request, with: requestParams)
+        } else {
+            request = try JSONParameterEncoder().encode(request, with: requestParams)
+        }
         
+        RequestHashManager.shared.tryToAddHashHeader(for: self, in: &request)
+                
+        return request
+    }
+    
+    private var requestParams: Parameters {
         switch self {
         case .createProfile(_, let params),
              .updateProfile(_, let params),
@@ -149,33 +152,58 @@ enum Router {
              .updateAttribution(_, let params),
              .enableAnalytics(_, let params),
              .setTransactionVariationId(let params):
-            requestParams = params
+            return params
         case .getPurchaserInfo,
              .getPromo:
+            return [:]
+        }
+    }
+    
+    private var requestURL: URL {
+        return URL(string: "\(scheme)://\(host)\(stage)\(path)")!
+    }
+    
+    private var requestHeaders: [String: String?] {
+        var headers = [String: String?]()
+        switch self {
+        case .trackEvent:
             break
+        default:
+            headers[Constants.Headers.authorization] = authorizationHeader
+            headers[Constants.Headers.profileId] = DefaultsManager.shared.profileId
+            headers[Constants.Headers.platform] = UserProperties.platform
+            headers[Constants.Headers.version] = UserProperties.sdkVersion
+            headers[Constants.Headers.build] = String(UserProperties.sdkVersionBuild)
+            headers[Constants.Headers.locale] = String(UserProperties.locale)
         }
-        
-        if self.method == .get {
-            request = try URLParameterEncoder().encode(request, with: requestParams)
-        } else {
-            request = try JSONParameterEncoder().encode(request, with: requestParams)
-        }
-        
-        RequestHashManager.shared.tryToAddHashHeader(for: self, in: &request)
-        
+        return headers
+    }
+}
+
+extension Router {
+    
+    func logRequestStart() {
         let message = """
-        Starting new request: \(self.method.rawValue.uppercased()) \(request.url?.absoluteString ?? "")
+        Starting new request: \(self.method.rawValue.uppercased()) \(requestURL)
         Params: \(requestParams)
-        Headers: \(request.allHTTPHeaderFields ?? [:])
+        Headers: \(requestHeaders.compactMapValues({ $0 }))
         """
+        logMessage(message)
+    }
+
+    func logRequestRetry() {
+        let message = """
+        Retry request: \(self.method.rawValue.uppercased()) \(requestURL)
+        """
+        logMessage(message)
+    }
+
+    private func logMessage(_ message: String) {
         switch self {
         case .trackEvent:
             LoggerManager.logGlobalMessage(message)
         default:
             LoggerManager.logMessage(message)
         }
-        
-        return request
     }
-    
 }
