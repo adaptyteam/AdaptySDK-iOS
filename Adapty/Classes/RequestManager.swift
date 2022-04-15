@@ -291,7 +291,12 @@ class RequestManager {
     
     private func logResponse(_ data: Data?, _ response: URLResponse?, _ task: SessionDataTask) {
         var message = "Received response: \(response?.url?.absoluteString ?? "")\n"
-        if let data = data, let jsonString = String(data: data, encoding: .utf8) {
+        
+        if let data = data,
+           let response = response as? HTTPURLResponse,
+           let jsonObject = RequestHashManager.shared.tryToGetCachedJSONObject(for: data, response: response, router: task.router) {
+            message.append("Cached: \(jsonObject)\n")
+        } else if let data = data, let jsonString = String(data: data, encoding: .utf8) {
             message.append("\(jsonString)\n")
         }
         if let response = response as? HTTPURLResponse {
