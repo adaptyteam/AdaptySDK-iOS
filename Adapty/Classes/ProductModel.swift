@@ -45,7 +45,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
     @objc public var introductoryOfferEligibility: Bool = false
     @objc public var promotionalOfferEligibility: Bool = false
     @objc public var promotionalOfferId: String?
-    var variationId: String?
+    @objc public var variationId: String?
     @objc public var paywallABTestName: String?
     @objc public var paywallName: String?
     
