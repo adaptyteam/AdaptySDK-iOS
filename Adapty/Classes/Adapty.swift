@@ -11,7 +11,7 @@ import Foundation
 import UIKit
 #endif
 
-@objc public protocol AdaptyDelegate: class {
+@objc public protocol AdaptyDelegate: AnyObject {
     
     func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel)
     func didReceivePromo(_ promo: PromoModel)

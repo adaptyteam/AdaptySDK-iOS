@@ -9,7 +9,7 @@
 import UIKit
 import WebKit
 
-@objc public protocol AdaptyVisualPaywallDelegate: class {
+@objc public protocol AdaptyVisualPaywallDelegate: AnyObject {
     
     func didPurchase(product: ProductModel, purchaserInfo: PurchaserInfoModel?, receipt: String?, appleValidationResult: Parameters?, paywall: PaywallViewController)
     func didFailPurchase(product: ProductModel, error: AdaptyError, paywall: PaywallViewController)

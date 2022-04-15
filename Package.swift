@@ -13,14 +13,15 @@ let package = Package(
             targets: ["Adapty"]
         ),
     ],
-    dependencies: [
-        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .exact("1.4.0")),
-    ],
+    dependencies: [],
     targets: [
         .target(
             name: "Adapty",
             dependencies: [],
-            path: "Adapty"
+            path: "Adapty",
+            swiftSettings: [
+                .unsafeFlags(["-suppress-warnings"])
+            ]
         ),
     ]
 )

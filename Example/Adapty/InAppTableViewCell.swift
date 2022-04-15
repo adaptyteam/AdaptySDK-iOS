@@ -9,7 +9,7 @@
 import UIKit
 import Adapty
 
-protocol InAppTableViewCellDelegate: class {
+protocol InAppTableViewCellDelegate: AnyObject {
     func didBuyProduct(_ product: ProductModel, useDiscount: Bool)
 }
 
