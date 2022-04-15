@@ -11,7 +11,7 @@ import AppKit
 #endif
 
 
-protocol AppDelegateSwizzlerDelegate: class {
+protocol AppDelegateSwizzlerDelegate: AnyObject {
     func didReceiveAPNSToken(_ deviceToken: Data)
 }
 
