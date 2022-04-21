@@ -18,10 +18,7 @@ let package = Package(
         .target(
             name: "Adapty",
             dependencies: [],
-            path: "Adapty",
-            swiftSettings: [
-                .unsafeFlags(["-suppress-warnings"])
-            ]
+            path: "Adapty"
         ),
     ]
 )
