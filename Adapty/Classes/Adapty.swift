@@ -209,7 +209,7 @@ import UIKit
 
         let params = Parameters.formatData(with: profileId, type: Constants.TypeNames.profile, attributes: params.toDictionary())
         
-        #warning("Think of a way how to move cache checker to the request manager")
+        // TODO: Think of a way how to move cache checker to the request manager
         if shared.requestHashManager.isPostHashExists(for: .updateProfile, params: params) {
             completion?(nil)
             return
@@ -254,7 +254,7 @@ import UIKit
         let params: Parameters
         let originalParams = formattedParameters(attributes)
         
-        #warning("Think of a way how to move cache checker to the request manager")
+        // TODO: Think of a way how to move cache checker to the request manager
         if requestHashManager.isPostHashExists(for: .syncInstallation, params: originalParams) {
             // send empty body in case of unchanged data
             params = formattedParameters(Parameters())
@@ -313,8 +313,7 @@ import UIKit
         attributes["attribution"] = attribution
         
         let params = Parameters.formatData(with: shared.profileId, type: Constants.TypeNames.profileAttribution, attributes: attributes)
-        
-        #warning("Think of a way how to move cache checker to the request manager")
+        // TODO: Think of a way how to move cache checker to the request manager
         if shared.requestHashManager.isPostHashExists(for: .updateAttribution, source: source, params: params) {
             completion?(nil)
             return
