@@ -81,6 +81,7 @@ import UIKit
     }()
     private var isConfigured = false
     private static var initialCustomerUserId: String?
+    private var logShowPaywallCalled: Bool = false
     static var observerMode = false
     
     @objc public static weak var delegate: AdaptyDelegate?
@@ -340,6 +341,14 @@ import UIKit
     @objc public class func makePurchase(product: ProductModel, offerId: String? = nil, completion: @escaping BuyProductCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
+        let hasPaywalls = (shared.iapManager.paywalls?.count ?? 0) > 0
+        if hasPaywalls && shared.logShowPaywallCalled == false {
+            assertionFailure("[Adapty] In order to properly measure performance of the paywalls, you need to call Adapty.logShowPaywall for every paywall show. https://docs.adapty.io/docs/ios-displaying-products#paywall-analytics")
+        }
+        if hasPaywalls && product.variationId == nil {
+            assertionFailure("[Adapty] In order to properly measure performance of the paywalls, you need to use products from paywalls. https://docs.adapty.io/docs/ios-displaying-products#showcase")
+        }
+        
         shared.iapManager.makePurchase(product: product, offerId: offerId) { (purchaserInfo, receipt, appleValidationResult, product, error) in
             if let error = error {
                 LoggerManager.logError("Failed to purchase product: \(product?.vendorProductId ?? "")\n\(error.localizedDescription)")
@@ -552,6 +561,7 @@ import UIKit
     
     @objc public class func logShowPaywall(_ paywall: PaywallModel, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
+        shared.logShowPaywallCalled = true
         
         shared.kinesisManager.trackEvent(.paywallShowed, params: ["is_promo": paywall.isPromo.description, "variation_id": paywall.variationId], completion: completion)
     }
