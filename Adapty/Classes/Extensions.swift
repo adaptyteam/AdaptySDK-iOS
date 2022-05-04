@@ -171,17 +171,30 @@ extension Locale {
 
 #if os(iOS)
 extension UIApplication {
-    
+
+    static var safeShared: UIApplication? {
+        let selector = NSSelectorFromString("sharedApplication")
+        return UIApplication.perform(selector)?.takeRetainedValue() as? UIApplication
+    }
+
     static var topOffset: CGFloat {
-        if #available(iOS 11.0, *), let safeAreaInsetsTop = UIApplication.shared.keyWindow?.safeAreaInsets.top {
+        guard let app = UIApplication.safeShared else {
+            return 0
+        }
+
+        if #available(iOS 11.0, *), let safeAreaInsetsTop = app.keyWindow?.safeAreaInsets.top {
             return safeAreaInsetsTop
         } else {
-            return UIApplication.shared.statusBarFrame.height
+            return app.statusBarFrame.height
         }
     }
     
     static var bottomOffset: CGFloat {
-        if #available(iOS 11.0, *), let safeAreaInsetsBottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom {
+        guard let app = UIApplication.safeShared else {
+            return 0
+        }
+
+        if #available(iOS 11.0, *), let safeAreaInsetsBottom = app.keyWindow?.safeAreaInsets.bottom {
             return safeAreaInsetsBottom
         } else {
             return 0
