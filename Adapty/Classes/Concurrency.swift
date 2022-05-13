@@ -11,7 +11,7 @@ extension Adapty {
         products: [ProductModel]?
     )
     
-    public typealias PurchaseResult = (
+    public typealias MakePurchaseResult = (
         purchaserInfo: PurchaserInfoModel?,
         receipt: String?,
         appleValidationResult: Parameters?,
@@ -40,7 +40,9 @@ extension Adapty {
                 if let error = error {
                     return continuation.resume(throwing: error)
                 }
-                continuation.resume(returning: ())
+                continuation.resume(
+                    returning: ()
+                )
             }
         }
     }
@@ -51,7 +53,9 @@ extension Adapty {
                 if let error = error {
                     return continuation.resume(throwing: error)
                 }
-                continuation.resume(returning: ())
+                continuation.resume(
+                    returning: ()
+                )
             }
         }
     }
@@ -66,7 +70,9 @@ extension Adapty {
                 if let error = error {
                     return continuation.resume(throwing: error)
                 }
-                continuation.resume(returning: ())
+                continuation.resume(
+                    returning: ()
+                )
             }
         }
     }
@@ -77,7 +83,9 @@ extension Adapty {
                 if let error = error {
                     return continuation.resume(throwing: error)
                 }
-                continuation.resume(returning: (paywalls, products))
+                continuation.resume(
+                    returning: (paywalls, products)
+                )
             }
         }
     }
@@ -85,7 +93,7 @@ extension Adapty {
     public static func makePurchase(
         product: ProductModel,
         offerID: String? = nil
-    ) async throws -> PurchaseResult {
+    ) async throws -> MakePurchaseResult {
         return try await withCheckedThrowingContinuation { continuation in
             Adapty.makePurchase(
                 product: product,
