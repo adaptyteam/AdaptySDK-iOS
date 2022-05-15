@@ -6,7 +6,7 @@ target 'Adapty_Example' do
   pod 'Adapty', :path => '../'
   
   pod 'Adjust', '~> 4.29.6'
-  pod 'AppsFlyerFramework', '~> 6.0.5'
+  pod 'AppsFlyerFramework', '~> 6.6.0'
   pod 'Branch', '~> 0.33.1'
 
   target 'Adapty_Tests' do
