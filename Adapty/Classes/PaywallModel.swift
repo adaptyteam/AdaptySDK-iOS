@@ -93,12 +93,12 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
     
 }
 
-class PaywallsArray: JSONCodable {
+public class PaywallsArray: JSONCodable {
     
-    var paywalls: [PaywallModel] = []
-    var products: [ProductModel] = []
+    public var paywalls: [PaywallModel] = []
+    public var products: [ProductModel] = []
     
-    required init?(json: Parameters) throws {
+    public required init?(json: Parameters) throws {
         guard let paywalls = json["data"] as? [Parameters] else {
             return
         }
