@@ -1,5 +1,5 @@
 PODS:
-  - Adapty (1.16.9)
+  - Adapty (1.17.1)
   - Adjust (4.29.6):
     - Adjust/Core (= 4.29.6)
   - Adjust/Core (4.29.6)
@@ -28,7 +28,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Adapty: 70f483904bde5428bb64f8fd74d9241ef5e3b981
+  Adapty: 3409c53560f6adf74e6c0c1c63ed2e3a1edb1c37
   Adjust: 94f1c99429fb2a7ebe530294fd66a88d63a54922
   AppsFlyerFramework: 57fb1fc68a5b8103353ce94d6e57861cbc4a55c3
   Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
