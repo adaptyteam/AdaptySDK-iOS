@@ -3,7 +3,9 @@ PODS:
   - Adjust (4.29.6):
     - Adjust/Core (= 4.29.6)
   - Adjust/Core (4.29.6)
-  - AppsFlyerFramework (6.0.8)
+  - AppsFlyerFramework (6.6.0):
+    - AppsFlyerFramework/Main (= 6.6.0)
+  - AppsFlyerFramework/Main (6.6.0)
   - Branch (0.33.1):
     - Branch/Core (= 0.33.1)
   - Branch/Core (0.33.1)
@@ -12,7 +14,7 @@ PODS:
 DEPENDENCIES:
   - Adapty (from `../`)
   - Adjust (~> 4.29.6)
-  - AppsFlyerFramework (~> 6.0.5)
+  - AppsFlyerFramework (~> 6.6.0)
   - Branch (~> 0.33.1)
   - Nimble
 
@@ -30,10 +32,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Adapty: 3409c53560f6adf74e6c0c1c63ed2e3a1edb1c37
   Adjust: 94f1c99429fb2a7ebe530294fd66a88d63a54922
-  AppsFlyerFramework: 57fb1fc68a5b8103353ce94d6e57861cbc4a55c3
+  AppsFlyerFramework: 55821f40c687dc7a683835eeb821994cef437807
   Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
   Nimble: e7e615c0335ee4bf5b0d786685451e62746117d5
 
-PODFILE CHECKSUM: d72c1fc10f9aaa6daf274125cc8ef02a87a146d4
+PODFILE CHECKSUM: 46249c38be9a056287a973cf5bcf3514aa122444
 
 COCOAPODS: 1.11.2

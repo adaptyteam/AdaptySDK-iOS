@@ -159,9 +159,9 @@ extension PaywallViewController: WKNavigationDelegate {
         
         guard url.contains("adapty://") else {
             if #available(iOS 10.0, *) {
-                UIApplication.shared.open(URL)
+                UIApplication.safeShared?.open(URL)
             } else {
-                UIApplication.shared.openURL(URL)
+                UIApplication.safeShared?.openURL(URL)
             }
             return
         }
