@@ -149,8 +149,8 @@ class ModelsTests: XCTestCase {
     }
     
     func testProductModel() throws {
-        guard let url = bundle.url(forResource: "Product", withExtension: "json") else {
-            XCTFail("Missing file: Product.json")
+        guard let url = bundle.url(forResource: "Product_subscription", withExtension: "json") else {
+            XCTFail("Missing file: Product_subscription.json")
             return
         }
         let data = try Data(contentsOf: url)
@@ -178,7 +178,7 @@ class ModelsTests: XCTestCase {
         
         let paywallsArray = try PaywallsArray(json: json)
         expect(paywallsArray?.paywalls.count).to(equal(1))
-        expect(paywallsArray?.products.count).to(equal(2))
+        expect(paywallsArray?.products.count).to(equal(3))
     }
     
     func testPromoModel() {

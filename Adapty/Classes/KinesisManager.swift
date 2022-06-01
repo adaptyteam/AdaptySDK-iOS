@@ -102,7 +102,7 @@ class KinesisManager {
 
         urlRequest = KinesisManager.sign(request: urlRequest, secretSigningKey: secretSigningKey, accessKeyId: accessKeyId, sessionToken: sessionToken)!
 
-        RequestManager.request(urlRequest: urlRequest, router: router) { (result: Result<JSONModel, AdaptyError>, response) in
+        RequestManager.shared.request(urlRequest: urlRequest, router: router) { (result: Result<JSONModel, AdaptyError>, response) in
             switch result {
             case .success:
                 let updatedCachedEvents = Set(self.cachedEvents).subtracting(currentCachedEvents)

@@ -1,0 +1,88 @@
+{
+  "identifier" : "2F72209A",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "C76D64AA",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "coins_pack_100",
+      "referenceName" : "Coins Pack 100",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "74A52D44",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "coins_pack_200",
+      "referenceName" : "Coins Pack 200",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "FAB46265",
+      "localizations" : [
+
+      ],
+      "name" : "AutoRenewable",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "5.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "515747CB",
+          "introductoryOffer" : {
+            "displayPrice" : "",
+            "internalID" : "32524E3C",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "payAsYouGo",
+            "subscriptionPeriod" : "P1Y"
+          },
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "basic_subscription_1_year",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Basic Subscription 1 Year",
+          "subscriptionGroupID" : "FAB46265",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "subscriptionOffersKeyPair" : {
+    "id" : "DDD4A10A",
+    "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgXqGqZoHiFld3juqqaMj4tegxFaLeB+U2haeE8B+iDPCgCgYIKoZIzj0DAQehRANCAATf6q+YIzFNSzc9KDmCBP0HxmPXTZz5IPajdwEusW3e4lG9tfU91weJkJ+a3SALGWeXrmrZmO2cSqeFMllJYCf9"
+  },
+  "version" : {
+    "major" : 1,
+    "minor" : 1
+  }
+}

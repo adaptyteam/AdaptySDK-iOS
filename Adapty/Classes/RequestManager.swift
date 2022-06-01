@@ -26,13 +26,21 @@ fileprivate class SessionDataTask: Equatable {
     
     var task: URLSessionDataTask?
     var router: Router?
+    private var session: URLSession
     private var retriesCount = 0
     private var maxRetriesCount: Int
     private var retriesDelay: TimeInterval
     
-    init(task: URLSessionDataTask? = nil, router: Router?, maxRetriesCount: Int = 3, retriesDelay: TimeInterval = 2) {
+    init(
+        task: URLSessionDataTask? = nil,
+        router: Router?,
+        session: URLSession,
+        maxRetriesCount: Int = 3,
+        retriesDelay: TimeInterval = 2)
+    {
         self.task = task
         self.router = router
+        self.session = session
         self.maxRetriesCount = maxRetriesCount
         self.retriesDelay = retriesDelay
     }
@@ -49,7 +57,7 @@ fileprivate class SessionDataTask: Equatable {
             return
         }
         
-        task = URLSession.shared.dataTask(with: request) { data, response, error in
+        task = session.dataTask(with: request) { data, response, error in
             DispatchQueue.global(qos: .background).async {
                 completion(data, response, error)
             }
@@ -75,6 +83,12 @@ class RequestManager {
     
     static let shared = RequestManager()
     
+    private let session: URLSession
+    
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+    
     private var runningTasksLimit: Int {
         return 1
     }
@@ -89,10 +103,10 @@ class RequestManager {
     // MARK:- Public methods
     
     @discardableResult
-    class func request<T: JSONCodable>(router: Router, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
+    func request<T: JSONCodable>(router: Router, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
         do {
             let urlRequest = try router.asURLRequest()
-            return shared.performRequest(urlRequest, router: router, completion: completion)
+            return performRequest(urlRequest, router: router, completion: completion)
         } catch let error as AdaptyError {
             LoggerManager.logError(error)
             completion(.failure(error), nil)
@@ -105,16 +119,16 @@ class RequestManager {
     }
 
     @discardableResult
-    class func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
-        return shared.performRequest(urlRequest, router: router, completion: completion)
+    func request<T: JSONCodable>(urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
+        return performRequest(urlRequest, router: router, completion: completion)
     }
     
     // MARK:- Private methods
 
     @discardableResult
     private func performRequest<T: JSONCodable>(_ urlRequest: URLRequest, router: Router?, completion: @escaping RequestCompletion<T>) -> URLSessionDataTask? {
-        let task = SessionDataTask(router: router)
-        let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+        let task = SessionDataTask(router: router, session: session)
+        let dataTask = session.dataTask(with: urlRequest) { data, response, error in
             DispatchQueue.global(qos: .background).async {
                 self.handleResponse(task: task, data: data, response: response, error: error) { (result: Result<T, AdaptyError>, response) in
                     switch result {
