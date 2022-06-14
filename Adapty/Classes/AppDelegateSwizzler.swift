@@ -10,6 +10,8 @@ import Foundation
 import AppKit
 #endif
 
+#if ADAPTY_DISABLE_PUSHES
+#else
 
 protocol AppDelegateSwizzlerDelegate: AnyObject {
     func didReceiveAPNSToken(_ deviceToken: Data)
@@ -82,3 +84,5 @@ class AppDelegateSwizzler {
     }
     
 }
+
+#endif

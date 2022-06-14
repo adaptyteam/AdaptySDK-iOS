@@ -135,7 +135,12 @@ import UIKit
             }
         }
         
+        #if ADAPTY_DISABLE_PUSHES
+        #else
+        
         AppDelegateSwizzler.startSwizzlingIfPossible(self)
+        
+        #endif
     }
     
     private func performInitialRequests() {
@@ -617,6 +622,9 @@ import UIKit
     
 }
 
+#if ADAPTY_DISABLE_PUSHES
+#else
+
 extension Adapty: AppDelegateSwizzlerDelegate {
     
     func didReceiveAPNSToken(_ deviceToken: Data) {
@@ -624,3 +632,5 @@ extension Adapty: AppDelegateSwizzlerDelegate {
     }
     
 }
+
+#endif
