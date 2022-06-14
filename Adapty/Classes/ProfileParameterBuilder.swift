@@ -90,7 +90,7 @@ public class ProfileParameterBuilder: NSObject {
     }
     
     @objc public func withCustomAttributes(_ customAttributes: Parameters) -> Self {
-        params["custom_attributes"] = customAttributes
+        params["custom_attributes"] = customAttributes.mapValues(makeJSONSerializable(_:))
         return self
     }
     
@@ -106,4 +106,47 @@ public class ProfileParameterBuilder: NSObject {
         return params
     }
     
+    private func makeJSONSerializable(_ param: Any) -> AnyObject {
+        if let null = param as? NSNull {
+            return null
+        }
+        if let string = param as? NSString {
+            return string
+        }
+        if let number = param as? NSNumber,
+           !number.doubleValue.isInfinite,
+           !number.doubleValue.isNaN {
+            return number
+        }
+        if let date = param as? Date {
+            return date.iso8601Value as NSString
+        }
+        if let array = param as? NSArray {
+            return array.map(makeJSONSerializable(_:)) as NSArray
+        }
+        if let dict = param as? NSDictionary {
+            var result = NSMutableDictionary()
+            dict.forEach({
+                result.setValue(makeJSONSerializable($0.value), forKey: coerceToString(key: $0.key))
+            })
+            return result
+        }
+        let description = String(describing: param) as NSString
+        LoggerManager.logError(
+            "Invalid property value type received of type \(type(of: param)), coercing to \"\(description)\""
+        )
+        return description
+    }
+    
+    private func coerceToString(key: Any) -> String {
+        if let key = key as? String {
+            return key
+        } else {
+            let description = String(describing: key)
+            LoggerManager.logError(
+                "Non-string received of type \(type(of: key)), coercing to \"\(description)\""
+            )
+            return description
+        }
+    }
 }
