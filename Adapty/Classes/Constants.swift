@@ -58,7 +58,7 @@ enum Constants {
     }
     
     enum Versions {
-        static let SDKVersion = "1.17.3"
+        static let SDKVersion = "1.17.4"
         static let SDKBuild = 1
     }
     
