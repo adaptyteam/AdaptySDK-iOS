@@ -168,84 +168,98 @@ public final class ProfileParameterBuilder: NSObject {
 // MARK: - Deprecations
 
 extension ProfileParameterBuilder {
+    @discardableResult
     @available(*, deprecated, message: "use email instead.")
     @objc public func withEmail(_ email: String) -> Self {
         self.email = email
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use phoneNumber instead.")
     @objc public func withPhoneNumber(_ phoneNumber: String) -> Self {
         self.phoneNumber = phoneNumber
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use facebookUserId instead.")
     @objc public func withFacebookUserId(_ facebookUserId: String) -> Self {
         self.facebookUserId = facebookUserId
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use facebookAnonymousId instead.")
     @objc public func withFacebookAnonymousId(_ facebookAnonymousId: String) -> Self {
         self.facebookAnonymousId = facebookAnonymousId
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use amplitudeUserId instead.")
     @objc public func withAmplitudeUserId(_ amplitudeUserId: String) -> Self {
         self.amplitudeUserId = amplitudeUserId
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use amplitudeDeviceId instead.")
     @objc public func withAmplitudeDeviceId(_ amplitudeDeviceId: String) -> Self {
         self.amplitudeDeviceId = amplitudeDeviceId
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use mixpanelUserId instead.")
     @objc public func withMixpanelUserId(_ mixpanelUserId: String) -> Self {
         self.mixpanelUserId = mixpanelUserId
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use appmetricaProfileId instead.")
     @objc public func withAppmetricaProfileId(_ appmetricaProfileId: String) -> Self {
         self.appmetricaProfileId = appmetricaProfileId
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use appmetricaDeviceId instead.")
     @objc public func withAppmetricaDeviceId(_ appmetricaDeviceId: String) -> Self {
         self.appmetricaDeviceId = appmetricaDeviceId
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use firstName instead.")
     @objc public func withFirstName(_ firstName: String) -> Self {
         self.firstName = firstName
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use lastName instead.")
     @objc public func withLastName(_ lastName: String) -> Self {
         self.lastName = lastName
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use gender instead.")
     @objc public func withGender(_ gender: Gender) -> Self {
         self.gender = gender
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use birthday instead.")
     @objc public func withBirthday(_ birthday: Date) -> Self {
         self.birthday = birthday
         return self
     }
 
+    @discardableResult
     @available(*, deprecated, message: "use setCustomAttributes instead.")
     @objc public func withCustomAttributes(_ customAttributes: Parameters) -> Self {
         self.setCustomAttributes(customAttributes)
@@ -253,6 +267,7 @@ extension ProfileParameterBuilder {
     }
     
     #if swift(>=5.3)
+    @discardableResult
     @available(iOS 14, macOS 11.0, *)
     @available(*, deprecated, message: "use atTrackingAuthorizationStatus instead.")
     @objc public func withAppTrackingTransparencyStatus(_ appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus) -> Self {
