@@ -61,8 +61,6 @@ class SessionsManager {
     
     private func trackLiveEventInBackground() {
         #if canImport(UIKit)
-        guard UIApplication.safeShared != nil else { return }
-
         var eventBackgroundTaskID: UIBackgroundTaskIdentifier = .invalid
         eventBackgroundTaskID = UIApplication.shared.beginBackgroundTask (withName: "AdaptyTrackLiveBackgroundTask") {
             // End the task if time expires.
