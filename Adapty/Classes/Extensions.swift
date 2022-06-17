@@ -16,6 +16,17 @@ extension Date {
         formatter.dateFormat = "YYYY-MM-dd"
         return formatter.string(from: self)
     }
+
+    init?(stringValue: String) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "YYYY-MM-dd"
+
+        guard let date = formatter.date(from: stringValue) else {
+            return nil
+        }
+
+        self = date
+    }
     
     var iso8601Value: String {
         return DateFormatter.iso8601Formatter.string(from: self)
