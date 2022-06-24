@@ -1,5 +1,5 @@
 PODS:
-  - Adapty (1.17.1)
+  - Adapty (1.17.5)
   - Adjust (4.29.6):
     - Adjust/Core (= 4.29.6)
   - Adjust/Core (4.29.6)
@@ -30,12 +30,12 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Adapty: 3409c53560f6adf74e6c0c1c63ed2e3a1edb1c37
+  Adapty: 5cadcdfebe57c727ef30bb5c221dc53a4c7482ad
   Adjust: 94f1c99429fb2a7ebe530294fd66a88d63a54922
   AppsFlyerFramework: 55821f40c687dc7a683835eeb821994cef437807
   Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
   Nimble: e7e615c0335ee4bf5b0d786685451e62746117d5
 
-PODFILE CHECKSUM: 46249c38be9a056287a973cf5bcf3514aa122444
+PODFILE CHECKSUM: 720fee08107e81d06aabe6ac64571afbfbb9a176
 
 COCOAPODS: 1.11.2

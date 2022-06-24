@@ -11,6 +11,7 @@ import StoreKit
 public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: AdaptyError?) -> Void
 public typealias RestorePurchasesCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ error: AdaptyError?) -> Void
 public typealias DeferredPurchaseCompletion = (BuyProductCompletion?) -> Void
+private typealias RefreshReceiptCompletion = (_ receipt: String?) -> Void
 private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, completion: BuyProductCompletion?)
 
 class IAPManager: NSObject {
@@ -48,6 +49,8 @@ class IAPManager: NSObject {
     private var paywallsRequest: URLSessionDataTask?
     private var productsRequest: SKProductsRequest?
     private var paywallsRequestCompletions: [PaywallsCompletion] = []
+    private var refreshReceiptCompletions: [RefreshReceiptCompletion] = []
+    private var refreshReceiptRequest: SKReceiptRefreshRequest?
     
     private var isSyncedAtLeastOnce: Bool = false
 
@@ -58,7 +61,7 @@ class IAPManager: NSObject {
     
     private var apiManager: ApiManager
     
-    // MARK:- Public
+    // MARK: - Public
     
     init(apiManager: ApiManager) {
         self.apiManager = apiManager
@@ -284,18 +287,23 @@ class IAPManager: NSObject {
             }
         }
         
-        guard let receipt = latestReceipt else {
-            getPaywalls(with: nil)
-            return
+        func validate(receipt: String) {
+            Adapty.validateReceipt(receipt) { _, validationResult, validationError in
+                guard validationError == nil else {
+                    completion?(nil, nil, nil, validationError)
+                    return
+                }
+                // re-sync paywalls so user'll get updated eligibility properties
+                getPaywalls(with: validationResult)
+            }
         }
         
-        Adapty.validateReceipt(receipt) { _, validationResult, validationError in
-            guard validationError == nil else {
-                completion?(nil, nil, nil, validationError)
-                return
+        getReceipt { receipt in
+            if let receipt = receipt {
+                validate(receipt: receipt)
+            } else {
+                getPaywalls(with: nil)
             }
-            // re-sync paywalls so user'll get updated eligibility properties
-            getPaywalls(with: validationResult)
         }
     }
     
@@ -358,7 +366,29 @@ class IAPManager: NSObject {
 
 private extension IAPManager {
     
-    // MARK:- Callbacks handling
+    // MARK: - Refresh receipt
+    
+    private func getReceipt(completion: @escaping RefreshReceiptCompletion) {
+        if let receipt = latestReceipt {
+            completion(receipt)
+        } else {
+            refreshReceipt(completion: completion)
+        }
+    }
+    
+    private func refreshReceipt(completion: @escaping RefreshReceiptCompletion) {
+        refreshReceiptCompletions.append(completion)
+        if refreshReceiptRequest == nil {
+            refreshReceiptRequest = SKReceiptRefreshRequest()
+            refreshReceiptRequest?.delegate = self
+            refreshReceiptRequest?.start()
+        }
+    }
+}
+
+private extension IAPManager {
+    
+    // MARK: - Callbacks handling
     
     private func callPaywallsCompletionAndCleanCallback(_ result: Result<(paywalls: [PaywallModel], products: [ProductModel]), AdaptyError>) {
         DispatchQueue.main.async {
@@ -416,7 +446,14 @@ private extension IAPManager {
 
 extension IAPManager: SKProductsRequestDelegate {
     
-    // MARK:- Products list
+    // MARK: - Products list and refresh receipt
+    
+    func requestDidFinish(_ request: SKRequest) {
+        guard let request = request as? SKReceiptRefreshRequest else { return }
+        refreshReceiptRequest = nil
+        refreshReceiptCompletions.forEach({ $0(latestReceipt) })
+        refreshReceiptCompletions.removeAll()
+    }
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         for product in response.products {
@@ -454,6 +491,13 @@ extension IAPManager: SKProductsRequestDelegate {
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
+        if let request = request as? SKReceiptRefreshRequest {
+            refreshReceiptRequest = nil
+            refreshReceiptCompletions.forEach({ $0(nil) })
+            refreshReceiptCompletions.removeAll()
+            return
+        }
+        
         if #available(iOS 14.0, *), let error = error as? SKError, SKError.Code(rawValue: error.errorCode) == SKError.unknown {
             LoggerManager.logError("Can't fetch products from Store. Please, make sure you run simulator under iOS 14 or if you want to continue using iOS 14 make sure you run it on a real device.")
         }
@@ -465,7 +509,7 @@ extension IAPManager: SKProductsRequestDelegate {
 
 extension IAPManager: SKPaymentTransactionObserver {
     
-    // MARK:- Transactions
+    // MARK: - Transactions
     
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         transactions.forEach { (transaction) in
