@@ -46,7 +46,7 @@ class PurchasesTests: XCTestCase {
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
         let iapManager = IAPManager(apiManager: apiManager)
-        iapManager.startObservingPurchases(nil)
+        iapManager.startObservingPurchases(syncTransactions: false, nil)
         
         waitUntil(timeout: .seconds(10)) { done in
             iapManager.makePurchase(product: product, offerId: nil, completion: {
@@ -88,7 +88,7 @@ class PurchasesTests: XCTestCase {
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
         let iapManager = IAPManager(apiManager: apiManager)
-        iapManager.startObservingPurchases(nil)
+        iapManager.startObservingPurchases(syncTransactions: false, nil)
         
         waitUntil(timeout: .seconds(10)) { done in
             iapManager.makePurchase(product: product, offerId: nil, completion: {
@@ -130,7 +130,7 @@ class PurchasesTests: XCTestCase {
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
         let iapManager = IAPManager(apiManager: apiManager)
-        iapManager.startObservingPurchases(nil)
+        iapManager.startObservingPurchases(syncTransactions: false, nil)
 
         waitUntil(timeout: .seconds(10)) { done in
             iapManager.makePurchase(product: product, offerId: nil, completion: {
@@ -167,7 +167,7 @@ class PurchasesTests: XCTestCase {
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
         let iapManager = IAPManager(apiManager: apiManager)
-        iapManager.startObservingPurchases(nil)
+        iapManager.startObservingPurchases(syncTransactions: false, nil)
 
         waitUntil(timeout: .seconds(10)) { done in
             iapManager.makePurchase(product: product, offerId: nil, completion: {
@@ -195,7 +195,7 @@ class PurchasesTests: XCTestCase {
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
         let iapManager = IAPManager(apiManager: apiManager)
-        iapManager.startObservingPurchases(nil)
+        iapManager.startObservingPurchases(syncTransactions: false, nil)
         
         MockURLProtocol.removeAllStubs()
         let paywallsStub = Stub(statusCode: 200, jsonFileName: "PaywallArray",
@@ -230,7 +230,7 @@ class PurchasesTests: XCTestCase {
         let requestManager = RequestManager(session: .mock)
         let apiManager = ApiManager(requestManager:requestManager)
         let iapManager = IAPManager(apiManager: apiManager)
-        iapManager.startObservingPurchases(nil)
+        iapManager.startObservingPurchases(syncTransactions: false, nil)
         iapManager.syncTransactionsHistory()
         
         expect(iapManager.paywalls?.count).to(equal(1))

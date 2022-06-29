@@ -6,6 +6,7 @@
 //
 
 extension Adapty {
+    
     public typealias GetPaywallsResult = (
         paywalls: [PaywallModel]?,
         products: [ProductModel]?
@@ -29,11 +30,26 @@ extension Adapty {
         paywalls: [PaywallModel]?,
         products: [ProductModel]?
     )
+    
 }
 
 #if canImport(_Concurrency) && compiler(>=5.5.2)
 @available(macOS 10.15, iOS 13.0.0, watchOS 6.0, tvOS 13.0, *)
 extension Adapty {
+    
+    public static func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            Adapty.activate(apiKey, observerMode: observerMode, customerUserId: customerUserId) { error in
+                if let error = error {
+                    return continuation.resume(throwing: error)
+                }
+                continuation.resume(
+                    returning: ()
+                )
+            }
+        }
+    }
+    
     public static func identify(_ customerUserId: String) async throws {
         return try await withCheckedThrowingContinuation { continuation in
             Adapty.identify(customerUserId) { error in
@@ -242,5 +258,6 @@ extension Adapty {
             }
         }
     }
+    
 }
 #endif

@@ -109,29 +109,42 @@ import UIKit
     }
     
     @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) {
+        activate(apiKey, observerMode: observerMode, customerUserId: customerUserId, completion: nil)
+    }
+    
+    @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?, completion: ErrorCompletion?) {
         Constants.APIKeys.secretKey = apiKey
         self.observerMode = observerMode
         self.initialCustomerUserId = customerUserId
-        shared.configure()
+        shared.configure(completion)
     }
     
-    private func configure() {
-        if isConfigured { return }
+    private func configure(_ completion: ErrorCompletion? = nil) {
+        if isConfigured {
+            DispatchQueue.main.async {
+                completion?(nil)
+            }
+            return
+        }
         isConfigured = true
         
         if purchaserInfo == nil {
             // didn't find synced profile, sync a local one and perform initial requests right after
-            createProfile(Self.initialCustomerUserId)
+            createProfile(Self.initialCustomerUserId, completion)
         } else {
             // already have a synced profile
             // update local cache for purchaser info
             // or create new profile 
             if let customerId = Self.initialCustomerUserId, purchaserInfo?.customerUserId != customerId {
-                Self.identify(customerId)
+                Self.identify(customerId, completion: completion)
             } else {
-                Self.getPurchaserInfo { (_, _) in }
+                Self.getPurchaserInfo { _, error in
+                    completion?(error)
+                }
+                // sync device meta info so user will get into a correct segment
+                syncInstallationAndStartTrackingLiveEvent()
                 // perform initial requests
-                performInitialRequests()
+                performInitialRequests(isNewUser: false)
             }
         }
         
@@ -143,15 +156,9 @@ import UIKit
         #endif
     }
     
-    private func performInitialRequests() {
-        // sync installation data and receive cognito credentials
-        syncInstallation { _, _ in
-            // start live tracking
-            self.sessionsManager.startTrackingLiveEvent()
-        }
-        
+    private func performInitialRequests(isNewUser: Bool) {
         // start observing purchases
-        iapManager.startObservingPurchases { (_, _, _) in
+        iapManager.startObservingPurchases(syncTransactions: isNewUser) { (_, _, _) in
             // get current existing promo
             Self.getPromo()
         }
@@ -165,6 +172,14 @@ import UIKit
             updateAppleSearchAdsAttribution()
         }
         #endif
+    }
+    
+    private func syncInstallationAndStartTrackingLiveEvent() {
+        // sync installation data and receive cognito credentials
+        syncInstallation { _, _ in
+            // start live tracking
+            self.sessionsManager.startTrackingLiveEvent()
+        }
     }
     
     //MARK: - REST
@@ -182,15 +197,15 @@ import UIKit
             if let purchaserInfo = purchaserInfo {
                 // do not overwrite in case of error
                 self.purchaserInfo = purchaserInfo
+                // sync device meta info so user will get into a correct segment
+                self.syncInstallationAndStartTrackingLiveEvent()
             }
             
             completion?(error)
             
             if error == nil {
-                self.performInitialRequests()
-                
-                // sync latest receipt to server and obtain eligibility criteria for introductory and promotional offers
-                self.syncTransactionsHistory()
+                // perform initial requests
+                self.performInitialRequests(isNewUser: true)
             }
         }
     }

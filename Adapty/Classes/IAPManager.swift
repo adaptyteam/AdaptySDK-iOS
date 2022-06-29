@@ -67,10 +67,17 @@ class IAPManager: NSObject {
         self.apiManager = apiManager
     }
     
-    func startObservingPurchases(_ completion: PaywallsCompletion? = nil) {
+    func startObservingPurchases(syncTransactions: Bool, _ completion: PaywallsCompletion? = nil) {
         startObserving()
         
-        internalGetPaywalls(completion)
+        if syncTransactions {
+            syncTransactionsHistory { _, paywalls, products, error in
+                completion?(paywalls, products, error)
+            }
+        } else {
+            internalGetPaywalls(completion)
+        }
+        
         
         NotificationCenter.default.addObserver(forName: Application.willTerminateNotification, object: nil, queue: .main) { [weak self] (_) in
             self?.stopObserving()
@@ -97,10 +104,14 @@ class IAPManager: NSObject {
     }
     
     private func internalGetPaywalls(_ completion: PaywallsCompletion? = nil) {
+        internalGetPaywalls(forceUpdate: false, completion)
+    }
+    
+    private func internalGetPaywalls(forceUpdate: Bool, _ completion: PaywallsCompletion? = nil) {
         if let completion = completion { paywallsRequestCompletions.append(completion) }
         
         // syncing already in progress
-        if paywallsRequest != nil {
+        if paywallsRequest != nil && forceUpdate == false {
             return
         }
         
@@ -282,17 +293,13 @@ class IAPManager: NSObject {
     
     func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
         func getPaywalls(with validationResult: Parameters?) {
-            self.internalGetPaywalls { paywalls, products, paywallsError in
+            self.internalGetPaywalls(forceUpdate: true) { paywalls, products, paywallsError in
                 completion?(validationResult, paywalls, products, paywallsError)
             }
         }
         
         func validate(receipt: String) {
             Adapty.validateReceipt(receipt) { _, validationResult, validationError in
-                guard validationError == nil else {
-                    completion?(nil, nil, nil, validationError)
-                    return
-                }
                 // re-sync paywalls so user'll get updated eligibility properties
                 getPaywalls(with: validationResult)
             }
