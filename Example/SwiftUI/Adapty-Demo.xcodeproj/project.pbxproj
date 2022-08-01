@@ -19,6 +19,7 @@
 		DCD3696A2898461700F07357 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = DCD369692898461700F07357 /* Adapty */; };
 		DCD3696D2898478500F07357 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3696C2898478500F07357 /* UserService.swift */; };
 		DCD3696F289847D400F07357 /* PaywallService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3696E289847D400F07357 /* PaywallService.swift */; };
+		DCD369722898486000F07357 /* PremiumStuffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369712898486000F07357 /* PremiumStuffView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		DCD36966289845D700F07357 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		DCD3696C2898478500F07357 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 		DCD3696E289847D400F07357 /* PaywallService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallService.swift; sourceTree = "<group>"; };
+		DCD369712898486000F07357 /* PremiumStuffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumStuffView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				DCD369482898362900F07357 /* Preview Content */,
 				DCD369602898452F00F07357 /* Model */,
 				DCD3696B2898475100F07357 /* Service */,
+				DCD369702898483800F07357 /* Scene */,
 				DCD3695B2898443B00F07357 /* Utils */,
 				DCD369422898362800F07357 /* Adapty_DemoApp.swift */,
 				DCD369442898362800F07357 /* ContentView.swift */,
@@ -123,6 +126,14 @@
 				DCD3696E289847D400F07357 /* PaywallService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		DCD369702898483800F07357 /* Scene */ = {
+			isa = PBXGroup;
+			children = (
+				DCD369712898486000F07357 /* PremiumStuffView.swift */,
+			);
+			path = Scene;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,6 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCD3696D2898478500F07357 /* UserService.swift in Sources */,
+				DCD369722898486000F07357 /* PremiumStuffView.swift in Sources */,
 				DCD3695F289844C400F07357 /* Image+Gallery.swift in Sources */,
 				DCD3696F289847D400F07357 /* PaywallService.swift in Sources */,
 				DCD369452898362800F07357 /* ContentView.swift in Sources */,
