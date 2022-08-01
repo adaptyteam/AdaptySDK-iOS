@@ -16,6 +16,7 @@
 		DCD369622898453E00F07357 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369612898453E00F07357 /* User.swift */; };
 		DCD369642898457600F07357 /* PaywallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369632898457600F07357 /* PaywallViewModel.swift */; };
 		DCD36967289845D700F07357 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCD36966289845D700F07357 /* StoreKit.framework */; };
+		DCD3696A2898461700F07357 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = DCD369692898461700F07357 /* Adapty */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DCD36967289845D700F07357 /* StoreKit.framework in Frameworks */,
+				DCD3696A2898461700F07357 /* Adapty in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +127,9 @@
 			dependencies = (
 			);
 			name = "Adapty-Demo";
+			packageProductDependencies = (
+				DCD369692898461700F07357 /* Adapty */,
+			);
 			productName = "Adapty-Demo";
 			productReference = DCD3693F2898362800F07357 /* Adapty-Demo.app */;
 			productType = "com.apple.product-type.application";
@@ -153,6 +158,9 @@
 				Base,
 			);
 			mainGroup = DCD369362898362800F07357;
+			packageReferences = (
+				DCD369682898461700F07357 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */,
+			);
 			productRefGroup = DCD369402898362800F07357 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -383,6 +391,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DCD369682898461700F07357 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/adaptyteam/AdaptySDK-iOS";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DCD369692898461700F07357 /* Adapty */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DCD369682898461700F07357 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
+			productName = Adapty;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DCD369372898362800F07357 /* Project object */;
 }
