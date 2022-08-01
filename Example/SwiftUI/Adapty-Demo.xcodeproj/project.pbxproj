@@ -22,6 +22,7 @@
 		DCD369722898486000F07357 /* PremiumStuffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369712898486000F07357 /* PremiumStuffView.swift */; };
 		DCD36974289848A800F07357 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD36973289848A800F07357 /* PaywallView.swift */; };
 		DCD36976289848BE00F07357 /* View+isHidden.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD36975289848BE00F07357 /* View+isHidden.swift */; };
+		DCD3697828984A2100F07357 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3697728984A2100F07357 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		DCD369712898486000F07357 /* PremiumStuffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumStuffView.swift; sourceTree = "<group>"; };
 		DCD36973289848A800F07357 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		DCD36975289848BE00F07357 /* View+isHidden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+isHidden.swift"; sourceTree = "<group>"; };
+		DCD3697728984A2100F07357 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +86,7 @@
 				DCD369702898483800F07357 /* Scene */,
 				DCD3695B2898443B00F07357 /* Utils */,
 				DCD369422898362800F07357 /* Adapty_DemoApp.swift */,
+				DCD3697728984A2100F07357 /* AppDelegate.swift */,
 			);
 			path = "Adapty-Demo";
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCD3697828984A2100F07357 /* AppDelegate.swift in Sources */,
 				DCD3696D2898478500F07357 /* UserService.swift in Sources */,
 				DCD369722898486000F07357 /* PremiumStuffView.swift in Sources */,
 				DCD3695F289844C400F07357 /* Image+Gallery.swift in Sources */,

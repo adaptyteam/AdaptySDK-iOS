@@ -10,6 +10,8 @@ import SwiftUI
 
 @main
 struct Adapty_DemoApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     var body: some Scene {
         WindowGroup {
             EmptyView()
