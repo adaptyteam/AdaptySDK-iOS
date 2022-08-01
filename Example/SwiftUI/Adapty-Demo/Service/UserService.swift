@@ -73,7 +73,7 @@ final class UserService: ObservableObject {
                 completion(false, error)
                 return
             }
-            self?.updatePremiumStatus(with: purchaserInfo, error: error)
+            self?.updatePremiumStatus(with: purchaserInfo, error: error, completion: completion)
         }
     }
     
