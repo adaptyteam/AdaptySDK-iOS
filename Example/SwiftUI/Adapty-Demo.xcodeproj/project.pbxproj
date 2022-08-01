@@ -20,6 +20,8 @@
 		DCD3696D2898478500F07357 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3696C2898478500F07357 /* UserService.swift */; };
 		DCD3696F289847D400F07357 /* PaywallService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3696E289847D400F07357 /* PaywallService.swift */; };
 		DCD369722898486000F07357 /* PremiumStuffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369712898486000F07357 /* PremiumStuffView.swift */; };
+		DCD36974289848A800F07357 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD36973289848A800F07357 /* PaywallView.swift */; };
+		DCD36976289848BE00F07357 /* View+isHidden.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD36975289848BE00F07357 /* View+isHidden.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +39,8 @@
 		DCD3696C2898478500F07357 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 		DCD3696E289847D400F07357 /* PaywallService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallService.swift; sourceTree = "<group>"; };
 		DCD369712898486000F07357 /* PremiumStuffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumStuffView.swift; sourceTree = "<group>"; };
+		DCD36973289848A800F07357 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		DCD36975289848BE00F07357 /* View+isHidden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+isHidden.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +102,7 @@
 			children = (
 				DCD3695C2898445B00F07357 /* Color+Palette.swift */,
 				DCD3695E289844C400F07357 /* Image+Gallery.swift */,
+				DCD36975289848BE00F07357 /* View+isHidden.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -132,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				DCD369712898486000F07357 /* PremiumStuffView.swift */,
+				DCD36973289848A800F07357 /* PaywallView.swift */,
 			);
 			path = Scene;
 			sourceTree = "<group>";
@@ -215,10 +221,12 @@
 				DCD3696D2898478500F07357 /* UserService.swift in Sources */,
 				DCD369722898486000F07357 /* PremiumStuffView.swift in Sources */,
 				DCD3695F289844C400F07357 /* Image+Gallery.swift in Sources */,
+				DCD36976289848BE00F07357 /* View+isHidden.swift in Sources */,
 				DCD3696F289847D400F07357 /* PaywallService.swift in Sources */,
 				DCD369452898362800F07357 /* ContentView.swift in Sources */,
 				DCD369432898362800F07357 /* Adapty_DemoApp.swift in Sources */,
 				DCD369622898453E00F07357 /* User.swift in Sources */,
+				DCD36974289848A800F07357 /* PaywallView.swift in Sources */,
 				DCD3695D2898445B00F07357 /* Color+Palette.swift in Sources */,
 				DCD369642898457600F07357 /* PaywallViewModel.swift in Sources */,
 			);

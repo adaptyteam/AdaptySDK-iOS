@@ -77,6 +77,18 @@ final class UserService: ObservableObject {
         }
     }
     
+    // MARK: - Restore Purchases
+    
+    func restorePurchases(completion: @escaping ((Bool, Error?) -> Void)) {
+        Adapty.restorePurchases { [weak self] purchaserInfo, receipt, appleValidationResult, error in
+            guard error == nil, let purchaserInfo = purchaserInfo else {
+                completion(self?.isPremium ?? false, error)
+                return
+            }
+            self?.updatePremiumStatus(with: purchaserInfo, completion: completion)
+        }
+    }
+    
     // MARK: - Update Premium Status
     
     private func updatePremiumStatus(
