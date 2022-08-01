@@ -12,7 +12,7 @@ import SwiftUI
 struct Adapty_DemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            EmptyView()
         }
     }
 }

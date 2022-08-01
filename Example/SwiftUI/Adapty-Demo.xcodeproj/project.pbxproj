@@ -84,7 +84,6 @@
 				DCD369702898483800F07357 /* Scene */,
 				DCD3695B2898443B00F07357 /* Utils */,
 				DCD369422898362800F07357 /* Adapty_DemoApp.swift */,
-				DCD369442898362800F07357 /* ContentView.swift */,
 			);
 			path = "Adapty-Demo";
 			sourceTree = "<group>";
@@ -136,6 +135,7 @@
 		DCD369702898483800F07357 /* Scene */ = {
 			isa = PBXGroup;
 			children = (
+				DCD369442898362800F07357 /* ContentView.swift */,
 				DCD369712898486000F07357 /* PremiumStuffView.swift */,
 				DCD36973289848A800F07357 /* PaywallView.swift */,
 			);
