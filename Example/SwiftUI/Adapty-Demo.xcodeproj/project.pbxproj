@@ -17,6 +17,7 @@
 		DCD369642898457600F07357 /* PaywallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369632898457600F07357 /* PaywallViewModel.swift */; };
 		DCD36967289845D700F07357 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCD36966289845D700F07357 /* StoreKit.framework */; };
 		DCD3696A2898461700F07357 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = DCD369692898461700F07357 /* Adapty */; };
+		DCD3696D2898478500F07357 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3696C2898478500F07357 /* UserService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		DCD369612898453E00F07357 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		DCD369632898457600F07357 /* PaywallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewModel.swift; sourceTree = "<group>"; };
 		DCD36966289845D700F07357 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		DCD3696C2898478500F07357 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				DCD369462898362900F07357 /* Assets.xcassets */,
 				DCD369482898362900F07357 /* Preview Content */,
 				DCD369602898452F00F07357 /* Model */,
+				DCD3696B2898475100F07357 /* Service */,
 				DCD3695B2898443B00F07357 /* Utils */,
 				DCD369422898362800F07357 /* Adapty_DemoApp.swift */,
 				DCD369442898362800F07357 /* ContentView.swift */,
@@ -109,6 +112,14 @@
 				DCD36966289845D700F07357 /* StoreKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DCD3696B2898475100F07357 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				DCD3696C2898478500F07357 /* UserService.swift */,
+			);
+			path = Service;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -187,6 +198,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCD3696D2898478500F07357 /* UserService.swift in Sources */,
 				DCD3695F289844C400F07357 /* Image+Gallery.swift in Sources */,
 				DCD369452898362800F07357 /* ContentView.swift in Sources */,
 				DCD369432898362800F07357 /* Adapty_DemoApp.swift in Sources */,
