@@ -18,6 +18,7 @@
 		DCD36967289845D700F07357 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCD36966289845D700F07357 /* StoreKit.framework */; };
 		DCD3696A2898461700F07357 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = DCD369692898461700F07357 /* Adapty */; };
 		DCD3696D2898478500F07357 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3696C2898478500F07357 /* UserService.swift */; };
+		DCD3696F289847D400F07357 /* PaywallService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3696E289847D400F07357 /* PaywallService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		DCD369632898457600F07357 /* PaywallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewModel.swift; sourceTree = "<group>"; };
 		DCD36966289845D700F07357 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		DCD3696C2898478500F07357 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
+		DCD3696E289847D400F07357 /* PaywallService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				DCD3696C2898478500F07357 /* UserService.swift */,
+				DCD3696E289847D400F07357 /* PaywallService.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -200,6 +203,7 @@
 			files = (
 				DCD3696D2898478500F07357 /* UserService.swift in Sources */,
 				DCD3695F289844C400F07357 /* Image+Gallery.swift in Sources */,
+				DCD3696F289847D400F07357 /* PaywallService.swift in Sources */,
 				DCD369452898362800F07357 /* ContentView.swift in Sources */,
 				DCD369432898362800F07357 /* Adapty_DemoApp.swift in Sources */,
 				DCD369622898453E00F07357 /* User.swift in Sources */,
