@@ -15,6 +15,7 @@
 		DCD3695F289844C400F07357 /* Image+Gallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3695E289844C400F07357 /* Image+Gallery.swift */; };
 		DCD369622898453E00F07357 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369612898453E00F07357 /* User.swift */; };
 		DCD369642898457600F07357 /* PaywallViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD369632898457600F07357 /* PaywallViewModel.swift */; };
+		DCD36967289845D700F07357 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCD36966289845D700F07357 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		DCD3695E289844C400F07357 /* Image+Gallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Image+Gallery.swift"; sourceTree = "<group>"; };
 		DCD369612898453E00F07357 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		DCD369632898457600F07357 /* PaywallViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewModel.swift; sourceTree = "<group>"; };
+		DCD36966289845D700F07357 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCD36967289845D700F07357 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +49,7 @@
 			children = (
 				DCD369412898362800F07357 /* Adapty-Demo */,
 				DCD369402898362800F07357 /* Products */,
+				DCD36965289845D700F07357 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,6 +99,14 @@
 				DCD369632898457600F07357 /* PaywallViewModel.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		DCD36965289845D700F07357 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DCD36966289845D700F07357 /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
