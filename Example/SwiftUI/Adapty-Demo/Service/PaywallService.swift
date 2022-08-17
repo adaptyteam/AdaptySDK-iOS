@@ -52,7 +52,12 @@ extension PaywallService {
             iconName: iconName,
             description: description,
             buyActionTitle: buyActionTitle,
-            restoreActionTitle: restorePurchasesActionTitle
+            restoreActionTitle: restorePurchasesActionTitle,
+            productModels: currentPaywall.products.map { product in
+                let priceString = product.localizedPrice ?? ""
+                let periodString = product.localizedSubscriptionPeriod ?? ""
+                return .init(id: product.vendorProductId, priceString: priceString, period: periodString)
+            }
         )
     }
 }

@@ -13,4 +13,11 @@ struct PaywallViewModel: Equatable {
     let description: String
     let buyActionTitle: String
     let restoreActionTitle: String
+    let productModels: [ProductItemModel]
+}
+
+struct ProductItemModel: Equatable {
+    let id: String
+    let priceString: String
+    let period: String
 }

@@ -82,7 +82,10 @@ struct PaywallView: View {
     
     var buttonGroup: some View {
         VStack(alignment: .center, spacing: 12) {
-            buyButton
+            let model = paywallService.paywallViewModel
+            ForEach(model?.productModels ?? [], id: \.id) { product in
+                buyButton(title: model?.buyActionTitle ?? "", product: product)
+            }
             restoreButton
         }
         .padding()
@@ -90,12 +93,13 @@ struct PaywallView: View {
     
     // MARK: - buyButton
     
-    var buyButton: some View {
+    func buyButton(title: String, product: ProductItemModel) -> some View {
         Button(
             action: {
-                guard let product = paywallService.paywall?.products.first else {
-                    errorAlertMessage = "No product found"
-                    shouldShowErrorAlert = true
+                guard
+                    let product = paywallService.paywall?.products.first(where: { $0.vendorProductId == product.id })
+                else {
+                    updateErrorAlert(isShown: true, title: "No product found")
                     return
                 }
                 isLoading = true
@@ -103,8 +107,7 @@ struct PaywallView: View {
                     isLoading = false
                     guard succeeded else {
                         error.map { print($0) }
-                        errorAlertMessage = "Ooops! Error Occured"
-                        shouldShowErrorAlert = true
+                        updateErrorAlert(isShown: true, title: "Ooops! Error Occured")
                         return
                     }
                     alertMessage = "Success!"
@@ -112,7 +115,7 @@ struct PaywallView: View {
                 }
             },
             label: {
-                Text(paywallService.paywallViewModel?.buyActionTitle ?? "")
+                Text("\(title) \(product.priceString)/\(product.period)")
                     .font(.title2)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
@@ -174,6 +177,11 @@ struct PaywallView: View {
                 presentationMode.wrappedValue.dismiss()
             }
         }
+    }
+    
+    private func updateErrorAlert(isShown: Bool, title: String) {
+        errorAlertMessage = title
+        shouldShowErrorAlert = isShown
     }
 }
 
