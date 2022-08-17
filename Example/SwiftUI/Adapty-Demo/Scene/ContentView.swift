@@ -15,10 +15,13 @@ struct ContentView: View {
     @State var showingPremiumStuff: Bool = false
     @State var showingMenu: Bool = false
     @State var isLoading: Bool = false
+    @State var alertMessage: String?
+    @State var shouldShowAlert: Bool = false
     
     @State private var buttonImageName: String = Image.System.Name.locked
     
     @EnvironmentObject var userService: UserService
+    @EnvironmentObject var paywallService: PaywallService
     
     // MARK: - body
     
@@ -50,9 +53,17 @@ struct ContentView: View {
                 
                 premiumStuffView
             }
+            .alert(alertMessage ?? "Error occurred", isPresented: $shouldShowAlert) {
+                Button("OK", role: .cancel) {
+                    alertMessage = nil
+                    shouldShowAlert = false
+                }
+            }
         }
         .onChange(of: userService.isPremium) { isPremium in
             buttonImageName = isPremium ? Image.System.Name.unlocked : Image.System.Name.locked
+        }.onAppear() {
+            userService.getPurchaserInfo()
         }
     }
     
@@ -115,10 +126,19 @@ struct ContentView: View {
     
     private var button: some View {
         Button {
+            guard !userService.isPremium else {
+                updateNavigationWhen(isPremium: true)
+                return
+            }
             isLoading = true
-            userService.getPurchaserInfo { isPremium, error in
+            paywallService.getPaywalls { error in
                 isLoading = false
-                updateNavigationWhen(isPremium: isPremium)
+                if let error = error {
+                    alertMessage = error.localizedDescription
+                    shouldShowAlert = true
+                    return
+                }
+                updateNavigationWhen(isPremium: false)
             }
         } label: {
             Label("Premium Stuff", systemImage: buttonImageName)

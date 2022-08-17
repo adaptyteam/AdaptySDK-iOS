@@ -21,11 +21,12 @@ final class PaywallService: ObservableObject {
         
     // MARK: - Paywalls
     
-    func getPaywalls() {
+    func getPaywalls(completion: ((Error?) -> Void)? = nil) {
         Adapty.getPaywalls(forceUpdate: true) { [weak self] paywalls, products, error in
             if error == nil {
                 self?.paywall = paywalls?.first(where: { $0.developerId == "YOUR_PAYWALL_ID" })
             }
+            completion?(error)
         }
     }
     

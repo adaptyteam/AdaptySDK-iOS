@@ -33,7 +33,6 @@ struct Adapty_DemoApp: App {
                     if Adapty.delegate == nil {
                         Adapty.delegate = userService
                     }
-                    paywallService.getPaywalls()
                 }
         }
     }
