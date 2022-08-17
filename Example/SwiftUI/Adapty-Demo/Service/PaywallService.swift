@@ -24,7 +24,7 @@ final class PaywallService: ObservableObject {
     func getPaywalls() {
         Adapty.getPaywalls(forceUpdate: true) { [weak self] paywalls, products, error in
             if error == nil {
-                self?.paywall = paywalls?.first
+                self?.paywall = paywalls?.first(where: { $0.developerId == "YOUR_PAYWALL_ID" })
             }
         }
     }
