@@ -17,7 +17,7 @@ final class PaywallService: ObservableObject {
         }
     }
     
-    var paywallViewModel: PaywallViewModel = PaywallService.defaultPaywall
+    var paywallViewModel: PaywallViewModel?
         
     // MARK: - Paywalls
     
@@ -38,16 +38,7 @@ final class PaywallService: ObservableObject {
 // MARK: - Utils
 
 extension PaywallService {
-    static var defaultPaywall: PaywallViewModel {
-        .init(
-            iconName: Image.Gallery.Name.duck,
-            description: "Premium users bring our company more money!",
-            buyActionTitle: "Give us money",
-            restoreActionTitle: "Restore purchases"
-        )
-    }
-    
-    private func model(for paywall: PaywallModel?) -> PaywallViewModel {
+    private func model(for paywall: PaywallModel?) -> PaywallViewModel? {
         let restorePurchasesActionTitle = "Restore purchases"
         guard
             let currentPaywall = paywall,
@@ -55,7 +46,7 @@ extension PaywallService {
             let description = currentPaywall.customPayload?["header_text"] as? String,
             let buyActionTitle = currentPaywall.customPayload?["buy_button_text"] as? String
         else {
-            return PaywallService.defaultPaywall
+            return nil
         }
         return PaywallViewModel(
             iconName: iconName,

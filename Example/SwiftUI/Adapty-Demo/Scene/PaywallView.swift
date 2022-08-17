@@ -65,10 +65,10 @@ struct PaywallView: View {
     
     var descriptionGroup: some View {
         VStack {
-            Image(paywallService.paywallViewModel.iconName)
+            Image(paywallService.paywallViewModel?.iconName ?? "")
                 .resizable()
                 .frame(width: 300, height: 300, alignment: .center)
-            Text(paywallService.paywallViewModel.description)
+            Text(paywallService.paywallViewModel?.description ?? "")
                 .font(.title)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
@@ -112,7 +112,7 @@ struct PaywallView: View {
                 }
             },
             label: {
-                Text(paywallService.paywallViewModel.buyActionTitle)
+                Text(paywallService.paywallViewModel?.buyActionTitle ?? "")
                     .font(.title2)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
@@ -142,7 +142,7 @@ struct PaywallView: View {
                 }
             },
             label: {
-                Text(paywallService.paywallViewModel.restoreActionTitle)
+                Text(paywallService.paywallViewModel?.restoreActionTitle ?? "")
                     .font(.title3)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
