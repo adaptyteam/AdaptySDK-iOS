@@ -43,7 +43,6 @@ extension PaywallService {
             iconName: Image.Gallery.Name.duck,
             description: "Premium users bring our company more money!",
             buyActionTitle: "Give us money",
-            cancelActionTitle: "Not today!",
             restoreActionTitle: "Restore purchases"
         )
     }
@@ -54,8 +53,7 @@ extension PaywallService {
             let currentPaywall = paywall,
             let iconName = currentPaywall.customPayload?["icon_name"] as? String,
             let description = currentPaywall.customPayload?["header_text"] as? String,
-            let buyActionTitle = currentPaywall.customPayload?["buy_button_text"] as? String,
-            let cancelActionTitle = currentPaywall.customPayload?["cancel_button_text"] as? String
+            let buyActionTitle = currentPaywall.customPayload?["buy_button_text"] as? String
         else {
             return PaywallService.defaultPaywall
         }
@@ -63,7 +61,6 @@ extension PaywallService {
             iconName: iconName,
             description: description,
             buyActionTitle: buyActionTitle,
-            cancelActionTitle: cancelActionTitle,
             restoreActionTitle: restorePurchasesActionTitle
         )
     }

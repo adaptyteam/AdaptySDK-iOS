@@ -12,6 +12,5 @@ struct PaywallViewModel: Equatable {
     let iconName: String
     let description: String
     let buyActionTitle: String
-    let cancelActionTitle: String
     let restoreActionTitle: String
 }

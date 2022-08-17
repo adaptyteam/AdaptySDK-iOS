@@ -83,7 +83,6 @@ struct PaywallView: View {
     var buttonGroup: some View {
         VStack(alignment: .center, spacing: 12) {
             buyButton
-            cancelButton
             restoreButton
         }
         .padding()
@@ -120,26 +119,6 @@ struct PaywallView: View {
                     .foregroundColor(Color.Palette.accent)
                     .background(Color.Palette.accentContent)
                     .cornerRadius(30)
-            }
-        )
-    }
-    
-    // MARK: - cancel button
-    
-    var cancelButton: some View {
-        Button(
-            role: .cancel,
-            action: { presentationMode.wrappedValue.dismiss() },
-            label: {
-                Text(paywallService.paywallViewModel.cancelActionTitle)
-                    .font(.title2)
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .padding()
-                    .foregroundColor(Color.Palette.accentContent)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 30)
-                            .stroke(Color.Palette.accentContent, lineWidth: 2)
-                )
             }
         )
     }
