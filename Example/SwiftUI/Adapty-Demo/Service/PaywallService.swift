@@ -37,27 +37,51 @@ final class PaywallService: ObservableObject {
 
 // MARK: - Utils
 
-extension PaywallService {
-    private func model(for paywall: PaywallModel?) -> PaywallViewModel? {
-        let restorePurchasesActionTitle = "Restore purchases"
+private extension PaywallService {
+    func model(for paywall: PaywallModel?) -> PaywallViewModel? {
+        guard let currentPaywall = paywall else { return nil }
+        let payloadDTO = decodePaywallData(from: currentPaywall.customPayload)
+        let buttonStyle = payloadDTO?.buyButtonStyle
+        return PaywallViewModel(
+            iconName: payloadDTO?.iconName ?? Image.Gallery.Name.duck,
+            description: payloadDTO?.description ?? "Please, subscribe!",
+            buyActionTitle: payloadDTO?.buyButtonText ?? "Get premium access",
+            restoreActionTitle: "Restore purchases",
+            productModels: createPaywallModels(for: currentPaywall.products),
+            backgroundColor: getColor(for: payloadDTO?.backgroundColor) ?? Color.Palette.accent,
+            textColor: getColor(for: payloadDTO?.textColor) ?? Color.Palette.accentContent,
+            buyButtonStyle: .init(
+                buttonColor: getColor(for: buttonStyle?.buttonColor) ?? Color.Palette.accentContent,
+                buttonTextColor: getColor(for: buttonStyle?.buttonTextColor) ?? Color.Palette.accent
+            )
+        )
+    }
+    
+    func decodePaywallData(from parameters: Parameters?) -> PaywallDataDTO? {
         guard
-            let currentPaywall = paywall,
-            let iconName = currentPaywall.customPayload?["icon_name"] as? String,
-            let description = currentPaywall.customPayload?["header_text"] as? String,
-            let buyActionTitle = currentPaywall.customPayload?["buy_button_text"] as? String
+            let parameters = parameters,
+            let data = try? JSONSerialization.data(withJSONObject: parameters)
         else {
             return nil
         }
-        return PaywallViewModel(
-            iconName: iconName,
-            description: description,
-            buyActionTitle: buyActionTitle,
-            restoreActionTitle: restorePurchasesActionTitle,
-            productModels: currentPaywall.products.map { product in
-                let priceString = product.localizedPrice ?? ""
-                let periodString = product.localizedSubscriptionPeriod ?? ""
-                return .init(id: product.vendorProductId, priceString: priceString, period: periodString)
-            }
-        )
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try? decoder.decode(PaywallDataDTO.self, from: data)
+    }
+    
+    func createPaywallModels(for products: [ProductModel]) -> [ProductItemModel] {
+        products.compactMap { product in
+            guard
+                let priceString = product.localizedPrice,
+                let periodString = product.localizedSubscriptionPeriod
+            else { return nil }
+            return .init(id: product.vendorProductId, priceString: priceString, period: periodString)
+        }
+    }
+    
+    func getColor(for hexString: String?) -> Color? {
+        guard let hexString = hexString else { return nil }
+        return Color(hex: hexString)
     }
 }

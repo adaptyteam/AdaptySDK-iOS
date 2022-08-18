@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct PaywallViewModel: Equatable {
     let iconName: String
@@ -14,10 +15,18 @@ struct PaywallViewModel: Equatable {
     let buyActionTitle: String
     let restoreActionTitle: String
     let productModels: [ProductItemModel]
+    let backgroundColor: Color
+    let textColor: Color
+    let buyButtonStyle: ProductBuyButtonStyle
 }
 
 struct ProductItemModel: Equatable {
     let id: String
     let priceString: String
     let period: String
+}
+
+struct ProductBuyButtonStyle: Equatable {
+    let buttonColor: Color
+    let buttonTextColor: Color
 }

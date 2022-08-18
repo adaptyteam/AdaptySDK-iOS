@@ -24,7 +24,7 @@ struct PaywallView: View {
     
     var body: some View {
         ZStack {
-            Color.Palette.accent.ignoresSafeArea()
+            backgorundColor.ignoresSafeArea()
             VStack {
                 topCloseButton
                 Spacer()
@@ -53,7 +53,7 @@ struct PaywallView: View {
                     Image.System.close
                         .resizable()
                         .frame(width: 30, height: 30)
-                        .foregroundColor(Color.Palette.accentContent)
+                        .foregroundColor(textColor)
                 }
             ).padding()
             Spacer()
@@ -74,7 +74,7 @@ struct PaywallView: View {
                 .frame(maxWidth: .infinity)
         }
         .fixedSize(horizontal: false, vertical: true)
-        .foregroundColor(Color.Palette.accentContent)
+        .foregroundColor(textColor)
         .padding()
     }
         
@@ -119,8 +119,8 @@ struct PaywallView: View {
                     .font(.title2)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
-                    .foregroundColor(Color.Palette.accent)
-                    .background(Color.Palette.accentContent)
+                    .foregroundColor(buyButtonTextColor)
+                    .background(buyButtonColor)
                     .cornerRadius(30)
             }
         )
@@ -149,7 +149,7 @@ struct PaywallView: View {
                     .font(.title3)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
-                    .foregroundColor(Color.Palette.accentContent)
+                    .foregroundColor(textColor)
             }
         )
     }
@@ -182,6 +182,26 @@ struct PaywallView: View {
     private func updateErrorAlert(isShown: Bool, title: String) {
         errorAlertMessage = title
         shouldShowErrorAlert = isShown
+    }
+}
+
+// MARK: - Colors
+
+extension PaywallView {
+    var backgorundColor: Color {
+        paywallService.paywallViewModel?.backgroundColor ?? Color.Palette.accent
+    }
+    
+    var textColor: Color {
+        paywallService.paywallViewModel?.textColor ?? Color.Palette.accentContent
+    }
+    
+    var buyButtonTextColor: Color {
+        paywallService.paywallViewModel?.buyButtonStyle.buttonTextColor ?? Color.Palette.accent
+    }
+    
+    var buyButtonColor: Color {
+        paywallService.paywallViewModel?.buyButtonStyle.buttonColor ?? Color.Palette.accentContent
     }
 }
 
