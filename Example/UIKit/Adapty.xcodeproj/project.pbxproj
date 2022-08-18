@@ -17,12 +17,26 @@
 		4A9C8BFE274695DA00392217 /* PurchaserInfo.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8BFC274694DB00392217 /* PurchaserInfo.json */; };
 		4A9C8C00274697CA00392217 /* Paywall.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8BFF274697CA00392217 /* Paywall.json */; };
 		4A9C8C0427469A5A00392217 /* Product_subscription.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8C0327469A5A00392217 /* Product_subscription.json */; };
-		4A9C8C062747B78100392217 /* PaywallArray.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8C052747B78100392217 /* PaywallArray.json */; };
+		4A9C8C062747B78100392217 /* FallbackPaywalls.json in Resources */ = {isa = PBXBuildFile; fileRef = 4A9C8C052747B78100392217 /* FallbackPaywalls.json */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
-		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
+		7485FBF628ABCF4A00FFBEEB /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FBF528ABCF4A00FFBEEB /* MainController.swift */; };
+		7485FBF828ABCF5100FFBEEB /* MainPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FBF728ABCF5100FFBEEB /* MainPresenter.swift */; };
+		7485FBFA28ABD43500FFBEEB /* MainControllerCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FBF928ABD43500FFBEEB /* MainControllerCells.swift */; };
+		7485FBFC28ABDD6900FFBEEB /* PurchasesObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FBFB28ABDD6900FFBEEB /* PurchasesObserver.swift */; };
+		7485FBFF28ABF11600FFBEEB /* PurchaseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FBFE28ABF11600FFBEEB /* PurchaseController.swift */; };
+		7485FC0128ABF13100FFBEEB /* PurchasePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FC0028ABF13100FFBEEB /* PurchasePresenter.swift */; };
+		7485FC0328ACD45700FFBEEB /* PurchaseWideButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7485FC0228ACD45700FFBEEB /* PurchaseWideButton.xib */; };
+		7485FC0528ACD4A800FFBEEB /* PurchaseWideButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FC0428ACD4A800FFBEEB /* PurchaseWideButton.swift */; };
+		7485FC0728ACD8EA00FFBEEB /* UIColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FC0628ACD8EA00FFBEEB /* UIColorExtensions.swift */; };
+		7485FC0928ACDB0200FFBEEB /* PurchaseConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FC0828ACDB0200FFBEEB /* PurchaseConfiguration.swift */; };
+		7485FC0B28ACDF5500FFBEEB /* fallback_paywalls.json in Resources */ = {isa = PBXBuildFile; fileRef = 7485FC0A28ACDF5500FFBEEB /* fallback_paywalls.json */; };
+		7485FC1028ACF14600FFBEEB /* PurchaseTallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FC0F28ACF14600FFBEEB /* PurchaseTallButton.swift */; };
+		7485FC1228ACF14F00FFBEEB /* PurchaseTallButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7485FC1128ACF14F00FFBEEB /* PurchaseTallButton.xib */; };
+		7485FC1428ACF1D300FFBEEB /* IPurchaseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FC1328ACF1D300FFBEEB /* IPurchaseButton.swift */; };
+		7485FC1628ACF23100FFBEEB /* AdaptyModelsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7485FC1528ACF23100FFBEEB /* AdaptyModelsExtensions.swift */; };
 		75E09E001FF56A10F9975314 /* Pods_Adapty_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6933B2657041857BD974C893 /* Pods_Adapty_Tests.framework */; };
 		9A0AF094E860226F6230BAA9 /* Pods_Adapty_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BAE9CF399A8493F9C5027242 /* Pods_Adapty_Example.framework */; };
 		D613205023A385A900402998 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D613204F23A385A900402998 /* StoreKit.framework */; };
@@ -61,14 +75,13 @@
 		4A9C8BFC274694DB00392217 /* PurchaserInfo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = PurchaserInfo.json; sourceTree = "<group>"; };
 		4A9C8BFF274697CA00392217 /* Paywall.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Paywall.json; sourceTree = "<group>"; };
 		4A9C8C0327469A5A00392217 /* Product_subscription.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Product_subscription.json; sourceTree = "<group>"; };
-		4A9C8C052747B78100392217 /* PaywallArray.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = PaywallArray.json; sourceTree = "<group>"; };
+		4A9C8C052747B78100392217 /* FallbackPaywalls.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = FallbackPaywalls.json; sourceTree = "<group>"; };
 		4AE005B626BC7B3800FE4D12 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
 		53AD3D6D363A126F96F974FE /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		588DF37E8E29D1227EDF23E6 /* Pods-Adapty_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adapty_Example.release.xcconfig"; path = "Target Support Files/Pods-Adapty_Example/Pods-Adapty_Example.release.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* Adapty_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Adapty_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		607FACD71AFB9204008FA782 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		607FACDA1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		607FACDC1AFB9204008FA782 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		607FACDF1AFB9204008FA782 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -76,6 +89,21 @@
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6933B2657041857BD974C893 /* Pods_Adapty_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adapty_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E1331FC8AE46397495452B /* Pods-Adapty_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adapty_Tests.debug.xcconfig"; path = "Target Support Files/Pods-Adapty_Tests/Pods-Adapty_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		7485FBF528ABCF4A00FFBEEB /* MainController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainController.swift; sourceTree = "<group>"; };
+		7485FBF728ABCF5100FFBEEB /* MainPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPresenter.swift; sourceTree = "<group>"; };
+		7485FBF928ABD43500FFBEEB /* MainControllerCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainControllerCells.swift; sourceTree = "<group>"; };
+		7485FBFB28ABDD6900FFBEEB /* PurchasesObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasesObserver.swift; sourceTree = "<group>"; };
+		7485FBFE28ABF11600FFBEEB /* PurchaseController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseController.swift; sourceTree = "<group>"; };
+		7485FC0028ABF13100FFBEEB /* PurchasePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasePresenter.swift; sourceTree = "<group>"; };
+		7485FC0228ACD45700FFBEEB /* PurchaseWideButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PurchaseWideButton.xib; sourceTree = "<group>"; };
+		7485FC0428ACD4A800FFBEEB /* PurchaseWideButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseWideButton.swift; sourceTree = "<group>"; };
+		7485FC0628ACD8EA00FFBEEB /* UIColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtensions.swift; sourceTree = "<group>"; };
+		7485FC0828ACDB0200FFBEEB /* PurchaseConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseConfiguration.swift; sourceTree = "<group>"; };
+		7485FC0A28ACDF5500FFBEEB /* fallback_paywalls.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = fallback_paywalls.json; sourceTree = "<group>"; };
+		7485FC0F28ACF14600FFBEEB /* PurchaseTallButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseTallButton.swift; sourceTree = "<group>"; };
+		7485FC1128ACF14F00FFBEEB /* PurchaseTallButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PurchaseTallButton.xib; sourceTree = "<group>"; };
+		7485FC1328ACF1D300FFBEEB /* IPurchaseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPurchaseButton.swift; sourceTree = "<group>"; };
+		7485FC1528ACF23100FFBEEB /* AdaptyModelsExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyModelsExtensions.swift; sourceTree = "<group>"; };
 		8049AD70F15878396F72026E /* Pods-Adapty_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Adapty_Example.debug.xcconfig"; path = "Target Support Files/Pods-Adapty_Example/Pods-Adapty_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		B3A0F805975930A3344E36CB /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		BAE9CF399A8493F9C5027242 /* Pods_Adapty_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Adapty_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,7 +151,7 @@
 				4A9C8C0327469A5A00392217 /* Product_subscription.json */,
 				4A19B9C5275F9B6E003B4532 /* Product_coins_100.json */,
 				4A19B9D32763A306003B4532 /* Product_coins_200.json */,
-				4A9C8C052747B78100392217 /* PaywallArray.json */,
+				4A9C8C052747B78100392217 /* FallbackPaywalls.json */,
 				4A19B9CF2762357B003B4532 /* ValidationResponse.json */,
 				4A19B9D127625456003B4532 /* DataProvider.swift */,
 			);
@@ -154,9 +182,12 @@
 		607FACD21AFB9204008FA782 /* Example for Adapty */ = {
 			isa = PBXGroup;
 			children = (
+				7485FC0A28ACDF5500FFBEEB /* fallback_paywalls.json */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
-				607FACD71AFB9204008FA782 /* ViewController.swift */,
-				D6F8D53D23BFBE4A00CB719A /* UIViewControllerExtension.swift */,
+				7485FBFB28ABDD6900FFBEEB /* PurchasesObserver.swift */,
+				7485FBF428ABCF3900FFBEEB /* Main Controller */,
+				7485FBFD28ABF0A900FFBEEB /* Purchase Conroller */,
+				7485FBF328ABCEE500FFBEEB /* Helpers */,
 				D6F8D53B23BFBC8100CB719A /* InAppContainersTableViewController.swift */,
 				D65757C4248FE2730055A431 /* InAppContainersTableViewCell.swift */,
 				D6F8D53323B0E22300CB719A /* InAppTableViewController.swift */,
@@ -210,6 +241,49 @@
 				B3A0F805975930A3344E36CB /* LICENSE */,
 			);
 			name = "Podspec Metadata";
+			sourceTree = "<group>";
+		};
+		7485FBF328ABCEE500FFBEEB /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				D6F8D53D23BFBE4A00CB719A /* UIViewControllerExtension.swift */,
+				7485FC0628ACD8EA00FFBEEB /* UIColorExtensions.swift */,
+				7485FC1528ACF23100FFBEEB /* AdaptyModelsExtensions.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		7485FBF428ABCF3900FFBEEB /* Main Controller */ = {
+			isa = PBXGroup;
+			children = (
+				7485FBF728ABCF5100FFBEEB /* MainPresenter.swift */,
+				7485FBF528ABCF4A00FFBEEB /* MainController.swift */,
+				7485FBF928ABD43500FFBEEB /* MainControllerCells.swift */,
+			);
+			path = "Main Controller";
+			sourceTree = "<group>";
+		};
+		7485FBFD28ABF0A900FFBEEB /* Purchase Conroller */ = {
+			isa = PBXGroup;
+			children = (
+				7485FC0E28ACF12900FFBEEB /* Buttons */,
+				7485FC0828ACDB0200FFBEEB /* PurchaseConfiguration.swift */,
+				7485FC0028ABF13100FFBEEB /* PurchasePresenter.swift */,
+				7485FBFE28ABF11600FFBEEB /* PurchaseController.swift */,
+			);
+			path = "Purchase Conroller";
+			sourceTree = "<group>";
+		};
+		7485FC0E28ACF12900FFBEEB /* Buttons */ = {
+			isa = PBXGroup;
+			children = (
+				7485FC1328ACF1D300FFBEEB /* IPurchaseButton.swift */,
+				7485FC0428ACD4A800FFBEEB /* PurchaseWideButton.swift */,
+				7485FC0228ACD45700FFBEEB /* PurchaseWideButton.xib */,
+				7485FC0F28ACF14600FFBEEB /* PurchaseTallButton.swift */,
+				7485FC1128ACF14F00FFBEEB /* PurchaseTallButton.xib */,
+			);
+			path = Buttons;
 			sourceTree = "<group>";
 		};
 		D61FFE2D2770C7F3008FF7D3 /* Paywall UI Example */ = {
@@ -340,9 +414,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7485FC0B28ACDF5500FFBEEB /* fallback_paywalls.json in Resources */,
 				D61FFE2F2770C80A008FF7D3 /* remote_config_example.json in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
+				7485FC1228ACF14F00FFBEEB /* PurchaseTallButton.xib in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
+				7485FC0328ACD45700FFBEEB /* PurchaseWideButton.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 				D6C7F085276CCF9100672755 /* ShowcasePaywallViewController.xib in Resources */,
 			);
@@ -353,7 +430,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A9C8C0427469A5A00392217 /* Product_subscription.json in Resources */,
-				4A9C8C062747B78100392217 /* PaywallArray.json in Resources */,
+				4A9C8C062747B78100392217 /* FallbackPaywalls.json in Resources */,
 				4A19B9C6275F9B6E003B4532 /* Product_coins_100.json in Resources */,
 				4A9C8C00274697CA00392217 /* Paywall.json in Resources */,
 				4A19B9C4275D170C003B4532 /* StoreKitConfiguration.storekit in Resources */,
@@ -457,14 +534,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7485FC0128ABF13100FFBEEB /* PurchasePresenter.swift in Sources */,
 				D6F8D53423B0E22300CB719A /* InAppTableViewController.swift in Sources */,
 				D6F8D53223B0E1CE00CB719A /* InAppTableViewCell.swift in Sources */,
 				D6F8D53E23BFBE4A00CB719A /* UIViewControllerExtension.swift in Sources */,
 				D6F8D53C23BFBC8100CB719A /* InAppContainersTableViewController.swift in Sources */,
+				7485FBFC28ABDD6900FFBEEB /* PurchasesObserver.swift in Sources */,
+				7485FC1628ACF23100FFBEEB /* AdaptyModelsExtensions.swift in Sources */,
+				7485FBF628ABCF4A00FFBEEB /* MainController.swift in Sources */,
+				7485FBF828ABCF5100FFBEEB /* MainPresenter.swift in Sources */,
 				D65757C5248FE2740055A431 /* InAppContainersTableViewCell.swift in Sources */,
-				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				7485FC0928ACDB0200FFBEEB /* PurchaseConfiguration.swift in Sources */,
+				7485FC0728ACD8EA00FFBEEB /* UIColorExtensions.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				7485FBFA28ABD43500FFBEEB /* MainControllerCells.swift in Sources */,
+				7485FC1028ACF14600FFBEEB /* PurchaseTallButton.swift in Sources */,
+				7485FBFF28ABF11600FFBEEB /* PurchaseController.swift in Sources */,
+				7485FC1428ACF1D300FFBEEB /* IPurchaseButton.swift in Sources */,
 				D6C7F084276CCF9100672755 /* ShowcasePaywallViewController.swift in Sources */,
+				7485FC0528ACD4A800FFBEEB /* PurchaseWideButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -622,6 +710,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Adapty/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
@@ -637,6 +726,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Adapty/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";

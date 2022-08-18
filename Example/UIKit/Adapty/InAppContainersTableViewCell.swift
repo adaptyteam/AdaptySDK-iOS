@@ -11,7 +11,6 @@ import Adapty
 
 protocol InAppContainersTableViewCellDelegate: AnyObject {
     func didShowRemotePaywall(for paywall: PaywallModel)
-    func didShowVisualPaywall(for paywall: PaywallModel)
 }
 
 class InAppContainersTableViewCell: UITableViewCell {
@@ -31,13 +30,5 @@ class InAppContainersTableViewCell: UITableViewCell {
         }
         
         delegate?.didShowRemotePaywall(for: paywall)
-    }
-    
-    @IBAction private func showVisualPaywallButtonAction(_ sender: Any) {
-        guard let paywall = paywall else {
-            return
-        }
-        
-        delegate?.didShowVisualPaywall(for: paywall)
     }
 }

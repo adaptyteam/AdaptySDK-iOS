@@ -8,23 +8,16 @@
 import Foundation
 
 class RequestHashManager {
-    
-    enum RouterGETType: String {
-        case none
-        case getPaywalls
-        case getPurchaserInfo
-        case getPromo
-    }
-    
+
     enum RouterPOSTType: String {
         case none
         case updateAttribution
         case updateProfile
         case syncInstallation
     }
-    
+
     static let shared = RequestHashManager()
-    
+
     private var previousResponseHashes: [String: String] {
         get {
             return DefaultsManager.shared.previousResponseHashes
@@ -33,6 +26,7 @@ class RequestHashManager {
             DefaultsManager.shared.previousResponseHashes = newValue
         }
     }
+
     private(set) var responseJSONCaches: [String: [String: Data]] {
         get {
             return DefaultsManager.shared.responseJSONCaches
@@ -41,6 +35,7 @@ class RequestHashManager {
             DefaultsManager.shared.responseJSONCaches = newValue
         }
     }
+
     private(set) var postRequestParamsHashes: [String: String] {
         get {
             return DefaultsManager.shared.postRequestParamsHashes
@@ -49,60 +44,58 @@ class RequestHashManager {
             DefaultsManager.shared.postRequestParamsHashes = newValue
         }
     }
-    
+
     func tryToGetCachedJSONObject(for data: Data, response: HTTPURLResponse, router: Router?) -> Parameters? {
-        guard let routerType = router?.routerGETType, routerType != .none else {
+        guard
+            let hashKey = router?.hashKey,
+            let hash = response.allHeaderFields[API.Headers.xResponseHash] as? String
+        else {
             return nil
         }
-        
-        guard let hash = response.allHeaderFields[Constants.Headers.xResponseHash] as? String else {
-            return nil
-        }
-        
-        previousResponseHashes[routerType.rawValue] = hash
-        
-        if let cachedResponse = responseJSONCaches[routerType.rawValue]?[hash] {
+
+        previousResponseHashes[hashKey] = hash
+
+        if let cachedResponse = responseJSONCaches[hashKey]?[hash] {
             return try? JSONSerialization.jsonObject(with: cachedResponse, options: []) as? Parameters
         } else {
-            responseJSONCaches[routerType.rawValue] = [hash: data]
+            responseJSONCaches[hashKey] = [hash: data]
         }
-        
+
         return nil
     }
-    
+
     func tryToAddHashHeader(for router: Router, in request: inout URLRequest) {
-        request.setValue(previousResponseHashes[router.routerGETType.rawValue], forHTTPHeaderField: Constants.Headers.previousResponseHash)
+        guard let hashKey = router.hashKey, let value = previousResponseHashes[hashKey] else { return }
+        request.setValue(value, forHTTPHeaderField: API.Headers.previousResponseHash)
     }
-    
+
     func isPostHashExists(for routerType: RouterPOSTType, source: AttributionNetwork? = nil, params: Parameters) -> Bool {
         var hashPath = routerType.rawValue
         if let source = source {
             hashPath.append("/\(source.rawSource)")
         }
-        
+
         guard let hashCache = postRequestParamsHashes[hashPath] else {
             return false
         }
-        
+
         return hashCache == params.hashValue
     }
-    
+
     func storePostHash(for routerType: RouterPOSTType, source: AttributionNetwork? = nil, params: Parameters) {
         var hashPath = routerType.rawValue
         if let source = source {
             hashPath.append("/\(source.rawSource)")
         }
-        
+
         postRequestParamsHashes[hashPath] = params.hashValue
     }
-
 }
 
 fileprivate extension Parameters {
-    
     var hashValue: String {
         let sortedKeys = keys.sorted(by: <)
-        let sortedValues = sortedKeys.map { (key) -> String in
+        let sortedValues = sortedKeys.map { key -> String in
             let value = self[key]
             if let parametersValue = value as? Parameters {
                 return "\(key): [\(parametersValue.hashValue)]"
@@ -110,25 +103,23 @@ fileprivate extension Parameters {
                 return "\(key): \(value ?? "")"
             }
         }
-        
+
         return sortedValues.joined(separator: "; ")
     }
-    
 }
 
 fileprivate extension Router {
-    
-    var routerGETType: RequestHashManager.RouterGETType {
+    var hashKey: String? {
         switch self {
-        case .getPaywalls:
-            return .getPaywalls
+        case .getProducts:
+            return "getProducts"
         case .getPurchaserInfo:
-            return .getPurchaserInfo
-        case .getPromo:
-            return .getPromo
+            return "getPurchaserInfo"
+        case let .getPaywall( id, _):
+            return "getPaywallById_\(id)"
         default:
-            return .none
+            return nil
         }
     }
-    
 }
+

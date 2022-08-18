@@ -5,13 +5,13 @@
 //  Created by Rustam on 03.08.2021.
 //
 
-import Foundation
 import CommonCrypto
+import Foundation
 
 internal extension String {
     func sha256() -> String {
         let data = Data(utf8)
-        var hash = [UInt8](repeating: 0,  count: Int(CC_SHA256_DIGEST_LENGTH))
+        var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
 
         data.withUnsafeBytes { buffer in
             _ = CC_SHA256(buffer.baseAddress, CC_LONG(buffer.count), &hash)
@@ -26,20 +26,20 @@ internal class HMAC {
     private let algorithm: HMAC.Algorithm
 
     init(secret: String = "", algorithm: HMAC.Algorithm) {
-        self.secretKey = [UInt8](secret.utf8)
+        secretKey = [UInt8](secret.utf8)
         self.algorithm = algorithm
     }
-    
+
     private init(secret: [UInt8], algorithm: HMAC.Algorithm) {
-        self.secretKey = secret
+        secretKey = secret
         self.algorithm = algorithm
     }
-    
+
     func authenticate(with text: String) -> [UInt8] {
         let textBytes: [UInt8] = [UInt8](text.utf8)
         let data = NSMutableData()
         data.append(textBytes, length: textBytes.count)
-        var hmac = [UInt8](repeating: UInt8(0), count: Int(self.algorithm.digestLength))
+        var hmac = [UInt8](repeating: UInt8(0), count: Int(algorithm.digestLength))
 
         CCHmac(algorithm.cchmac, secretKey, secretKey.count, data.bytes, data.length, &hmac)
 
@@ -96,7 +96,7 @@ internal extension HMAC {
 
 internal extension Array where Element == UInt8 {
     func toHexString() -> String {
-        `lazy`.reduce(into: "") {
+        lazy.reduce(into: "") {
             var s = String($1, radix: 16)
             if s.count == 1 {
                 s = "0" + s

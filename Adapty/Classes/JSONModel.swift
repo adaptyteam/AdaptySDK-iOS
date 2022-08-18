@@ -9,19 +9,16 @@
 import Foundation
 
 struct JSONModel: JSONCodable {
-    
     let data: Parameters
-    
+
     init?(json: Parameters) throws {
-        self.data = json
+        data = json
     }
-    
 }
 
 struct JSONAttributedModel: JSONCodable {
-    
     let data: Parameters
-    
+
     init?(json: Parameters) throws {
         let attributes: Parameters!
         do {
@@ -29,8 +26,7 @@ struct JSONAttributedModel: JSONCodable {
         } catch {
             throw error
         }
-        
-        self.data = attributes
+
+        data = attributes
     }
-    
 }

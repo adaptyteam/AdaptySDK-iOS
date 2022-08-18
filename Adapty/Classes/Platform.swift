@@ -5,13 +5,13 @@
 //  Created by Dmitry Obukhov on 3/17/20.
 //
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 
-typealias Application = UIApplication
-typealias ApplicationDelegate = UIApplicationDelegate
+    typealias Application = UIApplication
+    typealias ApplicationDelegate = UIApplicationDelegate
 #elseif os(macOS)
-import AppKit
+    import AppKit
 
-typealias Application = NSApplication
-typealias ApplicationDelegate = NSApplicationDelegate
+    typealias Application = NSApplication
+    typealias ApplicationDelegate = NSApplicationDelegate
 #endif

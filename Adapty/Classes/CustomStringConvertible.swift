@@ -9,18 +9,16 @@
 // MARK: - PaywallModel
 
 extension PaywallModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "developerId": developerId,
             "variationId": variationId,
             "revision": revision,
-            "isPromo": isPromo,
             "products": products,
-            "visualPaywall": visualPaywall,
             "customPayloadString": customPayloadString,
             "customPayload": customPayload,
             "abTestName": abTestName,
-            "name": name
+            "name": name,
         ]
 
         return keysAndValues
@@ -33,7 +31,7 @@ extension PaywallModel {
 // MARK: - ProductModel
 
 extension ProductModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "vendorProductId": vendorProductId,
             "introductoryOfferEligibility": introductoryOfferEligibility,
@@ -54,7 +52,7 @@ extension ProductModel {
             "subscriptionGroupIdentifier": subscriptionGroupIdentifier,
             "discounts": discounts,
             "localizedPrice": localizedPrice,
-            "localizedSubscriptionPeriod": localizedSubscriptionPeriod
+            "localizedSubscriptionPeriod": localizedSubscriptionPeriod,
         ]
 
         return keysAndValues
@@ -82,10 +80,10 @@ extension ProductModel.PeriodUnit: CustomStringConvertible {
 }
 
 extension ProductSubscriptionPeriodModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "unit": unit,
-            "numberOfUnits": numberOfUnits
+            "numberOfUnits": numberOfUnits,
         ]
 
         return keysAndValues
@@ -96,7 +94,7 @@ extension ProductSubscriptionPeriodModel {
 }
 
 extension ProductDiscountModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "price": price,
             "identifier": identifier,
@@ -105,7 +103,7 @@ extension ProductDiscountModel {
             "paymentMode": paymentMode,
             "localizedPrice": localizedPrice,
             "localizedSubscriptionPeriod": localizedSubscriptionPeriod,
-            "localizedNumberOfPeriods": localizedNumberOfPeriods
+            "localizedNumberOfPeriods": localizedNumberOfPeriods,
         ]
 
         return keysAndValues
@@ -130,32 +128,14 @@ extension ProductDiscountModel.PaymentMode: CustomStringConvertible {
     }
 }
 
-// MARK: - PromoModel
-
-extension PromoModel {
-    public override var description: String {
-        let keysAndValues: [String: Any?] = [
-            "promoType": promoType,
-            "variationId": variationId,
-            "expiresAt": expiresAt,
-            "paywall": paywall
-        ]
-
-        return keysAndValues
-            .compactMapValues { $0 }
-            .map { "\($0.key): \($0.value)" }
-            .joined(separator: ", ")
-    }
-}
-
 // MARK: - PurchaserInfoModel
 
 extension PurchaserInfoModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "accessLevels": accessLevels,
             "subscriptions": subscriptions,
-            "nonSubscriptions": nonSubscriptions
+            "nonSubscriptions": nonSubscriptions,
         ]
 
         return keysAndValues
@@ -166,7 +146,7 @@ extension PurchaserInfoModel {
 }
 
 extension AccessLevelInfoModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "id": id,
             "isActive": isActive,
@@ -186,7 +166,7 @@ extension AccessLevelInfoModel {
             "vendorOriginalTransactionId": vendorOriginalTransactionId,
             "startsAt": startsAt,
             "cancellationReason": cancellationReason,
-            "isRefund": isRefund
+            "isRefund": isRefund,
         ]
 
         return keysAndValues
@@ -197,7 +177,7 @@ extension AccessLevelInfoModel {
 }
 
 extension SubscriptionInfoModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "isActive": isActive,
             "vendorProductId": vendorProductId,
@@ -217,7 +197,7 @@ extension SubscriptionInfoModel {
             "vendorTransactionId": vendorTransactionId,
             "vendorOriginalTransactionId": vendorOriginalTransactionId,
             "cancellationReason": cancellationReason,
-            "isRefund": isRefund
+            "isRefund": isRefund,
         ]
 
         return keysAndValues
@@ -228,7 +208,7 @@ extension SubscriptionInfoModel {
 }
 
 extension NonSubscriptionInfoModel {
-    public override var description: String {
+    override public var description: String {
         let keysAndValues: [String: Any?] = [
             "purchaseId": purchaseId,
             "vendorProductId": vendorProductId,
@@ -238,7 +218,7 @@ extension NonSubscriptionInfoModel {
             "isSandbox": isSandbox,
             "vendorTransactionId": vendorTransactionId,
             "vendorOriginalTransactionId": vendorOriginalTransactionId,
-            "isRefund": isRefund
+            "isRefund": isRefund,
         ]
 
         return keysAndValues

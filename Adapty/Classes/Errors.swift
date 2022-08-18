@@ -9,40 +9,39 @@ import Foundation
 import StoreKit
 
 public class AdaptyError: NSError {
-    
     @objc public var originalError: Error?
     @objc public var adaptyErrorCode: AdaptyErrorCode = .none
-    
+
     private let adaptyDomain = "com.adapty.AdaptySDK"
-    
+
     init(with error: Error) {
-        self.originalError = error
-        
+        originalError = error
+
         if let error = error as? SKError {
-            self.adaptyErrorCode = AdaptyErrorCode(rawValue: error.code.rawValue) ?? .none
+            adaptyErrorCode = AdaptyErrorCode(rawValue: error.code.rawValue) ?? .none
         }
-        
+
         let error = error as NSError
         super.init(domain: error.domain, code: error.code, userInfo: error.userInfo)
     }
-    
+
     init(code: Int, adaptyCode: AdaptyErrorCode = .none, message: String) {
-        self.adaptyErrorCode = adaptyCode
+        adaptyErrorCode = adaptyCode
         super.init(domain: adaptyDomain, code: code, userInfo: [NSLocalizedDescriptionKey: message])
     }
-    
+
     init(code: AdaptyErrorCode, message: String) {
-        self.adaptyErrorCode = code
+        adaptyErrorCode = code
         super.init(domain: adaptyDomain, code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: message])
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     @objc public enum AdaptyErrorCode: Int {
         case none = -1
-        
+
         // system storekit codes
         case unknown = 0
         case clientInvalid = 1 // client is not allowed to issue the request, etc.
@@ -59,7 +58,7 @@ public class AdaptyError: NSError {
         case invalidSignature = 12 // The cryptographic signature provided is not valid
         case missingOfferParams = 13 // One or more parameters from SKPaymentDiscount is missing
         case invalidOfferPrice = 14
-        
+
         // custom storekit codes
         case noProductIDsFound = 1000 // No In-App Purchase product identifiers were found
         case noProductsFound = 1001 // No In-App Purchases were found
@@ -70,7 +69,7 @@ public class AdaptyError: NSError {
         case productPurchaseFailed = 1006 // Product purchase failed
         case missingOfferSigningParams = 1007 // Missing offer signing required params
         case fallbackPaywallsNotRequired = 1008 // Fallback paywalls are not required
-        
+
         // custom network codes
         case emptyResponse = 2000 // Response is empty
         case emptyData = 2001 // Request data is empty
@@ -83,11 +82,11 @@ public class AdaptyError: NSError {
         case invalidProperty = 2008 // Received invalid property data
         case encodingFailed = 2009 // Parameters encoding failed
         case missingURL = 2010 // Request url is nil
-        
+
         // general
         case analyticsDisabled = 3000 // We can't handle analytics events, since you've opted it out
     }
-    
+
     // network shortcuts
     class var emptyResponse: AdaptyError { return AdaptyError(code: .emptyResponse, message: "Response is empty.") }
     class var emptyData: AdaptyError { return AdaptyError(code: .emptyData, message: "Request data is empty.") }
@@ -99,12 +98,14 @@ public class AdaptyError: NSError {
     class func missingParam(_ params: String) -> AdaptyError {
         return AdaptyError(code: .missingParam, message: "Missing some of the required params: `\(params)`")
     }
+
     class func invalidProperty(_ property: String, _ data: Any) -> AdaptyError {
         return AdaptyError(code: .invalidProperty, message: "Received invalid `\(property)`: `\(data)`")
     }
+
     class var encodingFailed: AdaptyError { return AdaptyError(code: .encodingFailed, message: "Parameters encoding failed.") }
     class var missingURL: AdaptyError { return AdaptyError(code: .missingURL, message: "Request url is nil.") }
-    
+
     // store shortcuts
     class var noProductIDsFound: AdaptyError { return AdaptyError(code: .noProductIDsFound, message: "No In-App Purchase product identifiers were found.") }
     class var noProductsFound: AdaptyError { return AdaptyError(code: .noProductsFound, message: "No In-App Purchases were found.") }
@@ -115,8 +116,7 @@ public class AdaptyError: NSError {
     class var productPurchaseFailed: AdaptyError { return AdaptyError(code: .productPurchaseFailed, message: "Product purchase failed.") }
     class var missingOfferSigningParams: AdaptyError { return AdaptyError(code: .missingOfferSigningParams, message: "Missing offer signing required params.") }
     class var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
-    
+
     // general
     class var analyticsDisabled: AdaptyError { return AdaptyError(code: .analyticsDisabled, message: "We can't handle analytics events, since you've opted it out.") }
-    
 }

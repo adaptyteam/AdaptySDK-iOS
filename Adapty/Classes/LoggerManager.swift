@@ -15,48 +15,47 @@ import Foundation
 }
 
 class LoggerManager {
-    
     static var logLevel: AdaptyLogLevel = .none
-    
+
     class func logError(_ error: Any) {
         guard isAllowedToLog(.errors) else {
             return
         }
-        
+
         print("\n\(prefix) - ERROR.\n\(error)")
     }
-    
-    class func logMessage(_  message: String) {
+
+    class func logMessage(_ message: String) {
         guard isAllowedToLog(.verbose) else {
             return
         }
-        
+
         print("\n\(prefix) - INFO.\n\(message)")
     }
-    
-    class func logGlobalMessage(_  message: String) {
+
+    class func logGlobalMessage(_ message: String) {
         guard isAllowedToLog(.all) else {
             return
         }
-        
+
         print("\n\(prefix) - INFO.\n\(message)")
     }
-    
+
     private class func isAllowedToLog(_ level: AdaptyLogLevel) -> Bool {
         return logLevel.rawValue >= level.rawValue
     }
-    
+
     private class var prefix: String {
-        return "\(dateTime) [Adapty v\(UserProperties.sdkVersion ?? "")(\(UserProperties.sdkVersionBuild))]"
+        return "\(dateTime) [Adapty v\(Adapty.SDKVersion)(\(Adapty.SDKBuild))]"
     }
-    
+
     private static var formatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSZ"
         return formatter
     }()
+
     private class var dateTime: String {
         return formatter.string(from: Date())
     }
-    
 }

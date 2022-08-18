@@ -9,12 +9,11 @@
 import Foundation
 
 class InstallationModel: JSONCodable, Codable {
-    
     var profileInstallationMetaId: String
     var iamAccessKeyId: String
     var iamSecretKey: String
     var iamSessionToken: String
-    
+
     required init?(json: Parameters) throws {
         let attributes: Parameters?
         do {
@@ -22,26 +21,26 @@ class InstallationModel: JSONCodable, Codable {
         } catch {
             throw error
         }
-        
+
         guard
             let profileInstallationMetaId = attributes?["id"] as? String
         else {
             throw AdaptyError.missingParam("InstallationModel - id")
         }
-        
+
         self.profileInstallationMetaId = profileInstallationMetaId
-        self.iamAccessKeyId = attributes?["iam_access_key_id"] as? String ?? ""
-        self.iamSecretKey = attributes?["iam_secret_key"] as? String ?? ""
-        self.iamSessionToken = attributes?["iam_session_token"] as? String ?? ""
-        
+        iamAccessKeyId = attributes?["iam_access_key_id"] as? String ?? ""
+        iamSecretKey = attributes?["iam_secret_key"] as? String ?? ""
+        iamSessionToken = attributes?["iam_session_token"] as? String ?? ""
+
         logMissingRequiredParams()
     }
-    
+
     private func logMissingRequiredParams() {
         var missingParams: [String] = []
-        if self.iamAccessKeyId.isEmpty { missingParams.append("iam_access_key_id") }
-        if self.iamSecretKey.isEmpty { missingParams.append("iam_secret_key") }
-        if self.iamSessionToken.isEmpty { missingParams.append("iam_session_token") }
+        if iamAccessKeyId.isEmpty { missingParams.append("iam_access_key_id") }
+        if iamSecretKey.isEmpty { missingParams.append("iam_secret_key") }
+        if iamSessionToken.isEmpty { missingParams.append("iam_session_token") }
         if !missingParams.isEmpty { LoggerManager.logError(AdaptyError.missingParam("InstallationModel - \(missingParams.joined(separator: ", "))")) }
     }
 }
@@ -49,9 +48,13 @@ class InstallationModel: JSONCodable, Codable {
 extension InstallationModel: Equatable { }
 
 func == (lhs: InstallationModel, rhs: InstallationModel) -> Bool {
-    if lhs.profileInstallationMetaId == rhs.profileInstallationMetaId, lhs.iamAccessKeyId == rhs.iamAccessKeyId, lhs.iamSecretKey == rhs.iamSecretKey, lhs.iamSessionToken == rhs.iamSessionToken {
+    if
+        lhs.profileInstallationMetaId == rhs.profileInstallationMetaId,
+        lhs.iamAccessKeyId == rhs.iamAccessKeyId,
+        lhs.iamSecretKey == rhs.iamSecretKey,
+        lhs.iamSessionToken == rhs.iamSessionToken {
         return true
     }
-    
+
     return false
 }

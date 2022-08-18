@@ -9,16 +9,15 @@
 import Foundation
 
 class UserDefaultsMock: UserDefaults {
-    
     var removedObjectsKeys: [String] = []
-    var calledObjectKey: String? = nil
-    
+    var calledObjectKey: String?
+
     var mockValues: [String: Any] = [:]
-    
+
     override func set(_ value: Any?, forKey defaultName: String) {
         mockValues[defaultName] = value
     }
-    
+
     override func removeObject(forKey defaultName: String) {
         removedObjectsKeys.append(defaultName)
         mockValues.removeValue(forKey: defaultName)
@@ -32,13 +31,12 @@ class UserDefaultsMock: UserDefaults {
         calledObjectKey = defaultName
         return mockValues[defaultName]
     }
-    
+
     override func array(forKey defaultName: String) -> [Any]? {
         return mockValues[defaultName] as? [Any]
     }
 
     override func dictionary(forKey defaultName: String) -> [String: Any]? {
-        return mockValues[defaultName] as? [String : Any]
+        return mockValues[defaultName] as? [String: Any]
     }
-    
 }
