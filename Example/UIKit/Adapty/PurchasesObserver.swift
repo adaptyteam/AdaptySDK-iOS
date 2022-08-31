@@ -24,7 +24,7 @@ class PurchasesObserver: ObservableObject {
     @Published var paywall: PaywallModel?
 
     func loadInitialPaywallData() {
-        Adapty.getPaywall(Self.paywallId, forceUpdate: false) { [weak self] paywall, _ in
+        Adapty.getPaywall(Self.paywallId) { [weak self] paywall, _ in
             self?.paywall = paywall
 
             // Since this version of PaywallModel object was obtained at the application start
@@ -38,7 +38,7 @@ class PurchasesObserver: ObservableObject {
     @objc private func loadUpdatedPaywallData() {
         let paywallId = Self.paywallId
 
-        Adapty.getPaywall(paywallId, forceUpdate: true) { [weak self] paywall, _ in
+        Adapty.getPaywall(paywallId) { [weak self] paywall, _ in
             guard let paywall = paywall else { return }
 
             self?.paywall = paywall

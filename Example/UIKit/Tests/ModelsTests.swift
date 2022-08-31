@@ -127,6 +127,11 @@ class ModelsTests: XCTestCase {
             .to(equal("100000084301705511"))
         expect(purchaserInfo?.accessLevels["standard"]?.vendorProductId).to(equal("basic_subscription_1_month"))
         expect(purchaserInfo?.nonSubscriptions["coins_pack_100"]?.first?.vendorProductId).to(equal("coins_pack_100"))
+        
+        expect(purchaserInfo?.customAttributes["additionalProp1"] as? String).to(equal("string"))
+        expect(purchaserInfo?.customAttributes["additionalProp2"] as? Int).to(equal(145))
+        expect(purchaserInfo?.customAttributes["additionalProp3"] as? Double).to(equal(3.14))
+
     }
 
     // MARK: - Purchases
@@ -140,7 +145,7 @@ class ModelsTests: XCTestCase {
         let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
         let paywall = try PaywallModel(json: attributes(from: json))
 
-        expect(paywall?.developerId).to(equal("main_paywall"))
+        expect(paywall?.id).to(equal("main_paywall"))
         expect(paywall?.variationId).to(equal("23b3f5e7-5490-49e7-ad45-33e8ae3a3e97"))
         expect(paywall?.revision).to(equal(3))
         expect(paywall?.products.count).to(equal(2))

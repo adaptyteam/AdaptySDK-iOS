@@ -11,7 +11,7 @@
 extension PaywallModel {
     override public var description: String {
         let keysAndValues: [String: Any?] = [
-            "developerId": developerId,
+            "id": id,
             "variationId": variationId,
             "revision": revision,
             "products": products,

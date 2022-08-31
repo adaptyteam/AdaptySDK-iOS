@@ -38,11 +38,11 @@ class MockURLProtocol: URLProtocol {
 
     // MARK: URLProtocol
 
-    override class func canInit(with request: URLRequest) -> Bool {
+    override static func canInit(with request: URLRequest) -> Bool {
         return true
     }
 
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
         return request
     }
 
@@ -78,7 +78,7 @@ class MockURLProtocol: URLProtocol {
 }
 
 extension URLSession {
-    class var mock: URLSession {
+    static var mock: URLSession {
         URLProtocol.registerClass(MockURLProtocol.self)
 
         let configuration = URLSessionConfiguration.default

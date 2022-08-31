@@ -9,7 +9,7 @@ import Foundation
 
 public class PaywallModel: NSObject, JSONCodable, Codable {
     enum CodingKeys: String, CodingKey {
-        case developerId
+        case id = "developerId"
         case variationId
         case revision
         case products
@@ -18,7 +18,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         case name
     }
 
-    @objc public var developerId: String
+    @objc public var id: String
     @objc public var variationId: String
     @objc public var revision: Int = 0
     @objc public var products: [ProductModel] = []
@@ -48,7 +48,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
             throw AdaptyError.missingParam("PaywallModel - developer_id, variation_id")
         }
 
-        self.developerId = developerId
+        self.id = developerId
         self.variationId = variationId
         if let revision = attributes?["revision"] as? Int { self.revision = revision }
         if let customPayloadString = attributes?["custom_payload"] as? String { self.customPayloadString = customPayloadString }
@@ -83,7 +83,7 @@ public class PaywallModel: NSObject, JSONCodable, Codable {
         }
 
         return
-            developerId == object.developerId &&
+            id == object.id &&
             variationId == object.variationId &&
             revision == object.revision &&
             products == object.products &&

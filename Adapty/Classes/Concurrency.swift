@@ -84,9 +84,9 @@ extension Adapty {
             }
         }
 
-        public static func getPaywall(_ id: String, forceUpdate: Bool = false) async throws -> PaywallModel? {
+        public static func getPaywall(_ id: String) async throws -> PaywallModel? {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPaywall(id, forceUpdate: forceUpdate) { paywall, error in
+                Adapty.getPaywall(id) { paywall, error in
                     if let error = error {
                         return continuation.resume(throwing: error)
                     }

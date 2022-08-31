@@ -90,7 +90,7 @@ class DefaultsManagerTests: XCTestCase {
                                                              "variation_id": "variation_id",
                                                              "products": []],
             ])
-        let paywalls: [String: PaywallModel] = [paywall!.developerId: paywall!]
+        let paywalls: [String: PaywallModel] = [paywall!.id: paywall!]
 
         defaultsManager.cachedPaywalls = paywalls
 

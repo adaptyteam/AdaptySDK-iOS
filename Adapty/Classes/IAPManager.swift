@@ -19,6 +19,8 @@ class IAPManager: NSObject {
         DefaultsManager.shared.profileId
     }
 
+    private var fallbackPaywalls: FallbackPaywalls?
+
     private(set) var storedPaywalls = DefaultsManager.shared.cachedPaywalls {
         didSet {
             DefaultsManager.shared.cachedPaywalls = storedPaywalls
@@ -62,6 +64,14 @@ class IAPManager: NSObject {
         self.apiManager = apiManager
     }
 
+    var storefrontCountryCode: String? {
+        if #available(iOS 13.0, *) {
+            return SKPaymentQueue.default().storefront?.countryCode
+        } else {
+            return nil
+        }
+    }
+    
     func startObservingPurchases(syncTransactions: Bool, _ completion: ProductsCompletion? = nil) {
         startObserving()
 
@@ -78,61 +88,59 @@ class IAPManager: NSObject {
         }
     }
 
-    func getPaywall(_ id: String, forceUpdate: Bool = false, _ completion: @escaping PaywallCompletion) {
+    func getPaywall(_ id: String, _ completion: @escaping PaywallCompletion) {
         getProducts(forceUpdate: false) { [weak self] _, error in
             if let error = error {
                 completion(nil, error)
                 return
             }
-            
+
             guard let self = self else {
                 completion(nil, nil)
                 return
             }
-            
-            self.internalGetPaywall(id, forceUpdate: forceUpdate, completion)
+
+            self.internalGetPaywall(id, completion)
         }
     }
-    
-    private func internalGetPaywall(_ id: String, forceUpdate: Bool = false, _ completion: @escaping PaywallCompletion) {
+
+    private func internalGetPaywall(_ id: String, _ completion: @escaping PaywallCompletion) {
         func updateSKProducts(_ paywall: PaywallModel, _ completion: @escaping PaywallCompletion) {
             let products = storedProducts
-            guard !products.isEmpty else {
-                completion(paywall, nil)
-                return
-            }
-            paywall.products.forEach {
-                let vendorProductId = $0.vendorProductId
-                if let skProduct = products.first { $0.vendorProductId == vendorProductId }?.skProduct {
-                    $0.skProduct = skProduct
+            if !products.isEmpty {
+                paywall.products.forEach {
+                    let vendorProductId = $0.vendorProductId
+                    if let skProduct = products.first { $0.vendorProductId == vendorProductId }?.skProduct {
+                        $0.skProduct = skProduct
+                    }
                 }
             }
             completion(paywall, nil)
         }
 
-        if !forceUpdate, let paywall = storedPaywalls[id] {
-            // call callback instantly with freshly cached data if there are such
-            DispatchQueue.main.async {
-                updateSKProducts(paywall, completion)
-            }
-        } else {
-            apiManager.getPaywall(id: id, params: ["profile_id": profileId]) { paywall, error in
+        apiManager.getPaywall(id: id, params: ["profile_id": profileId]) { paywall, error in
 
-                if let error = error {
+            if let error = error {
+                if error.canUseCache, let paywall = self.storedPaywalls[id] {
+                    updateSKProducts(paywall, completion)
+                } else if error.canUseFallback, let paywall = self.fallbackPaywalls?.paywalls[id] {
+                    updateSKProducts(paywall, completion)
+                } else {
                     completion(nil, error)
-                    return
                 }
-                guard let paywall = paywall else {
-                    completion(nil, nil)
-                    return
-                }
-
-                var paywalls = self.storedPaywalls
-                paywalls[paywall.developerId] = paywall
-                self.storedPaywalls = paywalls
-
-                updateSKProducts(paywall, completion)
+                return
             }
+
+            guard let paywall = paywall else {
+                completion(nil, nil)
+                return
+            }
+
+            var paywalls = self.storedPaywalls
+            paywalls[paywall.id] = paywall
+            self.storedPaywalls = paywalls
+
+            updateSKProducts(paywall, completion)
         }
     }
 
@@ -166,8 +174,11 @@ class IAPManager: NSObject {
             }
 
             let products = self.storedProducts
-            if products.isEmpty {
+            if error.canUseCache, !products.isEmpty  {
                 // request products with cached data
+                self.requestSKProducts(products)
+            } else if  error.canUseFallback, let products = self.fallbackPaywalls?.products, !products.isEmpty {
+                // request products with fallback data
                 self.requestSKProducts(products)
             } else {
                 self.callProductsCompletionAndCleanCallback(.failure(error))
@@ -176,46 +187,36 @@ class IAPManager: NSObject {
     }
 
     func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
-        // either already have cached paywalls or appstore request is in progress, which means real paywalls were successfully received
-        if !storedPaywalls.isEmpty || skProductsRequest != nil {
-            LoggerManager.logMessage("Tried to set Fallback Paywalls but it's unnecessary, since we already have a real paywalls data.")
-            handleSetFallbackPaywallsError(nil, completion: completion)
-            return
+        func callCompletion(_ completion: ErrorCompletion?, withError error: AdaptyError? = nil) {
+            guard let completion = completion else { return }
+            DispatchQueue.main.async {
+                completion(error)
+            }
         }
 
-        var fallbackPaywalls: FallbackPaywalls?
         do {
             guard
                 let paywallsData = paywalls.data(using: .utf8),
                 let paywallsJSON = try JSONSerialization.jsonObject(with: paywallsData, options: []) as? Parameters
             else {
-                handleSetFallbackPaywallsError(AdaptyError.unableToDecode, completion: completion)
+                callCompletion(completion, withError: AdaptyError.unableToDecode)
                 return
             }
 
             fallbackPaywalls = try FallbackPaywalls(json: paywallsJSON)
         } catch let error as AdaptyError {
-            handleSetFallbackPaywallsError(error, completion: completion)
+            callCompletion(completion, withError: error)
             return
         } catch {
-            handleSetFallbackPaywallsError(AdaptyError(with: error), completion: completion)
+            callCompletion(completion, withError: AdaptyError(with: error))
             return
         }
 
-        allProductsRequestCompletions.append { [weak self] _, error in
-            self?.handleSetFallbackPaywallsError(error, completion: completion)
+        if storedProducts.isEmpty {
+            requestSKProducts(fallbackPaywalls?.products)
         }
 
-        if storedPaywalls.isEmpty, let paywalls = fallbackPaywalls?.paywalls, !paywalls.isEmpty {
-            storedPaywalls = paywalls
-        }
-        requestSKProducts(fallbackPaywalls?.products)
-    }
-
-    private func handleSetFallbackPaywallsError(_ error: AdaptyError?, completion: ErrorCompletion? = nil) {
-        DispatchQueue.main.async {
-            completion?(error)
-        }
+        callCompletion(completion)
     }
 
     private func requestSKProducts(_ products: [ProductModel]?) {

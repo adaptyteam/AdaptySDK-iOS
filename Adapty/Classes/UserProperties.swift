@@ -26,7 +26,7 @@ import Foundation
 
 class UserProperties {
     private(set) static var staticUuid = UUID().stringValue
-    class func resetStaticUuid() {
+    static func resetStaticUuid() {
         staticUuid = UUID().stringValue
     }
 
@@ -110,7 +110,7 @@ class UserProperties {
     }
 
     #if os(iOS)
-        class func appleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
+        static func appleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
             ADClient.shared().requestAttributionDetails { attribution, error in
                 if let attribution = attribution {
                     completion(attribution, error)
@@ -120,7 +120,7 @@ class UserProperties {
             }
         }
 
-        private class func modernAppleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
+        private static func modernAppleSearchAdsAttribution(completion: @escaping (Parameters?, Error?) -> Void) {
             if #available(iOS 14.3, *) {
                 do {
                     let attributionToken = try AAAttribution.attributionToken()

@@ -88,35 +88,44 @@ public class AdaptyError: NSError {
     }
 
     // network shortcuts
-    class var emptyResponse: AdaptyError { return AdaptyError(code: .emptyResponse, message: "Response is empty.") }
-    class var emptyData: AdaptyError { return AdaptyError(code: .emptyData, message: "Request data is empty.") }
-    class var authenticationError: AdaptyError { return AdaptyError(code: .authenticationError, message: "You need to be authenticated first.") }
-    class var badRequest: AdaptyError { return AdaptyError(code: .badRequest, message: "Bad request.") }
-    class var serverError: AdaptyError { return AdaptyError(code: .serverError, message: "Server error.") }
-    class var failed: AdaptyError { return AdaptyError(code: .failed, message: "Network request failed.") }
-    class var unableToDecode: AdaptyError { return AdaptyError(code: .unableToDecode, message: "We could not decode the response.") }
-    class func missingParam(_ params: String) -> AdaptyError {
+    static var emptyResponse: AdaptyError { return AdaptyError(code: .emptyResponse, message: "Response is empty.") }
+    static var emptyData: AdaptyError { return AdaptyError(code: .emptyData, message: "Request data is empty.") }
+    static var authenticationError: AdaptyError { return AdaptyError(code: .authenticationError, message: "You need to be authenticated first.") }
+    static var badRequest: AdaptyError { return AdaptyError(code: .badRequest, message: "Bad request.") }
+    static var serverError: AdaptyError { return AdaptyError(code: .serverError, message: "Server error.") }
+    static var failed: AdaptyError { return AdaptyError(code: .failed, message: "Network request failed.") }
+    static var unableToDecode: AdaptyError { return AdaptyError(code: .unableToDecode, message: "We could not decode the response.") }
+    static func missingParam(_ params: String) -> AdaptyError {
         return AdaptyError(code: .missingParam, message: "Missing some of the required params: `\(params)`")
     }
 
-    class func invalidProperty(_ property: String, _ data: Any) -> AdaptyError {
+    static func invalidProperty(_ property: String, _ data: Any) -> AdaptyError {
         return AdaptyError(code: .invalidProperty, message: "Received invalid `\(property)`: `\(data)`")
     }
 
-    class var encodingFailed: AdaptyError { return AdaptyError(code: .encodingFailed, message: "Parameters encoding failed.") }
-    class var missingURL: AdaptyError { return AdaptyError(code: .missingURL, message: "Request url is nil.") }
+    static var encodingFailed: AdaptyError { return AdaptyError(code: .encodingFailed, message: "Parameters encoding failed.") }
+    static var missingURL: AdaptyError { return AdaptyError(code: .missingURL, message: "Request url is nil.") }
 
     // store shortcuts
-    class var noProductIDsFound: AdaptyError { return AdaptyError(code: .noProductIDsFound, message: "No In-App Purchase product identifiers were found.") }
-    class var noProductsFound: AdaptyError { return AdaptyError(code: .noProductsFound, message: "No In-App Purchases were found.") }
-    class var productRequestFailed: AdaptyError { return AdaptyError(code: .productRequestFailed, message: "Unable to fetch available In-App Purchase products at the moment.") }
-    class var cantMakePayments: AdaptyError { return AdaptyError(code: .cantMakePayments, message: "In-App Purchases are not allowed on this device.") }
-    class var noPurchasesToRestore: AdaptyError { return AdaptyError(code: .noPurchasesToRestore, message: "No purchases to restore.") }
-    class var cantReadReceipt: AdaptyError { return AdaptyError(code: .cantReadReceipt, message: "Can't find a valid receipt.") }
-    class var productPurchaseFailed: AdaptyError { return AdaptyError(code: .productPurchaseFailed, message: "Product purchase failed.") }
-    class var missingOfferSigningParams: AdaptyError { return AdaptyError(code: .missingOfferSigningParams, message: "Missing offer signing required params.") }
-    class var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
+    static var noProductIDsFound: AdaptyError { return AdaptyError(code: .noProductIDsFound, message: "No In-App Purchase product identifiers were found.") }
+    static var noProductsFound: AdaptyError { return AdaptyError(code: .noProductsFound, message: "No In-App Purchases were found.") }
+    static var productRequestFailed: AdaptyError { return AdaptyError(code: .productRequestFailed, message: "Unable to fetch available In-App Purchase products at the moment.") }
+    static var cantMakePayments: AdaptyError { return AdaptyError(code: .cantMakePayments, message: "In-App Purchases are not allowed on this device.") }
+    static var noPurchasesToRestore: AdaptyError { return AdaptyError(code: .noPurchasesToRestore, message: "No purchases to restore.") }
+    static var cantReadReceipt: AdaptyError { return AdaptyError(code: .cantReadReceipt, message: "Can't find a valid receipt.") }
+    static var productPurchaseFailed: AdaptyError { return AdaptyError(code: .productPurchaseFailed, message: "Product purchase failed.") }
+    static var missingOfferSigningParams: AdaptyError { return AdaptyError(code: .missingOfferSigningParams, message: "Missing offer signing required params.") }
+    static var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
 
     // general
-    class var analyticsDisabled: AdaptyError { return AdaptyError(code: .analyticsDisabled, message: "We can't handle analytics events, since you've opted it out.") }
+    static var analyticsDisabled: AdaptyError { return AdaptyError(code: .analyticsDisabled, message: "We can't handle analytics events, since you've opted it out.") }
+}
+
+extension AdaptyError {
+    var canUseCache : Bool {
+        adaptyErrorCode == .serverError || adaptyErrorCode == .badRequest || adaptyErrorCode == .failed
+    }
+    var canUseFallback : Bool {
+        adaptyErrorCode == .serverError || adaptyErrorCode == .badRequest || adaptyErrorCode == .failed
+    }
 }

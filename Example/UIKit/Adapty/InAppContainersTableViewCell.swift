@@ -18,7 +18,7 @@ class InAppContainersTableViewCell: UITableViewCell {
     weak var delegate: InAppContainersTableViewCellDelegate?
     var paywall: PaywallModel? {
         didSet {
-            titleLabel.text = paywall?.developerId
+            titleLabel.text = paywall?.id
         }
     }
     

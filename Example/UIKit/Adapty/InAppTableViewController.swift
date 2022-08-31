@@ -21,7 +21,7 @@ class InAppTableViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = paywallToShow?.developerId
+        title = paywallToShow?.id
         tableView.tableFooterView = UIView(frame: .zero)
         
         if let paywallToShow = paywallToShow {

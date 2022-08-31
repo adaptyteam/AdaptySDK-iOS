@@ -17,7 +17,7 @@ import Foundation
 class LoggerManager {
     static var logLevel: AdaptyLogLevel = .none
 
-    class func logError(_ error: Any) {
+    static func logError(_ error: Any) {
         guard isAllowedToLog(.errors) else {
             return
         }
@@ -25,7 +25,7 @@ class LoggerManager {
         print("\n\(prefix) - ERROR.\n\(error)")
     }
 
-    class func logMessage(_ message: String) {
+    static func logMessage(_ message: String) {
         guard isAllowedToLog(.verbose) else {
             return
         }
@@ -33,7 +33,7 @@ class LoggerManager {
         print("\n\(prefix) - INFO.\n\(message)")
     }
 
-    class func logGlobalMessage(_ message: String) {
+    static func logGlobalMessage(_ message: String) {
         guard isAllowedToLog(.all) else {
             return
         }
@@ -41,11 +41,11 @@ class LoggerManager {
         print("\n\(prefix) - INFO.\n\(message)")
     }
 
-    private class func isAllowedToLog(_ level: AdaptyLogLevel) -> Bool {
+    private static func isAllowedToLog(_ level: AdaptyLogLevel) -> Bool {
         return logLevel.rawValue >= level.rawValue
     }
 
-    private class var prefix: String {
+    private static var prefix: String {
         return "\(dateTime) [Adapty v\(Adapty.SDKVersion)(\(Adapty.SDKBuild))]"
     }
 
@@ -55,7 +55,7 @@ class LoggerManager {
         return formatter
     }()
 
-    private class var dateTime: String {
+    private static var dateTime: String {
         return formatter.string(from: Date())
     }
 }

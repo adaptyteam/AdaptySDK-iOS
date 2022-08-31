@@ -112,7 +112,7 @@ class DefaultsManager {
             if
                 let data = defaults.object(forKey: Constants.cachedPaywalls) as? Data,
                 let array = try? JSONDecoder().decode([PaywallModel].self, from: data) {
-                let paywalls = Dictionary( array.map { ( $0.developerId, $0) } ,  uniquingKeysWith: { (_, last) in last })
+                let paywalls = Dictionary( array.map { ( $0.id, $0) } ,  uniquingKeysWith: { (_, last) in last })
                 return paywalls
             }
             

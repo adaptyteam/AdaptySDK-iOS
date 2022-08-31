@@ -92,23 +92,23 @@ import Foundation
         super.init()
     }
 
-    @objc public class func activate(_ apiKey: String) {
+    @objc public static func activate(_ apiKey: String) {
         activate(apiKey, observerMode: false, customerUserId: nil)
     }
 
-    @objc public class func activate(_ apiKey: String, observerMode: Bool) {
+    @objc public static func activate(_ apiKey: String, observerMode: Bool) {
         activate(apiKey, observerMode: observerMode, customerUserId: nil)
     }
 
-    @objc public class func activate(_ apiKey: String, customerUserId: String?) {
+    @objc public static func activate(_ apiKey: String, customerUserId: String?) {
         activate(apiKey, observerMode: false, customerUserId: customerUserId)
     }
 
-    @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) {
+    @objc public static func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) {
         activate(apiKey, observerMode: observerMode, customerUserId: customerUserId, completion: nil)
     }
 
-    @objc public class func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?, completion: ErrorCompletion?) {
+    @objc public static func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?, completion: ErrorCompletion?) {
         API.secretKey = apiKey
         self.observerMode = observerMode
         initialCustomerUserId = customerUserId
@@ -197,7 +197,7 @@ import Foundation
         }
     }
 
-    @objc public class func identify(_ customerUserId: String, completion: ErrorCompletion? = nil) {
+    @objc public static func identify(_ customerUserId: String, completion: ErrorCompletion? = nil) {
         if shared.purchaserInfo?.customerUserId == customerUserId {
             DispatchQueue.main.async {
                 completion?(nil)
@@ -210,7 +210,7 @@ import Foundation
         shared.createProfile(customerUserId, completion)
     }
 
-    @objc public class func updateProfile(params: ProfileParameterBuilder, completion: ErrorCompletion? = nil) {
+    @objc public static func updateProfile(params: ProfileParameterBuilder, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         let profileId = shared.profileId
@@ -306,7 +306,7 @@ import Foundation
         }
     #endif
 
-    @objc public class func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionNetwork, networkUserId: String? = nil, completion: ErrorCompletion? = nil) {
+    @objc public static func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionNetwork, networkUserId: String? = nil, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         var attributes = Parameters()
@@ -338,19 +338,19 @@ import Foundation
         }
     }
 
-    @objc public class func getPaywall(_ id: String, forceUpdate: Bool = false, _ completion: @escaping PaywallCompletion) {
+    @objc public static func getPaywall(_ id: String, _ completion: @escaping PaywallCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
-        shared.iapManager.getPaywall(id, forceUpdate: forceUpdate, completion)
+        shared.iapManager.getPaywall(id, completion)
     }
 
-    @objc public class func getProducts(forceUpdate: Bool = false, _ completion: @escaping ProductsCompletion) {
+    @objc public static func getProducts(forceUpdate: Bool = false, _ completion: @escaping ProductsCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         shared.iapManager.getProducts(forceUpdate: forceUpdate, completion)
     }
 
-    @objc public class func makePurchase(product: ProductModel, offerId: String? = nil, completion: @escaping BuyProductCompletion) {
+    @objc public static func makePurchase(product: ProductModel, offerId: String? = nil, completion: @escaping BuyProductCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         shared.iapManager.makePurchase(product: product, offerId: offerId) { purchaserInfo, receipt, appleValidationResult, product, error in
@@ -364,17 +364,17 @@ import Foundation
         }
     }
 
-    @objc public class func restorePurchases(completion: @escaping RestorePurchasesCompletion) {
+    @objc public static func restorePurchases(completion: @escaping RestorePurchasesCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         shared.iapManager.restorePurchases(completion)
     }
 
-    @objc class func validateReceipt(_ receiptEncoded: String, completion: @escaping ValidateReceiptCompletion) {
+    @objc static func validateReceipt(_ receiptEncoded: String, completion: @escaping ValidateReceiptCompletion) {
         extendedValidateReceipt(receiptEncoded, completion: completion)
     }
 
-    class func extendedValidateReceipt(_ receiptEncoded: String, variationId: String? = nil, vendorProductId: String? = nil, transactionId: String? = nil, originalPrice: Decimal? = nil, discountPrice: Decimal? = nil, currencyCode: String? = nil, regionCode: String? = nil, promotionalOfferId: String? = nil, unit: String? = nil, numberOfUnits: Int? = nil, paymentMode: String? = nil, completion: @escaping ValidateReceiptCompletion) {
+    static func extendedValidateReceipt(_ receiptEncoded: String, variationId: String? = nil, vendorProductId: String? = nil, transactionId: String? = nil, originalPrice: Decimal? = nil, discountPrice: Decimal? = nil, currencyCode: String? = nil, regionCode: String? = nil, promotionalOfferId: String? = nil, unit: String? = nil, numberOfUnits: Int? = nil, paymentMode: String? = nil, completion: @escaping ValidateReceiptCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         var attributes = Parameters()
@@ -408,7 +408,7 @@ import Foundation
         }
     }
 
-    @objc public class var customerUserId: String? {
+    @objc public static var customerUserId: String? {
         return shared.purchaserInfo?.customerUserId
     }
 
@@ -422,7 +422,7 @@ import Foundation
         iapManager.syncTransactionsHistory(completion: completion)
     }
 
-    @objc public class func getPurchaserInfo(forceUpdate: Bool = false, _ completion: @escaping PurchaserCompletion) {
+    @objc public static func getPurchaserInfo(forceUpdate: Bool = false, _ completion: @escaping PurchaserCompletion) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         let cachedPurchaserInfo = shared.purchaserInfo
@@ -447,19 +447,19 @@ import Foundation
         }
     }
 
-    @objc public class func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
+    @objc public static func setFallbackPaywalls(_ paywalls: String, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         shared.iapManager.setFallbackPaywalls(paywalls, completion: completion)
     }
 
-    @objc public class func logShowPaywall(_ paywall: PaywallModel, completion: ErrorCompletion? = nil) {
+    @objc public static func logShowPaywall(_ paywall: PaywallModel, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         shared.kinesisManager.trackEvent(.paywallShowed, params: ["is_promo": false.description, "variation_id": paywall.variationId], completion: completion)
     }
 
-    @objc public class func setExternalAnalyticsEnabled(_ enabled: Bool, completion: ErrorCompletion? = nil) {
+    @objc public static func setExternalAnalyticsEnabled(_ enabled: Bool, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         DefaultsManager.shared.externalAnalyticsDisabled = !enabled
@@ -479,7 +479,7 @@ import Foundation
         }
     }
 
-    @objc public class func setVariationId(_ variationId: String, forTransactionId transactionId: String, completion: ErrorCompletion? = nil) {
+    @objc public static func setVariationId(_ variationId: String, forTransactionId transactionId: String, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         let attributes: Parameters = ["profile_id": shared.profileId, "variation_id": variationId, "transaction_id": transactionId]
@@ -488,13 +488,13 @@ import Foundation
         shared.apiManager.setTransactionVariationId(params: params, completion: completion)
     }
 
-    @objc public class func presentCodeRedemptionSheet() {
+    @objc public static func presentCodeRedemptionSheet() {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         shared.iapManager.presentCodeRedemptionSheet()
     }
 
-    @objc public class func logout(_ completion: ErrorCompletion? = nil) {
+    @objc public static func logout(_ completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
         shared.sessionsManager.invalidateTimers()

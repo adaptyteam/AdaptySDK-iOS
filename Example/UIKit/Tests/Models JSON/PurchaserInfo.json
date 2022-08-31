@@ -4,6 +4,11 @@
     "app_id": "d89416c5-e1d4-4349-81e8-a371ed1ecbsa",
     "custom_attributes": [],
     "customer_user_id": "wow",
+    "custom_attributes": {
+            "additionalProp1": "string",
+            "additionalProp2": 145,
+            "additionalProp3": 3.14
+        },
     "subscriptions": {
         "basic_subscription_1_month": {
             "vendor_transaction_id": "100000084301705511",

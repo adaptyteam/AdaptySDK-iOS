@@ -18,7 +18,7 @@ class FallbackPaywalls: JSONCodable {
         do {
             try paywalls.forEach { params in
                 if let paywall = try PaywallModel(json: params) {
-                    self.paywalls[paywall.developerId] = paywall
+                    self.paywalls[paywall.id] = paywall
                 }
             }
         } catch {
