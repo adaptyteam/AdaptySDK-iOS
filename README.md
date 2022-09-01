@@ -28,10 +28,10 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 - [No server code implementation](https://docs.adapty.io/docs/ios-sdk-configuration?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Integrate in-app purchases with server-side receipt validation in minutes. Apple Promotional Offers supported out-of-the-box.
 - [Advanced analytics](https://docs.adapty.io/docs/analytics-charts?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Analyze your app real-time metrics with advanced filters, such as Ad network, Ad campaign, country, A/B test, etc.
 - [24/7 PRO support](#support).
-- [All the settings you need](#settings).
+- [Settings](#settings).
 
 <h3 align="center" style="border-bottom: none; margin-top: -15px; margin-bottom: -15px; font-size: 150%">
-<a href="https://adapty.io/?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS">Schedule a Demo for Your Personal Onboarding</a>
+<a href="https://adapty.io/schedule-demo?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS_schedule-demo">Schedule a Demo for Your Personal Onboarding</a>
 </h3>
 
 ## Integrate IAPs Within a Few Hours Without Server Coding 
@@ -58,7 +58,7 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 }
 ```
 
-## Price Testing In-app Purchases on iOS Without App Releases
+## Price Testing for In-app Purchases on iOS Without App Releases
 
 - Optimize in-app subscriptions with the paywall A/B testing. Conversions, trials, revenue, cancellations, and more — everything is calculated for you: each paywall and each A/B test.
 - Change images, colors, layouts, and literally anything with a custom JSON. Configure different prices, trial periods, promo offers, and more in Adapty without app releases.
