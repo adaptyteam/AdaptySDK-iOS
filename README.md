@@ -27,11 +27,9 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 - [In-app purchase data integration](https://docs.adapty.io/docs/events?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Send subscription events to 3rd-party analytics, attribution, and ad services with no coding, even if the user uninstalls the app.
 - [No server code implementation](https://docs.adapty.io/docs/ios-sdk-configuration?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Integrate in-app purchases with server-side receipt validation in minutes. Apple Promotional Offers supported out-of-the-box.
 - [Advanced analytics](https://docs.adapty.io/docs/analytics-charts?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Analyze your app real-time metrics with advanced filters, such as Ad network, Ad campaign, country, A/B test, etc.
-- [24/7 PRO support](#support).
-- [Settings](#settings).
 
 <h3 align="center" style="border-bottom: none; margin-top: -15px; margin-bottom: -15px; font-size: 150%">
-<a href="https://adapty.io/schedule-demo?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS_schedule-demo">Schedule a Demo for Your Personal Onboarding</a>
+<a href="https://adapty.io/schedule-demo?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS_schedule-demo">Talk to Us to Learn More</a>
 </h3>
 
 ## Integrate IAPs Within a Few Hours Without Server Coding 
@@ -65,7 +63,7 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 
 ## Paywall A/B Testing on iOS
 
-![Adapty: CRM for mobile apps with subscriptions](https://adapty-portal-media-production.s3.amazonaws.com/github/ab+test.png)
+![Adapty: In-app subscriptions with paywall A/B testing](https://adapty-portal-media-production.s3.amazonaws.com/github/ab+test.png)
 
 - Conversions, trials, revenue, cancellations, and more  everything is calculated for you: each paywall and each A/B test.
 - Change images, colors, layouts and literally anything with a custom JSON.
@@ -73,30 +71,20 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 
 ## Real-time Analytics for Your iOS App
 
-![Adapty: CRM for mobile apps with subscriptions](https://adapty-portal-media-production.s3.amazonaws.com/github/analytics.gif)
+![Adapty: How Adapty works](https://adapty-portal-media-production.s3.amazonaws.com/github/analytics.gif)
 
 - Manage the subscription's state without managing transactions.
 - 99.5% accuracy with App Store Connect.
 - View and analyze data by attributes, such as status, channels, campaigns, and more.
 - Filter, group, and measure metrics by attribution, platform, custom users' segments, and more in a few clicks.
 
-## Support
+## Mobile App Monetization's Largest Community
 
 Ask questions, participate in discussions about Adapty-related topics, become a part of our community for iOS app developers and marketers. Learn how to monetize your app, ask questions, post jobs, read industry news and analytics. Ad free.
 
 <a href="https://discord.gg/subscriptions-hub"><img src="https://adapty-portal-media-production.s3.amazonaws.com/github/join-discord.svg" /></a>
 
-## License
-
-Adapty is available under the MIT license. [Click here](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.
-
 ## Getting Started
-
-- Read the [documentation](https://docs.adapty.io/docs/ios-sdk-installation?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS) to install and configure the Adapty iOS SDK. Set up purchases in hours instead of weeks.
-- Feel free to open an issue, we check all of them. Or drop us an email at [support@adapty.io](mailto:support@adapty.io) and tell us everything you want.
-- Want to suggest a feature? Just contact us or open an issue in the repo.
-
-## Settings
 
 ### 1. [Installing the iOS SDK via CocoaPods or Swift Package Manager](https://docs.adapty.io/docs/ios-installation)
 ### 2. [Importing, configuring, and setting up the logging](https://docs.adapty.io/docs/ios-configuring)
@@ -166,7 +154,16 @@ Adapty sends all subscription events to analytical services, such as Amplitude, 
 
 ### 11. [SDK Models](https://docs.adapty.io/docs/ios-sdk-sdk-models)
 
+## Contributing
+
+- Feel free to open an issue, we check all of them or drop us an email at [support@adapty.io](mailto:support@adapty.io) and tell us everything you want.
+- Want to suggest a feature? Just contact us or open an issue in the repo.
+
 ## Like Adapty SDK? 
 
 So do we! Feel free to star the repo ⭐️⭐️⭐️ and make our developers happy!
+
+## License
+
+Adapty is available under the MIT license. [Click here](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.
 
