@@ -65,7 +65,7 @@ class IAPManager: NSObject {
     }
 
     var storefrontCountryCode: String? {
-        if #available(iOS 13.0, *) {
+        if #available(iOS 13.0, macOS 10.15, *) {
             return SKPaymentQueue.default().storefront?.countryCode
         } else {
             return nil
