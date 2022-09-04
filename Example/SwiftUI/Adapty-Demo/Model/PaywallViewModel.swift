@@ -24,9 +24,16 @@ struct ProductItemModel: Equatable {
     let id: String
     let priceString: String
     let period: String
+    let introductoryDiscount: IntroductoryDiscountModel?
 }
 
 struct ProductBuyButtonStyle: Equatable {
     let buttonColor: Color
     let buttonTextColor: Color
+}
+
+struct IntroductoryDiscountModel: Equatable {
+    let localizedPeriod: String
+    let localizedPrice: String
+    let paymentMode: String
 }

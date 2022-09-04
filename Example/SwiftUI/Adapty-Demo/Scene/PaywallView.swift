@@ -67,7 +67,8 @@ struct PaywallView: View {
         VStack {
             Image(paywallService.paywallViewModel?.iconName ?? "")
                 .resizable()
-                .frame(width: 300, height: 300, alignment: .center)
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: 200, maxHeight: 200, alignment: .center)
             Text(paywallService.paywallViewModel?.description ?? "")
                 .font(.title)
                 .multilineTextAlignment(.center)
@@ -81,10 +82,12 @@ struct PaywallView: View {
     // MARK: - button group
     
     var buttonGroup: some View {
-        VStack(alignment: .center, spacing: 12) {
-            let model = paywallService.paywallViewModel
-            ForEach(model?.productModels ?? [], id: \.id) { product in
-                buyButton(title: model?.buyActionTitle ?? "", product: product)
+        VStack {
+            HStack(alignment: .center, spacing: 12) {
+                let model = paywallService.paywallViewModel
+                ForEach(model?.productModels ?? [], id: \.id) { product in
+                    buyButton(title: model?.buyActionTitle ?? "", product: product)
+                }
             }
             restoreButton
         }
@@ -113,16 +116,32 @@ struct PaywallView: View {
                     shouldShowAlert = true
                 }
             },
-            label: {
-                Text("\(title) \(product.priceString)/\(product.period)")
-                    .font(.title2)
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .padding()
-                    .foregroundColor(buyButtonTextColor)
-                    .background(buyButtonColor)
-                    .cornerRadius(30)
-            }
+            label: { buyButtonLabel(title: title, product: product) }
         )
+    }
+    
+    func buyButtonLabel(title: String, product: ProductItemModel) -> some View {
+        let discount = product.introductoryDiscount
+        let discountText = discount.map { "\($0.localizedPeriod) for \($0.localizedPrice)"} ?? ""
+        return ZStack {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(buyButtonColor)
+            VStack {
+                Text(product.period)
+                    .font(.title)
+                Text(title)
+                    .font(.body)
+                Text(product.priceString)
+                    .font(.title2)
+                Text(discountText)
+                    .font(.title3)
+                    .lineLimit(2)
+                    .padding(.top, 10)
+                    .isHidden(discount == nil, removeIfHidden: true)
+            }
+            .padding()
+            .foregroundColor(buyButtonTextColor)
+        }.frame(maxHeight: 200, alignment: .center)
     }
     
     // MARK: - restore button

@@ -76,12 +76,41 @@ private extension PaywallService {
                 let priceString = product.localizedPrice,
                 let periodString = product.localizedSubscriptionPeriod
             else { return nil }
-            return .init(id: product.vendorProductId, priceString: priceString, period: periodString)
+            
+            return .init(
+                id: product.vendorProductId,
+                priceString: priceString,
+                period: periodString,
+                introductoryDiscount: getIntroductoryDiscount(for: product)
+            )
         }
     }
     
     func getColor(for hexString: String?) -> Color? {
         guard let hexString = hexString else { return nil }
         return Color(hex: hexString)
+    }
+    
+    func getIntroductoryDiscount(for product: ProductModel) -> IntroductoryDiscountModel? {
+        guard
+            product.introductoryOfferEligibility,
+            let discount = product.introductoryDiscount,
+            let localizedPeriod = discount.localizedSubscriptionPeriod,
+            let localizedPrice = discount.localizedPrice
+        else {
+            return nil
+        }
+        let paymentMode: String
+        switch discount.paymentMode {
+        case .freeTrial: paymentMode = "Free trial"
+        case .payAsYouGo: paymentMode = "Pay as you go"
+        case .payUpFront: paymentMode = "Pay upfront"
+        case .unknown: paymentMode = ""
+        }
+        return .init(
+            localizedPeriod: localizedPeriod,
+            localizedPrice: localizedPrice,
+            paymentMode: paymentMode
+        )
     }
 }
