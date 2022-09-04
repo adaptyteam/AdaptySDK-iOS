@@ -107,7 +107,6 @@ struct PaywallView: View {
                     isLoading = false
                     guard succeeded else {
                         error.map { print($0) }
-                        updateErrorAlert(isShown: true, title: "Ooops! Error Occured")
                         return
                     }
                     alertMessage = "Success!"
