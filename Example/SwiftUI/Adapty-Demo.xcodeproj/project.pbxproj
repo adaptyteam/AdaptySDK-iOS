@@ -23,6 +23,8 @@
 		DCD36974289848A800F07357 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD36973289848A800F07357 /* PaywallView.swift */; };
 		DCD36976289848BE00F07357 /* View+isHidden.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD36975289848BE00F07357 /* View+isHidden.swift */; };
 		DCD3697828984A2100F07357 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCD3697728984A2100F07357 /* AppDelegate.swift */; };
+		DCEB3C5D28AEB21E004C3F8A /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEB3C5C28AEB21D004C3F8A /* Color+Hex.swift */; };
+		DCEB3C5F28AEB69E004C3F8A /* PaywallDataDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEB3C5E28AEB69E004C3F8A /* PaywallDataDTO.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +45,8 @@
 		DCD36973289848A800F07357 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
 		DCD36975289848BE00F07357 /* View+isHidden.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+isHidden.swift"; sourceTree = "<group>"; };
 		DCD3697728984A2100F07357 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DCEB3C5C28AEB21D004C3F8A /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		DCEB3C5E28AEB69E004C3F8A /* PaywallDataDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallDataDTO.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +106,7 @@
 		DCD3695B2898443B00F07357 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				DCEB3C5C28AEB21D004C3F8A /* Color+Hex.swift */,
 				DCD3695C2898445B00F07357 /* Color+Palette.swift */,
 				DCD3695E289844C400F07357 /* Image+Gallery.swift */,
 				DCD36975289848BE00F07357 /* View+isHidden.swift */,
@@ -114,6 +119,7 @@
 			children = (
 				DCD369612898453E00F07357 /* User.swift */,
 				DCD369632898457600F07357 /* PaywallViewModel.swift */,
+				DCEB3C5E28AEB69E004C3F8A /* PaywallDataDTO.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -221,6 +227,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCEB3C5D28AEB21E004C3F8A /* Color+Hex.swift in Sources */,
 				DCD3697828984A2100F07357 /* AppDelegate.swift in Sources */,
 				DCD3696D2898478500F07357 /* UserService.swift in Sources */,
 				DCD369722898486000F07357 /* PremiumStuffView.swift in Sources */,
@@ -232,6 +239,7 @@
 				DCD369622898453E00F07357 /* User.swift in Sources */,
 				DCD36974289848A800F07357 /* PaywallView.swift in Sources */,
 				DCD3695D2898445B00F07357 /* Color+Palette.swift in Sources */,
+				DCEB3C5F28AEB69E004C3F8A /* PaywallDataDTO.swift in Sources */,
 				DCD369642898457600F07357 /* PaywallViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -289,7 +297,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -343,7 +354,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -366,8 +380,8 @@
 				INFOPLIST_FILE = "Adapty-Demo/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -394,8 +408,8 @@
 				INFOPLIST_FILE = "Adapty-Demo/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

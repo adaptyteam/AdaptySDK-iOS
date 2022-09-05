@@ -24,7 +24,7 @@ struct PaywallView: View {
     
     var body: some View {
         ZStack {
-            Color.Palette.accent.ignoresSafeArea()
+            backgorundColor.ignoresSafeArea()
             VStack {
                 topCloseButton
                 Spacer()
@@ -53,7 +53,7 @@ struct PaywallView: View {
                     Image.System.close
                         .resizable()
                         .frame(width: 30, height: 30)
-                        .foregroundColor(Color.Palette.accentContent)
+                        .foregroundColor(textColor)
                 }
             ).padding()
             Spacer()
@@ -65,25 +65,30 @@ struct PaywallView: View {
     
     var descriptionGroup: some View {
         VStack {
-            Image(paywallService.paywallViewModel.iconName)
+            Image(paywallService.paywallViewModel?.iconName ?? "")
                 .resizable()
-                .frame(width: 300, height: 300, alignment: .center)
-            Text(paywallService.paywallViewModel.description)
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: 200, maxHeight: 200, alignment: .center)
+            Text(paywallService.paywallViewModel?.description ?? "")
                 .font(.title)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
         }
         .fixedSize(horizontal: false, vertical: true)
-        .foregroundColor(Color.Palette.accentContent)
+        .foregroundColor(textColor)
         .padding()
     }
         
     // MARK: - button group
     
     var buttonGroup: some View {
-        VStack(alignment: .center, spacing: 12) {
-            buyButton
-            cancelButton
+        VStack {
+            HStack(alignment: .center, spacing: 12) {
+                let model = paywallService.paywallViewModel
+                ForEach(model?.productModels ?? [], id: \.id) { product in
+                    buyButton(title: model?.buyActionTitle ?? "", product: product)
+                }
+            }
             restoreButton
         }
         .padding()
@@ -91,12 +96,13 @@ struct PaywallView: View {
     
     // MARK: - buyButton
     
-    var buyButton: some View {
+    func buyButton(title: String, product: ProductItemModel) -> some View {
         Button(
             action: {
-                guard let product = paywallService.paywall?.products.first else {
-                    errorAlertMessage = "No product found"
-                    shouldShowErrorAlert = true
+                guard
+                    let product = paywallService.paywall?.products.first(where: { $0.vendorProductId == product.id })
+                else {
+                    updateErrorAlert(isShown: true, title: "No product found")
                     return
                 }
                 isLoading = true
@@ -104,44 +110,38 @@ struct PaywallView: View {
                     isLoading = false
                     guard succeeded else {
                         error.map { print($0) }
-                        errorAlertMessage = "Ooops! Error Occured"
-                        shouldShowErrorAlert = true
                         return
                     }
                     alertMessage = "Success!"
                     shouldShowAlert = true
                 }
             },
-            label: {
-                Text(paywallService.paywallViewModel.buyActionTitle)
-                    .font(.title2)
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .padding()
-                    .foregroundColor(Color.Palette.accent)
-                    .background(Color.Palette.accentContent)
-                    .cornerRadius(30)
-            }
+            label: { buyButtonLabel(title: title, product: product) }
         )
     }
     
-    // MARK: - cancel button
-    
-    var cancelButton: some View {
-        Button(
-            role: .cancel,
-            action: { presentationMode.wrappedValue.dismiss() },
-            label: {
-                Text(paywallService.paywallViewModel.cancelActionTitle)
+    func buyButtonLabel(title: String, product: ProductItemModel) -> some View {
+        let discount = product.introductoryDiscount
+        let discountText = discount.map { "\($0.localizedPeriod) for \($0.localizedPrice)"} ?? ""
+        return ZStack {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(buyButtonColor)
+            VStack {
+                Text(product.period)
+                    .font(.title)
+                Text(title)
+                    .font(.body)
+                Text(product.priceString)
                     .font(.title2)
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .padding()
-                    .foregroundColor(Color.Palette.accentContent)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 30)
-                            .stroke(Color.Palette.accentContent, lineWidth: 2)
-                )
+                Text(discountText)
+                    .font(.title3)
+                    .lineLimit(2)
+                    .padding(.top, 10)
+                    .isHidden(discount == nil, removeIfHidden: true)
             }
-        )
+            .padding()
+            .foregroundColor(buyButtonTextColor)
+        }.frame(maxHeight: 200, alignment: .center)
     }
     
     // MARK: - restore button
@@ -163,11 +163,11 @@ struct PaywallView: View {
                 }
             },
             label: {
-                Text(paywallService.paywallViewModel.restoreActionTitle)
+                Text(paywallService.paywallViewModel?.restoreActionTitle ?? "")
                     .font(.title3)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
-                    .foregroundColor(Color.Palette.accentContent)
+                    .foregroundColor(textColor)
             }
         )
     }
@@ -195,6 +195,31 @@ struct PaywallView: View {
                 presentationMode.wrappedValue.dismiss()
             }
         }
+    }
+    
+    private func updateErrorAlert(isShown: Bool, title: String) {
+        errorAlertMessage = title
+        shouldShowErrorAlert = isShown
+    }
+}
+
+// MARK: - Colors
+
+extension PaywallView {
+    var backgorundColor: Color {
+        paywallService.paywallViewModel?.backgroundColor ?? Color.Palette.accent
+    }
+    
+    var textColor: Color {
+        paywallService.paywallViewModel?.textColor ?? Color.Palette.accentContent
+    }
+    
+    var buyButtonTextColor: Color {
+        paywallService.paywallViewModel?.buyButtonStyle.buttonTextColor ?? Color.Palette.accent
+    }
+    
+    var buyButtonColor: Color {
+        paywallService.paywallViewModel?.buyButtonStyle.buttonColor ?? Color.Palette.accentContent
     }
 }
 

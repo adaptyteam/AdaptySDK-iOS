@@ -17,15 +17,16 @@ final class PaywallService: ObservableObject {
         }
     }
     
-    var paywallViewModel: PaywallViewModel = PaywallService.defaultPaywall
+    var paywallViewModel: PaywallViewModel?
         
     // MARK: - Paywalls
     
-    func getPaywalls() {
+    func getPaywalls(completion: ((Error?) -> Void)? = nil) {
         Adapty.getPaywalls(forceUpdate: true) { [weak self] paywalls, products, error in
             if error == nil {
-                self?.paywall = paywalls?.first
+                self?.paywall = paywalls?.first(where: { $0.developerId == "YOUR_PAYWALL_ID" })
             }
+            completion?(error)
         }
     }
     
@@ -36,34 +37,80 @@ final class PaywallService: ObservableObject {
 
 // MARK: - Utils
 
-extension PaywallService {
-    static var defaultPaywall: PaywallViewModel {
-        .init(
-            iconName: Image.Gallery.Name.duck,
-            description: "Premium users bring our company more money!",
-            buyActionTitle: "Give us money",
-            cancelActionTitle: "Not today!",
-            restoreActionTitle: "Restore purchases"
+private extension PaywallService {
+    func model(for paywall: PaywallModel?) -> PaywallViewModel? {
+        guard let currentPaywall = paywall else { return nil }
+        let payloadDTO = decodePaywallData(from: currentPaywall.customPayload)
+        let buttonStyle = payloadDTO?.buyButtonStyle
+        return PaywallViewModel(
+            iconName: payloadDTO?.iconName ?? Image.Gallery.Name.duck,
+            description: payloadDTO?.description ?? "Please, subscribe!",
+            buyActionTitle: payloadDTO?.buyButtonText ?? "Get premium access",
+            restoreActionTitle: "Restore purchases",
+            productModels: createPaywallModels(for: currentPaywall.products),
+            backgroundColor: getColor(for: payloadDTO?.backgroundColor) ?? Color.Palette.accent,
+            textColor: getColor(for: payloadDTO?.textColor) ?? Color.Palette.accentContent,
+            buyButtonStyle: .init(
+                buttonColor: getColor(for: buttonStyle?.buttonColor) ?? Color.Palette.accentContent,
+                buttonTextColor: getColor(for: buttonStyle?.buttonTextColor) ?? Color.Palette.accent
+            )
         )
     }
     
-    private func model(for paywall: PaywallModel?) -> PaywallViewModel {
-        let restorePurchasesActionTitle = "Restore purchases"
+    func decodePaywallData(from parameters: Parameters?) -> PaywallDataDTO? {
         guard
-            let currentPaywall = paywall,
-            let iconName = currentPaywall.customPayload?["icon_name"] as? String,
-            let description = currentPaywall.customPayload?["header_text"] as? String,
-            let buyActionTitle = currentPaywall.customPayload?["buy_button_text"] as? String,
-            let cancelActionTitle = currentPaywall.customPayload?["cancel_button_text"] as? String
+            let parameters = parameters,
+            let data = try? JSONSerialization.data(withJSONObject: parameters)
         else {
-            return PaywallService.defaultPaywall
+            return nil
         }
-        return PaywallViewModel(
-            iconName: iconName,
-            description: description,
-            buyActionTitle: buyActionTitle,
-            cancelActionTitle: cancelActionTitle,
-            restoreActionTitle: restorePurchasesActionTitle
+
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return try? decoder.decode(PaywallDataDTO.self, from: data)
+    }
+    
+    func createPaywallModels(for products: [ProductModel]) -> [ProductItemModel] {
+        products.compactMap { product in
+            guard
+                let priceString = product.localizedPrice,
+                let periodString = product.localizedSubscriptionPeriod
+            else { return nil }
+            
+            return .init(
+                id: product.vendorProductId,
+                priceString: priceString,
+                period: periodString,
+                introductoryDiscount: getIntroductoryDiscount(for: product)
+            )
+        }
+    }
+    
+    func getColor(for hexString: String?) -> Color? {
+        guard let hexString = hexString else { return nil }
+        return Color(hex: hexString)
+    }
+    
+    func getIntroductoryDiscount(for product: ProductModel) -> IntroductoryDiscountModel? {
+        guard
+            product.introductoryOfferEligibility,
+            let discount = product.introductoryDiscount,
+            let localizedPeriod = discount.localizedSubscriptionPeriod,
+            let localizedPrice = discount.localizedPrice
+        else {
+            return nil
+        }
+        let paymentMode: String
+        switch discount.paymentMode {
+        case .freeTrial: paymentMode = "Free trial"
+        case .payAsYouGo: paymentMode = "Pay as you go"
+        case .payUpFront: paymentMode = "Pay upfront"
+        case .unknown: paymentMode = ""
+        }
+        return .init(
+            localizedPeriod: localizedPeriod,
+            localizedPrice: localizedPrice,
+            paymentMode: paymentMode
         )
     }
 }

@@ -7,11 +7,33 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct PaywallViewModel: Equatable {
     let iconName: String
     let description: String
     let buyActionTitle: String
-    let cancelActionTitle: String
     let restoreActionTitle: String
+    let productModels: [ProductItemModel]
+    let backgroundColor: Color
+    let textColor: Color
+    let buyButtonStyle: ProductBuyButtonStyle
+}
+
+struct ProductItemModel: Equatable {
+    let id: String
+    let priceString: String
+    let period: String
+    let introductoryDiscount: IntroductoryDiscountModel?
+}
+
+struct ProductBuyButtonStyle: Equatable {
+    let buttonColor: Color
+    let buttonTextColor: Color
+}
+
+struct IntroductoryDiscountModel: Equatable {
+    let localizedPeriod: String
+    let localizedPrice: String
+    let paymentMode: String
 }
