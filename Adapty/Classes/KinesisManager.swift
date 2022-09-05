@@ -13,6 +13,7 @@ class KinesisManager {
     enum EventType: String {
         case live
         case paywallShowed = "paywall_showed"
+        case onboardingScreenShowed = "onboarding_screen_showed"
     }
 
     enum Constants {
@@ -58,7 +59,7 @@ class KinesisManager {
 
         if DefaultsManager.shared.externalAnalyticsDisabled {
             let error = AdaptyError.analyticsDisabled
-            if eventType == .paywallShowed {
+            if eventType != .live {
                 LoggerManager.logMessage(error.localizedDescription)
             }
 
@@ -109,6 +110,7 @@ class KinesisManager {
         RequestManager.shared.request(urlRequest: urlRequest, router: router) { (result: Result<JSONModel, AdaptyError>, _) in
             switch result {
             case .success:
+
                 let updatedCachedEvents = Set(self.cachedEvents).subtracting(currentCachedEvents)
                 self.cachedEvents = Array(updatedCachedEvents)
                 completion?(nil)

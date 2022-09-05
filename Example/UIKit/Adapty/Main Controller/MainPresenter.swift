@@ -17,11 +17,13 @@ class MainPresenter: ObservableObject {
 
         case getPurchaserInfoResult(PurchaserInfoModel?)
         case getPurchaserInfo
-        
+
         case showPaywall
-        
+
         case updateAttribution
         case updateProfile
+
+        case sendOnboardingEvent(name: String, order: Int)
 
         case logout
         case lastError(Error?)
@@ -60,6 +62,9 @@ class MainPresenter: ObservableObject {
             .showPaywall,
             .updateProfile,
             .updateAttribution,
+            .sendOnboardingEvent(name: "Screen One", order: 1),
+            .sendOnboardingEvent(name: "Screen Two", order: 2),
+            .sendOnboardingEvent(name: "Screen Three", order: 3),
             .logout,
             .lastError(lastError),
         ]
@@ -103,6 +108,14 @@ class MainPresenter: ObservableObject {
         }
 
         Adapty.updateProfile(params: params) { [weak self] error in
+            if let error = error {
+                self?.lastError = error
+            }
+        }
+    }
+
+    func sendOnboardingEvent(name: String, order: Int) {
+        Adapty.logShowOnboarding(name: "test_onboarding", screenName: name, screenOrder: order) { [weak self] error in
             if let error = error {
                 self?.lastError = error
             }

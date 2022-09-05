@@ -114,6 +114,10 @@ extension MainController: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "MainControllerActionCell", for: indexPath) as! MainControllerActionCell
             cell.update(title: "Logout", style: .destructive)
             return cell
+        case let .sendOnboardingEvent(_, order):
+            let cell = tableView.dequeueReusableCell(withIdentifier: "MainControllerActionCell", for: indexPath) as! MainControllerActionCell
+            cell.update(title: "Send Onboarding Order \(order)", style: .default)
+            return cell
         case let .lastError(error):
             let cell = tableView.dequeueReusableCell(withIdentifier: "MainControllerDefaultCell", for: indexPath) as! MainControllerDefaultCell
             if let error = error {
@@ -145,6 +149,8 @@ extension MainController: UITableViewDelegate {
             showPaywall()
         case .logout:
             presenter.logout()
+        case let .sendOnboardingEvent(name, order):
+            presenter.sendOnboardingEvent(name: name, order: order)
         default:
             break
         }

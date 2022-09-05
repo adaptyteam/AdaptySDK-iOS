@@ -168,7 +168,6 @@ import Foundation
         }
     }
 
-    
     // MARK: - REST
 
     private func createProfile(_ customerUserId: String?, _ completion: ErrorCompletion? = nil) {
@@ -456,7 +455,17 @@ import Foundation
     @objc public static func logShowPaywall(_ paywall: PaywallModel, completion: ErrorCompletion? = nil) {
         LoggerManager.logMessage("Calling now: \(#function)")
 
-        shared.kinesisManager.trackEvent(.paywallShowed, params: ["is_promo": false.description, "variation_id": paywall.variationId], completion: completion)
+        shared.kinesisManager.trackEvent(.paywallShowed, params: ["variation_id": paywall.variationId], completion: completion)
+    }
+
+    @objc public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: Int, completion: ErrorCompletion? = nil) {
+        LoggerManager.logMessage("Calling now: \(#function)")
+        var params = [String: String]()
+        if let name = name { params["onboarding_name"] = name }
+        if let screenName = screenName { params["onboarding_name"] = screenName }
+        params["onboarding_screen_order"] = "\(screenOrder)"
+
+        shared.kinesisManager.trackEvent(.onboardingScreenShowed, params: params, completion: completion)
     }
 
     @objc public static func setExternalAnalyticsEnabled(_ enabled: Bool, completion: ErrorCompletion? = nil) {
