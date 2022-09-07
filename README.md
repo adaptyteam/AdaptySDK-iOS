@@ -1,7 +1,7 @@
 <h1 align="center" style="border-bottom: none">
 <b>
     <a href="https://adapty.io/?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS">
-        <img src="https://adapty-portal-media-production.s3.amazonaws.com/github/logo-adapty.png">
+        <img src="https://adapty-portal-media-production.s3.amazonaws.com/github/logo-adapty-new.svg">
     </a>
 </b>
 <br>Easy In-App Purchases Integration to
@@ -63,7 +63,7 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 
 ## Paywall A/B Testing on iOS
 
-![Adapty: In-app subscriptions with paywall A/B testing](https://adapty-portal-media-production.s3.amazonaws.com/github/ab+test.png)
+![Adapty: In-app subscriptions with paywall A/B testing](https://adapty-portal-media-production.s3.amazonaws.com/github/ab-test-new.png)
 
 - Conversions, trials, revenue, cancellations, and more  everything is calculated for you: each paywall and each A/B test.
 - Change images, colors, layouts and literally anything with a custom JSON.
@@ -71,12 +71,21 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 
 ## Real-time Analytics for Your iOS App
 
-![Adapty: How Adapty works](https://adapty-portal-media-production.s3.amazonaws.com/github/analytics.gif)
+![Adapty: How Adapty works](https://adapty-portal-media-production.s3.amazonaws.com/github/analytics-new.gif)
 
 - Manage the subscription's state without managing transactions.
 - 99.5% accuracy with App Store Connect.
 - View and analyze data by attributes, such as status, channels, campaigns, and more.
 - Filter, group, and measure metrics by attribution, platform, custom users' segments, and more in a few clicks.
+
+## Examples of Adapty-Demo apps
+
+This is a based demo applications for Adapty. Before running the app, you will need to configure the project.
+
+### 1. [UIKit](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Example/UIKit)
+### 2. [SwiftUI](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Example/SwiftUI)
+
+![Adapty: An example of the paywall is changed on the fly](https://adapty-portal-media-production.s3.amazonaws.com/github/swift-ui-example.jpg)
 
 ## Mobile App Monetization's Largest Community
 
