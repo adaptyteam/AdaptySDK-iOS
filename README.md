@@ -80,7 +80,7 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 
 ## Examples of Adapty-Demo apps
 
-This is a based demo applications for Adapty. Before running the app, you will need to configure the project.
+This is a demo applications for Adapty. Before running the app, you will need to configure the project.
 
 ### 1. [UIKit](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Example/UIKit)
 ### 2. [SwiftUI](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Example/SwiftUI)
