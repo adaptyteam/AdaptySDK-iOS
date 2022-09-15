@@ -17,10 +17,13 @@ public class AdaptyError: NSError {
     init(with error: Error) {
         originalError = error
 
-        if let error = error as? SKError {
+        if let adaptyError = error as? AdaptyError {
+            originalError = adaptyError.originalError
+            adaptyErrorCode = adaptyError.adaptyErrorCode
+        } else if let error = error as? SKError {
             adaptyErrorCode = AdaptyErrorCode(rawValue: error.code.rawValue) ?? .none
         }
-
+        
         let error = error as NSError
         super.init(domain: error.domain, code: error.code, userInfo: error.userInfo)
     }
@@ -68,7 +71,7 @@ public class AdaptyError: NSError {
         case cantReadReceipt = 1005 // Can't find a valid receipt
         case productPurchaseFailed = 1006 // Product purchase failed
         case missingOfferSigningParams = 1007 // Missing offer signing required params
-        case fallbackPaywallsNotRequired = 1008 // Fallback paywalls are not required
+//        case fallbackPaywallsNotRequired = 1008 // Fallback paywalls are not required
 
         // custom network codes
         case emptyResponse = 2000 // Response is empty
@@ -85,6 +88,7 @@ public class AdaptyError: NSError {
 
         // general
         case analyticsDisabled = 3000 // We can't handle analytics events, since you've opted it out
+        case wrongParam = 3001
     }
 
     // network shortcuts
@@ -115,7 +119,7 @@ public class AdaptyError: NSError {
     static var cantReadReceipt: AdaptyError { return AdaptyError(code: .cantReadReceipt, message: "Can't find a valid receipt.") }
     static var productPurchaseFailed: AdaptyError { return AdaptyError(code: .productPurchaseFailed, message: "Product purchase failed.") }
     static var missingOfferSigningParams: AdaptyError { return AdaptyError(code: .missingOfferSigningParams, message: "Missing offer signing required params.") }
-    static var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
+//    static var fallbackPaywallsNotRequired: AdaptyError { return AdaptyError(code: .fallbackPaywallsNotRequired, message: "Fallback paywalls are not required.") }
 
     // general
     static var analyticsDisabled: AdaptyError { return AdaptyError(code: .analyticsDisabled, message: "We can't handle analytics events, since you've opted it out.") }

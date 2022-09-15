@@ -19,6 +19,7 @@ class MainPresenter: ObservableObject {
         case getPurchaserInfo
 
         case showPaywall
+        case showProducts
 
         case updateAttribution
         case updateProfile
@@ -60,6 +61,7 @@ class MainPresenter: ObservableObject {
             .getPurchaserInfoResult(purchaserInfo),
             .getPurchaserInfo,
             .showPaywall,
+            .showProducts,
             .updateProfile,
             .updateAttribution,
             .sendOnboardingEvent(name: "Screen One", order: 1),

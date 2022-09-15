@@ -36,17 +36,28 @@ class MainController: UIViewController {
 
     private func presentPaywallController(_ paywall: PaywallModel) {
         let isHorizontal = paywall.isHorizontal()
-        
+
         let vc = isHorizontal ? PurchaseController.instantiateHorizontal() : PurchaseController.instantiateVertical()
         vc.presenter = PurchasePresenter(paywall: paywall, isHorizontalLayout: isHorizontal)
         vc.modalPresentationStyle = .fullScreen
-        
+
         present(vc, animated: true)
     }
 
     fileprivate func showPaywall() {
         if let paywall = PurchasesObserver.shared.paywall {
             presentPaywallController(paywall)
+        }
+    }
+
+    fileprivate func showProductsList() {
+        guard let allProducts = PurchasesObserver.shared.products else { return }
+        let consumableProducts = allProducts.filter { $0.vendorProductId.starts(with: "consumable") }
+
+        guard let product = consumableProducts.first else { return }
+
+        Adapty.makePurchase(product: product) { purchaserInfo, _, _, _, error in
+            print("DONE \(purchaserInfo), \(error)")
         }
     }
 }
@@ -110,6 +121,10 @@ extension MainController: UITableViewDataSource {
             let cell = tableView.dequeueReusableCell(withIdentifier: "MainControllerActionCell", for: indexPath) as! MainControllerActionCell
             cell.update(title: "Show Paywall", style: .default)
             return cell
+        case .showProducts:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "MainControllerActionCell", for: indexPath) as! MainControllerActionCell
+            cell.update(title: "Show Products", style: .default)
+            return cell
         case .logout:
             let cell = tableView.dequeueReusableCell(withIdentifier: "MainControllerActionCell", for: indexPath) as! MainControllerActionCell
             cell.update(title: "Logout", style: .destructive)
@@ -147,6 +162,8 @@ extension MainController: UITableViewDelegate {
             presenter.updateAttribution()
         case .showPaywall:
             showPaywall()
+        case .showProducts:
+            showProductsList()
         case .logout:
             presenter.logout()
         case let .sendOnboardingEvent(name, order):

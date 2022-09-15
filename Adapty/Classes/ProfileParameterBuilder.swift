@@ -88,6 +88,11 @@ public class ProfileParameterBuilder: NSObject {
         return self
     }
 
+    func withStoreCountry(_ value: String) -> Self {
+        params["store_country"] = value
+        return self
+    }
+
     @objc public func withCustomAttributes(_ customAttributes: Parameters) -> Self {
         params["custom_attributes"] = customAttributes.mapValues(makeJSONSerializable(_:))
         return self

@@ -31,15 +31,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         Adapty.logLevel = .verbose
-        Adapty.activate("YOUR_ADAPTY_APP_TOKEN", observerMode: false, customerUserId: nil) { _ in
-            PurchasesObserver.shared.loadInitialPaywallData()
-        }
-
+        Adapty.activate("YOUR_ADAPTY_APP_TOKEN", observerMode: false, customerUserId: nil)
         Adapty.delegate = PurchasesObserver.shared
 
         // in case you have / want to use fallback paywalls
         if let path = Bundle.main.path(forResource: "fallback_paywalls", ofType: "json"), let paywalls = try? String(contentsOfFile: path, encoding: .utf8) {
-            Adapty.setFallbackPaywalls(paywalls)
+            Adapty.setFallbackPaywalls(paywalls) { _ in
+                PurchasesObserver.shared.loadInitialPaywallData()
+            }
         }
 
         // Configure Adjust
