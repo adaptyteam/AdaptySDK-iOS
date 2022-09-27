@@ -71,7 +71,7 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 
 ## Real-time Analytics for Your iOS App
 
-![Adapty: How Adapty works](https://adapty-portal-media-production.s3.amazonaws.com/github/analytics-new.gif)
+![Adapty: How Adapty works](https://adapty-portal-media-production.s3.amazonaws.com/github/analyticss.gif)
 
 - Manage the subscription's state without managing transactions.
 - 99.5% accuracy with App Store Connect.
