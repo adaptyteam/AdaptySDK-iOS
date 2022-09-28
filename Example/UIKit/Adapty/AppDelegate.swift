@@ -31,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         Adapty.logLevel = .verbose
-        Adapty.activate("YOUR_ADAPTY_APP_TOKEN", observerMode: false, customerUserId: nil)
+        Adapty.activate(AppConstants.adaptyApiKey, observerMode: false, customerUserId: nil)
         Adapty.delegate = PurchasesObserver.shared
 
         // in case you have / want to use fallback paywalls
@@ -42,11 +42,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // Configure Adjust
+        
+        let config = ADJConfig(appToken: AppConstants.adjustAppToken, environment: ADJEnvironmentProduction)
+        config?.delegate = self
+        Adjust.appDidLaunch(config)
 
         // Configure AppsFlyer
-
+        AppsFlyerLib.shared().appsFlyerDevKey = AppConstants.appsFlyerDevKey
+        AppsFlyerLib.shared().appleAppID = AppConstants.appleAppId
+        AppsFlyerLib.shared().delegate = self
+        AppsFlyerLib.shared().isDebug = true
+        
         // Configure Branch
-
+        Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) in
+            if let data = data {
+                Adapty.updateAttribution(data, source: .branch)
+            }
+        }
+        
+        // Configure Branch
         Branch.getInstance().setIdentity("YOUR_USER_ID")
         Branch.getInstance().initSession(launchOptions: launchOptions) { data, _ in
             if let data = data {
@@ -74,5 +88,6 @@ extension AppDelegate: AppsFlyerLibDelegate {
     }
 
     func onConversionDataFail(_ error: Error) {
+        // handle error
     }
 }
