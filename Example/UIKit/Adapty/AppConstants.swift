@@ -14,5 +14,4 @@ struct AppConstants {
     
     static let adjustAppToken = "YOUR_ADJUST_APP_TOKEN"
     static let appsFlyerDevKey = "YOUR_APPSFLYER_DEV_KEY"
-    static let branchDevKey = "YOUR_APPSFLYER_DEV_KEY"
 }
