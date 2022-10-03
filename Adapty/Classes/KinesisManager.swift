@@ -18,6 +18,8 @@ enum EventType: String {
     case purchaseStarted = "purchase_started"
     case purchaseCancelled = "purchase_cancelled"
     case purchaseRestore = "purchase_restore"
+    
+    case systemLog = "system_log"
 }
 
 class KinesisManager {

@@ -179,6 +179,7 @@ import UIKit
         syncInstallation { _, _ in
             // start live tracking
             self.sessionsManager.startTrackingLiveEvent()
+            self.iapManager.flushReceiptEvents()
         }
     }
     
