@@ -374,17 +374,18 @@ class IAPManager: NSObject {
 
 extension IAPManager {
     func flushReceiptEvents() {
-        guard let firstEventData = receiptEventsCache.first else { return }
+        guard !receiptEventsCache.isEmpty else { return }
+        
+        let eventData = receiptEventsCache.removeFirst()
+        
+        LoggerManager.logMessage("log_receipt_event \(eventData) started")
 
-        LoggerManager.logMessage("log_receipt_event \(firstEventData) started")
-
-        KinesisManager.shared.trackEvent(.systemLog, params: ["custom_data": firstEventData]) { [weak self] error in
+        KinesisManager.shared.trackEvent(.systemLog, params: ["custom_data": eventData]) { [weak self] error in
             if let error = error {
-                LoggerManager.logMessage("log_receipt_event \(firstEventData) failed \(error)")
+                LoggerManager.logMessage("log_receipt_event \(eventData) failed \(error)")
+                self?.receiptEventsCache.insert(eventData, at: 0)
             } else {
-                LoggerManager.logMessage("log_receipt_event \(firstEventData) succeeded")
-
-                self?.receiptEventsCache.removeFirst()
+                LoggerManager.logMessage("log_receipt_event \(eventData) succeeded")
                 self?.flushReceiptEvents()
             }
         }
