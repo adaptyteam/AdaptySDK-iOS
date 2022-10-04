@@ -134,6 +134,10 @@ import Foundation
             if let customerId = Self.initialCustomerUserId, purchaserInfo?.customerUserId != customerId {
                 Self.identify(customerId, completion: completion)
             } else {
+                if let purchaserInfo = purchaserInfo {
+                    Self.delegate?.didReceiveUpdatedPurchaserInfo(purchaserInfo)
+                }
+
                 Self.getPurchaserInfo { _, error in
                     completion?(error)
                 }
