@@ -112,8 +112,19 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         }
         
         self.vendorProductId = vendorProductId
-        if let introductoryOfferEligibility = json["introductory_offer_eligibility"] as? Bool { self.introductoryOfferEligibility = introductoryOfferEligibility }
-        if let promotionalOfferEligibility = json["promotional_offer_eligibility"] as? Bool { self.promotionalOfferEligibility = promotionalOfferEligibility }
+
+        if DefaultsManager.shared.hasErrorAtLastReceiptRefresh {
+            // At this point we are not sure about the `introductory_offer_eligibility` field because we had an error while retrieving the receipt
+            // So we're setting the `introductoryOfferEligibility` flag to false
+            self.introductoryOfferEligibility = false
+        } else if let introductoryOfferEligibility = json["introductory_offer_eligibility"] as? Bool {
+            self.introductoryOfferEligibility = introductoryOfferEligibility
+        }
+
+        if let promotionalOfferEligibility = json["promotional_offer_eligibility"] as? Bool {
+            self.promotionalOfferEligibility = promotionalOfferEligibility
+        }
+
         self.promotionalOfferId = json["promotional_offer_id"] as? String
     }
     

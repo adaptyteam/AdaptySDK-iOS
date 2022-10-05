@@ -55,6 +55,7 @@ enum Constants {
         static let previousResponseHashes = "AdaptySDK_Previous_Response_Hashes"
         static let responseJSONCaches = "AdaptySDK_Response_JSON_Caches"
         static let postRequestParamsHashes = "AdaptySDK_Post_Request_Params_Hashes"
+        static let hasErrorAtLastReceiptRefresh = "AdaptySDK_Has_Error_At_Last_Receipt_Refresh"
     }
     
     enum Versions {

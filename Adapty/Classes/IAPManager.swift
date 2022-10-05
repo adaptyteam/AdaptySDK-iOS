@@ -375,9 +375,9 @@ class IAPManager: NSObject {
 extension IAPManager {
     func flushReceiptEvents() {
         guard !receiptEventsCache.isEmpty else { return }
-        
+
         let eventData = receiptEventsCache.removeFirst()
-        
+
         LoggerManager.logMessage("log_receipt_event \(eventData) started")
 
         KinesisManager.shared.trackEvent(.systemLog, params: ["custom_data": eventData]) { [weak self] error in
@@ -514,12 +514,13 @@ extension IAPManager: SKProductsRequestDelegate {
 
     func requestDidFinish(_ request: SKRequest) {
         guard let request = request as? SKReceiptRefreshRequest else { return }
-
+        DefaultsManager.shared.hasErrorAtLastReceiptRefresh = false
         logReceiptRequestFinished()
 
         refreshReceiptRequest = nil
         refreshReceiptCompletions.forEach({ $0(latestReceipt) })
         refreshReceiptCompletions.removeAll()
+        request.cancel()
     }
 
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
@@ -559,11 +560,15 @@ extension IAPManager: SKProductsRequestDelegate {
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
         if let request = request as? SKReceiptRefreshRequest {
+            DefaultsManager.shared.hasErrorAtLastReceiptRefresh = true
+
             logReceiptRequestFailed(with: error)
 
             refreshReceiptRequest = nil
             refreshReceiptCompletions.forEach({ $0(nil) })
             refreshReceiptCompletions.removeAll()
+
+            request.cancel()
             return
         }
 

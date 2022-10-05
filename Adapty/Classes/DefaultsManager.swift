@@ -176,6 +176,15 @@ class DefaultsManager {
         }
     }
     
+     var hasErrorAtLastReceiptRefresh: Bool {
+        get {
+            defaults.bool(forKey: Constants.UserDefaults.hasErrorAtLastReceiptRefresh)
+        }
+        set {
+            defaults.setValue(newValue, forKey: Constants.UserDefaults.hasErrorAtLastReceiptRefresh)
+        }
+    }
+    
     func clean() {
         defaults.removeObject(forKey: Constants.UserDefaults.cachedEvents)
         defaults.removeObject(forKey: Constants.UserDefaults.cachedVariationsIds)
@@ -186,6 +195,7 @@ class DefaultsManager {
         defaults.removeObject(forKey: Constants.UserDefaults.previousResponseHashes)
         defaults.removeObject(forKey: Constants.UserDefaults.responseJSONCaches)
         defaults.removeObject(forKey: Constants.UserDefaults.postRequestParamsHashes)
+        defaults.removeObject(forKey: Constants.UserDefaults.hasErrorAtLastReceiptRefresh)
     }
     
 }
