@@ -462,7 +462,7 @@ import Foundation
         LoggerManager.logMessage("Calling now: \(#function)")
         var params = [String: String]()
         if let name = name { params["onboarding_name"] = name }
-        if let screenName = screenName { params["onboarding_name"] = screenName }
+        if let screenName = screenName { params["onboarding_screen_name"] = screenName }
         params["onboarding_screen_order"] = "\(screenOrder)"
 
         shared.kinesisManager.trackEvent(.onboardingScreenShowed, params: params, completion: completion)
