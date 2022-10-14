@@ -179,7 +179,7 @@ import UIKit
         syncInstallation { _, _ in
             // start live tracking
             self.sessionsManager.startTrackingLiveEvent()
-            self.iapManager.flushReceiptEvents()
+            self.iapManager.flushStoreKitEvents()
         }
     }
     
@@ -416,6 +416,10 @@ import UIKit
         let params = Parameters.formatData(with: "", type: Constants.TypeNames.appleReceipt, attributes: attributes)
         
         shared.apiManager.validateReceipt(params: params) { (purchaserInfo, appleValidationResult, error) in
+            if error == nil {
+                DefaultsManager.shared.syncedReceiptAtLeastOnce = true
+            }
+            
             if let purchaserInfo = purchaserInfo {
                 // do not overwrite in case of error
                 shared.purchaserInfo = purchaserInfo
@@ -452,14 +456,14 @@ import UIKit
         return shared.purchaserInfo?.customerUserId
     }
     
-    @objc public static func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
-        shared.syncTransactionsHistory(completion: completion)
+    @objc public static func syncTransactionsHistoryAndGetPaywalls(onPaywallsLoaded: PaywallsCompletion?, onDeferredReceiptValidation: ValidateReceiptCompletion?) {
+        shared.syncTransactionsHistoryAndGetPaywalls(onPaywallsLoaded: onPaywallsLoaded, onDeferredReceiptValidation: onDeferredReceiptValidation)
     }
     
-    private func syncTransactionsHistory(completion: SyncTransactionsHistoryCompletion? = nil) {
+    private func syncTransactionsHistoryAndGetPaywalls(onPaywallsLoaded: PaywallsCompletion?, onDeferredReceiptValidation: ValidateReceiptCompletion?) {
         LoggerManager.logMessage("Calling now: \(#function)")
         
-        iapManager.syncTransactionsHistory(completion: completion)
+        iapManager.syncTransactionsHistoryAndGetPaywalls(onPaywallsLoaded: onPaywallsLoaded, onDeferredReceiptValidation: onDeferredReceiptValidation)
     }
     
     @objc public class func getPurchaserInfo(forceUpdate: Bool = false, _ completion: @escaping PurchaserCompletion) {

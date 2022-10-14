@@ -11,10 +11,12 @@ import StoreKit
 public typealias BuyProductCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ product: ProductModel?, _ error: AdaptyError?) -> Void
 public typealias RestorePurchasesCompletion = (_ purchaserInfo: PurchaserInfoModel?, _ receipt: String?, _ appleValidationResult: Parameters?, _ error: AdaptyError?) -> Void
 public typealias DeferredPurchaseCompletion = (BuyProductCompletion?) -> Void
-private typealias RefreshReceiptCompletion = (_ receipt: String?) -> Void
+private typealias RefreshReceiptCompletion = (Result<String?, Error>) -> Void
 private typealias PurchaseInfoTuple = (product: ProductModel, payment: SKPayment, completion: BuyProductCompletion?)
 
 class IAPManager: NSObject {
+    private static var refreshReceiptRequest: SKReceiptRefreshRequest?
+
     private var profileId: String {
         DefaultsManager.shared.profileId
     }
@@ -53,7 +55,6 @@ class IAPManager: NSObject {
     private var productsRequest: SKProductsRequest?
     private var paywallsRequestCompletions: [PaywallsCompletion] = []
     private var refreshReceiptCompletions: [RefreshReceiptCompletion] = []
-    private var refreshReceiptRequest: SKReceiptRefreshRequest?
 
     private var isSyncedAtLeastOnce: Bool = false
 
@@ -64,7 +65,7 @@ class IAPManager: NSObject {
 
     private var apiManager: ApiManager
 
-    fileprivate var receiptEventsCache = [String]()
+    fileprivate var storekitEventsCache = [String]()
 
     // MARK: - Public
 
@@ -215,6 +216,8 @@ class IAPManager: NSObject {
         productsRequest = SKProductsRequest(productIdentifiers: productIDs)
         productsRequest?.delegate = self
         productsRequest?.start()
+        
+        logStoreKitEvent(.productsRequestStarted, error: nil)
     }
 
     private func startObserving() {
@@ -275,6 +278,7 @@ class IAPManager: NSObject {
 
     var latestReceipt: String? {
         guard let appStoreReceiptURL = Bundle.main.appStoreReceiptURL, FileManager.default.fileExists(atPath: appStoreReceiptURL.path) else {
+            logStoreKitEvent(.receiptNotFound, error: nil)
             return nil
         }
 
@@ -283,10 +287,12 @@ class IAPManager: NSObject {
             receiptData = try Data(contentsOf: appStoreReceiptURL, options: .alwaysMapped)
         } catch {
             LoggerManager.logError("Couldn't read receipt data.\n\(error)")
+            logStoreKitEvent(.receiptIsCorrupted, error: error)
         }
 
         guard let receipt = receiptData?.base64EncodedString(options: []) else {
             LoggerManager.logError(AdaptyError.cantReadReceipt)
+            logStoreKitEvent(.receiptIsCorrupted, error: nil)
             return nil
         }
 
@@ -307,11 +313,52 @@ class IAPManager: NSObject {
             }
         }
 
-        getReceipt { receipt in
-            if let receipt = receipt {
-                validate(receipt: receipt)
-            } else {
+        getReceipt { result in
+            switch result {
+            case let .success(receipt):
+                if let receipt = receipt {
+                    validate(receipt: receipt)
+                } else {
+                    getPaywalls(with: nil)
+                }
+            case let .failure(error):
                 getPaywalls(with: nil)
+            }
+        }
+    }
+
+    func syncTransactionsHistoryAndGetPaywalls(onPaywallsLoaded: PaywallsCompletion?, onDeferredReceiptValidation: ValidateReceiptCompletion?) {
+        if let localReceipt = latestReceipt {
+            // If receipt is presented on the device
+            // We just need to force validate it and then fetch the paywalls
+
+            Adapty.validateReceipt(localReceipt) { [weak self] _, _, error in
+                if let error = error {
+                    onPaywallsLoaded?(nil, nil, error)
+                    return
+                }
+
+                self?.internalGetPaywalls(forceUpdate: true, onPaywallsLoaded)
+            }
+        } else {
+            // If receipt is NOT presented on the device
+            // We will return paywalls without the receipt (eligibility should be `unknown`) if there wasnt any receipt sync before
+            internalGetPaywalls(forceUpdate: true, onPaywallsLoaded)
+
+            // We need to refresh it first
+            refreshReceipt { result in
+                switch result {
+                case let .success(receipt):
+                    if let receipt = receipt {
+                        Adapty.validateReceipt(receipt) { [weak self] purchaserInfo, params, error in
+                            onDeferredReceiptValidation?(purchaserInfo, params, error)
+                        }
+                    } else {
+                        onDeferredReceiptValidation?(nil, nil, AdaptyError.cantReadReceipt)
+                    }
+                case let .failure(error):
+                    onDeferredReceiptValidation?(nil, nil, AdaptyError(with: error))
+                }
             }
         }
     }
@@ -373,60 +420,66 @@ class IAPManager: NSObject {
 }
 
 extension IAPManager {
-    func flushReceiptEvents() {
-        guard !receiptEventsCache.isEmpty else { return }
+    enum StoreKitEvent: String {
+        case receiptRequestStarted = "receipt_request_started"
+        case receiptRequestFinished = "receipt_request_finished"
+        case receiptRequestFailed = "receipt_request_failed"
+        
+        case productsRequestStarted = "products_request_started"
+        case productsRequestFinished = "products_request_finished"
+        case productsRequestFailed = "products_request_failed"
+        
+        case receiptNotFound = "receipt_not_found"
+        case receiptIsCorrupted = "receipt_is_corrupted"
+    }
+    
+    func flushStoreKitEvents() {
+        guard !storekitEventsCache.isEmpty else { return }
 
-        let eventData = receiptEventsCache.removeFirst()
+        let eventData = storekitEventsCache.removeFirst()
 
-        LoggerManager.logMessage("log_receipt_event \(eventData) started")
+        LoggerManager.logMessage("log_storekit_event SENDING \(eventData)")
 
         KinesisManager.shared.trackEvent(.systemLog, params: ["custom_data": eventData]) { [weak self] error in
             if let error = error {
-                LoggerManager.logMessage("log_receipt_event \(eventData) failed \(error)")
-                self?.receiptEventsCache.insert(eventData, at: 0)
+                LoggerManager.logMessage("log_storekit_event FAILED \(eventData) \(error)")
+                self?.storekitEventsCache.insert(eventData, at: 0)
             } else {
-                LoggerManager.logMessage("log_receipt_event \(eventData) succeeded")
-                self?.flushReceiptEvents()
+                LoggerManager.logMessage("log_storekit_event SENT \(eventData)")
+                self?.flushStoreKitEvents()
             }
         }
     }
 
-    private func cacheReceiptEvent(customData: String) {
-        receiptEventsCache.append(customData)
+    private func cacheStoreKitEvent(customData: String) {
+        storekitEventsCache.append(customData)
     }
 
-    private func logReceiptEvent(name: String, params: [String: String]?) {
-        var paramsToSend = params ?? [:]
-        paramsToSend["name"] = name
+    private func logStoreKitEvent(_ event: StoreKitEvent, error: Error?) {
+        var paramsToSend = [String:String]()
+        paramsToSend["name"] = event.rawValue
         paramsToSend["ts_collected"] = "\(Date().timeIntervalSince1970)"
 
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: paramsToSend),
+        if let skError = error as? SKError {
+            paramsToSend["error_skcode"] = "\(skError.code)"
+            paramsToSend["error_code"] = "\(skError.errorCode)"
+            paramsToSend["error_desc"] = skError.localizedDescription
+        } else if let error = error {
+            paramsToSend["error_desc"] = error.localizedDescription
+        }
+        
+        let jsonOptions: JSONSerialization.WritingOptions
+        if #available(iOS 11.0, *) {
+            jsonOptions = .sortedKeys
+        } else {
+            jsonOptions = []
+        }
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: paramsToSend, options: jsonOptions),
               let jsonString = String(data: jsonData, encoding: .utf8) else { return }
 
-        cacheReceiptEvent(customData: jsonString)
-        flushReceiptEvents()
-    }
-
-    fileprivate func logReceiptRequestStarted() {
-        logReceiptEvent(name: "receipt_request_started", params: nil)
-    }
-
-    fileprivate func logReceiptRequestFinished() {
-        logReceiptEvent(name: "receipt_request_finished", params: nil)
-    }
-
-    fileprivate func logReceiptRequestFailed(with error: Error) {
-        var params = [String: String]()
-
-        if let skError = error as? SKError {
-            params["error_skcode"] = "\(skError.code)"
-            params["error_code"] = "\(skError.errorCode)"
-            params["error_desc"] = skError.localizedDescription
-        } else {
-            params["error_desc"] = error.localizedDescription
-        }
-
-        logReceiptEvent(name: "receipt_request_failed", params: params)
+        cacheStoreKitEvent(customData: jsonString)
+        flushStoreKitEvents()
     }
 }
 
@@ -435,7 +488,7 @@ private extension IAPManager {
 
     private func getReceipt(completion: @escaping RefreshReceiptCompletion) {
         if let receipt = latestReceipt {
-            completion(receipt)
+            completion(.success(receipt))
         } else {
             refreshReceipt(completion: completion)
         }
@@ -443,12 +496,12 @@ private extension IAPManager {
 
     private func refreshReceipt(completion: @escaping RefreshReceiptCompletion) {
         refreshReceiptCompletions.append(completion)
-        if refreshReceiptRequest == nil {
-            logReceiptRequestStarted()
+        if Self.refreshReceiptRequest == nil {
+            logStoreKitEvent(.receiptRequestStarted, error: nil)
 
-            refreshReceiptRequest = SKReceiptRefreshRequest()
-            refreshReceiptRequest?.delegate = self
-            refreshReceiptRequest?.start()
+            Self.refreshReceiptRequest = SKReceiptRefreshRequest()
+            Self.refreshReceiptRequest?.delegate = self
+            Self.refreshReceiptRequest?.start()
         }
     }
 }
@@ -514,16 +567,20 @@ extension IAPManager: SKProductsRequestDelegate {
 
     func requestDidFinish(_ request: SKRequest) {
         guard let request = request as? SKReceiptRefreshRequest else { return }
-        DefaultsManager.shared.hasErrorAtLastReceiptRefresh = false
-        logReceiptRequestFinished()
+        logStoreKitEvent(.receiptRequestFinished, error: nil)
 
-        refreshReceiptRequest = nil
-        refreshReceiptCompletions.forEach({ $0(latestReceipt) })
+        Self.refreshReceiptRequest = nil
+
+        let receipt = latestReceipt
+
+        refreshReceiptCompletions.forEach({ $0(.success(receipt)) })
         refreshReceiptCompletions.removeAll()
         request.cancel()
     }
 
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        logStoreKitEvent(.productsRequestFinished, error: nil)
+        
         for product in response.products {
             LoggerManager.logMessage("Found product: \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
         }
@@ -560,16 +617,18 @@ extension IAPManager: SKProductsRequestDelegate {
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
         if let request = request as? SKReceiptRefreshRequest {
-            DefaultsManager.shared.hasErrorAtLastReceiptRefresh = true
+            logStoreKitEvent(.receiptRequestFailed, error: error)
 
-            logReceiptRequestFailed(with: error)
-
-            refreshReceiptRequest = nil
-            refreshReceiptCompletions.forEach({ $0(nil) })
-            refreshReceiptCompletions.removeAll()
-
+            Self.refreshReceiptRequest = nil
             request.cancel()
+
+            refreshReceiptCompletions.forEach({ $0(.failure(error)) })
+            refreshReceiptCompletions.removeAll()
             return
+        }
+        
+        if request is SKProductsRequest {
+            logStoreKitEvent(.productsRequestFailed, error: error)
         }
 
         if #available(iOS 14.0, *), let error = error as? SKError, SKError.Code(rawValue: error.errorCode) == SKError.unknown {

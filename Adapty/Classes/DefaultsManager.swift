@@ -176,12 +176,12 @@ class DefaultsManager {
         }
     }
     
-     var hasErrorAtLastReceiptRefresh: Bool {
+     var syncedReceiptAtLeastOnce: Bool {
         get {
-            defaults.bool(forKey: Constants.UserDefaults.hasErrorAtLastReceiptRefresh)
+            defaults.bool(forKey: Constants.UserDefaults.syncedReceiptAtLeastOnce)
         }
         set {
-            defaults.setValue(newValue, forKey: Constants.UserDefaults.hasErrorAtLastReceiptRefresh)
+            defaults.setValue(newValue, forKey: Constants.UserDefaults.syncedReceiptAtLeastOnce)
         }
     }
     
@@ -195,7 +195,7 @@ class DefaultsManager {
         defaults.removeObject(forKey: Constants.UserDefaults.previousResponseHashes)
         defaults.removeObject(forKey: Constants.UserDefaults.responseJSONCaches)
         defaults.removeObject(forKey: Constants.UserDefaults.postRequestParamsHashes)
-        defaults.removeObject(forKey: Constants.UserDefaults.hasErrorAtLastReceiptRefresh)
+        defaults.removeObject(forKey: Constants.UserDefaults.syncedReceiptAtLeastOnce)
     }
     
 }

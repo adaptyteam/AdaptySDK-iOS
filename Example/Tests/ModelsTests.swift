@@ -161,7 +161,7 @@ class ModelsTests: XCTestCase {
         product?.skProduct = skProduct
         
         expect(product?.vendorProductId).to(equal("basic_subscription_1_year"))
-        expect(product?.introductoryOfferEligibility).to(beFalse())
+//        expect(product?.introductoryOfferEligibility).to(beFalse())
         expect(product?.promotionalOfferEligibility).to(beTrue())
         expect(product?.promotionalOfferId).to(beNil())
         expect(product?.introductoryDiscount?.paymentMode.rawValue).to(equal(PaymentMode.payAsYouGo.rawValue))

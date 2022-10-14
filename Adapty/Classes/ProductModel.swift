@@ -41,8 +41,14 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         case unknown
     }
     
+    @objc public enum Eligibility: UInt, Codable {
+        case unknown
+        case eligible
+        case notEligible
+    }
+    
     @objc public var vendorProductId: String
-    @objc public var introductoryOfferEligibility: Bool = false
+    @objc public var introductoryOfferEligibility: Eligibility = .unknown
     @objc public var promotionalOfferEligibility: Bool = false
     @objc public var promotionalOfferId: String?
     @objc public var variationId: String?
@@ -113,12 +119,12 @@ public class ProductModel: NSObject, JSONCodable, Codable {
         
         self.vendorProductId = vendorProductId
 
-        if DefaultsManager.shared.hasErrorAtLastReceiptRefresh {
-            // At this point we are not sure about the `introductory_offer_eligibility` field because we had an error while retrieving the receipt
+        if DefaultsManager.shared.syncedReceiptAtLeastOnce, let introductoryOfferEligibility = json["introductory_offer_eligibility"] as? Bool {
+            self.introductoryOfferEligibility = introductoryOfferEligibility ? .eligible : .notEligible
+        } else {
+            // At this point we are not sure about the `introductory_offer_eligibility` field because there wasn't any successful recept sync
             // So we're setting the `introductoryOfferEligibility` flag to false
-            self.introductoryOfferEligibility = false
-        } else if let introductoryOfferEligibility = json["introductory_offer_eligibility"] as? Bool {
-            self.introductoryOfferEligibility = introductoryOfferEligibility
+            self.introductoryOfferEligibility = .unknown
         }
 
         if let promotionalOfferEligibility = json["promotional_offer_eligibility"] as? Bool {

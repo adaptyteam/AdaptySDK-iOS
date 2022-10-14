@@ -139,19 +139,6 @@ extension Adapty {
         }
     }
 
-    public static func syncTransactionsHistory() async throws -> SyncTransactionsHistoryResult {
-        return try await withCheckedThrowingContinuation { continuation in
-            Adapty.syncTransactionsHistory { parameters, paywalls, products, error in
-                if let error = error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: (parameters, paywalls, products)
-                )
-            }
-        }
-  }
-
     public static func getPurchaserInfo(forceUpdate: Bool = false) async throws -> PurchaserInfoModel? {
         return try await withCheckedThrowingContinuation { continuation in
             Adapty.getPurchaserInfo(forceUpdate: forceUpdate) { purchaserInfo, error in
