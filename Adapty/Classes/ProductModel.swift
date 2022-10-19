@@ -123,7 +123,7 @@ public class ProductModel: NSObject, JSONCodable, Codable {
             self.introductoryOfferEligibility = introductoryOfferEligibility ? .eligible : .notEligible
         } else {
             // At this point we are not sure about the `introductory_offer_eligibility` field because there wasn't any successful recept sync
-            // So we're setting the `introductoryOfferEligibility` flag to false
+            // So we're setting the `introductoryOfferEligibility` flag to .unknown
             self.introductoryOfferEligibility = .unknown
         }
 

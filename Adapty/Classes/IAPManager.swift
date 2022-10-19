@@ -216,7 +216,7 @@ class IAPManager: NSObject {
         productsRequest = SKProductsRequest(productIdentifiers: productIDs)
         productsRequest?.delegate = self
         productsRequest?.start()
-        
+
         logStoreKitEvent(.productsRequestStarted, error: nil)
     }
 
@@ -331,33 +331,85 @@ class IAPManager: NSObject {
         if let localReceipt = latestReceipt {
             // If receipt is presented on the device
             // We just need to force validate it and then fetch the paywalls
+            LoggerManager.logMessage("[SYNC] Local receipt is found, proceeding to validation")
 
             Adapty.validateReceipt(localReceipt) { [weak self] _, _, error in
                 if let error = error {
+                    LoggerManager.logMessage("[SYNC] Receipt validation ERROR: \(error)")
                     onPaywallsLoaded?(nil, nil, error)
                     return
                 }
+                
+                LoggerManager.logMessage("[SYNC] Receipt validation DONE")
 
-                self?.internalGetPaywalls(forceUpdate: true, onPaywallsLoaded)
+                self?.internalGetPaywalls(forceUpdate: true) { paywalls, products, error in
+                    LoggerManager.logMessage("[SYNC] Calling onPaywallsLoaded")
+                    onPaywallsLoaded?(paywalls, products, error)
+                }
             }
         } else {
+            LoggerManager.logMessage("[SYNC] Local receipt is NOT found, requesting the fresh one in the background")
+
+            var paywallsRequestIsFinished = false
+
+            var validationRequestWaitsCallback = false
+            var validationPurchaserInfo: PurchaserInfoModel?
+            var validationParams: Parameters?
+            var validationError: AdaptyError?
+
             // If receipt is NOT presented on the device
             // We will return paywalls without the receipt (eligibility should be `unknown`) if there wasnt any receipt sync before
-            internalGetPaywalls(forceUpdate: true, onPaywallsLoaded)
+            internalGetPaywalls(forceUpdate: true) { paywalls, products, error in
+                paywallsRequestIsFinished = true
+                LoggerManager.logMessage("[SYNC] Calling onPaywallsLoaded")
+                onPaywallsLoaded?(paywalls, products, error)
+
+                if validationRequestWaitsCallback {
+                    LoggerManager.logMessage("[SYNC] Calling onDeferredReceiptValidation")
+                    onDeferredReceiptValidation?(validationPurchaserInfo, validationParams, validationError)
+
+                    validationRequestWaitsCallback = false
+                }
+            }
 
             // We need to refresh it first
             refreshReceipt { result in
+                func tryToCallOnDeferredReceiptValidation(purchaserInfo: PurchaserInfoModel?, params: Parameters?, error: AdaptyError?) {
+                    if paywallsRequestIsFinished {
+                        LoggerManager.logMessage("[SYNC] Calling onDeferredReceiptValidation")
+                        onDeferredReceiptValidation?(purchaserInfo, params, error)
+
+                        validationPurchaserInfo = nil
+                        validationParams = nil
+                        validationError = nil
+                        validationRequestWaitsCallback = false
+                    } else {
+                        validationPurchaserInfo = purchaserInfo
+                        validationParams = params
+                        validationError = error
+                        validationRequestWaitsCallback = true
+                    }
+                }
+                
                 switch result {
                 case let .success(receipt):
                     if let receipt = receipt {
-                        Adapty.validateReceipt(receipt) { [weak self] purchaserInfo, params, error in
-                            onDeferredReceiptValidation?(purchaserInfo, params, error)
+                        Adapty.validateReceipt(receipt) { purchaserInfo, params, error in
+                            if let error = error {
+                                LoggerManager.logMessage("[SYNC] Receipt validation ERROR: \(error)")
+                            } else {
+                                LoggerManager.logMessage("[SYNC] Receipt validation DONE")
+                            }
+
+                            tryToCallOnDeferredReceiptValidation(purchaserInfo: purchaserInfo, params: params, error: error)
                         }
                     } else {
-                        onDeferredReceiptValidation?(nil, nil, AdaptyError.cantReadReceipt)
+                        LoggerManager.logMessage("[SYNC] Local receipt is NOT found after the request, nothing to do anymore")
+                        tryToCallOnDeferredReceiptValidation(purchaserInfo: nil, params: nil, error: AdaptyError.cantReadReceipt)
                     }
                 case let .failure(error):
-                    onDeferredReceiptValidation?(nil, nil, AdaptyError(with: error))
+                    LoggerManager.logMessage("[SYNC] Receipt refresh ERROR: \(error)")
+                    tryToCallOnDeferredReceiptValidation(purchaserInfo: nil, params: nil, error: AdaptyError(with: error))
                 }
             }
         }
@@ -424,15 +476,15 @@ extension IAPManager {
         case receiptRequestStarted = "receipt_request_started"
         case receiptRequestFinished = "receipt_request_finished"
         case receiptRequestFailed = "receipt_request_failed"
-        
+
         case productsRequestStarted = "products_request_started"
         case productsRequestFinished = "products_request_finished"
         case productsRequestFailed = "products_request_failed"
-        
+
         case receiptNotFound = "receipt_not_found"
         case receiptIsCorrupted = "receipt_is_corrupted"
     }
-    
+
     func flushStoreKitEvents() {
         guard !storekitEventsCache.isEmpty else { return }
 
@@ -456,7 +508,7 @@ extension IAPManager {
     }
 
     private func logStoreKitEvent(_ event: StoreKitEvent, error: Error?) {
-        var paramsToSend = [String:String]()
+        var paramsToSend = [String: String]()
         paramsToSend["name"] = event.rawValue
         paramsToSend["ts_collected"] = "\(Date().timeIntervalSince1970)"
 
@@ -467,14 +519,14 @@ extension IAPManager {
         } else if let error = error {
             paramsToSend["error_desc"] = error.localizedDescription
         }
-        
+
         let jsonOptions: JSONSerialization.WritingOptions
         if #available(iOS 11.0, *) {
             jsonOptions = .sortedKeys
         } else {
             jsonOptions = []
         }
-        
+
         guard let jsonData = try? JSONSerialization.data(withJSONObject: paramsToSend, options: jsonOptions),
               let jsonString = String(data: jsonData, encoding: .utf8) else { return }
 
@@ -511,22 +563,24 @@ private extension IAPManager {
 
     private func callPaywallsCompletionAndCleanCallback(_ result: Result<(paywalls: [PaywallModel], products: [ProductModel]), AdaptyError>) {
         DispatchQueue.main.async {
-            switch result {
-            case let .success(data):
-                LoggerManager.logMessage("Successfully loaded list of products: [\(self.productIDs?.joined(separator: ",") ?? "")]")
-                self.paywallsRequestCompletions.forEach { completion in
-                    completion(data.paywalls, data.products, nil)
-                }
-            case let .failure(error):
-                LoggerManager.logError("Failed to load list of products.\n\(error.localizedDescription)")
-                self.paywallsRequestCompletions.forEach { completion in
-                    completion(nil, nil, error)
-                }
-            }
+            let completions = self.paywallsRequestCompletions
 
             self.paywallsRequest = nil
             self.productsRequest = nil
             self.paywallsRequestCompletions.removeAll()
+
+            switch result {
+            case let .success(data):
+                LoggerManager.logMessage("Successfully loaded list of products: [\(self.productIDs?.joined(separator: ",") ?? "")]")
+                completions.forEach { completion in
+                    completion(data.paywalls, data.products, nil)
+                }
+            case let .failure(error):
+                LoggerManager.logError("Failed to load list of products.\n\(error.localizedDescription)")
+                completions.forEach { completion in
+                    completion(nil, nil, error)
+                }
+            }
         }
     }
 
@@ -580,7 +634,7 @@ extension IAPManager: SKProductsRequestDelegate {
 
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         logStoreKitEvent(.productsRequestFinished, error: nil)
-        
+
         for product in response.products {
             LoggerManager.logMessage("Found product: \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
         }
@@ -626,7 +680,7 @@ extension IAPManager: SKProductsRequestDelegate {
             refreshReceiptCompletions.removeAll()
             return
         }
-        
+
         if request is SKProductsRequest {
             logStoreKitEvent(.productsRequestFailed, error: error)
         }
