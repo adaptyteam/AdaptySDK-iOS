@@ -38,33 +38,21 @@ class PurchasesObserver: ObservableObject {
         paywall = nil
         products = nil
 
-        Profiler.measure(.begin, operation: .getPaywall)
-
         Adapty.getPaywall(Self.paywallId) { [weak self] result in
             self?.paywall = try? result.get()
-
-            Profiler.measure(.end, operation: .getPaywall)
-            Profiler.measure(.end, operation: .getPaywallsFromStart)
         }
     }
 
     private func loadPaywallProducts() {
         guard let paywall = paywall else { return }
 
-        Profiler.measure(.begin, operation: .getProducts)
-
         Adapty.getPaywallProducts(paywall: paywall) { [weak self] result in
-            Profiler.measure(.end, operation: .getProducts)
-            Profiler.measure(.end, operation: .getPaywallsAndProductsFromStart)
-
             guard let products = try? result.get() else { return }
 
             self?.products = products
 
             if products.hasUnknownEligibiity {
                 self?.loadPaywallProductsEnsuringEligibility()
-            } else {
-                Profiler.measure(.end, operation: .getPaywallsAndProductsWithEligibilityFromStart)
             }
         }
     }
@@ -72,11 +60,7 @@ class PurchasesObserver: ObservableObject {
     private func loadPaywallProductsEnsuringEligibility() {
         guard let paywall = paywall else { return }
 
-        Profiler.measure(.begin, operation: .getProducts)
         Adapty.getPaywallProducts(paywall: paywall, fetchPolicy: .waitForReceiptValidation) { [weak self] result in
-            Profiler.measure(.end, operation: .getProducts)
-            Profiler.measure(.end, operation: .getPaywallsAndProductsWithEligibilityFromStart)
-
             if let products = try? result.get() {
                 self?.products = products
             }
