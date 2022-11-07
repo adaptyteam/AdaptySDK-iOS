@@ -27,13 +27,23 @@ class PurchaseController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        configureInterface(presenter.paywall)
+        configureInterface(presenter.paywall, presenter.products)
 
         presenter.$paywall
-            .sink(receiveValue: { [weak self] paywall in
-                self?.configureInterface(paywall)
+            .sink(receiveValue: { [weak self] (paywall: Paywall) in
+                guard let self = self else { return }
+                self.configureInterface(paywall, self.presenter.products)
             })
             .store(in: &cancellable)
+        
+        presenter.$products
+            .sink(receiveValue: { [weak self] (products: [PaywallProduct]) in
+                guard let self = self else { return }
+                self.configureInterface(self.presenter.paywall, products)
+            })
+            .store(in: &cancellable)
+        
+        presenter.reloadProducts()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -42,10 +52,10 @@ class PurchaseController: UIViewController {
         presenter.logShowPaywall()
     }
 
-    private func configureInterface(_ paywall: PaywallModel) {
+    private func configureInterface(_ paywall: Paywall, _ products: [PaywallProduct]) {
         config = paywall.extractPurchaseConfiguration()
         configureTheme()
-        configureVariants(paywall)
+        configureVariants(paywall, products)
     }
 
     private func configureTheme() {
@@ -59,13 +69,13 @@ class PurchaseController: UIViewController {
         subtitleLabel.text = config.subtitle
     }
 
-    private func configureVariants(_ paywall: PaywallModel) {
+    private func configureVariants(_ paywall: Paywall, _ products: [PaywallProduct]) {
         for v in variantsContainer.arrangedSubviews {
             variantsContainer.removeArrangedSubview(v)
             v.removeFromSuperview()
         }
 
-        for product in paywall.products {
+        for product in products {
             let productView: IPurchaseButton = presenter.isHorizontalLayout ? PurchaseTallButton.instantiate() : PurchaseWideButton.instantiate()
             productView.update(product: product, config: config) { [weak self] in
                 self?.purchaseProductPressed(product)
@@ -84,13 +94,13 @@ class PurchaseController: UIViewController {
         }
     }
 
-    private func purchaseProductPressed(_ product: ProductModel) {
+    private func purchaseProductPressed(_ product: PaywallProduct) {
         setInProgress(true)
         presenter.makePurchase(product, completion: { [weak self] error in
             self?.setInProgress(false)
 
             if let error = error {
-                if let adaptyError = error as? AdaptyError, adaptyError.adaptyErrorCode == AdaptyError.AdaptyErrorCode.paymentCancelled {
+                if error.adaptyErrorCode == .paymentCancelled  {
                     // user cancelled
                 } else {
                     self?.showAlert(for: error)

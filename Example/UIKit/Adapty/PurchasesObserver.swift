@@ -10,9 +10,9 @@ import Adapty
 import Combine
 import Foundation
 
-extension PaywallModel {
-    var hasSKProducts: Bool {
-        products.first?.skProduct != nil
+extension Array where Element == PaywallProduct {
+    var hasUnknownEligibiity: Bool {
+        contains(where: { $0.introductoryOfferEligibility == .unknown })
     }
 }
 
@@ -20,53 +20,104 @@ class PurchasesObserver: ObservableObject {
     static let shared = PurchasesObserver()
     static let paywallId = "example_ab_test"
 
-    @Published var purchaserInfo: PurchaserInfoModel?
-    @Published var paywall: PaywallModel?
-    @Published var products: [ProductModel]?
-
-    func loadInitialPaywallData() {
-        Adapty.getPaywall(Self.paywallId) { [weak self] paywall, _ in
-            self?.paywall = paywall
-        }
-        
-        Adapty.getProducts(forceUpdate: true) { [weak self] products, error in
-            self?.products = products
+    @Published var profile: Profile?
+    @Published var products: [PaywallProduct]?
+    @Published var paywall: Paywall? {
+        didSet {
+            loadPaywallProducts()
         }
     }
 
-    func makePurchase(_ product: ProductModel, completion: ((Error?) -> Void)?) {
-        Adapty.makePurchase(product: product) { [weak self] purchaserInfo, _, _, _, error in
-            if let error = error {
-                completion?(error)
+    func loadInitialProfileData() {
+        Adapty.getProfile { [weak self] result in
+            self?.profile = try? result.get()
+        }
+    }
+
+    func loadInitialPaywallData() {
+        paywall = nil
+        products = nil
+
+        Profiler.measure(.begin, operation: .getPaywall)
+
+        Adapty.getPaywall(Self.paywallId) { [weak self] result in
+            self?.paywall = try? result.get()
+
+            Profiler.measure(.end, operation: .getPaywall)
+            Profiler.measure(.end, operation: .getPaywallsFromStart)
+        }
+    }
+
+    private func loadPaywallProducts() {
+        guard let paywall = paywall else { return }
+
+        Profiler.measure(.begin, operation: .getProducts)
+
+        Adapty.getPaywallProducts(paywall: paywall) { [weak self] result in
+            Profiler.measure(.end, operation: .getProducts)
+            Profiler.measure(.end, operation: .getPaywallsAndProductsFromStart)
+
+            guard let products = try? result.get() else { return }
+
+            self?.products = products
+
+            if products.hasUnknownEligibiity {
+                self?.loadPaywallProductsEnsuringEligibility()
             } else {
-                self?.purchaserInfo = purchaserInfo
-                completion?(nil)
+                Profiler.measure(.end, operation: .getPaywallsAndProductsWithEligibilityFromStart)
             }
         }
     }
 
-    func restore(completion: ((Error?) -> Void)?) {
-        Adapty.restorePurchases { [weak self] purchaserInfo, _, _, error in
-            if let error = error {
-                completion?(error)
-            } else {
-                self?.purchaserInfo = purchaserInfo
+    private func loadPaywallProductsEnsuringEligibility() {
+        guard let paywall = paywall else { return }
+
+        Profiler.measure(.begin, operation: .getProducts)
+        Adapty.getPaywallProducts(paywall: paywall, fetchPolicy: .waitForReceiptValidation) { [weak self] result in
+            Profiler.measure(.end, operation: .getProducts)
+            Profiler.measure(.end, operation: .getPaywallsAndProductsWithEligibilityFromStart)
+
+            if let products = try? result.get() {
+                self?.products = products
+            }
+        }
+    }
+
+    func makePurchase(_ product: PaywallProduct, completion: ((AdaptyError?) -> Void)?) {
+        Adapty.makePurchase(product: product) { [weak self] result in
+            switch result {
+            case let .success(profile):
+                self?.profile = profile
                 completion?(nil)
+            case let .failure(error):
+                completion?(error)
+            }
+        }
+    }
+
+    func restore(completion: ((AdaptyError?) -> Void)?) {
+        Adapty.restorePurchases { [weak self] result in
+            switch result {
+            case let .success(profile):
+                self?.profile = profile
+                completion?(nil)
+            case let .failure(error):
+                completion?(error)
             }
         }
     }
 }
 
 extension PurchasesObserver: AdaptyDelegate {
-    func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel) {
-        self.purchaserInfo = purchaserInfo
+    func didLoadLatestProfile(_ profile: Profile) {
+        self.profile = profile
     }
 
-    func paymentQueue(shouldAddStorePaymentFor product: ProductModel, defermentCompletion makeDeferredPurchase: @escaping DeferredPurchaseCompletion) {
+    func paymentQueue(shouldAddStorePaymentFor product: DeferredProduct, defermentCompletion makeDeferredPurchase: @escaping (ResultCompletion<Profile>?) -> Void) {
         // you can store makeDeferredPurchase callback and call it later as well
-
         // or you can call it right away in case you just want to continue purchase
-        makeDeferredPurchase { _, _, _, _, _ in
+
+        makeDeferredPurchase { _ in
             // check your purchase
         }
     }

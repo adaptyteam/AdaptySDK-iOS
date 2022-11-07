@@ -1,88 +1,151 @@
 {
-  "identifier" : "2F72209A",
+  "identifier" : "05DEFA8C",
   "nonRenewingSubscriptions" : [
 
   ],
   "products" : [
     {
-      "displayPrice" : "1.99",
+      "displayPrice" : "0.99",
       "familyShareable" : false,
-      "internalID" : "C76D64AA",
+      "internalID" : "1643891513",
       "localizations" : [
         {
-          "description" : "",
-          "displayName" : "",
+          "description" : "Delicious Apples (99 items)",
+          "displayName" : "Delicious Apples",
           "locale" : "en_US"
         }
       ],
-      "productID" : "coins_pack_100",
-      "referenceName" : "Coins Pack 100",
+      "productID" : "consumable_apples_99",
+      "referenceName" : "Apples",
       "type" : "Consumable"
     },
     {
-      "displayPrice" : "4.99",
+      "displayPrice" : "99.99",
       "familyShareable" : false,
-      "internalID" : "74A52D44",
+      "internalID" : "1647813976",
       "localizations" : [
         {
-          "description" : "",
-          "displayName" : "",
+          "description" : "Unlimited Subscription Description",
+          "displayName" : "Unlimited Subscription",
           "locale" : "en_US"
         }
       ],
-      "productID" : "coins_pack_200",
-      "referenceName" : "Coins Pack 200",
-      "type" : "Consumable"
+      "productID" : "unlimited.9999",
+      "referenceName" : "Lifetime",
+      "type" : "NonConsumable"
     }
   ],
   "settings" : {
-
+    "_compatibilityTimeRate" : 6,
+    "_timeRate" : 15
   },
   "subscriptionGroups" : [
     {
-      "id" : "FAB46265",
+      "id" : "20770576",
       "localizations" : [
 
       ],
-      "name" : "AutoRenewable",
+      "name" : "Demo Group",
       "subscriptions" : [
         {
           "adHocOffers" : [
 
           ],
-          "displayPrice" : "5.99",
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
           "familyShareable" : false,
           "groupNumber" : 1,
-          "internalID" : "515747CB",
+          "internalID" : "1564759952",
           "introductoryOffer" : {
-            "displayPrice" : "",
-            "internalID" : "32524E3C",
+            "internalID" : "DEF5140C",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Premium monthly",
+              "displayName" : "Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "monthly.premium.999",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Monthly Premium",
+          "subscriptionGroupID" : "20770576",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "5.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "1564765343",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Monthly Premium",
+              "displayName" : "Premium",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "weekly.premium.599",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "Weekly Premium",
+          "subscriptionGroupID" : "20770576",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+            {
+              "displayPrice" : "29.99",
+              "internalID" : "2247EC53",
+              "numberOfPeriods" : 1,
+              "offerID" : "promo50off",
+              "paymentMode" : "payAsYouGo",
+              "referenceName" : "Promo discount",
+              "subscriptionPeriod" : "P1Y"
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "69.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "1576337253",
+          "introductoryOffer" : {
+            "displayPrice" : "29.99",
+            "internalID" : "5346184C",
             "numberOfPeriods" : 1,
             "paymentMode" : "payAsYouGo",
             "subscriptionPeriod" : "P1Y"
           },
           "localizations" : [
             {
-              "description" : "",
-              "displayName" : "",
+              "description" : "Yearly premium",
+              "displayName" : "Premium",
               "locale" : "en_US"
             }
           ],
-          "productID" : "basic_subscription_1_year",
+          "productID" : "yearly.premium.6999",
           "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Basic Subscription 1 Year",
-          "subscriptionGroupID" : "FAB46265",
+          "referenceName" : "Yearly Premium",
+          "subscriptionGroupID" : "20770576",
           "type" : "RecurringSubscription"
         }
       ]
     }
   ],
-  "subscriptionOffersKeyPair" : {
-    "id" : "DDD4A10A",
-    "privateKey" : "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgXqGqZoHiFld3juqqaMj4tegxFaLeB+U2haeE8B+iDPCgCgYIKoZIzj0DAQehRANCAATf6q+YIzFNSzc9KDmCBP0HxmPXTZz5IPajdwEusW3e4lG9tfU91weJkJ+a3SALGWeXrmrZmO2cSqeFMllJYCf9"
-  },
   "version" : {
-    "major" : 1,
-    "minor" : 1
+    "major" : 2,
+    "minor" : 0
   }
 }

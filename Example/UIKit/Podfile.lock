@@ -1,21 +1,19 @@
 PODS:
-  - Adapty (1.18.0)
+  - Adapty (2.0.0)
   - Adjust (4.29.6):
     - Adjust/Core (= 4.29.6)
   - Adjust/Core (4.29.6)
   - AppsFlyerFramework (6.6.0):
     - AppsFlyerFramework/Main (= 6.6.0)
   - AppsFlyerFramework/Main (6.6.0)
-  - Branch (0.33.1):
-    - Branch/Core (= 0.33.1)
-  - Branch/Core (0.33.1)
+  - Branch (1.44.0)
   - Nimble (9.2.1)
 
 DEPENDENCIES:
   - Adapty (from `../../`)
   - Adjust (~> 4.29.6)
   - AppsFlyerFramework (~> 6.6.0)
-  - Branch (~> 0.33.1)
+  - Branch
   - Nimble
 
 SPEC REPOS:
@@ -30,12 +28,12 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Adapty: 4b69b0155a4a9c123de53cdec6c7a858611e25d2
+  Adapty: cc1891b28242dc7a451d97491db1923f9c2b3a46
   Adjust: 94f1c99429fb2a7ebe530294fd66a88d63a54922
   AppsFlyerFramework: 55821f40c687dc7a683835eeb821994cef437807
-  Branch: 65d05ffb137ef504777cff6bd4fb6f770f17145a
+  Branch: 7ef075130253915439cec12fa99027f587a72d00
   Nimble: e7e615c0335ee4bf5b0d786685451e62746117d5
 
-PODFILE CHECKSUM: 8ea3e70c26059048851b2420340e097d582a16cd
+PODFILE CHECKSUM: 35f6fb17b577c20ae0db0044e3f3c745fff40e48
 
 COCOAPODS: 1.11.3

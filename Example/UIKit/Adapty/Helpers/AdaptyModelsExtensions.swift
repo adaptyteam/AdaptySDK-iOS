@@ -8,7 +8,7 @@
 
 import Adapty
 
-extension ProductDiscountModel.PaymentMode {
+extension ProductDiscount.PaymentMode {
     var title: String {
         switch self {
         case .payAsYouGo:
@@ -18,7 +18,7 @@ extension ProductDiscountModel.PaymentMode {
         case .freeTrial:
             return "Free Trial"
         case .unknown:
-            return "Unknown Type"
+            return "Unknown"
         }
     }
 }

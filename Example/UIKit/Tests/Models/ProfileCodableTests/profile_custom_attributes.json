@@ -1,0 +1,18 @@
+{
+      "app_id": "14c3d623-2f3a-455a-aa86-ef83dff6913b",
+      "profile_id": "b8937cc3-27be-417b-931f-a710c5e69c6f",
+      "customer_user_id": null,
+      "total_revenue_usd": 0.0,
+      "paid_access_levels": null,
+      "subscriptions": null,
+      "non_subscriptions": null,
+      "custom_attributes": {
+        "custom_bool": 1.0,
+        "custom_float": 1984.84,
+        "custom_int": 123.0,
+        "custom_string": "str_value",
+        "custom_uint": 234.0
+      },
+      "promotional_offer_eligibility": false,
+      "introductory_offer_eligibility": true
+}

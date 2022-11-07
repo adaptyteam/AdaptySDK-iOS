@@ -28,7 +28,7 @@ extension PurchaseConfiguration {
     static let `default` = PurchaseConfiguration(title: "Title", subtitle: "Subtitle", accentColor: .systemBlue, backgroundColor: .systemBackground)
 }
 
-extension PaywallModel {
+extension Paywall {
     func isHorizontal() -> Bool {
         customPayload?["is_horizontal"] as? Bool ?? false
     }

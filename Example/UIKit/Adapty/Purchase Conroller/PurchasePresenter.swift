@@ -15,12 +15,14 @@ class PurchasePresenter: ObservableObject {
 
     let isHorizontalLayout: Bool
 
-    @Published var paywall: PaywallModel
+    @Published var paywall: Paywall
+    @Published var products: [PaywallProduct]
 
     private var isUpToDate = false
 
-    init(paywall: PaywallModel, isHorizontalLayout: Bool) {
+    init(paywall: Paywall, products: [PaywallProduct], isHorizontalLayout: Bool) {
         self.paywall = paywall
+        self.products = products
         self.isHorizontalLayout = isHorizontalLayout
 
         PurchasesObserver.shared.$paywall
@@ -32,7 +34,15 @@ class PurchasePresenter: ObservableObject {
             .store(in: &cancellable)
     }
 
-    func makePurchase(_ product: ProductModel, completion: ((Error?) -> Void)?) {
+    func reloadProducts() {
+        Adapty.getPaywallProducts(paywall: paywall) { [weak self] result in
+            if let products = try? result.get() {
+                self?.products = products
+            }
+        }
+    }
+
+    func makePurchase(_ product: PaywallProduct, completion: ((AdaptyError?) -> Void)?) {
         PurchasesObserver.shared.makePurchase(product, completion: completion)
     }
 

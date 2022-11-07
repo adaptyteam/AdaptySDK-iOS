@@ -1,5 +1,4 @@
 use_frameworks!
-inhibit_all_warnings!
 
 target 'Adapty_Example' do
   project 'Adapty.xcodeproj'
@@ -7,7 +6,7 @@ target 'Adapty_Example' do
   
   pod 'Adjust', '~> 4.29.6'
   pod 'AppsFlyerFramework', '~> 6.6.0'
-  pod 'Branch', '~> 0.33.1'
+  pod 'Branch'
 
   target 'Adapty_Tests' do
     inherit! :search_paths

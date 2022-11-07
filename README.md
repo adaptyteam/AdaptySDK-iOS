@@ -13,7 +13,7 @@
 <a href="http://bit.ly/3qXy7cf"><img src="https://img.shields.io/cocoapods/v/Adapty.svg?style=flat"></a>
 <a href="https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE"><img src="https://img.shields.io/cocoapods/l/Adapty.svg?style=flat"></a>
 <a href="http://bit.ly/3qXy7cf2"><img src="https://img.shields.io/cocoapods/p/Adapty.svg?style=flat"></a>
-<a href="https://docs.adapty.io/docs/ios-sdk-installation#install-via-swift-package-manager?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg"></a>
+<a href="https://docs.adapty.io/v2.0.0/docs/ios-sdk-installation#install-via-swift-package-manager?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg"></a>
 </p>
 
 ![Adapty: CRM for mobile apps with subscriptions](https://adapty-portal-media-production.s3.amazonaws.com/github/adapty-schema.png)
@@ -22,11 +22,11 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 
 ## Why Adapty?
 
-- [On-the-fly paywalls price testing](https://docs.adapty.io/docs/ab-test?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Test different prices, duration, offers, messages, and designs simultaneously, all without new app releases.
-- [Full customer's payment history](https://docs.adapty.io/docs/profiles-crm?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Explore the user's payment events from the trial start to subscription cancellation or billing issues.
-- [In-app purchase data integration](https://docs.adapty.io/docs/events?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Send subscription events to 3rd-party analytics, attribution, and ad services with no coding, even if the user uninstalls the app.
-- [No server code implementation](https://docs.adapty.io/docs/ios-sdk-configuration?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Integrate in-app purchases with server-side receipt validation in minutes. Apple Promotional Offers supported out-of-the-box.
-- [Advanced analytics](https://docs.adapty.io/docs/analytics-charts?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Analyze your app real-time metrics with advanced filters, such as Ad network, Ad campaign, country, A/B test, etc.
+- [On-the-fly paywalls price testing](https://docs.adapty.io/v2.0.0/docs/ab-test?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Test different prices, duration, offers, messages, and designs simultaneously, all without new app releases.
+- [Full customer's payment history](https://docs.adapty.io/v2.0.0/docs/profiles-crm?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Explore the user's payment events from the trial start to subscription cancellation or billing issues.
+- [In-app purchase data integration](https://docs.adapty.io/v2.0.0/docs/events?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Send subscription events to 3rd-party analytics, attribution, and ad services with no coding, even if the user uninstalls the app.
+- [No server code implementation](https://docs.adapty.io/v2.0.0/docs/ios-sdk-configuration?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Integrate in-app purchases with server-side receipt validation in minutes. Apple Promotional Offers supported out-of-the-box.
+- [Advanced analytics](https://docs.adapty.io/v2.0.0/docs/analytics-charts?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Analyze your app real-time metrics with advanced filters, such as Ad network, Ad campaign, country, A/B test, etc.
 
 <h3 align="center" style="border-bottom: none; margin-top: -15px; margin-bottom: -15px; font-size: 150%">
 <a href="https://adapty.io/schedule-demo?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS_schedule-demo">Talk to Us to Learn More</a>
@@ -49,9 +49,12 @@ import Adapty
 Adapty.activate("YOUR_APP_KEY")
 
 // Make a purchase, Adapty handles the rest
-Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response, error) in
-    if error == nil {
-       // successful purchase
+Adapty.makePurchase(product: product) { [weak self] result in
+    switch result {
+        case let .success(profile):
+            // check access level
+    case let .failure(error):
+            // handle error
     }
 }
 ```
@@ -71,7 +74,7 @@ Adapty.makePurchase(product: <product>, offerId: <offerid>) { (receipt, response
 
 ## Real-time Analytics for Your iOS App
 
-![Adapty: How Adapty works](https://adapty-portal-media-production.s3.amazonaws.com/github/analyticss.gif)
+![Adapty: How Adapty works](https://adapty-portal-media-production.s3.amazonaws.com/github/analytics-new.gif)
 
 - Manage the subscription's state without managing transactions.
 - 99.5% accuracy with App Store Connect.
@@ -95,8 +98,8 @@ Ask questions, participate in discussions about Adapty-related topics, become a 
 
 ## Getting Started
 
-### 1. [Installing the iOS SDK via CocoaPods or Swift Package Manager](https://docs.adapty.io/docs/ios-installation)
-### 2. [Importing, configuring, and setting up the logging](https://docs.adapty.io/docs/ios-configuring)
+### 1. [Installing the iOS SDK via CocoaPods or Swift Package Manager](https://docs.adapty.io/v2.0.0/docs/ios-installation)
+### 2. [Importing, configuring, and setting up the logging](https://docs.adapty.io/v2.0.0/docs/ios-configuring)
 
 In your `AppDelegate` class:
 ```swift
@@ -108,60 +111,82 @@ And add the following to `application(_:didFinishLaunchingWithOptions:):`
 Adapty.activate("PUBLIC_SDK_KEY", customerUserId: "YOUR_USER_ID")
 ```
 
-### 3. [Fetching and displaying products for paywalls in your app](https://docs.adapty.io/docs/ios-displaying-products)
+### 3. [Fetching and displaying products for paywalls in your app](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products)
 
 The Adapty iOS SDK allows you to remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without having to release a new version of the app.
 
-To fetch the products, you have to call `.getPaywalls()` method:
+To fetch the paywall, you have to call `.getPaywall()` method:
 ```swift
-Adapty.getPaywalls(forceUpdate: Bool) { (paywalls, products, error) in
-    if error == nil {
-       // retrieve the products from paywalls
-   }
+Adapty.getPaywall("YOUR_PAYWALL_ID") { result in
+    switch result {
+        case let .success(paywall):
+            // the requested paywall
+        case let .failure(error):
+            // handle the error
+    }
 }
 ```
 
-### 4. [Making and restoring mobile purchases](https://docs.adapty.io/docs/ios-making-purchases)
+Once you have the paywall, you can query the product array that corresponds to it:
+
+```swift
+Adapty.getPaywallProducts(paywall: paywall) { result in    
+    switch result {
+    case let .success(products):
+        // the requested products array
+    case let .failure(error):
+        // handle the error
+    }
+}
+```
+
+### 4. [Making and restoring mobile purchases](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
 
 To make the purchase, you have to call `.makePurchase()` method:
 ```swift
-Adapty.makePurchase(product: <product>, offerId: <offerid>) { ( purchaseInfo, receipt, appleValidationResult, product, error) in
-    if error == nil {
-       // successful purchase
-   }
+let product = products.first
+
+Adapty.makePurchase(product: product) { result in
+    switch result {
+    case let .success(profile):
+        // successful purchase
+    case let .failure(error):
+        // handle the error
+    }
 }
 ```
 
-### 5. [Getting info about the user subscription status and granting access to the premium features of the app](https://docs.adapty.io/docs/ios-subscription-status)
+### 5. [Getting info about the user subscription status and granting access to the premium features of the app](https://docs.adapty.io/v2.0.0/docs/ios-subscription-status)
 
-With the Adapty iOS App SDK you don't have to hardcode product IDs to check the subscription status. You just have to verify that the user has an active access level. To do this, you have to call `.getPurchaserInfo()` method:
+With the Adapty iOS App SDK you don't have to hardcode product IDs to check the subscription status. You just have to verify that the user has an active access level. To do this, you have to call `.getProfile()` method:
 ```swift
-Adapty.getPurchaseInfo(forceUpdate: Bool) { ( purchaseInfo, error) in
-    if error == nil {
-       // check the access
-   }
+Adapty.getProfile { result in
+    if let profile = try? result.get(), 
+           profile.accessLevels["premium"]?.isActive ?? false {
+        // grant access to premium features
+    }
 }
 ```
 
-### 6. [Identifying the users of your app](https://docs.adapty.io/docs/ios-identifying-users)
+### 6. [Identifying the users of your app](https://docs.adapty.io/v2.0.0/docs/ios-identifying-users)
 
 Adapty creates an internal profile ID for every user. But if you have your own authentification system, you should set your own Customer User ID. You can find the users by the Customer User ID in Profiles. It can be used in the server-side API and then sent to all integrations.
 
-### 7. [Attribution Integration](https://docs.adapty.io/docs/attribution-integration)
+### 7. [Attribution Integration](https://docs.adapty.io/v2.0.0/docs/attribution-integration)
 
 Adapty SDK supports AppsFlyer, Adjust, Branch, Facebook Ads, and Apple Search Ads.
 
-### 8. [Setting User Attributes](https://docs.adapty.io/docs/setting-user-attributes)
+### 8. [Setting User Attributes](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
 
 You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user segments or just view them in CRM.
 
-### 9. [Analytics Integration](https://docs.adapty.io/docs/analytics-integration)
+### 9. [Analytics Integration](https://docs.adapty.io/v2.0.0/docs/analytics-integration)
 
 Adapty sends all subscription events to analytical services, such as Amplitude, Mixpanel, and AppMetrica.
 
-### 10. [Error Handling (SKError, NSError, Error)](https://docs.adapty.io/docs/ios-sdk-error-handling-skerror-nserror-error)
+### 10. [Error Handling](https://docs.adapty.io/v2.0.0/docs/ios-sdk-error-handling)
 
-### 11. [SDK Models](https://docs.adapty.io/docs/ios-sdk-sdk-models)
+### 11. [SDK Models](https://docs.adapty.io/v2.0.0/docs/sdk-models)
 
 ## Contributing
 

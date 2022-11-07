@@ -5,30 +5,23 @@
 //  Copyright © 2022 Adapty. All rights reserved.
 //
 
-extension Adapty {
-    public typealias MakePurchaseResult = (
-        purchaserInfo: PurchaserInfoModel?,
-        receipt: String?,
-        appleValidationResult: Parameters?,
-        product: ProductModel?
-    )
-
-    public typealias RestorePurchasesResult = (
-        purchaserInfo: PurchaserInfoModel?,
-        receipt: String?,
-        appleValidationResult: Parameters?
-    )
-
-    public typealias SyncTransactionsHistoryResult = (
-        parameters: Parameters?,
-        products: [ProductModel]?
-    )
-}
+import Foundation
 
 #if canImport(_Concurrency) && compiler(>=5.5.2)
     @available(macOS 10.15, iOS 13.0.0, watchOS 6.0, tvOS 13.0, *)
     extension Adapty {
-        public static func activate(_ apiKey: String, observerMode: Bool, customerUserId: String?) async throws {
+        /// Use this method to initialize the Adapty SDK.
+        ///
+        /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
+        ///
+        /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
+        /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
+        /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
+        /// - Parameter customerUserId: User identifier in your system
+        public static func activate(_ apiKey: String,
+                                    observerMode: Bool = false,
+                                    customerUserId: String? = nil,
+                                    dispatchQueue: DispatchQueue = .main) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.activate(apiKey, observerMode: observerMode, customerUserId: customerUserId) { error in
                     if let error = error {
@@ -41,6 +34,12 @@ extension Adapty {
             }
         }
 
+        /// Use this method for identifying user with it's user id in your system.
+        ///
+        /// If you don't have a user id on SDK configuration, you can set it later at any time with `.identify()` method. The most common cases are after registration/authorization when the user switches from being an anonymous user to an authenticated user.
+        ///
+        /// - Parameters:
+        ///   - customerUserId: User identifier in your system.
         public static func identify(_ customerUserId: String) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.identify(customerUserId) { error in
@@ -54,7 +53,30 @@ extension Adapty {
             }
         }
 
-        public static func updateProfile(params: ProfileParameterBuilder) async throws {
+        /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
+        ///
+        /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates Profile cache on a regular basis, in order to keep this information as up-to-date as possible.
+        ///
+        /// - Parameter completion: the result containing a `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        public static func getProfile() async throws -> Profile? {
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.getProfile { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(profile):
+                        continuation.resume(returning: profile)
+                    }
+                }
+            }
+        }
+
+        /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://docs.adapty.io/v2.0.0/docs/segments) or just view them in CRM.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
+        ///
+        /// - Parameter params: use `ProfileParameters.Builder` class to build this object.
+        public static func updateProfile(params: ProfileParameters) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.updateProfile(params: params) { error in
                     if let error = error {
@@ -69,7 +91,7 @@ extension Adapty {
 
         public static func updateAttribution(
             _ attribution: [AnyHashable: Any],
-            source: AttributionNetwork,
+            source: AttributionSource,
             networkUserId: String? = nil
         ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
@@ -84,107 +106,101 @@ extension Adapty {
             }
         }
 
-        public static func getPaywall(_ id: String) async throws -> PaywallModel? {
+        /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
+        ///
+        /// - Parameters:
+        ///   - id: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
+        /// - Returns: The `Paywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+        /// - Throws: An `AdaptyError` object
+        public static func getPaywall(_ id: String) async throws -> Paywall? {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPaywall(id) { paywall, error in
-                    if let error = error {
-                        return continuation.resume(throwing: error)
+                Adapty.getPaywall(id) { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(paywall):
+                        continuation.resume(returning: paywall)
                     }
-                    continuation.resume(
-                        returning: paywall
-                    )
                 }
             }
         }
 
-        public static func getProducts(forceUpdate: Bool = false) async throws -> [ProductModel]? {
+        /// Once you have a `Paywall`, fetch corresponding products array using this method.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
+        ///
+        /// - Parameters:
+        ///   - paywall: the `Paywall` for which you want to get a products
+        ///   - fetchPolicy: the `ProductsFetchPolicy` value defining the behavior of the function at the time of the missing receipt
+        /// - Returns: A result containing the `PaywallProduct` objects array. You can present them in your UI
+        /// - Throws: An `AdaptyError` object
+        public static func getPaywallProducts(paywall: Paywall, fetchPolicy: ProductsFetchPolicy = .default) async throws -> [PaywallProduct]? {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getProducts(forceUpdate: forceUpdate) { products, error in
-                    if let error = error {
-                        return continuation.resume(throwing: error)
+                Adapty.getPaywallProducts(paywall: paywall, fetchPolicy: fetchPolicy) { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(products):
+                        continuation.resume(returning: products)
                     }
-                    continuation.resume(
-                        returning: products
-                    )
                 }
             }
         }
 
-        public static func makePurchase(
-            product: ProductModel,
-            offerID: String? = nil
-        ) async throws -> MakePurchaseResult {
+        /// To make the purchase, you have to call this method.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
+        ///
+        /// - Parameters:
+        ///   - product: a `PaywallProduct` object retrieved from the paywall.
+        /// - Returns: The `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        /// - Throws: An `AdaptyError` object
+        public static func makePurchase(product: PaywallProduct) async throws -> Profile {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.makePurchase(
-                    product: product,
-                    offerId: offerID,
-                    completion: { purchaserInfo, receipt, appleValidationResult, product, error in
-                        if let error = error {
-                            return continuation.resume(throwing: error)
-                        }
-                        continuation.resume(
-                            returning: (purchaserInfo, receipt, appleValidationResult, product)
-                        )
+                Adapty.makePurchase(product: product) { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(response):
+                        continuation.resume(returning: response)
                     }
-                )
-            }
-        }
-
-        public static func restorePurchases() async throws -> RestorePurchasesResult {
-            return try await withCheckedThrowingContinuation { continuation in
-                Adapty.restorePurchases { purchaserInfo, receipt, appleValidationResult, error in
-                    if let error = error {
-                        return continuation.resume(throwing: error)
-                    }
-                    continuation.resume(
-                        returning: (purchaserInfo, receipt, appleValidationResult)
-                    )
                 }
             }
         }
 
-        public static func syncTransactionsHistory() async throws -> SyncTransactionsHistoryResult {
+        /// To restore purchases, you have to call this method.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
+        ///
+        /// - Returns: The `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        /// - Throws: An `AdaptyError` object
+        public static func restorePurchases() async throws -> Profile {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.syncTransactionsHistory { parameters, products, error in
-                    if let error = error {
-                        return continuation.resume(throwing: error)
+                Adapty.restorePurchases { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(response):
+                        continuation.resume(returning: response)
                     }
-                    continuation.resume(
-                        returning: (parameters, products)
-                    )
                 }
             }
         }
 
-        public static func getPurchaserInfo(forceUpdate: Bool = false) async throws -> PurchaserInfoModel? {
+        /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
+        ///
+        /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#fallback-paywalls)
+        ///
+        /// - Parameters:
+        ///   - paywalls: a JSON representation of your paywalls/products list in the exact same format as provided by Adapty backend.
+        /// - Throws: An `AdaptyError` object
+        public static func setFallbackPaywalls(_ paywalls: Data) async throws {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPurchaserInfo(forceUpdate: forceUpdate) { purchaserInfo, error in
-                    if let error = error {
-                        return continuation.resume(throwing: error)
-                    }
-                    continuation.resume(
-                        returning: purchaserInfo
-                    )
-                }
-            }
-        }
-
-    public static func setFallbackPaywalls(_ paywalls: String) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            Adapty.setFallbackPaywalls(paywalls) { error in
-                if let error = error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
-
-        public static func logShowPaywall(_ paywall: PaywallModel) async throws {
-            return try await withCheckedThrowingContinuation { continuation in
-                Adapty.logShowPaywall(paywall) { error in
+                Adapty.setFallbackPaywalls(paywalls) { error in
                     if let error = error {
                         return continuation.resume(throwing: error)
                     }
@@ -195,9 +211,20 @@ extension Adapty {
             }
         }
 
-        public static func setExternalAnalyticsEnabled(_ enabled: Bool) async throws {
+        /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
+        ///
+        /// Adapty helps you to measure the performance of the paywalls. We automatically collect all the metrics related to purchases except for paywall views. This is because only you know when the paywall was shown to a customer.
+        /// Whenever you show a paywall to your user, call .logShowPaywall(paywall) to log the event, and it will be accumulated in the paywall metrics.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
+        ///
+        /// - Parameters:
+        ///   - paywall: A `Paywall` object.
+        ///  - Throws: An `AdaptyError` object
+        public static func logShowPaywall(_ paywall: Paywall) async throws {
+            let params = PaywallShowedParameters(variationId: paywall.variationId)
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.setExternalAnalyticsEnabled(enabled) { error in
+                Adapty.logShowPaywall(params) { error in
                     if let error = error {
                         return continuation.resume(throwing: error)
                     }
@@ -208,6 +235,39 @@ extension Adapty {
             }
         }
 
+        /// Call this method to keep track of the user's steps while onboarding
+        ///
+        /// The onboarding stage is a very common situation in modern mobile apps. The quality of its implementation, content, and number of steps can have a rather significant influence on further user behavior, especially on his desire to become a subscriber or simply make some purchases.
+        ///
+        /// In order for you to be able to analyze user behavior at this critical stage without leaving Adapty, we have implemented the ability to send dedicated events every time a user visits yet another onboarding screen.
+        ///
+        /// - Parameters:
+        ///   - name: Name of your onboarding.
+        ///   - screenName: Readable name of a particular screen as part of onboarding.
+        ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
+        /// - Throws: An `AdaptyError` object
+        public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
+            let params = OnboardingScreenParameters(name: name,
+                                                    screenName: screenName,
+                                                    screenOrder: screenOrder)
+
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.logShowOnboarding(params) { error in
+                    if let error = error {
+                        return continuation.resume(throwing: error)
+                    }
+                    continuation.resume(
+                        returning: ()
+                    )
+                }
+            }
+        }
+
+        /// In Observer mode, Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+        ///
+        /// - Parameters:
+        ///   - variationId:  A string identifier of variation. You can get it using variationId property of `Paywall`.
+        ///   - transactionId: A string identifier of your purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
         public static func setVariationId(
             _ variationId: String,
             forTransactionId transactionId: String
@@ -224,6 +284,8 @@ extension Adapty {
             }
         }
 
+        /// You can logout the user anytime by calling this method.
+        /// - Parameter completion: Result callback.
         public static func logout() async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.logout { error in

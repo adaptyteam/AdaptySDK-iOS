@@ -22,7 +22,7 @@ class PurchaseWideButton: UIView, IPurchaseButton {
         layer.cornerRadius = 12.0
     }
 
-    func update(product: ProductModel, config: PurchaseConfiguration, action: @escaping () -> Void) {
+    func update(product: PaywallProduct, config: PurchaseConfiguration, action: @escaping () -> Void) {
         defer {
             onAction = action
 
@@ -51,7 +51,7 @@ class PurchaseWideButton: UIView, IPurchaseButton {
         }
 
         if let discount = product.introductoryDiscount {
-            if !product.introductoryOfferEligibility {
+            if product.introductoryOfferEligibility != .eligible {
                 subtitleLabel.text = "Not Eligble for Discount"
             } else {
                 switch (discount.subscriptionPeriod.unit, discount.subscriptionPeriod.numberOfUnits) {

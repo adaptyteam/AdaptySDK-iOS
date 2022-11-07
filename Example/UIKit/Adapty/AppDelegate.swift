@@ -7,87 +7,43 @@
 //
 
 import Adapty
-import Adjust
-import AppsFlyerLib
-import Branch
 import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
+    private func instantiateTestingController() -> UIViewController {
+        UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TestingController")
+    }
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        if let _ = NSClassFromString("XCTest") {
-            // If we're running tests, don't launch the main storyboard
-            let viewController = UIViewController()
-            let label = UILabel()
-            label.text = "Running tests..."
-            label.frame = viewController.view.frame
-            label.textAlignment = .center
-            label.textColor = .white
-            viewController.view.addSubview(label)
-            window?.rootViewController = viewController
+        if NSClassFromString("XCTest") != nil {
+            window?.rootViewController = instantiateTestingController()
             return true
         }
 
-        Adapty.logLevel = .verbose
-        Adapty.activate(AppConstants.adaptyApiKey, observerMode: false, customerUserId: nil)
+        Adapty.logLevel = .debug
         Adapty.delegate = PurchasesObserver.shared
+        Adapty.setLogHandler { level, message in
+            LogsObserver.shared.postMessage(level, message)
+            NSLog("%@", message)
+        }
+
+        Adapty.activate(AppConstants.adaptyApiKey) { _ in
+            PurchasesObserver.shared.loadInitialProfileData()
+            PurchasesObserver.shared.loadInitialPaywallData()
+        }
 
         // in case you have / want to use fallback paywalls
-        if let path = Bundle.main.path(forResource: "fallback_paywalls", ofType: "json"), let paywalls = try? String(contentsOfFile: path, encoding: .utf8) {
-            Adapty.setFallbackPaywalls(paywalls) { _ in
-                PurchasesObserver.shared.loadInitialPaywallData()
+        if let urlPath = Bundle.main.url(forResource: "fallback_paywalls", withExtension: "json"),
+           let paywallsData = try? Data(contentsOf: urlPath) {
+            Adapty.setFallbackPaywalls(paywallsData) { _ in
             }
         }
 
-        // Configure Adjust
-        
-        let config = ADJConfig(appToken: AppConstants.adjustAppToken, environment: ADJEnvironmentProduction)
-        config?.delegate = self
-        Adjust.appDidLaunch(config)
-
-        // Configure AppsFlyer
-        AppsFlyerLib.shared().appsFlyerDevKey = AppConstants.appsFlyerDevKey
-        AppsFlyerLib.shared().appleAppID = AppConstants.appleAppId
-        AppsFlyerLib.shared().delegate = self
-        AppsFlyerLib.shared().isDebug = true
-        
-        // Configure Branch
-        Branch.getInstance().initSession(launchOptions: launchOptions) { (data, error) in
-            if let data = data {
-                Adapty.updateAttribution(data, source: .branch)
-            }
-        }
-        
-        // Configure Branch
-        Branch.getInstance().setIdentity("YOUR_USER_ID")
-        Branch.getInstance().initSession(launchOptions: launchOptions) { data, _ in
-            if let data = data {
-                Adapty.updateAttribution(data, source: .branch)
-            }
-        }
+        configureThirdPartyAnalytics(launchOptions)
 
         return true
-    }
-}
-
-extension AppDelegate: AdjustDelegate {
-    func adjustAttributionChanged(_ attribution: ADJAttribution?) {
-        // Just pass Adjust attribution to Adapty SDK
-        if let attribution = attribution?.dictionary() {
-            Adapty.updateAttribution(attribution, source: .adjust)
-        }
-    }
-}
-
-extension AppDelegate: AppsFlyerLibDelegate {
-    func onConversionDataSuccess(_ conversionInfo: [AnyHashable: Any]) {
-        // It's important to include the network user ID
-        Adapty.updateAttribution(conversionInfo, source: .appsflyer, networkUserId: AppsFlyerLib.shared().getAppsFlyerUID())
-    }
-
-    func onConversionDataFail(_ error: Error) {
-        // handle error
     }
 }
