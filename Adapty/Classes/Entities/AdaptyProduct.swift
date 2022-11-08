@@ -1,5 +1,5 @@
 //
-//  Product.swift
+//  AdaptyProduct.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -7,12 +7,12 @@
 
 import StoreKit
 
-public protocol Product {
+public protocol AdaptyProduct {
     var vendorProductId: String { get }
     var skProduct: SKProduct { get }
 }
 
-extension Product {
+extension AdaptyProduct {
     /// A description of the product.
     ///
     /// The description's language is determined by the storefront that the user's device is connected to, not the preferred language set on the device.
@@ -46,17 +46,17 @@ extension Product {
     }
 
     /// The period details for products that are subscriptions. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
-    public var subscriptionPeriod: ProductSubscriptionPeriod? {
+    public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
         if #available(iOS 11.2, macOS 10.14.4, *), let period = skProduct.subscriptionPeriod {
-            return ProductSubscriptionPeriod(subscriptionPeriod: period)
+            return AdaptyProductSubscriptionPeriod(subscriptionPeriod: period)
         }
         return nil
     }
 
     /// The object containing introductory price information for the product. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
-    public var introductoryDiscount: ProductDiscount? {
+    public var introductoryDiscount: AdaptyProductDiscount? {
         if #available(iOS 11.2, macOS 10.14.4, *), let discount = skProduct.introductoryPrice {
-            return ProductDiscount(discount: discount, locale: skProduct.priceLocale)
+            return AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
         }
         return nil
     }
@@ -70,10 +70,10 @@ extension Product {
     }
 
     /// An array of subscription offers available for the auto-renewable subscription. (Will be empty for iOS version below 12.2 and macOS version below 10.14.4).
-    public var discounts: [ProductDiscount] {
+    public var discounts: [AdaptyProductDiscount] {
         if #available(iOS 12.2, macOS 10.14.4, *) {
             return skProduct.discounts.map { discount in
-                ProductDiscount(discount: discount, locale: skProduct.priceLocale)
+                AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
             }
         }
         return []

@@ -10,7 +10,7 @@ import Foundation
 struct BackendProduct {
     let vendorId: String
     let promotionalOfferEligibility: Bool
-    var introductoryOfferEligibility: IntroductoryOfferEligibility
+    var introductoryOfferEligibility: AdaptyEligibility
     let promotionalOfferId: String?
     let version: Int64
 }
@@ -38,7 +38,7 @@ extension BackendProduct: Codable {
         vendorId = try container.decode(String.self, forKey: .vendorId)
         promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
         promotionalOfferEligibility = try container.decode(Bool.self, forKey: .promotionalOfferEligibility)
-        if let value = try? container.decode(IntroductoryOfferEligibility.self, forKey: .introductoryOfferEligibility) {
+        if let value = try? container.decode(AdaptyEligibility.self, forKey: .introductoryOfferEligibility) {
             introductoryOfferEligibility = value
         } else {
             introductoryOfferEligibility = (try container.decode(Bool.self, forKey: .introductoryOfferEligibility)) ? .eligible : .ineligible

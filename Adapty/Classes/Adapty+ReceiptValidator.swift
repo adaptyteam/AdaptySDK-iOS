@@ -8,7 +8,7 @@
 import Foundation
 
 extension Adapty: ReceiptValidator {
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo? = nil, refreshIfEmpty: Bool, _ completion: @escaping ResultCompletion<Profile>) {
+    func validateReceipt(purchaseProductInfo: PurchaseProductInfo? = nil, refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         skReceiptManager.getReceipt(refreshIfEmpty: refreshIfEmpty) { [weak self] result in
             switch result {
             case let .failure(error):

@@ -9,7 +9,7 @@ import StoreKit
 
 final class SKReceiptManager: NSObject {
     private let queue: DispatchQueue
-    private var completionHandlers: [ResultCompletion<Data>]?
+    private var completionHandlers: [AdaptyResultCompletion<Data>]?
 
     init(queue: DispatchQueue) {
         self.queue = queue
@@ -18,15 +18,15 @@ final class SKReceiptManager: NSObject {
 
     func prepare() { getReceipt(refreshIfEmpty: true) { _ in } }
 
-    func getReceipt(refreshIfEmpty: Bool, _ completion: @escaping ResultCompletion<Data>) {
+    func getReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<Data>) {
         queue.async { [weak self] in
             guard let self = self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
                 return
             }
 
-           let result = self.bundleReceipt()
-                
+            let result = self.bundleReceipt()
+
             switch result {
             case .success:
                 completion(result)
@@ -65,7 +65,7 @@ final class SKReceiptManager: NSObject {
         return .success(data)
     }
 
-    private func refresh(_ completion: @escaping ResultCompletion<Data>) {
+    private func refresh(_ completion: @escaping AdaptyResultCompletion<Data>) {
         queue.async { [weak self] in
             guard let self = self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))

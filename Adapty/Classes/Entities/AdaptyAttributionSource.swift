@@ -1,5 +1,5 @@
 //
-//  AttributionSource.swift
+//  AdaptyAttributionSource.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum AttributionSource: String, Equatable, Sendable {
+public enum AdaptyAttributionSource: String, Equatable, Sendable {
     case adjust
     case appsflyer
     case branch
@@ -15,6 +15,6 @@ public enum AttributionSource: String, Equatable, Sendable {
     case custom
 }
 
-extension AttributionSource: CustomStringConvertible {
+extension AdaptyAttributionSource: CustomStringConvertible {
     public var description: String { rawValue }
 }

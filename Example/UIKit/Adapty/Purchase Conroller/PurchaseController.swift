@@ -30,14 +30,14 @@ class PurchaseController: UIViewController {
         configureInterface(presenter.paywall, presenter.products)
 
         presenter.$paywall
-            .sink(receiveValue: { [weak self] (paywall: Paywall) in
+            .sink(receiveValue: { [weak self] (paywall: AdaptyPaywall) in
                 guard let self = self else { return }
                 self.configureInterface(paywall, self.presenter.products)
             })
             .store(in: &cancellable)
         
         presenter.$products
-            .sink(receiveValue: { [weak self] (products: [PaywallProduct]) in
+            .sink(receiveValue: { [weak self] (products: [AdaptyPaywallProduct]) in
                 guard let self = self else { return }
                 self.configureInterface(self.presenter.paywall, products)
             })
@@ -52,7 +52,7 @@ class PurchaseController: UIViewController {
         presenter.logShowPaywall()
     }
 
-    private func configureInterface(_ paywall: Paywall, _ products: [PaywallProduct]) {
+    private func configureInterface(_ paywall: AdaptyPaywall, _ products: [AdaptyPaywallProduct]) {
         config = paywall.extractPurchaseConfiguration()
         configureTheme()
         configureVariants(paywall, products)
@@ -69,7 +69,7 @@ class PurchaseController: UIViewController {
         subtitleLabel.text = config.subtitle
     }
 
-    private func configureVariants(_ paywall: Paywall, _ products: [PaywallProduct]) {
+    private func configureVariants(_ paywall: AdaptyPaywall, _ products: [AdaptyPaywallProduct]) {
         for v in variantsContainer.arrangedSubviews {
             variantsContainer.removeArrangedSubview(v)
             v.removeFromSuperview()
@@ -94,7 +94,7 @@ class PurchaseController: UIViewController {
         }
     }
 
-    private func purchaseProductPressed(_ product: PaywallProduct) {
+    private func purchaseProductPressed(_ product: AdaptyPaywallProduct) {
         setInProgress(true)
         presenter.makePurchase(product, completion: { [weak self] error in
             self?.setInProgress(false)

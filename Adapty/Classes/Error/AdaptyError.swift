@@ -101,7 +101,6 @@ extension AdaptyError {
         ///
         case invalidOfferPrice = 14
 
-        
         case noProductIDsFound = 1000
         ///
         case productRequestFailed = 1002
@@ -176,7 +175,7 @@ extension AdaptyError {
     static func decodingFallback(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         AdaptyError(wrapped: .decodingFailed(AdaptyError.Source(file: file, function: function, line: line),
-                                             "Decoding Fallback Paywall failed",
+                                             "Decoding Fallback Paywalls failed",
                                              error: error))
     }
 

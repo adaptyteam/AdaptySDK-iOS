@@ -8,18 +8,18 @@
 import Foundation
 
 struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<Profile>
+    typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
 
     let endpoint: HTTPEndpoint
     let headers: Headers
     let profileId: String
-    let parameters: ProfileParameters?
+    let parameters: AdaptyProfileParameters?
     let customerUserId: String?
     let environmentMeta: Environment.Meta
 
     init(profileId: String,
          customerUserId: String?,
-         parameters: ProfileParameters?,
+         parameters: AdaptyProfileParameters?,
          environmentMeta: Environment.Meta) {
         endpoint = HTTPEndpoint(
             method: .post,
@@ -69,7 +69,7 @@ extension CreateProfileRequest {
          analyticsDisabled: Bool) {
         self.init(profileId: profileId,
                   customerUserId: customerUserId,
-                  parameters: ProfileParameters.Builder()
+                  parameters: AdaptyProfileParameters.Builder()
                       .with(analyticsDisabled: analyticsDisabled)
                       .build(),
                   environmentMeta: Environment.Meta(includedAnalyticIds: !analyticsDisabled))
@@ -80,7 +80,7 @@ extension HTTPSession {
     func performCreateProfileRequest(profileId: String,
                                      customerUserId: String?,
                                      analyticsDisabled: Bool,
-                                     _ completion: @escaping ResultCompletion<VH<Profile>>) -> HTTPCancelable {
+                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) -> HTTPCancelable {
         perform(CreateProfileRequest(profileId: profileId,
                                      customerUserId: customerUserId,
                                      analyticsDisabled: analyticsDisabled)) { (result: CreateProfileRequest.Result) in

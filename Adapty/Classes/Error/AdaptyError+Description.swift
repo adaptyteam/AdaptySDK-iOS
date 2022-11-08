@@ -52,7 +52,7 @@ extension SKManagerError: CustomDebugStringConvertible {
         switch self {
         case .interrupted: return "Operation interrupted"
         case .noProductIDsFound: return "No In-App Purchase product identifiers were found."
-            
+
         case .receiptIsEmpty: return "Can't find a valid receipt"
         case .refreshReceiptFailed: return "Refresh receipt failed"
 

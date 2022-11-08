@@ -10,5 +10,5 @@ import Foundation
 import Adapty
 
 protocol IPurchaseButton: UIView {
-    func update(product: PaywallProduct, config: PurchaseConfiguration, action: @escaping () -> Void)
+    func update(product: AdaptyPaywallProduct, config: PurchaseConfiguration, action: @escaping () -> Void)
 }

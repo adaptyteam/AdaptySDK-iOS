@@ -28,7 +28,7 @@ extension Adapty {
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
                                 dispatchQueue: DispatchQueue = .main,
-                                _ completion: ErrorCompletion? = nil) {
+                                _ completion: AdaptyErrorCompletion? = nil) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
         async(completion) { completion in
@@ -61,15 +61,15 @@ extension Adapty {
     /// - Parameters:
     ///   - customerUserId: User identifier in your system.
     ///   - completion: Result callback.
-    public static func identify(_ customerUserId: String, _ completion: ErrorCompletion? = nil) {
+    public static func identify(_ customerUserId: String, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             manager.identify(toCustomerUserId: customerUserId, completion)
         }
     }
-    
+
     /// You can logout the user anytime by calling this method.
     /// - Parameter completion: Result callback.
-    public static func logout(_ completion: ErrorCompletion? = nil) {
+    public static func logout(_ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             manager.startLogout(completion)
         }
@@ -79,10 +79,10 @@ extension Adapty {
 extension Adapty {
     /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
     ///
-    /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates Profile cache on a regular basis, in order to keep this information as up-to-date as possible.
+    /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
     ///
-    /// - Parameter completion: the result containing a `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public static func getProfile(_ completion: @escaping ResultCompletion<Profile>) {
+    /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    public static func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
@@ -98,8 +98,8 @@ extension Adapty {
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
     ///
-    /// - Parameter params: use `ProfileParameters.Builder` class to build this object.
-    public static func updateProfile(params: ProfileParameters, _ completion: ErrorCompletion? = nil) {
+    /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
+    public static func updateProfile(params: AdaptyProfileParameters, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             if let analyticsDisabled = params.analyticsDisabled {
                 manager.profileStorage.setExternalAnalyticsDisabled(analyticsDisabled)
@@ -113,14 +113,14 @@ extension Adapty {
             }
         }
     }
-    
+
     /// In Observer mode, Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
     ///
     /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `Paywall`.
+    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     ///   - transactionId: A string identifier of your purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
     ///   - completion: A result containing the optional error.
-    public static func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: ErrorCompletion? = nil) {
+    public static func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
@@ -138,8 +138,8 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - id: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
-    ///   - completion: A result containing the `Paywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-    public static func getPaywall(_ id: String, _ completion: @escaping ResultCompletion<Paywall>) {
+    ///   - completion: A result containing the `AdaptyPaywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    public static func getPaywall(_ id: String, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
@@ -151,24 +151,15 @@ extension Adapty {
         }
     }
 
-    /// Variants of `getPaywallProducts(paywall:fetchPolicy:_:)` behavior.
-    public enum ProductsFetchPolicy {
-        /// In this scenario, the function will try to download the products anyway, although the ``PaywallProduct/introductoryOfferEligibility`` values may be unknown.
-        case `default`
-
-        /// If you use this option, the Adapty SDK will wait for the validation and the validation itself, only then the products will be returned.
-        case waitForReceiptValidation
-    }
-
-    /// Once you have a ``Paywall``, fetch corresponding products array using this method.
+    /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
     ///
     /// - Parameters:
-    ///   - paywall: the ``Paywall`` for which you want to get a products
-    ///   - fetchPolicy: the ``ProductsFetchPolicy`` value defining the behavior of the function at the time of the missing receipt
-    ///   - completion: A result containing the ``PaywallProduct`` objects array. You can present them in your UI
-    public static func getPaywallProducts(paywall: Paywall, fetchPolicy: ProductsFetchPolicy = .default, _ completion: @escaping ResultCompletion<[PaywallProduct]>) {
+    ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
+    ///   - fetchPolicy: the ``AdaptyProductsFetchPolicy`` value defining the behavior of the function at the time of the missing receipt
+    ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. You can present them in your UI
+    public static func getPaywallProducts(paywall: AdaptyPaywall, fetchPolicy: AdaptyProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
@@ -185,9 +176,9 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
     ///
     /// - Parameters:
-    ///   - product: a ``PaywallProduct`` object retrieved from the paywall.
-    ///   - completion: A result containing the ``Profile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public static func makePurchase(product: PaywallProduct, _ completion: @escaping ResultCompletion<Profile>) {
+    ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
+    ///   - completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    public static func makePurchase(product: AdaptyPaywallProduct, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         guard SKQueueManager.canMakePayments() else {
             completion(.failure(AdaptyError.cantMakePayments()))
             return
@@ -220,10 +211,19 @@ extension Adapty {
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
     ///
-    /// - Parameter completion: A result containing the `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public static func restorePurchases(_ completion: @escaping ResultCompletion<Profile>) {
+    /// - Parameter completion: A result containing the `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    public static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         async(completion) { manager, completion in
             manager.skQueueManager.restorePurchases(completion)
         }
     }
+}
+
+/// Variants of `getPaywallProducts(paywall:fetchPolicy:_:)` behavior.
+public enum AdaptyProductsFetchPolicy {
+    /// In this scenario, the function will try to download the products anyway, although the ``AdaptyPaywallProduct/introductoryOfferEligibility`` values may be unknown.
+    case `default`
+
+    /// If you use this option, the Adapty SDK will wait for the validation and the validation itself, only then the products will be returned.
+    case waitForReceiptValidation
 }

@@ -8,18 +8,18 @@
 import Foundation
 
 struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<Profile?>
+    typealias ResponseBody = Backend.Response.Body<AdaptyProfile?>
     let endpoint: HTTPEndpoint
     let headers: Headers
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<Profile?, Error>
+            let result: Result<AdaptyProfile?, Error>
 
             if headers.hasSameBackendResponseHash(response.headers) {
                 result = .success(nil)
             } else {
-                result = jsonDecoder.decode(Backend.Response.Body<Profile>.self, response.body).map { $0.value }
+                result = jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
             }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
@@ -41,7 +41,7 @@ struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
 extension HTTPSession {
     func performFetchProfileRequest(profileId: String,
                                     responseHash: String?,
-                                    _ completion: @escaping ResultCompletion<VH<Profile?>>) {
+                                    _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
         let request = FetchProfileRequest(profileId: profileId,
                                           responseHash: responseHash)
 

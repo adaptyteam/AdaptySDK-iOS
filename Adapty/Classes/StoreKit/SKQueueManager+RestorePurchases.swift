@@ -8,7 +8,7 @@
 import StoreKit
 
 extension SKQueueManager {
-    func restorePurchases(_ completion: @escaping ResultCompletion<Profile>) {
+    func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         queue.async { [weak self] in
             guard let self = self else { return }
             if let handlers = self.restorePurchasesCompletionHandlers {
@@ -22,7 +22,7 @@ extension SKQueueManager {
         }
     }
 
-    func callRestoreCompletionHandlers(_ result: AdaptyResult<Profile>) {
+    func callRestoreCompletionHandlers(_ result: AdaptyResult<AdaptyProfile>) {
         queue.async { [weak self] in
             guard let self = self else { return }
             guard let handlers = self.restorePurchasesCompletionHandlers else {

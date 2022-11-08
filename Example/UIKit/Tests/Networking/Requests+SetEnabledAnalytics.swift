@@ -23,7 +23,7 @@ final class Requests_SetEnabledAnalytics: XCTestCase {
 
             let request = UpdateProfileRequest(
                 profileId: profileId,
-                parameters: ProfileParameters.Builder()
+                parameters: AdaptyProfileParameters.Builder()
                     .with(analyticsDisabled: false)
                     .build(),
                 environmentMeta: Environment.Meta(includedAnalyticIds: true),

@@ -92,7 +92,7 @@ struct MainControllerView: View {
         return formatter
     }()
 
-    let onShowExamplePaywall: (Paywall, [PaywallProduct]) -> Void
+    let onShowExamplePaywall: (AdaptyPaywall, [AdaptyPaywallProduct]) -> Void
 
     @EnvironmentObject var presenter: MainPresenter
 
@@ -191,7 +191,7 @@ struct MainControllerView: View {
         }
     }
 
-    @ViewBuilder func paywallDetailsSection(paywall: Paywall, products: [PaywallProduct]?) -> some View {
+    @ViewBuilder func paywallDetailsSection(paywall: AdaptyPaywall, products: [AdaptyPaywallProduct]?) -> some View {
         ListItemView(title: "Variation", subtitle: paywall.variationId)
         ListItemView(title: "Revision", subtitle: "\(paywall.revision)")
 

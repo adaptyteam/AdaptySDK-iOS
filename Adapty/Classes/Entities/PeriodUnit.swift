@@ -1,5 +1,5 @@
 //
-//  PeriodUnit.swift
+//  AdaptyPeriodUnit.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-public enum PeriodUnit: UInt {
+public enum AdaptyPeriodUnit: UInt {
     case day
     case week
     case month
@@ -16,7 +16,7 @@ public enum PeriodUnit: UInt {
     case unknown
 }
 
-extension PeriodUnit {
+extension AdaptyPeriodUnit {
     @available(iOS 11.2, macOS 10.13.2, *)
     public init(unit: SKProduct.PeriodUnit) {
         switch unit {
@@ -43,7 +43,7 @@ extension PeriodUnit {
     }
 }
 
-extension PeriodUnit: CustomStringConvertible {
+extension AdaptyPeriodUnit: CustomStringConvertible {
     public var description: String {
         let value: CodingValues
         switch self {
@@ -57,9 +57,9 @@ extension PeriodUnit: CustomStringConvertible {
     }
 }
 
-extension PeriodUnit: Equatable, Sendable {}
+extension AdaptyPeriodUnit: Equatable, Sendable {}
 
-extension PeriodUnit: Codable {
+extension AdaptyPeriodUnit: Codable {
     fileprivate enum CodingValues: String {
         case day
         case week

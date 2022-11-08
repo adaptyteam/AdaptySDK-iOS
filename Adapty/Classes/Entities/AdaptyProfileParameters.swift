@@ -1,5 +1,5 @@
 //
-//  ProfileParameters.swift
+//  AdaptyProfileParameters.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 26.09.2022.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct ProfileParameters {
+public struct AdaptyProfileParameters {
     public internal(set) var firstName: String?
     public internal(set) var lastName: String?
-    public internal(set) var gender: Gender?
+    public internal(set) var gender: AdaptyProfile.Gender?
     public internal(set) var birthday: String?
     public internal(set) var email: String?
     public internal(set) var phoneNumber: String?
@@ -23,26 +23,28 @@ public struct ProfileParameters {
     public internal(set) var appmetricaDeviceId: String?
     var storeCountry: String?
     public internal(set) var appTrackingTransparencyStatus: UInt?
-    var codableCustomAttributes: Profile.CustomAttributes?
+    var codableCustomAttributes: AdaptyProfile.CustomAttributes?
     public internal(set) var analyticsDisabled: Bool?
     public var customAttributes: [String: Any]? { codableCustomAttributes?.convertToSimpleDictionary() }
-    
+
     init() {}
     init(storeCountry: String) {
         self.storeCountry = storeCountry
     }
-    init(customAttributes: Profile.CustomAttributes) {
-        self.codableCustomAttributes = customAttributes
+
+    init(customAttributes: AdaptyProfile.CustomAttributes) {
+        codableCustomAttributes = customAttributes
     }
 }
 
-extension ProfileParameters {
-    public static let empty : ProfileParameters = ProfileParameters()
+extension AdaptyProfileParameters {
+    public static let empty: AdaptyProfileParameters = AdaptyProfileParameters()
     public func builder() -> Builder { Builder(self) }
 }
-extension ProfileParameters: Equatable, Sendable {}
 
-extension ProfileParameters: Codable {
+extension AdaptyProfileParameters: Equatable, Sendable {}
+
+extension AdaptyProfileParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case firstName = "first_name"
         case lastName = "last_name"

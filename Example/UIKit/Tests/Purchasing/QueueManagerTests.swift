@@ -42,12 +42,12 @@ class TestablePurchaseValiadator: ReceiptValidator {
 
     var purchasedProduct: PurchaseProductInfo?
 
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo?, refreshIfEmpty: Bool, _ completion: @escaping ResultCompletion<Profile>) {
+    func validateReceipt(purchaseProductInfo: PurchaseProductInfo?, refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         purchasedProduct = purchaseProductInfo
 
         do {
             let profileData = try Tester.jsonDataNamed("profile_empty")
-            let profile = try decoder.decode(Profile.self, from: profileData)
+            let profile = try decoder.decode(AdaptyProfile.self, from: profileData)
             completion(.success(profile))
         } catch {
             completion(.failure(.cantMakePayments()))

@@ -36,10 +36,10 @@ extension UserDefaults: ProfileStorage {
         set(value, forKey: Constants.externalAnalyticsDisabledKey)
     }
 
-    func getProfile() -> VH<Profile>? {
+    func getProfile() -> VH<AdaptyProfile>? {
         guard let data = data(forKey: Constants.profileKey) else { return nil }
         do {
-            return try Backend.decoder.decode(VH<Profile>.self, from: data)
+            return try Backend.decoder.decode(VH<AdaptyProfile>.self, from: data)
         } catch {
             Log.warn(error.localizedDescription)
             return nil
@@ -65,7 +65,7 @@ extension UserDefaults: ProfileStorage {
         set(date, forKey: Constants.appleSearchAdsSyncDateKey)
     }
 
-    func setProfile(_ profile: VH<Profile>) {
+    func setProfile(_ profile: VH<AdaptyProfile>) {
         do {
             let data = try Backend.encoder.encode(profile)
             Log.debug("UserDefaults: saveing profile success.")

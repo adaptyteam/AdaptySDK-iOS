@@ -9,7 +9,7 @@
 import Foundation
 
 extension Adapty {
-    public static func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionSource, networkUserId: String? = nil, _ completion: ErrorCompletion? = nil) {
+    public static func updateAttribution(_ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
         if source == .appsflyer {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attribution, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         }
@@ -18,7 +18,7 @@ extension Adapty {
         }
     }
 
-    private func updateAttribution(_ attribution: [AnyHashable: Any], source: AttributionSource, networkUserId: String? = nil, _ completion: ErrorCompletion? = nil) {
+    private func updateAttribution(_ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
         httpSession.performSetAttributionRequest(profileId: profileStorage.profileId,
                                                  networkUserId: networkUserId,
                                                  source: source,

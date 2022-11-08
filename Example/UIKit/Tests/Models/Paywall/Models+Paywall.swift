@@ -1,5 +1,5 @@
 //
-//  Models+Paywall.swift
+//  Models+AdaptyPaywall.swift
 //  Adapty_Tests
 //
 //  Created by Aleksey Goncharov on 20.10.2022.
@@ -23,7 +23,7 @@ final class Models_Paywall: XCTestCase {
 
     func test_Create() throws {
         let data = try Tester.jsonDataNamed("paywall_example")
-        let result = try decoder.decode(Paywall.self, from: data)
+        let result = try decoder.decode(AdaptyPaywall.self, from: data)
 
         XCTAssertEqual(result.products.count, 2)
     }
@@ -34,7 +34,7 @@ final class Models_Paywall: XCTestCase {
 
         let exp = expectation(description: "Error expectation")
         do {
-            let _ = try decoder.decode(Paywall.self, from: data)
+            let _ = try decoder.decode(AdaptyPaywall.self, from: data)
         } catch {
             exp.fulfill()
         }
@@ -45,7 +45,7 @@ final class Models_Paywall: XCTestCase {
     func test_Empty_Products() throws {
         let decoder = JSONDecoder()
         let data = try Tester.jsonDataNamed("paywall_empty_products")
-        let result = try decoder.decode(Paywall.self, from: data)
+        let result = try decoder.decode(AdaptyPaywall.self, from: data)
 
         XCTAssertEqual(result.products.count, 0)
     }
@@ -56,7 +56,7 @@ final class Models_Paywall: XCTestCase {
 
         let exp = expectation(description: "Error expectation")
         do {
-            let _ = try decoder.decode(Paywall.self, from: data)
+            let _ = try decoder.decode(AdaptyPaywall.self, from: data)
         } catch {
             exp.fulfill()
         }
@@ -70,7 +70,7 @@ final class Models_Paywall: XCTestCase {
 
         let exp = expectation(description: "Error expectation")
         do {
-            let _ = try decoder.decode(Paywall.self, from: data)
+            let _ = try decoder.decode(AdaptyPaywall.self, from: data)
         } catch {
             exp.fulfill()
         }

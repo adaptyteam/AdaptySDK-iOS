@@ -23,7 +23,7 @@ class PurchaseTallButton: UIView, IPurchaseButton {
         layer.cornerRadius = 12.0
     }
 
-    func update(product: PaywallProduct, config: PurchaseConfiguration, action: @escaping () -> Void) {
+    func update(product: AdaptyPaywallProduct, config: PurchaseConfiguration, action: @escaping () -> Void) {
         defer {
             onAction = action
 

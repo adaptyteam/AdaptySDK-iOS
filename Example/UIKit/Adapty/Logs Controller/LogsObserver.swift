@@ -10,7 +10,7 @@ import Adapty
 import Foundation
 
 struct LogItem: Identifiable {
-    let level: Adapty.LogLevel
+    let level: AdaptyLogLevel
     let message: String
     let id = UUID().uuidString
     let date = Date()
@@ -33,7 +33,7 @@ class LogsObserver: ObservableObject {
     
     @Published var messages = [LogItem]()
     
-    func postMessage(_ level: Adapty.LogLevel, _ message: String) {
+    func postMessage(_ level: AdaptyLogLevel, _ message: String) {
         let item = LogItem(level: level, message: message)
         
         DispatchQueue.main.async { [weak self] in

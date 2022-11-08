@@ -1,5 +1,5 @@
 //
-//  Gender.swift
+//  AdaptyProfile.Gender.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 26.09.2022.
@@ -7,13 +7,15 @@
 
 import Foundation
 
-public enum Gender {
-    case female
-    case male
-    case other
+extension AdaptyProfile {
+    public enum Gender {
+        case female
+        case male
+        case other
+    }
 }
 
-extension Gender: CustomStringConvertible {
+extension AdaptyProfile.Gender: CustomStringConvertible {
     public var description: String {
         switch self {
         case .female: return "female"
@@ -23,9 +25,9 @@ extension Gender: CustomStringConvertible {
     }
 }
 
-extension Gender: Equatable, Sendable {}
+extension AdaptyProfile.Gender: Equatable, Sendable {}
 
-extension Gender: Codable {
+extension AdaptyProfile.Gender: Codable {
     enum CodingValues: String {
         case female = "f"
         case male = "m"

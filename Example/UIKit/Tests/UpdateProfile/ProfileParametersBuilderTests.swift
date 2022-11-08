@@ -11,7 +11,7 @@ import XCTest
 
 final class ProfileParametersBuilderTests: XCTestCase {
     func test_ParametersBuilder_Success() {
-        var builder = ProfileParameters.Builder()
+        var builder = AdaptyProfileParameters.Builder()
 
         do {
             builder = try builder.with(customAttribute: "123", forKey: "123")
@@ -22,7 +22,7 @@ final class ProfileParametersBuilderTests: XCTestCase {
 
     func test_ParametersBuilder_EmptyValue() {
         let expectation = expectation(description: "Expectation for 1 sec.")
-        var builder = ProfileParameters.Builder()
+        var builder = AdaptyProfileParameters.Builder()
 
         do {
             builder = try builder.with(customAttribute: "", forKey: "123")
@@ -42,7 +42,7 @@ final class ProfileParametersBuilderTests: XCTestCase {
 
     func test_ParametersBuilder_EmptyKey() {
         let expectation = expectation(description: "Expectation for 1 sec.")
-        var builder = ProfileParameters.Builder()
+        var builder = AdaptyProfileParameters.Builder()
 
         do {
             builder = try builder.with(customAttribute: "123", forKey: "")
@@ -62,7 +62,7 @@ final class ProfileParametersBuilderTests: XCTestCase {
 
     func test_ParametersBuilder_LongKey() {
         let expectation = expectation(description: "Expectation for 1 sec.")
-        var builder = ProfileParameters.Builder()
+        var builder = AdaptyProfileParameters.Builder()
 
         do {
             builder = try builder.with(customAttribute: "123", forKey: "1234567890_1234567890_1234567890")
@@ -82,7 +82,7 @@ final class ProfileParametersBuilderTests: XCTestCase {
 
     func test_ParametersBuilder_LongValue() {
         let expectation = expectation(description: "Expectation for 1 sec.")
-        var builder = ProfileParameters.Builder()
+        var builder = AdaptyProfileParameters.Builder()
 
         do {
             builder = try builder.with(customAttribute: "1234567890_1234567890_1234567890", forKey: "123")
@@ -103,7 +103,7 @@ final class ProfileParametersBuilderTests: XCTestCase {
     // ._-
     func test_ParametersBuilder_WrongKeySymbols() {
         let expectation = expectation(description: "Expectation for 1 sec.")
-        var builder = ProfileParameters.Builder()
+        var builder = AdaptyProfileParameters.Builder()
 
         do {
             builder = try builder.with(customAttribute: "123", forKey: "some$strange^&&*string")
@@ -124,7 +124,7 @@ final class ProfileParametersBuilderTests: XCTestCase {
     func test_ParametersBuilder_KeysOverflow() {
         let expectation = expectation(description: "Expectation for 1 sec.")
 
-        var overflowedBuilder = ProfileParameters.Builder()
+        var overflowedBuilder = AdaptyProfileParameters.Builder()
         do {
             try (0 ..< 11).forEach { i in
                 overflowedBuilder = try overflowedBuilder.with(customAttribute: "value_\(i)", forKey: "key_\(i)")
@@ -144,7 +144,7 @@ final class ProfileParametersBuilderTests: XCTestCase {
     }
 
     func test_ParametersBuilder_SendData() throws {
-        var builder = ProfileParameters.Builder()
+        var builder = AdaptyProfileParameters.Builder()
             .with(firstName: "John")
             .with(lastName: "Appleseed")
             .with(gender: .male)

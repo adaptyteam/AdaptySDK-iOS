@@ -12,7 +12,7 @@ extension UserDefaults: PaywallsStorage {
         static let paywallsStorageKey = "AdaptySDK_Cached_Purchase_Containers"
     }
 
-    func setPaywalls(_ paywalls: [VH<Paywall>]) {
+    func setPaywalls(_ paywalls: [VH<AdaptyPaywall>]) {
         guard !paywalls.isEmpty else {
             Log.debug("UserDefaults: Clear paywals .")
             removeObject(forKey: Constants.paywallsStorageKey)
@@ -22,16 +22,16 @@ extension UserDefaults: PaywallsStorage {
             let data = try Backend.encoder.encode(paywalls)
             Log.debug("UserDefaults: Saving paywals success.")
 
-            set(data , forKey: Constants.paywallsStorageKey)
+            set(data, forKey: Constants.paywallsStorageKey)
         } catch {
             Log.error("UserDefaults: Saving paywals fail. \(error.localizedDescription)")
         }
     }
 
-    func getPaywalls() -> [VH<Paywall>]? {
+    func getPaywalls() -> [VH<AdaptyPaywall>]? {
         guard let data = data(forKey: Constants.paywallsStorageKey) else { return nil }
         do {
-            return try Backend.decoder.decode([VH<Paywall>].self, from: data)
+            return try Backend.decoder.decode([VH<AdaptyPaywall>].self, from: data)
         } catch {
             Log.error(error.localizedDescription)
             return nil

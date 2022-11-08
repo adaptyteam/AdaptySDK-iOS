@@ -44,7 +44,7 @@ extension HTTPSession {
     func performSetTransactionVariationIdRequest(profileId: String,
                                                  transactionId: String,
                                                  variationId: String,
-                                                 _ completion: ErrorCompletion?) {
+                                                 _ completion: AdaptyErrorCompletion?) {
         let request = SetTransactionVariationIdRequest(profileId: profileId,
                                                        transactionId: transactionId,
                                                        variationId: variationId)

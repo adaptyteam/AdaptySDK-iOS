@@ -10,7 +10,7 @@ import Adapty
 import Combine
 import Foundation
 
-extension Array where Element == PaywallProduct {
+extension Array where Element == AdaptyPaywallProduct {
     var hasUnknownEligibiity: Bool {
         contains(where: { $0.introductoryOfferEligibility == .unknown })
     }
@@ -20,9 +20,9 @@ class PurchasesObserver: ObservableObject {
     static let shared = PurchasesObserver()
     static let paywallId = "example_ab_test"
 
-    @Published var profile: Profile?
-    @Published var products: [PaywallProduct]?
-    @Published var paywall: Paywall? {
+    @Published var profile: AdaptyProfile?
+    @Published var products: [AdaptyPaywallProduct]?
+    @Published var paywall: AdaptyPaywall? {
         didSet {
             loadPaywallProducts()
         }
@@ -67,7 +67,7 @@ class PurchasesObserver: ObservableObject {
         }
     }
 
-    func makePurchase(_ product: PaywallProduct, completion: ((AdaptyError?) -> Void)?) {
+    func makePurchase(_ product: AdaptyPaywallProduct, completion: ((AdaptyError?) -> Void)?) {
         Adapty.makePurchase(product: product) { [weak self] result in
             switch result {
             case let .success(profile):
@@ -93,11 +93,11 @@ class PurchasesObserver: ObservableObject {
 }
 
 extension PurchasesObserver: AdaptyDelegate {
-    func didLoadLatestProfile(_ profile: Profile) {
+    func didLoadLatestProfile(_ profile: AdaptyProfile) {
         self.profile = profile
     }
 
-    func paymentQueue(shouldAddStorePaymentFor product: DeferredProduct, defermentCompletion makeDeferredPurchase: @escaping (ResultCompletion<Profile>?) -> Void) {
+    func paymentQueue(shouldAddStorePaymentFor product: AdaptyDeferredProduct, defermentCompletion makeDeferredPurchase: @escaping (AdaptyResultCompletion<AdaptyProfile>?) -> Void) {
         // you can store makeDeferredPurchase callback and call it later as well
         // or you can call it right away in case you just want to continue purchase
 

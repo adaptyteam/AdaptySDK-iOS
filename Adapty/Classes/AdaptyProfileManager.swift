@@ -10,7 +10,7 @@ import StoreKit
 final class AdaptyProfileManager {
     let manager: Adapty
     let profileId: String
-    var profile: VH<Profile>
+    var profile: VH<AdaptyProfile>
     let paywallsCache: PaywallsCache
     let productsCache: ProductsCache
 
@@ -19,7 +19,7 @@ final class AdaptyProfileManager {
     init(manager: Adapty,
          paywallStorage: PaywallsStorage,
          productStorage: BackendProductsStorage,
-         profile: VH<Profile>) {
+         profile: VH<AdaptyProfile>) {
         self.manager = manager
         profileId = profile.value.profileId
         self.profile = profile
@@ -35,11 +35,11 @@ final class AdaptyProfileManager {
 }
 
 extension AdaptyProfileManager {
-    func updateProfile(params: ProfileParameters, _ completion: @escaping ErrorCompletion) {
+    func updateProfile(params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
         _updateProfile(params: params, sendEnvironmentMeta: .dont) { completion($0.error) }
     }
 
-    private func _updateProfile(params: ProfileParameters?, sendEnvironmentMeta: UpdateProfileRequest.SendEnvironment, _ completion: @escaping ResultCompletion<Profile>) {
+    private func _updateProfile(params: AdaptyProfileParameters?, sendEnvironmentMeta: UpdateProfileRequest.SendEnvironment, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         let old = profile.value
         manager.httpSession.performUpdateProfileRequest(profileId: profileId, parameters: params, sendEnvironmentMeta: sendEnvironmentMeta, responseHash: profile.hash) { [weak self] result in
             switch result {
@@ -55,7 +55,7 @@ extension AdaptyProfileManager {
         }
     }
 
-    private func _getProfile(_ completion: @escaping ResultCompletion<Profile>) {
+    private func _getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         let old = profile.value
         manager.httpSession.performFetchProfileRequest(profileId: profileId, responseHash: profile.hash) { [weak self] result in
             switch result {
@@ -70,8 +70,8 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getProfile(_ completion: @escaping ResultCompletion<Profile>) {
-        let completion: ResultCompletion<Profile> = { [weak self] result in
+    func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        let completion: AdaptyResultCompletion<AdaptyProfile> = { [weak self] result in
 
             guard let self = self, self.isActive else {
                 completion(.failure(AdaptyError.profileWasChanged()))
@@ -98,7 +98,7 @@ extension AdaptyProfileManager {
         _updateProfile(params: nil, sendEnvironmentMeta: analyticsDisabled ? .withoutAnalytics : .withAnalytics, completion)
     }
 
-    func saveResponse(_ newProfile: VH<Profile>?) {
+    func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
         guard isActive,
               let newProfile = newProfile,
               profile.value.profileId == newProfile.value.profileId
@@ -112,18 +112,18 @@ extension AdaptyProfileManager {
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
     }
 
-    func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: @escaping ErrorCompletion) {
+    func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: @escaping AdaptyErrorCompletion) {
         manager.httpSession.performSetTransactionVariationIdRequest(profileId: profileId, transactionId: transactionId, variationId: variationId, completion)
     }
 
-    func getPaywall(_ id: String, _ completion: @escaping ResultCompletion<Paywall>) {
+    func getPaywall(_ id: String, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         let old = paywallsCache.getPaywall(byId: id)
         let syncedBundleReceipt = manager.profileStorage.syncedBundleReceipt
         manager.httpSession.performFetchPaywallRequest(paywallId: id,
                                                        profileId: profileId,
                                                        responseHash: old?.hash,
                                                        syncedBundleReceipt: syncedBundleReceipt) {
-            [weak self] (result: AdaptyResult<VH<Paywall?>>) in
+            [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
 
             guard let self = self, self.isActive else {
                 completion(.failure(AdaptyError.profileWasChanged()))
@@ -155,7 +155,7 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getPaywallProducts(paywall: Paywall, fetchPolicy: Adapty.ProductsFetchPolicy = .default, _ completion: @escaping ResultCompletion<[PaywallProduct]>) {
+    func getPaywallProducts(paywall: AdaptyPaywall, fetchPolicy: AdaptyProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         switch fetchPolicy {
         case .default:
             getPaywallProducts(paywall: paywall, completion)
@@ -178,7 +178,7 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getPaywallProducts(paywall: Paywall, _ completion: @escaping ResultCompletion<[PaywallProduct]>) {
+    func getPaywallProducts(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         getPaywallProducts(paywall: paywall) { [weak self] (result: AdaptyResult<[BackendProduct]>) in
             switch result {
             case .failure:
@@ -189,12 +189,12 @@ extension AdaptyProfileManager {
                     return
                 }
                 manager.skProductsManager.fetchProducts(productIdentifiers: Set(backendProducts.map { $0.vendorId })) {
-                    completion($0.map { (skProducts: [SKProduct]) -> [PaywallProduct] in
+                    completion($0.map { (skProducts: [SKProduct]) -> [AdaptyPaywallProduct] in
                         backendProducts.compactMap { product in
                             guard let sk = skProducts.first(where: { $0.productIdentifier == product.vendorId }) else {
                                 return nil
                             }
-                            return PaywallProduct(paywall: paywall, product: product, skProduct: sk)
+                            return AdaptyPaywallProduct(paywall: paywall, product: product, skProduct: sk)
                         }
                     })
                 }
@@ -202,7 +202,7 @@ extension AdaptyProfileManager {
         }
     }
 
-    private func getPaywallProducts(paywall: Paywall, _ completion: @escaping ResultCompletion<[BackendProduct]>) {
+    private func getPaywallProducts(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<[BackendProduct]>) {
         let vendorProductIds = paywall.vendorProductIds
         let syncedBundleReceipt = manager.profileStorage.syncedBundleReceipt
         manager.httpSession.performFetchAllProductsRequest(profileId: profileId, responseHash: productsCache.productsHash, syncedBundleReceipt: syncedBundleReceipt) { [weak self] (result: AdaptyResult<VH<[BackendProduct]?>>) in
@@ -224,8 +224,6 @@ extension AdaptyProfileManager {
             case let .success(products):
                 if let value = products.value {
                     self.productsCache.setProducts(VH(value, hash: products.hash))
-                    completion(.success(value))
-                    return
                 }
                 completion(.success(self.productsCache.getProductsWithFallback(byIds: vendorProductIds)))
             }

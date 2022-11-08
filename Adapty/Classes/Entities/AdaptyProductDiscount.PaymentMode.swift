@@ -1,5 +1,5 @@
 //
-//  ProductDiscount.PaymentMode.swift
+//  AdaptyProductDiscount.PaymentMode.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-extension ProductDiscount {
+extension AdaptyProductDiscount {
     public enum PaymentMode: UInt {
         case payAsYouGo
         case payUpFront
@@ -17,7 +17,7 @@ extension ProductDiscount {
     }
 }
 
-extension ProductDiscount.PaymentMode {
+extension AdaptyProductDiscount.PaymentMode {
     @available(iOS 11.2, macOS 10.14.4, *)
     public init(mode: SKProductDiscount.PaymentMode) {
         switch mode {
@@ -33,7 +33,7 @@ extension ProductDiscount.PaymentMode {
     }
 }
 
-extension ProductDiscount.PaymentMode: CustomStringConvertible {
+extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
     public var description: String {
         switch self {
         case .payAsYouGo: return "payAsYouGo"
@@ -44,14 +44,14 @@ extension ProductDiscount.PaymentMode: CustomStringConvertible {
     }
 }
 
-extension ProductDiscount.PaymentMode: Equatable, Sendable {}
+extension AdaptyProductDiscount.PaymentMode: Equatable, Sendable {}
 
-extension ProductDiscount.PaymentMode: Encodable {
+extension AdaptyProductDiscount.PaymentMode: Encodable {
     fileprivate enum CodingValues: String {
         case payAsYouGo = "pay_as_you_go"
         case payUpFront = "pay_up_front"
         case freeTrial = "free_trial"
-        case unknown = "unknown"
+        case unknown
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -62,7 +62,7 @@ extension ProductDiscount.PaymentMode: Encodable {
         case .freeTrial: value = .freeTrial
         case .unknown: value = .unknown
         }
-        
+
         var container = encoder.singleValueContainer()
         try container.encode(value.rawValue)
     }

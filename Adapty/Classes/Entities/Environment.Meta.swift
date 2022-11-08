@@ -30,7 +30,6 @@ extension Environment {
             return nil
         }
 
-
         enum CodingKeys: String, CodingKey {
             case appInstallId = "device_id"
             case SDKVersion = "adapty_sdk_version"

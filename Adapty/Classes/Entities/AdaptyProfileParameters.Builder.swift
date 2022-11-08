@@ -7,23 +7,23 @@
 
 import Foundation
 
-extension ProfileParameters {
+extension AdaptyProfileParameters {
     public class Builder {
-        var parameters: ProfileParameters
+        var parameters: AdaptyProfileParameters
 
         public convenience init() {
-            self.init(ProfileParameters())
+            self.init(AdaptyProfileParameters())
         }
 
-        init(_ values: ProfileParameters) {
+        init(_ values: AdaptyProfileParameters) {
             parameters = values
         }
 
-        public func build() -> ProfileParameters { parameters }
+        public func build() -> AdaptyProfileParameters { parameters }
     }
 }
 
-extension ProfileParameters.Builder {
+extension AdaptyProfileParameters.Builder {
     @discardableResult
     public func with(firstName value: String?) -> Self {
         parameters.firstName = value
@@ -37,7 +37,7 @@ extension ProfileParameters.Builder {
     }
 
     @discardableResult
-    public func with(gender value: Gender?) -> Self {
+    public func with(gender value: AdaptyProfile.Gender?) -> Self {
         parameters.gender = value
         return self
     }
@@ -68,12 +68,12 @@ extension ProfileParameters.Builder {
     }
 }
 
-extension ProfileParameters.Builder {
-    func with(customAttributes: Profile.CustomAttributes?) -> Self {
+extension AdaptyProfileParameters.Builder {
+    func with(customAttributes: AdaptyProfile.CustomAttributes?) -> Self {
         parameters.codableCustomAttributes = customAttributes
         return self
     }
-    
+
     @discardableResult
     public func withRemoved(customAttributeForKey key: String) throws -> Self {
         try with(customAttribute: .nil, forKey: key)
@@ -89,10 +89,10 @@ extension ProfileParameters.Builder {
         try with(customAttribute: .float(value), forKey: key)
     }
 
-    func with(customAttribute value: Profile.CustomAttributeValue, forKey key: String) throws -> Self {
-        if let error = Profile.CustomAttributes.validateKey(key) { throw error }
+    func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws -> Self {
+        if let error = AdaptyProfile.CustomAttributes.validateKey(key) { throw error }
         if let error = value.validate() { throw error }
-        var attributes = parameters.codableCustomAttributes ?? Profile.CustomAttributes()
+        var attributes = parameters.codableCustomAttributes ?? AdaptyProfile.CustomAttributes()
         attributes.updateValue(value, forKey: key)
         if let error = attributes.validate() { throw error }
         parameters.codableCustomAttributes = attributes
@@ -100,7 +100,7 @@ extension ProfileParameters.Builder {
     }
 }
 
-extension ProfileParameters.Builder {
+extension AdaptyProfileParameters.Builder {
     @discardableResult
     public func with(analyticsDisabled value: Bool?) -> Self {
         parameters.analyticsDisabled = value
@@ -108,7 +108,7 @@ extension ProfileParameters.Builder {
     }
 }
 
-extension ProfileParameters.Builder {
+extension AdaptyProfileParameters.Builder {
     @discardableResult
     public func with(facebookUserId value: String?) -> Self {
         parameters.facebookUserId = value
@@ -155,7 +155,7 @@ extension ProfileParameters.Builder {
 #if canImport(AppTrackingTransparency)
     import AppTrackingTransparency
 
-extension ProfileParameters.Builder {
+    extension AdaptyProfileParameters.Builder {
         @available(iOS 14, macOS 11.0, *)
         @discardableResult
         public func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {

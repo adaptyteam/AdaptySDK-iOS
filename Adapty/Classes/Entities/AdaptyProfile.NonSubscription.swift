@@ -1,5 +1,5 @@
 //
-//    Profile.NonSubscription.swift
+//    AdaptyProfile.NonSubscription.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Profile {
+extension AdaptyProfile {
     public struct NonSubscription {
         /// An identifier of the purchase in Adapty. You can use it to ensure that you've already processed this purchase (for example tracking one time products).
         public let purchaseId: String
@@ -41,9 +41,9 @@ extension Profile {
     }
 }
 
-extension Profile.NonSubscription: Equatable {}
+extension AdaptyProfile.NonSubscription: Equatable {}
 
-extension Profile.NonSubscription: CustomStringConvertible {
+extension AdaptyProfile.NonSubscription: CustomStringConvertible {
     public var description: String {
         "(purchaseId: \(purchaseId), vendorProductId: \(vendorProductId), store: \(store), purchasedAt: \(purchasedAt), isOneTime: \(isOneTime), isSandbox: \(isSandbox), "
             + (vendorTransactionId == nil ? "" : "vendorTransactionId: \(vendorTransactionId!), ")
@@ -52,7 +52,7 @@ extension Profile.NonSubscription: CustomStringConvertible {
     }
 }
 
-extension Profile.NonSubscription: Codable {
+extension AdaptyProfile.NonSubscription: Codable {
     enum CodingKeys: String, CodingKey {
         case purchaseId = "purchase_id"
         case store

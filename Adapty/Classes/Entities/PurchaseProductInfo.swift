@@ -18,9 +18,9 @@ struct PurchaseProductInfo {
     let offer: Offer?
 
     struct Offer {
-        let periodUnit: PeriodUnit
+        let periodUnit: AdaptyPeriodUnit
         let numberOfUnits: Int
-        let type: ProductDiscount.PaymentMode
+        let type: AdaptyProductDiscount.PaymentMode
     }
 }
 
@@ -70,8 +70,8 @@ extension PurchaseProductInfo: Encodable {
 }
 
 extension PurchaseProductInfo {
-    init(_ product: Product?, _ variationId: String?, _ transaction: SKPaymentTransaction) {
-        var discount: ProductDiscount?
+    init(_ product: AdaptyProduct?, _ variationId: String?, _ transaction: SKPaymentTransaction) {
+        var discount: AdaptyProductDiscount?
 
         if #available(iOS 12.2, OSX 10.14.4, *),
            let identifier = transaction.payment.paymentDiscount?.identifier {
@@ -97,7 +97,7 @@ extension PurchaseProductInfo {
 }
 
 extension PurchaseProductInfo.Offer {
-    init?(_ discount: ProductDiscount?) {
+    init?(_ discount: AdaptyProductDiscount?) {
         guard let discount = discount else { return nil }
         self.init(periodUnit: discount.subscriptionPeriod.unit,
                   numberOfUnits: discount.subscriptionPeriod.numberOfUnits,

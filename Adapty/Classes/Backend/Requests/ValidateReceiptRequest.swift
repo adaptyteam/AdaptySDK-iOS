@@ -8,7 +8,7 @@
 import Foundation
 
 struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<Profile>
+    typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
 
     let endpoint = HTTPEndpoint(
         method: .post,
@@ -49,7 +49,7 @@ extension HTTPSession {
     func performValidateReceiptRequest(profileId: String,
                                        receipt: Data,
                                        purchaseProductInfo: PurchaseProductInfo?,
-                                       _ completion: @escaping ResultCompletion<VH<Profile>>) {
+                                       _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         let request = ValidateReceiptRequest(profileId: profileId,
                                              receipt: receipt,
                                              purchaseProductInfo: purchaseProductInfo)

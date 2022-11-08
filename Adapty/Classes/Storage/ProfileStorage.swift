@@ -9,8 +9,8 @@ import Foundation
 
 protocol ProfileStorage {
     var profileId: String { get }
-    func getProfile() -> VH<Profile>?
-    func setProfile(_: VH<Profile>)
+    func getProfile() -> VH<AdaptyProfile>?
+    func setProfile(_: VH<AdaptyProfile>)
 
     var externalAnalyticsDisabled: Bool { get }
     var syncedBundleReceipt: Bool { get }
@@ -25,7 +25,7 @@ protocol ProfileStorage {
 }
 
 extension ProfileStorage {
-    func getProfile(profileId: String, withCustomerUserId newCustomerUserId: String?) -> VH<Profile>? {
+    func getProfile(profileId: String, withCustomerUserId newCustomerUserId: String?) -> VH<AdaptyProfile>? {
         guard let profile = getProfile() else { return nil }
         guard profile.value.profileId == profileId else { return nil }
         guard let newCustomerUserId = newCustomerUserId else { return profile }

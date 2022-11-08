@@ -1,5 +1,5 @@
 //
-//    Profile.Subscription.swift
+//    AdaptyProfile.Subscription.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Profile {
+extension AdaptyProfile {
     /// Information about the user's subscription.
     public struct Subscription {
         /// A store of the purchase.
@@ -96,9 +96,9 @@ extension Profile {
     }
 }
 
-extension Profile.Subscription: Equatable {}
+extension AdaptyProfile.Subscription: Equatable {}
 
-extension Profile.Subscription: CustomStringConvertible {
+extension AdaptyProfile.Subscription: CustomStringConvertible {
     public var description: String {
         "(isActive: \(isActive), vendorProductId: \(vendorProductId), store: \(store), activatedAt: \(activatedAt), "
             + (renewedAt == nil ? "" : "renewedAt: \(renewedAt!), ")
@@ -117,7 +117,7 @@ extension Profile.Subscription: CustomStringConvertible {
     }
 }
 
-extension Profile.Subscription: Codable {
+extension AdaptyProfile.Subscription: Codable {
     enum CodingKeys: String, CodingKey {
         case isActive = "is_active"
         case vendorProductId = "vendor_product_id"

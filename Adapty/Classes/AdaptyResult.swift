@@ -9,8 +9,8 @@ import Foundation
 
 public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
 
-public typealias ErrorCompletion = (AdaptyError?) -> Void
-public typealias ResultCompletion<Success> = (AdaptyResult<Success>) -> Void
+public typealias AdaptyErrorCompletion = (AdaptyError?) -> Void
+public typealias AdaptyResultCompletion<Success> = (AdaptyResult<Success>) -> Void
 
 extension Result where Failure == AdaptyError {
     public var error: AdaptyError? {

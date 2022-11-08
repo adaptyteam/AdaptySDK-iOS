@@ -21,7 +21,7 @@ extension Adapty {
     /// - Parameters:
     ///   - paywalls: a JSON representation of your paywalls/products list in the exact same format as provided by Adapty backend.
     ///   - completion: Result callback.
-    public static func setFallbackPaywalls(_ paywalls: Data, _ completion: ErrorCompletion? = nil) {
+    public static func setFallbackPaywalls(_ paywalls: Data, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { completion in
             do {
                 Configuration.fallbackPaywalls = try FallbackPaywalls(from: paywalls)
@@ -35,7 +35,7 @@ extension Adapty {
 }
 
 extension PaywallsCache {
-    func getPaywallWithFallback(byId id: String) -> Paywall? {
+    func getPaywallWithFallback(byId id: String) -> AdaptyPaywall? {
         let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
         guard let cache = getPaywall(byId: id)?.value else { return fallback }
         guard let fallback = fallback else { return cache }
@@ -50,9 +50,9 @@ extension ProductsCache {
         guard let fallback = fallback else { return cache }
         return cache.version > fallback.version ? cache : fallback
     }
-    
+
     func getProductsWithFallback(byIds ids: [String]) -> [BackendProduct] {
-        ids.compactMap { getProductWithFallback(byId: $0)  }
+        ids.compactMap { getProductWithFallback(byId: $0) }
     }
 }
 

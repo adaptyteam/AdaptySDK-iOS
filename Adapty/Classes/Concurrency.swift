@@ -55,10 +55,10 @@ import Foundation
 
         /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
         ///
-        /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates Profile cache on a regular basis, in order to keep this information as up-to-date as possible.
+        /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
         ///
-        /// - Parameter completion: the result containing a `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-        public static func getProfile() async throws -> Profile? {
+        /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        public static func getProfile() async throws -> AdaptyProfile? {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getProfile { result in
                     switch result {
@@ -75,8 +75,8 @@ import Foundation
         ///
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
         ///
-        /// - Parameter params: use `ProfileParameters.Builder` class to build this object.
-        public static func updateProfile(params: ProfileParameters) async throws {
+        /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
+        public static func updateProfile(params: AdaptyProfileParameters) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.updateProfile(params: params) { error in
                     if let error = error {
@@ -91,7 +91,7 @@ import Foundation
 
         public static func updateAttribution(
             _ attribution: [AnyHashable: Any],
-            source: AttributionSource,
+            source: AdaptyAttributionSource,
             networkUserId: String? = nil
         ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
@@ -112,9 +112,9 @@ import Foundation
         ///
         /// - Parameters:
         ///   - id: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
-        /// - Returns: The `Paywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+        /// - Returns: The `AdaptyPaywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
         /// - Throws: An `AdaptyError` object
-        public static func getPaywall(_ id: String) async throws -> Paywall? {
+        public static func getPaywall(_ id: String) async throws -> AdaptyPaywall? {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getPaywall(id) { result in
                     switch result {
@@ -127,16 +127,16 @@ import Foundation
             }
         }
 
-        /// Once you have a `Paywall`, fetch corresponding products array using this method.
+        /// Once you have a `AdaptyPaywall`, fetch corresponding products array using this method.
         ///
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
         ///
         /// - Parameters:
-        ///   - paywall: the `Paywall` for which you want to get a products
-        ///   - fetchPolicy: the `ProductsFetchPolicy` value defining the behavior of the function at the time of the missing receipt
-        /// - Returns: A result containing the `PaywallProduct` objects array. You can present them in your UI
+        ///   - paywall: the `AdaptyPaywall` for which you want to get a products
+        ///   - fetchPolicy: the `AdaptyProductsFetchPolicy` value defining the behavior of the function at the time of the missing receipt
+        /// - Returns: A result containing the `AdaptyPaywallProduct` objects array. You can present them in your UI
         /// - Throws: An `AdaptyError` object
-        public static func getPaywallProducts(paywall: Paywall, fetchPolicy: ProductsFetchPolicy = .default) async throws -> [PaywallProduct]? {
+        public static func getPaywallProducts(paywall: AdaptyPaywall, fetchPolicy: AdaptyProductsFetchPolicy = .default) async throws -> [AdaptyPaywallProduct]? {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getPaywallProducts(paywall: paywall, fetchPolicy: fetchPolicy) { result in
                     switch result {
@@ -154,10 +154,10 @@ import Foundation
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
         ///
         /// - Parameters:
-        ///   - product: a `PaywallProduct` object retrieved from the paywall.
-        /// - Returns: The `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        ///   - product: a `AdaptyPaywallProduct` object retrieved from the paywall.
+        /// - Returns: The `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
         /// - Throws: An `AdaptyError` object
-        public static func makePurchase(product: PaywallProduct) async throws -> Profile {
+        public static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyProfile {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.makePurchase(product: product) { result in
                     switch result {
@@ -174,9 +174,9 @@ import Foundation
         ///
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
         ///
-        /// - Returns: The `Profile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        /// - Returns: The `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
         /// - Throws: An `AdaptyError` object
-        public static func restorePurchases() async throws -> Profile {
+        public static func restorePurchases() async throws -> AdaptyProfile {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.restorePurchases { result in
                     switch result {
@@ -219,9 +219,9 @@ import Foundation
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
         ///
         /// - Parameters:
-        ///   - paywall: A `Paywall` object.
+        ///   - paywall: A `AdaptyPaywall` object.
         ///  - Throws: An `AdaptyError` object
-        public static func logShowPaywall(_ paywall: Paywall) async throws {
+        public static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
             let params = PaywallShowedParameters(variationId: paywall.variationId)
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.logShowPaywall(params) { error in
@@ -247,9 +247,9 @@ import Foundation
         ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
         /// - Throws: An `AdaptyError` object
         public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
-            let params = OnboardingScreenParameters(name: name,
-                                                    screenName: screenName,
-                                                    screenOrder: screenOrder)
+            let params = AdaptyOnboardingScreenParameters(name: name,
+                                                          screenName: screenName,
+                                                          screenOrder: screenOrder)
 
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.logShowOnboarding(params) { error in
@@ -266,7 +266,7 @@ import Foundation
         /// In Observer mode, Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
         ///
         /// - Parameters:
-        ///   - variationId:  A string identifier of variation. You can get it using variationId property of `Paywall`.
+        ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
         ///   - transactionId: A string identifier of your purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
         public static func setVariationId(
             _ variationId: String,

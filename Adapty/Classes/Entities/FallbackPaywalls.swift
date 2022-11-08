@@ -8,7 +8,7 @@
 import Foundation
 
 struct FallbackPaywalls {
-    let paywalls: [String: Paywall]
+    let paywalls: [String: AdaptyPaywall]
     let products: [String: BackendProduct]
     let allProductVendorIds: [String]
 }
@@ -21,7 +21,7 @@ extension FallbackPaywalls: Decodable {
     }
 
     private struct PaywallContainer: Decodable {
-        let paywall: Paywall
+        let paywall: AdaptyPaywall
 
         enum CodingKeys: String, CodingKey {
             case paywall = "attributes"

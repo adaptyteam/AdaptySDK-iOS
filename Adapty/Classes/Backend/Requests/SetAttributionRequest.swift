@@ -13,10 +13,10 @@ struct SetAttributionRequest: HTTPDataRequest {
     let endpoint: HTTPEndpoint
     let headers: Headers
     let networkUserId: String?
-    let source: AttributionSource
+    let source: AdaptyAttributionSource
     let attribution: [AnyHashable: Any]
 
-    init(profileId: String, networkUserId: String?, source: AttributionSource, attribution: [AnyHashable: Any]) {
+    init(profileId: String, networkUserId: String?, source: AdaptyAttributionSource, attribution: [AnyHashable: Any]) {
         endpoint = HTTPEndpoint(
             method: .post,
             path: "/sdk/analytics/profiles/\(profileId)/attribution/"
@@ -52,9 +52,9 @@ struct SetAttributionRequest: HTTPDataRequest {
 extension HTTPSession {
     func performSetAttributionRequest(profileId: String,
                                       networkUserId: String?,
-                                      source: AttributionSource,
+                                      source: AdaptyAttributionSource,
                                       attribution: [AnyHashable: Any],
-                                      _ completion: ErrorCompletion?) {
+                                      _ completion: AdaptyErrorCompletion?) {
         let request = SetAttributionRequest(profileId: profileId,
                                             networkUserId: networkUserId,
                                             source: source,

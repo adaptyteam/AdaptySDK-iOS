@@ -12,12 +12,12 @@ extension Adapty {
     static var dispatchQueue: DispatchQueue?
 
     @inline(__always)
-    static func async(_ completion: ErrorCompletion?,
+    static func async(_ completion: AdaptyErrorCompletion?,
                       group: DispatchGroup? = nil,
                       qos: DispatchQoS = .unspecified,
                       flags: DispatchWorkItemFlags = [],
                       function: StaticString = #function,
-                      execute work: @escaping (ErrorCompletion) -> Void) {
+                      execute work: @escaping (AdaptyErrorCompletion) -> Void) {
         let function = "\(function) [\(Log.stamp)]"
         Log.verbose("Calling now: \(function).")
         let event = Log.Profiling.start(method: "Public call", "%@", function)
@@ -30,12 +30,12 @@ extension Adapty {
     }
 
     @inline(__always)
-    static func async(_ completion: ErrorCompletion?,
+    static func async(_ completion: AdaptyErrorCompletion?,
                       group: DispatchGroup? = nil,
                       qos: DispatchQoS = .unspecified,
                       flags: DispatchWorkItemFlags = [],
                       function: StaticString = #function,
-                      execute work: @escaping (Adapty, @escaping ErrorCompletion) -> Void) {
+                      execute work: @escaping (Adapty, @escaping AdaptyErrorCompletion) -> Void) {
         let function = "\(function) [\(Log.stamp)]"
         Log.verbose("Calling now: \(function).")
         let event = Log.Profiling.start(method: "Public call", "%@", function)
@@ -54,12 +54,12 @@ extension Adapty {
     }
 
     @inline(__always)
-    static func async<T>(_ completion: @escaping ResultCompletion<T>,
+    static func async<T>(_ completion: @escaping AdaptyResultCompletion<T>,
                          group: DispatchGroup? = nil,
                          qos: DispatchQoS = .unspecified,
                          flags: DispatchWorkItemFlags = [],
                          function: StaticString = #function,
-                         execute work: @escaping (Adapty, @escaping ResultCompletion<T>) -> Void) {
+                         execute work: @escaping (Adapty, @escaping AdaptyResultCompletion<T>) -> Void) {
         let function = "\(function) [\(Log.stamp)]"
         Log.verbose("Calling now: \(function).")
         let event = Log.Profiling.start(method: "Public call", "%@", function)
@@ -79,8 +79,8 @@ extension Adapty {
     }
 
     @inline(__always)
-    private static func callCompletion(_ function: String, _ completion: ErrorCompletion?, _ error: AdaptyError? = nil,
-                                       logLevel: LogLevel = .verbose) {
+    private static func callCompletion(_ function: String, _ completion: AdaptyErrorCompletion?, _ error: AdaptyError? = nil,
+                                       logLevel: AdaptyLogLevel = .verbose) {
         if let error = error {
             Log.message(logLevel, "Completed \(function) with error: \(error).")
         } else {
@@ -93,7 +93,7 @@ extension Adapty {
     }
 
     @inline(__always)
-    private static func callCompletion<T>(_ function: String, _ completion: ResultCompletion<T>?, _ result: AdaptyResult<T>, logLevel: LogLevel = .verbose) {
+    private static func callCompletion<T>(_ function: String, _ completion: AdaptyResultCompletion<T>?, _ result: AdaptyResult<T>, logLevel: AdaptyLogLevel = .verbose) {
         if case let .failure(error) = result {
             Log.message(logLevel, "Completed \(function) with error: \(error).")
         } else {

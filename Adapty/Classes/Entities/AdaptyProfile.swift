@@ -1,5 +1,5 @@
 //
-//    Profile.swift
+//  AdaptyProfile.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -7,14 +7,14 @@
 
 import Foundation
 
-public struct Profile {
+public struct AdaptyProfile {
     /// An identifier of a user in Adapty.
     public let profileId: String
 
     /// An identifier of a user in your system.
     public let customerUserId: String?
 
-    let codableCustomAttributes: Profile.CustomAttributes?
+    let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
     /// Previously set user custom attributes with `.updateProfile()` method.
     public let customAttributes: [String: Any]
@@ -29,8 +29,8 @@ public struct Profile {
     public let nonSubscriptions: [String: [NonSubscription]]
 }
 
-extension Profile: Equatable {
-    public static func == (lhs: Profile, rhs: Profile) -> Bool {
+extension AdaptyProfile: Equatable {
+    public static func == (lhs: AdaptyProfile, rhs: AdaptyProfile) -> Bool {
         lhs.profileId == rhs.profileId
             && lhs.customerUserId == rhs.customerUserId
             && lhs.codableCustomAttributes == rhs.codableCustomAttributes
@@ -40,7 +40,7 @@ extension Profile: Equatable {
     }
 }
 
-extension Profile: CustomStringConvertible {
+extension AdaptyProfile: CustomStringConvertible {
     public var description: String {
         "(profileId: \(profileId), "
             + (customerUserId == nil ? "" : "customerUserId: \(customerUserId!), ")
@@ -49,7 +49,7 @@ extension Profile: CustomStringConvertible {
     }
 }
 
-extension Profile: Codable {
+extension AdaptyProfile: Codable {
     enum CodingKeys: String, CodingKey {
         case profileId = "profile_id"
         case customerUserId = "customer_user_id"
@@ -63,7 +63,7 @@ extension Profile: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         profileId = try container.decode(String.self, forKey: .profileId)
         customerUserId = try container.decodeIfPresent(String.self, forKey: .customerUserId)
-        codableCustomAttributes = try container.decodeIfPresent(Profile.CustomAttributes.self, forKey: .customAttributes)
+        codableCustomAttributes = try container.decodeIfPresent(AdaptyProfile.CustomAttributes.self, forKey: .customAttributes)
         customAttributes = codableCustomAttributes?.convertToSimpleDictionary() ?? [:]
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
         subscriptions = try container.decodeIfPresent([String: Subscription].self, forKey: .subscriptions) ?? [:]

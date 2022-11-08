@@ -8,18 +8,12 @@
 import StoreKit
 
 extension SKQueueManager {
-    struct AnyProduct<T: Product>: Product {
-        let value: T
-        var vendorProductId: String { value.vendorProductId }
-        var skProduct: SKProduct { value.skProduct }
-    }
-
-    func makePurchase<T: Product>(payment: SKPayment, product: T, _ completion: @escaping ResultCompletion<Profile>) {
+    func makePurchase<T: AdaptyProduct>(payment: SKPayment, product: T, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         queue.async { [weak self] in
             let productId = payment.productIdentifier
             guard let self = self else { return }
 
-            if let productVariationId = (product as? PaywallProduct)?.variationId {
+            if let productVariationId = (product as? AdaptyPaywallProduct)?.variationId {
                 self.variationsIds[productId] = productVariationId
             }
 
@@ -81,7 +75,7 @@ extension SKQueueManager {
     }
 
     func callMakePurchasesCompletionHandlers(_ productId: String,
-                                             _ result: AdaptyResult<Profile>) {
+                                             _ result: AdaptyResult<AdaptyProfile>) {
         queue.async { [weak self] in
             guard let self = self else { return }
 

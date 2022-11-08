@@ -1,5 +1,5 @@
 //
-//  ProductDiscount.swift
+//  AdaptyProductDiscount.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-public struct ProductDiscount {
+public struct AdaptyProductDiscount {
     /// Discount price of a product in a local currency.
     public let price: Decimal
 
@@ -16,7 +16,7 @@ public struct ProductDiscount {
     public let identifier: String?
 
     /// An information about period for a product discount.
-    public let subscriptionPeriod: ProductSubscriptionPeriod
+    public let subscriptionPeriod: AdaptyProductSubscriptionPeriod
 
     /// A number of periods this product discount is available
     public let numberOfPeriods: Int
@@ -34,7 +34,7 @@ public struct ProductDiscount {
     public let localizedNumberOfPeriods: String?
 }
 
-extension ProductDiscount {
+extension AdaptyProductDiscount {
     @available(iOS 11.2, macOS 10.14.4, *)
     init(discount: SKProductDiscount, locale: Locale) {
         let identifier: String?
@@ -46,7 +46,7 @@ extension ProductDiscount {
 
         self.init(price: discount.price.decimalValue,
                   identifier: identifier,
-                  subscriptionPeriod: ProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
+                  subscriptionPeriod: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
                   numberOfPeriods: discount.numberOfPeriods,
                   paymentMode: PaymentMode(mode: discount.paymentMode),
                   localizedPrice: locale.localized(price: discount.price),
@@ -55,7 +55,7 @@ extension ProductDiscount {
     }
 }
 
-extension ProductDiscount: CustomStringConvertible {
+extension AdaptyProductDiscount: CustomStringConvertible {
     public var description: String {
         "(price: \(price)"
             + (identifier == nil ? "" : ", identifier: \(identifier!)")
@@ -67,9 +67,9 @@ extension ProductDiscount: CustomStringConvertible {
     }
 }
 
-extension ProductDiscount: Equatable, Sendable {}
+extension AdaptyProductDiscount: Equatable, Sendable {}
 
-extension ProductDiscount: Encodable {
+extension AdaptyProductDiscount: Encodable {
     enum CodingKeys: String, CodingKey {
         case price
         case identifier

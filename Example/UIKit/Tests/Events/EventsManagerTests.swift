@@ -11,13 +11,13 @@ import XCTest
 
 // final class ProfileStorageForTest: ProfileStorage {
 //    var profileId: String
-//    var profile: VH<Profile>?
+//    var profile: VH<AdaptyProfile>?
 //
 //    var externalAnalyticsDisabled: Bool
 //    var syncedBundleReceipt: Bool
 //
-//    func getProfile() -> VH<Profile>? { profile }
-//    func setProfile(_ value: VH<Profile>) { profile = value }
+//    func getProfile() -> VH<AdaptyProfile>? { profile }
+//    func setProfile(_ value: VH<AdaptyProfile>) { profile = value }
 //
 //
 //    init(profileId: String, externalAnalyticsDisabled: Bool, syncedBundleReceipt: Bool) {

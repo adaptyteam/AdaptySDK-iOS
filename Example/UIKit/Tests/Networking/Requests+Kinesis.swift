@@ -50,7 +50,7 @@ final class Requests_Kinesis: XCTestCase {
         [
             try Event(type: .appOpened, profileId: profileId).encodeToData(),
             try Event(type: .paywallShowed(PaywallShowedParameters(variationId: "test_variation_id")), profileId: profileId).encodeToData(),
-            try Event(type: .onboardingScreenShowed(OnboardingScreenParameters(name: "test_name", screenName: "test_screen", screenOrder: 0)), profileId: profileId).encodeToData(),
+            try Event(type: .onboardingScreenShowed(AdaptyOnboardingScreenParameters(name: "test_name", screenName: "test_screen", screenOrder: 0)), profileId: profileId).encodeToData(),
         ]
     }
     

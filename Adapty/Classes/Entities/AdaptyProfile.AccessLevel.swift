@@ -1,5 +1,5 @@
 //
-//    Profile.AccessLevel.swift
+//  AdaptyProfile.AccessLevel.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Profile {
+extension AdaptyProfile {
     public struct AccessLevel {
         /// Unique identifier of the access level configured by you in Adapty Dashboard.
         public let id: String
@@ -89,9 +89,9 @@ extension Profile {
     }
 }
 
-extension Profile.AccessLevel: Equatable {}
+extension AdaptyProfile.AccessLevel: Equatable {}
 
-extension Profile.AccessLevel: CustomStringConvertible {
+extension AdaptyProfile.AccessLevel: CustomStringConvertible {
     public var description: String {
         "(id: \(id), isActive: \(isActive), vendorProductId: \(vendorProductId), store: \(store), activatedAt: \(activatedAt), "
             + (renewedAt == nil ? "" : "renewedAt: \(renewedAt!), ")
@@ -109,7 +109,7 @@ extension Profile.AccessLevel: CustomStringConvertible {
     }
 }
 
-extension Profile.AccessLevel: Codable {
+extension AdaptyProfile.AccessLevel: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case isActive = "is_active"

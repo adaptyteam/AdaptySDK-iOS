@@ -12,7 +12,6 @@ enum EventsError: Error {
     case interrupted(AdaptyError.Source)
 }
 
-
 extension EventsError: CustomStringConvertible {
     var description: String {
         switch self {
@@ -49,7 +48,7 @@ extension EventsError {
             return false
         }
     }
-    
+
     var originalError: Error? {
         switch self {
         case let .sending(_, error):
@@ -95,7 +94,7 @@ extension EventsError {
         file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         .interrupted(AdaptyError.Source(file: file,
-                                      function: function,
-                                      line: line))
+                                        function: function,
+                                        line: line))
     }
 }

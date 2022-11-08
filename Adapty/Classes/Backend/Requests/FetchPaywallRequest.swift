@@ -8,7 +8,7 @@
 import Foundation
 
 struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<Paywall?>
+    typealias ResponseBody = Backend.Response.Body<AdaptyPaywall?>
 
     let endpoint: HTTPEndpoint
     let headers: Headers
@@ -16,12 +16,12 @@ struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<Paywall?, Error>
+            let result: Result<AdaptyPaywall?, Error>
 
             if headers.hasSameBackendResponseHash(response.headers) {
                 result = .success(nil)
             } else {
-                result = jsonDecoder.decode(Backend.Response.Body<Paywall>.self, response.body).map { $0.value }
+                result = jsonDecoder.decode(Backend.Response.Body<AdaptyPaywall>.self, response.body).map { $0.value }
             }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
@@ -47,7 +47,7 @@ extension HTTPSession {
                                     profileId: String,
                                     responseHash: String?,
                                     syncedBundleReceipt: Bool,
-                                    _ completion: @escaping ResultCompletion<VH<Paywall?>>) {
+                                    _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall?>>) {
         let request = FetchPaywallRequest(paywallId: paywallId,
                                           profileId: profileId,
                                           responseHash: responseHash)

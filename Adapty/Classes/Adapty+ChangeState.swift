@@ -20,7 +20,6 @@ public final class Adapty {
     var onceSendedEnvoriment: Bool = false
     var state: State
 
-    
     init(profileStorage: ProfileStorage,
          vendorIdsStorage: ProductVendorIdsStorage,
          backend: Backend,
@@ -41,12 +40,12 @@ public final class Adapty {
         initilizingProfileManager(toCustomerUserId: customerUserId)
     }
 
-    fileprivate var profileManagerCompletionHandlers: [ResultCompletion<AdaptyProfileManager>]?
+    fileprivate var profileManagerCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
 
-    fileprivate var logoutCompletionHandlers: [ErrorCompletion]?
+    fileprivate var logoutCompletionHandlers: [AdaptyErrorCompletion]?
 
     @inline(__always)
-    func getProfileManager(_ completion: @escaping ResultCompletion<AdaptyProfileManager>) {
+    func getProfileManager(_ completion: @escaping AdaptyResultCompletion<AdaptyProfileManager>) {
         if let result = state.initilizedResult {
             completion(result)
             return
@@ -79,7 +78,7 @@ public final class Adapty {
 
 extension Adapty {
     @inline(__always)
-    func startLogout(_ completion: @escaping ErrorCompletion) {
+    func startLogout(_ completion: @escaping AdaptyErrorCompletion) {
         if let handlers = logoutCompletionHandlers {
             logoutCompletionHandlers = handlers + [completion]
             return
@@ -113,7 +112,7 @@ extension Adapty {
     }
 
     @inline(__always)
-    func identify(toCustomerUserId newCustomerUserId: String, _ completion: @escaping ErrorCompletion) {
+    func identify(toCustomerUserId newCustomerUserId: String, _ completion: @escaping AdaptyErrorCompletion) {
         switch state {
         case let .failed(error):
             completion(error)
@@ -219,10 +218,10 @@ extension Adapty {
         }
     }
 
-    fileprivate func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping ResultCompletion<VH<Profile>>) {
+    fileprivate func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         _ = httpSession.performCreateProfileRequest(profileId: profileId,
-                                                customerUserId: customerUserId,
-                                                analyticsDisabled: profileStorage.externalAnalyticsDisabled) { [weak self] result in
+                                                    customerUserId: customerUserId,
+                                                    analyticsDisabled: profileStorage.externalAnalyticsDisabled) { [weak self] result in
             guard let self = self else { return }
 
             // TODO: Check Cancel
@@ -271,7 +270,7 @@ extension Adapty {
                 return nil
             }
         }
-        
+
         var initilizedResult: AdaptyResult<AdaptyProfileManager>? {
             switch self {
             case let .failed(error):

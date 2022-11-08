@@ -15,20 +15,20 @@ final class Requests_Profile: XCTestCase {
     let goodBackendId = "profile"
     let badBackendId = "profile_bad"
 
-    var profileParameters: ProfileParameters!
+    var profileParameters: AdaptyProfileParameters!
     var installationMeta: Environment.Meta!
 
     override func setUpWithError() throws {
         try super.setUpWithError()
 
-        let customAttributes: Profile.CustomAttributes =
+        let customAttributes: AdaptyProfile.CustomAttributes =
             [
                 "custom_nil": .nil,
                 "custom_string": .string("str_value"),
                 "custom_float": .float(1984.84),
             ]
 
-        profileParameters = ProfileParameters.Builder()
+        profileParameters = AdaptyProfileParameters.Builder()
             .with(firstName: "John")
             .with(lastName: "Appleseed")
             .with(gender: .male)
@@ -214,7 +214,7 @@ final class Requests_Profile: XCTestCase {
         let profileId: String = TestsConstants.existingProfileId
 
         let updateProfileRequest = UpdateProfileRequest(profileId: profileId,
-                                                        parameters: ProfileParameters(customAttributes: [
+                                                        parameters: AdaptyProfileParameters(customAttributes: [
                                                             "long_string": .string("1234567890_1234567890_1234567890"),
                                                         ]),
                                                         environmentMeta: nil,
@@ -234,7 +234,7 @@ final class Requests_Profile: XCTestCase {
         let profileId: String = TestsConstants.existingProfileId
 
         let updateProfileRequest = UpdateProfileRequest(profileId: profileId,
-                                                        parameters: ProfileParameters(customAttributes: [
+                                                        parameters: AdaptyProfileParameters(customAttributes: [
                                                             "long_string": .string(""),
                                                         ]),
                                                         environmentMeta: nil,
@@ -256,7 +256,7 @@ final class Requests_Profile: XCTestCase {
         let profileId: String = TestsConstants.existingProfileId
 
         let updateProfileRequest = UpdateProfileRequest(profileId: profileId,
-                                                        parameters: ProfileParameters(customAttributes: [
+                                                        parameters: AdaptyProfileParameters(customAttributes: [
                                                             "": .string("value"),
                                                         ]),
                                                         environmentMeta: nil,

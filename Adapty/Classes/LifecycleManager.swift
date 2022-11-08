@@ -91,7 +91,7 @@ class LifecycleManager {
         Log.verbose("LifecycleManager syncProfile Begin")
 
         if needsSyncStorefrontCountry, let storeCountry = Environment.Device.storeCountry {
-            Adapty.updateProfile(params: ProfileParameters(storeCountry: storeCountry)) { [weak self] error in
+            Adapty.updateProfile(params: AdaptyProfileParameters(storeCountry: storeCountry)) { [weak self] error in
                 if let error = error {
                     Log.verbose("LifecycleManager syncProfile Error: \(error)")
                     completion(false)

@@ -39,7 +39,7 @@ struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse {
 extension HTTPSession {
     func performFetchAllProductVendorIdsRequest(profileId: String,
                                                 responseHash: String?,
-                                                _ completion: @escaping ResultCompletion<VH<[String]?>>) {
+                                                _ completion: @escaping AdaptyResultCompletion<VH<[String]?>>) {
         let request = FetchAllProductVendorIdsRequest(profileId: profileId,
                                                       responseHash: responseHash)
 

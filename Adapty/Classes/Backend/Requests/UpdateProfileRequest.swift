@@ -8,21 +8,21 @@
 import Foundation
 
 struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<Profile?>
+    typealias ResponseBody = Backend.Response.Body<AdaptyProfile?>
     let endpoint: HTTPEndpoint
     let headers: Headers
     let profileId: String
-    let parameters: ProfileParameters?
+    let parameters: AdaptyProfileParameters?
     let environmentMeta: Environment.Meta?
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<Profile?, Error>
+            let result: Result<AdaptyProfile?, Error>
 
             if headers.hasSameBackendResponseHash(response.headers) {
                 result = .success(nil)
             } else {
-                result = jsonDecoder.decode(Backend.Response.Body<Profile>.self, response.body).map { $0.value }
+                result = jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
             }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
@@ -30,7 +30,7 @@ struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
     }
 
     init(profileId: String,
-         parameters: ProfileParameters?,
+         parameters: AdaptyProfileParameters?,
          environmentMeta: Environment.Meta?,
          responseHash: String?) {
         endpoint = HTTPEndpoint(
@@ -92,7 +92,7 @@ extension UpdateProfileRequest {
     }
 
     init(profileId: String,
-         parameters: ProfileParameters? = nil,
+         parameters: AdaptyProfileParameters? = nil,
          sendEnvironmentMeta: SendEnvironment,
          responseHash: String?) {
         let environmentMeta: Environment.Meta?
@@ -115,10 +115,10 @@ extension UpdateProfileRequest {
 
 extension HTTPSession {
     func performUpdateProfileRequest(profileId: String,
-                                     parameters: ProfileParameters?,
+                                     parameters: AdaptyProfileParameters?,
                                      sendEnvironmentMeta: UpdateProfileRequest.SendEnvironment,
                                      responseHash: String?,
-                                     _ completion: @escaping ResultCompletion<VH<Profile?>>) {
+                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
         let request = UpdateProfileRequest(profileId: profileId,
                                            parameters: parameters,
                                            sendEnvironmentMeta: sendEnvironmentMeta,

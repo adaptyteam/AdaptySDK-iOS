@@ -42,7 +42,7 @@ extension HTTPSession {
     func performFetchAllProductsRequest(profileId: String,
                                         responseHash: String?,
                                         syncedBundleReceipt: Bool,
-                                        _ completion: @escaping ResultCompletion<VH<[BackendProduct]?>>) {
+                                        _ completion: @escaping AdaptyResultCompletion<VH<[BackendProduct]?>>) {
         let request = FetchAllProductsRequest(profileId: profileId,
                                               responseHash: responseHash)
 

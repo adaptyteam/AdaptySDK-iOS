@@ -1,5 +1,5 @@
 //
-//  Models+Profile.swift
+//  Models+AdaptyProfile.swift
 //  Adapty_Tests
 //
 //  Created by Aleksey Goncharov on 20.10.2022.
@@ -23,21 +23,21 @@ final class Models_Profile: XCTestCase {
     
     func test_Profile_Empty() throws {
         let data = try Tester.jsonDataNamed("profile_empty")
-        let result = try decoder.decode(Profile.self, from: data)
+        let result = try decoder.decode(AdaptyProfile.self, from: data)
 
         XCTAssertNil(result.customerUserId)
     }
     
     func test_Profile_Full() throws {
         let data = try Tester.jsonDataNamed("profile_full")
-        let result = try decoder.decode(Profile.self, from: data)
+        let result = try decoder.decode(AdaptyProfile.self, from: data)
 
         XCTAssertNil(result.customerUserId)
     }
     
     func test_Profile_CustomAttributes() throws {
         let data = try Tester.jsonDataNamed("profile_custom_attributes")
-        let result = try decoder.decode(Profile.self, from: data)
+        let result = try decoder.decode(AdaptyProfile.self, from: data)
 
         XCTAssertNil(result.customerUserId)
     }

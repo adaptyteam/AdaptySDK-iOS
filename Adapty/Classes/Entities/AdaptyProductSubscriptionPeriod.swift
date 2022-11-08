@@ -1,5 +1,5 @@
 //
-//  ProductSubscriptionPeriod.swift
+//  AdaptyProductSubscriptionPeriod.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -8,30 +8,30 @@
 import Foundation
 import StoreKit
 
-public struct ProductSubscriptionPeriod {
+public struct AdaptyProductSubscriptionPeriod {
     /// A unit of time that a subscription period is specified in.
-    public let unit: PeriodUnit
-    
+    public let unit: AdaptyPeriodUnit
+
     /// A number of period units.
     public let numberOfUnits: Int
 }
 
-extension ProductSubscriptionPeriod {
+extension AdaptyProductSubscriptionPeriod {
     @available(iOS 11.2, macOS 10.13.2, *)
     init(subscriptionPeriod: SKProductSubscriptionPeriod) {
-        self.init(unit: PeriodUnit(unit: subscriptionPeriod.unit), numberOfUnits: subscriptionPeriod.numberOfUnits)
+        self.init(unit: AdaptyPeriodUnit(unit: subscriptionPeriod.unit), numberOfUnits: subscriptionPeriod.numberOfUnits)
     }
 }
 
-extension ProductSubscriptionPeriod: CustomStringConvertible {
+extension AdaptyProductSubscriptionPeriod: CustomStringConvertible {
     public var description: String {
         "\(numberOfUnits) \(unit)"
     }
 }
 
-extension ProductSubscriptionPeriod: Equatable, Sendable {}
+extension AdaptyProductSubscriptionPeriod: Equatable, Sendable {}
 
-extension ProductSubscriptionPeriod: Codable {
+extension AdaptyProductSubscriptionPeriod: Codable {
     enum CodingKeys: String, CodingKey {
         case unit
         case numberOfUnits

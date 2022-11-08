@@ -10,7 +10,7 @@ import Foundation
 enum EventType {
     case appOpened
     case paywallShowed(PaywallShowedParameters)
-    case onboardingScreenShowed(OnboardingScreenParameters)
+    case onboardingScreenShowed(AdaptyOnboardingScreenParameters)
 }
 
 extension EventType: Encodable {

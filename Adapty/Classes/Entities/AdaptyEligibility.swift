@@ -1,5 +1,5 @@
 //
-//  IntroductoryOfferEligibility.swift
+//  AdaptyEligibility.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 26.09.2022.
@@ -7,13 +7,13 @@
 
 import Foundation
 
-public enum IntroductoryOfferEligibility {
+public enum AdaptyEligibility {
     case unknown
     case ineligible
     case eligible
 }
 
-extension IntroductoryOfferEligibility: CustomStringConvertible {
+extension AdaptyEligibility: CustomStringConvertible {
     public var description: String {
         switch self {
         case .unknown: return "unknown"
@@ -23,9 +23,9 @@ extension IntroductoryOfferEligibility: CustomStringConvertible {
     }
 }
 
-extension IntroductoryOfferEligibility: Equatable, Sendable {}
+extension AdaptyEligibility: Equatable, Sendable {}
 
-extension IntroductoryOfferEligibility: Codable {
+extension AdaptyEligibility: Codable {
     enum CodingValues: String {
         case unknown
         case ineligible

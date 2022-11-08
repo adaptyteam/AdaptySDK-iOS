@@ -1,5 +1,5 @@
 //
-//  Profile.CustomAttributes.swift
+//  AdaptyProfile.CustomAttributes.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 26.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Profile {
+extension AdaptyProfile {
     typealias CustomAttributes = [String: CustomAttributeValue]
 
     enum CustomAttributeValue {
@@ -17,9 +17,9 @@ extension Profile {
     }
 }
 
-extension Profile.CustomAttributeValue: Equatable, Sendable {}
+extension AdaptyProfile.CustomAttributeValue: Equatable, Sendable {}
 
-extension Profile.CustomAttributeValue {
+extension AdaptyProfile.CustomAttributeValue {
     var hasValue: Bool {
         switch self {
         case .nil:
@@ -50,7 +50,7 @@ extension Profile.CustomAttributeValue {
     }
 }
 
-extension Profile.CustomAttributes {
+extension AdaptyProfile.CustomAttributes {
     func convertToSimpleDictionary() -> [String: Any] {
         Dictionary<String, Any>(uniqueKeysWithValues: compactMap {
             guard let rawValue = $1.rawValue else { return nil }
@@ -73,7 +73,7 @@ extension Profile.CustomAttributes {
     }
 }
 
-extension Profile.CustomAttributeValue: Codable {
+extension AdaptyProfile.CustomAttributeValue: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if container.decodeNil() {

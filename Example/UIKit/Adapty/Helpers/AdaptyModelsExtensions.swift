@@ -8,7 +8,7 @@
 
 import Adapty
 
-extension ProductDiscount.PaymentMode {
+extension AdaptyProductDiscount.PaymentMode {
     var title: String {
         switch self {
         case .payAsYouGo:

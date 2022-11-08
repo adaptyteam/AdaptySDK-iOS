@@ -31,7 +31,7 @@ class MainController: UIViewController {
             to: view)
     }
 
-    private func presentPaywallController(_ paywall: Paywall, _ products: [PaywallProduct]) {
+    private func presentPaywallController(_ paywall: AdaptyPaywall, _ products: [AdaptyPaywallProduct]) {
         let isHorizontal = paywall.isHorizontal()
 
         let vc = isHorizontal ? PurchaseController.instantiateHorizontal() : PurchaseController.instantiateVertical()

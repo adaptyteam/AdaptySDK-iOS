@@ -12,7 +12,7 @@ final class SKProductsManager: NSObject {
     private var invalidProductIdentifiers = Set<String>()
     private var products = [String: SKProduct]()
     private var requests = [SKRequest: (productIds: Set<String>, retryCount: Int)]()
-    private var completionHandlers = [Set<String>: [ResultCompletion<[SKProduct]>]]()
+    private var completionHandlers = [Set<String>: [AdaptyResultCompletion<[SKProduct]>]]()
     private var cache: ProductVendorIdsCache
     private let session: HTTPSession
     private var sending: Bool = false
@@ -24,7 +24,7 @@ final class SKProductsManager: NSObject {
         fetchAllProducts()
     }
 
-    func fetchProducts(productIdentifiers productIds: Set<String>, retryCount: Int = 3, _ completion: @escaping ResultCompletion<[SKProduct]>) {
+    func fetchProducts(productIdentifiers productIds: Set<String>, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SKProduct]>) {
         queue.async { [weak self] in
             guard let self = self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))

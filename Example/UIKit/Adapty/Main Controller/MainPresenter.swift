@@ -24,14 +24,14 @@ class MainPresenter: ObservableObject {
     @Published var customerUserIdEdited: String = ""
 
     @Published var profileCollapsed = true
-    @Published var profile: Profile? {
+    @Published var profile: AdaptyProfile? {
         didSet {
             adaptyId = profile?.profileId
         }
     }
 
-    @Published var exampleABTestPaywall: Paywall?
-    @Published var exampleABTestProducts: [PaywallProduct]?
+    @Published var exampleABTestPaywall: AdaptyPaywall?
+    @Published var exampleABTestProducts: [AdaptyPaywallProduct]?
     @Published var errors: [AdaptyIdentifiableError] = []
 
     init() {
@@ -85,12 +85,12 @@ class MainPresenter: ObservableObject {
         }
     }
 
-    @Published var customPaywall: Paywall? {
+    @Published var customPaywall: AdaptyPaywall? {
         didSet {
             reloadCustomPaywallProducts()
         }
     }
-    @Published var customPaywallProducts: [PaywallProduct]?
+    @Published var customPaywallProducts: [AdaptyPaywallProduct]?
     @Published var customPaywallId: String = ""
     @Published var customPaywallCollapsed: Bool = true
 
@@ -116,7 +116,7 @@ class MainPresenter: ObservableObject {
         }
     }
 
-    func purchaseProduct(product: PaywallProduct) {
+    func purchaseProduct(product: AdaptyPaywallProduct) {
         PurchasesObserver.shared.makePurchase(product, completion: { [weak self] error in
             if let error = error {
                 self?.errors.append(AdaptyIdentifiableError(error: error))
@@ -142,7 +142,7 @@ class MainPresenter: ObservableObject {
     }
 
     func updateProfileAttributes() throws {
-        let builder = try ProfileParameters.Builder()
+        let builder = try AdaptyProfileParameters.Builder()
             .with(email: "email@email.com")
             .with(phoneNumber: "+78888888888")
             .with(facebookUserId: "facebookUserId-test")

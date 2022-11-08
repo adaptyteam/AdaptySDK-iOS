@@ -1,5 +1,5 @@
 //
-//  OnboardingScreenParameters.swift
+//  AdaptyOnboardingScreenParameters.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 07.10.2022.
@@ -7,13 +7,13 @@
 
 import Foundation
 
-public struct OnboardingScreenParameters {
+public struct AdaptyOnboardingScreenParameters {
     public let name: String?
     public let screenName: String?
     public let screenOrder: UInt
 }
 
-extension OnboardingScreenParameters: Encodable {
+extension AdaptyOnboardingScreenParameters: Encodable {
     enum CodingKeys: String, CodingKey {
         case name = "onboarding_name"
         case screenName = "onboarding_screen_name"

@@ -8,22 +8,22 @@
 import Foundation
 
 enum AdaptyLogger {
-    static var logLevel: Adapty.LogLevel = .info
+    static var logLevel: AdaptyLogLevel = .info
 
-    static var handler: Adapty.LogHandler = { NSLog("%@", $1) }
+    static var handler: AdaptyLogHandler = { NSLog("%@", $1) }
 
     private static let dispatchQueue = DispatchQueue(label: "Adapty.SDK.Logger")
 
-    @inlinable static func write(_ level: Adapty.LogLevel, _ message: String, file: String, function: String, line: UInt) {
+    @inlinable static func write(_ level: AdaptyLogLevel, _ message: String, file: String, function: String, line: UInt) {
         guard logLevel.rawValue >= level.rawValue else { return }
-        if logLevel.rawValue >= Adapty.LogLevel.debug.rawValue {
+        if logLevel.rawValue >= AdaptyLogLevel.debug.rawValue {
             handler(level, "[Adapty v\(Adapty.SDKVersion)] - \(level)\t\(file)#\(line): \(message)")
         } else {
             handler(level, "[Adapty v\(Adapty.SDKVersion)] - \(level): \(message)")
         }
     }
 
-    @inlinable static func asyncWrite(_ level: Adapty.LogLevel, _ message: String, file: String, function: String, line: UInt) {
+    @inlinable static func asyncWrite(_ level: AdaptyLogLevel, _ message: String, file: String, function: String, line: UInt) {
         dispatchQueue.async { write(level, message, file: file, function: function, line: line) }
     }
 }
@@ -38,7 +38,7 @@ enum Log {
         return result
     }
 
-    @inlinable static func message(_ level: Adapty.LogLevel, _ message: String, file: String = #fileID, function: String = #function, line: UInt = #line) {
+    @inlinable static func message(_ level: AdaptyLogLevel, _ message: String, file: String = #fileID, function: String = #function, line: UInt = #line) {
         AdaptyLogger.asyncWrite(level, message, file: file, function: function, line: line)
     }
 

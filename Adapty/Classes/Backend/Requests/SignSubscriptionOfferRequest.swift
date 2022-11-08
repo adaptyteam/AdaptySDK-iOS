@@ -31,7 +31,7 @@ extension HTTPSession {
     func performSignSubscriptionOfferRequest(profileId: String,
                                              vendorProductId: String,
                                              discountId: String,
-                                             _ completion: @escaping ResultCompletion<SignSubscriptionOfferResponse>) {
+                                             _ completion: @escaping AdaptyResultCompletion<SignSubscriptionOfferResponse>) {
         let request = SignSubscriptionOfferRequest(vendorProductId: vendorProductId,
                                                    discountId: discountId,
                                                    profileId: profileId)

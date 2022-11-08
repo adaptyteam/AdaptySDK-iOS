@@ -94,7 +94,7 @@ extension SKManagerError: CustomNSError {
     var errorCode: Int {
         switch self {
         case .interrupted: return AdaptyError.SKManagerErrorCode.interrupted
-        case .noProductIDsFound: return  AdaptyError.SKManagerErrorCode.noProductIDsFound
+        case .noProductIDsFound: return AdaptyError.SKManagerErrorCode.noProductIDsFound
         case .receiptIsEmpty: return AdaptyError.SKManagerErrorCode.receiptIsEmpty
         case .productPurchaseFailed: return AdaptyError.SKManagerErrorCode.productPurchaseFailed
         case .noPurchasesToRestore: return AdaptyError.SKManagerErrorCode.noPurchasesToRestore

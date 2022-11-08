@@ -1,5 +1,5 @@
 //
-//  DeferredProduct.swift
+//  AdaptyPaywallProduct.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -7,50 +7,68 @@
 
 import StoreKit
 
-public struct DeferredProduct: Product {
+public struct AdaptyPaywallProduct: AdaptyProduct {
     /// Unique identifier of a product from App Store Connect or Google Play Console.
     public let vendorProductId: String
+
+    /// User's eligibility for your introductory offer. Check this property before displaying info about introductory offers (i.e. free trials).
+    public let introductoryOfferEligibility: AdaptyEligibility
 
     /// User's eligibility for the promotional offers. Check this property before displaying info about promotional offers.
     public var promotionalOfferEligibility: Bool { promotionalOfferId != nil }
 
+    let version: Int64
+
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?
+
+    /// Same as `variationId` property of the parent AdaptyPaywall.
+    public let variationId: String
+
+    /// Same as `abTestName` property of the parent AdaptyPaywall.
+    public let paywallABTestName: String
+
+    /// Same as `name` property of the parent AdaptyPaywall.
+    public let paywallName: String
 
     /// Underlying system representation of the product.
     public let skProduct: SKProduct
 }
 
-extension DeferredProduct: CustomStringConvertible {
+extension AdaptyPaywallProduct: CustomStringConvertible {
     public var description: String {
-        "(vendorProductId: \(vendorProductId)"
+        "(vendorProductId: \(vendorProductId), introductoryOfferEligibility: \(introductoryOfferEligibility)"
             + (promotionalOfferId == nil ? "" : ", promotionalOfferId: \(promotionalOfferId!)")
-            + ", skProduct: \(skProduct))"
+            + ", variationId: \(variationId), paywallABTestName: \(paywallABTestName), paywallName: \(paywallName), skProduct: \(skProduct))"
     }
 }
 
-extension DeferredProduct {
-    init(skProduct: SKProduct, payment: SKPayment?) {
-        let promotionalOfferId: String?
-        if #available(iOS 12.2, macOS 10.14.4, *), let discountId = payment?.paymentDiscount?.identifier {
-            promotionalOfferId = discountId
-        } else {
-            promotionalOfferId = nil
-        }
+extension AdaptyPaywallProduct {
+    init(paywall: AdaptyPaywall, product: BackendProduct, skProduct: SKProduct) {
         self.init(
-            vendorProductId: skProduct.productIdentifier,
-            promotionalOfferId: promotionalOfferId,
+            vendorProductId: product.vendorId,
+            introductoryOfferEligibility: product.introductoryOfferEligibility,
+            version: product.version,
+            promotionalOfferId: !product.promotionalOfferEligibility ? nil : paywall.products.first(where: { $0.vendorId == product.vendorId })?.promotionalOfferId,
+            variationId: paywall.variationId,
+            paywallABTestName: paywall.abTestName,
+            paywallName: paywall.name,
             skProduct: skProduct
         )
     }
 }
 
-extension DeferredProduct: Encodable {
+extension AdaptyPaywallProduct: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: ProductCodingKeys.self)
         try container.encode(vendorProductId, forKey: .vendorProductId)
+        try container.encode(introductoryOfferEligibility, forKey: .introductoryOfferEligibility)
+        try container.encode(version, forKey: .version)
 
         try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
+        try container.encode(variationId, forKey: .variationId)
+        try container.encode(paywallABTestName, forKey: .paywallABTestName)
+        try container.encode(paywallName, forKey: .paywallName)
 
         try container.encode(localizedDescription, forKey: .localizedDescription)
         try container.encode(localizedTitle, forKey: .localizedTitle)

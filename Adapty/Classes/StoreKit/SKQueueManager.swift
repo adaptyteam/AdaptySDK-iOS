@@ -29,7 +29,7 @@ extension Adapty {
 }
 
 protocol ReceiptValidator {
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo?, refreshIfEmpty: Bool, _ completion: @escaping ResultCompletion<Profile>)
+    func validateReceipt(purchaseProductInfo: PurchaseProductInfo?, refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>)
 }
 
 final class SKQueueManager: NSObject {
@@ -37,11 +37,11 @@ final class SKQueueManager: NSObject {
 
     var receiptValidator: ReceiptValidator!
 
-    var restorePurchasesCompletionHandlers: [ResultCompletion<Profile>]?
+    var restorePurchasesCompletionHandlers: [AdaptyResultCompletion<AdaptyProfile>]?
     var totalRestoredPurchases = 0
 
-    var makePurchasesCompletionHandlers = [String: [ResultCompletion<Profile>]]()
-    var makePurchasesProduct = [String: Product]()
+    var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyProfile>]]()
+    var makePurchasesProduct = [String: AdaptyProduct]()
 
     var storage: VariationIdStorage
 
@@ -95,7 +95,7 @@ extension SKQueueManager: SKPaymentTransactionObserver {
         func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
             guard Adapty.delegate != nil else { return true }
             Adapty.callDelegate { delegate in
-                let deferedProduct = DeferredProduct(skProduct: product, payment: payment)
+                let deferedProduct = AdaptyDeferredProduct(skProduct: product, payment: payment)
                 delegate.paymentQueue(shouldAddStorePaymentFor: deferedProduct) { [weak self] completion in
                     self?.makePurchase(payment: payment, product: deferedProduct) { result in
                         completion?(result)

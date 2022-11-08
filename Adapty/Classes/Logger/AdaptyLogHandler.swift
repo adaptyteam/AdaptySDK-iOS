@@ -7,12 +7,12 @@
 
 import Foundation
 
-extension Adapty {
-    public typealias LogHandler = (_ level: Adapty.LogLevel, _ message: String) -> Void
+public typealias AdaptyLogHandler = (_ level: AdaptyLogLevel, _ message: String) -> Void
 
+extension Adapty {
     /// Override the default logger behavior using this method
     /// - Parameter handler: The function will be called for each message with the appropriate `logLevel`
-    public static func setLogHandler(_ handler: @escaping Adapty.LogHandler) {
+    public static func setLogHandler(_ handler: @escaping AdaptyLogHandler) {
         AdaptyLogger.handler = handler
     }
 }
