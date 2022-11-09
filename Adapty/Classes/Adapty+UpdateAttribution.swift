@@ -14,41 +14,42 @@ extension Adapty {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attribution, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         }
         async(completion) { manager, completion in
-            manager.updateAttribution(attribution, source: source, networkUserId: networkUserId, completion)
+            manager.updateAttribution(profileId: manager.profileStorage.profileId,
+                                      attribution,
+                                      source: source,
+                                      networkUserId: networkUserId,
+                                      completion)
         }
     }
 
-    private func updateAttribution(_ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
-        httpSession.performSetAttributionRequest(profileId: profileStorage.profileId,
+    private func updateAttribution(profileId: String, _ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String?, _ completion: AdaptyErrorCompletion? = nil) {
+        httpSession.performSetAttributionRequest(profileId: profileId,
                                                  networkUserId: networkUserId,
                                                  source: source,
                                                  attribution: attribution) { [weak self] error in
-            if source == .appleSearchAds && error == nil {
+            if source == .appleSearchAds , error == nil, let storage = self?.profileStorage, storage.profileId == profileId {
                 // mark appleSearchAds attribution data as synced
-                self?.profileStorage.setAppleSearchAdsSyncDate()
+                storage.setAppleSearchAdsSyncDate()
             }
         }
     }
 
     func updateAppleSearchAdsAttribution() {
         #if os(iOS)
-            Environment.searchAdsAttribution { [weak self] attribution, _ in
-                // check if this is an actual first sync
-                guard let self = self,
-                      var attribution = attribution,
-                      self.profileStorage.appleSearchAdsSyncDate == nil else { return }
+            // check if this is an actual first sync
+            guard profileStorage.appleSearchAdsSyncDate == nil else { return }
+        let profileId = profileStorage.profileId
+        
+            Environment.searchAdsAttribution { [weak self] attribution, error in
+                guard let self = self, let attribution = attribution, error == nil else { return }
 
-                if var attribution = attribution.values.map({ $0 }).first as? [String: Any],
-                   let iAdAttribution = attribution["iad-attribution"] as? NSString {
+                if let values = attribution.values.map({ $0 }).first as? [String: Any],
+                   let iAdAttribution = values["iad-attribution"] as? NSString {
                     // check if the user clicked an Apple Search Ads impression up to 30 days before app download
-                    if iAdAttribution.boolValue == true {
-                        attribution["asa-attribution"] = false
-                        self.updateAttribution(attribution, source: .appleSearchAds)
-                    }
-                } else {
-                    attribution["asa-attribution"] = true
-                    self.updateAttribution(attribution, source: .appleSearchAds)
+                    guard iAdAttribution.boolValue == true else { return }
                 }
+
+                self.updateAttribution(profileId: profileId, attribution, source: .appleSearchAds, networkUserId: nil)
             }
         #endif
     }

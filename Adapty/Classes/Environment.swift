@@ -120,7 +120,8 @@ enum Environment {
     #if os(iOS)
         static func searchAdsAttribution(completion: @escaping ([String: Any]?, Error?) -> Void) {
             ADClient.shared().requestAttributionDetails { attribution, error in
-                if let attribution = attribution {
+                if var attribution: [String: Any] = attribution {
+                    attribution["asa-attribution"] = false
                     completion(attribution, error)
                 } else {
                     modernSearchAdsAttribution(completion)
@@ -129,32 +130,46 @@ enum Environment {
         }
 
         private static func modernSearchAdsAttribution(_ completion: @escaping ([String: Any]?, Error?) -> Void) {
-            if #available(iOS 14.3, *) {
+            guard #available(iOS 14.3, *) else {
+                completion(nil, nil)
+                return
+            }
+
+            let attributionToken: String
+            do {
+                attributionToken = try AAAttribution.attributionToken()
+            } catch {
+                completion(nil, error)
+                return
+            }
+
+            let request = NSMutableURLRequest(url: URL(string: "https://api-adservices.apple.com/api/v1/")!)
+            request.httpMethod = "POST"
+            request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+            request.httpBody = Data(attributionToken.utf8)
+
+            URLSession.shared.dataTask(with: request as URLRequest, completionHandler: { data, _, error in
+                guard let data = data else {
+                    completion(nil, error)
+                    return
+                }
+
+                let result: [String: Any]?
                 do {
-                    let attributionToken = try AAAttribution.attributionToken()
-                    let request = NSMutableURLRequest(url: URL(string: "https://api-adservices.apple.com/api/v1/")!)
-                    request.httpMethod = "POST"
-                    request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
-                    request.httpBody = Data(attributionToken.utf8)
-                    let task = URLSession.shared.dataTask(with: request as URLRequest) { data, _, error in
-                        guard let data = data else {
-                            completion(nil, error)
-                            return
-                        }
-                        do {
-                            let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
-                            completion(result, nil)
-                        } catch {
-                            completion(nil, error)
-                        }
-                    }
-                    task.resume()
+                    result = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
                 } catch {
                     completion(nil, error)
+                    return
                 }
-            } else {
-                completion(nil, nil)
-            }
+
+                guard var result = result else {
+                    completion(nil, nil)
+                    return
+                }
+
+                result["asa-attribution"] = true
+                completion(result, nil)
+            }).resume()
         }
 
     #endif
