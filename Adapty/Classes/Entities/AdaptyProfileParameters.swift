@@ -55,7 +55,7 @@ extension AdaptyProfileParameters: Codable {
         case facebookUserId = "facebook_user_id"
         case facebookAnonymousId = "facebook_anonymous_id"
         case amplitudeUserId = "amplitude_user_id"
-        case amplitudeDeviceId = "amplitude_device_i"
+        case amplitudeDeviceId = "amplitude_device_id"
         case mixpanelUserId = "mixpanel_user_id"
         case appmetricaProfileId = "appmetrica_profile_id"
         case appmetricaDeviceId = "appmetrica_device_id"
