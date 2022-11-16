@@ -28,7 +28,7 @@ final class AdaptyProfileManager {
 
         manager.updateAppleSearchAdsAttribution()
         if !manager.profileStorage.syncedBundleReceipt {
-            manager.validateReceipt(purchaseProductInfo: nil, refreshIfEmpty: true) { _ in }
+            manager.validateReceipt(refreshIfEmpty: true) { _ in }
         }
         Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
     }
@@ -159,9 +159,11 @@ extension AdaptyProfileManager {
         switch fetchPolicy {
         case .default:
             getPaywallProducts(paywall: paywall, completion)
-        case .waitForReceiptValidation where manager.profileStorage.syncedBundleReceipt:
-            getPaywallProducts(paywall: paywall, completion)
         case .waitForReceiptValidation:
+            guard !manager.profileStorage.syncedBundleReceipt else {
+                getPaywallProducts(paywall: paywall, completion)
+                return
+            }
             manager.validateReceipt(refreshIfEmpty: true) { [weak self] result in
                 if let error = result.error {
                     completion(.failure(error))

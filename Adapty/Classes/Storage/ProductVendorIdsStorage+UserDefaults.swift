@@ -32,4 +32,9 @@ extension UserDefaults: ProductVendorIdsStorage {
             return nil
         }
     }
+    
+    func clearProductVendorIds() {
+        Log.debug("UserDefaults: Clear vendor product ids.")
+        removeObject(forKey: Constants.productVendorIdsStorageKey)
+    }
 }

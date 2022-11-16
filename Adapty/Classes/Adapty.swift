@@ -37,6 +37,8 @@ extension Adapty {
                 return
             }
 
+            UserDefaults.standard.clearAllDataIfDifferent(apiKey: apiKey)
+            
             Adapty.dispatchQueue = dispatchQueue
 
             Configuration.observerMode = observerMode

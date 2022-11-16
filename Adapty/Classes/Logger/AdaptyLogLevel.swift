@@ -28,14 +28,51 @@ extension Adapty {
     }
 }
 
-extension AdaptyLogLevel: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .error: return "ERROR"
-        case .warn: return "WARN"
-        case .info: return "INFO"
-        case .verbose: return "VERBOSE"
-        case .debug: return "DEBUG"
+extension AdaptyLogLevel: Codable {
+    enum CodingValues: String {
+        case error
+        case warn
+        case info
+        case verbose
+        case debug
+    }
+
+    public init?(rawStringValue: String) {
+        guard let value = CodingValues(rawValue: rawStringValue) else { return nil }
+        switch value {
+        case .error: self = .error
+        case .warn: self = .warn
+        case .info: self = .info
+        case .verbose: self = .verbose
+        case .debug: self = .debug
         }
     }
+
+    public var rawStringValue: String {
+        let value: CodingValues
+        switch self {
+        case .error: value = .error
+        case .warn: value = .warn
+        case .info: value = .info
+        case .verbose: value = .verbose
+        case .debug: value = .debug
+        }
+        return value.rawValue
+    }
+
+    public init(from decoder: Decoder) throws {
+        guard let value = AdaptyLogLevel(rawStringValue: try decoder.singleValueContainer().decode(String.self)) else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "unknown value"))
+        }
+        self = value
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawStringValue)
+    }
+}
+
+extension AdaptyLogLevel: CustomStringConvertible {
+    public var description: String { rawStringValue.uppercased() }
 }

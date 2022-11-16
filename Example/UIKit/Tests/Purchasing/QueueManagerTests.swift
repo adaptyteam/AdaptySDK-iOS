@@ -10,10 +10,10 @@
 import StoreKitTest
 import XCTest
 
-class VariationIdStorageForTest : VariationIdStorage {
+class VariationIdStorageForTest: VariationIdStorage {
     var data = [String: String]()
     func getVariationsIds() -> [String: String] { data }
-    func setVariationsIds(_ value : [String: String]) { data = value}
+    func setVariationsIds(_ value: [String: String]) { data = value }
 }
 
 struct TestableProduct: AdaptyProduct {
@@ -42,13 +42,21 @@ class TestablePurchaseValiadator: ReceiptValidator {
 
     var purchasedProduct: PurchaseProductInfo?
 
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo?, refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        _validateReceipt(purchaseProductInfo: nil, refreshIfEmpty: refreshIfEmpty, completion)
+    }
+
+    func validateReceipt(purchaseProductInfo: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        _validateReceipt(purchaseProductInfo: purchaseProductInfo, refreshIfEmpty: true, completion)
+    }
+
+    func _validateReceipt(purchaseProductInfo: PurchaseProductInfo?, refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         purchasedProduct = purchaseProductInfo
 
         do {
             let profileData = try Tester.jsonDataNamed("profile_empty")
             let profile = try decoder.decode(AdaptyProfile.self, from: profileData)
-            completion(.success(profile))
+            completion(.success(VH(profile, hash: nil)))
         } catch {
             completion(.failure(.cantMakePayments()))
         }
@@ -113,19 +121,19 @@ final class QueueManagerTests: XCTestCase {
 
         wait(for: [purchaseExpectation], timeout: TestsConstants.timeoutInterval)
     }
-    
+
     func test_Purchase_Failed() throws {
         let storeSession = try SKTestSession(configurationFileNamed: "StoreKitConfiguration")
         storeSession.resetToDefaultState()
         storeSession.clearTransactions()
         storeSession.disableDialogs = true
         storeSession.failTransactionsEnabled = true
-        
+
         let productExpectation = XCTestExpectation()
         let purchaseExpectation = XCTestExpectation()
 
         var product: SKProduct!
-        
+
         productsManager.fetchProducts(productIdentifiers: ["consumable_apples_99"]) { result in
             product = try? result.get().first
             productExpectation.fulfill()
@@ -153,19 +161,19 @@ final class QueueManagerTests: XCTestCase {
 
         wait(for: [purchaseExpectation], timeout: TestsConstants.timeoutInterval)
     }
-    
+
     func test_Purchase_Interrupted() throws {
         let storeSession = try SKTestSession(configurationFileNamed: "StoreKitConfiguration")
         storeSession.resetToDefaultState()
         storeSession.clearTransactions()
         storeSession.disableDialogs = true
         storeSession.interruptedPurchasesEnabled = true
-        
+
         let productExpectation = XCTestExpectation()
         let purchaseExpectation = XCTestExpectation()
 
         var product: SKProduct!
-        
+
         productsManager.fetchProducts(productIdentifiers: ["consumable_apples_99"]) { result in
             product = try? result.get().first
             productExpectation.fulfill()
@@ -179,7 +187,7 @@ final class QueueManagerTests: XCTestCase {
 
         let payment = SKPayment(product: product)
         let testableProduct = TestableProduct(vendorProductId: product.productIdentifier, skProduct: product)
-        
+
         queueManager.makePurchase(payment: payment, product: testableProduct) { result in
             switch result {
             case .success:
@@ -193,19 +201,19 @@ final class QueueManagerTests: XCTestCase {
 
         wait(for: [purchaseExpectation], timeout: TestsConstants.timeoutInterval)
     }
-    
+
     func test_Purchase_AskToBuy() throws {
         let storeSession = try SKTestSession(configurationFileNamed: "StoreKitConfiguration")
         storeSession.resetToDefaultState()
         storeSession.clearTransactions()
         storeSession.disableDialogs = true
         storeSession.askToBuyEnabled = true
-        
+
         let productExpectation = XCTestExpectation()
         let purchaseExpectation = XCTestExpectation()
 
         var product: SKProduct!
-        
+
         productsManager.fetchProducts(productIdentifiers: ["consumable_apples_99"]) { result in
             product = try? result.get().first
             productExpectation.fulfill()
@@ -230,20 +238,19 @@ final class QueueManagerTests: XCTestCase {
 
             purchaseExpectation.fulfill()
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
             guard let transaction = storeSession.allTransactions().first else {
                 XCTFail("It is supposed to be a transaction here")
                 return
             }
-            
+
             do {
                 try storeSession.approveAskToBuyTransaction(identifier: transaction.identifier)
             } catch {
                 XCTFail()
             }
         }
-        
 
         wait(for: [purchaseExpectation], timeout: TestsConstants.timeoutInterval)
     }

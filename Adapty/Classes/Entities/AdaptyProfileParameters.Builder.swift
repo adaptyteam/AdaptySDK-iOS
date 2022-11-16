@@ -110,12 +110,6 @@ extension AdaptyProfileParameters.Builder {
 
 extension AdaptyProfileParameters.Builder {
     @discardableResult
-    public func with(facebookUserId value: String?) -> Self {
-        parameters.facebookUserId = value
-        return self
-    }
-
-    @discardableResult
     public func with(facebookAnonymousId value: String?) -> Self {
         parameters.facebookAnonymousId = value
         return self
@@ -148,6 +142,18 @@ extension AdaptyProfileParameters.Builder {
     @discardableResult
     public func with(appmetricaDeviceId value: String?) -> Self {
         parameters.appmetricaDeviceId = value
+        return self
+    }
+    
+    @discardableResult
+    public func with(oneSignalPlayerId value: String?) -> Self {
+        parameters.oneSignalPlayerId = value
+        return self
+    }
+    
+    @discardableResult
+    public func with(pushwooshHWID value: String?) -> Self {
+        parameters.pushwooshHWID = value
         return self
     }
 }

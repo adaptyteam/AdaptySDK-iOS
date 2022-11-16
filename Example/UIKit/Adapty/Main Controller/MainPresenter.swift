@@ -145,7 +145,6 @@ class MainPresenter: ObservableObject {
         let builder = try AdaptyProfileParameters.Builder()
             .with(email: "email@email.com")
             .with(phoneNumber: "+78888888888")
-            .with(facebookUserId: "facebookUserId-test")
             .with(amplitudeUserId: "amplitudeUserId-test")
             .with(amplitudeDeviceId: "amplitudeDeviceId-test")
             .with(mixpanelUserId: "mixpanelUserId-test")

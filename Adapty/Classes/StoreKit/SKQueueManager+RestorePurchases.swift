@@ -65,14 +65,13 @@ extension SKQueueManager {
                 Log.verbose("Successfully restored purchases.")
             }
 
-            self.receiptValidator.validateReceipt(purchaseProductInfo: nil, refreshIfEmpty: true) { [weak self] result in
+            self.receiptValidator.validateReceipt(refreshIfEmpty: true) { [weak self] result in
                 guard let self = self else { return }
 
                 if let error = error {
                     self.callRestoreCompletionHandlers(.failure(error))
                 }
-
-                self.callRestoreCompletionHandlers(result)
+                self.callRestoreCompletionHandlers(result.map { $0.value })
             }
         }
     }

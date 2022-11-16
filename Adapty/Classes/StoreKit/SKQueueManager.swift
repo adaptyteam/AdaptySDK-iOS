@@ -29,7 +29,9 @@ extension Adapty {
 }
 
 protocol ReceiptValidator {
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo?, refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>)
+    func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>)
+
+    func validateReceipt(purchaseProductInfo: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>)
 }
 
 final class SKQueueManager: NSObject {

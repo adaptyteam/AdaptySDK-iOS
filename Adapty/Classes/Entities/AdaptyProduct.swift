@@ -23,7 +23,7 @@ extension AdaptyProduct {
     /// The title's language is determined by the storefront that the user's device is connected to, not the preferred language set on the device.
     public var localizedTitle: String { skProduct.localizedTitle }
 
-    /// The cost of the product in the local currency..
+    /// The cost of the product in the local currency.
     public var price: Decimal { skProduct.price.decimalValue }
 
     /// The currency code of the locale used to format the price of the product.

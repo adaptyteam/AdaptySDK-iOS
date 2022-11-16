@@ -20,4 +20,10 @@ extension UserDefaults: VariationIdStorage {
         Log.debug("UserDefaults: Saving variationsIds for purchased product")
         set(value, forKey: Constants.variationsIds)
     }
+    
+    func clearVariationsIds() {
+        Log.debug("UserDefaults: Clear variationsIds for purchased product.")
+        removeObject(forKey: Constants.variationsIds)
+    }
+    
 }

@@ -30,12 +30,12 @@ public final class Adapty {
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)
 
         skProductsManager = SKProductsManager(storage: UserDefaults.standard, backend: backend)
-        skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue)
+        skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard)
         eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
         state = .initilizingTo(customerUserId: customerUserId)
 
-        skReceiptManager.prepare()
+        skReceiptManager.refreshReceiptIfEmpty()
         skQueueManager.startObserving(receiptValidator: self)
         initilizingProfileManager(toCustomerUserId: customerUserId)
     }
@@ -239,8 +239,8 @@ extension Adapty {
                 }
                 storage.setProfile(profile)
 
-                self.validateReceipt(refreshIfEmpty: false) { _ in
-                    completion(.success(profile))
+                self.validateReceipt(refreshIfEmpty: false) { result in
+                    completion(.success((try? result.get()) ?? profile))
                 }
             }
         }

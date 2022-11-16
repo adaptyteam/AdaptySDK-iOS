@@ -8,34 +8,39 @@
 import Foundation
 
 extension Adapty: ReceiptValidator {
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo? = nil, refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        skReceiptManager.getReceipt(refreshIfEmpty: refreshIfEmpty) { [weak self] result in
+    func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        skReceiptManager.validateReceipt(refreshIfEmpty: refreshIfEmpty) { [weak self] result in
+            completion(result.map { profile in
+                self?.saveValidateRecieptResponse(profile: profile)
+                return profile
+            })
+        }
+    }
+
+    fileprivate func saveValidateRecieptResponse(profile: VH<AdaptyProfile>) {
+        if profileStorage.profileId == profile.value.profileId {
+            profileStorage.setSyncedBundleReceipt()
+        }
+        if let manager = state.initilized {
+            manager.saveResponse(profile)
+        }
+    }
+
+    func validateReceipt(purchaseProductInfo: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        skReceiptManager.getReceipt(refreshIfEmpty: true) { [weak self] result in
             switch result {
             case let .failure(error):
                 completion(.failure(error))
-            case let .success(Receipt):
-
+            case let .success(receipt):
                 guard let self = self else { return }
-
                 let profileId = self.profileStorage.profileId
-
                 self.httpSession.performValidateReceiptRequest(profileId: profileId,
-                                                               receipt: Receipt,
+                                                               receipt: receipt,
                                                                purchaseProductInfo: purchaseProductInfo) { [weak self] result in
-
-                    switch result {
-                    case let .failure(error):
-                        completion(.failure(error))
-                    case let .success(profile):
-                        if let storage = self?.profileStorage, storage.profileId == profile.value.profileId {
-                            storage.setSyncedBundleReceipt()
-                            // TODO: save profile
-                        }
-                        if let manager = self?.state.initilized, manager.isActive, manager.profileId == profile.value.profileId {
-                            manager.saveResponse(profile)
-                        }
-                        completion(.success(profile.value))
-                    }
+                    completion(result.map { profile in
+                        self?.saveValidateRecieptResponse(profile: profile)
+                        return profile
+                    })
                 }
             }
         }

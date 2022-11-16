@@ -14,13 +14,15 @@ public struct AdaptyProfileParameters {
     public internal(set) var birthday: String?
     public internal(set) var email: String?
     public internal(set) var phoneNumber: String?
-    public internal(set) var facebookUserId: String?
     public internal(set) var facebookAnonymousId: String?
     public internal(set) var amplitudeUserId: String?
     public internal(set) var amplitudeDeviceId: String?
     public internal(set) var mixpanelUserId: String?
     public internal(set) var appmetricaProfileId: String?
     public internal(set) var appmetricaDeviceId: String?
+    public internal(set) var oneSignalPlayerId: String?
+    public internal(set) var pushwooshHWID: String?
+
     var storeCountry: String?
     public internal(set) var appTrackingTransparencyStatus: UInt?
     var codableCustomAttributes: AdaptyProfile.CustomAttributes?
@@ -52,7 +54,6 @@ extension AdaptyProfileParameters: Codable {
         case birthday
         case email
         case phoneNumber = "phone_number"
-        case facebookUserId = "facebook_user_id"
         case facebookAnonymousId = "facebook_anonymous_id"
         case amplitudeUserId = "amplitude_user_id"
         case amplitudeDeviceId = "amplitude_device_id"
@@ -63,6 +64,9 @@ extension AdaptyProfileParameters: Codable {
         case appTrackingTransparencyStatus = "att_status"
         case codableCustomAttributes = "custom_attributes"
         case analyticsDisabled = "analytics_disabled"
+        case oneSignalPlayerId = "one_signal_player_id"
+        case pushwooshHWID = "pushwoosh_hwid"
+
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -73,7 +77,6 @@ extension AdaptyProfileParameters: Codable {
         try container.encodeIfPresent(birthday, forKey: .birthday)
         try container.encodeIfPresent(email, forKey: .email)
         try container.encodeIfPresent(phoneNumber, forKey: .phoneNumber)
-        try container.encodeIfPresent(facebookUserId, forKey: .facebookUserId)
         try container.encodeIfPresent(facebookAnonymousId, forKey: .facebookAnonymousId)
         try container.encodeIfPresent(amplitudeUserId, forKey: .amplitudeUserId)
         try container.encodeIfPresent(amplitudeDeviceId, forKey: .amplitudeDeviceId)
@@ -83,6 +86,8 @@ extension AdaptyProfileParameters: Codable {
         try container.encodeIfPresent(storeCountry, forKey: .storeCountry)
         try container.encodeIfPresent(appTrackingTransparencyStatus, forKey: .appTrackingTransparencyStatus)
         try container.encodeIfPresent(codableCustomAttributes, forKey: .codableCustomAttributes)
+        try container.encodeIfPresent(oneSignalPlayerId, forKey: .oneSignalPlayerId)
+        try container.encodeIfPresent(pushwooshHWID, forKey: .pushwooshHWID)
         try container.encodeIfPresent(analyticsDisabled, forKey: .analyticsDisabled)
     }
 }
