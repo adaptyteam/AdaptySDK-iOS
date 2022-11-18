@@ -30,24 +30,24 @@ extension PurchaseConfiguration {
 
 extension AdaptyPaywall {
     func isHorizontal() -> Bool {
-        customPayload?["is_horizontal"] as? Bool ?? false
+        remoteConfig?["is_horizontal"] as? Bool ?? false
     }
     
     func extractPurchaseConfiguration() -> PurchaseConfiguration {
-        guard let payload = customPayload else { return PurchaseConfiguration.default }
+        guard let config = remoteConfig else { return PurchaseConfiguration.default }
 
-        let title = (payload["title"] as? String) ?? PurchaseConfiguration.default.title
-        let subtitle = (payload["subtitle"] as? String) ?? PurchaseConfiguration.default.subtitle
+        let title = (config["title"] as? String) ?? PurchaseConfiguration.default.title
+        let subtitle = (config["subtitle"] as? String) ?? PurchaseConfiguration.default.subtitle
 
         let accentColor: UIColor
-        if let accentColorString = payload["accent_color"] as? String {
+        if let accentColorString = config["accent_color"] as? String {
             accentColor = UIColor.fromHex(hexString: accentColorString)
         } else {
             accentColor = PurchaseConfiguration.default.accentColor
         }
 
         let backgroundColor: UIColor
-        if let backgroundColorString = payload["background_color"] as? String {
+        if let backgroundColorString = config["background_color"] as? String {
             backgroundColor = UIColor.fromHex(hexString: backgroundColorString)
         } else {
             backgroundColor = PurchaseConfiguration.default.backgroundColor

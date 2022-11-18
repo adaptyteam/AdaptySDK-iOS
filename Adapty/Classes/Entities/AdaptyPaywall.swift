@@ -24,14 +24,14 @@ public struct AdaptyPaywall {
     public let revision: Int
 
     /// A custom JSON string configured in Adapty Dashboard for this paywall.
-    public let customPayloadString: String?
+    public let remoteConfigString: String?
 
-    /// A custom dictionary configured in Adapty Dashboard for this paywall (same as `customPayloadString`)
-    public var customPayload: [String: Any]? {
-        guard let data = customPayloadString?.data(using: .utf8),
-              let customPayload = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+    /// A custom dictionary configured in Adapty Dashboard for this paywall (same as `remoteConfigString`)
+    public var remoteConfig: [String: Any]? {
+        guard let data = remoteConfigString?.data(using: .utf8),
+              let remoteConfig = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
         else { return nil }
-        return customPayload
+        return remoteConfig
     }
 
     var products: [BackendProduct]
@@ -44,7 +44,7 @@ public struct AdaptyPaywall {
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
         "(id: \(id), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), "
-            + (customPayloadString == nil ? "" : "customPayload: \(customPayloadString!), ")
+            + (remoteConfigString == nil ? "" : "remoteConfig: \(remoteConfigString!), ")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }
 }
@@ -57,7 +57,7 @@ extension AdaptyPaywall: Codable {
         case abTestName = "ab_test_name"
         case name = "paywall_name"
         case products
-        case customPayloadString = "custom_payload"
+        case remoteConfigString = "custom_payload"
         case version = "paywall_updated_at"
     }
 }
