@@ -156,6 +156,7 @@ extension AdaptyProfileManager {
     }
 
     func getPaywallProducts(paywall: AdaptyPaywall, fetchPolicy: AdaptyProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
+        Log.debug("call getPaywallProducts with params paywall.id: \(paywall.id) fetchPolicy: \(fetchPolicy)")
         switch fetchPolicy {
         case .default:
             getPaywallProducts(paywall: paywall, completion)
@@ -183,11 +184,11 @@ extension AdaptyProfileManager {
     func getPaywallProducts(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         getPaywallProducts(paywall: paywall) { [weak self] (result: AdaptyResult<[BackendProduct]>) in
             switch result {
-            case .failure:
-                completion(.success([]))
+            case let .failure(error):
+                completion(.failure(error))
             case let .success(backendProducts):
                 guard let manager = self?.manager else {
-                    completion(.success([]))
+                    completion(.failure(AdaptyError.profileWasChanged()))
                     return
                 }
                 manager.skProductsManager.fetchProducts(productIdentifiers: Set(backendProducts.map { $0.vendorId })) {

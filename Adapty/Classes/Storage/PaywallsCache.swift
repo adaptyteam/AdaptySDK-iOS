@@ -25,7 +25,7 @@ final class PaywallsCache {
 
     private func canStore(_ paywall: VH<AdaptyPaywall>) -> Bool {
         guard let cached: VH<AdaptyPaywall> = getPaywall(byId: paywall.value.id) else { return true }
-        return paywall.value.version > cached.value.version
+        return paywall.value.version >= cached.value.version
     }
 
     func setPaywall(_ paywall: VH<AdaptyPaywall>) {

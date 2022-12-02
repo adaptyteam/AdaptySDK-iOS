@@ -39,7 +39,13 @@ extension PaywallsCache {
         let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
         guard let cache = getPaywall(byId: id)?.value else { return fallback }
         guard let fallback = fallback else { return cache }
-        return cache.version > fallback.version ? cache : fallback
+        if cache.version >= fallback.version {
+            return cache
+        } else {
+            Log.verbose("PaywallsCache: return from fallback paywall: \(id)")
+            return fallback
+        }
+
     }
 }
 
@@ -48,7 +54,12 @@ extension ProductsCache {
         let fallback = Adapty.Configuration.fallbackPaywalls?.products[id]
         guard let cache = getProduct(byId: id) else { return fallback }
         guard let fallback = fallback else { return cache }
-        return cache.version > fallback.version ? cache : fallback
+        if cache.version >= fallback.version {
+            return cache
+        } else {
+            Log.verbose("ProductsCache: return from fallback product: \(id)")
+            return fallback
+        }
     }
 
     func getProductsWithFallback(byIds ids: [String]) -> [BackendProduct] {

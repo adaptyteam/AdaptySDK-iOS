@@ -30,7 +30,7 @@ class LifecycleManager {
     func initialize() {
         guard !initialized else { return }
 
-        Log.info("LifecycleManager initialize")
+        Log.info("LifecycleManager: initialize")
 
         subscribeForLifecycleEvents()
         scheduleProfileUpdate(after: Self.profileUpdateInterval)
@@ -40,11 +40,11 @@ class LifecycleManager {
 
     private func scheduleProfileUpdate(after delay: TimeInterval) {
         guard !Self.purchaseInfoUpdateScheduled else {
-            Log.verbose("LifecycleManager scheduleProfileUpdate already scheduled")
+            Log.verbose("LifecycleManager: scheduleProfileUpdate already scheduled")
             return
         }
 
-        Log.verbose("LifecycleManager scheduleProfileUpdate after \(delay) sec.")
+        Log.verbose("LifecycleManager: scheduleProfileUpdate after \(delay) sec.")
 
         Self.purchaseInfoUpdateScheduled = true
 
@@ -62,7 +62,7 @@ class LifecycleManager {
             NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification,
                                                    object: nil,
                                                    queue: nil) { [weak self] _ in
-                Log.verbose("LifecycleManager didBecomeActiveNotification")
+                Log.verbose("LifecycleManager: didBecomeActiveNotification")
 
                 self?.sendAppOpenedEvent()
                 self?.scheduleProfileUpdate(after: 0.0)
@@ -72,7 +72,7 @@ class LifecycleManager {
                 NotificationCenter.default.addObserver(forName: Notification.Name.SKStorefrontCountryCodeDidChange,
                                                        object: nil,
                                                        queue: nil) { [weak self] _ in
-                    Log.verbose("LifecycleManager SKStorefrontCountryCodeDidChange")
+                    Log.verbose("LifecycleManager: SKStorefrontCountryCodeDidChange")
 
                     self?.needsSyncStorefrontCountry = true
                 }
@@ -88,15 +88,15 @@ class LifecycleManager {
             return
         }
 
-        Log.verbose("LifecycleManager syncProfile Begin")
+        Log.verbose("LifecycleManager: syncProfile Begin")
 
         if needsSyncStorefrontCountry, let storeCountry = Environment.Device.storeCountry {
             Adapty.updateProfile(params: AdaptyProfileParameters(storeCountry: storeCountry)) { [weak self] error in
                 if let error = error {
-                    Log.verbose("LifecycleManager syncProfile Error: \(error)")
+                    Log.verbose("LifecycleManager: syncProfile Error: \(error)")
                     completion(false)
                 } else {
-                    Log.verbose("LifecycleManager syncProfile Done")
+                    Log.verbose("LifecycleManager: syncProfile Done")
 
                     self?.needsSyncStorefrontCountry = false
                     self?.profileSyncAt = Date()
@@ -107,11 +107,11 @@ class LifecycleManager {
             Adapty.getProfile { [weak self] result in
                 switch result {
                 case .success:
-                    Log.verbose("LifecycleManager syncProfile Done")
+                    Log.verbose("LifecycleManager: syncProfile Done")
                     self?.profileSyncAt = Date()
                     completion(true)
                 case let .failure(error):
-                    Log.verbose("LifecycleManager syncProfile Error: \(error)")
+                    Log.verbose("LifecycleManager: syncProfile Error: \(error)")
                     completion(false)
                 }
             }
@@ -120,19 +120,19 @@ class LifecycleManager {
 
     private func sendAppOpenedEvent() {
         if let appOpenedSentAt = appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
-            Log.verbose("LifecycleManager sendAppOpenedEvent too early")
+            Log.verbose("LifecycleManager: sendAppOpenedEvent too early")
             return
         }
 
-        Log.verbose("LifecycleManager sendAppOpenedEvent Begin")
+        Log.verbose("LifecycleManager: sendAppOpenedEvent Begin")
 
         Adapty.logAppOpened { [weak self] error in
             if case let .encoding(_, error) = error?.originalError as? EventsError {
-                Log.error("LifecycleManager sendAppOpenedEvent Error: \(error)")
+                Log.error("LifecycleManager: sendAppOpenedEvent Error: \(error)")
             } else if let error = error {
-                Log.verbose("LifecycleManager sendAppOpenedEvent Error: \(error)")
+                Log.verbose("LifecycleManager: sendAppOpenedEvent Error: \(error)")
             } else {
-                Log.verbose("LifecycleManager sendAppOpenedEvent Done")
+                Log.verbose("LifecycleManager: sendAppOpenedEvent Done")
                 self?.appOpenedSentAt = Date()
             }
         }

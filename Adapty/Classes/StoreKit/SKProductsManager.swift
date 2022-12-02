@@ -46,7 +46,7 @@ final class SKProductsManager: NSObject {
     }
 
     private func startRequest(_ productIds: Set<String>, retryCount: Int) {
-        Log.verbose("Called SKProductsManager.startRequest retryCount:\(retryCount)")
+        Log.verbose("SKProductsManager: Called SKProductsManager.startRequest retryCount:\(retryCount)")
         let request = SKProductsRequest(productIdentifiers: productIds)
         request.delegate = self
         requests[request] = (productIds: productIds, retryCount: retryCount)
@@ -90,22 +90,22 @@ extension SKProductsManager: SKProductsRequestDelegate {
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         queue.async { [weak self] in
             for product in response.products {
-                Log.verbose("Found product: \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
+                Log.verbose("SKProductsManager: Found product: \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
             }
 
             guard let self = self else { return }
             if !self.invalidProductIdentifiers.isEmpty {
-                Log.warn("InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
+                Log.warn("SKProductsManager: InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
                 self.invalidProductIdentifiers.formUnion(response.invalidProductIdentifiers)
             }
             guard let productIds = self.requests[request]?.productIds else {
-                Log.error("Not found SKRequest in self.requests")
+                Log.error("SKProductsManager: Not found SKRequest in self.requests")
                 return
             }
             self.requests.removeValue(forKey: request)
 
             guard let handlers = self.completionHandlers.removeValue(forKey: productIds) else {
-                Log.error("Not found completionHandlers by productIds")
+                Log.error("SKProductsManager: Not found completionHandlers by productIds")
                 return
             }
 
@@ -121,10 +121,10 @@ extension SKProductsManager: SKProductsRequestDelegate {
     func request(_ request: SKRequest, didFailWithError error: Error) {
         defer { request.cancel() }
         queue.async { [weak self] in
-            Log.error("Can't fetch products from Store \(error)")
+            Log.error("SKProductsManager: Can't fetch products from Store \(error)")
             guard let self = self else { return }
             guard let (productIds, retryCount) = self.requests[request] else {
-                Log.error("Not found SKRequest in self.requests")
+                Log.error("SKProductsManager: Not found SKRequest in self.requests")
                 return
             }
 
@@ -138,7 +138,7 @@ extension SKProductsManager: SKProductsRequestDelegate {
             self.requests.removeValue(forKey: request)
 
             guard let handlers = self.completionHandlers.removeValue(forKey: productIds) else {
-                Log.error("Not found completionHandlers by productIds")
+                Log.error("SKProductsManager: Not found completionHandlers by productIds")
                 return
             }
 

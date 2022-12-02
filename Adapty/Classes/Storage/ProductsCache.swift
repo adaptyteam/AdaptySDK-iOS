@@ -32,10 +32,11 @@ final class ProductsCache {
                 updated = true
                 return product
             }
-            if product.version > cached.version {
+            if product.version >= cached.version {
                 updated = true
                 return product
             } else {
+                Log.verbose("ProductsCache: seved product.version(\(product.version)) is older than cashed.version(\(cached.version) : \(product.vendorId)")
                 return cached
             }
         }
@@ -43,6 +44,13 @@ final class ProductsCache {
 
         self.products = VH(array.asDictionary, hash: products.hash)
         storage.setBackendProducts(VH(array, hash: products.hash))
+
+        let productsWithUnknownEligibility = array.compactMap {
+            $0.introductoryOfferEligibility == .unknown ? $0.vendorId : nil
+        }
+        if !productsWithUnknownEligibility.isEmpty {
+            Log.verbose("ProductsCache: saved products has eligibility == .unknown \(productsWithUnknownEligibility)")
+        }
     }
 }
 

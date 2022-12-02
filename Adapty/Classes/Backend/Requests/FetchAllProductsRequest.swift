@@ -51,7 +51,15 @@ extension HTTPSession {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))
             case let .success(response):
-                completion(.success(VH(response.body.value?.map(syncedBundleReceipt: syncedBundleReceipt), hash: response.headers.getBackendResponseHash())))
+                var products = response.body.value
+                var hash = response.headers.getBackendResponseHash()
+                if !syncedBundleReceipt {
+                    products = products?.map(syncedBundleReceipt: false)
+                    if products?.contains(where: { $0.introductoryOfferEligibility == .unknown }) ?? false {
+                        hash = nil
+                    }
+                }
+                completion(.success(VH(products, hash: hash)))
             }
         }
     }

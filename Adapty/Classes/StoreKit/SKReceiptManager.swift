@@ -152,7 +152,7 @@ final class SKReceiptManager: NSObject {
                 Log.error("SKReceiptManager: Refresh receipt failed. \(error)")
                 result = .failure(error)
             } else {
-                Log.error("SKReceiptManager: Refresh receipt success.")
+                Log.verbose("SKReceiptManager: Refresh receipt success.")
                 result = self.bundleReceipt()
             }
 
