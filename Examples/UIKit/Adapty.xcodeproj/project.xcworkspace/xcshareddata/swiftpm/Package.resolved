@@ -1,0 +1,34 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "AppsFlyerLib",
+        "repositoryURL": "https://github.com/AppsFlyerSDK/AppsFlyerFramework",
+        "state": {
+          "branch": null,
+          "revision": "7a3cd712a77b30e487e53102b101c5e9ff96a95e",
+          "version": "6.9.1"
+        }
+      },
+      {
+        "package": "Branch",
+        "repositoryURL": "https://github.com/BranchMetrics/ios-branch-deep-linking",
+        "state": {
+          "branch": null,
+          "revision": "e62c92c26b7d45c98052f3f163e07d9b5f572140",
+          "version": "1.45.1"
+        }
+      },
+      {
+        "package": "Adjust",
+        "repositoryURL": "https://github.com/adjust/ios_sdk",
+        "state": {
+          "branch": null,
+          "revision": "f7f2d4312824f23ab8b4a902557cf2d31a95d444",
+          "version": "4.33.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

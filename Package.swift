@@ -8,17 +8,15 @@ let package = Package(
         .macOS(.v10_12)
     ],
     products: [
-        .library(
-            name: "Adapty",
-            targets: ["Adapty"]
-        ),
+        .library(name: "Adapty",
+                 targets: ["Adapty"])
     ],
     dependencies: [],
     targets: [
         .target(
             name: "Adapty",
             dependencies: [],
-            path: "Adapty"
-        ),
+            path: "Sources"
+        )
     ]
 )
