@@ -50,27 +50,56 @@ extension SKQueueManager {
     }
 
     func receivedPurchasedTransaction(_ transaction: SKPaymentTransaction) {
-        queue.async { [weak self] in
-            guard let self = self else { return }
 
-            let productId = transaction.payment.productIdentifier
-            let variationId = self.variationsIds[productId]
-            let product = self.makePurchasesProduct[productId]
+        func fetchPurchaseProductInfo(manager: SKQueueManager,
+                                      _ productId: String,
+                                      variationId: String?,
+                                      _ transaction: SKPaymentTransaction,
+                                      _ completion: @escaping ((PurchaseProductInfo) -> Void)) {
+            if let product = manager.makePurchasesProduct[productId] {
+                completion(PurchaseProductInfo(product, variationId, transaction))
+                return
+            }
 
-            let purchaseProductInfo = PurchaseProductInfo(product, variationId, transaction)
-
-            self.receiptValidator.validateReceipt(purchaseProductInfo: purchaseProductInfo) { [weak self] result in
-                guard let self = self else { return }
-                if result.error == nil {
-                    self.variationsIds.removeValue(forKey: productId)
-                    self.makePurchasesProduct.removeValue(forKey: productId)
-
-                    if !Adapty.Configuration.observerMode {
-                        SKPaymentQueue.default().finishTransaction(transaction)
-                        Log.info("SKQueueManager: finish purchased transaction \(transaction)")
+            manager.skProductsManager.fetchProduct(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
+                switch result {
+                case let .failure(error):
+                    Log.error("SKQueueManager: fetch product \(productId) error: \(error)")
+                    completion(PurchaseProductInfo(nil, variationId, transaction))
+                    return
+                case let .success(skProduct):
+                    guard let skProduct = skProduct else {
+                        Log.error("SKQueueManager: unknown product \(productId)")
+                        completion(PurchaseProductInfo(nil, variationId, transaction))
+                        return
                     }
+                    completion(PurchaseProductInfo(skProduct, variationId, transaction))
+                    return
                 }
-                self.callMakePurchasesCompletionHandlers(productId, result.map { $0.value })
+            }
+        }
+
+        queue.async { [weak self] in
+
+            guard let self = self else { return }
+            let productId = transaction.payment.productIdentifier
+            fetchPurchaseProductInfo(manager: self,
+                                     productId,
+                                     variationId: self.variationsIds[productId],
+                                     transaction) { [weak self] purchaseProductInfo in
+                self?.receiptValidator.validateReceipt(purchaseProductInfo: purchaseProductInfo) { result in
+                    guard let self = self else { return }
+                    if result.error == nil {
+                        self.variationsIds.removeValue(forKey: productId)
+                        self.makePurchasesProduct.removeValue(forKey: productId)
+
+                        if !Adapty.Configuration.observerMode {
+                            SKPaymentQueue.default().finishTransaction(transaction)
+                            Log.info("SKQueueManager: finish purchased transaction \(transaction)")
+                        }
+                    }
+                    self.callMakePurchasesCompletionHandlers(productId, result.map { $0.value })
+                }
             }
         }
     }

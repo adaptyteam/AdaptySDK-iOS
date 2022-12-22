@@ -94,6 +94,10 @@ extension PurchaseProductInfo {
                   promotionalOfferId: discount?.identifier,
                   offer: PurchaseProductInfo.Offer(discount))
     }
+
+    init(_ product: SKProduct, _ variationId: String?, _ transaction: SKPaymentTransaction) {
+        self.init(AdaptyDeferredProduct(skProduct: product, payment: transaction.payment), variationId, transaction)
+    }
 }
 
 extension PurchaseProductInfo.Offer {

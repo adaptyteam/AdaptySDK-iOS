@@ -119,12 +119,12 @@ extension Adapty {
         }
     }
 
-    /// In Observer mode, Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
     ///
     /// - Parameters:
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     ///   - transactionId: A string identifier of your purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
-    ///   - completion: A result containing the optional error.
+    ///   - completion: A result containing an optional error.
     public static func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in

@@ -56,8 +56,6 @@ import Foundation
         /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
         ///
         /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
-        ///
-        /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
         public static func getProfile() async throws -> AdaptyProfile? {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getProfile { result in
@@ -89,6 +87,13 @@ import Foundation
             }
         }
 
+        /// To set attribution data for the profile, use this method.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
+        ///
+        /// - Parameter attribution: a dictionary containing attribution (conversion) data.
+        /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
+        /// - Parameter networkUserId: a string profile's identifier from the attribution service.
         public static func updateAttribution(
             _ attribution: [AnyHashable: Any],
             source: AdaptyAttributionSource,
@@ -263,7 +268,7 @@ import Foundation
             }
         }
 
-        /// In Observer mode, Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+        /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
         ///
         /// - Parameters:
         ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.

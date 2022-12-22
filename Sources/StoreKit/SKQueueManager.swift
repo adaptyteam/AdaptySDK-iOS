@@ -46,6 +46,7 @@ final class SKQueueManager: NSObject {
     var makePurchasesProduct = [String: AdaptyProduct]()
 
     var storage: VariationIdStorage
+    var skProductsManager: SKProductsManager
 
     var variationsIds: [String: String] {
         didSet {
@@ -53,10 +54,11 @@ final class SKQueueManager: NSObject {
         }
     }
 
-    init(queue: DispatchQueue, storage: VariationIdStorage) {
+    init(queue: DispatchQueue,  storage: VariationIdStorage, skProductsManager: SKProductsManager) {
         self.queue = queue
         self.storage = storage
         variationsIds = storage.getVariationsIds()
+        self.skProductsManager = skProductsManager
         super.init()
     }
 

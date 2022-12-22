@@ -31,7 +31,7 @@ public final class Adapty {
 
         skProductsManager = SKProductsManager(storage: UserDefaults.standard, backend: backend)
         skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
-        skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard)
+        skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
         eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
         state = .initilizingTo(customerUserId: customerUserId)
 

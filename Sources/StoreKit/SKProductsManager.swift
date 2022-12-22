@@ -29,6 +29,12 @@ final class SKProductsManager: NSObject {
         case returnCacheDataElseLoad
     }
 
+    func fetchProduct(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<SKProduct?>) {
+        fetchProducts(productIdentifiers: [productId]) { result in
+            completion(result.map { $0.first })
+        }
+    }
+
     func fetchProducts(productIdentifiers productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SKProduct]>) {
         queue.async { [weak self] in
             guard let self = self else {

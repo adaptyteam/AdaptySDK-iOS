@@ -9,6 +9,14 @@
 import Foundation
 
 extension Adapty {
+    /// To set attribution data for the profile, use this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
+    ///
+    /// - Parameter attribution: a dictionary containing attribution (conversion) data.
+    /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
+    /// - Parameter networkUserId: a string profile's identifier from the attribution service.
+    /// - Parameter completion: A result containing an optional error.
     public static func updateAttribution(_ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
         if source == .appsflyer {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attribution, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
