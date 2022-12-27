@@ -85,8 +85,8 @@ Adapty.makePurchase(product: product) { [weak self] result in
 
 This is a demo applications for Adapty. Before running the app, you will need to configure the project.
 
-### 1. [UIKit](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Example/UIKit)
-### 2. [SwiftUI](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Example/SwiftUI)
+### 1. [UIKit](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/UIKit)
+### 2. [SwiftUI](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/SwiftUI)
 
 ![Adapty: An example of the paywall is changed on the fly](https://adapty-portal-media-production.s3.amazonaws.com/github/swift-ui-example.jpg)
 
