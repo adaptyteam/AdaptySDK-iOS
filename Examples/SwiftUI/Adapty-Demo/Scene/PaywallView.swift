@@ -100,7 +100,7 @@ struct PaywallView: View {
         Button(
             action: {
                 guard
-                    let product = paywallService.paywall?.products.first(where: { $0.vendorProductId == product.id })
+                    let product = paywallService.paywallProducts?.first(where: { $0.vendorProductId == product.id })
                 else {
                     updateErrorAlert(isShown: true, title: "No product found")
                     return
