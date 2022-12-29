@@ -21,10 +21,7 @@ final class PaywallService: ObservableObject {
     func getPaywalls(completion: ((Error?) -> Void)? = nil) {
         reset()
         Adapty.getPaywall("YOUR_PAYWALL_ID") { [weak self] result in
-            guard let self = self else {
-                completion?(nil)
-                return
-            }
+            guard let self = self else { return }
             switch result {
             case let .success(paywall):
                 self.paywall = paywall
@@ -35,13 +32,28 @@ final class PaywallService: ObservableObject {
         }
     }
     
-    func getPaywallProducts(for currentPaywall: AdaptyPaywall, completion: ((Error?) -> Void)? = nil) {
+    private func getPaywallProducts(
+        for currentPaywall: AdaptyPaywall,
+        completion: ((Error?) -> Void)? = nil
+    ) {
         let remoteConfig = currentPaywall.remoteConfig
-        Adapty.getPaywallProducts(paywall: currentPaywall) { [weak self] result in
+        // `default` fetch policy allows to fetch products faster,
+        // without waiting for their `introductoryOfferEligibility` statuses
+        Adapty.getPaywallProducts(paywall: currentPaywall, fetchPolicy: .default) { [weak self] result in
             switch result {
             case let .success(products):
-                self?.paywallProducts = products
-                self?.paywallViewModel = self?.model(for: remoteConfig, products: products)
+                // If there is a product with `introductoryOfferEligibility` equal to `unknown`,
+                // we can refetch products again with `.waitForReceiptValidation` fetch policy.
+                // For more info:
+                // https://docs.adapty.io/docs/ios-displaying-products#products-fetch-policy-and-intro-offer-eligibility
+                guard !products.contains(where: { $0.introductoryOfferEligibility == .unknown }) else {
+                    self?.getPaywallProductsEnsuringEligibility(for: currentPaywall) { [weak self] updatedProducts in
+                        self?.updateProducts(updatedProducts ?? products, remoteConfig: remoteConfig)
+                        completion?(nil)
+                    }
+                    return
+                }
+                self?.updateProducts(products, remoteConfig: remoteConfig)
                 completion?(nil)
             case let .failure(error):
                 completion?(error)
@@ -49,6 +61,22 @@ final class PaywallService: ObservableObject {
         }
     }
     
+    private func getPaywallProductsEnsuringEligibility(
+        for currentPaywall: AdaptyPaywall,
+        completion: @escaping (([AdaptyPaywallProduct]?) -> Void)
+    ) {
+        Adapty.getPaywallProducts(paywall: currentPaywall, fetchPolicy: .waitForReceiptValidation) { result in
+            var newProducts: [AdaptyPaywallProduct]?
+            if case let .success(eligibleProducts) = result { newProducts = eligibleProducts }
+            completion(newProducts)
+        }
+    }
+    
+    private func updateProducts(_ products: [AdaptyPaywallProduct], remoteConfig: [String: Any]?) {
+        paywallProducts = products
+        paywallViewModel = model(for: remoteConfig, products: products)
+    }
+
     func logPaywallDisplay() {
         paywall.map { Adapty.logShowPaywall($0) }
     }
