@@ -54,11 +54,11 @@ final class UserService: ObservableObject {
     // MARK: - Get Purchaser Info
     
     func getPurchaserInfo(completion: ((Bool, Error?) -> Void)? = nil) {
-        Adapty.getPurchaserInfo(forceUpdate: true) { [weak self] purchaserInfo, error in
-            switch (purchaserInfo, error) {
-            case (.some(let info), nil):
-                self?.updatePremiumStatus(with: info, error: nil, completion: completion)
-            case (_, let error):
+        Adapty.getProfile { [weak self] result in
+            switch result {
+            case let .success(profile):
+                self?.updatePremiumStatus(with: profile, error: nil, completion: completion)
+            case let .failure(error):
                 print(error.debugDescription)
                 completion?(false, error)
             }
@@ -67,36 +67,38 @@ final class UserService: ObservableObject {
     
     // MARK: - Make Purchase
     
-    func makePurchase(for product: ProductModel, completion: @escaping ((Bool, Error?) -> Void)) {
-        Adapty.makePurchase(product: product) { [weak self] purchaserInfo, receipt, validationResult, product, error in
-            guard let purchaserInfo = purchaserInfo else {
+    func makePurchase(for product: AdaptyPaywallProduct, completion: @escaping ((Bool, Error?) -> Void)) {
+        Adapty.makePurchase(product: product) { [weak self] result in
+            switch result {
+            case let .success(profile):
+                self?.updatePremiumStatus(with: profile, error: nil, completion: completion)
+            case let .failure(error):
                 completion(false, error)
-                return
             }
-            self?.updatePremiumStatus(with: purchaserInfo, error: error, completion: completion)
         }
     }
     
     // MARK: - Restore Purchases
     
     func restorePurchases(completion: @escaping ((Bool, Error?) -> Void)) {
-        Adapty.restorePurchases { [weak self] purchaserInfo, receipt, appleValidationResult, error in
-            guard error == nil, let purchaserInfo = purchaserInfo else {
+        Adapty.restorePurchases { [weak self] result in
+            switch result {
+            case let .success(profile):
+                self?.updatePremiumStatus(with: profile, completion: completion)
+            case let .failure(error):
                 completion(self?.isPremium ?? false, error)
-                return
             }
-            self?.updatePremiumStatus(with: purchaserInfo, completion: completion)
         }
     }
     
     // MARK: - Update Premium Status
     
     private func updatePremiumStatus(
-        with paymentInfo: PurchaserInfoModel,
+        with profile: AdaptyProfile,
         error: Error? = nil,
         completion: ((Bool, Error?) -> Void)? = nil
     ) {
-        let isPremium = paymentInfo.accessLevels["premium"]?.isActive ?? false
+        let isPremium = profile.accessLevels["premium"]?.isActive ?? false
         user?.updateIsPremium(isPremium)
         completion?(isPremium, error)
     }
@@ -105,10 +107,7 @@ final class UserService: ObservableObject {
 // MARK: - AdaptyDelegate
 
 extension UserService: AdaptyDelegate {
-    
-    func didReceivePromo(_ promo: PromoModel) { }
-    
-    func didReceiveUpdatedPurchaserInfo(_ purchaserInfo: PurchaserInfoModel) {
-        updatePremiumStatus(with: purchaserInfo)
+    func didLoadLatestProfile(_ profile: AdaptyProfile) {
+        updatePremiumStatus(with: profile)
     }
 }

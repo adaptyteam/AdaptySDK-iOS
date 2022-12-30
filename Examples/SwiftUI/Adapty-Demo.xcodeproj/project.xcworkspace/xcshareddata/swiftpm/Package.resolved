@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "adaptysdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adaptyteam/AdaptySDK-iOS",
+      "state" : {
+        "revision" : "bab45f77d19c3ca12b993368454cdc9184bf60c0",
+        "version" : "2.2.1"
+      }
+    }
+  ],
+  "version" : 2
+}
