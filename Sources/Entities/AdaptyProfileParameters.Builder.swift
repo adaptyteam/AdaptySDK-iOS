@@ -156,6 +156,12 @@ extension AdaptyProfileParameters.Builder {
         parameters.pushwooshHWID = value
         return self
     }
+
+    @discardableResult
+    public func with(firebaseAppInstanceId value: String?) -> Self {
+        parameters.firebaseAppInstanceId = value
+        return self
+    }
 }
 
 #if canImport(AppTrackingTransparency)

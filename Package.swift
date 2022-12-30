@@ -11,7 +11,6 @@ let package = Package(
         .library(name: "Adapty",
                  targets: ["Adapty"])
     ],
-    dependencies: [],
     targets: [
         .target(
             name: "Adapty",

@@ -11,12 +11,15 @@ import Adjust
 import AppsFlyerLib
 import Branch
 import Foundation
+import FirebaseCore
+import FirebaseAnalytics
 
 extension AppDelegate {
     func configureThirdPartyAnalytics(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
         configureAdjust(launchOptions)
         configureAppsflyer(launchOptions)
         configureBranch(launchOptions)
+        configureFirebase(launchOptions)
     }
 
     private func configureAdjust(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
@@ -38,6 +41,21 @@ extension AppDelegate {
         Branch.getInstance().initSession(launchOptions: launchOptions) { data, _ in
             if let data = data {
                 Adapty.updateAttribution(data, source: .branch)
+            }
+        }
+    }
+    
+    private func configureFirebase(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
+        FirebaseApp.configure()
+        
+        if let appInstanceId = Analytics.appInstanceID() {
+            LogsObserver.shared.postMessage(.verbose, "#Firebase# appInstanceID = \(appInstanceId)")
+            
+            let builder = AdaptyProfileParameters.Builder()
+                .with(firebaseAppInstanceId: appInstanceId)
+            
+            Adapty.updateProfile(params: builder.build()) { error in
+                // handle error
             }
         }
     }

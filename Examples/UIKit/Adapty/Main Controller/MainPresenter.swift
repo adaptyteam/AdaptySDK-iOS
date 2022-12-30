@@ -177,6 +177,10 @@ class MainPresenter: ObservableObject {
             }
         }
     }
+    
+    func presentCodeRedemptionSheet() {
+        Adapty.presentCodeRedemptionSheet()
+    }
 
     @Published var isLoggingOut = false
 

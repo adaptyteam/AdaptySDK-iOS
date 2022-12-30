@@ -301,6 +301,12 @@ struct MainControllerView: View {
                     Text("Send Onboarding Order \(id)")
                 }
             }
+
+            Button {
+                presenter.presentCodeRedemptionSheet()
+            } label: {
+                Text("Present Code Redemption Sheet")
+            }
         } header: {
             Text("Other Actions")
         }
