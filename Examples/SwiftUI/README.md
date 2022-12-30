@@ -27,13 +27,18 @@ To find it, go to [Adapty Dashboard](https://app.adapty.io/home), choose `App Se
 In `PaywallService.swift` there is a `getPaywalls` method, there is a predicate for a developerID inside it. The value is compared to `YOUR_PAYWALL_ID`. You should replace this placeholder with your paywall id.
 ```swift
 func getPaywalls(completion: ((Error?) -> Void)? = nil) {
-        Adapty.getPaywalls(forceUpdate: true) { [weak self] paywalls, products, error in
-            if error == nil {
-                self?.paywall = paywalls?.first(where: { $0.developerId == "YOUR_PAYWALL_ID" })
-            }
+        reset()
+    Adapty.getPaywall("YOUR_PAYWALL_ID") { [weak self] result in
+        guard let self = self else { return }
+        switch result {
+        case let .success(paywall):
+            self.paywall = paywall
+            self.getPaywallProducts(for: paywall, completion: completion)
+        case let .failure(error):
             completion?(error)
         }
     }
+}
 ```
 You can find the paywall ID on [Adapty Dashboard](https://app.adapty.io/home). Go to `Products & Paywalls`, choose `Paywalls` and find the corresponding `Paywall ID` in the table.
 
