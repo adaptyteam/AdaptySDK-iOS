@@ -42,6 +42,8 @@ extension Environment {
             case timezone
             case idfa
             case idfv
+            case screenWidth = "screen_width"
+            case screenHeight = "screen_height"
         }
 
         func encode(to encoder: Encoder) throws {

@@ -116,10 +116,11 @@ extension AdaptyProfileManager {
         manager.httpSession.performSetTransactionVariationIdRequest(profileId: profileId, transactionId: transactionId, variationId: variationId, completion)
     }
 
-    func getPaywall(_ id: String, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let old = paywallsCache.getPaywall(byId: id)
+    func getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+        let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
         let syncedBundleReceipt = manager.profileStorage.syncedBundleReceipt
         manager.httpSession.performFetchPaywallRequest(paywallId: id,
+                                                       locale: locale,
                                                        profileId: profileId,
                                                        responseHash: old?.hash,
                                                        syncedBundleReceipt: syncedBundleReceipt) {
@@ -132,7 +133,8 @@ extension AdaptyProfileManager {
 
             switch result {
             case let .failure(error):
-                guard let value = self.paywallsCache.getPaywallWithFallback(byId: id) else {
+                guard let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) ?? old?.value
+                else {
                     completion(.failure(error))
                     return
                 }
@@ -140,12 +142,16 @@ extension AdaptyProfileManager {
             case let .success(paywall):
 
                 if let value = paywall.value {
-                    self.paywallsCache.setPaywall(VH(value, hash: paywall.hash))
+                    completion(.success(self.paywallsCache.savedPaywall(VH(value, hash: paywall.hash))))
+                    return
+                }
+
+                if let value = old?.value {
                     completion(.success(value))
                     return
                 }
 
-                if let value = self.paywallsCache.getPaywallWithFallback(byId: id) ?? old?.value {
+                if let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) {
                     completion(.success(value))
                     return
                 }

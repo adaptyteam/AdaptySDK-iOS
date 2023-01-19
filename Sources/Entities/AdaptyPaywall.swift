@@ -8,6 +8,7 @@
 import Foundation
 
 public struct AdaptyPaywall {
+    internal static var defaultLocale = "en"
     /// An identifier of a paywall, configured in Adapty Dashboard.
     public let id: String
 
@@ -22,6 +23,9 @@ public struct AdaptyPaywall {
 
     /// Current revision (version) of a paywall. Every change within a paywall creates a new revision.
     public let revision: Int
+
+    /// And identifier of a paywall locale.
+    public let locale: String
 
     /// A custom JSON string configured in Adapty Dashboard for this paywall.
     public let remoteConfigString: String?
@@ -57,8 +61,44 @@ extension AdaptyPaywall: Codable {
         case abTestName = "ab_test_name"
         case name = "paywall_name"
         case products
-        case remoteConfigString = "custom_payload"
+        case remoteConfig = "remote_config"
+        case remoteConfigLocale = "lang"
+        case remoteConfigString = "data"
         case version = "paywall_updated_at"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        version = try container.decode(Int64.self, forKey: .version)
+        revision = try container.decode(Int.self, forKey: .revision)
+        variationId = try container.decode(String.self, forKey: .variationId)
+        abTestName = try container.decode(String.self, forKey: .abTestName)
+        products = try container.decode([BackendProduct].self, forKey: .products)
+
+        if let remoteConfig = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig) {
+            locale = try remoteConfig.decode(String.self, forKey: .remoteConfigLocale)
+            remoteConfigString = try remoteConfig.decodeIfPresent(String.self, forKey: .remoteConfigString)
+        } else {
+            locale = AdaptyPaywall.defaultLocale
+            remoteConfigString = nil
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(version, forKey: .version)
+        try container.encode(revision, forKey: .revision)
+        try container.encode(variationId, forKey: .variationId)
+        try container.encode(abTestName, forKey: .abTestName)
+        try container.encode(products, forKey: .products)
+
+        var remoteConfig = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig)
+        try remoteConfig.encode(locale, forKey: .remoteConfigLocale)
+        try remoteConfig.encodeIfPresent(remoteConfigString, forKey: .remoteConfigString)
     }
 }
 

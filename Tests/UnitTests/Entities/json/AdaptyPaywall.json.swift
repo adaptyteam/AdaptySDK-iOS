@@ -22,7 +22,9 @@ extension AdaptyPaywall {
             "products": .array(BackendProduct.ValidJSON.all),
             "is_promo": false,
             "visual_paywall": nil,
-            "custom_payload": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            "remote_config": ["lang": "br",
+                              "data": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            ],
         ]
 
         static let withoutRemouteConfig: JSONValue = [
@@ -47,7 +49,9 @@ extension AdaptyPaywall {
             "products": .array([]),
             "is_promo": false,
             "visual_paywall": nil,
-            "custom_payload": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            "remote_config": ["lang": "br",
+                              "data": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            ],
         ]
     }
 
@@ -64,7 +68,9 @@ extension AdaptyPaywall {
             "products": .array(BackendProduct.InvalidJSON.all),
             "is_promo": false,
             "visual_paywall": nil,
-            "custom_payload": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            "remote_config": ["lang": "br",
+                              "data": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            ],
         ]
 
         static let withoutProducts: JSONValue = [
@@ -76,7 +82,9 @@ extension AdaptyPaywall {
             "paywall_updated_at": 1664642977264,
             "is_promo": false,
             "visual_paywall": nil,
-            "custom_payload": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            "remote_config": ["lang": "br",
+                              "data": "{\"title\":\"Meet Purple Subscription (edit 1):\",\"subtitle\":\"• benefit 1\\n• benefit 2\\n• benefit 3\",\"accent_color\":\"#781C68\",\"background_color\":\"#ebe134\"}",
+            ],
         ]
     }
 }

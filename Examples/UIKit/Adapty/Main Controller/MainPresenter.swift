@@ -23,7 +23,6 @@ class MainPresenter: ObservableObject {
     @Published var customerUserId: String = ""
     @Published var customerUserIdEdited: String = ""
 
-    @Published var profileCollapsed = true
     @Published var profile: AdaptyProfile? {
         didSet {
             adaptyId = profile?.profileId
@@ -91,13 +90,14 @@ class MainPresenter: ObservableObject {
         }
     }
     @Published var customPaywallProducts: [AdaptyPaywallProduct]?
+    @Published var customPaywallLocale: String = ""
     @Published var customPaywallId: String = ""
     @Published var customPaywallCollapsed: Bool = true
 
     func reloadCustomPaywall() {
         guard !customPaywallId.isEmpty else { return }
 
-        Adapty.getPaywall(customPaywallId) { [weak self] result in
+        Adapty.getPaywall(customPaywallId, locale: customPaywallLocale.isEmpty ? nil : customPaywallLocale) { [weak self] result in
             switch result {
             case let .failure(error):
                 self?.errors.append(AdaptyIdentifiableError(error: error))

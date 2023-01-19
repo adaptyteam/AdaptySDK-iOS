@@ -40,6 +40,7 @@ func XCTAssertEqual(_ expression: FallbackPaywalls?, withJSONValue jsonValue: JS
     }
 
     let meta = object["meta"]?.objectOrFail()
+    XCTAssertEqual(value.version, withJSONValue: meta?["version"])
     let products = meta?["products"]?.arrayOrFail()
     XCTAssertEqual(value.products.count, products?.count)
     products?.forEach {

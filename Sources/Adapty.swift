@@ -66,7 +66,8 @@ extension Adapty {
     /// - Parameters:
     ///   - customerUserId: User identifier in your system.
     ///   - completion: Result callback.
-    public static func identify(_ customerUserId: String, _ completion: AdaptyErrorCompletion? = nil) {
+    public static func identify(_ customerUserId: String,
+                                _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             manager.identify(toCustomerUserId: customerUserId, completion)
         }
@@ -104,7 +105,8 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
     ///
     /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
-    public static func updateProfile(params: AdaptyProfileParameters, _ completion: AdaptyErrorCompletion? = nil) {
+    public static func updateProfile(params: AdaptyProfileParameters,
+                                     _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             if let analyticsDisabled = params.analyticsDisabled {
                 manager.profileStorage.setExternalAnalyticsDisabled(analyticsDisabled)
@@ -125,7 +127,9 @@ extension Adapty {
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     ///   - transactionId: A string identifier of your purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
     ///   - completion: A result containing an optional error.
-    public static func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: AdaptyErrorCompletion? = nil) {
+    public static func setVariationId(_ variationId: String,
+                                      forTransactionId transactionId: String,
+                                      _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
@@ -143,15 +147,18 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - id: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
+    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
     ///   - completion: A result containing the `AdaptyPaywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-    public static func getPaywall(_ id: String, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+    public static func getPaywall(_ id: String,
+                                  locale: String? = nil,
+                                  _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(.failure(profileManager.error!))
                     return
                 }
-                profileManager.getPaywall(id, completion)
+                profileManager.getPaywall(id, locale, completion)
             }
         }
     }
@@ -164,7 +171,9 @@ extension Adapty {
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
     ///   - fetchPolicy: the ``AdaptyProductsFetchPolicy`` value defining the behavior of the function at the time of the missing receipt
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. You can present them in your UI
-    public static func getPaywallProducts(paywall: AdaptyPaywall, fetchPolicy: AdaptyProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
+    public static func getPaywallProducts(paywall: AdaptyPaywall,
+                                          fetchPolicy: AdaptyProductsFetchPolicy = .default,
+                                          _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
@@ -176,7 +185,9 @@ extension Adapty {
         }
     }
 
-    public static func getPaywallProduct(from decoder: JSONDecoder, data: Data, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallProduct>) {
+    public static func getPaywallProduct(from decoder: JSONDecoder,
+                                         data: Data,
+                                         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallProduct>) {
         async(completion) { manager, completion in
             let object: AdaptyPaywallProduct.PrivateObject
             do {
@@ -204,7 +215,8 @@ extension Adapty {
     /// - Parameters:
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
     ///   - completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public static func makePurchase(product: AdaptyPaywallProduct, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    public static func makePurchase(product: AdaptyPaywallProduct,
+                                    _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         guard SKQueueManager.canMakePayments() else {
             completion(.failure(AdaptyError.cantMakePayments()))
             return

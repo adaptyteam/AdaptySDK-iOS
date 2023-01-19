@@ -12,6 +12,7 @@ extension Adapty.Configuration {
 }
 
 extension Adapty {
+    fileprivate static var currentFallbackPaywallsVersion = 1
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///
     /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
@@ -24,7 +25,13 @@ extension Adapty {
     public static func setFallbackPaywalls(_ paywalls: Data, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { completion in
             do {
-                Configuration.fallbackPaywalls = try FallbackPaywalls(from: paywalls)
+                let fallbackPaywalls = try FallbackPaywalls(from: paywalls)
+                if fallbackPaywalls.version < currentFallbackPaywallsVersion {
+                    Log.error("The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard.")
+                } else if fallbackPaywalls.version > currentFallbackPaywallsVersion {
+                    Log.error("The fallback paywalls version is not correct. Please update the AdaptySDK.")
+                }
+                Configuration.fallbackPaywalls = fallbackPaywalls
             } catch {
                 completion(AdaptyError.decodingFallback(error))
                 return
@@ -35,9 +42,9 @@ extension Adapty {
 }
 
 extension PaywallsCache {
-    func getPaywallWithFallback(byId id: String) -> AdaptyPaywall? {
+    func getPaywallWithFallback(byId id: String, locale: String?) -> AdaptyPaywall? {
         let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
-        guard let cache = getPaywall(byId: id)?.value else { return fallback }
+        guard let cache = getPaywallByLocaleOrDefault(locale, withId: id)?.value else { return fallback }
         guard let fallback = fallback else { return cache }
         if cache.version >= fallback.version {
             return cache

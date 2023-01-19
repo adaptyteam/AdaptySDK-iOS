@@ -17,8 +17,17 @@ func XCTAssertEqual(_ expression: AdaptyPaywall?, withJSONValue jsonValue: JSONV
     XCTAssertEqual(value.variationId, withJSONValue: object["variation_id"])
     XCTAssertEqual(value.abTestName, withJSONValue: object["ab_test_name"])
     XCTAssertEqual(value.name, withJSONValue: object["paywall_name"])
-    XCTAssertEqual(value.remoteConfigString, withJSONValue: object["custom_payload"])
+    
     XCTAssertEqual(Int(value.version), withJSONValue: object["paywall_updated_at"])
+
+    if let remouteConfig = object["remote_config"]?.asObjectOrNil {
+        XCTAssertEqual(value.locale, withJSONValue: remouteConfig["lang"])
+        XCTAssertEqual(value.remoteConfigString, withJSONValue: remouteConfig["data"])
+    } else {
+        XCTAssertEqual(value.locale, AdaptyPaywall.defaultLocale)
+        XCTAssertNil(value.remoteConfigString)
+    }
+
     let products = object["products"]?.arrayOrFail(file: file, line: line)
     XCTAssertEqual(value.products.count, products?.count)
     for i in 0 ..< value.products.count {

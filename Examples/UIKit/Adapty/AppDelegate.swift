@@ -9,9 +9,6 @@
 import Adapty
 import UIKit
 
-// TODO: PROD: remove app_bundle_id
-// TODO: PROD: remove team_id
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?

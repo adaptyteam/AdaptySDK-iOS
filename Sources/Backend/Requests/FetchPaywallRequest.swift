@@ -28,7 +28,7 @@ struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(paywallId: String, profileId: String, responseHash: String?) {
+    init(paywallId: String, locale: String?, profileId: String, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/purchase-containers/\(paywallId)/"
@@ -38,17 +38,21 @@ struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
             .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
 
-        queryItems = QueryItems().setBackendProfileId(profileId)
+        queryItems = QueryItems()
+            .setLocale(locale)
+            .setBackendProfileId(profileId)
     }
 }
 
 extension HTTPSession {
     func performFetchPaywallRequest(paywallId: String,
+                                    locale: String?,
                                     profileId: String,
                                     responseHash: String?,
                                     syncedBundleReceipt: Bool,
                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall?>>) {
         let request = FetchPaywallRequest(paywallId: paywallId,
+                                          locale: locale,
                                           profileId: profileId,
                                           responseHash: responseHash)
 

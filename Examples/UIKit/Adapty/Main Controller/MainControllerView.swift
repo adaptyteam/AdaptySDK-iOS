@@ -134,41 +134,36 @@ struct MainControllerView: View {
                 if let level = profile.accessLevels["premium"] {
                     ListStatusItemView(title: "Premium",
                                        state: presenter.getProfileInProgress ? .loading : (level.isActive ? .success : .failure),
-                                       expanded: !presenter.profileCollapsed) {
-                        withAnimation {
-                            presenter.profileCollapsed.toggle()
-                        }
+                                       expanded: nil)
+
+                    ListItemView(title: "Is Lifetime", subtitle: level.isLifetime ? "true" : "false")
+
+                    if let activatedAt = level.activatedAt {
+                        ListItemView(title: "Activated At", subtitle: Self.dateFormatter.string(from: activatedAt))
                     }
 
-                    if !presenter.profileCollapsed {
-                        ListItemView(title: "Is Lifetime", subtitle: level.isLifetime ? "true" : "false")
-
-                        if let activatedAt = level.activatedAt {
-                            ListItemView(title: "Activated At", subtitle: Self.dateFormatter.string(from: activatedAt))
-                        }
-
-                        if let renewedAt = level.renewedAt {
-                            ListItemView(title: "Renewed At", subtitle: Self.dateFormatter.string(from: renewedAt))
-                        }
-
-                        if let expiresAt = level.expiresAt {
-                            ListItemView(title: "Expires At", subtitle: Self.dateFormatter.string(from: expiresAt))
-                        }
-
-                        ListItemView(title: "Will Renew", subtitle: level.willRenew ? "true" : "false")
-
-                        if let unsubscribedAt = level.unsubscribedAt {
-                            ListItemView(title: "Unsubscribed At", subtitle: Self.dateFormatter.string(from: unsubscribedAt))
-                        }
-
-                        if let billingIssueDetectedAt = level.billingIssueDetectedAt {
-                            ListItemView(title: "Billing Issue At", subtitle: Self.dateFormatter.string(from: billingIssueDetectedAt))
-                        }
-
-                        if let reason = level.cancellationReason {
-                            ListItemView(title: "Cancellation Reason", subtitle: reason)
-                        }
+                    if let renewedAt = level.renewedAt {
+                        ListItemView(title: "Renewed At", subtitle: Self.dateFormatter.string(from: renewedAt))
                     }
+
+                    if let expiresAt = level.expiresAt {
+                        ListItemView(title: "Expires At", subtitle: Self.dateFormatter.string(from: expiresAt))
+                    }
+
+                    ListItemView(title: "Will Renew", subtitle: level.willRenew ? "true" : "false")
+
+                    if let unsubscribedAt = level.unsubscribedAt {
+                        ListItemView(title: "Unsubscribed At", subtitle: Self.dateFormatter.string(from: unsubscribedAt))
+                    }
+
+                    if let billingIssueDetectedAt = level.billingIssueDetectedAt {
+                        ListItemView(title: "Billing Issue At", subtitle: Self.dateFormatter.string(from: billingIssueDetectedAt))
+                    }
+
+                    if let reason = level.cancellationReason {
+                        ListItemView(title: "Cancellation Reason", subtitle: reason)
+                    }
+
                 } else {
                     ListStatusItemView(title: "Access Levels: \(profile.accessLevels.count)",
                                        state: presenter.getProfileInProgress ? .loading : .failure,
@@ -194,6 +189,7 @@ struct MainControllerView: View {
     @ViewBuilder func paywallDetailsSection(paywall: AdaptyPaywall, products: [AdaptyPaywallProduct]?) -> some View {
         ListItemView(title: "Variation", subtitle: paywall.variationId)
         ListItemView(title: "Revision", subtitle: "\(paywall.revision)")
+        ListItemView(title: "Locale", subtitle: paywall.locale)
 
         if let products = products {
             ForEach(products, id: \.vendorProductId) { p in
@@ -227,6 +223,7 @@ struct MainControllerView: View {
                 ListStatusItemView(title: "No Paywall Loaded", state: .failure, expanded: nil)
             }
 
+            TextField("Enter Paywall Locale", text: $presenter.customPaywallLocale)            
             TextField("Enter Paywall Id", text: $presenter.customPaywallId)
                 .onSubmit {
                     presenter.reloadCustomPaywall()

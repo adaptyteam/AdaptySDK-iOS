@@ -117,11 +117,12 @@ import Foundation
         ///
         /// - Parameters:
         ///   - id: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
+        ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
         /// - Returns: The `AdaptyPaywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
         /// - Throws: An `AdaptyError` object
-        public static func getPaywall(_ id: String) async throws -> AdaptyPaywall? {
+        public static func getPaywall(_ id: String, locale: String? = nil) async throws -> AdaptyPaywall? {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPaywall(id) { result in
+                Adapty.getPaywall(id, locale: locale) { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)

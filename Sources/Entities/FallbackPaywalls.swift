@@ -11,6 +11,7 @@ struct FallbackPaywalls {
     let paywalls: [String: AdaptyPaywall]
     let products: [String: BackendProduct]
     let allProductVendorIds: [String]
+    let version: Int
 }
 
 extension FallbackPaywalls: Decodable {
@@ -18,6 +19,7 @@ extension FallbackPaywalls: Decodable {
         case data
         case meta
         case products
+        case version
     }
 
     private struct PaywallContainer: Decodable {
@@ -30,12 +32,22 @@ extension FallbackPaywalls: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let subcontainer = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
+
+        if let subcontainer = subcontainer,
+           let v = try subcontainer.decodeIfPresent(Int.self, forKey: .version) {
+            version = v
+        } else {
+            version = 0
+        }
+
         if let containers = try container.decodeIfPresent([PaywallContainer].self, forKey: .data) {
             paywalls = containers.map { $0.paywall }.map(syncedBundleReceipt: false).asDictionary
         } else {
             paywalls = [:]
         }
-        if let subcontainer = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta),
+
+        if let subcontainer = subcontainer,
            let productsArray = try subcontainer.decodeIfPresent([BackendProduct].self, forKey: .products)?.map(syncedBundleReceipt: false) {
             products = productsArray.asDictionary
             allProductVendorIds = productsArray.map { $0.vendorId }
