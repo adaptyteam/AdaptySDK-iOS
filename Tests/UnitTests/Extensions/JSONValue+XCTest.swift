@@ -84,6 +84,11 @@ func XCTAssertEqual(_ expression: Int?, withJSONValue jsonValue: JSONValue?, fil
     XCTAssertEqual(value, jsonValue.intOrFail(file: file, line: line), file: file, line: line)
 }
 
+func XCTAssertEqual(_ expression: Data?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
+    guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
+    XCTAssertEqual(value.base64EncodedString(), jsonValue.stringOrFail(file: file, line: line), file: file, line: line)
+}
+
 func XCTAssertEqual(_ expression: Double?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     XCTAssertEqual(value, jsonValue.floatOrFail(file: file, line: line), file: file, line: line)

@@ -12,6 +12,8 @@
 		8A1F743F2979B67C002B7FBC /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F743E2979B67C002B7FBC /* Color.swift */; };
 		8A1F74412979B689002B7FBC /* Asset.Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74402979B689002B7FBC /* Asset.Font.swift */; };
 		8A1F74432979B699002B7FBC /* Asset.Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74422979B699002B7FBC /* Asset.Image.swift */; };
+		8A1F74452979B9DF002B7FBC /* AdaptyUI.Assets.json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74442979B9DF002B7FBC /* AdaptyUI.Assets.json.swift */; };
+		8A1F74472979BBC4002B7FBC /* AdaptyUIAssetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74462979BBC4002B7FBC /* AdaptyUIAssetTests.swift */; };
 		8AAF8B062927ACA50003BA86 /* EventCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */; };
 		8AAF8B10292839280003BA86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B0F292839280003BA86 /* AppDelegate.swift */; };
 		8AAF8B14292839280003BA86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B13292839280003BA86 /* ViewController.swift */; };
@@ -185,6 +187,8 @@
 		8A1F743E2979B67C002B7FBC /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		8A1F74402979B689002B7FBC /* Asset.Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.Font.swift; sourceTree = "<group>"; };
 		8A1F74422979B699002B7FBC /* Asset.Image.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.Image.swift; sourceTree = "<group>"; };
+		8A1F74442979B9DF002B7FBC /* AdaptyUI.Assets.json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUI.Assets.json.swift; sourceTree = "<group>"; };
+		8A1F74462979BBC4002B7FBC /* AdaptyUIAssetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUIAssetTests.swift; sourceTree = "<group>"; };
 		8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollectionTests.swift; sourceTree = "<group>"; };
 		8AAF8B0D292839280003BA86 /* TestsHostApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestsHostApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AAF8B0F292839280003BA86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -720,6 +724,7 @@
 				8AF80413292D2C1500970E6B /* AdaptyProfileTests.swift */,
 				8AF80407292C4E3C00970E6B /* BackendProductTests.swift */,
 				8AF80411292CA19C00970E6B /* FallbackPaywallsTests.swift */,
+				8A1F74462979BBC4002B7FBC /* AdaptyUIAssetTests.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -743,6 +748,7 @@
 				8AF8041B292D349D00970E6B /* AdaptyProfile.json.swift */,
 				8AF8041D292D34B800970E6B /* BackendProduct.json.swift */,
 				8AF8041F292D34CA00970E6B /* FallbackPaywalls.json.swift */,
+				8A1F74442979B9DF002B7FBC /* AdaptyUI.Assets.json.swift */,
 			);
 			path = json;
 			sourceTree = "<group>";
@@ -1034,6 +1040,7 @@
 			files = (
 				8AF80416292D345600970E6B /* AdaptyAttributionSource.json.swift in Sources */,
 				8AF80408292C4E3C00970E6B /* BackendProductTests.swift in Sources */,
+				8A1F74472979BBC4002B7FBC /* AdaptyUIAssetTests.swift in Sources */,
 				8AAF8B34292848970003BA86 /* Backend.swift in Sources */,
 				8AF8040E292C97A700970E6B /* AdaptyAttributionSourceTests.swift in Sources */,
 				8AF80406292C407C00970E6B /* JSONValue.swift in Sources */,
@@ -1041,6 +1048,7 @@
 				8AAF8B36292849D90003BA86 /* Configuration.swift in Sources */,
 				8AF80420292D34CA00970E6B /* FallbackPaywalls.json.swift in Sources */,
 				8AAF8B2E292845BF0003BA86 /* EventsStorageMoke.swift in Sources */,
+				8A1F74452979B9DF002B7FBC /* AdaptyUI.Assets.json.swift in Sources */,
 				8AF80412292CA19C00970E6B /* FallbackPaywallsTests.swift in Sources */,
 				8AF8041C292D349D00970E6B /* AdaptyProfile.json.swift in Sources */,
 				8AF80418292D347500970E6B /* AdaptyEligibility.json.swift in Sources */,

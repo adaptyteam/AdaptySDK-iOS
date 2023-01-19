@@ -17,7 +17,6 @@ extension AdaptyUI {
     }
 }
 
-
 extension AdaptyUI.Asset: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
@@ -42,28 +41,30 @@ extension AdaptyUI.Asset: Decodable {
             self = .image(try decoder.singleValueContainer().decode(Image.self))
         }
     }
- }
+}
 
- extension AdaptyUI {
+extension AdaptyUI {
     struct Assets {
-        let value: [String: Asset]
-    }
- }
+        let value: [String: AdaptyUI.Asset]
 
- extension AdaptyUI.Assets: Decodable {
-    public init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-
-        var assets = [String: AdaptyUI.Asset]()
-        if let count = container.count {
-            assets.reserveCapacity(count)
+        struct Item {
+            let id: String
+            let value: AdaptyUI.Asset
         }
-        while !container.isAtEnd {
-            let item = try container.nestedContainer(keyedBy: AdaptyUI.Asset.CodingKeys.self)
-            let id = try item.decode(String.self, forKey: .id)
-            let singleContainer = try item.superDecoder().singleValueContainer()
-            assets[id] = try singleContainer.decode(AdaptyUI.Asset.self)
-        }
-        value = assets
     }
- }
+}
+
+extension AdaptyUI.Assets.Item: Decodable {
+     init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: AdaptyUI.Asset.CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+         value = try decoder.singleValueContainer().decode(AdaptyUI.Asset.self)
+    }
+}
+
+extension AdaptyUI.Assets: Decodable {
+     init(from decoder: Decoder) throws {
+        let array = try decoder.singleValueContainer().decode([Item].self)
+        value = Dictionary(uniqueKeysWithValues: array.map { ($0.id, $0.value) })
+    }
+}
