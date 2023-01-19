@@ -17,6 +17,7 @@
 		8A1F74492979CB8C002B7FBC /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74482979CB8C002B7FBC /* Localization.swift */; };
 		8A1F744B2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744A2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift */; };
 		8A1F744D2979CE18002B7FBC /* AdaptyUILocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */; };
+		8A1F744F2979D1B2002B7FBC /* PaywallConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744E2979D1B2002B7FBC /* PaywallConfiguration.swift */; };
 		8AAF8B062927ACA50003BA86 /* EventCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */; };
 		8AAF8B10292839280003BA86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B0F292839280003BA86 /* AppDelegate.swift */; };
 		8AAF8B14292839280003BA86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B13292839280003BA86 /* ViewController.swift */; };
@@ -195,6 +196,7 @@
 		8A1F74482979CB8C002B7FBC /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		8A1F744A2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUI.Localization.json.swift; sourceTree = "<group>"; };
 		8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUILocalizationTests.swift; sourceTree = "<group>"; };
+		8A1F744E2979D1B2002B7FBC /* PaywallConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallConfiguration.swift; sourceTree = "<group>"; };
 		8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollectionTests.swift; sourceTree = "<group>"; };
 		8AAF8B0D292839280003BA86 /* TestsHostApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestsHostApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AAF8B0F292839280003BA86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -394,6 +396,7 @@
 				8A1F74402979B689002B7FBC /* Asset.Font.swift */,
 				8A1F74422979B699002B7FBC /* Asset.Image.swift */,
 				8A1F74482979CB8C002B7FBC /* Localization.swift */,
+				8A1F744E2979D1B2002B7FBC /* PaywallConfiguration.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -984,6 +987,7 @@
 				8AB003482926FCEA008476A3 /* SignSubscriptionOfferRequest.swift in Sources */,
 				8AB003462926FCEA008476A3 /* FetchAllProductVendorIdsRequest.swift in Sources */,
 				8A1F743F2979B67C002B7FBC /* Color.swift in Sources */,
+				8A1F744F2979D1B2002B7FBC /* PaywallConfiguration.swift in Sources */,
 				8AB003622926FCEA008476A3 /* Adapty+ReceiptValidator.swift in Sources */,
 				8AB0035E2926FCEA008476A3 /* ProfileStorage+UserDefaults.swift in Sources */,
 				8AB003902926FCEA008476A3 /* AdaptyProfileParameters.Builder.swift in Sources */,
