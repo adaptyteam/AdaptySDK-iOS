@@ -17,11 +17,11 @@ func XCTAssertEqual(_ expression: AdaptyUI.Color?, withJSONValue jsonValue: JSON
     XCTAssertEqual(hex.lowercased(), str.lowercased())
 }
 
-func XCTAssertEqual(_ expression: AdaptyUI.Assets?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
+func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (assets, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     let array = jsonValue.arrayOrFail(file: file, line: line)
 
-    XCTAssertEqual(assets.value.count, array.count)
+    XCTAssertEqual(assets.count, array.count)
     for jsonValue in array {
         let object = jsonValue.objectOrFail(file: file, line: line)
 
@@ -34,7 +34,7 @@ func XCTAssertEqual(_ expression: AdaptyUI.Assets?, withJSONValue jsonValue: JSO
             return
         }
 
-        guard let value = assets.value[id] else {
+        guard let value = assets[id] else {
             XCTFail("Missing asset by id = \(id)")
             return
         }
@@ -63,14 +63,14 @@ final class AdaptyUIAssetTests: XCTestCase {
     func testDecodeValidJSON() throws {
         let all = try AdaptyUI.Assets.ValidJSON.all.map {
             let result = try $0.jsonData().decode(AdaptyUI.Assets.self)
-            XCTAssertEqual(result, withJSONValue: $0)
+            XCTAssertEqual(result.value, withJSONValue: $0)
             return result
         }
         XCTAssertFalse(all.isEmpty)
     }
 
     func testDecodeInvalidJSON() throws {
-        let all = AdaptyPaywall.InvalidJSON.all
+        let all = AdaptyUI.Assets.InvalidJSON.all
         XCTAssertFalse(all.isEmpty)
         try all.forEach {
             let data = try $0.jsonData()
