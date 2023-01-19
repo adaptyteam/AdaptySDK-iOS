@@ -15,4 +15,8 @@ extension Adapty {
     public static func setLogHandler(_ handler: @escaping AdaptyLogHandler) {
         AdaptyLogger.handler = handler
     }
+
+    public static func writeLog(level: AdaptyLogLevel, message: String, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        AdaptyLogger.asyncWrite(level, message, file: file, function: function, line: line)
+    }
 }
