@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VH<T: Codable>: Codable {
+struct VH<T> {
     let value: T
     let hash: String?
 
@@ -21,3 +21,7 @@ struct VH<T: Codable>: Codable {
         case hash = "h"
     }
 }
+
+extension VH: Encodable where T: Encodable {}
+
+extension VH: Decodable where T: Decodable {}
