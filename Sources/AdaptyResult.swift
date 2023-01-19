@@ -20,20 +20,3 @@ extension Result where Failure == AdaptyError {
         }
     }
 }
-
-extension Result: Encodable where Success: Encodable, Failure == AdaptyError {
-    enum CodingKeys: String, CodingKey {
-        case success
-        case error
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self {
-        case let .success(value):
-            try container.encode(value, forKey: .success)
-        case let .failure(value):
-            try container.encode(value, forKey: .error)
-        }
-    }
-}
