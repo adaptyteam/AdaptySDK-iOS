@@ -50,10 +50,10 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonV
             XCTAssertEqual("font", type)
             XCTAssertEqual(value.name, withJSONValue: object["value"])
             XCTAssertEqual(value.style, withJSONValue: object["style"])
-            XCTAssertEqual(value.size, withJSONValue: object["size"])
-            XCTAssertEqual(value.color, withJSONValue: object["color"])
+            XCTAssertEqual(value.defaultSize, withJSONValue: object["size"])
+            XCTAssertEqual(value.defaultColor, withJSONValue: object["color"])
         case let .unknown(value):
-            XCTFail("Unknown asset with type = \(value)")
+            XCTFail("Unknown asset with type = \(value == nil ? "nil" : value! )")
             return
         }
     }

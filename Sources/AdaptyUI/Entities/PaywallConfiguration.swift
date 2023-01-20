@@ -15,6 +15,7 @@ extension AdaptyUI {
         let assets: [String: Asset]
         let localizations: [String: Localization]
         let defaultLocalization: Localization?
+        let styles: [String: Style]
         public let isHard: Bool
         private let termsUrlId: String?
         private let privacyUrlId: String?
@@ -48,8 +49,8 @@ extension AdaptyUI.PaywallConfiguration: Decodable {
 
     enum CodingKeys: String, CodingKey {
         case format
-        case templateId = "template-id"
-        case version = "template-revision"
+        case templateId = "template_id"
+        case version = "template_revision"
         case terms
         case privacy
         case assets
@@ -83,6 +84,8 @@ extension AdaptyUI.PaywallConfiguration: Decodable {
         } else {
             defaultLocalization = nil
         }
+
+        styles = try container.decode([String:AdaptyUI.Style].self, forKey: .styles)
 
         termsUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .terms).decodeIfPresent(String.self, forKey: .url)
 

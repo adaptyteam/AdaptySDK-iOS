@@ -19,6 +19,10 @@
 		8A1F744D2979CE18002B7FBC /* AdaptyUILocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */; };
 		8A1F744F2979D1B2002B7FBC /* PaywallConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744E2979D1B2002B7FBC /* PaywallConfiguration.swift */; };
 		8A1F74522979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74512979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift */; };
+		8A1F7454297AC0B2002B7FBC /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7453297AC0B2002B7FBC /* Style.swift */; };
+		8A1F7456297AD6CD002B7FBC /* ViewItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7455297AD6CD002B7FBC /* ViewItem.swift */; };
+		8A1F745A297ADBA9002B7FBC /* ViewItem.Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7459297ADBA9002B7FBC /* ViewItem.Text.swift */; };
+		8A1F745C297ADBBC002B7FBC /* ViewItem.TextRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F745B297ADBBC002B7FBC /* ViewItem.TextRows.swift */; };
 		8AAF8B062927ACA50003BA86 /* EventCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */; };
 		8AAF8B10292839280003BA86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B0F292839280003BA86 /* AppDelegate.swift */; };
 		8AAF8B14292839280003BA86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B13292839280003BA86 /* ViewController.swift */; };
@@ -199,6 +203,10 @@
 		8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUILocalizationTests.swift; sourceTree = "<group>"; };
 		8A1F744E2979D1B2002B7FBC /* PaywallConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallConfiguration.swift; sourceTree = "<group>"; };
 		8A1F74512979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchUIPaywallConfigurationRequest.swift; sourceTree = "<group>"; };
+		8A1F7453297AC0B2002B7FBC /* Style.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
+		8A1F7455297AD6CD002B7FBC /* ViewItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewItem.swift; sourceTree = "<group>"; };
+		8A1F7459297ADBA9002B7FBC /* ViewItem.Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewItem.Text.swift; sourceTree = "<group>"; };
+		8A1F745B297ADBBC002B7FBC /* ViewItem.TextRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewItem.TextRows.swift; sourceTree = "<group>"; };
 		8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollectionTests.swift; sourceTree = "<group>"; };
 		8AAF8B0D292839280003BA86 /* TestsHostApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestsHostApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AAF8B0F292839280003BA86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -400,6 +408,10 @@
 				8A1F74422979B699002B7FBC /* Asset.Image.swift */,
 				8A1F74482979CB8C002B7FBC /* Localization.swift */,
 				8A1F744E2979D1B2002B7FBC /* PaywallConfiguration.swift */,
+				8A1F7453297AC0B2002B7FBC /* Style.swift */,
+				8A1F7455297AD6CD002B7FBC /* ViewItem.swift */,
+				8A1F7459297ADBA9002B7FBC /* ViewItem.Text.swift */,
+				8A1F745B297ADBBC002B7FBC /* ViewItem.TextRows.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -928,6 +940,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A1F7456297AD6CD002B7FBC /* ViewItem.swift in Sources */,
 				8AB003752926FCEA008476A3 /* Application.swift in Sources */,
 				8AB0033B2926FCEA008476A3 /* Adapty.Profiling.swift in Sources */,
 				8AB003592926FCEA008476A3 /* VariationIdStorage+UserDefaults.swift in Sources */,
@@ -1010,6 +1023,7 @@
 				8AB003332926FCEA008476A3 /* SKQueueManager+RestorePurchases.swift in Sources */,
 				8AB0033A2926FCEA008476A3 /* AdaptyLogLevel.swift in Sources */,
 				8A1F74492979CB8C002B7FBC /* Localization.swift in Sources */,
+				8A1F745A297ADBA9002B7FBC /* ViewItem.Text.swift in Sources */,
 				8AB003652926FCEA008476A3 /* Data+Curl.swift in Sources */,
 				8AB003802926FCEA008476A3 /* EventCollection.swift in Sources */,
 				8AB0039B2926FCEA008476A3 /* AdaptyProfileParameters.swift in Sources */,
@@ -1028,6 +1042,7 @@
 				8AB0036B2926FCEA008476A3 /* AnyEncodable.swift in Sources */,
 				8A1F74412979B689002B7FBC /* Asset.Font.swift in Sources */,
 				8AB003642926FCEA008476A3 /* URLRequest+Curl.swift in Sources */,
+				8A1F745C297ADBBC002B7FBC /* ViewItem.TextRows.swift in Sources */,
 				8AB003672926FCEA008476A3 /* HTTPConfiguration.swift in Sources */,
 				8AB003552926FCEA008476A3 /* ProductVendorIdsCache.swift in Sources */,
 				8AB003852926FCEA008476A3 /* AdaptyError.Source.swift in Sources */,
@@ -1037,6 +1052,7 @@
 				8AB0035F2926FCEA008476A3 /* PaywallsStorage+UserDefaults.swift in Sources */,
 				8AB003A12926FCEA008476A3 /* AdaptyProduct.swift in Sources */,
 				8AB0039F2926FCEA008476A3 /* AdaptyPaywallProduct.swift in Sources */,
+				8A1F7454297AC0B2002B7FBC /* Style.swift in Sources */,
 				8AB0032F2926FCEA008476A3 /* SKQueueManager.swift in Sources */,
 				8AB003582926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift in Sources */,
 				8A1F74522979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift in Sources */,
