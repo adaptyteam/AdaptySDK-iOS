@@ -42,8 +42,8 @@ extension AdaptyUI.ViewItem: Decodable {
         switch ContentType(rawValue: type) {
         case .text:
             self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
-//        case .textRows:
-//            self = .textRows(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextRows.self))
+        case .textRows:
+            self = .textRows(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextRows.self))
         default:
             self = .unknown(type)
         }

@@ -13,7 +13,7 @@ extension AdaptyUI.ViewItem {
         let stringId: String
         let fontAssetId: String
         let size: Double?
-        let color: AdaptyUI.Color?
+        let colorAssetId: String?
     }
 }
 
@@ -22,6 +22,6 @@ extension AdaptyUI.ViewItem.Text: Decodable {
         case stringId = "string_id"
         case fontAssetId = "font"
         case size = "size"
-        case color = "color"
+        case colorAssetId = "color"
     }
 }
