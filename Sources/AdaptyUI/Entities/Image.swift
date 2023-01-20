@@ -8,14 +8,8 @@
 
 import Foundation
 
-extension AdaptyUI.Asset {
+extension AdaptyUI {
     public struct Image {
         public let data: Data
-    }
-}
-
-extension AdaptyUI.Asset.Image: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case data = "value"
     }
 }

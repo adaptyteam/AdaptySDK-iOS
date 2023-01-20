@@ -1,5 +1,5 @@
 //
-//  FetchUIPaywallConfigurationRequest.swift
+//  FetchUIViewConfigurationRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -8,20 +8,20 @@
 
 import Foundation
 
-struct FetchUIPaywallConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyUI.PaywallConfiguration?>
+struct FetchUIViewConfigurationRequest: HTTPRequestWithDecodableResponse {
+    typealias ResponseBody = Backend.Response.Body<AdaptyUI.ViewConfiguration?>
 
     let endpoint: HTTPEndpoint
     let headers: Headers
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<AdaptyUI.PaywallConfiguration?, Error>
+            let result: Result<AdaptyUI.ViewConfiguration?, Error>
 
             if headers.hasSameBackendResponseHash(response.headers) {
                 result = .success(nil)
             } else {
-                result = jsonDecoder.decode(Backend.Response.Body<AdaptyUI.PaywallConfiguration>.self, response.body).map { $0.value }
+                result = jsonDecoder.decode(Backend.Response.Body<AdaptyUI.ViewConfiguration>.self, response.body).map { $0.value }
             }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
@@ -40,15 +40,15 @@ struct FetchUIPaywallConfigurationRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPSession {
-    func performFetchUIPaywallConfigurationRequest(variationId: String,
+    func performFetchUIViewConfigurationRequest(variationId: String,
                                                    locale: String?,
                                                    responseHash: String?,
-                                                   _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.PaywallConfiguration?>>) {
-        let request = FetchUIPaywallConfigurationRequest(variationId: variationId,
+                                                   _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
+        let request = FetchUIViewConfigurationRequest(variationId: variationId,
                                                          locale: locale,
                                                          responseHash: responseHash)
 
-        perform(request) { (result: FetchUIPaywallConfigurationRequest.Result) in
+        perform(request) { (result: FetchUIViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

@@ -7,26 +7,26 @@
 //
 
 public enum AdaptyUI {
-    public static func getPaywallConfiguration(paywall: AdaptyPaywall,
-                                               _ completion: @escaping AdaptyResultCompletion<AdaptyUI.PaywallConfiguration>) {
+    public static func getViewConfiguration(paywall: AdaptyPaywall,
+                                               _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         Adapty.async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(.failure(profileManager.error!))
                     return
                 }
-                profileManager.getUIPaywallConfiguration(paywall: paywall, completion)
+                profileManager.getUIViewConfiguration(paywall: paywall, completion)
             }
         }
     }
 }
 
 extension AdaptyProfileManager {
-    fileprivate func getUIPaywallConfiguration(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<AdaptyUI.PaywallConfiguration>) {
-        manager.httpSession.performFetchUIPaywallConfigurationRequest(variationId: paywall.variationId,
+    fileprivate func getUIViewConfiguration(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+        manager.httpSession.performFetchUIViewConfigurationRequest(variationId: paywall.variationId,
                                                                       locale: paywall.locale,
                                                                       responseHash: nil) {
-            [weak self] (result: AdaptyResult<VH<AdaptyUI.PaywallConfiguration?>>) in
+            [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
             switch result {
             case let .failure(error):

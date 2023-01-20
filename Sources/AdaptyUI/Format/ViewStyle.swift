@@ -1,5 +1,5 @@
 //
-//  ViewItem.swift
+//  ViewStyle.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -9,6 +9,15 @@
 import Foundation
 
 extension AdaptyUI {
+    struct ViewStyle {
+        let common: [String: AdaptyUI.ViewItem]?
+        let custom: [String: AdaptyUI.ViewItem]?
+
+        var isEmpty: Bool {
+            (common?.isEmpty ?? true) && (custom?.isEmpty ?? true)
+        }
+    }
+
     enum ViewItem {
         case asset(String)
         case text(Text)
@@ -16,6 +25,24 @@ extension AdaptyUI {
         case unknown(String?)
     }
 }
+
+extension AdaptyUI.ViewStyle: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case customProperties = "custom_properties"
+    }
+
+    init(from decoder: Decoder) throws {
+        let single = try decoder.singleValueContainer()
+
+        var common = try single.decode([String: AdaptyUI.ViewItem].self)
+        common.removeValue(forKey: CodingKeys.customProperties.rawValue)
+        self.common = common.isEmpty ? nil : common
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        custom = try container.decodeIfPresent([String: AdaptyUI.ViewItem].self, forKey: .customProperties)
+    }
+}
+
 
 extension AdaptyUI.ViewItem: Decodable {
     enum CodingKeys: String, CodingKey {
@@ -27,7 +54,7 @@ extension AdaptyUI.ViewItem: Decodable {
         case textRows = "text-rows"
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let single = try decoder.singleValueContainer()
         if let assetId = try? single.decode(String.self) {
             self = .asset(assetId)
@@ -45,7 +72,7 @@ extension AdaptyUI.ViewItem: Decodable {
         case .textRows:
             self = .textRows(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextRows.self))
         default:
-            self = .unknown(type)
+            self = .unknown("item.type: \(type)")
         }
     }
 }

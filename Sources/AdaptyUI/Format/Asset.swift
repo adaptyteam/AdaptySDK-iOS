@@ -9,10 +9,10 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum Asset {
+    enum Asset {
         case color(AdaptyUI.Color)
-        case image(Image)
-        case font(Font)
+        case image(AdaptyUI.Image)
+        case font(AdaptyUI.Font)
         case unknown(String?)
     }
 }
@@ -30,7 +30,7 @@ extension AdaptyUI.Asset: Decodable {
         case font
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard let type = try container.decodeIfPresent(String.self, forKey: .type) else {
@@ -41,37 +41,33 @@ extension AdaptyUI.Asset: Decodable {
         case .color:
             self = .color(try container.decode(AdaptyUI.Color.self, forKey: .value))
         case .font:
-            self = .font(try decoder.singleValueContainer().decode(Font.self))
+            self = .font(try decoder.singleValueContainer().decode(AdaptyUI.Font.self))
         case .image:
-            self = .image(try decoder.singleValueContainer().decode(Image.self))
+            self = .image(try decoder.singleValueContainer().decode(AdaptyUI.Image.self))
         default:
-            self = .unknown(type)
+            self = .unknown("asset.type: \(type)")
         }
     }
 }
 
 extension AdaptyUI {
-    struct Assets {
+    struct Assets: Decodable {
         let value: [String: AdaptyUI.Asset]
 
-        struct Item {
+        init(from decoder: Decoder) throws {
+            let array = try decoder.singleValueContainer().decode([Item].self)
+            value = Dictionary(uniqueKeysWithValues: array.map { ($0.id, $0.value) })
+        }
+
+        fileprivate struct Item: Decodable {
             let id: String
             let value: AdaptyUI.Asset
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: AdaptyUI.Asset.CodingKeys.self)
+                id = try container.decode(String.self, forKey: .id)
+                value = try decoder.singleValueContainer().decode(AdaptyUI.Asset.self)
+            }
         }
-    }
-}
-
-extension AdaptyUI.Assets.Item: Decodable {
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: AdaptyUI.Asset.CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
-        value = try decoder.singleValueContainer().decode(AdaptyUI.Asset.self)
-    }
-}
-
-extension AdaptyUI.Assets: Decodable {
-    init(from decoder: Decoder) throws {
-        let array = try decoder.singleValueContainer().decode([Item].self)
-        value = Dictionary(uniqueKeysWithValues: array.map { ($0.id, $0.value) })
     }
 }

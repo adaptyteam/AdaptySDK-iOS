@@ -1,5 +1,5 @@
 //
-//  PaywallConfiguration.swift
+//  ViewConfiguration.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -9,40 +9,20 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct PaywallConfiguration {
+    public struct ViewConfiguration {
         public let templateId: String
         let version: Int64
         let assets: [String: Asset]
         let localizations: [String: Localization]
         let defaultLocalization: Localization?
-        let styles: [String: Style]
-        public let isHard: Bool
-        private let termsUrlId: String?
-        private let privacyUrlId: String?
+        let styles: [String: ViewStyle]
+        let isHard: Bool
+        let termsUrlId: String?
+        let privacyUrlId: String?
     }
 }
 
-extension AdaptyUI.PaywallConfiguration {
-    public func string(id: String, locale: String) -> String? {
-        localizations[locale]?.strings?[id] ?? defaultLocalization?.strings?[id]
-    }
-
-    func asset(id: String, locale: String) -> AdaptyUI.Asset? {
-        localizations[locale]?.assets?[id] ?? defaultLocalization?.assets?[id] ?? assets[id]
-    }
-
-    public func termsUrl(locale: String) -> String? {
-        guard let id = termsUrlId else { return nil }
-        return string(id: id, locale: locale)
-    }
-
-    public func privacyUrl(locale: String) -> String? {
-        guard let id = privacyUrlId else { return nil }
-        return string(id: id, locale: locale)
-    }
-}
-
-extension AdaptyUI.PaywallConfiguration: Decodable {
+extension AdaptyUI.ViewConfiguration: Decodable {
     enum ContainerCodingKeys: String, CodingKey {
         case container = "paywall_builder_config"
     }
@@ -85,7 +65,7 @@ extension AdaptyUI.PaywallConfiguration: Decodable {
             defaultLocalization = nil
         }
 
-        styles = try container.decode([String:AdaptyUI.Style].self, forKey: .styles)
+        styles = try container.decode([String: AdaptyUI.ViewStyle].self, forKey: .styles)
 
         termsUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .terms).decodeIfPresent(String.self, forKey: .url)
 
