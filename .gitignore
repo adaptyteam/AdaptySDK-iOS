@@ -1,8 +1,21 @@
 # OS X
 .DS_Store
+.AppleDouble
+.LSOverride
 
-# Xcode
+## User settings
+xcuserdata/
+**/xcuserdata/
+*.xcworkspace
+
+## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
+*.xcscmblueprint
+*.xccheckout
+
+## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
 build/
+DerivedData/
+*.moved-aside
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -11,21 +24,30 @@ build/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-xcuserdata/
-*.xccheckout
-profile
-*.moved-aside
-DerivedData
+
+## Obj-C/Swift specific
 *.hmap
+
+## App packaging
 *.ipa
+*.dSYM.zip
+*.dSYM
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
 
 # Bundler
-.bundle
+.bundle/
 
 # Add this line if you want to avoid checking in source code from Carthage dependencies.
 # Carthage/Checkouts
 
-Carthage/Build
+Carthage
+CarthageUploads
+Carthage/Checkouts
+Carthage/Build/
+IntegrationTests/CarthageInstallation/Cartfile.resolved
 
 # We recommend against adding the Pods directory to your .gitignore. However
 # you should judge for yourself, the pros and cons are mentioned at:
@@ -36,5 +58,32 @@ Carthage/Build
 #
 Pods/
 
-.swiftpm/
+# Swift Package Manager
+.swiftpm
 .build/
+**/Package.resolved
+
+# Fastlane
+**/fastlane/report.xml
+**/fastlane/test_output/
+fastlane/.env
+
+# Diff
+*.patch
+*.diff
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.history/
+*.vsix
+
+# Other
+builds/
+*.bck
+.idea/
+.ruby-version
