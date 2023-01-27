@@ -14,7 +14,7 @@ extension AdaptyError {
         public let function: String
         public let line: UInt
 
-        init(file: String = #fileID, function: String = #function, line: UInt = #line) {
+        public init(file: String = #fileID, function: String = #function, line: UInt = #line) {
             self.file = file
             self.function = function
             self.line = line
