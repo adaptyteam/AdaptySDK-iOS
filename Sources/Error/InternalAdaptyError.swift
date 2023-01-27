@@ -117,3 +117,5 @@ extension InternalAdaptyError: CustomNSError {
         return data
     }
 }
+
+extension InternalAdaptyError: CustomAdaptyError { }

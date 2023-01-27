@@ -47,7 +47,7 @@ extension HTTPError: CustomNSError {
     }
 
     var asAdaptyError: AdaptyError {
-        AdaptyError(wrapped: .originalHTTPError(self))
+        AdaptyError(InternalAdaptyError.originalHTTPError(self))
     }
 }
 
@@ -84,7 +84,7 @@ extension EventsError: CustomNSError {
     }
 
     var asAdaptyError: AdaptyError {
-        AdaptyError(wrapped: .originalEventsError(self))
+        AdaptyError(InternalAdaptyError.originalEventsError(self))
     }
 }
 
@@ -135,7 +135,7 @@ extension SKManagerError: CustomNSError {
     }
 
     var asAdaptyError: AdaptyError {
-        AdaptyError(wrapped: .originalSKManagerError(self))
+        AdaptyError(InternalAdaptyError.originalSKManagerError(self))
     }
 }
 

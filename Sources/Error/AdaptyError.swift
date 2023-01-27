@@ -139,7 +139,7 @@ extension AdaptyError {
 public struct AdaptyError: CustomNSError, CustomStringConvertible, CustomDebugStringConvertible {
     public static let errorDomain = AdaptyErrorDomain
 
-    let wrapped: InternalAdaptyError
+    let wrapped: CustomAdaptyError
 
     public var description: String { wrapped.description }
     public var debugDescription: String { wrapped.debugDescription }
@@ -153,66 +153,70 @@ public struct AdaptyError: CustomNSError, CustomStringConvertible, CustomDebugSt
     public var adaptyErrorCode: ErrorCode { wrapped.adaptyErrorCode }
     public var errorCode: Int { wrapped.errorCode }
     public var errorUserInfo: [String: Any] { wrapped.errorUserInfo }
+
+    public init(_ wrapped: CustomAdaptyError) {
+        self.wrapped = wrapped
+    }
 }
 
 extension AdaptyError {
     static func activateOnceError(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
-        AdaptyError(wrapped: .activateOnceError(AdaptyError.Source(file: file, function: function, line: line)))
+        AdaptyError(InternalAdaptyError.activateOnceError(AdaptyError.Source(file: file, function: function, line: line)))
     }
 
     static func cantMakePayments(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
-        AdaptyError(wrapped: .cantMakePayments(AdaptyError.Source(file: file, function: function, line: line)))
+        AdaptyError(InternalAdaptyError.cantMakePayments(AdaptyError.Source(file: file, function: function, line: line)))
     }
 
     static func notActivated(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
-        AdaptyError(wrapped: .notActivated(AdaptyError.Source(file: file, function: function, line: line)))
+        AdaptyError(InternalAdaptyError.notActivated(AdaptyError.Source(file: file, function: function, line: line)))
     }
 
     static func profileWasChanged(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
-        AdaptyError(wrapped: .profileWasChanged(AdaptyError.Source(file: file, function: function, line: line)))
+        AdaptyError(InternalAdaptyError.profileWasChanged(AdaptyError.Source(file: file, function: function, line: line)))
     }
 
     static func decodingFallback(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        AdaptyError(wrapped: .decodingFailed(AdaptyError.Source(file: file, function: function, line: line),
+        AdaptyError(InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line),
                                              "Decoding Fallback Paywalls failed",
                                              error: error))
     }
 
     static func decodingPaywallProduct(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        AdaptyError(wrapped: .decodingFailed(AdaptyError.Source(file: file, function: function, line: line),
+        AdaptyError(InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line),
                                              "Decoding AdaptyPaywallProduct failed",
                                              error: error))
     }
 
     static func wrongParamOnboardingScreenOrder(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        AdaptyError(wrapped: .wrongParam(AdaptyError.Source(file: file, function: function, line: line),
+        AdaptyError(InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line),
                                          "Wrong screenOrder parameter value, it should be more than zero."))
     }
 
     static func wrongKeyOfCustomAttribute(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        AdaptyError(wrapped: .wrongParam(AdaptyError.Source(file: file, function: function, line: line),
+        AdaptyError(InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line),
                                          "The key must be string not more than 30 characters. Only letters, numbers, dashes, points and underscores allowed"))
     }
 
     static func wrongStringValueOfCustomAttribute(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        AdaptyError(wrapped: .wrongParam(AdaptyError.Source(file: file, function: function, line: line),
+        AdaptyError(InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line),
                                          "The value must not be empty and not more than 30 characters."))
     }
 
     static func wrongCountCustomAttributes(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        AdaptyError(wrapped: .wrongParam(AdaptyError.Source(file: file, function: function, line: line),
+        AdaptyError(InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line),
                                          "The total number of custom attributes must be no more than 10"))
     }
 
     static func cacheHasNotPaywall(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        AdaptyError(wrapped: .persistingDataError(AdaptyError.Source(file: file, function: function, line: line),
+        AdaptyError(InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line),
                                                   "Don't found paywall in cache"))
     }
 }
