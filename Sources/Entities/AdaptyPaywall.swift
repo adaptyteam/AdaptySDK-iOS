@@ -24,6 +24,8 @@ public struct AdaptyPaywall {
     /// Current revision (version) of a paywall. Every change within a paywall creates a new revision.
     public let revision: Int
 
+    public let hasViewConfiguration: Bool
+
     /// And identifier of a paywall locale.
     public let locale: String
 
@@ -65,6 +67,7 @@ extension AdaptyPaywall: Codable {
         case remoteConfigLocale = "lang"
         case remoteConfigString = "data"
         case version = "paywall_updated_at"
+        case hasViewConfiguration = "use_paywall_builder"
     }
 
     public init(from decoder: Decoder) throws {
@@ -76,6 +79,7 @@ extension AdaptyPaywall: Codable {
         variationId = try container.decode(String.self, forKey: .variationId)
         abTestName = try container.decode(String.self, forKey: .abTestName)
         products = try container.decode([BackendProduct].self, forKey: .products)
+        hasViewConfiguration = try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false
 
         if let remoteConfig = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig) {
             locale = try remoteConfig.decode(String.self, forKey: .remoteConfigLocale)
@@ -95,6 +99,7 @@ extension AdaptyPaywall: Codable {
         try container.encode(variationId, forKey: .variationId)
         try container.encode(abTestName, forKey: .abTestName)
         try container.encode(products, forKey: .products)
+        try container.encode(hasViewConfiguration, forKey: .hasViewConfiguration)
 
         var remoteConfig = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig)
         try remoteConfig.encode(locale, forKey: .remoteConfigLocale)
