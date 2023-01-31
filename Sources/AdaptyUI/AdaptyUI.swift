@@ -6,6 +6,9 @@
 //  Copyright © 2023 Adapty. All rights reserved.
 //
 
+/// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
+/// To make full use of this functionality, you need to install an [additional library](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git), as well as make additional setups in the Adapty Dashboard.
+/// You can find more information in the corresponding section of [our documentation](https://docs.adapty.io/docs/paywall-builder-getting-started).
 public enum AdaptyUI {
     /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
     ///
