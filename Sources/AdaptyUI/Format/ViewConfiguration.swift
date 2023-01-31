@@ -10,7 +10,9 @@ import Foundation
 
 extension AdaptyUI {
     public struct ViewConfiguration {
+        /// An identificator for the templete, used for ViewConfiguration creation.
         public let templateId: String
+        
         let version: Int64
         let assets: [String: Asset]
         let localizations: [String: Localization]
