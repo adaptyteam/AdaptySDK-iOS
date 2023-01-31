@@ -25,7 +25,6 @@ extension AdaptyUI.ViewConfiguration {
             guard let id = id else { return nil }
             return localization?.assets?[id] ?? assets[id]
         }
-
         func getAssetFont(_ id: String?) -> AdaptyUI.Font? {
             guard let asset = getAsset(id) else { return nil }
             switch asset {
@@ -35,7 +34,6 @@ extension AdaptyUI.ViewConfiguration {
                 return nil
             }
         }
-
         func getAssetColor(_ id: String?) -> AdaptyUI.Color? {
             guard let asset = getAsset(id) else { return nil }
             switch asset {
@@ -45,12 +43,10 @@ extension AdaptyUI.ViewConfiguration {
                 return nil
             }
         }
-
         func getString(_ id: String?) -> String? {
             guard let id = id else { return nil }
             return localization?.strings?[id]
         }
-
         func convert(_ items: [String: AdaptyUI.ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem]? {
             guard let items = items, !items.isEmpty else { return nil }
             var result = [String: AdaptyUI.LocalizedViewItem]()
@@ -116,6 +112,7 @@ extension AdaptyUI.ViewConfiguration {
         }
 
         return AdaptyUI.LocalizedViewConfiguration(
+            id: id,
             templateId: templateId,
             locale: localization?.id ?? locale,
             styles: styles,

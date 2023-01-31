@@ -28,10 +28,10 @@ struct FetchUIViewConfigurationRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(variationId: String, locale: String?, responseHash: String?) {
+    init(paywallVariationId: String, locale: String?, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/paywall-builder/\(variationId)/"
+            path: "/sdk/in-apps/paywall-builder/\(paywallVariationId)/"
         )
 
         headers = Headers()
@@ -40,13 +40,14 @@ struct FetchUIViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPSession {
-    func performFetchUIViewConfigurationRequest(variationId: String,
-                                                   locale: String?,
-                                                   responseHash: String?,
-                                                   _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
-        let request = FetchUIViewConfigurationRequest(variationId: variationId,
-                                                         locale: locale,
-                                                         responseHash: responseHash)
+    func performFetchUIViewConfigurationRequest(paywallId: String,
+                                                paywallVariationId: String,
+                                                locale: String?,
+                                                responseHash: String?,
+                                                _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
+        let request = FetchUIViewConfigurationRequest(paywallVariationId: paywallVariationId,
+                                                      locale: locale,
+                                                      responseHash: responseHash)
 
         perform(request) { (result: FetchUIViewConfigurationRequest.Result) in
             switch result {

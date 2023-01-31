@@ -10,6 +10,7 @@ import Foundation
 
 extension AdaptyUI {
     public struct ViewConfiguration {
+        public let id: String
         public let templateId: String
         let version: Int64
         let assets: [String: Asset]
@@ -17,14 +18,21 @@ extension AdaptyUI {
         let defaultLocalization: Localization?
         let styles: [String: ViewStyle]
         let isHard: Bool
-        let termsUrlId: String?
-        let privacyUrlId: String?
+        let termsUrlId: String
+        let privacyUrlId: String
+    }
+}
+
+extension AdaptyUI.ViewConfiguration: CustomStringConvertible {
+    public var description: String {
+        "(id: \(id), templateId: \(templateId), version: \(version), isHard: \(isHard))"
     }
 }
 
 extension AdaptyUI.ViewConfiguration: Decodable {
     enum ContainerCodingKeys: String, CodingKey {
         case container = "paywall_builder_config"
+        case id = "paywall_builder_id"
     }
 
     enum CodingKeys: String, CodingKey {
@@ -46,6 +54,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
 
     public init(from decoder: Decoder) throws {
         let superContainer = try decoder.container(keyedBy: ContainerCodingKeys.self)
+        id = try superContainer.decode(String.self, forKey: .id)
         let container = try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
 
         _ = try container.decode(String.self, forKey: .format) // TODO: "1.0.0"
@@ -67,8 +76,8 @@ extension AdaptyUI.ViewConfiguration: Decodable {
 
         styles = try container.decode([String: AdaptyUI.ViewStyle].self, forKey: .styles)
 
-        termsUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .terms).decodeIfPresent(String.self, forKey: .url)
+        termsUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .terms).decode(String.self, forKey: .url)
 
-        privacyUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .privacy).decodeIfPresent(String.self, forKey: .url)
+        privacyUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .privacy).decode(String.self, forKey: .url)
     }
 }

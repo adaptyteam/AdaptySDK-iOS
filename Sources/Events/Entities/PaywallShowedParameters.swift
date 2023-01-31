@@ -8,11 +8,14 @@
 import Foundation
 
 struct PaywallShowedParameters {
-    let variationId: String
+    let paywallVariationId: String
+    let viewConfigurationId: String?
 }
 
 extension PaywallShowedParameters: Codable {
     enum CodingKeys: String, CodingKey {
-        case variationId = "variation_id"
+        case paywallVariationId = "variation_id"
+        case viewConfigurationId = "paywall_builder_id"
+
     }
 }

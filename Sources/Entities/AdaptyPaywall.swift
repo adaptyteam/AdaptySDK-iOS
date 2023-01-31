@@ -49,7 +49,7 @@ public struct AdaptyPaywall {
 
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), "
+        "(id: \(id), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
             + (remoteConfigString == nil ? "" : "remoteConfig: \(remoteConfigString!), ")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }

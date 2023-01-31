@@ -8,7 +8,7 @@
 
 public enum AdaptyUI {
     public static func getViewConfiguration(paywall: AdaptyPaywall,
-                                               _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+                                            _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         Adapty.async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
@@ -23,9 +23,10 @@ public enum AdaptyUI {
 
 extension AdaptyProfileManager {
     fileprivate func getUIViewConfiguration(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
-        manager.httpSession.performFetchUIViewConfigurationRequest(variationId: paywall.variationId,
-                                                                      locale: paywall.locale,
-                                                                      responseHash: nil) {
+        manager.httpSession.performFetchUIViewConfigurationRequest(paywallId: paywall.id,
+                                                                   paywallVariationId: paywall.variationId,
+                                                                   locale: paywall.locale,
+                                                                   responseHash: nil) {
             [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
             switch result {

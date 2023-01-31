@@ -231,9 +231,8 @@ import Foundation
         ///   - paywall: A `AdaptyPaywall` object.
         ///  - Throws: An `AdaptyError` object
         public static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
-            let params = PaywallShowedParameters(variationId: paywall.variationId)
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.logShowPaywall(params) { error in
+                Adapty.logShowPaywall(paywall) { error in
                     if let error = error {
                         return continuation.resume(throwing: error)
                     }

@@ -23,7 +23,7 @@ final class EventsManagerTests: XCTestCase {
     var allEventTypes: [EventType] = [
         .appOpened,
         .onboardingScreenShowed(.init(name: "test_onboarding", screenName: "test_screen", screenOrder: 1)),
-        .paywallShowed(.init(variationId: "test_variation_id")),
+        .paywallShowed(.init(paywallVariationId: "test_variation_id", viewConfigurationId: nil)),
     ]
 
     func XCTAssertTrackEventType(_ eventType: EventType, assert: ((EventsError?) -> Void)? = nil) {

@@ -30,8 +30,8 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: A `AdaptyPaywall` object.
     ///   - completion: Result callback.
-    public static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
-        logShowPaywall(PaywallShowedParameters(variationId: paywall.variationId), completion)
+    public static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration? = nil, _ completion: AdaptyErrorCompletion? = nil) {
+        logShowPaywall(PaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration?.id), completion)
     }
 
     static func logShowPaywall(_ params: PaywallShowedParameters, _ completion: AdaptyErrorCompletion? = nil) {
