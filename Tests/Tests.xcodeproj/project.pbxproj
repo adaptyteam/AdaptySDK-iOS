@@ -30,6 +30,7 @@
 		8A1F7471297B2966002B7FBC /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7470297B2966002B7FBC /* Text.swift */; };
 		8A1F7473297B298D002B7FBC /* TextRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7472297B298D002B7FBC /* TextRows.swift */; };
 		8A1F74752983DA2D002B7FBC /* CustomAdaptyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */; };
+		8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */; };
 		8AAF8B062927ACA50003BA86 /* EventCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */; };
 		8AAF8B10292839280003BA86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B0F292839280003BA86 /* AppDelegate.swift */; };
 		8AAF8B14292839280003BA86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B13292839280003BA86 /* ViewController.swift */; };
@@ -58,7 +59,7 @@
 		8AB0033D2926FCEA008476A3 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002B82926FCEA008476A3 /* Environment.swift */; };
 		8AB0033E2926FCEA008476A3 /* Versions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002B92926FCEA008476A3 /* Versions.swift */; };
 		8AB0033F2926FCEA008476A3 /* AdaptyResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002BA2926FCEA008476A3 /* AdaptyResult.swift */; };
-		8AB003402926FCEA008476A3 /* Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002BB2926FCEA008476A3 /* Concurrency.swift */; };
+		8AB003402926FCEA008476A3 /* Adapty+Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002BB2926FCEA008476A3 /* Adapty+Concurrency.swift */; };
 		8AB003412926FCEA008476A3 /* Adapty+UpdateAttribution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002BC2926FCEA008476A3 /* Adapty+UpdateAttribution.swift */; };
 		8AB003422926FCEA008476A3 /* Adapty+ChangeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002BD2926FCEA008476A3 /* Adapty+ChangeState.swift */; };
 		8AB003432926FCEA008476A3 /* BackendError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002BF2926FCEA008476A3 /* BackendError.swift */; };
@@ -125,7 +126,7 @@
 		8AB003802926FCEA008476A3 /* EventCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003042926FCEA008476A3 /* EventCollection.swift */; };
 		8AB003812926FCEA008476A3 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003062926FCEA008476A3 /* Event.swift */; };
 		8AB003822926FCEA008476A3 /* EventType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003072926FCEA008476A3 /* EventType.swift */; };
-		8AB003832926FCEA008476A3 /* PaywallShowedParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003082926FCEA008476A3 /* PaywallShowedParameters.swift */; };
+		8AB003832926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003082926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift */; };
 		8AB003842926FCEA008476A3 /* AdaptyOnboardingScreenParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003092926FCEA008476A3 /* AdaptyOnboardingScreenParameters.swift */; };
 		8AB003852926FCEA008476A3 /* AdaptyError.Source.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0030B2926FCEA008476A3 /* AdaptyError.Source.swift */; };
 		8AB003862926FCEA008476A3 /* InternalAdaptyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0030C2926FCEA008476A3 /* InternalAdaptyError.swift */; };
@@ -221,6 +222,7 @@
 		8A1F7470297B2966002B7FBC /* Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text.swift; sourceTree = "<group>"; };
 		8A1F7472297B298D002B7FBC /* TextRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRows.swift; sourceTree = "<group>"; };
 		8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAdaptyError.swift; sourceTree = "<group>"; };
+		8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdaptyUI+Concurrency.swift"; sourceTree = "<group>"; };
 		8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollectionTests.swift; sourceTree = "<group>"; };
 		8AAF8B0D292839280003BA86 /* TestsHostApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestsHostApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AAF8B0F292839280003BA86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -252,7 +254,7 @@
 		8AB002B82926FCEA008476A3 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		8AB002B92926FCEA008476A3 /* Versions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Versions.swift; sourceTree = "<group>"; };
 		8AB002BA2926FCEA008476A3 /* AdaptyResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyResult.swift; sourceTree = "<group>"; };
-		8AB002BB2926FCEA008476A3 /* Concurrency.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Concurrency.swift; sourceTree = "<group>"; };
+		8AB002BB2926FCEA008476A3 /* Adapty+Concurrency.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+Concurrency.swift"; sourceTree = "<group>"; };
 		8AB002BC2926FCEA008476A3 /* Adapty+UpdateAttribution.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+UpdateAttribution.swift"; sourceTree = "<group>"; };
 		8AB002BD2926FCEA008476A3 /* Adapty+ChangeState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+ChangeState.swift"; sourceTree = "<group>"; };
 		8AB002BF2926FCEA008476A3 /* BackendError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendError.swift; sourceTree = "<group>"; };
@@ -319,7 +321,7 @@
 		8AB003042926FCEA008476A3 /* EventCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollection.swift; sourceTree = "<group>"; };
 		8AB003062926FCEA008476A3 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		8AB003072926FCEA008476A3 /* EventType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventType.swift; sourceTree = "<group>"; };
-		8AB003082926FCEA008476A3 /* PaywallShowedParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaywallShowedParameters.swift; sourceTree = "<group>"; };
+		8AB003082926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyPaywallShowedParameters.swift; sourceTree = "<group>"; };
 		8AB003092926FCEA008476A3 /* AdaptyOnboardingScreenParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyOnboardingScreenParameters.swift; sourceTree = "<group>"; };
 		8AB0030B2926FCEA008476A3 /* AdaptyError.Source.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyError.Source.swift; sourceTree = "<group>"; };
 		8AB0030C2926FCEA008476A3 /* InternalAdaptyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InternalAdaptyError.swift; sourceTree = "<group>"; };
@@ -410,6 +412,7 @@
 				8A1F74502979D473002B7FBC /* Requests */,
 				8A1F74392979B3A9002B7FBC /* Entities */,
 				8A1F743A2979B4F3002B7FBC /* AdaptyUI.swift */,
+				8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */,
 			);
 			path = AdaptyUI;
 			sourceTree = "<group>";
@@ -547,7 +550,7 @@
 				8AB002B02926FCEA008476A3 /* AdaptyProfileManager.swift */,
 				8AB002BA2926FCEA008476A3 /* AdaptyResult.swift */,
 				8AB002F62926FCEA008476A3 /* Application.swift */,
-				8AB002BB2926FCEA008476A3 /* Concurrency.swift */,
+				8AB002BB2926FCEA008476A3 /* Adapty+Concurrency.swift */,
 				8AB0032C2926FCEA008476A3 /* Configuration.swift */,
 				8AB002B82926FCEA008476A3 /* Environment.swift */,
 				8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */,
@@ -723,7 +726,7 @@
 			children = (
 				8AB003062926FCEA008476A3 /* Event.swift */,
 				8AB003072926FCEA008476A3 /* EventType.swift */,
-				8AB003082926FCEA008476A3 /* PaywallShowedParameters.swift */,
+				8AB003082926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift */,
 				8AB003092926FCEA008476A3 /* AdaptyOnboardingScreenParameters.swift */,
 			);
 			path = Entities;
@@ -981,6 +984,7 @@
 				8AB003682926FCEA008476A3 /* HTTPEncodableRequest.swift in Sources */,
 				8AB0034D2926FCEA008476A3 /* CreateProfileRequest.swift in Sources */,
 				8A1F746D297B28BF002B7FBC /* Font+Decodable.swift in Sources */,
+				8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */,
 				8AB003512926FCEA008476A3 /* Backend.Codable.swift in Sources */,
 				8AB0036A2926FCEA008476A3 /* HTTPCodableConfiguration.swift in Sources */,
 				8AB003822926FCEA008476A3 /* EventType.swift in Sources */,
@@ -1008,7 +1012,7 @@
 				8AB003712926FCEA008476A3 /* HTTPError.swift in Sources */,
 				8AB003502926FCEA008476A3 /* SetTransactionVariationIdRequest.swift in Sources */,
 				8AB003A72926FCEA008476A3 /* LifecycleManager.swift in Sources */,
-				8AB003402926FCEA008476A3 /* Concurrency.swift in Sources */,
+				8AB003402926FCEA008476A3 /* Adapty+Concurrency.swift in Sources */,
 				8AB003322926FCEA008476A3 /* SKReceiptManager.swift in Sources */,
 				8AB003342926FCEA008476A3 /* SKQueueManager+MakePurchase.swift in Sources */,
 				8AB003392926FCEA008476A3 /* AdaptyLogger.swift in Sources */,
@@ -1094,7 +1098,7 @@
 				8AB0037B2926FCEA008476A3 /* SendEventsRequest.swift in Sources */,
 				8AB003612926FCEA008476A3 /* Adapty+AsyncHelpers.swift in Sources */,
 				8AB003372926FCEA008476A3 /* Adapty.swift in Sources */,
-				8AB003832926FCEA008476A3 /* PaywallShowedParameters.swift in Sources */,
+				8AB003832926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift in Sources */,
 				8AB003312926FCEA008476A3 /* SKProductsManager.swift in Sources */,
 				8A1F7469297B287F002B7FBC /* Color+Decodable.swift in Sources */,
 				8AB0038C2926FCEA008476A3 /* AdaptyEligibility.swift in Sources */,

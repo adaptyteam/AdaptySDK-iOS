@@ -24,6 +24,7 @@ public struct AdaptyPaywall {
     /// Current revision (version) of a paywall. Every change within a paywall creates a new revision.
     public let revision: Int
 
+    /// If `true`, it is possible to fetch the view ``AdaptyUI.ViewConfiguration`` object and use it with ``AdaptyUI`` library.
     public let hasViewConfiguration: Bool
 
     /// And identifier of a paywall locale.

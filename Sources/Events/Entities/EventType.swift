@@ -9,7 +9,7 @@ import Foundation
 
 enum EventType {
     case appOpened
-    case paywallShowed(PaywallShowedParameters)
+    case paywallShowed(AdaptyPaywallShowedParameters)
     case onboardingScreenShowed(AdaptyOnboardingScreenParameters)
 }
 

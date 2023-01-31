@@ -1,5 +1,5 @@
 //
-//  Concurrency.swift
+//  Adapty+Concurrency.swift
 //  Adapty
 //
 //  Copyright © 2022 Adapty. All rights reserved.

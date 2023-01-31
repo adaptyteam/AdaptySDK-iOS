@@ -30,11 +30,11 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: A `AdaptyPaywall` object.
     ///   - completion: Result callback.
-    public static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration? = nil, _ completion: AdaptyErrorCompletion? = nil) {
-        logShowPaywall(PaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration?.id), completion)
+    public static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
+        logShowPaywall(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: nil), completion)
     }
 
-    static func logShowPaywall(_ params: PaywallShowedParameters, _ completion: AdaptyErrorCompletion? = nil) {
+    static func logShowPaywall(_ params: AdaptyPaywallShowedParameters, _ completion: AdaptyErrorCompletion? = nil) {
         trackEvent(.paywallShowed(params), completion)
     }
 
@@ -65,5 +65,11 @@ extension Adapty {
         }
 
         trackEvent(.onboardingScreenShowed(params), completion)
+    }
+}
+
+extension AdaptyUI {
+    public static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
+        Adapty.logShowPaywall(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id), completion)
     }
 }

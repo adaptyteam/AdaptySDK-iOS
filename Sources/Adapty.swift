@@ -188,6 +188,7 @@ extension Adapty {
         }
     }
 
+    /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
     public static func getPaywallProduct(from decoder: JSONDecoder,
                                          data: Data,
                                          _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallProduct>) {
