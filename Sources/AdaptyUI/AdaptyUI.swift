@@ -14,7 +14,7 @@ public enum AdaptyUI {
     ///
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
-    ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` objects. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
+    ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
     public static func getViewConfiguration(forPaywall paywall: AdaptyPaywall,
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         Adapty.async(completion) { manager, completion in
