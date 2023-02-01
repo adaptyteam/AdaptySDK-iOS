@@ -1,5 +1,5 @@
 //
-//  ViewConfiguration+extructLocale.swift
+//  ViewConfiguration+extractLocale.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    public func extructLocale(_ locale: String) -> AdaptyUI.LocalizedViewConfiguration {
+    public func extractLocale(_ locale: String) -> AdaptyUI.LocalizedViewConfiguration {
         let localization: AdaptyUI.Localization?
         if let value = localizations[locale] {
             if defaultLocalization?.id == value.id {
