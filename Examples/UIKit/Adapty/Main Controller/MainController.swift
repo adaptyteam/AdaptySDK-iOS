@@ -52,6 +52,11 @@ class MainController: UIViewController {
     private func presentPaywallController(_ paywall: AdaptyPaywall, _ products: [AdaptyPaywallProduct]) {
         let isHorizontal = paywall.isHorizontal()
 
+        // In case you don't want to implement the paywalls by yourself, we suggest you check out our new feature: Paywall Builder.
+        // It allows you to configure paywalls without writing any code!
+        // Read more in our docs: https://docs.adapty.io/docs/paywall-builder-getting-started
+        // AdaptyUI: https://github.com/adaptyteam/AdaptyUI-iOS.git
+        
         let vc = isHorizontal ? PurchaseController.instantiateHorizontal() : PurchaseController.instantiateVertical()
         vc.presenter = PurchasePresenter(paywall: paywall, products: products, isHorizontalLayout: isHorizontal)
         vc.modalPresentationStyle = .fullScreen
