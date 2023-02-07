@@ -16,9 +16,12 @@ extension UserDefaults {
     func clearAllDataIfDifferent(apiKey: String) -> Bool {
         let hash = apiKey.sha256()
 
-        if let value = string(forKey: Constants.appKeyHash), value == hash {
+        guard let value = string(forKey: Constants.appKeyHash) else {
+            set(hash, forKey: Constants.appKeyHash)
             return false
         }
+
+        if value == hash { return false }
 
         Log.verbose("UserDefaults: changing apiKeyHash = \(hash).")
         clearProfile(newProfileId: nil)
