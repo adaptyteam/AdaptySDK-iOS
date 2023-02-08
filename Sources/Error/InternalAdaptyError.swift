@@ -16,10 +16,6 @@ enum InternalAdaptyError: Error {
     case decodingFailed(AdaptyError.Source, String, error: Error)
     case wrongParam(AdaptyError.Source, String)
     case persistingDataError(AdaptyError.Source, String)
-
-    case originalHTTPError(HTTPError)
-    case originalEventsError(EventsError)
-    case originalSKManagerError(SKManagerError)
 }
 
 extension InternalAdaptyError: CustomStringConvertible {
@@ -39,10 +35,6 @@ extension InternalAdaptyError: CustomStringConvertible {
             return "AdaptyError.wrongParam(\(source), \(description))"
         case let .persistingDataError(source, description):
             return "AdaptyError.persistingDataError(\(source), \(description))"
-
-        case let .originalHTTPError(error): return error.description
-        case let .originalEventsError(error): return error.description
-        case let .originalSKManagerError(error): return error.description
         }
     }
 }
@@ -58,25 +50,12 @@ extension InternalAdaptyError {
              let .wrongParam(src, _),
              let .persistingDataError(src, _):
             return src
-
-        case let .originalHTTPError(error):
-            return error.source
-        case let .originalEventsError(error):
-            return error.source
-        case let .originalSKManagerError(error):
-            return error.source
         }
     }
 
     var originalError: Error? {
         switch self {
         case let .decodingFailed(_, _, error):
-            return error
-        case let .originalHTTPError(error):
-            return error
-        case let .originalEventsError(error):
-            return error
-        case let .originalSKManagerError(error):
             return error
         default:
             return nil
@@ -96,10 +75,6 @@ extension InternalAdaptyError: CustomNSError {
         case .decodingFailed: return AdaptyError.ErrorCode.decodingFailed
         case .wrongParam: return AdaptyError.ErrorCode.wrongParam
         case .persistingDataError: return AdaptyError.ErrorCode.persistingDataError
-
-        case let .originalHTTPError(error): return error.adaptyErrorCode
-        case let .originalEventsError(error): return error.adaptyErrorCode
-        case let .originalSKManagerError(error): return error.adaptyErrorCode
         }
     }
 
@@ -118,4 +93,56 @@ extension InternalAdaptyError: CustomNSError {
     }
 }
 
-extension InternalAdaptyError: CustomAdaptyError { }
+
+extension AdaptyError {
+    static func activateOnceError(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.activateOnceError(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func cantMakePayments(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.cantMakePayments(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func notActivated(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.notActivated(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func profileWasChanged(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.profileWasChanged(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func decodingFallback(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding Fallback Paywalls failed", error: error).asAdaptyError
+    }
+
+    static func decodingPaywallProduct(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding AdaptyPaywallProduct failed", error: error).asAdaptyError
+    }
+
+    static func wrongParamOnboardingScreenOrder(file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Wrong screenOrder parameter value, it should be more than zero.").asAdaptyError
+    }
+
+    static func wrongKeyOfCustomAttribute(file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The key must be string not more than 30 characters. Only letters, numbers, dashes, points and underscores allowed").asAdaptyError
+    }
+
+    static func wrongStringValueOfCustomAttribute(file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The value must not be empty and not more than 30 characters.").asAdaptyError
+    }
+
+    static func wrongCountCustomAttributes(file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 10").asAdaptyError
+    }
+
+    static func cacheHasNotPaywall(file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Don't found paywall in cache").asAdaptyError
+    }
+}

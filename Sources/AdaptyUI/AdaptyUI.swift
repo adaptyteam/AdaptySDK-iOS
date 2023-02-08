@@ -43,7 +43,7 @@ extension AdaptyProfileManager {
             case let .success(paywall):
 
                 guard let self = self, self.isActive else {
-                    completion(.failure(AdaptyError.profileWasChanged()))
+                    completion(.failure(.profileWasChanged()))
                     return
                 }
 
@@ -52,7 +52,7 @@ extension AdaptyProfileManager {
                     return
                 }
 
-                completion(.failure(AdaptyError.cacheHasNotPaywall()))
+                completion(.failure(.cacheHasNotPaywall()))
             }
         }
     }

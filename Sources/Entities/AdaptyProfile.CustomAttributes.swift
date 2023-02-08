@@ -40,10 +40,10 @@ extension AdaptyProfile.CustomAttributeValue {
         }
     }
 
-    func validate() -> Error? {
+    func validate() -> AdaptyError? {
         switch self {
         case let .string(value):
-            return (value.isEmpty || value.count > 30) ? AdaptyError.wrongStringValueOfCustomAttribute() : nil
+            return (value.isEmpty || value.count > 30) ? .wrongStringValueOfCustomAttribute() : nil
         default:
             return nil
         }
@@ -58,16 +58,16 @@ extension AdaptyProfile.CustomAttributes {
         })
     }
 
-    static func validateKey(_ key: String) -> Error? {
+    static func validateKey(_ key: String) -> AdaptyError? {
         if key.isEmpty || key.count > 30 || key.range(of: ".*[^A-Za-z0-9._-].*", options: .regularExpression) != nil {
-            return AdaptyError.wrongKeyOfCustomAttribute()
+            return .wrongKeyOfCustomAttribute()
         }
         return nil
     }
 
-    func validate() -> Error? {
+    func validate() -> AdaptyError? {
         if filter({ $1.hasValue }).count > 10 {
-            return AdaptyError.wrongCountCustomAttributes()
+            return .wrongCountCustomAttributes()
         }
         return nil
     }

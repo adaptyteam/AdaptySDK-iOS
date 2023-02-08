@@ -197,7 +197,7 @@ extension Adapty {
             do {
                 object = try decoder.decode(AdaptyPaywallProduct.PrivateObject.self, from: data)
             } catch {
-                completion(.failure(AdaptyError.decodingPaywallProduct(error)))
+                completion(.failure(.decodingPaywallProduct(error)))
                 return
             }
 
@@ -222,7 +222,7 @@ extension Adapty {
     public static func makePurchase(product: AdaptyPaywallProduct,
                                     _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         guard SKQueueManager.canMakePayments() else {
-            completion(.failure(AdaptyError.cantMakePayments()))
+            completion(.failure(.cantMakePayments()))
             return
         }
 

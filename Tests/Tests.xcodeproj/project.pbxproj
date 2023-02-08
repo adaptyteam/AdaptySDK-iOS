@@ -131,7 +131,6 @@
 		8AB003852926FCEA008476A3 /* AdaptyError.Source.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0030B2926FCEA008476A3 /* AdaptyError.Source.swift */; };
 		8AB003862926FCEA008476A3 /* InternalAdaptyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0030C2926FCEA008476A3 /* InternalAdaptyError.swift */; };
 		8AB003872926FCEA008476A3 /* AdaptyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0030D2926FCEA008476A3 /* AdaptyError.swift */; };
-		8AB003882926FCEA008476A3 /* AdaptyError+NSError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0030E2926FCEA008476A3 /* AdaptyError+NSError.swift */; };
 		8AB003892926FCEA008476A3 /* AdaptyError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0030F2926FCEA008476A3 /* AdaptyError+Description.swift */; };
 		8AB0038A2926FCEA008476A3 /* AdaptyError+Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003102926FCEA008476A3 /* AdaptyError+Encodable.swift */; };
 		8AB0038B2926FCEA008476A3 /* Adapty.h in Headers */ = {isa = PBXBuildFile; fileRef = 8AB003112926FCEA008476A3 /* Adapty.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -326,7 +325,6 @@
 		8AB0030B2926FCEA008476A3 /* AdaptyError.Source.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyError.Source.swift; sourceTree = "<group>"; };
 		8AB0030C2926FCEA008476A3 /* InternalAdaptyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InternalAdaptyError.swift; sourceTree = "<group>"; };
 		8AB0030D2926FCEA008476A3 /* AdaptyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyError.swift; sourceTree = "<group>"; };
-		8AB0030E2926FCEA008476A3 /* AdaptyError+NSError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AdaptyError+NSError.swift"; sourceTree = "<group>"; };
 		8AB0030F2926FCEA008476A3 /* AdaptyError+Description.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AdaptyError+Description.swift"; sourceTree = "<group>"; };
 		8AB003102926FCEA008476A3 /* AdaptyError+Encodable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AdaptyError+Encodable.swift"; sourceTree = "<group>"; };
 		8AB003112926FCEA008476A3 /* Adapty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Adapty.h; sourceTree = "<group>"; };
@@ -739,7 +737,6 @@
 				8AB0030D2926FCEA008476A3 /* AdaptyError.swift */,
 				8AB0030F2926FCEA008476A3 /* AdaptyError+Description.swift */,
 				8AB003102926FCEA008476A3 /* AdaptyError+Encodable.swift */,
-				8AB0030E2926FCEA008476A3 /* AdaptyError+NSError.swift */,
 				8AB0030C2926FCEA008476A3 /* InternalAdaptyError.swift */,
 				8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */,
 			);
@@ -1056,7 +1053,6 @@
 				8AB003602926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift in Sources */,
 				8AB003722926FCEA008476A3 /* HTTPRequest.QueryItems.swift in Sources */,
 				8A1F746B297B28A0002B7FBC /* Image+Decodable.swift in Sources */,
-				8AB003882926FCEA008476A3 /* AdaptyError+NSError.swift in Sources */,
 				8AB0038E2926FCEA008476A3 /* PurchaseProductInfo.swift in Sources */,
 				8AB003332926FCEA008476A3 /* SKQueueManager+RestorePurchases.swift in Sources */,
 				8AB0033A2926FCEA008476A3 /* AdaptyLogLevel.swift in Sources */,

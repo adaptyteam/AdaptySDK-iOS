@@ -17,9 +17,6 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
         case let .decodingFailed(_, description, _): return description
         case let .wrongParam(_, description): return description
         case let .persistingDataError(_, description): return description
-        case let .originalHTTPError(error): return error.debugDescription
-        case let .originalEventsError(error): return error.debugDescription
-        case let .originalSKManagerError(error): return error.debugDescription
         }
     }
 }

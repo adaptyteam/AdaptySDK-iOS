@@ -66,7 +66,7 @@ extension Adapty {
 
         underlayQueue.async(group: group, qos: qos, flags: flags) {
             guard let manager = shared else {
-                callCompletion(function, completion, .failure(AdaptyError.notActivated()), logLevel: .error)
+                callCompletion(function, completion, .failure(.notActivated()), logLevel: .error)
                 event.end("%@ Failed", function)
                 return
             }

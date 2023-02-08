@@ -74,7 +74,7 @@ extension AdaptyProfileManager {
         let completion: AdaptyResultCompletion<AdaptyProfile> = { [weak self] result in
 
             guard let self = self, self.isActive else {
-                completion(.failure(AdaptyError.profileWasChanged()))
+                completion(.failure(.profileWasChanged()))
                 return
             }
 
@@ -127,7 +127,7 @@ extension AdaptyProfileManager {
             [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
 
             guard let self = self, self.isActive else {
-                completion(.failure(AdaptyError.profileWasChanged()))
+                completion(.failure(.profileWasChanged()))
                 return
             }
 
@@ -156,7 +156,7 @@ extension AdaptyProfileManager {
                     return
                 }
 
-                completion(.failure(AdaptyError.cacheHasNotPaywall()))
+                completion(.failure(.cacheHasNotPaywall()))
             }
         }
     }
@@ -178,7 +178,7 @@ extension AdaptyProfileManager {
                 }
 
                 guard let self = self, self.isActive else {
-                    completion(.failure(AdaptyError.profileWasChanged()))
+                    completion(.failure(.profileWasChanged()))
                     return
                 }
 
@@ -194,7 +194,7 @@ extension AdaptyProfileManager {
                 completion(.failure(error))
             case let .success(backendProducts):
                 guard let manager = self?.manager else {
-                    completion(.failure(AdaptyError.profileWasChanged()))
+                    completion(.failure(.profileWasChanged()))
                     return
                 }
                 manager.skProductsManager.fetchProducts(productIdentifiers: Set(backendProducts.map { $0.vendorId })) {
@@ -217,7 +217,7 @@ extension AdaptyProfileManager {
         manager.httpSession.performFetchAllProductsRequest(profileId: profileId, responseHash: productsCache.productsHash, syncedBundleReceipt: syncedBundleReceipt) { [weak self] (result: AdaptyResult<VH<[BackendProduct]?>>) in
 
             guard let self = self, self.isActive else {
-                completion(.failure(AdaptyError.profileWasChanged()))
+                completion(.failure(.profileWasChanged()))
                 return
             }
 

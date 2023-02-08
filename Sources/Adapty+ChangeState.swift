@@ -105,7 +105,7 @@ extension Adapty {
         profileStorage.clearProfile(newProfileId: nil)
         state = .initilizingTo(customerUserId: nil)
         callLogoutCompletionHandlers(nil)
-        callProfileManagerCompletionHandlers(.failure(AdaptyError.profileWasChanged()))
+        callProfileManagerCompletionHandlers(.failure(.profileWasChanged()))
         Adapty.underlayQueue.async { [weak self] in
             self?.initilizingProfileManager(toCustomerUserId: nil)
         }
@@ -125,7 +125,7 @@ extension Adapty {
             manager.isActive = false
             state = .initilizingTo(customerUserId: newCustomerUserId)
 //            callLogoutCompletionHandlers(nil)
-            callProfileManagerCompletionHandlers(.failure(AdaptyError.profileWasChanged()))
+            callProfileManagerCompletionHandlers(.failure(.profileWasChanged()))
             getProfileManager { completion($0.error) }
             Adapty.underlayQueue.async { [weak self] in
                 self?.initilizingProfileManager(toCustomerUserId: newCustomerUserId)
@@ -138,7 +138,7 @@ extension Adapty {
             }
             state = .needIdentifyTo(customerUserId: newCustomerUserId)
 //            callLogoutCompletionHandlers(nil)
-            callProfileManagerCompletionHandlers(.failure(AdaptyError.profileWasChanged()))
+            callProfileManagerCompletionHandlers(.failure(.profileWasChanged()))
             getProfileManager { completion($0.error) }
         case let .needIdentifyTo(customerUserId):
             if customerUserId == newCustomerUserId {
@@ -147,13 +147,13 @@ extension Adapty {
             }
             state = .needIdentifyTo(customerUserId: newCustomerUserId)
 //            callLogoutCompletionHandlers(nil)
-            callProfileManagerCompletionHandlers(.failure(AdaptyError.profileWasChanged()))
+            callProfileManagerCompletionHandlers(.failure(.profileWasChanged()))
             getProfileManager { completion($0.error) }
         case .needLogout:
             profileStorage.clearProfile(newProfileId: nil)
             state = .needIdentifyTo(customerUserId: newCustomerUserId)
             callLogoutCompletionHandlers(nil)
-            callProfileManagerCompletionHandlers(.failure(AdaptyError.profileWasChanged()))
+            callProfileManagerCompletionHandlers(.failure(.profileWasChanged()))
             getProfileManager { completion($0.error) }
         }
     }

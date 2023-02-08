@@ -33,7 +33,7 @@ extension Adapty {
                 }
                 Configuration.fallbackPaywalls = fallbackPaywalls
             } catch {
-                completion(AdaptyError.decodingFallback(error))
+                completion(.decodingFallback(error))
                 return
             }
             completion(nil)
