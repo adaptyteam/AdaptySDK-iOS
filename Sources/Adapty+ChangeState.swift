@@ -45,7 +45,7 @@ public final class Adapty {
     fileprivate var logoutCompletionHandlers: [AdaptyErrorCompletion]?
 
     @inline(__always)
-    func getProfileManager(_ completion: @escaping AdaptyResultCompletion<AdaptyProfileManager>) {
+    func getProfileManager(waitCreatingProfile: Bool = true, _ completion: @escaping AdaptyResultCompletion<AdaptyProfileManager>) {
         if let result = state.initilizedResult {
             completion(result)
             return

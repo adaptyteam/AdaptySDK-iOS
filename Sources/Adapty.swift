@@ -156,12 +156,18 @@ extension Adapty {
                                   locale: String? = nil,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         async(completion) { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(.failure(profileManager.error!))
-                    return
+            let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
+            manager.getProfileManager(waitCreatingProfile: fallback == nil) { result in
+                switch result {
+                case let .success(profileManager):
+                    profileManager.getPaywall(id, locale, completion)
+                case let .failure(error):
+                    guard error.wrapped is HTTPError, let paywall = fallback else {
+                        completion(.failure(error))
+                        return
+                    }
+                    completion(.success(paywall))
                 }
-                profileManager.getPaywall(id, locale, completion)
             }
         }
     }
@@ -178,12 +184,23 @@ extension Adapty {
                                           fetchPolicy: AdaptyProductsFetchPolicy = .default,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         async(completion) { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(.failure(profileManager.error!))
-                    return
+            let fallback = paywall.vendorProductIds.compactMap {
+                Adapty.Configuration.fallbackPaywalls?.products[$0]
+            }
+
+            manager.getProfileManager(waitCreatingProfile: fallback.isEmpty) { result in
+
+                switch result {
+                case let .success(profileManager):
+                    profileManager.getPaywallProducts(paywall: paywall, fetchPolicy: fetchPolicy, completion)
+                case let .failure(error):
+                    guard error.wrapped is HTTPError, !fallback.isEmpty else {
+                        completion(.failure(error))
+                        return
+                    }
+
+                    manager.skProductsManager.getPaywallProducts(paywall: paywall, fallback, completion)
                 }
-                profileManager.getPaywallProducts(paywall: paywall, fetchPolicy: fetchPolicy, completion)
             }
         }
     }

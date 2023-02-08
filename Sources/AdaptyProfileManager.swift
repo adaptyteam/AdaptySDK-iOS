@@ -197,16 +197,7 @@ extension AdaptyProfileManager {
                     completion(.failure(.profileWasChanged()))
                     return
                 }
-                manager.skProductsManager.fetchProducts(productIdentifiers: Set(backendProducts.map { $0.vendorId })) {
-                    completion($0.map { (skProducts: [SKProduct]) -> [AdaptyPaywallProduct] in
-                        backendProducts.compactMap { product in
-                            guard let sk = skProducts.first(where: { $0.productIdentifier == product.vendorId }) else {
-                                return nil
-                            }
-                            return AdaptyPaywallProduct(paywall: paywall, product: product, skProduct: sk)
-                        }
-                    })
-                }
+                manager.skProductsManager.getPaywallProducts(paywall: paywall, backendProducts, completion)
             }
         }
     }
