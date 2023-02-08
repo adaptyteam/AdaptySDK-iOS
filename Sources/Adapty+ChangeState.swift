@@ -41,6 +41,7 @@ public final class Adapty {
     }
 
     fileprivate var profileManagerCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
+    fileprivate var profileManagerOrFailedCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
 
     fileprivate var logoutCompletionHandlers: [AdaptyErrorCompletion]?
 
@@ -50,17 +51,35 @@ public final class Adapty {
             completion(result)
             return
         }
-        if let handlers = profileManagerCompletionHandlers {
-            profileManagerCompletionHandlers = handlers + [completion]
-            return
+
+        if waitCreatingProfile {
+            if let handlers = profileManagerCompletionHandlers {
+                profileManagerCompletionHandlers = handlers + [completion]
+                return
+            }
+            profileManagerCompletionHandlers = [completion]
+        } else {
+            if let handlers = profileManagerOrFailedCompletionHandlers {
+                profileManagerOrFailedCompletionHandlers = handlers + [completion]
+                return
+            }
+            profileManagerOrFailedCompletionHandlers = [completion]
         }
-        profileManagerCompletionHandlers = [completion]
     }
 
     @inline(__always)
     fileprivate func callProfileManagerCompletionHandlers(_ result: AdaptyResult<AdaptyProfileManager>) {
-        guard let handlers = profileManagerCompletionHandlers else { return }
-        profileManagerCompletionHandlers = nil
+        let handlers: [AdaptyResultCompletion<AdaptyProfileManager>]
+        if let error = result.error, error.isProfileCreateFailed {
+            handlers = profileManagerOrFailedCompletionHandlers ?? []
+            profileManagerOrFailedCompletionHandlers = nil
+        } else {
+            handlers = (profileManagerCompletionHandlers ?? []) + (profileManagerOrFailedCompletionHandlers ?? [])
+            profileManagerCompletionHandlers = nil
+            profileManagerOrFailedCompletionHandlers = nil
+        }
+        guard !handlers.isEmpty else { return }
+
         Adapty.underlayQueue.async {
             handlers.forEach { $0(result) }
         }
@@ -200,7 +219,10 @@ extension Adapty {
         createProfile(profileId, customerUserId) { [weak self] result in
             guard let self = self, !self.needBreakInitilizing() else { return }
             switch result {
-            case .failure:
+            case let .failure(error):
+                if let error = error.wrapped as? HTTPError {
+                    self.callProfileManagerCompletionHandlers(.failure(.profileCreateFailed(error)))
+                }
                 // TODO: Dont repeat if wrong apiKey, and ???
                 Adapty.underlayQueue.asyncAfter(deadline: .now() + .seconds(1)) { [weak self] in
                     self?.initilizingProfileManager(toCustomerUserId: customerUserId)

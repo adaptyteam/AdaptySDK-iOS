@@ -162,7 +162,7 @@ extension Adapty {
                 case let .success(profileManager):
                     profileManager.getPaywall(id, locale, completion)
                 case let .failure(error):
-                    guard error.wrapped is HTTPError, let paywall = fallback else {
+                    guard error.isProfileCreateFailed, let paywall = fallback else {
                         completion(.failure(error))
                         return
                     }
@@ -187,14 +187,12 @@ extension Adapty {
             let fallback = paywall.vendorProductIds.compactMap {
                 Adapty.Configuration.fallbackPaywalls?.products[$0]
             }
-
             manager.getProfileManager(waitCreatingProfile: fallback.isEmpty) { result in
-
                 switch result {
                 case let .success(profileManager):
                     profileManager.getPaywallProducts(paywall: paywall, fetchPolicy: fetchPolicy, completion)
                 case let .failure(error):
-                    guard error.wrapped is HTTPError, !fallback.isEmpty else {
+                    guard error.isProfileCreateFailed, !fallback.isEmpty else {
                         completion(.failure(error))
                         return
                     }

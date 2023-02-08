@@ -13,6 +13,7 @@ enum InternalAdaptyError: Error {
     case cantMakePayments(AdaptyError.Source)
     case notActivated(AdaptyError.Source)
     case profileWasChanged(AdaptyError.Source)
+    case profileCreateFailed(AdaptyError.Source, error: HTTPError)
     case decodingFailed(AdaptyError.Source, String, error: Error)
     case wrongParam(AdaptyError.Source, String)
     case persistingDataError(AdaptyError.Source, String)
@@ -29,6 +30,8 @@ extension InternalAdaptyError: CustomStringConvertible {
             return "AdaptyError.notActivated(\(source))"
         case let .profileWasChanged(source):
             return "AdaptyError.profileWasChanged(\(source))"
+        case let .profileCreateFailed(source, error):
+            return "AdaptyError.profileCreateFailed(\(source), \(error))"
         case let .decodingFailed(source, description, error):
             return "AdaptyError.decodingFailed(\(source), \(description), \(error))"
         case let .wrongParam(source, description):
@@ -46,6 +49,7 @@ extension InternalAdaptyError {
              let .cantMakePayments(src),
              let .notActivated(src),
              let .profileWasChanged(src),
+             let .profileCreateFailed(src, _),
              let .decodingFailed(src, _, _),
              let .wrongParam(src, _),
              let .persistingDataError(src, _):
@@ -55,6 +59,8 @@ extension InternalAdaptyError {
 
     var originalError: Error? {
         switch self {
+        case let .profileCreateFailed(_, error):
+            return error
         case let .decodingFailed(_, _, error):
             return error
         default:
@@ -72,6 +78,7 @@ extension InternalAdaptyError: CustomNSError {
         case .cantMakePayments: return AdaptyError.ErrorCode.cantMakePayments
         case .notActivated: return AdaptyError.ErrorCode.notActivated
         case .profileWasChanged: return AdaptyError.ErrorCode.profileWasChanged
+        case let .profileCreateFailed(_, error): return error.adaptyErrorCode
         case .decodingFailed: return AdaptyError.ErrorCode.decodingFailed
         case .wrongParam: return AdaptyError.ErrorCode.wrongParam
         case .persistingDataError: return AdaptyError.ErrorCode.persistingDataError
@@ -83,7 +90,7 @@ extension InternalAdaptyError: CustomNSError {
     var errorUserInfo: [String: Any] {
         var data: [String: Any] = [
             AdaptyError.UserInfoKey.description: debugDescription,
-            AdaptyError.UserInfoKey.source: source.description
+            AdaptyError.UserInfoKey.source: source.description,
         ]
 
         if let originalError = originalError {
@@ -92,7 +99,6 @@ extension InternalAdaptyError: CustomNSError {
         return data
     }
 }
-
 
 extension AdaptyError {
     static func activateOnceError(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
@@ -109,6 +115,20 @@ extension AdaptyError {
 
     static func profileWasChanged(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         InternalAdaptyError.profileWasChanged(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func profileCreateFailed(_ error: HTTPError, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.profileCreateFailed(AdaptyError.Source(file: file, function: function, line: line), error: error).asAdaptyError
+    }
+
+    var isProfileCreateFailed: Bool {
+        guard let error = wrapped as? InternalAdaptyError else { return false }
+        switch error {
+        case .profileCreateFailed:
+            return true
+        default:
+            return false
+        }
     }
 
     static func decodingFallback(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
