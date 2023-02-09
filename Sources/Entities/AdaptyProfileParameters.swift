@@ -23,7 +23,8 @@ public struct AdaptyProfileParameters {
     public internal(set) var oneSignalPlayerId: String?
     public internal(set) var pushwooshHWID: String?
     public internal(set) var firebaseAppInstanceId: String?
-
+    public internal(set) var airbridgeDeviceId: String?
+    
     var storeCountry: String?
     public internal(set) var appTrackingTransparencyStatus: AdaptyProfileParameters.AppTrackingTransparencyStatus?
     
@@ -69,6 +70,7 @@ extension AdaptyProfileParameters: Codable {
         case oneSignalPlayerId = "one_signal_player_id"
         case pushwooshHWID = "pushwoosh_hwid"
         case firebaseAppInstanceId = "firebase_app_instance_id"
+        case airbridgeDeviceId = "airbridge_device_id"
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -91,6 +93,8 @@ extension AdaptyProfileParameters: Codable {
         try container.encodeIfPresent(oneSignalPlayerId, forKey: .oneSignalPlayerId)
         try container.encodeIfPresent(pushwooshHWID, forKey: .pushwooshHWID)
         try container.encodeIfPresent(firebaseAppInstanceId, forKey: .firebaseAppInstanceId)
+        try container.encodeIfPresent(airbridgeDeviceId, forKey: .airbridgeDeviceId)
+
         try container.encodeIfPresent(analyticsDisabled, forKey: .analyticsDisabled)
     }
 }

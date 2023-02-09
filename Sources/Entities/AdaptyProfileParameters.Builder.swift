@@ -162,6 +162,12 @@ extension AdaptyProfileParameters.Builder {
         parameters.firebaseAppInstanceId = value
         return self
     }
+
+    @discardableResult
+    public func with(airbridgeDeviceId value: String?) -> Self {
+        parameters.airbridgeDeviceId = value
+        return self
+    }
 }
 
 #if canImport(AppTrackingTransparency)
