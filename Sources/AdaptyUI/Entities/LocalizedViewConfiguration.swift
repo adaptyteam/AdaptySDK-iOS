@@ -66,11 +66,11 @@ extension AdaptyUI {
     }
 }
 
-extension [String: AdaptyUI.LocalizedViewItem] {
-    public func getColor(_ key: String) -> AdaptyUI.Color? { self[key]?.asColor }
-    public func getImage(_ key: String) -> AdaptyUI.Image? { self[key]?.asImage }
-    public func getText(_ key: String) -> AdaptyUI.Text? { self[key]?.asText }
-    public func getTextRows(_ key: String) -> AdaptyUI.TextRows? { self[key]?.asTextRows }
+extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
+    public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asColor }
+    public func getImage(_ key: Key) -> AdaptyUI.Image? { self[key]?.asImage }
+    public func getText(_ key: Key) -> AdaptyUI.Text? { self[key]?.asText }
+    public func getTextRows(_ key: Key) -> AdaptyUI.TextRows? { self[key]?.asTextRows }
 }
 
 extension AdaptyUI.LocalizedViewConfiguration: CustomStringConvertible {
