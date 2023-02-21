@@ -66,7 +66,7 @@ final class SKProductsManager: NSObject {
     }
 
     private func startRequest(_ productIds: Set<String>, retryCount: Int) {
-        Log.verbose("SKProductManager: Called SKProductsManager.startRequest retryCount:\(retryCount)")
+        Log.verbose("SKProductManager: Called SKProductsManager.startRequest productIds:\(productIds) retryCount:\(retryCount)")
         let request = SKProductsRequest(productIdentifiers: productIds)
         request.delegate = self
         requests[request] = (productIds: productIds, retryCount: retryCount)
@@ -109,6 +109,11 @@ final class SKProductsManager: NSObject {
 extension SKProductsManager: SKProductsRequestDelegate {
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         queue.async { [weak self] in
+
+            if response.products.isEmpty {
+                Log.verbose("SKProductManager: SKProductsResponse don't have any product")
+            }
+
             for product in response.products {
                 Log.verbose("SKProductManager: found product \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
             }
@@ -122,6 +127,7 @@ extension SKProductsManager: SKProductsRequestDelegate {
                 Log.error("SKProductManager: Not found SKRequest in self.requests")
                 return
             }
+
             self.requests.removeValue(forKey: request)
 
             guard let handlers = self.completionHandlers.removeValue(forKey: productIds) else {
