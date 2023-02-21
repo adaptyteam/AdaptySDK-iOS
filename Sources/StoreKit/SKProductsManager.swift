@@ -135,6 +135,14 @@ extension SKProductsManager: SKProductsRequestDelegate {
                 return
             }
 
+            guard !response.products.isEmpty else {
+                let error = SKManagerError.noProductIDsFound().asAdaptyError
+                for completion in handlers {
+                    completion(.failure(error))
+                }
+                return
+            }
+
             self.saveProducts(response.products)
             for completion in handlers {
                 completion(.success(response.products))
