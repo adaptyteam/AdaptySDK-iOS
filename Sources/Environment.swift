@@ -62,8 +62,10 @@ enum Environment {
 
         static var displayResolution: DisplayResolution? {
             {
-                #if os(macOS) || targetEnvironment(macCatalyst)
+                #if os(macOS)
                     return NSScreen.main?.frame.size
+                #elseif targetEnvironment(macCatalyst)
+                    return Optional.some(UIScreen.main.bounds.size)
                 #else
                     return Optional.some(UIScreen.main.bounds.size)
                 #endif

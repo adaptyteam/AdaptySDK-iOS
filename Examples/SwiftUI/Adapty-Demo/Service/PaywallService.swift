@@ -12,9 +12,8 @@ import SwiftUI
 
 final class PaywallService: ObservableObject {
     @Published var paywall: AdaptyPaywall?
-    
-    var paywallProducts: [AdaptyPaywallProduct]?
-    var paywallViewModel: PaywallViewModel?
+    @Published var paywallProducts: [AdaptyPaywallProduct]?
+    @Published var paywallViewModel: PaywallViewModel?
         
     // MARK: - Paywalls
     
