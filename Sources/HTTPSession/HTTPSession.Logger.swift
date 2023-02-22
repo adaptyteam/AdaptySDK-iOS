@@ -9,49 +9,88 @@ import Foundation
 
 extension HTTPSession {
     struct Logger: Sendable {
-        static func request(_ request: URLRequest, endpoint: HTTPEndpoint) {
-            let url = request.url
-            let query: String
-            if let data = url?.query {
-                query = " ?\(data)"
-            } else {
-                query = ""
-            }
+        static func request(_ request: URLRequest, endpoint: HTTPEndpoint, session: URLSessionConfiguration? = nil, stamp: String) {
+            Log.verbose {
+                let url = request.url
 
-            let body: String
-            if let data = request.httpBody, !data.isEmpty {
-                let length = data.count
-                body = length < 200 ? String(decoding: data, as: UTF8.self) : "bytes[\(length)]"
-            } else {
-                body = ""
+                let query: String
+                if let data = url?.query {
+                    query = " ?\(data)"
+                } else {
+                    query = ""
+                }
+
+                let path: String
+                if endpoint.path.isEmpty, let url = url {
+                    path = url.relativeString
+                } else {
+                    path = endpoint.path
+                }
+
+                return "#API# \(endpoint.method) --> \(path)\(query) [\(stamp)]\n"
+                    + "----------OUTGOING-----------\n"
+                    + request.curlCommand(session: session, verbose: true)
+                    + "\n-------------END-------------"
             }
-            Log.verbose("#API# \(endpoint.method) --> \(endpoint.path)\(query) \(body)")
         }
 
         static func encoding(endpoint: HTTPEndpoint, error: HTTPError) {
             Log.error("#API# ENCODING ERROR !-- \(endpoint) -- \(error)")
         }
 
-        static func response(_ response: URLResponse?, endpoint: HTTPEndpoint, error: HTTPError?, session: URLSessionConfiguration? = nil, request: URLRequest?, forceLogCurl: Bool = false) {
+        static func response(_ response: URLResponse?, data: Data?, endpoint: HTTPEndpoint, error: HTTPError?, request: URLRequest, stamp: String) {
             let metrics = "" // logMetrics(nil)
-            guard let error = error else {
-                if forceLogCurl, let request = request {
-                    Log.debug("#API# " + request.curlCommand(session: session, verbose: true))
+            let path: String
+            if endpoint.path.isEmpty, let url = response?.url ?? request.url {
+                path = url.relativeString
+            } else {
+                path = endpoint.path
+            }
+
+            func responseAsString(_ response: URLResponse?) -> String {
+                guard let response = response as? HTTPURLResponse else {
+                    return "HTTP ???"
                 }
-                Log.verbose("#API# RESPONSE <-- \(endpoint) \(metrics)")
+                let headers = response.allHeaderFields.map { "\($0): \($1)" }.joined(separator: "\" -H \"")
+                return "HTTP \(response.statusCode)" + (headers.isEmpty ? "" : (" -H \"" + headers + "\""))
+            }
+
+            func dataAsString(_ data: Data?) -> String {
+                guard let data = data, let str = String(data: data, encoding: .utf8), !str.isEmpty else {
+                    return ""
+                }
+                return " -d '\(str)'"
+            }
+
+            guard let error = error else {
+                Log.verbose {
+                    "#API# RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)\n"
+                        + "----------INCOMMING----------\n"
+                        + responseAsString(response)
+                        + dataAsString(data)
+                        + "\n-------------END-------------"
+                }
                 return
             }
 
             if case let .network(_, _, error: error) = error,
                (error as NSError).isNetworkConnectionError {
-                Log.verbose("#API# NO CONNECTION <-- \(endpoint) \(metrics)")
+                Log.verbose("#API# NO CONNECTION <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)")
             } else if error.isCancelled {
-                Log.verbose("#API# CANCELED <-- \(endpoint) \(metrics)")
+                Log.verbose("#API# CANCELED <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)")
             } else {
-                if let request = request {
-                    Log.debug("#API# " + request.curlCommand(session: session, verbose: true))
+                Log.error {
+                    if AdaptyLogger.isLogLevel(.verbose), error.statusCode != nil {
+                        return "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)\n"
+                            + "----------INCOMMING----------\n"
+                            + responseAsString(response)
+                            + dataAsString(data)
+                            + "\n-------------END-------------"
+
+                    } else {
+                        return "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)"
+                    }
                 }
-                Log.error("#API# ERROR <-- \(endpoint) -- \(error) \(metrics)")
             }
         }
 

@@ -71,9 +71,10 @@ final class HTTPSession {
         }
 
         let responseValidator = _responseValidator
-        let forceLogCurl = request.forceLogCurl || forceLogCurl
+//        let forceLogCurl = request.forceLogCurl || forceLogCurl
         let sessionConfiguration = _session.configuration
-        Logger.request(urlRequest, endpoint: endpoint)
+        let stamp = Log.stamp
+        Logger.request(urlRequest, endpoint: endpoint, session: sessionConfiguration, stamp: stamp)
         let task = _session.dataTask(with: urlRequest) { data, response, error in
             let result: HTTPResponse<Body>.Result
             if let error = error {
@@ -89,7 +90,7 @@ final class HTTPSession {
                 result = .failure(.network(endpoint, error: DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The given response is nil or not is HTTPURLResponse."))))
             }
 
-            Logger.response(response, endpoint: endpoint, error: result.error, session: sessionConfiguration, request: urlRequest, forceLogCurl: forceLogCurl)
+            Logger.response(response, data: data, endpoint: endpoint, error: result.error, request: urlRequest, stamp: stamp)
             queue.async {
                 if let errorHandler = errorHandler, let error = result.error { errorHandler(error) }
                 completionHandler(result)

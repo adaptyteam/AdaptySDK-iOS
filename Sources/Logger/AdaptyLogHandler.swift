@@ -7,7 +7,7 @@
 
 import Foundation
 
-public typealias AdaptyLogHandler = (_ level: AdaptyLogLevel, _ message: String) -> Void
+public typealias AdaptyLogHandler = (_ time: Date, _ level: AdaptyLogLevel, _ message: String) -> Void
 
 extension Adapty {
     /// Override the default logger behavior using this method
@@ -16,7 +16,7 @@ extension Adapty {
         AdaptyLogger.handler = handler
     }
 
-    public static func writeLog(level: AdaptyLogLevel, message: String, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        AdaptyLogger.asyncWrite(level, message, file: file, function: function, line: line)
+    public static func writeLog(time: Date = Date(), level: AdaptyLogLevel, message: String, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        AdaptyLogger.asyncWrite(time, level, { message }, file: file, function: function, line: line)
     }
 }

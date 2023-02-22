@@ -14,5 +14,5 @@ struct HTTPEndpoint: Sendable, Equatable {
 }
 
 extension HTTPEndpoint: CustomStringConvertible {
-    var description: String { "\(method) \(path.isEmpty ? "*" : path)" }
+    var description: String { "\(method) \(path)" }
 }
