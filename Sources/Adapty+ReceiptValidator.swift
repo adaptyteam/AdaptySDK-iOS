@@ -11,17 +11,17 @@ extension Adapty: ReceiptValidator {
     func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         skReceiptManager.validateReceipt(refreshIfEmpty: refreshIfEmpty) { [weak self] result in
             completion(result.map { profile in
-                self?.saveValidateRecieptResponse(profile: profile)
+                self?.saveValidateReceiptResponse(profile: profile)
                 return profile
             })
         }
     }
 
-    fileprivate func saveValidateRecieptResponse(profile: VH<AdaptyProfile>) {
+    fileprivate func saveValidateReceiptResponse(profile: VH<AdaptyProfile>) {
         if profileStorage.profileId == profile.value.profileId {
             profileStorage.setSyncedBundleReceipt()
         }
-        if let manager = state.initilized {
+        if let manager = state.initialized {
             manager.saveResponse(profile)
         }
     }
@@ -38,7 +38,7 @@ extension Adapty: ReceiptValidator {
                                                                receipt: receipt,
                                                                purchaseProductInfo: purchaseProductInfo) { [weak self] result in
                     completion(result.map { profile in
-                        self?.saveValidateRecieptResponse(profile: profile)
+                        self?.saveValidateReceiptResponse(profile: profile)
                         return profile
                     })
                 }

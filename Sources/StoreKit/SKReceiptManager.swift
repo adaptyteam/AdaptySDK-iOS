@@ -43,16 +43,16 @@ final class SKReceiptManager: NSObject {
                 guard let self = self else { return }
                 switch result {
                 case let .failure(error):
-                    complatedValidate(.failure(error))
+                    completedValidate(.failure(error))
                 case let .success(receipt):
                     self.session.performValidateReceiptRequest(profileId: self.storage.profileId,
                                                                receipt: receipt,
-                                                               complatedValidate)
+                                                               completedValidate)
                 }
             }
         }
 
-        func complatedValidate(_ result: AdaptyResult<VH<AdaptyProfile>>) {
+        func completedValidate(_ result: AdaptyResult<VH<AdaptyProfile>>) {
             guard let handlers = validateCompletionHandlers, !handlers.isEmpty else {
                 Log.error("SKReceiptManager: Not found validateCompletionHandlers")
                 return
@@ -136,7 +136,7 @@ final class SKReceiptManager: NSObject {
         }
     }
 
-    fileprivate func complatedRefresh(_ error: AdaptyError?) {
+    fileprivate func completedRefresh(_ error: AdaptyError?) {
         queue.async { [weak self] in
             guard let self = self else { return }
 
@@ -165,13 +165,13 @@ final class SKReceiptManager: NSObject {
 extension SKReceiptManager: SKRequestDelegate {
     func requestDidFinish(_ request: SKRequest) {
         guard request is SKReceiptRefreshRequest else { return }
-        complatedRefresh(nil)
+        completedRefresh(nil)
         request.cancel()
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
         guard request is SKReceiptRefreshRequest else { return }
-        complatedRefresh(SKManagerError.refreshReceiptFailed(error).asAdaptyError)
+        completedRefresh(SKManagerError.refreshReceiptFailed(error).asAdaptyError)
         request.cancel()
     }
 }

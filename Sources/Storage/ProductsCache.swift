@@ -36,7 +36,7 @@ final class ProductsCache {
                 updated = true
                 return product
             } else {
-                Log.verbose("ProductsCache: seved product.version(\(product.version)) is older than cashed.version(\(cached.version) : \(product.vendorId)")
+                Log.verbose("ProductsCache: saved product.version(\(product.version)) is older than cashed.version(\(cached.version) : \(product.vendorId)")
                 return cached
             }
         }

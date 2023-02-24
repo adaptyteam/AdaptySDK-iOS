@@ -14,17 +14,17 @@ extension UserDefaults: PaywallsStorage {
 
     func setPaywalls(_ paywalls: [VH<AdaptyPaywall>]) {
         guard !paywalls.isEmpty else {
-            Log.debug("UserDefaults: Clear paywals .")
+            Log.debug("UserDefaults: Clear paywalls.")
             removeObject(forKey: Constants.paywallsStorageKey)
             return
         }
         do {
             let data = try Backend.encoder.encode(paywalls)
-            Log.debug("UserDefaults: Saving paywals success.")
+            Log.debug("UserDefaults: Saving paywalls success.")
 
             set(data, forKey: Constants.paywallsStorageKey)
         } catch {
-            Log.error("UserDefaults: Saving paywals fail. \(error.localizedDescription)")
+            Log.error("UserDefaults: Saving paywalls fail. \(error.localizedDescription)")
         }
     }
 
@@ -39,7 +39,7 @@ extension UserDefaults: PaywallsStorage {
     }
 
     func clearPaywalls() {
-        Log.debug("UserDefaults: Clear paywals .")
+        Log.debug("UserDefaults: Clear paywalls.")
         removeObject(forKey: Constants.paywallsStorageKey)
     }
 }

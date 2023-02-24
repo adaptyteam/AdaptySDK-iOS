@@ -68,7 +68,7 @@ extension AdaptyUI.ViewConfiguration {
                     case let .unknown(value):
                         result[item.key] = .unknown(value)
                     case .font:
-                        result[item.key] = .unknown("unsupport asset {type: font, id: \(id)}")
+                        result[item.key] = .unknown("unsupported asset {type: font, id: \(id)}")
                     }
                 case let .text(value):
                     let font = getAssetFont(value.fontAssetId)

@@ -65,7 +65,7 @@ extension HTTPSession {
             guard let error = error else {
                 Log.verbose {
                     "#API# RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)\n"
-                        + "----------INCOMMING----------\n"
+                        + "----------INCOMING----------\n"
                         + responseAsString(response)
                         + dataAsString(data)
                         + "\n-------------END-------------"
@@ -82,7 +82,7 @@ extension HTTPSession {
                 Log.error {
                     if AdaptyLogger.isLogLevel(.verbose), error.statusCode != nil {
                         return "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)\n"
-                            + "----------INCOMMING----------\n"
+                            + "----------INCOMING----------\n"
                             + responseAsString(response)
                             + dataAsString(data)
                             + "\n-------------END-------------"

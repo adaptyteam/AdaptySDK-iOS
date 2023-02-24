@@ -46,7 +46,7 @@ extension AdaptyProfileManager {
             case let .failure(error):
                 completion(.failure(error))
             case let .success(profile):
-                self?.manager.onceSendedEnvoriment = true
+                self?.manager.onceSentEnvironment = true
                 if let value = profile.value, let self = self, self.isActive {
                     self.saveResponse(VH(value, hash: profile.hash))
                 }
@@ -85,7 +85,7 @@ extension AdaptyProfileManager {
             }
         }
 
-        guard !manager.onceSendedEnvoriment else {
+        guard !manager.onceSentEnvironment else {
             _getProfile(completion)
             return
         }

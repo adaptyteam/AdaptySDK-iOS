@@ -17,7 +17,7 @@ public final class Adapty {
     let skReceiptManager: SKReceiptManager
     let skQueueManager: SKQueueManager
     let vendorIdsCache: ProductVendorIdsCache
-    var onceSendedEnvoriment: Bool = false
+    var onceSentEnvironment: Bool = false
     var state: State
 
     init(profileStorage: ProfileStorage,
@@ -33,11 +33,11 @@ public final class Adapty {
         skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
         eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
-        state = .initilizingTo(customerUserId: customerUserId)
+        state = .initializingTo(customerUserId: customerUserId)
 
         skReceiptManager.refreshReceiptIfEmpty()
         skQueueManager.startObserving(receiptValidator: self)
-        initilizingProfileManager(toCustomerUserId: customerUserId)
+        initializingProfileManager(toCustomerUserId: customerUserId)
     }
 
     fileprivate var profileManagerCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
@@ -47,7 +47,7 @@ public final class Adapty {
 
     @inline(__always)
     func getProfileManager(waitCreatingProfile: Bool = true, _ completion: @escaping AdaptyResultCompletion<AdaptyProfileManager>) {
-        if let result = state.initilizedResult {
+        if let result = state.initializedResult {
             completion(result)
             return
         }
@@ -109,10 +109,10 @@ extension Adapty {
         case let .failed(error):
             callLogoutCompletionHandlers(error)
             return
-        case let .initilized(manager):
+        case let .initialized(manager):
             manager.isActive = false
             finishLogout()
-        case .initilizingTo,
+        case .initializingTo,
              .needIdentifyTo,
              .needLogout:
             state = .needLogout
@@ -122,11 +122,11 @@ extension Adapty {
     @inline(__always)
     fileprivate func finishLogout() {
         profileStorage.clearProfile(newProfileId: nil)
-        state = .initilizingTo(customerUserId: nil)
+        state = .initializingTo(customerUserId: nil)
         callLogoutCompletionHandlers(nil)
         callProfileManagerCompletionHandlers(.failure(.profileWasChanged()))
         Adapty.underlayQueue.async { [weak self] in
-            self?.initilizingProfileManager(toCustomerUserId: nil)
+            self?.initializingProfileManager(toCustomerUserId: nil)
         }
     }
 
@@ -136,21 +136,21 @@ extension Adapty {
         case let .failed(error):
             completion(error)
             return
-        case let .initilized(manager):
+        case let .initialized(manager):
             guard manager.profile.value.customerUserId != newCustomerUserId else {
                 completion(nil)
                 return
             }
             manager.isActive = false
-            state = .initilizingTo(customerUserId: newCustomerUserId)
+            state = .initializingTo(customerUserId: newCustomerUserId)
 //            callLogoutCompletionHandlers(nil)
             callProfileManagerCompletionHandlers(.failure(.profileWasChanged()))
             getProfileManager { completion($0.error) }
             Adapty.underlayQueue.async { [weak self] in
-                self?.initilizingProfileManager(toCustomerUserId: newCustomerUserId)
+                self?.initializingProfileManager(toCustomerUserId: newCustomerUserId)
             }
             return
-        case let .initilizingTo(customerUserId):
+        case let .initializingTo(customerUserId):
             if let customerUserId = customerUserId, customerUserId == newCustomerUserId {
                 getProfileManager { completion($0.error) }
                 return
@@ -178,26 +178,26 @@ extension Adapty {
     }
 
     @inline(__always)
-    fileprivate func needBreakInitilizing() -> Bool {
+    fileprivate func needBreakInitializing() -> Bool {
         switch state {
-        case .initilizingTo:
+        case .initializingTo:
             return false
-        case .failed, .initilized:
+        case .failed, .initialized:
             return true
         case .needLogout:
             finishLogout()
             return true
         case let .needIdentifyTo(customerUserId):
-            state = .initilizingTo(customerUserId: customerUserId)
+            state = .initializingTo(customerUserId: customerUserId)
             Adapty.underlayQueue.async { [weak self] in
-                self?.initilizingProfileManager(toCustomerUserId: customerUserId)
+                self?.initializingProfileManager(toCustomerUserId: customerUserId)
             }
             return true
         }
     }
 
-    fileprivate func initilizingProfileManager(toCustomerUserId customerUserId: String?) {
-        guard !needBreakInitilizing() else { return }
+    fileprivate func initializingProfileManager(toCustomerUserId customerUserId: String?) {
+        guard !needBreakInitializing() else { return }
 
         let profileId = profileStorage.profileId
 
@@ -207,17 +207,17 @@ extension Adapty {
                                                productStorage: UserDefaults.standard,
                                                profile: profile)
 
-            state = .initilized(manager)
+            state = .initialized(manager)
             callProfileManagerCompletionHandlers(.success(manager))
 
-            if !onceSendedEnvoriment {
+            if !onceSentEnvironment {
                 manager.getProfile { _ in }
             }
             return
         }
 
         createProfile(profileId, customerUserId) { [weak self] result in
-            guard let self = self, !self.needBreakInitilizing() else { return }
+            guard let self = self, !self.needBreakInitializing() else { return }
             switch result {
             case let .failure(error):
                 if let error = error.wrapped as? HTTPError {
@@ -225,7 +225,7 @@ extension Adapty {
                 }
                 // TODO: Dont repeat if wrong apiKey, and ???
                 Adapty.underlayQueue.asyncAfter(deadline: .now() + .seconds(1)) { [weak self] in
-                    self?.initilizingProfileManager(toCustomerUserId: customerUserId)
+                    self?.initializingProfileManager(toCustomerUserId: customerUserId)
                 }
             case let .success(profile):
 
@@ -234,7 +234,7 @@ extension Adapty {
                                                    productStorage: UserDefaults.standard,
                                                    profile: profile)
 
-                self.state = .initilized(manager)
+                self.state = .initialized(manager)
                 self.callProfileManagerCompletionHandlers(.success(manager))
             }
         }
@@ -253,7 +253,7 @@ extension Adapty {
                 completion(.failure(error))
                 break
             case let .success(profile):
-                self.onceSendedEnvoriment = true
+                self.onceSentEnvironment = true
 
                 let storage = self.profileStorage
                 if profileId != profile.value.profileId {
@@ -269,35 +269,35 @@ extension Adapty {
     }
 
     enum State {
-        case initilizingTo(customerUserId: String?)
+        case initializingTo(customerUserId: String?)
         case needLogout
         case needIdentifyTo(customerUserId: String)
         case failed(AdaptyError)
-        case initilized(AdaptyProfileManager)
+        case initialized(AdaptyProfileManager)
 
-        var initilizing: Bool {
+        var initializing: Bool {
             switch self {
-            case .failed, .initilized:
+            case .failed, .initialized:
                 return false
             default:
                 return true
             }
         }
 
-        var initilized: AdaptyProfileManager? {
+        var initialized: AdaptyProfileManager? {
             switch self {
-            case let .initilized(manager):
+            case let .initialized(manager):
                 return manager
             default:
                 return nil
             }
         }
 
-        var initilizedResult: AdaptyResult<AdaptyProfileManager>? {
+        var initializedResult: AdaptyResult<AdaptyProfileManager>? {
             switch self {
             case let .failed(error):
                 return .failure(error)
-            case let .initilized(manager):
+            case let .initialized(manager):
                 return .success(manager)
             default:
                 return nil
@@ -309,7 +309,7 @@ extension Adapty {
             case let .failure(error):
                 self = .failed(error)
             case let .success(manager):
-                self = .initilized(manager)
+                self = .initialized(manager)
             }
         }
     }

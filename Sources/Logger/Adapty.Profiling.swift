@@ -12,7 +12,7 @@ protocol ProfilingEvent {
 }
 
 extension Log {
-    struct ProfilingEventWraper: ProfilingEvent {
+    struct ProfilingEventWrapper: ProfilingEvent {
         var event: ProfilingEvent?
         func end(_ format: StaticString, _ arguments: CVarArg...) {
             event?.end(format, arguments)
@@ -20,13 +20,13 @@ extension Log {
     }
 
     enum Profiling {
-        static func start(method: StaticString, _ format: StaticString, _ arguments: CVarArg...) -> ProfilingEventWraper {
+        static func start(method: StaticString, _ format: StaticString, _ arguments: CVarArg...) -> ProfilingEventWrapper {
             #if canImport(os) && PROFILE
                 if #available(macOS 10.14, iOS 12.0, watchOS 5.0, tvOS 12.0, *) {
-                    return ProfilingEventWraper(event: _ProfilingEvent.start(method: method, format, arguments))
+                    return ProfilingEventWrapper(event: _ProfilingEvent.start(method: method, format, arguments))
                 }
             #endif
-            return ProfilingEventWraper()
+            return ProfilingEventWrapper()
         }
     }
 }

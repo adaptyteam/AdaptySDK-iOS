@@ -35,7 +35,7 @@ extension SKQueueManager {
 
             if !Adapty.Configuration.observerMode {
                 SKPaymentQueue.default().finishTransaction(transaction)
-                Log.verbose("SKQueueManager: finish faild transaction \(transaction)")
+                Log.verbose("SKQueueManager: finish failed transaction \(transaction)")
             }
 
             let productId = transaction.payment.productIdentifier

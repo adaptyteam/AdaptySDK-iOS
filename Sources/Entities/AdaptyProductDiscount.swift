@@ -59,7 +59,7 @@ extension AdaptyProductDiscount: CustomStringConvertible {
     public var description: String {
         "(price: \(price)"
             + (identifier == nil ? "" : ", identifier: \(identifier!)")
-            + ", subscriptionP eriod: \(subscriptionPeriod), numberOfPeriods: \(numberOfPeriods), paymentMode: \(paymentMode)"
+            + ", subscriptionPeriod: \(subscriptionPeriod), numberOfPeriods: \(numberOfPeriods), paymentMode: \(paymentMode)"
             + (localizedPrice == nil ? "" : ", localizedPrice: \(localizedPrice!)")
             + (localizedSubscriptionPeriod == nil ? "" : ", localizedSubscriptionPeriod: \(localizedSubscriptionPeriod!)")
             + (localizedNumberOfPeriods == nil ? "" : ", localizedNumberOfPeriods: \(localizedNumberOfPeriods!)")

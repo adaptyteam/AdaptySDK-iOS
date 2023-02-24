@@ -117,6 +117,6 @@ extension SKQueueManager: SKPaymentTransactionObserver {
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
-        // TODO: validate reciept
+        // TODO: validate receipt
     }
 }

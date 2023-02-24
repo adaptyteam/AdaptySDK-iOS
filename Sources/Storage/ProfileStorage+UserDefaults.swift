@@ -68,7 +68,7 @@ extension UserDefaults: ProfileStorage {
     func setProfile(_ profile: VH<AdaptyProfile>) {
         do {
             let data = try Backend.encoder.encode(profile)
-            Log.debug("UserDefaults: saveing profile success.")
+            Log.debug("UserDefaults: saving profile success.")
             set(data, forKey: Constants.profileKey)
         } catch {
             Log.error("UserDefaults: saving profile fail. \(error.localizedDescription)")
