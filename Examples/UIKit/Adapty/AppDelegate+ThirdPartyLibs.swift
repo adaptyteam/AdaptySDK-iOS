@@ -49,7 +49,7 @@ extension AppDelegate {
         FirebaseApp.configure()
         
         if let appInstanceId = Analytics.appInstanceID() {
-            LogsObserver.shared.postMessage(.verbose, "#Firebase# appInstanceID = \(appInstanceId)")
+            LogsObserver.shared.postMessage(Date(), .verbose, "#Firebase# appInstanceID = \(appInstanceId)")
             
             let builder = AdaptyProfileParameters.Builder()
                 .with(firebaseAppInstanceId: appInstanceId)

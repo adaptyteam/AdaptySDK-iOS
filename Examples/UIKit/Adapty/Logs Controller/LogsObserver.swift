@@ -10,10 +10,10 @@ import Adapty
 import Foundation
 
 struct LogItem: Identifiable {
+    let id = UUID().uuidString
+    let date: Date
     let level: AdaptyLogLevel
     let message: String
-    let id = UUID().uuidString
-    let date = Date()
 }
 
 class LogsObserver: ObservableObject {
@@ -22,20 +22,20 @@ class LogsObserver: ObservableObject {
         f.dateFormat = "yyyy-MM-dd_HH_mm_ss"
         return f
     }()
-    
+
     static let formatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         return f
     }()
-    
+
     static let shared = LogsObserver()
-    
+
     @Published var messages = [LogItem]()
-    
-    func postMessage(_ level: AdaptyLogLevel, _ message: String) {
-        let item = LogItem(level: level, message: message)
-        
+
+    func postMessage(_ date: Date, _ level: AdaptyLogLevel, _ message: String) {
+        let item = LogItem(date: date, level: level, message: message)
+
         DispatchQueue.main.async { [weak self] in
             self?.messages.append(item)
         }
@@ -46,7 +46,7 @@ extension LogsObserver {
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
-    
+
     func saveLogToFile() -> URL? {
         let logString = messages.map { "\(Self.formatter.string(from: $0.date)) \($0.message)" }.joined(separator: "\n")
         let filename = "adapty_log_\(Self.fileNameFormatter.string(from: Date())).log"

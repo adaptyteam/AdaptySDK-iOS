@@ -25,8 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         Adapty.delegate = PurchasesObserver.shared
         Adapty.logLevel = .debug
-        Adapty.setLogHandler { level, message in
-            LogsObserver.shared.postMessage(level, message)
+        Adapty.setLogHandler { date, level, message in
+            LogsObserver.shared.postMessage(date, level, message)
             NSLog("%@", message)
         }
 
