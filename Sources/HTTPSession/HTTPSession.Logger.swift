@@ -28,9 +28,9 @@ extension HTTPSession {
                 }
 
                 return "#API# \(endpoint.method) --> \(path)\(query) [\(stamp)]\n"
-                    + "----------OUTGOING-----------\n"
+                    + "----------REQUEST START----------\n"
                     + request.curlCommand(session: session, verbose: true)
-                    + "\n-------------END-------------"
+                    + "\n----------REQUEST END------------"
             }
         }
 
@@ -65,10 +65,10 @@ extension HTTPSession {
             guard let error = error else {
                 Log.verbose {
                     "#API# RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)\n"
-                        + "----------INCOMING----------\n"
+                        + "----------RESPONSE START----------\n"
                         + responseAsString(response)
                         + dataAsString(data)
-                        + "\n-------------END-------------"
+                        + "\n----------RESPONSE END------------"
                 }
                 return
             }
@@ -82,10 +82,10 @@ extension HTTPSession {
                 Log.error {
                     if AdaptyLogger.isLogLevel(.verbose), error.statusCode != nil {
                         return "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)\n"
-                            + "----------INCOMING----------\n"
+                            + "----------RESPONSE START----------\n"
                             + responseAsString(response)
                             + dataAsString(data)
-                            + "\n-------------END-------------"
+                            + "\n----------RESPONSE END------------"
 
                     } else {
                         return "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)"
