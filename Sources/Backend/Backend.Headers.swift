@@ -13,7 +13,7 @@ extension Backend.Request {
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
     fileprivate static let platformHeaderKey = "adapty-sdk-platform"
-    fileprivate static let sessionIDHeaderKey = "adapty-sdk-session-id"
+    fileprivate static let sessionIDHeaderKey = "adapty-sdk-session"
 
     static func globalHeaders(secretKey: String) -> HTTPRequest.Headers { [
         authorizationHeaderKey: "Api-Key \(secretKey)",
