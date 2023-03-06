@@ -43,7 +43,7 @@ extension AdaptyProfile.CustomAttributeValue {
     func validate() -> AdaptyError? {
         switch self {
         case let .string(value):
-            return (value.isEmpty || value.count > 30) ? .wrongStringValueOfCustomAttribute() : nil
+            return (value.isEmpty || value.count > 50) ? .wrongStringValueOfCustomAttribute() : nil
         default:
             return nil
         }
@@ -66,7 +66,7 @@ extension AdaptyProfile.CustomAttributes {
     }
 
     func validate() -> AdaptyError? {
-        if filter({ $1.hasValue }).count > 10 {
+        if filter({ $1.hasValue }).count > 30 {
             return .wrongCountCustomAttributes()
         }
         return nil

@@ -153,12 +153,12 @@ extension AdaptyError {
 
     static func wrongStringValueOfCustomAttribute(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The value must not be empty and not more than 30 characters.").asAdaptyError
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The value must not be empty and not more than 50 characters.").asAdaptyError
     }
 
     static func wrongCountCustomAttributes(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 10").asAdaptyError
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
 
     static func cacheHasNotPaywall(file: String = #fileID, function: String = #function, line: UInt = #line
