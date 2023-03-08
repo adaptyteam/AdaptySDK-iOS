@@ -8,5 +8,5 @@
 import Foundation
 
 extension Adapty {
-    public static let SDKVersion = "2.4.0"
+    public static let SDKVersion = "2.4.1"
 }
