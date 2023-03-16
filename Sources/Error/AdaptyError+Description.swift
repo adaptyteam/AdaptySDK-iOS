@@ -50,14 +50,9 @@ extension SKManagerError: CustomDebugStringConvertible {
         switch self {
         case .interrupted: return "Operation interrupted"
         case .noProductIDsFound: return "No In-App Purchase product identifiers were found."
-
         case .receiptIsEmpty: return "Can't find a valid receipt"
         case .refreshReceiptFailed: return "Refresh receipt failed"
-
-        case .noPurchasesToRestore: return "No purchases to restore"
         case .productPurchaseFailed: return "Product purchase failed"
-        case .receiveRestoredTransactionsFailed: return "Restore completed transactions failed"
-
         case .requestSKProductsFailed: return "Request products form App Store failed"
         }
     }

@@ -46,7 +46,6 @@
 		8AB003302926FCEA008476A3 /* SKManagerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002AA2926FCEA008476A3 /* SKManagerError.swift */; };
 		8AB003312926FCEA008476A3 /* SKProductsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002AB2926FCEA008476A3 /* SKProductsManager.swift */; };
 		8AB003322926FCEA008476A3 /* SKReceiptManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002AC2926FCEA008476A3 /* SKReceiptManager.swift */; };
-		8AB003332926FCEA008476A3 /* SKQueueManager+RestorePurchases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002AD2926FCEA008476A3 /* SKQueueManager+RestorePurchases.swift */; };
 		8AB003342926FCEA008476A3 /* SKQueueManager+MakePurchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002AE2926FCEA008476A3 /* SKQueueManager+MakePurchase.swift */; };
 		8AB003352926FCEA008476A3 /* Locale+StoreKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002AF2926FCEA008476A3 /* Locale+StoreKit.swift */; };
 		8AB003362926FCEA008476A3 /* AdaptyProfileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002B02926FCEA008476A3 /* AdaptyProfileManager.swift */; };
@@ -240,7 +239,6 @@
 		8AB002AA2926FCEA008476A3 /* SKManagerError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKManagerError.swift; sourceTree = "<group>"; };
 		8AB002AB2926FCEA008476A3 /* SKProductsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKProductsManager.swift; sourceTree = "<group>"; };
 		8AB002AC2926FCEA008476A3 /* SKReceiptManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKReceiptManager.swift; sourceTree = "<group>"; };
-		8AB002AD2926FCEA008476A3 /* SKQueueManager+RestorePurchases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKQueueManager+RestorePurchases.swift"; sourceTree = "<group>"; };
 		8AB002AE2926FCEA008476A3 /* SKQueueManager+MakePurchase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKQueueManager+MakePurchase.swift"; sourceTree = "<group>"; };
 		8AB002AF2926FCEA008476A3 /* Locale+StoreKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Locale+StoreKit.swift"; sourceTree = "<group>"; };
 		8AB002B02926FCEA008476A3 /* AdaptyProfileManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyProfileManager.swift; sourceTree = "<group>"; };
@@ -575,7 +573,6 @@
 				8AB002AB2926FCEA008476A3 /* SKProductsManager.swift */,
 				8AB002A92926FCEA008476A3 /* SKQueueManager.swift */,
 				8AB002AE2926FCEA008476A3 /* SKQueueManager+MakePurchase.swift */,
-				8AB002AD2926FCEA008476A3 /* SKQueueManager+RestorePurchases.swift */,
 				8AB002AC2926FCEA008476A3 /* SKReceiptManager.swift */,
 			);
 			path = StoreKit;
@@ -1054,7 +1051,6 @@
 				8AB003722926FCEA008476A3 /* HTTPRequest.QueryItems.swift in Sources */,
 				8A1F746B297B28A0002B7FBC /* Image+Decodable.swift in Sources */,
 				8AB0038E2926FCEA008476A3 /* PurchaseProductInfo.swift in Sources */,
-				8AB003332926FCEA008476A3 /* SKQueueManager+RestorePurchases.swift in Sources */,
 				8AB0033A2926FCEA008476A3 /* AdaptyLogLevel.swift in Sources */,
 				8A1F74492979CB8C002B7FBC /* Localization.swift in Sources */,
 				8AB003652926FCEA008476A3 /* Data+Curl.swift in Sources */,
