@@ -162,6 +162,7 @@
 		8AB003A52926FCEA008476A3 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032C2926FCEA008476A3 /* Configuration.swift */; };
 		8AB003A62926FCEA008476A3 /* Adapty+FallbackPaywalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */; };
 		8AB003A72926FCEA008476A3 /* LifecycleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */; };
+		8AD35AFE29C9E20F0096700C /* Environment+StoreKit2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */; };
 		8AF80404292BB58600970E6B /* XCTestCase+getDataFromResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF80403292BB58600970E6B /* XCTestCase+getDataFromResource.swift */; };
 		8AF80406292C407C00970E6B /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF80405292C407C00970E6B /* JSONValue.swift */; };
 		8AF80408292C4E3C00970E6B /* BackendProductTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF80407292C4E3C00970E6B /* BackendProductTests.swift */; };
@@ -357,6 +358,7 @@
 		8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+FallbackPaywalls.swift"; sourceTree = "<group>"; };
 		8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LifecycleManager.swift; sourceTree = "<group>"; };
 		8AB003A82926FDC3008476A3 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
+		8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+StoreKit2.swift"; sourceTree = "<group>"; };
 		8AF80403292BB58600970E6B /* XCTestCase+getDataFromResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+getDataFromResource.swift"; sourceTree = "<group>"; };
 		8AF80405292C407C00970E6B /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		8AF80407292C4E3C00970E6B /* BackendProductTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendProductTests.swift; sourceTree = "<group>"; };
@@ -562,6 +564,7 @@
 				8AB002B32926FCEA008476A3 /* Logger */,
 				8AB002D22926FCEA008476A3 /* Storage */,
 				8AB002A82926FCEA008476A3 /* StoreKit */,
+				8AD35AFC29C9DA2B0096700C /* StoreKit2 */,
 			);
 			name = Sources;
 			path = ../Sources;
@@ -774,6 +777,14 @@
 				8AF804222938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift */,
 			);
 			path = Entities;
+			sourceTree = "<group>";
+		};
+		8AD35AFC29C9DA2B0096700C /* StoreKit2 */ = {
+			isa = PBXGroup;
+			children = (
+				8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */,
+			);
+			path = StoreKit2;
 			sourceTree = "<group>";
 		};
 		8AF80400292BABE800970E6B /* Entities */ = {
@@ -1104,6 +1115,7 @@
 				8AB0038A2926FCEA008476A3 /* AdaptyError+Encodable.swift in Sources */,
 				8AB003972926FCEA008476A3 /* FallbackPaywalls.swift in Sources */,
 				8AB0036C2926FCEA008476A3 /* HTTPRequest.swift in Sources */,
+				8AD35AFE29C9E20F0096700C /* Environment+StoreKit2.swift in Sources */,
 				8AB0036F2926FCEA008476A3 /* HTTPSession.Logger.swift in Sources */,
 				8AB0039D2926FCEA008476A3 /* AdaptyPaywall.swift in Sources */,
 				8A1F743D2979B624002B7FBC /* Asset.swift in Sources */,

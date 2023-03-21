@@ -55,6 +55,18 @@ enum Environment {
                 UIDevice.current.systemName
             #endif
         }()
+
+        static let isSandbox: Bool = {
+            guard !Device.isSimulator else { return true }
+
+            guard let path = Bundle.main.appStoreReceiptURL?.path else { return false }
+
+            if path.contains("MASReceipt/receipt") {
+                return path.contains("Xcode/DerivedData")
+            } else {
+                return path.contains("sandboxReceipt")
+            }
+        }()
     }
 
     enum Device {
@@ -129,6 +141,12 @@ enum Environment {
                 return UIDevice.current.identifierForVendor?.uuidString
             #endif
         }()
+
+        #if targetEnvironment(simulator)
+            static let isSimulator = true
+        #else
+            static let isSimulator = false
+        #endif
     }
 
     #if os(iOS)
