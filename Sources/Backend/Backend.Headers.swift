@@ -14,13 +14,20 @@ extension Backend.Request {
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
     fileprivate static let platformHeaderKey = "adapty-sdk-platform"
     fileprivate static let sessionIDHeaderKey = "adapty-sdk-session"
+    fileprivate static let appVersionHeaderKey = "adapty-app-version"
 
-    static func globalHeaders(secretKey: String) -> HTTPRequest.Headers { [
-        authorizationHeaderKey: "Api-Key \(secretKey)",
-        sdkVersionHeaderKey: Adapty.SDKVersion,
-        platformHeaderKey: Environment.System.name,
-        sessionIDHeaderKey: Environment.Application.sessionIdentifier,
-    ] }
+    static func globalHeaders(secretKey: String) -> HTTPRequest.Headers {
+        var headers = [
+            authorizationHeaderKey: "Api-Key \(secretKey)",
+            sdkVersionHeaderKey: Adapty.SDKVersion,
+            platformHeaderKey: Environment.System.name,
+            sessionIDHeaderKey: Environment.Application.sessionIdentifier,
+        ]
+        if let ver = Environment.Application.version {
+            headers[appVersionHeaderKey] = ver
+        }
+        return headers
+    }
 }
 
 extension Backend.Response {
