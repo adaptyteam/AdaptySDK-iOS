@@ -7,43 +7,52 @@
 
 import Foundation
 
+protocol EventsBackendConfigurationStorage: AnyObject {
+    func setEventsConfiguration(_ value: EventsBackendConfiguration)
+    func getEventsConfiguration() -> EventsBackendConfiguration?
+}
+
 final class EventsManager {
     typealias ErrorHandler = (EventsError) -> Void
     private static let defaultDispatchQueue = DispatchQueue(label: "Adapty.SDK.SendEvents")
 
     private let dispatchQueue: DispatchQueue
     private let storage: EventCollectionStorage
-    private let kinesis: Kinesis
+    private let configurationStorage: EventsBackendConfigurationStorage
+    private var configuration: EventsBackendConfiguration?
     private let backendSession: HTTPSession
-    private let kinesisSession: HTTPSession
     private var sending: Bool = false
 
     convenience init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
-                     storage: EventsStorage,
-                     backend: Backend,
-                     kinesis: Kinesis = Kinesis(credentials: nil)) {
+                     storage: EventsStorage & EventsBackendConfigurationStorage,
+                     backend: Backend) {
         self.init(dispatchQueue: dispatchQueue,
                   storage: EventCollectionStorage(with: storage),
-                  backend: backend,
-                  kinesis: kinesis)
+                  configurationStorage: storage,
+                  backend: backend)
     }
 
     init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
          storage: EventCollectionStorage,
-         backend: Backend,
-         kinesis: Kinesis = Kinesis(credentials: nil)) {
+         configurationStorage: EventsBackendConfigurationStorage,
+         backend: Backend) {
         self.storage = storage
         self.dispatchQueue = dispatchQueue
-        self.kinesis = kinesis
+        self.configurationStorage = configurationStorage
 
         backendSession = backend.createHTTPSession(responseQueue: dispatchQueue)
-        kinesisSession = kinesis.createHTTPSession(responseQueue: dispatchQueue)
-        if !storage.isEmpty { needSendEvents() }
+        configuration = configurationStorage.getEventsConfiguration()
+        if !storage.isEmpty || configuration == nil { needSendEvents() }
     }
 
-    func trackEvent(_ event: Event, completion: @escaping (EventsError?) -> Void) {
+    func trackEvent(_ event: Event, _ ifEnabled: Bool, completion: @escaping (EventsError?) -> Void) {
         dispatchQueue.async { [weak self] in
             guard let self = self else {
+                completion(nil)
+                return
+            }
+
+            guard !(self.configuration?.isBlocked(event) ?? false) else {
                 completion(nil)
                 return
             }
@@ -51,7 +60,7 @@ final class EventsManager {
             guard !self.storage.externalAnalyticsDisabled else {
                 let error = EventsError.analyticsDisabled()
                 completion(error)
-                Log.warn(error.description)
+                if !ifEnabled { Log.warn(error.description) }
                 return
             }
 
@@ -74,7 +83,7 @@ final class EventsManager {
             guard let self = self, !self.sending else { return }
 
             self.sending = true
-            self.sendEvents { [weak self] error in
+            self._sendEvents { [weak self] error in
                 defer { self?.sending = false }
                 guard let self = self else { return }
 
@@ -90,53 +99,58 @@ final class EventsManager {
         }
     }
 
-    private func updateCredential(completion: @escaping (EventsError?) -> Void) {
-        dispatchQueue.async { [weak self] in
+    func _sendEvents(completion: @escaping (EventsError?) -> Void) {
+        _updateBackendConfigurationIfNeed { [weak self] error in
+
+            if let error = error {
+                completion(error)
+                return
+            }
+
             guard let self = self else {
                 completion(.interrupted())
                 return
             }
-            if let credentials = self.kinesis.credentials, credentials.expiration > Date() {
+
+            guard let events = self.storage.getEvents(limit: 500, blackList: self.configuration?.blacklist) else {
                 completion(nil)
                 return
             }
 
-            self.kinesis.credentials = nil
-            self.backendSession.perform(FetchKinesisCredentialsRequest(profileId: self.storage.profileId)) { [weak self] (result: FetchKinesisCredentialsRequest.Result) in
+            guard !events.elements.isEmpty else {
+                self.storage.subtract(newStartIndex: events.endIndex + 1)
+                completion(nil)
+                return
+            }
+
+            self.backendSession.perform(SendEventsRequest(profileId: self.storage.profileId, events: events.elements)) {
+                (result: SendEventsRequest.Result) in
                 switch result {
                 case let .failure(error):
                     completion(.sending(error))
-                case let .success(response):
-                    self?.kinesis.credentials = response.body.value
+                case .success:
+                    self.storage.subtract(newStartIndex: events.endIndex + 1)
                     completion(nil)
                 }
             }
         }
     }
 
-    private func sendEvents(completion: @escaping (EventsError?) -> Void) {
-        dispatchQueue.async { [weak self] in
-            self?.updateCredential { error in
-                if let error = error {
-                    completion(error)
-                    return
-                }
+    func _updateBackendConfigurationIfNeed(completion: @escaping (EventsError?) -> Void) {
+        guard configuration?.isExpired ?? true else {
+            completion(nil)
+            return
+        }
 
-                guard let events = self?.storage.getEvents() else {
-                    completion(nil)
-                    return
-                }
-
-                self?.kinesisSession.perform(SendEventsRequest(events: events.elements, streamName: Kinesis.Configuration.publicStreamName)) {
-                    (result: SendEventsRequest.Result) in
-                    switch result {
-                    case let .failure(error):
-                        completion(.sending(error))
-                    case .success:
-                        self?.storage.subtract(newStartIndex: events.endIndex + 1)
-                        completion(nil)
-                    }
-                }
+        backendSession.perform(FetchEventsConfigRequest(profileId: storage.profileId)) { [weak self] (result: FetchEventsConfigRequest.Result) in
+            switch result {
+            case let .failure(error):
+                completion(.sending(error))
+            case let .success(response):
+                let configuration = response.body.value
+                self?.configuration = configuration
+                self?.configurationStorage.setEventsConfiguration(configuration)
+                completion(nil)
             }
         }
     }

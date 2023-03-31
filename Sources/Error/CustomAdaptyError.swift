@@ -140,21 +140,3 @@ extension SKManagerError: CustomAdaptyError {
         return AdaptyError.ErrorCode(rawValue: error.code.rawValue)
     }
 }
-
-extension KinesisError: CustomNSError {
-    static let errorDomain = AdaptyError.KinesisErrorDomain
-
-    var errorCode: Int {
-        switch self {
-        case .missingСredentials: return AdaptyError.KinesisErrorCode.missingСredentials
-        case .requestWithoutURL: return AdaptyError.KinesisErrorCode.requestWithoutURL
-        case .requestWithoutHTTPMethod: return AdaptyError.KinesisErrorCode.requestWithoutHTTPMethod
-        case .urlWithoutHost: return AdaptyError.KinesisErrorCode.urlWithoutHost
-        }
-    }
-
-    var errorUserInfo: [String: Any] { [
-        AdaptyError.UserInfoKey.description: debugDescription,
-        AdaptyError.UserInfoKey.source: source.description,
-    ] }
-}

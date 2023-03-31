@@ -13,7 +13,6 @@ extension AdaptyError {
     public static let HTTPErrorDomain = "AdaptyHTTPErrorDomain"
     public static let EventsErrorDomain = "AdaptyEventsErrorDomain"
     public static let SKManagerErrorDomain = "AdaptySKManagerErrorDomain"
-    public static let KinesisErrorDomain = "AdaptyKinesisErrorDomain"
 
     public enum HTTPErrorCode {
         public static let cancelled = ErrorCode.operationInterrupted.rawValue
@@ -39,13 +38,6 @@ extension AdaptyError {
         public static let refreshReceiptFailed = ErrorCode.refreshReceiptFailed.rawValue
         public static let receiveRestoredTransactionsFailed = ErrorCode.receiveRestoredTransactionsFailed.rawValue
         public static let requestSKProductsFailed = ErrorCode.productRequestFailed.rawValue
-    }
-
-    public enum KinesisErrorCode {
-        public static let missingСredentials = 5001
-        public static let requestWithoutURL = 5002
-        public static let requestWithoutHTTPMethod = 5003
-        public static let urlWithoutHost = 5004
     }
 
     public enum UserInfoKey {

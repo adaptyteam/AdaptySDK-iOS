@@ -62,14 +62,3 @@ extension SKManagerError: CustomDebugStringConvertible {
         }
     }
 }
-
-extension KinesisError: CustomDebugStringConvertible {
-    var debugDescription: String {
-        switch self {
-        case .missingСredentials: return "Missing credentials"
-        case .requestWithoutURL: return "Request without url"
-        case .requestWithoutHTTPMethod: return "Request without host"
-        case .urlWithoutHost: return "Request url without host"
-        }
-    }
-}

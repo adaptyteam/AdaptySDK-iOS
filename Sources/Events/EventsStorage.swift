@@ -16,11 +16,11 @@ protocol EventsStorage: AnyObject {
 
 class EventCollectionStorage {
     private enum Constants {
-        static let limitEvents = 50
+        static let limitEvents = 500
     }
 
     private let storage: EventsStorage
-    private var events: EventCollection<Data>
+    private var events: EventCollection<(String, Data)>
 
     struct Events {
         let elements: [Data]
@@ -31,29 +31,52 @@ class EventCollectionStorage {
 
     init(with storage: EventsStorage) {
         self.storage = storage
-        var events = EventCollection(elements: storage.getEvents() ?? [], startIndex: 0)
+        var events = EventCollection<(String, Data)>(elements: storage.getEvents() ?? [], startIndex: 0)
         events.remove(toLimit: Constants.limitEvents)
         self.events = events
     }
 
-    func getEvents() -> Events? {
-        events.isEmpty ? nil : Events(elements: events.elements, endIndex: events.endIndex)
+    func getEvents(limit: Int, blackList: Set<String>?) -> Events? {
+        guard limit > 0, !events.isEmpty else { return nil }
+        var elements = [Data]()
+        var count = 0
+
+        for item in events.elements {
+            guard elements.count < limit else { break }
+            count += 1
+            if !(blackList?.contains(item.0) ?? false) {
+                elements.append(item.1)
+            }
+        }
+
+        return Events(elements: elements, endIndex: events.endIndex(count))
     }
 
     func add(_ event: Event) throws {
-        events.append(try event.encodeToData(), withLimit: Constants.limitEvents)
-        storage.setEvents(events.elements)
+        let data = try event.encodeToData()
+        events.append((event.type.name, data), withLimit: Constants.limitEvents)
+        storage.setEvents(events.elements.map { $1 })
     }
 
     func subtract(newStartIndex: Int) {
         let startIndex = events.startIndex
         events.subtract(newStartIndex: newStartIndex)
         guard startIndex != events.startIndex else { return }
-        storage.setEvents(events.elements)
+        storage.setEvents(events.elements.map { $1 })
     }
 }
 
 extension EventCollectionStorage {
     var profileId: String { storage.profileId }
     var externalAnalyticsDisabled: Bool { storage.externalAnalyticsDisabled }
+}
+
+extension EventsStorage {
+    fileprivate func getEvents() -> [(String, Data)]? {
+        guard let array: [Data] = getEvents() else { return nil }
+        return array.compactMap {
+            guard let name = try? Event.decodeName($0) else { return nil }
+            return (name, $0)
+        }
+    }
 }

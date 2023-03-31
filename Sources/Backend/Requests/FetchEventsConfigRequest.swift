@@ -1,5 +1,5 @@
 //
-//  FetchKinesisCredentialsRequest.swift
+//  FetchEventsConfigRequest.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 23.09.2022.
@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct FetchKinesisCredentialsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<KinesisCredentials>
+struct FetchEventsConfigRequest: HTTPRequestWithDecodableResponse {
+    typealias ResponseBody = Backend.Response.ValueOfData<EventsBackendConfiguration>
 
     let endpoint = HTTPEndpoint(
         method: .get,
-        path: "/sdk/kinesis/credentials/"
+        path: "/sdk/events/blacklist/"
     )
     let headers: Headers
 

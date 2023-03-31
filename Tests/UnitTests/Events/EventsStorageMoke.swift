@@ -9,8 +9,9 @@
 @testable import AdaptySDK
 import Foundation
 
-final class EventsStorageMoke: AdaptySDK.EventsStorage {
+final class EventsStorageMoke: AdaptySDK.EventsStorage , AdaptySDK.EventsBackendConfigurationStorage {
     var data: [Data]?
+    var config: EventsBackendConfiguration?
 
     var profileId: String
     var externalAnalyticsDisabled: Bool
@@ -18,6 +19,9 @@ final class EventsStorageMoke: AdaptySDK.EventsStorage {
     func setEvents(_ value: [Data]) { data = value }
     func getEvents() -> [Data]? { data }
     func clearEvents() { data = nil }
+
+    func setEventsConfiguration(_ value: EventsBackendConfiguration) { config = value }
+    func getEventsConfiguration() -> EventsBackendConfiguration? { config }
 
     init(profileId: String, externalAnalyticsDisabled: Bool) {
         self.profileId = profileId
@@ -27,4 +31,6 @@ final class EventsStorageMoke: AdaptySDK.EventsStorage {
     convenience init(externalAnalyticsDisabled: Bool) {
         self.init(profileId: Adapty.Configuration.existingProfileId, externalAnalyticsDisabled: externalAnalyticsDisabled)
     }
+
+
 }

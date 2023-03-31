@@ -10,8 +10,10 @@ import Foundation
 struct EventCollection<Element> {
     private(set) var elements: [Element]
     private(set) var startIndex: Int
-    var endIndex: Int { startIndex + elements.count - 1 }
+    var endIndex: Int { endIndex(elements.count) }
     var isEmpty: Bool { elements.isEmpty }
+
+    func endIndex(_ count: Int) -> Int { startIndex + count - 1 }
 
     mutating func removeAll() {
         guard !elements.isEmpty else { return }
@@ -47,4 +49,5 @@ struct EventCollection<Element> {
         guard toLimit >= 0 else { return }
         removeFirst(elements.count - toLimit)
     }
+
 }

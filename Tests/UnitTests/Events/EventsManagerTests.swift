@@ -33,7 +33,7 @@ final class EventsManagerTests: XCTestCase {
     func XCTAssertTrackEvent(_ event: Event, assert: ((EventsError?) -> Void)? = nil) {
         let expectation = expectation(description: "wait trackEvent")
 
-        manager.trackEvent(event) { error in
+        manager.trackEvent(event, false) { error in
             expectation.fulfill()
             if let assert = assert {
                 assert(error)

@@ -75,7 +75,27 @@ extension Event {
             encoder.dataEncodingStrategy = .base64
             return encoder
         }()
+
+        static var decoder: JSONDecoder = {
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .formatted(dateFormatter)
+            decoder.dataDecodingStrategy = .base64
+            return decoder
+        }()
     }
 
     func encodeToData() throws -> Data { try Default.encoder.encode(self) }
+
+    static func decodeName(_ data: Data) throws -> String {
+        struct Temp: Decodable {
+            let name: String
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: Event.CodingKeys.self)
+                name = try container.decode(String.self, forKey: .type)
+            }
+        }
+
+        return (try Default.decoder.decode(Temp.self, from: data)).name
+    }
 }

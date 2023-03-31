@@ -16,6 +16,7 @@ extension UserDefaults: EventsStorage {
         Log.debug("UserDefaults: Save Events success.")
         set(value, forKey: Constants.eventsStorageKey)
     }
+
     func getEvents() -> [Data]? { object(forKey: Constants.eventsStorageKey) as? [Data] }
 
     func clearEvents() {

@@ -74,7 +74,7 @@
 		8AB0034C2926FCEA008476A3 /* SetAttributionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002C92926FCEA008476A3 /* SetAttributionRequest.swift */; };
 		8AB0034D2926FCEA008476A3 /* CreateProfileRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CA2926FCEA008476A3 /* CreateProfileRequest.swift */; };
 		8AB0034E2926FCEA008476A3 /* FetchAllProductsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CB2926FCEA008476A3 /* FetchAllProductsRequest.swift */; };
-		8AB0034F2926FCEA008476A3 /* FetchKinesisCredentialsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CC2926FCEA008476A3 /* FetchKinesisCredentialsRequest.swift */; };
+		8AB0034F2926FCEA008476A3 /* FetchEventsConfigRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CC2926FCEA008476A3 /* FetchEventsConfigRequest.swift */; };
 		8AB003502926FCEA008476A3 /* SetTransactionVariationIdRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CD2926FCEA008476A3 /* SetTransactionVariationIdRequest.swift */; };
 		8AB003512926FCEA008476A3 /* Backend.Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CE2926FCEA008476A3 /* Backend.Codable.swift */; };
 		8AB003522926FCEA008476A3 /* Backend.Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CF2926FCEA008476A3 /* Backend.Validator.swift */; };
@@ -114,12 +114,7 @@
 		8AB003742926FCEA008476A3 /* HTTPCancelable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002F52926FCEA008476A3 /* HTTPCancelable.swift */; };
 		8AB003752926FCEA008476A3 /* Application.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002F62926FCEA008476A3 /* Application.swift */; };
 		8AB003762926FCEA008476A3 /* String.sha256.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002FA2926FCEA008476A3 /* String.sha256.swift */; };
-		8AB003772926FCEA008476A3 /* HMAC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002FB2926FCEA008476A3 /* HMAC.swift */; };
-		8AB003782926FCEA008476A3 /* ByteArray.toHexString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002FC2926FCEA008476A3 /* ByteArray.toHexString.swift */; };
-		8AB003792926FCEA008476A3 /* URLRequest.KinesisSigning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002FD2926FCEA008476A3 /* URLRequest.KinesisSigning.swift */; };
-		8AB0037A2926FCEA008476A3 /* KinesisError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002FE2926FCEA008476A3 /* KinesisError.swift */; };
 		8AB0037B2926FCEA008476A3 /* SendEventsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002FF2926FCEA008476A3 /* SendEventsRequest.swift */; };
-		8AB0037C2926FCEA008476A3 /* Kinesis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003002926FCEA008476A3 /* Kinesis.swift */; };
 		8AB0037D2926FCEA008476A3 /* EventsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003012926FCEA008476A3 /* EventsError.swift */; };
 		8AB0037E2926FCEA008476A3 /* EventsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003022926FCEA008476A3 /* EventsStorage.swift */; };
 		8AB0037F2926FCEA008476A3 /* EventsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003032926FCEA008476A3 /* EventsManager.swift */; };
@@ -144,7 +139,7 @@
 		8AB003932926FCEA008476A3 /* VH.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0031A2926FCEA008476A3 /* VH.swift */; };
 		8AB003942926FCEA008476A3 /* AdaptyProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0031B2926FCEA008476A3 /* AdaptyProfile.swift */; };
 		8AB003952926FCEA008476A3 /* AdaptyProfile.CustomAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0031C2926FCEA008476A3 /* AdaptyProfile.CustomAttributes.swift */; };
-		8AB003962926FCEA008476A3 /* KinesisCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0031D2926FCEA008476A3 /* KinesisCredentials.swift */; };
+		8AB003962926FCEA008476A3 /* EventsBackendConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0031D2926FCEA008476A3 /* EventsBackendConfiguration.swift */; };
 		8AB003972926FCEA008476A3 /* FallbackPaywalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0031E2926FCEA008476A3 /* FallbackPaywalls.swift */; };
 		8AB003982926FCEA008476A3 /* AdaptyProfile.AccessLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0031F2926FCEA008476A3 /* AdaptyProfile.AccessLevel.swift */; };
 		8AB003992926FCEA008476A3 /* SignSubscriptionOfferResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB003202926FCEA008476A3 /* SignSubscriptionOfferResponse.swift */; };
@@ -163,6 +158,7 @@
 		8AB003A62926FCEA008476A3 /* Adapty+FallbackPaywalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */; };
 		8AB003A72926FCEA008476A3 /* LifecycleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */; };
 		8AD35AFE29C9E20F0096700C /* Environment+StoreKit2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */; };
+		8AD35B0029D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35AFF29D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift */; };
 		8AF80404292BB58600970E6B /* XCTestCase+getDataFromResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF80403292BB58600970E6B /* XCTestCase+getDataFromResource.swift */; };
 		8AF80406292C407C00970E6B /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF80405292C407C00970E6B /* JSONValue.swift */; };
 		8AF80408292C4E3C00970E6B /* BackendProductTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF80407292C4E3C00970E6B /* BackendProductTests.swift */; };
@@ -269,7 +265,7 @@
 		8AB002C92926FCEA008476A3 /* SetAttributionRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetAttributionRequest.swift; sourceTree = "<group>"; };
 		8AB002CA2926FCEA008476A3 /* CreateProfileRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateProfileRequest.swift; sourceTree = "<group>"; };
 		8AB002CB2926FCEA008476A3 /* FetchAllProductsRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchAllProductsRequest.swift; sourceTree = "<group>"; };
-		8AB002CC2926FCEA008476A3 /* FetchKinesisCredentialsRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchKinesisCredentialsRequest.swift; sourceTree = "<group>"; };
+		8AB002CC2926FCEA008476A3 /* FetchEventsConfigRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchEventsConfigRequest.swift; sourceTree = "<group>"; };
 		8AB002CD2926FCEA008476A3 /* SetTransactionVariationIdRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetTransactionVariationIdRequest.swift; sourceTree = "<group>"; };
 		8AB002CE2926FCEA008476A3 /* Backend.Codable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.Codable.swift; sourceTree = "<group>"; };
 		8AB002CF2926FCEA008476A3 /* Backend.Validator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.Validator.swift; sourceTree = "<group>"; };
@@ -309,12 +305,7 @@
 		8AB002F52926FCEA008476A3 /* HTTPCancelable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPCancelable.swift; sourceTree = "<group>"; };
 		8AB002F62926FCEA008476A3 /* Application.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Application.swift; sourceTree = "<group>"; };
 		8AB002FA2926FCEA008476A3 /* String.sha256.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.sha256.swift; sourceTree = "<group>"; };
-		8AB002FB2926FCEA008476A3 /* HMAC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HMAC.swift; sourceTree = "<group>"; };
-		8AB002FC2926FCEA008476A3 /* ByteArray.toHexString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteArray.toHexString.swift; sourceTree = "<group>"; };
-		8AB002FD2926FCEA008476A3 /* URLRequest.KinesisSigning.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLRequest.KinesisSigning.swift; sourceTree = "<group>"; };
-		8AB002FE2926FCEA008476A3 /* KinesisError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KinesisError.swift; sourceTree = "<group>"; };
 		8AB002FF2926FCEA008476A3 /* SendEventsRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SendEventsRequest.swift; sourceTree = "<group>"; };
-		8AB003002926FCEA008476A3 /* Kinesis.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Kinesis.swift; sourceTree = "<group>"; };
 		8AB003012926FCEA008476A3 /* EventsError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsError.swift; sourceTree = "<group>"; };
 		8AB003022926FCEA008476A3 /* EventsStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsStorage.swift; sourceTree = "<group>"; };
 		8AB003032926FCEA008476A3 /* EventsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsManager.swift; sourceTree = "<group>"; };
@@ -339,7 +330,7 @@
 		8AB0031A2926FCEA008476A3 /* VH.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VH.swift; sourceTree = "<group>"; };
 		8AB0031B2926FCEA008476A3 /* AdaptyProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyProfile.swift; sourceTree = "<group>"; };
 		8AB0031C2926FCEA008476A3 /* AdaptyProfile.CustomAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyProfile.CustomAttributes.swift; sourceTree = "<group>"; };
-		8AB0031D2926FCEA008476A3 /* KinesisCredentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KinesisCredentials.swift; sourceTree = "<group>"; };
+		8AB0031D2926FCEA008476A3 /* EventsBackendConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsBackendConfiguration.swift; sourceTree = "<group>"; };
 		8AB0031E2926FCEA008476A3 /* FallbackPaywalls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FallbackPaywalls.swift; sourceTree = "<group>"; };
 		8AB0031F2926FCEA008476A3 /* AdaptyProfile.AccessLevel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdaptyProfile.AccessLevel.swift; sourceTree = "<group>"; };
 		8AB003202926FCEA008476A3 /* SignSubscriptionOfferResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignSubscriptionOfferResponse.swift; sourceTree = "<group>"; };
@@ -359,6 +350,7 @@
 		8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LifecycleManager.swift; sourceTree = "<group>"; };
 		8AB003A82926FDC3008476A3 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
 		8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+StoreKit2.swift"; sourceTree = "<group>"; };
+		8AD35AFF29D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventsBackendConfigurationStorage+UserDefaults.swift"; sourceTree = "<group>"; };
 		8AF80403292BB58600970E6B /* XCTestCase+getDataFromResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+getDataFromResource.swift"; sourceTree = "<group>"; };
 		8AF80405292C407C00970E6B /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		8AF80407292C4E3C00970E6B /* BackendProductTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendProductTests.swift; sourceTree = "<group>"; };
@@ -542,6 +534,7 @@
 				8AB002B12926FCEA008476A3 /* Adapty.swift */,
 				8AB002DF2926FCEA008476A3 /* Adapty+AsyncHelpers.swift */,
 				8AB002BD2926FCEA008476A3 /* Adapty+ChangeState.swift */,
+				8AB002BB2926FCEA008476A3 /* Adapty+Concurrency.swift */,
 				8AB002B22926FCEA008476A3 /* Adapty+Events.swift */,
 				8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */,
 				8AB002E02926FCEA008476A3 /* Adapty+ReceiptValidator.swift */,
@@ -550,7 +543,6 @@
 				8AB002B02926FCEA008476A3 /* AdaptyProfileManager.swift */,
 				8AB002BA2926FCEA008476A3 /* AdaptyResult.swift */,
 				8AB002F62926FCEA008476A3 /* Application.swift */,
-				8AB002BB2926FCEA008476A3 /* Adapty+Concurrency.swift */,
 				8AB0032C2926FCEA008476A3 /* Configuration.swift */,
 				8AB002B82926FCEA008476A3 /* Environment.swift */,
 				8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */,
@@ -598,13 +590,13 @@
 		8AB002BE2926FCEA008476A3 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
+				8AB002C22926FCEA008476A3 /* Requests */,
 				8AB002CE2926FCEA008476A3 /* Backend.Codable.swift */,
 				8AB002C12926FCEA008476A3 /* Backend.Headers.swift */,
 				8AB002D02926FCEA008476A3 /* Backend.QueryItems.swift */,
 				8AB002C02926FCEA008476A3 /* Backend.swift */,
 				8AB002CF2926FCEA008476A3 /* Backend.Validator.swift */,
 				8AB002BF2926FCEA008476A3 /* BackendError.swift */,
-				8AB002C22926FCEA008476A3 /* Requests */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -615,9 +607,10 @@
 				8AB002CA2926FCEA008476A3 /* CreateProfileRequest.swift */,
 				8AB002CB2926FCEA008476A3 /* FetchAllProductsRequest.swift */,
 				8AB002C32926FCEA008476A3 /* FetchAllProductVendorIdsRequest.swift */,
-				8AB002CC2926FCEA008476A3 /* FetchKinesisCredentialsRequest.swift */,
+				8AB002CC2926FCEA008476A3 /* FetchEventsConfigRequest.swift */,
 				8AB002C62926FCEA008476A3 /* FetchPaywallRequest.swift */,
 				8AB002C82926FCEA008476A3 /* FetchProfileRequest.swift */,
+				8AB002FF2926FCEA008476A3 /* SendEventsRequest.swift */,
 				8AB002C92926FCEA008476A3 /* SetAttributionRequest.swift */,
 				8AB002CD2926FCEA008476A3 /* SetTransactionVariationIdRequest.swift */,
 				8AB002C52926FCEA008476A3 /* SignSubscriptionOfferRequest.swift */,
@@ -630,6 +623,7 @@
 		8AB002D22926FCEA008476A3 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				8AB002FA2926FCEA008476A3 /* String.sha256.swift */,
 				8AB002DE2926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift */,
 				8AB002D62926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift */,
 				8AB002D42926FCEA008476A3 /* EventsStorage+UserDefaults.swift */,
@@ -642,6 +636,7 @@
 				8AB002DB2926FCEA008476A3 /* ProfileStorage.swift */,
 				8AB002DC2926FCEA008476A3 /* ProfileStorage+UserDefaults.swift */,
 				8AB002D72926FCEA008476A3 /* VariationIdStorage+UserDefaults.swift */,
+				8AD35AFF29D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -695,36 +690,14 @@
 				8AB003012926FCEA008476A3 /* EventsError.swift */,
 				8AB003032926FCEA008476A3 /* EventsManager.swift */,
 				8AB003022926FCEA008476A3 /* EventsStorage.swift */,
-				8AB002F82926FCEA008476A3 /* Kinesis */,
 			);
 			path = Events;
-			sourceTree = "<group>";
-		};
-		8AB002F82926FCEA008476A3 /* Kinesis */ = {
-			isa = PBXGroup;
-			children = (
-				8AB002F92926FCEA008476A3 /* Signing */,
-				8AB002FE2926FCEA008476A3 /* KinesisError.swift */,
-				8AB002FF2926FCEA008476A3 /* SendEventsRequest.swift */,
-				8AB003002926FCEA008476A3 /* Kinesis.swift */,
-			);
-			path = Kinesis;
-			sourceTree = "<group>";
-		};
-		8AB002F92926FCEA008476A3 /* Signing */ = {
-			isa = PBXGroup;
-			children = (
-				8AB002FA2926FCEA008476A3 /* String.sha256.swift */,
-				8AB002FB2926FCEA008476A3 /* HMAC.swift */,
-				8AB002FC2926FCEA008476A3 /* ByteArray.toHexString.swift */,
-				8AB002FD2926FCEA008476A3 /* URLRequest.KinesisSigning.swift */,
-			);
-			path = Signing;
 			sourceTree = "<group>";
 		};
 		8AB003052926FCEA008476A3 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				8AB0031D2926FCEA008476A3 /* EventsBackendConfiguration.swift */,
 				8AB003062926FCEA008476A3 /* Event.swift */,
 				8AB003072926FCEA008476A3 /* EventType.swift */,
 				8AB003082926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift */,
@@ -770,7 +743,6 @@
 				8AB003142926FCEA008476A3 /* BackendProduct.swift */,
 				8AB003192926FCEA008476A3 /* Environment.Meta.swift */,
 				8AB0031E2926FCEA008476A3 /* FallbackPaywalls.swift */,
-				8AB0031D2926FCEA008476A3 /* KinesisCredentials.swift */,
 				8AB003152926FCEA008476A3 /* PurchaseProductInfo.swift */,
 				8AB003202926FCEA008476A3 /* SignSubscriptionOfferResponse.swift */,
 				8AB0031A2926FCEA008476A3 /* VH.swift */,
@@ -999,7 +971,7 @@
 				8AB0038F2926FCEA008476A3 /* AdaptyProductDiscount.PaymentMode.swift in Sources */,
 				8AB0037D2926FCEA008476A3 /* EventsError.swift in Sources */,
 				8AB003A22926FCEA008476A3 /* AdaptyPeriodUnit.swift in Sources */,
-				8AB003962926FCEA008476A3 /* KinesisCredentials.swift in Sources */,
+				8AB003962926FCEA008476A3 /* EventsBackendConfiguration.swift in Sources */,
 				8AB0033E2926FCEA008476A3 /* Versions.swift in Sources */,
 				8AB003562926FCEA008476A3 /* EventsStorage+UserDefaults.swift in Sources */,
 				8AB0034B2926FCEA008476A3 /* FetchProfileRequest.swift in Sources */,
@@ -1009,11 +981,8 @@
 				8AB003542926FCEA008476A3 /* AdaptyDelegate.swift in Sources */,
 				8AF804232938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift in Sources */,
 				8AB0037E2926FCEA008476A3 /* EventsStorage.swift in Sources */,
-				8AB0037C2926FCEA008476A3 /* Kinesis.swift in Sources */,
 				8A1F7466297B21F0002B7FBC /* ViewConfiguration+extractLocale.swift in Sources */,
 				8AB003892926FCEA008476A3 /* AdaptyError+Description.swift in Sources */,
-				8AB003782926FCEA008476A3 /* ByteArray.toHexString.swift in Sources */,
-				8AB0037A2926FCEA008476A3 /* KinesisError.swift in Sources */,
 				8AB003842926FCEA008476A3 /* AdaptyOnboardingScreenParameters.swift in Sources */,
 				8AB003302926FCEA008476A3 /* SKManagerError.swift in Sources */,
 				8AB003942926FCEA008476A3 /* AdaptyProfile.swift in Sources */,
@@ -1025,9 +994,9 @@
 				8AB003342926FCEA008476A3 /* SKQueueManager+MakePurchase.swift in Sources */,
 				8AB003392926FCEA008476A3 /* AdaptyLogger.swift in Sources */,
 				8A1F743B2979B4F3002B7FBC /* AdaptyUI.swift in Sources */,
+				8AD35B0029D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift in Sources */,
 				8AB003762926FCEA008476A3 /* String.sha256.swift in Sources */,
 				8AB003992926FCEA008476A3 /* SignSubscriptionOfferResponse.swift in Sources */,
-				8AB003772926FCEA008476A3 /* HMAC.swift in Sources */,
 				8AB003872926FCEA008476A3 /* AdaptyError.swift in Sources */,
 				8AB003982926FCEA008476A3 /* AdaptyProfile.AccessLevel.swift in Sources */,
 				8AB003A52926FCEA008476A3 /* Configuration.swift in Sources */,
@@ -1039,7 +1008,6 @@
 				8A1F745E297B098B002B7FBC /* LocalizedViewConfiguration.swift in Sources */,
 				8AB0034C2926FCEA008476A3 /* SetAttributionRequest.swift in Sources */,
 				8AB003492926FCEA008476A3 /* FetchPaywallRequest.swift in Sources */,
-				8AB003792926FCEA008476A3 /* URLRequest.KinesisSigning.swift in Sources */,
 				8AB003742926FCEA008476A3 /* HTTPCancelable.swift in Sources */,
 				8AB003862926FCEA008476A3 /* InternalAdaptyError.swift in Sources */,
 				8AB003412926FCEA008476A3 /* Adapty+UpdateAttribution.swift in Sources */,
@@ -1079,7 +1047,7 @@
 				8AB003362926FCEA008476A3 /* AdaptyProfileManager.swift in Sources */,
 				8AB0035B2926FCEA008476A3 /* ProductVendorIdsStorage+UserDefaults.swift in Sources */,
 				8AB0037F2926FCEA008476A3 /* EventsManager.swift in Sources */,
-				8AB0034F2926FCEA008476A3 /* FetchKinesisCredentialsRequest.swift in Sources */,
+				8AB0034F2926FCEA008476A3 /* FetchEventsConfigRequest.swift in Sources */,
 				8AB003452926FCEA008476A3 /* Backend.Headers.swift in Sources */,
 				8A1F74432979B699002B7FBC /* Image.swift in Sources */,
 				8AB003A32926FCEA008476A3 /* AdaptyProfile.Gender.swift in Sources */,

@@ -8,16 +8,16 @@
 import Foundation
 
 extension Adapty {
-    fileprivate static func trackEvent(_ eventType: EventType, _ completion: AdaptyErrorCompletion? = nil) {
+    fileprivate static func trackEvent(_ eventType: EventType, ifEnabled: Bool = false, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
-            manager.eventsManager.trackEvent(Event(type: eventType, profileId: manager.profileStorage.profileId)) { error in
+            manager.eventsManager.trackEvent(Event(type: eventType, profileId: manager.profileStorage.profileId), ifEnabled) { error in
                 completion(error?.asAdaptyError)
             }
         }
     }
 
-    static func logAppOpened(completion: AdaptyErrorCompletion? = nil) {
-        trackEvent(.appOpened, completion)
+    static func logIfEnabledAppOpened(completion: AdaptyErrorCompletion? = nil) {
+        trackEvent(.appOpened, ifEnabled: true, completion)
     }
 
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
@@ -31,11 +31,7 @@ extension Adapty {
     ///   - paywall: A `AdaptyPaywall` object.
     ///   - completion: Result callback.
     public static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
-        logShowPaywall(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: nil), completion)
-    }
-
-    static func logShowPaywall(_ params: AdaptyPaywallShowedParameters, _ completion: AdaptyErrorCompletion? = nil) {
-        trackEvent(.paywallShowed(params), completion)
+        trackEvent(.paywallShowed(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
     }
 
     /// Call this method to keep track of the user's steps while onboarding
@@ -69,7 +65,12 @@ extension Adapty {
 }
 
 extension AdaptyUI {
+    @available(*, deprecated, renamed: "logIfEnabledShowPaywall(_:viewConfiguration:_:)")
     public static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
-        Adapty.logShowPaywall(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id), completion)
+        logIfEnabledShowPaywall(paywall, viewConfiguration: viewConfiguration, completion)
+    }
+
+    public static func logIfEnabledShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
+        Adapty.trackEvent(.paywallShowed(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)), ifEnabled: true, completion)
     }
 }
