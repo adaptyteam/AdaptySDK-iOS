@@ -27,6 +27,7 @@ extension Adapty {
     public static func activate(_ apiKey: String,
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
+                                enableUsageLogs: Bool = false,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
@@ -44,6 +45,7 @@ extension Adapty {
             Adapty.dispatchQueue = dispatchQueue
 
             Configuration.observerMode = observerMode
+            Configuration.sendSystemEventsEnabled = enableUsageLogs
 
             shared = Adapty(profileStorage: UserDefaults.standard,
                             vendorIdsStorage: UserDefaults.standard,

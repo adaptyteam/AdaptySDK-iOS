@@ -16,7 +16,8 @@ extension Adapty {
         static var idfaCollectionDisabled: Bool = false
 
         static var observerMode: Bool = false
-
+        static var sendSystemEventsEnabled: Bool = false
+        
         static var backendBaseUrl: URL?
         static var backendProxy: (host: String, port: Int)?
     }

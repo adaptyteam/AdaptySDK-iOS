@@ -23,7 +23,7 @@ final class EventsManager {
     private let dispatchQueue: DispatchQueue
     private let storage: EventCollectionStorage
     private let configurationStorage: EventsBackendConfigurationStorage
-    private var configuration: EventsBackendConfiguration?
+    private var configuration: EventsBackendConfiguration
     private let backendSession: HTTPSession
     private var sending: Bool = false
 
@@ -45,26 +45,30 @@ final class EventsManager {
         self.configurationStorage = configurationStorage
 
         backendSession = backend.createHTTPSession(responseQueue: dispatchQueue)
-        configuration = configurationStorage.getEventsConfiguration()
-        if !storage.isEmpty || configuration == nil { needSendEvents() }
+        var configuration = configurationStorage.getEventsConfiguration() ?? EventsBackendConfiguration()
+        if !Adapty.Configuration.sendSystemEventsEnabled {
+            configuration.blacklist.formUnion(EventType.systemEvents)
+        }
+        self.configuration = configuration
+        if !storage.isEmpty || configuration.isExpired { needSendEvents() }
     }
 
-    func trackEvent(_ event: Event, _ ifEnabled: Bool, completion: @escaping (EventsError?) -> Void) {
+    func trackEvent(_ event: Event, completion: @escaping (EventsError?) -> Void) {
         dispatchQueue.async { [weak self] in
             guard let self = self else {
                 completion(nil)
                 return
             }
 
-            guard !(self.configuration?.isBlocked(event) ?? false) else {
+            guard !self.configuration.blacklist.contains(event.type.name) else {
                 completion(nil)
                 return
             }
 
-            guard !self.storage.externalAnalyticsDisabled else {
+            if event.type.isAnalyticEvent, self.storage.externalAnalyticsDisabled {
                 let error = EventsError.analyticsDisabled()
                 completion(error)
-                if !ifEnabled { Log.warn(error.description) }
+                Log.warn(error.description)
                 return
             }
 
@@ -116,7 +120,7 @@ final class EventsManager {
                 return
             }
 
-            guard let events = self.storage.getEvents(limit: Constants.sendingLimitEvents, blackList: self.configuration?.blacklist) else {
+            guard let events = self.storage.getEvents(limit: Constants.sendingLimitEvents, blackList: self.configuration.blacklist) else {
                 completion(nil)
                 return
             }
@@ -141,7 +145,7 @@ final class EventsManager {
     }
 
     func _updateBackendConfigurationIfNeed(completion: @escaping (EventsError?) -> Void) {
-        guard configuration?.isExpired ?? true else {
+        guard configuration.isExpired else {
             completion(nil)
             return
         }
@@ -151,9 +155,12 @@ final class EventsManager {
             case let .failure(error):
                 completion(.sending(error))
             case let .success(response):
-                let configuration = response.body.value
-                self?.configuration = configuration
+                var configuration = response.body.value
                 self?.configurationStorage.setEventsConfiguration(configuration)
+                if !Adapty.Configuration.sendSystemEventsEnabled {
+                    configuration.blacklist.formUnion(EventType.systemEvents)
+                }
+                self?.configuration = configuration
                 completion(nil)
             }
         }

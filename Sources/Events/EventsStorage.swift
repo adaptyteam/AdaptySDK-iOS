@@ -36,7 +36,7 @@ class EventCollectionStorage {
         self.events = events
     }
 
-    func getEvents(limit: Int, blackList: Set<String>?) -> Events? {
+    func getEvents(limit: Int, blackList: Set<String>) -> Events? {
         guard limit > 0, !events.isEmpty else { return nil }
         var elements = [Data]()
         var count = 0
@@ -44,7 +44,7 @@ class EventCollectionStorage {
         for item in events.elements {
             guard elements.count < limit else { break }
             count += 1
-            if !(blackList?.contains(item.0) ?? false) {
+            if !blackList.contains(item.0) {
                 elements.append(item.1)
             }
         }

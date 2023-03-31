@@ -8,16 +8,16 @@
 import Foundation
 
 extension Adapty {
-    fileprivate static func trackEvent(_ eventType: EventType, ifEnabled: Bool = false, _ completion: AdaptyErrorCompletion? = nil) {
+    fileprivate static func trackEvent(_ eventType: EventType, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
-            manager.eventsManager.trackEvent(Event(type: eventType, profileId: manager.profileStorage.profileId), ifEnabled) { error in
+            manager.eventsManager.trackEvent(Event(type: eventType, profileId: manager.profileStorage.profileId)) { error in
                 completion(error?.asAdaptyError)
             }
         }
     }
 
-    static func logIfEnabledAppOpened(completion: AdaptyErrorCompletion? = nil) {
-        trackEvent(.appOpened, ifEnabled: true, completion)
+    static func logAppOpened(completion: AdaptyErrorCompletion? = nil) {
+        trackEvent(.appOpened, completion)
     }
 
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
@@ -65,12 +65,7 @@ extension Adapty {
 }
 
 extension AdaptyUI {
-    @available(*, deprecated, renamed: "logIfEnabledShowPaywall(_:viewConfiguration:_:)")
     public static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
-        logIfEnabledShowPaywall(paywall, viewConfiguration: viewConfiguration, completion)
-    }
-
-    public static func logIfEnabledShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
-        Adapty.trackEvent(.paywallShowed(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)), ifEnabled: true, completion)
+        Adapty.trackEvent(.paywallShowed(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)), completion)
     }
 }

@@ -8,28 +8,23 @@
 import Foundation
 
 struct EventsBackendConfiguration: Equatable {
-    let blacklist: Set<String>
+    var blacklist: Set<String>
     let expiration: Date
+
+    init(blacklist: Set<String>, expiration: Date) {
+        self.blacklist = blacklist
+        self.expiration = expiration
+    }
+
+    init() {
+        blacklist = Set<String>()
+        expiration = Date(timeIntervalSince1970: 0)
+    }
 }
 
 extension EventsBackendConfiguration {
     var isExpired: Bool {
         expiration <= Date()
-    }
-
-    func isBlocked(_ event: Event) -> Bool { isBlocked(event.type) }
-
-    func isBlocked(_ type: EventType) -> Bool {
-        switch type {
-        case .appOpened:
-            return blacklist.contains(EventType.Name.appOpened)
-        case .onboardingScreenShowed:
-            return blacklist.contains(EventType.Name.onboardingScreenShowed)
-        case .paywallShowed:
-            return blacklist.contains(EventType.Name.paywallShowed)
-        case .systemLog:
-            return blacklist.contains(EventType.Name.systemLog)
-        }
     }
 }
 

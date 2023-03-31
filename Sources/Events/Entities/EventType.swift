@@ -22,6 +22,8 @@ extension EventType {
         static let systemLog = "system_log"
     }
 
+    static let systemEvents = [Name.systemLog]
+
     var name: String {
         switch self {
         case .appOpened:
@@ -34,10 +36,20 @@ extension EventType {
             return Name.systemLog
         }
     }
+
+    var isAnalyticEvent: Bool {
+        switch self {
+        case .appOpened,
+             .paywallShowed,
+             .onboardingScreenShowed:
+            return true
+        case .systemLog:
+            return false
+        }
+    }
 }
 
 extension EventType: Encodable {
-
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Event.CodingKeys.self)
         switch self {
