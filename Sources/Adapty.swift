@@ -271,7 +271,9 @@ extension Adapty {
     /// - Parameter completion: A result containing the `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     public static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         async(completion) { manager, completion in
-            manager.skQueueManager.restorePurchases(completion)
+            manager.validateReceipt(refreshIfEmpty: true) { result in
+                completion(result.map { $0.value })
+            }
         }
     }
 }

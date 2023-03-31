@@ -36,7 +36,7 @@ public final class Adapty {
         state = .initializingTo(customerUserId: customerUserId)
 
         skReceiptManager.refreshReceiptIfEmpty()
-        skQueueManager.startObserving(receiptValidator: self)
+        skQueueManager.startObserving(purchaseValidator: self)
         initializingProfileManager(toCustomerUserId: customerUserId)
     }
 

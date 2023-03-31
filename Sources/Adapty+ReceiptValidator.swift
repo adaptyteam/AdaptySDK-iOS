@@ -7,7 +7,11 @@
 
 import Foundation
 
-extension Adapty: ReceiptValidator {
+protocol PurchaseValidator {
+    func validatePurchase(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>)
+}
+
+extension Adapty: PurchaseValidator {
     func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         skReceiptManager.validateReceipt(refreshIfEmpty: refreshIfEmpty) { [weak self] result in
             completion(result.map { profile in
@@ -26,7 +30,7 @@ extension Adapty: ReceiptValidator {
         }
     }
 
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+    func validatePurchase(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         skReceiptManager.getReceipt(refreshIfEmpty: true) { [weak self] result in
             switch result {
             case let .failure(error):
@@ -36,7 +40,7 @@ extension Adapty: ReceiptValidator {
                 let profileId = self.profileStorage.profileId
                 self.httpSession.performValidateReceiptRequest(profileId: profileId,
                                                                receipt: receipt,
-                                                               purchaseProductInfo: purchaseProductInfo) { [weak self] result in
+                                                               purchaseProductInfo: info) { [weak self] result in
                     completion(result.map { profile in
                         self?.saveValidateReceiptResponse(profile: profile)
                         return profile
