@@ -13,6 +13,10 @@ protocol EventsBackendConfigurationStorage: AnyObject {
 }
 
 final class EventsManager {
+    private enum Constants {
+        static let sendingLimitEvents = 10
+    }
+
     typealias ErrorHandler = (EventsError) -> Void
     private static let defaultDispatchQueue = DispatchQueue(label: "Adapty.SDK.SendEvents")
 
@@ -112,7 +116,7 @@ final class EventsManager {
                 return
             }
 
-            guard let events = self.storage.getEvents(limit: 500, blackList: self.configuration?.blacklist) else {
+            guard let events = self.storage.getEvents(limit: Constants.sendingLimitEvents, blackList: self.configuration?.blacklist) else {
                 completion(nil)
                 return
             }

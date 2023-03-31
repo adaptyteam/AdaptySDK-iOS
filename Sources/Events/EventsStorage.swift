@@ -16,7 +16,7 @@ protocol EventsStorage: AnyObject {
 
 class EventCollectionStorage {
     private enum Constants {
-        static let limitEvents = 500
+        static let limitEvents = 50
     }
 
     private let storage: EventsStorage
