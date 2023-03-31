@@ -103,9 +103,7 @@ extension SKManagerError: CustomAdaptyError {
         case .noProductIDsFound: return AdaptyError.SKManagerErrorCode.noProductIDsFound
         case .receiptIsEmpty: return AdaptyError.SKManagerErrorCode.receiptIsEmpty
         case .productPurchaseFailed: return AdaptyError.SKManagerErrorCode.productPurchaseFailed
-        case .noPurchasesToRestore: return AdaptyError.SKManagerErrorCode.noPurchasesToRestore
         case .refreshReceiptFailed: return AdaptyError.SKManagerErrorCode.refreshReceiptFailed
-        case .receiveRestoredTransactionsFailed: return AdaptyError.SKManagerErrorCode.receiveRestoredTransactionsFailed
         case .requestSKProductsFailed: return AdaptyError.SKManagerErrorCode.requestSKProductsFailed
         }
     }
@@ -128,10 +126,8 @@ extension SKManagerError: CustomAdaptyError {
         case .noProductIDsFound: return .noProductIDsFound
         case .receiptIsEmpty: return .cantReadReceipt
         case .refreshReceiptFailed: return .refreshReceiptFailed
-        case .receiveRestoredTransactionsFailed: return .receiveRestoredTransactionsFailed
         case .requestSKProductsFailed: return .productRequestFailed
         case .productPurchaseFailed: return .productPurchaseFailed
-        case .noPurchasesToRestore: return .noPurchasesToRestore
         }
     }
 

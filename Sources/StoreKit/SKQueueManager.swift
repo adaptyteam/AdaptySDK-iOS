@@ -28,19 +28,10 @@ extension Adapty {
     }
 }
 
-protocol ReceiptValidator {
-    func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>)
-
-    func validateReceipt(purchaseProductInfo: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>)
-}
-
 final class SKQueueManager: NSObject {
     let queue: DispatchQueue
 
-    var receiptValidator: ReceiptValidator!
-
-    var restorePurchasesCompletionHandlers: [AdaptyResultCompletion<AdaptyProfile>]?
-    var totalRestoredPurchases = 0
+    var purchaseValidator: PurchaseValidator!
 
     var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyProfile>]]()
     var makePurchasesProduct = [String: AdaptyProduct]()
@@ -66,8 +57,8 @@ final class SKQueueManager: NSObject {
         SKPaymentQueue.canMakePayments()
     }
 
-    func startObserving(receiptValidator: ReceiptValidator) {
-        self.receiptValidator = receiptValidator
+    func startObserving(purchaseValidator: PurchaseValidator) {
+        self.purchaseValidator = purchaseValidator
         SKPaymentQueue.default().add(self)
 
         NotificationCenter.default.addObserver(forName: Application.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
@@ -87,8 +78,10 @@ extension SKQueueManager: SKPaymentTransactionObserver {
                 receivedFailedTransaction(transaction)
 
             case .restored:
-                receivedRestoredTransaction(transaction)
-
+                if !Adapty.Configuration.observerMode {
+                    SKPaymentQueue.default().finishTransaction(transaction)
+                    Log.verbose("SKQueueManager: finish restored transaction \(transaction)")
+                }
             case .deferred, .purchasing: break
             @unknown default: break
             }
@@ -109,11 +102,11 @@ extension SKQueueManager: SKPaymentTransactionObserver {
     #endif
 
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
-        receiveRestoredTransactionsFinished(nil)
+        Log.verbose("SKQueueManager: Restore сompleted transactions finished.")
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
-        receiveRestoredTransactionsFinished(SKManagerError.receiveRestoredTransactionsFailed(error).asAdaptyError)
+        Log.error("SKQueueManager: Restore сompleted transactions failed with error: \(error)")
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {

@@ -35,9 +35,7 @@ extension AdaptyError {
         public static let noProductIDsFound = ErrorCode.noProductIDsFound.rawValue
         public static let receiptIsEmpty = ErrorCode.cantReadReceipt.rawValue
         public static let productPurchaseFailed = ErrorCode.productPurchaseFailed.rawValue
-        public static let noPurchasesToRestore = ErrorCode.noPurchasesToRestore.rawValue
         public static let refreshReceiptFailed = ErrorCode.refreshReceiptFailed.rawValue
-        public static let receiveRestoredTransactionsFailed = ErrorCode.receiveRestoredTransactionsFailed.rawValue
         public static let requestSKProductsFailed = ErrorCode.productRequestFailed.rawValue
     }
 
@@ -107,11 +105,9 @@ extension AdaptyError {
 
         /// In-App Purchases are not allowed on this device.
         case cantMakePayments = 1003
-        case noPurchasesToRestore = 1004
         case cantReadReceipt = 1005
         case productPurchaseFailed = 1006
         case refreshReceiptFailed = 1010
-        case receiveRestoredTransactionsFailed = 1011
 
         /// Adapty SDK is not activated.
         case notActivated = 2002

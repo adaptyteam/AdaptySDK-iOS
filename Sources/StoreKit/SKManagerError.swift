@@ -12,10 +12,8 @@ enum SKManagerError: Error {
     case noProductIDsFound(AdaptyError.Source)
     case receiptIsEmpty(AdaptyError.Source, error: Error?)
     case refreshReceiptFailed(AdaptyError.Source, error: Error)
-    case receiveRestoredTransactionsFailed(AdaptyError.Source, error: Error)
     case requestSKProductsFailed(AdaptyError.Source, error: Error)
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
-    case noPurchasesToRestore(AdaptyError.Source)
 }
 
 extension SKManagerError: CustomStringConvertible {
@@ -33,8 +31,6 @@ extension SKManagerError: CustomStringConvertible {
             }
         case let .refreshReceiptFailed(source, error):
             return "StoreKitManagerError.refreshReceiptFailed(\(source), \(error)"
-        case let .receiveRestoredTransactionsFailed(source, error):
-            return "StoreKitManagerError.receiveRestoredTransactionsFailed(\(source), \(error)"
         case let .requestSKProductsFailed(source, error):
             return "StoreKitManagerError.requestSKProductsFailed(\(source), \(error)"
         case let .productPurchaseFailed(source, error):
@@ -43,8 +39,6 @@ extension SKManagerError: CustomStringConvertible {
             } else {
                 return "StoreKitManagerError.productPurchaseFailed(\(source))"
             }
-        case let .noPurchasesToRestore(source):
-            return "StoreKitManagerError.noPurchasesToRestore(\(source))"
         }
     }
 }
@@ -56,9 +50,7 @@ extension SKManagerError {
              let .noProductIDsFound(src),
              let .receiptIsEmpty(src, _),
              let .refreshReceiptFailed(src, _),
-             let .receiveRestoredTransactionsFailed(src, _),
              let .requestSKProductsFailed(src, _),
-             let .noPurchasesToRestore(src),
              let .interrupted(src):
             return src
         }
@@ -70,7 +62,6 @@ extension SKManagerError {
              let .productPurchaseFailed(_, error):
             return error
         case let .refreshReceiptFailed(_, error),
-             let .receiveRestoredTransactionsFailed(_, error),
              let .requestSKProductsFailed(_, error):
             return error
         default:
@@ -101,10 +92,6 @@ extension SKManagerError {
         .refreshReceiptFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
-    static func receiveRestoredTransactionsFailed(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
-        .receiveRestoredTransactionsFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
-    }
-
     static func requestSKProductsFailed(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         .requestSKProductsFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
@@ -113,7 +100,4 @@ extension SKManagerError {
         .interrupted(AdaptyError.Source(file: file, function: function, line: line))
     }
 
-    static func noPurchasesToRestore(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
-        .noPurchasesToRestore(AdaptyError.Source(file: file, function: function, line: line))
-    }
 }

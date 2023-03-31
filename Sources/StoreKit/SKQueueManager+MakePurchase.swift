@@ -50,7 +50,6 @@ extension SKQueueManager {
     }
 
     func receivedPurchasedTransaction(_ transaction: SKPaymentTransaction) {
-
         func fetchPurchaseProductInfo(manager: SKQueueManager,
                                       _ productId: String,
                                       variationId: String?,
@@ -87,7 +86,7 @@ extension SKQueueManager {
                                      productId,
                                      variationId: self.variationsIds[productId],
                                      transaction) { [weak self] purchaseProductInfo in
-                self?.receiptValidator.validateReceipt(purchaseProductInfo: purchaseProductInfo) { result in
+                self?.purchaseValidator.validatePurchase(info: purchaseProductInfo) { result in
                     guard let self = self else { return }
                     if result.error == nil {
                         self.variationsIds.removeValue(forKey: productId)
