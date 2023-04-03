@@ -16,7 +16,7 @@ final class EventsManagerTests: XCTestCase {
 
     override func setUp() {
         backend = Backend.createForTests()
-        storage = EventsStorageMoke(externalAnalyticsDisabled: false)
+        storage = EventsStorageMoke()
         manager = EventsManager(storage: storage, backend: backend)
     }
 
@@ -48,21 +48,6 @@ final class EventsManagerTests: XCTestCase {
     func testTrackEvents() {
         allEventTypes.forEach {
             XCTAssertTrackEventType($0)
-        }
-    }
-
-    func testAnalyticsDisabledError() {
-        storage.externalAnalyticsDisabled = true
-
-        allEventTypes.forEach {
-            XCTAssertTrackEventType($0, assert: { error in
-                switch error {
-                case .analyticsDisabled:
-                    break
-                default:
-                    XCTFail()
-                }
-            })
         }
     }
 

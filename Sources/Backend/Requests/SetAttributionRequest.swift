@@ -45,7 +45,7 @@ struct SetAttributionRequest: HTTPDataRequest {
 
         return try JSONSerialization.data(withJSONObject: [Backend.CodingKeys.data.stringValue: [
             Backend.CodingKeys.type.stringValue: "adapty_analytics_profile_attribution",
-            Backend.CodingKeys.attributes.stringValue: object]])
+            Backend.CodingKeys.attributes.stringValue: object] as [String : Any]])
     }
 }
 

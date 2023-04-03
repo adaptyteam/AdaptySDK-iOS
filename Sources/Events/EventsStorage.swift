@@ -11,7 +11,6 @@ protocol EventsStorage: AnyObject {
     func setEvents(_ value: [Data])
     func getEvents() -> [Data]?
     var profileId: String { get }
-    var externalAnalyticsDisabled: Bool { get }
 }
 
 class EventCollectionStorage {
@@ -68,7 +67,6 @@ class EventCollectionStorage {
 
 extension EventCollectionStorage {
     var profileId: String { storage.profileId }
-    var externalAnalyticsDisabled: Bool { storage.externalAnalyticsDisabled }
 }
 
 extension EventsStorage {

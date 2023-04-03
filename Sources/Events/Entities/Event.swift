@@ -44,6 +44,7 @@ extension Event: Encodable {
         case createdAt = "created_at"
         case appInstallId = "device_id"
         case sysName = "platform"
+        case customData = "custom_data"
     }
 
     func encode(to encoder: Encoder) throws {

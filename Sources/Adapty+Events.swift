@@ -20,6 +20,10 @@ extension Adapty {
         trackEvent(.appOpened, completion)
     }
 
+    static func logSystemEvent(_ params: AdaptySystemEventParameters, completion: AdaptyErrorCompletion? = nil) {
+        trackEvent(.system(params), completion)
+    }
+
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
     ///
     /// Adapty helps you to measure the performance of the paywalls. We automatically collect all the metrics related to purchases except for paywall views. This is because only you know when the paywall was shown to a customer.

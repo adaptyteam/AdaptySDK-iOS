@@ -14,7 +14,6 @@ final class EventsStorageMoke: AdaptySDK.EventsStorage , AdaptySDK.EventsBackend
     var config: EventsBackendConfiguration?
 
     var profileId: String
-    var externalAnalyticsDisabled: Bool
 
     func setEvents(_ value: [Data]) { data = value }
     func getEvents() -> [Data]? { data }
@@ -23,14 +22,11 @@ final class EventsStorageMoke: AdaptySDK.EventsStorage , AdaptySDK.EventsBackend
     func setEventsConfiguration(_ value: EventsBackendConfiguration) { config = value }
     func getEventsConfiguration() -> EventsBackendConfiguration? { config }
 
-    init(profileId: String, externalAnalyticsDisabled: Bool) {
+    init(profileId: String) {
         self.profileId = profileId
-        self.externalAnalyticsDisabled = externalAnalyticsDisabled
     }
 
-    convenience init(externalAnalyticsDisabled: Bool) {
-        self.init(profileId: Adapty.Configuration.existingProfileId, externalAnalyticsDisabled: externalAnalyticsDisabled)
+    convenience init() {
+        self.init(profileId: Adapty.Configuration.existingProfileId)
     }
-
-
 }

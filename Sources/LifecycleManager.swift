@@ -126,7 +126,7 @@ class LifecycleManager {
 
         Log.verbose("LifecycleManager: sendAppOpenedEvent Begin")
 
-        Adapty.logIfEnabledAppOpened { [weak self] error in
+        Adapty.logAppOpened { [weak self] error in
             if case let .encoding(_, error) = error?.originalError as? EventsError {
                 Log.error("LifecycleManager: sendAppOpenedEvent Error: \(error)")
             } else if let error = error {

@@ -11,7 +11,7 @@ enum EventType {
     case appOpened
     case paywallShowed(AdaptyPaywallShowedParameters)
     case onboardingScreenShowed(AdaptyOnboardingScreenParameters)
-    case systemLog
+    case system(AdaptySystemEventParameters)
 }
 
 extension EventType {
@@ -19,10 +19,10 @@ extension EventType {
         static let appOpened = "app_opened"
         static let paywallShowed = "paywall_showed"
         static let onboardingScreenShowed = "onboarding_screen_showed"
-        static let systemLog = "system_log"
+        static let system = "system_log"
     }
 
-    static let systemEvents = [Name.systemLog]
+    static let systemEvents = [Name.system]
 
     var name: String {
         switch self {
@@ -32,19 +32,8 @@ extension EventType {
             return Name.paywallShowed
         case .onboardingScreenShowed:
             return Name.onboardingScreenShowed
-        case .systemLog:
-            return Name.systemLog
-        }
-    }
-
-    var isAnalyticEvent: Bool {
-        switch self {
-        case .appOpened,
-             .paywallShowed,
-             .onboardingScreenShowed:
-            return true
-        case .systemLog:
-            return false
+        case .system:
+            return Name.system
         }
     }
 }
@@ -61,8 +50,9 @@ extension EventType: Encodable {
         case let .onboardingScreenShowed(value):
             try container.encode(Name.onboardingScreenShowed, forKey: .type)
             try value.encode(to: encoder)
-        case .systemLog:
-            try container.encode(Name.systemLog, forKey: .type)
+        case let .system(value):
+            try container.encode(Name.system, forKey: .type)
+            try container.encode(value, forKey: .customData)
         }
     }
 }

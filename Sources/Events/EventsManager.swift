@@ -65,12 +65,6 @@ final class EventsManager {
                 return
             }
 
-            if event.type.isAnalyticEvent, self.storage.externalAnalyticsDisabled {
-                let error = EventsError.analyticsDisabled()
-                completion(error)
-                Log.warn(error.description)
-                return
-            }
 
             do {
                 try self.storage.add(event)
