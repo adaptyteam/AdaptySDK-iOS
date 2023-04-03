@@ -18,7 +18,10 @@ struct SendEventsRequest: HTTPDataRequest {
     let headers: Headers
 
     init(profileId: String, events: [Data]) {
-        headers = Headers().setBackendProfileId(profileId)
+        headers = Headers()
+            .setLegacyContentType()
+            .setBackendProfileId(profileId)
+
         self.events = events
     }
 

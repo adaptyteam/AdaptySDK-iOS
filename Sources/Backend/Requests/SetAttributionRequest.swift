@@ -21,7 +21,9 @@ struct SetAttributionRequest: HTTPDataRequest {
             method: .post,
             path: "/sdk/analytics/profiles/\(profileId)/attribution/"
         )
-        headers = Headers().setBackendProfileId(profileId)
+        headers = Headers()
+            .setLegacyContentType()
+            .setBackendProfileId(profileId)
         self.networkUserId = networkUserId
         self.source = source
         self.attribution = attribution

@@ -56,6 +56,12 @@ extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.
         return headers
     }
 
+    func setLegacyContentType() -> Self {
+        var headers = self
+        headers.updateValue("Content-Type", forKey: "application/vnd.api+json")
+        return headers
+    }
+
     func hasSameBackendResponseHash(_ responseHeaders: [AnyHashable: Any]) -> Bool {
         guard let requestHash = self[Backend.Request.hashHeaderKey],
               let responseHash = responseHeaders.getBackendResponseHash(),

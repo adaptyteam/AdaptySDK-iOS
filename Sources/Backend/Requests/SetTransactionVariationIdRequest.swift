@@ -19,7 +19,9 @@ struct SetTransactionVariationIdRequest: HTTPEncodableRequest {
     let variationId: String
 
     init(profileId: String, transactionId: String, variationId: String) {
-        headers = Headers().setBackendProfileId(profileId)
+        headers = Headers()
+            .setLegacyContentType()
+            .setBackendProfileId(profileId)
         self.transactionId = transactionId
         self.variationId = variationId
     }
