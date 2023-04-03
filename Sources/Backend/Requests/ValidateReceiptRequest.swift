@@ -20,9 +20,7 @@ struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRes
     let purchaseProductInfo: PurchaseProductInfo?
 
     init(profileId: String, receipt: Data, purchaseProductInfo: PurchaseProductInfo?) {
-        headers = Headers()
-            .setLegacyContentType()
-            .setBackendProfileId(profileId)
+        headers = Headers().setBackendProfileId(profileId)
         self.profileId = profileId
         self.receipt = receipt
         self.purchaseProductInfo = purchaseProductInfo

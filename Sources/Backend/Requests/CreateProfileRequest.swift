@@ -26,10 +26,7 @@ struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
             path: "/sdk/analytics/profiles/\(profileId)/"
         )
 
-        headers = Headers()
-            .setLegacyContentType()
-            .setBackendProfileId(profileId)
-
+        headers = Headers().setBackendProfileId(profileId)
         self.profileId = profileId
         self.parameters = parameters
         self.customerUserId = customerUserId

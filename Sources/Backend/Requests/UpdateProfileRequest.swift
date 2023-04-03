@@ -39,7 +39,6 @@ struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
         )
 
         headers = Headers()
-            .setLegacyContentType()
             .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
 

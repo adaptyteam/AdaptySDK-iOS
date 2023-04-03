@@ -38,7 +38,7 @@ struct Backend: HTTPCodableConfiguration {
                     errorHandler: errorHandler)
     }
 
-    let defaultEncodedContentType = "application/json" 
+    let defaultEncodedContentType = "application/vnd.api+json"
 
     func configure(decoder: JSONDecoder) { Backend.configure(decoder: decoder) }
     func configure(encoder: JSONEncoder) { Backend.configure(encoder: encoder) }
