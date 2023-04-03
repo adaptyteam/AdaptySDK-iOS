@@ -17,7 +17,8 @@ extension Adapty {
 
         static var observerMode: Bool = false
         static var sendSystemEventsEnabled: Bool = false
-        
+        static let storeKit2Enabled: Bool = false
+
         static var backendBaseUrl: URL?
         static var backendProxy: (host: String, port: Int)?
     }

@@ -12,19 +12,35 @@ extension Backend.Request {
     fileprivate static let hashHeaderKey = "adapty-sdk-previous-response-hash"
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
-    fileprivate static let platformHeaderKey = "adapty-sdk-platform"
+    fileprivate static let sdkPlatformHeaderKey = "adapty-sdk-platform"
     fileprivate static let sessionIDHeaderKey = "adapty-sdk-session"
     fileprivate static let appVersionHeaderKey = "adapty-app-version"
+
+    fileprivate static let isSandboxHeaderKey = "adapty-sdk-sandbox-mode-enabled"
+    fileprivate static let isObserveModeHeaderKey = "adapty-sdk-observer-mode-enabled"
+    fileprivate static let storeKit2EnabledHeaderKey = "adapty-sdk-storekit2-enabled"
+    fileprivate static let appInstallIdHeaderKey = "adapty-sdk-device-id"
+    fileprivate static let crossSDKVersionHeaderKey = "adapty-sdk-crossplatform-version"
+    fileprivate static let crossSDKPlatformHeaderKey = "adapty-sdk-crossplatform-name"
 
     static func globalHeaders(secretKey: String) -> HTTPRequest.Headers {
         var headers = [
             authorizationHeaderKey: "Api-Key \(secretKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
-            platformHeaderKey: Environment.System.name,
+            sdkPlatformHeaderKey: Environment.System.name,
             sessionIDHeaderKey: Environment.Application.sessionIdentifier,
+            isSandboxHeaderKey: Environment.System.isSandbox ? "true" : "false",
+            isObserveModeHeaderKey: Adapty.Configuration.observerMode ? "true" : "false",
+            storeKit2EnabledHeaderKey: "false",
         ]
         if let ver = Environment.Application.version {
             headers[appVersionHeaderKey] = ver
+        }
+        if let ver = Environment.CrossPlatformSDK.version {
+            headers[crossSDKVersionHeaderKey] = ver
+        }
+        if let name = Environment.CrossPlatformSDK.name {
+            headers[crossSDKPlatformHeaderKey] = name
         }
         return headers
     }
