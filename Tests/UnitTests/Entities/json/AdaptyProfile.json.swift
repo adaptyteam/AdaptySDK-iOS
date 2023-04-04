@@ -111,7 +111,7 @@ extension AdaptyProfile {
                                            "vendor_transaction_id": "2000000189496768",
                                            "vendor_original_transaction_id": "2000000189496768",
                                            "store": "app_store",
-                                           "is_one_time": false,
+                                           "is_consumable": false,
                                            "is_sandbox": true,
                                            "is_refund": false]]],
              "custom_attributes": [:],
