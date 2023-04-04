@@ -26,19 +26,23 @@ struct SendEventsRequest: HTTPDataRequest {
         case events
     }
 
-    func getData(configuration: HTTPConfiguration) throws -> Data? {
-        let separator = ",".data(using: .utf8)!
-        let data = NSMutableData(data: "{\"\(CodingKeys.events.stringValue)\":[".data(using: .utf8)!)
-        var count = events.count
-        events.forEach {
-            data.append($0)
-            count -= 1
-            if count > 0 {
-                data.append(separator)
-            }
-        }
-        data.append("]}".data(using: .utf8)!)
+    private struct Constants {
+        static let prefix = [
+            "{", Backend.CodingKeys.data.stringValue,
+            ":{", Backend.CodingKeys.type.stringValue,
+            ":", "sdk_background_event",
+            ",", Backend.CodingKeys.attributes.stringValue,
+            ":{", CodingKeys.events.stringValue, ":[",
+        ].joined(separator: "\"").data(using: .utf8)!
+        static let separator = ",".data(using: .utf8)!
+        static let sufix = "]}}}".data(using: .utf8)!
+    }
 
-        return data as Data
+    func getData(configuration: HTTPConfiguration) throws -> Data? {
+        var data = Data()
+        data.append(Constants.prefix)
+        data.append(contentsOf: events.joined(separator: Constants.separator))
+        data.append(Constants.sufix)
+        return data
     }
 }
