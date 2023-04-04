@@ -12,26 +12,16 @@ struct Event {
     let id: String
     let profileId: String
     let sessionId: String
+    var counter: Int
     let createdAt: Date
 
-    fileprivate init(type: EventType,
-                     id: String,
-                     profileId: String,
-                     sessionId: String,
-                     createdAt: Date) {
-        self.type = type
-        self.id = id
-        self.profileId = profileId
-        self.sessionId = sessionId
-        self.createdAt = createdAt
-    }
-
     init(type: EventType, profileId: String) {
-        self.init(type: type,
-                  id: UUID().uuidString.lowercased(),
-                  profileId: profileId,
-                  sessionId: Environment.Application.sessionIdentifier,
-                  createdAt: Date())
+        self.type = type
+        self.profileId = profileId
+        counter = 0
+        id = UUID().uuidString.lowercased()
+        sessionId = Environment.Application.sessionIdentifier
+        createdAt = Date()
     }
 }
 
@@ -40,6 +30,7 @@ extension Event: Encodable {
         case type = "event_name"
         case id = "event_id"
         case profileId = "profile_id"
+        case counter
         case sessionId = "session_id"
         case createdAt = "created_at"
         case appInstallId = "device_id"
@@ -53,6 +44,7 @@ extension Event: Encodable {
         try container.encode(profileId, forKey: .profileId)
         try container.encode(sessionId, forKey: .sessionId)
         try container.encode(createdAt, forKey: .createdAt)
+        try container.encode(counter, forKey: .counter)
         try container.encode(Environment.System.name, forKey: .sysName)
         try container.encode(Environment.Application.installationIdentifier, forKey: .appInstallId)
         try type.encode(to: encoder)
@@ -87,16 +79,32 @@ extension Event {
 
     func encodeToData() throws -> Data { try Default.encoder.encode(self) }
 
-    static func decodeName(_ data: Data) throws -> String {
-        struct Temp: Decodable {
-            let name: String
+    struct Info: Decodable {
+        static let emptyData = Data()
+        let type: String
+        let id: String
+        let counter: Int
+        var data: Data
 
-            init(from decoder: Decoder) throws {
-                let container = try decoder.container(keyedBy: Event.CodingKeys.self)
-                name = try container.decode(String.self, forKey: .type)
-            }
+        init(from event: Event) throws {
+            type = event.type.name
+            id = event.id
+            counter = event.counter
+            data = try event.encodeToData()
         }
 
-        return (try Default.decoder.decode(Temp.self, from: data)).name
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: Event.CodingKeys.self)
+            type = try container.decode(String.self, forKey: .type)
+            id = try container.decode(String.self, forKey: .id)
+            counter = try container.decode(Int.self, forKey: .counter)
+            data = Info.emptyData
+        }
+    }
+
+    static func decodeFromData(_ data: Data) throws -> Info {
+        var info = try Default.decoder.decode(Info.self, from: data)
+        info.data = data
+        return info
     }
 }

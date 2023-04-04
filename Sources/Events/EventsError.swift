@@ -7,8 +7,8 @@
 
 enum EventsError: Error {
     case sending(AdaptyError.Source, error: HTTPError)
-    case analyticsDisabled(AdaptyError.Source)
     case encoding(AdaptyError.Source, error: Error)
+    case decoding(AdaptyError.Source, error: Error)
     case interrupted(AdaptyError.Source)
 }
 
@@ -17,10 +17,10 @@ extension EventsError: CustomStringConvertible {
         switch self {
         case let .sending(source, error: error):
             return "EventsError.sending(\(source), \(error))"
-        case let .analyticsDisabled(source):
-            return "EventsError.analyticsDisabled(\(source))"
         case let .encoding(source, error: error):
             return "EventsError.encoding(\(source), \(error))"
+        case let .decoding(source, error: error):
+            return "EventsError.decoding(\(source), \(error))"
         case let .interrupted(source):
             return "EventsError.interrupted(\(source))"
         }
@@ -31,8 +31,8 @@ extension EventsError {
     var source: AdaptyError.Source {
         switch self {
         case let .sending(src, _),
-             let .analyticsDisabled(src),
              let .encoding(src, _),
+             let .decoding(src, _),
              let .interrupted(src):
             return src
         }
@@ -53,7 +53,8 @@ extension EventsError {
         switch self {
         case let .sending(_, error):
             return error
-        case let .encoding(_, error):
+        case let .encoding(_, error),
+             let .decoding(_, error):
             return error
         default:
             return nil
@@ -72,19 +73,21 @@ extension EventsError {
                  error: error)
     }
 
-    static func analyticsDisabled(
-        file: String = #fileID, function: String = #function, line: UInt = #line
-    ) -> Self {
-        .analyticsDisabled(AdaptyError.Source(file: file,
-                                              function: function,
-                                              line: line))
-    }
-
     static func encoding(
         _ error: Error,
         file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         .encoding(AdaptyError.Source(file: file,
+                                     function: function,
+                                     line: line),
+                  error: error)
+    }
+
+    static func decoding(
+        _ error: Error,
+        file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        .decoding(AdaptyError.Source(file: file,
                                      function: function,
                                      line: line),
                   error: error)

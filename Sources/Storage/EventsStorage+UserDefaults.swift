@@ -10,7 +10,15 @@ import Foundation
 extension UserDefaults: EventsStorage {
     fileprivate enum Constants {
         static let eventsStorageKey = "AdaptySDK_Cached_Events"
+        static let eventCounterKey = "AdaptySDK_Event_Counter"
     }
+
+    func setEventCounter(_ value: Int) {
+        Log.debug("UserDefaults: Save Event Counter = \(value) success.")
+        set(value, forKey: Constants.eventsStorageKey)
+    }
+
+    func getEventCounter() -> Int { integer(forKey: Constants.eventCounterKey) }
 
     func setEvents(_ value: [Data]) {
         Log.debug("UserDefaults: Save Events success.")
@@ -21,6 +29,7 @@ extension UserDefaults: EventsStorage {
 
     func clearEvents() {
         Log.debug("UserDefaults: Clear events.")
+        removeObject(forKey: Constants.eventCounterKey)
         removeObject(forKey: Constants.eventsStorageKey)
     }
 }

@@ -8,6 +8,9 @@
 import Foundation
 
 protocol EventsStorage: AnyObject {
+    func setEventCounter(_ value: Int)
+    func getEventCounter() -> Int
+
     func setEvents(_ value: [Data])
     func getEvents() -> [Data]?
     var profileId: String { get }
@@ -19,7 +22,8 @@ class EventCollectionStorage {
     }
 
     private let storage: EventsStorage
-    private var events: EventCollection<(String, Data)>
+    private var events: EventCollection<Event.Info>
+    private var eventCounter: Int
 
     struct Events {
         let elements: [Data]
@@ -30,7 +34,8 @@ class EventCollectionStorage {
 
     init(with storage: EventsStorage) {
         self.storage = storage
-        var events = EventCollection<(String, Data)>(elements: storage.getEvents() ?? [], startIndex: 0)
+        eventCounter = storage.getEventCounter()
+        var events = EventCollection<Event.Info>(elements: storage.getEvents() ?? [], startIndex: 0)
         events.remove(toLimit: Constants.limitEvents)
         self.events = events
     }
@@ -43,8 +48,10 @@ class EventCollectionStorage {
         for item in events.elements {
             guard elements.count < limit else { break }
             count += 1
-            if !blackList.contains(item.0) {
-                elements.append(item.1)
+            if !blackList.contains(item.type) {
+                elements.append(item.data)
+            } else {
+                Log.verbose("Events: event \(item.type) #\(item.counter) blacklisted")
             }
         }
 
@@ -52,16 +59,24 @@ class EventCollectionStorage {
     }
 
     func add(_ event: Event) throws {
-        let data = try event.encodeToData()
-        events.append((event.type.name, data), withLimit: Constants.limitEvents)
-        storage.setEvents(events.elements.map { $1 })
+        var event = event
+        event.counter = eventCounter
+        let info = try Event.Info(from: event)
+        eventCounter += 1
+        let old = events.elements.first
+        events.append(info, withLimit: Constants.limitEvents)
+        if let item = old, item.id != events.elements.first?.id {
+            Log.verbose("Events: event \(item.type) #\(item.counter) deleted due to exceeded the limit of \(Constants.limitEvents)")
+        }
+        storage.setEventCounter(eventCounter)
+        storage.setEvents(events.elements.map { $0.data })
     }
 
     func subtract(newStartIndex: Int) {
         let startIndex = events.startIndex
         events.subtract(newStartIndex: newStartIndex)
         guard startIndex != events.startIndex else { return }
-        storage.setEvents(events.elements.map { $1 })
+        storage.setEvents(events.elements.map { $0.data })
     }
 }
 
@@ -70,11 +85,17 @@ extension EventCollectionStorage {
 }
 
 extension EventsStorage {
-    fileprivate func getEvents() -> [(String, Data)]? {
+    fileprivate func getEvents() -> [Event.Info]? {
         guard let array: [Data] = getEvents() else { return nil }
         return array.compactMap {
-            guard let name = try? Event.decodeName($0) else { return nil }
-            return (name, $0)
+            do {
+                let info = try Event.decodeFromData($0)
+                return info
+            } catch {
+                let error = EventsError.decoding(error)
+                Log.error("Events: event skipped due to error \(error.description)")
+                return nil
+            }
         }
     }
 }
