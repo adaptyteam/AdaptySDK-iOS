@@ -29,6 +29,7 @@ extension Backend.Request {
             sdkVersionHeaderKey: Adapty.SDKVersion,
             sdkPlatformHeaderKey: Environment.System.name,
             sessionIDHeaderKey: Environment.Application.sessionIdentifier,
+            appInstallIdHeaderKey: Environment.Application.installationIdentifier,
             isSandboxHeaderKey: Environment.System.isSandbox ? "true" : "false",
             isObserveModeHeaderKey: Adapty.Configuration.observerMode ? "true" : "false",
             storeKit2EnabledHeaderKey: "false",
