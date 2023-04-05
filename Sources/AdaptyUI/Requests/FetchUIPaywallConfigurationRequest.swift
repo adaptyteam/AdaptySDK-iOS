@@ -28,7 +28,7 @@ struct FetchUIViewConfigurationRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(paywallVariationId: String, locale: String?, responseHash: String?) {
+    init(paywallVariationId: String, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/paywall-builder/\(paywallVariationId)/"
@@ -42,14 +42,17 @@ struct FetchUIViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 extension HTTPSession {
     func performFetchUIViewConfigurationRequest(paywallId: String,
                                                 paywallVariationId: String,
-                                                locale: String?,
                                                 responseHash: String?,
                                                 _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
         let request = FetchUIViewConfigurationRequest(paywallVariationId: paywallVariationId,
-                                                      locale: locale,
                                                       responseHash: responseHash)
 
-        perform(request) { (result: FetchUIViewConfigurationRequest.Result) in
+        // TODO: get_paywall_builder event
+        // variation_id
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "get_paywall_builder", callId: stamp))
+
+        perform(request, logStamp: stamp) { (result: FetchUIViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

@@ -45,7 +45,13 @@ extension HTTPSession {
                                                        transactionId: transactionId,
                                                        variationId: variationId)
 
-        perform(request) { (result: SetTransactionVariationIdRequest.Result) in
+        // TODO: set_variation_id event
+        // transaction_id: String
+        // variation_id: String
+
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "set_variation_id", callId: stamp))
+        perform(request, logStamp: stamp) { (result: SetTransactionVariationIdRequest.Result) in
             switch result {
             case let .failure(error):
                 completion?(error.asAdaptyError)

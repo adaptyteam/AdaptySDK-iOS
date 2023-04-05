@@ -241,9 +241,9 @@ extension Adapty {
     }
 
     fileprivate func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
-        _ = httpSession.performCreateProfileRequest(profileId: profileId,
-                                                    customerUserId: customerUserId,
-                                                    analyticsDisabled: profileStorage.externalAnalyticsDisabled) { [weak self] result in
+        httpSession.performCreateProfileRequest(profileId: profileId,
+                                                customerUserId: customerUserId,
+                                                analyticsDisabled: profileStorage.externalAnalyticsDisabled) { [weak self] result in
             guard let self = self else { return }
 
             // TODO: Check Cancel

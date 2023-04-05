@@ -123,7 +123,10 @@ extension HTTPSession {
                                            parameters: parameters,
                                            sendEnvironmentMeta: sendEnvironmentMeta,
                                            responseHash: responseHash)
-        perform(request) { (result: UpdateProfileRequest.Result) in
+        // TODO: update_profile event
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "update_profile", callId: stamp))
+        perform(request, logStamp: stamp) { (result: UpdateProfileRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

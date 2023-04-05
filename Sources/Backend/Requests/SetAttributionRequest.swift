@@ -36,7 +36,7 @@ struct SetAttributionRequest: HTTPDataRequest {
     func getData(configuration: HTTPConfiguration) throws -> Data? {
         var object: [AnyHashable: Any] = [
             CodingKeys.source.stringValue: source.rawValue,
-            CodingKeys.attribution.stringValue: attribution
+            CodingKeys.attribution.stringValue: attribution,
         ]
 
         if let networkUserId = networkUserId {
@@ -45,7 +45,7 @@ struct SetAttributionRequest: HTTPDataRequest {
 
         return try JSONSerialization.data(withJSONObject: [Backend.CodingKeys.data.stringValue: [
             Backend.CodingKeys.type.stringValue: "adapty_analytics_profile_attribution",
-            Backend.CodingKeys.attributes.stringValue: object] as [String : Any]])
+            Backend.CodingKeys.attributes.stringValue: object] as [String: Any]])
     }
 }
 
@@ -59,8 +59,10 @@ extension HTTPSession {
                                             networkUserId: networkUserId,
                                             source: source,
                                             attribution: attribution)
-
-        perform(request) { (result: SetAttributionRequest.Result) in
+        // TODO: set_attribution event
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "set_attribution", callId: stamp))
+        perform(request, logStamp: stamp) { (result: SetAttributionRequest.Result) in
             switch result {
             case let .failure(error):
                 completion?(error.asAdaptyError)

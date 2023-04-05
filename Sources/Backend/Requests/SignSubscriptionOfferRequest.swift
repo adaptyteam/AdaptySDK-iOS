@@ -35,8 +35,12 @@ extension HTTPSession {
         let request = SignSubscriptionOfferRequest(vendorProductId: vendorProductId,
                                                    discountId: discountId,
                                                    profileId: profileId)
-
-        perform(request) { (result: SignSubscriptionOfferRequest.Result) in
+        // TODO: sign_offer event
+        // product_id
+        // discount_id
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "sign_offer", callId: stamp))
+        perform(request, logStamp: stamp) { (result: SignSubscriptionOfferRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

@@ -33,7 +33,6 @@ extension AdaptyProfileManager {
     fileprivate func getUIViewConfiguration(forPaywall paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         manager.httpSession.performFetchUIViewConfigurationRequest(paywallId: paywall.id,
                                                                    paywallVariationId: paywall.variationId,
-                                                                   locale: paywall.locale,
                                                                    responseHash: nil) {
             [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 

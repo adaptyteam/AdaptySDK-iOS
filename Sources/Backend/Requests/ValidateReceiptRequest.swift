@@ -54,7 +54,14 @@ extension HTTPSession {
                                              receipt: receipt,
                                              purchaseProductInfo: purchaseProductInfo)
 
-        perform(request) { (result: ValidateReceiptRequest.Result) in
+        //TODO: validate_receipt event
+        // transaction_id: String?
+        // product_id: String?
+        // variation_id: String?
+        // promo_offer_id: String?
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "validate_receipt", callId: stamp))
+        perform(request, logStamp: stamp) { (result: ValidateReceiptRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

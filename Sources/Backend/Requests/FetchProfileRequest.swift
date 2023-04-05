@@ -45,7 +45,10 @@ extension HTTPSession {
         let request = FetchProfileRequest(profileId: profileId,
                                           responseHash: responseHash)
 
-        perform(request) { (result: FetchProfileRequest.Result) in
+        // TODO: create_profile event
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "create_profile", callId: stamp))
+        perform(request, logStamp: stamp) { (result: FetchProfileRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

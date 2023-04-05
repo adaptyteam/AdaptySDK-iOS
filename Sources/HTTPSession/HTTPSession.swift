@@ -50,6 +50,7 @@ final class HTTPSession {
         _ request: Request,
         queue: DispatchQueue? = nil,
         decoder: @escaping Decoder<Body>,
+        logStamp: String = Log.stamp,
         _ completionHandler: @escaping (HTTPResponse<Body>.Result) -> Void
     ) -> HTTPCancelable {
         let errorHandler = _errorHandler
@@ -73,8 +74,7 @@ final class HTTPSession {
         let responseValidator = _responseValidator
 //        let forceLogCurl = request.forceLogCurl || forceLogCurl
         let sessionConfiguration = _session.configuration
-        let stamp = Log.stamp
-        Logger.request(urlRequest, endpoint: endpoint, session: sessionConfiguration, stamp: stamp)
+        Logger.request(urlRequest, endpoint: endpoint, session: sessionConfiguration, stamp: logStamp)
         let task = _session.dataTask(with: urlRequest) { data, response, error in
             let result: HTTPResponse<Body>.Result
             if let error = error {
@@ -90,7 +90,7 @@ final class HTTPSession {
                 result = .failure(.network(endpoint, error: DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The given response is nil or not is HTTPURLResponse."))))
             }
 
-            Logger.response(response, data: data, endpoint: endpoint, error: result.error, request: urlRequest, stamp: stamp)
+            Logger.response(response, data: data, endpoint: endpoint, error: result.error, request: urlRequest, stamp: logStamp)
             queue.async {
                 if let errorHandler = errorHandler, let error = result.error { errorHandler(error) }
                 completionHandler(result)
@@ -104,6 +104,7 @@ final class HTTPSession {
     final func perform<Request: HTTPRequest>(
         _ request: Request,
         queue: DispatchQueue? = nil,
+        logStamp: String = Log.stamp,
         _ completionHandler: @escaping (HTTPStringResponse.Result) -> Void
     ) -> HTTPCancelable {
         perform(request, queue: queue, decoder: { response in
@@ -114,24 +115,26 @@ final class HTTPSession {
                 body = nil
             }
             return .success(response.replaceBody(body))
-        }, completionHandler)
+        }, logStamp: logStamp, completionHandler)
     }
 
     @discardableResult
     final func perform<Request: HTTPRequest>(
         _ request: Request,
         queue: DispatchQueue? = nil,
+        logStamp: String = Log.stamp,
         _ completionHandler: @escaping (HTTPDataResponse.Result) -> Void
     ) -> HTTPCancelable {
-        perform(request, queue: queue, decoder: { .success($0) }, completionHandler)
+        perform(request, queue: queue, decoder: { .success($0) }, logStamp: logStamp, completionHandler)
     }
 
     @discardableResult
     final func perform<Request: HTTPRequest>(
         _ request: Request,
         queue: DispatchQueue? = nil,
+        logStamp: String = Log.stamp,
         _ completionHandler: @escaping (HTTPEmptyResponse.Result) -> Void
     ) -> HTTPCancelable {
-        perform(request, queue: queue, decoder: { .success($0.asEmptyResponse) }, completionHandler)
+        perform(request, queue: queue, decoder: { .success($0.asEmptyResponse) }, logStamp: logStamp, completionHandler)
     }
 }

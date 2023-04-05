@@ -80,10 +80,16 @@ extension HTTPSession {
     func performCreateProfileRequest(profileId: String,
                                      customerUserId: String?,
                                      analyticsDisabled: Bool,
-                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) -> HTTPCancelable {
-        perform(CreateProfileRequest(profileId: profileId,
-                                     customerUserId: customerUserId,
-                                     analyticsDisabled: analyticsDisabled)) { (result: CreateProfileRequest.Result) in
+                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        let request = CreateProfileRequest(profileId: profileId,
+                                           customerUserId: customerUserId,
+                                           analyticsDisabled: analyticsDisabled)
+        // TODO: create_profile event
+        // has_customer_user_id: bool
+        let stamp = Log.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "create_profile", callId: stamp))
+
+        perform(request, logStamp: stamp) { (result: CreateProfileRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

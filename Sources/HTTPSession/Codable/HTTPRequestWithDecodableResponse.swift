@@ -26,12 +26,14 @@ extension HTTPSession {
     final func perform<Request: HTTPRequestWithDecodableResponse>(
         _ request: Request,
         queue: DispatchQueue? = nil,
+        logStamp: String = Log.stamp,
         _ completionHandler: @escaping (Request.Result) -> Void
     ) -> HTTPCancelable {
         let decoder = request.getDecoder(configuration.decoder)
         return perform(request,
                        queue: queue,
                        decoder: decoder,
+                       logStamp: logStamp,
                        completionHandler)
     }
 }
