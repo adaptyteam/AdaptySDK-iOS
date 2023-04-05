@@ -25,7 +25,7 @@ extension AdaptyError {
     public enum EventsErrorCode {
         public static let interrupted = ErrorCode.operationInterrupted.rawValue
         public static let sending = ErrorCode.networkFailed.rawValue
-        public static let analyticsDisabled = ErrorCode.analyticsDisabled.rawValue
+        public static let decoding = ErrorCode.decodingFailed.rawValue
         public static let encoding = ErrorCode.encodingFailed.rawValue
     }
 

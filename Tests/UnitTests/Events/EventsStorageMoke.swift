@@ -10,11 +10,16 @@
 import Foundation
 
 final class EventsStorageMoke: AdaptySDK.EventsStorage , AdaptySDK.EventsBackendConfigurationStorage {
+
+
     var data: [Data]?
     var config: EventsBackendConfiguration?
+    var counter = 0
 
     var profileId: String
 
+    func setEventCounter(_ value: Int) { counter = value}
+    func getEventCounter() -> Int { counter }
     func setEvents(_ value: [Data]) { data = value }
     func getEvents() -> [Data]? { data }
     func clearEvents() { data = nil }

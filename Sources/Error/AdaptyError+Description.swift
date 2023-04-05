@@ -39,7 +39,7 @@ extension EventsError: CustomDebugStringConvertible {
         switch self {
         case .interrupted: return "Operation interrupted"
         case .sending: return "Network request failed"
-        case .analyticsDisabled: return "We can't handle analytics events, since you've opted it out"
+        case .decoding: return "Event decoding failed"
         case .encoding: return "Event encoding failed"
         }
     }

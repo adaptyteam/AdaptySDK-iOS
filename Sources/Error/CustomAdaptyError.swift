@@ -68,8 +68,8 @@ extension EventsError: CustomAdaptyError {
         switch self {
         case .interrupted: return AdaptyError.EventsErrorCode.interrupted
         case .sending: return AdaptyError.EventsErrorCode.sending
-        case .analyticsDisabled: return AdaptyError.EventsErrorCode.analyticsDisabled
         case .encoding: return AdaptyError.EventsErrorCode.encoding
+        case .decoding: return AdaptyError.EventsErrorCode.decoding
         }
     }
 
@@ -87,8 +87,8 @@ extension EventsError: CustomAdaptyError {
     var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
         case .sending: return .networkFailed
-        case .analyticsDisabled: return .analyticsDisabled
         case .encoding: return .encodingFailed
+        case .decoding: return .decodingFailed
         case .interrupted: return .operationInterrupted
         }
     }
