@@ -15,7 +15,7 @@ protocol VariationIdStorage {
 extension Adapty {
     /// Call this method to have StoreKit present a sheet enabling the user to redeem codes provided by your app.
     public static func presentCodeRedemptionSheet() {
-        let logName = "present_code_redeption_sheet"
+        let logName = "present_code_redemption_sheet"
         #if swift(>=5.3) && os(iOS) && !targetEnvironment(macCatalyst)
             async(nil, logName: logName) { _, completion in
                 if #available(iOS 14.0, *) {
@@ -26,9 +26,9 @@ extension Adapty {
                 completion(nil)
             }
         #else
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp))
-        Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: "not available"))
+            let stamp = Log.stamp
+            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp))
+            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: "not available"))
         #endif
     }
 }
