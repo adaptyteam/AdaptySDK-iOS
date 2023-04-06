@@ -35,25 +35,3 @@ struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse {
             .setBackendResponseHash(responseHash)
     }
 }
-
-extension HTTPSession {
-    func performFetchAllProductVendorIdsRequest(profileId: String,
-                                                responseHash: String?,
-                                                _ completion: @escaping (Result<VH<[String]?>, HTTPError>) -> Void
-) {
-        let request = FetchAllProductVendorIdsRequest(profileId: profileId,
-                                                      responseHash: responseHash)
-
-        //TODO: fetch_products_ids event
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "fetch_products_ids", callId: stamp))
-        perform(request, logStamp: stamp) { (result: FetchAllProductVendorIdsRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error))
-            case let .success(response):
-                completion(.success(VH(response.body.value, hash: response.headers.getBackendResponseHash())))
-            }
-        }
-    }
-}

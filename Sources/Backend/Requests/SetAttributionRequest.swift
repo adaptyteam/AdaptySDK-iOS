@@ -59,10 +59,7 @@ extension HTTPSession {
                                             networkUserId: networkUserId,
                                             source: source,
                                             attribution: attribution)
-        // TODO: set_attribution event
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "set_attribution", callId: stamp))
-        perform(request, logStamp: stamp) { (result: SetAttributionRequest.Result) in
+        perform(request, logName: "set_attribution") { (result: SetAttributionRequest.Result) in
             switch result {
             case let .failure(error):
                 completion?(error.asAdaptyError)

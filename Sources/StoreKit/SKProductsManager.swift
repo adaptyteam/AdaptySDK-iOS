@@ -85,14 +85,14 @@ final class SKProductsManager: NSObject {
             guard let self = self, !self.sending else { return }
             self.sending = true
             let profileId = self.cache.profileId
-
-            self.session.performFetchAllProductVendorIdsRequest(profileId: profileId, responseHash: self.cache.allProductVendorIds?.hash) { [weak self] (result: Result<VH<[String]?>, HTTPError>) in
+            let request = FetchAllProductVendorIdsRequest(profileId: profileId, responseHash: self.cache.allProductVendorIds?.hash)
+            self.session.perform(request, logName: "get_products_ids") { [weak self] (result: FetchAllProductVendorIdsRequest.Result) in
                 defer { self?.sending = false }
                 guard let self = self else { return }
                 switch result {
-                case let .success(productVendorIds):
-                    if let value = productVendorIds.value {
-                        self.cache.setProductVendorIds(VH(value, hash: productVendorIds.hash))
+                case let .success(response):
+                    if let value = response.body.value {
+                        self.cache.setProductVendorIds(VH(value, hash: response.headers.getBackendResponseHash()))
                     }
                     self.fetchProducts(productIdentifiers: self.cache.allProductVendorIdsWithFallback) { _ in }
                 case let .failure(error):

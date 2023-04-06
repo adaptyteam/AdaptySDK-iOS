@@ -55,7 +55,7 @@ extension HTTPError: CustomAdaptyError {
         case .perform: return .encodingFailed
         case .network: return .networkFailed
         case .decoding: return .decodingFailed
-        case let .backend(_, _, code, _):
+        case let .backend(_, _, code, _, _):
             return Backend.toAdaptyErrorCode(statusCode: code) ?? .networkFailed
         }
     }

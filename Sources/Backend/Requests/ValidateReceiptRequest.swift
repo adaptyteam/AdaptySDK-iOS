@@ -53,15 +53,23 @@ extension HTTPSession {
         let request = ValidateReceiptRequest(profileId: profileId,
                                              receipt: receipt,
                                              purchaseProductInfo: purchaseProductInfo)
-
-        //TODO: validate_receipt event
-        // transaction_id: String?
-        // product_id: String?
-        // variation_id: String?
-        // promo_offer_id: String?
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "validate_receipt", callId: stamp))
-        perform(request, logStamp: stamp) { (result: ValidateReceiptRequest.Result) in
+        let logParams : [String: AnyEncodable]?
+        if let info = purchaseProductInfo {
+            var params = ["product_id": AnyEncodable(info.vendorProductId)]
+            if let value = info.transactionId {
+                params["transaction_id"] = AnyEncodable(value)
+            }
+            if let value = info.productVariationId {
+                params["variation_id"] = AnyEncodable(value)
+            }
+            if let value = info.promotionalOfferId {
+                params["promotional_offer_id"] = AnyEncodable(value)
+            }
+            logParams = params
+        } else {
+            logParams = nil
+        }
+        perform(request, logName: "validate_receipt", logParams: logParams) { (result: ValidateReceiptRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

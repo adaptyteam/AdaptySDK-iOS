@@ -17,18 +17,26 @@ fileprivate enum CodingKeys: String, CodingKey {
     case eventData = "event_data"
 
     case backendRequestId = "api_request_id"
-    case isError = "is_error"
+    case success
     case error
 }
 
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
     let methodName: String
     let callId: String
+    let params: [String: AnyEncodable?]?
+
+    init(methodName: String, callId: String, params: [String: AnyEncodable?]? = nil) {
+        self.methodName = methodName
+        self.callId = callId
+        self.params = params
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("sdk_method_request_\(methodName)", forKey: .name)
         try container.encode(callId, forKey: .callId)
+        try encoder.encode(params)
     }
 }
 
@@ -42,8 +50,10 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
         try container.encode("sdk_method_response_\(methodName)", forKey: .name)
         try container.encode(callId, forKey: .callId)
         if let error = error {
-            try container.encode(true, forKey: .isError)
+            try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
+        } else {
+            try container.encode(true, forKey: .success)
         }
     }
 }
@@ -51,11 +61,19 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
 struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {
     let methodName: String
     let callId: String
+    let params: [String: AnyEncodable?]?
+
+    init(methodName: String, callId: String, params: [String: AnyEncodable?]? = nil) {
+        self.methodName = methodName
+        self.callId = callId
+        self.params = params
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("api_method_request_\(methodName)", forKey: .name)
         try container.encode(callId, forKey: .callId)
+        try encoder.encode(params)
     }
 }
 
@@ -72,8 +90,26 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         try container.encodeIfPresent(backendRequestId, forKey: .backendRequestId)
 
         if let error = error {
-            try container.encode(true, forKey: .isError)
+            try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
+        } else {
+            try container.encode(true, forKey: .success)
+        }
+    }
+
+    init(methodName: String, callId: String, backendRequestId: String?, error: String?) {
+        self.methodName = methodName
+        self.callId = callId
+        self.backendRequestId = backendRequestId
+        self.error = error
+    }
+
+    init<T>(methodName: String, callId: String, _ result: HTTPResponse<T>.Result) {
+        switch result {
+        case let .failure(error):
+            self.init(methodName: methodName, callId: callId, backendRequestId: error.headers?.getBackendRequestId(), error: error.description)
+        case let .success(response):
+            self.init(methodName: methodName, callId: callId, backendRequestId: response.headers.getBackendRequestId(), error: nil)
         }
     }
 }
@@ -104,8 +140,10 @@ struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
         try container.encode(callId, forKey: .callId)
         try container.encode(data, forKey: .responseData)
         if let error = error {
-            try container.encode(true, forKey: .isError)
+            try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
+        } else {
+            try container.encode(true, forKey: .success)
         }
     }
 }
@@ -120,8 +158,21 @@ struct AdaptyAppleEventQueueHandlerParameters: AdaptySystemEventParameters {
         try container.encode("apple_event_queue_handler_\(eventName)", forKey: .name)
         try container.encode(data, forKey: .eventData)
         if let error = error {
-            try container.encode(true, forKey: .isError)
+            try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
+        } else {
+            try container.encode(true, forKey: .success)
+        }
+    }
+}
+
+fileprivate extension Encoder {
+    func encode(_ params: [String: AnyEncodable?]?) throws {
+        guard let params = params else { return }
+        var container = container(keyedBy: AnyCodingKeys.self)
+        try params.forEach {
+            guard let value = $1 else { return }
+            try container.encode(value, forKey: AnyCodingKeys(stringValue: $0))
         }
     }
 }

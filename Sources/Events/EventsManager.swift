@@ -65,7 +65,6 @@ final class EventsManager {
                 return
             }
 
-
             do {
                 try self.storage.add(event)
             } catch {
@@ -125,7 +124,9 @@ final class EventsManager {
                 return
             }
 
-            self.backendSession.perform(SendEventsRequest(profileId: self.storage.profileId, events: events.elements)) {
+            let request = SendEventsRequest(profileId: self.storage.profileId, events: events.elements)
+
+            self.backendSession.perform(request) {
                 (result: SendEventsRequest.Result) in
                 switch result {
                 case let .failure(error):
@@ -144,7 +145,7 @@ final class EventsManager {
             return
         }
 
-        backendSession.perform(FetchEventsConfigRequest(profileId: storage.profileId)) { [weak self] (result: FetchEventsConfigRequest.Result) in
+        backendSession.perform(FetchEventsConfigRequest(profileId: storage.profileId), logName: "get_events_blacklist") { [weak self] (result: FetchEventsConfigRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.sending(error))

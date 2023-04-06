@@ -10,8 +10,8 @@ import Foundation
 enum HTTPError: Error {
     case perform(HTTPEndpoint, AdaptyError.Source, error: Error)
     case network(HTTPEndpoint, AdaptyError.Source, error: Error)
-    case decoding(HTTPEndpoint, AdaptyError.Source, statusCode: Int, error: Error)
-    case backend(HTTPEndpoint, AdaptyError.Source, statusCode: Int, error: Error?)
+    case decoding(HTTPEndpoint, AdaptyError.Source, statusCode: Int, headers: [AnyHashable: Any], error: Error)
+    case backend(HTTPEndpoint, AdaptyError.Source, statusCode: Int, headers: [AnyHashable: Any], error: Error?)
 }
 
 extension HTTPError: CustomStringConvertible {
@@ -21,9 +21,9 @@ extension HTTPError: CustomStringConvertible {
             return "HTTPError.network(\(endpoint), \(source), \(error))"
         case let .perform(endpoint, source, error: error):
             return "HTTPError.perform(\(endpoint), \(source), \(error))"
-        case let .decoding(endpoint, source, statusCode: statusCode, error: error):
+        case let .decoding(endpoint, source, statusCode: statusCode, headers: _, error: error):
             return "HTTPError.decoding(\(endpoint), \(source), statusCode: \(statusCode), \(error))"
-        case let .backend(endpoint, source, statusCode: statusCode, error: error):
+        case let .backend(endpoint, source, statusCode: statusCode, headers: _, error: error):
             return "HTTPError.backend(\(endpoint), \(source), statusCode: \(statusCode)"
                 + (error == nil ? "" : ", \(error!)")
                 + ")"
@@ -36,8 +36,8 @@ extension HTTPError {
         switch self {
         case let .network(_, src, _),
              let .perform(_, src, _),
-             let .decoding(_, src, _, _),
-             let .backend(_, src, _, _):
+             let .decoding(_, src, _, _, _),
+             let .backend(_, src, _, _, _):
             return src
         }
     }
@@ -46,8 +46,8 @@ extension HTTPError {
         switch self {
         case let .network(endpoint, _, _),
              let .perform(endpoint, _, _),
-             let .decoding(endpoint, _, _, _),
-             let .backend(endpoint, _, _, _):
+             let .decoding(endpoint, _, _, _, _),
+             let .backend(endpoint, _, _, _, _):
             return endpoint
         }
     }
@@ -55,9 +55,20 @@ extension HTTPError {
     var statusCode: Int? {
         switch self {
         case
-            let .decoding(_, _, code, _),
-            let .backend(_, _, code, _):
+            let .decoding(_, _, code, _, _),
+            let .backend(_, _, code, _, _):
             return code
+        default:
+            return nil
+        }
+    }
+
+    var headers: [AnyHashable: Any]? {
+        switch self {
+        case
+            let .decoding(_, _, _, headers, _),
+            let .backend(_, _, _, headers, _):
+            return headers
         default:
             return nil
         }
@@ -67,9 +78,9 @@ extension HTTPError {
         switch self {
         case let .network(_, _, err),
              let .perform(_, _, err),
-             let .decoding(_, _, _, err):
+             let .decoding(_, _, _, _, err):
             return err
-        case let .backend(_, _, _, err):
+        case let .backend(_, _, _, _, err):
             return err
         }
     }
@@ -96,7 +107,7 @@ extension NSError {
         NSURLErrorDNSLookupFailed,
         NSURLErrorResourceUnavailable,
         NSURLErrorCannotFindHost,
-        NSURLErrorCannotConnectToHost
+        NSURLErrorCannotConnectToHost,
     ]
 
     var isNetworkConnectionError: Bool {
@@ -151,6 +162,7 @@ extension HTTPError {
                                      function: function,
                                      line: line),
                   statusCode: response.statusCode,
+                  headers: response.headers,
                   error: error)
     }
 
@@ -164,6 +176,7 @@ extension HTTPError {
                                     function: function,
                                     line: line),
                  statusCode: response.statusCode,
+                 headers: response.headers,
                  error: error)
     }
 }

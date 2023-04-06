@@ -26,8 +26,8 @@ extension Backend {
             return false
         case let .network(_, _, error: error):
             return (error as NSError).isNetworkConnectionError
-        case let .decoding(_, _, statusCode: code, error: _),
-             let .backend(_, _, statusCode: code, error: _):
+        case let .decoding(_, _, statusCode: code, _, _),
+             let .backend(_, _, statusCode: code, _, _):
             switch code {
             case 429, 499, 500 ... 599:
                 return true

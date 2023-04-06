@@ -55,11 +55,7 @@ extension HTTPSession {
                                           locale: locale,
                                           profileId: profileId,
                                           responseHash: responseHash)
-        
-        // TODO: get_paywall event
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "get_paywall", callId: stamp))
-        perform(request, logStamp: stamp) { (result: FetchPaywallRequest.Result) in
+        perform(request, logName: "get_paywall") { (result: FetchPaywallRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

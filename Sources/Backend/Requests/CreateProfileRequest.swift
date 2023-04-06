@@ -84,12 +84,11 @@ extension HTTPSession {
         let request = CreateProfileRequest(profileId: profileId,
                                            customerUserId: customerUserId,
                                            analyticsDisabled: analyticsDisabled)
-        // TODO: create_profile event
-        // has_customer_user_id: bool
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "create_profile", callId: stamp))
-
-        perform(request, logStamp: stamp) { (result: CreateProfileRequest.Result) in
+        perform(request,
+                logName: "create_profile",
+                logParams: [
+                    "has_customer_user_id": AnyEncodable(customerUserId != nil)
+                ]) { (result: CreateProfileRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

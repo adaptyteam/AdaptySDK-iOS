@@ -31,6 +31,8 @@
 		8A1F7473297B298D002B7FBC /* TextRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7472297B298D002B7FBC /* TextRows.swift */; };
 		8A1F74752983DA2D002B7FBC /* CustomAdaptyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */; };
 		8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */; };
+		8A590DD829DE27FE00547895 /* AnyCodingKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */; };
+		8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */; };
 		8AAF8B062927ACA50003BA86 /* EventCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */; };
 		8AAF8B10292839280003BA86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B0F292839280003BA86 /* AppDelegate.swift */; };
 		8AAF8B14292839280003BA86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B13292839280003BA86 /* ViewController.swift */; };
@@ -219,6 +221,8 @@
 		8A1F7472297B298D002B7FBC /* TextRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRows.swift; sourceTree = "<group>"; };
 		8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAdaptyError.swift; sourceTree = "<group>"; };
 		8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdaptyUI+Concurrency.swift"; sourceTree = "<group>"; };
+		8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodingKeys.swift; sourceTree = "<group>"; };
+		8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPSession+logSystemEvent.swift"; sourceTree = "<group>"; };
 		8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollectionTests.swift; sourceTree = "<group>"; };
 		8AAF8B0D292839280003BA86 /* TestsHostApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestsHostApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AAF8B0F292839280003BA86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -596,6 +600,7 @@
 				8AB002C02926FCEA008476A3 /* Backend.swift */,
 				8AB002CF2926FCEA008476A3 /* Backend.Validator.swift */,
 				8AB002BF2926FCEA008476A3 /* BackendError.swift */,
+				8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */,
 			);
 			path = Backend;
 			sourceTree = "<group>";
@@ -677,6 +682,7 @@
 				8AB002EA2926FCEA008476A3 /* HTTPRequestWithDecodableResponse.swift */,
 				8AB002EB2926FCEA008476A3 /* HTTPCodableConfiguration.swift */,
 				8AB002EC2926FCEA008476A3 /* AnyEncodable.swift */,
+				8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */,
 			);
 			path = Codable;
 			sourceTree = "<group>";
@@ -999,6 +1005,7 @@
 				8AB003992926FCEA008476A3 /* SignSubscriptionOfferResponse.swift in Sources */,
 				8AB003872926FCEA008476A3 /* AdaptyError.swift in Sources */,
 				8AB003982926FCEA008476A3 /* AdaptyProfile.AccessLevel.swift in Sources */,
+				8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */,
 				8AB003A52926FCEA008476A3 /* Configuration.swift in Sources */,
 				8AB003442926FCEA008476A3 /* Backend.swift in Sources */,
 				8AB0036E2926FCEA008476A3 /* HTTPMethod.swift in Sources */,
@@ -1042,6 +1049,7 @@
 				8AB003662926FCEA008476A3 /* HTTPResponse.Result.swift in Sources */,
 				8AB003912926FCEA008476A3 /* AdaptyProfile.NonSubscription.swift in Sources */,
 				8AB003A62926FCEA008476A3 /* Adapty+FallbackPaywalls.swift in Sources */,
+				8A590DD829DE27FE00547895 /* AnyCodingKeys.swift in Sources */,
 				8AB0035A2926FCEA008476A3 /* ProductsCache.swift in Sources */,
 				8AB003362926FCEA008476A3 /* AdaptyProfileManager.swift in Sources */,
 				8AB0035B2926FCEA008476A3 /* ProductVendorIdsStorage+UserDefaults.swift in Sources */,

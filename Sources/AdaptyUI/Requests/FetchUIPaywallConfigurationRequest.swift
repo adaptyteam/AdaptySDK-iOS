@@ -46,13 +46,11 @@ extension HTTPSession {
                                                 _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
         let request = FetchUIViewConfigurationRequest(paywallVariationId: paywallVariationId,
                                                       responseHash: responseHash)
-
-        // TODO: get_paywall_builder event
-        // variation_id
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "get_paywall_builder", callId: stamp))
-
-        perform(request, logStamp: stamp) { (result: FetchUIViewConfigurationRequest.Result) in
+        perform(request,
+                logName: "get_paywall_builder",
+                logParams: [
+                    "variation_id": AnyEncodable(paywallVariationId)
+                ]) { (result: FetchUIViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

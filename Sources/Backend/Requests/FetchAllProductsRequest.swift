@@ -45,11 +45,7 @@ extension HTTPSession {
                                         _ completion: @escaping AdaptyResultCompletion<VH<[BackendProduct]?>>) {
         let request = FetchAllProductsRequest(profileId: profileId,
                                               responseHash: responseHash)
-
-        //TODO: fetch_products event
-        let stamp = Log.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: "fetch_products", callId: stamp))
-        perform(request, logStamp: stamp) { (result: FetchAllProductsRequest.Result) in
+        perform(request, logName: "get_products") { (result: FetchAllProductsRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))
