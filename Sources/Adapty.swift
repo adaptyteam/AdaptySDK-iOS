@@ -201,7 +201,7 @@ extension Adapty {
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           fetchPolicy: AdaptyProductsFetchPolicy = .default,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        var logParams = [
+        let logParams = [
             "paywall_id": AnyEncodable(paywall.id),
             "policy": AnyEncodable(fetchPolicy.description),
         ]
