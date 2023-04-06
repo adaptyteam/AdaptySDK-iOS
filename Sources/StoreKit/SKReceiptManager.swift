@@ -73,13 +73,18 @@ final class SKReceiptManager: NSObject {
                 return
             }
 
+            let logName = "get_receipt"
+            let stamp = Log.stamp
+            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: logName, callId: stamp, params: ["refresh_if_empty": AnyEncodable(refreshIfEmpty)]))
             let result = self.bundleReceipt()
 
             switch result {
             case .success:
+                Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: logName, callId: stamp))
                 completion(result)
                 return
-            case .failure:
+            case let .failure(error):
+                Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: logName, callId: stamp, error: error.description))
                 if refreshIfEmpty {
                     self.refresh(completion)
                 } else {
@@ -133,11 +138,16 @@ final class SKReceiptManager: NSObject {
             let request = SKReceiptRefreshRequest()
             request.delegate = self
             request.start()
+
+            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "refresh_receipt"))
         }
     }
 
     fileprivate func completedRefresh(_ error: AdaptyError?) {
         queue.async { [weak self] in
+
+            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "refresh_receipt", error: error?.description))
+
             guard let self = self else { return }
 
             guard let handlers = self.refreshCompletionHandlers, !handlers.isEmpty else {

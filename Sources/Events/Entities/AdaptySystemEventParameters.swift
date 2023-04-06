@@ -125,29 +125,41 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
 
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {
     let methodName: String
-    let callId: String
-    let data: String
+    let callId: String?
+    let params: [String: AnyEncodable?]?
+
+    init(methodName: String, callId: String? = nil, params: [String: AnyEncodable?]? = nil) {
+        self.methodName = methodName
+        self.callId = callId
+        self.params = params
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("apple_method_request_\(methodName)", forKey: .name)
-        try container.encode(callId, forKey: .callId)
-        try container.encode(data, forKey: .requestData)
+        try container.encodeIfPresent(callId, forKey: .callId)
+        try encoder.encode(params)
     }
 }
 
 struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
     let methodName: String
-    let callId: String
-    let data: String
-    var isError: Bool { error != nil }
+    let callId: String?
+    let params: [String: AnyEncodable?]?
     let error: String?
+
+    init(methodName: String, callId: String? = nil, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+        self.methodName = methodName
+        self.callId = callId
+        self.params = params
+        self.error = error
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("apple_method_response_\(methodName)", forKey: .name)
-        try container.encode(callId, forKey: .callId)
-        try container.encode(data, forKey: .responseData)
+        try container.encodeIfPresent(callId, forKey: .callId)
+        try encoder.encode(params)
         if let error = error {
             try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
@@ -159,18 +171,21 @@ struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
 
 struct AdaptyAppleEventQueueHandlerParameters: AdaptySystemEventParameters {
     let eventName: String
-    let data: String
+    let params: [String: AnyEncodable?]?
     let error: String?
+
+    init(eventName: String, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+        self.eventName = eventName
+        self.params = params
+        self.error = error
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("apple_event_queue_handler_\(eventName)", forKey: .name)
-        try container.encode(data, forKey: .eventData)
+        try encoder.encode(params)
         if let error = error {
-            try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
-        } else {
-            try container.encode(true, forKey: .success)
         }
     }
 }

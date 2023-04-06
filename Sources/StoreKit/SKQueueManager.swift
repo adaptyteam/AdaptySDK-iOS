@@ -72,14 +72,49 @@ final class SKQueueManager: NSObject {
     }
 }
 
+extension SKPaymentTransactionState {
+    fileprivate var stringValue: String {
+        switch self {
+        case .purchasing: return "purchasing"
+        case .purchased: return "purchased"
+        case .failed: return "failed"
+        case .restored: return "restored"
+        case .deferred: return "deferred"
+        default:
+            return "unknown(\(self))"
+        }
+    }
+}
+
 extension SKQueueManager: SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         transactions.forEach { transaction in
+
+            var logParams = [
+                "product_id": AnyEncodable(transaction.payment.productIdentifier),
+                "state": AnyEncodable(transaction.transactionState.stringValue),
+            ]
+            if let v = transaction.transactionIdentifier {
+                logParams["transaction_id"] = AnyEncodable(v)
+            }
+            if let v = transaction.original?.transactionIdentifier {
+                logParams["original_id"] = AnyEncodable(v)
+            }
+
+            Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "updated_transaction", params: logParams, error: transaction.error == nil ? nil : "\(transaction.error!.localizedDescription). Detail: \(transaction.error!)"))
+
             switch transaction.transactionState {
             case .purchased:
                 receivedPurchasedTransaction(transaction)
 
             case .failed:
+
+                Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "updated_transaction", params: [
+                    "transaction_id": AnyEncodable(transaction.transactionIdentifier),
+                    "original_id": AnyEncodable(transaction.original?.transactionIdentifier),
+                    "product_id": AnyEncodable(transaction.payment.productIdentifier),
+                ], error: transaction.error == nil ? nil : "\(transaction.error!.localizedDescription). Detail: \(transaction.error!)"))
+
                 receivedFailedTransaction(transaction)
 
             case .restored:
@@ -107,14 +142,18 @@ extension SKQueueManager: SKPaymentTransactionObserver {
     #endif
 
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_finished"))
         Log.verbose("SKQueueManager: Restore сompleted transactions finished.")
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
+        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_failed", error: "\(error.localizedDescription). Detail: \(error)"))
         Log.error("SKQueueManager: Restore сompleted transactions failed with error: \(error)")
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
+        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": AnyEncodable(productIdentifiers)]))
+
         // TODO: validate receipt
     }
 }

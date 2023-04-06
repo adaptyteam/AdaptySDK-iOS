@@ -71,6 +71,7 @@ final class SKProductsManager: NSObject {
         request.delegate = self
         requests[request] = (productIds: productIds, retryCount: retryCount)
         request.start()
+        Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_products", params: ["products_ids": AnyEncodable(productIds)]))
     }
 
     fileprivate func saveProducts(_ products: [SKProduct]) {
@@ -109,6 +110,10 @@ final class SKProductsManager: NSObject {
 extension SKProductsManager: SKProductsRequestDelegate {
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         queue.async { [weak self] in
+            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "fetch_products", params: [
+                "products_count": AnyEncodable(response.products.count),
+                "invalid_products": response.invalidProductIdentifiers.isEmpty ? nil : AnyEncodable(response.invalidProductIdentifiers),
+            ]))
 
             if response.products.isEmpty {
                 Log.verbose("SKProductManager: SKProductsResponse don't have any product")
@@ -119,10 +124,11 @@ extension SKProductsManager: SKProductsRequestDelegate {
             }
 
             guard let self = self else { return }
-            if !self.invalidProductIdentifiers.isEmpty {
+            if !response.invalidProductIdentifiers.isEmpty {
                 Log.warn("SKProductManager: InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
                 self.invalidProductIdentifiers.formUnion(response.invalidProductIdentifiers)
             }
+
             guard let productIds = self.requests[request]?.productIds else {
                 Log.error("SKProductManager: Not found SKRequest in self.requests")
                 return
@@ -150,11 +156,16 @@ extension SKProductsManager: SKProductsRequestDelegate {
         }
     }
 
-    func requestDidFinish(_ request: SKRequest) { request.cancel() }
+    func requestDidFinish(_ request: SKRequest) {
+        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "fetch_products_did_finish"))
+        request.cancel()
+    }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
         defer { request.cancel() }
         queue.async { [weak self] in
+            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "fetch_products", error: "\(error.localizedDescription). Detail: \(error)"))
+
             Log.error("SKProductManager: Can't fetch products from Store \(error)")
             guard let self = self else { return }
             guard let (productIds, retryCount) = self.requests[request] else {

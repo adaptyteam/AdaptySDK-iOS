@@ -26,6 +26,9 @@ extension SKQueueManager {
 
             self.makePurchasesCompletionHandlers[productId] = [completion]
             SKPaymentQueue.default().add(payment)
+            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "add_payment", params: [
+                "product_id": AnyEncodable(payment.productIdentifier),
+            ]))
         }
     }
 
@@ -50,6 +53,7 @@ extension SKQueueManager {
     }
 
     func receivedPurchasedTransaction(_ transaction: SKPaymentTransaction) {
+
         func fetchPurchaseProductInfo(manager: SKQueueManager,
                                       _ productId: String,
                                       variationId: String?,
