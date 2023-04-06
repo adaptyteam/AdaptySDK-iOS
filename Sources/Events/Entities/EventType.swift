@@ -52,7 +52,9 @@ extension EventType: Encodable {
             try value.encode(to: encoder)
         case let .system(value):
             try container.encode(Name.system, forKey: .type)
-            try container.encode(try Backend.encoder.encode(value), forKey: .customData)
+            let data = try Backend.encoder.encode(value)
+            let string = String(decoding: data, as: UTF8.self)
+            try container.encode(string, forKey: .customData)
         }
     }
 }
