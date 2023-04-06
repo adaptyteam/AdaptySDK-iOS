@@ -42,19 +42,28 @@ struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
 
 struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
     let methodName: String
-    let callId: String
+    let callId: String?
+    let params: [String: AnyEncodable?]?
     let error: String?
+
+    init(methodName: String, callId: String? = nil, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+        self.methodName = methodName
+        self.callId = callId
+        self.params = params
+        self.error = error
+    }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("sdk_method_response_\(methodName)", forKey: .name)
-        try container.encode(callId, forKey: .callId)
+        try container.encodeIfPresent(callId, forKey: .callId)
         if let error = error {
             try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
         } else {
             try container.encode(true, forKey: .success)
         }
+        try encoder.encode(params)
     }
 }
 

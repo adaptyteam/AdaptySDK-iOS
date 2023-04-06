@@ -33,10 +33,18 @@ extension Adapty {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
         async(completion) { completion in
+
+            let logName = "activate"
+            let logParams = [
+                "observer_mode": AnyEncodable(observerMode),
+                "has_customer_user_id": AnyEncodable(customerUserId != nil),
+            ]
+
             if isActivated {
                 let err = AdaptyError.activateOnceError()
-                completion(err)
+                Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, params: logParams, error: err.description))
                 Log.warn("Adapty activate error \(err)")
+                completion(err)
                 return
             }
 
@@ -51,11 +59,11 @@ extension Adapty {
                             vendorIdsStorage: UserDefaults.standard,
                             backend: Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy),
                             customerUserId: customerUserId)
-
             LifecycleManager.shared.initialize()
 
-            completion(nil)
+            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, params: logParams))
             Log.info("Adapty activated withObserverMode:\(observerMode), withCustomerUserId: \(customerUserId != nil)")
+            completion(nil)
         }
     }
 }
@@ -70,7 +78,7 @@ extension Adapty {
     ///   - completion: Result callback.
     public static func identify(_ customerUserId: String,
                                 _ completion: AdaptyErrorCompletion? = nil) {
-        async(completion) { manager, completion in
+        async(completion, logName: "identify") { manager, completion in
             manager.identify(toCustomerUserId: customerUserId, completion)
         }
     }
@@ -78,7 +86,7 @@ extension Adapty {
     /// You can logout the user anytime by calling this method.
     /// - Parameter completion: Result callback.
     public static func logout(_ completion: AdaptyErrorCompletion? = nil) {
-        async(completion) { manager, completion in
+        async(completion, logName: "logout") { manager, completion in
             manager.startLogout(completion)
         }
     }
@@ -91,7 +99,7 @@ extension Adapty {
     ///
     /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     public static func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        async(completion) { manager, completion in
+        async(completion, logName: "get_profile") { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(.failure(profileManager.error!))
@@ -109,7 +117,7 @@ extension Adapty {
     /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
     public static func updateProfile(params: AdaptyProfileParameters,
                                      _ completion: AdaptyErrorCompletion? = nil) {
-        async(completion) { manager, completion in
+        async(completion, logName: "update_profile") { manager, completion in
             if let analyticsDisabled = params.analyticsDisabled {
                 manager.profileStorage.setExternalAnalyticsDisabled(analyticsDisabled)
             }
@@ -132,7 +140,11 @@ extension Adapty {
     public static func setVariationId(_ variationId: String,
                                       forTransactionId transactionId: String,
                                       _ completion: AdaptyErrorCompletion? = nil) {
-        async(completion) { manager, completion in
+        let logParams = [
+            "variation_id": AnyEncodable(variationId),
+            "transaction_id": AnyEncodable(transactionId),
+        ]
+        async(completion, logName: "set_variation_id", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(profileManager.error)
@@ -157,7 +169,11 @@ extension Adapty {
     public static func getPaywall(_ id: String,
                                   locale: String? = nil,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        async(completion) { manager, completion in
+        let logParams = [
+            "paywall_id": AnyEncodable(id),
+            "locale": locale == nil ? nil : AnyEncodable(locale!),
+        ]
+        async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
             let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
             manager.getProfileManager(waitCreatingProfile: fallback == nil) { result in
                 switch result {
@@ -185,7 +201,11 @@ extension Adapty {
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           fetchPolicy: AdaptyProductsFetchPolicy = .default,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        async(completion) { manager, completion in
+        var logParams = [
+            "paywall_id": AnyEncodable(paywall.id),
+            "policy": AnyEncodable(fetchPolicy.description),
+        ]
+        async(completion, logName: "get_paywall_products", logParams: logParams) { manager, completion in
             let fallback = paywall.vendorProductIds.compactMap {
                 Adapty.Configuration.fallbackPaywalls?.products[$0]
             }
@@ -238,12 +258,23 @@ extension Adapty {
     ///   - completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     public static func makePurchase(product: AdaptyPaywallProduct,
                                     _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        let logName = "make_purchase"
+        let logParams = [
+            "paywall_name": AnyEncodable(product.paywallName),
+            "variation_id": AnyEncodable(product.variationId),
+            "product_id": AnyEncodable(product.vendorProductId),
+        ]
+
         guard SKQueueManager.canMakePayments() else {
-            completion(.failure(.cantMakePayments()))
+            let stamp = Log.stamp
+            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
+            let error = AdaptyError.cantMakePayments()
+            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: error.description))
+            completion(.failure(error))
             return
         }
 
-        async(completion) { manager, completion in
+        async(completion, logName: logName, logParams: logParams) { manager, completion in
             if #available(iOS 12.2, macOS 10.14.4, *), let discountId = product.promotionalOfferId {
                 let profileId = manager.profileStorage.profileId
 
@@ -272,7 +303,7 @@ extension Adapty {
     ///
     /// - Parameter completion: A result containing the `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     public static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        async(completion) { manager, completion in
+        async(completion, logName: "restore_purchases") { manager, completion in
             manager.validateReceipt(refreshIfEmpty: true) { result in
                 completion(result.map { $0.value })
             }
@@ -281,10 +312,17 @@ extension Adapty {
 }
 
 /// Variants of `getPaywallProducts(paywall:fetchPolicy:_:)` behavior.
-public enum AdaptyProductsFetchPolicy {
+public enum AdaptyProductsFetchPolicy: CustomStringConvertible {
     /// In this scenario, the function will try to download the products anyway, although the ``AdaptyPaywallProduct/introductoryOfferEligibility`` values may be unknown.
     case `default`
 
     /// If you use this option, the Adapty SDK will wait for the validation and the validation itself, only then the products will be returned.
     case waitForReceiptValidation
+
+    public var description: String {
+        switch self {
+        case .default: return "default"
+        case .waitForReceiptValidation: return "waitForReceiptValidation"
+        }
+    }
 }

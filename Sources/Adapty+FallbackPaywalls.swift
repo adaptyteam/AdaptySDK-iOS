@@ -23,7 +23,7 @@ extension Adapty {
     ///   - paywalls: a JSON representation of your paywalls/products list in the exact same format as provided by Adapty backend.
     ///   - completion: Result callback.
     public static func setFallbackPaywalls(_ paywalls: Data, _ completion: AdaptyErrorCompletion? = nil) {
-        async(completion) { completion in
+        async(completion, logName: "set_fallback_paywalls") { completion in
             do {
                 let fallbackPaywalls = try FallbackPaywalls(from: paywalls)
                 if fallbackPaywalls.version < currentFallbackPaywallsVersion {

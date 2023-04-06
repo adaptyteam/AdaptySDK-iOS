@@ -16,15 +16,21 @@ extension Adapty {
                       group: DispatchGroup? = nil,
                       qos: DispatchQoS = .unspecified,
                       flags: DispatchWorkItemFlags = [],
+                      logName: String? = nil,
+                      logParams: [String: AnyEncodable?]? = nil,
                       function: StaticString = #function,
                       execute work: @escaping (AdaptyErrorCompletion) -> Void) {
-        let function = "\(function) [\(Log.stamp)]"
-        Log.verbose("Calling now: \(function).")
-        let event = Log.Profiling.start(method: "Public call", "%@", function)
+        let stamp = Log.stamp
+        if let logName = logName {
+            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
+        }
+        Log.verbose("Calling now: \(function) [\(Log.stamp)].")
+        let eventId = "\(function) [\(stamp)]"
+        let event = Log.Profiling.start(method: "Public call", "%@", eventId)
         underlayQueue.async(group: group, qos: qos, flags: flags) {
             work({
-                callCompletion(function, completion, $0, logLevel: .error)
-                event.end($0 == nil ? "%@ Success" : "%@ Failed", function)
+                callCompletion(logName: logName, function, stamp, completion, $0, logLevel: .error)
+                event.end($0 == nil ? "%@ Success" : "%@ Failed", eventId)
             })
         }
     }
@@ -34,21 +40,27 @@ extension Adapty {
                       group: DispatchGroup? = nil,
                       qos: DispatchQoS = .unspecified,
                       flags: DispatchWorkItemFlags = [],
+                      logName: String? = nil,
+                      logParams: [String: AnyEncodable?]? = nil,
                       function: StaticString = #function,
                       execute work: @escaping (Adapty, @escaping AdaptyErrorCompletion) -> Void) {
-        let function = "\(function) [\(Log.stamp)]"
-        Log.verbose("Calling now: \(function).")
-        let event = Log.Profiling.start(method: "Public call", "%@", function)
+        let stamp = Log.stamp
+        if let logName = logName {
+            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
+        }
+        Log.verbose("Calling now: \(function) [\(stamp)].")
+        let eventId = "\(function) [\(stamp)]"
+        let event = Log.Profiling.start(method: "Public call", "%@", eventId)
         underlayQueue.async(group: group, qos: qos, flags: flags) {
             guard let manager = shared else {
-                callCompletion(function, completion, AdaptyError.notActivated(), logLevel: .error)
-                event.end("%@ Failed", function)
+                callCompletion(logName: logName, function, stamp, completion, AdaptyError.notActivated(), logLevel: .error)
+                event.end("%@ Failed", eventId)
                 return
             }
 
             work(manager, {
-                callCompletion(function, completion, $0)
-                event.end("%@ Success", function)
+                callCompletion(logName: logName, function, stamp, completion, $0)
+                event.end("%@ Success", eventId)
             })
         }
     }
@@ -58,33 +70,42 @@ extension Adapty {
                          group: DispatchGroup? = nil,
                          qos: DispatchQoS = .unspecified,
                          flags: DispatchWorkItemFlags = [],
+                         logName: String? = nil,
+                         logParams: [String: AnyEncodable?]? = nil,
                          function: StaticString = #function,
                          execute work: @escaping (Adapty, @escaping AdaptyResultCompletion<T>) -> Void) {
-        let function = "\(function) [\(Log.stamp)]"
-        Log.verbose("Calling now: \(function).")
-        let event = Log.Profiling.start(method: "Public call", "%@", function)
-
+        let stamp = Log.stamp
+        if let logName = logName {
+            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
+        }
+        let eventId = "\(function) [\(Log.stamp)]"
+        Log.verbose("Calling now: \(function) [\(stamp)].")
+        let event = Log.Profiling.start(method: "Public call", "%@", eventId)
         underlayQueue.async(group: group, qos: qos, flags: flags) {
             guard let manager = shared else {
-                callCompletion(function, completion, .failure(.notActivated()), logLevel: .error)
-                event.end("%@ Failed", function)
+                callCompletion(logName: logName, function, stamp, completion, .failure(.notActivated()), logLevel: .error)
+                event.end("%@ Failed", eventId)
                 return
             }
 
             work(manager, {
-                callCompletion(function, completion, $0)
-                event.end("%@ Success", function)
+                callCompletion(logName: logName, function, stamp, completion, $0)
+                event.end("%@ Success", eventId)
             })
         }
     }
 
     @inline(__always)
-    private static func callCompletion(_ function: String, _ completion: AdaptyErrorCompletion?, _ error: AdaptyError? = nil,
+    private static func callCompletion(logName: String? = nil, _ function: StaticString, _ stamp: String, _ completion: AdaptyErrorCompletion?, _ error: AdaptyError? = nil,
                                        logLevel: AdaptyLogLevel = .verbose) {
+        if let logName = logName {
+            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: error?.description))
+        }
+
         if let error = error {
-            Log.message(logLevel, "Completed \(function) with error: \(error).")
+            Log.message(logLevel, "Completed \(function) [\(stamp)] with error: \(error).")
         } else {
-            Log.message(.verbose, "Completed \(function) is successful.")
+            Log.message(.verbose, "Completed \(function) [\(stamp)] is successful.")
         }
         guard let completion = completion else { return }
         (dispatchQueue ?? .main).async {
@@ -93,11 +114,22 @@ extension Adapty {
     }
 
     @inline(__always)
-    private static func callCompletion<T>(_ function: String, _ completion: AdaptyResultCompletion<T>?, _ result: AdaptyResult<T>, logLevel: AdaptyLogLevel = .verbose) {
-        if case let .failure(error) = result {
-            Log.message(logLevel, "Completed \(function) with error: \(error).")
+    private static func callCompletion<T>(logName: String? = nil, _ function: StaticString, _ stamp: String, _ completion: AdaptyResultCompletion<T>?, _ result: AdaptyResult<T>, logLevel: AdaptyLogLevel = .verbose) {
+        let error: AdaptyError?
+        if case let .failure(e) = result {
+            error = e
         } else {
-            Log.message(.verbose, "Completed \(function) is successful.")
+            error = nil
+        }
+
+        if let logName = logName {
+            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: error?.description))
+        }
+
+        if let error = error {
+            Log.message(logLevel, "Completed \(function) [\(stamp)]  with error: \(error).")
+        } else {
+            Log.message(.verbose, "Completed \(function) [\(stamp)]  is successful.")
         }
         guard let completion = completion else { return }
         (dispatchQueue ?? .main).async {

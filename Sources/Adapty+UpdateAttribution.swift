@@ -21,7 +21,11 @@ extension Adapty {
         if source == .appsflyer {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attribution, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         }
-        async(completion) { manager, completion in
+        let logParams = [
+            "source": AnyEncodable(source.rawValue),
+            "has_network_user_id": AnyEncodable(networkUserId != nil),
+        ]
+        async(completion, logName: "update_attribution", logParams: logParams) { manager, completion in
             manager.updateAttribution(profileId: manager.profileStorage.profileId,
                                       attribution,
                                       source: source,
@@ -47,7 +51,7 @@ extension Adapty {
         #if os(iOS)
             // check if this is an actual first sync
             guard profileStorage.appleSearchAdsSyncDate == nil else { return }
-        let profileId = profileStorage.profileId
+            let profileId = profileStorage.profileId
 
             Environment.searchAdsAttribution { [weak self] attribution, error in
                 guard let self = self, let attribution = attribution, error == nil else { return }
