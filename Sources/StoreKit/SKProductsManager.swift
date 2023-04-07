@@ -114,7 +114,7 @@ extension SKProductsManager: SKProductsRequestDelegate {
                 methodName: "fetch_products",
                 callId: "SKR\(request.hash)",
                 params: [
-                    "products_count": .value(response.products.count),
+                    "products_ids": .value(response.products.map { $0.productIdentifier }),
                     "invalid_products": .valueOrNil(response.invalidProductIdentifiers),
                 ]))
 
