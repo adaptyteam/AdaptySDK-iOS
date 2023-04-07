@@ -35,9 +35,9 @@ extension Adapty {
         async(completion) { completion in
 
             let logName = "activate"
-            let logParams = [
-                "observer_mode": AnyEncodable(observerMode),
-                "has_customer_user_id": AnyEncodable(customerUserId != nil),
+            let logParams: EventParameters = [
+                "observer_mode": .value(observerMode),
+                "has_customer_user_id": .value(customerUserId != nil),
             ]
 
             if isActivated {
@@ -140,9 +140,9 @@ extension Adapty {
     public static func setVariationId(_ variationId: String,
                                       forTransactionId transactionId: String,
                                       _ completion: AdaptyErrorCompletion? = nil) {
-        let logParams = [
-            "variation_id": AnyEncodable(variationId),
-            "transaction_id": AnyEncodable(transactionId),
+        let logParams: EventParameters = [
+            "variation_id": .value(variationId),
+            "transaction_id": .value(transactionId),
         ]
         async(completion, logName: "set_variation_id", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
@@ -201,9 +201,9 @@ extension Adapty {
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           fetchPolicy: AdaptyProductsFetchPolicy = .default,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        let logParams = [
-            "paywall_id": AnyEncodable(paywall.id),
-            "policy": AnyEncodable(fetchPolicy.description),
+        let logParams: EventParameters = [
+            "paywall_id": .value(paywall.id),
+            "policy": .value(fetchPolicy.description),
         ]
         async(completion, logName: "get_paywall_products", logParams: logParams) { manager, completion in
             let fallback = paywall.vendorProductIds.compactMap {
@@ -259,10 +259,10 @@ extension Adapty {
     public static func makePurchase(product: AdaptyPaywallProduct,
                                     _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         let logName = "make_purchase"
-        let logParams = [
-            "paywall_name": AnyEncodable(product.paywallName),
-            "variation_id": AnyEncodable(product.variationId),
-            "product_id": AnyEncodable(product.vendorProductId),
+        let logParams: EventParameters = [
+            "paywall_name": .value(product.paywallName),
+            "variation_id": .value(product.variationId),
+            "product_id": .value(product.vendorProductId),
         ]
 
         guard SKQueueManager.canMakePayments() else {

@@ -75,7 +75,7 @@ final class SKReceiptManager: NSObject {
 
             let logName = "get_receipt"
             let stamp = Log.stamp
-            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: logName, callId: stamp, params: ["refresh_if_empty": AnyEncodable(refreshIfEmpty)]))
+            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: logName, callId: stamp, params: ["refresh_if_empty": .value(refreshIfEmpty)]))
             let result = self.bundleReceipt()
 
             switch result {

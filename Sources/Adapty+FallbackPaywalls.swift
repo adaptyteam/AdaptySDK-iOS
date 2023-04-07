@@ -38,8 +38,8 @@ extension Adapty {
                 }
                 if hasErrorVersion {
                     Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
-                        "in_version": AnyEncodable(fallbackPaywalls.version),
-                        "expected_version": AnyEncodable(currentFallbackPaywallsVersion),
+                        "in_version": .value(fallbackPaywalls.version),
+                        "expected_version": .value(currentFallbackPaywallsVersion),
                     ]))
                 }
                 Configuration.fallbackPaywalls = fallbackPaywalls

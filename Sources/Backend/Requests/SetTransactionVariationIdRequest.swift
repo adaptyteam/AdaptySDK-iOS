@@ -47,8 +47,8 @@ extension HTTPSession {
         perform(request,
                 logName: "set_variation_id",
                 logParams: [
-                    "transaction_id": AnyEncodable(transactionId),
-                    "variation_id": AnyEncodable(variationId),
+                    "transaction_id": .value(transactionId),
+                    "variation_id": .value(variationId),
                 ]) { (result: SetTransactionVariationIdRequest.Result) in
             switch result {
             case let .failure(error):

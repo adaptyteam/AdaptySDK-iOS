@@ -38,8 +38,8 @@ extension HTTPSession {
         perform(request,
                 logName: "sign_offer",
                 logParams: [
-                    "product_id": AnyEncodable(vendorProductId),
-                    "discount_id": AnyEncodable(discountId)
+                    "product_id": .value(vendorProductId),
+                    "discount_id": .value(discountId)
                 ]) { (result: SignSubscriptionOfferRequest.Result) in
             switch result {
             case let .failure(error):

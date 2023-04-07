@@ -71,7 +71,7 @@ final class SKProductsManager: NSObject {
         request.delegate = self
         requests[request] = (productIds: productIds, retryCount: retryCount)
         request.start()
-        Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_products", callId: "SKR\(request.hash)", params: ["products_ids": AnyEncodable(productIds)]))
+        Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_products", callId: "SKR\(request.hash)", params: ["products_ids": .value(productIds)]))
     }
 
     fileprivate func saveProducts(_ products: [SKProduct]) {
@@ -114,8 +114,8 @@ extension SKProductsManager: SKProductsRequestDelegate {
                 methodName: "fetch_products",
                 callId: "SKR\(request.hash)",
                 params: [
-                    "products_count": AnyEncodable(response.products.count),
-                    "invalid_products": response.invalidProductIdentifiers.isEmpty ? nil : AnyEncodable(response.invalidProductIdentifiers),
+                    "products_count": .value(response.products.count),
+                    "invalid_products": .valueOrNil(response.invalidProductIdentifiers),
                 ]))
 
             if response.products.isEmpty {

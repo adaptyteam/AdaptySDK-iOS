@@ -87,7 +87,7 @@ extension HTTPSession {
         perform(request,
                 logName: "create_profile",
                 logParams: [
-                    "has_customer_user_id": AnyEncodable(customerUserId != nil)
+                    "has_customer_user_id": .value(customerUserId != nil)
                 ]) { (result: CreateProfileRequest.Result) in
             switch result {
             case let .failure(error):

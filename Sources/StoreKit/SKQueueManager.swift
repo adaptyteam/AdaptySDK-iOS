@@ -46,7 +46,7 @@ final class SKQueueManager: NSObject {
 
     var variationsIds: [String: String] {
         didSet {
-            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: ["variation_by_product": AnyEncodable(variationsIds)]))
+            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: ["variation_by_product": .value(variationsIds)]))
             storage.setVariationsIds(variationsIds)
         }
     }
@@ -88,19 +88,13 @@ extension SKPaymentTransactionState {
 }
 
 extension SKPaymentTransaction {
-    var logParams: [String: AnyEncodable] {
-        var logParams = [
-            "product_id": AnyEncodable(payment.productIdentifier),
-            "state": AnyEncodable(transactionState.stringValue),
+    var logParams: EventParameters {
+        [
+            "product_id": .value(payment.productIdentifier),
+            "state": .value(transactionState.stringValue),
+            "transaction_id": .valueOrNil(transactionIdentifier),
+            "original_id": .valueOrNil(original?.transactionIdentifier),
         ]
-        if let v = transactionIdentifier {
-            logParams["transaction_id"] = AnyEncodable(v)
-        }
-        if let v = original?.transactionIdentifier {
-            logParams["original_id"] = AnyEncodable(v)
-        }
-
-        return logParams
     }
 }
 
@@ -153,7 +147,7 @@ extension SKQueueManager: SKPaymentTransactionObserver {
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
-        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": AnyEncodable(productIdentifiers)]))
+        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": .value(productIdentifiers)]))
 
         // TODO: validate receipt
     }

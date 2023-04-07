@@ -49,7 +49,7 @@ extension HTTPSession {
         perform(request,
                 logName: "get_paywall_builder",
                 logParams: [
-                    "variation_id": AnyEncodable(paywallVariationId)
+                    "variation_id": .value(paywallVariationId)
                 ]) { (result: FetchUIViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):

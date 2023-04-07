@@ -53,22 +53,12 @@ extension HTTPSession {
         let request = ValidateReceiptRequest(profileId: profileId,
                                              receipt: receipt,
                                              purchaseProductInfo: purchaseProductInfo)
-        let logParams : [String: AnyEncodable]?
-        if let info = purchaseProductInfo {
-            var params = ["product_id": AnyEncodable(info.vendorProductId)]
-            if let value = info.transactionId {
-                params["transaction_id"] = AnyEncodable(value)
-            }
-            if let value = info.productVariationId {
-                params["variation_id"] = AnyEncodable(value)
-            }
-            if let value = info.promotionalOfferId {
-                params["promotional_offer_id"] = AnyEncodable(value)
-            }
-            logParams = params
-        } else {
-            logParams = nil
-        }
+        let logParams: EventParameters? = purchaseProductInfo == nil ? nil : [
+            "product_id": .value(purchaseProductInfo!.vendorProductId),
+            "transaction_id": .valueOrNil(purchaseProductInfo!.transactionId),
+            "variation_id": .valueOrNil(purchaseProductInfo!.productVariationId),
+            "promotional_offer_id": .valueOrNil(purchaseProductInfo!.promotionalOfferId),
+        ]
         perform(request, logName: "validate_receipt", logParams: logParams) { (result: ValidateReceiptRequest.Result) in
             switch result {
             case let .failure(error):
