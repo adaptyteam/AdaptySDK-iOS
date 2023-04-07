@@ -26,10 +26,21 @@ extension Adapty {
         async(completion, logName: "set_fallback_paywalls") { completion in
             do {
                 let fallbackPaywalls = try FallbackPaywalls(from: paywalls)
+                let hasErrorVersion: Bool
                 if fallbackPaywalls.version < currentFallbackPaywallsVersion {
+                    hasErrorVersion = true
                     Log.error("The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard.")
                 } else if fallbackPaywalls.version > currentFallbackPaywallsVersion {
+                    hasErrorVersion = true
                     Log.error("The fallback paywalls version is not correct. Please update the AdaptySDK.")
+                } else {
+                    hasErrorVersion = false
+                }
+                if hasErrorVersion {
+                    Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fallback_wrong_version", params: [
+                        "in_version": AnyEncodable(fallbackPaywalls.version),
+                        "expected_version": AnyEncodable(currentFallbackPaywallsVersion),
+                    ]))
                 }
                 Configuration.fallbackPaywalls = fallbackPaywalls
             } catch {

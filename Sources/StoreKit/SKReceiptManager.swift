@@ -139,14 +139,14 @@ final class SKReceiptManager: NSObject {
             request.delegate = self
             request.start()
 
-            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "refresh_receipt"))
+            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "refresh_receipt", callId: "SKR\(request.hash)"))
         }
     }
 
     fileprivate func completedRefresh(_ error: AdaptyError?) {
         queue.async { [weak self] in
 
-            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "refresh_receipt", error: error?.description))
+            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "refresh_receipt", callId: "SKR\(request.hash)", error: error?.description))
 
             guard let self = self else { return }
 
