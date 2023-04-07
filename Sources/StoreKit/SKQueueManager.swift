@@ -41,11 +41,12 @@ final class SKQueueManager: NSObject {
     var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyProfile>]]()
     var makePurchasesProduct = [String: AdaptyProduct]()
 
-    var storage: VariationIdStorage
+    private var storage: VariationIdStorage
     var skProductsManager: SKProductsManager
 
     var variationsIds: [String: String] {
         didSet {
+            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: ["variation_by_product": AnyEncodable(variationsIds)]))
             storage.setVariationsIds(variationsIds)
         }
     }
@@ -86,40 +87,40 @@ extension SKPaymentTransactionState {
     }
 }
 
+extension SKPaymentTransaction {
+    var logParams: [String: AnyEncodable] {
+        var logParams = [
+            "product_id": AnyEncodable(payment.productIdentifier),
+            "state": AnyEncodable(transactionState.stringValue),
+        ]
+        if let v = transactionIdentifier {
+            logParams["transaction_id"] = AnyEncodable(v)
+        }
+        if let v = original?.transactionIdentifier {
+            logParams["original_id"] = AnyEncodable(v)
+        }
+
+        return logParams
+    }
+}
+
 extension SKQueueManager: SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         transactions.forEach { transaction in
 
-            var logParams = [
-                "product_id": AnyEncodable(transaction.payment.productIdentifier),
-                "state": AnyEncodable(transaction.transactionState.stringValue),
-            ]
-            if let v = transaction.transactionIdentifier {
-                logParams["transaction_id"] = AnyEncodable(v)
-            }
-            if let v = transaction.original?.transactionIdentifier {
-                logParams["original_id"] = AnyEncodable(v)
-            }
+            let logParams = transaction.logParams
 
             Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "updated_transaction", params: logParams, error: transaction.error == nil ? nil : "\(transaction.error!.localizedDescription). Detail: \(transaction.error!)"))
 
             switch transaction.transactionState {
             case .purchased:
                 receivedPurchasedTransaction(transaction)
-
             case .failed:
-
-                Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "updated_transaction", params: [
-                    "transaction_id": AnyEncodable(transaction.transactionIdentifier),
-                    "original_id": AnyEncodable(transaction.original?.transactionIdentifier),
-                    "product_id": AnyEncodable(transaction.payment.productIdentifier),
-                ], error: transaction.error == nil ? nil : "\(transaction.error!.localizedDescription). Detail: \(transaction.error!)"))
-
                 receivedFailedTransaction(transaction)
-
             case .restored:
                 if !Adapty.Configuration.observerMode {
                     SKPaymentQueue.default().finishTransaction(transaction)
+                    Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: logParams))
                     Log.verbose("SKQueueManager: finish restored transaction \(transaction)")
                 }
             case .deferred, .purchasing: break

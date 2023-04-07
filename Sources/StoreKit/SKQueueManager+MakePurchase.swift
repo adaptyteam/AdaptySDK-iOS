@@ -38,6 +38,7 @@ extension SKQueueManager {
 
             if !Adapty.Configuration.observerMode {
                 SKPaymentQueue.default().finishTransaction(transaction)
+                Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.logParams))
                 Log.verbose("SKQueueManager: finish failed transaction \(transaction)")
             }
 
@@ -53,7 +54,6 @@ extension SKQueueManager {
     }
 
     func receivedPurchasedTransaction(_ transaction: SKPaymentTransaction) {
-
         func fetchPurchaseProductInfo(manager: SKQueueManager,
                                       _ productId: String,
                                       variationId: String?,
@@ -98,6 +98,7 @@ extension SKQueueManager {
 
                         if !Adapty.Configuration.observerMode {
                             SKPaymentQueue.default().finishTransaction(transaction)
+                            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.logParams))
                             Log.info("SKQueueManager: finish purchased transaction \(transaction)")
                         }
                     }

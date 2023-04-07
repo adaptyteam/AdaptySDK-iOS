@@ -190,6 +190,27 @@ struct AdaptyAppleEventQueueHandlerParameters: AdaptySystemEventParameters {
     }
 }
 
+struct AdaptyInternalEventParameters: AdaptySystemEventParameters {
+    let eventName: String
+    let params: [String: AnyEncodable?]?
+    let error: String?
+
+    init(eventName: String, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+        self.eventName = eventName
+        self.params = params
+        self.error = error
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode("internal_\(eventName)", forKey: .name)
+        try encoder.encode(params)
+        if let error = error {
+            try container.encode(error, forKey: .error)
+        }
+    }
+}
+
 fileprivate extension Encoder {
     func encode(_ params: [String: AnyEncodable?]?) throws {
         guard let params = params else { return }
