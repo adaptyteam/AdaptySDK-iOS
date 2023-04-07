@@ -55,7 +55,12 @@ extension HTTPSession {
                                           locale: locale,
                                           profileId: profileId,
                                           responseHash: responseHash)
-        perform(request, logName: "get_paywall") { (result: FetchPaywallRequest.Result) in
+
+        perform(request, logName: "get_paywall",
+                logParams: [
+                    "paywall_id": .value(paywallId),
+                    "locale": .valueOrNil(locale),
+                ]) { (result: FetchPaywallRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

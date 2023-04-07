@@ -169,9 +169,9 @@ extension Adapty {
     public static func getPaywall(_ id: String,
                                   locale: String? = nil,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let logParams = [
-            "paywall_id": AnyEncodable(id),
-            "locale": locale == nil ? nil : AnyEncodable(locale!),
+        let logParams: [String: AnyEncodable?] = [
+            "paywall_id": .value(id),
+            "locale": .valueOrNil(locale),
         ]
         async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
             let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
