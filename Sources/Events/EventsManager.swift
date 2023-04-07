@@ -14,7 +14,7 @@ protocol EventsBackendConfigurationStorage: AnyObject {
 
 final class EventsManager {
     private enum Constants {
-        static let sendingLimitEvents = 10
+        static let sendingLimitEvents = 500
     }
 
     typealias ErrorHandler = (EventsError) -> Void
