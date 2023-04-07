@@ -44,7 +44,7 @@ extension HTTPSession {
                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
         let request = FetchProfileRequest(profileId: profileId,
                                           responseHash: responseHash)
-        perform(request, logName: "create_profile") { (result: FetchProfileRequest.Result) in
+        perform(request, logName: "get_profile") { (result: FetchProfileRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

@@ -59,7 +59,12 @@ extension HTTPSession {
                                             networkUserId: networkUserId,
                                             source: source,
                                             attribution: attribution)
-        perform(request, logName: "set_attribution") { (result: SetAttributionRequest.Result) in
+        perform(request,
+                logName: "set_attribution",
+                logParams: [
+                    "source": .value(source.description),
+                    "network_user_id": .valueOrNil(networkUserId)
+                ]) { (result: SetAttributionRequest.Result) in
             switch result {
             case let .failure(error):
                 completion?(error.asAdaptyError)
