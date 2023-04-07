@@ -169,7 +169,7 @@ extension Adapty {
     public static func getPaywall(_ id: String,
                                   locale: String? = nil,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let logParams: [String: AnyEncodable?] = [
+        let logParams: EventParameters = [
             "paywall_id": .value(id),
             "locale": .valueOrNil(locale),
         ]

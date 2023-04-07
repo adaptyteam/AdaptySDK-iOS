@@ -143,7 +143,7 @@ final class SKReceiptManager: NSObject {
         }
     }
 
-    fileprivate func completedRefresh(_ error: AdaptyError?) {
+    fileprivate func completedRefresh(_ request: SKRequest, _ error: AdaptyError? = nil) {
         queue.async { [weak self] in
 
             Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "refresh_receipt", callId: "SKR\(request.hash)", error: error?.description))
@@ -175,13 +175,13 @@ final class SKReceiptManager: NSObject {
 extension SKReceiptManager: SKRequestDelegate {
     func requestDidFinish(_ request: SKRequest) {
         guard request is SKReceiptRefreshRequest else { return }
-        completedRefresh(nil)
+        completedRefresh(request)
         request.cancel()
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
         guard request is SKReceiptRefreshRequest else { return }
-        completedRefresh(SKManagerError.refreshReceiptFailed(error).asAdaptyError)
+        completedRefresh(request, SKManagerError.refreshReceiptFailed(error).asAdaptyError)
         request.cancel()
     }
 }

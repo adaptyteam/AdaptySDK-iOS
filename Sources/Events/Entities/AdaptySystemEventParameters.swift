@@ -21,12 +21,14 @@ fileprivate enum CodingKeys: String, CodingKey {
     case error
 }
 
+typealias EventParameters = [String: AnyEncodable?]
+
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
     let methodName: String
     let callId: String
-    let params: [String: AnyEncodable?]?
+    let params: EventParameters?
 
-    init(methodName: String, callId: String, params: [String: AnyEncodable?]? = nil) {
+    init(methodName: String, callId: String, params: EventParameters? = nil) {
         self.methodName = methodName
         self.callId = callId
         self.params = params
@@ -43,10 +45,10 @@ struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
 struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
     let methodName: String
     let callId: String?
-    let params: [String: AnyEncodable?]?
+    let params: EventParameters?
     let error: String?
 
-    init(methodName: String, callId: String? = nil, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+    init(methodName: String, callId: String? = nil, params: EventParameters? = nil, error: String? = nil) {
         self.methodName = methodName
         self.callId = callId
         self.params = params
@@ -70,9 +72,9 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
 struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {
     let methodName: String
     let callId: String
-    let params: [String: AnyEncodable?]?
+    let params: EventParameters?
 
-    init(methodName: String, callId: String, params: [String: AnyEncodable?]? = nil) {
+    init(methodName: String, callId: String, params: EventParameters? = nil) {
         self.methodName = methodName
         self.callId = callId
         self.params = params
@@ -126,9 +128,9 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {
     let methodName: String
     let callId: String?
-    let params: [String: AnyEncodable?]?
+    let params: EventParameters?
 
-    init(methodName: String, callId: String? = nil, params: [String: AnyEncodable?]? = nil) {
+    init(methodName: String, callId: String? = nil, params: EventParameters? = nil) {
         self.methodName = methodName
         self.callId = callId
         self.params = params
@@ -145,10 +147,10 @@ struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {
 struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
     let methodName: String
     let callId: String?
-    let params: [String: AnyEncodable?]?
+    let params: EventParameters?
     let error: String?
 
-    init(methodName: String, callId: String? = nil, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+    init(methodName: String, callId: String? = nil, params: EventParameters? = nil, error: String? = nil) {
         self.methodName = methodName
         self.callId = callId
         self.params = params
@@ -172,10 +174,10 @@ struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
 struct AdaptyAppleEventQueueHandlerParameters: AdaptySystemEventParameters {
     let eventName: String
     let callId: String?
-    let params: [String: AnyEncodable?]?
+    let params: EventParameters?
     let error: String?
 
-    init(eventName: String, callId: String? = nil, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+    init(eventName: String, callId: String? = nil, params: EventParameters? = nil, error: String? = nil) {
         self.eventName = eventName
         self.callId = callId
         self.params = params
@@ -195,10 +197,10 @@ struct AdaptyAppleEventQueueHandlerParameters: AdaptySystemEventParameters {
 
 struct AdaptyInternalEventParameters: AdaptySystemEventParameters {
     let eventName: String
-    let params: [String: AnyEncodable?]?
+    let params: EventParameters?
     let error: String?
 
-    init(eventName: String, params: [String: AnyEncodable?]? = nil, error: String? = nil) {
+    init(eventName: String, params: EventParameters? = nil, error: String? = nil) {
         self.eventName = eventName
         self.params = params
         self.error = error
@@ -215,7 +217,7 @@ struct AdaptyInternalEventParameters: AdaptySystemEventParameters {
 }
 
 fileprivate extension Encoder {
-    func encode(_ params: [String: AnyEncodable?]?) throws {
+    func encode(_ params: EventParameters?) throws {
         guard let params = params else { return }
         var container = container(keyedBy: AnyCodingKeys.self)
         try params.forEach {

@@ -62,6 +62,8 @@ class LifecycleManager {
             NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification,
                                                    object: nil,
                                                    queue: nil) { [weak self] _ in
+
+                Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
                 Log.verbose("LifecycleManager: didBecomeActiveNotification")
 
                 self?.sendAppOpenedEvent()

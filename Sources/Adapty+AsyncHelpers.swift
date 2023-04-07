@@ -17,7 +17,7 @@ extension Adapty {
                       qos: DispatchQoS = .unspecified,
                       flags: DispatchWorkItemFlags = [],
                       logName: String? = nil,
-                      logParams: [String: AnyEncodable?]? = nil,
+                      logParams: EventParameters? = nil,
                       function: StaticString = #function,
                       execute work: @escaping (AdaptyErrorCompletion) -> Void) {
         let stamp = Log.stamp
@@ -41,7 +41,7 @@ extension Adapty {
                       qos: DispatchQoS = .unspecified,
                       flags: DispatchWorkItemFlags = [],
                       logName: String? = nil,
-                      logParams: [String: AnyEncodable?]? = nil,
+                      logParams: EventParameters? = nil,
                       function: StaticString = #function,
                       execute work: @escaping (Adapty, @escaping AdaptyErrorCompletion) -> Void) {
         let stamp = Log.stamp
@@ -71,7 +71,7 @@ extension Adapty {
                          qos: DispatchQoS = .unspecified,
                          flags: DispatchWorkItemFlags = [],
                          logName: String? = nil,
-                         logParams: [String: AnyEncodable?]? = nil,
+                         logParams: EventParameters? = nil,
                          function: StaticString = #function,
                          execute work: @escaping (Adapty, @escaping AdaptyResultCompletion<T>) -> Void) {
         let stamp = Log.stamp

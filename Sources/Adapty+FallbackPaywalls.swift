@@ -37,7 +37,7 @@ extension Adapty {
                     hasErrorVersion = false
                 }
                 if hasErrorVersion {
-                    Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fallback_wrong_version", params: [
+                    Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
                         "in_version": AnyEncodable(fallbackPaywalls.version),
                         "expected_version": AnyEncodable(currentFallbackPaywallsVersion),
                     ]))

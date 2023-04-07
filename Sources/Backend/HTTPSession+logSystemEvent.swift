@@ -14,7 +14,7 @@ extension HTTPSession {
         _ request: Request,
         logName: String,
         logStamp: String = Log.stamp,
-        logParams: [String: AnyEncodable?]? = nil,
+        logParams: EventParameters? = nil,
         _ completionHandler: @escaping (Request.Result) -> Void
     ) -> HTTPCancelable {
         Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: logName, callId: logStamp, params: logParams))
@@ -29,7 +29,7 @@ extension HTTPSession {
         _ request: Request,
         logName: String,
         logStamp: String = Log.stamp,
-        logParams: [String: AnyEncodable?]? = nil,
+        logParams: EventParameters? = nil,
         _ completionHandler: @escaping (HTTPEmptyResponse.Result) -> Void
     ) -> HTTPCancelable {
         Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: logName, callId: logStamp, params: logParams))
