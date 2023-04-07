@@ -15,7 +15,7 @@ extension UserDefaults: EventsStorage {
 
     func setEventCounter(_ value: Int) {
         Log.debug("UserDefaults: Save Event Counter = \(value) success.")
-        set(value, forKey: Constants.eventsStorageKey)
+        set(value, forKey: Constants.eventCounterKey)
     }
 
     func getEventCounter() -> Int { integer(forKey: Constants.eventCounterKey) }
