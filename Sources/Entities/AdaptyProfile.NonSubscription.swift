@@ -35,10 +35,9 @@ extension AdaptyProfile {
         /// `true` if the purchase was refunded.
         public let isRefund: Bool
 
-        /// `true` if the product should only be processed once (e.g. consumable purchase).
+        /// `true` if the product is consumable (should only be processed once).
         public let isConsumable : Bool
 
-        /// `true` if the product should only be processed once (e.g. consumable purchase).
         @available(*, deprecated, renamed: "isConsumable")
         public var isOneTime: Bool { isConsumable }
     }
