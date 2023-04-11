@@ -10,6 +10,7 @@ struct PurchaseProductInfo {
     let transactionId: String?
     let vendorProductId: String
     let productVariationId: String?
+    let persistentProductVariationId: String?
     let originalPrice: Decimal?
     let discountPrice: Decimal?
     let priceLocale: String?
@@ -47,6 +48,7 @@ extension PurchaseProductInfo: Encodable {
         case transactionId = "transaction_id"
         case vendorProductId = "vendor_product_id"
         case productVariationId = "variation_id"
+        case persistentProductVariationId = "variation_id_persistent"
         case originalPrice = "original_price"
         case discountPrice = "discount_price"
         case priceLocale = "price_locale"
@@ -60,6 +62,7 @@ extension PurchaseProductInfo: Encodable {
         try container.encodeIfPresent(transactionId, forKey: .transactionId)
         try container.encode(vendorProductId, forKey: .vendorProductId)
         try container.encodeIfPresent(productVariationId, forKey: .productVariationId)
+        try container.encodeIfPresent(persistentProductVariationId, forKey: .persistentProductVariationId)
         try container.encodeIfPresent(originalPrice, forKey: .originalPrice)
         try container.encodeIfPresent(discountPrice, forKey: .discountPrice)
         try container.encodeIfPresent(priceLocale, forKey: .priceLocale)
@@ -70,7 +73,7 @@ extension PurchaseProductInfo: Encodable {
 }
 
 extension PurchaseProductInfo {
-    init(_ product: AdaptyProduct?, _ variationId: String?, _ transaction: SKPaymentTransaction) {
+    init(_ product: AdaptyProduct?, _ variationId: String?, _ persistentVariationId: String?, _ transaction: SKPaymentTransaction) {
         var discount: AdaptyProductDiscount?
 
         if #available(iOS 12.2, OSX 10.14.4, *),
@@ -87,6 +90,7 @@ extension PurchaseProductInfo {
         self.init(transactionId: transaction.transactionIdentifier,
                   vendorProductId: transaction.payment.productIdentifier,
                   productVariationId: variationId,
+                  persistentProductVariationId: persistentVariationId,
                   originalPrice: product?.price,
                   discountPrice: discount?.price,
                   priceLocale: product?.currencyCode,
@@ -95,8 +99,8 @@ extension PurchaseProductInfo {
                   offer: PurchaseProductInfo.Offer(discount))
     }
 
-    init(_ product: SKProduct, _ variationId: String?, _ transaction: SKPaymentTransaction) {
-        self.init(AdaptyDeferredProduct(skProduct: product, payment: transaction.payment), variationId, transaction)
+    init(_ product: SKProduct, _ variationId: String?, _ persistentVariationId: String?, _ transaction: SKPaymentTransaction) {
+        self.init(AdaptyDeferredProduct(skProduct: product, payment: transaction.payment), variationId, persistentVariationId, transaction)
     }
 }
 

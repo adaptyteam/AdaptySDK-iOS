@@ -10,6 +10,8 @@ import StoreKit
 protocol VariationIdStorage {
     func getVariationsIds() -> [String: String]
     func setVariationsIds(_: [String: String])
+    func getPersistentVariationsIds() -> [String: String]
+    func setPersistentVariationsIds(_: [String: String])
 }
 
 extension Adapty {
@@ -44,19 +46,40 @@ final class SKQueueManager: NSObject {
     private var storage: VariationIdStorage
     var skProductsManager: SKProductsManager
 
-    var variationsIds: [String: String] {
-        didSet {
-            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: ["variation_by_product": .value(variationsIds)]))
-            storage.setVariationsIds(variationsIds)
-        }
-    }
+    private(set) var variationsIds: [String: String]
+    private(set) var persistentVariationsIds: [String: String]
 
     init(queue: DispatchQueue, storage: VariationIdStorage, skProductsManager: SKProductsManager) {
         self.queue = queue
         self.storage = storage
         variationsIds = storage.getVariationsIds()
+        persistentVariationsIds = storage.getPersistentVariationsIds()
         self.skProductsManager = skProductsManager
         super.init()
+    }
+
+    func setVariationId(_ variationId: String, for productId: String) {
+        if variationId != variationsIds.updateValue(variationId, forKey: productId) {
+            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
+                "variation_by_product": .value(variationsIds),
+            ]))
+            storage.setVariationsIds(variationsIds)
+        }
+
+        if variationId != persistentVariationsIds.updateValue(variationId, forKey: productId) {
+            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids_persistent", params: [
+                "variation_by_product": .value(variationsIds),
+            ]))
+            storage.setPersistentVariationsIds(variationsIds)
+        }
+    }
+
+    func removeVariationId(for productId: String) {
+        guard variationsIds.removeValue(forKey: productId) != nil else { return }
+        Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
+            "variation_by_product": .value(variationsIds),
+        ]))
+        storage.setVariationsIds(variationsIds)
     }
 
     static func canMakePayments() -> Bool {

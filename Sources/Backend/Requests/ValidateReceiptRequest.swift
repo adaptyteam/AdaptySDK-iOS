@@ -57,6 +57,7 @@ extension HTTPSession {
             "product_id": .value(purchaseProductInfo!.vendorProductId),
             "transaction_id": .valueOrNil(purchaseProductInfo!.transactionId),
             "variation_id": .valueOrNil(purchaseProductInfo!.productVariationId),
+            "variation_id_persistent": .valueOrNil(purchaseProductInfo!.persistentProductVariationId),
             "promotional_offer_id": .valueOrNil(purchaseProductInfo!.promotionalOfferId),
         ]
         perform(request, logName: "validate_receipt", logParams: logParams) { (result: ValidateReceiptRequest.Result) in

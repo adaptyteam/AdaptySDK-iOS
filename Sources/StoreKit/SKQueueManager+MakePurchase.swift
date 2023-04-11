@@ -14,7 +14,7 @@ extension SKQueueManager {
             guard let self = self else { return }
 
             if let productVariationId = (product as? AdaptyPaywallProduct)?.variationId {
-                self.variationsIds[productId] = productVariationId
+                self.setVariationId(productVariationId, for: productId)
             }
 
             self.makePurchasesProduct[productId] = product
@@ -44,7 +44,7 @@ extension SKQueueManager {
 
             let productId = transaction.payment.productIdentifier
 
-            self.variationsIds.removeValue(forKey: productId)
+            self.removeVariationId(for: productId)
             self.makePurchasesProduct.removeValue(forKey: productId)
 
             let error = SKManagerError.productPurchaseFailed(transaction.error).asAdaptyError
@@ -57,10 +57,11 @@ extension SKQueueManager {
         func fetchPurchaseProductInfo(manager: SKQueueManager,
                                       _ productId: String,
                                       variationId: String?,
+                                      persistentVariationId: String?,
                                       _ transaction: SKPaymentTransaction,
                                       _ completion: @escaping ((PurchaseProductInfo) -> Void)) {
             if let product = manager.makePurchasesProduct[productId] {
-                completion(PurchaseProductInfo(product, variationId, transaction))
+                completion(PurchaseProductInfo(product, variationId, persistentVariationId, transaction))
                 return
             }
 
@@ -68,15 +69,15 @@ extension SKQueueManager {
                 switch result {
                 case let .failure(error):
                     Log.error("SKQueueManager: fetch product \(productId) error: \(error)")
-                    completion(PurchaseProductInfo(nil, variationId, transaction))
+                    completion(PurchaseProductInfo(nil, variationId, persistentVariationId, transaction))
                     return
                 case let .success(skProduct):
                     guard let skProduct = skProduct else {
                         Log.error("SKQueueManager: unknown product \(productId)")
-                        completion(PurchaseProductInfo(nil, variationId, transaction))
+                        completion(PurchaseProductInfo(nil, variationId, persistentVariationId, transaction))
                         return
                     }
-                    completion(PurchaseProductInfo(skProduct, variationId, transaction))
+                    completion(PurchaseProductInfo(skProduct, variationId, persistentVariationId, transaction))
                     return
                 }
             }
@@ -89,11 +90,12 @@ extension SKQueueManager {
             fetchPurchaseProductInfo(manager: self,
                                      productId,
                                      variationId: self.variationsIds[productId],
+                                     persistentVariationId: self.persistentVariationsIds[productId],
                                      transaction) { [weak self] purchaseProductInfo in
                 self?.purchaseValidator.validatePurchase(info: purchaseProductInfo) { result in
                     guard let self = self else { return }
                     if result.error == nil {
-                        self.variationsIds.removeValue(forKey: productId)
+                        self.removeVariationId(for: productId)
                         self.makePurchasesProduct.removeValue(forKey: productId)
 
                         if !Adapty.Configuration.observerMode {
