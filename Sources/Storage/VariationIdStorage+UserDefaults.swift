@@ -13,8 +13,8 @@ extension UserDefaults: VariationIdStorage {
         static let persistentVariationsIds = "AdaptySDK_Variations_Ids"
     }
 
-    func getVariationsIds() -> [String: String] {
-        dictionary(forKey: Constants.variationsIds) as? [String: String] ?? [:]
+    func getVariationsIds() -> [String: String]? {
+        dictionary(forKey: Constants.variationsIds) as? [String: String]
     }
 
     func setVariationsIds(_ value: [String: String]) {
@@ -22,8 +22,8 @@ extension UserDefaults: VariationIdStorage {
         set(value, forKey: Constants.variationsIds)
     }
 
-    func getPersistentVariationsIds() -> [String: String] {
-        dictionary(forKey: Constants.persistentVariationsIds) as? [String: String] ?? [:]
+    func getPersistentVariationsIds() -> [String: String]? {
+        dictionary(forKey: Constants.persistentVariationsIds) as? [String: String]
     }
 
     func setPersistentVariationsIds(_ value: [String: String]) {

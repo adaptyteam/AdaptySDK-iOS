@@ -8,9 +8,9 @@
 import StoreKit
 
 protocol VariationIdStorage {
-    func getVariationsIds() -> [String: String]
+    func getVariationsIds() -> [String: String]?
     func setVariationsIds(_: [String: String])
-    func getPersistentVariationsIds() -> [String: String]
+    func getPersistentVariationsIds() -> [String: String]?
     func setPersistentVariationsIds(_: [String: String])
 }
 
@@ -52,8 +52,13 @@ final class SKQueueManager: NSObject {
     init(queue: DispatchQueue, storage: VariationIdStorage, skProductsManager: SKProductsManager) {
         self.queue = queue
         self.storage = storage
-        variationsIds = storage.getVariationsIds()
-        persistentVariationsIds = storage.getPersistentVariationsIds()
+        variationsIds = storage.getVariationsIds() ?? [:]
+        if let persistent = storage.getPersistentVariationsIds() {
+            persistentVariationsIds = persistent
+        } else {
+            persistentVariationsIds = variationsIds
+            storage.setPersistentVariationsIds(variationsIds)
+        }
         self.skProductsManager = skProductsManager
         super.init()
     }
