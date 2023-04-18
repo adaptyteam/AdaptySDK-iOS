@@ -14,30 +14,6 @@ extension AdaptyError {
     public static let EventsErrorDomain = "AdaptyEventsErrorDomain"
     public static let SKManagerErrorDomain = "AdaptySKManagerErrorDomain"
 
-    public enum HTTPErrorCode {
-        public static let cancelled = ErrorCode.operationInterrupted.rawValue
-        public static let perform = ErrorCode.encodingFailed.rawValue
-        public static let network = ErrorCode.networkFailed.rawValue
-        public static let decoding = ErrorCode.decodingFailed.rawValue
-        public static let backend = ErrorCode.serverError.rawValue
-    }
-
-    public enum EventsErrorCode {
-        public static let interrupted = ErrorCode.operationInterrupted.rawValue
-        public static let sending = ErrorCode.networkFailed.rawValue
-        public static let decoding = ErrorCode.decodingFailed.rawValue
-        public static let encoding = ErrorCode.encodingFailed.rawValue
-    }
-
-    public enum SKManagerErrorCode {
-        public static let interrupted = ErrorCode.operationInterrupted.rawValue
-        public static let noProductIDsFound = ErrorCode.noProductIDsFound.rawValue
-        public static let receiptIsEmpty = ErrorCode.cantReadReceipt.rawValue
-        public static let productPurchaseFailed = ErrorCode.productPurchaseFailed.rawValue
-        public static let refreshReceiptFailed = ErrorCode.refreshReceiptFailed.rawValue
-        public static let requestSKProductsFailed = ErrorCode.productRequestFailed.rawValue
-    }
-
     public enum UserInfoKey {
         public static let description = NSDebugDescriptionErrorKey
         public static let source = "AdaptySourceErrorKey"

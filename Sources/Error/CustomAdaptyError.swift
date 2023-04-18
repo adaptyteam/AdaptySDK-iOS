@@ -24,15 +24,7 @@ extension InternalAdaptyError: CustomAdaptyError { }
 extension HTTPError: CustomAdaptyError {
     static let errorDomain = AdaptyError.HTTPErrorDomain
 
-    var errorCode: Int {
-        if isCancelled { return AdaptyError.HTTPErrorCode.cancelled }
-        switch self {
-        case .perform: return AdaptyError.HTTPErrorCode.perform
-        case .network: return AdaptyError.HTTPErrorCode.network
-        case .decoding: return AdaptyError.HTTPErrorCode.decoding
-        case .backend: return AdaptyError.HTTPErrorCode.backend
-        }
-    }
+    var errorCode: Int { adaptyErrorCode.rawValue }
 
     var errorUserInfo: [String: Any] {
         var data: [String: Any] = [
@@ -64,14 +56,7 @@ extension HTTPError: CustomAdaptyError {
 extension EventsError: CustomAdaptyError {
     static let errorDomain = AdaptyError.EventsErrorDomain
 
-    var errorCode: Int {
-        switch self {
-        case .interrupted: return AdaptyError.EventsErrorCode.interrupted
-        case .sending: return AdaptyError.EventsErrorCode.sending
-        case .encoding: return AdaptyError.EventsErrorCode.encoding
-        case .decoding: return AdaptyError.EventsErrorCode.decoding
-        }
-    }
+    var errorCode: Int  { adaptyErrorCode.rawValue }
 
     var errorUserInfo: [String: Any] {
         var data: [String: Any] = [
@@ -97,16 +82,7 @@ extension EventsError: CustomAdaptyError {
 extension SKManagerError: CustomAdaptyError {
     static let errorDomain = AdaptyError.SKManagerErrorDomain
 
-    var errorCode: Int {
-        switch self {
-        case .interrupted: return AdaptyError.SKManagerErrorCode.interrupted
-        case .noProductIDsFound: return AdaptyError.SKManagerErrorCode.noProductIDsFound
-        case .receiptIsEmpty: return AdaptyError.SKManagerErrorCode.receiptIsEmpty
-        case .productPurchaseFailed: return AdaptyError.SKManagerErrorCode.productPurchaseFailed
-        case .refreshReceiptFailed: return AdaptyError.SKManagerErrorCode.refreshReceiptFailed
-        case .requestSKProductsFailed: return AdaptyError.SKManagerErrorCode.requestSKProductsFailed
-        }
-    }
+    var errorCode: Int  { adaptyErrorCode.rawValue }
 
     var errorUserInfo: [String: Any] {
         var data: [String: Any] = [
