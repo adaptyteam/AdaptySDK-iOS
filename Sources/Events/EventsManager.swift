@@ -24,7 +24,7 @@ final class EventsManager {
     private let storage: EventCollectionStorage
     private let configurationStorage: EventsBackendConfigurationStorage
     private var configuration: EventsBackendConfiguration
-    private var backendSession: HTTPSession?
+    private let backendSession: HTTPSession?
     private var sending: Bool = false
 
     convenience init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
@@ -49,17 +49,11 @@ final class EventsManager {
             configuration.blacklist.formUnion(EventType.systemEvents)
         }
         self.configuration = configuration
-        _setBackend(backend)
-    }
 
-    func setBackend(_ backend: Backend) {
-        dispatchQueue.async { [weak self] in
-            self?._setBackend(backend)
+        guard let backend = backend else {
+            backendSession = nil
+            return
         }
-    }
-
-    private func _setBackend(_ backend: Backend?) {
-        guard let backend = backend, backendSession == nil else { return }
         backendSession = backend.createHTTPSession(responseQueue: dispatchQueue)
         if !storage.isEmpty || configuration.isExpired { needSendEvents() }
     }

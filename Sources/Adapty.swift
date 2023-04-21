@@ -49,9 +49,7 @@ extension Adapty {
                 return
             }
 
-            if UserDefaults.standard.clearAllDataIfDifferent(apiKey: apiKey) {
-                Adapty.eventsManager = Adapty.createEventsManager()
-            }
+            UserDefaults.standard.clearAllDataIfDifferent(apiKey: apiKey)
 
             Adapty.dispatchQueue = dispatchQueue
 
@@ -60,7 +58,7 @@ extension Adapty {
 
             let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
 
-            Adapty.eventsManager.setBackend(backend)
+            Adapty.eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
 
             shared = Adapty(profileStorage: UserDefaults.standard,
                             vendorIdsStorage: UserDefaults.standard,

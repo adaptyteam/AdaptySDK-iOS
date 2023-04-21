@@ -8,11 +8,7 @@
 import Foundation
 
 extension Adapty {
-    static var eventsManager = createEventsManager()
-
-    static func createEventsManager() -> EventsManager {
-        EventsManager(storage: UserDefaults.standard, backend: nil)
-    }
+    static var eventsManager = EventsManager(storage: UserDefaults.standard, backend: nil)
 
     fileprivate static func trackEvent(_ eventType: EventType, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
