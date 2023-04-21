@@ -35,17 +35,15 @@ extension Adapty {
                                 _ completion: AdaptyErrorCompletion? = nil) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
-        async(completion) { completion in
+        let logName = "activate"
+        let logParams: EventParameters = [
+            "observer_mode": .value(observerMode),
+            "has_customer_user_id": .value(customerUserId != nil),
+        ]
 
-            let logName = "activate"
-            let logParams: EventParameters = [
-                "observer_mode": .value(observerMode),
-                "has_customer_user_id": .value(customerUserId != nil),
-            ]
-
+        async(completion, logName: logName, logParams: logParams) { completion in
             if isActivated {
                 let err = AdaptyError.activateOnceError()
-                Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, params: logParams, error: err.description))
                 Log.warn("Adapty activate error \(err)")
                 completion(err)
                 return
@@ -69,8 +67,6 @@ extension Adapty {
                             backend: backend,
                             customerUserId: customerUserId)
             LifecycleManager.shared.initialize()
-
-            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, params: logParams))
             Log.info("Adapty activated withObserverMode:\(observerMode), withCustomerUserId: \(customerUserId != nil)")
             completion(nil)
         }

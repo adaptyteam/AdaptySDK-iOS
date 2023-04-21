@@ -29,6 +29,7 @@ extension Adapty {
             Configuration.idfaCollectionDisabled
         }
         set {
+            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: "idfa_collection_disabled", callId: Log.stamp, params: ["value": .value(newValue)]))
             Configuration.idfaCollectionDisabled = newValue
         }
     }
