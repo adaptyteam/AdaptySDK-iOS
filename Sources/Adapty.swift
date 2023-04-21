@@ -51,7 +51,9 @@ extension Adapty {
                 return
             }
 
-            UserDefaults.standard.clearAllDataIfDifferent(apiKey: apiKey)
+            if UserDefaults.standard.clearAllDataIfDifferent(apiKey: apiKey) {
+                Adapty.eventsManager = Adapty.createEventsManager()
+            }
 
             Adapty.dispatchQueue = dispatchQueue
 
