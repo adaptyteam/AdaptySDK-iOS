@@ -19,7 +19,7 @@ extension Adapty {
                       logName: String? = nil,
                       logParams: EventParameters? = nil,
                       function: StaticString = #function,
-                      execute work: @escaping (AdaptyErrorCompletion) -> Void) {
+                      execute work: @escaping (@escaping AdaptyErrorCompletion) -> Void) {
         let stamp = Log.stamp
         if let logName = logName {
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))

@@ -24,12 +24,12 @@ final class EventsManager {
     private let storage: EventCollectionStorage
     private let configurationStorage: EventsBackendConfigurationStorage
     private var configuration: EventsBackendConfiguration
-    private let backendSession: HTTPSession
+    private var backendSession: HTTPSession?
     private var sending: Bool = false
 
     convenience init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
                      storage: EventsStorage & EventsBackendConfigurationStorage,
-                     backend: Backend) {
+                     backend: Backend?) {
         self.init(dispatchQueue: dispatchQueue,
                   storage: EventCollectionStorage(with: storage),
                   configurationStorage: storage,
@@ -39,17 +39,28 @@ final class EventsManager {
     init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
          storage: EventCollectionStorage,
          configurationStorage: EventsBackendConfigurationStorage,
-         backend: Backend) {
+         backend: Backend?) {
         self.storage = storage
         self.dispatchQueue = dispatchQueue
         self.configurationStorage = configurationStorage
 
-        backendSession = backend.createHTTPSession(responseQueue: dispatchQueue)
         var configuration = configurationStorage.getEventsConfiguration() ?? EventsBackendConfiguration()
         if !Adapty.Configuration.sendSystemEventsEnabled {
             configuration.blacklist.formUnion(EventType.systemEvents)
         }
         self.configuration = configuration
+        _setBackend(backend)
+    }
+
+    func setBackend(_ backend: Backend) {
+        dispatchQueue.async { [weak self] in
+            self?._setBackend(backend)
+        }
+    }
+
+    private func _setBackend(_ backend: Backend?) {
+        guard let backend = backend, backendSession == nil else { return }
+        backendSession = backend.createHTTPSession(responseQueue: dispatchQueue)
         if !storage.isEmpty || configuration.isExpired { needSendEvents() }
     }
 
@@ -81,10 +92,10 @@ final class EventsManager {
 
     private func needSendEvents() {
         dispatchQueue.async { [weak self] in
-            guard let self = self, !self.sending else { return }
+            guard let self = self, let session = self.backendSession, !self.sending else { return }
 
             self.sending = true
-            self._sendEvents { [weak self] error in
+            self._sendEvents(session) { [weak self] error in
                 defer { self?.sending = false }
                 guard let self = self else { return }
 
@@ -100,8 +111,8 @@ final class EventsManager {
         }
     }
 
-    func _sendEvents(completion: @escaping (EventsError?) -> Void) {
-        _updateBackendConfigurationIfNeed { [weak self] error in
+    func _sendEvents(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
+        _updateBackendConfigurationIfNeed(session) { [weak self] error in
 
             if let error = error {
                 completion(error)
@@ -126,7 +137,7 @@ final class EventsManager {
 
             let request = SendEventsRequest(profileId: self.storage.profileId, events: events.elements)
 
-            self.backendSession.perform(request) {
+            session.perform(request) {
                 (result: SendEventsRequest.Result) in
                 switch result {
                 case let .failure(error):
@@ -139,13 +150,13 @@ final class EventsManager {
         }
     }
 
-    func _updateBackendConfigurationIfNeed(completion: @escaping (EventsError?) -> Void) {
+    func _updateBackendConfigurationIfNeed(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
         guard configuration.isExpired else {
             completion(nil)
             return
         }
 
-        backendSession.perform(FetchEventsConfigRequest(profileId: storage.profileId), logName: "get_events_blacklist") { [weak self] (result: FetchEventsConfigRequest.Result) in
+        session.perform(FetchEventsConfigRequest(profileId: storage.profileId), logName: "get_events_blacklist") { [weak self] (result: FetchEventsConfigRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.sending(error))

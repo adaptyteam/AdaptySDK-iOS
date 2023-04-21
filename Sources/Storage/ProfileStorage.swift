@@ -7,8 +7,11 @@
 
 import Foundation
 
-protocol ProfileStorage {
+protocol ProfileIdentifierStorage {
     var profileId: String { get }
+}
+
+protocol ProfileStorage: ProfileIdentifierStorage {
     func getProfile() -> VH<AdaptyProfile>?
     func setProfile(_: VH<AdaptyProfile>)
 

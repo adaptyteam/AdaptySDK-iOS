@@ -8,9 +8,11 @@
 import Foundation
 
 extension Adapty {
+    static var eventsManager = EventsManager(storage: UserDefaults.standard, backend: nil)
+
     fileprivate static func trackEvent(_ eventType: EventType, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
-            manager.eventsManager.trackEvent(Event(type: eventType, profileId: manager.profileStorage.profileId)) { error in
+            Adapty.eventsManager.trackEvent(Event(type: eventType, profileId: manager.profileStorage.profileId)) { error in
                 completion(error?.asAdaptyError)
             }
         }
@@ -21,7 +23,12 @@ extension Adapty {
     }
 
     static func logSystemEvent(_ params: AdaptySystemEventParameters, completion: AdaptyErrorCompletion? = nil) {
-        trackEvent(.system(params), completion)
+        async(completion) { completion in
+
+            Adapty.eventsManager.trackEvent(Event(type: .system(params), profileId: profileIdentifierStorage.profileId)) { error in
+                completion(error?.asAdaptyError)
+            }
+        }
     }
 
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.

@@ -15,6 +15,8 @@ import StoreKit
 extension Adapty {
     static var isActivated: Bool { shared != nil }
 
+    static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
+
     /// Use this method to initialize the Adapty SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
@@ -56,9 +58,13 @@ extension Adapty {
             Configuration.observerMode = observerMode
             Configuration.sendSystemEventsEnabled = enableUsageLogs
 
+            let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
+
+            Adapty.eventsManager.setBackend(backend)
+
             shared = Adapty(profileStorage: UserDefaults.standard,
                             vendorIdsStorage: UserDefaults.standard,
-                            backend: Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy),
+                            backend: backend,
                             customerUserId: customerUserId)
             LifecycleManager.shared.initialize()
 

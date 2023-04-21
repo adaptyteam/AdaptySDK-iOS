@@ -12,7 +12,6 @@ public final class Adapty {
     let profileStorage: ProfileStorage
     let backend: Backend
     let httpSession: HTTPSession
-    let eventsManager: EventsManager
     let skProductsManager: SKProductsManager
     let skReceiptManager: SKReceiptManager
     let skQueueManager: SKQueueManager
@@ -32,7 +31,8 @@ public final class Adapty {
         skProductsManager = SKProductsManager(storage: UserDefaults.standard, backend: backend)
         skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
-        eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
+
+
         state = .initializingTo(customerUserId: customerUserId)
 
         skReceiptManager.refreshReceiptIfEmpty()
