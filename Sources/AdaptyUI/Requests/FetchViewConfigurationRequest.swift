@@ -1,5 +1,5 @@
 //
-//  FetchUIViewConfigurationRequest.swift
+//  FetchViewConfigurationRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct FetchUIViewConfigurationRequest: HTTPRequestWithDecodableResponse {
+struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyUI.ViewConfiguration?>
 
     let endpoint: HTTPEndpoint
@@ -40,17 +40,17 @@ struct FetchUIViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPSession {
-    func performFetchUIViewConfigurationRequest(paywallId: String,
-                                                paywallVariationId: String,
-                                                responseHash: String?,
-                                                _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
-        let request = FetchUIViewConfigurationRequest(paywallVariationId: paywallVariationId,
-                                                      responseHash: responseHash)
+    func performFetchViewConfigurationRequest(paywallId: String,
+                                              paywallVariationId: String,
+                                              responseHash: String?,
+                                              _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
+        let request = FetchViewConfigurationRequest(paywallVariationId: paywallVariationId,
+                                                    responseHash: responseHash)
         perform(request,
                 logName: "get_paywall_builder",
                 logParams: [
-                    "variation_id": .value(paywallVariationId)
-                ]) { (result: FetchUIViewConfigurationRequest.Result) in
+                    "variation_id": .value(paywallVariationId),
+                ]) { (result: FetchViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))
