@@ -43,8 +43,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        configureThirdPartyAnalytics(launchOptions)
-
         return true
     }
 }
