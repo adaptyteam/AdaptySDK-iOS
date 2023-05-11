@@ -24,7 +24,7 @@ extension Adapty {
         if let logName = logName {
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
         }
-        Log.verbose("Calling now: \(function) [\(Log.stamp)].")
+        Log.verbose("Calling now: \(function) [\(stamp)].")
         let eventId = "\(function) [\(stamp)]"
         let event = Log.Profiling.start(method: "Public call", "%@", eventId)
         underlayQueue.async(group: group, qos: qos, flags: flags) {
@@ -78,7 +78,7 @@ extension Adapty {
         if let logName = logName {
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
         }
-        let eventId = "\(function) [\(Log.stamp)]"
+        let eventId = "\(function) [\(stamp)]"
         Log.verbose("Calling now: \(function) [\(stamp)].")
         let event = Log.Profiling.start(method: "Public call", "%@", eventId)
         underlayQueue.async(group: group, qos: qos, flags: flags) {
