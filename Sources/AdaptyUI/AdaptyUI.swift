@@ -6,6 +6,8 @@
 //  Copyright © 2023 Adapty. All rights reserved.
 //
 
+import Foundation
+
 /// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
 /// To make full use of this functionality, you need to install an [additional library](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git), as well as make additional setups in the Adapty Dashboard.
 /// You can find more information in the corresponding section of [our documentation](https://docs.adapty.io/docs/paywall-builder-getting-started).
@@ -23,35 +25,35 @@ public enum AdaptyUI {
                     completion(.failure(profileManager.error!))
                     return
                 }
-                profileManager.getUIViewConfiguration(forPaywall: paywall, completion)
+                profileManager.getViewConfiguration(forPaywall: paywall, completion)
             }
         }
     }
 }
 
 extension AdaptyProfileManager {
-    fileprivate func getUIViewConfiguration(forPaywall paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
-        manager.httpSession.performFetchUIViewConfigurationRequest(paywallId: paywall.id,
-                                                                   paywallVariationId: paywall.variationId,
-                                                                   responseHash: nil) {
+    fileprivate func getViewConfiguration(forPaywall paywall: AdaptyPaywall,
+                                          _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+        manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywall.id,
+                                                                 paywallVariationId: paywall.variationId,
+                                                                 responseHash: nil) {
             [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
             switch result {
             case let .failure(error):
                 completion(.failure(error))
-            case let .success(paywall):
-
+            case let .success(viewConfiguration):
                 guard let self = self, self.isActive else {
                     completion(.failure(.profileWasChanged()))
                     return
                 }
 
-                if let value = paywall.value {
+                if let value = viewConfiguration.value {
                     completion(.success(value))
                     return
                 }
 
-                completion(.failure(.cacheHasNotPaywall()))
+                completion(.failure(.cacheHasNoViewConfiguration()))
             }
         }
     }

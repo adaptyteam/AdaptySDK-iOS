@@ -156,7 +156,7 @@ extension AdaptyProfileManager {
                     return
                 }
 
-                completion(.failure(.cacheHasNotPaywall()))
+                completion(.failure(.cacheHasNoPaywall()))
             }
         }
     }

@@ -161,8 +161,13 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
 
-    static func cacheHasNotPaywall(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func cacheHasNoPaywall(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Don't found paywall in cache").asAdaptyError
+        InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Didn't found paywall in cache").asAdaptyError
+    }
+    
+    static func cacheHasNoViewConfiguration(file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Didn't found view configuration in cache").asAdaptyError
     }
 }
