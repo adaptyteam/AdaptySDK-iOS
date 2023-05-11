@@ -18,7 +18,7 @@
 		8A1F744B2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744A2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift */; };
 		8A1F744D2979CE18002B7FBC /* AdaptyUILocalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */; };
 		8A1F744F2979D1B2002B7FBC /* ViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F744E2979D1B2002B7FBC /* ViewConfiguration.swift */; };
-		8A1F74522979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74512979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift */; };
+		8A1F74522979D5AD002B7FBC /* FetchViewConfigurationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74512979D5AD002B7FBC /* FetchViewConfigurationRequest.swift */; };
 		8A1F7454297AC0B2002B7FBC /* ViewStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7453297AC0B2002B7FBC /* ViewStyle.swift */; };
 		8A1F745C297ADBBC002B7FBC /* ViewItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F745B297ADBBC002B7FBC /* ViewItems.swift */; };
 		8A1F745E297B098B002B7FBC /* LocalizedViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F745D297B098B002B7FBC /* LocalizedViewConfiguration.swift */; };
@@ -213,7 +213,7 @@
 		8A1F744A2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUI.Localization.json.swift; sourceTree = "<group>"; };
 		8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUILocalizationTests.swift; sourceTree = "<group>"; };
 		8A1F744E2979D1B2002B7FBC /* ViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewConfiguration.swift; sourceTree = "<group>"; };
-		8A1F74512979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchUIPaywallConfigurationRequest.swift; sourceTree = "<group>"; };
+		8A1F74512979D5AD002B7FBC /* FetchViewConfigurationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchViewConfigurationRequest.swift; sourceTree = "<group>"; };
 		8A1F7453297AC0B2002B7FBC /* ViewStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewStyle.swift; sourceTree = "<group>"; };
 		8A1F745B297ADBBC002B7FBC /* ViewItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewItems.swift; sourceTree = "<group>"; };
 		8A1F745D297B098B002B7FBC /* LocalizedViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedViewConfiguration.swift; sourceTree = "<group>"; };
@@ -440,7 +440,7 @@
 		8A1F74502979D473002B7FBC /* Requests */ = {
 			isa = PBXGroup;
 			children = (
-				8A1F74512979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift */,
+				8A1F74512979D5AD002B7FBC /* FetchViewConfigurationRequest.swift */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -1096,7 +1096,7 @@
 				8A1F7454297AC0B2002B7FBC /* ViewStyle.swift in Sources */,
 				8AB0032F2926FCEA008476A3 /* SKQueueManager.swift in Sources */,
 				8AB003582926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift in Sources */,
-				8A1F74522979D5AD002B7FBC /* FetchUIPaywallConfigurationRequest.swift in Sources */,
+				8A1F74522979D5AD002B7FBC /* FetchViewConfigurationRequest.swift in Sources */,
 				8AB0037B2926FCEA008476A3 /* SendEventsRequest.swift in Sources */,
 				8AB003612926FCEA008476A3 /* Adapty+AsyncHelpers.swift in Sources */,
 				8AB003372926FCEA008476A3 /* Adapty.swift in Sources */,
