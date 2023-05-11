@@ -39,7 +39,7 @@ extension HTTPSession {
 }
 
 extension JSONDecoder {
-    func decode<T>(_ type: T.Type, _ data: Data?) -> Result<T, Error> where T: Decodable {
+    func decode<T: Decodable>(_ type: T.Type, _ data: Data?) -> Result<T, Error> {
         guard let data = data, !data.isEmpty else {
             return .failure(DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The given data is nil or empty.")))
         }
@@ -53,7 +53,7 @@ extension JSONDecoder {
         return .success(result)
     }
 
-    func decode<T>(_ type: T.Type, _ response: HTTPDataResponse) -> HTTPResponse<T>.Result where T: Decodable {
+    func decode<T: Decodable>(_ type: T.Type, _ response: HTTPDataResponse) -> HTTPResponse<T>.Result {
         decode(type, response.body)
             .map { response.replaceBody($0) }
             .mapError { .decoding(response, error: $0) }

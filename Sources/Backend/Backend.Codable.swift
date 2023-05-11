@@ -17,7 +17,7 @@ extension Backend {
 }
 
 extension Encoder {
-    func backendContainer<Key>(type: String, keyedBy: Key.Type) throws -> KeyedEncodingContainer<Key> where Key: CodingKey {
+    func backendContainer<Key: CodingKey>(type: String, keyedBy: Key.Type) throws -> KeyedEncodingContainer<Key> {
         var container = container(keyedBy: Backend.CodingKeys.self)
         var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
         try dataObject.encode(type, forKey: .type)

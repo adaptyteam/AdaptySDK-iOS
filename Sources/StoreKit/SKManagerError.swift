@@ -32,7 +32,7 @@ extension SKManagerError: CustomStringConvertible {
         case let .refreshReceiptFailed(source, error):
             return "StoreKitManagerError.refreshReceiptFailed(\(source), \(error)"
         case let .requestSKProductsFailed(source, error):
-            return "StoreKitManagerError.requestSKProductsFailed(\(source), \(error)"
+            return "StoreKitManagerError.requestSK1ProductsFailed(\(source), \(error)"
         case let .productPurchaseFailed(source, error):
             if let error = error {
                 return "StoreKitManagerError.productPurchaseFailed(\(source), \(error))"
@@ -80,6 +80,7 @@ extension SKManagerError {
     ) -> Self {
         .noProductIDsFound(AdaptyError.Source(file: file, function: function, line: line))
     }
+
     static func productPurchaseFailed(_ error: Error?, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         .productPurchaseFailed(AdaptyError.Source(file: file, function: function, line: line), transactionError: error)
     }
@@ -92,12 +93,19 @@ extension SKManagerError {
         .refreshReceiptFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
-    static func requestSKProductsFailed(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+    static func requestSK1ProductsFailed(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        .requestSKProductsFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
+    }
+
+    static func requestSK2ProductsFailed(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        .requestSKProductsFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
+    }
+
+    static func requestSK2IsEligibleForIntroOfferFailed(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         .requestSKProductsFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
     static func interrupted(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         .interrupted(AdaptyError.Source(file: file, function: function, line: line))
     }
-
 }

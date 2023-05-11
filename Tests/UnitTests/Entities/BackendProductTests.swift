@@ -16,7 +16,11 @@ func XCTAssertEqual(_ expression: BackendProduct?, withJSONValue jsonValue: JSON
     XCTAssertEqual(value.promotionalOfferId, withJSONValue: object["promotional_offer_id"])
     XCTAssertEqual(value.promotionalOfferEligibility, withJSONValue: object["promotional_offer_eligibility"])
     if let boolValue = object["introductory_offer_eligibility"]?.asBoolOrNil {
-        XCTAssertEqual(value.introductoryOfferEligibility, AdaptyEligibility(booleanLiteral: boolValue))
+        if boolValue {
+            XCTAssertEqual(value.introductoryOfferEligibility, .eligible)
+        } else {
+            XCTAssertEqual(value.introductoryOfferEligibility, .ineligible)
+        }
     } else {
         XCTAssertEqual(value.introductoryOfferEligibility, withJSONValue: object["introductory_offer_eligibility"])
     }

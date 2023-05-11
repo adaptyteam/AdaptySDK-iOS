@@ -31,6 +31,7 @@ extension Adapty {
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
                                 enableUsageLogs: Bool = false,
+                                usingStoreKit2: StoreKit2Configuration = .default,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
@@ -53,6 +54,7 @@ extension Adapty {
 
             Adapty.dispatchQueue = dispatchQueue
 
+            Configuration.setUsingStoreKit2(usingStoreKit2)
             Configuration.observerMode = observerMode
             Configuration.sendSystemEventsEnabled = enableUsageLogs
 
@@ -241,7 +243,7 @@ extension Adapty {
                 return
             }
 
-            manager.skProductsManager.fetchProducts(productIdentifiers: Set([object.vendorProductId]), fetchPolicy: .returnCacheDataElseLoad) { result in
+            manager.skProductsManager.fetchSK1Products(productIdentifiers: Set([object.vendorProductId]), fetchPolicy: .returnCacheDataElseLoad) { result in
                 completion(result.flatMap { (skProducts: [SKProduct]) -> AdaptyResult<AdaptyPaywallProduct> in
                     guard let sk = skProducts.first(where: { $0.productIdentifier == object.vendorProductId }) else {
                         return .failure(SKManagerError.noProductIDsFound().asAdaptyError)

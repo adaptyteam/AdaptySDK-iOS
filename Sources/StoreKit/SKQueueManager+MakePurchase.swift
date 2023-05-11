@@ -65,7 +65,7 @@ extension SKQueueManager {
                 return
             }
 
-            manager.skProductsManager.fetchProduct(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
+            manager.skProductsManager.fetchSK1Product(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
                 switch result {
                 case let .failure(error):
                     Log.error("SKQueueManager: fetch product \(productId) error: \(error)")
