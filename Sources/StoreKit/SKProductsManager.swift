@@ -103,6 +103,70 @@ final class SKProductsManager {
 }
 
 extension SKProductsManager {
-    func getSKProductsWithIntroductoryOfferEligibility(vendorProductIds: [String], fetchSK2Products: ProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[(SKProduct, AdaptyEligibility)]>) {
+    func getSKProductsWithIntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[(SKProduct, AdaptyEligibility)]>) {
+        getSK1ProductsWithIntroductoryOfferEligibility(vendorProductIds: vendorProductIds) { [weak self] result in
+
+            let skProducts: [(SKProduct, AdaptyEligibility)]
+            switch result {
+            case let .failure(error):
+                completion(.failure(error))
+                return
+            case let .success(value):
+                skProducts = value
+            }
+
+            let unknownProductIds = skProducts.compactMap {
+                $0.1 == .unknown ? $0.0.productIdentifier : nil
+            }
+
+            guard !unknownProductIds.isEmpty,
+                  Adapty.Configuration.enabledStoreKit2ProductsFetcher,
+                  let self = self,
+                  #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+            else {
+                completion(.success(skProducts))
+                return
+            }
+
+            self.getSK2ProductsWithIntroductoryOfferEligibility(vendorProductIds: unknownProductIds) { result in
+
+                switch result {
+                case let .failure(error):
+                    completion(.failure(error))
+                    return
+                case let .success(value):
+                    completion(.success(skProducts.apply(Dictionary(uniqueKeysWithValues: value.map { ($0.id, $1) }))))
+                }
+            }
+        }
+    }
+
+    func getSK1ProductsWithIntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[(SKProduct, AdaptyEligibility)]>) {
+        fetchSK1Products(productIdentifiers: Set(vendorProductIds), fetchPolicy: .returnCacheDataElseLoad) { result in
+            completion(result.map { value in
+                value.map { ($0, $0.introductoryOfferEligibility) }
+            })
+        }
+    }
+
+    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    func getSK2ProductsWithIntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[(Product, AdaptyEligibility)]>) {
+        guard let storeKit2Fetcher = storeKit2Fetcher else {
+            completion(.success([]))
+            return
+        }
+        Task {
+            do {
+                var result = [(Product, AdaptyEligibility)]()
+                for product in try await storeKit2Fetcher.fetchProducts(productIdentifiers: Set(vendorProductIds), fetchPolicy: .returnCacheDataElseLoad) {
+                    result.append((product, await product.introductoryOfferEligibility))
+                }
+                completion(.success(result))
+            } catch {
+                completion(.failure(
+                    (error as? AdaptyError) ?? (error as? CustomAdaptyError)?.asAdaptyError ?? SKManagerError.requestSK2ProductsFailed(error).asAdaptyError
+                ))
+            }
+        }
     }
 }

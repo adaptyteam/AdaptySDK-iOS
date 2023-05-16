@@ -212,7 +212,7 @@ extension Adapty {
         ]
         async(completion, logName: "get_paywall_products", logParams: logParams) { manager, completion in
 
-            manager.skProductsManager.getSKProductsWithIntroductoryOfferEligibility(vendorProductIds: paywall.vendorProductIds, fetchSK2Products: .returnCacheDataElseLoad) { (result: AdaptyResult<[(SKProduct, AdaptyEligibility)]>) in
+            manager.skProductsManager.getSKProductsWithIntroductoryOfferEligibility(vendorProductIds: paywall.vendorProductIds) { (result: AdaptyResult<[(SKProduct, AdaptyEligibility)]>) in
 
                 let skProducts: [(SKProduct, AdaptyEligibility)]
                 switch result {

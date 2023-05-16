@@ -135,10 +135,13 @@ extension Sequence where Element == (SKProduct, AdaptyEligibility) {
     }
 
     func apply<T: Sequence>(_ states: T) -> [(SKProduct, AdaptyEligibility)] where T.Element == BackendProductState {
-        let states = states.asDictionary
-        return map { element in
+        apply(Dictionary(uniqueKeysWithValues: states.map { ($0.vendorId, $0.introductoryOfferEligibility) }))
+    }
+
+    func apply(_ states: [String: AdaptyEligibility]) -> [(SKProduct, AdaptyEligibility)] {
+        map { element in
             let id = element.0.productIdentifier
-            return (element.0, states[id]?.introductoryOfferEligibility ?? element.1)
+            return (element.0, states[id] ?? element.1)
         }
     }
 }
