@@ -9,7 +9,6 @@ import Foundation
 
 struct FallbackPaywalls {
     let paywalls: [String: AdaptyPaywall]
-    let products: [String: BackendProduct]
     let allProductVendorIds: [String]
     let version: Int
 }
@@ -30,6 +29,13 @@ extension FallbackPaywalls: Decodable {
         }
     }
 
+    private struct ProductContainer: Decodable {
+        let vendorId: String
+        enum CodingKeys: String, CodingKey {
+            case vendorId = "vendor_product_id"
+        }
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let subcontainer = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
@@ -41,20 +47,23 @@ extension FallbackPaywalls: Decodable {
             version = 0
         }
 
+        var productVendorIds = Set<String>()
+
         if let containers = try container.decodeIfPresent([PaywallContainer].self, forKey: .data) {
-            paywalls = containers.map { $0.paywall }.map(syncedBundleReceipt: false).asDictionary
+            let paywallsArray = containers.map { $0.paywall }
+            paywalls = paywallsArray.asDictionary
+            productVendorIds = Set(paywallsArray.flatMap { $0.products.map { $0.vendorId } })
         } else {
             paywalls = [:]
         }
 
         if let subcontainer = subcontainer,
-           let productsArray = try subcontainer.decodeIfPresent([BackendProduct].self, forKey: .products)?.map(syncedBundleReceipt: false) {
-            products = productsArray.asDictionary
-            allProductVendorIds = productsArray.map { $0.vendorId }
-        } else {
-            products = [:]
-            allProductVendorIds = []
+           let productsArray = try subcontainer.decodeIfPresent([ProductContainer].self, forKey: .products),
+           !productsArray.isEmpty {
+            productVendorIds = productVendorIds.union(productsArray.map { $0.vendorId })
         }
+
+        allProductVendorIds = Array(productVendorIds)
     }
 
     init(from data: Data) throws {

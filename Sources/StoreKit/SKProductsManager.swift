@@ -103,16 +103,6 @@ final class SKProductsManager {
 }
 
 extension SKProductsManager {
-    func getPaywallProducts(paywall: AdaptyPaywall, _ backendProducts: [BackendProduct], _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        fetchSK1Products(productIdentifiers: Set(backendProducts.map { $0.vendorId })) {
-            completion($0.map { (skProducts: [SKProduct]) -> [AdaptyPaywallProduct] in
-                backendProducts.compactMap { product in
-                    guard let sk = skProducts.first(where: { $0.productIdentifier == product.vendorId }) else {
-                        return nil
-                    }
-                    return AdaptyPaywallProduct(paywall: paywall, product: product, skProduct: sk)
-                }
-            })
-        }
+    func getSKProductsWithIntroductoryOfferEligibility(vendorProductIds: [String], fetchSK2Products: ProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[(SKProduct, AdaptyEligibility)]>) {
     }
 }

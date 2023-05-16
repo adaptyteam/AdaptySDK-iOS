@@ -16,7 +16,7 @@ extension FallbackPaywalls {
             JSONValue.object(["type": "adapty_inapps_fallback_paywalls",
                               "attributes": $0])
         }),
-        "meta": ["version": 1, "products": .array(BackendProduct.ValidJSON.all)]]
+        "meta": ["version": 1, "products": .array(AdaptyPaywall.ProductReference.ValidJSON.all)]]
 
         static let example: JSONValue = [
             "data": [["type": "adapty_inapps_fallback_paywalls",

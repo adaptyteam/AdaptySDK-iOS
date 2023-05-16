@@ -41,7 +41,7 @@ public struct AdaptyPaywall {
         return remoteConfig
     }
 
-    var products: [BackendProduct]
+    var products: [ProductReference]
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
@@ -79,7 +79,7 @@ extension AdaptyPaywall: Codable {
         revision = try container.decode(Int.self, forKey: .revision)
         variationId = try container.decode(String.self, forKey: .variationId)
         abTestName = try container.decode(String.self, forKey: .abTestName)
-        products = try container.decode([BackendProduct].self, forKey: .products)
+        products = try container.decode([ProductReference].self, forKey: .products)
         hasViewConfiguration = try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false
 
         if let remoteConfig = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig) {
@@ -117,21 +117,5 @@ extension Sequence where Element == AdaptyPaywall {
 extension Sequence where Element == VH<AdaptyPaywall> {
     var asDictionary: [String: VH<AdaptyPaywall>] {
         Dictionary(uniqueKeysWithValues: map { ($0.value.id, $0) })
-    }
-}
-
-extension AdaptyPaywall {
-    func map(syncedBundleReceipt: Bool) -> Self {
-        guard !syncedBundleReceipt else { return self }
-        var paywall = self
-        paywall.products = paywall.products.map(syncedBundleReceipt: syncedBundleReceipt)
-        return paywall
-    }
-}
-
-extension Array where Element == AdaptyPaywall {
-    func map(syncedBundleReceipt: Bool) -> [AdaptyPaywall] {
-        guard !syncedBundleReceipt else { return self }
-        return map { $0.map(syncedBundleReceipt: syncedBundleReceipt) }
     }
 }

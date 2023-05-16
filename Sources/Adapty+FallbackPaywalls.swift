@@ -66,24 +66,6 @@ extension PaywallsCache {
     }
 }
 
-extension ProductsCache {
-    func getProductWithFallback(byId id: String) -> BackendProduct? {
-        let fallback = Adapty.Configuration.fallbackPaywalls?.products[id]
-        guard let cache = getProduct(byId: id) else { return fallback }
-        guard let fallback = fallback else { return cache }
-        if cache.version >= fallback.version {
-            return cache
-        } else {
-            Log.verbose("ProductsCache: return from fallback product: \(id)")
-            return fallback
-        }
-    }
-
-    func getProductsWithFallback(byIds ids: [String]) -> [BackendProduct] {
-        ids.compactMap { getProductWithFallback(byId: $0) }
-    }
-}
-
 extension ProductVendorIdsCache {
     var allProductVendorIdsWithFallback: Set<String> {
         Set(allProductVendorIds?.value ?? []).union(Adapty.Configuration.fallbackPaywalls?.allProductVendorIds ?? [])

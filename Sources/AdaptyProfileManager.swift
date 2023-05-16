@@ -12,19 +12,19 @@ final class AdaptyProfileManager {
     let profileId: String
     var profile: VH<AdaptyProfile>
     let paywallsCache: PaywallsCache
-    let productsCache: ProductsCache
+    let productStatesCache: ProductStatesCache
 
     var isActive: Bool = true
 
     init(manager: Adapty,
          paywallStorage: PaywallsStorage,
-         productStorage: BackendProductsStorage,
+         productStorage: BackendProductStatesStorage,
          profile: VH<AdaptyProfile>) {
         self.manager = manager
         profileId = profile.value.profileId
         self.profile = profile
         paywallsCache = PaywallsCache(storage: paywallStorage)
-        productsCache = ProductsCache(storage: productStorage)
+        productStatesCache = ProductStatesCache(storage: productStorage)
 
         manager.updateAppleSearchAdsAttribution()
         if !manager.profileStorage.syncedBundleReceipt {
@@ -118,12 +118,10 @@ extension AdaptyProfileManager {
 
     func getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
-        let syncedBundleReceipt = manager.profileStorage.syncedBundleReceipt
         manager.httpSession.performFetchPaywallRequest(paywallId: id,
                                                        locale: locale,
                                                        profileId: profileId,
-                                                       responseHash: old?.hash,
-                                                       syncedBundleReceipt: syncedBundleReceipt) {
+                                                       responseHash: old?.hash) {
             [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
 
             guard let self = self, self.isActive else {
@@ -161,14 +159,17 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getPaywallProducts(paywall: AdaptyPaywall, fetchPolicy: AdaptyProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        Log.debug("call getPaywallProducts with params paywall.id: \(paywall.id) fetchPolicy: \(fetchPolicy)")
+    func getBackendProductStates(vendorProductIds: [String], fetchPolicy: AdaptyProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
         switch fetchPolicy {
         case .default:
-            getPaywallProducts(paywall: paywall, completion)
+            guard manager.profileStorage.syncedBundleReceipt else {
+                completion(.success([]))
+                return
+            }
+            getBackendProductStates(vendorProductIds: vendorProductIds, completion)
         case .waitForReceiptValidation:
             guard !manager.profileStorage.syncedBundleReceipt else {
-                getPaywallProducts(paywall: paywall, completion)
+                getBackendProductStates(vendorProductIds: vendorProductIds, completion)
                 return
             }
             manager.validateReceipt(refreshIfEmpty: true) { [weak self] result in
@@ -182,30 +183,13 @@ extension AdaptyProfileManager {
                     return
                 }
 
-                self.getPaywallProducts(paywall: paywall, completion)
+                self.getBackendProductStates(vendorProductIds: vendorProductIds, completion)
             }
         }
     }
 
-    func getPaywallProducts(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        getPaywallProducts(paywall: paywall) { [weak self] (result: AdaptyResult<[BackendProduct]>) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error))
-            case let .success(backendProducts):
-                guard let manager = self?.manager else {
-                    completion(.failure(.profileWasChanged()))
-                    return
-                }
-                manager.skProductsManager.getPaywallProducts(paywall: paywall, backendProducts, completion)
-            }
-        }
-    }
-
-    private func getPaywallProducts(paywall: AdaptyPaywall, _ completion: @escaping AdaptyResultCompletion<[BackendProduct]>) {
-        let vendorProductIds = paywall.vendorProductIds
-        let syncedBundleReceipt = manager.profileStorage.syncedBundleReceipt
-        manager.httpSession.performFetchAllProductsRequest(profileId: profileId, responseHash: productsCache.productsHash, syncedBundleReceipt: syncedBundleReceipt) { [weak self] (result: AdaptyResult<VH<[BackendProduct]?>>) in
+    private func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
+        manager.httpSession.performFetchProductStatesRequest(profileId: profileId, responseHash: productStatesCache.productsHash) { [weak self] (result: AdaptyResult<VH<[BackendProductState]?>>) in
 
             guard let self = self, self.isActive else {
                 completion(.failure(.profileWasChanged()))
@@ -215,7 +199,7 @@ extension AdaptyProfileManager {
             switch result {
             case let .failure(error):
 
-                let value = self.productsCache.getProductsWithFallback(byIds: vendorProductIds)
+                let value = self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)
                 guard !value.isEmpty else {
                     completion(.failure(error))
                     return
@@ -223,9 +207,9 @@ extension AdaptyProfileManager {
                 completion(.success(value))
             case let .success(products):
                 if let value = products.value {
-                    self.productsCache.setProducts(VH(value, hash: products.hash))
+                    self.productStatesCache.setBackendProductStates(VH(value, hash: products.hash))
                 }
-                completion(.success(self.productsCache.getProductsWithFallback(byIds: vendorProductIds)))
+                completion(.success(self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)))
             }
         }
     }

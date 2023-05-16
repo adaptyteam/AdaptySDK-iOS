@@ -49,7 +49,6 @@ extension HTTPSession {
                                     locale: String?,
                                     profileId: String,
                                     responseHash: String?,
-                                    syncedBundleReceipt: Bool,
                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall?>>) {
         let request = FetchPaywallRequest(paywallId: paywallId,
                                           locale: locale,
@@ -65,14 +64,8 @@ extension HTTPSession {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))
             case let .success(response):
-                var paywall = response.body.value
-                var hash = response.headers.getBackendResponseHash()
-                if !syncedBundleReceipt {
-                    paywall = paywall?.map(syncedBundleReceipt: false)
-                    if paywall?.products.contains(where: { $0.introductoryOfferEligibility == .unknown }) ?? false {
-                        hash = nil
-                    }
-                }
+                let paywall = response.body.value
+                let hash = response.headers.getBackendResponseHash()
                 completion(.success(VH(paywall, hash: hash)))
             }
         }

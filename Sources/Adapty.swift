@@ -211,20 +211,49 @@ extension Adapty {
             "policy": .value(fetchPolicy.description),
         ]
         async(completion, logName: "get_paywall_products", logParams: logParams) { manager, completion in
-            let fallback = paywall.vendorProductIds.compactMap {
-                Adapty.Configuration.fallbackPaywalls?.products[$0]
-            }
-            manager.getProfileManager(waitCreatingProfile: fallback.isEmpty) { result in
+
+            manager.skProductsManager.getSKProductsWithIntroductoryOfferEligibility(vendorProductIds: paywall.vendorProductIds, fetchSK2Products: .returnCacheDataElseLoad) { (result: AdaptyResult<[(SKProduct, AdaptyEligibility)]>) in
+
+                let skProducts: [(SKProduct, AdaptyEligibility)]
                 switch result {
-                case let .success(profileManager):
-                    profileManager.getPaywallProducts(paywall: paywall, fetchPolicy: fetchPolicy, completion)
                 case let .failure(error):
-                    guard error.isProfileCreateFailed, !fallback.isEmpty else {
-                        completion(.failure(error))
+                    completion(.failure(error))
+                    return
+                case let .success(value):
+                    skProducts = value
+                }
+
+                let unknownProductIds = skProducts.compactMap {
+                    $0.1 == .unknown ? $0.0.productIdentifier : nil
+                }
+                guard !unknownProductIds.isEmpty else {
+                    completion(.success(skProducts.createAdaptyPaywallProducts(with: paywall)))
+                    return
+                }
+
+                manager.getProfileManager(waitCreatingProfile: false) { result in
+
+                    let profileManager: AdaptyProfileManager
+                    switch result {
+                    case let .failure(error):
+                        guard error.isProfileCreateFailed else {
+                            completion(.failure(error))
+                            return
+                        }
+                        completion(.success(skProducts.createAdaptyPaywallProducts(with: paywall)))
                         return
+                    case let .success(value):
+                        profileManager = value
                     }
 
-                    manager.skProductsManager.getPaywallProducts(paywall: paywall, fallback, completion)
+                    profileManager.getBackendProductStates(vendorProductIds: unknownProductIds, fetchPolicy: fetchPolicy) { result in
+
+                        var skProducts = skProducts
+                        if case let .success(states) = result {
+                            skProducts = skProducts.apply(states)
+                        }
+                        completion(.success(skProducts.createAdaptyPaywallProducts(with: paywall)))
+                    }
                 }
             }
         }

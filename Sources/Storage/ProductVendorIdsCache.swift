@@ -1,5 +1,5 @@
 //
-//  BackendProductsCache.swift
+//  ProductVendorIdsCache.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 30.09.2022.

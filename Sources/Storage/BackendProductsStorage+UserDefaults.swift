@@ -1,5 +1,5 @@
 //
-//  BackendProductsStorage+UserDefaults.swift
+//  BackendProductStatesStorage+UserDefaults.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 07.10.2022.
@@ -7,25 +7,25 @@
 
 import Foundation
 
-extension UserDefaults: BackendProductsStorage {
+extension UserDefaults: BackendProductStatesStorage {
     fileprivate enum Constants {
-        static let backendProductsStorageKey = "AdaptySDK_Cached_Products"
+        static let backendProductStatesStorageKey = "AdaptySDK_Cached_Products"
     }
 
-    func setBackendProducts(_ products: VH<[BackendProduct]>) {
+    func setBackendProductStates(_ products: VH<[BackendProductState]>) {
         do {
             let data = try Backend.encoder.encode(products)
             Log.debug("UserDefaults: Save products success.")
-            set(data, forKey: Constants.backendProductsStorageKey)
+            set(data, forKey: Constants.backendProductStatesStorageKey)
         } catch {
             Log.error("UserDefaults: Save products failed. \(error.localizedDescription)")
         }
     }
 
-    func getBackendProducts() -> VH<[BackendProduct]>? {
-        guard let data = data(forKey: Constants.backendProductsStorageKey) else { return nil }
+    func getBackendProductStates() -> VH<[BackendProductState]>? {
+        guard let data = data(forKey: Constants.backendProductStatesStorageKey) else { return nil }
         do {
-            return try Backend.decoder.decode(VH<[BackendProduct]>.self, from: data)
+            return try Backend.decoder.decode(VH<[BackendProductState]>.self, from: data)
         } catch {
             Log.warn(error.localizedDescription)
             return nil
@@ -34,6 +34,6 @@ extension UserDefaults: BackendProductsStorage {
 
     func clearBackendProducts() {
         Log.debug("UserDefaults: Clear products.")
-        removeObject(forKey: Constants.backendProductsStorageKey)
+        removeObject(forKey: Constants.backendProductStatesStorageKey)
     }
 }
