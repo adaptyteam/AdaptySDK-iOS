@@ -25,13 +25,14 @@ extension Adapty {
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
     /// - Parameter enableUsageLogs: You can enable "Usage Logs" collection, passing here `true`
+    /// - Parameter useStoreKit2: You can override StoreKit 2 usage policy overriding this value
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
     public static func activate(_ apiKey: String,
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
                                 enableUsageLogs: Bool = false,
-                                usingStoreKit2: StoreKit2Configuration = .default,
+                                useStoreKit2: StoreKit2Configuration = .default,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
@@ -54,7 +55,7 @@ extension Adapty {
 
             Adapty.dispatchQueue = dispatchQueue
 
-            Configuration.setUsingStoreKit2(usingStoreKit2)
+            Configuration.setUseStoreKit2(useStoreKit2)
             Configuration.observerMode = observerMode
             Configuration.sendSystemEventsEnabled = enableUsageLogs
 

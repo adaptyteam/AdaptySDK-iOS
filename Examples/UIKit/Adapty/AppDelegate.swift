@@ -30,7 +30,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSLog("%@", message)
         }
 
-        Adapty.activate(AppConstants.adaptyApiKey) { _ in
+        Adapty.activate(AppConstants.adaptyApiKey,
+                        useStoreKit2: .enableToDetermineIntroductoryOfferEligibility) { _ in
             PurchasesObserver.shared.loadInitialProfileData()
             PurchasesObserver.shared.loadInitialPaywallData()
         }

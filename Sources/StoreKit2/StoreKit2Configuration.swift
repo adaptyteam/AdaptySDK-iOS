@@ -8,8 +8,11 @@
 public enum StoreKit2Configuration {
     public static let `default`: Self = .disabled
 
+    /// Adapty SDK will not use StoreKit 2 functionality.
     case disabled
-    case enableForCheckIntroductoryOfferEligibility
+    
+    /// Adapty SDK will use StoreKit 2 functionality to determine introductory offers eligibility.
+    case enableToDetermineIntroductoryOfferEligibility
 }
 
 extension Adapty.Configuration {
@@ -17,14 +20,14 @@ extension Adapty.Configuration {
 
     static var enabledStoreKit2ProductsFetcher: Bool {
         guard Environment.StoreKit2.available else { return false }
-        switch _usingStoreKit2 {
+        switch _useStoreKit2 {
         case .disabled: return false
         default: return true
         }
     }
 
-    private static var _usingStoreKit2: StoreKit2Configuration = .default
-    static func setUsingStoreKit2(_ value: StoreKit2Configuration) {
-        _usingStoreKit2 = value
+    private static var _useStoreKit2: StoreKit2Configuration = .default
+    static func setUseStoreKit2(_ value: StoreKit2Configuration) {
+        _useStoreKit2 = value
     }
 }

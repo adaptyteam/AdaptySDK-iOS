@@ -17,7 +17,8 @@ final class SKProductsManager {
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
     private var storeKit2Fetcher: SK2ProductsFetcher? {
-        _storeKit2Fetcher! as? SK2ProductsFetcher
+        guard let fetcher = _storeKit2Fetcher else { return nil }
+        return fetcher as? SK2ProductsFetcher
     }
 
     init(storage: ProductVendorIdsStorage, backend: Backend) {

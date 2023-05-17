@@ -16,19 +16,22 @@ import Foundation
         ///
         /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
         /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
-        /// - Parameter enableUsageLogs: You can enable "Usage Logs" collection, passing here `true`
-        /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
         /// - Parameter customerUserId: User identifier in your system
+        /// - Parameter enableUsageLogs: You can enable "Usage Logs" collection, passing here `true`
+        /// - Parameter useStoreKit2: You can override StoreKit 2 usage policy overriding this value
+        /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
         public static func activate(_ apiKey: String,
                                     observerMode: Bool = false,
                                     customerUserId: String? = nil,
                                     enableUsageLogs: Bool = false,
+                                    useStoreKit2: StoreKit2Configuration = .default,
                                     dispatchQueue: DispatchQueue = .main) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.activate(apiKey,
                                 observerMode: observerMode,
                                 customerUserId: customerUserId,
                                 enableUsageLogs: enableUsageLogs,
+                                useStoreKit2: useStoreKit2,
                                 dispatchQueue: dispatchQueue) { error in
                     if let error = error {
                         return continuation.resume(throwing: error)
