@@ -202,60 +202,14 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
-    ///   - fetchPolicy: the ``AdaptyProductsFetchPolicy`` value defining the behavior of the function at the time of the missing receipt
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. You can present them in your UI
     public static func getPaywallProducts(paywall: AdaptyPaywall,
-                                          fetchPolicy: AdaptyProductsFetchPolicy = .default,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        let logParams: EventParameters = [
-            "paywall_id": .value(paywall.id),
-            "policy": .value(fetchPolicy.description),
-        ]
-        async(completion, logName: "get_paywall_products", logParams: logParams) { manager, completion in
-
-            manager.skProductsManager.getSKProductsWithIntroductoryOfferEligibility(vendorProductIds: paywall.vendorProductIds) { (result: AdaptyResult<[(SKProduct, AdaptyEligibility)]>) in
-
-                let skProducts: [(SKProduct, AdaptyEligibility)]
-                switch result {
-                case let .failure(error):
-                    completion(.failure(error))
-                    return
-                case let .success(value):
-                    skProducts = value
-                }
-
-                let unknownProductIds = skProducts.compactMap {
-                    $0.1 == .unknown ? $0.0.productIdentifier : nil
-                }
-                guard !unknownProductIds.isEmpty else {
-                    completion(.success(skProducts.createAdaptyPaywallProducts(with: paywall)))
-                    return
-                }
-
-                manager.getProfileManager(waitCreatingProfile: false) { result in
-
-                    let profileManager: AdaptyProfileManager
-                    switch result {
-                    case let .failure(error):
-                        guard error.isProfileCreateFailed else {
-                            completion(.failure(error))
-                            return
-                        }
-                        completion(.success(skProducts.createAdaptyPaywallProducts(with: paywall)))
-                        return
-                    case let .success(value):
-                        profileManager = value
-                    }
-
-                    profileManager.getBackendProductStates(vendorProductIds: unknownProductIds, fetchPolicy: fetchPolicy) { result in
-
-                        var skProducts = skProducts
-                        if case let .success(states) = result {
-                            skProducts = skProducts.apply(states)
-                        }
-                        completion(.success(skProducts.createAdaptyPaywallProducts(with: paywall)))
-                    }
-                }
+        async(completion, logName: "get_paywall_products", logParams: ["paywall_id": .value(paywall.id)]) { manager, completion in
+            manager.skProductsManager.fetchSK1Products(productIdentifiers: Set(paywall.vendorProductIds), fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SKProduct]>) in
+                completion(result.map { skProducts in
+                    skProducts.compactMap { AdaptyPaywallProduct(paywall: paywall, skProduct: $0) }
+                })
             }
         }
     }
@@ -273,12 +227,77 @@ extension Adapty {
                 return
             }
 
-            manager.skProductsManager.fetchSK1Products(productIdentifiers: Set([object.vendorProductId]), fetchPolicy: .returnCacheDataElseLoad) { result in
-                completion(result.flatMap { (skProducts: [SKProduct]) -> AdaptyResult<AdaptyPaywallProduct> in
-                    guard let sk = skProducts.first(where: { $0.productIdentifier == object.vendorProductId }) else {
+            manager.skProductsManager.fetchSK1Product(productIdentifier: object.vendorProductId, fetchPolicy: .returnCacheDataElseLoad) { result in
+                completion(result.flatMap { (sk1Product: SKProduct?) -> AdaptyResult<AdaptyPaywallProduct> in
+                    guard let sk1Product = sk1Product else {
                         return .failure(SKManagerError.noProductIDsFound().asAdaptyError)
                     }
-                    return .success(AdaptyPaywallProduct(from: object, skProduct: sk))
+                    return .success(AdaptyPaywallProduct(from: object, skProduct: sk1Product))
+                })
+            }
+        }
+    }
+
+    public static func getProductsIntroductoryOfferEligibility(products: [AdaptyPaywallProduct],
+                                                               _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
+        async(completion,
+              logName: "get_products_introductory_offer_eligibility",
+              logParams: ["products": .value(products.map { $0.vendorProductId })]) { manager, completion in
+            manager.skProductsManager.getIntroductoryOfferEligibility(sk1Products: products.map { $0.skProduct }) {
+                completionGetIntroductoryOfferEligibility($0, manager, completion)
+            }
+        }
+    }
+
+    public static func getProductsIntroductoryOfferEligibility(vendorProductIds: [String],
+                                                               _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
+        async(completion,
+              logName: "get_products_introductory_offer_eligibility",
+              logParams: ["products": .value(vendorProductIds)]) { manager, completion in
+            manager.skProductsManager.getIntroductoryOfferEligibility(vendorProductIds: vendorProductIds) {
+                completionGetIntroductoryOfferEligibility($0, manager, completion)
+            }
+        }
+    }
+
+    private static func completionGetIntroductoryOfferEligibility(_ result: AdaptyResult<[String: AdaptyEligibility?]>, _ manager: Adapty, _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
+        let introductoryOfferEligibilityByVendorProductId: [String: AdaptyEligibility?]
+        switch result {
+        case let .failure(error):
+            completion(.failure(error))
+            return
+        case let .success(value):
+            introductoryOfferEligibilityByVendorProductId = value
+        }
+
+        let vendorProductIdsWithUnknownEligibility = introductoryOfferEligibilityByVendorProductId.filter { $0.value == nil }.map { $0.key }
+
+        guard !vendorProductIdsWithUnknownEligibility.isEmpty else {
+            completion(.success(introductoryOfferEligibilityByVendorProductId.compactMapValues { $0 }))
+            return
+        }
+
+        manager.getProfileManager { result in
+            let profileManager: AdaptyProfileManager
+            switch result {
+            case let .failure(error):
+                completion(.failure(error))
+                return
+            case let .success(value):
+                profileManager = value
+            }
+
+            profileManager.getBackendProductStates(vendorProductIds: vendorProductIdsWithUnknownEligibility) { result in
+                completion(result.map { states in
+                    let states = states.asDictionary.mapValues { $0.introductoryOfferEligibility }
+                    let result = introductoryOfferEligibilityByVendorProductId.merging(states, uniquingKeysWith: { _, last in last })
+
+                    let vendorProductIdsWithUnknownEligibility = result.filter { $0.value == nil }.map { $0.key }
+                    if !vendorProductIdsWithUnknownEligibility.isEmpty {
+                        Log.verbose("Adapty: products without eligibility  \(vendorProductIdsWithUnknownEligibility)")
+                    }
+
+                    return result.compactMapValues { $0 }
                 })
             }
         }
@@ -342,22 +361,6 @@ extension Adapty {
             manager.validateReceipt(refreshIfEmpty: true) { result in
                 completion(result.map { $0.value })
             }
-        }
-    }
-}
-
-/// Variants of `getPaywallProducts(paywall:fetchPolicy:_:)` behavior.
-public enum AdaptyProductsFetchPolicy: CustomStringConvertible {
-    /// In this scenario, the function will try to download the products anyway, although the ``AdaptyPaywallProduct/introductoryOfferEligibility`` values may be unknown.
-    case `default`
-
-    /// If you use this option, the Adapty SDK will wait for the validation and the validation itself, only then the products will be returned.
-    case waitForReceiptValidation
-
-    public var description: String {
-        switch self {
-        case .default: return "default"
-        case .waitForReceiptValidation: return "waitForReceiptValidation"
         }
     }
 }

@@ -159,36 +159,27 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getBackendProductStates(vendorProductIds: [String], fetchPolicy: AdaptyProductsFetchPolicy = .default, _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
-        switch fetchPolicy {
-        case .default:
-            guard manager.profileStorage.syncedBundleReceipt else {
-                completion(.success([]))
+    func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
+        guard !manager.profileStorage.syncedBundleReceipt else {
+            _getBackendProductStates(vendorProductIds: vendorProductIds, completion)
+            return
+        }
+        manager.validateReceipt(refreshIfEmpty: true) { [weak self] result in
+            if let error = result.error {
+                completion(.failure(error))
                 return
             }
-            getBackendProductStates(vendorProductIds: vendorProductIds, completion)
-        case .waitForReceiptValidation:
-            guard !manager.profileStorage.syncedBundleReceipt else {
-                getBackendProductStates(vendorProductIds: vendorProductIds, completion)
+
+            guard let self = self, self.isActive else {
+                completion(.failure(.profileWasChanged()))
                 return
             }
-            manager.validateReceipt(refreshIfEmpty: true) { [weak self] result in
-                if let error = result.error {
-                    completion(.failure(error))
-                    return
-                }
 
-                guard let self = self, self.isActive else {
-                    completion(.failure(.profileWasChanged()))
-                    return
-                }
-
-                self.getBackendProductStates(vendorProductIds: vendorProductIds, completion)
-            }
+            self._getBackendProductStates(vendorProductIds: vendorProductIds, completion)
         }
     }
 
-    private func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
+    private func _getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
         manager.httpSession.performFetchProductStatesRequest(profileId: profileId, responseHash: productStatesCache.productsHash) { [weak self] (result: AdaptyResult<VH<[BackendProductState]?>>) in
 
             guard let self = self, self.isActive else {

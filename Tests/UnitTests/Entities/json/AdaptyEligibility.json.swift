@@ -10,10 +10,9 @@
 
 extension AdaptyEligibility {
     enum ValidJSON {
-        static let all = [eligible, ineligible, unknown, blablabla]
+        static let all = [eligible, ineligible, notApplicable]
         static let eligible: JSONValue = "eligible"
         static let ineligible: JSONValue = "ineligible"
-        static let unknown: JSONValue = "unknown"
-        static let blablabla: JSONValue = "bla-bla-bla"
+        static let notApplicable: JSONValue = "not_applicable"
     }
 }

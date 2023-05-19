@@ -13,7 +13,8 @@ func XCTAssertEqual(_ value: AdaptyEligibility, withStringValue stringValue: Str
     switch stringValue {
     case "eligible": XCTAssertEqual(value, .eligible, file: file, line: line)
     case "ineligible": XCTAssertEqual(value, .ineligible, file: file, line: line)
-    default: XCTAssertEqual(value, .unknown, file: file, line: line)
+    case "not_applicable": XCTAssertEqual(value, .notApplicable, file: file, line: line)
+    default: XCTFail(" unknown value \(value)", file: file, line: line)
     }
 }
 

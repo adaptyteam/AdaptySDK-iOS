@@ -48,9 +48,7 @@ extension HTTPSession {
                                                     responseHash: responseHash)
         perform(request,
                 logName: "get_paywall_builder",
-                logParams: [
-                    "variation_id": .value(paywallVariationId),
-                ]) { (result: FetchViewConfigurationRequest.Result) in
+                logParams: ["variation_id": .value(paywallVariationId)]) { (result: FetchViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

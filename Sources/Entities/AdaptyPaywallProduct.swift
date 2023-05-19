@@ -11,9 +11,6 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
     /// Unique identifier of a product from App Store Connect or Google Play Console.
     public let vendorProductId: String
 
-    /// User's eligibility for your introductory offer. Check this property before displaying info about introductory offers (i.e. free trials).
-    public let introductoryOfferEligibility: AdaptyEligibility
-
     /// User's eligibility for the promotional offers. Check this property before displaying info about promotional offers.
     public var promotionalOfferEligibility: Bool { promotionalOfferId != nil }
 
@@ -35,7 +32,7 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
 
 extension AdaptyPaywallProduct: CustomStringConvertible {
     public var description: String {
-        "(vendorProductId: \(vendorProductId), introductoryOfferEligibility: \(introductoryOfferEligibility)"
+        "(vendorProductId: \(vendorProductId)"
             + (promotionalOfferId == nil ? "" : ", promotionalOfferId: \(promotionalOfferId!)")
             + ", variationId: \(variationId), paywallABTestName: \(paywallABTestName), paywallName: \(paywallName), skProduct: \(skProduct))"
     }
@@ -44,11 +41,9 @@ extension AdaptyPaywallProduct: CustomStringConvertible {
 extension AdaptyPaywallProduct {
     init(paywall: AdaptyPaywall,
          productReference: AdaptyPaywall.ProductReference,
-         introductoryOfferEligibility: AdaptyEligibility,
          skProduct: SKProduct) {
         self.init(
             vendorProductId: productReference.vendorId,
-            introductoryOfferEligibility: introductoryOfferEligibility,
             promotionalOfferId: productReference.promotionalOfferId,
             variationId: paywall.variationId,
             paywallABTestName: paywall.abTestName,
@@ -58,21 +53,19 @@ extension AdaptyPaywallProduct {
     }
 
     init?(paywall: AdaptyPaywall,
-          introductoryOfferEligibility: AdaptyEligibility,
           skProduct: SKProduct) {
         let vendorId = skProduct.productIdentifier
         guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
             return nil
         }
 
-        self.init(paywall: paywall, productReference: reference, introductoryOfferEligibility: introductoryOfferEligibility, skProduct: skProduct)
+        self.init(paywall: paywall, productReference: reference, skProduct: skProduct)
     }
 }
 
 extension AdaptyPaywallProduct: Encodable {
     struct PrivateObject: Decodable {
         let vendorProductId: String
-        let introductoryOfferEligibility: AdaptyEligibility
         let promotionalOfferId: String?
         let variationId: String
         let paywallABTestName: String
@@ -81,7 +74,6 @@ extension AdaptyPaywallProduct: Encodable {
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: ProductCodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
-            introductoryOfferEligibility = try container.decode(AdaptyEligibility.self, forKey: .introductoryOfferEligibility)
             promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
             variationId = try container.decode(String.self, forKey: .variationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
@@ -92,7 +84,6 @@ extension AdaptyPaywallProduct: Encodable {
     init(from object: PrivateObject, skProduct: SKProduct) {
         self.init(
             vendorProductId: object.vendorProductId,
-            introductoryOfferEligibility: object.introductoryOfferEligibility,
             promotionalOfferId: object.promotionalOfferId,
             variationId: object.variationId,
             paywallABTestName: object.paywallABTestName,
@@ -104,7 +95,6 @@ extension AdaptyPaywallProduct: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: ProductCodingKeys.self)
         try container.encode(vendorProductId, forKey: .vendorProductId)
-        try container.encode(introductoryOfferEligibility, forKey: .introductoryOfferEligibility)
 
         try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
         try container.encode(variationId, forKey: .variationId)
@@ -124,24 +114,5 @@ extension AdaptyPaywallProduct: Encodable {
         try container.encode(discounts, forKey: .discounts)
         try container.encodeIfPresent(localizedPrice, forKey: .localizedPrice)
         try container.encodeIfPresent(localizedSubscriptionPeriod, forKey: .localizedSubscriptionPeriod)
-    }
-}
-
-extension Sequence where Element == (SKProduct, AdaptyEligibility) {
-    func createAdaptyPaywallProducts(with paywall: AdaptyPaywall) -> [AdaptyPaywallProduct] {
-        compactMap { element in
-            AdaptyPaywallProduct(paywall: paywall, introductoryOfferEligibility: element.1, skProduct: element.0)
-        }
-    }
-
-    func apply<T: Sequence>(_ states: T) -> [(SKProduct, AdaptyEligibility)] where T.Element == BackendProductState {
-        apply(Dictionary(uniqueKeysWithValues: states.map { ($0.vendorId, $0.introductoryOfferEligibility) }))
-    }
-
-    func apply(_ states: [String: AdaptyEligibility]) -> [(SKProduct, AdaptyEligibility)] {
-        map { element in
-            let id = element.0.productIdentifier
-            return (element.0, states[id] ?? element.1)
-        }
     }
 }

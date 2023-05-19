@@ -95,7 +95,6 @@ extension AdaptyProduct {
 
 enum ProductCodingKeys: String, CodingKey {
     case vendorProductId = "vendor_product_id"
-    case introductoryOfferEligibility = "introductory_offer_eligibility"
     case version = "timestamp"
 
     case promotionalOfferId = "promotional_offer_id"

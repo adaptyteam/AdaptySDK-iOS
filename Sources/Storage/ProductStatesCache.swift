@@ -51,11 +51,6 @@ final class ProductStatesCache {
         self.products = VH(array.asDictionary, hash: products.hash)
         storage.setBackendProductStates(VH(array, hash: products.hash))
 
-        let productsWithUnknownEligibility = array.compactMap {
-            $0.introductoryOfferEligibility == .unknown ? $0.vendorId : nil
-        }
-        if !productsWithUnknownEligibility.isEmpty {
-            Log.verbose("ProductStatesCache: saved products has eligibility == .unknown \(productsWithUnknownEligibility)")
-        }
+   
     }
 }

@@ -151,12 +151,11 @@ import Foundation
         ///
         /// - Parameters:
         ///   - paywall: the `AdaptyPaywall` for which you want to get a products
-        ///   - fetchPolicy: the `AdaptyProductsFetchPolicy` value defining the behavior of the function at the time of the missing receipt
         /// - Returns: A result containing the `AdaptyPaywallProduct` objects array. You can present them in your UI
         /// - Throws: An `AdaptyError` object
-        public static func getPaywallProducts(paywall: AdaptyPaywall, fetchPolicy: AdaptyProductsFetchPolicy = .default) async throws -> [AdaptyPaywallProduct]? {
+        public static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct]? {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPaywallProducts(paywall: paywall, fetchPolicy: fetchPolicy) { result in
+                Adapty.getPaywallProducts(paywall: paywall) { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)
