@@ -18,20 +18,13 @@ class MainController: UIViewController {
         super.viewDidLoad()
 
         UIScrollView.appearance().keyboardDismissMode = .onDrag
-        
         navigationItem.title = "Welcome to Adapty!"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Logs",
-                                                            style: .plain,
-                                                            target: self,
-                                                            action: #selector(presentLogsController))
 
         addSubSwiftUIView(
-            MainControllerView(onShowExamplePaywall: { [weak self] paywall, products in
-                self?.presentPaywallController(paywall, products)
-            })
-            .environmentObject(presenter),
+            MainControllerView()
+                .environmentObject(presenter),
             to: view)
-        
+
         presenter.$errors
             .sink(receiveValue: { [weak self] v in
                 guard let error = v.last else { return }
@@ -39,34 +32,13 @@ class MainController: UIViewController {
             })
             .store(in: &cancellable)
     }
-    
+
     private func showError(_ error: AdaptyError) {
         let alert = UIAlertController(title: "Error \(error.errorCode)",
-                          message: error.localizedDescription,
-                          preferredStyle: .alert)
+                                      message: error.localizedDescription,
+                                      preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
-        
+
         present(alert, animated: true)
-    }
-
-    private func presentPaywallController(_ paywall: AdaptyPaywall, _ products: [AdaptyPaywallProduct]) {
-        let isHorizontal = paywall.isHorizontal()
-
-        // In case you don't want to implement the paywalls by yourself, we suggest you check out our new feature: Paywall Builder.
-        // It allows you to configure paywalls without writing any code!
-        // Read more in our docs: https://docs.adapty.io/docs/paywall-builder-getting-started
-        // AdaptyUI: https://github.com/adaptyteam/AdaptyUI-iOS.git
-        
-        let vc = isHorizontal ? PurchaseController.instantiateHorizontal() : PurchaseController.instantiateVertical()
-        vc.presenter = PurchasePresenter(paywall: paywall, products: products, isHorizontalLayout: isHorizontal)
-        vc.modalPresentationStyle = .fullScreen
-
-        present(vc, animated: true)
-    }
-
-    @objc
-    private func presentLogsController() {
-        let vc = LogsController()
-        present(UINavigationController(rootViewController: vc), animated: true)
     }
 }

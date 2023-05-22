@@ -31,6 +31,7 @@ class MainPresenter: ObservableObject {
 
     @Published var exampleABTestPaywall: AdaptyPaywall?
     @Published var exampleABTestProducts: [AdaptyPaywallProduct]?
+    @Published var exampleABTestIntroEligibilities: [String: AdaptyEligibility]?
     @Published var errors: [AdaptyIdentifiableError] = []
 
     init() {
@@ -52,6 +53,12 @@ class MainPresenter: ObservableObject {
         PurchasesObserver.shared.$products
             .sink(receiveValue: { [weak self] v in
                 self?.exampleABTestProducts = v
+            })
+            .store(in: &cancellable)
+
+        PurchasesObserver.shared.$introEligibilities
+            .sink(receiveValue: { [weak self] v in
+                self?.exampleABTestIntroEligibilities = v
             })
             .store(in: &cancellable)
     }
@@ -89,7 +96,14 @@ class MainPresenter: ObservableObject {
             reloadCustomPaywallProducts()
         }
     }
-    @Published var customPaywallProducts: [AdaptyPaywallProduct]?
+
+    @Published var customPaywallProducts: [AdaptyPaywallProduct]? {
+        didSet {
+            reloadCustomPaywallInroEligibilities()
+        }
+    }
+
+    @Published var customPaywallIntroEligibilities: [String: AdaptyEligibility]?
     @Published var customPaywallLocale: String = ""
     @Published var customPaywallId: String = ""
     @Published var customPaywallCollapsed: Bool = true
@@ -97,7 +111,8 @@ class MainPresenter: ObservableObject {
     func reloadCustomPaywall() {
         guard !customPaywallId.isEmpty else { return }
 
-        Adapty.getPaywall(customPaywallId, locale: customPaywallLocale.isEmpty ? nil : customPaywallLocale) { [weak self] result in
+        Adapty.getPaywall(customPaywallId,
+                          locale: customPaywallLocale.isEmpty ? nil : customPaywallLocale) { [weak self] result in
             switch result {
             case let .failure(error):
                 self?.errors.append(AdaptyIdentifiableError(error: error))
@@ -106,13 +121,21 @@ class MainPresenter: ObservableObject {
             }
         }
     }
-    
+
     private func reloadCustomPaywallProducts() {
         guard let customPaywall = customPaywall else { return }
-        
+
         Adapty.getPaywallProducts(paywall: customPaywall) { [weak self] result in
             self?.customPaywallProducts = try? result.get()
             self?.customPaywallCollapsed = false
+        }
+    }
+
+    private func reloadCustomPaywallInroEligibilities() {
+        guard let products = customPaywallProducts else { return }
+
+        Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
+            self?.customPaywallIntroEligibilities = try? result.get()
         }
     }
 
@@ -123,18 +146,9 @@ class MainPresenter: ObservableObject {
             }
         })
     }
-    
+
     func restorePurchases() {
         PurchasesObserver.shared.restore { [weak self] error in
-            if let error = error {
-                self?.errors.append(AdaptyIdentifiableError(error: error))
-            }
-        }
-    }
-
-    func updateAttribution() {
-        let attribution = ["trackerToken": "test_trackerToken", "trackerName": "test_trackerName", "network": "test_network", "campaign": "test_campaign", "adgroup": "test_adgroup", "creative": "test_creative", "clickLabel": "test_clickLabel", "adid": "test_adid"]
-        Adapty.updateAttribution(attribution, source: .adjust) { [weak self] error in
             if let error = error {
                 self?.errors.append(AdaptyIdentifiableError(error: error))
             }
@@ -170,45 +184,14 @@ class MainPresenter: ObservableObject {
         }
     }
 
-    func sendOnboardingEvent(name: String, order: UInt) {
-        Adapty.logShowOnboarding(name: "test_onboarding", screenName: name, screenOrder: order) { [weak self] error in
-            if let error = error {
-                self?.errors.append(AdaptyIdentifiableError(error: error))
-            }
-        }
-    }
-    
-    func presentCodeRedemptionSheet() {
-        Adapty.presentCodeRedemptionSheet()
-    }
-
     @Published var isLoggingOut = false
-
-//    func setEnvironment(_ env: AdaptyEnvironment) {
-//        guard env != AppEnvironment.selectedEnvironment else { return }
-//
-//        isLoggingOut = true
-//
-//        AppEnvironment.selectedEnvironment = env
-//
-//        Adapty.logout { [weak self] error in
-//            self?.isLoggingOut = false
-//
-//            if let error = error {
-//                self?.errors.append(AdaptyIdentifiableError(error: error))
-//            } else {
-//                self?.customerUserId = ""
-//                self?.customerUserIdEdited = ""
-//            }
-//        }
-//    }
 
     func logout() {
         isLoggingOut = true
 
         Adapty.logout { [weak self] error in
             guard let self = self else { return }
-            
+
             self.isLoggingOut = false
 
             if let error = error {
@@ -216,12 +199,12 @@ class MainPresenter: ObservableObject {
             } else {
                 self.customerUserId = ""
                 self.customerUserIdEdited = ""
-                
+
                 self.customPaywall = nil
                 self.customPaywallProducts = nil
                 self.customPaywallId = ""
                 self.customPaywallCollapsed = true
-                
+
                 PurchasesObserver.shared.loadInitialProfileData()
                 PurchasesObserver.shared.loadInitialPaywallData()
             }

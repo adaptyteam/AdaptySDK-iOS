@@ -92,8 +92,6 @@ struct MainControllerView: View {
         return formatter
     }()
 
-    let onShowExamplePaywall: (AdaptyPaywall, [AdaptyPaywallProduct]) -> Void
-
     @EnvironmentObject var presenter: MainPresenter
 
     @State var customerUserId: String = ""
@@ -137,10 +135,7 @@ struct MainControllerView: View {
                                        expanded: nil)
 
                     ListItemView(title: "Is Lifetime", subtitle: level.isLifetime ? "true" : "false")
-
-                    if let activatedAt = level.activatedAt {
-                        ListItemView(title: "Activated At", subtitle: Self.dateFormatter.string(from: activatedAt))
-                    }
+                    ListItemView(title: "Activated At", subtitle: Self.dateFormatter.string(from: level.activatedAt))
 
                     if let renewedAt = level.renewedAt {
                         ListItemView(title: "Renewed At", subtitle: Self.dateFormatter.string(from: renewedAt))
@@ -186,7 +181,9 @@ struct MainControllerView: View {
         }
     }
 
-    @ViewBuilder func paywallDetailsSection(paywall: AdaptyPaywall, products: [AdaptyPaywallProduct]?) -> some View {
+    @ViewBuilder func paywallDetailsSection(paywall: AdaptyPaywall,
+                                            products: [AdaptyPaywallProduct]?,
+                                            introEligibilities: [String: AdaptyEligibility]?) -> some View {
         ListItemView(title: "Variation", subtitle: paywall.variationId)
         ListItemView(title: "Revision", subtitle: "\(paywall.revision)")
         ListItemView(title: "Locale", subtitle: paywall.locale)
@@ -196,11 +193,41 @@ struct MainControllerView: View {
                 Button {
                     presenter.purchaseProduct(product: p)
                 } label: {
-                    HStack {
-                        Text(p.vendorProductId)
-                        Spacer()
-                        Text(p.localizedPrice ?? "0.0")
-                            .foregroundColor(.secondary)
+                    VStack {
+                        HStack {
+                            Text(p.vendorProductId)
+                            Spacer()
+                            Text(p.localizedPrice ?? "0.0")
+                                .foregroundColor(.secondary)
+                        }
+
+                        HStack {
+                            VStack {
+                                Text("Intro:")
+                                Text("Promo:")
+                            }
+                            .multilineTextAlignment(.leading)
+
+                            Spacer()
+                            VStack {
+                                Text(p.introductoryDiscount?.paymentMode.description ?? "none")
+                                Text(p.discounts.first?.paymentMode.description ?? "none")
+                            }
+                            .multilineTextAlignment(.center)
+
+                            Spacer()
+                            VStack {
+                                if let introEligibility = introEligibilities?[p.vendorProductId] {
+                                    Text(introEligibility.description)
+                                } else {
+                                    Text("Unknown")
+                                }
+                                
+                                Text(p.promotionalOfferEligibility.description)
+                            }
+                            .multilineTextAlignment(.trailing)
+                        }
+                        .foregroundColor(.secondary)
                     }
                 }
             }
@@ -217,13 +244,15 @@ struct MainControllerView: View {
                 }
 
                 if !presenter.customPaywallCollapsed {
-                    paywallDetailsSection(paywall: paywall, products: presenter.customPaywallProducts)
+                    paywallDetailsSection(paywall: paywall,
+                                          products: presenter.customPaywallProducts,
+                                          introEligibilities: presenter.customPaywallIntroEligibilities)
                 }
             } else {
                 ListStatusItemView(title: "No Paywall Loaded", state: .failure, expanded: nil)
             }
 
-            TextField("Enter Paywall Locale", text: $presenter.customPaywallLocale)            
+            TextField("Enter Paywall Locale", text: $presenter.customPaywallLocale)
             TextField("Enter Paywall Id", text: $presenter.customPaywallId)
                 .onSubmit {
                     presenter.reloadCustomPaywall()
@@ -248,18 +277,14 @@ struct MainControllerView: View {
             if let paywall = presenter.exampleABTestPaywall {
                 ListStatusItemView(title: paywall.id, state: .success, expanded: nil)
 
-                paywallDetailsSection(paywall: paywall, products: presenter.exampleABTestProducts)
+                paywallDetailsSection(paywall: paywall,
+                                      products: presenter.exampleABTestProducts,
+                                      introEligibilities: presenter.exampleABTestIntroEligibilities)
 
                 Button {
                     PurchasesObserver.shared.loadInitialPaywallData()
                 } label: {
                     Text("Refresh")
-                }
-
-                Button {
-                    onShowExamplePaywall(paywall, presenter.exampleABTestProducts ?? [])
-                } label: {
-                    Text("Present Paywall")
                 }
             } else {
                 ListStatusItemView(title: "Paywall is loading", state: .loading, expanded: nil)
@@ -283,26 +308,6 @@ struct MainControllerView: View {
                 try? presenter.updateProfileAttributes()
             } label: {
                 Text("Update Profile")
-            }
-
-            Button {
-                presenter.updateAttribution()
-            } label: {
-                Text("Update Attribution")
-            }
-
-            ForEach(1 ... 3, id: \.self) { id in
-                Button {
-                    presenter.sendOnboardingEvent(name: "screen_\(id)", order: UInt(id))
-                } label: {
-                    Text("Send Onboarding Order \(id)")
-                }
-            }
-
-            Button {
-                presenter.presentCodeRedemptionSheet()
-            } label: {
-                Text("Present Code Redemption Sheet")
             }
         } header: {
             Text("Other Actions")
@@ -341,7 +346,7 @@ struct MainControllerView: View {
 
 struct MainControllerView_Previews: PreviewProvider {
     static var previews: some View {
-        MainControllerView(onShowExamplePaywall: { _, _ in })
+        MainControllerView()
             .environmentObject(MainPresenter())
     }
 }

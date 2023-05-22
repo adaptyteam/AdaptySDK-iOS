@@ -10,18 +10,13 @@ import Adapty
 import Combine
 import Foundation
 
-extension Array where Element == AdaptyPaywallProduct {
-    var hasUnknownEligibiity: Bool {
-        contains(where: { $0.introductoryOfferEligibility == .unknown })
-    }
-}
-
 class PurchasesObserver: ObservableObject {
     static let shared = PurchasesObserver()
-    static let paywallId = "example_ab_test"
 
     @Published var profile: AdaptyProfile?
     @Published var products: [AdaptyPaywallProduct]?
+    @Published var introEligibilities: [String: AdaptyEligibility]?
+
     @Published var paywall: AdaptyPaywall? {
         didSet {
             loadPaywallProducts()
@@ -38,7 +33,7 @@ class PurchasesObserver: ObservableObject {
         paywall = nil
         products = nil
 
-        Adapty.getPaywall(Self.paywallId, locale: "fr") { [weak self] result in
+        Adapty.getPaywall(AppConstants.examplePaywallId, locale: "fr") { [weak self] result in
             self?.paywall = try? result.get()
         }
     }
@@ -50,20 +45,13 @@ class PurchasesObserver: ObservableObject {
             guard let products = try? result.get() else { return }
 
             self?.products = products
-
-            if products.hasUnknownEligibiity {
-                self?.loadPaywallProductsEnsuringEligibility()
-            }
+            self?.loadIntroductoryOfferEligibilities(products)
         }
     }
 
-    private func loadPaywallProductsEnsuringEligibility() {
-        guard let paywall = paywall else { return }
-
-        Adapty.getPaywallProducts(paywall: paywall, fetchPolicy: .waitForReceiptValidation) { [weak self] result in
-            if let products = try? result.get() {
-                self?.products = products
-            }
+    private func loadIntroductoryOfferEligibilities(_ products: [AdaptyPaywallProduct]) {
+        Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
+            self?.introEligibilities = try? result.get()
         }
     }
 

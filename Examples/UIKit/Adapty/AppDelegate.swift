@@ -18,18 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        if NSClassFromString("XCTest") != nil {
-            window?.rootViewController = instantiateTestingController()
-            return true
-        }
-
         Adapty.delegate = PurchasesObserver.shared
-        Adapty.logLevel = .debug
-        Adapty.setLogHandler { date, level, message in
-            LogsObserver.shared.postMessage(date, level, message)
-            NSLog("%@", message)
-        }
-
+        Adapty.logLevel = .verbose
         Adapty.activate(AppConstants.adaptyApiKey,
                         useStoreKit2: .enableToDetermineIntroductoryOfferEligibility) { _ in
             PurchasesObserver.shared.loadInitialProfileData()
