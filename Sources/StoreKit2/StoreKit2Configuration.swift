@@ -6,18 +6,18 @@
 //
 
 /// Defines StoreKit 2 utilization behaviour.
-public enum StoreKitConfiguration {
-    public static let `default`: Self = .useStoreKit1
+public enum StoreKit2Usage {
+    public static let `default`: Self = .disabled
 
     /// Adapty will never use StoreKit 2.
-    case useStoreKit1
+    case disabled
 
     /// Adapty will use StoreKit 2 functionality to optimize some features.
     ///
     /// For now it can be used only to determine introductory offers eligibility.
     ///
     /// Note, that StoreKit 2 is only available with iOS 15.0 and newer.
-    case useStoreKit2ForOptimizations
+    case forIntroEligibilityCheck
 }
 
 extension Adapty.Configuration {
@@ -26,15 +26,15 @@ extension Adapty.Configuration {
     static var enabledStoreKit2ProductsFetcher: Bool {
         guard Environment.StoreKit2.available else { return false }
 
-        switch _storeKitConfiguration {
-        case .useStoreKit1: return false
+        switch _storeKit2Usage {
+        case .disabled: return false
         default: return true
         }
     }
 
-    private static var _storeKitConfiguration: StoreKitConfiguration = .default
+    private static var _storeKit2Usage: StoreKit2Usage = .default
 
-    static func setStoreKitConfiguration(_ value: StoreKitConfiguration) {
-        _storeKitConfiguration = value
+    static func setStoreKit2Usage(_ value: StoreKit2Usage) {
+        _storeKit2Usage = value
     }
 }
