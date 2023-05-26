@@ -10,7 +10,7 @@ public enum StoreKit2Configuration {
 
     /// Adapty SDK will not use StoreKit 2 functionality.
     case disabled
-    
+
     /// Adapty SDK will use StoreKit 2 functionality to determine introductory offers eligibility.
     case enableToDetermineIntroductoryOfferEligibility
 }
@@ -25,6 +25,8 @@ extension Adapty.Configuration {
         default: return true
         }
     }
+
+    static var enabledStoreKit2TransactionObserver: Bool { Environment.StoreKit2.available }
 
     private static var _useStoreKit2: StoreKit2Configuration = .default
     static func setUseStoreKit2(_ value: StoreKit2Configuration) {

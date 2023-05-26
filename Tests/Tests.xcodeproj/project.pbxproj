@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A1561D62A20D8DD00CF7214 /* Adapty+presentCodeRedemptionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1561D52A20D8DD00CF7214 /* Adapty+presentCodeRedemptionSheet.swift */; };
+		8A1561D82A20D9F300CF7214 /* SK2TransactionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1561D72A20D9F300CF7214 /* SK2TransactionObserver.swift */; };
 		8A1F743B2979B4F3002B7FBC /* AdaptyUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F743A2979B4F3002B7FBC /* AdaptyUI.swift */; };
 		8A1F743D2979B624002B7FBC /* Asset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F743C2979B624002B7FBC /* Asset.swift */; };
 		8A1F743F2979B67C002B7FBC /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F743E2979B67C002B7FBC /* Color.swift */; };
@@ -205,6 +207,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A1561D52A20D8DD00CF7214 /* Adapty+presentCodeRedemptionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Adapty+presentCodeRedemptionSheet.swift"; sourceTree = "<group>"; };
+		8A1561D72A20D9F300CF7214 /* SK2TransactionObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SK2TransactionObserver.swift; sourceTree = "<group>"; };
 		8A1F743A2979B4F3002B7FBC /* AdaptyUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUI.swift; sourceTree = "<group>"; };
 		8A1F743C2979B624002B7FBC /* Asset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Asset.swift; sourceTree = "<group>"; };
 		8A1F743E2979B67C002B7FBC /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
@@ -559,6 +563,7 @@
 				8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */,
 				8AB002E02926FCEA008476A3 /* Adapty+ReceiptValidator.swift */,
 				8AB002BC2926FCEA008476A3 /* Adapty+UpdateAttribution.swift */,
+				8A1561D52A20D8DD00CF7214 /* Adapty+presentCodeRedemptionSheet.swift */,
 				8AB002D12926FCEA008476A3 /* AdaptyDelegate.swift */,
 				8AB002B02926FCEA008476A3 /* AdaptyProfileManager.swift */,
 				8AB002BA2926FCEA008476A3 /* AdaptyResult.swift */,
@@ -783,6 +788,7 @@
 				8AE26FA829FA9737003D1A15 /* SK2ProductsFetcher.swift */,
 				8AE26FAC2A0D1D8E003D1A15 /* StoreKit2Configuration.swift */,
 				8AE26FB02A0D2333003D1A15 /* SK2Product+IntroductoryOfferEligibility.swift */,
+				8A1561D72A20D9F300CF7214 /* SK2TransactionObserver.swift */,
 			);
 			path = StoreKit2;
 			sourceTree = "<group>";
@@ -996,6 +1002,7 @@
 				8AB003682926FCEA008476A3 /* HTTPEncodableRequest.swift in Sources */,
 				8AB0034D2926FCEA008476A3 /* CreateProfileRequest.swift in Sources */,
 				8A1F746D297B28BF002B7FBC /* Font+Decodable.swift in Sources */,
+				8A1561D62A20D8DD00CF7214 /* Adapty+presentCodeRedemptionSheet.swift in Sources */,
 				8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */,
 				8AB003512926FCEA008476A3 /* Backend.Codable.swift in Sources */,
 				8AB0036A2926FCEA008476A3 /* HTTPCodableConfiguration.swift in Sources */,
@@ -1015,6 +1022,7 @@
 				8AF804232938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift in Sources */,
 				8AB0037E2926FCEA008476A3 /* EventsStorage.swift in Sources */,
 				8A1F7466297B21F0002B7FBC /* ViewConfiguration+extractLocale.swift in Sources */,
+				8A1561D82A20D9F300CF7214 /* SK2TransactionObserver.swift in Sources */,
 				8AB003892926FCEA008476A3 /* AdaptyError+Description.swift in Sources */,
 				8AB003842926FCEA008476A3 /* AdaptyOnboardingScreenParameters.swift in Sources */,
 				8AB003302926FCEA008476A3 /* SKManagerError.swift in Sources */,

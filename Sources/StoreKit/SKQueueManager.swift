@@ -14,27 +14,6 @@ protocol VariationIdStorage {
     func setPersistentVariationsIds(_: [String: String])
 }
 
-extension Adapty {
-    /// Call this method to have StoreKit present a sheet enabling the user to redeem codes provided by your app.
-    public static func presentCodeRedemptionSheet() {
-        let logName = "present_code_redemption_sheet"
-        #if swift(>=5.3) && os(iOS) && !targetEnvironment(macCatalyst)
-            async(nil, logName: logName) { _, completion in
-                if #available(iOS 14.0, *) {
-                    SKPaymentQueue.default().presentCodeRedemptionSheet()
-                } else {
-                    Log.error("Presenting code redemption sheet is available only for iOS 14 and higher.")
-                }
-                completion(nil)
-            }
-        #else
-            let stamp = Log.stamp
-            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp))
-            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: "not available"))
-        #endif
-    }
-}
-
 final class SKQueueManager: NSObject {
     let queue: DispatchQueue
 
@@ -49,6 +28,8 @@ final class SKQueueManager: NSObject {
     private(set) var variationsIds: [String: String]
     private(set) var persistentVariationsIds: [String: String]
 
+    private(set) var _sk2TransactionObserver: Any?
+
     init(queue: DispatchQueue, storage: VariationIdStorage, skProductsManager: SKProductsManager) {
         self.queue = queue
         self.storage = storage
@@ -60,7 +41,12 @@ final class SKQueueManager: NSObject {
             storage.setPersistentVariationsIds(variationsIds)
         }
         self.skProductsManager = skProductsManager
+
         super.init()
+
+        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *), Adapty.Configuration.enabledStoreKit2TransactionObserver {
+            _sk2TransactionObserver = SK2TransactionObserver(delegate: self)
+        }
     }
 
     func setVariationId(_ variationId: String, for productId: String) {
