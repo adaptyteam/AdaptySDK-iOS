@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Adapty.delegate = PurchasesObserver.shared
         Adapty.logLevel = .verbose
         Adapty.activate(AppConstants.adaptyApiKey,
-                        useStoreKit2: .enableToDetermineIntroductoryOfferEligibility) { _ in
+                        storeKitConfiguration: .useStoreKit2ForOptimizations) { _ in
             PurchasesObserver.shared.loadInitialProfileData()
             PurchasesObserver.shared.loadInitialPaywallData()
         }

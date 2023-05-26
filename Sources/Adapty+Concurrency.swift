@@ -24,14 +24,14 @@ import Foundation
                                     observerMode: Bool = false,
                                     customerUserId: String? = nil,
                                     enableUsageLogs: Bool = false,
-                                    useStoreKit2: StoreKit2Configuration = .default,
+                                    storeKitConfiguration: StoreKitConfiguration = .default,
                                     dispatchQueue: DispatchQueue = .main) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.activate(apiKey,
                                 observerMode: observerMode,
                                 customerUserId: customerUserId,
                                 enableUsageLogs: enableUsageLogs,
-                                useStoreKit2: useStoreKit2,
+                                storeKitConfiguration: storeKitConfiguration,
                                 dispatchQueue: dispatchQueue) { error in
                     if let error = error {
                         return continuation.resume(throwing: error)
@@ -161,6 +161,49 @@ import Foundation
                         continuation.resume(throwing: error)
                     case let .success(products):
                         continuation.resume(returning: products)
+                    }
+                }
+            }
+        }
+
+        /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+        ///
+        /// - Parameters:
+        ///   - products: the ``AdaptyPaywallProduct`` array, for which information will be retrieved
+        ///
+        ///  - Returns: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
+        ///  - Throws: An `AdaptyError` object.
+        public static func getProductsIntroductoryOfferEligibility(products: [AdaptyPaywallProduct]) async throws -> [String: AdaptyEligibility] {
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.getProductsIntroductoryOfferEligibility(products: products) { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(eligibilities):
+                        continuation.resume(returning: eligibilities)
+                    }
+                }
+            }
+        }
+
+        /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
+        ///
+        /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+        ///
+        /// - Parameters:
+        ///   - vendorProductIds: The products ids `String` array, for which information will be retrieved
+        ///  - Returns: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
+        ///  - Throws: An `AdaptyError` object.
+        public static func getProductsIntroductoryOfferEligibility(vendorProductIds: [String]) async throws -> [String: AdaptyEligibility] {
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.getProductsIntroductoryOfferEligibility(vendorProductIds: vendorProductIds) { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(eligibilities):
+                        continuation.resume(returning: eligibilities)
                     }
                 }
             }

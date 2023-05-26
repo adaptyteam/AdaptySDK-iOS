@@ -25,14 +25,14 @@ extension Adapty {
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
     /// - Parameter enableUsageLogs: You can enable "Usage Logs" collection, passing here `true`
-    /// - Parameter useStoreKit2: You can override StoreKit 2 usage policy overriding this value
+    /// - Parameter storeKitConfiguration: You can override StoreKit 2 usage policy overriding this value
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
     public static func activate(_ apiKey: String,
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
                                 enableUsageLogs: Bool = false,
-                                useStoreKit2: StoreKit2Configuration = .default,
+                                storeKitConfiguration: StoreKitConfiguration = .default,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
@@ -55,7 +55,7 @@ extension Adapty {
 
             Adapty.dispatchQueue = dispatchQueue
 
-            Configuration.setUseStoreKit2(useStoreKit2)
+            Configuration.setStoreKitConfiguration(storeKitConfiguration)
             Configuration.observerMode = observerMode
             Configuration.sendSystemEventsEnabled = enableUsageLogs
 
@@ -198,7 +198,7 @@ extension Adapty {
 
     /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
     ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products)
     ///
     /// - Parameters:
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
@@ -237,7 +237,14 @@ extension Adapty {
             }
         }
     }
-
+    
+    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+    ///
+    /// - Parameters:
+    ///   - products: The ``AdaptyPaywallProduct`` array, for which information will be retrieved.
+    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
     public static func getProductsIntroductoryOfferEligibility(products: [AdaptyPaywallProduct],
                                                                _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
         async(completion,
@@ -249,6 +256,13 @@ extension Adapty {
         }
     }
 
+    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+    ///
+    /// - Parameters:
+    ///   - products: The products ids `String` array, for which information will be retrieved
+    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
     public static func getProductsIntroductoryOfferEligibility(vendorProductIds: [String],
                                                                _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
         async(completion,
