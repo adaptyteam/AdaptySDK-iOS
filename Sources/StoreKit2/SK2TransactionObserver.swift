@@ -48,7 +48,7 @@ extension SKQueueManager: SK2TransactionObserverDelegate {
     func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate != nil && transaction.expirationDate! < Date()) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
-        if let revocationDate = transaction.revocationDate {
+        if transaction.revocationDate != nil {
             return
         } else if let expirationDate = transaction.expirationDate, expirationDate < Date() {
             return

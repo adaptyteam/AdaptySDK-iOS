@@ -55,10 +55,7 @@ extension AdaptyProduct {
 
     /// The object containing introductory price information for the product. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
     public var introductoryDiscount: AdaptyProductDiscount? {
-        if #available(iOS 11.2, macOS 10.14.4, *), let discount = skProduct.introductoryPrice {
-            return AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
-        }
-        return nil
+        skProduct.adaptyIntroductoryDiscount
     }
 
     /// The identifier of the subscription group to which the subscription belongs. (Will be `nil` for iOS version below 12.0 and macOS version below 10.14).
@@ -71,7 +68,7 @@ extension AdaptyProduct {
 
     /// An array of subscription offers available for the auto-renewable subscription. (Will be empty for iOS version below 12.2 and macOS version below 10.14.4).
     public var discounts: [AdaptyProductDiscount] {
-        if #available(iOS 12.2, macOS 10.14.4, *) {
+        if #available(iOS 12.2, macOS 10.14.4, *) {            
             return skProduct.discounts.map { discount in
                 AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
             }
@@ -92,6 +89,16 @@ extension AdaptyProduct {
         return nil
     }
 }
+
+extension SKProduct {
+    var adaptyIntroductoryDiscount: AdaptyProductDiscount? {
+        if #available(iOS 11.2, macOS 10.14.4, *), let discount = introductoryPrice {
+            return AdaptyProductDiscount(discount: discount, locale: priceLocale)
+        }
+        return nil
+    }
+}
+
 
 enum ProductCodingKeys: String, CodingKey {
     case vendorProductId = "vendor_product_id"

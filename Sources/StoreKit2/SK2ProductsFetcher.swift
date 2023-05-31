@@ -63,6 +63,10 @@ actor SK2ProductsFetcher {
                 "products_ids": .value(products.map { $0.id }),
             ]))
 
+        guard !products.isEmpty else {
+            throw SKManagerError.noProductIDsFound().asAdaptyError
+        }
+
         products.forEach { self.products[$0.id] = $0 }
 
         return products

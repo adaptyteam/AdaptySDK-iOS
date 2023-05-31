@@ -33,6 +33,22 @@ extension AdaptyPeriodUnit {
         }
     }
 
+    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    public init(unit: Product.SubscriptionPeriod.Unit) {
+        switch unit {
+        case .day:
+            self = .day
+        case .week:
+            self = .week
+        case .month:
+            self = .month
+        case .year:
+            self = .year
+        @unknown default:
+            self = .unknown
+        }
+    }
+    
     @available(iOS 11.2, macOS 10.13.2, *)
     public init(unit: SKProduct.PeriodUnit?) {
         guard let unit = unit else {

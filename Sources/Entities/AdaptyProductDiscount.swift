@@ -36,6 +36,12 @@ public struct AdaptyProductDiscount {
 
 extension AdaptyProductDiscount {
     @available(iOS 11.2, macOS 10.14.4, *)
+    init?(discount: SKProductDiscount?, locale: Locale) {
+        guard let discount = discount else { return nil }
+        self.init(discount: discount, locale: locale)
+    }
+
+    @available(iOS 11.2, macOS 10.14.4, *)
     init(discount: SKProductDiscount, locale: Locale) {
         let identifier: String?
         if #available(iOS 12.2, *) {

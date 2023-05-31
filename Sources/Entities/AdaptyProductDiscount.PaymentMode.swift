@@ -31,6 +31,20 @@ extension AdaptyProductDiscount.PaymentMode {
             self = .unknown
         }
     }
+
+    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    public init(mode: Product.SubscriptionOffer.PaymentMode) {
+        switch mode {
+        case .payAsYouGo:
+            self = .payAsYouGo
+        case .payUpFront:
+            self = .payUpFront
+        case .freeTrial:
+            self = .freeTrial
+        default:
+            self = .unknown
+        }
+    }
 }
 
 extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {

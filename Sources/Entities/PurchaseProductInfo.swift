@@ -7,7 +7,7 @@
 import StoreKit
 
 struct PurchaseProductInfo {
-    let transactionId: String?
+    let transactionId: String? //
     let vendorProductId: String
     let productVariationId: String?
     let persistentProductVariationId: String?
@@ -73,34 +73,69 @@ extension PurchaseProductInfo: Encodable {
 }
 
 extension PurchaseProductInfo {
-    init(_ product: AdaptyProduct?, _ variationId: String?, _ persistentVariationId: String?, _ transaction: SKPaymentTransaction) {
+    init(_ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SKPaymentTransaction) {
+        self.init(transactionId: transaction.transactionIdentifier,
+                  vendorProductId: transaction.payment.productIdentifier,
+                  productVariationId: variationId,
+                  persistentProductVariationId: persistentVariationId,
+                  originalPrice: nil,
+                  discountPrice: nil,
+                  priceLocale: nil,
+                  storeCountry: nil,
+                  promotionalOfferId: nil,
+                  offer: nil)
+    }
+
+    init(_ product: SKProduct, _ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SKPaymentTransaction) {
         var discount: AdaptyProductDiscount?
 
         if #available(iOS 12.2, OSX 10.14.4, *),
            let identifier = transaction.payment.paymentDiscount?.identifier {
             // trying to extract promotional offer from transaction
-            discount = product?.discounts.first(where: { $0.identifier == identifier })
+            discount = AdaptyProductDiscount(
+                discount: product.discounts.first(where: { $0.identifier == identifier }),
+                locale: product.priceLocale
+            )
         }
         if discount == nil {
             // fill with introductory offer details by default if possible
             // server handles introductory price application
-            discount = product?.introductoryDiscount
+            discount = product.adaptyIntroductoryDiscount
         }
 
         self.init(transactionId: transaction.transactionIdentifier,
                   vendorProductId: transaction.payment.productIdentifier,
                   productVariationId: variationId,
                   persistentProductVariationId: persistentVariationId,
-                  originalPrice: product?.price,
+                  originalPrice: product.price.decimalValue,
                   discountPrice: discount?.price,
-                  priceLocale: product?.currencyCode,
-                  storeCountry: product?.regionCode,
+                  priceLocale: product.priceLocale.currencyCode,
+                  storeCountry: product.priceLocale.regionCode,
                   promotionalOfferId: discount?.identifier,
                   offer: PurchaseProductInfo.Offer(discount))
     }
 
-    init(_ product: SKProduct, _ variationId: String?, _ persistentVariationId: String?, _ transaction: SKPaymentTransaction) {
-        self.init(AdaptyDeferredProduct(skProduct: product, payment: transaction.payment), variationId, persistentVariationId, transaction)
+    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    init(_ product: Product, _ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: Transaction) {
+        var offer: Product.SubscriptionOffer?
+
+        if transaction.offerType == .introductory {
+            offer = product.subscription?.introductoryOffer
+        } else if let identifier = transaction.offerID {
+            // trying to extract promotional offer from transaction
+            offer = product.subscription?.promotionalOffers.first(where: { $0.id == identifier })
+        }
+
+        self.init(transactionId: String(transaction.id),
+                  vendorProductId: transaction.productID,
+                  productVariationId: variationId,
+                  persistentProductVariationId: persistentVariationId,
+                  originalPrice: product.price,
+                  discountPrice: offer?.price,
+                  priceLocale: product.priceFormatStyle.locale.currencyCode,
+                  storeCountry: product.priceFormatStyle.locale.regionCode,
+                  promotionalOfferId: transaction.offerID,
+                  offer: PurchaseProductInfo.Offer(offer))
     }
 }
 
@@ -110,5 +145,13 @@ extension PurchaseProductInfo.Offer {
         self.init(periodUnit: discount.subscriptionPeriod.unit,
                   numberOfUnits: discount.subscriptionPeriod.numberOfUnits,
                   type: discount.paymentMode)
+    }
+
+    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    init?(_ offer: Product.SubscriptionOffer?) {
+        guard let offer = offer else { return nil }
+        self.init(periodUnit: AdaptyPeriodUnit(unit: offer.period.unit),
+                  numberOfUnits: offer.period.value,
+                  type: AdaptyProductDiscount.PaymentMode(mode: offer.paymentMode))
     }
 }
