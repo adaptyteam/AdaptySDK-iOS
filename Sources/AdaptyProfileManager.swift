@@ -112,8 +112,52 @@ extension AdaptyProfileManager {
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
     }
 
-    func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: @escaping AdaptyErrorCompletion) {
-        manager.httpSession.performSetTransactionVariationIdRequest(profileId: profileId, transactionId: transactionId, variationId: variationId, completion)
+    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SKPaymentTransaction, _ completion: @escaping AdaptyErrorCompletion) {
+        guard transaction.transactionState == .purchased || transaction.transactionState == .restored else {
+            completion(.wrongParamPurchasedTransaction())
+            return
+        }
+        manager.skProductsManager.fetchPurchaseProductInfo(variationId: variationId, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
+
+            guard let self = self, self.isActive else {
+                completion(.profileWasChanged())
+                return
+            }
+
+            self.manager.validatePurchase(info: purchaseProductInfo) { [weak self] result in
+                switch result {
+                case let .failure(error):
+                    completion(error)
+                case let .success(profile):
+                    if let self = self, self.isActive { self.saveResponse(profile) }
+                    completion(nil)
+                }
+            }
+        }
+    }
+
+    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: Transaction, _ completion: @escaping AdaptyErrorCompletion) {
+        manager.skProductsManager.fetchPurchaseProductInfo(variationId: variationId, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
+
+            guard let self = self, self.isActive else {
+                completion(.profileWasChanged())
+                return
+            }
+
+            self.manager.httpSession
+                .performValidateTransactionRequest(profileId: profileId,
+                                                   originalTransactionId: String(transaction.originalID),
+                                                   purchaseProductInfo: purchaseProductInfo) { [weak self] result in
+                    switch result {
+                    case let .failure(error):
+                        completion(error)
+                    case let .success(profile):
+                        if let self = self, self.isActive { self.saveResponse(profile) }
+                        completion(nil)
+                    }
+                }
+        }
     }
 
     func getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {

@@ -141,6 +141,11 @@ extension AdaptyError {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding AdaptyPaywallProduct failed", error: error).asAdaptyError
     }
 
+    static func wrongParamPurchasedTransaction(file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Transaction is not in \"purchased\" state").asAdaptyError
+    }
+
     static func wrongParamOnboardingScreenOrder(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Wrong screenOrder parameter value, it should be more than zero.").asAdaptyError

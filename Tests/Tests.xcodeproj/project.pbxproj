@@ -36,6 +36,8 @@
 		8A590DD829DE27FE00547895 /* AnyCodingKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */; };
 		8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */; };
 		8AA58F3E2A278A2000AE26CA /* ValidateTransactionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */; };
+		8AA58F402A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */; };
+		8AA58F422A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */; };
 		8AAF8B062927ACA50003BA86 /* EventCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */; };
 		8AAF8B10292839280003BA86 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B0F292839280003BA86 /* AppDelegate.swift */; };
 		8AAF8B14292839280003BA86 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAF8B13292839280003BA86 /* ViewController.swift */; };
@@ -79,7 +81,6 @@
 		8AB0034D2926FCEA008476A3 /* CreateProfileRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CA2926FCEA008476A3 /* CreateProfileRequest.swift */; };
 		8AB0034E2926FCEA008476A3 /* FetchProductStatesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CB2926FCEA008476A3 /* FetchProductStatesRequest.swift */; };
 		8AB0034F2926FCEA008476A3 /* FetchEventsConfigRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CC2926FCEA008476A3 /* FetchEventsConfigRequest.swift */; };
-		8AB003502926FCEA008476A3 /* SetTransactionVariationIdRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CD2926FCEA008476A3 /* SetTransactionVariationIdRequest.swift */; };
 		8AB003512926FCEA008476A3 /* Backend.Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CE2926FCEA008476A3 /* Backend.Codable.swift */; };
 		8AB003522926FCEA008476A3 /* Backend.Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002CF2926FCEA008476A3 /* Backend.Validator.swift */; };
 		8AB003532926FCEA008476A3 /* Backend.QueryItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D02926FCEA008476A3 /* Backend.QueryItems.swift */; };
@@ -237,6 +238,8 @@
 		8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodingKeys.swift; sourceTree = "<group>"; };
 		8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPSession+logSystemEvent.swift"; sourceTree = "<group>"; };
 		8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateTransactionRequest.swift; sourceTree = "<group>"; };
+		8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK1ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
+		8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK2ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
 		8AAF8B052927ACA50003BA86 /* EventCollectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollectionTests.swift; sourceTree = "<group>"; };
 		8AAF8B0D292839280003BA86 /* TestsHostApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestsHostApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AAF8B0F292839280003BA86 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -283,7 +286,6 @@
 		8AB002CA2926FCEA008476A3 /* CreateProfileRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateProfileRequest.swift; sourceTree = "<group>"; };
 		8AB002CB2926FCEA008476A3 /* FetchProductStatesRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchProductStatesRequest.swift; sourceTree = "<group>"; };
 		8AB002CC2926FCEA008476A3 /* FetchEventsConfigRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchEventsConfigRequest.swift; sourceTree = "<group>"; };
-		8AB002CD2926FCEA008476A3 /* SetTransactionVariationIdRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetTransactionVariationIdRequest.swift; sourceTree = "<group>"; };
 		8AB002CE2926FCEA008476A3 /* Backend.Codable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.Codable.swift; sourceTree = "<group>"; };
 		8AB002CF2926FCEA008476A3 /* Backend.Validator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.Validator.swift; sourceTree = "<group>"; };
 		8AB002D02926FCEA008476A3 /* Backend.QueryItems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.QueryItems.swift; sourceTree = "<group>"; };
@@ -600,6 +602,7 @@
 				8AB002AC2926FCEA008476A3 /* SKReceiptManager.swift */,
 				8AE26FAA29FAC73A003D1A15 /* SK1ProductsFetcher.swift */,
 				8AE26FB22A0D2A31003D1A15 /* SK1Product+IntroductoryOfferEligibility.swift */,
+				8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */,
 			);
 			path = StoreKit;
 			sourceTree = "<group>";
@@ -641,7 +644,6 @@
 				8AB002C82926FCEA008476A3 /* FetchProfileRequest.swift */,
 				8AB002FF2926FCEA008476A3 /* SendEventsRequest.swift */,
 				8AB002C92926FCEA008476A3 /* SetAttributionRequest.swift */,
-				8AB002CD2926FCEA008476A3 /* SetTransactionVariationIdRequest.swift */,
 				8AB002C52926FCEA008476A3 /* SignSubscriptionOfferRequest.swift */,
 				8AB002C72926FCEA008476A3 /* UpdateProfileRequest.swift */,
 				8AB002C42926FCEA008476A3 /* ValidateReceiptRequest.swift */,
@@ -792,6 +794,7 @@
 				8AE26FAC2A0D1D8E003D1A15 /* StoreKit2Configuration.swift */,
 				8AE26FB02A0D2333003D1A15 /* SK2Product+IntroductoryOfferEligibility.swift */,
 				8A1561D72A20D9F300CF7214 /* SK2TransactionObserver.swift */,
+				8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */,
 			);
 			path = StoreKit2;
 			sourceTree = "<group>";
@@ -1031,8 +1034,8 @@
 				8AB003842926FCEA008476A3 /* AdaptyOnboardingScreenParameters.swift in Sources */,
 				8AB003302926FCEA008476A3 /* SKManagerError.swift in Sources */,
 				8AB003942926FCEA008476A3 /* AdaptyProfile.swift in Sources */,
+				8AA58F422A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift in Sources */,
 				8AB003712926FCEA008476A3 /* HTTPError.swift in Sources */,
-				8AB003502926FCEA008476A3 /* SetTransactionVariationIdRequest.swift in Sources */,
 				8AB003A72926FCEA008476A3 /* LifecycleManager.swift in Sources */,
 				8AB003402926FCEA008476A3 /* Adapty+Concurrency.swift in Sources */,
 				8AB003322926FCEA008476A3 /* SKReceiptManager.swift in Sources */,
@@ -1116,6 +1119,7 @@
 				8A1F7471297B2966002B7FBC /* Text.swift in Sources */,
 				8AD35B0229D73BE90096700C /* AdaptySystemEventParameters.swift in Sources */,
 				8A1F7454297AC0B2002B7FBC /* ViewStyle.swift in Sources */,
+				8AA58F402A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift in Sources */,
 				8AB0032F2926FCEA008476A3 /* SKQueueManager.swift in Sources */,
 				8AB003582926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift in Sources */,
 				8A1F74522979D5AD002B7FBC /* FetchViewConfigurationRequest.swift in Sources */,

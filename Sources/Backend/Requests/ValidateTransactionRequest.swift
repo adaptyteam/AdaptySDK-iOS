@@ -49,7 +49,7 @@ struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
 extension HTTPSession {
     func performValidateTransactionRequest(profileId: String,
                                            originalTransactionId: String,
-                                           purchaseProductInfo: PurchaseProductInfo? = nil,
+                                           purchaseProductInfo: PurchaseProductInfo?,
                                            _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         let request = ValidateTransactionRequest(profileId: profileId,
                                              originalTransactionId: originalTransactionId,
