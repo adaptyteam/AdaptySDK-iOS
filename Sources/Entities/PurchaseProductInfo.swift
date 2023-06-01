@@ -119,11 +119,15 @@ extension PurchaseProductInfo {
     init(_ product: Product, _ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: Transaction) {
         var offer: Product.SubscriptionOffer?
 
-        if transaction.offerType == .introductory {
-            offer = product.subscription?.introductoryOffer
-        } else if let identifier = transaction.offerID {
+        if let identifier = transaction.offerID {
             // trying to extract promotional offer from transaction
             offer = product.subscription?.promotionalOffers.first(where: { $0.id == identifier })
+        }
+
+        if offer == nil  {
+            // fill with introductory offer details by default if possible
+            // server handles introductory price application
+            offer = product.subscription?.introductoryOffer
         }
 
         self.init(transactionId: String(transaction.id),
@@ -134,7 +138,7 @@ extension PurchaseProductInfo {
                   discountPrice: offer?.price,
                   priceLocale: product.priceFormatStyle.locale.currencyCode,
                   storeCountry: product.priceFormatStyle.locale.regionCode,
-                  promotionalOfferId: transaction.offerID,
+                  promotionalOfferId: offer?.id,
                   offer: PurchaseProductInfo.Offer(offer))
     }
 }
