@@ -77,7 +77,7 @@ extension SKQueueManager {
             fetchPurchaseProductInfo(manager: self, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
                 let productId = purchaseProductInfo.vendorProductId
 
-                self?.purchaseValidator.validatePurchase(info: purchaseProductInfo) { result in
+                self?.purchaseValidator.validatePurchaseByReceipt(info: purchaseProductInfo) { result in
                     guard let self = self else { return }
                     if result.error == nil {
                         self.removeVariationId(for: productId)
@@ -89,7 +89,7 @@ extension SKQueueManager {
                             Log.info("SKQueueManager: finish purchased transaction \(transaction)")
                         }
                     }
-                    self.callMakePurchasesCompletionHandlers(productId, result.map { $0.value })
+                    self.callMakePurchasesCompletionHandlers(productId, result)
                 }
             }
         }

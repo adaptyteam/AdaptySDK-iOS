@@ -16,7 +16,13 @@ public enum StoreKit2Configuration {
 }
 
 extension Adapty.Configuration {
-    static var enabledStoreKit2: Bool { enabledStoreKit2ProductsFetcher }
+    static var useStoreKit2Configuration: String {
+        guard Environment.StoreKit2.available else { return "unavailable" }
+        switch _useStoreKit2 {
+        case .disabled: return "disabled"
+        case .enableToDetermineIntroductoryOfferEligibility: return "enabled_for_introductory_offer_eligibility"
+        }
+    }
 
     static var enabledStoreKit2ProductsFetcher: Bool {
         guard Environment.StoreKit2.available else { return false }

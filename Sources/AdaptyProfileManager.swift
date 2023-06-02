@@ -124,15 +124,7 @@ extension AdaptyProfileManager {
                 return
             }
 
-            self.manager.validatePurchase(info: purchaseProductInfo) { [weak self] result in
-                switch result {
-                case let .failure(error):
-                    completion(error)
-                case let .success(profile):
-                    if let self = self, self.isActive { self.saveResponse(profile) }
-                    completion(nil)
-                }
-            }
+            self.manager.validatePurchaseByReceipt(info: purchaseProductInfo) { completion($0.error) }
         }
     }
 
@@ -145,18 +137,8 @@ extension AdaptyProfileManager {
                 return
             }
 
-            self.manager.httpSession
-                .performValidateTransactionRequest(profileId: profileId,
-                                                   originalTransactionId: String(transaction.originalID),
-                                                   purchaseProductInfo: purchaseProductInfo) { [weak self] result in
-                    switch result {
-                    case let .failure(error):
-                        completion(error)
-                    case let .success(profile):
-                        if let self = self, self.isActive { self.saveResponse(profile) }
-                        completion(nil)
-                    }
-                }
+            self.manager.validatePurchaseByOriginalTransaction(originalTransactionId: String(transaction.originalID),
+                                                               info: purchaseProductInfo) { completion($0.error) }
         }
     }
 

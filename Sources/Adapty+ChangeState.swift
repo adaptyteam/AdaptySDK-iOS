@@ -32,7 +32,6 @@ public final class Adapty {
         skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
 
-
         state = .initializingTo(customerUserId: customerUserId)
 
         skReceiptManager.refreshReceiptIfEmpty()

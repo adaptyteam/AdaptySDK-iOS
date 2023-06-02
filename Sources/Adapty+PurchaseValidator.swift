@@ -1,5 +1,5 @@
 //
-//  Adapty+ReceiptValidator.swift
+//  Adapty+PurchaseValidator.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 24.10.2022.
@@ -8,7 +8,8 @@
 import Foundation
 
 protocol PurchaseValidator {
-    func validatePurchase(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>)
+    func validatePurchaseByReceipt(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>)
+    func validatePurchaseByOriginalTransaction(originalTransactionId: String, info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>)
 }
 
 extension Adapty: PurchaseValidator {
@@ -30,7 +31,7 @@ extension Adapty: PurchaseValidator {
         }
     }
 
-    func validatePurchase(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+    func validatePurchaseByReceipt(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         skReceiptManager.getReceipt(refreshIfEmpty: true) { [weak self] result in
             switch result {
             case let .failure(error):
@@ -43,10 +44,22 @@ extension Adapty: PurchaseValidator {
                                                                purchaseProductInfo: info) { [weak self] result in
                     completion(result.map { profile in
                         self?.saveValidateReceiptResponse(profile: profile)
-                        return profile
+                        return profile.value
                     })
                 }
             }
+        }
+    }
+
+    func validatePurchaseByOriginalTransaction(originalTransactionId: String, info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        let profileId = profileStorage.profileId
+        httpSession.performValidateTransactionRequest(profileId: profileId,
+                                                      originalTransactionId: originalTransactionId,
+                                                      purchaseProductInfo: info) { [weak self] result in
+            completion(result.map { profile in
+                self?.saveValidateReceiptResponse(profile: profile)
+                return profile.value
+            })
         }
     }
 }

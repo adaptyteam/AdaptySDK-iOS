@@ -98,7 +98,7 @@
 		8AB0035F2926FCEA008476A3 /* PaywallsStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002DD2926FCEA008476A3 /* PaywallsStorage+UserDefaults.swift */; };
 		8AB003602926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002DE2926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift */; };
 		8AB003612926FCEA008476A3 /* Adapty+AsyncHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002DF2926FCEA008476A3 /* Adapty+AsyncHelpers.swift */; };
-		8AB003622926FCEA008476A3 /* Adapty+ReceiptValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002E02926FCEA008476A3 /* Adapty+ReceiptValidator.swift */; };
+		8AB003622926FCEA008476A3 /* Adapty+PurchaseValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002E02926FCEA008476A3 /* Adapty+PurchaseValidator.swift */; };
 		8AB003632926FCEA008476A3 /* HTTPEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002E22926FCEA008476A3 /* HTTPEndpoint.swift */; };
 		8AB003642926FCEA008476A3 /* URLRequest+Curl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002E42926FCEA008476A3 /* URLRequest+Curl.swift */; };
 		8AB003652926FCEA008476A3 /* Data+Curl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002E52926FCEA008476A3 /* Data+Curl.swift */; };
@@ -303,7 +303,7 @@
 		8AB002DD2926FCEA008476A3 /* PaywallsStorage+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PaywallsStorage+UserDefaults.swift"; sourceTree = "<group>"; };
 		8AB002DE2926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ApiKeyHash+UserDefaults.swift"; sourceTree = "<group>"; };
 		8AB002DF2926FCEA008476A3 /* Adapty+AsyncHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+AsyncHelpers.swift"; sourceTree = "<group>"; };
-		8AB002E02926FCEA008476A3 /* Adapty+ReceiptValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+ReceiptValidator.swift"; sourceTree = "<group>"; };
+		8AB002E02926FCEA008476A3 /* Adapty+PurchaseValidator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+PurchaseValidator.swift"; sourceTree = "<group>"; };
 		8AB002E22926FCEA008476A3 /* HTTPEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPEndpoint.swift; sourceTree = "<group>"; };
 		8AB002E42926FCEA008476A3 /* URLRequest+Curl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URLRequest+Curl.swift"; sourceTree = "<group>"; };
 		8AB002E52926FCEA008476A3 /* Data+Curl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Curl.swift"; sourceTree = "<group>"; };
@@ -565,7 +565,7 @@
 				8AB002BB2926FCEA008476A3 /* Adapty+Concurrency.swift */,
 				8AB002B22926FCEA008476A3 /* Adapty+Events.swift */,
 				8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */,
-				8AB002E02926FCEA008476A3 /* Adapty+ReceiptValidator.swift */,
+				8AB002E02926FCEA008476A3 /* Adapty+PurchaseValidator.swift */,
 				8AB002BC2926FCEA008476A3 /* Adapty+UpdateAttribution.swift */,
 				8A1561D52A20D8DD00CF7214 /* Adapty+presentCodeRedemptionSheet.swift */,
 				8AB002D12926FCEA008476A3 /* AdaptyDelegate.swift */,
@@ -1075,7 +1075,7 @@
 				8AB003462926FCEA008476A3 /* FetchAllProductVendorIdsRequest.swift in Sources */,
 				8A1F743F2979B67C002B7FBC /* Color.swift in Sources */,
 				8A1F744F2979D1B2002B7FBC /* ViewConfiguration.swift in Sources */,
-				8AB003622926FCEA008476A3 /* Adapty+ReceiptValidator.swift in Sources */,
+				8AB003622926FCEA008476A3 /* Adapty+PurchaseValidator.swift in Sources */,
 				8AB0035E2926FCEA008476A3 /* ProfileStorage+UserDefaults.swift in Sources */,
 				8AB003902926FCEA008476A3 /* AdaptyProfileParameters.Builder.swift in Sources */,
 				8AB0034E2926FCEA008476A3 /* FetchProductStatesRequest.swift in Sources */,

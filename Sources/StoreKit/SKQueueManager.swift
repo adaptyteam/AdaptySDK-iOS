@@ -30,7 +30,7 @@ final class SKQueueManager: NSObject {
 
     private(set) var _sk2TransactionObserver: Any?
 
-    init(queue: DispatchQueue, storage: VariationIdStorage, skProductsManager: SKProductsManager) {
+    init(queue: DispatchQueue,  storage: VariationIdStorage, skProductsManager: SKProductsManager) {
         self.queue = queue
         self.storage = storage
         variationsIds = storage.getVariationsIds() ?? [:]

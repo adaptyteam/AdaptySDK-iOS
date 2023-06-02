@@ -48,13 +48,27 @@ extension SKQueueManager: SK2TransactionObserverDelegate {
     func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate != nil && transaction.expirationDate! < Date()) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
-        if transaction.revocationDate != nil {
-            return
-        } else if let expirationDate = transaction.expirationDate, expirationDate < Date() {
-            return
-        } else if transaction.isUpgraded {
-            return
-        } else {
+        guard transaction.justPurchased else { return }
+        let originalTransactionId = String(transaction.originalID)
+        skProductsManager.fetchPurchaseProductInfo(variationId: nil, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
+
+            self?.purchaseValidator.validatePurchaseByOriginalTransaction(originalTransactionId: originalTransactionId,
+                                                                          info: purchaseProductInfo) { _ in }
         }
+    }
+}
+
+@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+extension Transaction {
+    fileprivate var justPurchased: Bool {
+        if revocationDate != nil {
+            return false
+        } else if let expirationDate = expirationDate, expirationDate < Date() {
+            return false
+        } else if isUpgraded {
+            return false
+        }
+
+        return true
     }
 }
