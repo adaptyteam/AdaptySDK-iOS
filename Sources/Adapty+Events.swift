@@ -22,13 +22,8 @@ extension Adapty {
         trackEvent(.appOpened, completion)
     }
 
-    static func logSystemEvent(_ params: AdaptySystemEventParameters, completion: AdaptyErrorCompletion? = nil) {
-        async(completion) { completion in
-
-            Adapty.eventsManager.trackEvent(Event(type: .system(params), profileId: profileIdentifierStorage.profileId)) { error in
-                completion(error?.asAdaptyError)
-            }
-        }
+    static func logSystemEvent(_ params: AdaptySystemEventParameters) {
+        eventsManager.trackEvent(Event(type: .system(params), profileId: profileIdentifierStorage.profileId), completion: { _ in })
     }
 
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
