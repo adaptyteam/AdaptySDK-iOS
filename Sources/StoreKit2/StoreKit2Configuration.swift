@@ -23,9 +23,9 @@ public enum StoreKit2Usage {
 extension Adapty.Configuration {
     static var useStoreKit2Configuration: String {
         guard Environment.StoreKit2.available else { return "unavailable" }
-        switch _useStoreKit2 {
+        switch _storeKit2Usage {
         case .disabled: return "disabled"
-        case .enableToDetermineIntroductoryOfferEligibility: return "enabled_for_introductory_offer_eligibility"
+        case .forIntroEligibilityCheck: return "enabled_for_introductory_offer_eligibility"
         }
     }
 
