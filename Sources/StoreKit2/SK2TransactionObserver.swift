@@ -48,7 +48,7 @@ extension SKQueueManager: SK2TransactionObserverDelegate {
     func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate != nil && transaction.expirationDate! < Date()) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
-        guard transaction.justPurchased else { return }
+        guard transaction.justPurchasedRenewed else { return }
         let originalTransactionId = String(transaction.originalID)
         skProductsManager.fetchPurchaseProductInfo(variationId: nil, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
 
@@ -60,7 +60,7 @@ extension SKQueueManager: SK2TransactionObserverDelegate {
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
 extension Transaction {
-    fileprivate var justPurchased: Bool {
+    fileprivate var justPurchasedRenewed: Bool {
         if revocationDate != nil {
             return false
         } else if let expirationDate = expirationDate, expirationDate < Date() {
