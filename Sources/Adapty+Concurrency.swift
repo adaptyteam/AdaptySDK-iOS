@@ -217,7 +217,7 @@ import StoreKit
         ///   - product: a `AdaptyPaywallProduct` object retrieved from the paywall.
         /// - Returns: The `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
         /// - Throws: An `AdaptyError` object
-        public static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyProfile {
+        public static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchasedInfo {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.makePurchase(product: product) { result in
                     switch result {

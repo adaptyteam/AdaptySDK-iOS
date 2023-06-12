@@ -8,7 +8,7 @@
 import StoreKit
 
 extension SKQueueManager {
-    func makePurchase<T: AdaptyProduct>(payment: SKPayment, product: T, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    func makePurchase<T: AdaptyProduct>(payment: SKPayment, product: T, _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>) {
         queue.async { [weak self] in
             let productId = payment.productIdentifier
             guard let self = self else { return }
@@ -89,14 +89,16 @@ extension SKQueueManager {
                             Log.info("SKQueueManager: finish purchased transaction \(transaction)")
                         }
                     }
-                    self.callMakePurchasesCompletionHandlers(productId, result)
+                    self.callMakePurchasesCompletionHandlers(productId, result.map {
+                        AdaptyPurchasedInfo(profile: $0, transaction: transaction)
+                    })
                 }
             }
         }
     }
 
     func callMakePurchasesCompletionHandlers(_ productId: String,
-                                             _ result: AdaptyResult<AdaptyProfile>) {
+                                             _ result: AdaptyResult<AdaptyPurchasedInfo>) {
         queue.async { [weak self] in
             guard let self = self else { return }
 
