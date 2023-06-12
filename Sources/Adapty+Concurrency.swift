@@ -209,13 +209,27 @@ import StoreKit
             }
         }
 
+        public static func getReceipt() async throws -> Data {
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.getReceipt() { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(response):
+                        continuation.resume(returning: response)
+                    }
+                }
+            }
+        }
+        
+
         /// To make the purchase, you have to call this method.
         ///
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
         ///
         /// - Parameters:
         ///   - product: a `AdaptyPaywallProduct` object retrieved from the paywall.
-        /// - Returns: The `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        /// - Returns: The `AdaptyPurchasedInfo` object.
         /// - Throws: An `AdaptyError` object
         public static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchasedInfo {
             return try await withCheckedThrowingContinuation { continuation in
