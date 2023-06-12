@@ -40,7 +40,7 @@ final class SKQueueManager: NSObject {
 
     var purchaseValidator: PurchaseValidator!
 
-    var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyProfile>]]()
+    var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchasedInfo>]]()
     var makePurchasesProduct = [String: AdaptyProduct]()
 
     private var storage: VariationIdStorage

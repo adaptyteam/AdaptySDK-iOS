@@ -237,7 +237,7 @@ extension Adapty {
             }
         }
     }
-    
+
     /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
@@ -317,15 +317,21 @@ extension Adapty {
         }
     }
 
+    public static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
+        async(completion, logName: "get_reciept") { manager, completion in
+            manager.skReceiptManager.getReceipt(refreshIfEmpty: true, completion)
+        }
+    }
+
     /// To make the purchase, you have to call this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
     ///
     /// - Parameters:
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
-    ///   - completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    ///   - completion: A result containing the ``AdaptyPurchasedInfo`` object.
     public static func makePurchase(product: AdaptyPaywallProduct,
-                                    _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+                                    _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>) {
         let logName = "make_purchase"
         let logParams: EventParameters = [
             "paywall_name": .value(product.paywallName),
