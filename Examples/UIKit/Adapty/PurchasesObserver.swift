@@ -58,8 +58,8 @@ class PurchasesObserver: ObservableObject {
     func makePurchase(_ product: AdaptyPaywallProduct, completion: ((AdaptyError?) -> Void)?) {
         Adapty.makePurchase(product: product) { [weak self] result in
             switch result {
-            case let .success(profile):
-                self?.profile = profile
+            case let .success(purchasedResult):
+                self?.profile = purchasedResult.profile
                 completion?(nil)
             case let .failure(error):
                 completion?(error)
