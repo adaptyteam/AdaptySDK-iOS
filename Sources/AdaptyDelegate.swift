@@ -23,7 +23,7 @@ public protocol AdaptyDelegate: AnyObject {
 }
 
 extension AdaptyDelegate {
-    public func shouldAddStorePayment(for product: AdaptyDeferredProduct, defermentCompletion makeDeferredPurchase: @escaping (AdaptyResultCompletion<AdaptyProfile>?) -> Void) -> Bool {
+    public func shouldAddStorePayment(for product: AdaptyDeferredProduct, defermentCompletion makeDeferredPurchase: @escaping (AdaptyResultCompletion<AdaptyPurchasedInfo>?) -> Void) -> Bool {
         true
     }
 }
