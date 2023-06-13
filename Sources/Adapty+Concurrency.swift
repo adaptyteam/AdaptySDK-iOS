@@ -130,8 +130,8 @@ import StoreKit
         ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
         ///             Example: "en" means English, "en-US" represents US English.
         ///             If the parameter is omitted, the paywall will be returned in the default locale.
-        /// - Returns: The `AdaptyPaywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-        /// - Throws: An `AdaptyError` object
+        /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+        /// - Throws: An ``AdaptyError`` object
         public static func getPaywall(_ id: String, locale: String? = nil) async throws -> AdaptyPaywall? {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getPaywall(id, locale: locale) { result in
@@ -145,14 +145,14 @@ import StoreKit
             }
         }
 
-        /// Once you have a `AdaptyPaywall`, fetch corresponding products array using this method.
+        /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
         ///
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
         ///
         /// - Parameters:
-        ///   - paywall: the `AdaptyPaywall` for which you want to get a products
-        /// - Returns: A result containing the `AdaptyPaywallProduct` objects array. You can present them in your UI
-        /// - Throws: An `AdaptyError` object
+        ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
+        /// - Returns: A result containing the ``AdaptyPaywallProduct`` objects array. You can present them in your UI
+        /// - Throws: An ``AdaptyError`` object
         public static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct]? {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getPaywallProducts(paywall: paywall) { result in
@@ -174,7 +174,7 @@ import StoreKit
         ///   - products: the ``AdaptyPaywallProduct`` array, for which information will be retrieved
         ///
         ///  - Returns: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-        ///  - Throws: An `AdaptyError` object.
+        ///  - Throws: An ``AdaptyError`` object.
         public static func getProductsIntroductoryOfferEligibility(products: [AdaptyPaywallProduct]) async throws -> [String: AdaptyEligibility] {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getProductsIntroductoryOfferEligibility(products: products) { result in
@@ -195,7 +195,7 @@ import StoreKit
         /// - Parameters:
         ///   - vendorProductIds: The products ids `String` array, for which information will be retrieved
         ///  - Returns: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-        ///  - Throws: An `AdaptyError` object.
+        ///  - Throws: An ``AdaptyError`` object.
         public static func getProductsIntroductoryOfferEligibility(vendorProductIds: [String]) async throws -> [String: AdaptyEligibility] {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getProductsIntroductoryOfferEligibility(vendorProductIds: vendorProductIds) { result in
@@ -209,9 +209,15 @@ import StoreKit
             }
         }
 
+        /// You can fetch the StoreKit receipt by calling this method
+        ///
+        /// If the receipt is not presented on the device, Adapty will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
+        ///
+        /// - Returns: The receipt `Data`.
+        /// - Throws: An ``AdaptyError`` object.
         public static func getReceipt() async throws -> Data {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getReceipt() { result in
+                Adapty.getReceipt { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)
@@ -221,16 +227,15 @@ import StoreKit
                 }
             }
         }
-        
 
         /// To make the purchase, you have to call this method.
         ///
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
         ///
         /// - Parameters:
-        ///   - product: a `AdaptyPaywallProduct` object retrieved from the paywall.
-        /// - Returns: The `AdaptyPurchasedInfo` object.
-        /// - Throws: An `AdaptyError` object
+        ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
+        /// - Returns: The ``AdaptyPurchasedInfo`` object.
+        /// - Throws: An ``AdaptyError`` object
         public static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchasedInfo {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.makePurchase(product: product) { result in
@@ -248,8 +253,8 @@ import StoreKit
         ///
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
         ///
-        /// - Returns: The `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-        /// - Throws: An `AdaptyError` object
+        /// - Returns: The ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+        /// - Throws: An ``AdaptyError`` object
         public static func restorePurchases() async throws -> AdaptyProfile {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.restorePurchases { result in
@@ -271,7 +276,7 @@ import StoreKit
         ///
         /// - Parameters:
         ///   - paywalls: a JSON representation of your paywalls/products list in the exact same format as provided by Adapty backend.
-        /// - Throws: An `AdaptyError` object
+        /// - Throws: An ``AdaptyError`` object
         public static func setFallbackPaywalls(_ paywalls: Data) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.setFallbackPaywalls(paywalls) { error in
@@ -293,8 +298,8 @@ import StoreKit
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
         ///
         /// - Parameters:
-        ///   - paywall: A `AdaptyPaywall` object.
-        ///  - Throws: An `AdaptyError` object
+        ///   - paywall: A ``AdaptyPaywall`` object.
+        ///  - Throws: An ``AdaptyError`` object
         public static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.logShowPaywall(paywall) { error in
@@ -318,7 +323,7 @@ import StoreKit
         ///   - name: Name of your onboarding.
         ///   - screenName: Readable name of a particular screen as part of onboarding.
         ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
-        /// - Throws: An `AdaptyError` object
+        /// - Throws: An ``AdaptyError`` object
         public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
             let params = AdaptyOnboardingScreenParameters(name: name,
                                                           screenName: screenName,
@@ -336,11 +341,14 @@ import StoreKit
             }
         }
 
-        /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+        /// Link purchased transaction with paywall's variationId.
+        ///
+        /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
         ///
         /// - Parameters:
-        ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
-        ///   - forPurchasedTransaction: A purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
+        ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
+        ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
+        /// - Throws: An ``AdaptyError`` object
         public static func setVariationId(
             _ variationId: String,
             forPurchasedTransaction transaction: SKPaymentTransaction
@@ -357,11 +365,14 @@ import StoreKit
             }
         }
 
-        /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+        /// Link purchased transaction with paywall's variationId.
+        ///
+        /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
         ///
         /// - Parameters:
         ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
-        ///   - forPurchasedTransaction: A purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/transaction).
+        ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
+        /// - Throws: An ``AdaptyError`` object
         @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
         public static func setVariationId(
             _ variationId: String,

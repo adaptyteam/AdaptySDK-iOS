@@ -137,11 +137,13 @@ extension Adapty {
         }
     }
 
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+    /// Link purchased transaction with paywall's variationId.
+    ///
+    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
     ///
     /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
-    ///   - forPurchasedTransaction: A purchased transaction [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
+    ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
+    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
     ///   - completion: A result containing an optional error.
     public static func setVariationId(_ variationId: String,
                                       forPurchasedTransaction transaction: SKPaymentTransaction,
@@ -161,11 +163,13 @@ extension Adapty {
         }
     }
 
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/v2.0.0/docs/paywall) or [A/B Tests](https://docs.adapty.io/v2.0.0/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+    /// Link purchased transaction with paywall's variationId.
+    ///
+    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
     ///
     /// - Parameters:
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
-    ///   - forPurchasedTransaction: A purchased transaction [Transaction](https://developer.apple.com/documentation/storekit/transaction).
+    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - completion: A result containing an optional error.
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
     public static func setVariationId(_ variationId: String,
@@ -196,7 +200,7 @@ extension Adapty {
     ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
     ///             Example: "en" means English, "en-US" represents US English.
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
-    ///   - completion: A result containing the `AdaptyPaywall` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     public static func getPaywall(_ id: String,
                                   locale: String? = nil,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
@@ -342,6 +346,12 @@ extension Adapty {
         }
     }
 
+    /// You can fetch the StoreKit receipt by calling this method
+    ///
+    /// If the receipt is not presented on the device, Adapty will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
+    ///
+    /// - Parameters:
+    ///   - completion: A result containing the receipt `Data`.
     public static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
         async(completion, logName: "get_reciept") { manager, completion in
             manager.skReceiptManager.getReceipt(refreshIfEmpty: true, completion)
@@ -400,7 +410,7 @@ extension Adapty {
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
     ///
-    /// - Parameter completion: A result containing the `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    /// - Parameter completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     public static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         async(completion, logName: "restore_purchases") { manager, completion in
             manager.validateReceipt(refreshIfEmpty: true) { result in
