@@ -39,12 +39,22 @@ final class SKProductsManager {
     }
 
     func fetchSK1Product(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<SKProduct>) {
-        fetchSK1Products(productIdentifiers: [productId], fetchPolicy: fetchPolicy, retryCount: retryCount) { result in
+        fetchSK1Products(productIdentifiers: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount) { result in
             completion(result.flatMap {
                 guard let product = $0.first else {
                     return .failure(SKManagerError.noProductIDsFound().asAdaptyError)
                 }
                 return .success(product)
+            })
+        }
+    }
+
+    func fetchSK1ProductsInSameOrder(productIdentifiers productIds: [String], fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SKProduct]>) {
+        fetchSK1Products(productIdentifiers: Set(productIds), fetchPolicy: fetchPolicy, retryCount: retryCount) {
+            completion($0.map { skProducts in
+                productIds.compactMap { id in
+                    skProducts.first { $0.productIdentifier == id }
+                }
             })
         }
     }
@@ -55,12 +65,23 @@ final class SKProductsManager {
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
     func fetchSK2Product(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<Product>) {
-        fetchSK2Products(productIdentifiers: [productId], fetchPolicy: fetchPolicy, retryCount: retryCount) { result in
+        fetchSK2Products(productIdentifiers: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount) { result in
             completion(result.flatMap {
                 guard let product = $0.first else {
                     return .failure(SKManagerError.noProductIDsFound().asAdaptyError)
                 }
                 return .success(product)
+            })
+        }
+    }
+
+    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    func fetchSK2ProductsInSameOrder(productIdentifiers productIds: [String], fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[Product]>) {
+        fetchSK2Products(productIdentifiers: Set(productIds), fetchPolicy: fetchPolicy, retryCount: retryCount) {
+            completion($0.map { products in
+                productIds.compactMap { id in
+                    products.first { $0.id == id }
+                }
             })
         }
     }
@@ -114,8 +135,8 @@ final class SKProductsManager {
 }
 
 extension SKProductsManager {
-    func getIntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
-        fetchSK1Products(productIdentifiers: Set(vendorProductIds), fetchPolicy: .returnCacheDataElseLoad) { [weak self] result in
+    func getIntroductoryOfferEligibility(vendorProductIds: Set<String>, _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
+        fetchSK1Products(productIdentifiers: vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { [weak self] result in
             switch result {
             case let .failure(error):
                 completion(.failure(error))
