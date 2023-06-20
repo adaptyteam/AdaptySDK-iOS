@@ -151,7 +151,7 @@ import Foundation
         ///
         /// - Parameters:
         ///   - paywall: the `AdaptyPaywall` for which you want to get a products
-        /// - Returns: A result containing the `AdaptyPaywallProduct` objects array. You can present them in your UI
+        /// - Returns: A result containing the `AdaptyPaywallProduct` objects array. The order will be the same as in the paywalls object. You can present them in your UI
         /// - Throws: An `AdaptyError` object
         public static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct]? {
             return try await withCheckedThrowingContinuation { continuation in
