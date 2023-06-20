@@ -231,7 +231,7 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
-    ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. You can present them in your UI
+    ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         async(completion, logName: "get_paywall_products", logParams: ["paywall_id": .value(paywall.id)]) { manager, completion in
