@@ -206,7 +206,7 @@ extension Adapty {
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         async(completion, logName: "get_paywall_products", logParams: ["paywall_id": .value(paywall.id)]) { manager, completion in
-            manager.skProductsManager.fetchSK1Products(productIdentifiers: Set(paywall.vendorProductIds), fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SKProduct]>) in
+            manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SKProduct]>) in
                 completion(result.map { skProducts in
                     skProducts.compactMap { AdaptyPaywallProduct(paywall: paywall, skProduct: $0) }
                 })
@@ -268,7 +268,7 @@ extension Adapty {
         async(completion,
               logName: "get_products_introductory_offer_eligibility",
               logParams: ["products": .value(vendorProductIds)]) { manager, completion in
-            manager.skProductsManager.getIntroductoryOfferEligibility(vendorProductIds: vendorProductIds) {
+            manager.skProductsManager.getIntroductoryOfferEligibility(vendorProductIds: Set(vendorProductIds)) {
                 completionGetIntroductoryOfferEligibility($0, manager, completion)
             }
         }
