@@ -10,8 +10,7 @@ import Foundation
 
 extension AdaptyUI {
     enum Asset {
-        case color(AdaptyUI.Color)
-        case image(AdaptyUI.Image)
+        case filling(AdaptyUI.Filling)
         case font(AdaptyUI.Font)
         case unknown(String?)
     }
@@ -28,6 +27,7 @@ extension AdaptyUI.Asset: Decodable {
         case color
         case image
         case font
+        case colorLinearGradient = "linear-gradient"
     }
 
     init(from decoder: Decoder) throws {
@@ -39,11 +39,13 @@ extension AdaptyUI.Asset: Decodable {
         }
         switch ContentType(rawValue: type) {
         case .color:
-            self = .color(try container.decode(AdaptyUI.Color.self, forKey: .value))
+            self = .filling(.color(try container.decode(AdaptyUI.Color.self, forKey: .value)))
+        case .colorLinearGradient:
+            self = .filling(.colorLinearGradient(try decoder.singleValueContainer().decode(AdaptyUI.ColorLinearGradient.self)))
         case .font:
             self = .font(try decoder.singleValueContainer().decode(AdaptyUI.Font.self))
         case .image:
-            self = .image(try decoder.singleValueContainer().decode(AdaptyUI.Image.self))
+            self = .filling(.image(try decoder.singleValueContainer().decode(AdaptyUI.Image.self)))
         default:
             self = .unknown("asset.type: \(type)")
         }

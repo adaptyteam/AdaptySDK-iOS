@@ -15,8 +15,11 @@ extension AdaptyUI {
     }
 
     public struct TextRow {
+        static let defaultHorizontalAlign = Text.defaultHorizontalAlign
+
         public let value: String?
         public let size: Double?
-        public let color: AdaptyUI.Color?
+        public let fill: AdaptyUI.Filling?
+        public let horizontalAlign: AdaptyUI.HorizontalAlign
     }
 }

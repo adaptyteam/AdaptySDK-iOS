@@ -20,6 +20,8 @@ extension AdaptyUI {
 
     enum ViewItem {
         case asset(String)
+        case shape(Shape)
+        case button(Button)
         case text(Text)
         case textRows(TextRows)
         case unknown(String?)
@@ -43,7 +45,6 @@ extension AdaptyUI.ViewStyle: Decodable {
     }
 }
 
-
 extension AdaptyUI.ViewItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
@@ -51,6 +52,8 @@ extension AdaptyUI.ViewItem: Decodable {
 
     enum ContentType: String, Codable {
         case text
+        case shape
+        case button
         case textRows = "text-rows"
     }
 
@@ -67,6 +70,10 @@ extension AdaptyUI.ViewItem: Decodable {
             return
         }
         switch ContentType(rawValue: type) {
+        case .shape:
+            self = .shape(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Shape.self))
+        case .button:
+            self = .button(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Button.self))
         case .text:
             self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
         case .textRows:

@@ -34,19 +34,46 @@ extension AdaptyUI.ViewConfiguration {
                 return nil
             }
         }
-        func getAssetColor(_ id: String?) -> AdaptyUI.Color? {
+
+        func getAssetFilling(_ id: String?) -> AdaptyUI.Filling? {
             guard let asset = getAsset(id) else { return nil }
             switch asset {
-            case let .color(value):
+            case let .filling(value):
                 return value
             default:
                 return nil
             }
         }
+
         func getString(_ id: String?) -> String? {
             guard let id = id else { return nil }
             return localization?.strings?[id]
         }
+        func getShapeOrNil(from value: AdaptyUI.ViewItem.Shape?) -> AdaptyUI.Shape? {
+            guard let value else { return nil }
+            return getShape(from: value)
+        }
+        func getShape(from value: AdaptyUI.ViewItem.Shape) -> AdaptyUI.Shape {
+            AdaptyUI.Shape(
+                background: getAssetFilling(value.backgroundAssetId),
+                mask: value.mask
+            )
+        }
+        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.Text? {
+            guard let value else { return nil }
+            return getText(from: value)
+        }
+        func getText(from value: AdaptyUI.ViewItem.Text) -> AdaptyUI.Text {
+            let font = getAssetFont(value.fontAssetId)
+            return AdaptyUI.Text(
+                value: getString(value.stringId),
+                font: font,
+                size: value.size ?? font?.defaultSize,
+                fill: getAssetFilling(value.fillAssetId) ?? font?.defaultFilling,
+                horizontalAlign: value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
+            )
+        }
+
         func convert(_ items: [String: AdaptyUI.ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem]? {
             guard let items = items, !items.isEmpty else { return nil }
             var result = [String: AdaptyUI.LocalizedViewItem]()
@@ -61,26 +88,27 @@ extension AdaptyUI.ViewConfiguration {
                         break
                     }
                     switch asset {
-                    case let .color(value):
-                        result[item.key] = .color(value)
-                    case let .image(value):
-                        result[item.key] = .image(value)
+                    case let .filling(value):
+                        result[item.key] = .filling(value)
                     case let .unknown(value):
                         result[item.key] = .unknown(value)
                     case .font:
                         result[item.key] = .unknown("unsupported asset {type: font, id: \(id)}")
                     }
-                case let .text(value):
-                    let font = getAssetFont(value.fontAssetId)
-                    result[item.key] = .text(AdaptyUI.Text(
-                        value: getString(value.stringId),
-                        font: font,
-                        size: value.size ?? font?.defaultSize,
-                        color: getAssetColor(value.colorAssetId) ?? font?.defaultColor
+                case let .shape(value):
+                    result[item.key] = .shape(getShape(from: value))
+                case let .button(value):
+                    result[item.key] = .button(AdaptyUI.Button(
+                        shape: getShapeOrNil(from: value.shape),
+                        title: getTextOrNil(from: value.title),
+                        align: value.align ?? AdaptyUI.Button.defaultAlign
                     ))
+                case let .text(value):
+                    result[item.key] = .text(getText(from: value))
                 case let .textRows(value):
                     let font = getAssetFont(value.fontAssetId)
-                    let defaultColor = getAssetColor(value.colorAssetId) ?? font?.defaultColor
+                    let defaultFilling = getAssetFilling(value.fillAssetId) ?? font?.defaultFilling
+                    let defaultHorizontalAlign = value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.TextRow.defaultHorizontalAlign
                     let defaultSize = value.size ?? font?.defaultSize
                     result[item.key] = .textRows(AdaptyUI.TextRows(
                         font: font,
@@ -88,7 +116,8 @@ extension AdaptyUI.ViewConfiguration {
                             AdaptyUI.TextRow(
                                 value: getString(row.stringId),
                                 size: row.size ?? defaultSize,
-                                color: getAssetColor(row.colorAssetId) ?? defaultColor
+                                fill: getAssetFilling(row.fillAssetId) ?? defaultFilling,
+                                horizontalAlign: row.horizontalAlign ?? defaultHorizontalAlign
                             )
                         })
                     ))
@@ -117,8 +146,22 @@ extension AdaptyUI.ViewConfiguration {
             locale: localization?.id ?? locale,
             styles: styles,
             isHard: isHard,
-            termsUrl: getString(termsUrlId),
-            privacyUrl: getString(privacyUrlId),
+            mainImageRelativeHeight: mainImageRelativeHeight,
+            mainProductIndex: mainProductIndex,
+            productsBlockType: productsBlockType,
+            featuresBlockType: featuresBlockType,
+            footerButtons: footerButtons.map {
+                let action: AdaptyUI.FooterBlock.ButtonAction
+                switch $0.action {
+                case let .openUrl(id):
+                    action = .openUrl(getString(id))
+                default:
+                    action = $0.action
+                }
+                return AdaptyUI.FooterBlock.Button(
+                    id: $0.id,
+                    action: action)
+            },
             version: version
         )
     }

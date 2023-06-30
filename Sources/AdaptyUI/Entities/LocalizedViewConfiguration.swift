@@ -14,9 +14,14 @@ extension AdaptyUI {
         public let templateId: String
         public let locale: String
         public let styles: [String: LocalizedViewStyle]
+
         public let isHard: Bool
-        public let termsUrl: String?
-        public let privacyUrl: String?
+        public let mainImageRelativeHeight: Double?
+        public let mainProductIndex: Int
+        public let productsBlockType: ProductsBlockType
+        public let featuresBlockType: FeaturesBlockType
+        public let footerButtons: [FooterBlock.Button]
+
         let version: Int64
     }
 
@@ -30,22 +35,27 @@ extension AdaptyUI {
     }
 
     public enum LocalizedViewItem {
-        case color(AdaptyUI.Color)
-        case image(AdaptyUI.Image)
+        case filling(AdaptyUI.Filling)
+        case shape(AdaptyUI.Shape)
+        case button(AdaptyUI.Button)
         case text(AdaptyUI.Text)
         case textRows(AdaptyUI.TextRows)
         case unknown(String?)
 
-        public var asColor: AdaptyUI.Color? {
+        public var asFilling: AdaptyUI.Filling? {
             switch self {
-            case let .color(value): return value
+            case let .filling(value): return value
             default: return nil
             }
         }
 
-        public var asImage: AdaptyUI.Image? {
+        public var asColor: AdaptyUI.Color? { asFilling?.asColor }
+        public var asColorLinearGradient: AdaptyUI.ColorLinearGradient? { asFilling?.asColorLinearGradient }
+        public var asImage: AdaptyUI.Image? { asFilling?.asImage }
+
+        public var asShape: AdaptyUI.Shape? {
             switch self {
-            case let .image(value): return value
+            case let .shape(value): return value
             default: return nil
             }
         }
@@ -67,8 +77,10 @@ extension AdaptyUI {
 }
 
 extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
-    public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asColor }
-    public func getImage(_ key: Key) -> AdaptyUI.Image? { self[key]?.asImage }
+    public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asFilling?.asColor }
+    public func getColorLinearGradient(_ key: Key) -> AdaptyUI.ColorLinearGradient? { self[key]?.asFilling?.asColorLinearGradient }
+    public func getShape(_ key: Key) -> AdaptyUI.Shape? { self[key]?.asShape }
+    public func getImage(_ key: Key) -> AdaptyUI.Image? { self[key]?.asFilling?.asImage }
     public func getText(_ key: Key) -> AdaptyUI.Text? { self[key]?.asText }
     public func getTextRows(_ key: Key) -> AdaptyUI.TextRows? { self[key]?.asTextRows }
 }

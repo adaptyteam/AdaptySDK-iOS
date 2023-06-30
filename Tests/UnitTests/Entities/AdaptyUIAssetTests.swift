@@ -40,12 +40,15 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonV
         }
 
         switch value {
-        case let .image(value):
+        case let .filling(.image(value)):
             XCTAssertEqual("image", type)
             XCTAssertEqual(value.data, withJSONValue: object["value"])
-        case let .color(value):
+        case let .filling(.color(value)):
             XCTAssertEqual("color", type)
             XCTAssertEqual(value, withJSONValue: object["value"])
+        case .filling(.colorLinearGradient):
+            XCTAssertEqual("linear-gradient", type)
+        // TODO: implement check
         case let .font(value):
             XCTAssertEqual("font", type)
             XCTAssertEqual(value.name, withJSONValue: object["value"])
@@ -53,7 +56,7 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonV
             XCTAssertEqual(value.defaultSize, withJSONValue: object["size"])
             XCTAssertEqual(value.defaultColor, withJSONValue: object["color"])
         case let .unknown(value):
-            XCTFail("Unknown asset with type = \(value == nil ? "nil" : value! )")
+            XCTFail("Unknown asset with type = \(value == nil ? "nil" : value!)")
             return
         }
     }

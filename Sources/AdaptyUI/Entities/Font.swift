@@ -14,5 +14,13 @@ extension AdaptyUI {
         public let style: String
         public let defaultSize: Double?
         public let defaultColor: AdaptyUI.Color?
+        public let defaultHorizontalAlign: AdaptyUI.HorizontalAlign?
+    }
+}
+
+extension AdaptyUI.Font {
+    var defaultFilling: AdaptyUI.Filling? {
+        guard let color = defaultColor else { return nil }
+        return .color(color)
     }
 }

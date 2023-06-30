@@ -14,6 +14,7 @@ extension AdaptyUI.Font: Decodable {
         case style
         case defaultSize = "size"
         case defaultColor = "color"
+        case defaultHorizontalAlign = "horizontal_align"
     }
 
     public init(from decoder: Decoder) throws {
@@ -22,5 +23,6 @@ extension AdaptyUI.Font: Decodable {
         style = try container.decode(String.self, forKey: .style)
         defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize)
         defaultColor = try container.decodeIfPresent(AdaptyUI.Color.self, forKey: .defaultColor)
+        defaultHorizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .defaultHorizontalAlign)
     }
 }

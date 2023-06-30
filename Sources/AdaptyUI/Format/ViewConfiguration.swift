@@ -18,9 +18,13 @@ extension AdaptyUI {
         let localizations: [String: Localization]
         let defaultLocalization: Localization?
         let styles: [String: ViewStyle]
+
         let isHard: Bool
-        let termsUrlId: String
-        let privacyUrlId: String
+        let mainImageRelativeHeight: Double?
+        let mainProductIndex: Int
+        let productsBlockType: ProductsBlockType
+        let featuresBlockType: FeaturesBlockType
+        let footerButtons: [FooterBlock.Button]
     }
 }
 
@@ -40,17 +44,16 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         case format
         case templateId = "template_id"
         case version = "template_revision"
-        case terms
-        case privacy
         case assets
         case localizations
         case defaultLocalization = "default_localization"
         case isHard = "is_hard_paywall"
         case styles
-    }
-
-    enum TermsCodingKeys: String, CodingKey {
-        case url
+        case mainImageRelativeHeight = "main_image_relative_height"
+        case mainProductIndex = "main_product_index"
+        case productsBlockType = "products_block_type"
+        case featuresBlockType = "features_block_type"
+        case footerButtons = "footer_buttons"
     }
 
     public init(from decoder: Decoder) throws {
@@ -61,8 +64,6 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         _ = try container.decode(String.self, forKey: .format) // TODO: "1.0.0"
         templateId = try container.decode(String.self, forKey: .templateId)
         version = try container.decode(Int64.self, forKey: .version)
-
-        isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
 
         assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value ?? [:]
 
@@ -77,8 +78,11 @@ extension AdaptyUI.ViewConfiguration: Decodable {
 
         styles = try container.decode([String: AdaptyUI.ViewStyle].self, forKey: .styles)
 
-        termsUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .terms).decode(String.self, forKey: .url)
-
-        privacyUrlId = try container.nestedContainer(keyedBy: TermsCodingKeys.self, forKey: .privacy).decode(String.self, forKey: .url)
+        isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
+        mainImageRelativeHeight = try container.decodeIfPresent(Double.self, forKey: .mainImageRelativeHeight)
+        mainProductIndex = try container.decodeIfPresent(Int.self, forKey: .mainProductIndex) ?? 0
+        productsBlockType = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: .productsBlockType)
+        featuresBlockType = try container.decode(AdaptyUI.FeaturesBlockType.self, forKey: .featuresBlockType)
+        footerButtons = try container.decodeIfPresent([AdaptyUI.FooterBlock.Button].self, forKey: .footerButtons) ?? []
     }
 }

@@ -9,24 +9,65 @@
 import Foundation
 
 extension AdaptyUI.ViewItem {
+    struct Shape {
+        let backgroundAssetId: String?
+        let mask: AdaptyUI.Shape.Mask
+    }
+
+    struct Button {
+        let shape: Shape?
+        let title: Text?
+        let align: AdaptyUI.Button.Align?
+    }
+
     struct Text {
         let stringId: String
         let fontAssetId: String
         let size: Double?
-        let colorAssetId: String?
+        let fillAssetId: String?
+        let horizontalAlign: AdaptyUI.HorizontalAlign?
     }
 
     struct TextRows {
         let fontAssetId: String
         let size: Double?
-        let colorAssetId: String?
+        let fillAssetId: String?
         let rows: [TextRow]
+        let horizontalAlign: AdaptyUI.HorizontalAlign?
     }
 
     struct TextRow {
         let stringId: String
         let size: Double?
-        let colorAssetId: String?
+        let fillAssetId: String?
+        let horizontalAlign: AdaptyUI.HorizontalAlign?
+    }
+}
+
+extension AdaptyUI.ViewItem.Shape: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case backgroundAssetId = "background"
+        case rectangleCornerRadius = "rect_corner_radius"
+        case mask
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        backgroundAssetId = try container.decode(String.self, forKey: .backgroundAssetId)
+        var mask = try container.decodeIfPresent(AdaptyUI.Shape.Mask.self, forKey: .mask) ?? AdaptyUI.Shape.defaultMask
+        if case .rectangle = mask,
+           let rectangleCornerRadius = try container.decodeIfPresent(Double.self, forKey: .rectangleCornerRadius) {
+            mask = .rectangle(cornerRadius: rectangleCornerRadius)
+        }
+        self.mask = mask
+    }
+}
+
+extension AdaptyUI.ViewItem.Button: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case shape
+        case title
+        case align
     }
 }
 
@@ -35,7 +76,8 @@ extension AdaptyUI.ViewItem.Text: Decodable {
         case stringId = "string_id"
         case fontAssetId = "font"
         case size
-        case colorAssetId = "color"
+        case fillAssetId = "color"
+        case horizontalAlign = "horizontal_align"
     }
 }
 
@@ -44,7 +86,8 @@ extension AdaptyUI.ViewItem.TextRows: Decodable {
         case rows
         case fontAssetId = "font"
         case size
-        case colorAssetId = "color"
+        case fillAssetId = "color"
+        case horizontalAlign = "horizontal_align"
     }
 }
 
@@ -52,6 +95,7 @@ extension AdaptyUI.ViewItem.TextRow: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case size
-        case colorAssetId = "color"
+        case fillAssetId = "color"
+        case horizontalAlign = "horizontal_align"
     }
 }

@@ -10,9 +10,12 @@ import Foundation
 
 extension AdaptyUI {
     public struct Text {
+        static let defaultHorizontalAlign = HorizontalAlign.left
+
         public let value: String?
         public let font: AdaptyUI.Font?
         public let size: Double?
-        public let color: AdaptyUI.Color?
+        public let fill: AdaptyUI.Filling?
+        public let horizontalAlign: AdaptyUI.HorizontalAlign
     }
 }
