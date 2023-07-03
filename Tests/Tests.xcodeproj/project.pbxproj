@@ -206,7 +206,10 @@
 		8AFCD9532A4F2BF400C6211C /* Button.Align+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */; };
 		8AFCD9562A52EE2A00C6211C /* ButtonAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */; };
 		8AFCD9582A52EE7700C6211C /* ButtonAction+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */; };
-		8AFCD95A2A531ECA00C6211C /* Shape.CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9592A531ECA00C6211C /* Shape.CornerRadius.swift */; };
+		8AFCD95A2A531ECA00C6211C /* Shape.CornerRadius+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9592A531ECA00C6211C /* Shape.CornerRadius+Decodable.swift */; };
+		8AFCD95C2A53251100C6211C /* Shape.CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD95B2A53251100C6211C /* Shape.CornerRadius.swift */; };
+		8AFCD95E2A53255B00C6211C /* Shape.Mask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD95D2A53255B00C6211C /* Shape.Mask.swift */; };
+		8AFCD9602A53291B00C6211C /* FooterBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD95F2A53291B00C6211C /* FooterBlock.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -430,7 +433,10 @@
 		8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Button.Align+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAction.swift; sourceTree = "<group>"; };
 		8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ButtonAction+Decodable.swift"; sourceTree = "<group>"; };
-		8AFCD9592A531ECA00C6211C /* Shape.CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.CornerRadius.swift; sourceTree = "<group>"; };
+		8AFCD9592A531ECA00C6211C /* Shape.CornerRadius+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shape.CornerRadius+Decodable.swift"; sourceTree = "<group>"; };
+		8AFCD95B2A53251100C6211C /* Shape.CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.CornerRadius.swift; sourceTree = "<group>"; };
+		8AFCD95D2A53255B00C6211C /* Shape.Mask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.Mask.swift; sourceTree = "<group>"; };
+		8AFCD95F2A53291B00C6211C /* FooterBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBlock.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -476,22 +482,25 @@
 		8A1F74392979B3A9002B7FBC /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				8A1F743E2979B67C002B7FBC /* Color.swift */,
-				8A1F746E297B28E3002B7FBC /* Color+HexString.swift */,
-				8A1F74402979B689002B7FBC /* Font.swift */,
-				8A1F74422979B699002B7FBC /* Image.swift */,
-				8A1F745D297B098B002B7FBC /* LocalizedViewConfiguration.swift */,
-				8A1F7470297B2966002B7FBC /* Text.swift */,
-				8A1F7472297B298D002B7FBC /* TextRows.swift */,
-				8AFCD9332A4DD48900C6211C /* FeaturesBlock.swift */,
-				8AFCD9352A4DD51800C6211C /* ProductsBlock.swift */,
-				8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */,
-				8AFCD9422A4DE59500C6211C /* Point.swift */,
-				8AFCD9462A4DFCC600C6211C /* HorizontalAlign.swift */,
-				8AFCD94A2A4F171C00C6211C /* Shape.swift */,
-				8AFCD94C2A4F1EC500C6211C /* Filling.swift */,
 				8AFCD9502A4F2B2100C6211C /* Button.swift */,
 				8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */,
+				8A1F743E2979B67C002B7FBC /* Color.swift */,
+				8A1F746E297B28E3002B7FBC /* Color+HexString.swift */,
+				8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */,
+				8AFCD9332A4DD48900C6211C /* FeaturesBlock.swift */,
+				8AFCD94C2A4F1EC500C6211C /* Filling.swift */,
+				8A1F74402979B689002B7FBC /* Font.swift */,
+				8AFCD95F2A53291B00C6211C /* FooterBlock.swift */,
+				8AFCD9462A4DFCC600C6211C /* HorizontalAlign.swift */,
+				8A1F74422979B699002B7FBC /* Image.swift */,
+				8A1F745D297B098B002B7FBC /* LocalizedViewConfiguration.swift */,
+				8AFCD9422A4DE59500C6211C /* Point.swift */,
+				8AFCD9352A4DD51800C6211C /* ProductsBlock.swift */,
+				8AFCD95B2A53251100C6211C /* Shape.CornerRadius.swift */,
+				8AFCD95D2A53255B00C6211C /* Shape.Mask.swift */,
+				8AFCD94A2A4F171C00C6211C /* Shape.swift */,
+				8A1F7470297B2966002B7FBC /* Text.swift */,
+				8A1F7472297B298D002B7FBC /* TextRows.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -508,22 +517,22 @@
 			isa = PBXGroup;
 			children = (
 				8A1F743C2979B624002B7FBC /* Asset.swift */,
+				8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */,
+				8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */,
 				8A1F7468297B287F002B7FBC /* Color+Decodable.swift */,
+				8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */,
+				8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */,
 				8A1F746C297B28BF002B7FBC /* Font+Decodable.swift */,
+				8AFCD9482A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift */,
 				8A1F746A297B28A0002B7FBC /* Image+Decodable.swift */,
-				8AFCD94E2A4F27AE00C6211C /* Shape.Mask+Decodable.swift */,
 				8A1F74482979CB8C002B7FBC /* Localization.swift */,
+				8AFCD93C2A4DE14500C6211C /* ProductsBlockType+Decodable.swift */,
+				8AFCD9592A531ECA00C6211C /* Shape.CornerRadius+Decodable.swift */,
+				8AFCD94E2A4F27AE00C6211C /* Shape.Mask+Decodable.swift */,
 				8A1F744E2979D1B2002B7FBC /* ViewConfiguration.swift */,
 				8A1F7465297B21F0002B7FBC /* ViewConfiguration+extractLocale.swift */,
 				8A1F745B297ADBBC002B7FBC /* ViewItems.swift */,
 				8A1F7453297AC0B2002B7FBC /* ViewStyle.swift */,
-				8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */,
-				8AFCD93C2A4DE14500C6211C /* ProductsBlockType+Decodable.swift */,
-				8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */,
-				8AFCD9482A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift */,
-				8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */,
-				8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */,
-				8AFCD9592A531ECA00C6211C /* Shape.CornerRadius.swift */,
 			);
 			path = Format;
 			sourceTree = "<group>";
@@ -1084,7 +1093,7 @@
 				8AB003542926FCEA008476A3 /* AdaptyDelegate.swift in Sources */,
 				8AF804232938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift in Sources */,
 				8AA58F3E2A278A2000AE26CA /* ValidateTransactionRequest.swift in Sources */,
-				8AFCD95A2A531ECA00C6211C /* Shape.CornerRadius.swift in Sources */,
+				8AFCD95A2A531ECA00C6211C /* Shape.CornerRadius+Decodable.swift in Sources */,
 				8AFCD94F2A4F27AE00C6211C /* Shape.Mask+Decodable.swift in Sources */,
 				8AFCD93D2A4DE14500C6211C /* ProductsBlockType+Decodable.swift in Sources */,
 				8AFCD9472A4DFCC600C6211C /* HorizontalAlign.swift in Sources */,
@@ -1127,6 +1136,7 @@
 				8AB003812926FCEA008476A3 /* Event.swift in Sources */,
 				8AB003422926FCEA008476A3 /* Adapty+ChangeState.swift in Sources */,
 				8A1F74752983DA2D002B7FBC /* CustomAdaptyError.swift in Sources */,
+				8AFCD95E2A53255B00C6211C /* Shape.Mask.swift in Sources */,
 				8AFCD94D2A4F1EC500C6211C /* Filling.swift in Sources */,
 				8AE26FB32A0D2A31003D1A15 /* SK1Product+IntroductoryOfferEligibility.swift in Sources */,
 				8AB003692926FCEA008476A3 /* HTTPRequestWithDecodableResponse.swift in Sources */,
@@ -1149,6 +1159,7 @@
 				8AB003602926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift in Sources */,
 				8AB003722926FCEA008476A3 /* HTTPRequest.QueryItems.swift in Sources */,
 				8A1F746B297B28A0002B7FBC /* Image+Decodable.swift in Sources */,
+				8AFCD9602A53291B00C6211C /* FooterBlock.swift in Sources */,
 				8AB0038E2926FCEA008476A3 /* PurchaseProductInfo.swift in Sources */,
 				8AB0033A2926FCEA008476A3 /* AdaptyLogLevel.swift in Sources */,
 				8A1F74492979CB8C002B7FBC /* Localization.swift in Sources */,
@@ -1195,6 +1206,7 @@
 				8A1F74522979D5AD002B7FBC /* FetchViewConfigurationRequest.swift in Sources */,
 				8AB0037B2926FCEA008476A3 /* SendEventsRequest.swift in Sources */,
 				8AB003612926FCEA008476A3 /* Adapty+AsyncHelpers.swift in Sources */,
+				8AFCD95C2A53251100C6211C /* Shape.CornerRadius.swift in Sources */,
 				8AB003372926FCEA008476A3 /* Adapty.swift in Sources */,
 				8AB003832926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift in Sources */,
 				8AB003312926FCEA008476A3 /* SKProductsManager.swift in Sources */,

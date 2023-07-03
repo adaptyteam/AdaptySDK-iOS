@@ -17,19 +17,19 @@ extension AdaptyUI {
 
         public let isHard: Bool
         public let mainImageRelativeHeight: Double?
-        public let mainProductIndex: Int
-        public let productsBlockType: ProductsBlockType
-        public let featuresBlockType: FeaturesBlockType
+
 
         let version: Int64
     }
 
     public struct LocalizedViewStyle {
+        public let featureBlock: AdaptyUI.FeaturesBlock
+        public let productBlock: AdaptyUI.ProductsBlock
+        public let footerBlock: AdaptyUI.FooterBlock?
         public let items: [String: AdaptyUI.LocalizedViewItem]
     }
 
     public enum LocalizedViewItem {
-        case group([String: AdaptyUI.LocalizedViewItem])
         case filling(AdaptyUI.Filling)
         case shape(AdaptyUI.Shape)
         case button(AdaptyUI.Button)
@@ -79,6 +79,7 @@ extension AdaptyUI {
 }
 
 extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
+    public func getFilling(_ key: Key) -> AdaptyUI.Filling? { self[key]?.asFilling }
     public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asFilling?.asColor }
     public func getColorLinearGradient(_ key: Key) -> AdaptyUI.ColorLinearGradient? { self[key]?.asFilling?.asColorLinearGradient }
     public func getShape(_ key: Key) -> AdaptyUI.Shape? { self[key]?.asShape }

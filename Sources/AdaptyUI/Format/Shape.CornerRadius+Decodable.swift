@@ -1,5 +1,5 @@
 //
-//  Shape.CornerRadius.swift
+//  Shape.CornerRadius+Decodable.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 03.07.2023

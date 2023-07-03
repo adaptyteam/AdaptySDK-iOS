@@ -85,8 +85,8 @@ extension AdaptyUI.ViewConfiguration {
             )
         }
 
-        func convert(_ items: [String: AdaptyUI.ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem]? {
-            guard let items = items, !items.isEmpty else { return nil }
+        func convert(_ items: [String: AdaptyUI.ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {
+            guard let items = items, !items.isEmpty else { return [:] }
             var result = [String: AdaptyUI.LocalizedViewItem]()
             result.reserveCapacity(items.count)
             for item in items {
@@ -105,10 +105,6 @@ extension AdaptyUI.ViewConfiguration {
                         result[item.key] = .unknown(value)
                     case .font:
                         result[item.key] = .unknown("unsupported asset {type: font, id: \(id)}")
-                    }
-                case let .group(value):
-                    if let group = convert(value) {
-                        result[item.key] = .group(group)
                     }
                 case let .shape(value):
                     result[item.key] = .shape(getShape(from: value))
@@ -142,15 +138,27 @@ extension AdaptyUI.ViewConfiguration {
                     ))
                 }
             }
-            return result.isEmpty ? nil : result
+            return result.isEmpty ? [:] : result
         }
 
         var styles = [String: AdaptyUI.LocalizedViewStyle]()
         styles.reserveCapacity(self.styles.count)
 
         for style in self.styles {
-            guard let items = convert(style.value.items), !items.isEmpty else { continue }
-            styles[style.key] = AdaptyUI.LocalizedViewStyle(items: items)
+            styles[style.key] = AdaptyUI.LocalizedViewStyle(
+                featureBlock: AdaptyUI.FeaturesBlock(
+                    type: style.value.featuresBlock.type,
+                    items: convert(style.value.featuresBlock.items)
+                ),
+                productBlock: AdaptyUI.ProductsBlock(
+                    type: style.value.productsBlock.type,
+                    mainProductIndex: style.value.productsBlock.mainProductIndex,
+                    items: convert(style.value.productsBlock.items)
+                ),
+                footerBlock: style.value.footerBlock.map { AdaptyUI.FooterBlock(
+                    items: convert($0.items)
+                ) },
+                items: convert(style.value.items))
         }
 
         return AdaptyUI.LocalizedViewConfiguration(
@@ -160,9 +168,6 @@ extension AdaptyUI.ViewConfiguration {
             styles: styles,
             isHard: isHard,
             mainImageRelativeHeight: mainImageRelativeHeight,
-            mainProductIndex: mainProductIndex,
-            productsBlockType: productsBlockType,
-            featuresBlockType: featuresBlockType,
             version: version
         )
     }

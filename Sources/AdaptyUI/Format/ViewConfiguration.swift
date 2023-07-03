@@ -21,9 +21,6 @@ extension AdaptyUI {
 
         let isHard: Bool
         let mainImageRelativeHeight: Double?
-        let mainProductIndex: Int
-        let productsBlockType: ProductsBlockType
-        let featuresBlockType: FeaturesBlockType
     }
 }
 
@@ -49,9 +46,6 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         case isHard = "is_hard_paywall"
         case styles
         case mainImageRelativeHeight = "main_image_relative_height"
-        case mainProductIndex = "main_product_index"
-        case productsBlockType = "products_block_type"
-        case featuresBlockType = "features_block_type"
     }
 
     public init(from decoder: Decoder) throws {
@@ -78,8 +72,5 @@ extension AdaptyUI.ViewConfiguration: Decodable {
 
         isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
         mainImageRelativeHeight = try container.decodeIfPresent(Double.self, forKey: .mainImageRelativeHeight)
-        mainProductIndex = try container.decodeIfPresent(Int.self, forKey: .mainProductIndex) ?? 0
-        productsBlockType = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: .productsBlockType)
-        featuresBlockType = try container.decode(AdaptyUI.FeaturesBlockType.self, forKey: .featuresBlockType)
     }
 }
