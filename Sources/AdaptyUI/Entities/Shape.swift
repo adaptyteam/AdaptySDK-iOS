@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyUI {
     public struct Shape {
-        static let defaultMask = Mask.rectangle(cornerRadius: 0.0)
+        static let defaultMask = Mask.rectangle(cornerRadius: .none)
         public let background: Filling?
         public let mask: Mask
     }
@@ -18,9 +18,49 @@ extension AdaptyUI {
 
 extension AdaptyUI.Shape {
     public enum Mask {
-        case rectangle(cornerRadius: Double?)
+        case rectangle(cornerRadius: CornerRadius)
         case circle
         case curveUp
         case curveDown
+    }
+
+    public enum CornerRadius {
+        case none
+        case same(Double)
+        case different(topLeft: Double, topRight: Double, bottomRight: Double, bottomLeft: Double)
+
+        var value: Double? { topLeft }
+
+        var topLeft: Double? {
+            switch self {
+            case .none: return nil
+            case let .same(value): return value
+            case let .different(value, _, _, _): return value
+            }
+        }
+
+        var topRight: Double? {
+            switch self {
+            case .none: return nil
+            case let .same(value): return value
+            case let .different(_, value, _, _): return value
+            }
+        }
+
+        var bottomRight: Double? {
+            switch self {
+            case .none: return nil
+            case let .same(value): return value
+            case let .different(_, _, value, _): return value
+            }
+        }
+
+        var bottomLeft: Double? {
+            switch self {
+            case .none: return nil
+            case let .same(value): return value
+            case let .different(_, _, _, value): return value
+            }
+        }
     }
 }

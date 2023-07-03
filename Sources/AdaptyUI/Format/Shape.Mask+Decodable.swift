@@ -26,7 +26,7 @@ extension AdaptyUI.Shape.Mask: Decodable {
         case .curveDown:
             self = .curveDown
         case .rectangle:
-            self = .rectangle(cornerRadius: 0.0)
+            self = .rectangle(cornerRadius: .none)
         case .circle:
             self = .circle
         }

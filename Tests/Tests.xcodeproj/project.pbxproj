@@ -206,6 +206,7 @@
 		8AFCD9532A4F2BF400C6211C /* Button.Align+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */; };
 		8AFCD9562A52EE2A00C6211C /* ButtonAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */; };
 		8AFCD9582A52EE7700C6211C /* ButtonAction+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */; };
+		8AFCD95A2A531ECA00C6211C /* Shape.CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9592A531ECA00C6211C /* Shape.CornerRadius.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -429,6 +430,7 @@
 		8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Button.Align+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAction.swift; sourceTree = "<group>"; };
 		8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ButtonAction+Decodable.swift"; sourceTree = "<group>"; };
+		8AFCD9592A531ECA00C6211C /* Shape.CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.CornerRadius.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -521,6 +523,7 @@
 				8AFCD9482A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift */,
 				8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */,
 				8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */,
+				8AFCD9592A531ECA00C6211C /* Shape.CornerRadius.swift */,
 			);
 			path = Format;
 			sourceTree = "<group>";
@@ -1081,6 +1084,7 @@
 				8AB003542926FCEA008476A3 /* AdaptyDelegate.swift in Sources */,
 				8AF804232938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift in Sources */,
 				8AA58F3E2A278A2000AE26CA /* ValidateTransactionRequest.swift in Sources */,
+				8AFCD95A2A531ECA00C6211C /* Shape.CornerRadius.swift in Sources */,
 				8AFCD94F2A4F27AE00C6211C /* Shape.Mask+Decodable.swift in Sources */,
 				8AFCD93D2A4DE14500C6211C /* ProductsBlockType+Decodable.swift in Sources */,
 				8AFCD9472A4DFCC600C6211C /* HorizontalAlign.swift in Sources */,

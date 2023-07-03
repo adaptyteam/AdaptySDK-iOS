@@ -59,7 +59,7 @@ extension AdaptyUI.ViewItem.Shape: Decodable {
         backgroundAssetId = try container.decode(String.self, forKey: .backgroundAssetId)
         var mask = try container.decodeIfPresent(AdaptyUI.Shape.Mask.self, forKey: .mask) ?? AdaptyUI.Shape.defaultMask
         if case .rectangle = mask,
-           let rectangleCornerRadius = try container.decodeIfPresent(Double.self, forKey: .rectangleCornerRadius) {
+           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.Shape.CornerRadius.self, forKey: .rectangleCornerRadius) {
             mask = .rectangle(cornerRadius: rectangleCornerRadius)
         }
         self.mask = mask
