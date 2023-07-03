@@ -24,7 +24,6 @@ extension AdaptyUI {
         let mainProductIndex: Int
         let productsBlockType: ProductsBlockType
         let featuresBlockType: FeaturesBlockType
-        let footerButtons: [FooterBlock.Button]
     }
 }
 
@@ -53,7 +52,6 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         case mainProductIndex = "main_product_index"
         case productsBlockType = "products_block_type"
         case featuresBlockType = "features_block_type"
-        case footerButtons = "footer_buttons"
     }
 
     public init(from decoder: Decoder) throws {
@@ -83,6 +81,5 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         mainProductIndex = try container.decodeIfPresent(Int.self, forKey: .mainProductIndex) ?? 0
         productsBlockType = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: .productsBlockType)
         featuresBlockType = try container.decode(AdaptyUI.FeaturesBlockType.self, forKey: .featuresBlockType)
-        footerButtons = try container.decodeIfPresent([AdaptyUI.FooterBlock.Button].self, forKey: .footerButtons) ?? []
     }
 }

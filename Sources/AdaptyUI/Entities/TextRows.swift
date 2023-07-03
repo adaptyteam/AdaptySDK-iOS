@@ -17,6 +17,7 @@ extension AdaptyUI {
     public struct TextRow {
         static let defaultHorizontalAlign = Text.defaultHorizontalAlign
 
+        public let bullet: Image?
         public let value: String?
         public let size: Double?
         public let fill: AdaptyUI.Filling?

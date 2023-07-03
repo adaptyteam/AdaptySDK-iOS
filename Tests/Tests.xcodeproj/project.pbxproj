@@ -192,10 +192,8 @@
 		8AF804232938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF804222938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift */; };
 		8AFCD9342A4DD48900C6211C /* FeaturesBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9332A4DD48900C6211C /* FeaturesBlock.swift */; };
 		8AFCD9362A4DD51800C6211C /* ProductsBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9352A4DD51800C6211C /* ProductsBlock.swift */; };
-		8AFCD9392A4DD5DC00C6211C /* FooterBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9382A4DD5DC00C6211C /* FooterBlock.swift */; };
 		8AFCD93B2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */; };
 		8AFCD93D2A4DE14500C6211C /* ProductsBlockType+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD93C2A4DE14500C6211C /* ProductsBlockType+Decodable.swift */; };
-		8AFCD93F2A4DE1AE00C6211C /* FooterBlock+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD93E2A4DE1AE00C6211C /* FooterBlock+Decodable.swift */; };
 		8AFCD9412A4DE2E300C6211C /* ColorLinearGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */; };
 		8AFCD9432A4DE59500C6211C /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9422A4DE59500C6211C /* Point.swift */; };
 		8AFCD9452A4DE64400C6211C /* ColorLinearGradient+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */; };
@@ -206,6 +204,8 @@
 		8AFCD94F2A4F27AE00C6211C /* Shape.Mask+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD94E2A4F27AE00C6211C /* Shape.Mask+Decodable.swift */; };
 		8AFCD9512A4F2B2100C6211C /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9502A4F2B2100C6211C /* Button.swift */; };
 		8AFCD9532A4F2BF400C6211C /* Button.Align+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */; };
+		8AFCD9562A52EE2A00C6211C /* ButtonAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */; };
+		8AFCD9582A52EE7700C6211C /* ButtonAction+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -415,10 +415,8 @@
 		8AF804222938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyProfileParameters.AppTrackingTransparencyStatus.swift; sourceTree = "<group>"; };
 		8AFCD9332A4DD48900C6211C /* FeaturesBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturesBlock.swift; sourceTree = "<group>"; };
 		8AFCD9352A4DD51800C6211C /* ProductsBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsBlock.swift; sourceTree = "<group>"; };
-		8AFCD9382A4DD5DC00C6211C /* FooterBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBlock.swift; sourceTree = "<group>"; };
 		8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FeaturesBlockType+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD93C2A4DE14500C6211C /* ProductsBlockType+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductsBlockType+Decodable.swift"; sourceTree = "<group>"; };
-		8AFCD93E2A4DE1AE00C6211C /* FooterBlock+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FooterBlock+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorLinearGradient.swift; sourceTree = "<group>"; };
 		8AFCD9422A4DE59500C6211C /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
 		8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ColorLinearGradient+Decodable.swift"; sourceTree = "<group>"; };
@@ -429,6 +427,8 @@
 		8AFCD94E2A4F27AE00C6211C /* Shape.Mask+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shape.Mask+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD9502A4F2B2100C6211C /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Button.Align+Decodable.swift"; sourceTree = "<group>"; };
+		8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonAction.swift; sourceTree = "<group>"; };
+		8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ButtonAction+Decodable.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -483,13 +483,13 @@
 				8A1F7472297B298D002B7FBC /* TextRows.swift */,
 				8AFCD9332A4DD48900C6211C /* FeaturesBlock.swift */,
 				8AFCD9352A4DD51800C6211C /* ProductsBlock.swift */,
-				8AFCD9382A4DD5DC00C6211C /* FooterBlock.swift */,
 				8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */,
 				8AFCD9422A4DE59500C6211C /* Point.swift */,
 				8AFCD9462A4DFCC600C6211C /* HorizontalAlign.swift */,
 				8AFCD94A2A4F171C00C6211C /* Shape.swift */,
 				8AFCD94C2A4F1EC500C6211C /* Filling.swift */,
 				8AFCD9502A4F2B2100C6211C /* Button.swift */,
+				8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -517,10 +517,10 @@
 				8A1F7453297AC0B2002B7FBC /* ViewStyle.swift */,
 				8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */,
 				8AFCD93C2A4DE14500C6211C /* ProductsBlockType+Decodable.swift */,
-				8AFCD93E2A4DE1AE00C6211C /* FooterBlock+Decodable.swift */,
 				8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */,
 				8AFCD9482A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift */,
 				8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */,
+				8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */,
 			);
 			path = Format;
 			sourceTree = "<group>";
@@ -1076,13 +1076,12 @@
 				8AB0038D2926FCEA008476A3 /* BackendProductState.swift in Sources */,
 				8AB0039E2926FCEA008476A3 /* AdaptyProfile.Subscription.swift in Sources */,
 				8AB003472926FCEA008476A3 /* ValidateReceiptRequest.swift in Sources */,
+				8AFCD9582A52EE7700C6211C /* ButtonAction+Decodable.swift in Sources */,
 				8AE26FAD2A0D1D8E003D1A15 /* StoreKit2Configuration.swift in Sources */,
 				8AB003542926FCEA008476A3 /* AdaptyDelegate.swift in Sources */,
 				8AF804232938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift in Sources */,
 				8AA58F3E2A278A2000AE26CA /* ValidateTransactionRequest.swift in Sources */,
 				8AFCD94F2A4F27AE00C6211C /* Shape.Mask+Decodable.swift in Sources */,
-				8AFCD93F2A4DE1AE00C6211C /* FooterBlock+Decodable.swift in Sources */,
-				8AFCD9392A4DD5DC00C6211C /* FooterBlock.swift in Sources */,
 				8AFCD93D2A4DE14500C6211C /* ProductsBlockType+Decodable.swift in Sources */,
 				8AFCD9472A4DFCC600C6211C /* HorizontalAlign.swift in Sources */,
 				8AB0037E2926FCEA008476A3 /* EventsStorage.swift in Sources */,
@@ -1177,6 +1176,7 @@
 				8AB003A02926FCEA008476A3 /* AdaptyDeferredProduct.swift in Sources */,
 				8AB003382926FCEA008476A3 /* Adapty+Events.swift in Sources */,
 				8AFCD9452A4DE64400C6211C /* ColorLinearGradient+Decodable.swift in Sources */,
+				8AFCD9562A52EE2A00C6211C /* ButtonAction.swift in Sources */,
 				8AB0034A2926FCEA008476A3 /* UpdateProfileRequest.swift in Sources */,
 				8AFCD9342A4DD48900C6211C /* FeaturesBlock.swift in Sources */,
 				8AB0035F2926FCEA008476A3 /* PaywallsStorage+UserDefaults.swift in Sources */,

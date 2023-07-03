@@ -20,21 +20,16 @@ extension AdaptyUI {
         public let mainProductIndex: Int
         public let productsBlockType: ProductsBlockType
         public let featuresBlockType: FeaturesBlockType
-        public let footerButtons: [FooterBlock.Button]
 
         let version: Int64
     }
 
     public struct LocalizedViewStyle {
-        public let common: [String: AdaptyUI.LocalizedViewItem]?
-        public let custom: [String: AdaptyUI.LocalizedViewItem]?
-
-        var isEmpty: Bool {
-            (common?.isEmpty ?? true) && (custom?.isEmpty ?? true)
-        }
+        public let items: [String: AdaptyUI.LocalizedViewItem]
     }
 
     public enum LocalizedViewItem {
+        case group([String: AdaptyUI.LocalizedViewItem])
         case filling(AdaptyUI.Filling)
         case shape(AdaptyUI.Shape)
         case button(AdaptyUI.Button)
@@ -60,6 +55,13 @@ extension AdaptyUI {
             }
         }
 
+        public var asButton: AdaptyUI.Button? {
+            switch self {
+            case let .button(value): return value
+            default: return nil
+            }
+        }
+
         public var asText: AdaptyUI.Text? {
             switch self {
             case let .text(value): return value
@@ -80,6 +82,7 @@ extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
     public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asFilling?.asColor }
     public func getColorLinearGradient(_ key: Key) -> AdaptyUI.ColorLinearGradient? { self[key]?.asFilling?.asColorLinearGradient }
     public func getShape(_ key: Key) -> AdaptyUI.Shape? { self[key]?.asShape }
+    public func getButton(_ key: Key) -> AdaptyUI.Button? { self[key]?.asButton }
     public func getImage(_ key: Key) -> AdaptyUI.Image? { self[key]?.asFilling?.asImage }
     public func getText(_ key: Key) -> AdaptyUI.Text? { self[key]?.asText }
     public func getTextRows(_ key: Key) -> AdaptyUI.TextRows? { self[key]?.asTextRows }

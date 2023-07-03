@@ -15,6 +15,7 @@ extension AdaptyUI {
         public let shape: Shape?
         public let title: Text?
         public let align: Align
+        public let action: ButtonAction?
     }
 }
 

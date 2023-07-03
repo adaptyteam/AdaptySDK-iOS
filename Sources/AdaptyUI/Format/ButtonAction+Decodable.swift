@@ -1,16 +1,18 @@
 //
-//  FooterBlock+Decodable.swift
+//  ButtonAction.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 29.06.2023
+//  Created by Aleksei Valiano on 03.07.2023
+//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import Foundation
 
-extension AdaptyUI.FooterBlock.ButtonAction: Decodable {
+extension AdaptyUI.ButtonAction: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case url
+        case customId = "custom_id"
     }
 
     enum Types: String {
@@ -29,20 +31,7 @@ extension AdaptyUI.FooterBlock.ButtonAction: Decodable {
         case .restore:
             self = .restore
         case .custom:
-            self = .custom
+            self = .custom(try container.decode(String.self, forKey: .customId))
         }
-    }
-}
-
-extension AdaptyUI.FooterBlock.Button: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case id
-        case action
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
-        action = try container.decode(AdaptyUI.FooterBlock.ButtonAction.self, forKey: .action)
     }
 }

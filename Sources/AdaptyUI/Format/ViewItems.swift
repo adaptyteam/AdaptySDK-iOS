@@ -18,6 +18,7 @@ extension AdaptyUI.ViewItem {
         let shape: Shape?
         let title: Text?
         let align: AdaptyUI.Button.Align?
+        let action: AdaptyUI.ButtonAction?
     }
 
     struct Text {
@@ -34,6 +35,7 @@ extension AdaptyUI.ViewItem {
         let fillAssetId: String?
         let rows: [TextRow]
         let horizontalAlign: AdaptyUI.HorizontalAlign?
+        let bulletAssetId: String?
     }
 
     struct TextRow {
@@ -41,6 +43,7 @@ extension AdaptyUI.ViewItem {
         let size: Double?
         let fillAssetId: String?
         let horizontalAlign: AdaptyUI.HorizontalAlign?
+        let bulletAssetId: String?
     }
 }
 
@@ -68,6 +71,7 @@ extension AdaptyUI.ViewItem.Button: Decodable {
         case shape
         case title
         case align
+        case action
     }
 }
 
@@ -88,6 +92,7 @@ extension AdaptyUI.ViewItem.TextRows: Decodable {
         case size
         case fillAssetId = "color"
         case horizontalAlign = "horizontal_align"
+        case bulletAssetId = "bullet"
     }
 }
 
@@ -97,5 +102,6 @@ extension AdaptyUI.ViewItem.TextRow: Decodable {
         case size
         case fillAssetId = "color"
         case horizontalAlign = "horizontal_align"
+        case bulletAssetId = "bullet"
     }
 }

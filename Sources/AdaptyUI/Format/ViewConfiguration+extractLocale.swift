@@ -59,6 +59,17 @@ extension AdaptyUI.ViewConfiguration {
                 mask: value.mask
             )
         }
+
+        func getButtonActionOrNil(from value: AdaptyUI.ButtonAction?) -> AdaptyUI.ButtonAction? {
+            guard let value else { return nil }
+            return getButtonAction(from: value)
+        }
+
+        func getButtonAction(from value: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
+            guard case let .openUrl(id) = value else { return value }
+            return .openUrl(getString(id))
+        }
+
         func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.Text? {
             guard let value else { return nil }
             return getText(from: value)
@@ -95,13 +106,18 @@ extension AdaptyUI.ViewConfiguration {
                     case .font:
                         result[item.key] = .unknown("unsupported asset {type: font, id: \(id)}")
                     }
+                case let .group(value):
+                    if let group = convert(value) {
+                        result[item.key] = .group(group)
+                    }
                 case let .shape(value):
                     result[item.key] = .shape(getShape(from: value))
                 case let .button(value):
                     result[item.key] = .button(AdaptyUI.Button(
                         shape: getShapeOrNil(from: value.shape),
                         title: getTextOrNil(from: value.title),
-                        align: value.align ?? AdaptyUI.Button.defaultAlign
+                        align: value.align ?? AdaptyUI.Button.defaultAlign,
+                        action: getButtonActionOrNil(from: value.action)
                     ))
                 case let .text(value):
                     result[item.key] = .text(getText(from: value))
@@ -110,10 +126,13 @@ extension AdaptyUI.ViewConfiguration {
                     let defaultFilling = getAssetFilling(value.fillAssetId) ?? font?.defaultFilling
                     let defaultHorizontalAlign = value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.TextRow.defaultHorizontalAlign
                     let defaultSize = value.size ?? font?.defaultSize
+                    let defaultBullet = getAssetFilling(value.bulletAssetId)?.asImage
+
                     result[item.key] = .textRows(AdaptyUI.TextRows(
                         font: font,
                         rows: value.rows.map({ row in
                             AdaptyUI.TextRow(
+                                bullet: getAssetFilling(row.bulletAssetId)?.asImage ?? defaultBullet,
                                 value: getString(row.stringId),
                                 size: row.size ?? defaultSize,
                                 fill: getAssetFilling(row.fillAssetId) ?? defaultFilling,
@@ -130,14 +149,8 @@ extension AdaptyUI.ViewConfiguration {
         styles.reserveCapacity(self.styles.count)
 
         for style in self.styles {
-            let value = AdaptyUI.LocalizedViewStyle(
-                common: convert(style.value.common),
-                custom: convert(style.value.custom)
-            )
-
-            if !value.isEmpty {
-                styles[style.key] = value
-            }
+            guard let items = convert(style.value.items), !items.isEmpty else { continue }
+            styles[style.key] = AdaptyUI.LocalizedViewStyle(items: items)
         }
 
         return AdaptyUI.LocalizedViewConfiguration(
@@ -150,18 +163,6 @@ extension AdaptyUI.ViewConfiguration {
             mainProductIndex: mainProductIndex,
             productsBlockType: productsBlockType,
             featuresBlockType: featuresBlockType,
-            footerButtons: footerButtons.map {
-                let action: AdaptyUI.FooterBlock.ButtonAction
-                switch $0.action {
-                case let .openUrl(id):
-                    action = .openUrl(getString(id))
-                default:
-                    action = $0.action
-                }
-                return AdaptyUI.FooterBlock.Button(
-                    id: $0.id,
-                    action: action)
-            },
             version: version
         )
     }

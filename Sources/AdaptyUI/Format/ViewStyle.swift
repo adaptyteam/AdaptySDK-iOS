@@ -10,15 +10,11 @@ import Foundation
 
 extension AdaptyUI {
     struct ViewStyle {
-        let common: [String: AdaptyUI.ViewItem]?
-        let custom: [String: AdaptyUI.ViewItem]?
-
-        var isEmpty: Bool {
-            (common?.isEmpty ?? true) && (custom?.isEmpty ?? true)
-        }
+        let items: [String: ViewItem]
     }
 
     enum ViewItem {
+        case group([String: ViewItem])
         case asset(String)
         case shape(Shape)
         case button(Button)
@@ -29,19 +25,9 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.ViewStyle: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case customProperties = "custom_properties"
-    }
-
     init(from decoder: Decoder) throws {
         let single = try decoder.singleValueContainer()
-
-        var common = try single.decode([String: AdaptyUI.ViewItem].self)
-        common.removeValue(forKey: CodingKeys.customProperties.rawValue)
-        self.common = common.isEmpty ? nil : common
-
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        custom = try container.decodeIfPresent([String: AdaptyUI.ViewItem].self, forKey: .customProperties)
+        items = try single.decode([String: AdaptyUI.ViewItem].self)
     }
 }
 
@@ -51,6 +37,7 @@ extension AdaptyUI.ViewItem: Decodable {
     }
 
     enum ContentType: String, Codable {
+        case group
         case text
         case shape
         case button
@@ -65,10 +52,7 @@ extension AdaptyUI.ViewItem: Decodable {
         }
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        guard let type = try container.decodeIfPresent(String.self, forKey: .type) else {
-            self = .unknown(nil)
-            return
-        }
+        let type = try container.decodeIfPresent(String.self, forKey: .type) ?? ContentType.group.rawValue
         switch ContentType(rawValue: type) {
         case .shape:
             self = .shape(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Shape.self))
@@ -78,6 +62,8 @@ extension AdaptyUI.ViewItem: Decodable {
             self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
         case .textRows:
             self = .textRows(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextRows.self))
+        case .group:
+            self = .group(try decoder.singleValueContainer().decode([String: AdaptyUI.ViewItem].self))
         default:
             self = .unknown("item.type: \(type)")
         }
