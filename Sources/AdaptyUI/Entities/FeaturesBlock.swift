@@ -14,7 +14,7 @@ extension AdaptyUI {
     }
 
     public enum FeaturesBlockType: String {
-        case textRows = "text-rows"
+        case list
         case timeline
     }
 }
