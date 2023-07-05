@@ -19,6 +19,7 @@ extension AdaptyUI.ButtonAction: Decodable {
         case openUrl = "open_url"
         case restore
         case custom
+        case close
     }
 
     public init(from decoder: Decoder) throws {
@@ -30,6 +31,8 @@ extension AdaptyUI.ButtonAction: Decodable {
             self = .openUrl(try container.decode(String.self, forKey: .url))
         case .restore:
             self = .restore
+        case .close:
+            self = .close
         case .custom:
             self = .custom(try container.decode(String.self, forKey: .customId))
         }
