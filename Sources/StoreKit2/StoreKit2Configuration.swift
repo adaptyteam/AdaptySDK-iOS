@@ -29,7 +29,7 @@ extension Adapty.Configuration {
         }
     }
 
-    static var enabledStoreKit2ProductsFetcher: Bool {
+    static var enabledStoreKit2IntroEligibilityCheck: Bool {
         guard Environment.StoreKit2.available else { return false }
 
         switch _storeKit2Usage {
@@ -38,8 +38,6 @@ extension Adapty.Configuration {
         }
     }
     
-    static var enabledStoreKit2TransactionObserver: Bool { Environment.StoreKit2.available }
-
     private static var _storeKit2Usage: StoreKit2Usage = .default
 
     static func setStoreKit2Usage(_ value: StoreKit2Usage) {
