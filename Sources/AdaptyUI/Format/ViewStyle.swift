@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyUI {
     struct ViewStyle {
-        let featuresBlock: FeaturesBlock
+        let featuresBlock: FeaturesBlock?
         let productsBlock: ProductsBlock
         let footerBlock: FooterBlock?
         let items: [String: ViewItem]
@@ -60,7 +60,7 @@ extension AdaptyUI.ViewStyle: Decodable {
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
         footerBlock = try container.decodeIfPresent(FooterBlock.self, forKey: .footerBlock)
-        featuresBlock = try container.decode(FeaturesBlock.self, forKey: .featuresBlock)
+        featuresBlock = try container.decodeIfPresent(FeaturesBlock.self, forKey: .featuresBlock)
         productsBlock = try container.decode(ProductsBlock.self, forKey: .productsBlock)
     }
 }

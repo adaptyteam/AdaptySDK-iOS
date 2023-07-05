@@ -146,10 +146,10 @@ extension AdaptyUI.ViewConfiguration {
 
         for style in self.styles {
             styles[style.key] = AdaptyUI.LocalizedViewStyle(
-                featureBlock: AdaptyUI.FeaturesBlock(
-                    type: style.value.featuresBlock.type,
-                    items: convert(style.value.featuresBlock.items)
-                ),
+                featureBlock: style.value.featuresBlock.map { AdaptyUI.FeaturesBlock(
+                    type: $0.type,
+                    items: convert($0.items)
+                ) },
                 productBlock: AdaptyUI.ProductsBlock(
                     type: style.value.productsBlock.type,
                     mainProductIndex: style.value.productsBlock.mainProductIndex,

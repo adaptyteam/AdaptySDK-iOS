@@ -23,7 +23,7 @@ extension AdaptyUI {
     }
 
     public struct LocalizedViewStyle {
-        public let featureBlock: AdaptyUI.FeaturesBlock
+        public let featureBlock: AdaptyUI.FeaturesBlock?
         public let productBlock: AdaptyUI.ProductsBlock
         public let footerBlock: AdaptyUI.FooterBlock?
         public let items: [String: AdaptyUI.LocalizedViewItem]
