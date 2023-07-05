@@ -129,8 +129,8 @@ extension AdaptyUI.ViewItem: Decodable {
             return
         }
 
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        guard let type = try container.decodeIfPresent(String.self, forKey: .type) else {
+        guard let container = try? decoder.container(keyedBy: CodingKeys.self),
+              let type = try container.decodeIfPresent(String.self, forKey: .type) else {
             self = .unknown(nil)
             return
         }
