@@ -25,7 +25,8 @@ final class SKProductsManager {
         cache = ProductVendorIdsCache(storage: storage)
         session = backend.createHTTPSession(responseQueue: queue)
         storeKit1Fetcher = SK1ProductsFetcher(queue: queue)
-        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *), Adapty.Configuration.enabledStoreKit2ProductsFetcher {
+        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *),
+            Environment.StoreKit2.available {
             _storeKit2Fetcher = SK2ProductsFetcher()
         } else {
             _storeKit2Fetcher = nil
@@ -89,6 +90,7 @@ final class SKProductsManager {
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
     func fetchSK2Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[Product]>) {
         guard let storeKit2Fetcher = storeKit2Fetcher else {
+            Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
             completion(.success([]))
             return
         }
@@ -153,7 +155,7 @@ extension SKProductsManager {
         let vendorProductIdsWithUnknownEligibility = introductoryOfferEligibilityByVendorProductId.filter { $0.value == nil }.map { $0.key }
 
         guard !vendorProductIdsWithUnknownEligibility.isEmpty,
-              Adapty.Configuration.enabledStoreKit2ProductsFetcher,
+              Adapty.Configuration.enabledStoreKit2IntroEligibilityCheck,
               #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
         else {
             completion(.success(introductoryOfferEligibilityByVendorProductId))
@@ -170,6 +172,7 @@ extension SKProductsManager {
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
     func getSK2IntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
         guard let storeKit2Fetcher = storeKit2Fetcher else {
+            Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
             completion(.success([:]))
             return
         }

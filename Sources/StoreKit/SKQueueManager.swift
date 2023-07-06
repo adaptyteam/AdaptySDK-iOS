@@ -44,7 +44,8 @@ final class SKQueueManager: NSObject {
 
         super.init()
 
-        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *), Adapty.Configuration.enabledStoreKit2TransactionObserver {
+        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *),
+           Environment.StoreKit2.available {
             _sk2TransactionObserver = SK2TransactionObserver(delegate: self)
         }
     }

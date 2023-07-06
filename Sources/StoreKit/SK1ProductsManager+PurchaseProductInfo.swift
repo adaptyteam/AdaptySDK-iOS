@@ -17,7 +17,7 @@ extension SKProductsManager {
         fetchSK1Product(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
             switch result {
             case let .failure(error):
-                Log.error("SKQueueManager: fetch product \(productId) error: \(error)")
+                Log.error("SKQueueManager: fetch SK1Product \(productId) error: \(error)")
                 completion(PurchaseProductInfo(variationId, persistentVariationId, purchasedTransaction: transaction))
                 return
             case let .success(skProduct):
