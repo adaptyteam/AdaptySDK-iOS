@@ -26,6 +26,11 @@ final class SK1ProductsFetcher: NSObject {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
                 return
             }
+            
+            guard !productIds.isEmpty else {
+                completion(.failure(SKManagerError.noProductIDsFound().asAdaptyError))
+                return
+            }
 
             if fetchPolicy == .returnCacheDataElseLoad {
                 let products = productIds.compactMap { self.products[$0] }
