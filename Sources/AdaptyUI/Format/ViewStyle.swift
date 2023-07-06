@@ -44,24 +44,43 @@ extension AdaptyUI.ViewStyle {
 }
 
 extension AdaptyUI.ViewStyle: Decodable {
-    enum CodingKeys: String, CodingKey, CaseIterable {
+    enum BlockKeys: String {
         case footerBlock = "footer_block"
         case featuresBlock = "features_block"
         case productsBlock = "products_block"
     }
 
+    struct CodingKeys: CodingKey {
+        let stringValue: String
+
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+
+        init<T: RawRepresentable>(_ value: T) where T.RawValue == String {
+            stringValue = value.rawValue
+        }
+
+        var intValue: Int? { Int(stringValue) }
+
+        init?(intValue: Int) {
+            stringValue = String(intValue)
+        }
+    }
+
     init(from decoder: Decoder) throws {
-        let single = try decoder.singleValueContainer()
-        var items = try single.decode([String: AdaptyUI.ViewItem].self)
-        for key in CodingKeys.allCases {
-            items.removeValue(forKey: key.rawValue)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let allKeys = container.allKeys
+        var items = [String: AdaptyUI.ViewItem]()
+        items.reserveCapacity(allKeys.count)
+        for key in allKeys {
+            guard BlockKeys(rawValue: key.stringValue) == nil else { continue }
+            items[key.stringValue] = try container.decode(AdaptyUI.ViewItem.self, forKey: key)
         }
         self.items = items
-
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        footerBlock = try container.decodeIfPresent(FooterBlock.self, forKey: .footerBlock)
-        featuresBlock = try container.decodeIfPresent(FeaturesBlock.self, forKey: .featuresBlock)
-        productsBlock = try container.decode(ProductsBlock.self, forKey: .productsBlock)
+        footerBlock = try container.decodeIfPresent(FooterBlock.self, forKey: CodingKeys(BlockKeys.footerBlock))
+        featuresBlock = try container.decodeIfPresent(FeaturesBlock.self, forKey: CodingKeys(BlockKeys.featuresBlock))
+        productsBlock = try container.decode(ProductsBlock.self, forKey: CodingKeys(BlockKeys.productsBlock))
     }
 }
 
@@ -73,40 +92,44 @@ extension AdaptyUI.ViewStyle.FooterBlock: Decodable {
 }
 
 extension AdaptyUI.ViewStyle.FeaturesBlock: Decodable {
-    enum CodingKeys: String, CodingKey, CaseIterable {
+    enum PropertyKeys: String {
         case type
     }
 
     init(from decoder: Decoder) throws {
+        typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decode(AdaptyUI.FeaturesBlockType.self, forKey: .type)
-
-        let single = try decoder.singleValueContainer()
-        var items = try single.decode([String: AdaptyUI.ViewItem].self)
-        for key in CodingKeys.allCases {
-            items.removeValue(forKey: key.rawValue)
+        let allKeys = container.allKeys
+        var items = [String: AdaptyUI.ViewItem]()
+        items.reserveCapacity(allKeys.count)
+        for key in allKeys {
+            guard PropertyKeys(rawValue: key.stringValue) == nil else { continue }
+            items[key.stringValue] = try container.decode(AdaptyUI.ViewItem.self, forKey: key)
         }
         self.items = items
+        type = try container.decode(AdaptyUI.FeaturesBlockType.self, forKey: CodingKeys(PropertyKeys.type))
     }
 }
 
 extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
-    enum CodingKeys: String, CodingKey, CaseIterable {
+    enum PropertyKeys: String {
         case type
         case mainProductIndex = "main_product_index"
     }
 
     init(from decoder: Decoder) throws {
+        typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: .type)
-        mainProductIndex = try container.decodeIfPresent(Int.self, forKey: .mainProductIndex) ?? 0
-
-        let single = try decoder.singleValueContainer()
-        var items = try single.decode([String: AdaptyUI.ViewItem].self)
-        for key in CodingKeys.allCases {
-            items.removeValue(forKey: key.rawValue)
+        let allKeys = container.allKeys
+        var items = [String: AdaptyUI.ViewItem]()
+        items.reserveCapacity(allKeys.count)
+        for key in allKeys {
+            guard PropertyKeys(rawValue: key.stringValue) == nil else { continue }
+            items[key.stringValue] = try container.decode(AdaptyUI.ViewItem.self, forKey: key)
         }
         self.items = items
+        type = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: CodingKeys(PropertyKeys.type))
+        mainProductIndex = try container.decodeIfPresent(Int.self, forKey: CodingKeys(PropertyKeys.mainProductIndex)) ?? 0
     }
 }
 
@@ -129,11 +152,9 @@ extension AdaptyUI.ViewItem: Decodable {
             return
         }
 
-        guard let container = try? decoder.container(keyedBy: CodingKeys.self),
-              let type = try container.decodeIfPresent(String.self, forKey: .type) else {
-            self = .unknown(nil)
-            return
-        }
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+
         switch ContentType(rawValue: type) {
         case .shape:
             self = .shape(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Shape.self))
@@ -144,7 +165,7 @@ extension AdaptyUI.ViewItem: Decodable {
         case .textRows:
             self = .textRows(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextRows.self))
         default:
-            self = .unknown("item.type: \(type)")
+            self = .unknown(type)
         }
     }
 }

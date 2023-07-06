@@ -9,8 +9,8 @@ import Foundation
 
 extension AdaptyUI {
     public struct FeaturesBlock {
-        let type: FeaturesBlockType
-        let items: [String: AdaptyUI.LocalizedViewItem]
+        public let type: FeaturesBlockType
+        public let items: [String: AdaptyUI.LocalizedViewItem]
     }
 
     public enum FeaturesBlockType: String {

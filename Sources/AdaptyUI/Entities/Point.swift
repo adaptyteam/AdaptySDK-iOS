@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyUI {
     public struct Point {
-        let x: Double
-        let y: Double
+        public let x: Double
+        public let y: Double
     }
 }

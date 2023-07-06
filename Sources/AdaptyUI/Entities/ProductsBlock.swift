@@ -9,9 +9,9 @@ import Foundation
 
 extension AdaptyUI {
     public struct ProductsBlock {
-        let type: ProductsBlockType
-        let mainProductIndex: Int
-        let items: [String: AdaptyUI.LocalizedViewItem]
+        public let type: ProductsBlockType
+        public let mainProductIndex: Int
+        public let items: [String: AdaptyUI.LocalizedViewItem]
     }
 
     public enum ProductsBlockType: String {

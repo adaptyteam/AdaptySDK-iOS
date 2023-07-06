@@ -13,7 +13,5 @@ extension AdaptyUI {
         static let defaultMask = Mask.rectangle(cornerRadius: .none)
         public let background: Filling?
         public let mask: Mask
-
-
     }
 }
