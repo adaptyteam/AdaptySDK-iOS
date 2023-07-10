@@ -123,6 +123,7 @@ extension AdaptyUI.ViewConfiguration {
                 case let .button(value):
                     result[item.key] = .button(AdaptyUI.Button(
                         shape: getShapeOrNil(from: value.shape),
+                        highlighted: getShapeOrNil(from: value.highlighted),
                         title: getTextOrNil(from: value.title),
                         align: value.align ?? AdaptyUI.Button.defaultAlign,
                         action: getButtonActionOrNil(from: value.action)

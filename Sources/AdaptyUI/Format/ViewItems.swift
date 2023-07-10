@@ -18,6 +18,7 @@ extension AdaptyUI.ViewItem {
 
     struct Button {
         let shape: Shape?
+        let highlighted: Shape?
         let title: Text?
         let align: AdaptyUI.Button.Align?
         let action: AdaptyUI.ButtonAction?
@@ -84,6 +85,7 @@ extension AdaptyUI.ViewItem.Shape: Decodable {
 extension AdaptyUI.ViewItem.Button: Decodable {
     enum CodingKeys: String, CodingKey {
         case shape
+        case highlighted
         case title
         case align
         case action
