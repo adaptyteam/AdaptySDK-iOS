@@ -1,5 +1,5 @@
 //
-//  Shape.Mask+Decodable.swift
+//  ShapeType+Decodable.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 30.06.2023
@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension AdaptyUI.Shape.Mask: Decodable {
+extension AdaptyUI.ShapeType: Decodable {
     enum Types: String {
         case circle
         case rectangle = "rect"

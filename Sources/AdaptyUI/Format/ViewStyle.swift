@@ -139,7 +139,13 @@ extension AdaptyUI.ViewItem: Decodable {
 
     enum ContentType: String, Codable {
         case text
+
         case shape
+        case rectangle
+        case circle
+        case curveUp
+        case curveDown
+
         case button
         case textRows = "text-rows" // deprecated
     }
@@ -155,7 +161,7 @@ extension AdaptyUI.ViewItem: Decodable {
         let type = try container.decode(String.self, forKey: .type)
 
         switch ContentType(rawValue: type) {
-        case .shape:
+        case .shape, .rectangle, .circle, .curveUp, .curveDown:
             self = .shape(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Shape.self))
         case .button:
             self = .button(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Button.self))

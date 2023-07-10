@@ -53,10 +53,10 @@ extension AdaptyUI.ViewConfiguration {
             guard let value else { return nil }
             return getShape(from: value)
         }
-        func getShape(from value: AdaptyUI.ViewItem.Shape) -> AdaptyUI.Shape {
+        func getShape(from item: AdaptyUI.ViewItem.Shape) -> AdaptyUI.Shape {
             AdaptyUI.Shape(
-                background: getAssetFilling(value.backgroundAssetId),
-                mask: value.mask
+                background: getAssetFilling(item.backgroundAssetId),
+                type: item.type
             )
         }
 

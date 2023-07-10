@@ -1,5 +1,5 @@
 //
-//  Shape.Mask.swift
+//  ShapeType.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 03.07.2023
@@ -8,9 +8,9 @@
 
 import Foundation
 
-extension AdaptyUI.Shape {
-    public enum Mask {
-        case rectangle(cornerRadius: CornerRadius)
+extension AdaptyUI {
+    public enum ShapeType {
+        case rectangle(cornerRadius: Shape.CornerRadius)
         case circle
         case curveUp
         case curveDown

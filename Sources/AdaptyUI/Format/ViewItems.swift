@@ -11,7 +11,7 @@ import Foundation
 extension AdaptyUI.ViewItem {
     struct Shape {
         let backgroundAssetId: String?
-        let mask: AdaptyUI.Shape.Mask
+        let type: AdaptyUI.ShapeType
     }
 
     struct Button {
@@ -45,18 +45,27 @@ extension AdaptyUI.ViewItem.Shape: Decodable {
     enum CodingKeys: String, CodingKey {
         case backgroundAssetId = "background"
         case rectangleCornerRadius = "rect_corner_radius"
-        case mask
+        case type
+        case value
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         backgroundAssetId = try container.decode(String.self, forKey: .backgroundAssetId)
-        var mask = try container.decodeIfPresent(AdaptyUI.Shape.Mask.self, forKey: .mask) ?? AdaptyUI.Shape.defaultMask
-        if case .rectangle = mask,
-           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.Shape.CornerRadius.self, forKey: .rectangleCornerRadius) {
-            mask = .rectangle(cornerRadius: rectangleCornerRadius)
+        var shape = AdaptyUI.Shape.defaultType
+
+        if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
+            shape = value
+        } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .type) {
+            shape = value
         }
-        self.mask = mask
+
+        if case .rectangle = shape,
+           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.Shape.CornerRadius.self, forKey: .rectangleCornerRadius) {
+            type = .rectangle(cornerRadius: rectangleCornerRadius)
+        } else {
+            type = shape
+        }
     }
 }
 

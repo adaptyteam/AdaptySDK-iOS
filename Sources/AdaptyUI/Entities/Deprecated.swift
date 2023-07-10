@@ -29,3 +29,10 @@ extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
     @available(*, deprecated, renamed: "getTextItems")
     public func getTextRows(_ key: Key) -> AdaptyUI.TextItems? { getTextItems(key) }
 }
+
+extension AdaptyUI.Shape {
+    @available(*, deprecated, renamed: "AdaptyUI.ShapeType")
+    public typealias Mask = AdaptyUI.ShapeType
+    @available(*, deprecated, renamed: "type")
+    public var mask: AdaptyUI.ShapeType { type }
+}
