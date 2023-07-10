@@ -77,11 +77,13 @@ extension AdaptyUI.ViewConfiguration {
         func getText(from value: AdaptyUI.ViewItem.Text) -> AdaptyUI.Text {
             let font = getAssetFont(value.fontAssetId)
             return AdaptyUI.Text(
+                bullet: getAssetFilling(value.bulletAssetId)?.asImage,
                 value: getString(value.stringId),
                 font: font,
                 size: value.size ?? font?.defaultSize,
                 fill: getAssetFilling(value.fillAssetId) ?? font?.defaultFilling,
                 horizontalAlign: value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
+                
             )
         }
 
@@ -117,23 +119,24 @@ extension AdaptyUI.ViewConfiguration {
                     ))
                 case let .text(value):
                     result[item.key] = .text(getText(from: value))
-                case let .textRows(value):
-                    let defaultFont = getAssetFont(value.fontAssetId)
-                    let defaultFilling = getAssetFilling(value.fillAssetId)
-                    let defaultBullet = getAssetFilling(value.bulletAssetId)?.asImage
+                case let .textItems(group):
+                    let defaultFont = getAssetFont(group.fontAssetId)
+                    let defaultFilling = getAssetFilling(group.fillAssetId)
+                    let defaultBullet = getAssetFilling(group.bulletAssetId)?.asImage
 
-                    result[item.key] = .textRows(AdaptyUI.TextRows(
-                        rows: value.rows.map({ row in
-                            let font = getAssetFont(row.fontAssetId) ?? defaultFont
-                            return AdaptyUI.TextRow(
+                    result[item.key] = .textItems(AdaptyUI.TextItems(
+                        items: group.items.map({ item in
+                            let font = getAssetFont(item.fontAssetId) ?? defaultFont
+                            return AdaptyUI.Text(
+                                bullet: getAssetFilling(item.bulletAssetId)?.asImage ?? defaultBullet,
+                                value: getString(item.stringId),
                                 font: font,
-                                bullet: getAssetFilling(row.bulletAssetId)?.asImage ?? defaultBullet,
-                                value: getString(row.stringId),
-                                size: row.size ??  value.size ?? font?.defaultSize,
-                                fill: getAssetFilling(row.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
-                                horizontalAlign: row.horizontalAlign ?? value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.TextRow.defaultHorizontalAlign
+                                size: item.size ??  group.size ?? font?.defaultSize,
+                                fill: getAssetFilling(item.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
+                                horizontalAlign: item.horizontalAlign ?? group.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
                             )
-                        })
+                        }),
+                        separator: group.separator
                     ))
                 }
             }

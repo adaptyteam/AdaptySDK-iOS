@@ -12,10 +12,17 @@ extension AdaptyUI {
     public struct Text {
         static let defaultHorizontalAlign = HorizontalAlign.left
 
+        public let bullet: Image?
         public let value: String?
         public let font: AdaptyUI.Font?
         public let size: Double?
         public let fill: AdaptyUI.Filling?
         public let horizontalAlign: AdaptyUI.HorizontalAlign
+    }
+}
+
+extension AdaptyUI.Text {
+    var asTextItems: AdaptyUI.TextItems {
+        AdaptyUI.TextItems(items: [self], separator: .none)
     }
 }

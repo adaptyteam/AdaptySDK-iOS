@@ -1,5 +1,5 @@
 //
-//  ViewItem.TextRows.swift
+//  ViewItems.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -27,25 +27,21 @@ extension AdaptyUI.ViewItem {
         let size: Double?
         let fillAssetId: String?
         let horizontalAlign: AdaptyUI.HorizontalAlign?
-    }
-
-    struct TextRows {
-        let fontAssetId: String
-        let size: Double?
-        let fillAssetId: String?
-        let rows: [TextRow]
-        let horizontalAlign: AdaptyUI.HorizontalAlign?
         let bulletAssetId: String?
     }
 
-    struct TextRow {
-        let stringId: String
-        let fontAssetId: String
+    struct TextItems {
+        let fontAssetId: String?
         let size: Double?
         let fillAssetId: String?
+        let items: [Text]
         let horizontalAlign: AdaptyUI.HorizontalAlign?
         let bulletAssetId: String?
+        let separator: AdaptyUI.Text.Separator
     }
+}
+
+extension AdaptyUI.ViewItem.TextItems {
 }
 
 extension AdaptyUI.ViewItem.Shape: Decodable {
@@ -83,27 +79,40 @@ extension AdaptyUI.ViewItem.Text: Decodable {
         case size
         case fillAssetId = "color"
         case horizontalAlign = "horizontal_align"
+        case bulletAssetId = "bullet"
     }
 }
 
-extension AdaptyUI.ViewItem.TextRows: Decodable {
+extension AdaptyUI.ViewItem.TextItems: Decodable {
     enum CodingKeys: String, CodingKey {
+        case type
         case rows
+        case items
         case fontAssetId = "font"
         case size
         case fillAssetId = "color"
         case horizontalAlign = "horizontal_align"
         case bulletAssetId = "bullet"
+        case separator
     }
-}
 
-extension AdaptyUI.ViewItem.TextRow: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case stringId = "string_id"
-        case fontAssetId = "font"
-        case size
-        case fillAssetId = "color"
-        case horizontalAlign = "horizontal_align"
-        case bulletAssetId = "bullet"
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        var itemsKey = CodingKeys.items
+        var defaultSeparator = AdaptyUI.TextItems.defaultSeparator
+
+        if AdaptyUI.ViewItem.ContentType.textRows.rawValue == (try container.decode(String.self, forKey: .type)) {
+            if container.contains(.rows) { itemsKey = .rows }
+            defaultSeparator = .newline
+        }
+
+        fontAssetId = try container.decodeIfPresent(String.self, forKey: .fontAssetId)
+        items = try container.decode([AdaptyUI.ViewItem.Text].self, forKey: itemsKey)
+        size = try container.decodeIfPresent(Double.self, forKey: .size)
+        fillAssetId = try container.decodeIfPresent(String.self, forKey: .fillAssetId)
+        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .horizontalAlign)
+        bulletAssetId = try container.decodeIfPresent(String.self, forKey: .bulletAssetId)
+        separator = try container.decodeIfPresent(AdaptyUI.Text.Separator.self, forKey: .separator) ?? defaultSeparator
     }
 }

@@ -21,7 +21,7 @@ extension AdaptyUI {
         case shape(Shape)
         case button(Button)
         case text(Text)
-        case textRows(TextRows)
+        case textItems(TextItems)
         case unknown(String?)
     }
 }
@@ -143,6 +143,8 @@ extension AdaptyUI.ViewItem: Decodable {
         case shape
         case button
         case textRows = "text-rows"
+        case textArray = "text-array"
+        case textItems = "text-items"
     }
 
     init(from decoder: Decoder) throws {
@@ -162,8 +164,8 @@ extension AdaptyUI.ViewItem: Decodable {
             self = .button(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Button.self))
         case .text:
             self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
-        case .textRows:
-            self = .textRows(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextRows.self))
+        case .textRows, .textArray, .textItems:
+            self = .textItems(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextItems.self))
         default:
             self = .unknown(type)
         }

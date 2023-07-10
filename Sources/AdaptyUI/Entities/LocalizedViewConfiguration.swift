@@ -18,7 +18,6 @@ extension AdaptyUI {
         public let isHard: Bool
         public let mainImageRelativeHeight: Double?
 
-
         let version: Int64
     }
 
@@ -34,7 +33,7 @@ extension AdaptyUI {
         case shape(AdaptyUI.Shape)
         case button(AdaptyUI.Button)
         case text(AdaptyUI.Text)
-        case textRows(AdaptyUI.TextRows)
+        case textItems(AdaptyUI.TextItems)
         case unknown(String?)
 
         public var asFilling: AdaptyUI.Filling? {
@@ -69,9 +68,10 @@ extension AdaptyUI {
             }
         }
 
-        public var asTextRows: AdaptyUI.TextRows? {
+        public var asTextItems: AdaptyUI.TextItems? {
             switch self {
-            case let .textRows(value): return value
+            case let .text(value): return value.asTextItems
+            case let .textItems(value): return value
             default: return nil
             }
         }
@@ -86,7 +86,7 @@ extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
     public func getButton(_ key: Key) -> AdaptyUI.Button? { self[key]?.asButton }
     public func getImage(_ key: Key) -> AdaptyUI.Image? { self[key]?.asFilling?.asImage }
     public func getText(_ key: Key) -> AdaptyUI.Text? { self[key]?.asText }
-    public func getTextRows(_ key: Key) -> AdaptyUI.TextRows? { self[key]?.asTextRows }
+    public func getTextItems(_ key: Key) -> AdaptyUI.TextItems? { self[key]?.asTextItems }
 }
 
 extension AdaptyUI.LocalizedViewConfiguration: CustomStringConvertible {
