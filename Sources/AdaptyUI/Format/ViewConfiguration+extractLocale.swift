@@ -70,20 +70,29 @@ extension AdaptyUI.ViewConfiguration {
             return .openUrl(getString(id))
         }
 
-        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.Text? {
+        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.TextItems? {
             guard let value else { return nil }
             return getText(from: value)
         }
-        func getText(from value: AdaptyUI.ViewItem.Text) -> AdaptyUI.Text {
-            let font = getAssetFont(value.fontAssetId)
-            return AdaptyUI.Text(
-                bullet: getAssetFilling(value.bulletAssetId)?.asImage,
-                value: getString(value.stringId),
-                font: font,
-                size: value.size ?? font?.defaultSize,
-                fill: getAssetFilling(value.fillAssetId) ?? font?.defaultFilling,
-                horizontalAlign: value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
-                
+
+        func getText(from group: AdaptyUI.ViewItem.Text) -> AdaptyUI.TextItems {
+            let defaultFont = getAssetFont(group.fontAssetId)
+            let defaultFilling = getAssetFilling(group.fillAssetId)
+            let defaultBullet = getAssetFilling(group.bulletAssetId)?.asImage
+
+            return AdaptyUI.TextItems(
+                items: group.items.map({ item in
+                    let font = getAssetFont(item.fontAssetId) ?? defaultFont
+                    return AdaptyUI.Text(
+                        bullet: getAssetFilling(item.bulletAssetId)?.asImage ?? defaultBullet,
+                        value: getString(item.stringId),
+                        font: font,
+                        size: item.size ?? group.size ?? font?.defaultSize,
+                        fill: getAssetFilling(item.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
+                        horizontalAlign: item.horizontalAlign ?? group.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
+                    )
+                }),
+                separator: group.separator
             )
         }
 
@@ -117,27 +126,8 @@ extension AdaptyUI.ViewConfiguration {
                         align: value.align ?? AdaptyUI.Button.defaultAlign,
                         action: getButtonActionOrNil(from: value.action)
                     ))
-                case let .text(value):
-                    result[item.key] = .text(getText(from: value))
-                case let .textItems(group):
-                    let defaultFont = getAssetFont(group.fontAssetId)
-                    let defaultFilling = getAssetFilling(group.fillAssetId)
-                    let defaultBullet = getAssetFilling(group.bulletAssetId)?.asImage
-
-                    result[item.key] = .textItems(AdaptyUI.TextItems(
-                        items: group.items.map({ item in
-                            let font = getAssetFont(item.fontAssetId) ?? defaultFont
-                            return AdaptyUI.Text(
-                                bullet: getAssetFilling(item.bulletAssetId)?.asImage ?? defaultBullet,
-                                value: getString(item.stringId),
-                                font: font,
-                                size: item.size ??  group.size ?? font?.defaultSize,
-                                fill: getAssetFilling(item.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
-                                horizontalAlign: item.horizontalAlign ?? group.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
-                            )
-                        }),
-                        separator: group.separator
-                    ))
+                case let .text(group):
+                    result[item.key] = .textItems(getText(from: group))
                 }
             }
             return result.isEmpty ? [:] : result

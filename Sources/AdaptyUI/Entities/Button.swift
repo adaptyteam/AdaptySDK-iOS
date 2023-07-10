@@ -13,7 +13,7 @@ extension AdaptyUI {
         static let defaultAlign = Align.center
 
         public let shape: Shape?
-        public let title: Text?
+        public let title: TextItems?
         public let align: Align
         public let action: ButtonAction?
     }

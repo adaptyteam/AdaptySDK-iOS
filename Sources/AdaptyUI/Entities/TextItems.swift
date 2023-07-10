@@ -23,3 +23,7 @@ extension AdaptyUI.Text {
         case newline
     }
 }
+
+extension AdaptyUI.TextItems {
+    var asText: AdaptyUI.Text? { items.first }
+}

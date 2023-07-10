@@ -21,7 +21,6 @@ extension AdaptyUI {
         case shape(Shape)
         case button(Button)
         case text(Text)
-        case textItems(TextItems)
         case unknown(String?)
     }
 }
@@ -136,8 +135,6 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
 extension AdaptyUI.ViewItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
-        case rows
-        case items
     }
 
     enum ContentType: String, Codable {
@@ -162,14 +159,8 @@ extension AdaptyUI.ViewItem: Decodable {
             self = .shape(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Shape.self))
         case .button:
             self = .button(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Button.self))
-        case .text:
-            if container.contains(.items) || container.contains(.rows) {
-                self = .textItems(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextItems.self))
-            } else {
-                self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
-            }
-        case .textRows:
-            self = .textItems(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextItems.self))
+        case .text, .textRows:
+            self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
         default:
             self = .unknown(type)
         }

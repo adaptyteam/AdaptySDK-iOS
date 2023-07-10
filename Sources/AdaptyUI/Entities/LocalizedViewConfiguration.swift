@@ -64,6 +64,7 @@ extension AdaptyUI {
         public var asText: AdaptyUI.Text? {
             switch self {
             case let .text(value): return value
+            case let .textItems(value): return value.asText
             default: return nil
             }
         }

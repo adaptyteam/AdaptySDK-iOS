@@ -11,6 +11,14 @@ import Foundation
 extension AdaptyUI {
     public struct Text {
         static let defaultHorizontalAlign = HorizontalAlign.left
+        static let empty = Text(
+            bullet: nil,
+            value: nil,
+            font: nil,
+            size: nil,
+            fill: nil,
+            horizontalAlign: defaultHorizontalAlign
+        )
 
         public let bullet: Image?
         public let value: String?
