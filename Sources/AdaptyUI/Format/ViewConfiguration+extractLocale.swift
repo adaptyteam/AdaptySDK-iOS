@@ -118,21 +118,20 @@ extension AdaptyUI.ViewConfiguration {
                 case let .text(value):
                     result[item.key] = .text(getText(from: value))
                 case let .textRows(value):
-                    let font = getAssetFont(value.fontAssetId)
-                    let defaultFilling = getAssetFilling(value.fillAssetId) ?? font?.defaultFilling
-                    let defaultHorizontalAlign = value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.TextRow.defaultHorizontalAlign
-                    let defaultSize = value.size ?? font?.defaultSize
+                    let defaultFont = getAssetFont(value.fontAssetId)
+                    let defaultFilling = getAssetFilling(value.fillAssetId)
                     let defaultBullet = getAssetFilling(value.bulletAssetId)?.asImage
 
                     result[item.key] = .textRows(AdaptyUI.TextRows(
-                        font: font,
                         rows: value.rows.map({ row in
-                            AdaptyUI.TextRow(
+                            let font = getAssetFont(row.fontAssetId) ?? defaultFont
+                            return AdaptyUI.TextRow(
+                                font: font,
                                 bullet: getAssetFilling(row.bulletAssetId)?.asImage ?? defaultBullet,
                                 value: getString(row.stringId),
-                                size: row.size ?? defaultSize,
-                                fill: getAssetFilling(row.fillAssetId) ?? defaultFilling,
-                                horizontalAlign: row.horizontalAlign ?? defaultHorizontalAlign
+                                size: row.size ??  value.size ?? font?.defaultSize,
+                                fill: getAssetFilling(row.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
+                                horizontalAlign: row.horizontalAlign ?? value.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.TextRow.defaultHorizontalAlign
                             )
                         })
                     ))

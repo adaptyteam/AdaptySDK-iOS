@@ -40,6 +40,7 @@ extension AdaptyUI.ViewItem {
 
     struct TextRow {
         let stringId: String
+        let fontAssetId: String
         let size: Double?
         let fillAssetId: String?
         let horizontalAlign: AdaptyUI.HorizontalAlign?
@@ -99,6 +100,7 @@ extension AdaptyUI.ViewItem.TextRows: Decodable {
 extension AdaptyUI.ViewItem.TextRow: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
+        case fontAssetId = "font"
         case size
         case fillAssetId = "color"
         case horizontalAlign = "horizontal_align"

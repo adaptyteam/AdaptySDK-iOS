@@ -10,13 +10,13 @@ import Foundation
 
 extension AdaptyUI {
     public struct TextRows {
-        public let font: AdaptyUI.Font?
         public let rows: [TextRow]
     }
 
     public struct TextRow {
         static let defaultHorizontalAlign = Text.defaultHorizontalAlign
 
+        public let font: AdaptyUI.Font?
         public let bullet: Image?
         public let value: String?
         public let size: Double?
