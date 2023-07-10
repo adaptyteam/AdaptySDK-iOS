@@ -56,6 +56,7 @@ extension AdaptyUI.ViewConfiguration {
         func getShape(from item: AdaptyUI.ViewItem.Shape) -> AdaptyUI.Shape {
             AdaptyUI.Shape(
                 background: getAssetFilling(item.backgroundAssetId),
+                border: AdaptyUI.Shape.Border(filling: getAssetFilling(item.borderAssetId), thickness: item.borderThickness),
                 type: item.type
             )
         }
