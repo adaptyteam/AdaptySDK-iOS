@@ -14,6 +14,8 @@ extension AdaptyUI {
 
         public let items: [Text]
         public let separator: Text.Separator
+
+        var isEmpty: Bool { items.isEmpty }
     }
 }
 

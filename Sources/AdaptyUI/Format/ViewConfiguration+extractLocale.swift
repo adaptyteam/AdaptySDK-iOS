@@ -121,10 +121,19 @@ extension AdaptyUI.ViewConfiguration {
                 case let .shape(value):
                     result[item.key] = .shape(getShape(from: value))
                 case let .button(value):
-                    result[item.key] = .button(AdaptyUI.Button(
+                    let normal = AdaptyUI.Button.State(
                         shape: getShapeOrNil(from: value.shape),
-                        highlighted: getShapeOrNil(from: value.highlighted),
-                        title: getTextOrNil(from: value.title),
+                        title: getTextOrNil(from: value.title)
+                    )
+
+                    let selected = AdaptyUI.Button.State(
+                        shape: getShapeOrNil(from: value.selectedShape),
+                        title: getTextOrNil(from: value.selectedTitle)
+                    )
+
+                    result[item.key] = .button(AdaptyUI.Button(
+                        normal: normal.isEmpty ? nil : normal,
+                        selected: selected.isEmpty ? nil : selected,
                         align: value.align ?? AdaptyUI.Button.defaultAlign,
                         action: getButtonActionOrNil(from: value.action)
                     ))

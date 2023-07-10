@@ -36,3 +36,10 @@ extension AdaptyUI.Shape {
     @available(*, deprecated, renamed: "type")
     public var mask: AdaptyUI.ShapeType { type }
 }
+
+extension AdaptyUI.Button {
+    @available(*, deprecated, renamed: "normal.shape")
+    public var shape: AdaptyUI.Shape? { normal?.shape }
+    @available(*, deprecated, renamed: "normal.title")
+    public var title: AdaptyUI.TextItems? { normal?.title }
+}
