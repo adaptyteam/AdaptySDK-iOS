@@ -127,7 +127,7 @@ extension AdaptyUI.ViewConfiguration {
                         action: getButtonActionOrNil(from: value.action)
                     ))
                 case let .text(group):
-                    result[item.key] = .textItems(getText(from: group))
+                    result[item.key] = .text(getText(from: group))
                 }
             }
             return result.isEmpty ? [:] : result

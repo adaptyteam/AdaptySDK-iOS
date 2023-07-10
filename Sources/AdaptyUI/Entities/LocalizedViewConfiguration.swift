@@ -32,8 +32,7 @@ extension AdaptyUI {
         case filling(AdaptyUI.Filling)
         case shape(AdaptyUI.Shape)
         case button(AdaptyUI.Button)
-        case text(AdaptyUI.Text)
-        case textItems(AdaptyUI.TextItems)
+        case text(AdaptyUI.TextItems)
         case unknown(String?)
 
         public var asFilling: AdaptyUI.Filling? {
@@ -63,16 +62,14 @@ extension AdaptyUI {
 
         public var asText: AdaptyUI.Text? {
             switch self {
-            case let .text(value): return value
-            case let .textItems(value): return value.asText
+            case let .text(value): return value.asText
             default: return nil
             }
         }
 
         public var asTextItems: AdaptyUI.TextItems? {
             switch self {
-            case let .text(value): return value.asTextItems
-            case let .textItems(value): return value
+            case let .text(value): return value
             default: return nil
             }
         }
