@@ -56,7 +56,7 @@ extension AdaptyUI.ViewItem.Shape: Decodable {
 
         if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
             shape = value
-        } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .type) {
+        } else if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .type) {
             shape = value
         }
 
