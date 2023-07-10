@@ -136,15 +136,15 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
 extension AdaptyUI.ViewItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
+        case rows
+        case items
     }
 
     enum ContentType: String, Codable {
         case text
         case shape
         case button
-        case textRows = "text-rows"
-        case textArray = "text-array"
-        case textItems = "text-items"
+        case textRows = "text-rows" // deprecated
     }
 
     init(from decoder: Decoder) throws {
@@ -163,8 +163,12 @@ extension AdaptyUI.ViewItem: Decodable {
         case .button:
             self = .button(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Button.self))
         case .text:
-            self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
-        case .textRows, .textArray, .textItems:
+            if container.contains(.items) || container.contains(.rows) {
+                self = .textItems(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextItems.self))
+            } else {
+                self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
+            }
+        case .textRows:
             self = .textItems(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.TextItems.self))
         default:
             self = .unknown(type)
