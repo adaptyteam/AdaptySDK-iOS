@@ -10,6 +10,6 @@ import Foundation
 
 extension AdaptyUI {
     public struct FooterBlock {
-        let items: [String: AdaptyUI.LocalizedViewItem]
+        public let items: [String: AdaptyUI.LocalizedViewItem]
     }
 }
