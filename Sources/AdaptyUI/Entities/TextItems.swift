@@ -27,5 +27,5 @@ extension AdaptyUI.Text {
 }
 
 extension AdaptyUI.TextItems {
-    var asText: AdaptyUI.Text? { items.first }
+    public var asText: AdaptyUI.Text? { items.first }
 }
