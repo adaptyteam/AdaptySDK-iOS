@@ -21,14 +21,9 @@ extension AdaptyUI {
 
 extension AdaptyUI.Shape {
     public struct Border {
+        static let defaultThickness = 1.0
+
         public let filling: AdaptyUI.Filling
         public let thickness: Double
-    }
-}
-
-extension AdaptyUI.Shape.Border {
-    init?(filling: AdaptyUI.Filling?, thickness: Double?) {
-        guard let filling else { return nil }
-        self.init(filling: filling, thickness: thickness)
     }
 }
