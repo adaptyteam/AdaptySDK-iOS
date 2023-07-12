@@ -10,7 +10,8 @@ import Foundation
 extension AdaptyUI {
     public struct FeaturesBlock {
         public let type: FeaturesBlockType
-        public let items: [String: AdaptyUI.LocalizedViewItem]
+        public lazy var items = { Dictionary(uniqueKeysWithValues: orderedItems) }()
+        public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
     }
 
     public enum FeaturesBlockType: String {

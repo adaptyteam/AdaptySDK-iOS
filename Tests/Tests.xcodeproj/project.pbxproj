@@ -211,7 +211,6 @@
 		8AFCD95E2A53255B00C6211C /* ShapeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD95D2A53255B00C6211C /* ShapeType.swift */; };
 		8AFCD9602A53291B00C6211C /* FooterBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD95F2A53291B00C6211C /* FooterBlock.swift */; };
 		8AFCD9642A5C43BF00C6211C /* TextArray.Separator+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9632A5C43BF00C6211C /* TextArray.Separator+Decodable.swift */; };
-		8AFCD9662A5C4D3600C6211C /* Deprecated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9652A5C4D3600C6211C /* Deprecated.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -440,7 +439,6 @@
 		8AFCD95D2A53255B00C6211C /* ShapeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeType.swift; sourceTree = "<group>"; };
 		8AFCD95F2A53291B00C6211C /* FooterBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBlock.swift; sourceTree = "<group>"; };
 		8AFCD9632A5C43BF00C6211C /* TextArray.Separator+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TextArray.Separator+Decodable.swift"; sourceTree = "<group>"; };
-		8AFCD9652A5C4D3600C6211C /* Deprecated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deprecated.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -505,7 +503,6 @@
 				8AFCD94A2A4F171C00C6211C /* Shape.swift */,
 				8A1F7470297B2966002B7FBC /* Text.swift */,
 				8A1F7472297B298D002B7FBC /* TextItems.swift */,
-				8AFCD9652A5C4D3600C6211C /* Deprecated.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -1103,7 +1100,6 @@
 				8AFCD94F2A4F27AE00C6211C /* ShapeType+Decodable.swift in Sources */,
 				8AFCD93D2A4DE14500C6211C /* ProductsBlockType+Decodable.swift in Sources */,
 				8AFCD9472A4DFCC600C6211C /* HorizontalAlign.swift in Sources */,
-				8AFCD9662A5C4D3600C6211C /* Deprecated.swift in Sources */,
 				8AB0037E2926FCEA008476A3 /* EventsStorage.swift in Sources */,
 				8A1F7466297B21F0002B7FBC /* ViewConfiguration+extractLocale.swift in Sources */,
 				8A1561D82A20D9F300CF7214 /* SK2TransactionObserver.swift in Sources */,

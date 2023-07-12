@@ -101,51 +101,52 @@ extension AdaptyUI.ViewConfiguration {
             )
         }
 
-        func convert(_ items: [String: AdaptyUI.ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {
-            guard let items = items, !items.isEmpty else { return [:] }
-            var result = [String: AdaptyUI.LocalizedViewItem]()
-            result.reserveCapacity(items.count)
-            for item in items {
-                switch item.value {
-                case let .unknown(value):
-                    result[item.key] = .unknown(value)
-                case let .asset(id):
-                    guard let asset = getAsset(id) else {
-                        result[item.key] = .unknown("asset.id: \(id)")
-                        break
-                    }
-                    switch asset {
-                    case let .filling(value):
-                        result[item.key] = .filling(value)
-                    case let .unknown(value):
-                        result[item.key] = .unknown(value)
-                    case .font:
-                        result[item.key] = .unknown("unsupported asset {type: font, id: \(id)}")
-                    }
-                case let .shape(value):
-                    result[item.key] = .shape(getShape(from: value))
-                case let .button(value):
-                    let normal = AdaptyUI.Button.State(
-                        shape: getShapeOrNil(from: value.shape),
-                        title: getTextOrNil(from: value.title)
-                    )
+        func convert(_ items: [(key: String, value: AdaptyUI.ViewItem)]?) -> [(key: String, value: AdaptyUI.LocalizedViewItem)] {
+            items?.map(convert) ?? []
+        }
 
-                    let selected = AdaptyUI.Button.State(
-                        shape: getShapeOrNil(from: value.selectedShape),
-                        title: getTextOrNil(from: value.selectedTitle)
-                    )
+        func convert(_ item: (key: String, value: AdaptyUI.ViewItem)) -> (key: String, value: AdaptyUI.LocalizedViewItem) {
+            (key: item.key, value: convert(item.value))
+        }
 
-                    result[item.key] = .button(AdaptyUI.Button(
-                        normal: normal.isEmpty ? nil : normal,
-                        selected: selected.isEmpty ? nil : selected,
-                        align: value.align ?? AdaptyUI.Button.defaultAlign,
-                        action: getButtonActionOrNil(from: value.action)
-                    ))
-                case let .text(group):
-                    result[item.key] = .text(getText(from: group))
+        func convert(_ item: AdaptyUI.ViewItem) -> AdaptyUI.LocalizedViewItem {
+            switch item {
+            case let .unknown(value):
+                return .unknown(value)
+            case let .asset(id):
+                guard let asset = getAsset(id) else {
+                    return .unknown("asset.id: \(id)")
                 }
+                switch asset {
+                case let .filling(value):
+                    return .filling(value)
+                case let .unknown(value):
+                    return .unknown(value)
+                case .font:
+                    return .unknown("unsupported asset {type: font, id: \(id)}")
+                }
+            case let .shape(value):
+                return .shape(getShape(from: value))
+            case let .button(value):
+                let normal = AdaptyUI.Button.State(
+                    shape: getShapeOrNil(from: value.shape),
+                    title: getTextOrNil(from: value.title)
+                )
+
+                let selected = AdaptyUI.Button.State(
+                    shape: getShapeOrNil(from: value.selectedShape),
+                    title: getTextOrNil(from: value.selectedTitle)
+                )
+
+                return .button(AdaptyUI.Button(
+                    normal: normal.isEmpty ? nil : normal,
+                    selected: selected.isEmpty ? nil : selected,
+                    align: value.align ?? AdaptyUI.Button.defaultAlign,
+                    action: getButtonActionOrNil(from: value.action)
+                ))
+            case let .text(group):
+                return .text(getText(from: group))
             }
-            return result.isEmpty ? [:] : result
         }
 
         var styles = [String: AdaptyUI.LocalizedViewStyle]()
@@ -155,17 +156,17 @@ extension AdaptyUI.ViewConfiguration {
             styles[style.key] = AdaptyUI.LocalizedViewStyle(
                 featureBlock: style.value.featuresBlock.map { AdaptyUI.FeaturesBlock(
                     type: $0.type,
-                    items: convert($0.items)
+                    orderedItems: convert($0.orderedItems)
                 ) },
                 productBlock: AdaptyUI.ProductsBlock(
                     type: style.value.productsBlock.type,
                     mainProductIndex: style.value.productsBlock.mainProductIndex,
-                    items: convert(style.value.productsBlock.items)
+                    orderedItems: convert(style.value.productsBlock.orderedItems)
                 ),
                 footerBlock: style.value.footerBlock.map { AdaptyUI.FooterBlock(
-                    items: convert($0.items)
+                    orderedItems: convert($0.orderedItems)
                 ) },
-                items: convert(style.value.items))
+                orderedItems: convert(style.value.orderedItems))
         }
 
         return AdaptyUI.LocalizedViewConfiguration(
