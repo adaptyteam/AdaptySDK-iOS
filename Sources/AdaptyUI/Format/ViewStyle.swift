@@ -13,7 +13,7 @@ extension AdaptyUI {
         let featuresBlock: FeaturesBlock?
         let productsBlock: ProductsBlock
         let footerBlock: FooterBlock?
-        let orderedItems: [(key: String, value: ViewItem)]
+        let items: [String: ViewItem]
     }
 
     enum ViewItem {
@@ -32,13 +32,13 @@ extension AdaptyUI.ViewStyle {
 
     struct FeaturesBlock {
         let type: AdaptyUI.FeaturesBlockType
-        let orderedItems: [(key: String, value: AdaptyUI.ViewItem)]
+        let items: [String: AdaptyUI.ViewItem]
     }
 
     struct ProductsBlock {
         let type: AdaptyUI.ProductsBlockType
         let mainProductIndex: Int
-        let orderedItems: [(key: String, value: AdaptyUI.ViewItem)]
+        let items: [String: AdaptyUI.ViewItem]
     }
 }
 
@@ -69,13 +69,16 @@ extension AdaptyUI.ViewStyle: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        orderedItems = try container.allKeys
-            .filter { key in
-                BlockKeys(rawValue: key.stringValue) == nil
-            }
-            .map { key in
-                (key: key.stringValue, value: try container.decode(AdaptyUI.ViewItem.self, forKey: key))
-            }
+        items = [String: AdaptyUI.ViewItem](
+            try container.allKeys
+                .filter {
+                    BlockKeys(rawValue: $0.stringValue) == nil
+                }
+                .map {
+                    ($0.stringValue, value: try container.decode(AdaptyUI.ViewItem.self, forKey: $0))
+                },
+            uniquingKeysWith: { $1 }
+        )
         footerBlock = try container.decodeIfPresent(FooterBlock.self, forKey: CodingKeys(BlockKeys.footerBlock))
         featuresBlock = try container.decodeIfPresent(FeaturesBlock.self, forKey: CodingKeys(BlockKeys.featuresBlock))
         productsBlock = try container.decode(ProductsBlock.self, forKey: CodingKeys(BlockKeys.productsBlock))
@@ -83,12 +86,25 @@ extension AdaptyUI.ViewStyle: Decodable {
 }
 
 extension AdaptyUI.ViewStyle.FooterBlock: Decodable {
+    struct Order: Decodable {
+        let order: Int
+    }
+
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        orderedItems = try container.allKeys.map { key in
-            (key: key.stringValue, value: try container.decode(AdaptyUI.ViewItem.self, forKey: key))
-        }
+        orderedItems = try container.allKeys
+            .map { key in
+                (key: key.stringValue,
+                 value: try container.decode(AdaptyUI.ViewItem.self, forKey: key),
+                 order: (try? container.decode(Order.self, forKey: key))?.order ?? 0)
+            }
+            .sorted(by: { first, second in
+                first.order < second.order
+            })
+            .map {
+                (key: $0.key, value: $0.value)
+            }
     }
 }
 
@@ -100,13 +116,17 @@ extension AdaptyUI.ViewStyle.FeaturesBlock: Decodable {
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        orderedItems = try container.allKeys
-            .filter { key in
-                PropertyKeys(rawValue: key.stringValue) == nil
-            }
-            .map { key in
-                (key: key.stringValue, value: try container.decode(AdaptyUI.ViewItem.self, forKey: key))
-            }
+
+        items = [String: AdaptyUI.ViewItem](
+            try container.allKeys
+                .filter {
+                    PropertyKeys(rawValue: $0.stringValue) == nil
+                }
+                .map {
+                    ($0.stringValue, try container.decode(AdaptyUI.ViewItem.self, forKey: $0))
+                },
+            uniquingKeysWith: { $1 }
+        )
 
         type = try container.decode(AdaptyUI.FeaturesBlockType.self, forKey: CodingKeys(PropertyKeys.type))
     }
@@ -121,14 +141,16 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        orderedItems = try container.allKeys
-            .filter { key in
-                PropertyKeys(rawValue: key.stringValue) == nil
-            }
-            .map { key in
-                (key: key.stringValue, value: try container.decode(AdaptyUI.ViewItem.self, forKey: key))
-            }
-
+        items = [String: AdaptyUI.ViewItem](
+            try container.allKeys
+                .filter {
+                    PropertyKeys(rawValue: $0.stringValue) == nil
+                }
+                .map {
+                    ($0.stringValue, try container.decode(AdaptyUI.ViewItem.self, forKey: $0))
+                },
+            uniquingKeysWith: { $1 }
+        )
         type = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: CodingKeys(PropertyKeys.type))
         mainProductIndex = try container.decodeIfPresent(Int.self, forKey: CodingKeys(PropertyKeys.mainProductIndex)) ?? 0
     }

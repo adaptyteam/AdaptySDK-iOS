@@ -57,7 +57,7 @@ extension AdaptyProfile.CustomAttributes {
                 guard let rawValue = $1.rawValue else { return nil }
                 return ($0, rawValue)
             },
-            uniquingKeysWith: { current, _ in current }
+            uniquingKeysWith: { $1 }
         )
     }
 

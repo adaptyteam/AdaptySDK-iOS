@@ -16,11 +16,30 @@ extension AdaptyUI.ViewStyle {
             "products_block": [
                 "type": "vertical",
             ],
-
         ]
 
         static let full: JSONValue = [
-            "footer_block": [:],
+            "footer_block": [
+                "shape_example2": [
+                    "type": "shape",
+                    "value": "circle",
+                    "order": 3,
+                ],
+                "shape_example1": [
+                    "type": "shape",
+                    "order": "sss",
+                ],
+
+                "shape_example3": [
+                    "type": "shape",
+                    "value": "curve_up",
+                    "order": 2,
+                ],
+                "shape_example4": [
+                    "type": "curve_up",
+                    "order": "sss",
+                ],
+            ],
             "features_block": [
                 "type": "list",
             ],

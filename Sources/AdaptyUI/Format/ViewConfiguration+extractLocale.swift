@@ -101,12 +101,12 @@ extension AdaptyUI.ViewConfiguration {
             )
         }
 
-        func convert(_ items: [(key: String, value: AdaptyUI.ViewItem)]?) -> [(key: String, value: AdaptyUI.LocalizedViewItem)] {
-            items?.map(convert) ?? []
+        func convert(_ items: [String: AdaptyUI.ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {
+            items?.mapValues(convert) ?? [:]
         }
 
-        func convert(_ item: (key: String, value: AdaptyUI.ViewItem)) -> (key: String, value: AdaptyUI.LocalizedViewItem) {
-            (key: item.key, value: convert(item.value))
+        func convert(_ item: [(key: String, value: AdaptyUI.ViewItem)]?) -> [(key: String, value: AdaptyUI.LocalizedViewItem)] {
+            item?.map { (key: $0.key, value: convert($0.value)) } ?? []
         }
 
         func convert(_ item: AdaptyUI.ViewItem) -> AdaptyUI.LocalizedViewItem {
@@ -156,17 +156,17 @@ extension AdaptyUI.ViewConfiguration {
             styles[style.key] = AdaptyUI.LocalizedViewStyle(
                 featureBlock: style.value.featuresBlock.map { AdaptyUI.FeaturesBlock(
                     type: $0.type,
-                    orderedItems: convert($0.orderedItems)
+                    items: convert($0.items)
                 ) },
                 productBlock: AdaptyUI.ProductsBlock(
                     type: style.value.productsBlock.type,
                     mainProductIndex: style.value.productsBlock.mainProductIndex,
-                    orderedItems: convert(style.value.productsBlock.orderedItems)
+                    items: convert(style.value.productsBlock.items)
                 ),
                 footerBlock: style.value.footerBlock.map { AdaptyUI.FooterBlock(
                     orderedItems: convert($0.orderedItems)
                 ) },
-                orderedItems: convert(style.value.orderedItems))
+                items: convert(style.value.items))
         }
 
         return AdaptyUI.LocalizedViewConfiguration(

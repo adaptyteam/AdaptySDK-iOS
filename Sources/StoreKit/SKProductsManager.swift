@@ -150,7 +150,7 @@ extension SKProductsManager {
     }
 
     func getIntroductoryOfferEligibility(sk1Products: [SKProduct], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
-        let introductoryOfferEligibilityByVendorProductId = [String: AdaptyEligibility?](sk1Products.map { ($0.productIdentifier, $0.introductoryOfferEligibility) }, uniquingKeysWith: { f, _ in f })
+        let introductoryOfferEligibilityByVendorProductId = [String: AdaptyEligibility?](sk1Products.map { ($0.productIdentifier, $0.introductoryOfferEligibility) }, uniquingKeysWith: { $1 })
 
         let vendorProductIdsWithUnknownEligibility = introductoryOfferEligibilityByVendorProductId.filter { $0.value == nil }.map { $0.key }
 
@@ -164,7 +164,7 @@ extension SKProductsManager {
 
         getSK2IntroductoryOfferEligibility(vendorProductIds: vendorProductIdsWithUnknownEligibility) { result in
             completion(result.map {
-                introductoryOfferEligibilityByVendorProductId.merging($0, uniquingKeysWith: { _, last in last })
+                introductoryOfferEligibilityByVendorProductId.merging($0, uniquingKeysWith: { $1 })
             })
         }
     }

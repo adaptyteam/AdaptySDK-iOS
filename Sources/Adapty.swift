@@ -333,7 +333,7 @@ extension Adapty {
             profileManager.getBackendProductStates(vendorProductIds: vendorProductIdsWithUnknownEligibility) { result in
                 completion(result.map { states in
                     let states = states.asDictionary.mapValues { $0.introductoryOfferEligibility }
-                    let result = introductoryOfferEligibilityByVendorProductId.merging(states, uniquingKeysWith: { _, last in last })
+                    let result = introductoryOfferEligibilityByVendorProductId.merging(states, uniquingKeysWith: { $1 })
 
                     let vendorProductIdsWithUnknownEligibility = result.filter { $0.value == nil }.map { $0.key }
                     if !vendorProductIdsWithUnknownEligibility.isEmpty {
