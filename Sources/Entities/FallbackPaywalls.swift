@@ -51,7 +51,9 @@ extension FallbackPaywalls: Decodable {
 
         if let containers = try container.decodeIfPresent([PaywallContainer].self, forKey: .data) {
             let paywallsArray = containers.map { $0.paywall }
-            paywalls = paywallsArray.asDictionary
+            paywalls = try [String: AdaptyPaywall](paywallsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.data], debugDescription: "Duplicate paywall id"))
+            })
             productVendorIds = Set(paywallsArray.flatMap { $0.products.map { $0.vendorId } })
         } else {
             paywalls = [:]

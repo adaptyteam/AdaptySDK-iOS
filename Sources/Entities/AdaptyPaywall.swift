@@ -108,14 +108,10 @@ extension AdaptyPaywall: Codable {
     }
 }
 
-extension Sequence where Element == AdaptyPaywall {
-    var asDictionary: [String: AdaptyPaywall] {
-        Dictionary(uniqueKeysWithValues: map { ($0.id, $0) })
-    }
-}
-
 extension Sequence where Element == VH<AdaptyPaywall> {
     var asDictionary: [String: VH<AdaptyPaywall>] {
-        Dictionary(uniqueKeysWithValues: map { ($0.value.id, $0) })
+        Dictionary(map { ($0.value.id, $0) }, uniquingKeysWith: { first, second in
+            first.value.version > second.value.version ? first : second
+        })
     }
 }

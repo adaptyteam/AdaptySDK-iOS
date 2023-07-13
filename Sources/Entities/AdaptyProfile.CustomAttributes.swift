@@ -52,10 +52,13 @@ extension AdaptyProfile.CustomAttributeValue {
 
 extension AdaptyProfile.CustomAttributes {
     func convertToSimpleDictionary() -> [String: Any] {
-        [String: Any](uniqueKeysWithValues: compactMap {
-            guard let rawValue = $1.rawValue else { return nil }
-            return ($0, rawValue)
-        })
+        [String: Any](
+            compactMap {
+                guard let rawValue = $1.rawValue else { return nil }
+                return ($0, rawValue)
+            },
+            uniquingKeysWith: { current, _ in current }
+        )
     }
 
     static func validateKey(_ key: String) -> AdaptyError? {

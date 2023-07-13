@@ -60,7 +60,9 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value ?? [:]
 
         let localizationsArray = try container.decode([AdaptyUI.Localization].self, forKey: .localizations)
-        let localizations = Dictionary(uniqueKeysWithValues: localizationsArray.map { ($0.id, $0) })
+        let localizations = try [String: AdaptyUI.Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate id"))
+        })
         self.localizations = localizations
         if let defaultLocalization = try container.decodeIfPresent(String.self, forKey: .defaultLocalization) {
             self.defaultLocalization = localizations[defaultLocalization]

@@ -10,10 +10,10 @@ import Foundation
 
 extension AdaptyUI {
     public struct FooterBlock {
-        public let items : [String: AdaptyUI.LocalizedViewItem]
+        public let items: [String: AdaptyUI.LocalizedViewItem]
         public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
         init(orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
-            items = Dictionary(uniqueKeysWithValues: orderedItems)
+            items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
             self.orderedItems = orderedItems
         }
     }

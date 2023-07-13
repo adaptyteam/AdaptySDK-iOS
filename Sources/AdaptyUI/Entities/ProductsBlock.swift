@@ -18,7 +18,7 @@ extension AdaptyUI {
             self.type = type
             self.mainProductIndex = mainProductIndex
             self.orderedItems = orderedItems
-            items = Dictionary(uniqueKeysWithValues: orderedItems)
+            items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
         }
     }
 

@@ -26,7 +26,7 @@ final class SKProductsManager {
         session = backend.createHTTPSession(responseQueue: queue)
         storeKit1Fetcher = SK1ProductsFetcher(queue: queue)
         if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *),
-            Environment.StoreKit2.available {
+           Environment.StoreKit2.available {
             _storeKit2Fetcher = SK2ProductsFetcher()
         } else {
             _storeKit2Fetcher = nil
@@ -150,7 +150,7 @@ extension SKProductsManager {
     }
 
     func getIntroductoryOfferEligibility(sk1Products: [SKProduct], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
-        let introductoryOfferEligibilityByVendorProductId = Dictionary(uniqueKeysWithValues: sk1Products.map { ($0.productIdentifier, $0.introductoryOfferEligibility) })
+        let introductoryOfferEligibilityByVendorProductId = [String: AdaptyEligibility?](sk1Products.map { ($0.productIdentifier, $0.introductoryOfferEligibility) }, uniquingKeysWith: { f, _ in f })
 
         let vendorProductIdsWithUnknownEligibility = introductoryOfferEligibilityByVendorProductId.filter { $0.value == nil }.map { $0.key }
 

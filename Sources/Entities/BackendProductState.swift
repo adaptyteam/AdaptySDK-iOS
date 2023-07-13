@@ -42,8 +42,8 @@ extension BackendProductState: Codable {
 
 extension Sequence where Element == BackendProductState {
     var asDictionary: [String: BackendProductState] {
-        Dictionary(uniqueKeysWithValues: map { ($0.vendorId, $0) })
+        Dictionary(map { ($0.vendorId, $0) }, uniquingKeysWith: { first, second in
+            first.version > second.version ? first : second
+        })
     }
 }
-
-

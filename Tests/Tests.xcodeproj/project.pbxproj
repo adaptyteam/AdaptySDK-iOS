@@ -35,6 +35,8 @@
 		8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */; };
 		8A590DD829DE27FE00547895 /* AnyCodingKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */; };
 		8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */; };
+		8A7ED1782A60505A003CB084 /* AdaptyUI.ViewStyle.json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7ED1772A60505A003CB084 /* AdaptyUI.ViewStyle.json.swift */; };
+		8A7ED17A2A605305003CB084 /* AdaptyUIViewStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7ED1792A605305003CB084 /* AdaptyUIViewStyleTests.swift */; };
 		8AA58F3E2A278A2000AE26CA /* ValidateTransactionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */; };
 		8AA58F402A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */; };
 		8AA58F422A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */; };
@@ -259,6 +261,8 @@
 		8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdaptyUI+Concurrency.swift"; sourceTree = "<group>"; };
 		8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodingKeys.swift; sourceTree = "<group>"; };
 		8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPSession+logSystemEvent.swift"; sourceTree = "<group>"; };
+		8A7ED1772A60505A003CB084 /* AdaptyUI.ViewStyle.json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUI.ViewStyle.json.swift; sourceTree = "<group>"; };
+		8A7ED1792A605305003CB084 /* AdaptyUIViewStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUIViewStyleTests.swift; sourceTree = "<group>"; };
 		8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateTransactionRequest.swift; sourceTree = "<group>"; };
 		8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK1ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
 		8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK2ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
@@ -878,6 +882,7 @@
 				8AF80411292CA19C00970E6B /* FallbackPaywallsTests.swift */,
 				8A1F74462979BBC4002B7FBC /* AdaptyUIAssetTests.swift */,
 				8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */,
+				8A7ED1792A605305003CB084 /* AdaptyUIViewStyleTests.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -904,6 +909,7 @@
 				8AF8041F292D34CA00970E6B /* FallbackPaywalls.json.swift */,
 				8A1F74442979B9DF002B7FBC /* AdaptyUI.Assets.json.swift */,
 				8A1F744A2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift */,
+				8A7ED1772A60505A003CB084 /* AdaptyUI.ViewStyle.json.swift */,
 			);
 			path = json;
 			sourceTree = "<group>";
@@ -1243,6 +1249,7 @@
 				8A1F74472979BBC4002B7FBC /* AdaptyUIAssetTests.swift in Sources */,
 				8AAF8B34292848970003BA86 /* Backend.swift in Sources */,
 				8AE26FB92A13DA54003D1A15 /* AdaptyPaywallProductReferenceTests.swift in Sources */,
+				8A7ED1782A60505A003CB084 /* AdaptyUI.ViewStyle.json.swift in Sources */,
 				8AF8040E292C97A700970E6B /* AdaptyAttributionSourceTests.swift in Sources */,
 				8AF80406292C407C00970E6B /* JSONValue.swift in Sources */,
 				8AF80414292D2C1500970E6B /* AdaptyProfileTests.swift in Sources */,
@@ -1260,6 +1267,7 @@
 				8AF80404292BB58600970E6B /* XCTestCase+getDataFromResource.swift in Sources */,
 				8AF8041E292D34B800970E6B /* BackendProductState.json.swift in Sources */,
 				8AAF8B30292847430003BA86 /* EventsManagerTests.swift in Sources */,
+				8A7ED17A2A605305003CB084 /* AdaptyUIViewStyleTests.swift in Sources */,
 				8AF8040C292C929200970E6B /* JSONValue+XCTest.swift in Sources */,
 				8AF8041A292D348A00970E6B /* AdaptyPaywall.json.swift in Sources */,
 				8AAF8B062927ACA50003BA86 /* EventCollectionTests.swift in Sources */,

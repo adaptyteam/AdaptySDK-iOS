@@ -48,9 +48,3 @@ extension AdaptyPaywall.ProductReference: Codable {
         try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
     }
 }
-
-extension Sequence where Element == AdaptyPaywall.ProductReference {
-    var asDictionary: [String: AdaptyPaywall.ProductReference] {
-        Dictionary(uniqueKeysWithValues: map { ($0.vendorId, $0) })
-    }
-}

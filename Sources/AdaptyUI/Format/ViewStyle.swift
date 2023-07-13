@@ -145,8 +145,8 @@ extension AdaptyUI.ViewItem: Decodable {
         case shape
         case rectangle
         case circle
-        case curveUp
-        case curveDown
+        case curveUp = "curve_up"
+        case curveDown = "curve_down"
 
         case button
         case textRows = "text-rows" // deprecated

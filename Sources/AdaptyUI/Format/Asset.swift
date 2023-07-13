@@ -58,7 +58,9 @@ extension AdaptyUI {
 
         init(from decoder: Decoder) throws {
             let array = try decoder.singleValueContainer().decode([Item].self)
-            value = Dictionary(uniqueKeysWithValues: array.map { ($0.id, $0.value) })
+            value = try [String: AdaptyUI.Asset](array.map { ($0.id, $0.value) }, uniquingKeysWith: { _, _ in
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate key"))
+            })
         }
 
         fileprivate struct Item: Decodable {

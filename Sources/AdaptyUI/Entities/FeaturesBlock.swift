@@ -14,7 +14,7 @@ extension AdaptyUI {
         public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
         init(type: FeaturesBlockType, orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
             self.type = type
-            items = Dictionary(uniqueKeysWithValues: orderedItems)
+            items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
             self.orderedItems = orderedItems
         }
     }
