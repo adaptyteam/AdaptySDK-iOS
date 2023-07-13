@@ -11,8 +11,15 @@ extension AdaptyUI {
     public struct ProductsBlock {
         public let type: ProductsBlockType
         public let mainProductIndex: Int
-        public lazy var items = { Dictionary(uniqueKeysWithValues: orderedItems) }()
+        public let items: [String: AdaptyUI.LocalizedViewItem]
         public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
+
+        init(type: ProductsBlockType, mainProductIndex: Int, orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+            self.type = type
+            self.mainProductIndex = mainProductIndex
+            self.orderedItems = orderedItems
+            items = Dictionary(uniqueKeysWithValues: orderedItems)
+        }
     }
 
     public enum ProductsBlockType: String {

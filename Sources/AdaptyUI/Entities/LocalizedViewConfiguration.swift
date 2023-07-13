@@ -25,8 +25,15 @@ extension AdaptyUI {
         public let featureBlock: AdaptyUI.FeaturesBlock?
         public let productBlock: AdaptyUI.ProductsBlock
         public let footerBlock: AdaptyUI.FooterBlock?
-        public lazy var items = { Dictionary(uniqueKeysWithValues: orderedItems) }()
+        public let items : [String: AdaptyUI.LocalizedViewItem]
         public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
+        init(featureBlock: AdaptyUI.FeaturesBlock?, productBlock: AdaptyUI.ProductsBlock, footerBlock: AdaptyUI.FooterBlock?, orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+            self.featureBlock = featureBlock
+            self.productBlock = productBlock
+            self.footerBlock = footerBlock
+            self.orderedItems = orderedItems
+            items = Dictionary(uniqueKeysWithValues: orderedItems)
+        }
     }
 
     public enum LocalizedViewItem {

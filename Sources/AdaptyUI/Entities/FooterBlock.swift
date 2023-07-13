@@ -10,7 +10,11 @@ import Foundation
 
 extension AdaptyUI {
     public struct FooterBlock {
-        public lazy var items = { Dictionary(uniqueKeysWithValues: orderedItems) }()
+        public let items : [String: AdaptyUI.LocalizedViewItem]
         public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
+        init(orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+            items = Dictionary(uniqueKeysWithValues: orderedItems)
+            self.orderedItems = orderedItems
+        }
     }
 }
