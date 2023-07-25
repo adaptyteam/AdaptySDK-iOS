@@ -35,6 +35,7 @@
 		8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */; };
 		8A590DD829DE27FE00547895 /* AnyCodingKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */; };
 		8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */; };
+		8A7ED17C2A701FBB003CB084 /* AdaptyPrice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7ED17B2A701FBB003CB084 /* AdaptyPrice.swift */; };
 		8AA58F3E2A278A2000AE26CA /* ValidateTransactionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */; };
 		8AA58F402A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */; };
 		8AA58F422A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */; };
@@ -238,6 +239,7 @@
 		8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdaptyUI+Concurrency.swift"; sourceTree = "<group>"; };
 		8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodingKeys.swift; sourceTree = "<group>"; };
 		8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPSession+logSystemEvent.swift"; sourceTree = "<group>"; };
+		8A7ED17B2A701FBB003CB084 /* AdaptyPrice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyPrice.swift; sourceTree = "<group>"; };
 		8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateTransactionRequest.swift; sourceTree = "<group>"; };
 		8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK1ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
 		8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK2ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
@@ -785,6 +787,7 @@
 				8AB0031A2926FCEA008476A3 /* VH.swift */,
 				8AF804222938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift */,
 				8ADC930D2A37482B0084F1E4 /* AdaptyPurchasedInfo.swift */,
+				8A7ED17B2A701FBB003CB084 /* AdaptyPrice.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -1130,6 +1133,7 @@
 				8AB003612926FCEA008476A3 /* Adapty+AsyncHelpers.swift in Sources */,
 				8AB003372926FCEA008476A3 /* Adapty.swift in Sources */,
 				8AB003832926FCEA008476A3 /* AdaptyPaywallShowedParameters.swift in Sources */,
+				8A7ED17C2A701FBB003CB084 /* AdaptyPrice.swift in Sources */,
 				8AB003312926FCEA008476A3 /* SKProductsManager.swift in Sources */,
 				8A1F7469297B287F002B7FBC /* Color+Decodable.swift in Sources */,
 				8AB0038C2926FCEA008476A3 /* AdaptyEligibility.swift in Sources */,

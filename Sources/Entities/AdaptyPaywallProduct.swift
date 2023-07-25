@@ -11,9 +11,6 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
     /// Unique identifier of a product from App Store Connect or Google Play Console.
     public let vendorProductId: String
 
-    /// User's eligibility for the promotional offers. Check this property before displaying info about promotional offers.
-    public var promotionalOfferEligibility: Bool { promotionalOfferId != nil }
-
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?
 
@@ -75,10 +72,27 @@ extension AdaptyPaywallProduct: Encodable {
             let container = try decoder.container(keyedBy: ProductCodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
             promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
-            variationId = try container.decode(String.self, forKey: .variationId)
+            variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
         }
+    }
+
+    private enum ProductCodingKeys: String, CodingKey {
+        case vendorProductId = "vendor_product_id"
+
+        case promotionalOfferId = "promotional_offer_id"
+        case paywallVariationId = "paywall_variation_id"
+        case paywallABTestName = "paywall_ab_test_name"
+        case paywallName = "paywall_name"
+
+        case subscriptionDetails = "subscription_details"
+
+        case localizedDescription = "localized_description"
+        case localizedTitle = "localized_title"
+        case price
+        case regionCode = "region_code"
+        case isFamilyShareable = "is_family_shareable"
     }
 
     init(from object: PrivateObject, skProduct: SKProduct) {
@@ -92,27 +106,51 @@ extension AdaptyPaywallProduct: Encodable {
         )
     }
 
+    private struct SubscriptionDetail: Encodable {
+        let product: AdaptyPaywallProduct
+
+        enum CodingKeys: String, CodingKey {
+            case subscriptionGroupIdentifier = "subscription_group_identifier"
+            case renewalType = "renewal_type"
+            case subscriptionPeriod = "subscription_period"
+            case localizedSubscriptionPeriod = "localized_subscription_period"
+            case introductoryOfferPhases = "introductory_offer_phases"
+            case promotionalOffer = "promotional_offer"
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(product.subscriptionGroupIdentifier, forKey: .subscriptionGroupIdentifier)
+            try container.encode("autorenewable", forKey: .renewalType)
+            try container.encodeIfPresent(product.subscriptionPeriod, forKey: .subscriptionPeriod)
+            try container.encodeIfPresent(product.localizedSubscriptionPeriod, forKey: .localizedSubscriptionPeriod)
+
+            if let id = product.promotionalOfferId,
+               let discount = product.discount(byIdentifier: id) {
+                try container.encode(discount, forKey: .promotionalOffer)
+            }
+
+            if let discount = product.introductoryDiscount {
+                try container.encode([discount], forKey: .introductoryOfferPhases)
+            }
+        }
+    }
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: ProductCodingKeys.self)
         try container.encode(vendorProductId, forKey: .vendorProductId)
 
-        try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
-        try container.encode(variationId, forKey: .variationId)
+        try container.encode(variationId, forKey: .paywallVariationId)
         try container.encode(paywallABTestName, forKey: .paywallABTestName)
         try container.encode(paywallName, forKey: .paywallName)
 
         try container.encode(localizedDescription, forKey: .localizedDescription)
         try container.encode(localizedTitle, forKey: .localizedTitle)
-        try container.encode(price, forKey: .price)
-        try container.encodeIfPresent(currencyCode, forKey: .currencyCode)
-        try container.encodeIfPresent(currencySymbol, forKey: .currencySymbol)
+        try container.encode(priceValue, forKey: .price)
         try container.encodeIfPresent(regionCode, forKey: .regionCode)
         try container.encode(isFamilyShareable, forKey: .isFamilyShareable)
-        try container.encodeIfPresent(subscriptionPeriod, forKey: .subscriptionPeriod)
-        try container.encodeIfPresent(introductoryDiscount, forKey: .introductoryDiscount)
-        try container.encodeIfPresent(subscriptionGroupIdentifier, forKey: .subscriptionGroupIdentifier)
-        try container.encode(discounts, forKey: .discounts)
-        try container.encodeIfPresent(localizedPrice, forKey: .localizedPrice)
-        try container.encodeIfPresent(localizedSubscriptionPeriod, forKey: .localizedSubscriptionPeriod)
+
+        guard #available(iOS 11.2, macOS 10.14.4, *), skProduct.subscriptionPeriod != nil else { return }
+        try container.encode(SubscriptionDetail(product: self), forKey: .subscriptionDetails)
     }
 }

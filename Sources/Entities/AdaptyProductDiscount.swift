@@ -9,8 +9,10 @@ import Foundation
 import StoreKit
 
 public struct AdaptyProductDiscount {
+    let priceValue: AdaptyPrice
+
     /// Discount price of a product in a local currency.
-    public let price: Decimal
+    public var price: Decimal { priceValue.amount }
 
     /// Unique identifier of a discount offer for a product.
     public let identifier: String?
@@ -25,7 +27,7 @@ public struct AdaptyProductDiscount {
     public let paymentMode: PaymentMode
 
     /// A formatted price of a discount for a user's locale.
-    public let localizedPrice: String?
+    public var localizedPrice: String? { priceValue.localizedString }
 
     /// A formatted subscription period of a discount for a user's locale.
     public let localizedSubscriptionPeriod: String?
@@ -50,12 +52,11 @@ extension AdaptyProductDiscount {
             identifier = nil
         }
 
-        self.init(price: discount.price.decimalValue,
+        self.init(priceValue: AdaptyPrice(value: discount.price, locale: locale),
                   identifier: identifier,
                   subscriptionPeriod: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
                   numberOfPeriods: discount.numberOfPeriods,
                   paymentMode: PaymentMode(mode: discount.paymentMode),
-                  localizedPrice: locale.localized(price: discount.price),
                   localizedSubscriptionPeriod: locale.localized(period: discount.subscriptionPeriod),
                   localizedNumberOfPeriods: locale.localized(numberOfPeriods: discount))
     }
@@ -79,11 +80,22 @@ extension AdaptyProductDiscount: Encodable {
     enum CodingKeys: String, CodingKey {
         case price
         case identifier
-        case subscriptionPeriod = "subscription_period"
         case numberOfPeriods = "number_of_periods"
         case paymentMode = "payment_mode"
-        case localizedPrice = "localized_price"
+        case subscriptionPeriod = "subscription_period"
         case localizedSubscriptionPeriod = "localized_subscription_period"
         case localizedNumberOfPeriods = "localized_number_of_periods"
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(identifier, forKey: .identifier)
+
+        try container.encode(priceValue, forKey: .price)
+        try container.encode(numberOfPeriods, forKey: .numberOfPeriods)
+        try container.encode(paymentMode, forKey: .paymentMode)
+        try container.encode(subscriptionPeriod, forKey: .subscriptionPeriod)
+        try container.encodeIfPresent(localizedSubscriptionPeriod, forKey: .localizedSubscriptionPeriod)
+        try container.encodeIfPresent(localizedNumberOfPeriods, forKey: .localizedNumberOfPeriods)
     }
 }
