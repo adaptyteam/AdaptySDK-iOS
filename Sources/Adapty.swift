@@ -137,6 +137,42 @@ extension Adapty {
         }
     }
 
+    /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
+    public static func setVariationId(from decoder: JSONDecoder,
+                                      data: Data,
+                                      _ completion: AdaptyErrorCompletion? = nil) {
+        struct PrivateObject: Decodable {
+            let variationId: String
+            let transactionId: String
+
+            enum CodingKeys: String, CodingKey {
+                case variationId = "variation_id"
+                case transactionId = "transaction_id"
+            }
+        }
+        let object: PrivateObject
+        do {
+            object = try decoder.decode(PrivateObject.self, from: data)
+        } catch {
+            completion?(.decodingSetVariationIdParams(error))
+            return
+        }
+
+        let logParams: EventParameters = [
+            "variation_id": .value(object.variationId),
+            "transaction_id": .value(object.transactionId),
+        ]
+        async(completion, logName: "set_variation_id", logParams: logParams) { manager, completion in
+            manager.getProfileManager { profileManager in
+                guard let profileManager = try? profileManager.get() else {
+                    completion(profileManager.error)
+                    return
+                }
+                profileManager.setVariationId(object.variationId, forTransactionId: object.transactionId, completion)
+            }
+        }
+    }
+
     /// Link purchased transaction with paywall's variationId.
     ///
     /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
