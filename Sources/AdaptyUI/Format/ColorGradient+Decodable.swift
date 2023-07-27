@@ -1,5 +1,5 @@
 //
-//  ColorLinearGradient+Decodable.swift
+//  ColorGradient+Decodable.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 29.06.2023
@@ -7,10 +7,11 @@
 
 import Foundation
 
-extension AdaptyUI.ColorLinearGradient: Decodable {
+extension AdaptyUI.ColorGradient: Decodable {
     enum CodingKeys: String, CodingKey {
         case points
         case items = "values"
+        case type
     }
 
     struct Points: Codable {
@@ -34,10 +35,19 @@ extension AdaptyUI.ColorLinearGradient: Decodable {
         let points = try container.decode(Points.self, forKey: .points)
         start = points.start
         end = points.end
+
+        switch try container.decode(String.self, forKey: .type) {
+        case AdaptyUI.Asset.ContentType.colorRadialGradient.rawValue:
+            kind = .radial
+        case AdaptyUI.Asset.ContentType.colorConicGradient.rawValue:
+            kind = .conic
+        default:
+            kind = .linear
+        }
     }
 }
 
-extension AdaptyUI.ColorLinearGradient.Item: Decodable {
+extension AdaptyUI.ColorGradient.Item: Decodable {
     enum CodingKeys: String, CodingKey {
         case color
         case p

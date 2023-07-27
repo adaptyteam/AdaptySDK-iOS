@@ -43,7 +43,7 @@ extension AdaptyUI {
         }
 
         public var asColor: AdaptyUI.Color? { asFilling?.asColor }
-        public var asColorLinearGradient: AdaptyUI.ColorLinearGradient? { asFilling?.asColorLinearGradient }
+        public var asColorGradient: AdaptyUI.ColorGradient? { asFilling?.asColorGradient }
         public var asImage: AdaptyUI.Image? { asFilling?.asImage }
 
         public var asShape: AdaptyUI.Shape? {
@@ -79,7 +79,7 @@ extension AdaptyUI {
 extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
     public func getFilling(_ key: Key) -> AdaptyUI.Filling? { self[key]?.asFilling }
     public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asFilling?.asColor }
-    public func getColorLinearGradient(_ key: Key) -> AdaptyUI.ColorLinearGradient? { self[key]?.asFilling?.asColorLinearGradient }
+    public func getColorGradient(_ key: Key) -> AdaptyUI.ColorGradient? { self[key]?.asFilling?.asColorGradient }
     public func getShape(_ key: Key) -> AdaptyUI.Shape? { self[key]?.asShape }
     public func getButton(_ key: Key) -> AdaptyUI.Button? { self[key]?.asButton }
     public func getImage(_ key: Key) -> AdaptyUI.Image? { self[key]?.asFilling?.asImage }

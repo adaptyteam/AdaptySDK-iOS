@@ -46,7 +46,7 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonV
         case let .filling(.color(value)):
             XCTAssertEqual("color", type)
             XCTAssertEqual(value, withJSONValue: object["value"])
-        case .filling(.colorLinearGradient):
+        case .filling(.colorGradient):
             XCTAssertEqual("linear-gradient", type)
         // TODO: implement check
         case let .font(value):

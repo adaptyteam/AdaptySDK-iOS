@@ -28,6 +28,8 @@ extension AdaptyUI.Asset: Decodable {
         case image
         case font
         case colorLinearGradient = "linear-gradient"
+        case colorRadialGradient = "radial-gradient"
+        case colorConicGradient = "conic-gradient"
     }
 
     init(from decoder: Decoder) throws {
@@ -40,12 +42,14 @@ extension AdaptyUI.Asset: Decodable {
         switch ContentType(rawValue: type) {
         case .color:
             self = .filling(.color(try container.decode(AdaptyUI.Color.self, forKey: .value)))
-        case .colorLinearGradient:
-            self = .filling(.colorLinearGradient(try decoder.singleValueContainer().decode(AdaptyUI.ColorLinearGradient.self)))
+        case .colorLinearGradient,
+             .colorRadialGradient,
+             .colorConicGradient:
+            self = .filling(.colorGradient(try AdaptyUI.ColorGradient(from: decoder)))
         case .font:
-            self = .font(try decoder.singleValueContainer().decode(AdaptyUI.Font.self))
+            self = .font(try AdaptyUI.Font(from: decoder))
         case .image:
-            self = .filling(.image(try decoder.singleValueContainer().decode(AdaptyUI.Image.self)))
+            self = .filling(.image(try AdaptyUI.Image(from: decoder)))
         default:
             self = .unknown("asset.type: \(type)")
         }

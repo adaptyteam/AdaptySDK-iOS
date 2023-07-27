@@ -11,7 +11,7 @@ import Foundation
 extension AdaptyUI {
     public enum Filling {
         case color(AdaptyUI.Color)
-        case colorLinearGradient(AdaptyUI.ColorLinearGradient)
+        case colorGradient(AdaptyUI.ColorGradient)
         case image(AdaptyUI.Image)
 
         public var asColor: AdaptyUI.Color? {
@@ -21,9 +21,9 @@ extension AdaptyUI {
             }
         }
 
-        public var asColorLinearGradient: AdaptyUI.ColorLinearGradient? {
+        public var asColorGradient: AdaptyUI.ColorGradient? {
             switch self {
-            case let .colorLinearGradient(value): return value
+            case let .colorGradient(value): return value
             default: return nil
             }
         }

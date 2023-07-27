@@ -23,21 +23,21 @@ extension AdaptyUI.ViewStyle {
                 "shape_example2": [
                     "type": "shape",
                     "value": "circle",
-                    "order": 3,
+                    "order": 2,
                 ],
                 "shape_example1": [
                     "type": "shape",
-                    "order": "sss",
+                    "order": 1,
                 ],
 
                 "shape_example3": [
                     "type": "shape",
                     "value": "curve_up",
-                    "order": 2,
+                    "order": 3,
                 ],
                 "shape_example4": [
                     "type": "curve_up",
-                    "order": "sss",
+                    "order": 4,
                 ],
             ],
             "features_block": [

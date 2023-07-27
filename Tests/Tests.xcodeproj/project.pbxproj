@@ -198,9 +198,9 @@
 		8AFCD9362A4DD51800C6211C /* ProductsBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9352A4DD51800C6211C /* ProductsBlock.swift */; };
 		8AFCD93B2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */; };
 		8AFCD93D2A4DE14500C6211C /* ProductsBlockType+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD93C2A4DE14500C6211C /* ProductsBlockType+Decodable.swift */; };
-		8AFCD9412A4DE2E300C6211C /* ColorLinearGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */; };
+		8AFCD9412A4DE2E300C6211C /* ColorGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9402A4DE2E300C6211C /* ColorGradient.swift */; };
 		8AFCD9432A4DE59500C6211C /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9422A4DE59500C6211C /* Point.swift */; };
-		8AFCD9452A4DE64400C6211C /* ColorLinearGradient+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */; };
+		8AFCD9452A4DE64400C6211C /* ColorGradient+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9442A4DE64400C6211C /* ColorGradient+Decodable.swift */; };
 		8AFCD9472A4DFCC600C6211C /* HorizontalAlign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9462A4DFCC600C6211C /* HorizontalAlign.swift */; };
 		8AFCD9492A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD9482A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift */; };
 		8AFCD94B2A4F171C00C6211C /* Shape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCD94A2A4F171C00C6211C /* Shape.swift */; };
@@ -430,9 +430,9 @@
 		8AFCD9352A4DD51800C6211C /* ProductsBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductsBlock.swift; sourceTree = "<group>"; };
 		8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FeaturesBlockType+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD93C2A4DE14500C6211C /* ProductsBlockType+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProductsBlockType+Decodable.swift"; sourceTree = "<group>"; };
-		8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorLinearGradient.swift; sourceTree = "<group>"; };
+		8AFCD9402A4DE2E300C6211C /* ColorGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorGradient.swift; sourceTree = "<group>"; };
 		8AFCD9422A4DE59500C6211C /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
-		8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ColorLinearGradient+Decodable.swift"; sourceTree = "<group>"; };
+		8AFCD9442A4DE64400C6211C /* ColorGradient+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ColorGradient+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD9462A4DFCC600C6211C /* HorizontalAlign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalAlign.swift; sourceTree = "<group>"; };
 		8AFCD9482A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HorizontalAlign+Decodable.swift"; sourceTree = "<group>"; };
 		8AFCD94A2A4F171C00C6211C /* Shape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shape.swift; sourceTree = "<group>"; };
@@ -496,7 +496,7 @@
 				8AFCD9552A52EE2A00C6211C /* ButtonAction.swift */,
 				8A1F743E2979B67C002B7FBC /* Color.swift */,
 				8A1F746E297B28E3002B7FBC /* Color+HexString.swift */,
-				8AFCD9402A4DE2E300C6211C /* ColorLinearGradient.swift */,
+				8AFCD9402A4DE2E300C6211C /* ColorGradient.swift */,
 				8AFCD9332A4DD48900C6211C /* FeaturesBlock.swift */,
 				8AFCD94C2A4F1EC500C6211C /* Filling.swift */,
 				8A1F74402979B689002B7FBC /* Font.swift */,
@@ -530,7 +530,7 @@
 				8AFCD9522A4F2BF400C6211C /* Button.Align+Decodable.swift */,
 				8AFCD9572A52EE7700C6211C /* ButtonAction+Decodable.swift */,
 				8A1F7468297B287F002B7FBC /* Color+Decodable.swift */,
-				8AFCD9442A4DE64400C6211C /* ColorLinearGradient+Decodable.swift */,
+				8AFCD9442A4DE64400C6211C /* ColorGradient+Decodable.swift */,
 				8AFCD93A2A4DE11A00C6211C /* FeaturesBlockType+Decodable.swift */,
 				8A1F746C297B28BF002B7FBC /* Font+Decodable.swift */,
 				8AFCD9482A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift */,
@@ -1165,7 +1165,7 @@
 				8AB003482926FCEA008476A3 /* SignSubscriptionOfferRequest.swift in Sources */,
 				8AB003462926FCEA008476A3 /* FetchAllProductVendorIdsRequest.swift in Sources */,
 				8A1F743F2979B67C002B7FBC /* Color.swift in Sources */,
-				8AFCD9412A4DE2E300C6211C /* ColorLinearGradient.swift in Sources */,
+				8AFCD9412A4DE2E300C6211C /* ColorGradient.swift in Sources */,
 				8A1F744F2979D1B2002B7FBC /* ViewConfiguration.swift in Sources */,
 				8AB003622926FCEA008476A3 /* Adapty+PurchaseValidator.swift in Sources */,
 				8AFCD9492A4DFD3F00C6211C /* HorizontalAlign+Decodable.swift in Sources */,
@@ -1206,7 +1206,7 @@
 				8AB003852926FCEA008476A3 /* AdaptyError.Source.swift in Sources */,
 				8AB003A02926FCEA008476A3 /* AdaptyDeferredProduct.swift in Sources */,
 				8AB003382926FCEA008476A3 /* Adapty+Events.swift in Sources */,
-				8AFCD9452A4DE64400C6211C /* ColorLinearGradient+Decodable.swift in Sources */,
+				8AFCD9452A4DE64400C6211C /* ColorGradient+Decodable.swift in Sources */,
 				8AFCD9562A52EE2A00C6211C /* ButtonAction.swift in Sources */,
 				8AB0034A2926FCEA008476A3 /* UpdateProfileRequest.swift in Sources */,
 				8AFCD9342A4DD48900C6211C /* FeaturesBlock.swift in Sources */,
