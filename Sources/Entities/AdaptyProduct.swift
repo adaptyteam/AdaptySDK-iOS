@@ -8,11 +8,21 @@
 import StoreKit
 
 public protocol AdaptyProduct {
+    /// Unique identifier of a product from App Store Connect or Google Play Console.
     var vendorProductId: String { get }
+    /// Underlying system representation of the product.
     var skProduct: SKProduct { get }
+    /// An identifier of a promotional offer, provided by Adapty for this specific user.
+    var promotionalOfferId: String? { get }
 }
 
 extension AdaptyProduct {
+    /// Unique identifier of a product from App Store Connect or Google Play Console.
+    public var vendorProductId: String { skProduct.productIdentifier }
+
+    /// User's eligibility for the promotional offers. Check this property before displaying info about promotional offers.
+    public var promotionalOfferEligibility: Bool { promotionalOfferId != nil }
+
     /// A description of the product.
     ///
     /// The description's language is determined by the storefront that the user's device is connected to, not the preferred language set on the device.
@@ -26,6 +36,8 @@ extension AdaptyProduct {
     /// The cost of the product in the local currency.
     public var price: Decimal { skProduct.price.decimalValue }
 
+    var priceValue: AdaptyPrice { AdaptyPrice(value: skProduct.price, locale: skProduct.priceLocale) }
+
     /// The currency code of the locale used to format the price of the product.
     public var currencyCode: String? { skProduct.priceLocale.currencyCode }
 
@@ -37,20 +49,14 @@ extension AdaptyProduct {
 
     /// A Boolean value that indicates whether the product is available for family sharing in App Store Connect. (Will be `false` for iOS version below 14.0 and macOS version below 11.0).
     public var isFamilyShareable: Bool {
-        #if swift(>=5.3)
-            if #available(iOS 14.0, macOS 11.0, *) {
-                return skProduct.isFamilyShareable
-            }
-        #endif
-        return false
+        guard #available(iOS 14.0, macOS 11.0, *) else { return false }
+        return skProduct.isFamilyShareable
     }
 
     /// The period details for products that are subscriptions. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
     public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
-        if #available(iOS 11.2, macOS 10.14.4, *), let period = skProduct.subscriptionPeriod {
-            return AdaptyProductSubscriptionPeriod(subscriptionPeriod: period)
-        }
-        return nil
+        guard #available(iOS 11.2, macOS 10.14.4, *), let period = skProduct.subscriptionPeriod else { return nil }
+        return AdaptyProductSubscriptionPeriod(subscriptionPeriod: period)
     }
 
     /// The object containing introductory price information for the product. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
@@ -60,20 +66,23 @@ extension AdaptyProduct {
 
     /// The identifier of the subscription group to which the subscription belongs. (Will be `nil` for iOS version below 12.0 and macOS version below 10.14).
     public var subscriptionGroupIdentifier: String? {
-        if #available(iOS 12.0, macOS 10.14, *) {
-            return skProduct.subscriptionGroupIdentifier
-        }
-        return nil
+        guard #available(iOS 12.0, macOS 10.14, *) else { return nil }
+        return skProduct.subscriptionGroupIdentifier
     }
 
     /// An array of subscription offers available for the auto-renewable subscription. (Will be empty for iOS version below 12.2 and macOS version below 10.14.4).
     public var discounts: [AdaptyProductDiscount] {
-        if #available(iOS 12.2, macOS 10.14.4, *) {            
-            return skProduct.discounts.map { discount in
-                AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
-            }
+        guard #available(iOS 12.2, macOS 10.14.4, *) else { return [] }
+        return skProduct.discounts.map { discount in
+            AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
         }
-        return []
+    }
+
+    public func discount(byIdentifier identifier: String) -> AdaptyProductDiscount? {
+        guard #available(iOS 12.2, macOS 10.14.4, *),
+              let discount = skProduct.discounts.first(where: { $0.identifier == identifier })
+        else { return nil }
+        return AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
     }
 
     /// The price's language is determined by the preferred language set on the device.
@@ -83,43 +92,14 @@ extension AdaptyProduct {
 
     /// The period's language is determined by the preferred language set on the device.
     public var localizedSubscriptionPeriod: String? {
-        if #available(iOS 11.2, macOS 10.14.4, *), let period = skProduct.subscriptionPeriod {
-            return skProduct.priceLocale.localized(period: period)
-        }
-        return nil
+        guard #available(iOS 11.2, macOS 10.14.4, *), let period = skProduct.subscriptionPeriod else { return nil }
+        return skProduct.priceLocale.localized(period: period)
     }
 }
 
 extension SKProduct {
     var adaptyIntroductoryDiscount: AdaptyProductDiscount? {
-        if #available(iOS 11.2, macOS 10.14.4, *), let discount = introductoryPrice {
-            return AdaptyProductDiscount(discount: discount, locale: priceLocale)
-        }
-        return nil
+        guard #available(iOS 11.2, macOS 10.14.4, *), let discount = introductoryPrice else { return nil }
+        return AdaptyProductDiscount(discount: discount, locale: priceLocale)
     }
-}
-
-
-enum ProductCodingKeys: String, CodingKey {
-    case vendorProductId = "vendor_product_id"
-    case version = "timestamp"
-
-    case promotionalOfferId = "promotional_offer_id"
-    case variationId = "variation_id"
-    case paywallABTestName = "paywall_ab_test_name"
-    case paywallName = "paywall_name"
-
-    case localizedDescription = "localized_description"
-    case localizedTitle = "localized_title"
-    case price
-    case currencyCode = "currency_code"
-    case currencySymbol = "currency_symbol"
-    case regionCode = "region_code"
-    case isFamilyShareable = "is_family_shareable"
-    case subscriptionPeriod = "subscription_period"
-    case introductoryDiscount = "introductory_discount"
-    case subscriptionGroupIdentifier = "subscription_group_identifier"
-    case discounts
-    case localizedPrice = "localized_price"
-    case localizedSubscriptionPeriod = "localized_subscription_period"
 }

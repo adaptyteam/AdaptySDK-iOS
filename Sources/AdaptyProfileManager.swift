@@ -112,6 +112,10 @@ extension AdaptyProfileManager {
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
     }
 
+    func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: @escaping AdaptyErrorCompletion) {
+        manager.httpSession.performSetTransactionVariationIdRequest(profileId: profileId, transactionId: transactionId, variationId: variationId, completion)
+    }
+
     func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SKPaymentTransaction, _ completion: @escaping AdaptyErrorCompletion) {
         guard transaction.transactionState == .purchased || transaction.transactionState == .restored else {
             completion(.wrongParamPurchasedTransaction())

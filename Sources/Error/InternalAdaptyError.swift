@@ -136,6 +136,11 @@ extension AdaptyError {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding Fallback Paywalls failed", error: error).asAdaptyError
     }
 
+    static func decodingSetVariationIdParams(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding SetVariationIdParams failed", error: error).asAdaptyError
+    }
+
     static func decodingPaywallProduct(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding AdaptyPaywallProduct failed", error: error).asAdaptyError
@@ -170,7 +175,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Didn't found paywall in cache").asAdaptyError
     }
-    
+
     static func cacheHasNoViewConfiguration(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Didn't found view configuration in cache").asAdaptyError
