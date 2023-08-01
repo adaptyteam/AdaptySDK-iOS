@@ -57,6 +57,8 @@ extension AdaptyProfile {
         /// An id of active promotional offer.
         public let activePromotionalOfferId: String?
 
+        public let offerId: String?
+
         /// `true` if this auto-renewable subscription is set to renew.
         public let willRenew: Bool
 
@@ -101,6 +103,7 @@ extension AdaptyProfile.AccessLevel: CustomStringConvertible {
             + (activeIntroductoryOfferType == nil ? "" : "activeIntroductoryOfferType: \(activeIntroductoryOfferType!), ")
             + (activePromotionalOfferType == nil ? "" : "activePromotionalOfferType: \(activePromotionalOfferType!), ")
             + (activePromotionalOfferId == nil ? "" : "activePromotionalOfferId: \(activePromotionalOfferId!), ")
+            + (offerId == nil ? "" : "offerId: \(offerId!), ")
             + "willRenew: \(willRenew), isInGracePeriod: \(isInGracePeriod), "
             + (unsubscribedAt == nil ? "" : "unsubscribedAt: \(unsubscribedAt!), ")
             + (billingIssueDetectedAt == nil ? "" : "billingIssueDetectedAt: \(billingIssueDetectedAt!), ")
@@ -122,6 +125,7 @@ extension AdaptyProfile.AccessLevel: Codable {
         case activeIntroductoryOfferType = "active_introductory_offer_type"
         case activePromotionalOfferType = "active_promotional_offer_type"
         case activePromotionalOfferId = "active_promotional_offer_id"
+        case offerId = "offer_id"
         case willRenew = "will_renew"
         case isInGracePeriod = "is_in_grace_period"
         case unsubscribedAt = "unsubscribed_at"
