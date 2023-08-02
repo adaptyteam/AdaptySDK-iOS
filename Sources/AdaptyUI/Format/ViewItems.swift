@@ -31,16 +31,30 @@ extension AdaptyUI.ViewItem {
         let fillAssetId: String?
         let items: [Item]
         let horizontalAlign: AdaptyUI.HorizontalAlign?
-        let bulletAssetId: String?
-        let separator: AdaptyUI.Text.Separator
+        let bulletSpace: Double?
 
-        struct Item {
+        enum Item {
+            case text(TextItem)
+            case image(ImageItem)
+            case newline
+            case space(Double)
+        }
+
+        struct TextItem {
             let stringId: String
             let fontAssetId: String?
             let size: Double?
             let fillAssetId: String?
             let horizontalAlign: AdaptyUI.HorizontalAlign?
-            let bulletAssetId: String?
+            let isBullet: Bool
+        }
+
+        struct ImageItem {
+            let imageAssetId: String
+            let colorAssetId: String?
+            let width: Double
+            let height: Double
+            let isBullet: Bool
         }
     }
 }
@@ -94,72 +108,108 @@ extension AdaptyUI.ViewItem.Button: Decodable {
     }
 }
 
-extension AdaptyUI.ViewItem.Text.Item: Decodable {
+extension AdaptyUI.ViewItem.Text.TextItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case fontAssetId = "font"
         case size
         case fillAssetId = "color"
         case horizontalAlign = "horizontal_align"
-        case bulletAssetId = "bullet"
+        case isBullet = "bullet"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        stringId = try container.decode(String.self, forKey: .stringId)
+        fontAssetId = try container.decodeIfPresent(String.self, forKey: .fontAssetId)
+        size = try container.decodeIfPresent(Double.self, forKey: .size)
+        fillAssetId = try container.decodeIfPresent(String.self, forKey: .fillAssetId)
+        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .horizontalAlign)
+        isBullet = try container.decodeIfPresent(Bool.self, forKey: .isBullet) ?? false
+    }
+}
+
+extension AdaptyUI.ViewItem.Text.ImageItem: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case imageAssetId = "image"
+        case colorAssetId = "color"
+        case width
+        case height
+        case isBullet = "bullet"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        imageAssetId = try container.decode(String.self, forKey: .imageAssetId)
+        colorAssetId = try container.decodeIfPresent(String.self, forKey: .colorAssetId)
+        width = try container.decode(Double.self, forKey: .width)
+        height = try container.decode(Double.self, forKey: .height)
+        isBullet = try container.decodeIfPresent(Bool.self, forKey: .isBullet) ?? false
+    }
+}
+
+extension AdaptyUI.ViewItem.Text.Item: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case image
+        case stringId = "string_id"
+        case space
+        case newline
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.stringId) {
+            self = .text(try AdaptyUI.ViewItem.Text.TextItem(from: decoder))
+        } else if container.contains(.image) {
+            self = .image(try AdaptyUI.ViewItem.Text.ImageItem(from: decoder))
+        } else if container.contains(.newline) {
+            self = .newline
+        } else {
+            self = .space(try container.decodeIfPresent(Double.self, forKey: .space) ?? 0.0)
+        }
     }
 }
 
 extension AdaptyUI.ViewItem.Text: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
-        case rows
         case items
         case stringId = "string_id"
         case fontAssetId = "font"
         case size
         case fillAssetId = "color"
         case horizontalAlign = "horizontal_align"
-        case bulletAssetId = "bullet"
-        case separator
+        case bulletSpace = "bullet_space"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        var itemsKey: CodingKeys
-        var defaultSeparator: AdaptyUI.Text.Separator
-
-        if container.contains(.items) {
-            itemsKey = .items
-            defaultSeparator = .none
-        } else if container.contains(.rows) {
-            itemsKey = .rows
-            defaultSeparator = .newline
-        } else {
-            itemsKey = .stringId
-            defaultSeparator = .none
-        }
-
         size = try container.decodeIfPresent(Double.self, forKey: .size)
         fillAssetId = try container.decodeIfPresent(String.self, forKey: .fillAssetId)
         horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .horizontalAlign)
-        bulletAssetId = try container.decodeIfPresent(String.self, forKey: .bulletAssetId)
-        separator = try container.decodeIfPresent(AdaptyUI.Text.Separator.self, forKey: .separator) ?? defaultSeparator
+        bulletSpace = try container.decodeIfPresent(Double.self, forKey: .bulletSpace)
 
-        if itemsKey == .stringId {
-            fontAssetId = try container.decode(String.self, forKey: .fontAssetId)
-            items = [
-                AdaptyUI.ViewItem.Text.Item(
-                    stringId: try container.decode(String.self, forKey: .stringId),
-                    fontAssetId: nil,
-                    size: nil,
-                    fillAssetId: nil,
-                    horizontalAlign: nil,
-                    bulletAssetId: nil),
-            ]
-        } else {
-            items = try container.decode([AdaptyUI.ViewItem.Text.Item].self, forKey: itemsKey)
-            if items.contains(where: { $0.fontAssetId == nil }) {
+        if container.contains(.items) {
+            items = try container.decode([AdaptyUI.ViewItem.Text.Item].self, forKey: .items)
+            if items.compactMap({
+                if case let .text(item) = $0 { return item }
+                return nil
+            }).contains(where: { $0.fontAssetId == nil }) {
                 fontAssetId = try container.decode(String.self, forKey: .fontAssetId)
             } else {
                 fontAssetId = try container.decodeIfPresent(String.self, forKey: .fontAssetId)
             }
+        } else {
+            fontAssetId = try container.decode(String.self, forKey: .fontAssetId)
+            items = [.text(AdaptyUI.ViewItem.Text.TextItem(
+                stringId: try container.decode(String.self, forKey: .stringId),
+                fontAssetId: nil,
+                size: nil,
+                fillAssetId: nil,
+                horizontalAlign: nil,
+                isBullet: false
+            ))]
         }
     }
 }

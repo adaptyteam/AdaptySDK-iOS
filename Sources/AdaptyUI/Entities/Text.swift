@@ -12,7 +12,6 @@ extension AdaptyUI {
     public struct Text {
         static let defaultHorizontalAlign = HorizontalAlign.left
 
-        public let bullet: Image?
         public let value: String?
         public let font: AdaptyUI.Font?
         public let size: Double?

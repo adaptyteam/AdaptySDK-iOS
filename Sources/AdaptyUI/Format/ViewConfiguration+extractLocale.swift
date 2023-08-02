@@ -75,29 +75,41 @@ extension AdaptyUI.ViewConfiguration {
             return .openUrl(getString(id))
         }
 
-        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.TextItems? {
+        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.СompoundText? {
             guard let value else { return nil }
             return getText(from: value)
         }
 
-        func getText(from group: AdaptyUI.ViewItem.Text) -> AdaptyUI.TextItems {
+        func getText(from group: AdaptyUI.ViewItem.Text) -> AdaptyUI.СompoundText {
             let defaultFont = getAssetFont(group.fontAssetId)
             let defaultFilling = getAssetFilling(group.fillAssetId)
-            let defaultBullet = getAssetFilling(group.bulletAssetId)?.asImage
 
-            return AdaptyUI.TextItems(
-                items: group.items.map({ item in
-                    let font = getAssetFont(item.fontAssetId) ?? defaultFont
-                    return AdaptyUI.Text(
-                        bullet: getAssetFilling(item.bulletAssetId)?.asImage ?? defaultBullet,
-                        value: getString(item.stringId),
-                        font: font,
-                        size: item.size ?? group.size ?? font?.defaultSize,
-                        fill: getAssetFilling(item.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
-                        horizontalAlign: item.horizontalAlign ?? group.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
-                    )
+            return AdaptyUI.СompoundText(
+                items: group.items.map({
+                    switch $0 {
+                    case let .text(item):
+                        let font = getAssetFont(item.fontAssetId) ?? defaultFont
+                        let text = AdaptyUI.Text(
+                            value: getString(item.stringId),
+                            font: font,
+                            size: item.size ?? group.size ?? font?.defaultSize,
+                            fill: getAssetFilling(item.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
+                            horizontalAlign: item.horizontalAlign ?? group.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
+                        )
+                        return item.isBullet ? .textBullet(text) : .text(text)
+                    case let .image(item):
+                        let image = AdaptyUI.Text.Image(
+                            data: getAssetFilling(item.imageAssetId)?.asImage?.data,
+                            tint: getAssetFilling(item.colorAssetId)?.asColor,
+                            size: AdaptyUI.Size(width: item.width, height: item.height))
+                        return item.isBullet ? .imageBullet(image) : .image(image)
+                    case let .space(value):
+                        return .space(value)
+                    case .newline:
+                        return .newline
+                    }
                 }),
-                separator: group.separator
+                bulletSpace: group.bulletSpace
             )
         }
 
