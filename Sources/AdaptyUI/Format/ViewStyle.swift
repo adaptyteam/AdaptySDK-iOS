@@ -171,7 +171,6 @@ extension AdaptyUI.ViewItem: Decodable {
         case curveDown = "curve_down"
 
         case button
-        case textRows = "text-rows" // deprecated
     }
 
     init(from decoder: Decoder) throws {
@@ -189,7 +188,7 @@ extension AdaptyUI.ViewItem: Decodable {
             self = .shape(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Shape.self))
         case .button:
             self = .button(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Button.self))
-        case .text, .textRows:
+        case .text:
             self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
         default:
             self = .unknown(type)

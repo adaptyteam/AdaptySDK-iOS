@@ -172,7 +172,6 @@ extension AdaptyUI.ViewItem.Text.Item: Decodable {
 
 extension AdaptyUI.ViewItem.Text: Decodable {
     enum CodingKeys: String, CodingKey {
-        case type
         case items
         case stringId = "string_id"
         case fontAssetId = "font"
@@ -188,7 +187,6 @@ extension AdaptyUI.ViewItem.Text: Decodable {
         size = try container.decodeIfPresent(Double.self, forKey: .size)
         fillAssetId = try container.decodeIfPresent(String.self, forKey: .fillAssetId)
         horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .horizontalAlign)
-        bulletSpace = try container.decodeIfPresent(Double.self, forKey: .bulletSpace)
 
         if container.contains(.items) {
             items = try container.decode([AdaptyUI.ViewItem.Text.Item].self, forKey: .items)
@@ -200,8 +198,18 @@ extension AdaptyUI.ViewItem.Text: Decodable {
             } else {
                 fontAssetId = try container.decodeIfPresent(String.self, forKey: .fontAssetId)
             }
+            if items.contains(where: {
+                if case let .image(item) = $0 { return item.isBullet }
+                if case let .text(item) = $0 { return item.isBullet }
+                return false
+            }) {
+                bulletSpace = try container.decode(Double.self, forKey: .bulletSpace)
+            } else {
+                bulletSpace = try container.decodeIfPresent(Double.self, forKey: .bulletSpace)
+            }
         } else {
             fontAssetId = try container.decode(String.self, forKey: .fontAssetId)
+            bulletSpace = try container.decodeIfPresent(Double.self, forKey: .bulletSpace)
             items = [.text(AdaptyUI.ViewItem.Text.TextItem(
                 stringId: try container.decode(String.self, forKey: .stringId),
                 fontAssetId: nil,
