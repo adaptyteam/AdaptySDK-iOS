@@ -10,6 +10,7 @@ import Foundation
 
 extension AdaptyUI.ViewItem {
     struct CustomObject {
+        let type: String
         let properties: [(key: String, value: AdaptyUI.ViewItem)]
     }
 
@@ -64,10 +65,15 @@ extension AdaptyUI.ViewItem {
 }
 
 extension AdaptyUI.ViewItem.CustomObject: Decodable {
+    enum PropertyKeys: String {
+        case type
+    }
+
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        properties = try container.toOrderedItems { $0 != AdaptyUI.ViewItem.CodingKeys.type.rawValue }
+        properties = try container.toOrderedItems { $0 != PropertyKeys.type.rawValue }
+        type = try container.decode(String.self, forKey: CodingKeys(PropertyKeys.type))
     }
 }
 

@@ -157,7 +157,7 @@ extension AdaptyUI.ViewConfiguration {
             case let .text(group):
                 return .text(getText(from: group))
             case let .object(value):
-                return .object(AdaptyUI.CustomObject(orderedProperties: convert(value.properties)))
+                return .object(AdaptyUI.CustomObject(type: value.type, orderedProperties: convert(value.properties)))
             }
         }
 
