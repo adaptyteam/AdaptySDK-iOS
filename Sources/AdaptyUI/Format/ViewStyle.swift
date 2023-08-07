@@ -92,6 +92,9 @@ extension KeyedDecodingContainer where Key == AdaptyUI.ViewStyle.CodingKeys {
 
     func toOrderedItems(filter: (String) -> Bool) throws -> [(key: String, value: AdaptyUI.ViewItem)] {
         try allKeys
+            .filter {
+                filter($0.stringValue)
+            }
             .map { key in
                 (key: key.stringValue,
                  value: try decode(AdaptyUI.ViewItem.self, forKey: key),
