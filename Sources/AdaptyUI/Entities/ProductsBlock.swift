@@ -12,6 +12,14 @@ extension AdaptyUI {
         public let type: ProductsBlockType
         public let mainProductIndex: Int
         public let items: [String: AdaptyUI.LocalizedViewItem]
+        public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
+
+        init(type: ProductsBlockType, mainProductIndex: Int, orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+            self.type = type
+            self.mainProductIndex = mainProductIndex
+            items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
+            self.orderedItems = orderedItems
+        }
     }
 
     public enum ProductsBlockType: String {

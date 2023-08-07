@@ -21,7 +21,7 @@ extension AdaptyUI {
         case shape(Shape)
         case button(Button)
         case text(Text)
-        case unknown(String?)
+        case object(CustomObject)
     }
 }
 
@@ -32,13 +32,13 @@ extension AdaptyUI.ViewStyle {
 
     struct FeaturesBlock {
         let type: AdaptyUI.FeaturesBlockType
-        let items: [String: AdaptyUI.ViewItem]
+        let orderedItems: [(key: String, value: AdaptyUI.ViewItem)]
     }
 
     struct ProductsBlock {
         let type: AdaptyUI.ProductsBlockType
         let mainProductIndex: Int
-        let items: [String: AdaptyUI.ViewItem]
+        let orderedItems: [(key: String, value: AdaptyUI.ViewItem)]
     }
 }
 
@@ -85,19 +85,17 @@ extension AdaptyUI.ViewStyle: Decodable {
     }
 }
 
-extension AdaptyUI.ViewStyle.FooterBlock: Decodable {
-    struct Order: Decodable {
+extension KeyedDecodingContainer where Key == AdaptyUI.ViewStyle.CodingKeys {
+    struct OrderedItem: Decodable {
         let order: Int
     }
 
-    init(from decoder: Decoder) throws {
-        typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        orderedItems = try container.allKeys
+    func toOrderedItems(filter: (String) -> Bool) throws -> [(key: String, value: AdaptyUI.ViewItem)] {
+        try allKeys
             .map { key in
                 (key: key.stringValue,
-                 value: try container.decode(AdaptyUI.ViewItem.self, forKey: key),
-                 order: (try? container.decode(Order.self, forKey: key))?.order ?? 0)
+                 value: try decode(AdaptyUI.ViewItem.self, forKey: key),
+                 order: (try? decode(OrderedItem.self, forKey: key))?.order ?? 0)
             }
             .sorted(by: { first, second in
                 first.order < second.order
@@ -105,6 +103,14 @@ extension AdaptyUI.ViewStyle.FooterBlock: Decodable {
             .map {
                 (key: $0.key, value: $0.value)
             }
+    }
+}
+
+extension AdaptyUI.ViewStyle.FooterBlock: Decodable {
+    init(from decoder: Decoder) throws {
+        typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        orderedItems = try container.toOrderedItems { _ in true }
     }
 }
 
@@ -116,18 +122,9 @@ extension AdaptyUI.ViewStyle.FeaturesBlock: Decodable {
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        items = [String: AdaptyUI.ViewItem](
-            try container.allKeys
-                .filter {
-                    PropertyKeys(rawValue: $0.stringValue) == nil
-                }
-                .map {
-                    ($0.stringValue, try container.decode(AdaptyUI.ViewItem.self, forKey: $0))
-                },
-            uniquingKeysWith: { $1 }
-        )
-
+        orderedItems = try container.toOrderedItems {
+            PropertyKeys(rawValue: $0) == nil
+        }
         type = try container.decode(AdaptyUI.FeaturesBlockType.self, forKey: CodingKeys(PropertyKeys.type))
     }
 }
@@ -141,16 +138,9 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        items = [String: AdaptyUI.ViewItem](
-            try container.allKeys
-                .filter {
-                    PropertyKeys(rawValue: $0.stringValue) == nil
-                }
-                .map {
-                    ($0.stringValue, try container.decode(AdaptyUI.ViewItem.self, forKey: $0))
-                },
-            uniquingKeysWith: { $1 }
-        )
+        orderedItems = try container.toOrderedItems {
+            PropertyKeys(rawValue: $0) == nil
+        }
         type = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: CodingKeys(PropertyKeys.type))
         mainProductIndex = try container.decodeIfPresent(Int.self, forKey: CodingKeys(PropertyKeys.mainProductIndex)) ?? 0
     }
@@ -171,6 +161,7 @@ extension AdaptyUI.ViewItem: Decodable {
         case curveDown = "curve_down"
 
         case button
+        case object
     }
 
     init(from decoder: Decoder) throws {
@@ -191,7 +182,7 @@ extension AdaptyUI.ViewItem: Decodable {
         case .text:
             self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.Text.self))
         default:
-            self = .unknown(type)
+            self = .object(try decoder.singleValueContainer().decode(AdaptyUI.ViewItem.CustomObject.self))
         }
     }
 }

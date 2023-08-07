@@ -9,6 +9,10 @@
 import Foundation
 
 extension AdaptyUI.ViewItem {
+    struct CustomObject {
+        let properties: [(key: String, value: AdaptyUI.ViewItem)]
+    }
+
     struct Shape {
         let backgroundAssetId: String?
         let type: AdaptyUI.ShapeType
@@ -56,6 +60,14 @@ extension AdaptyUI.ViewItem {
             let height: Double
             let isBullet: Bool
         }
+    }
+}
+
+extension AdaptyUI.ViewItem.CustomObject: Decodable {
+    init(from decoder: Decoder) throws {
+        typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        properties = try container.toOrderedItems { $0 != AdaptyUI.ViewItem.CodingKeys.type.rawValue }
     }
 }
 

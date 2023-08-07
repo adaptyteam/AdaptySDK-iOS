@@ -123,8 +123,6 @@ extension AdaptyUI.ViewConfiguration {
 
         func convert(_ item: AdaptyUI.ViewItem) -> AdaptyUI.LocalizedViewItem {
             switch item {
-            case let .unknown(value):
-                return .unknown(value)
             case let .asset(id):
                 guard let asset = getAsset(id) else {
                     return .unknown("asset.id: \(id)")
@@ -158,6 +156,8 @@ extension AdaptyUI.ViewConfiguration {
                 ))
             case let .text(group):
                 return .text(getText(from: group))
+            case let .object(value):
+                return .object(AdaptyUI.CustomObject(orderedProperties: convert(value.properties)))
             }
         }
 
@@ -166,18 +166,22 @@ extension AdaptyUI.ViewConfiguration {
 
         for style in self.styles {
             styles[style.key] = AdaptyUI.LocalizedViewStyle(
-                featureBlock: style.value.featuresBlock.map { AdaptyUI.FeaturesBlock(
-                    type: $0.type,
-                    items: convert($0.items)
-                ) },
+                featureBlock: style.value.featuresBlock.map {
+                    AdaptyUI.FeaturesBlock(
+                        type: $0.type,
+                        orderedItems: convert($0.orderedItems)
+                    )
+                },
                 productBlock: AdaptyUI.ProductsBlock(
                     type: style.value.productsBlock.type,
                     mainProductIndex: style.value.productsBlock.mainProductIndex,
-                    items: convert(style.value.productsBlock.items)
+                    orderedItems: convert(style.value.productsBlock.orderedItems)
                 ),
-                footerBlock: style.value.footerBlock.map { AdaptyUI.FooterBlock(
-                    orderedItems: convert($0.orderedItems)
-                ) },
+                footerBlock: style.value.footerBlock.map {
+                    AdaptyUI.FooterBlock(
+                        orderedItems: convert($0.orderedItems)
+                    )
+                },
                 items: convert(style.value.items))
         }
 
