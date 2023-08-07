@@ -67,12 +67,13 @@ extension AdaptyUI.ViewItem {
 extension AdaptyUI.ViewItem.CustomObject: Decodable {
     enum PropertyKeys: String {
         case type
+        case order
     }
 
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        properties = try container.toOrderedItems { $0 != PropertyKeys.type.rawValue }
+        properties = try container.toOrderedItems {  PropertyKeys(rawValue: $0) == nil }
         type = try container.decode(String.self, forKey: CodingKeys(PropertyKeys.type))
     }
 }
