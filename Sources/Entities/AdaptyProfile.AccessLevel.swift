@@ -54,9 +54,10 @@ extension AdaptyProfile {
         /// - `pay_up_front`
         public let activePromotionalOfferType: String?
 
-        /// An id of active promotional offer.
+        /// An id of active promotional offer in case the purchase was made with iOS.
         public let activePromotionalOfferId: String?
 
+        /// An id of active offer in case the purchase was made with Android.
         public let offerId: String?
 
         /// `true` if this auto-renewable subscription is set to renew.
