@@ -32,7 +32,7 @@ extension AdaptyUI {
         case filling(AdaptyUI.Filling)
         case shape(AdaptyUI.Shape)
         case button(AdaptyUI.Button)
-        case text(AdaptyUI.СompoundText)
+        case text(AdaptyUI.CompoundText)
         case object(AdaptyUI.CustomObject)
         case unknown(String?)
 
@@ -61,7 +61,7 @@ extension AdaptyUI {
             }
         }
 
-        public var asText: AdaptyUI.СompoundText? {
+        public var asText: AdaptyUI.CompoundText? {
             switch self {
             case let .text(value): return value
             default: return nil
@@ -84,7 +84,7 @@ extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
     public func getShape(_ key: Key) -> AdaptyUI.Shape? { self[key]?.asShape }
     public func getButton(_ key: Key) -> AdaptyUI.Button? { self[key]?.asButton }
     public func getImage(_ key: Key) -> AdaptyUI.Image? { self[key]?.asFilling?.asImage }
-    public func getText(_ key: Key) -> AdaptyUI.СompoundText? { self[key]?.asText }
+    public func getText(_ key: Key) -> AdaptyUI.CompoundText? { self[key]?.asText }
     public func getObject(_ key: Key) -> AdaptyUI.CustomObject? { self[key]?.asObject }
 }
 

@@ -1,5 +1,5 @@
 //
-//  TextItems.swift
+//  CompoundText.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct СompoundText {
+    public struct CompoundText {
         public let items: [Text.Item]
         public let bulletSpace: Double?
 

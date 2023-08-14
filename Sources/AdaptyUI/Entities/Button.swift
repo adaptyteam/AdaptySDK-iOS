@@ -23,7 +23,7 @@ extension AdaptyUI {
 extension AdaptyUI.Button {
     public struct State {
         public let shape: AdaptyUI.Shape?
-        public let title: AdaptyUI.СompoundText?
+        public let title: AdaptyUI.CompoundText?
 
         var isEmpty: Bool {
             (shape == nil) && (title?.isEmpty ?? true)
