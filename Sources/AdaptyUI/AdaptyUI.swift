@@ -13,11 +13,12 @@ import Foundation
 /// You can find more information in the corresponding section of [our documentation](https://docs.adapty.io/docs/paywall-builder-getting-started).
 public enum AdaptyUI {
     /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
-    ///
+    ///
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
     ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
     public static func getViewConfiguration(forPaywall paywall: AdaptyPaywall,
+                                            locale: String,
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         Adapty.async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
@@ -25,7 +26,7 @@ public enum AdaptyUI {
                     completion(.failure(profileManager.error!))
                     return
                 }
-                profileManager.getViewConfiguration(forPaywall: paywall, completion)
+                profileManager.getViewConfiguration(forPaywall: paywall, locale: locale, completion)
             }
         }
     }
@@ -33,9 +34,12 @@ public enum AdaptyUI {
 
 extension AdaptyProfileManager {
     fileprivate func getViewConfiguration(forPaywall paywall: AdaptyPaywall,
+                                          locale: String,
                                           _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywall.id,
                                                                  paywallVariationId: paywall.variationId,
+                                                                 locale: locale,
+                                                                 builderVersion: Environment.VisualPaywallBuilder.version,
                                                                  responseHash: nil) {
             [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
@@ -56,5 +60,17 @@ extension AdaptyProfileManager {
                 completion(.failure(.cacheHasNoViewConfiguration()))
             }
         }
+    }
+}
+
+extension AdaptyUI {
+    public static func setVisualPaywallBuilder(version: String) {
+        Environment.VisualPaywallBuilder.version = version
+    }
+}
+
+extension Environment {
+    enum VisualPaywallBuilder {
+        static var version: String?
     }
 }

@@ -73,7 +73,7 @@ extension AdaptyUI.ViewItem.CustomObject: Decodable {
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        properties = try container.toOrderedItems {  PropertyKeys(rawValue: $0) == nil }
+        properties = try container.toOrderedItems { PropertyKeys(rawValue: $0) == nil }
         type = try container.decode(String.self, forKey: CodingKeys(PropertyKeys.type))
     }
 }
@@ -91,13 +91,16 @@ extension AdaptyUI.ViewItem.Shape: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         backgroundAssetId = try container.decodeIfPresent(String.self, forKey: .backgroundAssetId)
-        var shape = AdaptyUI.Shape.defaultType
+        var shape: AdaptyUI.ShapeType
 
-        if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
+        if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .type) {
             shape = value
-        } else if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .type) {
+        } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
             shape = value
+        } else {
+            shape = AdaptyUI.Shape.defaultType
         }
+
 
         if case .rectangle = shape,
            let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.Shape.CornerRadius.self, forKey: .rectangleCornerRadius) {

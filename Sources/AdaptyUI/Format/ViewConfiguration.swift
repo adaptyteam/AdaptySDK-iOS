@@ -53,13 +53,13 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         id = try superContainer.decode(String.self, forKey: .id)
         let container = try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
 
-        _ = try container.decode(String.self, forKey: .format) // TODO: "1.0.0"
+        _ = try container.decode(String.self, forKey: .format) // TODO: "2.0.0"
         templateId = try container.decode(String.self, forKey: .templateId)
         version = try container.decode(Int64.self, forKey: .version)
 
         assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value ?? [:]
 
-        let localizationsArray = try container.decode([AdaptyUI.Localization].self, forKey: .localizations)
+        let localizationsArray = try container.decodeIfPresent([AdaptyUI.Localization].self, forKey: .localizations) ?? []
         let localizations = try [String: AdaptyUI.Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate id"))
         })

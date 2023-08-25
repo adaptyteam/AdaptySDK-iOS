@@ -12,6 +12,7 @@ extension Backend.Request {
     fileprivate static let discountIdQueryItemName = "offer_code"
     fileprivate static let vendorProductIdQueryItemName = "product"
     fileprivate static let localeQueryItemName = "locale"
+    fileprivate static let localeQueryBuilderVersionName = "builder_version"
 }
 
 extension Array where Element == HTTPRequest.QueryItems.Element {
@@ -47,6 +48,15 @@ extension Array where Element == HTTPRequest.QueryItems.Element {
 
         if let locale = locale {
             queryItems.append(URLQueryItem(name: Backend.Request.localeQueryItemName, value: locale))
+        }
+        return queryItems
+    }
+
+    func setBuilderVersion(_ version: String?) -> Self {
+        var queryItems = filter { $0.name != Backend.Request.localeQueryBuilderVersionName }
+
+        if let version = version {
+            queryItems.append(URLQueryItem(name: Backend.Request.localeQueryBuilderVersionName, value: version))
         }
         return queryItems
     }
