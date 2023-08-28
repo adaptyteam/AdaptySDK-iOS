@@ -39,7 +39,7 @@ extension AdaptyProfileManager {
         manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywall.id,
                                                                  paywallVariationId: paywall.variationId,
                                                                  locale: locale,
-                                                                 builderVersion: Environment.VisualPaywallBuilder.version,
+                                                                 builderVersion: "2.0.0",
                                                                  responseHash: nil) {
             [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
@@ -60,17 +60,5 @@ extension AdaptyProfileManager {
                 completion(.failure(.cacheHasNoViewConfiguration()))
             }
         }
-    }
-}
-
-extension AdaptyUI {
-    public static func setVisualPaywallBuilder(version: String) {
-        Environment.VisualPaywallBuilder.version = version
-    }
-}
-
-extension Environment {
-    enum VisualPaywallBuilder {
-        static var version: String?
     }
 }

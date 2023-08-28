@@ -158,6 +158,8 @@ extension AdaptyUI.ViewConfiguration {
                 return .text(getText(from: group))
             case let .object(value):
                 return .object(AdaptyUI.CustomObject(type: value.type, orderedProperties: convert(value.properties)))
+            case .unknown:
+                return .unknown("unsupported type")
             }
         }
 

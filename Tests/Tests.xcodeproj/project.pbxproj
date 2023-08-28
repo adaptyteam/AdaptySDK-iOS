@@ -168,6 +168,8 @@
 		8AB003A52926FCEA008476A3 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032C2926FCEA008476A3 /* Configuration.swift */; };
 		8AB003A62926FCEA008476A3 /* Adapty+FallbackPaywalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */; };
 		8AB003A72926FCEA008476A3 /* LifecycleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */; };
+		8AB52EB42A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB52EB32A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift */; };
+		8AB52EB62A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB52EB52A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift */; };
 		8AD35AFE29C9E20F0096700C /* Environment+StoreKit2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */; };
 		8AD35B0029D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35AFF29D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift */; };
 		8AD35B0229D73BE90096700C /* AdaptySystemEventParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35B0129D73BE90096700C /* AdaptySystemEventParameters.swift */; };
@@ -401,6 +403,8 @@
 		8AB0032D2926FCEA008476A3 /* Adapty+FallbackPaywalls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Adapty+FallbackPaywalls.swift"; sourceTree = "<group>"; };
 		8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LifecycleManager.swift; sourceTree = "<group>"; };
 		8AB003A82926FDC3008476A3 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
+		8AB52EB32A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUI.ViewConfiguration.json.swift; sourceTree = "<group>"; };
+		8AB52EB52A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUIViewConfigurationTests.swift; sourceTree = "<group>"; };
 		8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+StoreKit2.swift"; sourceTree = "<group>"; };
 		8AD35AFF29D6F4950096700C /* EventsBackendConfigurationStorage+UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EventsBackendConfigurationStorage+UserDefaults.swift"; sourceTree = "<group>"; };
 		8AD35B0129D73BE90096700C /* AdaptySystemEventParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptySystemEventParameters.swift; sourceTree = "<group>"; };
@@ -892,6 +896,7 @@
 				8A1F74462979BBC4002B7FBC /* AdaptyUIAssetTests.swift */,
 				8A1F744C2979CE18002B7FBC /* AdaptyUILocalizationTests.swift */,
 				8A7ED1792A605305003CB084 /* AdaptyUIViewStyleTests.swift */,
+				8AB52EB52A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -919,6 +924,7 @@
 				8A1F74442979B9DF002B7FBC /* AdaptyUI.Assets.json.swift */,
 				8A1F744A2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift */,
 				8A7ED1772A60505A003CB084 /* AdaptyUI.ViewStyle.json.swift */,
+				8AB52EB32A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift */,
 			);
 			path = json;
 			sourceTree = "<group>";
@@ -1268,7 +1274,9 @@
 				8AAF8B36292849D90003BA86 /* Configuration.swift in Sources */,
 				8AF80420292D34CA00970E6B /* FallbackPaywalls.json.swift in Sources */,
 				8AAF8B2E292845BF0003BA86 /* EventsStorageMoke.swift in Sources */,
+				8AB52EB62A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift in Sources */,
 				8A1F74452979B9DF002B7FBC /* AdaptyUI.Assets.json.swift in Sources */,
+				8AB52EB42A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift in Sources */,
 				8A1F744B2979CBF2002B7FBC /* AdaptyUI.Localization.json.swift in Sources */,
 				8AF80412292CA19C00970E6B /* FallbackPaywallsTests.swift in Sources */,
 				8AF8041C292D349D00970E6B /* AdaptyProfile.json.swift in Sources */,

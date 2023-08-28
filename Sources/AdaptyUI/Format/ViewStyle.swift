@@ -22,6 +22,7 @@ extension AdaptyUI {
         case button(Button)
         case text(Text)
         case object(CustomObject)
+        case unknown
     }
 }
 
@@ -164,7 +165,6 @@ extension AdaptyUI.ViewItem: Decodable {
         case curveDown = "curve_down"
 
         case button
-        case object
     }
 
     init(from decoder: Decoder) throws {
@@ -174,7 +174,11 @@ extension AdaptyUI.ViewItem: Decodable {
             return
         }
 
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        guard let container = try? decoder.container(keyedBy: CodingKeys.self) else {
+            self = .unknown
+            return
+        }
+
         let type = try container.decode(String.self, forKey: .type)
 
         switch ContentType(rawValue: type) {

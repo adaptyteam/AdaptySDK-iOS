@@ -19,6 +19,7 @@ extension AdaptyUI.ViewStyle {
         ]
 
         static let full: JSONValue = [
+            "other": true,
             "footer_block": [
                 "shape_example2": [
                     "type": "shape",
@@ -29,7 +30,12 @@ extension AdaptyUI.ViewStyle {
                     "type": "shape",
                     "order": 1,
                 ],
-
+                "other": true,
+                "unknown_object": [
+                    "type": "unknown_type",
+                    "other": true,
+                    "order": 30,
+                ],
                 "shape_example3": [
                     "type": "shape",
                     "value": "curve_up",
@@ -41,10 +47,12 @@ extension AdaptyUI.ViewStyle {
                 ],
             ],
             "features_block": [
+                "other": true,
                 "type": "timeline",
                 "phase_0": [
                     "order": 10,
                     "type": "timeline_entry",
+                    "other": true,
                     "text": [
                         "type": "text",
                         "items": [
@@ -60,7 +68,7 @@ extension AdaptyUI.ViewStyle {
                 //  ],
                 "phase_1": [
                     "order": 1,
-                    "type": "p;timeline_entry",
+                    "type": "timeline_entry",
                     "text": [
                         "type": "text",
                         "items": [
@@ -128,6 +136,7 @@ extension AdaptyUI.ViewStyle {
             "products_block": [
                 "type": "single",
                 "main_product_index": 0,
+                "other": true,
             ],
             "shape_example1": [
                 "type": "shape",
