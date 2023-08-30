@@ -141,6 +141,11 @@ extension AdaptyError {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding SetVariationIdParams failed", error: error).asAdaptyError
     }
 
+    static func decodingGetViewConfiguration(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding GetViewConfigurationParams failed", error: error).asAdaptyError
+    }
+
     static func decodingPaywallProduct(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding AdaptyPaywallProduct failed", error: error).asAdaptyError

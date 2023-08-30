@@ -8,45 +8,65 @@
 
 import Foundation
 
-public enum AdaptyUI {}
-
-// #if canImport(AdaptyUI)
-//    import AdaptyUI
-//typealias SMNumberFormatter = AdaptyUIVersion.NumberFormatter
-
 /// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
 /// To make full use of this functionality, you need to install an [additional library](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git), as well as make additional setups in the Adapty Dashboard.
 /// You can find more information in the corresponding section of [our documentation](https://docs.adapty.io/docs/paywall-builder-getting-started).
-extension AdaptyUI {
-    /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
-    ///
-    /// - Parameters:
-    ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
-    ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
-    public static func getViewConfiguration(forPaywall paywall: AdaptyPaywall,
-                                            locale: String,
+public enum AdaptyUI {
+    /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
+    public static func getViewConfiguration(data: Data,
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+        struct PrivateObject: Decodable {
+            let paywallId: String
+            let paywallVariationId: String
+            let locale: String
+            let builderVersion: String
+
+            enum CodingKeys: String, CodingKey {
+                case paywallId = "paywall_id"
+                case paywallVariationId = "paywall_variation_id"
+                case locale
+                case builderVersion = "builder_version"
+            }
+        }
+
+        let object: PrivateObject
+        do {
+            object = try Backend.decoder.decode(PrivateObject.self, from: data)
+        } catch {
+            completion(.failure(.decodingGetViewConfiguration(error)))
+            return
+        }
+
         Adapty.async(completion) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(.failure(profileManager.error!))
                     return
                 }
-                profileManager.getViewConfiguration(forPaywall: paywall, locale: locale, completion)
+                profileManager.getViewConfiguration(
+                    paywallId: object.paywallId,
+                    paywallVariationId: object.paywallVariationId,
+                    locale: object.locale,
+                    builderVersion: object.builderVersion,
+                    responseHash: nil,
+                    completion)
             }
         }
     }
 }
 
 extension AdaptyProfileManager {
-    fileprivate func getViewConfiguration(forPaywall paywall: AdaptyPaywall,
+    fileprivate func getViewConfiguration(paywallId: String,
+                                          paywallVariationId: String,
                                           locale: String,
+                                          builderVersion: String,
+                                          responseHash: String?,
                                           _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
-        manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywall.id,
-                                                                 paywallVariationId: paywall.variationId,
+        manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywallId,
+                                                                 paywallVariationId: paywallVariationId,
                                                                  locale: locale,
-                                                                 builderVersion: "2.0.0", // AdaptyUI.SDKVersion,
-                                                                 responseHash: nil) {
+                                                                 builderVersion: builderVersion,
+                                                                 responseHash: responseHash) {
             [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
             switch result {
@@ -68,5 +88,3 @@ extension AdaptyProfileManager {
         }
     }
 }
-
-// #endif
