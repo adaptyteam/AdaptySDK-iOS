@@ -9,10 +9,10 @@
 import Foundation
 
 /// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
-/// To make full use of this functionality, you need to install an [additional library](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git), as well as make additional setups in the Adapty Dashboard.
+/// To make full use of this functionality, you need to install an [additional library](https://github.com/adaptyteam/AdaptyUI-iOS), as well as make additional setups in the Adapty Dashboard.
 /// You can find more information in the corresponding section of [our documentation](https://docs.adapty.io/docs/paywall-builder-getting-started).
 public enum AdaptyUI {
-    /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
+    /// This method is intended to be used directly. Read [AdaptyUI Documentation](https://docs.adapty.io/docs/paywall-builder-installation-ios) first.
     public static func getViewConfiguration(data: Data,
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         struct PrivateObject: Decodable {
