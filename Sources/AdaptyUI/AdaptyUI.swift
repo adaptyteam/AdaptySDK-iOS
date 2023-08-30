@@ -45,7 +45,7 @@ extension AdaptyProfileManager {
         manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywall.id,
                                                                  paywallVariationId: paywall.variationId,
                                                                  locale: locale,
-                                                                 builderVersion: "1.3.0", // AdaptyUI.SDKVersion,
+                                                                 builderVersion: "2.0.0", // AdaptyUI.SDKVersion,
                                                                  responseHash: nil) {
             [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
