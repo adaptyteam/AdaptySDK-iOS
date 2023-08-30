@@ -15,7 +15,7 @@ public enum AdaptyUI {
     /// This method is intended to be used directly. Read [AdaptyUI Documentation](https://docs.adapty.io/docs/paywall-builder-installation-ios) first.
     public static func getViewConfiguration(data: Data,
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
-        struct PrivateObject: Decodable {
+        struct PrivateParameters: Decodable {
             let paywallId: String
             let paywallVariationId: String
             let locale: String
@@ -29,9 +29,9 @@ public enum AdaptyUI {
             }
         }
 
-        let object: PrivateObject
+        let parameters: PrivateParameters
         do {
-            object = try Backend.decoder.decode(PrivateObject.self, from: data)
+            parameters = try Backend.decoder.decode(PrivateParameters.self, from: data)
         } catch {
             completion(.failure(.decodingGetViewConfiguration(error)))
             return
@@ -44,10 +44,10 @@ public enum AdaptyUI {
                     return
                 }
                 profileManager.getViewConfiguration(
-                    paywallId: object.paywallId,
-                    paywallVariationId: object.paywallVariationId,
-                    locale: object.locale,
-                    builderVersion: object.builderVersion,
+                    paywallId: parameters.paywallId,
+                    paywallVariationId: parameters.paywallVariationId,
+                    locale: parameters.locale,
+                    builderVersion: parameters.builderVersion,
                     responseHash: nil,
                     completion)
             }

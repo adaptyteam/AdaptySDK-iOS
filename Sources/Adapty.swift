@@ -141,7 +141,7 @@ extension Adapty {
     public static func setVariationId(from decoder: JSONDecoder,
                                       data: Data,
                                       _ completion: AdaptyErrorCompletion? = nil) {
-        struct PrivateObject: Decodable {
+        struct PrivateParameters: Decodable {
             let variationId: String
             let transactionId: String
 
@@ -150,17 +150,17 @@ extension Adapty {
                 case transactionId = "transaction_id"
             }
         }
-        let object: PrivateObject
+        let parameters: PrivateParameters
         do {
-            object = try decoder.decode(PrivateObject.self, from: data)
+            parameters = try decoder.decode(PrivateParameters.self, from: data)
         } catch {
             completion?(.decodingSetVariationIdParams(error))
             return
         }
 
         let logParams: EventParameters = [
-            "variation_id": .value(object.variationId),
-            "transaction_id": .value(object.transactionId),
+            "variation_id": .value(parameters.variationId),
+            "transaction_id": .value(parameters.transactionId),
         ]
         async(completion, logName: "set_variation_id", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
@@ -168,7 +168,7 @@ extension Adapty {
                     completion(profileManager.error)
                     return
                 }
-                profileManager.setVariationId(object.variationId, forTransactionId: object.transactionId, completion)
+                profileManager.setVariationId(parameters.variationId, forTransactionId: parameters.transactionId, completion)
             }
         }
     }

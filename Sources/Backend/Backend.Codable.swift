@@ -43,6 +43,10 @@ extension Backend.Response {
     struct ValueOfData<T: Decodable>: Decodable {
         let value: T
 
+        init(_ value: T) {
+            self.value = value
+        }
+        
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
             value = try container.decode(T.self, forKey: .data)

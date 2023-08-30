@@ -9,7 +9,7 @@
 import Foundation
 
 struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyUI.ViewConfiguration?>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration?>
 
     let endpoint: HTTPEndpoint
     let headers: Headers
@@ -22,9 +22,9 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
             if headers.hasSameBackendResponseHash(response.headers) {
                 result = .success(nil)
             } else {
-                result = jsonDecoder.decode(Backend.Response.Body<AdaptyUI.ViewConfiguration>.self, response.body).map { $0.value }
+                result = jsonDecoder.decode(Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration>.self, response.body).map { $0.value }
             }
-            return result.map { response.replaceBody(Backend.Response.Body($0)) }
+            return result.map { response.replaceBody(Backend.Response.ValueOfData($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
     }

@@ -33,7 +33,6 @@
 		8A1F7471297B2966002B7FBC /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7470297B2966002B7FBC /* Text.swift */; };
 		8A1F7473297B298D002B7FBC /* СompoundText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7472297B298D002B7FBC /* СompoundText.swift */; };
 		8A1F74752983DA2D002B7FBC /* CustomAdaptyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */; };
-		8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */; };
 		8A49DF7B2A8073930007C871 /* CustomObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A49DF7A2A8073930007C871 /* CustomObject.swift */; };
 		8A590DD829DE27FE00547895 /* AnyCodingKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */; };
 		8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */; };
@@ -264,7 +263,6 @@
 		8A1F7470297B2966002B7FBC /* Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text.swift; sourceTree = "<group>"; };
 		8A1F7472297B298D002B7FBC /* СompoundText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "СompoundText.swift"; sourceTree = "<group>"; };
 		8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAdaptyError.swift; sourceTree = "<group>"; };
-		8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AdaptyUI+Concurrency.swift"; sourceTree = "<group>"; };
 		8A49DF7A2A8073930007C871 /* CustomObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomObject.swift; sourceTree = "<group>"; };
 		8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodingKeys.swift; sourceTree = "<group>"; };
 		8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPSession+logSystemEvent.swift"; sourceTree = "<group>"; };
@@ -490,7 +488,6 @@
 				8A1F74502979D473002B7FBC /* Requests */,
 				8A1F74392979B3A9002B7FBC /* Entities */,
 				8A1F743A2979B4F3002B7FBC /* AdaptyUI.swift */,
-				8A2B9DFD298997F900D4B0DE /* AdaptyUI+Concurrency.swift */,
 			);
 			path = AdaptyUI;
 			sourceTree = "<group>";
@@ -1098,7 +1095,6 @@
 				8AB0034D2926FCEA008476A3 /* CreateProfileRequest.swift in Sources */,
 				8A1F746D297B28BF002B7FBC /* Font+Decodable.swift in Sources */,
 				8A1561D62A20D8DD00CF7214 /* Adapty+presentCodeRedemptionSheet.swift in Sources */,
-				8A2B9DFE298997F900D4B0DE /* AdaptyUI+Concurrency.swift in Sources */,
 				8AB003512926FCEA008476A3 /* Backend.Codable.swift in Sources */,
 				8AB0036A2926FCEA008476A3 /* HTTPCodableConfiguration.swift in Sources */,
 				8AB003822926FCEA008476A3 /* EventType.swift in Sources */,
