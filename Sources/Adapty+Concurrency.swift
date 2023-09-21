@@ -65,7 +65,7 @@ import StoreKit
         /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
         ///
         /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
-        public static func getProfile() async throws -> AdaptyProfile? {
+        public static func getProfile() async throws -> AdaptyProfile {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getProfile { result in
                     switch result {
@@ -132,7 +132,7 @@ import StoreKit
         ///             If the parameter is omitted, the paywall will be returned in the default locale.
         /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
         /// - Throws: An ``AdaptyError`` object
-        public static func getPaywall(_ id: String, locale: String? = nil) async throws -> AdaptyPaywall? {
+        public static func getPaywall(_ id: String, locale: String? = nil) async throws -> AdaptyPaywall {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getPaywall(id, locale: locale) { result in
                     switch result {
@@ -153,7 +153,7 @@ import StoreKit
         ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
         /// - Returns: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
         /// - Throws: An ``AdaptyError`` object
-        public static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct]? {
+        public static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct] {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getPaywallProducts(paywall: paywall) { result in
                     switch result {
