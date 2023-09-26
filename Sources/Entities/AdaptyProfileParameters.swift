@@ -20,6 +20,7 @@ public struct AdaptyProfileParameters {
     public internal(set) var mixpanelUserId: String?
     public internal(set) var appmetricaProfileId: String?
     public internal(set) var appmetricaDeviceId: String?
+    public internal(set) var oneSignalPlayerId: String?
     public internal(set) var oneSignalSubscriptionId: String?
     public internal(set) var pushwooshHWID: String?
     public internal(set) var firebaseAppInstanceId: String?
@@ -67,6 +68,7 @@ extension AdaptyProfileParameters: Codable {
         case appTrackingTransparencyStatus = "att_status"
         case codableCustomAttributes = "custom_attributes"
         case analyticsDisabled = "analytics_disabled"
+        case oneSignalPlayerId = "one_signal_player_id"
         case oneSignalSubscriptionId = "one_signal_subscription_id"
         case pushwooshHWID = "pushwoosh_hwid"
         case firebaseAppInstanceId = "firebase_app_instance_id"
@@ -90,6 +92,7 @@ extension AdaptyProfileParameters: Codable {
         try container.encodeIfPresent(storeCountry, forKey: .storeCountry)
         try container.encodeIfPresent(appTrackingTransparencyStatus, forKey: .appTrackingTransparencyStatus)
         try container.encodeIfPresent(codableCustomAttributes, forKey: .codableCustomAttributes)
+        try container.encodeIfPresent(oneSignalPlayerId, forKey: .oneSignalPlayerId)
         try container.encodeIfPresent(oneSignalSubscriptionId, forKey: .oneSignalSubscriptionId)
         try container.encodeIfPresent(pushwooshHWID, forKey: .pushwooshHWID)
         try container.encodeIfPresent(firebaseAppInstanceId, forKey: .firebaseAppInstanceId)

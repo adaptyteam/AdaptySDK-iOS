@@ -146,6 +146,12 @@ extension AdaptyProfileParameters.Builder {
     }
 
     @discardableResult
+    public func with(oneSignalPlayerId value: String?) -> Self {
+        parameters.oneSignalPlayerId = value
+        return self
+    }
+
+    @discardableResult
     public func with(oneSignalSubscriptionId value: String?) -> Self {
         parameters.oneSignalSubscriptionId = value
         return self
