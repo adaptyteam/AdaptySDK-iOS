@@ -33,6 +33,7 @@
 		8A1F7471297B2966002B7FBC /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7470297B2966002B7FBC /* Text.swift */; };
 		8A1F7473297B298D002B7FBC /* СompoundText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F7472297B298D002B7FBC /* СompoundText.swift */; };
 		8A1F74752983DA2D002B7FBC /* CustomAdaptyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */; };
+		8A3BDC462AE0272800DFC769 /* AdaptyPaywall.FetchPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3BDC452AE0272800DFC769 /* AdaptyPaywall.FetchPolicy.swift */; };
 		8A49DF7B2A8073930007C871 /* CustomObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A49DF7A2A8073930007C871 /* CustomObject.swift */; };
 		8A590DD829DE27FE00547895 /* AnyCodingKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */; };
 		8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */; };
@@ -93,7 +94,7 @@
 		8AB003552926FCEA008476A3 /* ProductVendorIdsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D32926FCEA008476A3 /* ProductVendorIdsCache.swift */; };
 		8AB003562926FCEA008476A3 /* EventsStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D42926FCEA008476A3 /* EventsStorage+UserDefaults.swift */; };
 		8AB003572926FCEA008476A3 /* InstallationIdentifier+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D52926FCEA008476A3 /* InstallationIdentifier+UserDefaults.swift */; };
-		8AB003582926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D62926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift */; };
+		8AB003582926FCEA008476A3 /* BackendProductStatesStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D62926FCEA008476A3 /* BackendProductStatesStorage+UserDefaults.swift */; };
 		8AB003592926FCEA008476A3 /* VariationIdStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D72926FCEA008476A3 /* VariationIdStorage+UserDefaults.swift */; };
 		8AB0035A2926FCEA008476A3 /* ProductStatesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D82926FCEA008476A3 /* ProductStatesCache.swift */; };
 		8AB0035B2926FCEA008476A3 /* ProductVendorIdsStorage+UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB002D92926FCEA008476A3 /* ProductVendorIdsStorage+UserDefaults.swift */; };
@@ -263,6 +264,7 @@
 		8A1F7470297B2966002B7FBC /* Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text.swift; sourceTree = "<group>"; };
 		8A1F7472297B298D002B7FBC /* СompoundText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "СompoundText.swift"; sourceTree = "<group>"; };
 		8A1F74742983DA2D002B7FBC /* CustomAdaptyError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAdaptyError.swift; sourceTree = "<group>"; };
+		8A3BDC452AE0272800DFC769 /* AdaptyPaywall.FetchPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyPaywall.FetchPolicy.swift; sourceTree = "<group>"; };
 		8A49DF7A2A8073930007C871 /* CustomObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomObject.swift; sourceTree = "<group>"; };
 		8A590DD729DE27FE00547895 /* AnyCodingKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyCodingKeys.swift; sourceTree = "<group>"; };
 		8A590DD929DE2ED600547895 /* HTTPSession+logSystemEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPSession+logSystemEvent.swift"; sourceTree = "<group>"; };
@@ -326,7 +328,7 @@
 		8AB002D32926FCEA008476A3 /* ProductVendorIdsCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductVendorIdsCache.swift; sourceTree = "<group>"; };
 		8AB002D42926FCEA008476A3 /* EventsStorage+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "EventsStorage+UserDefaults.swift"; sourceTree = "<group>"; };
 		8AB002D52926FCEA008476A3 /* InstallationIdentifier+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InstallationIdentifier+UserDefaults.swift"; sourceTree = "<group>"; };
-		8AB002D62926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BackendProductsStorage+UserDefaults.swift"; sourceTree = "<group>"; };
+		8AB002D62926FCEA008476A3 /* BackendProductStatesStorage+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BackendProductStatesStorage+UserDefaults.swift"; sourceTree = "<group>"; };
 		8AB002D72926FCEA008476A3 /* VariationIdStorage+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VariationIdStorage+UserDefaults.swift"; sourceTree = "<group>"; };
 		8AB002D82926FCEA008476A3 /* ProductStatesCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductStatesCache.swift; sourceTree = "<group>"; };
 		8AB002D92926FCEA008476A3 /* ProductVendorIdsStorage+UserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ProductVendorIdsStorage+UserDefaults.swift"; sourceTree = "<group>"; };
@@ -735,7 +737,7 @@
 			children = (
 				8AB002FA2926FCEA008476A3 /* String.sha256.swift */,
 				8AB002DE2926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift */,
-				8AB002D62926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift */,
+				8AB002D62926FCEA008476A3 /* BackendProductStatesStorage+UserDefaults.swift */,
 				8AB002D42926FCEA008476A3 /* EventsStorage+UserDefaults.swift */,
 				8AB002D52926FCEA008476A3 /* InstallationIdentifier+UserDefaults.swift */,
 				8AB002DA2926FCEA008476A3 /* PaywallsCache.swift */,
@@ -862,6 +864,7 @@
 				8AF804222938E85800970E6B /* AdaptyProfileParameters.AppTrackingTransparencyStatus.swift */,
 				8ADC930D2A37482B0084F1E4 /* AdaptyPurchasedInfo.swift */,
 				8A7ED17B2A701FBB003CB084 /* AdaptyPrice.swift */,
+				8A3BDC452AE0272800DFC769 /* AdaptyPaywall.FetchPolicy.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -1006,7 +1009,7 @@
 				TargetAttributes = {
 					8AAF8B0C292839280003BA86 = {
 						CreatedOnToolsVersion = 14.1;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 					8AB002872926E7BB008476A3 = {
 						CreatedOnToolsVersion = 14.1;
@@ -1164,6 +1167,7 @@
 				8AB003692926FCEA008476A3 /* HTTPRequestWithDecodableResponse.swift in Sources */,
 				8AB0033C2926FCEA008476A3 /* AdaptyLogHandler.swift in Sources */,
 				8AB003632926FCEA008476A3 /* HTTPEndpoint.swift in Sources */,
+				8A3BDC462AE0272800DFC769 /* AdaptyPaywall.FetchPolicy.swift in Sources */,
 				8AB003732926FCEA008476A3 /* HTTPSession.swift in Sources */,
 				8AB003952926FCEA008476A3 /* AdaptyProfile.CustomAttributes.swift in Sources */,
 				8AB0039A2926FCEA008476A3 /* AdaptyProductSubscriptionPeriod.swift in Sources */,
@@ -1225,7 +1229,7 @@
 				8A1F7454297AC0B2002B7FBC /* ViewStyle.swift in Sources */,
 				8AA58F402A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift in Sources */,
 				8AB0032F2926FCEA008476A3 /* SKQueueManager.swift in Sources */,
-				8AB003582926FCEA008476A3 /* BackendProductsStorage+UserDefaults.swift in Sources */,
+				8AB003582926FCEA008476A3 /* BackendProductStatesStorage+UserDefaults.swift in Sources */,
 				8A1F74522979D5AD002B7FBC /* FetchViewConfigurationRequest.swift in Sources */,
 				8AB0037B2926FCEA008476A3 /* SendEventsRequest.swift in Sources */,
 				8AB003612926FCEA008476A3 /* Adapty+AsyncHelpers.swift in Sources */,
@@ -1313,9 +1317,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = KGK5UKQJ46;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TestsHostApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
@@ -1339,9 +1344,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = KGK5UKQJ46;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TestsHostApp/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";

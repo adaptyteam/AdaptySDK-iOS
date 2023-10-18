@@ -130,11 +130,16 @@ import StoreKit
         ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
         ///             Example: "en" means English, "en-US" represents US English.
         ///             If the parameter is omitted, the paywall will be returned in the default locale.
+        ///   - fetchPolicy:
         /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
         /// - Throws: An ``AdaptyError`` object
-        public static func getPaywall(_ id: String, locale: String? = nil) async throws -> AdaptyPaywall {
+        public static func getPaywall(
+            _ id: String,
+            locale: String? = nil,
+            fetchPolicy: AdaptyPaywall.FetchPolicy = .default
+        ) async throws -> AdaptyPaywall {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPaywall(id, locale: locale) { result in
+                Adapty.getPaywall(id, locale: locale, fetchPolicy: fetchPolicy) { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)
