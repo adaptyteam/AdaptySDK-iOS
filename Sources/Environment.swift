@@ -13,10 +13,6 @@
     import AdServices
 #endif
 
-#if canImport(iAd)
-    import iAd
-#endif
-
 import Foundation
 #if canImport(UIKit)
     import UIKit
@@ -151,17 +147,6 @@ enum Environment {
 
     #if os(iOS)
         static func searchAdsAttribution(completion: @escaping ([String: Any]?, Error?) -> Void) {
-            ADClient.shared().requestAttributionDetails { attribution, error in
-                if var attribution: [String: Any] = attribution {
-                    attribution["asa-attribution"] = false
-                    completion(attribution, error)
-                } else {
-                    modernSearchAdsAttribution(completion)
-                }
-            }
-        }
-
-        private static func modernSearchAdsAttribution(_ completion: @escaping ([String: Any]?, Error?) -> Void) {
             guard #available(iOS 14.3, *) else {
                 completion(nil, nil)
                 return
