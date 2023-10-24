@@ -21,18 +21,16 @@ final class PaywallsCache {
         paywalls = storage.getPaywalls()?.asDictionary ?? [:]
     }
 
-    func getPaywallByLocale(_ locale: String?, withId id: String) -> VH<AdaptyPaywall>? {
-        guard let paywall = paywalls[id] else { return nil }
-        guard let locale = locale else { return paywall }
-        guard sameLocale(paywall.value.locale, locale) else { return nil }
-        return paywall
-    }
+//    func getPaywall(byId id: String, locale: String = AdaptyPaywall.defaultLocale) -> VH<AdaptyPaywall>? {
+//        guard let paywall = paywalls[id], paywall.value.locale == locale else { return nil }
+//        return paywall
+//    }
 
     private func sameLocale(_ first: String, _ second: String) -> Bool {
         guard let first = first.components(separatedBy: "-").first?.lowercased(),
               let second = second.components(separatedBy: "-").first?.lowercased(),
               !first.isEmpty, !second.isEmpty else { return false }
-        return first == second
+        return first == second 
     }
 
     func getPaywallByLocaleOrDefault(_ locale: String?, withId id: String) -> VH<AdaptyPaywall>? {
@@ -50,7 +48,7 @@ final class PaywallsCache {
     }
 
     func savedPaywall(_ paywall: VH<AdaptyPaywall>) -> AdaptyPaywall {
-        if let newer = getNewerPaywall(than: paywall) { return newer.value }
+        if let newer = getNewerPaywall(than: paywall) { return  newer.value }
         paywalls[paywall.value.id] = paywall
         storage.setPaywalls(Array(paywalls.values))
         return paywall.value

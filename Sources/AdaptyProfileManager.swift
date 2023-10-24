@@ -48,7 +48,7 @@ extension AdaptyProfileManager {
             case let .success(profile):
                 self?.manager.onceSentEnvironment = true
                 if let value = profile.value, let self = self, self.isActive {
-                    self.saveResponse(profile.withValue(value))
+                    self.saveResponse(VH(value, hash: profile.hash))
                 }
                 completion(.success(profile.value ?? old))
             }
@@ -63,7 +63,7 @@ extension AdaptyProfileManager {
                 completion(.failure(error))
             case let .success(profile):
                 if let value = profile.value, let self = self, self.isActive {
-                    self.saveResponse(profile.withValue(value))
+                    self.saveResponse(VH(value, hash: profile.hash))
                 }
                 completion(.success(profile.value ?? old))
             }
@@ -146,17 +146,8 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getPaywall(_ id: String, _ locale: String?, fetchPolicy: AdaptyPaywall.FetchPolicy, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        if let cached = paywallsCache.getPaywallByLocale(locale, withId: id), fetchPolicy.canReturn(cached) {
-            completion(.success(cached.value))
-        } else {
-            _getPaywall(id, locale, completion)
-        }
-    }
-
-    private func _getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+    func getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
-
         manager.httpSession.performFetchPaywallRequest(paywallId: id,
                                                        locale: locale,
                                                        profileId: profileId,
@@ -179,7 +170,7 @@ extension AdaptyProfileManager {
             case let .success(paywall):
 
                 if let value = paywall.value {
-                    completion(.success(self.paywallsCache.savedPaywall(paywall.withValue(value))))
+                    completion(.success(self.paywallsCache.savedPaywall(VH(value, hash: paywall.hash))))
                     return
                 }
 
@@ -237,7 +228,7 @@ extension AdaptyProfileManager {
                 completion(.success(value))
             case let .success(products):
                 if let value = products.value {
-                    self.productStatesCache.setBackendProductStates(products.withValue(value))
+                    self.productStatesCache.setBackendProductStates(VH(value, hash: products.hash))
                 }
                 completion(.success(self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)))
             }

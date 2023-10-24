@@ -236,11 +236,9 @@ extension Adapty {
     ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
     ///             Example: "en" means English, "en-US" represents US English.
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
-    ///   - fetchPolicy:
     ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     public static func getPaywall(_ id: String,
                                   locale: String? = nil,
-                                  fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         let logParams: EventParameters = [
             "paywall_id": .value(id),
@@ -251,7 +249,7 @@ extension Adapty {
             manager.getProfileManager(waitCreatingProfile: fallback == nil) { result in
                 switch result {
                 case let .success(profileManager):
-                    profileManager.getPaywall(id, locale, fetchPolicy: fetchPolicy, completion)
+                    profileManager.getPaywall(id, locale, completion)
                 case let .failure(error):
                     guard error.isProfileCreateFailed, let paywall = fallback else {
                         completion(.failure(error))
