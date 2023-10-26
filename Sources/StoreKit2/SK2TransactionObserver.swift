@@ -9,7 +9,7 @@ import StoreKit
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
 protocol SK2TransactionObserverDelegate: AnyObject {
-    func transactionListener(_ observer: SK2TransactionObserver, updatedTransaction transaction: Transaction) async
+    func transactionListener(_ observer: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
@@ -29,7 +29,7 @@ class SK2TransactionObserver {
 
     func transactionObserverTask() -> Task<Void, Never> {
         Task(priority: .utility) { [weak self] in
-            for await verificationResult in Transaction.updates {
+            for await verificationResult in SK2Transaction.updates {
                 guard let self = self, let delegate = self.delegate else { break }
                 switch verificationResult {
                 case let .unverified(transaction, error):
@@ -45,21 +45,19 @@ class SK2TransactionObserver {
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
 extension SKQueueManager: SK2TransactionObserverDelegate {
-    func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: Transaction) async {
+    func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate != nil && transaction.expirationDate! < Date()) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
         guard transaction.justPurchasedRenewed else { return }
-        let originalTransactionId = String(transaction.originalID)
         skProductsManager.fetchPurchaseProductInfo(variationId: nil, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
 
-            self?.purchaseValidator.validatePurchaseByOriginalTransaction(originalTransactionId: originalTransactionId,
-                                                                          info: purchaseProductInfo) { _ in }
+            self?.purchaseValidator.validatePurchase(info: purchaseProductInfo) { _ in }
         }
     }
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-extension Transaction {
+extension SK2Transaction {
     fileprivate var justPurchasedRenewed: Bool {
         if revocationDate != nil {
             return false

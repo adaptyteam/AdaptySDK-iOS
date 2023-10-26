@@ -30,7 +30,7 @@ final class SKQueueManager: NSObject {
 
     private(set) var _sk2TransactionObserver: Any?
 
-    init(queue: DispatchQueue,  storage: VariationIdStorage, skProductsManager: SKProductsManager) {
+    init(queue: DispatchQueue, storage: VariationIdStorage, skProductsManager: SKProductsManager) {
         self.queue = queue
         self.storage = storage
         variationsIds = storage.getVariationsIds() ?? [:]
@@ -85,31 +85,6 @@ final class SKQueueManager: NSObject {
         NotificationCenter.default.addObserver(forName: Application.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
             if let self = self { SKPaymentQueue.default().remove(self) }
         }
-    }
-}
-
-extension SKPaymentTransactionState {
-    fileprivate var stringValue: String {
-        switch self {
-        case .purchasing: return "purchasing"
-        case .purchased: return "purchased"
-        case .failed: return "failed"
-        case .restored: return "restored"
-        case .deferred: return "deferred"
-        default:
-            return "unknown(\(self))"
-        }
-    }
-}
-
-extension SKPaymentTransaction {
-    var logParams: EventParameters {
-        [
-            "product_id": .value(payment.productIdentifier),
-            "state": .value(transactionState.stringValue),
-            "transaction_id": .valueOrNil(transactionIdentifier),
-            "original_id": .valueOrNil(original?.transactionIdentifier),
-        ]
     }
 }
 

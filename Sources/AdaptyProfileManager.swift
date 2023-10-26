@@ -116,7 +116,7 @@ extension AdaptyProfileManager {
         manager.httpSession.performSetTransactionVariationIdRequest(profileId: profileId, transactionId: transactionId, variationId: variationId, completion)
     }
 
-    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SKPaymentTransaction, _ completion: @escaping AdaptyErrorCompletion) {
+    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK1Transaction, _ completion: @escaping AdaptyErrorCompletion) {
         guard transaction.transactionState == .purchased || transaction.transactionState == .restored else {
             completion(.wrongParamPurchasedTransaction())
             return
@@ -128,12 +128,12 @@ extension AdaptyProfileManager {
                 return
             }
 
-            self.manager.validatePurchaseByReceipt(info: purchaseProductInfo) { completion($0.error) }
+            self.manager.validatePurchase(info: purchaseProductInfo) { completion($0.error) }
         }
     }
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: Transaction, _ completion: @escaping AdaptyErrorCompletion) {
+    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK2Transaction, _ completion: @escaping AdaptyErrorCompletion) {
         manager.skProductsManager.fetchPurchaseProductInfo(variationId: variationId, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
 
             guard let self = self, self.isActive else {
@@ -141,8 +141,7 @@ extension AdaptyProfileManager {
                 return
             }
 
-            self.manager.validatePurchaseByOriginalTransaction(originalTransactionId: String(transaction.originalID),
-                                                               info: purchaseProductInfo) { completion($0.error) }
+            self.manager.validatePurchase(info: purchaseProductInfo) { completion($0.error) }
         }
     }
 

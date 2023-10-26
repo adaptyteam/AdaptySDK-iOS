@@ -10,7 +10,7 @@ import StoreKit
 extension SKProductsManager {
     func fetchPurchaseProductInfo(variationId: String?,
                                   persistentVariationId: String? = nil,
-                                  purchasedTransaction transaction: SKPaymentTransaction,
+                                  purchasedTransaction transaction: SK1Transaction,
                                   _ completion: @escaping (PurchaseProductInfo) -> Void) {
         let productId = transaction.payment.productIdentifier
 
@@ -29,8 +29,9 @@ extension SKProductsManager {
 }
 
 extension PurchaseProductInfo {
-    fileprivate init(_ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SKPaymentTransaction) {
+    fileprivate init(_ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SK1Transaction) {
         self.init(transactionId: transaction.transactionIdentifier,
+                  originalTransactionId: transaction.originalTransactionIdentifier,
                   vendorProductId: transaction.payment.productIdentifier,
                   productVariationId: variationId,
                   persistentProductVariationId: persistentVariationId,
@@ -42,7 +43,7 @@ extension PurchaseProductInfo {
                   offer: nil)
     }
 
-    init(_ product: SKProduct, _ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SKPaymentTransaction) {
+    init(_ product: SKProduct, _ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SK1Transaction) {
         var discount: AdaptyProductDiscount?
 
         if #available(iOS 12.2, OSX 10.14.4, *),
@@ -60,6 +61,7 @@ extension PurchaseProductInfo {
         }
 
         self.init(transactionId: transaction.transactionIdentifier,
+                  originalTransactionId: transaction.originalTransactionIdentifier,
                   vendorProductId: transaction.payment.productIdentifier,
                   productVariationId: variationId,
                   persistentProductVariationId: persistentVariationId,
