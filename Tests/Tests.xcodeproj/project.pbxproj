@@ -41,6 +41,7 @@
 		8A7ED17A2A605305003CB084 /* AdaptyUIViewStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7ED1792A605305003CB084 /* AdaptyUIViewStyleTests.swift */; };
 		8A7ED17C2A701FBB003CB084 /* AdaptyPrice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7ED17B2A701FBB003CB084 /* AdaptyPrice.swift */; };
 		8A7ED17E2A714E7A003CB084 /* SetTransactionVariationIdRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A7ED17D2A714E7A003CB084 /* SetTransactionVariationIdRequest.swift */; };
+		8A9DF68A2AEBF1ED00A47AEB /* String.md5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9DF6892AEBF1ED00A47AEB /* String.md5.swift */; };
 		8AA58F3E2A278A2000AE26CA /* ValidateTransactionRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */; };
 		8AA58F402A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */; };
 		8AA58F422A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */; };
@@ -272,6 +273,7 @@
 		8A7ED1792A605305003CB084 /* AdaptyUIViewStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUIViewStyleTests.swift; sourceTree = "<group>"; };
 		8A7ED17B2A701FBB003CB084 /* AdaptyPrice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyPrice.swift; sourceTree = "<group>"; };
 		8A7ED17D2A714E7A003CB084 /* SetTransactionVariationIdRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetTransactionVariationIdRequest.swift; sourceTree = "<group>"; };
+		8A9DF6892AEBF1ED00A47AEB /* String.md5.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.md5.swift; sourceTree = "<group>"; };
 		8AA58F3D2A278A2000AE26CA /* ValidateTransactionRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidateTransactionRequest.swift; sourceTree = "<group>"; };
 		8AA58F3F2A28E0C800AE26CA /* SK1ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK1ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
 		8AA58F412A28E4C200AE26CA /* SK2ProductsManager+PurchaseProductInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SK2ProductsManager+PurchaseProductInfo.swift"; sourceTree = "<group>"; };
@@ -736,6 +738,7 @@
 			isa = PBXGroup;
 			children = (
 				8AB002FA2926FCEA008476A3 /* String.sha256.swift */,
+				8A9DF6892AEBF1ED00A47AEB /* String.md5.swift */,
 				8AB002DE2926FCEA008476A3 /* ApiKeyHash+UserDefaults.swift */,
 				8AB002D62926FCEA008476A3 /* BackendProductStatesStorage+UserDefaults.swift */,
 				8AB002D42926FCEA008476A3 /* EventsStorage+UserDefaults.swift */,
@@ -1143,6 +1146,7 @@
 				8AB003872926FCEA008476A3 /* AdaptyError.swift in Sources */,
 				8AFCD9532A4F2BF400C6211C /* Button.Align+Decodable.swift in Sources */,
 				8AB003982926FCEA008476A3 /* AdaptyProfile.AccessLevel.swift in Sources */,
+				8A9DF68A2AEBF1ED00A47AEB /* String.md5.swift in Sources */,
 				8A590DDA29DE2ED600547895 /* HTTPSession+logSystemEvent.swift in Sources */,
 				8AB003A52926FCEA008476A3 /* Configuration.swift in Sources */,
 				8AB003442926FCEA008476A3 /* Backend.swift in Sources */,
