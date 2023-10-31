@@ -12,7 +12,6 @@ struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
     let headers: Headers
-    let queryItems: QueryItems
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
@@ -28,37 +27,40 @@ struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(paywallId: String, locale: String?, profileId: String, responseHash: String?) {
+    init(apiKeyPrefix: String, paywallId: String, locale: String, md5Hash: String, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/purchase-containers/\(paywallId)/"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(paywallId)/\(md5Hash)/"
         )
 
         headers = Headers()
-            .setBackendProfileId(profileId)
+            .setPaywallLocale(locale)
             .setBackendResponseHash(responseHash)
-
-        queryItems = QueryItems()
-            .setLocale(locale)
-            .setBackendProfileId(profileId)
     }
 }
 
 extension HTTPSession {
-    func performFetchPaywallRequest(paywallId: String,
-                                    locale: String?,
-                                    profileId: String,
+    func performFetchPaywallRequest(apiKeyPrefix: String,
+                                    paywallId: String,
+                                    locale: String,
+                                    segmentId: String,
                                     responseHash: String?,
                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall?>>) {
-        let request = FetchPaywallRequest(paywallId: paywallId,
+        let md5Hash = "{\"locale\":\"\(locale.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5()
+
+        let request = FetchPaywallRequest(apiKeyPrefix: apiKeyPrefix,
+                                          paywallId: paywallId,
                                           locale: locale,
-                                          profileId: profileId,
+                                          md5Hash: md5Hash,
                                           responseHash: responseHash)
 
         perform(request, logName: "get_paywall",
                 logParams: [
+                    "api_prefix": .value(apiKeyPrefix),
                     "paywall_id": .value(paywallId),
-                    "locale": .valueOrNil(locale),
+                    "locale": .value(locale),
+                    "segment_id": .value(segmentId),
+                    "md5": .value(md5Hash)
                 ]) { (result: FetchPaywallRequest.Result) in
             switch result {
             case let .failure(error):

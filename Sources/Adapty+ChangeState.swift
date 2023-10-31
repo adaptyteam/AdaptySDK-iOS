@@ -11,6 +11,8 @@ public final class Adapty {
     static var shared: Adapty?
     let profileStorage: ProfileStorage
     let backend: Backend
+    let fallbackBackend: FallbackBackend
+
     let httpSession: HTTPSession
     let skProductsManager: SKProductsManager
     let skReceiptManager: SKReceiptManager
@@ -22,8 +24,10 @@ public final class Adapty {
     init(profileStorage: ProfileStorage,
          vendorIdsStorage: ProductVendorIdsStorage,
          backend: Backend,
+         fallbackBackend: FallbackBackend,
          customerUserId: String?) {
         self.backend = backend
+        self.fallbackBackend = fallbackBackend
         self.profileStorage = profileStorage
         vendorIdsCache = ProductVendorIdsCache(storage: vendorIdsStorage)
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)

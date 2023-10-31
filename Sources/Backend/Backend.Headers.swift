@@ -10,11 +10,16 @@ import Foundation
 extension Backend.Request {
     fileprivate static let authorizationHeaderKey = "Authorization"
     fileprivate static let hashHeaderKey = "adapty-sdk-previous-response-hash"
+    fileprivate static let paywallLocaelHeaderKey = "adapty-paywall-locale"
+
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
     fileprivate static let sdkPlatformHeaderKey = "adapty-sdk-platform"
+    fileprivate static let sdkStoreHeaderKey = "adapty-sdk-store"
     fileprivate static let sessionIDHeaderKey = "adapty-sdk-session"
     fileprivate static let appVersionHeaderKey = "adapty-app-version"
+
+
 
     fileprivate static let isSandboxHeaderKey = "adapty-sdk-sandbox-mode-enabled"
     fileprivate static let isObserveModeHeaderKey = "adapty-sdk-observer-mode-enabled"
@@ -28,6 +33,7 @@ extension Backend.Request {
             authorizationHeaderKey: "Api-Key \(secretKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
             sdkPlatformHeaderKey: Environment.System.name,
+            sdkStoreHeaderKey: "app_store",
             sessionIDHeaderKey: Environment.Application.sessionIdentifier,
             appInstallIdHeaderKey: Environment.Application.installationIdentifier,
             isSandboxHeaderKey: Environment.System.isSandbox ? "true" : "false",
@@ -53,6 +59,17 @@ extension Backend.Response {
 }
 
 extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.Headers.Value {
+
+    func setPaywallLocale(_ locale: String?) -> Self {
+        var headers = self
+        if let locale = locale {
+            headers.updateValue(locale, forKey: Backend.Request.paywallLocaelHeaderKey)
+        } else {
+            headers.removeValue(forKey: Backend.Request.paywallLocaelHeaderKey)
+        }
+        return headers
+    }
+
     func setBackendResponseHash(_ hash: String?) -> Self {
         var headers = self
         if let hash = hash {

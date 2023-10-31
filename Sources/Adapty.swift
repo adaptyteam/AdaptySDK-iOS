@@ -61,11 +61,14 @@ extension Adapty {
 
             let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
 
+            let fallbackBackend = FallbackBackend(secretKey: apiKey, baseURL: Configuration.backendFallbackBaseUrl ?? Backend.publicEnvironmentFallbackBaseUrl, withProxy: Configuration.backendProxy)
+
             Adapty.eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
 
             shared = Adapty(profileStorage: UserDefaults.standard,
                             vendorIdsStorage: UserDefaults.standard,
                             backend: backend,
+                            fallbackBackend: fallbackBackend,
                             customerUserId: customerUserId)
             LifecycleManager.shared.initialize()
             Log.info("Adapty activated withObserverMode:\(observerMode), withCustomerUserId: \(customerUserId != nil)")
