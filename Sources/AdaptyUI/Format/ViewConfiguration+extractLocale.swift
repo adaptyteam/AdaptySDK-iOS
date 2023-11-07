@@ -10,6 +10,10 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     public func extractLocale(_ locale: String) -> AdaptyUI.LocalizedViewConfiguration {
+        extractLocale(AdaptyLocale(id: locale))
+    }
+
+    func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
         let localization: AdaptyUI.Localization?
         if let value = localizations[locale] {
             if defaultLocalization?.id == value.id {
@@ -190,7 +194,7 @@ extension AdaptyUI.ViewConfiguration {
         return AdaptyUI.LocalizedViewConfiguration(
             id: id,
             templateId: templateId,
-            locale: localization?.id ?? locale,
+            locale: (localization?.id ?? locale).id,
             styles: styles,
             isHard: isHard,
             mainImageRelativeHeight: mainImageRelativeHeight,

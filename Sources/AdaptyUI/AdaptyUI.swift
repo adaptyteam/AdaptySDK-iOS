@@ -18,7 +18,7 @@ public enum AdaptyUI {
         struct PrivateParameters: Decodable {
             let paywallId: String
             let paywallVariationId: String
-            let locale: String
+            let locale: AdaptyLocale
             let builderVersion: String
 
             enum CodingKeys: String, CodingKey {
@@ -58,7 +58,7 @@ public enum AdaptyUI {
 extension AdaptyProfileManager {
     fileprivate func getViewConfiguration(paywallId: String,
                                           paywallVariationId: String,
-                                          locale: String,
+                                          locale: AdaptyLocale,
                                           builderVersion: String,
                                           responseHash: String?,
                                           _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {

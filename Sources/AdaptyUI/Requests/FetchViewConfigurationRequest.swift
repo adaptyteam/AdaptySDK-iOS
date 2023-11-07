@@ -13,7 +13,6 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
     let headers: Headers
-    let queryItems: QueryItems
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
@@ -29,7 +28,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(paywallVariationId: String, locale: String, builderVersion: String, responseHash: String?) {
+    init(paywallVariationId: String, locale: AdaptyLocale, builderVersion: String, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/paywall-builder/v2/\(paywallVariationId)/"
@@ -37,17 +36,15 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
         headers = Headers()
             .setBackendResponseHash(responseHash)
-
-        queryItems = QueryItems()
-            .setLocale(locale)
-            .setBuilderVersion(builderVersion)
+            .setAdaptyUISDKVersion(builderVersion)
+            .setViewConfigurationLocale(locale)
     }
 }
 
 extension HTTPSession {
     func performFetchViewConfigurationRequest(paywallId: String,
                                               paywallVariationId: String,
-                                              locale: String,
+                                              locale: AdaptyLocale,
                                               builderVersion: String,
                                               responseHash: String?,
                                               _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {

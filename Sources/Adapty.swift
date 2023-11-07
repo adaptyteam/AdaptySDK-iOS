@@ -65,7 +65,8 @@ extension Adapty {
 
             Adapty.eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
 
-            shared = Adapty(profileStorage: UserDefaults.standard,
+            shared = Adapty(apiKeyPrefix: String(apiKey.prefix(while: { $0 != "." })),
+                            profileStorage: UserDefaults.standard,
                             vendorIdsStorage: UserDefaults.standard,
                             backend: backend,
                             fallbackBackend: fallbackBackend,

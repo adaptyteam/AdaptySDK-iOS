@@ -10,7 +10,9 @@ import Foundation
 extension Backend.Request {
     fileprivate static let authorizationHeaderKey = "Authorization"
     fileprivate static let hashHeaderKey = "adapty-sdk-previous-response-hash"
-    fileprivate static let paywallLocaelHeaderKey = "adapty-paywall-locale"
+    fileprivate static let paywallLocaleHeaderKey = "adapty-paywall-locale"
+    fileprivate static let viewConfigurationLocaleHeaderKey = "adapty-paywall-builder-locale"
+    fileprivate static let adaptyUISDKVersionHeaderKey = "adapty-paywall-builder-version"
 
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
@@ -18,8 +20,6 @@ extension Backend.Request {
     fileprivate static let sdkStoreHeaderKey = "adapty-sdk-store"
     fileprivate static let sessionIDHeaderKey = "adapty-sdk-session"
     fileprivate static let appVersionHeaderKey = "adapty-app-version"
-
-
 
     fileprivate static let isSandboxHeaderKey = "adapty-sdk-sandbox-mode-enabled"
     fileprivate static let isObserveModeHeaderKey = "adapty-sdk-observer-mode-enabled"
@@ -59,33 +59,32 @@ extension Backend.Response {
 }
 
 extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.Headers.Value {
+    func setPaywallLocale(_ locale: AdaptyLocale?) -> Self {
+        updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallLocaleHeaderKey)
+    }
 
-    func setPaywallLocale(_ locale: String?) -> Self {
-        var headers = self
-        if let locale = locale {
-            headers.updateValue(locale, forKey: Backend.Request.paywallLocaelHeaderKey)
-        } else {
-            headers.removeValue(forKey: Backend.Request.paywallLocaelHeaderKey)
-        }
-        return headers
+    func setViewConfigurationLocale(_ locale: AdaptyLocale?) -> Self {
+        updateOrRemoveValue(locale?.id, forKey: Backend.Request.viewConfigurationLocaleHeaderKey)
+    }
+
+    func setAdaptyUISDKVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.adaptyUISDKVersionHeaderKey)
     }
 
     func setBackendResponseHash(_ hash: String?) -> Self {
-        var headers = self
-        if let hash = hash {
-            headers.updateValue(hash, forKey: Backend.Request.hashHeaderKey)
-        } else {
-            headers.removeValue(forKey: Backend.Request.hashHeaderKey)
-        }
-        return headers
+        updateOrRemoveValue(hash, forKey: Backend.Request.hashHeaderKey)
     }
 
     func setBackendProfileId(_ profileId: String?) -> Self {
+        updateOrRemoveValue(profileId, forKey: Backend.Request.profileIdHeaderKey)
+    }
+
+    private func updateOrRemoveValue(_ value: String?, forKey key: String) -> Self {
         var headers = self
-        if let profileId = profileId {
-            headers.updateValue(profileId, forKey: Backend.Request.profileIdHeaderKey)
+        if let value = value {
+            headers.updateValue(value, forKey: key)
         } else {
-            headers.removeValue(forKey: Backend.Request.profileIdHeaderKey)
+            headers.removeValue(forKey: key)
         }
         return headers
     }

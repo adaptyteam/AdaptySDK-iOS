@@ -9,6 +9,7 @@ import StoreKit
 
 final class SKProductsManager {
     private let queue = DispatchQueue(label: "Adapty.SDK.SKProductsManager")
+    private let apiKeyPrefix: String
     private var cache: ProductVendorIdsCache
     private let session: HTTPSession
     private var sending: Bool = false
@@ -21,7 +22,8 @@ final class SKProductsManager {
         return fetcher as? SK2ProductsFetcher
     }
 
-    init(storage: ProductVendorIdsStorage, backend: Backend) {
+    init(apiKeyPrefix: String, storage: ProductVendorIdsStorage, backend: Backend) {
+        self.apiKeyPrefix = apiKeyPrefix
         cache = ProductVendorIdsCache(storage: storage)
         session = backend.createHTTPSession(responseQueue: queue)
         storeKit1Fetcher = SK1ProductsFetcher(queue: queue)
@@ -111,8 +113,7 @@ final class SKProductsManager {
         queue.async { [weak self] in
             guard let self = self, !self.sending else { return }
             self.sending = true
-            let profileId = self.cache.profileId
-            let request = FetchAllProductVendorIdsRequest(profileId: profileId, responseHash: self.cache.allProductVendorIds?.hash)
+            let request = FetchAllProductVendorIdsRequest(apiKeyPrefix: apiKeyPrefix, responseHash: self.cache.allProductVendorIds?.hash)
             self.session.perform(request, logName: "get_products_ids") { [weak self] (result: FetchAllProductVendorIdsRequest.Result) in
                 defer { self?.sending = false }
                 guard let self = self else { return }

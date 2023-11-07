@@ -10,6 +10,7 @@ import Foundation
 public final class Adapty {
     static var shared: Adapty?
     let profileStorage: ProfileStorage
+    let apiKeyPrefix: String
     let backend: Backend
     let fallbackBackend: FallbackBackend
 
@@ -21,18 +22,20 @@ public final class Adapty {
     var onceSentEnvironment: Bool = false
     var state: State
 
-    init(profileStorage: ProfileStorage,
+    init(apiKeyPrefix: String,
+         profileStorage: ProfileStorage,
          vendorIdsStorage: ProductVendorIdsStorage,
          backend: Backend,
          fallbackBackend: FallbackBackend,
          customerUserId: String?) {
+        self.apiKeyPrefix = apiKeyPrefix
         self.backend = backend
         self.fallbackBackend = fallbackBackend
         self.profileStorage = profileStorage
         vendorIdsCache = ProductVendorIdsCache(storage: vendorIdsStorage)
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)
 
-        skProductsManager = SKProductsManager(storage: UserDefaults.standard, backend: backend)
+        skProductsManager = SKProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, backend: backend)
         skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
 

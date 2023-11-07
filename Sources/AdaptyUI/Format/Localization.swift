@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyUI {
     struct Localization {
-        let id: String
+        let id: AdaptyLocale
         let strings: [String: String]?
         let assets: [String: Asset]?
     }
@@ -30,7 +30,7 @@ extension AdaptyUI.Localization: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
+        id = try container.decode(AdaptyLocale.self, forKey: .id)
 
         assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value
 

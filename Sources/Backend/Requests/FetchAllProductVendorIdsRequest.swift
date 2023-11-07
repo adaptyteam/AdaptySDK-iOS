@@ -9,10 +9,7 @@ import Foundation
 
 struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<[String]?>
-    let endpoint = HTTPEndpoint(
-        method: .get,
-        path: "/sdk/in-apps/products-ids/"
-    )
+    let endpoint: HTTPEndpoint
     let headers: Headers
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
@@ -29,9 +26,13 @@ struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(profileId: String, responseHash: String?) {
+    init(apiKeyPrefix: String, responseHash: String?) {
+        endpoint = HTTPEndpoint(
+            method: .get,
+            path: "/sdk/in-apps/\(apiKeyPrefix)/products-ids/app_store/"
+        )
+
         headers = Headers()
-            .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
     }
 }
