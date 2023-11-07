@@ -8,7 +8,6 @@
 import Foundation
 
 public struct AdaptyPaywall {
-    internal static var defaultLocale = "en"
     /// An identifier of a paywall, configured in Adapty Dashboard.
     public let id: String
 
@@ -83,10 +82,10 @@ extension AdaptyPaywall: Codable {
         hasViewConfiguration = try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false
 
         if let remoteConfig = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig) {
-            locale = try remoteConfig.decode(String.self, forKey: .remoteConfigLocale)
+            locale = (try remoteConfig.decode(AdaptyLocale.self, forKey: .remoteConfigLocale)).id
             remoteConfigString = try remoteConfig.decodeIfPresent(String.self, forKey: .remoteConfigString)
         } else {
-            locale = AdaptyPaywall.defaultLocale
+            locale = AdaptyLocale.defaultPaywallLocale.id
             remoteConfigString = nil
         }
     }

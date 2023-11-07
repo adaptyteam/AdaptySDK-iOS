@@ -10,7 +10,6 @@ import Foundation
 protocol ProductVendorIdsStorage {
     func setProductVendorIds(_: VH<[String]>)
     func getProductVendorIds() -> VH<[String]>?
-    var profileId: String { get }
 }
 
 final class ProductVendorIdsCache {
@@ -27,8 +26,4 @@ final class ProductVendorIdsCache {
         allProductVendorIds = values
         storage.setProductVendorIds(values)
     }
-}
-
-extension ProductVendorIdsCache {
-    var profileId: String { storage.profileId }
 }

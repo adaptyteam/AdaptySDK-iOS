@@ -12,6 +12,16 @@ protocol PaywallsStorage {
     func getPaywalls() -> [VH<AdaptyPaywall>]?
 }
 
+fileprivate extension VH<AdaptyPaywall> {
+    func equalLanguageCode(_ locale: AdaptyLocale) ->Bool {
+        AdaptyLocale(id: value.locale).equalLanguageCode(locale)
+    }
+
+    func equalLanguageCode(_ paywall: VH<AdaptyPaywall>) ->Bool {
+        equalLanguageCode(AdaptyLocale(id: paywall.value.locale))
+    }
+}
+
 final class PaywallsCache {
     private let storage: PaywallsStorage
     private var paywalls: [String: VH<AdaptyPaywall>]
@@ -21,31 +31,24 @@ final class PaywallsCache {
         paywalls = storage.getPaywalls()?.asDictionary ?? [:]
     }
 
-    func getPaywallByLocale(_ locale: String?, withId id: String) -> VH<AdaptyPaywall>? {
+    func getPaywallByLocale(_ locale: AdaptyLocale?, withId id: String) -> VH<AdaptyPaywall>? {
         guard let paywall = paywalls[id] else { return nil }
         guard let locale = locale else { return paywall }
-        guard sameLocale(paywall.value.locale, locale) else { return nil }
+        guard paywall.equalLanguageCode(locale) else { return nil }
         return paywall
     }
 
-    private func sameLocale(_ first: String, _ second: String) -> Bool {
-        guard let first = first.components(separatedBy: "-").first?.lowercased(),
-              let second = second.components(separatedBy: "-").first?.lowercased(),
-              !first.isEmpty, !second.isEmpty else { return false }
-        return first == second
-    }
-
-    func getPaywallByLocaleOrDefault(_ locale: String?, withId id: String) -> VH<AdaptyPaywall>? {
+    func getPaywallByLocaleOrDefault(_ locale: AdaptyLocale?, withId id: String) -> VH<AdaptyPaywall>? {
         guard let paywall = paywalls[id] else { return nil }
-        if sameLocale(paywall.value.locale, AdaptyPaywall.defaultLocale) { return paywall }
+        if paywall.equalLanguageCode(.defaultPaywallLocale)  { return paywall }
         guard let locale = locale else { return nil }
-        if sameLocale(paywall.value.locale, locale) { return paywall }
+        if paywall.equalLanguageCode(locale)  { return paywall }
         return nil
     }
 
     private func getNewerPaywall(than paywall: VH<AdaptyPaywall>) -> VH<AdaptyPaywall>? {
         guard let cached: VH<AdaptyPaywall> = paywalls[paywall.value.id],
-              sameLocale(paywall.value.locale, cached.value.locale) else { return nil }
+              paywall.equalLanguageCode(cached) else { return nil }
         return paywall.value.version >= cached.value.version ? nil : cached
     }
 

@@ -146,7 +146,7 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getPaywall(_ id: String, _ locale: String?, fetchPolicy: AdaptyPaywall.FetchPolicy, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+    func getPaywall(_ id: String, _ locale: AdaptyLocale?, fetchPolicy: AdaptyPaywall.FetchPolicy, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         if let cached = paywallsCache.getPaywallByLocale(locale, withId: id), fetchPolicy.canReturn(cached) {
             completion(.success(cached.value))
         } else {
@@ -154,12 +154,13 @@ extension AdaptyProfileManager {
         }
     }
 
-    private func _getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+    private func _getPaywall(_ id: String, _ locale: AdaptyLocale?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
 
-        manager.httpSession.performFetchPaywallRequest(paywallId: id,
+        manager.httpSession.performFetchPaywallRequest(apiKeyPrefix: manager.apiKeyPrefix,
+                                                       paywallId: id,
                                                        locale: locale,
-                                                       profileId: profileId,
+                                                       segmentId: String,
                                                        responseHash: old?.hash) {
             [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
 

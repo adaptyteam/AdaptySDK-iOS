@@ -24,7 +24,7 @@ func XCTAssertEqual(_ expression: AdaptyPaywall?, withJSONValue jsonValue: JSONV
         XCTAssertEqual(value.locale, withJSONValue: remouteConfig["lang"])
         XCTAssertEqual(value.remoteConfigString, withJSONValue: remouteConfig["data"])
     } else {
-        XCTAssertEqual(value.locale, AdaptyPaywall.defaultLocale)
+        XCTAssertEqual(value.locale, AdaptyLocale.defaultPaywallLocale.id)
         XCTAssertNil(value.remoteConfigString)
     }
 

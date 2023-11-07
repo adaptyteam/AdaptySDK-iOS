@@ -12,10 +12,10 @@ struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
 
-    init(apiKeyPrefix: String, paywallId: String, localeCode: String, responseHash: String?) {
+    init(apiKeyPrefix: String, paywallId: String, locale: AdaptyLocale) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(paywallId)/app_store/\(localeCode)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(paywallId)/app_store/\(locale.languageCode)/fallback.json"
         )
     }
 }
@@ -24,19 +24,18 @@ extension HTTPSession {
     func performFetchFallbackPaywallRequest(
         apiKeyPrefix: String,
         paywallId: String,
-        localeCode: String,
+        locale: AdaptyLocale,
         responseHash: String?,
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>) {
         let request = FetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
                                                   paywallId: paywallId,
-                                                  localeCode: localeCode,
-                                                  responseHash: responseHash)
+                                                  locale: locale)
 
         perform(request, logName: "get_fallback_paywall",
                 logParams: [
                     "api_prefix": .value(apiKeyPrefix),
                     "paywall_id": .value(paywallId),
-                    "locale_code": .valueOrNil(localeCode),
+                    "language_code": .valueOrNil(locale.languageCode),
                 ]) { (result: FetchFallbackPaywallRequest.Result) in
             switch result {
             case let .failure(error):
