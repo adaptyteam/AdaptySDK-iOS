@@ -12,7 +12,7 @@ struct VH<T> {
     let hash: String?
     let time: Date?
 
-    init(_ value: T, hash: String?, time: Date? = Date()) {
+    init(_ value: T, hash: String?, time: Date? = nil) {
         self.value = value
         self.hash = hash
         self.time = time
@@ -36,3 +36,5 @@ struct VH<T> {
 extension VH: Encodable where T: Encodable {}
 
 extension VH: Decodable where T: Decodable {}
+
+

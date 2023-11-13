@@ -24,9 +24,9 @@ extension HTTPSession {
     func performFetchFallbackPaywallRequest(
         apiKeyPrefix: String,
         paywallId: String,
-        locale: AdaptyLocale,
-        responseHash: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>) {
+        locale: AdaptyLocale?,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         let request = FetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
                                                   paywallId: paywallId,
                                                   locale: locale)
@@ -36,14 +36,27 @@ extension HTTPSession {
                     "api_prefix": .value(apiKeyPrefix),
                     "paywall_id": .value(paywallId),
                     "language_code": .valueOrNil(locale.languageCode),
-                ]) { (result: FetchFallbackPaywallRequest.Result) in
+                ]) { [weak self] (result: FetchFallbackPaywallRequest.Result) in
             switch result {
             case let .failure(error):
-                completion(.failure(error.asAdaptyError))
+                guard let queue = self?.responseQueue, error.statusCode == 404, locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
+                    completion(.failure(error.asAdaptyError))
+                    break
+                }
+
+                queue.async {
+                    guard let session = self else {
+                        completion(.failure(error.asAdaptyError))
+                        return
+                    }
+                    session.performFetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
+                                                               paywallId: paywallId,
+                                                               locale: nil,
+                                                               completion)
+                }
+
             case let .success(response):
-                let paywall = response.body.value
-                let hash = response.headers.getBackendResponseHash()
-                completion(.success(VH(paywall, hash: hash)))
+                completion(.success(response.body.value))
             }
         }
     }
