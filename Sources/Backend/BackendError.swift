@@ -19,6 +19,23 @@ extension ErrorResponse: CustomStringConvertible {
 }
 
 extension Backend {
+    static func canUseFallbackServer(error: HTTPError) -> Bool {
+        switch error {
+        case .perform:
+            return false
+        case let .network(_, _, error: error):
+            return (error as NSError).isTimedOutError
+        case let .decoding(_, _, statusCode: code, _, _),
+             let .backend(_, _, statusCode: code, _, _):
+            switch code {
+            case 499, 500 ... 599:
+                return true
+            default:
+                return false
+            }
+        }
+    }
+
     // TODO: Retry Codes
     static func canRetryRequest(error: HTTPError) -> Bool {
         switch error {

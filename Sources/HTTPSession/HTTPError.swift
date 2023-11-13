@@ -114,6 +114,15 @@ extension NSError {
         guard let code = nsURLErrorCode else { return false }
         return NSError.networkConnectionErrorsCodes.contains(code)
     }
+
+    fileprivate static let timedOutErrorsCodes = [
+        NSURLErrorTimedOut,
+    ]
+
+    var isTimedOutError: Bool {
+        guard let code = nsURLErrorCode else { return false }
+        return NSError.timedOutErrorsCodes.contains(code)
+    }
 }
 
 extension HTTPError {
