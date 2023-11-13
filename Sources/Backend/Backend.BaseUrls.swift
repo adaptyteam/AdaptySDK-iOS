@@ -10,5 +10,5 @@ import Foundation
 
 extension Backend {
     static let publicEnvironmentBaseUrl = URL(string: "https://api.adapty.io/api/v1")!
-    static let publicEnvironmentFallbackBaseUrl = URL(string: "https://fallback-paywalls.adapty.io/api/v1")!
+    static let publicEnvironmentFallbackBaseUrl = URL(string: "https://fallback.adapty.io/api/v1")!
 }
