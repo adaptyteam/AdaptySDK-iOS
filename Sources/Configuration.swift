@@ -21,6 +21,7 @@ extension Adapty {
 
         static var backendBaseUrl: URL?
         static var backendFallbackBaseUrl: URL?
+        static var backendPaywallRequestTimeInterval: TimeInterval = 5.0
 
         static var backendProxy: (host: String, port: Int)?
     }
@@ -44,8 +45,8 @@ extension Adapty {
         Configuration.backendFallbackBaseUrl = fallbackBaseUrl
     }
 
-    public static func setBackendEnvironment(fallbackBaseUrl: TimeInterval) {
-        Configuration.backendFallbackBaseUrl = fallbackBaseUrl
+    public static func setBackendEnvironment(paywallRequestTimeInterval timeInterval: TimeInterval) {
+        Configuration.backendPaywallRequestTimeInterval = timeInterval
     }
 
     public static func setBackendEnvironment(withProxy host: String, withProxyPort port: Int) {
