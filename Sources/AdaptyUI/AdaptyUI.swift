@@ -78,13 +78,13 @@ extension Adapty {
                         return
                     }
 
-                    let session = manager.fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
-
-                    session.performFetchFallbackViewConfigurationRequest(apiKeyPrefix: manager.apiKeyPrefix,
-                                                                         paywallVariationId: paywallVariationId,
-                                                                         locale: locale,
-                                                                         builderVersion: builderVersion,
-                                                                         completion)
+                    manager
+                        .httpFallbackSession
+                        .performFetchFallbackViewConfigurationRequest(apiKeyPrefix: manager.apiKeyPrefix,
+                                                                      paywallVariationId: paywallVariationId,
+                                                                      locale: locale,
+                                                                      builderVersion: builderVersion,
+                                                                      completion)
                 }
 
             case let .success(viewConfiguration):

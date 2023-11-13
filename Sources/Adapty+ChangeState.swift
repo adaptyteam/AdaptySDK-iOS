@@ -15,6 +15,8 @@ public final class Adapty {
     let fallbackBackend: FallbackBackend
 
     let httpSession: HTTPSession
+    let httpFallbackSession: HTTPSession
+
     let skProductsManager: SKProductsManager
     let skReceiptManager: SKReceiptManager
     let skQueueManager: SKQueueManager
@@ -34,7 +36,7 @@ public final class Adapty {
         self.profileStorage = profileStorage
         vendorIdsCache = ProductVendorIdsCache(storage: vendorIdsStorage)
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)
-
+        httpFallbackSession = fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
         skProductsManager = SKProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, backend: backend)
         skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)

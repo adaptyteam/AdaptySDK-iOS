@@ -24,64 +24,98 @@ extension Adapty {
                                   locale: String? = nil,
                                   fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        getPaywall( id, locale: locale.map { AdaptyLocale(id: $0) }, fetchPolicy: fetchPolicy, completion)
+        getPaywall(id, locale: locale.map { AdaptyLocale(id: $0) }, fetchPolicy: fetchPolicy, completion)
     }
 
     static func getPaywall(_ id: String,
-                                  locale: AdaptyLocale? = nil,
-                                  fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-                                  _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+                           locale: AdaptyLocale? = nil,
+                           fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+                           _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         let logParams: EventParameters = [
             "paywall_id": .value(id),
             "locale": .valueOrNil(locale),
         ]
         async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
-            let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
-            manager.getProfileManager(waitCreatingProfile: fallback == nil) { result in
+
+            manager.getProfileManager(waitCreatingProfile: false) { [weak manager] result in
                 switch result {
                 case let .success(profileManager):
                     profileManager.getPaywall(id, locale, fetchPolicy: fetchPolicy, completion)
                 case let .failure(error):
-                    guard error.isProfileCreateFailed, let paywall = fallback else {
+                    guard error.isProfileCreateFailed, let manager = manager else {
                         completion(.failure(error))
                         return
                     }
-                    completion(.success(paywall))
+                    manager.getFallbackPaywall(id, locale: locale, completion)
                 }
             }
         }
     }
 
-    private func getFallbackPaywall(_ id: String, _ locale: AdaptyLocale?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let httpSession = fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
-        httpSession.performFetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix, paywallId: id, locale: locale, responseHash: nil) {
-                [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
-
-                guard let self = self else { return }
-
-                switch result {
-                case let .failure(error):
-                    guard let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) ?? old?.value
-                    else {
-                        completion(.failure(error))
-                        return
-                    }
-                    completion(.success(value))
-                case let .success(paywall):
-
-                    if let value = paywall.value ?? old?.value {
-                        completion(.success(self.paywallsCache.savedPaywall(paywall.withValue(value))))
-                        return
-                    }
-
-
-                    if let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) {
-                        completion(.success(value))
-                        return
-                    }
-
-                    completion(.failure(.cacheHasNoPaywall()))
+    fileprivate func getFallbackPaywall(_ id: String,
+                                        locale: AdaptyLocale? = nil,
+                                        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+        httpFallbackSession.performFetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
+                                                               paywallId: id,
+                                                               locale: locale) { result in
+            completion(result.flatMapError { error in
+                if let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id] {
+                    return .success(fallback)
+                } else {
+                    return .failure(error)
                 }
+            })
+        }
+    }
+}
+
+fileprivate extension AdaptyProfileManager {
+    func getPaywall(_ id: String, _ locale: AdaptyLocale?, fetchPolicy: AdaptyPaywall.FetchPolicy, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+        if let cached = paywallsCache.getPaywallByLocale(locale, withId: id), fetchPolicy.canReturn(cached) {
+            completion(.success(cached.value))
+        } else {
+            _getPaywall(id, locale, completion)
+        }
+    }
+
+    private func _getPaywall(_ id: String, _ locale: AdaptyLocale?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+        let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
+
+        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
+        manager.httpSession.performFetchPaywallRequest(apiKeyPrefix: manager.apiKeyPrefix,
+                                                       paywallId: id,
+                                                       locale: locale,
+                                                       segmentId: profile.value.segmentId,
+                                                       responseHash: old?.hash) {
+            [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
+
+            guard let self = self, self.isActive else {
+                completion(.failure(.profileWasChanged()))
+                return
             }
+
+            switch result {
+            case let .failure(error):
+                guard let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) ?? old?.value
+                else {
+                    completion(.failure(error))
+                    return
+                }
+                completion(.success(value))
+            case let .success(paywall):
+
+                if let value = paywall.value ?? old?.value {
+                    completion(.success(self.paywallsCache.savedPaywall(paywall.withValue(value))))
+                    return
+                }
+
+                if let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) {
+                    completion(.success(value))
+                    return
+                }
+
+                completion(.failure(.cacheHasNoPaywall()))
+            }
+        }
     }
 }
