@@ -179,13 +179,8 @@ extension AdaptyProfileManager {
                 completion(.success(value))
             case let .success(paywall):
 
-                if let value = paywall.value {
+                if let value = paywall.value ?? old?.value {
                     completion(.success(self.paywallsCache.savedPaywall(paywall.withValue(value))))
-                    return
-                }
-
-                if let value = old?.value {
-                    completion(.success(value))
                     return
                 }
 
