@@ -28,30 +28,36 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(paywallVariationId: String, locale: AdaptyLocale, builderVersion: String, responseHash: String?) {
+    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, adaptyUISDKVersion: String, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/paywall-builder/v2/\(paywallVariationId)/"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
         )
 
         headers = Headers()
-            .setBackendResponseHash(responseHash)
-            .setAdaptyUISDKVersion(builderVersion)
             .setViewConfigurationLocale(locale)
+            .setAdaptyUISDKVersion(adaptyUISDKVersion)
+            .setBackendResponseHash(responseHash)
     }
 }
 
 extension HTTPSession {
-    func performFetchViewConfigurationRequest(paywallId: String,
+    func performFetchViewConfigurationRequest(apiKeyPrefix: String,
                                               paywallVariationId: String,
                                               locale: AdaptyLocale,
                                               builderVersion: String,
+                                              adaptyUISDKVersion: String,
                                               responseHash: String?,
                                               _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
-        let request = FetchViewConfigurationRequest(paywallVariationId: paywallVariationId,
+        let md5Hash = "{\"builder_version\":\"\(builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5()
+
+        let request = FetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
+                                                    paywallVariationId: paywallVariationId,
                                                     locale: locale,
-                                                    builderVersion: builderVersion,
+                                                    md5Hash: md5Hash,
+                                                    adaptyUISDKVersion: adaptyUISDKVersion,
                                                     responseHash: responseHash)
+
         perform(request,
                 logName: "get_paywall_builder",
                 logParams: ["variation_id": .value(paywallVariationId)]) { (result: FetchViewConfigurationRequest.Result) in
@@ -61,7 +67,7 @@ extension HTTPSession {
             case let .success(response):
                 let paywall = response.body.value
                 let hash = response.headers.getBackendResponseHash()
-                completion(.success(VH(paywall, hash: hash)))
+                completion(.success(VH(paywall, hash: hash, time: Date())))
             }
         }
     }

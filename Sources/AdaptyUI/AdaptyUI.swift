@@ -16,16 +16,16 @@ public enum AdaptyUI {
     public static func getViewConfiguration(data: Data,
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         struct PrivateParameters: Decodable {
-            let paywallId: String
             let paywallVariationId: String
             let locale: AdaptyLocale
             let builderVersion: String
+            let adaptyUISDKVersion: String
 
             enum CodingKeys: String, CodingKey {
-                case paywallId = "paywall_id"
                 case paywallVariationId = "paywall_variation_id"
                 case locale
                 case builderVersion = "builder_version"
+                case adaptyUISDKVersion = "ui_sdk_version"
             }
         }
 
@@ -38,52 +38,61 @@ public enum AdaptyUI {
         }
 
         Adapty.async(completion) { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(.failure(profileManager.error!))
-                    return
-                }
-                profileManager.getViewConfiguration(
-                    paywallId: parameters.paywallId,
-                    paywallVariationId: parameters.paywallVariationId,
-                    locale: parameters.locale,
-                    builderVersion: parameters.builderVersion,
-                    responseHash: nil,
-                    completion)
-            }
+            manager.getViewConfiguration(paywallVariationId: parameters.paywallVariationId,
+                                         locale: parameters.locale,
+                                         builderVersion: parameters.builderVersion,
+                                         adaptyUISDKVersion: parameters.adaptyUISDKVersion,
+                                         responseHash: nil,
+                                         completion)
         }
     }
 }
 
-extension AdaptyProfileManager {
-    fileprivate func getViewConfiguration(paywallId: String,
-                                          paywallVariationId: String,
+extension Adapty {
+    fileprivate func getViewConfiguration(paywallVariationId: String,
                                           locale: AdaptyLocale,
                                           builderVersion: String,
+                                          adaptyUISDKVersion: String,
                                           responseHash: String?,
                                           _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
-        manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywallId,
-                                                                 paywallVariationId: paywallVariationId,
-                                                                 locale: locale,
-                                                                 builderVersion: builderVersion,
-                                                                 responseHash: responseHash) {
-            [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
+        httpSession.performFetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
+                                                         paywallVariationId: paywallVariationId,
+                                                         locale: locale,
+                                                         builderVersion: builderVersion,
+                                                         adaptyUISDKVersion: adaptyUISDKVersion,
+                                                         responseHash: responseHash) { [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
 
             switch result {
             case let .failure(error):
-                completion(.failure(error))
+
+                guard let queue = self?.httpSession.responseQueue,
+                      let httpError = error.wrapped as? HTTPError,
+                      Backend.canUseFallbackServer(error: httpError) else {
+                    completion(.failure(error))
+                    break
+                }
+
+                queue.async {
+                    guard let manager = self else {
+                        completion(.failure(error))
+                        return
+                    }
+
+                    let session = manager.fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
+
+                    session.performFetchFallbackViewConfigurationRequest(apiKeyPrefix: manager.apiKeyPrefix,
+                                                                         paywallVariationId: paywallVariationId,
+                                                                         locale: locale,
+                                                                         builderVersion: builderVersion,
+                                                                         completion)
+                }
+
             case let .success(viewConfiguration):
-                guard let self = self, self.isActive else {
-                    completion(.failure(.profileWasChanged()))
+                guard let value = viewConfiguration.value else {
+                    completion(.failure(.cacheHasNoViewConfiguration()))
                     return
                 }
-
-                if let value = viewConfiguration.value {
-                    completion(.success(value))
-                    return
-                }
-
-                completion(.failure(.cacheHasNoViewConfiguration()))
+                completion(.success(value))
             }
         }
     }
