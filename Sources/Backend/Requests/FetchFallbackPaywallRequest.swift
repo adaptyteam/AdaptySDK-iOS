@@ -25,7 +25,7 @@ extension HTTPSession {
         apiKeyPrefix: String,
         paywallId: String,
         locale: AdaptyLocale?,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         let request = FetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
                                                   paywallId: paywallId,
@@ -56,7 +56,9 @@ extension HTTPSession {
                 }
 
             case let .success(response):
-                completion(.success(response.body.value))
+                let paywall = response.body.value
+                let hash = response.headers.getBackendResponseHash()
+                completion(.success(VH(paywall, hash: hash, time: Date())))
             }
         }
     }
