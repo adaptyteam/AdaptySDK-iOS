@@ -44,7 +44,9 @@ extension HTTPSession {
             switch result {
             case let .failure(error):
 
-                guard let queue = self?.responseQueue, error.statusCode == 404, locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
+                guard let queue = self?.responseQueue,
+                      error.statusCode == 404,
+                      !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
                     completion(.failure(error.asAdaptyError))
                     break
                 }
