@@ -92,6 +92,7 @@ fileprivate extension AdaptyProfileManager {
 
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         manager.httpSession.performFetchPaywallRequest(apiKeyPrefix: manager.apiKeyPrefix,
+                                                       profileId: profileId,
                                                        paywallId: id,
                                                        locale: locale,
                                                        segmentId: profile.value.segmentId,

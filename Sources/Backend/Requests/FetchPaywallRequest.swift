@@ -27,7 +27,7 @@ struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(apiKeyPrefix: String, paywallId: String, locale: AdaptyLocale, md5Hash: String, responseHash: String?) {
+    init(apiKeyPrefix: String, profileId: String, paywallId: String, locale: AdaptyLocale, md5Hash: String, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(paywallId)/\(md5Hash)/"
@@ -36,11 +36,13 @@ struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
         headers = Headers()
             .setPaywallLocale(locale)
             .setBackendResponseHash(responseHash)
+            .setBackendProfileId(profileId)
     }
 }
 
 extension HTTPSession {
     func performFetchPaywallRequest(apiKeyPrefix: String,
+                                    profileId: String,
                                     paywallId: String,
                                     locale: AdaptyLocale,
                                     segmentId: String,
@@ -49,6 +51,7 @@ extension HTTPSession {
         let md5Hash = "{\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5()
 
         let request = FetchPaywallRequest(apiKeyPrefix: apiKeyPrefix,
+                                          profileId: profileId,
                                           paywallId: paywallId,
                                           locale: locale,
                                           md5Hash: md5Hash,
