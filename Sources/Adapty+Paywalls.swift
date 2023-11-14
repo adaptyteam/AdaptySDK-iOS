@@ -23,6 +23,7 @@ extension Adapty {
     public static func getPaywall(_ id: String,
                                   locale: String? = nil,
                                   fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+                                  loadTimeInterval: TimeInterval = 5.000,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         getPaywall(id, locale: locale.map { AdaptyLocale(id: $0) }, withFetchPolicy: fetchPolicy, completion)
     }

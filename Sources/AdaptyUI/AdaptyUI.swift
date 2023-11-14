@@ -20,12 +20,14 @@ public enum AdaptyUI {
             let locale: AdaptyLocale
             let builderVersion: String
             let adaptyUISDKVersion: String
+            let loadTimeInterval: TimeInterval
 
             enum CodingKeys: String, CodingKey {
                 case paywallVariationId = "paywall_variation_id"
                 case locale
                 case builderVersion = "builder_version"
                 case adaptyUISDKVersion = "ui_sdk_version"
+                case loadTimeInterval = "load_timeinterval"
             }
         }
 
@@ -42,6 +44,7 @@ public enum AdaptyUI {
                                          locale: parameters.locale,
                                          builderVersion: parameters.builderVersion,
                                          adaptyUISDKVersion: parameters.adaptyUISDKVersion,
+                                         loadTimeInterval: parameters.loadTimeInterval,
                                          responseHash: nil,
                                          completion)
         }
@@ -53,6 +56,7 @@ extension Adapty {
                                           locale: AdaptyLocale,
                                           builderVersion: String,
                                           adaptyUISDKVersion: String,
+                                          loadTimeInterval: TimeInterval = 5.000,
                                           responseHash: String?,
                                           _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         httpSession.performFetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
