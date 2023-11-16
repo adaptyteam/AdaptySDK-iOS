@@ -20,14 +20,14 @@ public enum AdaptyUI {
             let locale: AdaptyLocale
             let builderVersion: String
             let adaptyUISDKVersion: String
-            let loadTimeInterval: TimeInterval
+            let loadTimeout: TimeInterval?
 
             enum CodingKeys: String, CodingKey {
                 case paywallVariationId = "paywall_variation_id"
                 case locale
                 case builderVersion = "builder_version"
                 case adaptyUISDKVersion = "ui_sdk_version"
-                case loadTimeInterval = "load_timeinterval"
+                case loadTimeout = "load_timeout"
             }
         }
 
@@ -44,60 +44,82 @@ public enum AdaptyUI {
                                          locale: parameters.locale,
                                          builderVersion: parameters.builderVersion,
                                          adaptyUISDKVersion: parameters.adaptyUISDKVersion,
-                                         loadTimeInterval: parameters.loadTimeInterval,
                                          responseHash: nil,
+                                         loadTimeout: (parameters.loadTimeout?.allowedLoadPaywallTimeout ?? .defaultLoadPaywallTimeout).dispatchTimeInterval,
                                          completion)
         }
     }
 }
 
 extension Adapty {
+    fileprivate func getFallbackViewConfiguration(paywallVariationId: String,
+                                                  locale: AdaptyLocale,
+                                                  builderVersion: String,
+                                                  _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+        httpFallbackSession.performFetchFallbackViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
+                                                                         paywallVariationId: paywallVariationId,
+                                                                         locale: locale,
+                                                                         builderVersion: builderVersion,
+                                                                         completion)
+    }
+
     fileprivate func getViewConfiguration(paywallVariationId: String,
                                           locale: AdaptyLocale,
                                           builderVersion: String,
                                           adaptyUISDKVersion: String,
-                                          loadTimeInterval: TimeInterval = 5.000,
                                           responseHash: String?,
+                                          loadTimeout: DispatchTimeInterval,
                                           _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+        var isTerminationCalled = false
+
+        let termination: AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>> = { [weak self] result in
+            guard !isTerminationCalled else { return }
+            isTerminationCalled = true
+
+            if case let .success(viewConfiguration) = result, let value = viewConfiguration.value {
+                completion(.success(value))
+                return
+            }
+
+            let error = result.error ?? .cacheHasNoViewConfiguration()
+
+            guard let queue = self?.httpSession.responseQueue,
+                  {
+                      guard let error = result.error else { return true }
+
+                      if let httpError = error.wrapped as? HTTPError,
+                         Backend.canUseFallbackServer(httpError) { return true }
+
+                      return false
+                  }()
+            else {
+                completion(.failure(error))
+                return
+            }
+
+            queue.async {
+                guard let manager = self else {
+                    completion(.failure(error))
+                    return
+                }
+
+                manager.getFallbackViewConfiguration(paywallVariationId: paywallVariationId,
+                                                     locale: locale,
+                                                     builderVersion: builderVersion,
+                                                     completion)
+            }
+        }
+
         httpSession.performFetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
                                                          paywallVariationId: paywallVariationId,
                                                          locale: locale,
                                                          builderVersion: builderVersion,
                                                          adaptyUISDKVersion: adaptyUISDKVersion,
-                                                         responseHash: responseHash) { [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
+                                                         responseHash: responseHash,
+                                                         termination)
 
-            switch result {
-            case let .failure(error):
-
-                guard let queue = self?.httpSession.responseQueue,
-                      let httpError = error.wrapped as? HTTPError,
-                      Backend.canUseFallbackServer(error: httpError) else {
-                    completion(.failure(error))
-                    break
-                }
-
-                queue.async {
-                    guard let manager = self else {
-                        completion(.failure(error))
-                        return
-                    }
-
-                    manager
-                        .httpFallbackSession
-                        .performFetchFallbackViewConfigurationRequest(apiKeyPrefix: manager.apiKeyPrefix,
-                                                                      paywallVariationId: paywallVariationId,
-                                                                      locale: locale,
-                                                                      builderVersion: builderVersion,
-                                                                      completion)
-                }
-
-            case let .success(viewConfiguration):
-                guard let value = viewConfiguration.value else {
-                    completion(.failure(.cacheHasNoViewConfiguration()))
-                    return
-                }
-                completion(.success(value))
-            }
+        Adapty.underlayQueue.asyncAfter(deadline: .now() + loadTimeout - .milliseconds(500)) {
+            termination(.success(VH(nil, hash: nil)))
         }
     }
 }

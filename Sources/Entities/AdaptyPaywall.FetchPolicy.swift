@@ -30,7 +30,7 @@ extension AdaptyPaywall.FetchPolicy {
     }
 }
 
-extension AdaptyPaywall.FetchPolicy: Decodable {
+extension AdaptyPaywall.FetchPolicy: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case maxAge = "max_age"
@@ -51,6 +51,20 @@ extension AdaptyPaywall.FetchPolicy: Decodable {
             self = .returnCacheDataIfNotExpiredElseLoad(maxAge: try container.decode(Double.self, forKey: .maxAge))
         default:
             self = .default
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case .reloadRevalidatingCacheData:
+            try container.encode(CodingKeys.reloadRevalidatingCacheData.rawValue, forKey: .type)
+        case .returnCacheDataElseLoad:
+            try container.encode(CodingKeys.returnCacheDataElseLoad.rawValue, forKey: .type)
+        case let .returnCacheDataIfNotExpiredElseLoad(maxAge):
+            try container.encode(CodingKeys.returnCacheDataIfNotExpiredElseLoad.rawValue, forKey: .type)
+            try container.encode(maxAge, forKey: .maxAge)
         }
     }
 }

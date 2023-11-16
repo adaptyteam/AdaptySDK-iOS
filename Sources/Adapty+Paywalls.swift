@@ -23,20 +23,38 @@ extension Adapty {
     public static func getPaywall(_ id: String,
                                   locale: String? = nil,
                                   fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-                                  loadTimeInterval: TimeInterval = 5.000,
+                                  loadTimeout: TimeInterval = .defaultLoadPaywallTimeout,
                                   _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        getPaywall(id, locale: locale.map { AdaptyLocale(id: $0) }, withFetchPolicy: fetchPolicy, completion)
+        getPaywall(id, locale: locale.map { AdaptyLocale(id: $0) }, withFetchPolicy: fetchPolicy, loadTimeout: loadTimeout, completion)
     }
 
     static func getPaywall(_ id: String,
                            locale: AdaptyLocale? = nil,
-                           withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+                           withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy,
+                           loadTimeout: TimeInterval,
                            _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         let logParams: EventParameters = [
             "paywall_id": .value(id),
             "locale": .valueOrNil(locale),
+            "fetch_policy": .value(fetchPolicy),
+            "load_timeout": .value(loadTimeout),
         ]
+
+        let loadTimeout = loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval
+
         async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
+
+            var isCompletionCalled = false
+
+            let completion: AdaptyResultCompletion<AdaptyPaywall> = {
+                guard !isCompletionCalled else { return }
+                isCompletionCalled = true
+                completion($0)
+            }
+
+            Adapty.underlayQueue.asyncAfter(deadline: .now() + loadTimeout - .milliseconds(500)) {
+                manager.getFallbackPaywall(id, locale, completion)
+            }
 
             manager.getProfileManager(waitCreatingProfile: false) { [weak manager] result in
                 switch result {
@@ -54,7 +72,7 @@ extension Adapty {
     }
 
     fileprivate func getFallbackPaywall(_ id: String,
-                                        _ locale: AdaptyLocale? = nil,
+                                        _ locale: AdaptyLocale?,
                                         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         httpFallbackSession.performFetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
                                                                paywallId: id,
@@ -112,7 +130,7 @@ fileprivate extension AdaptyProfileManager {
                 }
 
                 if let httpError = error.wrapped as? HTTPError,
-                   Backend.canUseFallbackServer(error: httpError) {
+                   Backend.canUseFallbackServer(httpError) {
                     self.getFallbackPaywall(id, locale, cachedPaywall: old?.value, completion)
                     return
                 }
@@ -179,5 +197,22 @@ fileprivate extension AdaptyProfileManager {
                     completion(.success(self.paywallsCache.savedPaywall(paywall)))
                 }
             }
+    }
+}
+
+extension TimeInterval {
+    public static let defaultLoadPaywallTimeout: TimeInterval = 5.0
+    static let minimumLoadPaywallTimeout: TimeInterval = 1.0
+
+    var allowedLoadPaywallTimeout: TimeInterval {
+        let minimum: TimeInterval = .minimumLoadPaywallTimeout
+        guard self < minimum else { return self }
+        Log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
+        return minimum
+    }
+
+    var dispatchTimeInterval: DispatchTimeInterval {
+        let microseconds = Int64(self * TimeInterval(1000.0))
+        return microseconds < Int.max ? .microseconds(Int(microseconds)) : .seconds(Int(self))
     }
 }

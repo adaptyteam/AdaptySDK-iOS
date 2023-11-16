@@ -137,10 +137,10 @@ import StoreKit
             _ id: String,
             locale: String? = nil,
             fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-            loadTimeInterval: TimeInterval = 5.000
+            loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
         ) async throws -> AdaptyPaywall {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPaywall(id, locale: locale, fetchPolicy: fetchPolicy, loadTimeInterval: loadTimeInterval) { result in
+                Adapty.getPaywall(id, locale: locale, fetchPolicy: fetchPolicy, loadTimeout: loadTimeout) { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)

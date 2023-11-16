@@ -19,7 +19,7 @@ extension ErrorResponse: CustomStringConvertible {
 }
 
 extension Backend {
-    static func canUseFallbackServer(error: HTTPError) -> Bool {
+    static func canUseFallbackServer(_ error: HTTPError) -> Bool {
         switch error {
         case .perform:
             return false
@@ -37,7 +37,7 @@ extension Backend {
     }
 
     // TODO: Retry Codes
-    static func canRetryRequest(error: HTTPError) -> Bool {
+    static func canRetryRequest(_ error: HTTPError) -> Bool {
         switch error {
         case .perform:
             return false
