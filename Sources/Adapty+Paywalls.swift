@@ -40,43 +40,40 @@ extension Adapty {
             "load_timeout": .value(loadTimeout),
         ]
 
-//        let loadTimeout = loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval
+        Adapty.async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
 
-        async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
+            var isTerminationCalled = false
 
-//            var isTerminationCalled = false
-//
-//            let termination: (AdaptyResult<Success>) -> Void = { [weak manager] result in
-//                guard !isTerminationCalled else { return }
-//                isTerminationCalled = true
-//
-//                guard case let .failure(error) = result, let manager = manager else {
-//                    completion(result)
-//                    return
-//                }
-//
-//                if error.isProfileCreateFailed {
-//                    manager.getFallbackPaywall(id, locale, completion)
-//                    return
-//                }
-//            }
+            let termination: (AdaptyResult<AdaptyPaywall>) -> Void = { [weak manager] result in
+                guard !isTerminationCalled else { return }
+                isTerminationCalled = true
 
-            manager.getProfileManager(waitCreatingProfile: false) { [weak manager] result in
+                guard case let .failure(error) = result, let manager = manager else {
+                    completion(result)
+                    return
+                }
+
+                if error.isProfileCreateFailed {
+                    manager.getFallbackPaywall(id, locale, completion)
+                    return
+                }
+            }
+
+            manager.getProfileManager(waitCreatingProfile: false) { result in
                 switch result {
                 case let .success(profileManager):
                     profileManager.getPaywall(id, locale, withFetchPolicy: fetchPolicy, completion)
                 case let .failure(error):
-                    guard error.isProfileCreateFailed, let manager = manager else {
-                        completion(.failure(error))
-                        return
-                    }
-                    manager.getFallbackPaywall(id, locale, completion)
+                    termination(.failure(error))
                 }
             }
 
-//            Adapty.underlayQueue.asyncAfter(deadline: .now() + loadTimeout - .milliseconds(500)) {
-//                termination(.failure(.fetchPaywallTimeout()))
-//            }
+            let loadTimeout = loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval
+            if loadTimeout != .never {
+                Adapty.underlayQueue.asyncAfter(deadline: .now() - .milliseconds(500) + loadTimeout) {
+                    termination(.failure(.fetchPaywallTimeout()))
+                }
+            }
         }
     }
 
@@ -181,21 +178,18 @@ fileprivate extension AdaptyProfileManager {
 
 extension TimeInterval {
     public static let defaultLoadPaywallTimeout: TimeInterval = 5.0
-    static let maximumLoadPaywallTimeout: TimeInterval = 86400.0
     static let minimumLoadPaywallTimeout: TimeInterval = 1.0
 
     var allowedLoadPaywallTimeout: TimeInterval {
         let minimum: TimeInterval = .minimumLoadPaywallTimeout
 
-        guard self >= minimum else {
-            Log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
-            return minimum
-        }
-
-        return min(self, TimeInterval.maximumLoadPaywallTimeout)
+        guard self < minimum else { return self }
+        Log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
+        return minimum
     }
 
     var dispatchTimeInterval: DispatchTimeInterval {
+        guard isNormal else { return .never }
         let milliseconds = Int64(self * TimeInterval(1000.0))
         return milliseconds < Int.max ? .milliseconds(Int(milliseconds)) : .seconds(Int(self))
     }

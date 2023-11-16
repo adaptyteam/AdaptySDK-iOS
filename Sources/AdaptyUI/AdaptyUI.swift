@@ -100,8 +100,10 @@ extension Adapty {
                                                          adaptyUISDKVersion: adaptyUISDKVersion,
                                                          termination)
 
-        Adapty.underlayQueue.asyncAfter(deadline: .now() + loadTimeout - .milliseconds(500)) {
-            termination(.failure(.fetchViewConfigurationTimeout()))
+        if loadTimeout != .never {
+            Adapty.underlayQueue.asyncAfter(deadline: .now() - .milliseconds(500) + loadTimeout) {
+                termination(.failure(.fetchViewConfigurationTimeout()))
+            }
         }
     }
 }
