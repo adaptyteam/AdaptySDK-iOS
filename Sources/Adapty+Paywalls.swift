@@ -40,21 +40,26 @@ extension Adapty {
             "load_timeout": .value(loadTimeout),
         ]
 
-        let loadTimeout = loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval
+//        let loadTimeout = loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval
 
         async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
 
-            var isCompletionCalled = false
-
-            let completion: AdaptyResultCompletion<AdaptyPaywall> = {
-                guard !isCompletionCalled else { return }
-                isCompletionCalled = true
-                completion($0)
-            }
-
-            Adapty.underlayQueue.asyncAfter(deadline: .now() + loadTimeout - .milliseconds(500)) {
-                manager.getFallbackPaywall(id, locale, completion)
-            }
+//            var isTerminationCalled = false
+//
+//            let termination: (AdaptyResult<Success>) -> Void = { [weak manager] result in
+//                guard !isTerminationCalled else { return }
+//                isTerminationCalled = true
+//
+//                guard case let .failure(error) = result, let manager = manager else {
+//                    completion(result)
+//                    return
+//                }
+//
+//                if error.isProfileCreateFailed {
+//                    manager.getFallbackPaywall(id, locale, completion)
+//                    return
+//                }
+//            }
 
             manager.getProfileManager(waitCreatingProfile: false) { [weak manager] result in
                 switch result {
@@ -68,6 +73,10 @@ extension Adapty {
                     manager.getFallbackPaywall(id, locale, completion)
                 }
             }
+
+//            Adapty.underlayQueue.asyncAfter(deadline: .now() + loadTimeout - .milliseconds(500)) {
+//                termination(.failure(.fetchPaywallTimeout()))
+//            }
         }
     }
 
@@ -78,17 +87,16 @@ extension Adapty {
                                                                paywallId: id,
                                                                locale: locale) { result in
             completion(
-                result
-                    .map { paywall in
-                        paywall.value
+                result.map { paywall in
+                    paywall.value
+                }
+                .flatMapError { error in
+                    if let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id] {
+                        return .success(fallback)
+                    } else {
+                        return .failure(error)
                     }
-                    .flatMapError { error in
-                        if let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id] {
-                            return .success(fallback)
-                        } else {
-                            return .failure(error)
-                        }
-                    }
+                }
             )
         }
     }
@@ -106,71 +114,42 @@ fileprivate extension AdaptyProfileManager {
     private func getPaywall(_ id: String,
                             _ locale: AdaptyLocale?,
                             _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
-
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         manager.httpSession.performFetchPaywallRequest(apiKeyPrefix: manager.apiKeyPrefix,
                                                        profileId: profileId,
                                                        paywallId: id,
                                                        locale: locale,
-                                                       segmentId: profile.value.segmentId,
-                                                       responseHash: old?.hash) {
-            [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
+                                                       segmentId: profile.value.segmentId) {
+            [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
+
+            guard let self = self, self.isActive else {
+                completion(result.map { $0.value })
+                return
+            }
 
             switch result {
             case let .failure(error):
 
-                guard let self = self, self.isActive else {
-                    if let value = old?.value {
-                        completion(.success(value))
-                    } else {
-                        completion(.failure(error))
-                    }
+                guard !error.canUseFallbackServer else {
+                    self.getFallbackPaywall(id, locale, completion)
                     return
                 }
 
-                if let httpError = error.wrapped as? HTTPError,
-                   Backend.canUseFallbackServer(httpError) {
-                    self.getFallbackPaywall(id, locale, cachedPaywall: old?.value, completion)
-                    return
-                }
-
-                guard let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) ?? old?.value
-                else {
+                guard let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) else {
                     completion(.failure(error))
                     return
                 }
+
                 completion(.success(value))
 
             case let .success(paywall):
-
-                guard let self = self, self.isActive else {
-                    if let value = paywall.value ?? old?.value {
-                        completion(.success(value))
-                    } else {
-                        completion(.failure(.cacheHasNoPaywall()))
-                    }
-                    return
-                }
-
-                if let value = paywall.value ?? old?.value {
-                    completion(.success(self.paywallsCache.savedPaywall(paywall.withValue(value))))
-                    return
-                }
-
-                if let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) {
-                    completion(.success(value))
-                    return
-                }
-
-                completion(.failure(.cacheHasNoPaywall()))
+                completion(.success(self.paywallsCache.savedPaywall(paywall)))
             }
         }
     }
 
     private func getFallbackPaywall(_ id: String,
                                     _ locale: AdaptyLocale? = nil,
-                                    cachedPaywall: AdaptyPaywall?,
                                     _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
         manager.httpFallbackSession.performFetchFallbackPaywallRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
@@ -182,13 +161,13 @@ fileprivate extension AdaptyProfileManager {
 
                     let _self = (self?.isActive ?? false) ? self : nil
 
-                    guard let value = _self?.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) ?? cachedPaywall
-                    else {
+                    guard let value = _self?.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) else {
                         completion(.failure(error))
                         return
                     }
 
                     completion(.success(value))
+
                 case let .success(paywall):
                     guard let self = self, self.isActive else {
                         completion(.success(paywall.value))
@@ -202,17 +181,22 @@ fileprivate extension AdaptyProfileManager {
 
 extension TimeInterval {
     public static let defaultLoadPaywallTimeout: TimeInterval = 5.0
+    static let maximumLoadPaywallTimeout: TimeInterval = 86400.0
     static let minimumLoadPaywallTimeout: TimeInterval = 1.0
 
     var allowedLoadPaywallTimeout: TimeInterval {
         let minimum: TimeInterval = .minimumLoadPaywallTimeout
-        guard self < minimum else { return self }
-        Log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
-        return minimum
+
+        guard self >= minimum else {
+            Log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
+            return minimum
+        }
+
+        return min(self, TimeInterval.maximumLoadPaywallTimeout)
     }
 
     var dispatchTimeInterval: DispatchTimeInterval {
-        let microseconds = Int64(self * TimeInterval(1000.0))
-        return microseconds < Int.max ? .microseconds(Int(microseconds)) : .seconds(Int(self))
+        let milliseconds = Int64(self * TimeInterval(1000.0))
+        return milliseconds < Int.max ? .milliseconds(Int(milliseconds)) : .seconds(Int(self))
     }
 }

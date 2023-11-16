@@ -113,15 +113,13 @@ final class SKProductsManager {
         queue.async { [weak self] in
             guard let self = self, !self.sending else { return }
             self.sending = true
-            let request = FetchAllProductVendorIdsRequest(apiKeyPrefix: apiKeyPrefix, responseHash: self.cache.allProductVendorIds?.hash)
+            let request = FetchAllProductVendorIdsRequest(apiKeyPrefix: apiKeyPrefix)
             self.session.perform(request, logName: "get_products_ids") { [weak self] (result: FetchAllProductVendorIdsRequest.Result) in
                 defer { self?.sending = false }
                 guard let self = self else { return }
                 switch result {
                 case let .success(response):
-                    if let value = response.body.value {
-                        self.cache.setProductVendorIds(VH(value, hash: response.headers.getBackendResponseHash()))
-                    }
+                    self.cache.setProductVendorIds(VH(response.body.value, time: Date()))
                     self.fetchSK1Products(productIdentifiers: self.cache.allProductVendorIdsWithFallback) { _ in }
                     if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
                         self.fetchSK2Products(productIdentifiers: self.cache.allProductVendorIdsWithFallback) { _ in }

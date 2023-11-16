@@ -17,7 +17,7 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
         case .profileCreateFailed: return "Unable to create user profile"
         case let .decodingFailed(_, description, _): return description
         case let .wrongParam(_, description): return description
-        case let .persistingDataError(_, description): return description
+        case let .fetchTimeoutError(_, description): return description
         }
     }
 }

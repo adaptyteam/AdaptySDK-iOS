@@ -59,8 +59,7 @@ extension HTTPSession {
 
             case let .success(response):
                 let paywall = response.body.value
-                let hash = response.headers.getBackendResponseHash()
-                completion(.success(VH(paywall, hash: hash, time: Date())))
+                completion(.success(VH(paywall, time: Date())))
             }
         }
     }
