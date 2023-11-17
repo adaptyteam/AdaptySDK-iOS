@@ -12,7 +12,6 @@ extension AdaptyPaywall {
         public static let `default`: Self = .reloadRevalidatingCacheData
         case reloadRevalidatingCacheData
         case returnCacheDataElseLoad
-        case returnCacheDataIfNotExpiredElseLoad(maxAge: TimeInterval)
     }
 }
 
@@ -21,50 +20,37 @@ extension AdaptyPaywall.FetchPolicy {
         switch self {
         case .reloadRevalidatingCacheData: return false
         case .returnCacheDataElseLoad: return true
-        case let .returnCacheDataIfNotExpiredElseLoad(maxAge: maxAge):
-            guard let time = data.time,
-                  time.addingTimeInterval(maxAge) > Date()
-            else { return false }
-            return true
         }
     }
 }
 
 extension AdaptyPaywall.FetchPolicy: Codable {
-    enum CodingKeys: String, CodingKey {
-        case type
-        case maxAge = "max_age"
+    enum CodingValues: String {
         case reloadRevalidatingCacheData = "reload_revalidating_cache_data"
         case returnCacheDataElseLoad = "return_cache_data_else_load"
-        case returnCacheDataIfNotExpiredElseLoad = "return_cache_data_if_not_expired_else_load"
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.singleValueContainer()
 
-        switch try container.decode(String.self, forKey: .type) {
-        case CodingKeys.reloadRevalidatingCacheData.rawValue:
+        switch try container.decode(String.self) {
+        case CodingValues.reloadRevalidatingCacheData.rawValue:
             self = .reloadRevalidatingCacheData
-        case CodingKeys.returnCacheDataElseLoad.rawValue:
+        case CodingValues.returnCacheDataElseLoad.rawValue:
             self = .returnCacheDataElseLoad
-        case CodingKeys.returnCacheDataIfNotExpiredElseLoad.rawValue:
-            self = .returnCacheDataIfNotExpiredElseLoad(maxAge: try container.decode(Double.self, forKey: .maxAge))
         default:
             self = .default
         }
     }
 
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
+        var container = encoder.singleValueContainer()
 
         switch self {
         case .reloadRevalidatingCacheData:
-            try container.encode(CodingKeys.reloadRevalidatingCacheData.rawValue, forKey: .type)
+            try container.encode(CodingValues.reloadRevalidatingCacheData.rawValue)
         case .returnCacheDataElseLoad:
-            try container.encode(CodingKeys.returnCacheDataElseLoad.rawValue, forKey: .type)
-        case let .returnCacheDataIfNotExpiredElseLoad(maxAge):
-            try container.encode(CodingKeys.returnCacheDataIfNotExpiredElseLoad.rawValue, forKey: .type)
-            try container.encode(maxAge, forKey: .maxAge)
+            try container.encode(CodingValues.returnCacheDataElseLoad.rawValue)
         }
     }
 }
