@@ -43,8 +43,9 @@ extension Adapty {
         Adapty.async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
 
             var isTerminationCalled = false
+            var loadedProfileManager: AdaptyProfileManager?
 
-            let termination: (AdaptyProfileManager?, AdaptyResult<AdaptyPaywall>) -> Void = { [weak manager] profileManager, result in
+            let termination: (AdaptyResult<AdaptyPaywall>) -> Void = { [weak manager, loadedProfileManager] result in
                 guard !isTerminationCalled else { return }
                 isTerminationCalled = true
 
@@ -53,7 +54,7 @@ extension Adapty {
                     return
                 }
 
-                guard let profileManager = profileManager else {
+                guard let profileManager = loadedProfileManager, profileManager.isActive else {
                     if error.canUseFallbackServer || error.isProfileCreateFailed {
                         manager.getFallbackPaywall(id, locale, completion)
                     } else {
@@ -77,11 +78,13 @@ extension Adapty {
             manager.getProfileManager(waitCreatingProfile: false) { result in
                 switch result {
                 case let .success(profileManager):
+                    loadedProfileManager = profileManager
+                    
                     profileManager.getPaywall(id, locale, withFetchPolicy: fetchPolicy) { result in
-                        termination(profileManager, result)
+                        termination(result)
                     }
                 case let .failure(error):
-                    termination(nil, .failure(error))
+                    termination(.failure(error))
                 }
             }
 
@@ -89,7 +92,7 @@ extension Adapty {
 
             if loadTimeout != .never, !isTerminationCalled {
                 Adapty.underlayQueue.asyncAfter(deadline: .now() - .milliseconds(500) + loadTimeout) {
-                    termination(nil, .failure(.fetchPaywallTimeout()))
+                    termination(.failure(.fetchPaywallTimeout()))
                 }
             }
         }
