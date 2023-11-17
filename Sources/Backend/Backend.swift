@@ -20,7 +20,7 @@ struct Backend: HTTPCodableConfiguration {
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = Request.globalHeaders(secretKey: secretKey)
         configuration.timeoutIntervalForRequest = 30
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        configuration.requestCachePolicy = .useProtocolCachePolicy
         if let (host, port) = withProxy {
             configuration.connectionProxyDictionary = [
                 String(kCFNetworkProxiesHTTPEnable): NSNumber(value: 1),
