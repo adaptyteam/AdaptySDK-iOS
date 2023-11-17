@@ -45,7 +45,7 @@ extension Adapty {
             var isTerminationCalled = false
             var loadedProfileManager: AdaptyProfileManager?
 
-            let termination: (AdaptyResult<AdaptyPaywall>) -> Void = { [weak manager, loadedProfileManager] result in
+            let termination: (AdaptyResult<AdaptyPaywall>) -> Void = { [weak manager] result in
                 guard !isTerminationCalled else { return }
                 isTerminationCalled = true
 
