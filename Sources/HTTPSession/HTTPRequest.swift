@@ -66,9 +66,11 @@ extension HTTPRequest {
             return .failure(HTTPError.perform(endpoint, error: HTTPRequestError.wrongEncodingUrl))
         }
 
-        var request = URLRequest(url: url,
-                                 cachePolicy: cachePolicy ?? configuration.sessionConfiguration.requestCachePolicy,
-                                 timeoutInterval: timeoutInterval ?? configuration.sessionConfiguration.timeoutIntervalForRequest)
+        var request = URLRequest(
+            url: url,
+            cachePolicy: cachePolicy ?? .useProtocolCachePolicy,
+            timeoutInterval: timeoutInterval ?? 60.0
+        )
 
         request.httpMethod = endpoint.method.rawValue
         var requestHeaders = headers
