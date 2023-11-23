@@ -17,6 +17,7 @@ public enum AdaptyUI {
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         struct PrivateParameters: Decodable {
             let paywallVariationId: String
+            let paywallInstanceIdentity: String
             let locale: AdaptyLocale
             let builderVersion: String
             let adaptyUISDKVersion: String
@@ -24,6 +25,7 @@ public enum AdaptyUI {
 
             enum CodingKeys: String, CodingKey {
                 case paywallVariationId = "paywall_variation_id"
+                case paywallInstanceIdentity = "paywall_instance_id"
                 case locale
                 case builderVersion = "builder_version"
                 case adaptyUISDKVersion = "ui_sdk_version"
@@ -41,6 +43,7 @@ public enum AdaptyUI {
 
         Adapty.async(completion) { manager, completion in
             manager.getViewConfiguration(paywallVariationId: parameters.paywallVariationId,
+                                         paywallInstanceIdentity: parameters.paywallInstanceIdentity,
                                          locale: parameters.locale,
                                          builderVersion: parameters.builderVersion,
                                          adaptyUISDKVersion: parameters.adaptyUISDKVersion,
@@ -51,18 +54,19 @@ public enum AdaptyUI {
 }
 
 extension Adapty {
-    fileprivate func getFallbackViewConfiguration(paywallVariationId: String,
+    fileprivate func getFallbackViewConfiguration(paywallInstanceIdentity: String,
                                                   locale: AdaptyLocale,
                                                   builderVersion: String,
                                                   _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         httpFallbackSession.performFetchFallbackViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
-                                                                         paywallVariationId: paywallVariationId,
+                                                                         paywallInstanceIdentity: paywallInstanceIdentity,
                                                                          locale: locale,
                                                                          builderVersion: builderVersion,
                                                                          completion)
     }
 
     fileprivate func getViewConfiguration(paywallVariationId: String,
+                                          paywallInstanceIdentity: String,
                                           locale: AdaptyLocale,
                                           builderVersion: String,
                                           adaptyUISDKVersion: String,
@@ -86,7 +90,7 @@ extension Adapty {
                     return
                 }
 
-                self.getFallbackViewConfiguration(paywallVariationId: paywallVariationId,
+                self.getFallbackViewConfiguration(paywallInstanceIdentity: paywallInstanceIdentity,
                                                   locale: locale,
                                                   builderVersion: builderVersion,
                                                   completion)

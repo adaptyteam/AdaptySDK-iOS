@@ -14,6 +14,7 @@ extension AdaptyPaywall {
 
         static let full: JSONValue = [
             "developer_id": "full_example",
+            "paywall_id": "id-123",
             "revision": 16,
             "variation_id": "5f509ba1-c202-4a3a-afa1-06d10c8d40f2",
             "ab_test_name": "A/B Test For Example",
@@ -29,6 +30,7 @@ extension AdaptyPaywall {
 
         static let withoutRemouteConfig: JSONValue = [
             "developer_id": "without_remoute_config_example",
+            "paywall_id": "id-123",
             "revision": 16,
             "variation_id": "5f509ba1-c202-4a3a-afa1-06d10c8d40f2",
             "ab_test_name": "A/B Test For Example",
@@ -41,6 +43,7 @@ extension AdaptyPaywall {
 
         static let productsEmpty: JSONValue = [
             "developer_id": "products_empty_example",
+            "paywall_id": "id-123",
             "revision": 16,
             "variation_id": "5f509ba1-c202-4a3a-afa1-06d10c8d40f2",
             "ab_test_name": "A/B Test For Example",
@@ -60,6 +63,7 @@ extension AdaptyPaywall {
 
         static let wrongProducts: JSONValue = [
             "developer_id": "wrong_products_example",
+            "paywall_id": "id-123",
             "revision": 16,
             "variation_id": "5f509ba1-c202-4a3a-afa1-06d10c8d40f2",
             "ab_test_name": "A/B Test For Example",
@@ -75,6 +79,7 @@ extension AdaptyPaywall {
 
         static let withoutProducts: JSONValue = [
             "developer_id": "without_products_example",
+            "paywall_id": "id-123",
             "revision": 16,
             "variation_id": "5f509ba1-c202-4a3a-afa1-06d10c8d40f2",
             "ab_test_name": "A/B Test For Example",

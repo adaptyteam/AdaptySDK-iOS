@@ -11,6 +11,8 @@ public struct AdaptyPaywall {
     /// An identifier of a paywall, configured in Adapty Dashboard.
     public let id: String
 
+    public let instanceIdentity: String
+
     /// A paywall name.
     public let name: String
 
@@ -49,7 +51,7 @@ public struct AdaptyPaywall {
 
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
+        "(id: \(id), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
             + (remoteConfigString == nil ? "" : "remoteConfig: \(remoteConfigString!), ")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }
@@ -58,6 +60,7 @@ extension AdaptyPaywall: CustomStringConvertible {
 extension AdaptyPaywall: Codable {
     enum CodingKeys: String, CodingKey {
         case id = "developer_id"
+        case instanceIdentity = "paywall_id"
         case revision
         case variationId = "variation_id"
         case abTestName = "ab_test_name"
@@ -73,6 +76,7 @@ extension AdaptyPaywall: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
+        instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
         version = try container.decode(Int64.self, forKey: .version)
         revision = try container.decode(Int.self, forKey: .revision)
@@ -93,6 +97,7 @@ extension AdaptyPaywall: Codable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
+        try container.encode(instanceIdentity, forKey: .instanceIdentity)
         try container.encode(name, forKey: .name)
         try container.encode(version, forKey: .version)
         try container.encode(revision, forKey: .revision)
@@ -100,7 +105,6 @@ extension AdaptyPaywall: Codable {
         try container.encode(abTestName, forKey: .abTestName)
         try container.encode(products, forKey: .products)
         try container.encode(hasViewConfiguration, forKey: .hasViewConfiguration)
-
         var remoteConfig = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig)
         try remoteConfig.encode(locale, forKey: .remoteConfigLocale)
         try remoteConfig.encodeIfPresent(remoteConfigString, forKey: .remoteConfigString)
