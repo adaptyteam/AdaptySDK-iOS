@@ -12,7 +12,7 @@ extension Adapty.Configuration {
 }
 
 extension Adapty {
-    fileprivate static var currentFallbackPaywallsVersion = 2
+    fileprivate static var currentFallbackPaywallsVersion = 3
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///
     /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
