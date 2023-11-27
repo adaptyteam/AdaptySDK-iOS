@@ -16,7 +16,7 @@ enum InternalAdaptyError: Error {
     case profileCreateFailed(AdaptyError.Source, error: HTTPError)
     case decodingFailed(AdaptyError.Source, String, error: Error)
     case wrongParam(AdaptyError.Source, String)
-    case persistingDataError(AdaptyError.Source, String)
+    case fetchTimeoutError(AdaptyError.Source, String)
 }
 
 extension InternalAdaptyError: CustomStringConvertible {
@@ -36,8 +36,8 @@ extension InternalAdaptyError: CustomStringConvertible {
             return "AdaptyError.decodingFailed(\(source), \(description), \(error))"
         case let .wrongParam(source, description):
             return "AdaptyError.wrongParam(\(source), \(description))"
-        case let .persistingDataError(source, description):
-            return "AdaptyError.persistingDataError(\(source), \(description))"
+        case let .fetchTimeoutError(source, description):
+            return "AdaptyError.fetchTimeoutError(\(source), \(description))"
         }
     }
 }
@@ -52,7 +52,7 @@ extension InternalAdaptyError {
              let .profileCreateFailed(src, _),
              let .decodingFailed(src, _, _),
              let .wrongParam(src, _),
-             let .persistingDataError(src, _):
+             let .fetchTimeoutError(src, _):
             return src
         }
     }
@@ -81,7 +81,7 @@ extension InternalAdaptyError: CustomNSError {
         case let .profileCreateFailed(_, error): return error.adaptyErrorCode
         case .decodingFailed: return AdaptyError.ErrorCode.decodingFailed
         case .wrongParam: return AdaptyError.ErrorCode.wrongParam
-        case .persistingDataError: return AdaptyError.ErrorCode.persistingDataError
+        case .fetchTimeoutError: return AdaptyError.ErrorCode.fetchTimeoutError
         }
     }
 
@@ -176,13 +176,22 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
 
-    static func cacheHasNoPaywall(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func fetchPaywallTimeout(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Didn't found paywall in cache").asAdaptyError
+        InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request Paywall timeout").asAdaptyError
     }
 
-    static func cacheHasNoViewConfiguration(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func fetchViewConfigurationTimeout(file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.persistingDataError(AdaptyError.Source(file: file, function: function, line: line), "Didn't found view configuration in cache").asAdaptyError
+        InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request ViewConfiguration timeout").asAdaptyError
+    }
+
+    var canUseFallbackServer: Bool {
+        if let error = wrapped as? InternalAdaptyError {
+            if case .fetchTimeoutError = error { return true }
+        } else if let error = wrapped as? HTTPError {
+            return Backend.canUseFallbackServer(error)
+        }
+        return false
     }
 }

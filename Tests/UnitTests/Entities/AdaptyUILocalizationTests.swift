@@ -9,6 +9,11 @@
 @testable import AdaptySDK
 import XCTest
 
+func XCTAssertEqual(_ expression: AdaptyLocale?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
+    guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
+    XCTAssertEqual(value.id, jsonValue.stringOrFail(file: file, line: line), file: file, line: line)
+}
+
 func XCTAssertEqual(_ expression: AdaptyUI.Localization?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     let object = jsonValue.objectOrFail(file: file, line: line)

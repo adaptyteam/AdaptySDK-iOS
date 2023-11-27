@@ -146,57 +146,6 @@ extension AdaptyProfileManager {
         }
     }
 
-    func getPaywall(_ id: String, _ locale: String?, fetchPolicy: AdaptyPaywall.FetchPolicy, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        if let cached = paywallsCache.getPaywallByLocale(locale, withId: id), fetchPolicy.canReturn(cached) {
-            completion(.success(cached.value))
-        } else {
-            _getPaywall(id, locale, completion)
-        }
-    }
-
-    private func _getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
-
-        manager.httpSession.performFetchPaywallRequest(paywallId: id,
-                                                       locale: locale,
-                                                       profileId: profileId,
-                                                       responseHash: old?.hash) {
-            [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
-
-            guard let self = self, self.isActive else {
-                completion(.failure(.profileWasChanged()))
-                return
-            }
-
-            switch result {
-            case let .failure(error):
-                guard let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) ?? old?.value
-                else {
-                    completion(.failure(error))
-                    return
-                }
-                completion(.success(value))
-            case let .success(paywall):
-
-                if let value = paywall.value {
-                    completion(.success(self.paywallsCache.savedPaywall(paywall.withValue(value))))
-                    return
-                }
-
-                if let value = old?.value {
-                    completion(.success(value))
-                    return
-                }
-
-                if let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) {
-                    completion(.success(value))
-                    return
-                }
-
-                completion(.failure(.cacheHasNoPaywall()))
-            }
-        }
-    }
 
     func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
         guard !manager.profileStorage.syncedBundleReceipt else {

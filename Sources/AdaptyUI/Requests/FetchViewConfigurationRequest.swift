@@ -9,52 +9,40 @@
 import Foundation
 
 struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration?>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration>
 
     let endpoint: HTTPEndpoint
     let headers: Headers
-    let queryItems: QueryItems
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        { response in
-            let result: Result<AdaptyUI.ViewConfiguration?, Error>
-
-            if headers.hasSameBackendResponseHash(response.headers) {
-                result = .success(nil)
-            } else {
-                result = jsonDecoder.decode(Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration>.self, response.body).map { $0.value }
-            }
-            return result.map { response.replaceBody(Backend.Response.ValueOfData($0)) }
-                .mapError { .decoding(response, error: $0) }
-        }
-    }
-
-    init(paywallVariationId: String, locale: String, builderVersion: String, responseHash: String?) {
+    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, builderVersion: String, adaptyUISDKVersion: String) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/paywall-builder/v2/\(paywallVariationId)/"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
         )
 
         headers = Headers()
-            .setBackendResponseHash(responseHash)
-
-        queryItems = QueryItems()
-            .setLocale(locale)
-            .setBuilderVersion(builderVersion)
+            .setViewConfigurationLocale(locale)
+            .setVisualBuilderVersion(builderVersion)
+            .setAdaptyUISDKVersion(adaptyUISDKVersion)
     }
 }
 
 extension HTTPSession {
-    func performFetchViewConfigurationRequest(paywallId: String,
+    func performFetchViewConfigurationRequest(apiKeyPrefix: String,
                                               paywallVariationId: String,
-                                              locale: String,
+                                              locale: AdaptyLocale,
                                               builderVersion: String,
-                                              responseHash: String?,
-                                              _ completion: @escaping AdaptyResultCompletion<VH<AdaptyUI.ViewConfiguration?>>) {
-        let request = FetchViewConfigurationRequest(paywallVariationId: paywallVariationId,
+                                              adaptyUISDKVersion: String,
+                                              _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+        let md5Hash = "{\"builder_version\":\"\(builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5()
+
+        let request = FetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
+                                                    paywallVariationId: paywallVariationId,
                                                     locale: locale,
+                                                    md5Hash: md5Hash,
                                                     builderVersion: builderVersion,
-                                                    responseHash: responseHash)
+                                                    adaptyUISDKVersion: adaptyUISDKVersion)
+
         perform(request,
                 logName: "get_paywall_builder",
                 logParams: ["variation_id": .value(paywallVariationId)]) { (result: FetchViewConfigurationRequest.Result) in
@@ -62,9 +50,7 @@ extension HTTPSession {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))
             case let .success(response):
-                let paywall = response.body.value
-                let hash = response.headers.getBackendResponseHash()
-                completion(.success(VH(paywall, hash: hash)))
+                completion(.success(response.body.value))
             }
         }
     }

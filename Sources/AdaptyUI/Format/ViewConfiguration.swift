@@ -15,7 +15,7 @@ extension AdaptyUI {
         public let templateId: String
         let version: Int64
         let assets: [String: Asset]
-        let localizations: [String: Localization]
+        let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
         let styles: [String: ViewStyle]
 
@@ -60,11 +60,11 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value ?? [:]
 
         let localizationsArray = try container.decodeIfPresent([AdaptyUI.Localization].self, forKey: .localizations) ?? []
-        let localizations = try [String: AdaptyUI.Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
+        let localizations = try [AdaptyLocale: AdaptyUI.Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate id"))
         })
         self.localizations = localizations
-        if let defaultLocalization = try container.decodeIfPresent(String.self, forKey: .defaultLocalization) {
+        if let defaultLocalization = try container.decodeIfPresent(AdaptyLocale.self, forKey: .defaultLocalization) {
             self.defaultLocalization = localizations[defaultLocalization]
         } else {
             defaultLocalization = nil

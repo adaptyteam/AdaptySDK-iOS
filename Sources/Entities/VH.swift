@@ -12,10 +12,18 @@ struct VH<T> {
     let hash: String?
     let time: Date?
 
-    init(_ value: T, hash: String?, time: Date? = Date()) {
+    private init(_ value: T, hash: String?, time: Date?) {
         self.value = value
         self.hash = hash
         self.time = time
+    }
+
+    init(_ value: T, hash: String?) {
+        self.init(value, hash: hash, time: nil)
+    }
+
+    init(_ value: T, time: Date) {
+        self.init(value, hash: nil, time: time)
     }
 
     enum CodingKeys: String, CodingKey {

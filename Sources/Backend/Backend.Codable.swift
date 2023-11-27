@@ -8,6 +8,38 @@
 import Foundation
 
 extension Backend {
+    static func configure(decoder: JSONDecoder) {
+        decoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
+        decoder.dataDecodingStrategy = .base64
+    }
+
+    static func configure(encoder: JSONEncoder) {
+        encoder.dateEncodingStrategy = .formatted(Backend.dateFormatter)
+        encoder.dataEncodingStrategy = .base64
+    }
+
+    static var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return formatter
+    }()
+
+    static var decoder: JSONDecoder {
+        let decoder = JSONDecoder()
+        configure(decoder: decoder)
+        return decoder
+    }
+
+    static var encoder: JSONEncoder {
+        let encoder = JSONEncoder()
+        configure(encoder: encoder)
+        return encoder
+    }
+}
+
+extension Backend {
     enum CodingKeys: CodingKey {
         case data
         case type
@@ -46,7 +78,7 @@ extension Backend.Response {
         init(_ value: T) {
             self.value = value
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
             value = try container.decode(T.self, forKey: .data)

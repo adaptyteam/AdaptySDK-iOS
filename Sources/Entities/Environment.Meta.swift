@@ -9,7 +9,7 @@ import Foundation
 
 extension Environment {
     struct Meta: Encodable, Sendable {
-        let locale: String
+        let locale: AdaptyLocale
         let timezone: String
         var includedAnalyticIds: Bool
 

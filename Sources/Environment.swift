@@ -30,7 +30,7 @@ enum Environment {
     }
 
     enum User {
-        static var locale: String { Locale.preferredLanguages.first ?? Locale.current.identifier }
+        static var locale: AdaptyLocale { AdaptyLocale(id: Locale.preferredLanguages.first ?? Locale.current.identifier) }
     }
 
     enum System {

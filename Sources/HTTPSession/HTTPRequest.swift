@@ -13,6 +13,8 @@ protocol HTTPRequest {
     var endpoint: HTTPEndpoint { get }
     var headers: Headers { get }
     var queryItems: QueryItems { get }
+    var cachePolicy: URLRequest.CachePolicy? { get }
+    var timeoutInterval: TimeInterval? { get }
     var forceLogCurl: Bool { get }
 }
 
@@ -30,6 +32,8 @@ extension HTTPRequest {
     var method: HTTPMethod { endpoint.method }
     var headers: Headers { [:] }
     var queryItems: QueryItems { [] }
+    var cachePolicy: URLRequest.CachePolicy? { nil }
+    var timeoutInterval: TimeInterval? { nil }
     var forceLogCurl: Bool { false }
 }
 
@@ -62,7 +66,12 @@ extension HTTPRequest {
             return .failure(HTTPError.perform(endpoint, error: HTTPRequestError.wrongEncodingUrl))
         }
 
-        var request = URLRequest(url: url)
+        var request = URLRequest(
+            url: url,
+            cachePolicy: cachePolicy ?? .useProtocolCachePolicy,
+            timeoutInterval: timeoutInterval ?? 60.0
+        )
+
         request.httpMethod = endpoint.method.rawValue
         var requestHeaders = headers
 
