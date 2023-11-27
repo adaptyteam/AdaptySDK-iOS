@@ -7,7 +7,8 @@
 import StoreKit
 
 struct PurchaseProductInfo {
-    let transactionId: String? //
+    let transactionId: String?
+    let originalTransactionId: String?
     let vendorProductId: String
     let productVariationId: String?
     let persistentProductVariationId: String?
@@ -46,6 +47,7 @@ extension PurchaseProductInfo.Offer: Encodable {
 extension PurchaseProductInfo: Encodable {
     enum CodingKeys: String, CodingKey {
         case transactionId = "transaction_id"
+        case originalTransactionId = "original_transaction_id"
         case vendorProductId = "vendor_product_id"
         case productVariationId = "variation_id"
         case persistentProductVariationId = "variation_id_persistent"
@@ -60,6 +62,7 @@ extension PurchaseProductInfo: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(transactionId, forKey: .transactionId)
+        try container.encodeIfPresent(originalTransactionId, forKey: .originalTransactionId)
         try container.encode(vendorProductId, forKey: .vendorProductId)
         try container.encodeIfPresent(productVariationId, forKey: .productVariationId)
         try container.encodeIfPresent(persistentProductVariationId, forKey: .persistentProductVariationId)

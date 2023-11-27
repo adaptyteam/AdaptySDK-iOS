@@ -11,7 +11,7 @@ import StoreKit
 extension SKProductsManager {
     func fetchPurchaseProductInfo(variationId: String?,
                                   persistentVariationId: String? = nil,
-                                  purchasedTransaction transaction: Transaction,
+                                  purchasedTransaction transaction: SK2Transaction,
                                   _ completion: @escaping (PurchaseProductInfo) -> Void) {
         let productId = transaction.productID
 
@@ -30,9 +30,10 @@ extension SKProductsManager {
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-fileprivate extension PurchaseProductInfo {
-    init(_ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: Transaction) {
-        self.init(transactionId: String(transaction.id),
+extension PurchaseProductInfo {
+    fileprivate init(_ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SK2Transaction) {
+        self.init(transactionId: transaction.transactionIdentifier,
+                  originalTransactionId: transaction.originalTransactionIdentifier,
                   vendorProductId: transaction.productID,
                   productVariationId: variationId,
                   persistentProductVariationId: persistentVariationId,
@@ -44,7 +45,7 @@ fileprivate extension PurchaseProductInfo {
                   offer: nil)
     }
 
-    init(_ product: Product, _ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: Transaction) {
+    fileprivate init(_ product: Product, _ variationId: String?, _ persistentVariationId: String?, purchasedTransaction transaction: SK2Transaction) {
         var offer: Product.SubscriptionOffer?
 
         if let identifier = transaction.offerID {
@@ -58,7 +59,8 @@ fileprivate extension PurchaseProductInfo {
             offer = product.subscription?.introductoryOffer
         }
 
-        self.init(transactionId: String(transaction.id),
+        self.init(transactionId: transaction.transactionIdentifier,
+                  originalTransactionId: transaction.originalTransactionIdentifier,
                   vendorProductId: transaction.productID,
                   productVariationId: variationId,
                   persistentProductVariationId: persistentVariationId,
