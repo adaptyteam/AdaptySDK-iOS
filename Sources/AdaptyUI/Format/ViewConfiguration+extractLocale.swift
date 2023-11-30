@@ -49,7 +49,7 @@ extension AdaptyUI.ViewConfiguration {
             }
         }
 
-        func getString(_ id: String?) -> String? {
+        func getString(_ id: String?) -> AdaptyUI.Localization.Item? {
             guard let id = id else { return nil }
             return localization?.strings?[id]
         }
@@ -76,7 +76,7 @@ extension AdaptyUI.ViewConfiguration {
 
         func getButtonAction(from value: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
             guard case let .openUrl(id) = value else { return value }
-            return .openUrl(getString(id))
+            return .openUrl(getString(id)?.value)
         }
 
         func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.CompoundText? {
@@ -93,8 +93,10 @@ extension AdaptyUI.ViewConfiguration {
                     switch $0 {
                     case let .text(item):
                         let font = getAssetFont(item.fontAssetId) ?? defaultFont
+                        let str = getString(item.stringId)
                         let text = AdaptyUI.Text(
-                            value: getString(item.stringId),
+                            value: str?.value,
+                            hasTags: str?.hasTags ?? false,
                             font: font,
                             size: item.size ?? group.size ?? font?.defaultSize,
                             fill: getAssetFilling(item.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,

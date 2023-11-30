@@ -13,6 +13,7 @@ extension AdaptyUI {
         static let defaultHorizontalAlign = HorizontalAlign.left
 
         public let value: String?
+        public let hasTags: Bool
         public let font: AdaptyUI.Font?
         public let size: Double?
         public let fill: AdaptyUI.Filling?

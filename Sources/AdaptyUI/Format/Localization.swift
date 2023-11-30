@@ -11,8 +11,13 @@ import Foundation
 extension AdaptyUI {
     struct Localization {
         let id: AdaptyLocale
-        let strings: [String: String]?
+        let strings: [String: Item]?
         let assets: [String: Asset]?
+
+        struct Item {
+            let value: String
+            let hasTags: Bool
+        }
     }
 }
 
@@ -26,6 +31,7 @@ extension AdaptyUI.Localization: Decodable {
     enum ItemCodingKeys: String, CodingKey {
         case id
         case value
+        case hasTags = "has_tags"
     }
 
     init(from decoder: Decoder) throws {
@@ -35,13 +41,16 @@ extension AdaptyUI.Localization: Decodable {
         assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value
 
         var stringsContainer = try container.nestedUnkeyedContainer(forKey: .strings)
-        var strings = [String: String]()
+        var strings = [String: Item]()
         if let count = stringsContainer.count {
             strings.reserveCapacity(count)
         }
         while !stringsContainer.isAtEnd {
             let item = try stringsContainer.nestedContainer(keyedBy: ItemCodingKeys.self)
-            strings[try item.decode(String.self, forKey: .id)] = try item.decode(String.self, forKey: .value)
+            strings[try item.decode(String.self, forKey: .id)] = Item(
+                value: try item.decode(String.self, forKey: .value),
+                hasTags: (try item.decodeIfPresent(Bool.self, forKey: .hasTags)) ?? false
+            )
         }
         self.strings = strings.isEmpty ? nil : strings
     }
