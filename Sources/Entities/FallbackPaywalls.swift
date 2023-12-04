@@ -8,7 +8,7 @@
 import Foundation
 
 struct FallbackPaywalls {
-    let paywalls: [String: AdaptyPaywall]
+    let paywallByPlacementId: [String: AdaptyPaywall]
     let allProductVendorIds: [String]
     let version: Int
 }
@@ -51,12 +51,12 @@ extension FallbackPaywalls: Decodable {
 
         if let containers = try container.decodeIfPresent([PaywallContainer].self, forKey: .data) {
             let paywallsArray = containers.map { $0.paywall }
-            paywalls = try [String: AdaptyPaywall](paywallsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.data], debugDescription: "Duplicate paywall id"))
+            paywallByPlacementId = try [String: AdaptyPaywall](paywallsArray.map { ($0.placementId, $0) }, uniquingKeysWith: { _, _ in
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.data], debugDescription: "Duplicate paywalls placementId"))
             })
             productVendorIds = Set(paywallsArray.flatMap { $0.products.map { $0.vendorId } })
         } else {
-            paywalls = [:]
+            paywallByPlacementId = [:]
         }
 
         if let subcontainer = subcontainer,

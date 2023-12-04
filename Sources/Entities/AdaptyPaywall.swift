@@ -9,7 +9,7 @@ import Foundation
 
 public struct AdaptyPaywall {
     /// An identifier of a paywall, configured in Adapty Dashboard.
-    public let id: String
+    public let placementId: String
 
     public let instanceIdentity: String
 
@@ -51,7 +51,7 @@ public struct AdaptyPaywall {
 
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
+        "(placementId: \(placementId), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
             + (remoteConfigString == nil ? "" : "remoteConfig: \(remoteConfigString!), ")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }
@@ -59,7 +59,7 @@ extension AdaptyPaywall: CustomStringConvertible {
 
 extension AdaptyPaywall: Codable {
     enum CodingKeys: String, CodingKey {
-        case id = "developer_id"
+        case placementId = "developer_id"
         case instanceIdentity = "paywall_id"
         case revision
         case variationId = "variation_id"
@@ -75,7 +75,7 @@ extension AdaptyPaywall: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
+        placementId = try container.decode(String.self, forKey: .placementId)
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
         version = try container.decode(Int64.self, forKey: .version)
@@ -96,7 +96,7 @@ extension AdaptyPaywall: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
+        try container.encode(placementId, forKey: .placementId)
         try container.encode(instanceIdentity, forKey: .instanceIdentity)
         try container.encode(name, forKey: .name)
         try container.encode(version, forKey: .version)
@@ -112,8 +112,8 @@ extension AdaptyPaywall: Codable {
 }
 
 extension Sequence where Element == VH<AdaptyPaywall> {
-    var asDictionary: [String: VH<AdaptyPaywall>] {
-        Dictionary(map { ($0.value.id, $0) }, uniquingKeysWith: { first, second in
+    var asPaywallByPlacementId: [String: VH<AdaptyPaywall>] {
+        Dictionary(map { ($0.value.placementId, $0) }, uniquingKeysWith: { first, second in
             first.value.version > second.value.version ? first : second
         })
     }

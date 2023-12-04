@@ -239,7 +239,7 @@ extension Adapty {
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        async(completion, logName: "get_paywall_products", logParams: ["paywall_id": .value(paywall.id)]) { manager, completion in
+        async(completion, logName: "get_paywall_products", logParams: ["placement_id": .value(paywall.placementId)]) { manager, completion in
             manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SKProduct]>) in
                 completion(result.map { skProducts in
                     skProducts.compactMap { AdaptyPaywallProduct(paywall: paywall, skProduct: $0) }

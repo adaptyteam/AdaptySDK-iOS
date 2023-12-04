@@ -12,7 +12,7 @@ import XCTest
 func XCTAssertEqual(_ expression: AdaptyPaywall?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     let object = jsonValue.objectOrFail(file: file, line: line)
-    XCTAssertEqual(value.id, withJSONValue: object["developer_id"])
+    XCTAssertEqual(value.placementId, withJSONValue: object["developer_id"])
     XCTAssertEqual(value.instanceIdentity, withJSONValue: object["paywal_id"])
     XCTAssertEqual(value.revision, withJSONValue: object["revision"])
     XCTAssertEqual(value.variationId, withJSONValue: object["variation_id"])

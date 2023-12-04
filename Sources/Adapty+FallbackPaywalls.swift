@@ -53,14 +53,14 @@ extension Adapty {
 }
 
 extension PaywallsCache {
-    func getPaywallWithFallback(byId id: String, locale: AdaptyLocale?) -> AdaptyPaywall? {
-        let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
-        guard let cache = getPaywallByLocaleOrDefault(locale, withId: id)?.value else { return fallback }
+    func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale?) -> AdaptyPaywall? {
+        let fallback = Adapty.Configuration.fallbackPaywalls?.paywallByPlacementId[placementId]
+        guard let cache = getPaywallByLocaleOrDefault(locale, withPlacementId: placementId)?.value else { return fallback }
         guard let fallback = fallback else { return cache }
         if cache.version >= fallback.version {
             return cache
         } else {
-            Log.verbose("PaywallsCache: return from fallback paywall: \(id)")
+            Log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
             return fallback
         }
     }
