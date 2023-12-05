@@ -44,10 +44,7 @@ final class EventsManager {
         self.dispatchQueue = dispatchQueue
         self.configurationStorage = configurationStorage
 
-        var configuration = configurationStorage.getEventsConfiguration() ?? EventsBackendConfiguration()
-        if !Adapty.Configuration.sendSystemEventsEnabled {
-            configuration.blacklist.formUnion(EventType.systemEvents)
-        }
+        let configuration = configurationStorage.getEventsConfiguration() ?? EventsBackendConfiguration()
         self.configuration = configuration
 
         guard let backend = backend else {
@@ -155,11 +152,8 @@ final class EventsManager {
             case let .failure(error):
                 completion(.sending(error))
             case let .success(response):
-                var configuration = response.body.value
+                let configuration = response.body.value
                 self?.configurationStorage.setEventsConfiguration(configuration)
-                if !Adapty.Configuration.sendSystemEventsEnabled {
-                    configuration.blacklist.formUnion(EventType.systemEvents)
-                }
                 self?.configuration = configuration
                 completion(nil)
             }

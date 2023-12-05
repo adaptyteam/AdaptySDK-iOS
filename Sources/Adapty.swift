@@ -24,14 +24,12 @@ extension Adapty {
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
-    /// - Parameter enableUsageLogs: You can enable "Usage Logs" collection, passing here `true`
     /// - Parameter storeKit2Usage: You can override StoreKit 2 usage policy with this value
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
     public static func activate(_ apiKey: String,
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
-                                enableUsageLogs: Bool = false,
                                 storeKit2Usage: StoreKit2Usage = .default,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
@@ -57,7 +55,6 @@ extension Adapty {
 
             Configuration.setStoreKit2Usage(storeKit2Usage)
             Configuration.observerMode = observerMode
-            Configuration.sendSystemEventsEnabled = enableUsageLogs
 
             let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
 
