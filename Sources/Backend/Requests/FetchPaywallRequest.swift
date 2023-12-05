@@ -29,9 +29,11 @@ extension HTTPSession {
     func performFetchPaywallRequest(apiKeyPrefix: String,
                                     profileId: String,
                                     placementId: String,
-                                    locale: AdaptyLocale,
+                                    locale: AdaptyLocale?,
                                     segmentId: String,
                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>) {
+        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
+
         let md5Hash = "{\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5()
 
         let request = FetchPaywallRequest(apiKeyPrefix: apiKeyPrefix,

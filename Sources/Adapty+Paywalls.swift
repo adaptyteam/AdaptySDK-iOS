@@ -79,7 +79,7 @@ extension Adapty {
                 switch result {
                 case let .success(profileManager):
                     loadedProfileManager = profileManager
-                    
+
                     profileManager.getPaywall(placementId, locale, withFetchPolicy: fetchPolicy) { result in
                         termination(result)
                     }
@@ -122,8 +122,10 @@ extension Adapty {
 
 fileprivate extension AdaptyProfileManager {
     func getPaywall(_ placementId: String, _ locale: AdaptyLocale?, withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        if let cached = paywallsCache.getPaywallByLocale(locale, withPlacementId: placementId), fetchPolicy.canReturn(cached) {
+        if let cached = paywallsCache.getPaywallByLocale(locale, withPlacementId: placementId),
+           fetchPolicy.canReturn(cached) {
             completion(.success(cached.value))
+            getPaywall(placementId, locale, { _ in })
         } else {
             getPaywall(placementId, locale, completion)
         }
@@ -132,7 +134,6 @@ fileprivate extension AdaptyProfileManager {
     private func getPaywall(_ placementId: String,
                             _ locale: AdaptyLocale?,
                             _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         manager.httpSession.performFetchPaywallRequest(apiKeyPrefix: manager.apiKeyPrefix,
                                                        profileId: profileId,
                                                        placementId: placementId,
