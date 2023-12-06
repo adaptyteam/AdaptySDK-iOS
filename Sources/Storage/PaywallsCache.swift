@@ -8,16 +8,16 @@
 import Foundation
 
 protocol PaywallsStorage {
-    func setPaywalls(_ paywalls: [VH<AdaptyPaywall>])
+    func setPaywalls(_: [VH<AdaptyPaywall>])
     func getPaywalls() -> [VH<AdaptyPaywall>]?
 }
 
 fileprivate extension VH<AdaptyPaywall> {
-    func equalLanguageCode(_ locale: AdaptyLocale) ->Bool {
+    func equalLanguageCode(_ locale: AdaptyLocale) -> Bool {
         AdaptyLocale(id: value.locale).equalLanguageCode(locale)
     }
 
-    func equalLanguageCode(_ paywall: VH<AdaptyPaywall>) ->Bool {
+    func equalLanguageCode(_ paywall: VH<AdaptyPaywall>) -> Bool {
         equalLanguageCode(AdaptyLocale(id: paywall.value.locale))
     }
 }
@@ -40,9 +40,9 @@ final class PaywallsCache {
 
     func getPaywallByLocaleOrDefault(_ locale: AdaptyLocale?, withPlacementId placementId: String) -> VH<AdaptyPaywall>? {
         guard let paywall = paywallByPlacementId[placementId] else { return nil }
-        if paywall.equalLanguageCode(.defaultPaywallLocale)  { return paywall }
+        if paywall.equalLanguageCode(.defaultPaywallLocale) { return paywall }
         guard let locale = locale else { return nil }
-        if paywall.equalLanguageCode(locale)  { return paywall }
+        if paywall.equalLanguageCode(locale) { return paywall }
         return nil
     }
 

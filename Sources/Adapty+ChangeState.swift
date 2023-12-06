@@ -267,6 +267,7 @@ extension Adapty {
                 if profileId != profile.value.profileId {
                     storage.clearProfile(newProfileId: profile.value.profileId)
                 }
+                storage.setSyncedBundleReceipt(false)
                 storage.setProfile(profile)
 
                 self.validateReceipt(refreshIfEmpty: false) { result in

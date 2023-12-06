@@ -8,7 +8,7 @@
 import Foundation
 
 protocol EventsBackendConfigurationStorage: AnyObject {
-    func setEventsConfiguration(_ value: EventsBackendConfiguration)
+    func setEventsConfiguration(_: EventsBackendConfiguration)
     func getEventsConfiguration() -> EventsBackendConfiguration?
 }
 

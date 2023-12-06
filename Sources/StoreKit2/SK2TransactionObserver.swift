@@ -9,7 +9,7 @@ import StoreKit
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
 protocol SK2TransactionObserverDelegate: AnyObject {
-    func transactionListener(_ observer: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async
+    func transactionListener(_: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)

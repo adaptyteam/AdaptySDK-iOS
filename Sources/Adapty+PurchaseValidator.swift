@@ -8,7 +8,7 @@
 import Foundation
 
 protocol PurchaseValidator {
-    func validatePurchase(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>)
+    func validatePurchase(info: PurchaseProductInfo, _: @escaping AdaptyResultCompletion<AdaptyProfile>)
 }
 
 extension Adapty: PurchaseValidator {
@@ -23,7 +23,7 @@ extension Adapty: PurchaseValidator {
 
     fileprivate func saveValidateReceiptResponse(profile: VH<AdaptyProfile>) {
         if profileStorage.profileId == profile.value.profileId {
-            profileStorage.setSyncedBundleReceipt()
+            profileStorage.setSyncedBundleReceipt(true)
         }
         if let manager = state.initialized {
             manager.saveResponse(profile)
