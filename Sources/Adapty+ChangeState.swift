@@ -150,7 +150,7 @@ extension Adapty {
             }
             return
         case let .initializingTo(customerUserId):
-            if let customerUserId = customerUserId, customerUserId == newCustomerUserId {
+            if customerUserId == newCustomerUserId {
                 getProfileManager { completion($0.error) }
                 return
             }
@@ -258,6 +258,7 @@ extension Adapty {
                 if profileId != profile.value.profileId {
                     storage.clearProfile(newProfileId: profile.value.profileId)
                 }
+                storage.setSyncedBundleReceipt(false)
                 storage.setProfile(profile)
 
                 self.validateReceipt(refreshIfEmpty: false) { result in

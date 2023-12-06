@@ -31,7 +31,7 @@ extension Adapty {
     public static func activate(_ apiKey: String,
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
-                                enableUsageLogs: Bool = false,
+                                enableUsageLogs: Bool = true,
                                 storeKit2Usage: StoreKit2Usage = .default,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
@@ -57,7 +57,6 @@ extension Adapty {
 
             Configuration.setStoreKit2Usage(storeKit2Usage)
             Configuration.observerMode = observerMode
-            Configuration.sendSystemEventsEnabled = enableUsageLogs
 
             let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
 

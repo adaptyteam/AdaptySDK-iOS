@@ -23,7 +23,7 @@ import StoreKit
         public static func activate(_ apiKey: String,
                                     observerMode: Bool = false,
                                     customerUserId: String? = nil,
-                                    enableUsageLogs: Bool = false,
+                                    enableUsageLogs: Bool = true,
                                     storeKit2Usage: StoreKit2Usage = .default,
                                     dispatchQueue: DispatchQueue = .main) async throws {
             return try await withCheckedThrowingContinuation { continuation in
