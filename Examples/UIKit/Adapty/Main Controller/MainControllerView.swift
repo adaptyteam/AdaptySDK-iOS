@@ -236,8 +236,10 @@ struct MainControllerView: View {
 
     @ViewBuilder func paywallSection() -> some View {
         Section {
-            if let paywall = presenter.customPaywall, paywall.id == presenter.customPaywallId {
-                ListStatusItemView(title: paywall.id, state: .success, expanded: !presenter.customPaywallCollapsed) {
+            if let paywall = presenter.customPaywall, paywall.placementId == presenter.customPaywallId {
+                ListStatusItemView(title: paywall.placementId,
+                                   state: .success,
+                                   expanded: !presenter.customPaywallCollapsed) {
                     withAnimation {
                         presenter.customPaywallCollapsed.toggle()
                     }
@@ -275,7 +277,9 @@ struct MainControllerView: View {
     @ViewBuilder func exampleABTestSection() -> some View {
         Section {
             if let paywall = presenter.exampleABTestPaywall {
-                ListStatusItemView(title: paywall.id, state: .success, expanded: nil)
+                ListStatusItemView(title: paywall.placementId,
+                                   state: .success,
+                                   expanded: nil)
 
                 paywallDetailsSection(paywall: paywall,
                                       products: presenter.exampleABTestProducts,
