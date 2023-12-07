@@ -111,7 +111,7 @@ class MainPresenter: ObservableObject {
     func reloadCustomPaywall() {
         guard !customPaywallId.isEmpty else { return }
 
-        Adapty.getPaywall(customPaywallId,
+        Adapty.getPaywall(placementId: customPaywallId,
                           locale: customPaywallLocale.isEmpty ? nil : customPaywallLocale) { [weak self] result in
             switch result {
             case let .failure(error):

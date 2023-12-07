@@ -8,7 +8,7 @@
 import Foundation
 
 public struct AdaptyPaywall {
-    /// An identifier of a paywall, configured in Adapty Dashboard.
+    /// An identifier of a placement, configured in Adapty Dashboard.
     public let placementId: String
 
     public let instanceIdentity: String

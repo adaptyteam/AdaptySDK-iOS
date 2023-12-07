@@ -13,12 +13,13 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
     ///
     /// - Parameters:
-    ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
+    ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
     ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
     ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
     ///             Example: "en" means English, "en-US" represents US English.
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
-    ///   - fetchPolicy:
+    ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
+    ///   - loadTimeout: This value limits the timeout for this method. If the timeout is reached, cached data or local fallback will be returned.
     ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     public static func getPaywall(placementId: String,
                                   locale: String? = nil,
