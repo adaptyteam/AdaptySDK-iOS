@@ -11,11 +11,20 @@ struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
 
     let endpoint: HTTPEndpoint
+    let locale: AdaptyLocale
+
+    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
+        { response in
+            jsonDecoder.userInfo[FetchPaywallRequest.localeCodeUserInfoKey] = locale
+            return jsonDecoder.decode(ResponseBody.self, response)
+        }
+    }
 
     init(apiKeyPrefix: String, placementId: String, locale: AdaptyLocale) {
+        self.locale = locale
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(placementId)/app_store/\(locale.languageCode)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(placementId)/app_store/\(locale.languageCode.lowercased())/fallback.json"
         )
     }
 }
