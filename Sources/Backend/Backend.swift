@@ -44,7 +44,7 @@ extension Backend {
                            errorHandler: ((HTTPError) -> Void)? = nil) -> HTTPSession {
         HTTPSession(configuration: self,
                     responseQueue: responseQueue,
-                    requestAdditionals: nil,
+                    requestAdditional: nil,
                     responseValidator: validator,
                     errorHandler: errorHandler)
     }
