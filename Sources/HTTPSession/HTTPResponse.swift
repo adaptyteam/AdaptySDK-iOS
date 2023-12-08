@@ -11,7 +11,7 @@ typealias HTTPDataResponse = HTTPResponse<Data?>
 typealias HTTPStringResponse = HTTPResponse<String?>
 typealias HTTPEmptyResponse = HTTPResponse<Void>
 
-// https://github.com/apple/swift-corelibs-foundation/issues/3267
+// https://github.com/apple/swift-corelibs-foundation/issues/4338
 typealias HTTPResponseHeaders = NSDictionary
 
 struct HTTPResponse<Body> {
