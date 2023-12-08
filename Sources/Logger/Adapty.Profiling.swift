@@ -8,7 +8,7 @@
 import Foundation
 
 protocol ProfilingEvent {
-    func end(_ format: StaticString, _ arguments: CVarArg...)
+    func end(_: StaticString, _: CVarArg...)
 }
 
 extension Log {

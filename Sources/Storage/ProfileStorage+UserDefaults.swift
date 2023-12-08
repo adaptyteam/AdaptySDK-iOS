@@ -50,9 +50,9 @@ extension UserDefaults: ProfileStorage {
         bool(forKey: Constants.syncedBundleReceiptKey)
     }
 
-    func setSyncedBundleReceipt() {
-        Log.debug("UserDefaults: syncedBundleReceipt = true.")
-        set(true, forKey: Constants.syncedBundleReceiptKey)
+    func setSyncedBundleReceipt(_ value: Bool) {
+        Log.debug("UserDefaults: syncedBundleReceipt = \(value).")
+        set(value, forKey: Constants.syncedBundleReceiptKey)
     }
 
     var appleSearchAdsSyncDate: Date? {

@@ -24,14 +24,12 @@ extension Adapty {
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
-    /// - Parameter enableUsageLogs: You can enable "Usage Logs" collection, passing here `true`
     /// - Parameter storeKit2Usage: You can override StoreKit 2 usage policy with this value
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
     public static func activate(_ apiKey: String,
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
-                                enableUsageLogs: Bool = false,
                                 storeKit2Usage: StoreKit2Usage = .default,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
@@ -57,15 +55,18 @@ extension Adapty {
 
             Configuration.setStoreKit2Usage(storeKit2Usage)
             Configuration.observerMode = observerMode
-            Configuration.sendSystemEventsEnabled = enableUsageLogs
 
             let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
 
+            let fallbackBackend = FallbackBackend(secretKey: apiKey, baseURL: Configuration.backendFallbackBaseUrl ?? Backend.publicEnvironmentFallbackBaseUrl, withProxy: Configuration.backendProxy)
+
             Adapty.eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
 
-            shared = Adapty(profileStorage: UserDefaults.standard,
+            shared = Adapty(apiKeyPrefix: String(apiKey.prefix(while: { $0 != "." })),
+                            profileStorage: UserDefaults.standard,
                             vendorIdsStorage: UserDefaults.standard,
                             backend: backend,
+                            fallbackBackend: fallbackBackend,
                             customerUserId: customerUserId)
             LifecycleManager.shared.initialize()
             Log.info("Adapty activated withObserverMode:\(observerMode), withCustomerUserId: \(customerUserId != nil)")
@@ -213,7 +214,7 @@ extension Adapty {
                                       _ completion: AdaptyErrorCompletion? = nil) {
         let logParams: EventParameters = [
             "variation_id": .value(variationId),
-            "transaction_id": .value(String(transaction.id)),
+            "transaction_id": .value(transaction.transactionIdentifier),
         ]
         async(completion, logName: "set_variation_id_sk2", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
@@ -222,41 +223,6 @@ extension Adapty {
                     return
                 }
                 profileManager.setVariationId(variationId, forPurchasedTransaction: transaction, completion)
-            }
-        }
-    }
-
-    /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
-    ///
-    /// - Parameters:
-    ///   - id: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
-    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
-    ///             Example: "en" means English, "en-US" represents US English.
-    ///             If the parameter is omitted, the paywall will be returned in the default locale.
-    ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-    public static func getPaywall(_ id: String,
-                                  locale: String? = nil,
-                                  _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let logParams: EventParameters = [
-            "paywall_id": .value(id),
-            "locale": .valueOrNil(locale),
-        ]
-        async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
-            let fallback = Adapty.Configuration.fallbackPaywalls?.paywalls[id]
-            manager.getProfileManager(waitCreatingProfile: fallback == nil) { result in
-                switch result {
-                case let .success(profileManager):
-                    profileManager.getPaywall(id, locale, completion)
-                case let .failure(error):
-                    guard error.isProfileCreateFailed, let paywall = fallback else {
-                        completion(.failure(error))
-                        return
-                    }
-                    completion(.success(paywall))
-                }
             }
         }
     }
@@ -270,7 +236,7 @@ extension Adapty {
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        async(completion, logName: "get_paywall_products", logParams: ["paywall_id": .value(paywall.id)]) { manager, completion in
+        async(completion, logName: "get_paywall_products", logParams: ["placement_id": .value(paywall.placementId)]) { manager, completion in
             manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SKProduct]>) in
                 completion(result.map { skProducts in
                     skProducts.compactMap { AdaptyPaywallProduct(paywall: paywall, skProduct: $0) }

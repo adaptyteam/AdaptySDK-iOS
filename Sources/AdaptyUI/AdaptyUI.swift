@@ -16,16 +16,20 @@ public enum AdaptyUI {
     public static func getViewConfiguration(data: Data,
                                             _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         struct PrivateParameters: Decodable {
-            let paywallId: String
             let paywallVariationId: String
-            let locale: String
+            let paywallInstanceIdentity: String
+            let locale: AdaptyLocale
             let builderVersion: String
+            let adaptyUISDKVersion: String
+            let loadTimeout: TimeInterval?
 
             enum CodingKeys: String, CodingKey {
-                case paywallId = "paywall_id"
                 case paywallVariationId = "paywall_variation_id"
+                case paywallInstanceIdentity = "paywall_instance_id"
                 case locale
                 case builderVersion = "builder_version"
+                case adaptyUISDKVersion = "ui_sdk_version"
+                case loadTimeout = "load_timeout"
             }
         }
 
@@ -38,52 +42,71 @@ public enum AdaptyUI {
         }
 
         Adapty.async(completion) { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(.failure(profileManager.error!))
-                    return
-                }
-                profileManager.getViewConfiguration(
-                    paywallId: parameters.paywallId,
-                    paywallVariationId: parameters.paywallVariationId,
-                    locale: parameters.locale,
-                    builderVersion: parameters.builderVersion,
-                    responseHash: nil,
-                    completion)
-            }
+            manager.getViewConfiguration(paywallVariationId: parameters.paywallVariationId,
+                                         paywallInstanceIdentity: parameters.paywallInstanceIdentity,
+                                         locale: parameters.locale,
+                                         builderVersion: parameters.builderVersion,
+                                         adaptyUISDKVersion: parameters.adaptyUISDKVersion,
+                                         loadTimeout: (parameters.loadTimeout?.allowedLoadPaywallTimeout ?? .defaultLoadPaywallTimeout).dispatchTimeInterval,
+                                         completion)
         }
     }
 }
 
-extension AdaptyProfileManager {
-    fileprivate func getViewConfiguration(paywallId: String,
-                                          paywallVariationId: String,
-                                          locale: String,
+extension Adapty {
+    fileprivate func getFallbackViewConfiguration(paywallInstanceIdentity: String,
+                                                  locale: AdaptyLocale,
+                                                  builderVersion: String,
+                                                  _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+        httpFallbackSession.performFetchFallbackViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
+                                                                         paywallInstanceIdentity: paywallInstanceIdentity,
+                                                                         locale: locale,
+                                                                         builderVersion: builderVersion,
+                                                                         completion)
+    }
+
+    fileprivate func getViewConfiguration(paywallVariationId: String,
+                                          paywallInstanceIdentity: String,
+                                          locale: AdaptyLocale,
                                           builderVersion: String,
-                                          responseHash: String?,
+                                          adaptyUISDKVersion: String,
+                                          loadTimeout: DispatchTimeInterval,
                                           _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
-        manager.httpSession.performFetchViewConfigurationRequest(paywallId: paywallId,
-                                                                 paywallVariationId: paywallVariationId,
-                                                                 locale: locale,
-                                                                 builderVersion: builderVersion,
-                                                                 responseHash: responseHash) {
-            [weak self] (result: AdaptyResult<VH<AdaptyUI.ViewConfiguration?>>) in
+        var isTerminationCalled = false
 
-            switch result {
-            case let .failure(error):
-                completion(.failure(error))
-            case let .success(viewConfiguration):
-                guard let self = self, self.isActive else {
-                    completion(.failure(.profileWasChanged()))
+        let termination: AdaptyResultCompletion<AdaptyUI.ViewConfiguration> = { [weak self] result in
+            guard !isTerminationCalled else { return }
+            isTerminationCalled = true
+
+            guard let queue = self?.httpSession.responseQueue,
+                  let error = result.error, error.canUseFallbackServer else {
+                completion(result)
+                return
+            }
+
+            queue.async {
+                guard let self = self else {
+                    completion(result)
                     return
                 }
 
-                if let value = viewConfiguration.value {
-                    completion(.success(value))
-                    return
-                }
+                self.getFallbackViewConfiguration(paywallInstanceIdentity: paywallInstanceIdentity,
+                                                  locale: locale,
+                                                  builderVersion: builderVersion,
+                                                  completion)
+            }
+        }
 
-                completion(.failure(.cacheHasNoViewConfiguration()))
+        httpSession.performFetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
+                                                         paywallVariationId: paywallVariationId,
+                                                         locale: locale,
+                                                         builderVersion: builderVersion,
+                                                         adaptyUISDKVersion: adaptyUISDKVersion,
+                                                         termination)
+
+        if loadTimeout != .never, !isTerminationCalled {
+            Adapty.underlayQueue.asyncAfter(deadline: .now() - .milliseconds(500) + loadTimeout) {
+                termination(.failure(.fetchViewConfigurationTimeout()))
             }
         }
     }

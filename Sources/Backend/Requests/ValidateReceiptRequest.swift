@@ -46,10 +46,23 @@ struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRes
 }
 
 extension HTTPSession {
+    func performValidateTransactionRequest(profileId: String,
+                                           purchaseProductInfo: PurchaseProductInfo,
+                                           withReceipt receipt: Data,
+                                           _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        _performValidateReceiptRequest(profileId, receipt, purchaseProductInfo, completion)
+    }
+
     func performValidateReceiptRequest(profileId: String,
                                        receipt: Data,
-                                       purchaseProductInfo: PurchaseProductInfo? = nil,
                                        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        _performValidateReceiptRequest(profileId, receipt, nil, completion)
+    }
+
+    fileprivate func _performValidateReceiptRequest(_ profileId: String,
+                                                    _ receipt: Data,
+                                                    _ purchaseProductInfo: PurchaseProductInfo?,
+                                                    _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         let request = ValidateReceiptRequest(profileId: profileId,
                                              receipt: receipt,
                                              purchaseProductInfo: purchaseProductInfo)

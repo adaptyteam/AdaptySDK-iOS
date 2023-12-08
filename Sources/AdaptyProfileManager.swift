@@ -48,7 +48,7 @@ extension AdaptyProfileManager {
             case let .success(profile):
                 self?.manager.onceSentEnvironment = true
                 if let value = profile.value, let self = self, self.isActive {
-                    self.saveResponse(VH(value, hash: profile.hash))
+                    self.saveResponse(profile.withValue(value))
                 }
                 completion(.success(profile.value ?? old))
             }
@@ -63,7 +63,7 @@ extension AdaptyProfileManager {
                 completion(.failure(error))
             case let .success(profile):
                 if let value = profile.value, let self = self, self.isActive {
-                    self.saveResponse(VH(value, hash: profile.hash))
+                    self.saveResponse(profile.withValue(value))
                 }
                 completion(.success(profile.value ?? old))
             }
@@ -116,7 +116,7 @@ extension AdaptyProfileManager {
         manager.httpSession.performSetTransactionVariationIdRequest(profileId: profileId, transactionId: transactionId, variationId: variationId, completion)
     }
 
-    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SKPaymentTransaction, _ completion: @escaping AdaptyErrorCompletion) {
+    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK1Transaction, _ completion: @escaping AdaptyErrorCompletion) {
         guard transaction.transactionState == .purchased || transaction.transactionState == .restored else {
             completion(.wrongParamPurchasedTransaction())
             return
@@ -128,12 +128,12 @@ extension AdaptyProfileManager {
                 return
             }
 
-            self.manager.validatePurchaseByReceipt(info: purchaseProductInfo) { completion($0.error) }
+            self.manager.validatePurchase(info: purchaseProductInfo) { completion($0.error) }
         }
     }
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: Transaction, _ completion: @escaping AdaptyErrorCompletion) {
+    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK2Transaction, _ completion: @escaping AdaptyErrorCompletion) {
         manager.skProductsManager.fetchPurchaseProductInfo(variationId: variationId, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
 
             guard let self = self, self.isActive else {
@@ -141,53 +141,10 @@ extension AdaptyProfileManager {
                 return
             }
 
-            self.manager.validatePurchaseByOriginalTransaction(originalTransactionId: String(transaction.originalID),
-                                                               info: purchaseProductInfo) { completion($0.error) }
+            self.manager.validatePurchase(info: purchaseProductInfo) { completion($0.error) }
         }
     }
 
-    func getPaywall(_ id: String, _ locale: String?, _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        let old = paywallsCache.getPaywallByLocaleOrDefault(locale, withId: id)
-        manager.httpSession.performFetchPaywallRequest(paywallId: id,
-                                                       locale: locale,
-                                                       profileId: profileId,
-                                                       responseHash: old?.hash) {
-            [weak self] (result: AdaptyResult<VH<AdaptyPaywall?>>) in
-
-            guard let self = self, self.isActive else {
-                completion(.failure(.profileWasChanged()))
-                return
-            }
-
-            switch result {
-            case let .failure(error):
-                guard let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) ?? old?.value
-                else {
-                    completion(.failure(error))
-                    return
-                }
-                completion(.success(value))
-            case let .success(paywall):
-
-                if let value = paywall.value {
-                    completion(.success(self.paywallsCache.savedPaywall(VH(value, hash: paywall.hash))))
-                    return
-                }
-
-                if let value = old?.value {
-                    completion(.success(value))
-                    return
-                }
-
-                if let value = self.paywallsCache.getPaywallWithFallback(byId: id, locale: locale) {
-                    completion(.success(value))
-                    return
-                }
-
-                completion(.failure(.cacheHasNoPaywall()))
-            }
-        }
-    }
 
     func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
         guard !manager.profileStorage.syncedBundleReceipt else {
@@ -228,7 +185,7 @@ extension AdaptyProfileManager {
                 completion(.success(value))
             case let .success(products):
                 if let value = products.value {
-                    self.productStatesCache.setBackendProductStates(VH(value, hash: products.hash))
+                    self.productStatesCache.setBackendProductStates(products.withValue(value))
                 }
                 completion(.success(self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)))
             }

@@ -11,6 +11,6 @@ import Foundation
 
 extension Backend {
     static func createForTests() -> Backend {
-        Backend(secretKey: Adapty.Configuration.secretKey)
+        Backend(secretKey: Adapty.Configuration.secretKey, baseURL: Backend.publicEnvironmentBaseUrl)
     }
 }

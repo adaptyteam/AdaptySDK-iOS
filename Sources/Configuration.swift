@@ -16,10 +16,11 @@ extension Adapty {
         static var idfaCollectionDisabled: Bool = false
 
         static var observerMode: Bool = false
-        static var sendSystemEventsEnabled: Bool = true
         static let storeKit2Enabled: Bool = false
 
         static var backendBaseUrl: URL?
+        static var backendFallbackBaseUrl: URL?
+
         static var backendProxy: (host: String, port: Int)?
     }
 
@@ -36,6 +37,10 @@ extension Adapty {
 
     public static func setBackendEnvironment(baseUrl: URL) {
         Configuration.backendBaseUrl = baseUrl
+    }
+
+    public static func setBackendEnvironment(fallbackBaseUrl: URL) {
+        Configuration.backendFallbackBaseUrl = fallbackBaseUrl
     }
 
     public static func setBackendEnvironment(withProxy host: String, withProxyPort port: Int) {

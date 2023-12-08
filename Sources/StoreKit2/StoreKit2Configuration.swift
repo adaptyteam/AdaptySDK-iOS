@@ -7,7 +7,7 @@
 
 /// Defines StoreKit 2 utilization behaviour.
 public enum StoreKit2Usage {
-    public static let `default`: Self = .disabled
+    public static let `default`: Self = .forIntroEligibilityCheck
 
     /// Adapty will never use StoreKit 2.
     case disabled
@@ -37,7 +37,7 @@ extension Adapty.Configuration {
         default: return true
         }
     }
-    
+
     private static var _storeKit2Usage: StoreKit2Usage = .default
 
     static func setStoreKit2Usage(_ value: StoreKit2Usage) {

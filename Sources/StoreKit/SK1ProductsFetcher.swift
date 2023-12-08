@@ -10,7 +10,6 @@ import StoreKit
 
 final class SK1ProductsFetcher: NSObject {
     private let queue: DispatchQueue
-    private var invalidProductIdentifiers = Set<String>()
     private var products = [String: SKProduct]()
     private var requests = [SKRequest: (productIds: Set<String>, retryCount: Int)]()
     private var completionHandlers = [Set<String>: [AdaptyResultCompletion<[SKProduct]>]]()
@@ -40,7 +39,6 @@ final class SK1ProductsFetcher: NSObject {
                 }
             }
 
-            let productIds = productIds.subtracting(self.invalidProductIdentifiers)
             guard !productIds.isEmpty else {
                 completion(.failure(SKManagerError.noProductIDsFound().asAdaptyError))
                 return
@@ -94,7 +92,6 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
             guard let self = self else { return }
             if !response.invalidProductIdentifiers.isEmpty {
                 Log.warn("SK1ProductsFetcher: InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
-                self.invalidProductIdentifiers.formUnion(response.invalidProductIdentifiers)
             }
 
             guard let productIds = self.requests[request]?.productIds else {

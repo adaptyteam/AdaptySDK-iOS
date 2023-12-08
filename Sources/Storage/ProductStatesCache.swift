@@ -18,7 +18,7 @@ final class ProductStatesCache {
 
     init(storage: BackendProductStatesStorage) {
         self.storage = storage
-        products = storage.getBackendProductStates().map { VH($0.value.asDictionary, hash: $0.hash) }
+        products = storage.getBackendProductStates().map { $0.mapValue { $0.asDictionary } }
     }
 
     func getBackendProductState(byId id: String) -> BackendProductState? { products?.value[id] }
@@ -32,7 +32,8 @@ final class ProductStatesCache {
 
     func setBackendProductStates(_ products: VH<[BackendProductState]>) {
         var updated = false
-        let array = products.value.map { product -> BackendProductState in
+
+        let newValue = products.value.map { product -> BackendProductState in
             guard let cached = self.products?.value[product.vendorId] else {
                 updated = true
                 return product
@@ -45,12 +46,11 @@ final class ProductStatesCache {
                 return cached
             }
         }
+
         guard updated else { return }
 
-
-        self.products = VH(array.asDictionary, hash: products.hash)
-        storage.setBackendProductStates(VH(array, hash: products.hash))
-
-   
+        let array = products.withValue(newValue)
+        self.products = array.mapValue { $0.asDictionary }
+        storage.setBackendProductStates(array)
     }
 }

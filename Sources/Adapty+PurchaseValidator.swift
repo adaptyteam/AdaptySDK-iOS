@@ -8,8 +8,7 @@
 import Foundation
 
 protocol PurchaseValidator {
-    func validatePurchaseByReceipt(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>)
-    func validatePurchaseByOriginalTransaction(originalTransactionId: String, info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>)
+    func validatePurchase(info: PurchaseProductInfo, _: @escaping AdaptyResultCompletion<AdaptyProfile>)
 }
 
 extension Adapty: PurchaseValidator {
@@ -24,14 +23,29 @@ extension Adapty: PurchaseValidator {
 
     fileprivate func saveValidateReceiptResponse(profile: VH<AdaptyProfile>) {
         if profileStorage.profileId == profile.value.profileId {
-            profileStorage.setSyncedBundleReceipt()
+            profileStorage.setSyncedBundleReceipt(true)
         }
         if let manager = state.initialized {
             manager.saveResponse(profile)
         }
     }
 
-    func validatePurchaseByReceipt(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    func validatePurchase(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        guard info.originalTransactionId != nil, Environment.StoreKit2.available else {
+            validatePurchaseByReceipt(info: info, completion)
+            return
+        }
+
+        httpSession.performValidateTransactionRequest(profileId: profileStorage.profileId,
+                                                      purchaseProductInfo: info) { [weak self] result in
+            completion(result.map { profile in
+                self?.saveValidateReceiptResponse(profile: profile)
+                return profile.value
+            })
+        }
+    }
+
+    fileprivate func validatePurchaseByReceipt(info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         skReceiptManager.getReceipt(refreshIfEmpty: true) { [weak self] result in
             switch result {
             case let .failure(error):
@@ -39,27 +53,15 @@ extension Adapty: PurchaseValidator {
             case let .success(receipt):
                 guard let self = self else { return }
                 let profileId = self.profileStorage.profileId
-                self.httpSession.performValidateReceiptRequest(profileId: profileId,
-                                                               receipt: receipt,
-                                                               purchaseProductInfo: info) { [weak self] result in
+                self.httpSession.performValidateTransactionRequest(profileId: profileId,
+                                                                   purchaseProductInfo: info,
+                                                                   withReceipt: receipt) { [weak self] result in
                     completion(result.map { profile in
                         self?.saveValidateReceiptResponse(profile: profile)
                         return profile.value
                     })
                 }
             }
-        }
-    }
-
-    func validatePurchaseByOriginalTransaction(originalTransactionId: String, info: PurchaseProductInfo, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        let profileId = profileStorage.profileId
-        httpSession.performValidateTransactionRequest(profileId: profileId,
-                                                      originalTransactionId: originalTransactionId,
-                                                      purchaseProductInfo: info) { [weak self] result in
-            completion(result.map { profile in
-                self?.saveValidateReceiptResponse(profile: profile)
-                return profile.value
-            })
         }
     }
 }

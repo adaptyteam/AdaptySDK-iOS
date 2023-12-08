@@ -10,7 +10,7 @@ import Foundation
 final class HTTPSession {
     let configuration: HTTPCodableConfiguration
     let responseQueue: DispatchQueue
-    let requestAdditionals: HTTPRequestAdditionals?
+    let requestAdditional: HTTPRequestAdditional?
     private let _responseValidator: HTTPDataResponse.Validator
     private let _errorHandler: ErrorHandler?
     private let _session: URLSession
@@ -25,14 +25,14 @@ final class HTTPSession {
     init(
         configuration: HTTPCodableConfiguration,
         responseQueue: DispatchQueue = .main,
-        requestAdditionals: HTTPRequestAdditionals? = nil,
+        requestAdditional: HTTPRequestAdditional? = nil,
         requestSign: Sign? = nil,
         responseValidator: @escaping HTTPDataResponse.Validator = HTTPDataResponse.defaultValidator,
         errorHandler: ErrorHandler? = nil,
         forceLogCurl: Bool = false
     ) {
         self.configuration = configuration
-        self.requestAdditionals = requestAdditionals
+        self.requestAdditional = requestAdditional
         self.responseQueue = responseQueue
         self.forceLogCurl = forceLogCurl
         self.requestSign = requestSign ?? { r, _ in .success(r) }
@@ -58,7 +58,7 @@ final class HTTPSession {
         let endpoint = request.endpoint
         let urlRequest: URLRequest
 
-        switch request.tryConvertToURLRequest(configuration: configuration, additionals: requestAdditionals)
+        switch request.tryConvertToURLRequest(configuration: configuration, additional: requestAdditional)
             .flatMap({ requestSign($0, request.endpoint) }) {
         case let .success(request):
             urlRequest = request

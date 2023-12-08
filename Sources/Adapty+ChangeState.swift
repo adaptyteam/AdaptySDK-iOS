@@ -10,8 +10,13 @@ import Foundation
 public final class Adapty {
     static var shared: Adapty?
     let profileStorage: ProfileStorage
+    let apiKeyPrefix: String
     let backend: Backend
+    let fallbackBackend: FallbackBackend
+
     let httpSession: HTTPSession
+    let httpFallbackSession: HTTPSession
+
     let skProductsManager: SKProductsManager
     let skReceiptManager: SKReceiptManager
     let skQueueManager: SKQueueManager
@@ -19,16 +24,20 @@ public final class Adapty {
     var onceSentEnvironment: Bool = false
     var state: State
 
-    init(profileStorage: ProfileStorage,
+    init(apiKeyPrefix: String,
+         profileStorage: ProfileStorage,
          vendorIdsStorage: ProductVendorIdsStorage,
          backend: Backend,
+         fallbackBackend: FallbackBackend,
          customerUserId: String?) {
+        self.apiKeyPrefix = apiKeyPrefix
         self.backend = backend
+        self.fallbackBackend = fallbackBackend
         self.profileStorage = profileStorage
         vendorIdsCache = ProductVendorIdsCache(storage: vendorIdsStorage)
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)
-
-        skProductsManager = SKProductsManager(storage: UserDefaults.standard, backend: backend)
+        httpFallbackSession = fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
+        skProductsManager = SKProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, backend: backend)
         skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
 
@@ -258,6 +267,7 @@ extension Adapty {
                 if profileId != profile.value.profileId {
                     storage.clearProfile(newProfileId: profile.value.profileId)
                 }
+                storage.setSyncedBundleReceipt(false)
                 storage.setProfile(profile)
 
                 self.validateReceipt(refreshIfEmpty: false) { result in

@@ -13,6 +13,8 @@ protocol HTTPRequest {
     var endpoint: HTTPEndpoint { get }
     var headers: Headers { get }
     var queryItems: QueryItems { get }
+    var cachePolicy: URLRequest.CachePolicy? { get }
+    var timeoutInterval: TimeInterval? { get }
     var forceLogCurl: Bool { get }
 }
 
@@ -20,7 +22,7 @@ protocol HTTPDataRequest: HTTPRequest {
     func getData(configuration: HTTPConfiguration) throws -> Data?
 }
 
-protocol HTTPRequestAdditionals: Sendable {
+protocol HTTPRequestAdditional: Sendable {
     var headers: HTTPRequest.Headers? { get }
     var queryItems: HTTPRequest.QueryItems? { get }
 }
@@ -30,6 +32,8 @@ extension HTTPRequest {
     var method: HTTPMethod { endpoint.method }
     var headers: Headers { [:] }
     var queryItems: QueryItems { [] }
+    var cachePolicy: URLRequest.CachePolicy? { nil }
+    var timeoutInterval: TimeInterval? { nil }
     var forceLogCurl: Bool { false }
 }
 
@@ -42,7 +46,7 @@ enum HTTPRequestError: Error {
 }
 
 extension HTTPRequest {
-    func tryConvertToURLRequest(configuration: HTTPCodableConfiguration, additionals: HTTPRequestAdditionals?) -> Result<URLRequest, HTTPError> {
+    func tryConvertToURLRequest(configuration: HTTPCodableConfiguration, additional: HTTPRequestAdditional?) -> Result<URLRequest, HTTPError> {
         let preUrl = configuration.baseURL.appendingPathComponent(endpoint.path)
 
         guard var urlComponents = URLComponents(url: preUrl, resolvingAgainstBaseURL: false) else {
@@ -50,8 +54,8 @@ extension HTTPRequest {
         }
 
         var queryItems = self.queryItems
-        if let additionalsQueryItems = additionals?.queryItems {
-            queryItems.append(contentsOf: additionalsQueryItems)
+        if let additionalQueryItems = additional?.queryItems {
+            queryItems.append(contentsOf: additionalQueryItems)
         }
 
         if !queryItems.isEmpty {
@@ -62,14 +66,20 @@ extension HTTPRequest {
             return .failure(HTTPError.perform(endpoint, error: HTTPRequestError.wrongEncodingUrl))
         }
 
-        var request = URLRequest(url: url)
+        var request = URLRequest(
+            url: url,
+            cachePolicy: cachePolicy ?? .useProtocolCachePolicy,
+            timeoutInterval: timeoutInterval ?? 60.0
+        )
+
         request.httpMethod = endpoint.method.rawValue
-        var requestHeaders = headers
 
-        additionals?.headers?.forEach { requestHeaders[$0] = $1 }
+        headers.forEach {
+            request.setValue($1, forHTTPHeaderField: $0)
+        }
 
-        if !requestHeaders.isEmpty {
-            request.allHTTPHeaderFields = requestHeaders
+        additional?.headers?.forEach {
+            request.setValue($1, forHTTPHeaderField: $0)
         }
 
         if let params = self as? HTTPDataRequest {

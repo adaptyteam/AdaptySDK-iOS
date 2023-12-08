@@ -17,20 +17,17 @@ import StoreKit
         /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
         /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
         /// - Parameter customerUserId: User identifier in your system
-        /// - Parameter enableUsageLogs: You can enable "Usage Logs" collection, passing here `true`
         /// - Parameter storeKit2Usage: You can override StoreKit 2 usage policy with this value
         /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
         public static func activate(_ apiKey: String,
                                     observerMode: Bool = false,
                                     customerUserId: String? = nil,
-                                    enableUsageLogs: Bool = false,
                                     storeKit2Usage: StoreKit2Usage = .default,
                                     dispatchQueue: DispatchQueue = .main) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.activate(apiKey,
                                 observerMode: observerMode,
                                 customerUserId: customerUserId,
-                                enableUsageLogs: enableUsageLogs,
                                 storeKit2Usage: storeKit2Usage,
                                 dispatchQueue: dispatchQueue) { error in
                     if let error = error {
@@ -125,16 +122,22 @@ import StoreKit
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
         ///
         /// - Parameters:
-        ///   - id: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
+        ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
         ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
         ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
         ///             Example: "en" means English, "en-US" represents US English.
         ///             If the parameter is omitted, the paywall will be returned in the default locale.
+        ///   - fetchPolicy:
         /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
         /// - Throws: An ``AdaptyError`` object
-        public static func getPaywall(_ id: String, locale: String? = nil) async throws -> AdaptyPaywall {
+        public static func getPaywall(
+            placementId: String,
+            locale: String? = nil,
+            fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+            loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
+        ) async throws -> AdaptyPaywall {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.getPaywall(id, locale: locale) { result in
+                Adapty.getPaywall(placementId: placementId, locale: locale, fetchPolicy: fetchPolicy, loadTimeout: loadTimeout) { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)

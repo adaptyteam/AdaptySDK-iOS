@@ -8,9 +8,10 @@
 import Foundation
 
 public struct AdaptyPaywall {
-    internal static var defaultLocale = "en"
-    /// An identifier of a paywall, configured in Adapty Dashboard.
-    public let id: String
+    /// An identifier of a placement, configured in Adapty Dashboard.
+    public let placementId: String
+
+    public let instanceIdentity: String
 
     /// A paywall name.
     public let name: String
@@ -50,7 +51,7 @@ public struct AdaptyPaywall {
 
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
+        "(placementId: \(placementId), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
             + (remoteConfigString == nil ? "" : "remoteConfig: \(remoteConfigString!), ")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }
@@ -58,7 +59,8 @@ extension AdaptyPaywall: CustomStringConvertible {
 
 extension AdaptyPaywall: Codable {
     enum CodingKeys: String, CodingKey {
-        case id = "developer_id"
+        case placementId = "developer_id"
+        case instanceIdentity = "paywall_id"
         case revision
         case variationId = "variation_id"
         case abTestName = "ab_test_name"
@@ -73,7 +75,8 @@ extension AdaptyPaywall: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(String.self, forKey: .id)
+        placementId = try container.decode(String.self, forKey: .placementId)
+        instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
         version = try container.decode(Int64.self, forKey: .version)
         revision = try container.decode(Int.self, forKey: .revision)
@@ -83,17 +86,19 @@ extension AdaptyPaywall: Codable {
         hasViewConfiguration = try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false
 
         if let remoteConfig = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig) {
-            locale = try remoteConfig.decode(String.self, forKey: .remoteConfigLocale)
+            locale = (try remoteConfig.decode(AdaptyLocale.self, forKey: .remoteConfigLocale)).id
             remoteConfigString = try remoteConfig.decodeIfPresent(String.self, forKey: .remoteConfigString)
         } else {
-            locale = AdaptyPaywall.defaultLocale
+            let requestLocale = decoder.userInfo[FetchPaywallRequest.localeCodeUserInfoKey] as? AdaptyLocale
+            locale = (requestLocale ?? AdaptyLocale.defaultPaywallLocale).languageCode.lowercased()
             remoteConfigString = nil
         }
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
+        try container.encode(placementId, forKey: .placementId)
+        try container.encode(instanceIdentity, forKey: .instanceIdentity)
         try container.encode(name, forKey: .name)
         try container.encode(version, forKey: .version)
         try container.encode(revision, forKey: .revision)
@@ -101,7 +106,6 @@ extension AdaptyPaywall: Codable {
         try container.encode(abTestName, forKey: .abTestName)
         try container.encode(products, forKey: .products)
         try container.encode(hasViewConfiguration, forKey: .hasViewConfiguration)
-
         var remoteConfig = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig)
         try remoteConfig.encode(locale, forKey: .remoteConfigLocale)
         try remoteConfig.encodeIfPresent(remoteConfigString, forKey: .remoteConfigString)
@@ -109,8 +113,8 @@ extension AdaptyPaywall: Codable {
 }
 
 extension Sequence where Element == VH<AdaptyPaywall> {
-    var asDictionary: [String: VH<AdaptyPaywall>] {
-        Dictionary(map { ($0.value.id, $0) }, uniquingKeysWith: { first, second in
+    var asPaywallByPlacementId: [String: VH<AdaptyPaywall>] {
+        Dictionary(map { ($0.value.placementId, $0) }, uniquingKeysWith: { first, second in
             first.value.version > second.value.version ? first : second
         })
     }

@@ -11,12 +11,13 @@ typealias HTTPDataResponse = HTTPResponse<Data?>
 typealias HTTPStringResponse = HTTPResponse<String?>
 typealias HTTPEmptyResponse = HTTPResponse<Void>
 
-struct HTTPResponse<Body> {
-    typealias Headers = [AnyHashable: Any]
+// https://github.com/apple/swift-corelibs-foundation/issues/4338
+typealias HTTPResponseHeaders = NSDictionary
 
+struct HTTPResponse<Body> {
     let endpoint: HTTPEndpoint
     let statusCode: Int
-    let headers: Headers
+    let headers: HTTPResponseHeaders
     let body: Body
 }
 
@@ -32,18 +33,18 @@ extension HTTPResponse {
 
 extension HTTPStringResponse {
     init(endpoint: HTTPEndpoint, response: HTTPURLResponse, string: String?) {
-        self.init(endpoint: endpoint, statusCode: response.statusCode, headers: response.allHeaderFields, body: string)
+        self.init(endpoint: endpoint, statusCode: response.statusCode, headers: response.allHeaderFields as HTTPResponseHeaders, body: string)
     }
 }
 
 extension HTTPDataResponse {
     init(endpoint: HTTPEndpoint, response: HTTPURLResponse, data: Data?) {
-        self.init(endpoint: endpoint, statusCode: response.statusCode, headers: response.allHeaderFields, body: data)
+        self.init(endpoint: endpoint, statusCode: response.statusCode, headers: response.allHeaderFields as HTTPResponseHeaders, body: data)
     }
 }
 
 extension HTTPEmptyResponse {
-    init(endpoint: HTTPEndpoint, statusCode: Int, headers: Headers) {
+    init(endpoint: HTTPEndpoint, statusCode: Int, headers: HTTPResponseHeaders) {
         self.init(endpoint: endpoint, statusCode: statusCode, headers: headers, body: ())
     }
 }

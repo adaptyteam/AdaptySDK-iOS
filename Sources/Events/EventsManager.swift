@@ -7,11 +7,6 @@
 
 import Foundation
 
-protocol EventsBackendConfigurationStorage: AnyObject {
-    func setEventsConfiguration(_ value: EventsBackendConfiguration)
-    func getEventsConfiguration() -> EventsBackendConfiguration?
-}
-
 final class EventsManager {
     private enum Constants {
         static let sendingLimitEvents = 500
@@ -22,32 +17,25 @@ final class EventsManager {
 
     private let dispatchQueue: DispatchQueue
     private let storage: EventCollectionStorage
-    private let configurationStorage: EventsBackendConfigurationStorage
     private var configuration: EventsBackendConfiguration
     private let backendSession: HTTPSession?
     private var sending: Bool = false
 
     convenience init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
-                     storage: EventsStorage & EventsBackendConfigurationStorage,
+                     storage: EventsStorage,
                      backend: Backend?) {
         self.init(dispatchQueue: dispatchQueue,
                   storage: EventCollectionStorage(with: storage),
-                  configurationStorage: storage,
                   backend: backend)
     }
 
     init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
          storage: EventCollectionStorage,
-         configurationStorage: EventsBackendConfigurationStorage,
          backend: Backend?) {
         self.storage = storage
         self.dispatchQueue = dispatchQueue
-        self.configurationStorage = configurationStorage
 
-        var configuration = configurationStorage.getEventsConfiguration() ?? EventsBackendConfiguration()
-        if !Adapty.Configuration.sendSystemEventsEnabled {
-            configuration.blacklist.formUnion(EventType.systemEvents)
-        }
+        let configuration = EventsBackendConfiguration()
         self.configuration = configuration
 
         guard let backend = backend else {
@@ -155,12 +143,7 @@ final class EventsManager {
             case let .failure(error):
                 completion(.sending(error))
             case let .success(response):
-                var configuration = response.body.value
-                self?.configurationStorage.setEventsConfiguration(configuration)
-                if !Adapty.Configuration.sendSystemEventsEnabled {
-                    configuration.blacklist.formUnion(EventType.systemEvents)
-                }
-                self?.configuration = configuration
+                self?.configuration = response.body.value
                 completion(nil)
             }
         }

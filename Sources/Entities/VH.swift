@@ -10,15 +10,34 @@ import Foundation
 struct VH<T> {
     let value: T
     let hash: String?
+    let time: Date?
 
-    init(_ value: T, hash: String?) {
+    private init(_ value: T, hash: String?, time: Date?) {
         self.value = value
         self.hash = hash
+        self.time = time
+    }
+
+    init(_ value: T, hash: String?) {
+        self.init(value, hash: hash, time: nil)
+    }
+
+    init(_ value: T, time: Date) {
+        self.init(value, hash: nil, time: time)
     }
 
     enum CodingKeys: String, CodingKey {
         case value = "v"
         case hash = "h"
+        case time = "t"
+    }
+
+    @inlinable func withValue<U>(_ other: U) -> VH<U> {
+        VH<U>(other, hash: hash, time: time)
+    }
+
+    @inlinable func mapValue<U>(_ transform: (T) -> U) -> VH<U> {
+        withValue(transform(value))
     }
 }
 

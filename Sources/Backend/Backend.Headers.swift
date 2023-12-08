@@ -10,9 +10,15 @@ import Foundation
 extension Backend.Request {
     fileprivate static let authorizationHeaderKey = "Authorization"
     fileprivate static let hashHeaderKey = "adapty-sdk-previous-response-hash"
+    fileprivate static let paywallLocaleHeaderKey = "adapty-paywall-locale"
+    fileprivate static let viewConfigurationLocaleHeaderKey = "adapty-paywall-builder-locale"
+    fileprivate static let adaptyUISDKVersionHeaderKey = "adapty-ui-version"
+    fileprivate static let visualBuilderVersion = "adapty-paywall-builder-version"
+
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
     fileprivate static let sdkPlatformHeaderKey = "adapty-sdk-platform"
+    fileprivate static let sdkStoreHeaderKey = "adapty-sdk-store"
     fileprivate static let sessionIDHeaderKey = "adapty-sdk-session"
     fileprivate static let appVersionHeaderKey = "adapty-app-version"
 
@@ -28,6 +34,7 @@ extension Backend.Request {
             authorizationHeaderKey: "Api-Key \(secretKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
             sdkPlatformHeaderKey: Environment.System.name,
+            sdkStoreHeaderKey: "app_store",
             sessionIDHeaderKey: Environment.Application.sessionIdentifier,
             appInstallIdHeaderKey: Environment.Application.installationIdentifier,
             isSandboxHeaderKey: Environment.System.isSandbox ? "true" : "false",
@@ -49,31 +56,45 @@ extension Backend.Request {
 
 extension Backend.Response {
     fileprivate static let hashHeaderKey = "x-response-hash"
-    fileprivate static let requestIdHeaderKey = "Request-Id"
+    fileprivate static let requestIdHeaderKey = "request-id"
 }
 
 extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.Headers.Value {
+    func setPaywallLocale(_ locale: AdaptyLocale?) -> Self {
+        updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallLocaleHeaderKey)
+    }
+
+    func setViewConfigurationLocale(_ locale: AdaptyLocale?) -> Self {
+        updateOrRemoveValue(locale?.id, forKey: Backend.Request.viewConfigurationLocaleHeaderKey)
+    }
+
+    func setAdaptyUISDKVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.adaptyUISDKVersionHeaderKey)
+    }
+
+    func setVisualBuilderVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderVersion)
+    }
+
     func setBackendResponseHash(_ hash: String?) -> Self {
-        var headers = self
-        if let hash = hash {
-            headers.updateValue(hash, forKey: Backend.Request.hashHeaderKey)
-        } else {
-            headers.removeValue(forKey: Backend.Request.hashHeaderKey)
-        }
-        return headers
+        updateOrRemoveValue(hash, forKey: Backend.Request.hashHeaderKey)
     }
 
     func setBackendProfileId(_ profileId: String?) -> Self {
+        updateOrRemoveValue(profileId, forKey: Backend.Request.profileIdHeaderKey)
+    }
+
+    private func updateOrRemoveValue(_ value: String?, forKey key: String) -> Self {
         var headers = self
-        if let profileId = profileId {
-            headers.updateValue(profileId, forKey: Backend.Request.profileIdHeaderKey)
+        if let value = value {
+            headers.updateValue(value, forKey: key)
         } else {
-            headers.removeValue(forKey: Backend.Request.profileIdHeaderKey)
+            headers.removeValue(forKey: key)
         }
         return headers
     }
 
-    func hasSameBackendResponseHash(_ responseHeaders: [AnyHashable: Any]) -> Bool {
+    func hasSameBackendResponseHash(_ responseHeaders: HTTPResponseHeaders) -> Bool {
         guard let requestHash = self[Backend.Request.hashHeaderKey],
               let responseHash = responseHeaders.getBackendResponseHash(),
               requestHash == responseHash
@@ -82,7 +103,7 @@ extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.
     }
 }
 
-extension Dictionary where Key == HTTPResponse.Headers.Key, Value == HTTPResponse.Headers.Value {
+extension HTTPResponseHeaders {
     func getBackendResponseHash() -> String? {
         let value = self[Backend.Response.hashHeaderKey] as? String
         return value

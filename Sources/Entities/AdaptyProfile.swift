@@ -14,6 +14,8 @@ public struct AdaptyProfile {
     /// An identifier of a user in your system.
     public let customerUserId: String?
 
+    let segmentId: String
+
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
     /// Previously set user custom attributes with `.updateProfile()` method.
@@ -33,6 +35,7 @@ extension AdaptyProfile: Equatable {
     public static func == (lhs: AdaptyProfile, rhs: AdaptyProfile) -> Bool {
         lhs.profileId == rhs.profileId
             && lhs.customerUserId == rhs.customerUserId
+            && lhs.segmentId == rhs.segmentId
             && lhs.codableCustomAttributes == rhs.codableCustomAttributes
             && lhs.accessLevels == rhs.accessLevels
             && lhs.subscriptions == rhs.subscriptions
@@ -44,6 +47,7 @@ extension AdaptyProfile: CustomStringConvertible {
     public var description: String {
         "(profileId: \(profileId), "
             + (customerUserId == nil ? "" : "customerUserId: \(customerUserId!), ")
+            + "segmentId: \(segmentId), "
             + (codableCustomAttributes == nil ? "" : "customAttributes: \(customAttributes), ")
             + "accessLevels: \(accessLevels), subscriptions: \(subscriptions), nonSubscriptions: \(nonSubscriptions))"
     }
@@ -53,6 +57,7 @@ extension AdaptyProfile: Codable {
     enum CodingKeys: String, CodingKey {
         case profileId = "profile_id"
         case customerUserId = "customer_user_id"
+        case segmentId = "segment_hash"
         case customAttributes = "custom_attributes"
         case accessLevels = "paid_access_levels"
         case subscriptions
@@ -63,6 +68,7 @@ extension AdaptyProfile: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         profileId = try container.decode(String.self, forKey: .profileId)
         customerUserId = try container.decodeIfPresent(String.self, forKey: .customerUserId)
+        segmentId = try container.decode(String.self, forKey: .segmentId)
         codableCustomAttributes = try container.decodeIfPresent(AdaptyProfile.CustomAttributes.self, forKey: .customAttributes)
         customAttributes = codableCustomAttributes?.convertToSimpleDictionary() ?? [:]
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
@@ -74,6 +80,7 @@ extension AdaptyProfile: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(profileId, forKey: .profileId)
         try container.encodeIfPresent(customerUserId, forKey: .customerUserId)
+        try container.encode(segmentId, forKey: .segmentId)
         try container.encodeIfPresent(codableCustomAttributes, forKey: .customAttributes)
         if !accessLevels.isEmpty {
             try container.encode(accessLevels, forKey: .accessLevels)
