@@ -105,12 +105,12 @@ final class SKReceiptManager: NSObject {
         do {
             data = try Data(contentsOf: url)
         } catch {
-            Log.error("SKReceiptManager: Receipt Data did not loaded. \(error)")
+            Log.error("SKReceiptManager: The receipt data failed to load. \(error)")
             return .failure(SKManagerError.receiptIsEmpty(error).asAdaptyError)
         }
 
         if data.isEmpty {
-            Log.error("SKReceiptManager: Receipt Data is empty")
+            Log.error("SKReceiptManager: The receipt data is empty.")
             return .failure(SKManagerError.receiptIsEmpty().asAdaptyError)
         }
 
