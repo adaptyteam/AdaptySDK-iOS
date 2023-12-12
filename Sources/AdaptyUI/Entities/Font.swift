@@ -10,8 +10,10 @@ import Foundation
 
 extension AdaptyUI {
     public struct Font {
-        public let name: String
-        public let style: String
+        public let alias: String
+        public let familyName: String
+        public let weight: Int?
+        public let italic: Bool
         public let defaultSize: Double?
         public let defaultColor: AdaptyUI.Color?
         public let defaultHorizontalAlign: AdaptyUI.HorizontalAlign?

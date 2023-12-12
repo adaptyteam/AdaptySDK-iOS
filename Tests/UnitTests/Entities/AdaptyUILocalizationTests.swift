@@ -32,7 +32,7 @@ func XCTAssertEqual(_ expression: AdaptyUI.Localization?, withJSONValue jsonValu
             return
         }
 
-        XCTAssertEqual(value.strings![id], withJSONValue: object["value"])
+        XCTAssertEqual(value.strings![id]?.value, withJSONValue: object["value"])
     }
 }
 

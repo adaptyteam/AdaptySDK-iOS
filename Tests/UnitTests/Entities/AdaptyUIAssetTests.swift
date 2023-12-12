@@ -51,8 +51,10 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonV
         // TODO: implement check
         case let .font(value):
             XCTAssertEqual("font", type)
-            XCTAssertEqual(value.name, withJSONValue: object["value"])
-            XCTAssertEqual(value.style, withJSONValue: object["style"])
+            XCTAssertEqual(value.alias, withJSONValue: object["value"])
+            XCTAssertEqual(value.familyName, withJSONValue: object["family_name"])
+            XCTAssertEqual(value.weight, withJSONValue: object["weight"])
+            XCTAssertEqual(value.italic, withJSONValue: object["italic"])
             XCTAssertEqual(value.defaultSize, withJSONValue: object["size"])
             XCTAssertEqual(value.defaultColor, withJSONValue: object["color"])
         case let .unknown(value):
