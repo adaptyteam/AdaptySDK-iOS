@@ -16,7 +16,6 @@ extension Adapty {
         static var idfaCollectionDisabled: Bool = false
 
         static var observerMode: Bool = false
-        static var sendSystemEventsEnabled: Bool = true
         static let storeKit2Enabled: Bool = false
 
         static var backendBaseUrl: URL?

@@ -18,8 +18,8 @@ protocol ProfileStorage: ProfileIdentifierStorage {
     var externalAnalyticsDisabled: Bool { get }
     var syncedBundleReceipt: Bool { get }
 
-    func setSyncedBundleReceipt()
-    func setExternalAnalyticsDisabled(_ value: Bool)
+    func setSyncedBundleReceipt(_: Bool)
+    func setExternalAnalyticsDisabled(_: Bool)
 
     var appleSearchAdsSyncDate: Date? { get }
     func setAppleSearchAdsSyncDate()

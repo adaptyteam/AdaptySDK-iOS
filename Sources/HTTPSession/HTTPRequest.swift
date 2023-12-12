@@ -22,7 +22,7 @@ protocol HTTPDataRequest: HTTPRequest {
     func getData(configuration: HTTPConfiguration) throws -> Data?
 }
 
-protocol HTTPRequestAdditionals: Sendable {
+protocol HTTPRequestAdditional: Sendable {
     var headers: HTTPRequest.Headers? { get }
     var queryItems: HTTPRequest.QueryItems? { get }
 }
@@ -46,7 +46,7 @@ enum HTTPRequestError: Error {
 }
 
 extension HTTPRequest {
-    func tryConvertToURLRequest(configuration: HTTPCodableConfiguration, additionals: HTTPRequestAdditionals?) -> Result<URLRequest, HTTPError> {
+    func tryConvertToURLRequest(configuration: HTTPCodableConfiguration, additional: HTTPRequestAdditional?) -> Result<URLRequest, HTTPError> {
         let preUrl = configuration.baseURL.appendingPathComponent(endpoint.path)
 
         guard var urlComponents = URLComponents(url: preUrl, resolvingAgainstBaseURL: false) else {
@@ -54,8 +54,8 @@ extension HTTPRequest {
         }
 
         var queryItems = self.queryItems
-        if let additionalsQueryItems = additionals?.queryItems {
-            queryItems.append(contentsOf: additionalsQueryItems)
+        if let additionalQueryItems = additional?.queryItems {
+            queryItems.append(contentsOf: additionalQueryItems)
         }
 
         if !queryItems.isEmpty {
@@ -73,12 +73,13 @@ extension HTTPRequest {
         )
 
         request.httpMethod = endpoint.method.rawValue
-        var requestHeaders = headers
 
-        additionals?.headers?.forEach { requestHeaders[$0] = $1 }
+        headers.forEach {
+            request.setValue($1, forHTTPHeaderField: $0)
+        }
 
-        if !requestHeaders.isEmpty {
-            request.allHTTPHeaderFields = requestHeaders
+        additional?.headers?.forEach {
+            request.setValue($1, forHTTPHeaderField: $0)
         }
 
         if let params = self as? HTTPDataRequest {

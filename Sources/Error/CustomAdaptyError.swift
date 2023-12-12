@@ -56,7 +56,7 @@ extension HTTPError: CustomAdaptyError {
 extension EventsError: CustomAdaptyError {
     static let errorDomain = AdaptyError.EventsErrorDomain
 
-    var errorCode: Int  { adaptyErrorCode.rawValue }
+    var errorCode: Int { adaptyErrorCode.rawValue }
 
     var errorUserInfo: [String: Any] {
         var data: [String: Any] = [
@@ -82,7 +82,7 @@ extension EventsError: CustomAdaptyError {
 extension SKManagerError: CustomAdaptyError {
     static let errorDomain = AdaptyError.SKManagerErrorDomain
 
-    var errorCode: Int  { adaptyErrorCode.rawValue }
+    var errorCode: Int { adaptyErrorCode.rawValue }
 
     var errorUserInfo: [String: Any] {
         var data: [String: Any] = [

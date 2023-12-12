@@ -11,11 +11,20 @@ struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
 
     let endpoint: HTTPEndpoint
+    let locale: AdaptyLocale
 
-    init(apiKeyPrefix: String, paywallId: String, locale: AdaptyLocale) {
+    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
+        { response in
+            jsonDecoder.userInfo[FetchPaywallRequest.localeCodeUserInfoKey] = locale
+            return jsonDecoder.decode(ResponseBody.self, response)
+        }
+    }
+
+    init(apiKeyPrefix: String, placementId: String, locale: AdaptyLocale) {
+        self.locale = locale
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(paywallId)/app_store/\(locale.languageCode)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(placementId)/app_store/\(locale.languageCode.lowercased())/fallback.json"
         )
     }
 }
@@ -23,18 +32,18 @@ struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
 extension HTTPSession {
     func performFetchFallbackPaywallRequest(
         apiKeyPrefix: String,
-        paywallId: String,
+        placementId: String,
         locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         let request = FetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
-                                                  paywallId: paywallId,
+                                                  placementId: placementId,
                                                   locale: locale)
 
         perform(request, logName: "get_fallback_paywall",
                 logParams: [
                     "api_prefix": .value(apiKeyPrefix),
-                    "paywall_id": .value(paywallId),
+                    "placement_id": .value(placementId),
                     "language_code": .valueOrNil(locale.languageCode),
                 ]) { [weak self] (result: FetchFallbackPaywallRequest.Result) in
             switch result {
@@ -52,7 +61,7 @@ extension HTTPSession {
                         return
                     }
                     session.performFetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
-                                                               paywallId: paywallId,
+                                                               placementId: placementId,
                                                                locale: nil,
                                                                completion)
                 }

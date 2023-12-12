@@ -14,16 +14,16 @@ func XCTAssertEqual(_ expression: FallbackPaywalls?, withJSONValue jsonValue: JS
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     let object = jsonValue.objectOrFail(file: file, line: line)
     let paywalls = object["data"]?.arrayOrFail()
-    XCTAssertEqual(value.paywalls.count, paywalls?.count)
+    XCTAssertEqual(value.paywallByPlacementId.count, paywalls?.count)
     paywalls?.forEach {
         var object = $0.objectOrFail()["attributes"]?.objectOrFail()
         XCTAssertNotNil(object)
         if let products = object!["products"]?.arrayOrFail() {
             object!["products"] = .array(products.map { .object($0.objectOrFail()) })
         }
-        let id = object!["developer_id"]?.stringOrFail()
-        XCTAssertNotNil(id)
-        XCTAssertEqual(value.paywalls[id!], withJSONValue: .object(object!))
+        let placementId = object!["developer_id"]?.stringOrFail()
+        XCTAssertNotNil(placementId)
+        XCTAssertEqual(value.paywallByPlacementId[placementId!], withJSONValue: .object(object!))
     }
 
     let meta = object["meta"]?.objectOrFail()

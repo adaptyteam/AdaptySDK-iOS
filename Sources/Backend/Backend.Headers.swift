@@ -56,7 +56,7 @@ extension Backend.Request {
 
 extension Backend.Response {
     fileprivate static let hashHeaderKey = "x-response-hash"
-    fileprivate static let requestIdHeaderKey = "Request-Id"
+    fileprivate static let requestIdHeaderKey = "request-id"
 }
 
 extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.Headers.Value {
@@ -94,7 +94,7 @@ extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.
         return headers
     }
 
-    func hasSameBackendResponseHash(_ responseHeaders: [AnyHashable: Any]) -> Bool {
+    func hasSameBackendResponseHash(_ responseHeaders: HTTPResponseHeaders) -> Bool {
         guard let requestHash = self[Backend.Request.hashHeaderKey],
               let responseHash = responseHeaders.getBackendResponseHash(),
               requestHash == responseHash
@@ -103,7 +103,7 @@ extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.
     }
 }
 
-extension Dictionary where Key == HTTPResponse.Headers.Key, Value == HTTPResponse.Headers.Value {
+extension HTTPResponseHeaders {
     func getBackendResponseHash() -> String? {
         let value = self[Backend.Response.hashHeaderKey] as? String
         return value

@@ -33,7 +33,8 @@ class PurchasesObserver: ObservableObject {
         paywall = nil
         products = nil
 
-        Adapty.getPaywall(AppConstants.examplePaywallId, locale: "fr") { [weak self] result in
+        Adapty.getPaywall(placementId: AppConstants.examplePaywallId,
+                          locale: "fr") { [weak self] result in
             self?.paywall = try? result.get()
         }
     }

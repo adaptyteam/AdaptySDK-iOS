@@ -10,8 +10,8 @@ import Foundation
 enum HTTPError: Error {
     case perform(HTTPEndpoint, AdaptyError.Source, error: Error)
     case network(HTTPEndpoint, AdaptyError.Source, error: Error)
-    case decoding(HTTPEndpoint, AdaptyError.Source, statusCode: Int, headers: [AnyHashable: Any], error: Error)
-    case backend(HTTPEndpoint, AdaptyError.Source, statusCode: Int, headers: [AnyHashable: Any], error: Error?)
+    case decoding(HTTPEndpoint, AdaptyError.Source, statusCode: Int, headers: HTTPResponseHeaders, error: Error)
+    case backend(HTTPEndpoint, AdaptyError.Source, statusCode: Int, headers: HTTPResponseHeaders, error: Error?)
 }
 
 extension HTTPError: CustomStringConvertible {
@@ -63,7 +63,7 @@ extension HTTPError {
         }
     }
 
-    var headers: [AnyHashable: Any]? {
+    var headers: HTTPResponseHeaders? {
         switch self {
         case
             let .decoding(_, _, _, headers, _),

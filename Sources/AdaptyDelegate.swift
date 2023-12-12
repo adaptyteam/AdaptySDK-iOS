@@ -11,7 +11,7 @@ import Foundation
 public protocol AdaptyDelegate: AnyObject {
     /// Implement this delegate method to receive automatic profile updates
     func didLoadLatestProfile(_ profile: AdaptyProfile)
-    
+
     /// Implement this delegate method to handle a [user initiated an in-app purchases](https://developer.apple.com/documentation/storekit/skpaymenttransactionobserver/2877502-paymentqueue) from the App Store.
     /// The default implementation returns `true`.
     ///
@@ -27,6 +27,7 @@ extension AdaptyDelegate {
         true
     }
 }
+
 extension Adapty {
     /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
     public weak static var delegate: AdaptyDelegate?
