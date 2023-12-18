@@ -57,6 +57,10 @@ extension Encoder {
     }
 }
 
+extension Backend.Request {
+    static let localeCodeUserInfoKey = CodingUserInfoKey(rawValue: "request_paywall_locale")!
+}
+
 extension Backend.Response {
     struct Body<T: Decodable>: Decodable {
         let value: T

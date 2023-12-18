@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
+fileprivate struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
 
     let endpoint: HTTPEndpoint

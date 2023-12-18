@@ -20,6 +20,8 @@ extension Environment {
         }
 
         var storeCountry: String? { Device.storeCountry }
+        var ipV4Address: String? { Device.ipV4Address }
+        var webViewUserAgent: String? { Device.webViewUserAgent }
 
         var appTrackingTransparencyStatus: UInt? {
             #if canImport(AppTrackingTransparency)

@@ -89,7 +89,7 @@ extension AdaptyPaywall: Codable {
             locale = (try remoteConfig.decode(AdaptyLocale.self, forKey: .remoteConfigLocale)).id
             remoteConfigString = try remoteConfig.decodeIfPresent(String.self, forKey: .remoteConfigString)
         } else {
-            let requestLocale = decoder.userInfo[FetchPaywallRequest.localeCodeUserInfoKey] as? AdaptyLocale
+            let requestLocale = decoder.userInfo[ Backend.Request.localeCodeUserInfoKey] as? AdaptyLocale
             locale = (requestLocale ?? AdaptyLocale.defaultPaywallLocale).languageCode.lowercased()
             remoteConfigString = nil
         }

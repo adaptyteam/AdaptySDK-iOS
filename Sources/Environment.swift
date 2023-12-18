@@ -20,6 +20,10 @@ import Foundation
     import AppKit
 #endif
 
+#if canImport(WebKit)
+import WebKit
+#endif
+
 import StoreKit
 
 enum Environment {
@@ -86,6 +90,33 @@ enum Environment {
             } else {
                 return nil
             }
+        }
+
+        static var webViewUserAgent: String? {
+            #if canImport(WebKit)
+            return WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
+            #else
+            return nil
+            #endif
+        }
+
+        static var ipV4Address: String?
+
+        static func ipV4AddressRefresh(completion: @escaping (Result<String, Error>) -> Void) {
+            struct IP: Decodable {
+                let ip: String
+            }
+
+            let url = URL(string: "https://api.ipify.org?format=json")!
+            let task = URLSession.shared.dataTask(with: url) { data, _, error in
+                let result: Result<String, Error> =
+                    error.map { .failure($0) } ?? JSONDecoder().decode(IP.self, data).map { $0.ip }
+
+                _ = result.map { Device.ipV4Address = $0 }
+                completion(result)
+            }
+
+            task.resume()
         }
 
         static let name: String = {

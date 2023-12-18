@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
+fileprivate struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
 
     let endpoint: HTTPEndpoint
@@ -15,7 +15,7 @@ struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            jsonDecoder.userInfo[FetchPaywallRequest.localeCodeUserInfoKey] = locale
+            jsonDecoder.userInfo[Backend.Request.localeCodeUserInfoKey] = locale
             return jsonDecoder.decode(ResponseBody.self, response)
         }
     }

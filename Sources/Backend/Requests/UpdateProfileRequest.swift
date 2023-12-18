@@ -7,7 +7,15 @@
 
 import Foundation
 
-struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+extension Backend.Request {
+    enum SendEnvironment {
+        case dont
+        case withAnalytics
+        case withoutAnalytics
+    }
+}
+
+fileprivate struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile?>
     let endpoint: HTTPEndpoint
     let headers: Headers
@@ -27,6 +35,27 @@ struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
+    }
+
+    init(profileId: String,
+         parameters: AdaptyProfileParameters? = nil,
+         sendEnvironmentMeta: Backend.Request.SendEnvironment,
+         responseHash: String?) {
+        let environmentMeta: Environment.Meta?
+
+        switch sendEnvironmentMeta {
+        case .dont:
+            environmentMeta = nil
+        case .withAnalytics:
+            environmentMeta = Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? false))
+        case .withoutAnalytics:
+            environmentMeta = Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? true))
+        }
+
+        self.init(profileId: profileId,
+                  parameters: parameters,
+                  environmentMeta: environmentMeta,
+                  responseHash: responseHash)
     }
 
     init(profileId: String,
@@ -60,6 +89,8 @@ struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
     enum CodingKeys: String, CodingKey {
         case environmentMeta = "installation_meta"
         case storeCountry = "store_country"
+        case ipV4Address = "ip_v4_address"
+        case webViewUserAgent = "user_agent"
         case appTrackingTransparencyStatus = "att_status"
     }
 
@@ -77,6 +108,8 @@ struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
         if let environmentMeta = environmentMeta {
             try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
             try attributesObject.encodeIfPresent(environmentMeta.storeCountry, forKey: .storeCountry)
+            try attributesObject.encodeIfPresent(environmentMeta.ipV4Address, forKey: .ipV4Address)
+            try attributesObject.encodeIfPresent(environmentMeta.webViewUserAgent, forKey: .webViewUserAgent)
             if parameters?.appTrackingTransparencyStatus == nil {
                 try attributesObject.encodeIfPresent(environmentMeta.appTrackingTransparencyStatus, forKey: .appTrackingTransparencyStatus)
             }
@@ -84,39 +117,10 @@ struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
     }
 }
 
-extension UpdateProfileRequest {
-    enum SendEnvironment {
-        case dont
-        case withAnalytics
-        case withoutAnalytics
-    }
-
-    init(profileId: String,
-         parameters: AdaptyProfileParameters? = nil,
-         sendEnvironmentMeta: SendEnvironment,
-         responseHash: String?) {
-        let environmentMeta: Environment.Meta?
-
-        switch sendEnvironmentMeta {
-        case .dont:
-            environmentMeta = nil
-        case .withAnalytics:
-            environmentMeta = Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? false))
-        case .withoutAnalytics:
-            environmentMeta = Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? true))
-        }
-
-        self.init(profileId: profileId,
-                  parameters: parameters,
-                  environmentMeta: environmentMeta,
-                  responseHash: responseHash)
-    }
-}
-
 extension HTTPSession {
     func performUpdateProfileRequest(profileId: String,
                                      parameters: AdaptyProfileParameters?,
-                                     sendEnvironmentMeta: UpdateProfileRequest.SendEnvironment,
+                                     sendEnvironmentMeta: Backend.Request.SendEnvironment,
                                      responseHash: String?,
                                      _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
         let request = UpdateProfileRequest(profileId: profileId,

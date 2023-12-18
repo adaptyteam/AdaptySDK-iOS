@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SetTransactionVariationIdRequest: HTTPEncodableRequest {
+fileprivate struct SetTransactionVariationIdRequest: HTTPEncodableRequest {
     typealias Result = HTTPEmptyResponse.Result
 
     let endpoint = HTTPEndpoint(
