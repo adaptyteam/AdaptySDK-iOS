@@ -16,7 +16,7 @@ extension Adapty {
     }
 
     private func send(ipV4Address: String, _ completion: @escaping AdaptyErrorCompletion) {
-        getProfileManager { profileManager in
+        getProfileManager(waitCreatingProfile: false) { profileManager in
             guard let profileManager = try? profileManager.get() else {
                 completion(profileManager.error)
                 return
