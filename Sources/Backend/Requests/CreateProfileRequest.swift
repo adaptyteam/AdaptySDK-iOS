@@ -42,7 +42,6 @@ fileprivate struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDe
         case environmentMeta = "installation_meta"
         case storeCountry = "store_country"
         case ipV4Address = "ip_v4_address"
-        case webViewUserAgent = "user_agent"
         case appTrackingTransparencyStatus = "att_status"
     }
 
@@ -60,7 +59,6 @@ fileprivate struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDe
         try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
         try attributesObject.encodeIfPresent(environmentMeta.storeCountry, forKey: .storeCountry)
         try attributesObject.encodeIfPresent(environmentMeta.ipV4Address, forKey: .ipV4Address)
-        try attributesObject.encodeIfPresent(environmentMeta.webViewUserAgent, forKey: .webViewUserAgent)
 
         if parameters?.appTrackingTransparencyStatus == nil {
             try attributesObject.encodeIfPresent(environmentMeta.appTrackingTransparencyStatus, forKey: .appTrackingTransparencyStatus)

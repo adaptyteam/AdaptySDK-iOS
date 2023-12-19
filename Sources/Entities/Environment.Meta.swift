@@ -21,7 +21,6 @@ extension Environment {
 
         var storeCountry: String? { Device.storeCountry }
         var ipV4Address: String? { Device.ipV4Address }
-        var webViewUserAgent: String? { Device.webViewUserAgent }
 
         var appTrackingTransparencyStatus: UInt? {
             #if canImport(AppTrackingTransparency)
@@ -37,6 +36,7 @@ extension Environment {
             case SDKVersion = "adapty_sdk_version"
             case appBuild = "app_build"
             case appVersion = "app_version"
+            case webViewUserAgent = "user_agent"
             case device
             case locale
             case sysVersion = "os"
@@ -54,6 +54,7 @@ extension Environment {
             try container.encode(Adapty.SDKVersion, forKey: .SDKVersion)
             try container.encodeIfPresent(Application.build, forKey: .appBuild)
             try container.encodeIfPresent(Application.version, forKey: .appVersion)
+            try container.encodeIfPresent(Device.webViewUserAgent, forKey: .webViewUserAgent)
             try container.encode(Device.name, forKey: .device)
             try container.encode(System.version, forKey: .sysVersion)
             try container.encode(System.name, forKey: .sysName)

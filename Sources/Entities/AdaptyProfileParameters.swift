@@ -28,7 +28,6 @@ public struct AdaptyProfileParameters {
 
     var storeCountry: String?
     var ipV4Address: String?
-    var webViewUserAgent: String?
 
     public internal(set) var appTrackingTransparencyStatus: AdaptyProfileParameters.AppTrackingTransparencyStatus?
 
@@ -42,9 +41,8 @@ public struct AdaptyProfileParameters {
         self.storeCountry = storeCountry
     }
 
-    init(ipV4Address: String, webViewUserAgent: String) {
+    init(ipV4Address: String) {
         self.ipV4Address = ipV4Address
-        self.webViewUserAgent = webViewUserAgent
     }
 
     init(customAttributes: AdaptyProfile.CustomAttributes) {
@@ -75,7 +73,6 @@ extension AdaptyProfileParameters: Codable {
         case appmetricaDeviceId = "appmetrica_device_id"
         case storeCountry = "store_country"
         case ipV4Address = "ip_v4_address"
-        case webViewUserAgent = "user_agent"
 
         case appTrackingTransparencyStatus = "att_status"
         case codableCustomAttributes = "custom_attributes"
@@ -103,7 +100,6 @@ extension AdaptyProfileParameters: Codable {
         try container.encodeIfPresent(appmetricaDeviceId, forKey: .appmetricaDeviceId)
         try container.encodeIfPresent(storeCountry, forKey: .storeCountry)
         try container.encodeIfPresent(ipV4Address, forKey: .ipV4Address)
-        try container.encodeIfPresent(webViewUserAgent, forKey: .webViewUserAgent)
         try container.encodeIfPresent(appTrackingTransparencyStatus, forKey: .appTrackingTransparencyStatus)
         try container.encodeIfPresent(codableCustomAttributes, forKey: .codableCustomAttributes)
         try container.encodeIfPresent(oneSignalPlayerId, forKey: .oneSignalPlayerId)
