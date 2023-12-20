@@ -21,7 +21,7 @@ import Foundation
 #endif
 
 #if canImport(WebKit)
-import WebKit
+    import WebKit
 #endif
 
 import StoreKit
@@ -92,17 +92,21 @@ enum Environment {
             }
         }
 
+        static var _webViewUserAgent: String?
+
         static var webViewUserAgent: String? {
+            if let value = _webViewUserAgent { return value }
             #if canImport(WebKit)
-            return WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
+                DispatchQueue.syncInMainIfNeeded {
+                    Device._webViewUserAgent = WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
+                }
+                return Device._webViewUserAgent
             #else
-            return nil
+                return nil
             #endif
         }
 
         static var ipV4Address: String?
-
-
 
         static let name: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)

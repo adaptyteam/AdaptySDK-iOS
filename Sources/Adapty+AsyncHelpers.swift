@@ -137,3 +137,14 @@ extension Adapty {
         }
     }
 }
+
+extension DispatchQueue {
+    static func syncInMainIfNeeded(_ closure: () -> Void) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.sync(execute: closure)
+            return
+        }
+
+        closure()
+    }
+}
