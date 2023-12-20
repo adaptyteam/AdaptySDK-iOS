@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
+fileprivate struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<SignSubscriptionOfferResponse>
 
     let endpoint = HTTPEndpoint(

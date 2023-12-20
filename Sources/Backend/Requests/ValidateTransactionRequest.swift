@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+fileprivate struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
 
     let endpoint = HTTPEndpoint(
@@ -59,7 +59,7 @@ extension HTTPSession {
             "variation_id_persistent": .valueOrNil(purchaseProductInfo.persistentProductVariationId),
             "promotional_offer_id": .valueOrNil(purchaseProductInfo.promotionalOfferId),
         ]
-        perform(request, logName: "validate_transaction", logParams: logParams) { (result: ValidateReceiptRequest.Result) in
+        perform(request, logName: "validate_transaction", logParams: logParams) { (result: ValidateTransactionRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

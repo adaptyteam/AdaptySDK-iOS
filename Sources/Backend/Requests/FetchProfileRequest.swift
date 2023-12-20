@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
+fileprivate struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile?>
     let endpoint: HTTPEndpoint
     let headers: Headers

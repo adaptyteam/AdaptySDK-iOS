@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SetAttributionRequest: HTTPDataRequest {
+fileprivate struct SetAttributionRequest: HTTPDataRequest {
     typealias Result = HTTPEmptyResponse.Result
 
     let endpoint: HTTPEndpoint
@@ -63,7 +63,7 @@ extension HTTPSession {
                 logName: "set_attribution",
                 logParams: [
                     "source": .value(source.description),
-                    "network_user_id": .valueOrNil(networkUserId)
+                    "network_user_id": .valueOrNil(networkUserId),
                 ]) { (result: SetAttributionRequest.Result) in
             switch result {
             case let .failure(error):

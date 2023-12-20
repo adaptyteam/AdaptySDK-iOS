@@ -45,6 +45,7 @@ public final class Adapty {
 
         skReceiptManager.refreshReceiptIfEmpty()
         skQueueManager.startObserving(purchaseValidator: self)
+        syncIPv4IfNeed()
         initializingProfileManager(toCustomerUserId: customerUserId)
     }
 

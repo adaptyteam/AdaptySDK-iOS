@@ -20,6 +20,10 @@ import Foundation
     import AppKit
 #endif
 
+#if canImport(WebKit)
+import WebKit
+#endif
+
 import StoreKit
 
 enum Environment {
@@ -87,6 +91,18 @@ enum Environment {
                 return nil
             }
         }
+
+        static var webViewUserAgent: String? {
+            #if canImport(WebKit)
+            return WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
+            #else
+            return nil
+            #endif
+        }
+
+        static var ipV4Address: String?
+
+
 
         static let name: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)

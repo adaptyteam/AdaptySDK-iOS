@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+fileprivate struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
 
     let endpoint: HTTPEndpoint
@@ -41,6 +41,7 @@ struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
         case customerUserId = "customer_user_id"
         case environmentMeta = "installation_meta"
         case storeCountry = "store_country"
+        case ipV4Address = "ip_v4_address"
         case appTrackingTransparencyStatus = "att_status"
     }
 
@@ -57,13 +58,15 @@ struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableRespo
         try attributesObject.encodeIfPresent(customerUserId, forKey: .customerUserId)
         try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
         try attributesObject.encodeIfPresent(environmentMeta.storeCountry, forKey: .storeCountry)
+        try attributesObject.encodeIfPresent(environmentMeta.ipV4Address, forKey: .ipV4Address)
+
         if parameters?.appTrackingTransparencyStatus == nil {
             try attributesObject.encodeIfPresent(environmentMeta.appTrackingTransparencyStatus, forKey: .appTrackingTransparencyStatus)
         }
     }
 }
 
-extension CreateProfileRequest {
+fileprivate extension CreateProfileRequest {
     init(profileId: String,
          customerUserId: String?,
          analyticsDisabled: Bool) {
