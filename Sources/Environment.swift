@@ -92,8 +92,7 @@ enum Environment {
             }
         }
 
-        static var _webViewUserAgent: String?
-
+        private static var _webViewUserAgent: String?
         static var webViewUserAgent: String? {
             if let value = _webViewUserAgent { return value }
             #if canImport(WebKit)
