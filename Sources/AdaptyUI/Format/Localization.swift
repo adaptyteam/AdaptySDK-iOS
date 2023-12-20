@@ -16,6 +16,7 @@ extension AdaptyUI {
 
         struct Item {
             let value: String
+            let fallback: String?
             let hasTags: Bool
         }
     }
@@ -31,6 +32,7 @@ extension AdaptyUI.Localization: Decodable {
     enum ItemCodingKeys: String, CodingKey {
         case id
         case value
+        case fallback
         case hasTags = "has_tags"
     }
 
@@ -49,6 +51,7 @@ extension AdaptyUI.Localization: Decodable {
             let item = try stringsContainer.nestedContainer(keyedBy: ItemCodingKeys.self)
             strings[try item.decode(String.self, forKey: .id)] = Item(
                 value: try item.decode(String.self, forKey: .value),
+                fallback: try item.decodeIfPresent(String.self, forKey: .fallback),
                 hasTags: (try item.decodeIfPresent(Bool.self, forKey: .hasTags)) ?? false
             )
         }
