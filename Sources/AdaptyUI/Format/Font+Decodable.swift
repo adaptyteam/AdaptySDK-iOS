@@ -30,7 +30,7 @@ extension AdaptyUI.Font: Decodable {
         if let v = (try? container.decode([String].self, forKey: .familyName))?.first {
             familyName = v
         } else {
-            familyName = try container.decode(String.self, forKey: .familyName)
+            familyName = (try container.decodeIfPresent(String.self, forKey: .familyName)) ?? "adapty_system"
         }
         weight = try container.decodeIfPresent(Int.self, forKey: .weight)
         italic = (try container.decodeIfPresent(Bool.self, forKey: .italic)) ?? false
