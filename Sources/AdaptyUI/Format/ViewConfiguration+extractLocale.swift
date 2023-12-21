@@ -96,6 +96,7 @@ extension AdaptyUI.ViewConfiguration {
                         let str = getString(item.stringId)
                         let text = AdaptyUI.Text(
                             value: str?.value,
+                            fallback: str?.fallback,
                             hasTags: str?.hasTags ?? false,
                             font: font,
                             size: item.size ?? group.size ?? font?.defaultSize,
