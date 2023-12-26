@@ -107,12 +107,13 @@ extension Adapty {
     /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     public static func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         async(completion, logName: "get_profile") { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(.failure(profileManager.error!))
-                    return
+            manager.getProfileManager { result in
+                switch result {
+                case let .failure(error):
+                    completion(.failure(error))
+                case let .success(profileManager):
+                    profileManager.getProfile(completion)
                 }
-                profileManager.getProfile(completion)
             }
         }
     }

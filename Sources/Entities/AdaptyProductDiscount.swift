@@ -65,11 +65,11 @@ extension AdaptyProductDiscount {
 extension AdaptyProductDiscount: CustomStringConvertible {
     public var description: String {
         "(price: \(price)"
-            + (identifier == nil ? "" : ", identifier: \(identifier!)")
+            + (identifier.map { "identifier: \($0), " } ?? "")
             + ", subscriptionPeriod: \(subscriptionPeriod), numberOfPeriods: \(numberOfPeriods), paymentMode: \(paymentMode)"
-            + (localizedPrice == nil ? "" : ", localizedPrice: \(localizedPrice!)")
-            + (localizedSubscriptionPeriod == nil ? "" : ", localizedSubscriptionPeriod: \(localizedSubscriptionPeriod!)")
-            + (localizedNumberOfPeriods == nil ? "" : ", localizedNumberOfPeriods: \(localizedNumberOfPeriods!)")
+            + (localizedPrice.map { "localizedPrice: \($0), " } ?? "")
+            + (localizedSubscriptionPeriod.map { "localizedSubscriptionPeriod: \($0), " } ?? "")
+            + (localizedNumberOfPeriods.map { "localizedNumberOfPeriods: \($0), " } ?? "")
             + ")"
     }
 }

@@ -97,18 +97,18 @@ extension AdaptyProfile.AccessLevel: Equatable {}
 extension AdaptyProfile.AccessLevel: CustomStringConvertible {
     public var description: String {
         "(id: \(id), isActive: \(isActive), vendorProductId: \(vendorProductId), store: \(store), activatedAt: \(activatedAt), "
-            + (renewedAt == nil ? "" : "renewedAt: \(renewedAt!), ")
-            + (expiresAt == nil ? "" : "expiresAt: \(expiresAt!), ")
-            + (startsAt == nil ? "" : "startsAt: \(startsAt!), ")
+            + (renewedAt.map { "renewedAt: \($0), " } ?? "")
+            + (expiresAt.map { "expiresAt: \($0), " } ?? "")
+            + (startsAt.map { "startsAt: \($0), " } ?? "")
             + "isLifetime: \(isLifetime), "
-            + (activeIntroductoryOfferType == nil ? "" : "activeIntroductoryOfferType: \(activeIntroductoryOfferType!), ")
-            + (activePromotionalOfferType == nil ? "" : "activePromotionalOfferType: \(activePromotionalOfferType!), ")
-            + (activePromotionalOfferId == nil ? "" : "activePromotionalOfferId: \(activePromotionalOfferId!), ")
-            + (offerId == nil ? "" : "offerId: \(offerId!), ")
+            + (activeIntroductoryOfferType.map { "activeIntroductoryOfferType: \($0), " } ?? "")
+            + (activePromotionalOfferType.map { "activePromotionalOfferType: \($0), " } ?? "")
+            + (activePromotionalOfferId.map { "activePromotionalOfferId: \($0), " } ?? "")
+            + (offerId.map { "offerId: \($0), " } ?? "")
             + "willRenew: \(willRenew), isInGracePeriod: \(isInGracePeriod), "
-            + (unsubscribedAt == nil ? "" : "unsubscribedAt: \(unsubscribedAt!), ")
-            + (billingIssueDetectedAt == nil ? "" : "billingIssueDetectedAt: \(billingIssueDetectedAt!), ")
-            + (cancellationReason == nil ? "" : "cancellationReason: \(cancellationReason!), ")
+            + (unsubscribedAt.map { "unsubscribedAt: \($0), " } ?? "")
+            + (billingIssueDetectedAt.map { "billingIssueDetectedAt: \($0), " } ?? "")
+            + (cancellationReason.map { "cancellationReason: \($0), " } ?? "")
             + "isRefund: \(isRefund))"
     }
 }

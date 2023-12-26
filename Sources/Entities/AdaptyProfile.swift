@@ -46,7 +46,7 @@ extension AdaptyProfile: Equatable {
 extension AdaptyProfile: CustomStringConvertible {
     public var description: String {
         "(profileId: \(profileId), "
-            + (customerUserId == nil ? "" : "customerUserId: \(customerUserId!), ")
+            + (customerUserId.map { "customerUserId: \($0), " } ?? "")
             + "segmentId: \(segmentId), "
             + (codableCustomAttributes == nil ? "" : "customAttributes: \(customAttributes), ")
             + "accessLevels: \(accessLevels), subscriptions: \(subscriptions), nonSubscriptions: \(nonSubscriptions))"

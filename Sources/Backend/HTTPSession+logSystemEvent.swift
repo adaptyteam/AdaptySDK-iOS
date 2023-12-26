@@ -8,7 +8,6 @@
 import Foundation
 
 extension HTTPSession {
-    
     @discardableResult
     final func perform<Request: HTTPRequestWithDecodableResponse>(
         _ request: Request,

@@ -66,13 +66,16 @@ extension HTTPSession {
         let request = ValidateReceiptRequest(profileId: profileId,
                                              receipt: receipt,
                                              purchaseProductInfo: purchaseProductInfo)
-        let logParams: EventParameters? = purchaseProductInfo == nil ? nil : [
-            "product_id": .value(purchaseProductInfo!.vendorProductId),
-            "transaction_id": .valueOrNil(purchaseProductInfo!.transactionId),
-            "variation_id": .valueOrNil(purchaseProductInfo!.productVariationId),
-            "variation_id_persistent": .valueOrNil(purchaseProductInfo!.persistentProductVariationId),
-            "promotional_offer_id": .valueOrNil(purchaseProductInfo!.promotionalOfferId),
-        ]
+        let logParams: EventParameters? = purchaseProductInfo.map {
+            [
+                "product_id": .value($0.vendorProductId),
+                "transaction_id": .valueOrNil($0.transactionId),
+                "variation_id": .valueOrNil($0.productVariationId),
+                "variation_id_persistent": .valueOrNil($0.persistentProductVariationId),
+                "promotional_offer_id": .valueOrNil($0.promotionalOfferId),
+            ]
+        }
+
         perform(request, logName: "validate_receipt", logParams: logParams) { (result: ValidateReceiptRequest.Result) in
             switch result {
             case let .failure(error):

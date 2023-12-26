@@ -52,7 +52,7 @@ public struct AdaptyPaywall {
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
         "(placementId: \(placementId), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
-            + (remoteConfigString == nil ? "" : "remoteConfig: \(remoteConfigString!), ")
+            + (remoteConfigString.map { "remoteConfig: \($0), " } ?? "")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }
 }
@@ -89,7 +89,7 @@ extension AdaptyPaywall: Codable {
             locale = (try remoteConfig.decode(AdaptyLocale.self, forKey: .remoteConfigLocale)).id
             remoteConfigString = try remoteConfig.decodeIfPresent(String.self, forKey: .remoteConfigString)
         } else {
-            let requestLocale = decoder.userInfo[ Backend.Request.localeCodeUserInfoKey] as? AdaptyLocale
+            let requestLocale = decoder.userInfo[Backend.Request.localeCodeUserInfoKey] as? AdaptyLocale
             locale = (requestLocale ?? AdaptyLocale.defaultPaywallLocale).languageCode.lowercased()
             remoteConfigString = nil
         }

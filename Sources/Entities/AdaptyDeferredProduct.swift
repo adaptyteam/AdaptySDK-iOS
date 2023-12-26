@@ -18,7 +18,7 @@ public struct AdaptyDeferredProduct: AdaptyProduct {
 extension AdaptyDeferredProduct: CustomStringConvertible {
     public var description: String {
         "(vendorProductId: \(vendorProductId)"
-            + (promotionalOfferId == nil ? "" : ", promotionalOfferId: \(promotionalOfferId!)")
+            + (promotionalOfferId.map { ", promotionalOfferId: \($0)" } ?? "")
             + ", skProduct: \(skProduct))"
     }
 }

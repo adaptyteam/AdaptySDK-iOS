@@ -30,7 +30,7 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
 extension AdaptyPaywallProduct: CustomStringConvertible {
     public var description: String {
         "(vendorProductId: \(vendorProductId)"
-            + (promotionalOfferId == nil ? "" : ", promotionalOfferId: \(promotionalOfferId!)")
+            + (promotionalOfferId.map { ", promotionalOfferId: \($0)" } ?? "")
             + ", variationId: \(variationId), paywallABTestName: \(paywallABTestName), paywallName: \(paywallName), skProduct: \(skProduct))"
     }
 }

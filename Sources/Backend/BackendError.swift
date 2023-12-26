@@ -14,7 +14,7 @@ struct ErrorResponse: Codable, Error, Equatable {
 
 extension ErrorResponse: CustomStringConvertible {
     public var description: String {
-        (requestId == nil ? "" : "requestId: \(requestId!), ") + "body: \(body)"
+        (requestId.map { "requestId: \($0), " } ?? "") + "body: \(body)"
     }
 }
 

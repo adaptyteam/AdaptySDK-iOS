@@ -17,7 +17,7 @@ protocol VariationIdStorage {
 final class SKQueueManager: NSObject {
     let queue: DispatchQueue
 
-    var purchaseValidator: PurchaseValidator!
+    var purchaseValidator: PurchaseValidator! //TODO: need refactoring
 
     var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchasedInfo>]]()
     var makePurchasesProduct = [String: AdaptyProduct]()
@@ -94,7 +94,11 @@ extension SKQueueManager: SKPaymentTransactionObserver {
 
             let logParams = transaction.logParams
 
-            Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "updated_transaction", params: logParams, error: transaction.error == nil ? nil : "\(transaction.error!.localizedDescription). Detail: \(transaction.error!)"))
+            Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+                eventName: "updated_transaction",
+                params: logParams,
+                error: transaction.error.map { "\($0.localizedDescription). Detail: \($0)" }
+            ))
 
             switch transaction.transactionState {
             case .purchased:

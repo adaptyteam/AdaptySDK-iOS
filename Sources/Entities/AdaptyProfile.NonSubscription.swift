@@ -36,7 +36,7 @@ extension AdaptyProfile {
         public let isRefund: Bool
 
         /// `true` if the product is consumable (should only be processed once).
-        public let isConsumable : Bool
+        public let isConsumable: Bool
 
         @available(*, deprecated, renamed: "isConsumable")
         public var isOneTime: Bool { isConsumable }
@@ -48,7 +48,7 @@ extension AdaptyProfile.NonSubscription: Equatable {}
 extension AdaptyProfile.NonSubscription: CustomStringConvertible {
     public var description: String {
         "(purchaseId: \(purchaseId), vendorProductId: \(vendorProductId), store: \(store), purchasedAt: \(purchasedAt), isConsumable: \(isConsumable), isSandbox: \(isSandbox), "
-            + (vendorTransactionId == nil ? "" : "vendorTransactionId: \(vendorTransactionId!), ")
+            + (vendorTransactionId.map { "vendorTransactionId: \($0), " } ?? "")
             + "isRefund: \(isRefund))"
     }
 }

@@ -103,19 +103,19 @@ extension AdaptyProfile.Subscription: Equatable {}
 extension AdaptyProfile.Subscription: CustomStringConvertible {
     public var description: String {
         "(isActive: \(isActive), vendorProductId: \(vendorProductId), store: \(store), activatedAt: \(activatedAt), "
-            + (renewedAt == nil ? "" : "renewedAt: \(renewedAt!), ")
-            + (expiresAt == nil ? "" : "expiresAt: \(expiresAt!), ")
-            + (startsAt == nil ? "" : "startsAt: \(startsAt!), ")
+            + (renewedAt.map { "renewedAt: \($0), " } ?? "")
+            + (expiresAt.map { "expiresAt: \($0), " } ?? "")
+            + (startsAt.map { "startsAt: \($0), " } ?? "")
             + "isLifetime: \(isLifetime), "
-            + (activeIntroductoryOfferType == nil ? "" : "activeIntroductoryOfferType: \(activeIntroductoryOfferType!), ")
-            + (activePromotionalOfferType == nil ? "" : "activePromotionalOfferType: \(activePromotionalOfferType!), ")
-            + (activePromotionalOfferId == nil ? "" : "activePromotionalOfferId: \(activePromotionalOfferId!), ")
-            + (offerId == nil ? "" : "offerId: \(offerId!), ")
+            + (activeIntroductoryOfferType.map { "activeIntroductoryOfferType: \($0), " } ?? "")
+            + (activePromotionalOfferType.map { "activePromotionalOfferType: \($0), " } ?? "")
+            + (activePromotionalOfferId.map { "activePromotionalOfferId: \($0), " } ?? "")
+            + (offerId.map { "offerId: \($0), " } ?? "")
             + "willRenew: \(willRenew), isInGracePeriod: \(isInGracePeriod), "
-            + (unsubscribedAt == nil ? "" : "unsubscribedAt: \(unsubscribedAt!), ")
-            + (billingIssueDetectedAt == nil ? "" : "billingIssueDetectedAt: \(billingIssueDetectedAt!), ")
+            + (unsubscribedAt.map { "unsubscribedAt: \($0), " } ?? "")
+            + (billingIssueDetectedAt.map { "billingIssueDetectedAt: \($0), " } ?? "")
             + "isSandbox: \(isSandbox), vendorTransactionId: \(vendorTransactionId), vendorOriginalTransactionId: \(vendorOriginalTransactionId), "
-            + (cancellationReason == nil ? "" : "cancellationReason: \(cancellationReason!), ")
+            + (cancellationReason.map { "cancellationReason: \($0), " } ?? "")
             + "isRefund: \(isRefund))"
     }
 }

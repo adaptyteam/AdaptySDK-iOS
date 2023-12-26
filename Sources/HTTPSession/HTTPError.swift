@@ -25,8 +25,8 @@ extension HTTPError: CustomStringConvertible {
             return "HTTPError.decoding(\(endpoint), \(source), statusCode: \(statusCode), \(error))"
         case let .backend(endpoint, source, statusCode: statusCode, headers: _, error: error):
             return "HTTPError.backend(\(endpoint), \(source), statusCode: \(statusCode)"
-                + (error == nil ? "" : ", \(error!)")
-                + ")"
+            + (error.map { ", \($0)" } ?? "")
+            + ")"
         }
     }
 }

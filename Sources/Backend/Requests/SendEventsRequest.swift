@@ -34,6 +34,7 @@ struct SendEventsRequest: HTTPDataRequest {
             ",", Backend.CodingKeys.attributes.stringValue,
             ":{", CodingKeys.events.stringValue, ":[",
         ].joined(separator: "\"").data(using: .utf8)!
+
         static let separator = ",".data(using: .utf8)!
         static let sufix = "]}}}".data(using: .utf8)!
     }
