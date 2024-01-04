@@ -11,6 +11,8 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
     /// Unique identifier of a product from App Store Connect or Google Play Console.
     public let vendorProductId: String
 
+    public let instanceIdentity: String
+
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?
 
@@ -29,7 +31,7 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
 
 extension AdaptyPaywallProduct: CustomStringConvertible {
     public var description: String {
-        "(vendorProductId: \(vendorProductId)"
+        "(vendorProductId: \(vendorProductId), instanceIdentity: \(instanceIdentity)"
             + (promotionalOfferId.map { ", promotionalOfferId: \($0)" } ?? "")
             + ", variationId: \(variationId), paywallABTestName: \(paywallABTestName), paywallName: \(paywallName), skProduct: \(skProduct))"
     }
@@ -41,6 +43,7 @@ extension AdaptyPaywallProduct {
          skProduct: SKProduct) {
         self.init(
             vendorProductId: productReference.vendorId,
+            instanceIdentity: productReference.productId,
             promotionalOfferId: productReference.promotionalOfferId,
             variationId: paywall.variationId,
             paywallABTestName: paywall.abTestName,
@@ -63,6 +66,7 @@ extension AdaptyPaywallProduct {
 extension AdaptyPaywallProduct: Encodable {
     struct PrivateObject: Decodable {
         let vendorProductId: String
+        let instanceIdentity: String
         let promotionalOfferId: String?
         let variationId: String
         let paywallABTestName: String
@@ -71,6 +75,7 @@ extension AdaptyPaywallProduct: Encodable {
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: ProductCodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
+            instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
             promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
@@ -80,6 +85,7 @@ extension AdaptyPaywallProduct: Encodable {
 
     private enum ProductCodingKeys: String, CodingKey {
         case vendorProductId = "vendor_product_id"
+        case instanceIdentity = "adapty_product_id"
 
         case promotionalOfferId = "promotional_offer_id"
         case paywallVariationId = "paywall_variation_id"
@@ -98,6 +104,7 @@ extension AdaptyPaywallProduct: Encodable {
     init(from object: PrivateObject, skProduct: SKProduct) {
         self.init(
             vendorProductId: object.vendorProductId,
+            instanceIdentity: object.instanceIdentity,
             promotionalOfferId: object.promotionalOfferId,
             variationId: object.variationId,
             paywallABTestName: object.paywallABTestName,
@@ -139,6 +146,7 @@ extension AdaptyPaywallProduct: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: ProductCodingKeys.self)
         try container.encode(vendorProductId, forKey: .vendorProductId)
+        try container.encode(instanceIdentity, forKey: .instanceIdentity)
 
         try container.encode(variationId, forKey: .paywallVariationId)
         try container.encode(paywallABTestName, forKey: .paywallABTestName)
