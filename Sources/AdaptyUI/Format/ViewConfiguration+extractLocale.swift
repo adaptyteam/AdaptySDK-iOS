@@ -128,6 +128,10 @@ extension AdaptyUI.ViewConfiguration {
             item?.map { (key: $0.key, value: convert($0.value)) } ?? []
         }
 
+        func convert(_ item: AdaptyUI.ViewItem.ProductObject) -> AdaptyUI.ProductObject {
+            AdaptyUI.ProductObject(productId: item.productId, orderedProperties: convert(item.properties))
+        }
+
         func convert(_ item: AdaptyUI.ViewItem) -> AdaptyUI.LocalizedViewItem {
             switch item {
             case let .asset(id):
@@ -184,6 +188,7 @@ extension AdaptyUI.ViewConfiguration {
                 productBlock: AdaptyUI.ProductsBlock(
                     type: style.value.productsBlock.type,
                     mainProductIndex: style.value.productsBlock.mainProductIndex,
+                    products: style.value.productsBlock.products.map { convert($0) },
                     orderedItems: convert(style.value.productsBlock.orderedItems)
                 ),
                 footerBlock: style.value.footerBlock.map {

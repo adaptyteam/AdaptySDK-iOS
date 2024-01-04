@@ -14,6 +14,11 @@ extension AdaptyUI.ViewItem {
         let properties: [(key: String, value: AdaptyUI.ViewItem)]
     }
 
+    struct ProductObject {
+        let productId: String
+        let properties: [(key: String, value: AdaptyUI.ViewItem)]
+    }
+
     struct Shape {
         let backgroundAssetId: String?
         let type: AdaptyUI.ShapeType
@@ -75,6 +80,21 @@ extension AdaptyUI.ViewItem.CustomObject: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         properties = try container.toOrderedItems { PropertyKeys(rawValue: $0) == nil }
         type = try container.decode(String.self, forKey: CodingKeys(PropertyKeys.type))
+    }
+}
+
+extension AdaptyUI.ViewItem.ProductObject: Decodable {
+    enum PropertyKeys: String {
+        case type
+        case productId = "product_id"
+        case order
+    }
+
+    init(from decoder: Decoder) throws {
+        typealias CodingKeys = AdaptyUI.ViewStyle.CodingKeys
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        properties = try container.toOrderedItems { PropertyKeys(rawValue: $0) == nil }
+        productId = try container.decode(String.self, forKey: CodingKeys(PropertyKeys.productId))
     }
 }
 

@@ -39,6 +39,7 @@ extension AdaptyUI.ViewStyle {
     struct ProductsBlock {
         let type: AdaptyUI.ProductsBlockType
         let mainProductIndex: Int
+        let products: [AdaptyUI.ViewItem.ProductObject]
         let orderedItems: [(key: String, value: AdaptyUI.ViewItem)]
     }
 }
@@ -137,6 +138,7 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
     enum PropertyKeys: String {
         case type
         case mainProductIndex = "main_product_index"
+        case products
     }
 
     init(from decoder: Decoder) throws {
@@ -147,6 +149,8 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
         }
         type = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: CodingKeys(PropertyKeys.type))
         mainProductIndex = try container.decodeIfPresent(Int.self, forKey: CodingKeys(PropertyKeys.mainProductIndex)) ?? 0
+
+        products = try container.decodeIfPresent([AdaptyUI.ViewItem.ProductObject].self, forKey: CodingKeys(PropertyKeys.products)) ?? []
     }
 }
 

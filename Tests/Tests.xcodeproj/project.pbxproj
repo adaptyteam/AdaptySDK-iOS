@@ -174,6 +174,7 @@
 		8AB003A72926FCEA008476A3 /* LifecycleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB0032E2926FCEA008476A3 /* LifecycleManager.swift */; };
 		8AB52EB42A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB52EB32A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift */; };
 		8AB52EB62A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB52EB52A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift */; };
+		8AD323832B46EA230026D0A9 /* ProductObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD323822B46EA230026D0A9 /* ProductObject.swift */; };
 		8AD35AFE29C9E20F0096700C /* Environment+StoreKit2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */; };
 		8AD35B0229D73BE90096700C /* AdaptySystemEventParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD35B0129D73BE90096700C /* AdaptySystemEventParameters.swift */; };
 		8AD77C692AEFF733000E6AD5 /* Backend.BaseUrls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD77C682AEFF733000E6AD5 /* Backend.BaseUrls.swift */; };
@@ -417,6 +418,7 @@
 		8AB003A82926FDC3008476A3 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Package.swift; path = ../Package.swift; sourceTree = "<group>"; };
 		8AB52EB32A9CD97D00770C84 /* AdaptyUI.ViewConfiguration.json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUI.ViewConfiguration.json.swift; sourceTree = "<group>"; };
 		8AB52EB52A9CDCF100770C84 /* AdaptyUIViewConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyUIViewConfigurationTests.swift; sourceTree = "<group>"; };
+		8AD323822B46EA230026D0A9 /* ProductObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductObject.swift; sourceTree = "<group>"; };
 		8AD35AFD29C9E20F0096700C /* Environment+StoreKit2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Environment+StoreKit2.swift"; sourceTree = "<group>"; };
 		8AD35B0129D73BE90096700C /* AdaptySystemEventParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptySystemEventParameters.swift; sourceTree = "<group>"; };
 		8AD77C682AEFF733000E6AD5 /* Backend.BaseUrls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backend.BaseUrls.swift; sourceTree = "<group>"; };
@@ -534,6 +536,7 @@
 				8A1F7472297B298D002B7FBC /* СompoundText.swift */,
 				8A110E9D2A7A7E570077302D /* Size.swift */,
 				8A49DF7A2A8073930007C871 /* CustomObject.swift */,
+				8AD323822B46EA230026D0A9 /* ProductObject.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -1202,6 +1205,7 @@
 				8AB0039A2926FCEA008476A3 /* AdaptyProductSubscriptionPeriod.swift in Sources */,
 				8AB003A42926FCEA008476A3 /* AdaptyProductDiscount.swift in Sources */,
 				8AB003482926FCEA008476A3 /* SignSubscriptionOfferRequest.swift in Sources */,
+				8AD323832B46EA230026D0A9 /* ProductObject.swift in Sources */,
 				8AB003462926FCEA008476A3 /* FetchAllProductVendorIdsRequest.swift in Sources */,
 				8A1F743F2979B67C002B7FBC /* Color.swift in Sources */,
 				8AFCD9412A4DE2E300C6211C /* ColorGradient.swift in Sources */,

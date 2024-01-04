@@ -11,12 +11,14 @@ extension AdaptyUI {
     public struct ProductsBlock {
         public let type: ProductsBlockType
         public let mainProductIndex: Int
+        public let products: [String: AdaptyUI.ProductObject]
         public let items: [String: AdaptyUI.LocalizedViewItem]
         public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
 
-        init(type: ProductsBlockType, mainProductIndex: Int, orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+        init(type: ProductsBlockType, mainProductIndex: Int, products: [AdaptyUI.ProductObject], orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
             self.type = type
             self.mainProductIndex = mainProductIndex
+            self.products = [String: AdaptyUI.ProductObject](products.map { ($0.productId, $0) }, uniquingKeysWith: { f, _ in f })
             items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
             self.orderedItems = orderedItems
         }
@@ -27,4 +29,8 @@ extension AdaptyUI {
         case vertical
         case horizontal
     }
+}
+
+extension AdaptyUI.ProductsBlock {
+    public func product(by: AdaptyPaywallProduct) -> AdaptyUI.ProductObject? { products[by.adaptyProductId] }
 }
