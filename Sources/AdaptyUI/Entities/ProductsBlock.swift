@@ -32,5 +32,11 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.ProductsBlock {
-    public func product(by: AdaptyPaywallProduct) -> AdaptyUI.ProductObject? { products[by.adaptyProductId] }
+    public func product(by: AdaptyPaywallProduct) -> AdaptyUI.ProductObject? {
+        products[by.adaptyProductId]
+    }
+
+    public func products(by: AdaptyPaywall) -> [AdaptyUI.ProductObject] {
+        by.products.compactMap { products[$0.adaptyProductId] }
+    }
 }
