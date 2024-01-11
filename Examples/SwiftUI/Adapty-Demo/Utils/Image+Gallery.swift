@@ -22,7 +22,7 @@ extension Image {
         static let diamond = Image(Name.diamond)
         static let duck = Image(Name.duck)
     }
-    
+
     enum System {
         enum Name {
             static let locked = "lock.fill"

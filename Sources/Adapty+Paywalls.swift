@@ -135,13 +135,13 @@ fileprivate extension AdaptyProfileManager {
     private func getPaywall(_ placementId: String,
                             _ locale: AdaptyLocale?,
                             _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>) {
-        manager.httpSession.performFetchPaywallRequest(apiKeyPrefix: manager.apiKeyPrefix,
-                                                       profileId: profileId,
-                                                       placementId: placementId,
-                                                       locale: locale,
-                                                       segmentId: profile.value.segmentId) {
-            [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
-
+        manager.httpSession.performFetchPaywallRequest(
+            apiKeyPrefix: manager.apiKeyPrefix,
+            profileId: profileId,
+            placementId: placementId,
+            locale: locale,
+            segmentId: profile.value.segmentId
+        ) { [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
             completion(result.map {
                 if let self = self, self.isActive {
                     return self.paywallsCache.savedPaywall($0)

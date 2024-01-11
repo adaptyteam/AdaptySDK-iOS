@@ -9,13 +9,13 @@ import Foundation
 
 /// Defines offers eligibility state (e.g. introductory offers or promotional offers.)
 public enum AdaptyEligibility {
-    
+
     /// User is not eligible to get any offer, you should't present it in your UI.
     case ineligible
-    
+
     /// User is eligible for intro offer, it is safe to reflect this info in you UI.
     case eligible
-    
+
     /// This kind of product is not configured to have an offer.
     case notApplicable
 }

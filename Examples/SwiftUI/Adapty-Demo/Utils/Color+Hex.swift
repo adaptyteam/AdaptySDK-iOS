@@ -25,12 +25,12 @@ public extension Color {
         default:
             return nil
         }
-        
+
         self.init(
             .sRGB,
             red: Double(red) / 255,
             green: Double(green) / 255,
-            blue:  Double(blue) / 255,
+            blue: Double(blue) / 255,
             opacity: Double(alpha) / 255
         )
     }

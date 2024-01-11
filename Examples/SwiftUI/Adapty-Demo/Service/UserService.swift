@@ -17,11 +17,11 @@ final class UserService: ObservableObject {
         }
     }
     @Published var isPremium: Bool = false
-    
+
     var isLoggedIn: Bool { user != nil }
-    
+
     // MARK: - Login
-    
+
     func login(completion: @escaping () -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             let userID = "user_id"
@@ -36,9 +36,9 @@ final class UserService: ObservableObject {
             completion()
         }
     }
-    
+
     // MARK: - Logout
-    
+
     func logout(completion: @escaping () -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             Adapty.logout { (error) in
@@ -50,9 +50,9 @@ final class UserService: ObservableObject {
             completion()
         }
     }
-    
+
     // MARK: - Get Purchaser Info
-    
+
     func getPurchaserInfo(completion: ((Bool, Error?) -> Void)? = nil) {
         Adapty.getProfile { [weak self] result in
             switch result {
@@ -64,9 +64,9 @@ final class UserService: ObservableObject {
             }
         }
     }
-    
+
     // MARK: - Make Purchase
-    
+
     func makePurchase(for product: AdaptyPaywallProduct, completion: @escaping ((Bool, Error?) -> Void)) {
         Adapty.makePurchase(product: product) { [weak self] result in
             switch result {
@@ -77,9 +77,9 @@ final class UserService: ObservableObject {
             }
         }
     }
-    
+
     // MARK: - Restore Purchases
-    
+
     func restorePurchases(completion: @escaping ((Bool, Error?) -> Void)) {
         Adapty.restorePurchases { [weak self] result in
             switch result {
@@ -90,9 +90,9 @@ final class UserService: ObservableObject {
             }
         }
     }
-    
+
     // MARK: - Update Premium Status
-    
+
     private func updatePremiumStatus(
         with profile: AdaptyProfile,
         error: Error? = nil,

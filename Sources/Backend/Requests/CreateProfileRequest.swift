@@ -7,7 +7,7 @@
 
 import Foundation
 
-fileprivate struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
 
     let endpoint: HTTPEndpoint
@@ -66,7 +66,7 @@ fileprivate struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDe
     }
 }
 
-fileprivate extension CreateProfileRequest {
+private extension CreateProfileRequest {
     init(profileId: String,
          customerUserId: String?,
          analyticsDisabled: Bool) {

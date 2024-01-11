@@ -11,12 +11,12 @@ import Foundation
 import UIKit
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
-    
+
     // MARK: - Configuration of Adapty SDK
-    
+
     func application(
         _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         Adapty.activate("YOUR_ADAPTY_APP_TOKEN", customerUserId: nil)
         Adapty.logLevel = .verbose

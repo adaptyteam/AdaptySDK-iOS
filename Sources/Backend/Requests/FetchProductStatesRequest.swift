@@ -7,7 +7,7 @@
 
 import Foundation
 
-fileprivate struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
+private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<[BackendProductState]?>
     let endpoint = HTTPEndpoint(
         method: .get,

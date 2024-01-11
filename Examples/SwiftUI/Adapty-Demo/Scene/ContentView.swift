@@ -17,14 +17,14 @@ struct ContentView: View {
     @State var isLoading: Bool = false
     @State var alertMessage: String?
     @State var shouldShowAlert: Bool = false
-    
+
     @State private var buttonImageName: String = Image.System.Name.locked
-    
+
     @EnvironmentObject var userService: UserService
     @EnvironmentObject var paywallService: PaywallService
-    
+
     // MARK: - body
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -36,7 +36,7 @@ struct ContentView: View {
                         Spacer()
                         button.isHidden(!userService.isLoggedIn)
                     }
-                    .toolbar() {
+                    .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             profileButton
                         }
@@ -49,8 +49,7 @@ struct ContentView: View {
                 .navigationBarTitle("")
                 .navigationBarHidden(false)
                 .navigationBarTitleDisplayMode(.inline)
-                
-                
+
                 premiumStuffView
             }
             .alert(alertMessage ?? "Error occurred", isPresented: $shouldShowAlert) {
@@ -62,13 +61,13 @@ struct ContentView: View {
         }
         .onChange(of: userService.isPremium) { isPremium in
             buttonImageName = isPremium ? Image.System.Name.unlocked : Image.System.Name.locked
-        }.onAppear() {
+        }.onAppear {
             userService.getPurchaserInfo()
         }
     }
-    
+
     // MARK: - progress view
-    
+
     var progressView: some View {
         ZStack {
             Color.Palette.background.ignoresSafeArea().opacity(0.3)
@@ -78,9 +77,9 @@ struct ContentView: View {
                 .animation(.easeOut, value: isLoading)
         }
     }
-    
+
     // MARK: - profile button
-    
+
     private var profileButton: some View {
         Menu {
             Button(action: {
@@ -113,17 +112,17 @@ struct ContentView: View {
             .frame(width: 100, height: 30, alignment: .leading)
         }
     }
-    
+
     // MARK: - icon
-    
+
     private var icon: some View {
         Image.Gallery.thinking
             .resizable()
             .frame(width: 300, height: 300, alignment: .center)
     }
-    
+
     // MARK: - button
-    
+
     private var button: some View {
         Button {
             guard !userService.isPremium else {
@@ -148,9 +147,9 @@ struct ContentView: View {
             PaywallView()
         }
     }
-    
+
     // MARK: - premium
-    
+
     private var premiumStuffView: some View {
         NavigationLink(
             destination: PremiumStuffView()
@@ -163,7 +162,7 @@ struct ContentView: View {
             EmptyView()
         }
     }
-    
+
     private func updateNavigationWhen(isPremium: Bool) {
         showingPaywall = !isPremium
         showingPremiumStuff = isPremium

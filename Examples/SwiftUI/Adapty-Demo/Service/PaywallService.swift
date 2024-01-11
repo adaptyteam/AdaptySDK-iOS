@@ -14,9 +14,9 @@ final class PaywallService: ObservableObject {
     @Published var paywall: AdaptyPaywall?
     @Published var paywallProducts: [AdaptyPaywallProduct]?
     @Published var paywallViewModel: PaywallViewModel?
-        
+
     // MARK: - Paywalls
-    
+
     func getPaywalls(completion: ((Error?) -> Void)? = nil) {
         reset()
         Adapty.getPaywall("YOUR_PAYWALL_ID") { [weak self] result in
@@ -30,7 +30,7 @@ final class PaywallService: ObservableObject {
             }
         }
     }
-    
+
     private func getPaywallProducts(
         for currentPaywall: AdaptyPaywall,
         completion: ((Error?) -> Void)? = nil
@@ -59,7 +59,7 @@ final class PaywallService: ObservableObject {
             }
         }
     }
-    
+
     private func getPaywallProductsEnsuringEligibility(
         for currentPaywall: AdaptyPaywall,
         completion: @escaping (([AdaptyPaywallProduct]?) -> Void)
@@ -70,7 +70,7 @@ final class PaywallService: ObservableObject {
             completion(newProducts)
         }
     }
-    
+
     private func updateProducts(_ products: [AdaptyPaywallProduct], remoteConfig: [String: Any]?) {
         paywallProducts = products
         paywallViewModel = model(for: remoteConfig, products: products)
@@ -79,7 +79,7 @@ final class PaywallService: ObservableObject {
     func logPaywallDisplay() {
         paywall.map { Adapty.logShowPaywall($0) }
     }
-    
+
     func reset() {
         paywall = nil
         paywallProducts = nil
@@ -108,7 +108,7 @@ private extension PaywallService {
             )
         )
     }
-    
+
     func decodePaywallData(from parameters: [String: Any]?) -> PaywallDataDTO? {
         guard
             let parameters = parameters,
@@ -121,14 +121,14 @@ private extension PaywallService {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try? decoder.decode(PaywallDataDTO.self, from: data)
     }
-    
+
     func createPaywallModels(for products: [AdaptyPaywallProduct]) -> [ProductItemModel] {
         products.compactMap { product in
             guard
                 let priceString = product.localizedPrice,
                 let periodString = product.localizedSubscriptionPeriod
             else { return nil }
-            
+
             return .init(
                 id: product.vendorProductId,
                 priceString: priceString,
@@ -137,12 +137,12 @@ private extension PaywallService {
             )
         }
     }
-    
+
     func getColor(for hexString: String?) -> Color? {
         guard let hexString = hexString else { return nil }
         return Color(hex: hexString)
     }
-    
+
     func getIntroductoryDiscount(for product: AdaptyPaywallProduct) -> IntroductoryDiscountModel? {
         guard
             case .eligible = product.introductoryOfferEligibility,

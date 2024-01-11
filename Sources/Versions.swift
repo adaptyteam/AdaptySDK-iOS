@@ -15,7 +15,6 @@ extension Adapty {
         Environment.CrossPlatformSDK.version = version
     }
 
-
 }
 
 extension Environment {

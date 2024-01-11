@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyProfileParameters {
-    public class Builder {
+    public final class Builder {
         var parameters: AdaptyProfileParameters
 
         public convenience init() {

@@ -15,7 +15,7 @@ actor SK2ProductsFetcher {
         guard !productIds.isEmpty else {
             throw SKManagerError.noProductIDsFound().asAdaptyError
         }
-        
+
         if fetchPolicy == .returnCacheDataElseLoad {
             let products = productIds.compactMap { self.products[$0] }
             if products.count == productIds.count {
@@ -24,7 +24,7 @@ actor SK2ProductsFetcher {
         }
 
         Log.verbose("SK2ProductsFetcher: Called StoreKit.Product.products productIds:\(productIds)")
-        
+
         let callId = Log.stamp
         let methodName = "fetch_sk2_products"
         Adapty.logSystemEvent(AdaptyAppleRequestParameters(

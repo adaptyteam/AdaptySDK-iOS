@@ -14,5 +14,3 @@ extension AdaptyUI {
         public let height: Double
     }
 }
-
-

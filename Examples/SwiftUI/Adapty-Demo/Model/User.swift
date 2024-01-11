@@ -12,7 +12,7 @@ struct User: Equatable {
     let id: String
     let name: String
     var isPremium: Bool
-    
+
     mutating func updateIsPremium(_ newValue: Bool) {
         isPremium = newValue
     }

@@ -37,7 +37,7 @@ enum Log {
         var result = ""
         let base62chars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
         for _ in 0 ..< 6 {
-            result.append(base62chars[Int(arc4random_uniform(62))])
+            result.append(base62chars[Int.random(in: 0...61)])
         }
         return result
     }

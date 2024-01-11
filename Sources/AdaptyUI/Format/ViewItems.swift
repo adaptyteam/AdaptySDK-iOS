@@ -121,7 +121,6 @@ extension AdaptyUI.ViewItem.Shape: Decodable {
             shape = AdaptyUI.Shape.defaultType
         }
 
-
         if case .rectangle = shape,
            let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.Shape.CornerRadius.self, forKey: .rectangleCornerRadius) {
             type = .rectangle(cornerRadius: rectangleCornerRadius)

@@ -7,7 +7,7 @@
 
 import Foundation
 
-fileprivate struct SetAttributionRequest: HTTPDataRequest {
+private struct SetAttributionRequest: HTTPDataRequest {
     typealias Result = HTTPEmptyResponse.Result
 
     let endpoint: HTTPEndpoint

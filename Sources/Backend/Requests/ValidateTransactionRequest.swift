@@ -7,7 +7,7 @@
 
 import Foundation
 
-fileprivate struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
 
     let endpoint = HTTPEndpoint(

@@ -15,7 +15,6 @@ extension AdaptyUI {
         public let background: Filling?
         public let border: Border?
         public let type: ShapeType
-        
     }
 }
 

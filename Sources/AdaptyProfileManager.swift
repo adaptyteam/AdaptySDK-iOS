@@ -39,7 +39,7 @@ extension AdaptyProfileManager {
         _updateProfile(params: params, sendEnvironmentMeta: .dont) { completion($0.error) }
     }
 
-    private func _updateProfile(params: AdaptyProfileParameters?, sendEnvironmentMeta:  Backend.Request.SendEnvironment, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    private func _updateProfile(params: AdaptyProfileParameters?, sendEnvironmentMeta: Backend.Request.SendEnvironment, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         let old = profile.value
         manager.httpSession.performUpdateProfileRequest(profileId: profileId, parameters: params, sendEnvironmentMeta: sendEnvironmentMeta, responseHash: profile.hash) { [weak self] result in
             switch result {
@@ -144,7 +144,6 @@ extension AdaptyProfileManager {
             self.manager.validatePurchase(info: purchaseProductInfo) { completion($0.error) }
         }
     }
-
 
     func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
         guard !manager.profileStorage.syncedBundleReceipt else {

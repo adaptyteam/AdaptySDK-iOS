@@ -19,9 +19,9 @@ struct PaywallView: View {
     @State var shouldShowErrorAlert: Bool = false
     @State var alertMessage: String?
     @State var shouldShowAlert: Bool = false
-    
+
     // MARK: - body
-    
+
     var body: some View {
         ZStack {
             backgorundColor.ignoresSafeArea()
@@ -35,13 +35,13 @@ struct PaywallView: View {
             .disabled(isLoading)
             progressView
                 .isHidden(!isLoading)
-        }.onAppear() {
+        }.onAppear {
             paywallService.logPaywallDisplay()
         }
     }
-    
+
     // MARK: - top close button
-    
+
     var topCloseButton: some View {
         HStack {
             Button(
@@ -60,9 +60,9 @@ struct PaywallView: View {
         }
         .padding()
     }
-    
+
     // MARK: - description
-    
+
     var descriptionGroup: some View {
         VStack {
             Image(paywallService.paywallViewModel?.iconName ?? "")
@@ -78,9 +78,9 @@ struct PaywallView: View {
         .foregroundColor(textColor)
         .padding()
     }
-        
+
     // MARK: - button group
-    
+
     var buttonGroup: some View {
         VStack {
             HStack(alignment: .center, spacing: 12) {
@@ -93,9 +93,9 @@ struct PaywallView: View {
         }
         .padding()
     }
-    
+
     // MARK: - buyButton
-    
+
     func buyButton(title: String, product: ProductItemModel) -> some View {
         Button(
             action: {
@@ -119,7 +119,7 @@ struct PaywallView: View {
             label: { buyButtonLabel(title: title, product: product) }
         )
     }
-    
+
     func buyButtonLabel(title: String, product: ProductItemModel) -> some View {
         let discount = product.introductoryDiscount
         let discountText = discount.map { "\($0.localizedPeriod) for \($0.localizedPrice)"} ?? ""
@@ -143,9 +143,9 @@ struct PaywallView: View {
             .foregroundColor(buyButtonTextColor)
         }.frame(maxHeight: 200, alignment: .center)
     }
-    
+
     // MARK: - restore button
-    
+
     var restoreButton: some View {
         Button(
             role: .none,
@@ -171,9 +171,9 @@ struct PaywallView: View {
             }
         )
     }
-    
+
     // MARK: - progress view
-    
+
     var progressView: some View {
         ZStack {
             Color.Palette.background.ignoresSafeArea().opacity(0.3)
@@ -196,7 +196,7 @@ struct PaywallView: View {
             }
         }
     }
-    
+
     private func updateErrorAlert(isShown: Bool, title: String) {
         errorAlertMessage = title
         shouldShowErrorAlert = isShown
@@ -209,15 +209,15 @@ extension PaywallView {
     var backgorundColor: Color {
         paywallService.paywallViewModel?.backgroundColor ?? Color.Palette.accent
     }
-    
+
     var textColor: Color {
         paywallService.paywallViewModel?.textColor ?? Color.Palette.accentContent
     }
-    
+
     var buyButtonTextColor: Color {
         paywallService.paywallViewModel?.buyButtonStyle.buttonTextColor ?? Color.Palette.accent
     }
-    
+
     var buyButtonColor: Color {
         paywallService.paywallViewModel?.buyButtonStyle.buttonColor ?? Color.Palette.accentContent
     }

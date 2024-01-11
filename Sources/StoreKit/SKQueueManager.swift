@@ -17,7 +17,7 @@ protocol VariationIdStorage {
 final class SKQueueManager: NSObject {
     let queue: DispatchQueue
 
-    var purchaseValidator: PurchaseValidator! //TODO: need refactoring
+    var purchaseValidator: PurchaseValidator! // TODO: need refactoring
 
     var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchasedInfo>]]()
     var makePurchasesProduct = [String: AdaptyProduct]()

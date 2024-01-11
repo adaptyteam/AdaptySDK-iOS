@@ -23,7 +23,6 @@ extension UserDefaults {
 
         if value == hash { return false }
 
-        
         Log.verbose("UserDefaults: changing apiKeyHash = \(hash).")
         clearProfile(newProfileId: nil)
         clearEvents()

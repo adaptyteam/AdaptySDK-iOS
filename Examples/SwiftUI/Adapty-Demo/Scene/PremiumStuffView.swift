@@ -10,7 +10,7 @@ import SwiftUI
 
 struct PremiumStuffView: View {
     @Environment(\.presentationMode) var presentationMode
-    
+
     var body: some View {
         ZStack {
             Color.Palette.background.ignoresSafeArea()

@@ -38,7 +38,7 @@ extension Locale {
     @available(iOS 11.2, macOS 10.13.2, *)
     func localized(numberOfPeriods discount: SKProductDiscount) -> String? {
         let resultingNumber = discount.numberOfPeriods * discount.subscriptionPeriod.numberOfUnits
-        
+
         switch discount.subscriptionPeriod.unit {
         case .day:
             return localizedComponents(day: resultingNumber)

@@ -15,7 +15,7 @@ extension Backend.Request {
     }
 }
 
-fileprivate struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile?>
     let endpoint: HTTPEndpoint
     let headers: Headers

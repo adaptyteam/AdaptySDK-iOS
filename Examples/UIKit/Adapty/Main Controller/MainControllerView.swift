@@ -222,7 +222,7 @@ struct MainControllerView: View {
                                 } else {
                                     Text("Unknown")
                                 }
-                                
+
                                 Text(p.promotionalOfferEligibility.description)
                             }
                             .multilineTextAlignment(.trailing)

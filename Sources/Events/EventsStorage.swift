@@ -16,7 +16,7 @@ protocol EventsStorage: AnyObject {
     var profileId: String { get }
 }
 
-class EventCollectionStorage {
+final class EventCollectionStorage {
     private enum Constants {
         static let limitEvents = 500
     }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-fileprivate struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
 
     let endpoint = HTTPEndpoint(

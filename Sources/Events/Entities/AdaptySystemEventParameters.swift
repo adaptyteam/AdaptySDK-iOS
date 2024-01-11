@@ -9,7 +9,7 @@ import Foundation
 
 protocol AdaptySystemEventParameters: Encodable {}
 
-fileprivate enum CodingKeys: String, CodingKey {
+private enum CodingKeys: String, CodingKey {
     case name = "event_name"
     case callId = "sdk_flow_id"
     case requestData = "request_data"

@@ -12,7 +12,7 @@ import StoreKit
     import UIKit
 #endif
 
-class LifecycleManager {
+final class LifecycleManager {
     private static let underlayQueue = DispatchQueue(label: "Adapty.SDK.Lifecycle")
     private static let appOpenedSendInterval: TimeInterval = 60.0
     private static let profileUpdateInterval: TimeInterval = 60.0

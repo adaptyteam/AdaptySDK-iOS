@@ -48,7 +48,7 @@ extension AdaptyPeriodUnit {
             self = .unknown
         }
     }
-    
+
     @available(iOS 11.2, macOS 10.13.2, *)
     public init(unit: SKProduct.PeriodUnit?) {
         guard let unit = unit else {

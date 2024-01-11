@@ -8,7 +8,7 @@
 @testable import Adapty
 import Foundation
 
-final class EventsStorageMoke: EventsStorage  {
+final class EventsStorageMoke: EventsStorage {
 
     var data: [Data]?
     var config: EventsBackendConfiguration?

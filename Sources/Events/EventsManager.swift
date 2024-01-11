@@ -82,8 +82,11 @@ final class EventsManager {
                 guard let self = self else { return }
 
                 var retryAt: DispatchTime?
-                if let error = error, !error.isInterrupted { retryAt = .now() + .seconds(20) }
-                else if !self.storage.isEmpty { retryAt = .now() + .seconds(1) }
+                if let error = error, !error.isInterrupted {
+                    retryAt = .now() + .seconds(20)
+                } else if !self.storage.isEmpty {
+                    retryAt = .now() + .seconds(1)
+                }
 
                 guard let deadline = retryAt else { return }
                 self.dispatchQueue.asyncAfter(deadline: deadline) { [weak self] in
@@ -119,8 +122,7 @@ final class EventsManager {
 
             let request = SendEventsRequest(profileId: self.storage.profileId, events: events.elements)
 
-            session.perform(request) {
-                (result: SendEventsRequest.Result) in
+            session.perform(request) { (result: SendEventsRequest.Result) in
                 switch result {
                 case let .failure(error):
                     completion(.sending(error))

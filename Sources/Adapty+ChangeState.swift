@@ -260,7 +260,6 @@ extension Adapty {
             switch result {
             case let .failure(error):
                 completion(.failure(error))
-                break
             case let .success(profile):
                 self.onceSentEnvironment = true
 

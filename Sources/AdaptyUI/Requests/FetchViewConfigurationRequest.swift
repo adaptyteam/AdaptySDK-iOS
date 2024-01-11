@@ -28,12 +28,14 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPSession {
-    func performFetchViewConfigurationRequest(apiKeyPrefix: String,
-                                              paywallVariationId: String,
-                                              locale: AdaptyLocale,
-                                              builderVersion: String,
-                                              adaptyUISDKVersion: String,
-                                              _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
+    func performFetchViewConfigurationRequest(
+        apiKeyPrefix: String,
+        paywallVariationId: String,
+        locale: AdaptyLocale,
+        builderVersion: String,
+        adaptyUISDKVersion: String,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
+    ) {
         let md5Hash = "{\"builder_version\":\"\(builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5()
 
         let request = FetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,

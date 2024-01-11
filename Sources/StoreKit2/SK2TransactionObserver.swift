@@ -13,7 +13,7 @@ protocol SK2TransactionObserverDelegate: AnyObject {
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-class SK2TransactionObserver {
+final class SK2TransactionObserver {
     private var updates: Task<Void, Never>?
     private weak var delegate: SK2TransactionObserverDelegate?
 

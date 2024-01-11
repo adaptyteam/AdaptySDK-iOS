@@ -17,13 +17,13 @@ struct Adapty_DemoApp: App {
     @StateObject var paywallService = PaywallService()
     @StateObject var userService = UserService()
     @State private var showingPaywall = false
-    
+
     init() {
         UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor(Color.Palette.accent)]
     }
-    
+
     // MARK: - UI
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView(showingPaywall: $showingPaywall)
@@ -36,9 +36,9 @@ struct Adapty_DemoApp: App {
                 }
         }
     }
-    
+
     // MARK: - Lifecycle
-    
+
     private func processScenePhaseChange(to phase: ScenePhase) {
         switch phase {
         case .active, .background:
