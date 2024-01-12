@@ -188,7 +188,7 @@ extension AdaptyUI.ViewConfiguration {
                 productBlock: AdaptyUI.ProductsBlock(
                     type: style.value.productsBlock.type,
                     mainProductIndex: style.value.productsBlock.mainProductIndex,
-                    initiatePurchaseOnSecondTap: style.value.productsBlock.initiatePurchaseOnSecondTap,
+                    initiatePurchaseOnTap: style.value.productsBlock.initiatePurchaseOnTap,
                     products: style.value.productsBlock.products.map { convert($0) },
                     orderedItems: convert(style.value.productsBlock.orderedItems)
                 ),

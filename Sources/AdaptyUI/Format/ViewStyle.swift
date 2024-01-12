@@ -39,7 +39,7 @@ extension AdaptyUI.ViewStyle {
     struct ProductsBlock {
         let type: AdaptyUI.ProductsBlockType
         let mainProductIndex: Int
-        let initiatePurchaseOnSecondTap: Bool
+        let initiatePurchaseOnTap: Bool
         let products: [AdaptyUI.ViewItem.ProductObject]
         let orderedItems: [(key: String, value: AdaptyUI.ViewItem)]
     }
@@ -139,7 +139,7 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
     enum PropertyKeys: String {
         case type
         case mainProductIndex = "main_product_index"
-        case initiatePurchaseOnSecondTap = "initiate_purchase_on_second_tap"
+        case initiatePurchaseOnTap = "initiate_purchase_on_tap"
         case products
     }
 
@@ -151,7 +151,7 @@ extension AdaptyUI.ViewStyle.ProductsBlock: Decodable {
         }
         type = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: CodingKeys(PropertyKeys.type))
         mainProductIndex = try container.decodeIfPresent(Int.self, forKey: CodingKeys(PropertyKeys.mainProductIndex)) ?? 0
-        initiatePurchaseOnSecondTap = try container.decodeIfPresent(Bool.self, forKey: CodingKeys(PropertyKeys.initiatePurchaseOnSecondTap)) ?? false
+        initiatePurchaseOnTap = try container.decodeIfPresent(Bool.self, forKey: CodingKeys(PropertyKeys.initiatePurchaseOnTap)) ?? false
         products = try container.decodeIfPresent([AdaptyUI.ViewItem.ProductObject].self, forKey: CodingKeys(PropertyKeys.products)) ?? []
     }
 }
