@@ -17,6 +17,9 @@ extension AdaptyUI {
 
         public let align: Align
         public let action: ButtonAction?
+
+        public let visibility: Bool
+        public let transitionIn: [AdaptyUI.Transition]
     }
 }
 

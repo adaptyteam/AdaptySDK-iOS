@@ -163,7 +163,9 @@ extension AdaptyUI.ViewConfiguration {
                     normal: normal.isEmpty ? nil : normal,
                     selected: selected.isEmpty ? nil : selected,
                     align: value.align ?? AdaptyUI.Button.defaultAlign,
-                    action: getButtonActionOrNil(from: value.action)
+                    action: getButtonActionOrNil(from: value.action),
+                    visibility: value.visibility,
+                    transitionIn: value.transitionIn
                 ))
             case let .text(group):
                 return .text(getText(from: group))

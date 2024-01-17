@@ -33,6 +33,8 @@ extension AdaptyUI.ViewItem {
         let selectedTitle: Text?
         let align: AdaptyUI.Button.Align?
         let action: AdaptyUI.ButtonAction?
+        let visibility: Bool
+        let transitionIn: [AdaptyUI.Transition]
     }
 
     struct Text {
@@ -146,6 +148,29 @@ extension AdaptyUI.ViewItem.Button: Decodable {
         case title
         case align
         case action
+        case visibility
+        case transitionIn = "transition_in"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        shape = try container.decodeIfPresent(AdaptyUI.ViewItem.Shape.self, forKey: .shape)
+        selectedShape = try container.decodeIfPresent(AdaptyUI.ViewItem.Shape.self, forKey: .selectedShape)
+        selectedTitle = try container.decodeIfPresent(AdaptyUI.ViewItem.Text.self, forKey: .selectedTitle)
+        title = try container.decodeIfPresent(AdaptyUI.ViewItem.Text.self, forKey: .title)
+        align = try container.decodeIfPresent(AdaptyUI.Button.Align.self, forKey: .align)
+        action = try container.decodeIfPresent(AdaptyUI.ButtonAction.self, forKey: .action)
+        visibility = try container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true
+
+        if let array = try? container.decodeIfPresent([AdaptyUI.Transition].self, forKey: .transitionIn) {
+            transitionIn = array
+        } else if let union = try? container.decodeIfPresent(AdaptyUI.TransitionUnion.self, forKey: .transitionIn) {
+            transitionIn = union.items
+        } else if let transition = try container.decodeIfPresent(AdaptyUI.Transition.self, forKey: .transitionIn) {
+            transitionIn = [transition]
+        } else {
+            transitionIn = []
+        }
     }
 }
 
