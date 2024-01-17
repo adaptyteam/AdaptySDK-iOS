@@ -78,14 +78,17 @@ final class EventsManager {
 
             self.sending = true
             self._sendEvents(session) { [weak self] error in
-                defer { self?.sending = false }
                 guard let self = self else { return }
 
                 var retryAt: DispatchTime?
                 if let error = error, !error.isInterrupted { retryAt = .now() + .seconds(20) }
                 else if !self.storage.isEmpty { retryAt = .now() + .seconds(1) }
 
-                guard let deadline = retryAt else { return }
+                guard let deadline = retryAt else {
+                    self.sending = false
+                    return
+                }
+                
                 self.dispatchQueue.asyncAfter(deadline: deadline) { [weak self] in
                     self?.needSendEvents()
                 }
