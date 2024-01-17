@@ -90,6 +90,7 @@ final class EventsManager {
                 }
                 
                 self.dispatchQueue.asyncAfter(deadline: deadline) { [weak self] in
+                    self?.sending = false
                     self?.needSendEvents()
                 }
             }
