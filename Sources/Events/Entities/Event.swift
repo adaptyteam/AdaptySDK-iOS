@@ -25,6 +25,15 @@ struct Event {
     }
 }
 
+extension Event {
+    var lowPriority: Bool {
+        switch type {
+        case .system: return true
+        default: return false
+        }
+    }
+}
+
 extension Event: Encodable {
     enum CodingKeys: String, CodingKey {
         case type = "event_name"

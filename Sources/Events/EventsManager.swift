@@ -16,23 +16,39 @@ final class EventsManager {
     private static let defaultDispatchQueue = DispatchQueue(label: "Adapty.SDK.SendEvents")
 
     private let dispatchQueue: DispatchQueue
-    private let storage: EventCollectionStorage
+    private let profileStorage: ProfileIdentifierStorage
+    private let eventStorages: [EventCollectionStorage]
     private var configuration: EventsBackendConfiguration
     private let backendSession: HTTPSession?
     private var sending: Bool = false
 
+    convenience init(profileStorage: ProfileIdentifierStorage, backend: Backend? = nil) {
+        self.init(
+            profileStorage: profileStorage,
+            eventStorages: [
+                UserDefaults.standard.defaultEventsStorage,
+                UserDefaults.standard.sysLogEventsStorage,
+            ],
+            backend: backend
+        )
+    }
+
     convenience init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
-                     storage: EventsStorage,
+                     profileStorage: ProfileIdentifierStorage,
+                     eventStorages: [EventsStorage],
                      backend: Backend?) {
         self.init(dispatchQueue: dispatchQueue,
-                  storage: EventCollectionStorage(with: storage),
+                  profileStorage: profileStorage,
+                  eventStorages: eventStorages.map { EventCollectionStorage(with: $0) },
                   backend: backend)
     }
 
     init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
-         storage: EventCollectionStorage,
+         profileStorage: ProfileIdentifierStorage,
+         eventStorages: [EventCollectionStorage],
          backend: Backend?) {
-        self.storage = storage
+        self.profileStorage = profileStorage
+        self.eventStorages = eventStorages
         self.dispatchQueue = dispatchQueue
 
         let configuration = EventsBackendConfiguration()
@@ -43,7 +59,7 @@ final class EventsManager {
             return
         }
         backendSession = backend.createHTTPSession(responseQueue: dispatchQueue)
-        if !storage.isEmpty || configuration.isExpired { needSendEvents() }
+        if eventStorages.hasEvents || configuration.isExpired { needSendEvents() }
     }
 
     func trackEvent(_ event: Event, completion: @escaping (EventsError?) -> Void) {
@@ -59,7 +75,11 @@ final class EventsManager {
             }
 
             do {
-                try self.storage.add(event)
+                if event.lowPriority {
+                    try self.eventStorages.last?.add(event)
+                } else {
+                    try self.eventStorages.first?.add(event)
+                }
             } catch {
                 let error = EventsError.encoding(error)
                 completion(error)
@@ -83,7 +103,7 @@ final class EventsManager {
                 var retryAt: DispatchTime?
                 if let error = error, !error.isInterrupted {
                     retryAt = .now() + .seconds(20)
-                } else if !self.storage.isEmpty {
+                } else if self.eventStorages.hasEvents {
                     retryAt = .now() + .seconds(1)
                 }
 
@@ -91,7 +111,7 @@ final class EventsManager {
                     self.sending = false
                     return
                 }
-                
+
                 self.dispatchQueue.asyncAfter(deadline: deadline) { [weak self] in
                     self?.sending = false
                     self?.needSendEvents()
@@ -113,25 +133,25 @@ final class EventsManager {
                 return
             }
 
-            guard let events = self.storage.getEvents(limit: Constants.sendingLimitEvents, blackList: self.configuration.blacklist) else {
-                completion(nil)
-                return
-            }
+            let events = self.eventStorages.getEvents(
+                limit: Constants.sendingLimitEvents,
+                blackList: self.configuration.blacklist
+            )
 
             guard !events.elements.isEmpty else {
-                self.storage.subtract(newStartIndex: events.endIndex + 1)
+                self.eventStorages.subtract(oldIndexes: events.endIndex)
                 completion(nil)
                 return
             }
 
-            let request = SendEventsRequest(profileId: self.storage.profileId, events: events.elements)
+            let request = SendEventsRequest(profileId: self.profileStorage.profileId, events: events.elements)
 
             session.perform(request) { (result: SendEventsRequest.Result) in
                 switch result {
                 case let .failure(error):
                     completion(.sending(error))
                 case .success:
-                    self.storage.subtract(newStartIndex: events.endIndex + 1)
+                    self.eventStorages.subtract(oldIndexes: events.endIndex)
                     completion(nil)
                 }
             }
@@ -144,7 +164,7 @@ final class EventsManager {
             return
         }
 
-        session.perform(FetchEventsConfigRequest(profileId: storage.profileId), logName: "get_events_blacklist") { [weak self] (result: FetchEventsConfigRequest.Result) in
+        session.perform(FetchEventsConfigRequest(profileId: profileStorage.profileId), logName: "get_events_blacklist") { [weak self] (result: FetchEventsConfigRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.sending(error))
@@ -153,5 +173,33 @@ final class EventsManager {
                 completion(nil)
             }
         }
+    }
+}
+
+private extension Array where Element == EventCollectionStorage {
+    var hasEvents: Bool { contains { !$0.isEmpty } }
+
+    func getEvents(limit: Int, blackList: Set<String>) -> (elements: [Data], endIndex: [Int?]) {
+        var limit = limit
+        let initResult = (elements: [Data](), endIndex: [Int?]())
+        return reduce(initResult) { result, storage in
+
+            guard limit > 0,
+                  let (elements, endIndex) = storage.getEvents(limit: limit, blackList: blackList)
+            else {
+                return (result.elements, result.endIndex + [nil])
+            }
+
+            limit -= elements.count
+            return (result.elements + elements, result.endIndex + [endIndex])
+        }
+    }
+
+    func subtract(oldIndexes: [Int?]) {
+        zip(oldIndexes, self)
+            .forEach { optionalIndex, storage in
+                guard let index = optionalIndex else { return }
+                storage.subtract(newStartIndex: index + 1)
+            }
     }
 }

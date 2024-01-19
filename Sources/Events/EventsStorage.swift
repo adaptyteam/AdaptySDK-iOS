@@ -13,7 +13,6 @@ protocol EventsStorage: AnyObject {
 
     func setEvents(_: [Data])
     func getEvents() -> [Data]?
-    var profileId: String { get }
 }
 
 final class EventCollectionStorage {
@@ -25,11 +24,6 @@ final class EventCollectionStorage {
     private var events: EventCollection<Event.Info>
     private var eventCounter: Int
 
-    struct Events {
-        let elements: [Data]
-        let endIndex: Int
-    }
-
     var isEmpty: Bool { events.isEmpty }
 
     init(with storage: EventsStorage) {
@@ -40,7 +34,7 @@ final class EventCollectionStorage {
         self.events = events
     }
 
-    func getEvents(limit: Int, blackList: Set<String>) -> Events? {
+    func getEvents(limit: Int, blackList: Set<String>) -> (elements: [Data], endIndex: Int)? {
         guard limit > 0, !events.isEmpty else { return nil }
         var elements = [Data]()
         var count = 0
@@ -55,7 +49,7 @@ final class EventCollectionStorage {
             }
         }
 
-        return Events(elements: elements, endIndex: events.endIndex(count))
+        return (elements, events.endIndex(count))
     }
 
     func add(_ event: Event) throws {
@@ -80,9 +74,6 @@ final class EventCollectionStorage {
     }
 }
 
-extension EventCollectionStorage {
-    var profileId: String { storage.profileId }
-}
 
 extension EventsStorage {
     fileprivate func getEvents() -> [Event.Info]? {

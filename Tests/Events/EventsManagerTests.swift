@@ -10,13 +10,17 @@ import XCTest
 
 final class EventsManagerTests: XCTestCase {
     var backend: Backend!
+    var profileStorage: ProfileIdentifierStorageMoke!
     var storage: EventsStorageMoke!
+    var sysLogStorage: EventsStorageMoke!
     var manager: EventsManager!
 
     override func setUp() {
         backend = Backend.createForTests()
         storage = EventsStorageMoke()
-        manager = EventsManager(storage: storage, backend: backend)
+        sysLogStorage = EventsStorageMoke()
+        profileStorage = ProfileIdentifierStorageMoke()
+        manager = EventsManager(profileStorage: profileStorage, eventStorages: [storage, sysLogStorage], backend: backend)
     }
 
     var allEventTypes: [EventType] = [
@@ -26,7 +30,7 @@ final class EventsManagerTests: XCTestCase {
     ]
 
     func XCTAssertTrackEventType(_ eventType: EventType, assert: ((EventsError?) -> Void)? = nil) {
-        XCTAssertTrackEvent(Event(type: eventType, profileId: storage.profileId), assert: assert)
+        XCTAssertTrackEvent(Event(type: eventType, profileId: profileStorage.profileId), assert: assert)
     }
 
     func XCTAssertTrackEvent(_ event: Event, assert: ((EventsError?) -> Void)? = nil) {
@@ -55,7 +59,7 @@ final class EventsManagerTests: XCTestCase {
 
         allEventTypes.forEach {
             XCTAssertTrackEventType($0)
-            storage.profileId = UUID().uuidString
+            profileStorage.profileId = UUID().uuidString
         }
     }
 }

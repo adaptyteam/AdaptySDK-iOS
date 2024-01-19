@@ -60,7 +60,7 @@ extension Adapty {
 
             let fallbackBackend = FallbackBackend(secretKey: apiKey, baseURL: Configuration.backendFallbackBaseUrl ?? Backend.publicEnvironmentFallbackBaseUrl, withProxy: Configuration.backendProxy)
 
-            Adapty.eventsManager = EventsManager(storage: UserDefaults.standard, backend: backend)
+            Adapty.eventsManager = EventsManager(profileStorage: UserDefaults.standard, backend: backend)
 
             shared = Adapty(apiKeyPrefix: String(apiKey.prefix(while: { $0 != "." })),
                             profileStorage: UserDefaults.standard,
