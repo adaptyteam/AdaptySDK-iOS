@@ -1,5 +1,5 @@
 //
-//  Backend.swift
+//  FallbackBackend.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 08.09.2022.
@@ -7,18 +7,15 @@
 
 import Foundation
 
-struct Backend: HTTPCodableConfiguration {
+struct FallbackBackend: HTTPCodableConfiguration {
     let baseURL: URL
     let sessionConfiguration: URLSessionConfiguration
-
-    let defaultEncodedContentType = "application/vnd.api+json"
 
     func configure(decoder: JSONDecoder) { Backend.configure(decoder: decoder) }
     func configure(encoder: JSONEncoder) { Backend.configure(encoder: encoder) }
 
     init(secretKey: String, baseURL url: URL, withProxy: (host: String, port: Int)? = nil) {
         let configuration = URLSessionConfiguration.default
-        configuration.httpAdditionalHeaders = Request.globalHeaders(secretKey: secretKey)
         configuration.timeoutIntervalForRequest = 30
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
 
@@ -34,10 +31,7 @@ struct Backend: HTTPCodableConfiguration {
     }
 }
 
-extension Backend {
-    enum Request {}
-    enum Response {}
-
+extension FallbackBackend {
     func createHTTPSession(responseQueue: DispatchQueue,
                            errorHandler: ((HTTPError) -> Void)? = nil) -> HTTPSession {
         HTTPSession(configuration: self,
@@ -45,5 +39,9 @@ extension Backend {
                     requestAdditional: nil,
                     responseValidator: validator,
                     errorHandler: errorHandler)
+    }
+
+    func validator(_ response: HTTPDataResponse) -> HTTPError? {
+        HTTPResponse.statusCodeValidator(response)
     }
 }
