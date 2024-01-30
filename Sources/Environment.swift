@@ -170,7 +170,7 @@ enum Environment {
         #endif
     }
 
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
         static func searchAdsAttribution(completion: @escaping ([String: Any]?, Error?) -> Void) {
             guard #available(iOS 14.3, *) else {
                 completion(nil, nil)
@@ -213,7 +213,6 @@ enum Environment {
                 completion(result, nil)
             }).resume()
         }
-
     #endif
 }
 
