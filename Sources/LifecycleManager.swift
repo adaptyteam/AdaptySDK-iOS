@@ -37,11 +37,11 @@ final class LifecycleManager {
         subscribeForLifecycleEvents()
         scheduleProfileUpdate(after: Self.profileUpdateInterval)
 
-        if #available(iOS 13.0, *) {
-            storefrontManager = SKStorefrontManager()
-        } else if Environment.StoreKit2.available,
-                  #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+        if Environment.StoreKit2.available,
+           #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             storefrontManager = SK2StorefrontManager()
+        } else if #available(iOS 13.0, *) {
+            storefrontManager = SKStorefrontManager()
         }
 
         storefrontManager?.subscribeForUpdates { [weak self] countryCode in
