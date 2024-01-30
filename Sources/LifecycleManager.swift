@@ -24,7 +24,9 @@ final class LifecycleManager {
     private var appOpenedSentAt: Date?
     private var profileSyncAt: Date?
 
-    private var needsSyncStorefrontCountry = false
+    private(set) var storefrontManager: StorefrontManager?
+    private var newStorefrontCountryAvailable: String?
+
     private var initialized = false
 
     func initialize() {
@@ -34,6 +36,17 @@ final class LifecycleManager {
 
         subscribeForLifecycleEvents()
         scheduleProfileUpdate(after: Self.profileUpdateInterval)
+
+        if #available(iOS 13.0, *) {
+            storefrontManager = SKStorefrontManager()
+        } else if Environment.StoreKit2.available,
+                  #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+            storefrontManager = SK2StorefrontManager()
+        }
+
+        storefrontManager?.subscribeForUpdates { [weak self] countryCode in
+            self?.newStorefrontCountryAvailable = countryCode
+        }
 
         initialized = true
     }
@@ -69,16 +82,6 @@ final class LifecycleManager {
                 self?.sendAppOpenedEvent()
                 self?.scheduleProfileUpdate(after: 0.0)
             }
-
-//            if #available(iOS 13.0, *) {
-//                NotificationCenter.default.addObserver(forName: Notification.Name.SKStorefrontCountryCodeDidChange,
-//                                                       object: nil,
-//                                                       queue: nil) { [weak self] _ in
-//                    Log.verbose("LifecycleManager: SKStorefrontCountryCodeDidChange")
-//
-//                    self?.needsSyncStorefrontCountry = true
-//                }
-//            }
         #endif
     }
 
@@ -92,7 +95,7 @@ final class LifecycleManager {
 
         Log.verbose("LifecycleManager: syncProfile Begin")
 
-        if needsSyncStorefrontCountry, let storeCountry = Environment.Device.storeCountry {
+        if let storeCountry = newStorefrontCountryAvailable {
             Adapty.updateProfile(params: AdaptyProfileParameters(storeCountry: storeCountry)) { [weak self] error in
                 if let error = error {
                     Log.verbose("LifecycleManager: syncProfile Error: \(error)")
@@ -100,7 +103,7 @@ final class LifecycleManager {
                 } else {
                     Log.verbose("LifecycleManager: syncProfile Done")
 
-                    self?.needsSyncStorefrontCountry = false
+                    self?.newStorefrontCountryAvailable = nil
                     self?.profileSyncAt = Date()
                     completion(true)
                 }
