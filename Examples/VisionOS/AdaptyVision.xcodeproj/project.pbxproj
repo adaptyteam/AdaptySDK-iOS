@@ -12,6 +12,7 @@
 		7417D2F82B5FDA7F00CA1278 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7417D2F72B5FDA7F00CA1278 /* Assets.xcassets */; };
 		7417D2FC2B5FDA7F00CA1278 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7417D2FB2B5FDA7F00CA1278 /* Preview Assets.xcassets */; };
 		7417D3042B5FDABE00CA1278 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 7417D3032B5FDABE00CA1278 /* Adapty */; };
+		7417D3072B5FE60500CA1278 /* Views.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7417D3062B5FE60500CA1278 /* Views.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,8 @@
 		7417D2F72B5FDA7F00CA1278 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7417D2F92B5FDA7F00CA1278 /* AdaptyVision.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AdaptyVision.entitlements; sourceTree = "<group>"; };
 		7417D2FB2B5FDA7F00CA1278 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7417D3052B5FE28700CA1278 /* SKConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = SKConfig.storekit; sourceTree = "<group>"; };
+		7417D3062B5FE60500CA1278 /* Views.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,9 +58,11 @@
 			isa = PBXGroup;
 			children = (
 				7417D2F32B5FDA7E00CA1278 /* AdaptyVisionApp.swift */,
+				7417D3062B5FE60500CA1278 /* Views.swift */,
 				7417D2F52B5FDA7E00CA1278 /* ContentView.swift */,
 				7417D2F72B5FDA7F00CA1278 /* Assets.xcassets */,
 				7417D2F92B5FDA7F00CA1278 /* AdaptyVision.entitlements */,
+				7417D3052B5FE28700CA1278 /* SKConfig.storekit */,
 				7417D2FA2B5FDA7F00CA1278 /* Preview Content */,
 			);
 			path = AdaptyVision;
@@ -149,6 +154,7 @@
 			files = (
 				7417D2F62B5FDA7E00CA1278 /* ContentView.swift in Sources */,
 				7417D2F42B5FDA7E00CA1278 /* AdaptyVisionApp.swift in Sources */,
+				7417D3072B5FE60500CA1278 /* Views.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

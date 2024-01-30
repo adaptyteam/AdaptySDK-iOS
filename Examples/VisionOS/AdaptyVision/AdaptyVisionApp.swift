@@ -6,17 +6,15 @@
 //
 
 import SwiftUI
-import Adapty
 
 @main
 struct AdaptyVisionApp: App {
-    init() {
-        Adapty.activate("public_live_iNuUlSsN.83zcTTR8D5Y8FI9cGUI6")
-    }
+    let vm = ContentViewModel()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(vm)
         }
     }
 }
