@@ -117,7 +117,7 @@ extension SKQueueManager: SKPaymentTransactionObserver {
         }
     }
 
-    #if os(iOS) && !targetEnvironment(macCatalyst)
+    #if (os(iOS) || os(visionOS)) && !targetEnvironment(macCatalyst)
         func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
             guard let delegate = Adapty.delegate else { return true }
 
