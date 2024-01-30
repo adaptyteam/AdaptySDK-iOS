@@ -70,15 +70,15 @@ final class LifecycleManager {
                 self?.scheduleProfileUpdate(after: 0.0)
             }
 
-            if #available(iOS 13.0, *) {
-                NotificationCenter.default.addObserver(forName: Notification.Name.SKStorefrontCountryCodeDidChange,
-                                                       object: nil,
-                                                       queue: nil) { [weak self] _ in
-                    Log.verbose("LifecycleManager: SKStorefrontCountryCodeDidChange")
-
-                    self?.needsSyncStorefrontCountry = true
-                }
-            }
+//            if #available(iOS 13.0, *) {
+//                NotificationCenter.default.addObserver(forName: Notification.Name.SKStorefrontCountryCodeDidChange,
+//                                                       object: nil,
+//                                                       queue: nil) { [weak self] _ in
+//                    Log.verbose("LifecycleManager: SKStorefrontCountryCodeDidChange")
+//
+//                    self?.needsSyncStorefrontCountry = true
+//                }
+//            }
         #endif
     }
 

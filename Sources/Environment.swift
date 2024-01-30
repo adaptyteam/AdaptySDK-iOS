@@ -78,6 +78,8 @@ enum Environment {
                     return NSScreen.main?.frame.size
                 #elseif targetEnvironment(macCatalyst)
                     return Optional.some(UIScreen.main.bounds.size)
+                #elseif os(visionOS)
+                    return Optional<DisplayResolution>.none
                 #else
                     return Optional.some(UIScreen.main.bounds.size)
                 #endif
@@ -136,7 +138,11 @@ enum Environment {
             guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
             // Get and return IDFA
             if #available(iOS 9.0, macOS 10.14, *) {
-                return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                #if canImport(AdSupport)
+                    return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                #else
+                    return nil
+                #endif
             } else {
                 return nil
             }
