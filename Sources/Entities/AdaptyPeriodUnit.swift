@@ -17,7 +17,6 @@ public enum AdaptyPeriodUnit: UInt {
 }
 
 extension AdaptyPeriodUnit {
-    @available(iOS 11.2, macOS 10.13.2, *)
     public init(unit: SKProduct.PeriodUnit) {
         switch unit {
         case .day:
@@ -47,15 +46,6 @@ extension AdaptyPeriodUnit {
         @unknown default:
             self = .unknown
         }
-    }
-
-    @available(iOS 11.2, macOS 10.13.2, *)
-    public init(unit: SKProduct.PeriodUnit?) {
-        guard let unit = unit else {
-            self = .unknown
-            return
-        }
-        self.init(unit: unit)
     }
 }
 

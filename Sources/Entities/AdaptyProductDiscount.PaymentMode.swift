@@ -18,7 +18,6 @@ extension AdaptyProductDiscount {
 }
 
 extension AdaptyProductDiscount.PaymentMode {
-    @available(iOS 11.2, macOS 10.14.4, *)
     public init(mode: SKProductDiscount.PaymentMode) {
         switch mode {
         case .payAsYouGo:

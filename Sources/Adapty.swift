@@ -387,7 +387,7 @@ extension Adapty {
         }
 
         async(completion, logName: logName, logParams: logParams) { manager, completion in
-            if #available(iOS 12.2, macOS 10.14.4, *), let discountId = product.promotionalOfferId {
+            if #available(iOS 12.2, *), let discountId = product.promotionalOfferId {
                 let profileId = manager.profileStorage.profileId
 
                 manager.httpSession.performSignSubscriptionOfferRequest(profileId: profileId, vendorProductId: product.vendorProductId, discountId: discountId) { result in

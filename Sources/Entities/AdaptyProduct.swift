@@ -55,7 +55,7 @@ extension AdaptyProduct {
 
     /// The period details for products that are subscriptions. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
     public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
-        guard #available(iOS 11.2, macOS 10.14.4, *), let period = skProduct.subscriptionPeriod else { return nil }
+        guard let period = skProduct.subscriptionPeriod else { return nil }
         return AdaptyProductSubscriptionPeriod(subscriptionPeriod: period)
     }
 
@@ -66,20 +66,19 @@ extension AdaptyProduct {
 
     /// The identifier of the subscription group to which the subscription belongs. (Will be `nil` for iOS version below 12.0 and macOS version below 10.14).
     public var subscriptionGroupIdentifier: String? {
-        guard #available(iOS 12.0, macOS 10.14, *) else { return nil }
-        return skProduct.subscriptionGroupIdentifier
+        skProduct.subscriptionGroupIdentifier
     }
 
     /// An array of subscription offers available for the auto-renewable subscription. (Will be empty for iOS version below 12.2 and macOS version below 10.14.4).
     public var discounts: [AdaptyProductDiscount] {
-        guard #available(iOS 12.2, macOS 10.14.4, *) else { return [] }
+        guard #available(iOS 12.2, *) else { return [] }
         return skProduct.discounts.map { discount in
             AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
         }
     }
 
     public func discount(byIdentifier identifier: String) -> AdaptyProductDiscount? {
-        guard #available(iOS 12.2, macOS 10.14.4, *),
+        guard #available(iOS 12.2, *),
               let discount = skProduct.discounts.first(where: { $0.identifier == identifier })
         else { return nil }
         return AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
@@ -92,14 +91,14 @@ extension AdaptyProduct {
 
     /// The period's language is determined by the preferred language set on the device.
     public var localizedSubscriptionPeriod: String? {
-        guard #available(iOS 11.2, macOS 10.14.4, *), let period = skProduct.subscriptionPeriod else { return nil }
+        guard let period = skProduct.subscriptionPeriod else { return nil }
         return skProduct.priceLocale.localized(period: period)
     }
 }
 
 extension SKProduct {
     var adaptyIntroductoryDiscount: AdaptyProductDiscount? {
-        guard #available(iOS 11.2, macOS 10.14.4, *), let discount = introductoryPrice else { return nil }
+        guard let discount = introductoryPrice else { return nil }
         return AdaptyProductDiscount(discount: discount, locale: priceLocale)
     }
 }

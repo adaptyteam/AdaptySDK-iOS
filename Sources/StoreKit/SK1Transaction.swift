@@ -26,7 +26,7 @@ extension SK1Transaction {
     }
 
     var offerIdentifier: String? {
-        if #available(iOS 12.2, OSX 10.14.4, *),
+        if #available(iOS 12.2, *),
            let identifier = payment.paymentDiscount?.identifier {
             return identifier
         } else {

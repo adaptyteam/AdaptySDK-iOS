@@ -135,11 +135,7 @@ enum Environment {
         static let idfa: String? = {
             guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
             // Get and return IDFA
-            if #available(iOS 9.0, macOS 10.14, *) {
-                return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-            } else {
-                return nil
-            }
+            return ASIdentifierManager.shared().advertisingIdentifier.uuidString
         }()
 
         static let idfv: String? = {

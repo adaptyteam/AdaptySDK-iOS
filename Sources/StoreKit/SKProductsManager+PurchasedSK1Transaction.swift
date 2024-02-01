@@ -54,7 +54,7 @@ private extension PurchasedTransaction {
         let (transaction, transactionIdentifier) = transaction
         var subscriptionOffer: PurchasedTransaction.SubscriptionOffer?
 
-        if #available(iOS 12.2, OSX 10.14.4, *),
+        if #available(iOS 12.2, *),
            let offerIdentifier = transaction.payment.paymentDiscount?.identifier {
             if let discount = product?.discounts.first(where: { $0.identifier == offerIdentifier }) {
                 subscriptionOffer = PurchasedTransaction.SubscriptionOffer.promotional(discount)
@@ -63,8 +63,7 @@ private extension PurchasedTransaction {
             }
         }
 
-        if #available(iOS 11.2, *),
-           subscriptionOffer == nil,
+        if subscriptionOffer == nil,
            let discount = product?.introductoryPrice {
             subscriptionOffer = PurchasedTransaction.SubscriptionOffer.introductory(discount)
         }
@@ -84,7 +83,7 @@ private extension PurchasedTransaction {
     }
 }
 
-@available(iOS 12.2, OSX 10.14.4, *)
+@available(iOS 12.2, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     static func promotional(_ discount: SKProductDiscount) -> PurchasedTransaction.SubscriptionOffer {
         .init(
@@ -97,7 +96,6 @@ private extension PurchasedTransaction.SubscriptionOffer {
     }
 }
 
-@available(iOS 11.2, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     static func introductory(_ discount: SKProductDiscount) -> PurchasedTransaction.SubscriptionOffer {
         .init(

@@ -3,9 +3,10 @@ import PackageDescription
 
 let package = Package(
     name: "Adapty",
+
     platforms: [
-        .iOS(.v9),
-        .macOS(.v10_12)
+        .iOS(.v12),
+        .macOS("10.14.4")
     ],
     products: [
         .library(name: "Adapty",

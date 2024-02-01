@@ -17,7 +17,6 @@ public struct AdaptyProductSubscriptionPeriod {
 }
 
 extension AdaptyProductSubscriptionPeriod {
-    @available(iOS 11.2, macOS 10.13.2, *)
     init(subscriptionPeriod: SKProductSubscriptionPeriod) {
         self.init(unit: AdaptyPeriodUnit(unit: subscriptionPeriod.unit), numberOfUnits: subscriptionPeriod.numberOfUnits)
     }

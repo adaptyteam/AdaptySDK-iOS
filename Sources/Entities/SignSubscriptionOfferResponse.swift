@@ -30,7 +30,7 @@ struct SignSubscriptionOfferResponse: Decodable, Equatable {
         self.timestamp = NSNumber(value: timestamp)
     }
 
-    @available(iOS 12.2, macOS 10.14.4, *)
+    @available(iOS 12.2, *)
     func discount(identifier: String) -> SKPaymentDiscount {
         SKPaymentDiscount(identifier: identifier, keyIdentifier: keyIdentifier, nonce: nonce, signature: signature, timestamp: timestamp)
     }

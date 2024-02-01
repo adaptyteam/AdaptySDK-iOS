@@ -158,7 +158,8 @@ extension AdaptyPaywallProduct: Encodable {
         try container.encodeIfPresent(regionCode, forKey: .regionCode)
         try container.encode(isFamilyShareable, forKey: .isFamilyShareable)
 
-        guard #available(iOS 11.2, macOS 10.14.4, *), skProduct.subscriptionPeriod != nil else { return }
-        try container.encode(SubscriptionDetail(product: self), forKey: .subscriptionDetails)
+        if skProduct.subscriptionPeriod != nil {
+            try container.encode(SubscriptionDetail(product: self), forKey: .subscriptionDetails)
+        }
     }
 }

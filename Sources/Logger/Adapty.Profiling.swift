@@ -22,11 +22,10 @@ extension Log {
     enum Profiling {
         static func start(method: StaticString, _ format: StaticString, _ arguments: CVarArg...) -> ProfilingEventWrapper {
             #if canImport(os) && PROFILE
-                if #available(macOS 10.14, iOS 12.0, watchOS 5.0, tvOS 12.0, *) {
-                    return ProfilingEventWrapper(event: _ProfilingEvent.start(method: method, format, arguments))
-                }
+                return ProfilingEventWrapper(event: _ProfilingEvent.start(method: method, format, arguments))
+            #else
+                return ProfilingEventWrapper()
             #endif
-            return ProfilingEventWrapper()
         }
     }
 }
@@ -35,7 +34,6 @@ extension Log {
     import Foundation
     import os.signpost
     extension Log {
-        @available(macOS 10.14, iOS 12.0, watchOS 5.0, tvOS 12.0, *)
         struct _ProfilingEvent: ProfilingEvent {
             private static let handler = OSLog(subsystem: "AdaptySDK", category: "AdaptySDK")
 
