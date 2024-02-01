@@ -12,7 +12,7 @@ struct AdaptyPrice {
     let locale: Locale
 
     var amount: Decimal { value.decimalValue }
-    var currencyCode: String? { locale.currencyCode }
+    var currencyCode: String? { locale.a_currencyCode }
     var currencySymbol: String? { locale.currencySymbol }
     var localizedString: String? { locale.localized(price: value) }
 }

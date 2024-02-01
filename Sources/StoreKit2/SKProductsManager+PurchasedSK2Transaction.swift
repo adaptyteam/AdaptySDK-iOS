@@ -52,7 +52,7 @@ private extension PurchasedTransaction {
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: product?.price,
-            priceLocale: product?.priceFormatStyle.locale.currencyCode,
+            priceLocale: product?.priceFormatStyle.locale.a_currencyCode,
             storeCountry: product?.priceFormatStyle.locale.regionCode,
             subscriptionOffer: subscriptionOffer,
             environment: transaction.environmentString

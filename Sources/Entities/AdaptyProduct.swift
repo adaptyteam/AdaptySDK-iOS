@@ -39,7 +39,7 @@ extension AdaptyProduct {
     var priceValue: AdaptyPrice { AdaptyPrice(value: skProduct.price, locale: skProduct.priceLocale) }
 
     /// The currency code of the locale used to format the price of the product.
-    public var currencyCode: String? { skProduct.priceLocale.currencyCode }
+    public var currencyCode: String? { skProduct.priceLocale.a_currencyCode }
 
     /// The currency symbol of the locale used to format the price of the product.
     public var currencySymbol: String? { skProduct.priceLocale.currencySymbol }
