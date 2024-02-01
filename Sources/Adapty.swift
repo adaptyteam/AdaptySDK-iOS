@@ -387,24 +387,24 @@ extension Adapty {
         }
 
         async(completion, logName: logName, logParams: logParams) { manager, completion in
-            if #available(iOS 12.2, *), let discountId = product.promotionalOfferId {
-                let profileId = manager.profileStorage.profileId
-
-                manager.httpSession.performSignSubscriptionOfferRequest(profileId: profileId, vendorProductId: product.vendorProductId, discountId: discountId) { result in
-                    switch result {
-                    case let .failure(error):
-                        completion(.failure(error))
-                    case let .success(response):
-
-                        let payment = SKMutablePayment(product: product.skProduct)
-                        payment.applicationUsername = ""
-                        payment.paymentDiscount = response.discount(identifier: discountId)
-                        manager.skQueueManager.makePurchase(payment: payment, product: product, completion)
-                    }
-                }
-
-            } else {
+            guard let discountId = product.promotionalOfferId else {
                 manager.skQueueManager.makePurchase(payment: SKPayment(product: product.skProduct), product: product, completion)
+                return
+            }
+
+            let profileId = manager.profileStorage.profileId
+
+            manager.httpSession.performSignSubscriptionOfferRequest(profileId: profileId, vendorProductId: product.vendorProductId, discountId: discountId) { result in
+                switch result {
+                case let .failure(error):
+                    completion(.failure(error))
+                case let .success(response):
+
+                    let payment = SKMutablePayment(product: product.skProduct)
+                    payment.applicationUsername = ""
+                    payment.paymentDiscount = response.discount(identifier: discountId)
+                    manager.skQueueManager.makePurchase(payment: payment, product: product, completion)
+                }
             }
         }
     }

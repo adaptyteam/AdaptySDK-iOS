@@ -52,20 +52,18 @@ private extension PurchasedTransaction {
         purchasedSK1Transaction transaction: (value: SK1Transaction, id: String)
     ) {
         let (transaction, transactionIdentifier) = transaction
-        var subscriptionOffer: PurchasedTransaction.SubscriptionOffer?
+        let offer: PurchasedTransaction.SubscriptionOffer?
 
-        if #available(iOS 12.2, *),
-           let offerIdentifier = transaction.payment.paymentDiscount?.identifier {
-            if let discount = product?.discounts.first(where: { $0.identifier == offerIdentifier }) {
-                subscriptionOffer = PurchasedTransaction.SubscriptionOffer.promotional(discount)
+        if let discountIdentifier = transaction.payment.paymentDiscount?.identifier {
+            if let discount = product?.discounts.first(where: { $0.identifier == discountIdentifier }) {
+                offer = PurchasedTransaction.SubscriptionOffer.promotional(discount)
             } else {
-                subscriptionOffer = .init(id: offerIdentifier, type: .promotional)
+                offer = .init(id: discountIdentifier, type: .promotional)
             }
-        }
-
-        if subscriptionOffer == nil,
-           let discount = product?.introductoryPrice {
-            subscriptionOffer = PurchasedTransaction.SubscriptionOffer.introductory(discount)
+        } else if let discount = product?.introductoryPrice {
+            offer = PurchasedTransaction.SubscriptionOffer.introductory(discount)
+        } else {
+            offer = nil
         }
 
         self.init(
@@ -77,13 +75,12 @@ private extension PurchasedTransaction {
             price: product?.price.decimalValue,
             priceLocale: product?.priceLocale.a_currencyCode,
             storeCountry: product?.priceLocale.regionCode,
-            subscriptionOffer: subscriptionOffer,
+            subscriptionOffer: offer,
             environment: nil
         )
     }
 }
 
-@available(iOS 12.2, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     static func promotional(_ discount: SKProductDiscount) -> PurchasedTransaction.SubscriptionOffer {
         .init(

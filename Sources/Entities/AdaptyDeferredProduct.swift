@@ -25,14 +25,8 @@ extension AdaptyDeferredProduct: CustomStringConvertible {
 
 extension AdaptyDeferredProduct {
     init(skProduct: SKProduct, payment: SKPayment?) {
-        let promotionalOfferId: String?
-        if #available(iOS 12.2, *), let discountId = payment?.paymentDiscount?.identifier {
-            promotionalOfferId = discountId
-        } else {
-            promotionalOfferId = nil
-        }
         self.init(
-            promotionalOfferId: promotionalOfferId,
+            promotionalOfferId: payment?.paymentDiscount?.identifier,
             skProduct: skProduct
         )
     }

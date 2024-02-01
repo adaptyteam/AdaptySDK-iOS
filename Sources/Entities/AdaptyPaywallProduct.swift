@@ -52,8 +52,7 @@ extension AdaptyPaywallProduct {
         )
     }
 
-    init?(paywall: AdaptyPaywall,
-          skProduct: SKProduct) {
+    init?(paywall: AdaptyPaywall, skProduct: SKProduct) {
         let vendorId = skProduct.productIdentifier
         guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
             return nil

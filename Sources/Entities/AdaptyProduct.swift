@@ -71,15 +71,13 @@ extension AdaptyProduct {
 
     /// An array of subscription offers available for the auto-renewable subscription. (Will be empty for iOS version below 12.2 and macOS version below 10.14.4).
     public var discounts: [AdaptyProductDiscount] {
-        guard #available(iOS 12.2, *) else { return [] }
-        return skProduct.discounts.map { discount in
+         skProduct.discounts.map { discount in
             AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
         }
     }
 
     public func discount(byIdentifier identifier: String) -> AdaptyProductDiscount? {
-        guard #available(iOS 12.2, *),
-              let discount = skProduct.discounts.first(where: { $0.identifier == identifier })
+        guard let discount = skProduct.discounts.first(where: { $0.identifier == identifier })
         else { return nil }
         return AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
     }

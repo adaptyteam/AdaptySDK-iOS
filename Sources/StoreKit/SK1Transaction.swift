@@ -24,15 +24,6 @@ extension SK1Transaction {
             "original_id": .valueOrNil(original?.transactionIdentifier),
         ]
     }
-
-    var offerIdentifier: String? {
-        if #available(iOS 12.2, *),
-           let identifier = payment.paymentDiscount?.identifier {
-            return identifier
-        } else {
-            return nil
-        }
-    }
 }
 
 fileprivate extension SKPaymentTransactionState {

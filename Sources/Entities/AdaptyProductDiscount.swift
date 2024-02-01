@@ -37,21 +37,9 @@ public struct AdaptyProductDiscount {
 }
 
 extension AdaptyProductDiscount {
-    init?(discount: SKProductDiscount?, locale: Locale) {
-        guard let discount = discount else { return nil }
-        self.init(discount: discount, locale: locale)
-    }
-
     init(discount: SKProductDiscount, locale: Locale) {
-        let identifier: String?
-        if #available(iOS 12.2, *) {
-            identifier = discount.identifier
-        } else {
-            identifier = nil
-        }
-
         self.init(priceValue: AdaptyPrice(value: discount.price, locale: locale),
-                  identifier: identifier,
+                  identifier: discount.identifier,
                   subscriptionPeriod: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
                   numberOfPeriods: discount.numberOfPeriods,
                   paymentMode: PaymentMode(mode: discount.paymentMode),

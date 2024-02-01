@@ -37,12 +37,12 @@ private extension PurchasedTransaction {
         persistentVariationId: String?,
         purchasedSK2Transaction transaction: SK2Transaction
     ) {
-        var subscriptionOffer: PurchasedTransaction.SubscriptionOffer?
+        let offer: PurchasedTransaction.SubscriptionOffer?
 
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            subscriptionOffer = .init(transaction.offer, product: product)
+            offer = .init(transaction.offer, product: product)
         } else {
-            subscriptionOffer = .init(transaction, product: product)
+            offer = .init(transaction, product: product)
         }
 
         self.init(
@@ -54,7 +54,7 @@ private extension PurchasedTransaction {
             price: product?.price,
             priceLocale: product?.priceFormatStyle.locale.a_currencyCode,
             storeCountry: product?.priceFormatStyle.locale.regionCode,
-            subscriptionOffer: subscriptionOffer,
+            subscriptionOffer: offer,
             environment: transaction.environmentString
         )
     }
