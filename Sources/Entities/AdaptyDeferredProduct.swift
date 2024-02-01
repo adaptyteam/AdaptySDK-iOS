@@ -24,10 +24,10 @@ extension AdaptyDeferredProduct: CustomStringConvertible {
 }
 
 extension AdaptyDeferredProduct {
-    init(skProduct: SKProduct, payment: SKPayment?) {
+    init(sk1Product: SK1Product, payment: SKPayment?) {
         self.init(
             promotionalOfferId: payment?.paymentDiscount?.identifier,
-            skProduct: skProduct
+            skProduct: sk1Product
         )
     }
 }

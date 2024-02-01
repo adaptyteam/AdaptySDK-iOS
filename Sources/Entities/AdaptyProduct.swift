@@ -94,7 +94,7 @@ extension AdaptyProduct {
     }
 }
 
-extension SKProduct {
+private extension SK1Product {
     var adaptyIntroductoryDiscount: AdaptyProductDiscount? {
         guard let discount = introductoryPrice else { return nil }
         return AdaptyProductDiscount(discount: discount, locale: priceLocale)

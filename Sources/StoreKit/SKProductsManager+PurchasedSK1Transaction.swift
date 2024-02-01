@@ -19,7 +19,7 @@ extension SKProductsManager {
                 Log.error("SKQueueManager: fetch SK1Product \(productId) error: \(error)")
             }
             completion(PurchasedTransaction(
-                product: try? result.get(),
+                sk1Product: try? result.get(),
                 variationId: variationId,
                 persistentVariationId: persistentVariationId,
                 purchasedSK1Transaction: transaction
@@ -30,13 +30,13 @@ extension SKProductsManager {
 
 extension PurchasedTransaction {
     static func withSK1Product(
-        _ product: SKProduct,
+        _ sk1Product: SK1Product,
         _ variationId: String?,
         _ persistentVariationId: String?,
         purchasedSK1Transaction: (value: SK1Transaction, id: String)
     ) -> PurchasedTransaction {
         .init(
-            product: product,
+            sk1Product: sk1Product,
             variationId: variationId,
             persistentVariationId: persistentVariationId,
             purchasedSK1Transaction: purchasedSK1Transaction
@@ -46,7 +46,7 @@ extension PurchasedTransaction {
 
 private extension PurchasedTransaction {
     init(
-        product: SKProduct?,
+        sk1Product: SK1Product?,
         variationId: String?,
         persistentVariationId: String?,
         purchasedSK1Transaction transaction: (value: SK1Transaction, id: String)
@@ -55,12 +55,12 @@ private extension PurchasedTransaction {
         let offer: PurchasedTransaction.SubscriptionOffer?
 
         if let discountIdentifier = transaction.payment.paymentDiscount?.identifier {
-            if let discount = product?.discounts.first(where: { $0.identifier == discountIdentifier }) {
+            if let discount = sk1Product?.discounts.first(where: { $0.identifier == discountIdentifier }) {
                 offer = PurchasedTransaction.SubscriptionOffer.promotional(discount)
             } else {
                 offer = .init(id: discountIdentifier, type: .promotional)
             }
-        } else if let discount = product?.introductoryPrice {
+        } else if let discount = sk1Product?.introductoryPrice {
             offer = PurchasedTransaction.SubscriptionOffer.introductory(discount)
         } else {
             offer = nil
@@ -72,9 +72,9 @@ private extension PurchasedTransaction {
             vendorProductId: transaction.payment.productIdentifier,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
-            price: product?.price.decimalValue,
-            priceLocale: product?.priceLocale.a_currencyCode,
-            storeCountry: product?.priceLocale.regionCode,
+            price: sk1Product?.price.decimalValue,
+            priceLocale: sk1Product?.priceLocale.a_currencyCode,
+            storeCountry: sk1Product?.priceLocale.regionCode,
             subscriptionOffer: offer,
             environment: nil
         )

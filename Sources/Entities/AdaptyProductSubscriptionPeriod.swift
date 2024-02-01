@@ -22,7 +22,7 @@ extension AdaptyProductSubscriptionPeriod {
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(subscriptionPeriod: Product.SubscriptionPeriod) {
+    init(subscriptionPeriod: SK2Product.SubscriptionPeriod) {
         self.init(unit: AdaptyPeriodUnit(unit: subscriptionPeriod.unit), numberOfUnits: subscriptionPeriod.value)
     }
 }

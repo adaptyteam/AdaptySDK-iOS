@@ -18,7 +18,7 @@ extension AdaptyProductDiscount {
 }
 
 extension AdaptyProductDiscount.PaymentMode {
-    public init(mode: SKProductDiscount.PaymentMode) {
+    init(mode: SKProductDiscount.PaymentMode) {
         switch mode {
         case .payAsYouGo:
             self = .payAsYouGo
@@ -32,7 +32,7 @@ extension AdaptyProductDiscount.PaymentMode {
     }
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-    public init(mode: Product.SubscriptionOffer.PaymentMode) {
+    init(mode: SK2Product.SubscriptionOffer.PaymentMode) {
         switch mode {
         case .payAsYouGo:
             self = .payAsYouGo

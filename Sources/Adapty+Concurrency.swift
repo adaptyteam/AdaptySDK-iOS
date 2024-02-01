@@ -162,8 +162,8 @@ import StoreKit
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)
-                    case let .success(products):
-                        continuation.resume(returning: products)
+                    case let .success(sk1Products):
+                        continuation.resume(returning: sk1Products)
                     }
                 }
             }
