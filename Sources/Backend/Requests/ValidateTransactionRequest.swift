@@ -17,12 +17,12 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     let headers: Headers
     let profileId: String
 
-    let purchaseProductInfo: PurchaseProductInfo
+    let purchasedTransaction: PurchasedTransaction
 
-    init(profileId: String, purchaseProductInfo: PurchaseProductInfo) {
+    init(profileId: String, purchasedTransaction: PurchasedTransaction) {
         headers = Headers().setBackendProfileId(profileId)
         self.profileId = profileId
-        self.purchaseProductInfo = purchaseProductInfo
+        self.purchasedTransaction = purchasedTransaction
     }
 
     enum CodingKeys: String, CodingKey {
@@ -34,11 +34,7 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
         try dataObject.encode("adapty_purchase_app_store_original_transaction_id_validation_result", forKey: .type)
 
-        guard purchaseProductInfo.originalTransactionId != nil else {
-            throw EncodingError.invalidValue(purchaseProductInfo, EncodingError.Context(codingPath: dataObject.codingPath + [Backend.CodingKeys.attributes, PurchaseProductInfo.CodingKeys.originalTransactionId], debugDescription: "originalTransactionId is nil "))
-        }
-
-        try dataObject.encode(purchaseProductInfo, forKey: .attributes)
+        try dataObject.encode(purchasedTransaction, forKey: .attributes)
 
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
         try attributesObject.encode(profileId, forKey: .profileId)
@@ -47,17 +43,18 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
 
 extension HTTPSession {
     func performValidateTransactionRequest(profileId: String,
-                                           purchaseProductInfo: PurchaseProductInfo,
+                                           purchasedTransaction: PurchasedTransaction,
                                            _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         let request = ValidateTransactionRequest(profileId: profileId,
-                                                 purchaseProductInfo: purchaseProductInfo)
+                                                 purchasedTransaction: purchasedTransaction)
         let logParams: EventParameters = [
-            "product_id": .value(purchaseProductInfo.vendorProductId),
-            "original_transaction_id": .valueOrNil(purchaseProductInfo.originalTransactionId),
-            "transaction_id": .valueOrNil(purchaseProductInfo.transactionId),
-            "variation_id": .valueOrNil(purchaseProductInfo.productVariationId),
-            "variation_id_persistent": .valueOrNil(purchaseProductInfo.persistentProductVariationId),
-            "promotional_offer_id": .valueOrNil(purchaseProductInfo.promotionalOfferId),
+            "product_id": .value(purchasedTransaction.vendorProductId),
+            "original_transaction_id": .valueOrNil(purchasedTransaction.originalTransactionId),
+            "transaction_id": .valueOrNil(purchasedTransaction.transactionId),
+            "variation_id": .valueOrNil(purchasedTransaction.productVariationId),
+            "variation_id_persistent": .valueOrNil(purchasedTransaction.persistentProductVariationId),
+            "promotional_offer_id": .valueOrNil(purchasedTransaction.subscriptionOffer?.id),
+            "environment": .valueOrNil(purchasedTransaction.environment),
         ]
         perform(request, logName: "validate_transaction", logParams: logParams) { (result: ValidateTransactionRequest.Result) in
             switch result {

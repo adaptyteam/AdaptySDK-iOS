@@ -45,6 +45,20 @@ extension AdaptyProductDiscount.PaymentMode {
             self = .unknown
         }
     }
+
+    @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
+    init(mode: SK2Transaction.Offer.PaymentMode) {
+        switch mode {
+        case .payAsYouGo:
+            self = .payAsYouGo
+        case .payUpFront:
+            self = .payUpFront
+        case .freeTrial:
+            self = .freeTrial
+        default:
+            self = .unknown
+        }
+    }
 }
 
 extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
@@ -61,7 +75,7 @@ extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
 extension AdaptyProductDiscount.PaymentMode: Equatable, Sendable {}
 
 extension AdaptyProductDiscount.PaymentMode: Encodable {
-    fileprivate enum CodingValues: String {
+    private enum CodingValues: String {
         case payAsYouGo = "pay_as_you_go"
         case payUpFront = "pay_up_front"
         case freeTrial = "free_trial"

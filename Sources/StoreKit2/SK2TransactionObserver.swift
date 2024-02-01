@@ -49,9 +49,9 @@ extension SKQueueManager: SK2TransactionObserverDelegate {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
         guard transaction.justPurchasedRenewed else { return }
-        skProductsManager.fetchPurchaseProductInfo(variationId: nil, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
+        skProductsManager.fillPurchasedTransaction(variationId: nil, purchasedSK2Transaction: transaction) { [weak self] purchasedTransaction in
 
-            self?.purchaseValidator.validatePurchase(info: purchaseProductInfo) { _ in }
+            self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction) { _ in }
         }
     }
 }
@@ -65,6 +65,10 @@ extension SK2Transaction {
             return false
         } else if isUpgraded {
             return false
+        }
+
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            if reason == .renewal { return false }
         }
 
         return true
