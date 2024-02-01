@@ -25,6 +25,16 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
 
     /// Underlying system representation of the product.
     public let skProduct: SKProduct
+
+    /// Underlying system representation of the product using StoreKit 2 `Product`.
+    @available(iOS 15.0, *)
+    public var sk2Product: Product {
+        _sk2Product as! Product
+    }
+
+    /// Unsafe wrapper for StoreKit 2 `Product`. This solution is needed since `@available` property wrappers can't be used with stored properties.
+    private let _sk2Product: Any?
+
 }
 
 extension AdaptyPaywallProduct: CustomStringConvertible {
@@ -36,6 +46,34 @@ extension AdaptyPaywallProduct: CustomStringConvertible {
 }
 
 extension AdaptyPaywallProduct {
+    @available(iOS 15.0, *)
+    init(paywall: AdaptyPaywall,
+         productReference: AdaptyPaywall.ProductReference,
+         skProduct: SKProduct,
+         sk2Product: Product) {
+        self.init(
+            vendorProductId: productReference.vendorId,
+            promotionalOfferId: productReference.promotionalOfferId,
+            variationId: paywall.variationId,
+            paywallABTestName: paywall.abTestName,
+            paywallName: paywall.name,
+            skProduct: skProduct,
+            _sk2Product: sk2Product
+        )
+    }
+
+    @available(iOS 15.0, *)
+    init?(paywall: AdaptyPaywall,
+          skProduct: SKProduct,
+          sk2Product: Product) {
+        let vendorId = skProduct.productIdentifier
+        guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+            return nil
+        }
+
+        self.init(paywall: paywall, productReference: reference, skProduct: skProduct, sk2Product: sk2Product)
+    }
+
     init(paywall: AdaptyPaywall,
          productReference: AdaptyPaywall.ProductReference,
          skProduct: SKProduct) {
@@ -45,7 +83,8 @@ extension AdaptyPaywallProduct {
             variationId: paywall.variationId,
             paywallABTestName: paywall.abTestName,
             paywallName: paywall.name,
-            skProduct: skProduct
+            skProduct: skProduct,
+            _sk2Product: nil
         )
     }
 
@@ -95,6 +134,19 @@ extension AdaptyPaywallProduct: Encodable {
         case isFamilyShareable = "is_family_shareable"
     }
 
+    @available(iOS 15.0, *)
+    init(from object: PrivateObject, skProduct: SKProduct, sk2Product: Product) {
+        self.init(
+            vendorProductId: object.vendorProductId,
+            promotionalOfferId: object.promotionalOfferId,
+            variationId: object.variationId,
+            paywallABTestName: object.paywallABTestName,
+            paywallName: object.paywallName,
+            skProduct: skProduct,
+            _sk2Product: sk2Product
+        )
+    }
+
     init(from object: PrivateObject, skProduct: SKProduct) {
         self.init(
             vendorProductId: object.vendorProductId,
@@ -102,7 +154,8 @@ extension AdaptyPaywallProduct: Encodable {
             variationId: object.variationId,
             paywallABTestName: object.paywallABTestName,
             paywallName: object.paywallName,
-            skProduct: skProduct
+            skProduct: skProduct,
+            _sk2Product: nil
         )
     }
 

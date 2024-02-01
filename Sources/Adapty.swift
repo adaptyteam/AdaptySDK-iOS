@@ -237,10 +237,40 @@ extension Adapty {
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         async(completion, logName: "get_paywall_products", logParams: ["placement_id": .value(paywall.placementId)]) { manager, completion in
-            manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SKProduct]>) in
-                completion(result.map { skProducts in
-                    skProducts.compactMap { AdaptyPaywallProduct(paywall: paywall, skProduct: $0) }
-                })
+            manager.skProductsManager.fetchSK1ProductsInSameOrder(
+                productIdentifiers: paywall.vendorProductIds,
+                fetchPolicy: .returnCacheDataElseLoad
+            ) { sk1Result in
+                if #available(iOS 15.0, *) {
+                    manager.skProductsManager.fetchSK2ProductsInSameOrder(
+                        productIdentifiers: paywall.vendorProductIds,
+                        fetchPolicy: .returnCacheDataElseLoad
+                    ) { sk2Result in
+                        switch sk1Result {
+                        case .success(let sk1Products):
+                            switch sk2Result {
+                            case .success(let sk2Products):
+                                completion(
+                                    .success(
+                                        zip(sk1Products, sk2Products).compactMap { sk1Product, sk2Product in
+                                            AdaptyPaywallProduct(paywall: paywall, skProduct: sk1Product, sk2Product: sk2Product)
+                                        }
+                                    )
+                                )
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                        case .failure(let error):
+                            completion(.failure(error))
+                        }
+                    }
+                } else {
+                    completion(
+                        sk1Result.map { skProducts in
+                            skProducts.compactMap { AdaptyPaywallProduct(paywall: paywall, skProduct: $0) }
+                        }
+                    )
+                }
             }
         }
     }
@@ -258,13 +288,39 @@ extension Adapty {
                 return
             }
 
-            manager.skProductsManager.fetchSK1Product(productIdentifier: object.vendorProductId, fetchPolicy: .returnCacheDataElseLoad) { result in
-                completion(result.flatMap { (sk1Product: SKProduct?) -> AdaptyResult<AdaptyPaywallProduct> in
-                    guard let sk1Product = sk1Product else {
-                        return .failure(SKManagerError.noProductIDsFound().asAdaptyError)
+            manager.skProductsManager.fetchSK1Product(
+                productIdentifier: object.vendorProductId,
+                fetchPolicy: .returnCacheDataElseLoad
+            ) { sk1Result in
+                if #available(iOS 15.0, *) {
+                    manager.skProductsManager.fetchSK2Product(
+                        productIdentifier: object.vendorProductId,
+                        fetchPolicy: .returnCacheDataElseLoad
+                    ) { sk2Result in
+                        switch sk1Result {
+                        case .success(let sk1Product):
+                            switch sk2Result {
+                            case .success(let sk2Product):
+                                completion(
+                                    .success(
+                                        AdaptyPaywallProduct(from: object, skProduct: sk1Product, sk2Product: sk2Product)
+                                    )
+                                )
+                            case .failure(let error):
+                                completion(.failure(error))
+                            }
+                        case .failure(let error):
+                            completion(.failure(error))
+                        }
                     }
-                    return .success(AdaptyPaywallProduct(from: object, skProduct: sk1Product))
-                })
+                } else {
+                    completion(sk1Result.flatMap { (sk1Product: SKProduct?) -> AdaptyResult<AdaptyPaywallProduct> in
+                        guard let sk1Product else {
+                            return .failure(SKManagerError.noProductIDsFound().asAdaptyError)
+                        }
+                        return .success(AdaptyPaywallProduct(from: object, skProduct: sk1Product))
+                    })
+                }
             }
         }
     }
