@@ -32,7 +32,7 @@ extension SKQueueManager {
         }
     }
 
-    func receivedFailedTransaction(_ transaction: SKPaymentTransaction) {
+    func receivedFailedTransaction(_ transaction: SK1Transaction) {
         queue.async { [weak self] in
             guard let self = self else { return }
 
@@ -53,31 +53,36 @@ extension SKQueueManager {
         }
     }
 
-    func receivedPurchasedTransaction(_ transaction: SKPaymentTransaction) {
-        func fetchPurchaseProductInfo(manager: SKQueueManager,
-                                      purchasedTransaction transaction: SK1Transaction,
-                                      _ completion: @escaping ((PurchaseProductInfo) -> Void)) {
-            let productId = transaction.payment.productIdentifier
+    func receivedPurchasedTransaction(_ transaction: SK1Transaction) {
+        guard let transactionIdentifier = transaction.transactionIdentifier else {
+            Log.error("SKQueueManager: received purchased transaction without identifier")
+            return
+        }
+
+        func fillPurchasedTransaction(manager: SKQueueManager,
+                                      purchasedSK1Transaction transaction: (value: SK1Transaction, id: String),
+                                      _ completion: @escaping ((PurchasedTransaction) -> Void)) {
+            let productId = transaction.value.payment.productIdentifier
             let variationId: String? = manager.variationsIds[productId]
             let persistentVariationId: String? = manager.persistentVariationsIds[productId]
 
             if let product = manager.makePurchasesProduct[productId] {
-                completion(PurchaseProductInfo(product.skProduct, variationId, persistentVariationId, purchasedTransaction: transaction))
+                completion(PurchasedTransaction.withSK1Product(product.skProduct, variationId, persistentVariationId, purchasedSK1Transaction: transaction))
                 return
             }
 
-            manager.skProductsManager.fetchPurchaseProductInfo(variationId: variationId,
+            manager.skProductsManager.fillPurchasedTransaction(variationId: variationId,
                                                                persistentVariationId: persistentVariationId,
-                                                               purchasedTransaction: transaction,
+                                                               purchasedSK1Transaction: transaction,
                                                                completion)
         }
 
         queue.async { [weak self] in
             guard let self = self else { return }
-            fetchPurchaseProductInfo(manager: self, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
-                let productId = purchaseProductInfo.vendorProductId
+            fillPurchasedTransaction(manager: self, purchasedSK1Transaction: (transaction, transactionIdentifier)) { [weak self] purchasedTransaction in
+                let productId = purchasedTransaction.vendorProductId
 
-                self?.purchaseValidator.validatePurchase(info: purchaseProductInfo) { result in
+                self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction) { result in
                     guard let self = self else { return }
                     if result.error == nil {
                         self.removeVariationId(for: productId)

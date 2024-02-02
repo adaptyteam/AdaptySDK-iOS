@@ -24,16 +24,10 @@ extension AdaptyDeferredProduct: CustomStringConvertible {
 }
 
 extension AdaptyDeferredProduct {
-    init(skProduct: SKProduct, payment: SKPayment?) {
-        let promotionalOfferId: String?
-        if #available(iOS 12.2, macOS 10.14.4, *), let discountId = payment?.paymentDiscount?.identifier {
-            promotionalOfferId = discountId
-        } else {
-            promotionalOfferId = nil
-        }
+    init(sk1Product: SK1Product, payment: SKPayment?) {
         self.init(
-            promotionalOfferId: promotionalOfferId,
-            skProduct: skProduct
+            promotionalOfferId: payment?.paymentDiscount?.identifier,
+            skProduct: sk1Product
         )
     }
 }

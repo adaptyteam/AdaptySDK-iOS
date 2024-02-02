@@ -10,16 +10,16 @@ import StoreKit
 
 final class SK1ProductsFetcher: NSObject {
     private let queue: DispatchQueue
-    private var products = [String: SKProduct]()
+    private var sk1Products = [String: SK1Product]()
     private var requests = [SKRequest: (productIds: Set<String>, retryCount: Int)]()
-    private var completionHandlers = [Set<String>: [AdaptyResultCompletion<[SKProduct]>]]()
+    private var completionHandlers = [Set<String>: [AdaptyResultCompletion<[SK1Product]>]]()
 
     init(queue: DispatchQueue) {
         self.queue = queue
         super.init()
     }
 
-    func fetchProducts(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SKProduct]>) {
+    func fetchProducts(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK1Product]>) {
         queue.async { [weak self] in
             guard let self = self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
@@ -32,7 +32,7 @@ final class SK1ProductsFetcher: NSObject {
             }
 
             if fetchPolicy == .returnCacheDataElseLoad {
-                let products = productIds.compactMap { self.products[$0] }
+                let products = productIds.compactMap { self.sk1Products[$0] }
                 if products.count == productIds.count {
                     completion(.success(products))
                     return
@@ -62,10 +62,10 @@ final class SK1ProductsFetcher: NSObject {
         Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_sk1_products", callId: "SKR\(request.hash)", params: ["products_ids": .value(productIds)]))
     }
 
-    fileprivate func saveProducts(_ products: [SKProduct]) {
+    fileprivate func saveProducts(_ sk1Products: [SK1Product]) {
         queue.async { [weak self] in
             guard let self = self else { return }
-            products.forEach { self.products[$0.productIdentifier] = $0 }
+            sk1Products.forEach { self.sk1Products[$0.productIdentifier] = $0 }
         }
     }
 }

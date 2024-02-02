@@ -29,4 +29,17 @@ extension SK2Transaction {
     var originalTransactionIdentifier: String {
         String(originalID)
     }
+
+    var environmentString: String? {
+        guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
+            return Optional(environmentStringRepresentation).flatMap { $0.isEmpty ? nil : $0.lowercased() }
+        }
+
+        switch environment {
+        case .production: return "production"
+        case .sandbox: return "sandbox"
+        case .xcode: return "xcode"
+        default: return environment.rawValue
+        }
+    }
 }

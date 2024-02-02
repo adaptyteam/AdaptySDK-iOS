@@ -41,7 +41,7 @@ final class SKProductsManager {
         case returnCacheDataElseLoad
     }
 
-    func fetchSK1Product(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<SKProduct>) {
+    func fetchSK1Product(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<SK1Product>) {
         fetchSK1Products(productIdentifiers: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount) { result in
             completion(result.flatMap {
                 guard let product = $0.first else {
@@ -52,7 +52,7 @@ final class SKProductsManager {
         }
     }
 
-    func fetchSK1ProductsInSameOrder(productIdentifiers productIds: [String], fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SKProduct]>) {
+    func fetchSK1ProductsInSameOrder(productIdentifiers productIds: [String], fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK1Product]>) {
         fetchSK1Products(productIdentifiers: Set(productIds), fetchPolicy: fetchPolicy, retryCount: retryCount) {
             completion($0.map { skProducts in
                 productIds.compactMap { id in
@@ -62,12 +62,12 @@ final class SKProductsManager {
         }
     }
 
-    func fetchSK1Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SKProduct]>) {
+    func fetchSK1Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK1Product]>) {
         storeKit1Fetcher.fetchProducts(productIdentifiers: productIds, fetchPolicy: fetchPolicy, retryCount: retryCount, completion)
     }
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-    func fetchSK2Product(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<Product>) {
+    func fetchSK2Product(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<SK2Product>) {
         fetchSK2Products(productIdentifiers: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount) { result in
             completion(result.flatMap {
                 guard let product = $0.first else {
@@ -79,7 +79,7 @@ final class SKProductsManager {
     }
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-    func fetchSK2ProductsInSameOrder(productIdentifiers productIds: [String], fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[Product]>) {
+    func fetchSK2ProductsInSameOrder(productIdentifiers productIds: [String], fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK2Product]>) {
         fetchSK2Products(productIdentifiers: Set(productIds), fetchPolicy: fetchPolicy, retryCount: retryCount) {
             completion($0.map { products in
                 productIds.compactMap { id in
@@ -90,7 +90,7 @@ final class SKProductsManager {
     }
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-    func fetchSK2Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[Product]>) {
+    func fetchSK2Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK2Product]>) {
         guard let storeKit2Fetcher = storeKit2Fetcher else {
             Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
             completion(.success([]))
@@ -148,7 +148,7 @@ extension SKProductsManager {
         }
     }
 
-    func getIntroductoryOfferEligibility(sk1Products: [SKProduct], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
+    func getIntroductoryOfferEligibility(sk1Products: [SK1Product], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
         let introductoryOfferEligibilityByVendorProductId = [String: AdaptyEligibility?](sk1Products.map { ($0.productIdentifier, $0.introductoryOfferEligibility) }, uniquingKeysWith: { $1 })
 
         let vendorProductIdsWithUnknownEligibility = introductoryOfferEligibilityByVendorProductId.filter { $0.value == nil }.map { $0.key }

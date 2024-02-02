@@ -117,31 +117,33 @@ extension AdaptyProfileManager {
     }
 
     func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK1Transaction, _ completion: @escaping AdaptyErrorCompletion) {
-        guard transaction.transactionState == .purchased || transaction.transactionState == .restored else {
+        guard transaction.transactionState == .purchased || transaction.transactionState == .restored,
+              let transactionIdentifier = transaction.transactionIdentifier else {
             completion(.wrongParamPurchasedTransaction())
             return
         }
-        manager.skProductsManager.fetchPurchaseProductInfo(variationId: variationId, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
+
+        manager.skProductsManager.fillPurchasedTransaction(variationId: variationId, purchasedSK1Transaction: (transaction, transactionIdentifier)) { [weak self] purchasedTransaction in
 
             guard let self = self, self.isActive else {
                 completion(.profileWasChanged())
                 return
             }
 
-            self.manager.validatePurchase(info: purchaseProductInfo) { completion($0.error) }
+            self.manager.validatePurchase(transaction: purchasedTransaction) { completion($0.error) }
         }
     }
 
     @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
     func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK2Transaction, _ completion: @escaping AdaptyErrorCompletion) {
-        manager.skProductsManager.fetchPurchaseProductInfo(variationId: variationId, purchasedTransaction: transaction) { [weak self] purchaseProductInfo in
+        manager.skProductsManager.fillPurchasedTransaction(variationId: variationId, purchasedSK2Transaction: transaction) { [weak self] purchasedTransaction in
 
             guard let self = self, self.isActive else {
                 completion(.profileWasChanged())
                 return
             }
 
-            self.manager.validatePurchase(info: purchaseProductInfo) { completion($0.error) }
+            self.manager.validatePurchase(transaction: purchasedTransaction) { completion($0.error) }
         }
     }
 

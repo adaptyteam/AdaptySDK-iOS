@@ -40,7 +40,7 @@ extension AdaptyPaywallProduct: CustomStringConvertible {
 extension AdaptyPaywallProduct {
     init(paywall: AdaptyPaywall,
          productReference: AdaptyPaywall.ProductReference,
-         skProduct: SKProduct) {
+         sk1Product: SK1Product) {
         self.init(
             vendorProductId: productReference.vendorId,
             adaptyProductId: productReference.adaptyProductId,
@@ -48,18 +48,17 @@ extension AdaptyPaywallProduct {
             variationId: paywall.variationId,
             paywallABTestName: paywall.abTestName,
             paywallName: paywall.name,
-            skProduct: skProduct
+            skProduct: sk1Product
         )
     }
 
-    init?(paywall: AdaptyPaywall,
-          skProduct: SKProduct) {
-        let vendorId = skProduct.productIdentifier
+    init?(paywall: AdaptyPaywall, sk1Product: SK1Product) {
+        let vendorId = sk1Product.productIdentifier
         guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
             return nil
         }
 
-        self.init(paywall: paywall, productReference: reference, skProduct: skProduct)
+        self.init(paywall: paywall, productReference: reference, sk1Product: sk1Product)
     }
 }
 
@@ -101,7 +100,7 @@ extension AdaptyPaywallProduct: Encodable {
         case isFamilyShareable = "is_family_shareable"
     }
 
-    init(from object: PrivateObject, skProduct: SKProduct) {
+    init(from object: PrivateObject, sk1Product: SK1Product) {
         self.init(
             vendorProductId: object.vendorProductId,
             adaptyProductId: object.adaptyProductId,
@@ -109,7 +108,7 @@ extension AdaptyPaywallProduct: Encodable {
             variationId: object.variationId,
             paywallABTestName: object.paywallABTestName,
             paywallName: object.paywallName,
-            skProduct: skProduct
+            skProduct: sk1Product
         )
     }
 
@@ -158,7 +157,8 @@ extension AdaptyPaywallProduct: Encodable {
         try container.encodeIfPresent(regionCode, forKey: .regionCode)
         try container.encode(isFamilyShareable, forKey: .isFamilyShareable)
 
-        guard #available(iOS 11.2, macOS 10.14.4, *), skProduct.subscriptionPeriod != nil else { return }
-        try container.encode(SubscriptionDetail(product: self), forKey: .subscriptionDetails)
+        if skProduct.subscriptionPeriod != nil {
+            try container.encode(SubscriptionDetail(product: self), forKey: .subscriptionDetails)
+        }
     }
 }

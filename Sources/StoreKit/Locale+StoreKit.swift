@@ -18,7 +18,6 @@ extension Locale {
         return formatter.string(from: price)
     }
 
-    @available(iOS 11.2, macOS 10.13.2, *)
     func localized(period: SKProductSubscriptionPeriod) -> String? {
         switch period.unit {
         case .day:
@@ -35,7 +34,6 @@ extension Locale {
         }
     }
 
-    @available(iOS 11.2, macOS 10.13.2, *)
     func localized(numberOfPeriods discount: SKProductDiscount) -> String? {
         let resultingNumber = discount.numberOfPeriods * discount.subscriptionPeriod.numberOfUnits
 

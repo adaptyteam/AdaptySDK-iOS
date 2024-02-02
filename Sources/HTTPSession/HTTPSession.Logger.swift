@@ -94,7 +94,6 @@ extension HTTPSession {
             }
         }
 
-        @available(iOS 10.0, *)
         fileprivate static func logMetrics(_ metrics: URLSessionTaskMetrics?) -> String {
             guard let metrics = metrics else { return "" }
             guard

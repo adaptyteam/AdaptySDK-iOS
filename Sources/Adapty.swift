@@ -238,9 +238,9 @@ extension Adapty {
     public static func getPaywallProducts(paywall: AdaptyPaywall,
                                           _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         async(completion, logName: "get_paywall_products", logParams: ["placement_id": .value(paywall.placementId)]) { manager, completion in
-            manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SKProduct]>) in
-                completion(result.map { skProducts in
-                    skProducts.compactMap { AdaptyPaywallProduct(paywall: paywall, skProduct: $0) }
+            manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SK1Product]>) in
+                completion(result.map { sk1Products in
+                    sk1Products.compactMap { AdaptyPaywallProduct(paywall: paywall, sk1Product: $0) }
                 })
             }
         }
@@ -260,11 +260,11 @@ extension Adapty {
             }
 
             manager.skProductsManager.fetchSK1Product(productIdentifier: object.vendorProductId, fetchPolicy: .returnCacheDataElseLoad) { result in
-                completion(result.flatMap { (sk1Product: SKProduct?) -> AdaptyResult<AdaptyPaywallProduct> in
+                completion(result.flatMap { (sk1Product: SK1Product?) -> AdaptyResult<AdaptyPaywallProduct> in
                     guard let sk1Product = sk1Product else {
                         return .failure(SKManagerError.noProductIDsFound().asAdaptyError)
                     }
-                    return .success(AdaptyPaywallProduct(from: object, skProduct: sk1Product))
+                    return .success(AdaptyPaywallProduct(from: object, sk1Product: sk1Product))
                 })
             }
         }
@@ -387,24 +387,24 @@ extension Adapty {
         }
 
         async(completion, logName: logName, logParams: logParams) { manager, completion in
-            if #available(iOS 12.2, macOS 10.14.4, *), let discountId = product.promotionalOfferId {
-                let profileId = manager.profileStorage.profileId
-
-                manager.httpSession.performSignSubscriptionOfferRequest(profileId: profileId, vendorProductId: product.vendorProductId, discountId: discountId) { result in
-                    switch result {
-                    case let .failure(error):
-                        completion(.failure(error))
-                    case let .success(response):
-
-                        let payment = SKMutablePayment(product: product.skProduct)
-                        payment.applicationUsername = ""
-                        payment.paymentDiscount = response.discount(identifier: discountId)
-                        manager.skQueueManager.makePurchase(payment: payment, product: product, completion)
-                    }
-                }
-
-            } else {
+            guard let discountId = product.promotionalOfferId else {
                 manager.skQueueManager.makePurchase(payment: SKPayment(product: product.skProduct), product: product, completion)
+                return
+            }
+
+            let profileId = manager.profileStorage.profileId
+
+            manager.httpSession.performSignSubscriptionOfferRequest(profileId: profileId, vendorProductId: product.vendorProductId, discountId: discountId) { result in
+                switch result {
+                case let .failure(error):
+                    completion(.failure(error))
+                case let .success(response):
+
+                    let payment = SKMutablePayment(product: product.skProduct)
+                    payment.applicationUsername = ""
+                    payment.paymentDiscount = response.discount(identifier: discountId)
+                    manager.skQueueManager.makePurchase(payment: payment, product: product, completion)
+                }
             }
         }
     }

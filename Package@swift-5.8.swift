@@ -1,4 +1,4 @@
-// swift-tools-version:5.9
+// swift-tools-version:5.8
 import PackageDescription
 
 let package = Package(
@@ -6,8 +6,7 @@ let package = Package(
 
     platforms: [
         .iOS("12.2"),
-        .macOS("10.14.4"),
-        .visionOS(.v1)
+        .macOS("10.14.4")
     ],
     products: [
         .library(name: "Adapty",
