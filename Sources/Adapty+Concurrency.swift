@@ -17,18 +17,15 @@ import StoreKit
         /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
         /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
         /// - Parameter customerUserId: User identifier in your system
-        /// - Parameter storeKit2Usage: You can override StoreKit 2 usage policy with this value
         /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
         public static func activate(_ apiKey: String,
                                     observerMode: Bool = false,
                                     customerUserId: String? = nil,
-                                    storeKit2Usage: StoreKit2Usage = .default,
                                     dispatchQueue: DispatchQueue = .main) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.activate(apiKey,
                                 observerMode: observerMode,
                                 customerUserId: customerUserId,
-                                storeKit2Usage: storeKit2Usage,
                                 dispatchQueue: dispatchQueue) { error in
                     if let error = error {
                         return continuation.resume(throwing: error)

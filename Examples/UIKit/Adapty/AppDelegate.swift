@@ -20,8 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Adapty.delegate = PurchasesObserver.shared
         Adapty.logLevel = .verbose
-        Adapty.activate(AppConstants.adaptyApiKey,
-                        storeKit2Usage: .forIntroEligibilityCheck) { _ in
+        Adapty.activate(AppConstants.adaptyApiKey) { _ in
             PurchasesObserver.shared.loadInitialProfileData()
             PurchasesObserver.shared.loadInitialPaywallData()
         }

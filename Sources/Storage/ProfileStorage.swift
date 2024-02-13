@@ -16,9 +16,9 @@ protocol ProfileStorage: ProfileIdentifierStorage {
     func setProfile(_: VH<AdaptyProfile>)
 
     var externalAnalyticsDisabled: Bool { get }
-    var syncedBundleReceipt: Bool { get }
+    var syncedTransactions: Bool { get }
 
-    func setSyncedBundleReceipt(_: Bool)
+    func setSyncedTransactions(_: Bool)
     func setExternalAnalyticsDisabled(_: Bool)
 
     var appleSearchAdsSyncDate: Date? { get }

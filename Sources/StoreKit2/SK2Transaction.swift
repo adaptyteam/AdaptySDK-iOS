@@ -30,9 +30,10 @@ extension SK2Transaction {
         String(originalID)
     }
 
-    var environmentString: String? {
+    var environmentString: String {
         guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
-            return Optional(environmentStringRepresentation).flatMap { $0.isEmpty ? nil : $0.lowercased() }
+            let environment = environmentStringRepresentation
+            return environment.isEmpty ? "storekit2" : environment.lowercased()
         }
 
         switch environment {

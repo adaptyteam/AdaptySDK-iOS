@@ -16,8 +16,12 @@ extension Adapty {
         static var idfaCollectionDisabled: Bool = false
 
         static var observerMode: Bool = false
-        static let storeKit2Enabled: Bool = false
 
+        static var storeKit2Enabled: String {
+            guard #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) else { return "unavailable" }
+            return  "enabled"
+        }
+        
         static var backendBaseUrl: URL?
         static var backendFallbackBaseUrl: URL?
 

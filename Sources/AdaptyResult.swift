@@ -19,4 +19,23 @@ extension Result where Failure == AdaptyError {
         default: return nil
         }
     }
+
+    @inlinable func `do`(_ call: (Success) -> Void) -> Self {
+        guard case let .success(value) = self else { return self }
+        call(value)
+        return self
+    }
+
+    @inlinable func flatValue<T>() -> AdaptyResult<T>? where Success == Optional<T> {
+        switch self {
+        case let .failure(error):
+            return .failure(error)
+        case let .success(v):
+            if let v = v {
+                return .success(v)
+            } else {
+                return nil
+            }
+        }
+    }
 }

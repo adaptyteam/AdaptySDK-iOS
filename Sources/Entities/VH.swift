@@ -7,22 +7,22 @@
 
 import Foundation
 
-struct VH<T> {
-    let value: T
+struct VH<Value> {
+    let value: Value
     let hash: String?
     let time: Date?
 
-    private init(_ value: T, hash: String?, time: Date?) {
+    private init(_ value: Value, hash: String?, time: Date?) {
         self.value = value
         self.hash = hash
         self.time = time
     }
 
-    init(_ value: T, hash: String?) {
+    init(_ value: Value, hash: String?) {
         self.init(value, hash: hash, time: nil)
     }
 
-    init(_ value: T, time: Date) {
+    init(_ value: Value, time: Date) {
         self.init(value, hash: nil, time: time)
     }
 
@@ -32,15 +32,22 @@ struct VH<T> {
         case time = "t"
     }
 
-    @inlinable func withValue<U>(_ other: U) -> VH<U> {
-        VH<U>(other, hash: hash, time: time)
-    }
-
-    @inlinable func mapValue<U>(_ transform: (T) -> U) -> VH<U> {
-        withValue(transform(value))
+    @inlinable func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
+        VH<U>(transform(value), hash: hash, time: time)
     }
 }
 
-extension VH: Encodable where T: Encodable {}
+extension VH: Encodable where Value: Encodable {}
 
-extension VH: Decodable where T: Decodable {}
+extension VH: Decodable where Value: Decodable {}
+
+extension VH {
+    @inlinable func flatValue<T>() -> VH<T>? where Value == Optional<T> {
+        switch value {
+        case .none:
+            return .none
+        case let .some(v):
+            return VH<T>(v, hash: hash, time: time)
+        }
+    }
+}

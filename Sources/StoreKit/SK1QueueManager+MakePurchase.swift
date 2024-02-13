@@ -1,5 +1,5 @@
 //
-//  SKQueueManager+MakePurchase.swift
+//  SK1QueueManager+MakePurchase.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 25.10.2022
@@ -7,7 +7,7 @@
 
 import StoreKit
 
-extension SKQueueManager {
+extension SK1QueueManager {
     func makePurchase<T: AdaptyProduct>(payment: SKPayment, product: T, _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>) {
         queue.async { [weak self] in
             let productId = payment.productIdentifier
@@ -39,7 +39,7 @@ extension SKQueueManager {
             if !Adapty.Configuration.observerMode {
                 SKPaymentQueue.default().finishTransaction(transaction)
                 Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.logParams))
-                Log.verbose("SKQueueManager: finish failed transaction \(transaction)")
+                Log.verbose("SK1QueueManager: finish failed transaction \(transaction)")
             }
 
             let productId = transaction.payment.productIdentifier
@@ -55,11 +55,11 @@ extension SKQueueManager {
 
     func receivedPurchasedTransaction(_ transaction: SK1Transaction) {
         guard let transactionIdentifier = transaction.transactionIdentifier else {
-            Log.error("SKQueueManager: received purchased transaction without identifier")
+            Log.error("SK1QueueManager: received purchased transaction without identifier")
             return
         }
 
-        func fillPurchasedTransaction(manager: SKQueueManager,
+        func fillPurchasedTransaction(manager: SK1QueueManager,
                                       purchasedSK1Transaction transaction: (value: SK1Transaction, id: String),
                                       _ completion: @escaping ((PurchasedTransaction) -> Void)) {
             let productId = transaction.value.payment.productIdentifier
@@ -82,20 +82,21 @@ extension SKQueueManager {
             fillPurchasedTransaction(manager: self, purchasedSK1Transaction: (transaction, transactionIdentifier)) { [weak self] purchasedTransaction in
                 let productId = purchasedTransaction.vendorProductId
 
-                self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction) { result in
+                let isObserverMode = Adapty.Configuration.observerMode
+                self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction, reason: isObserverMode ? .observing : .purchasing) { result in
                     guard let self = self else { return }
                     if result.error == nil {
                         self.removeVariationId(for: productId)
                         self.makePurchasesProduct.removeValue(forKey: productId)
 
-                        if !Adapty.Configuration.observerMode {
+                        if !isObserverMode {
                             SKPaymentQueue.default().finishTransaction(transaction)
                             Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.logParams))
-                            Log.info("SKQueueManager: finish purchased transaction \(transaction)")
+                            Log.info("SK1QueueManager: finish purchased transaction \(transaction)")
                         }
                     }
                     self.callMakePurchasesCompletionHandlers(productId, result.map {
-                        AdaptyPurchasedInfo(profile: $0, transaction: transaction)
+                        AdaptyPurchasedInfo(profile: $0.value, transaction: transaction)
                     })
                 }
             }
