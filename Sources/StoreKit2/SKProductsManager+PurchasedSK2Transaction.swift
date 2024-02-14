@@ -35,15 +35,9 @@ private extension PurchasedTransaction {
         sk2Product: SK2Product?,
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK2Transaction transaction: SK2Transaction
+        purchasedSK2Transaction transaction: Transaction
     ) {
-        let offer: PurchasedTransaction.SubscriptionOffer?
-
-        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            offer = .init(transaction.offer, sk2Product: sk2Product)
-        } else {
-            offer = .init(transaction, sk2Product: sk2Product)
-        }
+        let offer = PurchasedTransaction.SubscriptionOffer(transaction, sk2Product: sk2Product)
 
         self.init(
             transactionId: transaction.transactionIdentifier,
@@ -70,19 +64,6 @@ private extension PurchasedTransaction.SubscriptionOffer {
             period: (productOffer?.period).map { AdaptyProductSubscriptionPeriod(subscriptionPeriod: $0) },
             paymentMode: (productOffer?.paymentMode).map { .init(mode: $0) } ?? .unknown,
             type: .init(type: offerType),
-            price: productOffer?.price
-        )
-    }
-
-    @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
-    init?(_ transactionOffer: SK2Transaction.Offer?, sk2Product: SK2Product?) {
-        guard let transactionOffer = transactionOffer else { return nil }
-        let productOffer = sk2Product?.subscriptionOffer(byType: transactionOffer.type, withId: transactionOffer.id)
-        self = .init(
-            id: transactionOffer.id,
-            period: (productOffer?.period).map { .init(subscriptionPeriod: $0) },
-            paymentMode: transactionOffer.paymentMode.map { .init(mode: $0) } ?? .unknown,
-            type: .init(type: transactionOffer.type),
             price: productOffer?.price
         )
     }
