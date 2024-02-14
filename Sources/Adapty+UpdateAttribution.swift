@@ -21,7 +21,7 @@ extension Adapty {
         if source == .appsflyer {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attribution, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         }
-       let logParams: EventParameters = [
+        let logParams: EventParameters = [
             "source": .value(source.rawValue),
             "has_network_user_id": .value(networkUserId != nil),
         ]
@@ -35,15 +35,27 @@ extension Adapty {
     }
 
     private func updateAttribution(profileId: String, _ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String?, _ completion: AdaptyErrorCompletion? = nil) {
+        let oldProfile = state.initialized?.profile
         httpSession.performSetAttributionRequest(profileId: profileId,
                                                  networkUserId: networkUserId,
                                                  source: source,
-                                                 attribution: attribution) { [weak self] error in
-            if source == .appleSearchAds, error == nil, let storage = self?.profileStorage, storage.profileId == profileId {
-                // mark appleSearchAds attribution data as synced
-                storage.setAppleSearchAdsSyncDate()
+                                                 attribution: attribution,
+                                                 responseHash: oldProfile?.hash) { [weak self] result in
+            switch result {
+            case let .failure(error):
+                completion?(error)
+            case let .success(profile):
+
+                if let profile = profile.flatValue() {
+                    self?.state.initialized?.saveResponse(profile)
+                }
+
+                if source == .appleSearchAds, let storage = self?.profileStorage, storage.profileId == profileId {
+                    // mark appleSearchAds attribution data as synced
+                    storage.setAppleSearchAdsSyncDate()
+                }
+                completion?(nil)
             }
-            completion?(error)
         }
     }
 

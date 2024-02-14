@@ -58,8 +58,6 @@ extension Adapty: PurchaseValidator {
         if profileStorage.profileId == profile.value.profileId {
             profileStorage.setSyncedTransactions(true)
         }
-        if let manager = state.initialized {
-            manager.saveResponse(profile)
-        }
+        state.initialized?.saveResponse(profile)
     }
 }

@@ -25,8 +25,10 @@ extension Result where Failure == AdaptyError {
         call(value)
         return self
     }
+}
 
-    @inlinable func flatValue<T>() -> AdaptyResult<T>? where Success == Optional<T> {
+extension Result {
+    @inlinable func flatValue<NewSuccess>() -> Result<NewSuccess, Failure>? where Success == Optional<NewSuccess> {
         switch self {
         case let .failure(error):
             return .failure(error)

@@ -105,6 +105,7 @@ extension AdaptyProfileManager {
         if let oldHash = profile.hash,
            let newHash = newProfile.hash,
            oldHash == newHash { return }
+        
         profile = newProfile
         manager.profileStorage.setProfile(newProfile)
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
