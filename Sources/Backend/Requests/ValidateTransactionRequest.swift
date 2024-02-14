@@ -35,16 +35,17 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         var container = encoder.container(keyedBy: Backend.CodingKeys.self)
         var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
         try dataObject.encode("adapty_purchase_app_store_original_transaction_id_validation_result", forKey: .type)
-        var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-        try attributesObject.encode(profileId, forKey: .profileId)
-
         switch requestSource {
         case let .restore(originalTransactionId):
+            var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+            try attributesObject.encode(profileId, forKey: .profileId)
             try attributesObject.encode(Adapty.ValidatePurchaseReason.restoreRawString, forKey: .requestSource)
             try attributesObject.encode(originalTransactionId, forKey: .originalTransactionId)
         case let .other(purchasedTransaction, reason):
-            try attributesObject.encode(reason.rawString, forKey: .requestSource)
             try dataObject.encode(purchasedTransaction, forKey: .attributes)
+            var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+            try attributesObject.encode(profileId, forKey: .profileId)
+            try attributesObject.encode(reason.rawString, forKey: .requestSource)
         }
     }
 
