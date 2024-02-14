@@ -8,11 +8,12 @@
 import Foundation
 
 extension UserDefaults: ProfileStorage {
+    
     fileprivate enum Constants {
         static let profileKey = "AdaptySDK_Purchaser_Info"
         static let profileIdKey = "AdaptySDK_Profile_Id"
         static let externalAnalyticsDisabledKey = "AdaptySDK_External_Analytics_Disabled"
-        static let syncedBundleReceiptKey = "AdaptySDK_Synced_Bundle_Receipt"
+        static let syncedTransactionsKey = "AdaptySDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "AdaptySDK_Apple_Search_Ads_Sync_Date"
     }
 
@@ -46,13 +47,13 @@ extension UserDefaults: ProfileStorage {
         }
     }
 
-    var syncedBundleReceipt: Bool {
-        bool(forKey: Constants.syncedBundleReceiptKey)
+    var syncedTransactions: Bool {
+        bool(forKey: Constants.syncedTransactionsKey)
     }
 
-    func setSyncedBundleReceipt(_ value: Bool) {
+    func setSyncedTransactions(_ value: Bool) {
         Log.debug("UserDefaults: syncedBundleReceipt = \(value).")
-        set(value, forKey: Constants.syncedBundleReceiptKey)
+        set(value, forKey: Constants.syncedTransactionsKey)
     }
 
     var appleSearchAdsSyncDate: Date? {
@@ -85,7 +86,7 @@ extension UserDefaults: ProfileStorage {
         }
 
         removeObject(forKey: Constants.externalAnalyticsDisabledKey)
-        removeObject(forKey: Constants.syncedBundleReceiptKey)
+        removeObject(forKey: Constants.syncedTransactionsKey)
         removeObject(forKey: Constants.appleSearchAdsSyncDateKey)
         removeObject(forKey: Constants.profileKey)
         clearPaywalls()

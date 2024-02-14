@@ -1,5 +1,5 @@
 //
-//  SKQueueManager.swift
+//  SK1QueueManager.swift
 //  Adapty
 //
 //  Created by Aleksei Valiano on 25.10.2022
@@ -14,7 +14,7 @@ protocol VariationIdStorage {
     func setPersistentVariationsIds(_: [String: String])
 }
 
-final class SKQueueManager: NSObject {
+internal final class SK1QueueManager: NSObject {
     let queue: DispatchQueue
 
     var purchaseValidator: PurchaseValidator! // TODO: need refactoring
@@ -44,8 +44,7 @@ final class SKQueueManager: NSObject {
 
         super.init()
 
-        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *),
-           Environment.StoreKit2.available {
+        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
             _sk2TransactionObserver = SK2TransactionObserver(delegate: self)
         }
     }
@@ -88,7 +87,7 @@ final class SKQueueManager: NSObject {
     }
 }
 
-extension SKQueueManager: SKPaymentTransactionObserver {
+extension SK1QueueManager: SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         transactions.forEach { transaction in
 
@@ -109,7 +108,7 @@ extension SKQueueManager: SKPaymentTransactionObserver {
                 if !Adapty.Configuration.observerMode {
                     SKPaymentQueue.default().finishTransaction(transaction)
                     Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: logParams))
-                    Log.verbose("SKQueueManager: finish restored transaction \(transaction)")
+                    Log.verbose("SK1QueueManager: finish restored transaction \(transaction)")
                 }
             case .deferred, .purchasing: break
             @unknown default: break
@@ -121,7 +120,7 @@ extension SKQueueManager: SKPaymentTransactionObserver {
         func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
             guard let delegate = Adapty.delegate else { return true }
 
-            let deferredProduct = AdaptyDeferredProduct(skProduct: product, payment: payment)
+            let deferredProduct = AdaptyDeferredProduct(sk1Product: product, payment: payment)
             return delegate.shouldAddStorePayment(for: deferredProduct, defermentCompletion: { [weak self] completion in
                 self?.makePurchase(payment: payment, product: deferredProduct) { result in
                     completion?(result)
@@ -132,12 +131,12 @@ extension SKQueueManager: SKPaymentTransactionObserver {
 
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
         Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_finished"))
-        Log.verbose("SKQueueManager: Restore сompleted transactions finished.")
+        Log.verbose("SK1QueueManager: Restore сompleted transactions finished.")
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
         Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_failed", error: "\(error.localizedDescription). Detail: \(error)"))
-        Log.error("SKQueueManager: Restore сompleted transactions failed with error: \(error)")
+        Log.error("SK1QueueManager: Restore сompleted transactions failed with error: \(error)")
     }
 
     func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {

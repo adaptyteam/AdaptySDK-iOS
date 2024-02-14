@@ -30,26 +30,28 @@ final class ProductStatesCache {
 
     var productsHash: String? { products?.hash }
 
-    func setBackendProductStates(_ products: VH<[BackendProductState]>) {
+    func setBackendProductStates(_ products: VH<[BackendProductState]>?) {
+        guard let products = products else { return }
         var updated = false
 
-        let newValue = products.value.map { product -> BackendProductState in
-            guard let cached = self.products?.value[product.vendorId] else {
-                updated = true
-                return product
-            }
-            if product.version >= cached.version {
-                updated = true
-                return product
-            } else {
-                Log.verbose("ProductStatesCache: saved product.version(\(product.version)) is older than cashed.version(\(cached.version) : \(product.vendorId)")
-                return cached
+        let array = products.mapValue {
+            $0.map { product -> BackendProductState in
+                guard let cached = self.products?.value[product.vendorId] else {
+                    updated = true
+                    return product
+                }
+                if product.version >= cached.version {
+                    updated = true
+                    return product
+                } else {
+                    Log.verbose("ProductStatesCache: saved product.version(\(product.version)) is older than cashed.version(\(cached.version) : \(product.vendorId)")
+                    return cached
+                }
             }
         }
 
         guard updated else { return }
 
-        let array = products.withValue(newValue)
         self.products = array.mapValue { $0.asDictionary }
         storage.setBackendProductStates(array)
     }

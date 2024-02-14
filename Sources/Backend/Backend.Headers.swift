@@ -39,7 +39,7 @@ extension Backend.Request {
             appInstallIdHeaderKey: Environment.Application.installationIdentifier,
             isSandboxHeaderKey: Environment.System.isSandbox ? "true" : "false",
             isObserveModeHeaderKey: Adapty.Configuration.observerMode ? "true" : "false",
-            storeKit2EnabledHeaderKey: Adapty.Configuration.useStoreKit2Configuration,
+            storeKit2EnabledHeaderKey: Adapty.Configuration.storeKit2Enabled,
         ]
         if let ver = Environment.Application.version {
             headers[appVersionHeaderKey] = ver

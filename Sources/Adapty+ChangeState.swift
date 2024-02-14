@@ -18,8 +18,9 @@ public final class Adapty {
     let httpFallbackSession: HTTPSession
 
     let skProductsManager: SKProductsManager
-    let skReceiptManager: SKReceiptManager
-    let skQueueManager: SKQueueManager
+    let sk1ReceiptManager: SK1ReceiptManager
+    let _sk2TransactionManager: Any?
+    let sk1QueueManager: SK1QueueManager
     let vendorIdsCache: ProductVendorIdsCache
     var onceSentEnvironment: Bool = false
     var state: State
@@ -38,13 +39,17 @@ public final class Adapty {
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)
         httpFallbackSession = fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
         skProductsManager = SKProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, backend: backend)
-        skReceiptManager = SKReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
-        skQueueManager = SKQueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
+        sk1ReceiptManager = SK1ReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend, refreshIfEmpty: true)
+        if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *) {
+            _sk2TransactionManager = SK2TransactionManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
+        } else {
+            _sk2TransactionManager = nil
+        }
+
+        sk1QueueManager = SK1QueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
 
         state = .initializingTo(customerUserId: customerUserId)
-
-        skReceiptManager.refreshReceiptIfEmpty()
-        skQueueManager.startObserving(purchaseValidator: self)
+        sk1QueueManager.startObserving(purchaseValidator: self)
         syncIPv4IfNeed()
         initializingProfileManager(toCustomerUserId: customerUserId)
     }
@@ -249,7 +254,7 @@ extension Adapty {
         }
     }
 
-    fileprivate func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+    private func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         httpSession.performCreateProfileRequest(profileId: profileId,
                                                 customerUserId: customerUserId,
                                                 analyticsDisabled: profileStorage.externalAnalyticsDisabled) { [weak self] result in
@@ -267,10 +272,10 @@ extension Adapty {
                 if profileId != profile.value.profileId {
                     storage.clearProfile(newProfileId: profile.value.profileId)
                 }
-                storage.setSyncedBundleReceipt(false)
+                storage.setSyncedTransactions(false)
                 storage.setProfile(profile)
 
-                self.validateReceipt(refreshIfEmpty: false) { result in
+                self.syncTransactions(refreshReceiptIfEmpty: false) { result in
                     completion(.success((try? result.get()) ?? profile))
                 }
             }

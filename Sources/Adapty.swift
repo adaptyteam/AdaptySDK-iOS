@@ -24,13 +24,11 @@ extension Adapty {
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
-    /// - Parameter storeKit2Usage: You can override StoreKit 2 usage policy with this value
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
     public static func activate(_ apiKey: String,
                                 observerMode: Bool = false,
                                 customerUserId: String? = nil,
-                                storeKit2Usage: StoreKit2Usage = .default,
                                 dispatchQueue: DispatchQueue = .main,
                                 _ completion: AdaptyErrorCompletion? = nil) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
@@ -53,7 +51,6 @@ extension Adapty {
 
             Adapty.dispatchQueue = dispatchQueue
 
-            Configuration.setStoreKit2Usage(storeKit2Usage)
             Configuration.observerMode = observerMode
 
             let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
@@ -357,7 +354,7 @@ extension Adapty {
     ///   - completion: A result containing the receipt `Data`.
     public static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
         async(completion, logName: "get_reciept") { manager, completion in
-            manager.skReceiptManager.getReceipt(refreshIfEmpty: true, completion)
+            manager.sk1ReceiptManager.getReceipt(refreshIfEmpty: true, completion)
         }
     }
 
@@ -377,7 +374,7 @@ extension Adapty {
             "product_id": .value(product.vendorProductId),
         ]
 
-        guard SKQueueManager.canMakePayments() else {
+        guard SK1QueueManager.canMakePayments() else {
             let stamp = Log.stamp
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
             let error = AdaptyError.cantMakePayments()
@@ -388,7 +385,7 @@ extension Adapty {
 
         async(completion, logName: logName, logParams: logParams) { manager, completion in
             guard let discountId = product.promotionalOfferId else {
-                manager.skQueueManager.makePurchase(payment: SKPayment(product: product.skProduct), product: product, completion)
+                manager.sk1QueueManager.makePurchase(payment: SKPayment(product: product.skProduct), product: product, completion)
                 return
             }
 
@@ -403,7 +400,7 @@ extension Adapty {
                     let payment = SKMutablePayment(product: product.skProduct)
                     payment.applicationUsername = ""
                     payment.paymentDiscount = response.discount(identifier: discountId)
-                    manager.skQueueManager.makePurchase(payment: payment, product: product, completion)
+                    manager.sk1QueueManager.makePurchase(payment: payment, product: product, completion)
                 }
             }
         }
@@ -416,8 +413,21 @@ extension Adapty {
     /// - Parameter completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     public static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         async(completion, logName: "restore_purchases") { manager, completion in
-            manager.validateReceipt(refreshIfEmpty: true) { result in
-                completion(result.map { $0.value })
+            manager.syncTransactions(refreshReceiptIfEmpty: true) { result in
+
+                if let result = result.flatValue() {
+                    completion(result.map { $0.value })
+                    return
+                }
+
+                manager.getProfileManager { result in
+                    switch result {
+                    case let .failure(error):
+                        completion(.failure(error))
+                    case let .success(manager):
+                        manager.getProfile(completion)
+                    }
+                }
             }
         }
     }

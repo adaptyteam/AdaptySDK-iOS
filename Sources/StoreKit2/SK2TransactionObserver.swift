@@ -44,14 +44,14 @@ final class SK2TransactionObserver {
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-extension SKQueueManager: SK2TransactionObserverDelegate {
+extension SK1QueueManager: SK2TransactionObserverDelegate {
     func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
         guard transaction.justPurchasedRenewed else { return }
         skProductsManager.fillPurchasedTransaction(variationId: nil, purchasedSK2Transaction: transaction) { [weak self] purchasedTransaction in
 
-            self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction) { _ in }
+            self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction, reason: .observing) { _ in }
         }
     }
 }

@@ -111,18 +111,20 @@ enum Environment {
 
         static let name: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)
-                let matchingDict = IOServiceMatching("IOPlatformExpertDevice")
-                let service = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict)
-                defer { IOObjectRelease(service) }
+                let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
 
-                if let modelData = IORegistryEntryCreateCFProperty(service,
-                                                                   "model" as CFString,
-                                                                   kCFAllocatorDefault, 0).takeRetainedValue() as? Data,
-                    let cString = modelData.withUnsafeBytes({ $0.baseAddress?.assumingMemoryBound(to: UInt8.self) }) {
-                    return String(cString: cString)
-                } else {
-                    return "unknown device"
+                var modelIdentifier: String?
+                if let modelData = IORegistryEntryCreateCFProperty(service, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data {
+                    modelIdentifier = String(data: modelData, encoding: .utf8)?.trimmingCharacters(in: .controlCharacters)
                 }
+                IOObjectRelease(service)
+
+                if modelIdentifier?.isEmpty ?? false {
+                    modelIdentifier = nil
+                }
+
+                return modelIdentifier ?? "unknown device"
+
             #else
                 var systemInfo = utsname()
                 uname(&systemInfo)
