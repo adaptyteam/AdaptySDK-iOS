@@ -86,13 +86,7 @@ enum Environment {
             }().map { (width: Int($0.width), height: Int($0.height)) }
         }
 
-        static var storeCountry: String? {
-            if #available(iOS 13.0, macOS 10.15, *) {
-                return SKStorefrontManager.countryCode
-            } else {
-                return nil
-            }
-        }
+        static var storeCountry: String? { SKStorefrontManager.countryCode }
 
         private static var _webViewUserAgent: String?
         static var webViewUserAgent: String? {

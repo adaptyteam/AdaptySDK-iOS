@@ -36,12 +36,10 @@ final class LifecycleManager {
         subscribeForLifecycleEvents()
         scheduleProfileUpdate(after: Self.profileUpdateInterval)
 
-        if #available(iOS 13.0, *) {
-            SKStorefrontManager.subscribeForUpdates { [weak self] countryCode in
-                self?.newStorefrontCountryAvailable = countryCode
-            }
+        SKStorefrontManager.subscribeForUpdates { [weak self] countryCode in
+            self?.newStorefrontCountryAvailable = countryCode
         }
-        
+
         initialized = true
     }
 
