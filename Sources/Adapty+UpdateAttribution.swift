@@ -60,7 +60,7 @@ extension Adapty {
     }
 
     func updateAppleSearchAdsAttribution() {
-        #if os(iOS)
+        #if os(iOS) || os(visionOS)
             // check if this is an actual first sync
             guard profileStorage.appleSearchAdsSyncDate == nil else { return }
             let profileId = profileStorage.profileId

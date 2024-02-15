@@ -10,10 +10,16 @@ import Foundation
 
 internal extension Locale {
     var a_currencyCode: String? {
-        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, *) {
-            return self.currency?.identifier
-        } else {
+        guard #available(macOS 13, iOS 16, tvOS 16, watchOS 9, *) else {
             return currencyCode
         }
+        return currency?.identifier
+    }
+
+    var a_regionCode: String? {
+        guard #available(macOS 13, iOS 16, tvOS 16, watchOS 9, *) else {
+            return regionCode
+        }
+        return region?.identifier
     }
 }

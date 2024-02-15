@@ -37,13 +37,14 @@ private extension PurchasedTransaction {
         persistentVariationId: String?,
         purchasedSK2Transaction transaction: SK2Transaction
     ) {
-        let offer: PurchasedTransaction.SubscriptionOffer?
-
-        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            offer = .init(transaction.offer, sk2Product: sk2Product)
-        } else {
-            offer = .init(transaction, sk2Product: sk2Product)
-        }
+        let offer: PurchasedTransaction.SubscriptionOffer? = {
+            #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
+                if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+                    return .init(transaction.offer, sk2Product: sk2Product)
+                }
+            #endif
+            return .init(transaction, sk2Product: sk2Product)
+        }()
 
         self.init(
             transactionId: transaction.transactionIdentifier,
@@ -53,7 +54,7 @@ private extension PurchasedTransaction {
             persistentProductVariationId: persistentVariationId,
             price: sk2Product?.price,
             priceLocale: sk2Product?.priceFormatStyle.locale.a_currencyCode,
-            storeCountry: sk2Product?.priceFormatStyle.locale.regionCode,
+            storeCountry: sk2Product?.priceFormatStyle.locale.a_regionCode,
             subscriptionOffer: offer,
             environment: transaction.environmentString
         )
@@ -63,10 +64,10 @@ private extension PurchasedTransaction {
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     init?(_ transaction: SK2Transaction, sk2Product: SK2Product?) {
-        guard let offerType = transaction.offerType else { return nil }
-        let productOffer = sk2Product?.subscriptionOffer(byType: offerType, withId: transaction.offerID)
+        guard let offerType = transaction.a_offerType else { return nil }
+        let productOffer = sk2Product?.subscriptionOffer(byType: offerType, withId: transaction.a_offerID)
         self = .init(
-            id: transaction.offerID,
+            id: transaction.a_offerID,
             period: (productOffer?.period).map { AdaptyProductSubscriptionPeriod(subscriptionPeriod: $0) },
             paymentMode: (productOffer?.paymentMode).map { .init(mode: $0) } ?? .unknown,
             type: .init(type: offerType),
@@ -74,18 +75,20 @@ private extension PurchasedTransaction.SubscriptionOffer {
         )
     }
 
-    @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
-    init?(_ transactionOffer: SK2Transaction.Offer?, sk2Product: SK2Product?) {
-        guard let transactionOffer = transactionOffer else { return nil }
-        let productOffer = sk2Product?.subscriptionOffer(byType: transactionOffer.type, withId: transactionOffer.id)
-        self = .init(
-            id: transactionOffer.id,
-            period: (productOffer?.period).map { .init(subscriptionPeriod: $0) },
-            paymentMode: transactionOffer.paymentMode.map { .init(mode: $0) } ?? .unknown,
-            type: .init(type: transactionOffer.type),
-            price: productOffer?.price
-        )
-    }
+    #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
+        @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
+        init?(_ transactionOffer: SK2Transaction.Offer?, sk2Product: SK2Product?) {
+            guard let transactionOffer = transactionOffer else { return nil }
+            let productOffer = sk2Product?.subscriptionOffer(byType: transactionOffer.type, withId: transactionOffer.id)
+            self = .init(
+                id: transactionOffer.id,
+                period: (productOffer?.period).map { .init(subscriptionPeriod: $0) },
+                paymentMode: transactionOffer.paymentMode.map { .init(mode: $0) } ?? .unknown,
+                type: .init(type: transactionOffer.type),
+                price: productOffer?.price
+            )
+        }
+    #endif
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)

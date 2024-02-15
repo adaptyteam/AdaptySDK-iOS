@@ -31,10 +31,12 @@ extension SK2Transaction {
     }
 
     var environmentString: String {
-        guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
-            let environment = environmentStringRepresentation
-            return environment.isEmpty ? "storekit2" : environment.lowercased()
-        }
+        #if !os(visionOS)
+            guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
+                let environment = environmentStringRepresentation
+                return environment.isEmpty ? "storekit2" : environment.lowercased()
+            }
+        #endif
 
         switch environment {
         case .production: return "production"
@@ -42,5 +44,23 @@ extension SK2Transaction {
         case .xcode: return "xcode"
         default: return environment.rawValue
         }
+    }
+
+    var a_offerType: Transaction.OfferType? {
+        #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
+            if #available(macOS 14.2, iOS 17.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+                return offer?.type
+            }
+        #endif
+        return offerType
+    }
+
+    var a_offerID: String? {
+        #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
+            if #available(macOS 14.2, iOS 17.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+                return offer?.id
+            }
+        #endif
+        return offerID
     }
 }

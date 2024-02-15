@@ -78,6 +78,8 @@ enum Environment {
                     return NSScreen.main?.frame.size
                 #elseif targetEnvironment(macCatalyst)
                     return Optional.some(UIScreen.main.bounds.size)
+                #elseif os(visionOS)
+                    return Optional<DisplayResolution>.none
                 #else
                     return Optional.some(UIScreen.main.bounds.size)
                 #endif
@@ -135,9 +137,13 @@ enum Environment {
         }()
 
         static let idfa: String? = {
-            guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
-            // Get and return IDFA
-            return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+            #if !canImport(AdSupport)
+                return nil
+            #else
+                guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
+                // Get and return IDFA
+                return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+            #endif
         }()
 
         static let idfv: String? = {
@@ -162,7 +168,7 @@ enum Environment {
         #endif
     }
 
-    #if os(iOS)
+    #if os(iOS) || os(visionOS)
         static func searchAdsAttribution(completion: @escaping ([String: Any]?, Error?) -> Void) {
             guard #available(iOS 14.3, *) else {
                 completion(nil, nil)
