@@ -88,7 +88,7 @@ enum Environment {
 
         static var storeCountry: String? {
             if #available(iOS 13.0, macOS 10.15, *) {
-                return SKPaymentQueue.default().storefront?.countryCode
+                return SKStorefrontManager.countryCode
             } else {
                 return nil
             }
