@@ -31,7 +31,7 @@ class SKStorefrontManager {
             NotificationCenter.default.addObserver(forName: Notification.Name.SKStorefrontCountryCodeDidChange,
                                                    object: nil,
                                                    queue: nil) { _ in
-                guard let countryCode = SKPaymentQueue.default().storefront?.countryCode else {
+                guard let countryCode = Self.countryCode else {
                     Log.warn("SKStorefrontManager (SK1): SKStorefrontCountryCodeDidChange to nil")
                     return
                 }
