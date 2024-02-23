@@ -7,21 +7,37 @@
 
 import Foundation
 
-private struct SetAttributionRequest: HTTPDataRequest {
-    typealias Result = HTTPEmptyResponse.Result
-
+private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableResponse {
+    typealias ResponseBody = Backend.Response.Body<AdaptyProfile?>
     let endpoint: HTTPEndpoint
     let headers: Headers
     let networkUserId: String?
     let source: AdaptyAttributionSource
     let attribution: [AnyHashable: Any]
 
-    init(profileId: String, networkUserId: String?, source: AdaptyAttributionSource, attribution: [AnyHashable: Any]) {
+    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
+        { response in
+            let result: Result<AdaptyProfile?, Error>
+
+            if headers.hasSameBackendResponseHash(response.headers) {
+                result = .success(nil)
+            } else {
+                result = jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
+            }
+            return result.map { response.replaceBody(Backend.Response.Body($0)) }
+                .mapError { .decoding(response, error: $0) }
+        }
+    }
+
+    init(profileId: String, networkUserId: String?, source: AdaptyAttributionSource, attribution: [AnyHashable: Any], responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .post,
             path: "/sdk/analytics/profiles/\(profileId)/attribution/"
         )
-        headers = Headers().setBackendProfileId(profileId)
+        headers = Headers()
+            .setBackendProfileId(profileId)
+            .setBackendResponseHash(responseHash)
+
         self.networkUserId = networkUserId
         self.source = source
         self.attribution = attribution
@@ -54,11 +70,13 @@ extension HTTPSession {
                                       networkUserId: String?,
                                       source: AdaptyAttributionSource,
                                       attribution: [AnyHashable: Any],
-                                      _ completion: AdaptyErrorCompletion?) {
+                                      responseHash: String?,
+                                      _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
         let request = SetAttributionRequest(profileId: profileId,
                                             networkUserId: networkUserId,
                                             source: source,
-                                            attribution: attribution)
+                                            attribution: attribution,
+                                            responseHash: responseHash)
         perform(request,
                 logName: "set_attribution",
                 logParams: [
@@ -67,9 +85,9 @@ extension HTTPSession {
                 ]) { (result: SetAttributionRequest.Result) in
             switch result {
             case let .failure(error):
-                completion?(error.asAdaptyError)
-            case .success:
-                completion?(nil)
+                completion(.failure(error.asAdaptyError))
+            case let .success(response):
+                completion(.success(VH(response.body.value, hash: response.headers.getBackendResponseHash())))
             }
         }
     }

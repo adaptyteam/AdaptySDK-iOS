@@ -74,7 +74,7 @@ private extension PurchasedTransaction {
             persistentProductVariationId: persistentVariationId,
             price: sk1Product?.price.decimalValue,
             priceLocale: sk1Product?.priceLocale.a_currencyCode,
-            storeCountry: sk1Product?.priceLocale.regionCode,
+            storeCountry: sk1Product?.priceLocale.a_regionCode,
             subscriptionOffer: offer,
             environment: nil
         )

@@ -45,7 +45,7 @@ extension AdaptyProduct {
     public var currencySymbol: String? { skProduct.priceLocale.currencySymbol }
 
     /// The region code of the locale used to format the price of the product.
-    public var regionCode: String? { skProduct.priceLocale.regionCode }
+    public var regionCode: String? { skProduct.priceLocale.a_regionCode }
 
     /// A Boolean value that indicates whether the product is available for family sharing in App Store Connect. (Will be `false` for iOS version below 14.0 and macOS version below 11.0).
     public var isFamilyShareable: Bool {
@@ -71,7 +71,7 @@ extension AdaptyProduct {
 
     /// An array of subscription offers available for the auto-renewable subscription. (Will be empty for iOS version below 12.2 and macOS version below 10.14.4).
     public var discounts: [AdaptyProductDiscount] {
-         skProduct.discounts.map { discount in
+        skProduct.discounts.map { discount in
             AdaptyProductDiscount(discount: discount, locale: skProduct.priceLocale)
         }
     }

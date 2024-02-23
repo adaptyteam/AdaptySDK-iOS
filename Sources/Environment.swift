@@ -131,12 +131,12 @@ enum Environment {
         }()
 
         static let idfa: String? = {
-            guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
-            // Get and return IDFA
-            #if canImport(AdSupport)
-                return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-            #else
+            #if !canImport(AdSupport)
                 return nil
+            #else
+                guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
+                // Get and return IDFA
+                return ASIdentifierManager.shared().advertisingIdentifier.uuidString
             #endif
         }()
 
