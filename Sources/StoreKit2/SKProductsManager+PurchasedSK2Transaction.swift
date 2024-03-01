@@ -47,16 +47,16 @@ private extension PurchasedTransaction {
         }()
 
         self.init(
-            transactionId: transaction.transactionIdentifier,
-            originalTransactionId: transaction.originalTransactionIdentifier,
+            transactionId: transaction.ext.identifier,
+            originalTransactionId: transaction.ext.originalIdentifier,
             vendorProductId: transaction.productID,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: sk2Product?.price,
-            priceLocale: sk2Product?.priceFormatStyle.locale.a_currencyCode,
-            storeCountry: sk2Product?.priceFormatStyle.locale.a_regionCode,
+            priceLocale: sk2Product?.priceFormatStyle.locale.ext.currencyCode,
+            storeCountry: sk2Product?.priceFormatStyle.locale.ext.regionCode,
             subscriptionOffer: offer,
-            environment: transaction.environmentString
+            environment: transaction.ext.environment
         )
     }
 }
@@ -64,10 +64,10 @@ private extension PurchasedTransaction {
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     init?(_ transaction: SK2Transaction, sk2Product: SK2Product?) {
-        guard let offerType = transaction.a_offerType else { return nil }
-        let productOffer = sk2Product?.subscriptionOffer(byType: offerType, withId: transaction.a_offerID)
+        guard let offerType = transaction.ext.offerType else { return nil }
+        let productOffer = sk2Product?.subscriptionOffer(byType: offerType, withId: transaction.ext.offerId)
         self = .init(
-            id: transaction.a_offerID,
+            id: transaction.ext.offerId,
             period: (productOffer?.period).map { AdaptyProductSubscriptionPeriod(subscriptionPeriod: $0) },
             paymentMode: (productOffer?.paymentMode).map { .init(mode: $0) } ?? .unknown,
             type: .init(type: offerType),

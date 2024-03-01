@@ -39,13 +39,13 @@ extension AdaptyProduct {
     var priceValue: AdaptyPrice { AdaptyPrice(value: skProduct.price, locale: skProduct.priceLocale) }
 
     /// The currency code of the locale used to format the price of the product.
-    public var currencyCode: String? { skProduct.priceLocale.a_currencyCode }
+    public var currencyCode: String? { skProduct.priceLocale.ext.currencyCode }
 
     /// The currency symbol of the locale used to format the price of the product.
     public var currencySymbol: String? { skProduct.priceLocale.currencySymbol }
 
     /// The region code of the locale used to format the price of the product.
-    public var regionCode: String? { skProduct.priceLocale.a_regionCode }
+    public var regionCode: String? { skProduct.priceLocale.ext.regionCode }
 
     /// A Boolean value that indicates whether the product is available for family sharing in App Store Connect. (Will be `false` for iOS version below 14.0 and macOS version below 11.0).
     public var isFamilyShareable: Bool {
@@ -84,13 +84,13 @@ extension AdaptyProduct {
 
     /// The price's language is determined by the preferred language set on the device.
     public var localizedPrice: String? {
-        skProduct.priceLocale.localized(price: skProduct.price)
+        skProduct.priceLocale.ext.localized(price: skProduct.price)
     }
 
     /// The period's language is determined by the preferred language set on the device.
     public var localizedSubscriptionPeriod: String? {
         guard let period = skProduct.subscriptionPeriod else { return nil }
-        return skProduct.priceLocale.localized(period: period)
+        return skProduct.priceLocale.ext.localized(period: period)
     }
 }
 

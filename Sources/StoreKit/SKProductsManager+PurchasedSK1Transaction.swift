@@ -67,14 +67,14 @@ private extension PurchasedTransaction {
         }
 
         self.init(
-            transactionId: transaction.transactionIdentifier ?? transactionIdentifier,
-            originalTransactionId: transaction.originalTransactionIdentifier ?? transactionIdentifier,
+            transactionId: transaction.ext.identifier ?? transactionIdentifier,
+            originalTransactionId: transaction.ext.originalIdentifier ?? transactionIdentifier,
             vendorProductId: transaction.payment.productIdentifier,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: sk1Product?.price.decimalValue,
-            priceLocale: sk1Product?.priceLocale.a_currencyCode,
-            storeCountry: sk1Product?.priceLocale.a_regionCode,
+            priceLocale: sk1Product?.priceLocale.ext.currencyCode,
+            storeCountry: sk1Product?.priceLocale.ext.regionCode,
             subscriptionOffer: offer,
             environment: nil
         )

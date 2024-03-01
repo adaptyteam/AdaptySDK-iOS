@@ -91,7 +91,7 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         transactions.forEach { transaction in
 
-            let logParams = transaction.logParams
+            let logParams = transaction.ext.logParams
 
             Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(
                 eventName: "updated_transaction",

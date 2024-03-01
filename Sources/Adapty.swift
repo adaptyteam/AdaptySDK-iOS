@@ -212,7 +212,7 @@ extension Adapty {
                                       _ completion: AdaptyErrorCompletion? = nil) {
         let logParams: EventParameters = [
             "variation_id": .value(variationId),
-            "transaction_id": .value(transaction.transactionIdentifier),
+            "transaction_id": .value(transaction.ext.identifier),
         ]
         async(completion, logName: "set_variation_id_sk2", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in

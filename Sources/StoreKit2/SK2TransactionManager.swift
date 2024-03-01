@@ -51,7 +51,7 @@ internal final class SK2TransactionManager {
                         }
                         self.session.performSyncTransactionRequest(
                             profileId: self.storage.profileId,
-                            originalTransactionId: transaction.originalTransactionIdentifier
+                            originalTransactionId: transaction.ext.originalIdentifier
                         ) { result in
                             completedSync(result.map { $0 })
                         }
@@ -85,7 +85,7 @@ internal final class SK2TransactionManager {
                     continue
                 }
 
-                Log.verbose("SK2TransactionManager: found transaction original-id: \(transaction.originalTransactionIdentifier), purchase date:\(transaction.purchaseDate)")
+                Log.verbose("SK2TransactionManager: found transaction original-id: \(transaction.ext.originalIdentifier), purchase date:\(transaction.purchaseDate)")
 
                 guard let lasted = lastTransaction,
                       transaction.purchaseDate < lasted.purchaseDate else {
@@ -98,8 +98,8 @@ internal final class SK2TransactionManager {
 
             if let lastTransaction = lastTransaction {
                 params = [
-                    "original_transaction_id": .valueOrNil(lastTransaction.originalTransactionIdentifier),
-                    "transaction_id": .valueOrNil(lastTransaction.transactionIdentifier),
+                    "original_transaction_id": .valueOrNil(lastTransaction.ext.originalIdentifier),
+                    "transaction_id": .valueOrNil(lastTransaction.ext.identifier),
                     "purchase_date": .valueOrNil(lastTransaction.purchaseDate),
                 ]
             } else {

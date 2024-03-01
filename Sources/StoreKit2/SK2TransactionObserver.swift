@@ -48,7 +48,7 @@ extension SK1QueueManager: SK2TransactionObserverDelegate {
     func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
-        guard transaction.justPurchasedRenewed else { return }
+        guard transaction.ext.justPurchasedRenewed else { return }
         skProductsManager.fillPurchasedTransaction(variationId: nil, purchasedSK2Transaction: transaction) { [weak self] purchasedTransaction in
 
             self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction, reason: .observing) { _ in }
@@ -57,18 +57,18 @@ extension SK1QueueManager: SK2TransactionObserverDelegate {
 }
 
 @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
-extension SK2Transaction {
-    fileprivate var justPurchasedRenewed: Bool {
-        if revocationDate != nil {
+private extension AdaptyExtension where Extended == SK2Transaction {
+    var justPurchasedRenewed: Bool {
+        if this.revocationDate != nil {
             return false
-        } else if let expirationDate = expirationDate, expirationDate < Date() {
+        } else if let expirationDate = this.expirationDate, expirationDate < Date() {
             return false
-        } else if isUpgraded {
+        } else if this.isUpgraded {
             return false
         }
 
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
-            if reason == .renewal { return false }
+            if this.reason == .renewal { return false }
         }
 
         return true

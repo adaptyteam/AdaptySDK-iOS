@@ -43,8 +43,8 @@ extension AdaptyProductDiscount {
                   subscriptionPeriod: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
                   numberOfPeriods: discount.numberOfPeriods,
                   paymentMode: PaymentMode(mode: discount.paymentMode),
-                  localizedSubscriptionPeriod: locale.localized(period: discount.subscriptionPeriod),
-                  localizedNumberOfPeriods: locale.localized(numberOfPeriods: discount))
+                  localizedSubscriptionPeriod: locale.ext.localized(period: discount.subscriptionPeriod),
+                  localizedNumberOfPeriods: locale.ext.localized(numberOfPeriods: discount))
     }
 }
 

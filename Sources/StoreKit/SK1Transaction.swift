@@ -10,23 +10,30 @@ import StoreKit
 
 typealias SK1Transaction = SKPaymentTransaction
 
-extension SK1Transaction {
-    var originalTransactionIdentifier: String? {
+extension SK1Transaction: AdaptyExtended {}
+
+extension AdaptyExtension where Extended == SK1Transaction {
+
+    var identifier: String? {
+        this.transactionIdentifier
+    }
+
+    var originalIdentifier: String? {
         // https://developer.apple.com/documentation/appstoreserverapi/originaltransactionid
-        original?.transactionIdentifier ?? transactionIdentifier
+        this.original?.transactionIdentifier ?? this.transactionIdentifier
     }
 
     var logParams: EventParameters {
         [
-            "product_id": .value(payment.productIdentifier),
-            "state": .value(transactionState.stringValue),
-            "transaction_id": .valueOrNil(transactionIdentifier),
-            "original_id": .valueOrNil(original?.transactionIdentifier),
+            "product_id": .value(this.payment.productIdentifier),
+            "state": .value(this.transactionState.stringValue),
+            "transaction_id": .valueOrNil(identifier),
+            "original_id": .valueOrNil(originalIdentifier),
         ]
     }
 }
 
-fileprivate extension SKPaymentTransactionState {
+private extension SKPaymentTransactionState {
     var stringValue: String {
         switch self {
         case .purchasing: return "purchasing"
