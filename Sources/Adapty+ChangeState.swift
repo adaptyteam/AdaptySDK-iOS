@@ -39,12 +39,14 @@ public final class Adapty {
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)
         httpFallbackSession = fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
         skProductsManager = SKProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, backend: backend)
-        sk1ReceiptManager = SK1ReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend, refreshIfEmpty: true)
+
         if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *) {
             _sk2TransactionManager = SK2TransactionManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend)
         } else {
             _sk2TransactionManager = nil
         }
+
+        sk1ReceiptManager = SK1ReceiptManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, backend: backend, refreshIfEmpty: _sk2TransactionManager == nil)
 
         sk1QueueManager = SK1QueueManager(queue: Adapty.underlayQueue, storage: UserDefaults.standard, skProductsManager: skProductsManager)
 
