@@ -106,7 +106,7 @@ extension AdaptyUI.ViewConfiguration {
                         return item.isBullet ? .textBullet(text) : .text(text)
                     case let .image(item):
                         let image = AdaptyUI.Text.Image(
-                            data: getAssetFilling(item.imageAssetId)?.asImage?.data,
+                            src: getAssetFilling(item.imageAssetId)?.asImage,
                             tint: getAssetFilling(item.colorAssetId)?.asColor,
                             size: AdaptyUI.Size(width: item.width, height: item.height))
                         return item.isBullet ? .imageBullet(image) : .image(image)

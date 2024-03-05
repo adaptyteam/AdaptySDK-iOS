@@ -9,7 +9,9 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Image {
-        public let data: Data
+    public enum Image {
+        case raster(Data)
+//        case vector(Data)
+        case url(URL, previewRaster: Data?)
     }
 }

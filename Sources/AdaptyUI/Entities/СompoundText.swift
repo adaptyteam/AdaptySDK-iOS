@@ -19,7 +19,7 @@ extension AdaptyUI {
 
 extension AdaptyUI.Text {
     public struct Image {
-        public let data: Data?
+        public let src: AdaptyUI.Image?
         public let tint: AdaptyUI.Color?
         public let size: AdaptyUI.Size
     }
