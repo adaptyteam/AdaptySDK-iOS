@@ -162,48 +162,37 @@ enum Environment {
         #endif
     }
 
-    #if os(iOS) || os(visionOS)
-        static func searchAdsAttribution(completion: @escaping ([String: Any]?, Error?) -> Void) {
-            guard #available(iOS 14.3, *) else {
-                completion(nil, nil)
-                return
-            }
+    #if canImport(AdServices)
+        @available(iOS 14.3, *)
+        static func getASAToken() throws -> String {
+            let callId = Log.stamp
+            let methodName = "fetch_ASA_Token"
+            Adapty.logSystemEvent(AdaptyAppleRequestParameters(
+                methodName: methodName,
+                callId: callId))
 
             let attributionToken: String
             do {
                 attributionToken = try AAAttribution.attributionToken()
+
             } catch {
-                completion(nil, error)
-                return
+                Log.error("UpdateASAToken: On AAAttribution.attributionToken \(error)")
+                Adapty.logSystemEvent(AdaptyAppleResponseParameters(
+                    methodName: methodName,
+                    callId: callId,
+                    error: "\(error.localizedDescription). Detail: \(error)"
+                ))
+                throw error
             }
 
-            let request = NSMutableURLRequest(url: URL(string: "https://api-adservices.apple.com/api/v1/")!)
-            request.httpMethod = "POST"
-            request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
-            request.httpBody = Data(attributionToken.utf8)
+            Adapty.logSystemEvent(AdaptyAppleResponseParameters(
+                methodName: methodName,
+                callId: callId,
+                params: [
+                    "token": .value(attributionToken),
+                ]))
 
-            URLSession.shared.dataTask(with: request as URLRequest, completionHandler: { data, _, error in
-                guard let data = data else {
-                    completion(nil, error)
-                    return
-                }
-
-                let result: [String: Any]?
-                do {
-                    result = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any]
-                } catch {
-                    completion(nil, error)
-                    return
-                }
-
-                guard var result = result else {
-                    completion(nil, nil)
-                    return
-                }
-
-                result["asa-attribution"] = true
-                completion(result, nil)
-            }).resume()
+            return attributionToken
         }
     #endif
 }

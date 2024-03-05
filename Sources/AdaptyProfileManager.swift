@@ -26,7 +26,7 @@ final class AdaptyProfileManager {
         paywallsCache = PaywallsCache(storage: paywallStorage)
         productStatesCache = ProductStatesCache(storage: productStorage)
 
-        manager.updateAppleSearchAdsAttribution()
+        manager.updateASAToken()
         if !manager.profileStorage.syncedTransactions {
             manager.syncTransactions(refreshReceiptIfEmpty: true) { _ in }
         }

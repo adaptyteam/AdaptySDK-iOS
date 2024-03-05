@@ -13,7 +13,6 @@ func XCTAssertEqual(_ value: AdaptyAttributionSource, withStringValue stringValu
     case "adjust": XCTAssertEqual(value, .adjust, file: file, line: line)
     case "appsflyer": XCTAssertEqual(value, .appsflyer, file: file, line: line)
     case "branch": XCTAssertEqual(value, .branch, file: file, line: line)
-    case "apple_search_ads": XCTAssertEqual(value, .appleSearchAds, file: file, line: line)
     case "custom": XCTAssertEqual(value, .custom, file: file, line: line)
     default: XCTFail("unknown value \"\(stringValue)\"", file: file, line: line)
     }

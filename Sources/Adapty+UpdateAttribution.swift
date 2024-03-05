@@ -7,6 +7,9 @@
 //
 
 import Foundation
+#if canImport(AdServices)
+    import AdServices
+#endif
 
 extension Adapty {
     /// To set attribution data for the profile, use this method.
@@ -41,41 +44,42 @@ extension Adapty {
                                                  source: source,
                                                  attribution: attribution,
                                                  responseHash: oldProfile?.hash) { [weak self] result in
-            switch result {
-            case let .failure(error):
-                completion?(error)
-            case let .success(profile):
 
+            _ = result.do { profile in
+                if let profile = profile.flatValue() {
+                    self?.state.initialized?.saveResponse(profile)
+                }
+            }
+
+            completion?(result.error)
+        }
+    }
+
+    func updateASAToken() {
+        #if canImport(AdServices)
+            guard
+                #available(iOS 14.3, *),
+                profileStorage.appleSearchAdsSyncDate == nil, // check if this is an actual first sync
+                let attributionToken = try? Environment.getASAToken()
+            else { return }
+
+            let profileId = profileStorage.profileId
+            let responseHash = state.initialized?.profile.hash
+            httpSession.performASATokenRequest(profileId: profileId,
+                                               token: attributionToken,
+                                               responseHash: responseHash) { [weak self] result in
+
+                guard let profile = try? result.get() else { return }
                 if let profile = profile.flatValue() {
                     self?.state.initialized?.saveResponse(profile)
                 }
 
-                if source == .appleSearchAds, let storage = self?.profileStorage, storage.profileId == profileId {
+                if let storage = self?.profileStorage, storage.profileId == profileId {
                     // mark appleSearchAds attribution data as synced
                     storage.setAppleSearchAdsSyncDate()
                 }
-                completion?(nil)
             }
-        }
-    }
 
-    func updateAppleSearchAdsAttribution() {
-        #if os(iOS) || os(visionOS)
-            // check if this is an actual first sync
-            guard profileStorage.appleSearchAdsSyncDate == nil else { return }
-            let profileId = profileStorage.profileId
-
-            Environment.searchAdsAttribution { [weak self] attribution, error in
-                guard let self = self, let attribution = attribution, error == nil else { return }
-
-                if let values = attribution.values.map({ $0 }).first as? [String: Any],
-                   let iAdAttribution = values["iad-attribution"] as? NSString {
-                    // check if the user clicked an Apple Search Ads impression up to 30 days before app download
-                    guard iAdAttribution.boolValue == true else { return }
-                }
-
-                self.updateAttribution(profileId: profileId, attribution, source: .appleSearchAds, networkUserId: nil)
-            }
         #endif
     }
 }

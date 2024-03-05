@@ -35,7 +35,7 @@ private extension PurchasedTransaction {
         sk2Product: SK2Product?,
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK2Transaction transaction: Transaction
+        purchasedSK2Transaction transaction: SK2Transaction
     ) {
         let offer: PurchasedTransaction.SubscriptionOffer? = {
             #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))

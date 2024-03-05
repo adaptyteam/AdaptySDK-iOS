@@ -11,7 +11,6 @@ public enum AdaptyAttributionSource: String, Equatable, Sendable {
     case adjust
     case appsflyer
     case branch
-    case appleSearchAds = "apple_search_ads"
     case custom
 }
 
