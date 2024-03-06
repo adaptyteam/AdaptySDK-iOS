@@ -206,7 +206,7 @@ extension Adapty {
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - completion: A result containing an optional error.
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public static func setVariationId(_ variationId: String,
                                       forPurchasedTransaction transaction: Transaction,
                                       _ completion: AdaptyErrorCompletion? = nil) {

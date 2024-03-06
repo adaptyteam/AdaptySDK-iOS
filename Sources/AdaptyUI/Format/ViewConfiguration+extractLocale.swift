@@ -14,7 +14,6 @@ extension AdaptyUI.ViewConfiguration {
     }
 
     func getLocalization(_ locale: AdaptyLocale) -> AdaptyUI.Localization? {
-        let localization: AdaptyUI.Localization?
         if let value = localizations[locale] {
             if defaultLocalization?.id == value.id {
                 return value

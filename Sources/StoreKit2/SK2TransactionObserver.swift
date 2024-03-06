@@ -7,12 +7,12 @@
 
 import StoreKit
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 protocol SK2TransactionObserverDelegate: AnyObject {
     func transactionListener(_: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async
 }
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 final class SK2TransactionObserver {
     private var updates: Task<Void, Never>?
     private weak var delegate: SK2TransactionObserverDelegate?
@@ -43,7 +43,7 @@ final class SK2TransactionObserver {
     }
 }
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK1QueueManager: SK2TransactionObserverDelegate {
     func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
@@ -56,7 +56,7 @@ extension SK1QueueManager: SK2TransactionObserverDelegate {
     }
 }
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension AdaptyExtension where Extended == SK2Transaction {
     var justPurchasedRenewed: Bool {
         if this.revocationDate != nil {

@@ -12,14 +12,14 @@ extension Locale: AdaptyExtended {}
 
 extension AdaptyExtension where Extended == Locale {
     var currencyCode: String? {
-        guard #available(macOS 13, iOS 16, tvOS 16, watchOS 9, *) else {
+        guard #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) else {
             return this.currencyCode
         }
         return this.currency?.identifier
     }
 
     var regionCode: String? {
-        guard #available(macOS 13, iOS 16, tvOS 16, watchOS 9, *) else {
+        guard #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) else {
             return this.regionCode
         }
         return this.region?.identifier

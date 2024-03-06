@@ -7,7 +7,7 @@
 
 import StoreKit
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SKProductsManager {
     func fillPurchasedTransaction(variationId: String?,
                                   persistentVariationId: String? = nil,
@@ -29,7 +29,7 @@ extension SKProductsManager {
     }
 }
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension PurchasedTransaction {
     init(
         sk2Product: SK2Product?,
@@ -61,7 +61,7 @@ private extension PurchasedTransaction {
     }
 }
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     init?(_ transaction: SK2Transaction, sk2Product: SK2Product?) {
         guard let offerType = transaction.ext.offerType else { return nil }
@@ -91,7 +91,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
     #endif
 }
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension SK2Product {
     func subscriptionOffer(
         byType offerType: SK2Transaction.OfferType,

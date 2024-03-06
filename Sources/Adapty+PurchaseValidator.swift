@@ -16,7 +16,7 @@ protocol PurchaseValidator {
 extension Adapty: PurchaseValidator {
     func syncTransactions(refreshReceiptIfEmpty: Bool,
                           _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>?>) {
-        guard #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *),
+        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2TransactionManager = _sk2TransactionManager as? SK2TransactionManager else {
             sk1ReceiptManager.validateReceipt(refreshIfEmpty: refreshReceiptIfEmpty) { [weak self] result in
                 completion(result.map {

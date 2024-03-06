@@ -7,7 +7,7 @@
 
 import StoreKit
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2ProductsFetcher {
     private var sk2Products = [String: SK2Product]()
 

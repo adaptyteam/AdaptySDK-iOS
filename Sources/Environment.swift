@@ -163,7 +163,7 @@ enum Environment {
     }
 
     #if canImport(AdServices)
-        @available(iOS 14.3, *)
+        @available(iOS 14.3, macOS 11.1, visionOS 1.0, *)
         static func getASAToken() throws -> String {
             let callId = Log.stamp
             let methodName = "fetch_ASA_Token"
@@ -201,7 +201,7 @@ enum Environment {
     import AppTrackingTransparency
 
     extension Environment.Device {
-        @available(iOS 14, macOS 11.0, *)
+        @available(iOS 14.0, macOS 11.0, tvOS 14.0,visionOS 1.0, *)
         static var appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus {
             ATTrackingManager.trackingAuthorizationStatus
         }

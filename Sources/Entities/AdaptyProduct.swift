@@ -49,7 +49,7 @@ extension AdaptyProduct {
 
     /// A Boolean value that indicates whether the product is available for family sharing in App Store Connect. (Will be `false` for iOS version below 14.0 and macOS version below 11.0).
     public var isFamilyShareable: Bool {
-        guard #available(iOS 14.0, macOS 11.0, *) else { return false }
+        guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, visionOS 1.0, *) else { return false }
         return skProduct.isFamilyShareable
     }
 

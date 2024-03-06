@@ -75,7 +75,7 @@ extension HTTPSession {
 
             if case let .network(_, _, error: error) = error,
                (error as NSError).isNetworkConnectionError {
-                Log.verbose("#API# NO CONNECTION <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)")
+                Log.verbose("#API# NO CONNECTION <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)")
             } else if error.isCancelled {
                 Log.verbose("#API# CANCELED <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)")
             } else {

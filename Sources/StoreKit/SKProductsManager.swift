@@ -16,7 +16,7 @@ final class SKProductsManager {
     private let storeKit1Fetcher: SK1ProductsFetcher
     private let _storeKit2Fetcher: Any?
 
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     private var storeKit2Fetcher: SK2ProductsFetcher? {
         guard let fetcher = _storeKit2Fetcher else { return nil }
         return fetcher as? SK2ProductsFetcher
@@ -27,7 +27,7 @@ final class SKProductsManager {
         cache = ProductVendorIdsCache(storage: storage)
         session = backend.createHTTPSession(responseQueue: queue)
         storeKit1Fetcher = SK1ProductsFetcher(queue: queue)
-        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             _storeKit2Fetcher = SK2ProductsFetcher()
         } else {
             _storeKit2Fetcher = nil
@@ -65,7 +65,7 @@ final class SKProductsManager {
         storeKit1Fetcher.fetchProducts(productIdentifiers: productIds, fetchPolicy: fetchPolicy, retryCount: retryCount, completion)
     }
 
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func fetchSK2Product(productIdentifier productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<SK2Product>) {
         fetchSK2Products(productIdentifiers: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount) { result in
             completion(result.flatMap {
@@ -77,7 +77,7 @@ final class SKProductsManager {
         }
     }
 
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func fetchSK2ProductsInSameOrder(productIdentifiers productIds: [String], fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK2Product]>) {
         fetchSK2Products(productIdentifiers: Set(productIds), fetchPolicy: fetchPolicy, retryCount: retryCount) {
             completion($0.map { products in
@@ -88,7 +88,7 @@ final class SKProductsManager {
         }
     }
 
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func fetchSK2Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK2Product]>) {
         guard let storeKit2Fetcher = storeKit2Fetcher else {
             Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
@@ -120,7 +120,7 @@ final class SKProductsManager {
                 case let .success(response):
                     self.cache.setProductVendorIds(VH(response.body.value, time: Date()))
                     self.fetchSK1Products(productIdentifiers: self.cache.allProductVendorIdsWithFallback) { _ in }
-                    if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
+                    if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                         self.fetchSK2Products(productIdentifiers: self.cache.allProductVendorIdsWithFallback) { _ in }
                     }
                 case let .failure(error):
@@ -153,7 +153,7 @@ extension SKProductsManager {
         let vendorProductIdsWithUnknownEligibility = introductoryOfferEligibilityByVendorProductId.filter { $0.value == nil }.map { $0.key }
 
         guard !vendorProductIdsWithUnknownEligibility.isEmpty,
-              #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+              #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
         else {
             completion(.success(introductoryOfferEligibilityByVendorProductId))
             return
@@ -166,7 +166,7 @@ extension SKProductsManager {
         }
     }
 
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func getSK2IntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
         guard let storeKit2Fetcher = storeKit2Fetcher else {
             Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")

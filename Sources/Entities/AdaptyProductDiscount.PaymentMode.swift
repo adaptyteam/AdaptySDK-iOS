@@ -31,7 +31,7 @@ extension AdaptyProductDiscount.PaymentMode {
         }
     }
 
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     init(mode: SK2Product.SubscriptionOffer.PaymentMode) {
         switch mode {
         case .payAsYouGo:

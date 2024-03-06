@@ -20,14 +20,19 @@ class SKStorefrontManager {
     static func subscribeForUpdates(_ callback: @escaping (String) -> Void) {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             subscribeSK2ForUpdates(callback)
-        } else if #available(macOS 11.0, *) {
-            subscribeSK1ForUpdates(callback)
+            return
         }
+#if !os(visionOS)
+        if #available(iOS 11.0, macOS 11.0, tvOS 11.0, watchOS 7.0, *) {
+            subscribeSK1ForUpdates(callback)
+            return
+        }
+#endif
     }
 
+#if !os(visionOS)
     @available(iOS 11.0, macOS 11.0, tvOS 11.0, watchOS 7.0, *)
     static func subscribeSK1ForUpdates(_ callback: @escaping (String) -> Void) {
-        #if !os(visionOS)
             NotificationCenter.default.addObserver(forName: Notification.Name.SKStorefrontCountryCodeDidChange,
                                                    object: nil,
                                                    queue: nil) { _ in
@@ -40,8 +45,8 @@ class SKStorefrontManager {
 
                 callback(countryCode)
             }
-        #endif
     }
+#endif
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     static func subscribeSK2ForUpdates(_ callback: @escaping (String) -> Void) {

@@ -180,7 +180,7 @@ extension AdaptyProfileParameters.Builder {
     import AppTrackingTransparency
 
     extension AdaptyProfileParameters.Builder {
-        @available(iOS 14, macOS 11.0, *)
+        @available(iOS 14, macOS 11.0, visionOS 1.0, *)
         @discardableResult
         public func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
             guard let value = value else {

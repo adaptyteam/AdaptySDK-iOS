@@ -8,13 +8,13 @@
 
 import StoreKit
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 typealias SK2Transaction = Transaction
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2Transaction: AdaptyExtended {}
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyExtension where Extended == SK2Transaction {
     var identifier: String {
         String(this.id)
@@ -35,7 +35,7 @@ extension AdaptyExtension where Extended == SK2Transaction {
 
     var offerType: SK2Transaction.OfferType? {
         #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
-            if #available(macOS 14.2, iOS 17.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
                 return this.offer?.type
             }
         #endif
@@ -44,7 +44,7 @@ extension AdaptyExtension where Extended == SK2Transaction {
 
     var offerId: String? {
         #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
-            if #available(macOS 14.2, iOS 17.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
                 return this.offer?.id
             }
         #endif
@@ -53,7 +53,7 @@ extension AdaptyExtension where Extended == SK2Transaction {
 
     var environment: String {
         #if !os(visionOS)
-            guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
+        guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
                 let environment = this.environmentStringRepresentation
                 return environment.isEmpty ? "storekit2" : environment.lowercased()
             }

@@ -32,7 +32,7 @@ extension AdaptyPeriodUnit {
         }
     }
 
-    @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     init(unit: SK2Product.SubscriptionPeriod.Unit) {
         switch unit {
         case .day:

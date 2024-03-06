@@ -24,7 +24,7 @@ extension Environment {
 
         var appTrackingTransparencyStatus: UInt? {
             #if canImport(AppTrackingTransparency)
-                if #available(iOS 14, macOS 11.0, *) {
+                if #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) {
                     return Device.appTrackingTransparencyStatus.rawValue
                 }
             #endif

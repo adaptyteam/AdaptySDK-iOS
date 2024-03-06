@@ -58,7 +58,7 @@ extension Adapty {
     func updateASAToken() {
         #if canImport(AdServices)
             guard
-                #available(iOS 14.3, *),
+                #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),
                 profileStorage.appleSearchAdsSyncDate == nil, // check if this is an actual first sync
                 let attributionToken = try? Environment.getASAToken()
             else { return }

@@ -8,7 +8,7 @@
 import StoreKit
 
 #if canImport(_Concurrency) && compiler(>=5.5.2)
-    @available(macOS 10.15, iOS 13.0.0, watchOS 6.0, tvOS 13.0, *)
+    @available(iOS 13.0, macOS 10.15,  watchOS 6.0, tvOS 13.0, visionOS 1.0, *)
     extension Adapty {
         /// Use this method to initialize the Adapty SDK.
         ///
@@ -373,7 +373,7 @@ import StoreKit
         ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
         ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
         /// - Throws: An ``AdaptyError`` object
-        @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+        @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
         public static func setVariationId(
             _ variationId: String,
             forPurchasedTransaction transaction: Transaction
