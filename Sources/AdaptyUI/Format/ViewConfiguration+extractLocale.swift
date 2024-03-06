@@ -13,22 +13,29 @@ extension AdaptyUI.ViewConfiguration {
         extractLocale(AdaptyLocale(id: locale))
     }
 
-    func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
+    func getLocalization(_ locale: AdaptyLocale) -> AdaptyUI.Localization? {
         let localization: AdaptyUI.Localization?
         if let value = localizations[locale] {
             if defaultLocalization?.id == value.id {
-                localization = value
+                return value
             } else {
-                localization = value.addDefault(localization: defaultLocalization)
+                return value.addDefault(localization: defaultLocalization)
             }
         } else {
-            localization = defaultLocalization
+            return defaultLocalization
         }
+    }
+
+
+
+    func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
+        let localization = getLocalization(locale)
 
         func getAsset(_ id: String?) -> AdaptyUI.Asset? {
             guard let id = id else { return nil }
             return localization?.assets?[id] ?? assets[id]
         }
+
         func getAssetFont(_ id: String?) -> AdaptyUI.Font? {
             guard let asset = getAsset(id) else { return nil }
             switch asset {
