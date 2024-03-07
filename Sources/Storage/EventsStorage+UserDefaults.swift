@@ -56,14 +56,14 @@ final class UserDefaultsEventsStorage: EventsStorage {
     }
 
     func setEventCounter(_ value: Int) {
-        Log.debug("UserDefaults: Save \(name)Event Counter = \(value) success.")
+        Log.debug("UserDefaults: Save \(self.name)Event Counter = \(value) success.")
         userDefaults.set(value, forKey: eventCounterKey)
     }
 
     func getEventCounter() -> Int { userDefaults.integer(forKey: eventCounterKey) }
 
     func setEvents(_ value: [Data]) {
-        Log.debug("UserDefaults: Save \(name)Events success.")
+        Log.debug("UserDefaults: Save \(self.name)Events success.")
         userDefaults.set(value, forKey: eventsStorageKey)
     }
 
