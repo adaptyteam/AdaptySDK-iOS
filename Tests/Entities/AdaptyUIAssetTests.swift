@@ -39,7 +39,7 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonV
         }
 
         switch value {
-        case let .filling(.image(value)):
+        case .filling(.image):
             XCTAssertEqual("image", type)
         // TODO: implement check
         case let .filling(.color(value)):
