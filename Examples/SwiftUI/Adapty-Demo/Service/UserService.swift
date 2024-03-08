@@ -70,8 +70,8 @@ final class UserService: ObservableObject {
     func makePurchase(for product: AdaptyPaywallProduct, completion: @escaping ((Bool, Error?) -> Void)) {
         Adapty.makePurchase(product: product) { [weak self] result in
             switch result {
-            case let .success(profile):
-                self?.updatePremiumStatus(with: profile, error: nil, completion: completion)
+            case let .success(purchasedInfo):
+                self?.updatePremiumStatus(with: purchasedInfo.profile, error: nil, completion: completion)
             case let .failure(error):
                 completion(false, error)
             }

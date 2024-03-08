@@ -19,7 +19,7 @@ final class PaywallService: ObservableObject {
 
     func getPaywalls(completion: ((Error?) -> Void)? = nil) {
         reset()
-        Adapty.getPaywall("YOUR_PAYWALL_ID") { [weak self] result in
+        Adapty.getPaywall(placementId: "example_ab_test") { [weak self] result in
             guard let self = self else { return }
             switch result {
             case let .success(paywall):
@@ -36,44 +36,32 @@ final class PaywallService: ObservableObject {
         completion: ((Error?) -> Void)? = nil
     ) {
         let remoteConfig = currentPaywall.remoteConfig
-        // `default` fetch policy allows to fetch products faster,
-        // without waiting for their `introductoryOfferEligibility` statuses
-        Adapty.getPaywallProducts(paywall: currentPaywall, fetchPolicy: .default) { [weak self] result in
+
+        Adapty.getPaywallProducts(paywall: currentPaywall) { [weak self] result in
             switch result {
             case let .success(products):
-                // If there is a product with `introductoryOfferEligibility` equal to `unknown`,
-                // we can refetch products again with `.waitForReceiptValidation` fetch policy.
-                // For more info:
-                // https://docs.adapty.io/docs/ios-displaying-products#products-fetch-policy-and-intro-offer-eligibility
-                guard !products.contains(where: { $0.introductoryOfferEligibility == .unknown }) else {
-                    self?.getPaywallProductsEnsuringEligibility(for: currentPaywall) { [weak self] updatedProducts in
-                        self?.updateProducts(updatedProducts ?? products, remoteConfig: remoteConfig)
+                self?.updateProducts(products, remoteConfig: remoteConfig, eligibilities: nil)
+
+                Adapty.getProductsIntroductoryOfferEligibility(products: products) { result in
+                    switch result {
+                    case let .success(eligibilities):
+                        self?.updateProducts(products, remoteConfig: remoteConfig, eligibilities: eligibilities)
                         completion?(nil)
+                    case let .failure(error):
+                        completion?(error)
                     }
-                    return
                 }
-                self?.updateProducts(products, remoteConfig: remoteConfig)
-                completion?(nil)
             case let .failure(error):
                 completion?(error)
             }
         }
     }
 
-    private func getPaywallProductsEnsuringEligibility(
-        for currentPaywall: AdaptyPaywall,
-        completion: @escaping (([AdaptyPaywallProduct]?) -> Void)
-    ) {
-        Adapty.getPaywallProducts(paywall: currentPaywall, fetchPolicy: .waitForReceiptValidation) { result in
-            var newProducts: [AdaptyPaywallProduct]?
-            if case let .success(eligibleProducts) = result { newProducts = eligibleProducts }
-            completion(newProducts)
-        }
-    }
-
-    private func updateProducts(_ products: [AdaptyPaywallProduct], remoteConfig: [String: Any]?) {
+    private func updateProducts(_ products: [AdaptyPaywallProduct],
+                                remoteConfig: [String: Any]?,
+                                eligibilities: [String: AdaptyEligibility]?) {
         paywallProducts = products
-        paywallViewModel = model(for: remoteConfig, products: products)
+        paywallViewModel = model(for: remoteConfig, products: products, eligibilities: eligibilities)
     }
 
     func logPaywallDisplay() {
@@ -90,7 +78,9 @@ final class PaywallService: ObservableObject {
 // MARK: - Utils
 
 private extension PaywallService {
-    func model(for config: [String: Any]?, products: [AdaptyPaywallProduct]) -> PaywallViewModel? {
+    func model(for config: [String: Any]?,
+               products: [AdaptyPaywallProduct],
+               eligibilities: [String: AdaptyEligibility]?) -> PaywallViewModel? {
         guard !products.isEmpty else { return nil }
         let payloadDTO = decodePaywallData(from: config)
         let buttonStyle = payloadDTO?.buyButtonStyle
@@ -99,7 +89,7 @@ private extension PaywallService {
             description: payloadDTO?.description ?? "Please, subscribe!",
             buyActionTitle: payloadDTO?.buyButtonText ?? "Get premium access",
             restoreActionTitle: "Restore purchases",
-            productModels: createPaywallModels(for: products),
+            productModels: createPaywallModels(for: products, eligibilities: eligibilities),
             backgroundColor: getColor(for: payloadDTO?.backgroundColor) ?? Color.Palette.accent,
             textColor: getColor(for: payloadDTO?.textColor) ?? Color.Palette.accentContent,
             buyButtonStyle: .init(
@@ -122,7 +112,8 @@ private extension PaywallService {
         return try? decoder.decode(PaywallDataDTO.self, from: data)
     }
 
-    func createPaywallModels(for products: [AdaptyPaywallProduct]) -> [ProductItemModel] {
+    func createPaywallModels(for products: [AdaptyPaywallProduct],
+                             eligibilities: [String: AdaptyEligibility]?) -> [ProductItemModel] {
         products.compactMap { product in
             guard
                 let priceString = product.localizedPrice,
@@ -133,7 +124,8 @@ private extension PaywallService {
                 id: product.vendorProductId,
                 priceString: priceString,
                 period: periodString,
-                introductoryDiscount: getIntroductoryDiscount(for: product)
+                introductoryDiscount: getIntroductoryDiscount(for: product,
+                                                              introductoryOfferEligibility: eligibilities?[product.vendorProductId])
             )
         }
     }
@@ -143,9 +135,10 @@ private extension PaywallService {
         return Color(hex: hexString)
     }
 
-    func getIntroductoryDiscount(for product: AdaptyPaywallProduct) -> IntroductoryDiscountModel? {
+    func getIntroductoryDiscount(for product: AdaptyPaywallProduct,
+                                 introductoryOfferEligibility: AdaptyEligibility?) -> IntroductoryDiscountModel? {
         guard
-            case .eligible = product.introductoryOfferEligibility,
+            case .eligible = introductoryOfferEligibility,
             let discount = product.introductoryDiscount,
             let localizedPeriod = discount.localizedSubscriptionPeriod,
             let localizedPrice = discount.localizedPrice

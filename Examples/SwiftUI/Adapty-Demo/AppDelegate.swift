@@ -18,8 +18,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        Adapty.activate("YOUR_ADAPTY_APP_TOKEN", customerUserId: nil)
         Adapty.logLevel = .verbose
+        Adapty.activate("YOUR_ADAPTY_APP_TOKEN", customerUserId: nil)
         return true
     }
 }
