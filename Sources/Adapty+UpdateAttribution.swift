@@ -55,7 +55,7 @@ extension Adapty {
         }
     }
 
-    func updateASAToken() {
+    func updateASATokenIfNeed(for profile:VH<AdaptyProfile>) {
         #if canImport(AdServices)
             guard
                 #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),
@@ -63,11 +63,10 @@ extension Adapty {
                 let attributionToken = try? Environment.getASAToken()
             else { return }
 
-            let profileId = profileStorage.profileId
-            let responseHash = state.initialized?.profile.hash
+            let profileId = profile.value.profileId
             httpSession.performASATokenRequest(profileId: profileId,
                                                token: attributionToken,
-                                               responseHash: responseHash) { [weak self] result in
+                                               responseHash: profile.hash) { [weak self] result in
 
                 guard let profile = try? result.get() else { return }
                 if let profile = profile.flatValue() {
