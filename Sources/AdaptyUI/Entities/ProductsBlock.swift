@@ -42,3 +42,6 @@ extension AdaptyUI.ProductsBlock {
         by.products.compactMap { products[$0.adaptyProductId] }
     }
 }
+
+extension AdaptyUI.ProductsBlockType: Decodable {
+}

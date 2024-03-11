@@ -16,7 +16,7 @@ func XCTAssertEqual(_ expression: AdaptyUI.Color?, withJSONValue jsonValue: JSON
     XCTAssertEqual(hex.lowercased(), str.lowercased())
 }
 
-func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
+func XCTAssertEqual(_ expression: [String: AdaptyUI.ViewConfiguration.Asset]?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (assets, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     let array = jsonValue.arrayOrFail(file: file, line: line)
 
@@ -65,8 +65,8 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.Asset]?, withJSONValue jsonV
 
 final class AdaptyUIAssetTests: XCTestCase {
     func testDecodeValidJSON() throws {
-        let all = try AdaptyUI.Assets.ValidJSON.all.map {
-            let result = try $0.jsonData().decode(AdaptyUI.Assets.self)
+        let all = try AdaptyUI.ViewConfiguration.Asset.ValidJSON.all.map {
+            let result = try $0.jsonData().decode(AdaptyUI.ViewConfiguration.AssetsContainer.self)
             XCTAssertEqual(result.value, withJSONValue: $0)
             return result
         }
@@ -74,12 +74,12 @@ final class AdaptyUIAssetTests: XCTestCase {
     }
 
     func testDecodeInvalidJSON() throws {
-        let all = AdaptyUI.Assets.InvalidJSON.all
+        let all = AdaptyUI.ViewConfiguration.Asset.InvalidJSON.all
         XCTAssertFalse(all.isEmpty)
         try all.forEach {
             let data = try $0.jsonData()
             do {
-                _ = try data.decode(AdaptyUI.Assets.self)
+                _ = try data.decode(AdaptyUI.ViewConfiguration.AssetsContainer.self)
                 XCTFail("Must be decoding error for \($0)")
             } catch { }
         }

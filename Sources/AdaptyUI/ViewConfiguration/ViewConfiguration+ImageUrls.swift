@@ -13,7 +13,7 @@ extension AdaptyUI.ViewConfiguration {
     }
 
     func extractImageUrls(_ locale: AdaptyLocale) -> Set<URL> {
-        let assets: [String: AdaptyUI.Asset]
+        let assets: [String: Asset]
 
         if let localAssets = getLocalization(locale)?.assets {
             assets = localAssets.merging(self.assets, uniquingKeysWith: { current, _ in current })

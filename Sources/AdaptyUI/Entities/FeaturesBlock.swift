@@ -26,3 +26,6 @@ extension AdaptyUI {
         case timeline
     }
 }
+
+extension AdaptyUI.FeaturesBlockType: Decodable {
+}

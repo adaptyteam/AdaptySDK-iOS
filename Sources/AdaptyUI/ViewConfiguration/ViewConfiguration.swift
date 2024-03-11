@@ -3,7 +3,6 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
-//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -57,10 +56,10 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         templateId = try container.decode(String.self, forKey: .templateId)
         version = try container.decode(Int64.self, forKey: .version)
 
-        assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value ?? [:]
+        assets = (try container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
 
-        let localizationsArray = try container.decodeIfPresent([AdaptyUI.Localization].self, forKey: .localizations) ?? []
-        let localizations = try [AdaptyLocale: AdaptyUI.Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
+        let localizationsArray = try container.decodeIfPresent([Localization].self, forKey: .localizations) ?? []
+        let localizations = try [AdaptyLocale: Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate id"))
         })
         self.localizations = localizations
@@ -70,7 +69,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
             defaultLocalization = nil
         }
 
-        styles = try container.decode([String: AdaptyUI.ViewStyle].self, forKey: .styles)
+        styles = try container.decode([String: ViewStyle].self, forKey: .styles)
 
         isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
         mainImageRelativeHeight = try container.decodeIfPresent(Double.self, forKey: .mainImageRelativeHeight)

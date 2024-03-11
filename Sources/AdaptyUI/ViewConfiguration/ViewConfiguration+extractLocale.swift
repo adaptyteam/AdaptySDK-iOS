@@ -3,7 +3,6 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
-//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -13,7 +12,7 @@ extension AdaptyUI.ViewConfiguration {
         extractLocale(AdaptyLocale(id: locale))
     }
 
-    func getLocalization(_ locale: AdaptyLocale) -> AdaptyUI.Localization? {
+    func getLocalization(_ locale: AdaptyLocale) -> Localization? {
         if let value = localizations[locale] {
             if defaultLocalization?.id == value.id {
                 return value
@@ -25,12 +24,10 @@ extension AdaptyUI.ViewConfiguration {
         }
     }
 
-
-
     func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
         let localization = getLocalization(locale)
 
-        func getAsset(_ id: String?) -> AdaptyUI.Asset? {
+        func getAsset(_ id: String?) -> Asset? {
             guard let id = id else { return nil }
             return localization?.assets?[id] ?? assets[id]
         }
@@ -55,15 +52,15 @@ extension AdaptyUI.ViewConfiguration {
             }
         }
 
-        func getString(_ id: String?) -> AdaptyUI.Localization.Item? {
+        func getString(_ id: String?) -> Localization.Item? {
             guard let id = id else { return nil }
             return localization?.strings?[id]
         }
-        func getShapeOrNil(from value: AdaptyUI.ViewItem.Shape?) -> AdaptyUI.Shape? {
+        func getShapeOrNil(from value: Shape?) -> AdaptyUI.Shape? {
             guard let value else { return nil }
             return getShape(from: value)
         }
-        func getShape(from item: AdaptyUI.ViewItem.Shape) -> AdaptyUI.Shape {
+        func getShape(from item: Shape) -> AdaptyUI.Shape {
             var border: AdaptyUI.Shape.Border?
             if let filling = getAssetFilling(item.borderAssetId) {
                 border = .init(filling: filling, thickness: item.borderThickness ?? AdaptyUI.Shape.Border.defaultThickness)
@@ -85,12 +82,12 @@ extension AdaptyUI.ViewConfiguration {
             return .openUrl(getString(id)?.value)
         }
 
-        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.RichText? {
+        func getTextOrNil(from value: Text?) -> AdaptyUI.RichText? {
             guard let value else { return nil }
             return getText(from: value)
         }
 
-        func getText(from group: AdaptyUI.ViewItem.Text) -> AdaptyUI.RichText {
+        func getText(from group: Text) -> AdaptyUI.RichText {
             let defaultFont = getAssetFont(group.fontAssetId)
             let defaultFilling = getAssetFilling(group.fillAssetId)
 
@@ -100,18 +97,18 @@ extension AdaptyUI.ViewConfiguration {
                     case let .text(item):
                         let font = getAssetFont(item.fontAssetId) ?? defaultFont
                         let str = getString(item.stringId)
-                        let text = AdaptyUI.Text(
+                        let text = AdaptyUI.RichText.TextItem(
                             value: str?.value,
                             fallback: str?.fallback,
                             hasTags: str?.hasTags ?? false,
                             font: font,
                             size: item.size ?? group.size ?? font?.defaultSize,
                             fill: getAssetFilling(item.fillAssetId) ?? defaultFilling ?? font?.defaultFilling,
-                            horizontalAlign: item.horizontalAlign ?? group.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.Text.defaultHorizontalAlign
+                            horizontalAlign: item.horizontalAlign ?? group.horizontalAlign ?? font?.defaultHorizontalAlign ?? AdaptyUI.RichText.defaultHorizontalAlign
                         )
                         return item.isBullet ? .textBullet(text) : .text(text)
                     case let .image(item):
-                        let image = AdaptyUI.Text.Image(
+                        let image = AdaptyUI.RichText.ImageItem(
                             src: getAssetFilling(item.imageAssetId)?.asImage,
                             tint: getAssetFilling(item.colorAssetId)?.asColor,
                             size: AdaptyUI.Size(width: item.width, height: item.height))
@@ -126,19 +123,19 @@ extension AdaptyUI.ViewConfiguration {
             )
         }
 
-        func convert(_ items: [String: AdaptyUI.ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {
+        func convert(_ items: [String: ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {
             items?.mapValues(convert) ?? [:]
         }
 
-        func convert(_ item: [(key: String, value: AdaptyUI.ViewItem)]?) -> [(key: String, value: AdaptyUI.LocalizedViewItem)] {
+        func convert(_ item: [(key: String, value: ViewItem)]?) -> [(key: String, value: AdaptyUI.LocalizedViewItem)] {
             item?.map { (key: $0.key, value: convert($0.value)) } ?? []
         }
 
-        func convert(_ item: AdaptyUI.ViewItem.ProductObject) -> AdaptyUI.ProductObject {
+        func convert(_ item: ProductObject) -> AdaptyUI.ProductObject {
             AdaptyUI.ProductObject(productId: item.productId, orderedProperties: convert(item.properties))
         }
 
-        func convert(_ item: AdaptyUI.ViewItem) -> AdaptyUI.LocalizedViewItem {
+        func convert(_ item: ViewItem) -> AdaptyUI.LocalizedViewItem {
             switch item {
             case let .asset(id):
                 guard let asset = getAsset(id) else {
@@ -220,7 +217,7 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.Localization {
+extension AdaptyUI.ViewConfiguration.Localization {
     fileprivate func addDefault(localization: Self?) -> Self {
         guard let localization = localization else { return self }
 
@@ -234,7 +231,7 @@ extension AdaptyUI.Localization {
             assets = assets.merging(other, uniquingKeysWith: { current, _ in current })
         }
 
-        return AdaptyUI.Localization(
+        return .init(
             id: id,
             strings: strings.isEmpty ? nil : strings,
             assets: assets.isEmpty ? nil : assets

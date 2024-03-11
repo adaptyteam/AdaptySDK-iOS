@@ -1,14 +1,13 @@
 //
-//  Asset.swift
+//  VC.Asset.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
-//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUI.ViewConfiguration {
     enum Asset {
         case filling(AdaptyUI.Filling)
         case font(AdaptyUI.Font)
@@ -16,7 +15,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Asset: Decodable {
+extension AdaptyUI.ViewConfiguration.Asset: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case type
@@ -56,26 +55,26 @@ extension AdaptyUI.Asset: Decodable {
     }
 }
 
-extension AdaptyUI {
-    struct Assets: Decodable {
-        let value: [String: AdaptyUI.Asset]
+extension AdaptyUI.ViewConfiguration {
+    struct AssetsContainer: Decodable {
+        let value: [String: Asset]
 
         init(from decoder: Decoder) throws {
+            struct Item: Decodable {
+                let id: String
+                let value: Asset
+
+                init(from decoder: Decoder) throws {
+                    let container = try decoder.container(keyedBy: Asset.CodingKeys.self)
+                    id = try container.decode(String.self, forKey: .id)
+                    value = try decoder.singleValueContainer().decode(Asset.self)
+                }
+            }
+
             let array = try decoder.singleValueContainer().decode([Item].self)
-            value = try [String: AdaptyUI.Asset](array.map { ($0.id, $0.value) }, uniquingKeysWith: { _, _ in
+            value = try [String: Asset](array.map { ($0.id, $0.value) }, uniquingKeysWith: { _, _ in
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate key"))
             })
-        }
-
-        fileprivate struct Item: Decodable {
-            let id: String
-            let value: AdaptyUI.Asset
-
-            init(from decoder: Decoder) throws {
-                let container = try decoder.container(keyedBy: AdaptyUI.Asset.CodingKeys.self)
-                id = try container.decode(String.self, forKey: .id)
-                value = try decoder.singleValueContainer().decode(AdaptyUI.Asset.self)
-            }
         }
     }
 }

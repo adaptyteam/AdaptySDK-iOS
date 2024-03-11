@@ -13,7 +13,7 @@ func XCTAssertEqual(_ expression: AdaptyLocale?, withJSONValue jsonValue: JSONVa
     XCTAssertEqual(value.id, jsonValue.stringOrFail(file: file, line: line), file: file, line: line)
 }
 
-func XCTAssertEqual(_ expression: AdaptyUI.Localization?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
+func XCTAssertEqual(_ expression: AdaptyUI.ViewConfiguration.Localization?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     let object = jsonValue.objectOrFail(file: file, line: line)
 
@@ -37,8 +37,8 @@ func XCTAssertEqual(_ expression: AdaptyUI.Localization?, withJSONValue jsonValu
 
 final class AdaptyUILocalizationTests: XCTestCase {
     func testDecodeValidJSON() throws {
-        let all = try AdaptyUI.Localization.ValidJSON.all.map {
-            let result = try $0.jsonData().decode(AdaptyUI.Localization.self)
+        let all = try AdaptyUI.ViewConfiguration.Localization.ValidJSON.all.map {
+            let result = try $0.jsonData().decode(AdaptyUI.ViewConfiguration.Localization.self)
             XCTAssertEqual(result, withJSONValue: $0)
             return result
         }
@@ -46,12 +46,12 @@ final class AdaptyUILocalizationTests: XCTestCase {
     }
 
     func testDecodeInvalidJSON() throws {
-        let all = AdaptyUI.Localization.InvalidJSON.all
+        let all = AdaptyUI.ViewConfiguration.Localization.InvalidJSON.all
         XCTAssertFalse(all.isEmpty)
         try all.forEach {
             let data = try $0.jsonData()
             do {
-                _ = try data.decode(AdaptyUI.Localization.self)
+                _ = try data.decode(AdaptyUI.ViewConfiguration.Localization.self)
                 XCTFail("Must be decoding error for \($0)")
             } catch { }
         }

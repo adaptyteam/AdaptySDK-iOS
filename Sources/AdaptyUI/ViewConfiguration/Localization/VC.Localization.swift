@@ -1,14 +1,13 @@
 //
-//  Localization.swift
+//  VC.Localization.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
-//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUI.ViewConfiguration {
     struct Localization {
         let id: AdaptyLocale
         let strings: [String: Item]?
@@ -22,7 +21,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Localization: Decodable {
+extension AdaptyUI.ViewConfiguration.Localization: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case strings
@@ -40,7 +39,7 @@ extension AdaptyUI.Localization: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(AdaptyLocale.self, forKey: .id)
 
-        assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value
+        assets = (try container.decodeIfPresent(AdaptyUI.ViewConfiguration.AssetsContainer.self, forKey: .assets))?.value
 
         var stringsContainer = try container.nestedUnkeyedContainer(forKey: .strings)
         var strings = [String: Item]()

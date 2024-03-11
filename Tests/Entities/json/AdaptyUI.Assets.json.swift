@@ -7,7 +7,7 @@
 
 @testable import Adapty
 
-extension AdaptyUI.Assets {
+extension AdaptyUI.ViewConfiguration.Asset {
     enum ValidJSON {
         static let all = [empty, colors, example]
 

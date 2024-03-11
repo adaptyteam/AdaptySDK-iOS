@@ -3,22 +3,18 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
-//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import Foundation
 
 extension AdaptyUI {
-
     public struct RichText {
+        static let defaultHorizontalAlign = AdaptyUI.HorizontalAlign.left
+
         public let items: [RichText.Item]
         public let bulletSpace: Double?
 
         var isEmpty: Bool { items.isEmpty }
-    }
-}
-
-extension AdaptyUI.RichText {
 
         public enum Item {
             case text(TextItem)
@@ -27,7 +23,7 @@ extension AdaptyUI.RichText {
             case imageBullet(ImageItem)
             case newline
             case space(Double)
-            
+
             public var isBullet: Bool {
                 switch self {
                 case .imageBullet, .textBullet: return true
@@ -35,16 +31,8 @@ extension AdaptyUI.RichText {
                 }
             }
         }
-    
-        public struct ImageItem {
-            public let src: AdaptyUI.Image?
-            public let tint: AdaptyUI.Color?
-            public let size: AdaptyUI.Size
-        }
-    
-        public struct TextItem {
-            static let defaultHorizontalAlign = AdaptyUI.HorizontalAlign.left
 
+        public struct TextItem {
             public let value: String?
             public let fallback: String?
             public let hasTags: Bool
@@ -53,5 +41,11 @@ extension AdaptyUI.RichText {
             public let fill: AdaptyUI.Filling?
             public let horizontalAlign: AdaptyUI.HorizontalAlign
         }
-    
+
+        public struct ImageItem {
+            public let src: AdaptyUI.Image?
+            public let tint: AdaptyUI.Color?
+            public let size: AdaptyUI.Size
+        }
+    }
 }

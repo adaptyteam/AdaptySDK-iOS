@@ -7,7 +7,7 @@
 
 @testable import Adapty
 
-extension AdaptyUI.Localization {
+extension AdaptyUI.ViewConfiguration.Localization {
     enum ValidJSON {
         static let all = [empty, full, example]
 
@@ -19,7 +19,7 @@ extension AdaptyUI.Localization {
         static let full: JSONValue = [
             "id": "en-GB",
             "strings": .array([]),
-            "assets": AdaptyUI.Assets.ValidJSON.colors,
+            "assets": AdaptyUI.ViewConfiguration.Asset.ValidJSON.colors,
         ]
 
         static let example: JSONValue = [
