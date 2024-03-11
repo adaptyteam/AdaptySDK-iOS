@@ -85,16 +85,16 @@ extension AdaptyUI.ViewConfiguration {
             return .openUrl(getString(id)?.value)
         }
 
-        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.CompoundText? {
+        func getTextOrNil(from value: AdaptyUI.ViewItem.Text?) -> AdaptyUI.RichText? {
             guard let value else { return nil }
             return getText(from: value)
         }
 
-        func getText(from group: AdaptyUI.ViewItem.Text) -> AdaptyUI.CompoundText {
+        func getText(from group: AdaptyUI.ViewItem.Text) -> AdaptyUI.RichText {
             let defaultFont = getAssetFont(group.fontAssetId)
             let defaultFilling = getAssetFilling(group.fillAssetId)
 
-            return AdaptyUI.CompoundText(
+            return AdaptyUI.RichText(
                 items: group.items.map({
                     switch $0 {
                     case let .text(item):
