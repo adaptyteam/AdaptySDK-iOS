@@ -99,13 +99,14 @@ extension AdaptyProfileManager {
     internal func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
         guard isActive,
               let newProfile = newProfile,
-              profile.value.profileId == newProfile.value.profileId
+              profile.value.profileId == newProfile.value.profileId,
+              profile.value.version <= newProfile.value.version
         else { return }
 
         if let oldHash = profile.hash,
            let newHash = newProfile.hash,
            oldHash == newHash { return }
-        
+
         profile = newProfile
         manager.profileStorage.setProfile(newProfile)
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }

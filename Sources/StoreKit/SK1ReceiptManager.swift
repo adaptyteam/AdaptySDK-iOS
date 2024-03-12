@@ -12,10 +12,10 @@ internal final class SK1ReceiptManager: NSObject {
     private var refreshCompletionHandlers: [AdaptyResultCompletion<Data>]?
     private var validateCompletionHandlers: [AdaptyResultCompletion<VH<AdaptyProfile>>]?
 
-    private let storage: ProfileStorage
+    private let storage: ProfileIdentifierStorage
     private let session: HTTPSession
 
-    internal init(queue: DispatchQueue, storage: ProfileStorage, backend: Backend, refreshIfEmpty: Bool) {
+    internal init(queue: DispatchQueue, storage: ProfileIdentifierStorage, backend: Backend, refreshIfEmpty: Bool) {
         self.queue = queue
         session = backend.createHTTPSession(responseQueue: queue)
         self.storage = storage

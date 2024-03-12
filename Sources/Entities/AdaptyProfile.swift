@@ -29,6 +29,8 @@ public struct AdaptyProfile {
 
     /// The keys are product ids from the store. The values are arrays of information about consumables. Can be null if the customer has no purchases.
     public let nonSubscriptions: [String: [NonSubscription]]
+
+    let version: Int64
 }
 
 extension AdaptyProfile: Equatable {
@@ -62,6 +64,7 @@ extension AdaptyProfile: Codable {
         case accessLevels = "paid_access_levels"
         case subscriptions
         case nonSubscriptions = "non_subscriptions"
+        case version = "timestamp"
     }
 
     public init(from decoder: Decoder) throws {
@@ -69,6 +72,7 @@ extension AdaptyProfile: Codable {
         profileId = try container.decode(String.self, forKey: .profileId)
         customerUserId = try container.decodeIfPresent(String.self, forKey: .customerUserId)
         segmentId = try container.decode(String.self, forKey: .segmentId)
+        version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
         codableCustomAttributes = try container.decodeIfPresent(AdaptyProfile.CustomAttributes.self, forKey: .customAttributes)
         customAttributes = codableCustomAttributes?.convertToSimpleDictionary() ?? [:]
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
@@ -81,6 +85,7 @@ extension AdaptyProfile: Codable {
         try container.encode(profileId, forKey: .profileId)
         try container.encodeIfPresent(customerUserId, forKey: .customerUserId)
         try container.encode(segmentId, forKey: .segmentId)
+        try container.encode(version, forKey: .version)
         try container.encodeIfPresent(codableCustomAttributes, forKey: .customAttributes)
         if !accessLevels.isEmpty {
             try container.encode(accessLevels, forKey: .accessLevels)

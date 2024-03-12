@@ -12,10 +12,10 @@ internal final class SK2TransactionManager {
     private let queue: DispatchQueue
     private var syncTransactionsCompletionHandlers: [AdaptyResultCompletion<VH<AdaptyProfile>?>]?
 
-    private let storage: ProfileStorage
+    private let storage: ProfileIdentifierStorage
     private let session: HTTPSession
 
-    internal init(queue: DispatchQueue, storage: ProfileStorage, backend: Backend) {
+    internal init(queue: DispatchQueue, storage: ProfileIdentifierStorage, backend: Backend) {
         self.queue = queue
         session = backend.createHTTPSession(responseQueue: queue)
         self.storage = storage
