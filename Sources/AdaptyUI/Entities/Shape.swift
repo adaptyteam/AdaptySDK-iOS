@@ -14,8 +14,7 @@ extension AdaptyUI {
         public let background: Filling?
         public let border: Border?
         public let type: ShapeType
-        
-        
+
         public struct Border {
             static let defaultThickness = 1.0
 

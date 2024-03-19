@@ -1,6 +1,6 @@
 //
 //  SK1ReceiptManager.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 25.10.2022
 //

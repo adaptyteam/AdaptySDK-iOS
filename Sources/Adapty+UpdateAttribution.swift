@@ -1,9 +1,8 @@
 //
 //  Adapty+UpdateAttribution.swift
-//  Adapty
+//  AdaptySDK
 //
-//  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 Adapty. All rights reserved.
+//  Created by Andrey Kyashkin on 28.10.2019.
 //
 
 import Foundation

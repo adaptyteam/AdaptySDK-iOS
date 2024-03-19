@@ -37,8 +37,8 @@ extension AdaptyUI {
 
         public var asFilling: AdaptyUI.Filling? {
             switch self {
-            case let .filling(value): return value
-            default: return nil
+            case let .filling(value): value
+            default: nil
             }
         }
 
@@ -48,35 +48,35 @@ extension AdaptyUI {
 
         public var asShape: AdaptyUI.Shape? {
             switch self {
-            case let .shape(value): return value
-            default: return nil
+            case let .shape(value): value
+            default: nil
             }
         }
 
         public var asButton: AdaptyUI.Button? {
             switch self {
-            case let .button(value): return value
-            default: return nil
+            case let .button(value): value
+            default: nil
             }
         }
 
         public var asText: AdaptyUI.RichText? {
             switch self {
-            case let .text(value): return value
-            default: return nil
+            case let .text(value): value
+            default: nil
             }
         }
 
         public var asObject: AdaptyUI.CustomObject? {
             switch self {
-            case let .object(value): return value
-            default: return nil
+            case let .object(value): value
+            default: nil
             }
         }
     }
 }
 
-extension Dictionary where Key == String, Value == AdaptyUI.LocalizedViewItem {
+extension [String: AdaptyUI.LocalizedViewItem] {
     public func getFilling(_ key: Key) -> AdaptyUI.Filling? { self[key]?.asFilling }
     public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asFilling?.asColor }
     public func getColorGradient(_ key: Key) -> AdaptyUI.ColorGradient? { self[key]?.asFilling?.asColorGradient }

@@ -43,13 +43,13 @@ extension AdaptyUI.ViewConfiguration.ViewStyle: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        items = [String: AdaptyUI.ViewConfiguration.ViewItem](
-            try container.allKeys
+        items = try [String: AdaptyUI.ViewConfiguration.ViewItem](
+            container.allKeys
                 .filter {
                     BlockKeys(rawValue: $0.stringValue) == nil
                 }
                 .map {
-                    ($0.stringValue, value: try container.decode(AdaptyUI.ViewConfiguration.ViewItem.self, forKey: $0))
+                    try ($0.stringValue, value: container.decode(AdaptyUI.ViewConfiguration.ViewItem.self, forKey: $0))
                 },
             uniquingKeysWith: { $1 }
         )
@@ -70,9 +70,11 @@ extension KeyedDecodingContainer where Key == AdaptyUI.ViewConfiguration.ViewSty
                 filter($0.stringValue)
             }
             .map { key in
-                (key: key.stringValue,
-                 value: try decode(AdaptyUI.ViewConfiguration.ViewItem.self, forKey: key),
-                 order: (try? decode(OrderedItem.self, forKey: key))?.order ?? 0)
+                try (
+                    key: key.stringValue,
+                    value: decode(AdaptyUI.ViewConfiguration.ViewItem.self, forKey: key),
+                    order: (try? decode(OrderedItem.self, forKey: key))?.order ?? 0
+                )
             }
             .sorted(by: { first, second in
                 first.order < second.order

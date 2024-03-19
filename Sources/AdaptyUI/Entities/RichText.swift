@@ -12,40 +12,64 @@ extension AdaptyUI {
         static let defaultHorizontalAlign = AdaptyUI.HorizontalAlign.left
 
         public let items: [RichText.Item]
-        public let bulletSpace: Double?
+        public let fallback: [RichText.Item]?
 
         var isEmpty: Bool { items.isEmpty }
 
         public enum Item {
-            case text(TextItem)
-            case image(ImageItem)
-            case textBullet(TextItem)
-            case imageBullet(ImageItem)
-            case newline
-            case space(Double)
+            case text(String, TextAttributes?)
+            case tag(String, TextAttributes?)
+            case paragraph(ParagraphAttributes?)
+            case image(AdaptyUI.Image?, ImageInTextAttributes?)
+        }
 
-            public var isBullet: Bool {
-                switch self {
-                case .imageBullet, .textBullet: return true
-                default: return false
-                }
+        public struct TextAttributes {
+            let font: AdaptyUI.Font?
+            let size: Double?
+            let color: AdaptyUI.Filling?
+            let background: AdaptyUI.Filling?
+            let strike: Bool?
+            let underline: Bool?
+        }
+
+        public struct ParagraphAttributes {
+            let horizontalAlign: AdaptyUI.HorizontalAlign?
+            let firstIndent: Double?
+            let indent: Double?
+        }
+
+        public struct ImageInTextAttributes {
+            let size: Double?
+            let tint: AdaptyUI.Filling?
+            let background: AdaptyUI.Filling?
+            let strike: Bool?
+            let underline: Bool?
+        }
+    }
+}
+
+extension [AdaptyUI.RichText.Item] {
+    var asString: String? {
+       let string =  compactMap {
+            switch $0 {
+            case let .text(value, _), let .tag(value, _):
+                value
+            case .paragraph:
+                "\n"
+            default:
+                nil
             }
-        }
+        }.joined()
+        
+        return string.isEmpty ? nil : string
+    }
+}
 
-        public struct TextItem {
-            public let value: String?
-            public let fallback: String?
-            public let hasTags: Bool
-            public let font: AdaptyUI.Font?
-            public let size: Double?
-            public let fill: AdaptyUI.Filling?
-            public let horizontalAlign: AdaptyUI.HorizontalAlign
-        }
-
-        public struct ImageItem {
-            public let src: AdaptyUI.Image?
-            public let tint: AdaptyUI.Color?
-            public let size: AdaptyUI.Size
-        }
+extension AdaptyUI.RichText {
+    var asString: String? {
+        items.asString
+    }
+    var asFallbackString: String? {
+        fallback?.asString
     }
 }

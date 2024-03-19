@@ -1,6 +1,6 @@
 //
 //  SetASATokenRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.03.2024.
 //

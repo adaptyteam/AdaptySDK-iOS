@@ -1,6 +1,6 @@
 //
 //  EventsBackendConfiguration.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //

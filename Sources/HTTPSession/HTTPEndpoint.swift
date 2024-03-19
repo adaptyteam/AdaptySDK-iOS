@@ -1,6 +1,6 @@
 //
 //  HTTPEndpoint.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 22.09.2022.
 //

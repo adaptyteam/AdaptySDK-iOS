@@ -1,6 +1,6 @@
 //
 //  SK1QueueManager+MakePurchase.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 25.10.2022
 //

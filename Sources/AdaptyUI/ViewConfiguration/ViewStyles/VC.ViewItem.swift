@@ -49,13 +49,13 @@ extension AdaptyUI.ViewConfiguration.ViewItem: Decodable {
 
         switch ContentType(rawValue: type) {
         case .shape, .rectangle, .circle, .curveUp, .curveDown:
-            self = .shape(try decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Shape.self))
+            self = try .shape(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Shape.self))
         case .button:
-            self = .button(try decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Button.self))
+            self = try .button(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Button.self))
         case .text:
-            self = .text(try decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Text.self))
+            self = try .text(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Text.self))
         default:
-            self = .object(try decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.CustomObject.self))
+            self = try .object(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.CustomObject.self))
         }
     }
 }

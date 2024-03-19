@@ -3,7 +3,6 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.12.2022
-//  Copyright © 2022 Adapty. All rights reserved.
 //
 
 import Foundation

@@ -40,5 +40,4 @@ extension AdaptyUI.Button {
     }
 }
 
-extension AdaptyUI.Button.Align: Decodable {
-}
+extension AdaptyUI.Button.Align: Decodable {}

@@ -1,6 +1,6 @@
 //
 //  FetchFallbackPaywallRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2022.
 //
@@ -34,18 +34,24 @@ extension HTTPSession {
         apiKeyPrefix: String,
         placementId: String,
         locale: AdaptyLocale?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>) {
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>
+    ) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
-        let request = FetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
-                                                  placementId: placementId,
-                                                  locale: locale)
+        let request = FetchFallbackPaywallRequest(
+            apiKeyPrefix: apiKeyPrefix,
+            placementId: placementId,
+            locale: locale
+        )
 
-        perform(request, logName: "get_fallback_paywall",
-                logParams: [
-                    "api_prefix": .value(apiKeyPrefix),
-                    "placement_id": .value(placementId),
-                    "language_code": .valueOrNil(locale.languageCode),
-                ]) { [weak self] (result: FetchFallbackPaywallRequest.Result) in
+        perform(
+            request,
+            logName: "get_fallback_paywall",
+            logParams: [
+                "api_prefix": .value(apiKeyPrefix),
+                "placement_id": .value(placementId),
+                "language_code": .valueOrNil(locale.languageCode),
+            ]
+        ) { [weak self] (result: FetchFallbackPaywallRequest.Result) in
             switch result {
             case let .failure(error):
                 guard let queue = self?.responseQueue,
@@ -60,10 +66,12 @@ extension HTTPSession {
                         completion(.failure(error.asAdaptyError))
                         return
                     }
-                    session.performFetchFallbackPaywallRequest(apiKeyPrefix: apiKeyPrefix,
-                                                               placementId: placementId,
-                                                               locale: nil,
-                                                               completion)
+                    session.performFetchFallbackPaywallRequest(
+                        apiKeyPrefix: apiKeyPrefix,
+                        placementId: placementId,
+                        locale: nil,
+                        completion
+                    )
                 }
 
             case let .success(response):

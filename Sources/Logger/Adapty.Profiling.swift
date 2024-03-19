@@ -1,6 +1,6 @@
 //
 //  Adapty.Profiling.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.10.2022.
 //

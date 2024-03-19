@@ -13,13 +13,12 @@ extension AdaptyUI.ViewConfiguration {
     }
 
     func extractImageUrls(_ locale: AdaptyLocale) -> Set<URL> {
-        let assets: [String: Asset]
-
-        if let localAssets = getLocalization(locale)?.assets {
-            assets = localAssets.merging(self.assets, uniquingKeysWith: { current, _ in current })
-        } else {
-            assets = self.assets
-        }
+        let assets: [String: Asset] =
+            if let localAssets = getLocalization(locale)?.assets {
+                localAssets.merging(self.assets, uniquingKeysWith: { current, _ in current })
+            } else {
+                self.assets
+            }
 
         return Set(assets.values.compactMap {
             guard case let .filling(.image(.url(url, _))) = $0 else {

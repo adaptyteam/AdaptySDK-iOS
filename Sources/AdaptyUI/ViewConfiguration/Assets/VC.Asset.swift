@@ -15,6 +15,18 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
+extension AdaptyUI.ViewConfiguration.Asset {
+    var asFont: AdaptyUI.Font? {
+        guard  case let .font(value) = self else { return nil }
+        return value
+    }
+    
+    var asFilling: AdaptyUI.Filling? {
+        guard  case let .filling(value) = self else { return nil }
+        return value
+    }
+}
+
 extension AdaptyUI.ViewConfiguration.Asset: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
@@ -40,15 +52,15 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
         }
         switch ContentType(rawValue: type) {
         case .color:
-            self = .filling(.color(try container.decode(AdaptyUI.Color.self, forKey: .value)))
+            self = try .filling(.color(container.decode(AdaptyUI.Color.self, forKey: .value)))
         case .colorLinearGradient,
              .colorRadialGradient,
              .colorConicGradient:
-            self = .filling(.colorGradient(try AdaptyUI.ColorGradient(from: decoder)))
+            self = try .filling(.colorGradient(AdaptyUI.ColorGradient(from: decoder)))
         case .font:
-            self = .font(try AdaptyUI.Font(from: decoder))
+            self = try .font(AdaptyUI.Font(from: decoder))
         case .image:
-            self = .filling(.image(try AdaptyUI.Image(from: decoder)))
+            self = try .filling(.image(AdaptyUI.Image(from: decoder)))
         default:
             self = .unknown("asset.type: \(type)")
         }

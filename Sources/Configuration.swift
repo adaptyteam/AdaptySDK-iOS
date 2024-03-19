@@ -1,6 +1,6 @@
 //
 //  Application.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Dmitry Obukhov on 3/17/20.
 //
@@ -21,7 +21,7 @@ extension Adapty {
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else { return "unavailable" }
             return  "enabled"
         }
-        
+
         static var backendBaseUrl: URL?
         static var backendFallbackBaseUrl: URL?
 

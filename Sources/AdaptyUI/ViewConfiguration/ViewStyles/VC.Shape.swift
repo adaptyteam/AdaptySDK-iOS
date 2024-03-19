@@ -16,6 +16,20 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
+extension AdaptyUI.ViewConfiguration.Shape {
+    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.Shape {
+        var border: AdaptyUI.Shape.Border?
+        if let filling = assetById(borderAssetId)?.asFilling {
+            border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.Shape.Border.defaultThickness)
+        }
+        return .init(
+            background: assetById(backgroundAssetId)?.asFilling,
+            border: border,
+            type: type
+        )
+    }
+}
+
 extension AdaptyUI.ViewConfiguration.Shape: Decodable {
     enum CodingKeys: String, CodingKey {
         case backgroundAssetId = "background"
@@ -29,15 +43,14 @@ extension AdaptyUI.ViewConfiguration.Shape: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         backgroundAssetId = try container.decodeIfPresent(String.self, forKey: .backgroundAssetId)
-        var shape: AdaptyUI.ShapeType
-
-        if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .type) {
-            shape = value
-        } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
-            shape = value
-        } else {
-            shape = AdaptyUI.Shape.defaultType
-        }
+        let shape: AdaptyUI.ShapeType =
+            if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .type) {
+                value
+            } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
+                value
+            } else {
+                AdaptyUI.Shape.defaultType
+            }
 
         if case .rectangle = shape,
            let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.Shape.CornerRadius.self, forKey: .rectangleCornerRadius) {

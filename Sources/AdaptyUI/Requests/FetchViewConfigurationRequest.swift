@@ -3,7 +3,6 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
-//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -38,16 +37,20 @@ extension HTTPSession {
     ) {
         let md5Hash = "{\"builder_version\":\"\(builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5()
 
-        let request = FetchViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
-                                                    paywallVariationId: paywallVariationId,
-                                                    locale: locale,
-                                                    md5Hash: md5Hash,
-                                                    builderVersion: builderVersion,
-                                                    adaptyUISDKVersion: adaptyUISDKVersion)
+        let request = FetchViewConfigurationRequest(
+            apiKeyPrefix: apiKeyPrefix,
+            paywallVariationId: paywallVariationId,
+            locale: locale,
+            md5Hash: md5Hash,
+            builderVersion: builderVersion,
+            adaptyUISDKVersion: adaptyUISDKVersion
+        )
 
-        perform(request,
-                logName: "get_paywall_builder",
-                logParams: ["variation_id": .value(paywallVariationId)]) { (result: FetchViewConfigurationRequest.Result) in
+        perform(
+            request,
+            logName: "get_paywall_builder",
+            logParams: ["variation_id": .value(paywallVariationId)]
+        ) { (result: FetchViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

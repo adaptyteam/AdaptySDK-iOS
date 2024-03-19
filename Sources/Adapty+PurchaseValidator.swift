@@ -1,6 +1,6 @@
 //
 //  Adapty+PurchaseValidator.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.10.2022.
 //

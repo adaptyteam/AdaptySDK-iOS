@@ -10,7 +10,6 @@ import Foundation
 extension AdaptyUI {
     public enum Image {
         case raster(Data)
-//        case vector(Data)
         case url(URL, previewRaster: Data?)
     }
 }
@@ -30,9 +29,9 @@ extension AdaptyUI.Image: Decodable {
             return
         }
 
-        self = .url(
-            try container.decode(URL.self, forKey: .url),
-            previewRaster: try container.decodeIfPresent(Data.self, forKey: .previewData)
+        self = try .url(
+            container.decode(URL.self, forKey: .url),
+            previewRaster: container.decodeIfPresent(Data.self, forKey: .previewData)
         )
     }
 }

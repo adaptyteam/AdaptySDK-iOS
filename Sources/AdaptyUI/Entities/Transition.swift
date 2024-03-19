@@ -56,7 +56,7 @@ extension AdaptyUI.Transition: Decodable {
         case .none:
             self = .unknown(typeName)
         case .fade:
-            self = .fade(try AdaptyUI.TransitionFade(from: decoder))
+            self = try .fade(AdaptyUI.TransitionFade(from: decoder))
         }
     }
 }
@@ -71,7 +71,7 @@ extension AdaptyUI.Transition.Interpolator: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        switch Values(rawValue: try container.decode(String.self)) {
+        switch try Values(rawValue: container.decode(String.self)) {
         case .none:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "unknown value"))
         case .easeInOut:
@@ -96,8 +96,8 @@ extension AdaptyUI.TransitionFade: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        startDelay = (try container.decodeIfPresent(Double.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultStartDelay
-        duration = (try container.decodeIfPresent(Double.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultDuration
-        interpolator = (try container.decodeIfPresent(AdaptyUI.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyUI.TransitionFade.defaultInterpolator
+        startDelay = try (container.decodeIfPresent(Double.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultStartDelay
+        duration = try (container.decodeIfPresent(Double.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultDuration
+        interpolator = try (container.decodeIfPresent(AdaptyUI.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyUI.TransitionFade.defaultInterpolator
     }
 }

@@ -1,6 +1,6 @@
 //
 //  AdaptyError+Description.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 30.10.2022.
 //

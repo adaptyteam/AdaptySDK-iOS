@@ -14,9 +14,8 @@ extension AdaptyUI.ViewConfiguration {
         let assets: [String: Asset]?
 
         struct Item {
-            let value: String
-            let fallback: String?
-            let hasTags: Bool
+            let value: RichText
+            let fallback: RichText?
         }
     }
 }
@@ -32,14 +31,13 @@ extension AdaptyUI.ViewConfiguration.Localization: Decodable {
         case id
         case value
         case fallback
-        case hasTags = "has_tags"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(AdaptyLocale.self, forKey: .id)
 
-        assets = (try container.decodeIfPresent(AdaptyUI.ViewConfiguration.AssetsContainer.self, forKey: .assets))?.value
+        assets = try (container.decodeIfPresent(AdaptyUI.ViewConfiguration.AssetsContainer.self, forKey: .assets))?.value
 
         var stringsContainer = try container.nestedUnkeyedContainer(forKey: .strings)
         var strings = [String: Item]()
@@ -48,10 +46,9 @@ extension AdaptyUI.ViewConfiguration.Localization: Decodable {
         }
         while !stringsContainer.isAtEnd {
             let item = try stringsContainer.nestedContainer(keyedBy: ItemCodingKeys.self)
-            strings[try item.decode(String.self, forKey: .id)] = Item(
-                value: try item.decode(String.self, forKey: .value),
-                fallback: try item.decodeIfPresent(String.self, forKey: .fallback),
-                hasTags: (try item.decodeIfPresent(Bool.self, forKey: .hasTags)) ?? false
+            try strings[item.decode(String.self, forKey: .id)] = try Item(
+                value: item.decode(AdaptyUI.ViewConfiguration.RichText.self, forKey: .value),
+                fallback: item.decodeIfPresent(AdaptyUI.ViewConfiguration.RichText.self, forKey: .fallback)
             )
         }
         self.strings = strings.isEmpty ? nil : strings

@@ -1,9 +1,10 @@
 //
 //  Adapty+Concurrency.swift
-//  Adapty
+//  AdaptySDK
 //
-//  Copyright © 2022 Adapty. All rights reserved.
+//  Created by larryonoff on 4/26/22.
 //
+
 
 import StoreKit
 

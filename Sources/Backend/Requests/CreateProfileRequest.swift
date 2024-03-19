@@ -1,6 +1,6 @@
 //
 //  CreateProfileRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2022.
 //
@@ -17,10 +17,12 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     let customerUserId: String?
     let environmentMeta: Environment.Meta
 
-    init(profileId: String,
-         customerUserId: String?,
-         parameters: AdaptyProfileParameters?,
-         environmentMeta: Environment.Meta) {
+    init(
+        profileId: String,
+        customerUserId: String?,
+        parameters: AdaptyProfileParameters?,
+        environmentMeta: Environment.Meta
+    ) {
         endpoint = HTTPEndpoint(
             method: .post,
             path: "/sdk/analytics/profiles/\(profileId)/"
@@ -51,7 +53,7 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         try dataObject.encode("adapty_analytics_profile", forKey: .type)
         try dataObject.encode(profileId, forKey: .id)
 
-        if let parameters = parameters {
+        if let parameters {
             try dataObject.encode(parameters, forKey: .attributes)
         }
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
@@ -67,29 +69,39 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 }
 
 private extension CreateProfileRequest {
-    init(profileId: String,
-         customerUserId: String?,
-         analyticsDisabled: Bool) {
-        self.init(profileId: profileId,
-                  customerUserId: customerUserId,
-                  parameters: AdaptyProfileParameters.Builder()
-                      .with(analyticsDisabled: analyticsDisabled)
-                      .build(),
-                  environmentMeta: Environment.Meta(includedAnalyticIds: !analyticsDisabled))
+    init(
+        profileId: String,
+        customerUserId: String?,
+        analyticsDisabled: Bool
+    ) {
+        self.init(
+            profileId: profileId,
+            customerUserId: customerUserId,
+            parameters: AdaptyProfileParameters.Builder()
+                .with(analyticsDisabled: analyticsDisabled)
+                .build(),
+            environmentMeta: Environment.Meta(includedAnalyticIds: !analyticsDisabled)
+        )
     }
 }
 
 extension HTTPSession {
-    func performCreateProfileRequest(profileId: String,
-                                     customerUserId: String?,
-                                     analyticsDisabled: Bool,
-                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
-        let request = CreateProfileRequest(profileId: profileId,
-                                           customerUserId: customerUserId,
-                                           analyticsDisabled: analyticsDisabled)
-        perform(request,
-                logName: "create_profile",
-                logParams: ["has_customer_user_id": .value(customerUserId != nil)]) { (result: CreateProfileRequest.Result) in
+    func performCreateProfileRequest(
+        profileId: String,
+        customerUserId: String?,
+        analyticsDisabled: Bool,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
+    ) {
+        let request = CreateProfileRequest(
+            profileId: profileId,
+            customerUserId: customerUserId,
+            analyticsDisabled: analyticsDisabled
+        )
+        perform(
+            request,
+            logName: "create_profile",
+            logParams: ["has_customer_user_id": .value(customerUserId != nil)]
+        ) { (result: CreateProfileRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

@@ -1,6 +1,6 @@
 //
 //  HTTPRequest.QueryItems.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.09.2022.
 //

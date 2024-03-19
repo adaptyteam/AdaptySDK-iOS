@@ -1,6 +1,6 @@
 //
 //  AdaptyPaywallShowedParameters.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //

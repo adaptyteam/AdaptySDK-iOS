@@ -1,6 +1,6 @@
 //
 //  AdaptyProductDiscount.PaymentMode.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2022.
 //

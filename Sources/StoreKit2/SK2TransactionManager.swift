@@ -1,6 +1,6 @@
 //
 //  SK2TransactionManager.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 06.02.2024
 //

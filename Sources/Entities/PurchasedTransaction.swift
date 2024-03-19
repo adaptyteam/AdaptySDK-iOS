@@ -1,6 +1,6 @@
 //
 //  PurchasedTransaction.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.09.2022.
 //

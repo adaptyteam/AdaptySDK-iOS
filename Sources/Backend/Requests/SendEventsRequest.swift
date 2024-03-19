@@ -1,6 +1,6 @@
 //
 //  SendEventsRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 13.10.2022.
 //
@@ -26,7 +26,7 @@ struct SendEventsRequest: HTTPDataRequest {
         case events
     }
 
-    private struct Constants {
+    private enum Constants {
         static let prefix = [
             "{", Backend.CodingKeys.data.stringValue,
             ":{", Backend.CodingKeys.type.stringValue,
@@ -39,7 +39,7 @@ struct SendEventsRequest: HTTPDataRequest {
         static let sufix = "]}}}".data(using: .utf8)!
     }
 
-    func getData(configuration: HTTPConfiguration) throws -> Data? {
+    func getData(configuration _: HTTPConfiguration) throws -> Data? {
         var data = Data()
         data.append(Constants.prefix)
         data.append(contentsOf: events.joined(separator: Constants.separator))

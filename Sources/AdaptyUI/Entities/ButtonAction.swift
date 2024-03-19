@@ -32,17 +32,17 @@ extension AdaptyUI.ButtonAction: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        switch Types(rawValue: try container.decode(String.self, forKey: .type)) {
+        switch try Types(rawValue: container.decode(String.self, forKey: .type)) {
         case .none:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.type], debugDescription: "unknown value"))
         case .openUrl:
-            self = .openUrl(try container.decode(String.self, forKey: .url))
+            self = try .openUrl(container.decode(String.self, forKey: .url))
         case .restore:
             self = .restore
         case .close:
             self = .close
         case .custom:
-            self = .custom(try container.decode(String.self, forKey: .customId))
+            self = try .custom(container.decode(String.self, forKey: .customId))
         }
     }
 }

@@ -43,5 +43,4 @@ extension AdaptyUI.ProductsBlock {
     }
 }
 
-extension AdaptyUI.ProductsBlockType: Decodable {
-}
+extension AdaptyUI.ProductsBlockType: Decodable {}

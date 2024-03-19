@@ -1,6 +1,6 @@
 //
 //  EventsManager.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 13.10.2022.
 //

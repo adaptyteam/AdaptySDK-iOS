@@ -1,0 +1,85 @@
+--acronyms ID,URL,UUID
+--allman false
+--anonymousforeach convert
+--assetliterals visual-width
+--asynccapturing 
+--beforemarks 
+--binarygrouping 4,8
+--categorymark "MARK: %c"
+--classthreshold 0
+--closingparen balanced
+--closurevoid remove
+--commas always
+--conflictmarkers reject
+--decimalgrouping 3,6
+--elseposition same-line
+--emptybraces no-space
+--enumnamespaces always
+--enumthreshold 0
+--exponentcase lowercase
+--exponentgrouping disabled
+--extensionacl on-extension
+--extensionlength 0
+--extensionmark "MARK: - %t + %c"
+--fractiongrouping disabled
+--fragment false
+--funcattributes preserve
+--generictypes 
+--groupedextension "MARK: %c"
+--guardelse auto
+--hexgrouping 4,8
+--hexliteralcase uppercase
+--ifdef indent
+--importgrouping testable-last
+--indent 4
+--indentcase false
+--indentstrings false
+--lifecycle 
+--lineaftermarks true
+--linebreaks lf
+--markcategories true
+--markextensions always
+--marktypes always
+--maxwidth none
+--modifierorder 
+--nevertrailing 
+--nospaceoperators 
+--nowrapoperators 
+--octalgrouping 4,8
+--onelineforeach ignore
+--operatorfunc spaced
+--organizetypes actor,class,enum,struct
+--patternlet hoist
+--ranges spaced
+--redundanttype infer-locals-only
+--self remove
+--selfrequired 
+--semicolons never
+--shortoptionals always
+--smarttabs enabled
+--someany true
+--stripunusedargs always
+--structthreshold 0
+--swiftversion 5.9
+--tabwidth unspecified
+--throwcapturing 
+--trailingclosures 
+--trimwhitespace always
+--typeattributes prev-line
+--typeblanklines remove
+--typemark "MARK: - %t"
+--varattributes preserve
+--voidtype void
+--wraparguments before-first
+--wrapcollections before-first
+--wrapconditions preserve
+--wrapeffects preserve
+--wrapenumcases with-values
+--wrapparameters before-first
+--wrapreturntype preserve
+--wrapternary default
+--wraptypealiases preserve
+--xcodeindentation disabled
+--yodaswap always
+--disable extensionAccessControl,preferForLoop,preferKeyPath,redundantInternal,redundantSelf,wrapMultilineStatementBraces
+--enable blockComments,docComments,isEmpty,wrapEnumCases

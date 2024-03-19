@@ -26,7 +26,7 @@ extension AdaptyUI.ShapeType: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        switch Types(rawValue: try container.decode(String.self)) {
+        switch try Types(rawValue: container.decode(String.self)) {
         case .none:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "unknown value"))
         case .curveUp:

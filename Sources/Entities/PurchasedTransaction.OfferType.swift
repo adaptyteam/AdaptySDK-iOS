@@ -1,6 +1,6 @@
 //
 //  PurchasedTransaction.OfferType.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 29.01.2024.
 //

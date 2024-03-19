@@ -1,8 +1,8 @@
 //
-//  Environment.swift
-//  Adapty
+// Environment.swift
+//  AdaptySDK
 //
-//  Created by Andrey Kyashkin on 19/12/2019.
+//  Created by Andrey Kyashkin on 19.12.2019.
 //
 
 #if canImport(AdSupport)

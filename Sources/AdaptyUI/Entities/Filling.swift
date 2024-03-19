@@ -15,22 +15,22 @@ extension AdaptyUI {
 
         public var asColor: AdaptyUI.Color? {
             switch self {
-            case let .color(value): return value
-            default: return nil
+            case let .color(value): value
+            default: nil
             }
         }
 
         public var asColorGradient: AdaptyUI.ColorGradient? {
             switch self {
-            case let .colorGradient(value): return value
-            default: return nil
+            case let .colorGradient(value): value
+            default: nil
             }
         }
 
         public var asImage: AdaptyUI.Image? {
             switch self {
-            case let .image(value): return value
-            default: return nil
+            case let .image(value): value
+            default: nil
             }
         }
     }

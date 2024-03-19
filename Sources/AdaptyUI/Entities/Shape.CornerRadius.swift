@@ -17,33 +17,33 @@ extension AdaptyUI.Shape {
 
         public var topLeft: Double? {
             switch self {
-            case .none: return nil
-            case let .same(value): return value
-            case let .different(value, _, _, _): return value
+            case .none: nil
+            case let .same(value): value
+            case let .different(value, _, _, _): value
             }
         }
 
         public var topRight: Double? {
             switch self {
-            case .none: return nil
-            case let .same(value): return value
-            case let .different(_, value, _, _): return value
+            case .none: nil
+            case let .same(value): value
+            case let .different(_, value, _, _): value
             }
         }
 
         public var bottomRight: Double? {
             switch self {
-            case .none: return nil
-            case let .same(value): return value
-            case let .different(_, _, value, _): return value
+            case .none: nil
+            case let .same(value): value
+            case let .different(_, _, value, _): value
             }
         }
 
         public var bottomLeft: Double? {
             switch self {
-            case .none: return nil
-            case let .same(value): return value
-            case let .different(_, _, _, value): return value
+            case .none: nil
+            case let .same(value): value
+            case let .different(_, _, _, value): value
             }
         }
     }

@@ -1,6 +1,6 @@
 //
 //  ValidateReceiptRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2022.
 //

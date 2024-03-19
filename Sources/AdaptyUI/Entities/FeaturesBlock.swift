@@ -27,5 +27,4 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.FeaturesBlockType: Decodable {
-}
+extension AdaptyUI.FeaturesBlockType: Decodable {}

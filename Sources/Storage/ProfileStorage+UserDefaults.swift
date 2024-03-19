@@ -1,6 +1,6 @@
 //
 //  ProfileStorage+UserDefaults.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //
@@ -8,7 +8,7 @@
 import Foundation
 
 extension UserDefaults: ProfileStorage {
-    
+
     fileprivate enum Constants {
         static let profileKey = "AdaptySDK_Purchaser_Info"
         static let profileIdKey = "AdaptySDK_Profile_Id"

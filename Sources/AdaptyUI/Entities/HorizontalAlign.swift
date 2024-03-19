@@ -12,8 +12,8 @@ extension AdaptyUI {
         case left
         case center
         case right
+        case fill
     }
 }
 
-extension AdaptyUI.HorizontalAlign: Decodable {
-}
+extension AdaptyUI.HorizontalAlign: Decodable {}

@@ -1,6 +1,6 @@
 //
 //  Adapty.h
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 17.11.2022.
 //

@@ -1,6 +1,6 @@
 //
 //  PaywallsCache.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 22.10.2022.
 //

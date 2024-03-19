@@ -56,7 +56,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         templateId = try container.decode(String.self, forKey: .templateId)
         version = try container.decode(Int64.self, forKey: .version)
 
-        assets = (try container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
+        assets = try (container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
 
         let localizationsArray = try container.decodeIfPresent([Localization].self, forKey: .localizations) ?? []
         let localizations = try [AdaptyLocale: Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in

@@ -1,6 +1,6 @@
 //
 //  ApiKeyHash+UserDefaults.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 17.10.2022.
 //
