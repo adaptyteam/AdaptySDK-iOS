@@ -85,7 +85,7 @@ extension HTTPRequest {
         if let params = self as? HTTPDataRequest {
             do {
                 request.httpBody = try params.getData(configuration: configuration)
-            } catch let error {
+            } catch {
                 return .failure(HTTPError.perform(endpoint, error: error))
             }
         }

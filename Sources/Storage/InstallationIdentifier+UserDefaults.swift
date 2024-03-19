@@ -8,7 +8,7 @@
 import Foundation
 
 extension Environment.Application {
-    static let installationIdentifier = { UserDefaults.standard.getAppInstallationIdentifier() }()
+    static let installationIdentifier = UserDefaults.standard.getAppInstallationIdentifier()
 }
 
 extension UserDefaults {

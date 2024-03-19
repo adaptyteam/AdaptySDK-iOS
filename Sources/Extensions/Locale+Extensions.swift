@@ -25,7 +25,6 @@ extension AdaptyExtension where Extended == Locale {
         return this.region?.identifier
     }
 
-
     func localized(price: NSNumber) -> String? {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency

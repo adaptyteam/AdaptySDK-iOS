@@ -17,12 +17,12 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.Asset {
     var asFont: AdaptyUI.Font? {
-        guard  case let .font(value) = self else { return nil }
+        guard case let .font(value) = self else { return nil }
         return value
     }
-    
+
     var asFilling: AdaptyUI.Filling? {
-        guard  case let .filling(value) = self else { return nil }
+        guard case let .filling(value) = self else { return nil }
         return value
     }
 }

@@ -18,12 +18,12 @@ struct AnyEncodable: Encodable {
         try encodable.encode(to: encoder)
     }
 
-    static func value<T: Encodable>(_ encodable: T) -> AnyEncodable {
+    static func value(_ encodable: some Encodable) -> AnyEncodable {
         AnyEncodable(encodable)
     }
 
-    static func valueOrNil<T: Encodable>(_ encodable: T?) -> AnyEncodable? {
-        guard let encodable = encodable else { return nil }
+    static func valueOrNil(_ encodable: (some Encodable)?) -> AnyEncodable? {
+        guard let encodable else { return nil }
         return AnyEncodable(encodable)
     }
 }

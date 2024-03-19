@@ -1,5 +1,5 @@
 //
-//  ProfileParameter.Builder.swift
+//  AdaptyProfileParameters.Builder.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 26.09.2022.
@@ -44,7 +44,7 @@ extension AdaptyProfileParameters.Builder {
 
     @discardableResult
     public func with(birthday value: Date?) -> Self {
-        guard let value = value else {
+        guard let value else {
             parameters.birthday = nil
             return self
         }
@@ -183,7 +183,7 @@ extension AdaptyProfileParameters.Builder {
         @available(iOS 14, macOS 11.0, visionOS 1.0, *)
         @discardableResult
         public func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
-            guard let value = value else {
+            guard let value else {
                 parameters.appTrackingTransparencyStatus = nil
                 return self
             }

@@ -59,7 +59,7 @@ extension Backend.Response {
     fileprivate static let requestIdHeaderKey = "request-id"
 }
 
-extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.Headers.Value {
+extension [HTTPRequest.Headers.Key: HTTPRequest.Headers.Value] {
     func setPaywallLocale(_ locale: AdaptyLocale?) -> Self {
         updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallLocaleHeaderKey)
     }
@@ -86,7 +86,7 @@ extension Dictionary where Key == HTTPRequest.Headers.Key, Value == HTTPRequest.
 
     private func updateOrRemoveValue(_ value: String?, forKey key: String) -> Self {
         var headers = self
-        if let value = value {
+        if let value {
             headers.updateValue(value, forKey: key)
         } else {
             headers.removeValue(forKey: key)

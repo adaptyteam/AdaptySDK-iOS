@@ -8,7 +8,6 @@
 import Foundation
 
 extension UserDefaults: ProfileStorage {
-
     fileprivate enum Constants {
         static let profileKey = "AdaptySDK_Purchaser_Info"
         static let profileIdKey = "AdaptySDK_Profile_Id"
@@ -78,7 +77,7 @@ extension UserDefaults: ProfileStorage {
 
     func clearProfile(newProfileId profileId: String?) {
         Log.debug("UserDefaults: Clear profile")
-        if let profileId = profileId {
+        if let profileId {
             Log.debug("UserDefaults: profileId = \(profileId)")
             set(profileId, forKey: Constants.profileIdKey)
         } else {

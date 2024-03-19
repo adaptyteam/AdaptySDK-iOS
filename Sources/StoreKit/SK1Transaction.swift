@@ -12,7 +12,6 @@ typealias SK1Transaction = SKPaymentTransaction
 extension SK1Transaction: AdaptyExtended {}
 
 extension AdaptyExtension where Extended == SK1Transaction {
-
     var identifier: String? {
         this.transactionIdentifier
     }
@@ -35,13 +34,13 @@ extension AdaptyExtension where Extended == SK1Transaction {
 private extension SKPaymentTransactionState {
     var stringValue: String {
         switch self {
-        case .purchasing: return "purchasing"
-        case .purchased: return "purchased"
-        case .failed: return "failed"
-        case .restored: return "restored"
-        case .deferred: return "deferred"
+        case .purchasing: "purchasing"
+        case .purchased: "purchased"
+        case .failed: "failed"
+        case .restored: "restored"
+        case .deferred: "deferred"
         default:
-            return "unknown(\(self))"
+            "unknown(\(self))"
         }
     }
 }

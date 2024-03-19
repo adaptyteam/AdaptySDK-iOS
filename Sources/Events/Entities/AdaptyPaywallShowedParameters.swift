@@ -16,6 +16,5 @@ extension AdaptyPaywallShowedParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case paywallVariationId = "variation_id"
         case viewConfigurationId = "paywall_builder_id"
-
     }
 }

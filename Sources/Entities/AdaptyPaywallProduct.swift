@@ -38,9 +38,11 @@ extension AdaptyPaywallProduct: CustomStringConvertible {
 }
 
 extension AdaptyPaywallProduct {
-    init(paywall: AdaptyPaywall,
-         productReference: AdaptyPaywall.ProductReference,
-         sk1Product: SK1Product) {
+    init(
+        paywall: AdaptyPaywall,
+        productReference: AdaptyPaywall.ProductReference,
+        sk1Product: SK1Product
+    ) {
         self.init(
             vendorProductId: productReference.vendorId,
             adaptyProductId: productReference.adaptyProductId,

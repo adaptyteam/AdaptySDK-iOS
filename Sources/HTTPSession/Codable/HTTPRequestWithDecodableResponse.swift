@@ -1,5 +1,5 @@
 //
-//  HTTPRequest.DecodableResponse.swift
+//  HTTPRequestWithDecodableResponse.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 15.09.2022.
@@ -30,17 +30,19 @@ extension HTTPSession {
         _ completionHandler: @escaping (Request.Result) -> Void
     ) -> HTTPCancelable {
         let decoder = request.getDecoder(configuration.decoder)
-        return perform(request,
-                       queue: queue,
-                       decoder: decoder,
-                       logStamp: logStamp,
-                       completionHandler)
+        return perform(
+            request,
+            queue: queue,
+            decoder: decoder,
+            logStamp: logStamp,
+            completionHandler
+        )
     }
 }
 
 extension JSONDecoder {
     func decode<T: Decodable>(_ type: T.Type, _ data: Data?) -> Result<T, Error> {
-        guard let data = data, !data.isEmpty else {
+        guard let data, !data.isEmpty else {
             return .failure(DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The given data is nil or empty.")))
         }
         let result: T

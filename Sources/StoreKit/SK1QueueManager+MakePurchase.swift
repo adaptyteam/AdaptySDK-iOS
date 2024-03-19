@@ -8,10 +8,10 @@
 import StoreKit
 
 extension SK1QueueManager {
-    func makePurchase<T: AdaptyProduct>(payment: SKPayment, product: T, _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>) {
+    func makePurchase(payment: SKPayment, product: some AdaptyProduct, _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>) {
         queue.async { [weak self] in
             let productId = payment.productIdentifier
-            guard let self = self else { return }
+            guard let self else { return }
 
             if let productVariationId = (product as? AdaptyPaywallProduct)?.variationId {
                 self.setVariationId(productVariationId, for: productId)
@@ -34,7 +34,7 @@ extension SK1QueueManager {
 
     func receivedFailedTransaction(_ transaction: SK1Transaction) {
         queue.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             if !Adapty.Configuration.observerMode {
                 SKPaymentQueue.default().finishTransaction(transaction)
@@ -59,9 +59,11 @@ extension SK1QueueManager {
             return
         }
 
-        func fillPurchasedTransaction(manager: SK1QueueManager,
-                                      purchasedSK1Transaction transaction: (value: SK1Transaction, id: String),
-                                      _ completion: @escaping ((PurchasedTransaction) -> Void)) {
+        func fillPurchasedTransaction(
+            manager: SK1QueueManager,
+            purchasedSK1Transaction transaction: (value: SK1Transaction, id: String),
+            _ completion: @escaping ((PurchasedTransaction) -> Void)
+        ) {
             let productId = transaction.value.payment.productIdentifier
             let variationId: String? = manager.variationsIds[productId]
             let persistentVariationId: String? = manager.persistentVariationsIds[productId]
@@ -71,20 +73,22 @@ extension SK1QueueManager {
                 return
             }
 
-            manager.skProductsManager.fillPurchasedTransaction(variationId: variationId,
-                                                               persistentVariationId: persistentVariationId,
-                                                               purchasedSK1Transaction: transaction,
-                                                               completion)
+            manager.skProductsManager.fillPurchasedTransaction(
+                variationId: variationId,
+                persistentVariationId: persistentVariationId,
+                purchasedSK1Transaction: transaction,
+                completion
+            )
         }
 
         queue.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             fillPurchasedTransaction(manager: self, purchasedSK1Transaction: (transaction, transactionIdentifier)) { [weak self] purchasedTransaction in
                 let productId = purchasedTransaction.vendorProductId
 
                 let isObserverMode = Adapty.Configuration.observerMode
                 self?.purchaseValidator.validatePurchase(transaction: purchasedTransaction, reason: isObserverMode ? .observing : .purchasing) { result in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     if result.error == nil {
                         self.removeVariationId(for: productId)
                         self.makePurchasesProduct.removeValue(forKey: productId)
@@ -103,10 +107,12 @@ extension SK1QueueManager {
         }
     }
 
-    func callMakePurchasesCompletionHandlers(_ productId: String,
-                                             _ result: AdaptyResult<AdaptyPurchasedInfo>) {
+    func callMakePurchasesCompletionHandlers(
+        _ productId: String,
+        _ result: AdaptyResult<AdaptyPurchasedInfo>
+    ) {
         queue.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             switch result {
             case let .failure(error):
@@ -120,7 +126,9 @@ extension SK1QueueManager {
                 return
             }
 
-            for completion in handlers { completion(result) }
+            for completion in handlers {
+                completion(result)
+            }
         }
     }
 }

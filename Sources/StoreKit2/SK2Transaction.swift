@@ -24,7 +24,7 @@ extension AdaptyExtension where Extended == SK2Transaction {
     }
 
     var logParams: EventParameters {
-        return [
+        [
             "product_id": .value(this.productID),
             "transaction_is_upgraded": .value(this.isUpgraded),
             "transaction_id": .value(identifier),
@@ -52,7 +52,7 @@ extension AdaptyExtension where Extended == SK2Transaction {
 
     var environment: String {
         #if !os(visionOS)
-        guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
+            guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
                 let environment = this.environmentStringRepresentation
                 return environment.isEmpty ? "storekit2" : environment.lowercased()
             }

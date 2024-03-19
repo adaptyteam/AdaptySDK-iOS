@@ -24,8 +24,8 @@ extension HTTPSession {
     }
 
     @discardableResult
-    final func perform<Request: HTTPRequest>(
-        _ request: Request,
+    final func perform(
+        _ request: some HTTPRequest,
         logName: String,
         logStamp: String = Log.stamp,
         logParams: EventParameters? = nil,

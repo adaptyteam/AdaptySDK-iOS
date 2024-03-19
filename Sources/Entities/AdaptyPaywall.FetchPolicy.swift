@@ -51,7 +51,7 @@ extension AdaptyPaywall.FetchPolicy: Codable {
         case CodingValues.returnCacheDataElseLoad.rawValue:
             self = .returnCacheDataElseLoad
         case CodingValues.returnCacheDataIfNotExpiredElseLoad.rawValue:
-            self = .returnCacheDataIfNotExpiredElseLoad(maxAge: try container.decode(Double.self, forKey: .maxAge))
+            self = try .returnCacheDataIfNotExpiredElseLoad(maxAge: container.decode(Double.self, forKey: .maxAge))
         default:
             self = .default
         }

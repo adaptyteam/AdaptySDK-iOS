@@ -28,8 +28,8 @@ import StoreKit
 
 enum Environment {
     enum Application {
-        static let version: String? = { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String }()
-        static let build: String? = { Bundle.main.infoDictionary?["CFBundleVersion"] as? String }()
+        static let version: String? = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        static let build: String? = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         static let sessionIdentifier = UUID().uuidString.lowercased()
     }
 
@@ -79,7 +79,7 @@ enum Environment {
                 #elseif targetEnvironment(macCatalyst)
                     return Optional.some(UIScreen.main.bounds.size)
                 #elseif os(visionOS)
-                    return Optional<DisplayResolution>.none
+                    return DisplayResolution?.none
                 #else
                     return Optional.some(UIScreen.main.bounds.size)
                 #endif
@@ -123,10 +123,10 @@ enum Environment {
                 var systemInfo = utsname()
                 uname(&systemInfo)
                 let machineMirror = Mirror(reflecting: systemInfo.machine)
-                return machineMirror.children.reduce("", { identifier, element in
+                return machineMirror.children.reduce("") { identifier, element in
                     guard let value = element.value as? Int8, value != 0 else { return identifier }
                     return identifier + String(UnicodeScalar(UInt8(value)))
-                })
+                }
             #endif
         }()
 
@@ -147,9 +147,12 @@ enum Environment {
                 defer { IOObjectRelease(platformExpert) }
 
                 guard platformExpert != 0 else { return nil }
-                return IORegistryEntryCreateCFProperty(platformExpert,
-                                                       kIOPlatformUUIDKey as CFString,
-                                                       kCFAllocatorDefault, 0).takeRetainedValue() as? String
+                return IORegistryEntryCreateCFProperty(
+                    platformExpert,
+                    kIOPlatformUUIDKey as CFString,
+                    kCFAllocatorDefault,
+                    0
+                ).takeRetainedValue() as? String
             #else
                 return UIDevice.current.identifierForVendor?.uuidString
             #endif
@@ -169,7 +172,8 @@ enum Environment {
             let methodName = "fetch_ASA_Token"
             Adapty.logSystemEvent(AdaptyAppleRequestParameters(
                 methodName: methodName,
-                callId: callId))
+                callId: callId
+            ))
 
             let attributionToken: String
             do {
@@ -190,7 +194,8 @@ enum Environment {
                 callId: callId,
                 params: [
                     "token": .value(attributionToken),
-                ]))
+                ]
+            ))
 
             return attributionToken
         }
@@ -201,7 +206,7 @@ enum Environment {
     import AppTrackingTransparency
 
     extension Environment.Device {
-        @available(iOS 14.0, macOS 11.0, tvOS 14.0,visionOS 1.0, *)
+        @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
         static var appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus {
             ATTrackingManager.trackingAuthorizationStatus
         }

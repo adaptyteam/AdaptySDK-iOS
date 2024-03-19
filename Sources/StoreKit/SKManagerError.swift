@@ -20,24 +20,24 @@ extension SKManagerError: CustomStringConvertible {
     var description: String {
         switch self {
         case let .interrupted(source):
-            return "StoreKitManagerError.interrupted(\(source))"
+            "StoreKitManagerError.interrupted(\(source))"
         case let .noProductIDsFound(source):
-            return "StoreKitManagerError.noProductIDsFound(\(source))"
+            "StoreKitManagerError.noProductIDsFound(\(source))"
         case let .receiptIsEmpty(source, error):
-            if let error = error {
-                return "StoreKitManagerError.receiptIsEmpty(\(source), \(error)"
+            if let error {
+                "StoreKitManagerError.receiptIsEmpty(\(source), \(error)"
             } else {
-                return "StoreKitManagerError.receiptIsEmpty(\(source))"
+                "StoreKitManagerError.receiptIsEmpty(\(source))"
             }
         case let .refreshReceiptFailed(source, error):
-            return "StoreKitManagerError.refreshReceiptFailed(\(source), \(error)"
+            "StoreKitManagerError.refreshReceiptFailed(\(source), \(error)"
         case let .requestSKProductsFailed(source, error):
-            return "StoreKitManagerError.requestSK1ProductsFailed(\(source), \(error)"
+            "StoreKitManagerError.requestSK1ProductsFailed(\(source), \(error)"
         case let .productPurchaseFailed(source, error):
-            if let error = error {
-                return "StoreKitManagerError.productPurchaseFailed(\(source), \(error))"
+            if let error {
+                "StoreKitManagerError.productPurchaseFailed(\(source), \(error))"
             } else {
-                return "StoreKitManagerError.productPurchaseFailed(\(source))"
+                "StoreKitManagerError.productPurchaseFailed(\(source))"
             }
         }
     }
@@ -51,32 +51,31 @@ extension SKManagerError {
              let .receiptIsEmpty(src, _),
              let .refreshReceiptFailed(src, _),
              let .requestSKProductsFailed(src, _),
-             let .interrupted(src):
-            return src
+             let .interrupted(src): src
         }
     }
 
     var originalError: Error? {
         switch self {
         case let .receiptIsEmpty(_, error),
-             let .productPurchaseFailed(_, error):
-            return error
+             let .productPurchaseFailed(_, error): error
         case let .refreshReceiptFailed(_, error),
-             let .requestSKProductsFailed(_, error):
-            return error
-        default:
-            return nil
+             let .requestSKProductsFailed(_, error): error
+        default: nil
         }
     }
 
     var skError: SKError? {
-        guard let originalError = originalError else { return nil }
+        guard let originalError else { return nil }
         return originalError as? SKError
     }
 }
 
 extension SKManagerError {
-    static func noProductIDsFound(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func noProductIDsFound(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .noProductIDsFound(AdaptyError.Source(file: file, function: function, line: line))
     }

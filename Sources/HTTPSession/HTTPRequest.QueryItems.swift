@@ -13,7 +13,7 @@ extension HTTPRequest {
 
 extension URLQueryItem {
     init(name: String, value: CustomStringConvertible?) {
-        guard let value = value else {
+        guard let value else {
             self.init(name: name, value: nil)
             return
         }
@@ -21,7 +21,7 @@ extension URLQueryItem {
         self.init(name: name, value: value.description)
     }
 
-    init<T: CustomStringConvertible>(name: String, values: [T]?) {
+    init(name: String, values: [some CustomStringConvertible]?) {
         guard let array = values, !array.isEmpty else {
             self.init(name: name, value: nil)
             return
@@ -31,7 +31,7 @@ extension URLQueryItem {
     }
 }
 
-extension Array where Element == HTTPRequest.QueryItems.Element {
+extension [HTTPRequest.QueryItems.Element] {
     func notNil() -> Self {
         filter { $0.value != nil }
     }
@@ -40,8 +40,8 @@ extension Array where Element == HTTPRequest.QueryItems.Element {
         isEmpty ? nil : self
     }
 
-    init<T: CustomStringConvertible>(key: String, array: [T]?) {
-        guard let array = array else {
+    init(key: String, array: [some CustomStringConvertible]?) {
+        guard let array else {
             self = []
             return
         }

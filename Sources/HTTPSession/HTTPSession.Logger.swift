@@ -13,19 +13,9 @@ extension HTTPSession {
             Log.verbose {
                 let url = request.url
 
-                let query: String
-                if let data = url?.query {
-                    query = " ?\(data)"
-                } else {
-                    query = ""
-                }
+                let query: String = if let data = url?.query { " ?\(data)" } else { "" }
 
-                let path: String
-                if endpoint.path.isEmpty, let url = url {
-                    path = url.relativeString
-                } else {
-                    path = endpoint.path
-                }
+                let path: String = if endpoint.path.isEmpty, let url { url.relativeString } else { endpoint.path }
 
                 return "#API# \(endpoint.method) --> \(path)\(query) [\(stamp)]\n"
                     + "----------REQUEST START----------\n"
@@ -40,12 +30,8 @@ extension HTTPSession {
 
         static func response(_ response: URLResponse?, data: Data?, endpoint: HTTPEndpoint, error: HTTPError?, request: URLRequest, stamp: String) {
             let metrics = "" // logMetrics(nil)
-            let path: String
-            if endpoint.path.isEmpty, let url = response?.url ?? request.url {
-                path = url.relativeString
-            } else {
-                path = endpoint.path
-            }
+            let path: String =
+                if endpoint.path.isEmpty, let url = response?.url ?? request.url { url.relativeString } else { endpoint.path }
 
             func responseAsString(_ response: URLResponse?) -> String {
                 guard let response = response as? HTTPURLResponse else {
@@ -56,13 +42,13 @@ extension HTTPSession {
             }
 
             func dataAsString(_ data: Data?) -> String {
-                guard let data = data, let str = String(data: data, encoding: .utf8), !str.isEmpty else {
+                guard let data, let str = String(data: data, encoding: .utf8), !str.isEmpty else {
                     return ""
                 }
                 return " -d '\(str)'"
             }
 
-            guard let error = error else {
+            guard let error else {
                 Log.verbose {
                     "#API# RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)\n"
                         + "----------RESPONSE START----------\n"
@@ -81,21 +67,21 @@ extension HTTPSession {
             } else {
                 Log.error {
                     if AdaptyLogger.isLogLevel(.verbose), error.statusCode != nil {
-                        return "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)\n"
+                        "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)\n"
                             + "----------RESPONSE START----------\n"
                             + responseAsString(response)
                             + dataAsString(data)
                             + "\n----------RESPONSE END------------"
 
                     } else {
-                        return "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)"
+                        "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)"
                     }
                 }
             }
         }
 
         fileprivate static func logMetrics(_ metrics: URLSessionTaskMetrics?) -> String {
-            guard let metrics = metrics else { return "" }
+            guard let metrics else { return "" }
             guard
                 let m = metrics.transactionMetrics.last,
                 let fetchStartDate = m.fetchStartDate,

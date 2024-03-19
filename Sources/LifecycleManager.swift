@@ -64,9 +64,11 @@ final class LifecycleManager {
 
     private func subscribeForLifecycleEvents() {
         #if canImport(UIKit)
-            NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification,
-                                                   object: nil,
-                                                   queue: nil) { [weak self] _ in
+            NotificationCenter.default.addObserver(
+                forName: UIApplication.didBecomeActiveNotification,
+                object: nil,
+                queue: nil
+            ) { [weak self] _ in
 
                 Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
                 Log.verbose("LifecycleManager: didBecomeActiveNotification")
@@ -79,7 +81,7 @@ final class LifecycleManager {
 
     @objc
     private func syncProfile(completion: @escaping (Bool) -> Void) {
-        if let profileSyncAt = profileSyncAt,
+        if let profileSyncAt,
            Date().timeIntervalSince(profileSyncAt) < Self.profileUpdateInterval {
             completion(false)
             return
@@ -89,7 +91,7 @@ final class LifecycleManager {
 
         if let storeCountry = newStorefrontCountryAvailable {
             Adapty.updateProfile(params: AdaptyProfileParameters(storeCountry: storeCountry)) { [weak self] error in
-                if let error = error {
+                if let error {
                     Log.verbose("LifecycleManager: syncProfile Error: \(error)")
                     completion(false)
                 } else {
@@ -116,7 +118,7 @@ final class LifecycleManager {
     }
 
     private func sendAppOpenedEvent() {
-        if let appOpenedSentAt = appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
+        if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
             Log.verbose("LifecycleManager: sendAppOpenedEvent too early")
             return
         }
@@ -126,7 +128,7 @@ final class LifecycleManager {
         Adapty.logAppOpened { [weak self] error in
             if case let .encoding(_, error) = error?.originalError as? EventsError {
                 Log.error("LifecycleManager: sendAppOpenedEvent Error: \(error)")
-            } else if let error = error {
+            } else if let error {
                 Log.verbose("LifecycleManager: sendAppOpenedEvent Error: \(error)")
             } else {
                 Log.verbose("LifecycleManager: sendAppOpenedEvent Done")

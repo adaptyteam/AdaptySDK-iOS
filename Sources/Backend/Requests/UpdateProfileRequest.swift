@@ -25,43 +25,47 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<AdaptyProfile?, Error>
-
-            if headers.hasSameBackendResponseHash(response.headers) {
-                result = .success(nil)
-            } else {
-                result = jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
-            }
+            let result: Result<AdaptyProfile?, Error> =
+                if headers.hasSameBackendResponseHash(response.headers) {
+                    .success(nil)
+                } else {
+                    jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
+                }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
     }
 
-    init(profileId: String,
-         parameters: AdaptyProfileParameters? = nil,
-         sendEnvironmentMeta: Backend.Request.SendEnvironment,
-         responseHash: String?) {
-        let environmentMeta: Environment.Meta?
+    init(
+        profileId: String,
+        parameters: AdaptyProfileParameters? = nil,
+        sendEnvironmentMeta: Backend.Request.SendEnvironment,
+        responseHash: String?
+    ) {
+        let environmentMeta: Environment.Meta? =
+            switch sendEnvironmentMeta {
+            case .dont:
+                nil
+            case .withAnalytics:
+                Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? false))
+            case .withoutAnalytics:
+                Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? true))
+            }
 
-        switch sendEnvironmentMeta {
-        case .dont:
-            environmentMeta = nil
-        case .withAnalytics:
-            environmentMeta = Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? false))
-        case .withoutAnalytics:
-            environmentMeta = Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? true))
-        }
-
-        self.init(profileId: profileId,
-                  parameters: parameters,
-                  environmentMeta: environmentMeta,
-                  responseHash: responseHash)
+        self.init(
+            profileId: profileId,
+            parameters: parameters,
+            environmentMeta: environmentMeta,
+            responseHash: responseHash
+        )
     }
 
-    init(profileId: String,
-         parameters: AdaptyProfileParameters?,
-         environmentMeta: Environment.Meta?,
-         responseHash: String?) {
+    init(
+        profileId: String,
+        parameters: AdaptyProfileParameters?,
+        environmentMeta: Environment.Meta?,
+        responseHash: String?
+    ) {
         endpoint = HTTPEndpoint(
             method: .patch,
             path: "/sdk/analytics/profiles/\(profileId)/"
@@ -78,7 +82,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
             self.environmentMeta = environmentMeta
             return
         }
-        if var environmentMeta = environmentMeta {
+        if var environmentMeta {
             environmentMeta.includedAnalyticIds = !analyticsDisabled
             self.environmentMeta = environmentMeta
         } else {
@@ -99,12 +103,12 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         try dataObject.encode("adapty_analytics_profile", forKey: .type)
         try dataObject.encode(profileId, forKey: .id)
 
-        if let parameters = parameters {
+        if let parameters {
             try dataObject.encode(parameters, forKey: .attributes)
         }
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
 
-        if let environmentMeta = environmentMeta {
+        if let environmentMeta {
             try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
             try attributesObject.encodeIfPresent(environmentMeta.storeCountry, forKey: .storeCountry)
             try attributesObject.encodeIfPresent(environmentMeta.ipV4Address, forKey: .ipV4Address)
@@ -116,15 +120,19 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 }
 
 extension HTTPSession {
-    func performUpdateProfileRequest(profileId: String,
-                                     parameters: AdaptyProfileParameters?,
-                                     sendEnvironmentMeta: Backend.Request.SendEnvironment,
-                                     responseHash: String?,
-                                     _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
-        let request = UpdateProfileRequest(profileId: profileId,
-                                           parameters: parameters,
-                                           sendEnvironmentMeta: sendEnvironmentMeta,
-                                           responseHash: responseHash)
+    func performUpdateProfileRequest(
+        profileId: String,
+        parameters: AdaptyProfileParameters?,
+        sendEnvironmentMeta: Backend.Request.SendEnvironment,
+        responseHash: String?,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
+    ) {
+        let request = UpdateProfileRequest(
+            profileId: profileId,
+            parameters: parameters,
+            sendEnvironmentMeta: sendEnvironmentMeta,
+            responseHash: responseHash
+        )
         perform(request, logName: "update_profile") { (result: UpdateProfileRequest.Result) in
             switch result {
             case let .failure(error):

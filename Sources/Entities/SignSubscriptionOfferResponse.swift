@@ -24,7 +24,7 @@ struct SignSubscriptionOfferResponse: Decodable, Equatable {
         keyIdentifier = try container.decode(String.self, forKey: .keyIdentifier)
         nonce = try container.decode(UUID.self, forKey: .nonce)
         signature = try container.decode(String.self, forKey: .signature)
-        guard let timestamp = Int64(try container.decode(String.self, forKey: .timestamp)) else {
+        guard let timestamp = try Int64(container.decode(String.self, forKey: .timestamp)) else {
             throw DecodingError.dataCorruptedError(forKey: .timestamp, in: container, debugDescription: "Wrong format of timestamp.")
         }
         self.timestamp = NSNumber(value: timestamp)

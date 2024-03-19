@@ -5,11 +5,10 @@
 //  Created by larryonoff on 4/26/22.
 //
 
-
 import StoreKit
 
 #if canImport(_Concurrency) && compiler(>=5.5.2)
-    @available(iOS 13.0, macOS 10.15,  watchOS 6.0, tvOS 13.0, visionOS 1.0, *)
+    @available(iOS 13.0, macOS 10.15, watchOS 6.0, tvOS 13.0, visionOS 1.0, *)
     extension Adapty {
         /// Use this method to initialize the Adapty SDK.
         ///
@@ -19,16 +18,20 @@ import StoreKit
         /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
         /// - Parameter customerUserId: User identifier in your system
         /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
-        public static func activate(_ apiKey: String,
-                                    observerMode: Bool = false,
-                                    customerUserId: String? = nil,
-                                    dispatchQueue: DispatchQueue = .main) async throws {
+        public static func activate(
+            _ apiKey: String,
+            observerMode: Bool = false,
+            customerUserId: String? = nil,
+            dispatchQueue: DispatchQueue = .main
+        ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.activate(apiKey,
-                                observerMode: observerMode,
-                                customerUserId: customerUserId,
-                                dispatchQueue: dispatchQueue) { error in
-                    if let error = error {
+                Adapty.activate(
+                    apiKey,
+                    observerMode: observerMode,
+                    customerUserId: customerUserId,
+                    dispatchQueue: dispatchQueue
+                ) { error in
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -47,7 +50,7 @@ import StoreKit
         public static func identify(_ customerUserId: String) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.identify(customerUserId) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -81,7 +84,7 @@ import StoreKit
         public static func updateProfile(params: AdaptyProfileParameters) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.updateProfile(params: params) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -105,7 +108,7 @@ import StoreKit
         ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.updateAttribution(attribution, source: source, networkUserId: networkUserId) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -281,7 +284,7 @@ import StoreKit
         public static func setFallbackPaywalls(_ paywalls: Data) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.setFallbackPaywalls(paywalls) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -304,7 +307,7 @@ import StoreKit
         public static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.logShowPaywall(paywall) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -326,13 +329,15 @@ import StoreKit
         ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
         /// - Throws: An ``AdaptyError`` object
         public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
-            let params = AdaptyOnboardingScreenParameters(name: name,
-                                                          screenName: screenName,
-                                                          screenOrder: screenOrder)
+            let params = AdaptyOnboardingScreenParameters(
+                name: name,
+                screenName: screenName,
+                screenOrder: screenOrder
+            )
 
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.logShowOnboarding(params) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -356,7 +361,7 @@ import StoreKit
         ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.setVariationId(variationId, forPurchasedTransaction: transaction) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -381,7 +386,7 @@ import StoreKit
         ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.setVariationId(variationId, forPurchasedTransaction: transaction) { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(
@@ -396,7 +401,7 @@ import StoreKit
         public static func logout() async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.logout { error in
-                    if let error = error {
+                    if let error {
                         return continuation.resume(throwing: error)
                     }
                     continuation.resume(

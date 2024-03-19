@@ -90,15 +90,15 @@ final class SKProductsManager {
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func fetchSK2Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK2Product]>) {
-        guard let storeKit2Fetcher = storeKit2Fetcher else {
+        guard let storeKit2Fetcher else {
             Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
             completion(.success([]))
             return
         }
         Task {
             do {
-                completion(.success(
-                    try await storeKit2Fetcher.fetchProducts(productIdentifiers: productIds, fetchPolicy: fetchPolicy, retryCount: retryCount)
+                try await completion(.success(
+                    storeKit2Fetcher.fetchProducts(productIdentifiers: productIds, fetchPolicy: fetchPolicy, retryCount: retryCount)
                 ))
             } catch {
                 completion(.failure(
@@ -110,12 +110,12 @@ final class SKProductsManager {
 
     private func fetchAllProducts() {
         queue.async { [weak self] in
-            guard let self = self, !self.sending else { return }
+            guard let self, !self.sending else { return }
             self.sending = true
             let request = FetchAllProductVendorIdsRequest(apiKeyPrefix: self.apiKeyPrefix)
             self.session.perform(request, logName: "get_products_ids") { [weak self] (result: FetchAllProductVendorIdsRequest.Result) in
                 defer { self?.sending = false }
-                guard let self = self else { return }
+                guard let self else { return }
                 switch result {
                 case let .success(response):
                     self.cache.setProductVendorIds(VH(response.body.value, time: Date()))
@@ -168,7 +168,7 @@ extension SKProductsManager {
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func getSK2IntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
-        guard let storeKit2Fetcher = storeKit2Fetcher else {
+        guard let storeKit2Fetcher else {
             Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
             completion(.success([:]))
             return

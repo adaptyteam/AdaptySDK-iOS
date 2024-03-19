@@ -1,5 +1,5 @@
 //
-//  AdaptyLogger.swift
+//  AdaptyLogLevel.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.10.2022.
@@ -49,19 +49,19 @@ extension AdaptyLogLevel: Codable {
     }
 
     public var rawStringValue: String {
-        let value: CodingValues
-        switch self {
-        case .error: value = .error
-        case .warn: value = .warn
-        case .info: value = .info
-        case .verbose: value = .verbose
-        case .debug: value = .debug
-        }
+        let value: CodingValues =
+            switch self {
+            case .error: .error
+            case .warn: .warn
+            case .info: .info
+            case .verbose: .verbose
+            case .debug: .debug
+            }
         return value.rawValue
     }
 
     public init(from decoder: Decoder) throws {
-        guard let value = AdaptyLogLevel(rawStringValue: try decoder.singleValueContainer().decode(String.self)) else {
+        guard let value = try AdaptyLogLevel(rawStringValue: decoder.singleValueContainer().decode(String.self)) else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "unknown value"))
         }
         self = value

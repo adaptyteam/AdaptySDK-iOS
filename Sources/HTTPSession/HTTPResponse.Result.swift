@@ -14,19 +14,15 @@ extension HTTPResponse {
 extension Result where Failure == HTTPError {
     var value: Success? {
         switch self {
-        case let .success(v):
-            return v
-        default:
-            return nil
+        case let .success(v): v
+        default: nil
         }
     }
 
     var error: HTTPError? {
         switch self {
-        case let .failure(e):
-            return e
-        default:
-            return nil
+        case let .failure(e): e
+        default: nil
         }
     }
 }

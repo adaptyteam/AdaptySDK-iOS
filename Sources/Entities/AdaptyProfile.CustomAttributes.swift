@@ -23,29 +23,29 @@ extension AdaptyProfile.CustomAttributeValue {
     var hasValue: Bool {
         switch self {
         case .nil:
-            return false
+            false
         default:
-            return true
+            true
         }
     }
 
     var rawValue: Any? {
         switch self {
         case .nil:
-            return nil
+            nil
         case let .string(value):
-            return value
+            value
         case let .float(value):
-            return value
+            value
         }
     }
 
     func validate() -> AdaptyError? {
         switch self {
         case let .string(value):
-            return (value.isEmpty || value.count > 50) ? .wrongStringValueOfCustomAttribute() : nil
+            (value.isEmpty || value.count > 50) ? .wrongStringValueOfCustomAttribute() : nil
         default:
-            return nil
+            nil
         }
     }
 }

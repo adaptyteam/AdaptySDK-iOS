@@ -20,7 +20,7 @@ extension AdaptyAttributionSource: CustomStringConvertible {
 
 extension AdaptyAttributionSource: Codable {
     public init(from decoder: Decoder) throws {
-        guard let value = AdaptyAttributionSource(rawValue: try decoder.singleValueContainer().decode(String.self)) else {
+        guard let value = try AdaptyAttributionSource(rawValue: decoder.singleValueContainer().decode(String.self)) else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "unknown value"))
         }
         self = value

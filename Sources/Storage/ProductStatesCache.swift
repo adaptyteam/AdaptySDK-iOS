@@ -31,7 +31,7 @@ final class ProductStatesCache {
     var productsHash: String? { products?.hash }
 
     func setBackendProductStates(_ products: VH<[BackendProductState]>?) {
-        guard let products = products else { return }
+        guard let products else { return }
         var updated = false
 
         let array = products.mapValue {

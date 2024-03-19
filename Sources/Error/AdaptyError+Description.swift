@@ -10,14 +10,14 @@ import Foundation
 extension InternalAdaptyError: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
-        case .activateOnceError: return "You need to be activate Adapty once"
-        case .cantMakePayments: return "In-App Purchases are not allowed on this device"
-        case .notActivated: return "The Adapty is not activated"
-        case .profileWasChanged: return "The user profile was replaced"
-        case .profileCreateFailed: return "Unable to create user profile"
-        case let .decodingFailed(_, description, _): return description
-        case let .wrongParam(_, description): return description
-        case let .fetchTimeoutError(_, description): return description
+        case .activateOnceError: "You need to be activate Adapty once"
+        case .cantMakePayments: "In-App Purchases are not allowed on this device"
+        case .notActivated: "The Adapty is not activated"
+        case .profileWasChanged: "The user profile was replaced"
+        case .profileCreateFailed: "Unable to create user profile"
+        case let .decodingFailed(_, description, _): description
+        case let .wrongParam(_, description): description
+        case let .fetchTimeoutError(_, description): description
         }
     }
 }
@@ -37,10 +37,10 @@ extension HTTPError: CustomDebugStringConvertible {
 extension EventsError: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
-        case .interrupted: return "Operation interrupted"
-        case .sending: return "Network request failed"
-        case .decoding: return "Event decoding failed"
-        case .encoding: return "Event encoding failed"
+        case .interrupted: "Operation interrupted"
+        case .sending: "Network request failed"
+        case .decoding: "Event decoding failed"
+        case .encoding: "Event encoding failed"
         }
     }
 }
@@ -48,12 +48,12 @@ extension EventsError: CustomDebugStringConvertible {
 extension SKManagerError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
-        case .interrupted: return "Operation interrupted"
-        case .noProductIDsFound: return "No In-App Purchase product identifiers were found."
-        case .receiptIsEmpty: return "Can't find a valid receipt"
-        case .refreshReceiptFailed: return "Refresh receipt failed"
-        case .productPurchaseFailed: return "Product purchase failed"
-        case .requestSKProductsFailed: return "Request products form App Store failed"
+        case .interrupted: "Operation interrupted"
+        case .noProductIDsFound: "No In-App Purchase product identifiers were found."
+        case .receiptIsEmpty: "Can't find a valid receipt"
+        case .refreshReceiptFailed: "Refresh receipt failed"
+        case .productPurchaseFailed: "Product purchase failed"
+        case .requestSKProductsFailed: "Request products form App Store failed"
         }
     }
 }

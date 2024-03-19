@@ -27,7 +27,7 @@ internal final class SK1ReceiptManager: NSObject {
 
     internal func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         queue.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
                 return
             }
@@ -43,14 +43,16 @@ internal final class SK1ReceiptManager: NSObject {
             Log.debug("SK1ReceiptManager: Start validateReceipt validateCompletionHandlers.count = \(self.validateCompletionHandlers?.count ?? 0)")
 
             self.getReceipt(refreshIfEmpty: refreshIfEmpty) { [weak self] result in
-                guard let self = self else { return }
+                guard let self else { return }
                 switch result {
                 case let .failure(error):
                     completedValidate(.failure(error))
                 case let .success(receipt):
-                    self.session.performValidateReceiptRequest(profileId: self.storage.profileId,
-                                                               receipt: receipt,
-                                                               completedValidate)
+                    self.session.performValidateReceiptRequest(
+                        profileId: self.storage.profileId,
+                        receipt: receipt,
+                        completedValidate
+                    )
                 }
             }
         }
@@ -69,7 +71,7 @@ internal final class SK1ReceiptManager: NSObject {
 
     internal func getReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<Data>) {
         queue.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
                 return
             }
@@ -121,7 +123,7 @@ internal final class SK1ReceiptManager: NSObject {
 
     private func refresh(_ completion: @escaping AdaptyResultCompletion<Data>) {
         queue.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
                 return
             }
@@ -149,7 +151,7 @@ internal final class SK1ReceiptManager: NSObject {
 
             Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "refresh_receipt", callId: "SKR\(request.hash)", error: error?.description))
 
-            guard let self = self else { return }
+            guard let self else { return }
 
             guard let handlers = self.refreshCompletionHandlers, !handlers.isEmpty else {
                 Log.error("SK1ReceiptManager: Not found refreshCompletionHandlers")
@@ -158,7 +160,7 @@ internal final class SK1ReceiptManager: NSObject {
             self.refreshCompletionHandlers = nil
 
             let result: AdaptyResult<Data>
-            if let error = error {
+            if let error {
                 Log.error("SK1ReceiptManager: Refresh receipt failed. \(error)")
                 result = .failure(error)
             } else {

@@ -23,21 +23,21 @@ extension InternalAdaptyError: CustomStringConvertible {
     var description: String {
         switch self {
         case let .activateOnceError(source):
-            return "AdaptyError.activateOnceError(\(source))"
+            "AdaptyError.activateOnceError(\(source))"
         case let .cantMakePayments(source):
-            return "AdaptyError.cantMakePayments(\(source))"
+            "AdaptyError.cantMakePayments(\(source))"
         case let .notActivated(source):
-            return "AdaptyError.notActivated(\(source))"
+            "AdaptyError.notActivated(\(source))"
         case let .profileWasChanged(source):
-            return "AdaptyError.profileWasChanged(\(source))"
+            "AdaptyError.profileWasChanged(\(source))"
         case let .profileCreateFailed(source, error):
-            return "AdaptyError.profileCreateFailed(\(source), \(error))"
+            "AdaptyError.profileCreateFailed(\(source), \(error))"
         case let .decodingFailed(source, description, error):
-            return "AdaptyError.decodingFailed(\(source), \(description), \(error))"
+            "AdaptyError.decodingFailed(\(source), \(description), \(error))"
         case let .wrongParam(source, description):
-            return "AdaptyError.wrongParam(\(source), \(description))"
+            "AdaptyError.wrongParam(\(source), \(description))"
         case let .fetchTimeoutError(source, description):
-            return "AdaptyError.fetchTimeoutError(\(source), \(description))"
+            "AdaptyError.fetchTimeoutError(\(source), \(description))"
         }
     }
 }
@@ -53,18 +53,18 @@ extension InternalAdaptyError {
              let .decodingFailed(src, _, _),
              let .wrongParam(src, _),
              let .fetchTimeoutError(src, _):
-            return src
+            src
         }
     }
 
     var originalError: Error? {
         switch self {
         case let .profileCreateFailed(_, error):
-            return error
+            error
         case let .decodingFailed(_, _, error):
-            return error
+            error
         default:
-            return nil
+            nil
         }
     }
 }
@@ -74,14 +74,14 @@ extension InternalAdaptyError: CustomNSError {
 
     var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
-        case .activateOnceError: return AdaptyError.ErrorCode.activateOnceError
-        case .cantMakePayments: return AdaptyError.ErrorCode.cantMakePayments
-        case .notActivated: return AdaptyError.ErrorCode.notActivated
-        case .profileWasChanged: return AdaptyError.ErrorCode.profileWasChanged
-        case let .profileCreateFailed(_, error): return error.adaptyErrorCode
-        case .decodingFailed: return AdaptyError.ErrorCode.decodingFailed
-        case .wrongParam: return AdaptyError.ErrorCode.wrongParam
-        case .fetchTimeoutError: return AdaptyError.ErrorCode.fetchTimeoutError
+        case .activateOnceError: AdaptyError.ErrorCode.activateOnceError
+        case .cantMakePayments: AdaptyError.ErrorCode.cantMakePayments
+        case .notActivated: AdaptyError.ErrorCode.notActivated
+        case .profileWasChanged: AdaptyError.ErrorCode.profileWasChanged
+        case let .profileCreateFailed(_, error): error.adaptyErrorCode
+        case .decodingFailed: AdaptyError.ErrorCode.decodingFailed
+        case .wrongParam: AdaptyError.ErrorCode.wrongParam
+        case .fetchTimeoutError: AdaptyError.ErrorCode.fetchTimeoutError
         }
     }
 
@@ -93,7 +93,7 @@ extension InternalAdaptyError: CustomNSError {
             AdaptyError.UserInfoKey.source: source.description,
         ]
 
-        if let originalError = originalError {
+        if let originalError {
             data[NSUnderlyingErrorKey] = originalError as NSError
         }
         return data
@@ -131,57 +131,94 @@ extension AdaptyError {
         }
     }
 
-    static func decodingFallback(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    static func decodingFallback(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding Fallback Paywalls failed", error: error).asAdaptyError
     }
 
-    static func decodingSetVariationIdParams(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    static func decodingSetVariationIdParams(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding SetVariationIdParams failed", error: error).asAdaptyError
     }
 
-    static func decodingGetViewConfiguration(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    static func decodingGetViewConfiguration(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding GetViewConfigurationParams failed", error: error).asAdaptyError
     }
 
-    static func decodingPaywallProduct(_ error: Error, file: String = #fileID, function: String = #function, line: UInt = #line
+    static func decodingPaywallProduct(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding AdaptyPaywallProduct failed", error: error).asAdaptyError
     }
 
-    static func wrongParamPurchasedTransaction(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func wrongParamPurchasedTransaction(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Transaction is not in \"purchased\" state").asAdaptyError
     }
 
-    static func wrongParamOnboardingScreenOrder(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func wrongParamOnboardingScreenOrder(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Wrong screenOrder parameter value, it should be more than zero.").asAdaptyError
     }
 
-    static func wrongKeyOfCustomAttribute(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func wrongKeyOfCustomAttribute(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The key must be string not more than 30 characters. Only letters, numbers, dashes, points and underscores allowed").asAdaptyError
     }
 
-    static func wrongStringValueOfCustomAttribute(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func wrongStringValueOfCustomAttribute(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The value must not be empty and not more than 50 characters.").asAdaptyError
     }
 
-    static func wrongCountCustomAttributes(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func wrongCountCustomAttributes(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
 
-    static func fetchPaywallTimeout(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func fetchPaywallTimeout(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request Paywall timeout").asAdaptyError
     }
 
-    static func fetchViewConfigurationTimeout(file: String = #fileID, function: String = #function, line: UInt = #line
+    static func fetchViewConfigurationTimeout(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request ViewConfiguration timeout").asAdaptyError
     }

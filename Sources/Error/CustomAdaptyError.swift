@@ -18,7 +18,7 @@ extension CustomAdaptyError {
     }
 }
 
-extension InternalAdaptyError: CustomAdaptyError { }
+extension InternalAdaptyError: CustomAdaptyError {}
 
 extension HTTPError: CustomAdaptyError {
     static let errorDomain = AdaptyError.HTTPErrorDomain
@@ -31,10 +31,10 @@ extension HTTPError: CustomAdaptyError {
             AdaptyError.UserInfoKey.source: source.description,
             AdaptyError.UserInfoKey.endpoint: endpoint.description,
         ]
-        if let statusCode = statusCode {
+        if let statusCode {
             data[AdaptyError.UserInfoKey.statusCode] = NSNumber(value: statusCode)
         }
-        if let originalError = originalError {
+        if let originalError {
             data[NSUnderlyingErrorKey] = originalError as NSError
         }
         return data
@@ -62,7 +62,7 @@ extension EventsError: CustomAdaptyError {
             AdaptyError.UserInfoKey.description: debugDescription,
             AdaptyError.UserInfoKey.source: source.description,
         ]
-        if let originalError = originalError {
+        if let originalError {
             data[NSUnderlyingErrorKey] = originalError as NSError
         }
         return data
@@ -70,10 +70,10 @@ extension EventsError: CustomAdaptyError {
 
     var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
-        case .sending: return .networkFailed
-        case .encoding: return .encodingFailed
-        case .decoding: return .decodingFailed
-        case .interrupted: return .operationInterrupted
+        case .sending: .networkFailed
+        case .encoding: .encodingFailed
+        case .decoding: .decodingFailed
+        case .interrupted: .operationInterrupted
         }
     }
 }
@@ -88,7 +88,7 @@ extension SKManagerError: CustomAdaptyError {
             AdaptyError.UserInfoKey.description: debugDescription,
             AdaptyError.UserInfoKey.source: source.description,
         ]
-        if let originalError = originalError {
+        if let originalError {
             data[NSUnderlyingErrorKey] = originalError as NSError
         }
         return data
@@ -107,7 +107,7 @@ extension SKManagerError: CustomAdaptyError {
     }
 
     func convertErrorCode(_ error: SKError?) -> AdaptyError.ErrorCode? {
-        guard let error = error else { return nil }
+        guard let error else { return nil }
         return AdaptyError.ErrorCode(rawValue: error.code.rawValue)
     }
 }

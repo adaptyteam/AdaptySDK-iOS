@@ -18,19 +18,15 @@ extension PurchasedTransaction {
 }
 
 extension PurchasedTransaction.OfferType {
-
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     init(type: SK2Transaction.OfferType) {
-        switch type {
-        case .introductory:
-            self = .introductory
-        case .promotional:
-            self = .promotional
-        case .code:
-            self = .code
-        default:
-            self = .unknown
-        }
+        self =
+            switch type {
+            case .introductory: .introductory
+            case .promotional: .promotional
+            case .code: .code
+            default: .unknown
+            }
     }
 }
 
@@ -45,13 +41,13 @@ extension PurchasedTransaction.OfferType: Encodable {
     }
 
     func encode(to encoder: Encoder) throws {
-        let value: CodingValues
-        switch self {
-        case .introductory: value = .introductory
-        case .promotional: value = .promotional
-        case .code: value = .code
-        case .unknown: value = .unknown
-        }
+        let value: CodingValues =
+            switch self {
+            case .introductory: .introductory
+            case .promotional: .promotional
+            case .code: .code
+            case .unknown: .unknown
+            }
 
         var container = encoder.singleValueContainer()
         try container.encode(value.rawValue)

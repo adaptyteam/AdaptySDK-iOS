@@ -33,11 +33,13 @@ struct PurchasedTransaction {
             price = nil
         }
 
-        init(id: String?,
-             period: AdaptyProductSubscriptionPeriod?,
-             paymentMode: AdaptyProductDiscount.PaymentMode,
-             type: PurchasedTransaction.OfferType,
-             price: Decimal?) {
+        init(
+            id: String?,
+            period: AdaptyProductSubscriptionPeriod?,
+            paymentMode: AdaptyProductDiscount.PaymentMode,
+            type: PurchasedTransaction.OfferType,
+            price: Decimal?
+        ) {
             self.id = id
             self.period = period
             self.paymentMode = paymentMode

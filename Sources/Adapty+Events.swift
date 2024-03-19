@@ -52,9 +52,11 @@ extension Adapty {
     ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
     ///   - completion: Result callback.
     public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt, _ completion: AdaptyErrorCompletion? = nil) {
-        let params = AdaptyOnboardingScreenParameters(name: name,
-                                                      screenName: screenName,
-                                                      screenOrder: screenOrder)
+        let params = AdaptyOnboardingScreenParameters(
+            name: name,
+            screenName: screenName,
+            screenOrder: screenOrder
+        )
         logShowOnboarding(params, completion)
     }
 

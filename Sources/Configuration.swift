@@ -1,5 +1,5 @@
 //
-//  Application.swift
+//  Configuration.swift
 //  AdaptySDK
 //
 //  Created by Dmitry Obukhov on 3/17/20.
@@ -9,9 +9,7 @@ import Foundation
 
 extension Adapty {
     enum Configuration {
-        static let appleSearchAdsAttributionCollectionEnabled: Bool = {
-            Bundle.main.infoDictionary?["AdaptyAppleSearchAdsAttributionCollectionEnabled"] as? Bool ?? false
-        }()
+        static let appleSearchAdsAttributionCollectionEnabled: Bool = Bundle.main.infoDictionary?["AdaptyAppleSearchAdsAttributionCollectionEnabled"] as? Bool ?? false
 
         static var idfaCollectionDisabled: Bool = false
 
@@ -19,7 +17,7 @@ extension Adapty {
 
         static var storeKit2Enabled: String {
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else { return "unavailable" }
-            return  "enabled"
+            return "enabled"
         }
 
         static var backendBaseUrl: URL?

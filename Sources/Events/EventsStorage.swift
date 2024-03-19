@@ -74,7 +74,6 @@ final class EventCollectionStorage {
     }
 }
 
-
 extension EventsStorage {
     fileprivate func getEvents() -> [Event.Info]? {
         guard let array: [Data] = getEvents() else { return nil }

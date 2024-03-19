@@ -49,5 +49,4 @@ struct EventCollection<Element> {
         guard toLimit >= 0 else { return }
         removeFirst(elements.count - toLimit)
     }
-
 }

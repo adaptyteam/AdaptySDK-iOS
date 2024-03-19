@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol HTTPEncodableRequest: HTTPDataRequest, Encodable { }
+protocol HTTPEncodableRequest: HTTPDataRequest, Encodable {}
 
 extension HTTPEncodableRequest {
     func getData(configuration: HTTPConfiguration) throws -> Data? {

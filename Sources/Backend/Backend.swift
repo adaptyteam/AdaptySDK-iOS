@@ -38,12 +38,16 @@ extension Backend {
     enum Request {}
     enum Response {}
 
-    func createHTTPSession(responseQueue: DispatchQueue,
-                           errorHandler: ((HTTPError) -> Void)? = nil) -> HTTPSession {
-        HTTPSession(configuration: self,
-                    responseQueue: responseQueue,
-                    requestAdditional: nil,
-                    responseValidator: validator,
-                    errorHandler: errorHandler)
+    func createHTTPSession(
+        responseQueue: DispatchQueue,
+        errorHandler: ((HTTPError) -> Void)? = nil
+    ) -> HTTPSession {
+        HTTPSession(
+            configuration: self,
+            responseQueue: responseQueue,
+            requestAdditional: nil,
+            responseValidator: validator,
+            errorHandler: errorHandler
+        )
     }
 }

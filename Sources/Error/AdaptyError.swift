@@ -22,7 +22,7 @@ extension AdaptyError {
     }
 
     public enum ErrorCode: Int {
-        // system StoreKit codes
+
         case unknown = 0
 
         /// Client is not allowed to make a request, etc.

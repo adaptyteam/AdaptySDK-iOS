@@ -1,5 +1,5 @@
 //
-//  AdaptyManager.swift
+//  AdaptyProfileManager.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.10.2022.
@@ -16,10 +16,12 @@ final class AdaptyProfileManager {
 
     var isActive: Bool = true
 
-    init(manager: Adapty,
-         paywallStorage: PaywallsStorage,
-         productStorage: BackendProductStatesStorage,
-         profile: VH<AdaptyProfile>) {
+    init(
+        manager: Adapty,
+        paywallStorage: PaywallsStorage,
+        productStorage: BackendProductStatesStorage,
+        profile: VH<AdaptyProfile>
+    ) {
         self.manager = manager
         profileId = profile.value.profileId
         self.profile = profile
@@ -44,7 +46,7 @@ extension AdaptyProfileManager {
             let out: AdaptyResult<AdaptyProfile>
             defer { completion(out) }
 
-            guard let self = self, self.isActive else {
+            guard let self, self.isActive else {
                 out = .failure(.profileWasChanged())
                 return
             }
@@ -98,7 +100,7 @@ extension AdaptyProfileManager {
 
     internal func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
         guard isActive,
-              let newProfile = newProfile,
+              let newProfile,
               profile.value.profileId == newProfile.value.profileId,
               profile.value.version <= newProfile.value.version
         else { return }
@@ -125,7 +127,7 @@ extension AdaptyProfileManager {
 
         manager.skProductsManager.fillPurchasedTransaction(variationId: variationId, purchasedSK1Transaction: (transaction, transactionIdentifier)) { [weak self] purchasedTransaction in
 
-            guard let self = self, self.isActive else {
+            guard let self, self.isActive else {
                 completion(.profileWasChanged())
                 return
             }
@@ -138,7 +140,7 @@ extension AdaptyProfileManager {
     func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK2Transaction, _ completion: @escaping AdaptyErrorCompletion) {
         manager.skProductsManager.fillPurchasedTransaction(variationId: variationId, purchasedSK2Transaction: transaction) { [weak self] purchasedTransaction in
 
-            guard let self = self, self.isActive else {
+            guard let self, self.isActive else {
                 completion(.profileWasChanged())
                 return
             }
@@ -158,7 +160,7 @@ extension AdaptyProfileManager {
                 return
             }
 
-            guard let self = self, self.isActive else {
+            guard let self, self.isActive else {
                 completion(.failure(.profileWasChanged()))
                 return
             }
@@ -170,7 +172,7 @@ extension AdaptyProfileManager {
     private func _getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
         manager.httpSession.performFetchProductStatesRequest(profileId: profileId, responseHash: productStatesCache.productsHash) { [weak self] (result: AdaptyResult<VH<[BackendProductState]?>>) in
 
-            guard let self = self, self.isActive else {
+            guard let self, self.isActive else {
                 completion(.failure(.profileWasChanged()))
                 return
             }

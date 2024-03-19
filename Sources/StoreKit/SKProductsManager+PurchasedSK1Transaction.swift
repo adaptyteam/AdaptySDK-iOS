@@ -8,10 +8,12 @@
 import StoreKit
 
 extension SKProductsManager {
-    func fillPurchasedTransaction(variationId: String?,
-                                  persistentVariationId: String? = nil,
-                                  purchasedSK1Transaction transaction: (value: SK1Transaction, id: String),
-                                  _ completion: @escaping (PurchasedTransaction) -> Void) {
+    func fillPurchasedTransaction(
+        variationId: String?,
+        persistentVariationId: String? = nil,
+        purchasedSK1Transaction transaction: (value: SK1Transaction, id: String),
+        _ completion: @escaping (PurchasedTransaction) -> Void
+    ) {
         let productId = transaction.value.payment.productIdentifier
 
         fetchSK1Product(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
@@ -52,19 +54,18 @@ private extension PurchasedTransaction {
         purchasedSK1Transaction transaction: (value: SK1Transaction, id: String)
     ) {
         let (transaction, transactionIdentifier) = transaction
-        let offer: PurchasedTransaction.SubscriptionOffer?
-
-        if let discountIdentifier = transaction.payment.paymentDiscount?.identifier {
-            if let discount = sk1Product?.discounts.first(where: { $0.identifier == discountIdentifier }) {
-                offer = PurchasedTransaction.SubscriptionOffer.promotional(discount)
+        let offer: PurchasedTransaction.SubscriptionOffer? =
+            if let discountIdentifier = transaction.payment.paymentDiscount?.identifier {
+                if let discount = sk1Product?.discounts.first(where: { $0.identifier == discountIdentifier }) {
+                    PurchasedTransaction.SubscriptionOffer.promotional(discount)
+                } else {
+                    .init(id: discountIdentifier, type: .promotional)
+                }
+            } else if let discount = sk1Product?.introductoryPrice {
+                PurchasedTransaction.SubscriptionOffer.introductory(discount)
             } else {
-                offer = .init(id: discountIdentifier, type: .promotional)
+                nil
             }
-        } else if let discount = sk1Product?.introductoryPrice {
-            offer = PurchasedTransaction.SubscriptionOffer.introductory(discount)
-        } else {
-            offer = nil
-        }
 
         self.init(
             transactionId: transaction.ext.identifier ?? transactionIdentifier,

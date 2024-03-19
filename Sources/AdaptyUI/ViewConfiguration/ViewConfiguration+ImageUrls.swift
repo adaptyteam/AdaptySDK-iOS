@@ -1,5 +1,5 @@
 //
-//  ViewConfiguration+extractLocale.swift
+//  ViewConfiguration+ImageUrls.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 06.03.2024

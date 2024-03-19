@@ -30,26 +30,36 @@ private struct SetTransactionVariationIdRequest: HTTPEncodableRequest {
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = try encoder.backendContainer(type: "adapty_analytics_transaction_variation_id", keyedBy: CodingKeys.self)
+        var container = try encoder.backendContainer(
+            type: "adapty_analytics_transaction_variation_id",
+            keyedBy: CodingKeys.self
+        )
         try container.encode(transactionId, forKey: .transactionId)
         try container.encode(variationId, forKey: .variationId)
     }
 }
 
 extension HTTPSession {
-    func performSetTransactionVariationIdRequest(profileId: String,
-                                                 transactionId: String,
-                                                 variationId: String,
-                                                 _ completion: AdaptyErrorCompletion?) {
-        let request = SetTransactionVariationIdRequest(profileId: profileId,
-                                                       transactionId: transactionId,
-                                                       variationId: variationId)
-        perform(request,
-                logName: "set_variation_id",
-                logParams: [
-                    "transaction_id": .value(transactionId),
-                    "variation_id": .value(variationId),
-                ]) { (result: SetTransactionVariationIdRequest.Result) in
+    func performSetTransactionVariationIdRequest(
+        profileId: String,
+        transactionId: String,
+        variationId: String,
+        _ completion: AdaptyErrorCompletion?
+    ) {
+        let request = SetTransactionVariationIdRequest(
+            profileId: profileId,
+            transactionId: transactionId,
+            variationId: variationId
+        )
+        
+        perform(
+            request,
+            logName: "set_variation_id",
+            logParams: [
+                "transaction_id": .value(transactionId),
+                "variation_id": .value(variationId),
+            ]
+        ) { (result: SetTransactionVariationIdRequest.Result) in
             switch result {
             case let .failure(error):
                 completion?(error.asAdaptyError)

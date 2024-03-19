@@ -41,9 +41,11 @@ private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDeco
 }
 
 extension HTTPSession {
-    func performValidateReceiptRequest(profileId: String,
-                                       receipt: Data,
-                                       _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+    func performValidateReceiptRequest(
+        profileId: String,
+        receipt: Data,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
+    ) {
         let request = ValidateReceiptRequest(profileId: profileId, receipt: receipt)
 
         perform(request, logName: "validate_receipt") { (result: ValidateReceiptRequest.Result) in

@@ -28,19 +28,25 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPSession {
-    func performSignSubscriptionOfferRequest(profileId: String,
-                                             vendorProductId: String,
-                                             discountId: String,
-                                             _ completion: @escaping AdaptyResultCompletion<SignSubscriptionOfferResponse>) {
-        let request = SignSubscriptionOfferRequest(vendorProductId: vendorProductId,
-                                                   discountId: discountId,
-                                                   profileId: profileId)
-        perform(request,
-                logName: "sign_offer",
-                logParams: [
-                    "product_id": .value(vendorProductId),
-                    "discount_id": .value(discountId)
-                ]) { (result: SignSubscriptionOfferRequest.Result) in
+    func performSignSubscriptionOfferRequest(
+        profileId: String,
+        vendorProductId: String,
+        discountId: String,
+        _ completion: @escaping AdaptyResultCompletion<SignSubscriptionOfferResponse>
+    ) {
+        let request = SignSubscriptionOfferRequest(
+            vendorProductId: vendorProductId,
+            discountId: discountId,
+            profileId: profileId
+        )
+        perform(
+            request,
+            logName: "sign_offer",
+            logParams: [
+                "product_id": .value(vendorProductId),
+                "discount_id": .value(discountId),
+            ]
+        ) { (result: SignSubscriptionOfferRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

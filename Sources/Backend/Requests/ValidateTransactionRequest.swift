@@ -67,11 +67,15 @@ extension HTTPSession {
         }
     }
 
-    func performSyncTransactionRequest(profileId: String,
-                                       originalTransactionId: String,
-                                       _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
-        let request = ValidateTransactionRequest(profileId: profileId,
-                                                 requestSource: .restore(originalTransactionId))
+    func performSyncTransactionRequest(
+        profileId: String,
+        originalTransactionId: String,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
+    ) {
+        let request = ValidateTransactionRequest(
+            profileId: profileId,
+            requestSource: .restore(originalTransactionId)
+        )
         let logParams: EventParameters = [
             "original_transaction_id": .valueOrNil(originalTransactionId),
             "request_source": .value(Adapty.ValidatePurchaseReason.restoreRawString),
@@ -79,12 +83,16 @@ extension HTTPSession {
         _ = perform(request, logParams, completion)
     }
 
-    func performValidateTransactionRequest(profileId: String,
-                                           purchasedTransaction: PurchasedTransaction,
-                                           reason: Adapty.ValidatePurchaseReason,
-                                           _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
-        let request = ValidateTransactionRequest(profileId: profileId,
-                                                 requestSource: .other(purchasedTransaction, reason: reason))
+    func performValidateTransactionRequest(
+        profileId: String,
+        purchasedTransaction: PurchasedTransaction,
+        reason: Adapty.ValidatePurchaseReason,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
+    ) {
+        let request = ValidateTransactionRequest(
+            profileId: profileId,
+            requestSource: .other(purchasedTransaction, reason: reason)
+        )
         let logParams: EventParameters = [
             "product_id": .value(purchasedTransaction.vendorProductId),
             "original_transaction_id": .valueOrNil(purchasedTransaction.originalTransactionId),
@@ -103,9 +111,9 @@ private extension Adapty.ValidatePurchaseReason {
     static let restoreRawString = "restore"
     var rawString: String {
         switch self {
-        case .setVariation: return "set_variation"
-        case .observing: return "observing"
-        case .purchasing: return "purchasing"
+        case .setVariation: "set_variation"
+        case .observing: "observing"
+        case .purchasing: "purchasing"
         }
     }
 }

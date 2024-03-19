@@ -1,5 +1,5 @@
 //
-//  Adapty+Events.swift
+//  Adapty+FallbackPaywalls.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -56,7 +56,7 @@ extension PaywallsCache {
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale?) -> AdaptyPaywall? {
         let fallback = Adapty.Configuration.fallbackPaywalls?.paywallByPlacementId[placementId]
         guard let cache = getPaywallByLocaleOrDefault(locale, withPlacementId: placementId)?.value else { return fallback }
-        guard let fallback = fallback else { return cache }
+        guard let fallback else { return cache }
         if cache.version >= fallback.version {
             return cache
         } else {

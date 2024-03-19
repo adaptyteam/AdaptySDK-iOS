@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  VC.RichText.swift
 //
 //
 //  Created by Aleksei Valiano on 15.03.2024

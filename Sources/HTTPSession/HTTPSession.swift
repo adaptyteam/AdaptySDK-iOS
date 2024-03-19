@@ -46,8 +46,8 @@ final class HTTPSession {
     }
 
     @discardableResult
-    final func perform<Request: HTTPRequest, Body>(
-        _ request: Request,
+    final func perform<Body>(
+        _ request: some HTTPRequest,
         queue: DispatchQueue? = nil,
         decoder: @escaping Decoder<Body>,
         logStamp: String = Log.stamp,
@@ -77,7 +77,7 @@ final class HTTPSession {
         Logger.request(urlRequest, endpoint: endpoint, session: sessionConfiguration, stamp: logStamp)
         let task = _session.dataTask(with: urlRequest) { data, response, error in
             let result: HTTPResponse<Body>.Result
-            if let error = error {
+            if let error {
                 result = .failure(.network(endpoint, error: error))
             } else if let response = response as? HTTPURLResponse {
                 let dataResponse = HTTPDataResponse(endpoint: endpoint, response: response, data: data)
@@ -92,7 +92,7 @@ final class HTTPSession {
 
             Logger.response(response, data: data, endpoint: endpoint, error: result.error, request: urlRequest, stamp: logStamp)
             queue.async {
-                if let errorHandler = errorHandler, let error = result.error { errorHandler(error) }
+                if let errorHandler, let error = result.error { errorHandler(error) }
                 completionHandler(result)
             }
         }
@@ -101,26 +101,24 @@ final class HTTPSession {
     }
 
     @discardableResult
-    final func perform<Request: HTTPRequest>(
-        _ request: Request,
+    final func perform(
+        _ request: some HTTPRequest,
         queue: DispatchQueue? = nil,
         logStamp: String = Log.stamp,
         _ completionHandler: @escaping (HTTPStringResponse.Result) -> Void
     ) -> HTTPCancelable {
         perform(request, queue: queue, decoder: { response in
-            let body: String?
-            if let data = response.body {
-                body = String(data: data, encoding: .utf8)
-            } else {
-                body = nil
-            }
+            let body: String? =
+                if let data = response.body {
+                    String(data: data, encoding: .utf8)
+                } else { nil }
             return .success(response.replaceBody(body))
         }, logStamp: logStamp, completionHandler)
     }
 
     @discardableResult
-    final func perform<Request: HTTPRequest>(
-        _ request: Request,
+    final func perform(
+        _ request: some HTTPRequest,
         queue: DispatchQueue? = nil,
         logStamp: String = Log.stamp,
         _ completionHandler: @escaping (HTTPDataResponse.Result) -> Void
@@ -129,8 +127,8 @@ final class HTTPSession {
     }
 
     @discardableResult
-    final func perform<Request: HTTPRequest>(
-        _ request: Request,
+    final func perform(
+        _ request: some HTTPRequest,
         queue: DispatchQueue? = nil,
         logStamp: String = Log.stamp,
         _ completionHandler: @escaping (HTTPEmptyResponse.Result) -> Void

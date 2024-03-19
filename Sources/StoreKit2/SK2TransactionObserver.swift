@@ -30,7 +30,7 @@ final class SK2TransactionObserver {
     func transactionObserverTask() -> Task<Void, Never> {
         Task(priority: .utility) { [weak self] in
             for await verificationResult in SK2Transaction.updates {
-                guard let self = self, let delegate = self.delegate else { break }
+                guard let self, let delegate = self.delegate else { break }
                 switch verificationResult {
                 case let .unverified(transaction, error):
                     Log.error("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID)) is unverified. Error: \(error.localizedDescription)")
@@ -45,7 +45,7 @@ final class SK2TransactionObserver {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK1QueueManager: SK2TransactionObserverDelegate {
-    func transactionListener(_ listener: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async {
+    func transactionListener(_: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async {
         Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
         guard transaction.ext.justPurchasedRenewed else { return }

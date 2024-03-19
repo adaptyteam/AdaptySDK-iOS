@@ -19,7 +19,6 @@ extension UserDefaults: ProductVendorIdsStorage {
             set(data, forKey: Constants.productVendorIdsStorageKey)
         } catch {
             Log.error("UserDefaults: Saving vendor product ids fail. \(error.localizedDescription)")
-
         }
     }
 

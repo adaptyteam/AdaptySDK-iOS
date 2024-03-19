@@ -19,4 +19,4 @@ extension HTTPSession {
     }
 }
 
-extension URLSessionDataTask: HTTPCancelable { }
+extension URLSessionDataTask: HTTPCancelable {}

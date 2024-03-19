@@ -59,7 +59,7 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("sdk_response_\(methodName)", forKey: .name)
         try container.encodeIfPresent(callId, forKey: .callId)
-        if let error = error {
+        if let error {
             try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
         } else {
@@ -100,7 +100,7 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         try container.encode(callId, forKey: .callId)
         try container.encodeIfPresent(backendRequestId, forKey: .backendRequestId)
 
-        if let error = error {
+        if let error {
             try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
         } else {
@@ -115,7 +115,7 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         self.error = error
     }
 
-    init<T>(methodName: String, callId: String, _ result: HTTPResponse<T>.Result) {
+    init(methodName: String, callId: String, _ result: HTTPResponse<some Any>.Result) {
         switch result {
         case let .failure(error):
             self.init(methodName: methodName, callId: callId, backendRequestId: error.headers?.getBackendRequestId(), error: error.description)
@@ -162,7 +162,7 @@ struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
         try container.encode("apple_response_\(methodName)", forKey: .name)
         try container.encodeIfPresent(callId, forKey: .callId)
         try encoder.encode(params)
-        if let error = error {
+        if let error {
             try container.encode(false, forKey: .success)
             try container.encode(error, forKey: .error)
         } else {
@@ -189,7 +189,7 @@ struct AdaptyAppleEventQueueHandlerParameters: AdaptySystemEventParameters {
         try container.encode("apple_event_\(eventName)", forKey: .name)
         try container.encodeIfPresent(callId, forKey: .callId)
         try encoder.encode(params)
-        if let error = error {
+        if let error {
             try container.encode(error, forKey: .error)
         }
     }
@@ -210,15 +210,15 @@ struct AdaptyInternalEventParameters: AdaptySystemEventParameters {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode("internal_\(eventName)", forKey: .name)
         try encoder.encode(params)
-        if let error = error {
+        if let error {
             try container.encode(error, forKey: .error)
         }
     }
 }
 
-fileprivate extension Encoder {
+private extension Encoder {
     func encode(_ params: EventParameters?) throws {
-        guard let params = params else { return }
+        guard let params else { return }
         var container = container(keyedBy: AnyCodingKeys.self)
         try params.forEach {
             guard let value = $1 else { return }

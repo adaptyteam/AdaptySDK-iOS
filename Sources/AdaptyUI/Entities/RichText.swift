@@ -50,7 +50,7 @@ extension AdaptyUI {
 
 extension [AdaptyUI.RichText.Item] {
     var asString: String? {
-       let string =  compactMap {
+        let string = compactMap {
             switch $0 {
             case let .text(value, _), let .tag(value, _):
                 value
@@ -60,7 +60,7 @@ extension [AdaptyUI.RichText.Item] {
                 nil
             }
         }.joined()
-        
+
         return string.isEmpty ? nil : string
     }
 }
@@ -69,6 +69,7 @@ extension AdaptyUI.RichText {
     var asString: String? {
         items.asString
     }
+
     var asFallbackString: String? {
         fallback?.asString
     }
