@@ -17,7 +17,8 @@ let package = Package(
         .target(
             name: "Adapty",
             dependencies: [],
-            path: "Sources"
+            path: "Sources",
+            resources: [ .process("Resources/PrivacyInfo.xcprivacy")]
         ),
         .testTarget(
             name: "AdaptyTests",

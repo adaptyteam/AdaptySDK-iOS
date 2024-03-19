@@ -28,6 +28,9 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.swift_version = '5.9'
   
   s.source_files = 'Sources/**/*.swift'
+  s.resource_bundles = {
+    "#{s.module_name}_Privacy" => 'Sources/Resources/PrivacyInfo.xcprivacy'
+  }
 
   s.frameworks = 'Foundation', 'StoreKit'
   s.ios.framework = 'UIKit', 'iAd', 'AdSupport'
