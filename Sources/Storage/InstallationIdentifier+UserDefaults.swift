@@ -1,6 +1,6 @@
 //
 //  InstallationIdentifier+UserDefaults.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 17.10.2022.
 //
@@ -8,7 +8,7 @@
 import Foundation
 
 extension Environment.Application {
-    static let installationIdentifier = { UserDefaults.standard.getAppInstallationIdentifier() }()
+    static let installationIdentifier = UserDefaults.standard.getAppInstallationIdentifier()
 }
 
 extension UserDefaults {

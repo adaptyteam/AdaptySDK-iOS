@@ -1,6 +1,6 @@
 //
-//  KinesisEvent.swift
-//  Adapty
+//  Event.swift
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //
@@ -28,8 +28,8 @@ struct Event {
 extension Event {
     var lowPriority: Bool {
         switch type {
-        case .system: return true
-        default: return false
+        case .system: true
+        default: false
         }
     }
 }

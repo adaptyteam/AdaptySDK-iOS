@@ -1,6 +1,6 @@
 //
 //  Adapty+ChangeState.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.10.2022.
 //
@@ -25,12 +25,14 @@ public final class Adapty {
     var onceSentEnvironment: Bool = false
     var state: State
 
-    init(apiKeyPrefix: String,
-         profileStorage: ProfileStorage,
-         vendorIdsStorage: ProductVendorIdsStorage,
-         backend: Backend,
-         fallbackBackend: FallbackBackend,
-         customerUserId: String?) {
+    init(
+        apiKeyPrefix: String,
+        profileStorage: ProfileStorage,
+        vendorIdsStorage: ProductVendorIdsStorage,
+        backend: Backend,
+        fallbackBackend: FallbackBackend,
+        customerUserId: String?
+    ) {
         self.apiKeyPrefix = apiKeyPrefix
         self.backend = backend
         self.fallbackBackend = fallbackBackend
@@ -56,10 +58,10 @@ public final class Adapty {
         initializingProfileManager(toCustomerUserId: customerUserId)
     }
 
-    fileprivate var profileManagerCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
-    fileprivate var profileManagerOrFailedCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
+    private var profileManagerCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
+    private var profileManagerOrFailedCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
 
-    fileprivate var logoutCompletionHandlers: [AdaptyErrorCompletion]?
+    private var logoutCompletionHandlers: [AdaptyErrorCompletion]?
 
     @inline(__always)
     func getProfileManager(waitCreatingProfile: Bool = true, _ completion: @escaping AdaptyResultCompletion<AdaptyProfileManager>) {
@@ -84,7 +86,7 @@ public final class Adapty {
     }
 
     @inline(__always)
-    fileprivate func callProfileManagerCompletionHandlers(_ result: AdaptyResult<AdaptyProfileManager>) {
+    private func callProfileManagerCompletionHandlers(_ result: AdaptyResult<AdaptyProfileManager>) {
         let handlers: [AdaptyResultCompletion<AdaptyProfileManager>]
         if let error = result.error, error.isProfileCreateFailed {
             handlers = profileManagerOrFailedCompletionHandlers ?? []
@@ -102,7 +104,7 @@ public final class Adapty {
     }
 
     @inline(__always)
-    fileprivate func callLogoutCompletionHandlers(_ error: AdaptyError?) {
+    private func callLogoutCompletionHandlers(_ error: AdaptyError?) {
         guard let handlers = logoutCompletionHandlers else { return }
         logoutCompletionHandlers = nil
         Adapty.underlayQueue.async {
@@ -136,7 +138,7 @@ extension Adapty {
     }
 
     @inline(__always)
-    fileprivate func finishLogout() {
+    private func finishLogout() {
         profileStorage.clearProfile(newProfileId: nil)
         state = .initializingTo(customerUserId: nil)
         callLogoutCompletionHandlers(nil)
@@ -167,7 +169,7 @@ extension Adapty {
             }
             return
         case let .initializingTo(customerUserId):
-            if let customerUserId = customerUserId, customerUserId == newCustomerUserId {
+            if let customerUserId, customerUserId == newCustomerUserId {
                 getProfileManager { completion($0.error) }
                 return
             }
@@ -194,7 +196,7 @@ extension Adapty {
     }
 
     @inline(__always)
-    fileprivate func needBreakInitializing() -> Bool {
+    private func needBreakInitializing() -> Bool {
         switch state {
         case .initializingTo:
             return false
@@ -212,16 +214,18 @@ extension Adapty {
         }
     }
 
-    fileprivate func initializingProfileManager(toCustomerUserId customerUserId: String?) {
+    private func initializingProfileManager(toCustomerUserId customerUserId: String?) {
         guard !needBreakInitializing() else { return }
 
         let profileId = profileStorage.profileId
 
         if let profile = profileStorage.getProfile(profileId: profileId, withCustomerUserId: customerUserId) {
-            let manager = AdaptyProfileManager(manager: self,
-                                               paywallStorage: UserDefaults.standard,
-                                               productStorage: UserDefaults.standard,
-                                               profile: profile)
+            let manager = AdaptyProfileManager(
+                manager: self,
+                paywallStorage: UserDefaults.standard,
+                productStorage: UserDefaults.standard,
+                profile: profile
+            )
 
             state = .initialized(manager)
             callProfileManagerCompletionHandlers(.success(manager))
@@ -233,7 +237,7 @@ extension Adapty {
         }
 
         createProfile(profileId, customerUserId) { [weak self] result in
-            guard let self = self, !self.needBreakInitializing() else { return }
+            guard let self, !self.needBreakInitializing() else { return }
             switch result {
             case let .failure(error):
                 if let error = error.wrapped as? HTTPError {
@@ -245,10 +249,12 @@ extension Adapty {
                 }
             case let .success(profile):
 
-                let manager = AdaptyProfileManager(manager: self,
-                                                   paywallStorage: UserDefaults.standard,
-                                                   productStorage: UserDefaults.standard,
-                                                   profile: profile)
+                let manager = AdaptyProfileManager(
+                    manager: self,
+                    paywallStorage: UserDefaults.standard,
+                    productStorage: UserDefaults.standard,
+                    profile: profile
+                )
 
                 self.state = .initialized(manager)
                 self.callProfileManagerCompletionHandlers(.success(manager))
@@ -257,10 +263,12 @@ extension Adapty {
     }
 
     private func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
-        httpSession.performCreateProfileRequest(profileId: profileId,
-                                                customerUserId: customerUserId,
-                                                analyticsDisabled: profileStorage.externalAnalyticsDisabled) { [weak self] result in
-            guard let self = self else { return }
+        httpSession.performCreateProfileRequest(
+            profileId: profileId,
+            customerUserId: customerUserId,
+            analyticsDisabled: profileStorage.externalAnalyticsDisabled
+        ) { [weak self] result in
+            guard let self else { return }
 
             // TODO: Check Cancel
 
@@ -294,29 +302,29 @@ extension Adapty {
         var initializing: Bool {
             switch self {
             case .failed, .initialized:
-                return false
+                false
             default:
-                return true
+                true
             }
         }
 
         var initialized: AdaptyProfileManager? {
             switch self {
             case let .initialized(manager):
-                return manager
+                manager
             default:
-                return nil
+                nil
             }
         }
 
         var initializedResult: AdaptyResult<AdaptyProfileManager>? {
             switch self {
             case let .failed(error):
-                return .failure(error)
+                .failure(error)
             case let .initialized(manager):
-                return .success(manager)
+                .success(manager)
             default:
-                return nil
+                nil
             }
         }
 

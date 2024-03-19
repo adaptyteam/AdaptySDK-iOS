@@ -1,6 +1,6 @@
 //
 //  EventsError.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //
@@ -16,13 +16,13 @@ extension EventsError: CustomStringConvertible {
     var description: String {
         switch self {
         case let .sending(source, error: error):
-            return "EventsError.sending(\(source), \(error))"
+            "EventsError.sending(\(source), \(error))"
         case let .encoding(source, error: error):
-            return "EventsError.encoding(\(source), \(error))"
+            "EventsError.encoding(\(source), \(error))"
         case let .decoding(source, error: error):
-            return "EventsError.decoding(\(source), \(error))"
+            "EventsError.decoding(\(source), \(error))"
         case let .interrupted(source):
-            return "EventsError.interrupted(\(source))"
+            "EventsError.interrupted(\(source))"
         }
     }
 }
@@ -33,31 +33,24 @@ extension EventsError {
         case let .sending(src, _),
              let .encoding(src, _),
              let .decoding(src, _),
-             let .interrupted(src):
-            return src
+             let .interrupted(src): src
         }
     }
 
     var isInterrupted: Bool {
         switch self {
-        case .interrupted:
-            return true
-        case let .sending(_, error: error):
-            return error.isCancelled
-        default:
-            return false
+        case .interrupted: true
+        case let .sending(_, error: error): error.isCancelled
+        default: false
         }
     }
 
     var originalError: Error? {
         switch self {
-        case let .sending(_, error):
-            return error
+        case let .sending(_, error): error
         case let .encoding(_, error),
-             let .decoding(_, error):
-            return error
-        default:
-            return nil
+             let .decoding(_, error): error
+        default: nil
         }
     }
 }
@@ -67,37 +60,51 @@ extension EventsError {
         _ error: HTTPError,
         file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        .sending(AdaptyError.Source(file: file,
-                                    function: function,
-                                    line: line),
-                 error: error)
+        .sending(
+            AdaptyError.Source(
+                file: file,
+                function: function,
+                line: line
+            ),
+            error: error
+        )
     }
 
     static func encoding(
         _ error: Error,
         file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        .encoding(AdaptyError.Source(file: file,
-                                     function: function,
-                                     line: line),
-                  error: error)
+        .encoding(
+            AdaptyError.Source(
+                file: file,
+                function: function,
+                line: line
+            ),
+            error: error
+        )
     }
 
     static func decoding(
         _ error: Error,
         file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        .decoding(AdaptyError.Source(file: file,
-                                     function: function,
-                                     line: line),
-                  error: error)
+        .decoding(
+            AdaptyError.Source(
+                file: file,
+                function: function,
+                line: line
+            ),
+            error: error
+        )
     }
 
     static func interrupted(
         file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
-        .interrupted(AdaptyError.Source(file: file,
-                                        function: function,
-                                        line: line))
+        .interrupted(AdaptyError.Source(
+            file: file,
+            function: function,
+            line: line
+        ))
     }
 }

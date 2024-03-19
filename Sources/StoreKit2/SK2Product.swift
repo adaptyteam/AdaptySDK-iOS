@@ -16,12 +16,12 @@ extension SK2Product {
     var introductoryOfferEligibility: AdaptyEligibility {
         get async {
             guard
-                let subscription = subscription,
+                let subscription,
                 subscription.introductoryOffer != nil else {
                 return .notApplicable
             }
 
-            return AdaptyEligibility(booleanLiteral: await subscription.isEligibleForIntroOffer)
+            return await AdaptyEligibility(booleanLiteral: subscription.isEligibleForIntroOffer)
         }
     }
 }

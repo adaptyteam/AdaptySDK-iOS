@@ -1,6 +1,6 @@
 //
 //  AdaptyLogger.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.10.2022.
 //
@@ -14,7 +14,7 @@ enum AdaptyLogger {
 
     private static let dispatchQueue = DispatchQueue(label: "Adapty.SDK.Logger")
 
-    @inlinable static func write(_ time: Date, _ level: AdaptyLogLevel, _ message: @escaping () -> String, file: String, function: String, line: UInt) {
+    @inlinable static func write(_ time: Date, _ level: AdaptyLogLevel, _ message: @escaping () -> String, file: String, function _: String, line: UInt) {
         guard logLevel.rawValue >= level.rawValue else { return }
         if logLevel.rawValue >= AdaptyLogLevel.debug.rawValue {
             handler(time, level, "[Adapty v\(Adapty.SDKVersion)] - \(level)\t\(file)#\(line): \(message())")
@@ -37,7 +37,7 @@ enum Log {
         var result = ""
         let base62chars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
         for _ in 0 ..< 6 {
-            result.append(base62chars[Int.random(in: 0...61)])
+            result.append(base62chars[Int.random(in: 0 ... 61)])
         }
         return result
     }

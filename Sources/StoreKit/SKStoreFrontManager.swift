@@ -11,9 +11,9 @@ import StoreKit
 class SKStorefrontManager {
     static var countryCode: String? {
         if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, visionOS 1.0, *) {
-            return SKPaymentQueue.default().storefront?.countryCode
+            SKPaymentQueue.default().storefront?.countryCode
         } else {
-            return nil
+            nil
         }
     }
 
@@ -22,20 +22,22 @@ class SKStorefrontManager {
             subscribeSK2ForUpdates(callback)
             return
         }
-#if !os(visionOS)
-        if #available(iOS 11.0, macOS 11.0, tvOS 11.0, watchOS 7.0, *) {
-            subscribeSK1ForUpdates(callback)
-            return
-        }
-#endif
+        #if !os(visionOS)
+            if #available(iOS 11.0, macOS 11.0, tvOS 11.0, watchOS 7.0, *) {
+                subscribeSK1ForUpdates(callback)
+                return
+            }
+        #endif
     }
 
-#if !os(visionOS)
-    @available(iOS 11.0, macOS 11.0, tvOS 11.0, watchOS 7.0, *)
-    static func subscribeSK1ForUpdates(_ callback: @escaping (String) -> Void) {
-            NotificationCenter.default.addObserver(forName: Notification.Name.SKStorefrontCountryCodeDidChange,
-                                                   object: nil,
-                                                   queue: nil) { _ in
+    #if !os(visionOS)
+        @available(iOS 11.0, macOS 11.0, tvOS 11.0, watchOS 7.0, *)
+        static func subscribeSK1ForUpdates(_ callback: @escaping (String) -> Void) {
+            NotificationCenter.default.addObserver(
+                forName: Notification.Name.SKStorefrontCountryCodeDidChange,
+                object: nil,
+                queue: nil
+            ) { _ in
                 guard let countryCode = Self.countryCode else {
                     Log.warn("SKStorefrontManager (SK1): SKStorefrontCountryCodeDidChange to nil")
                     return
@@ -45,8 +47,8 @@ class SKStorefrontManager {
 
                 callback(countryCode)
             }
-    }
-#endif
+        }
+    #endif
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     static func subscribeSK2ForUpdates(_ callback: @escaping (String) -> Void) {

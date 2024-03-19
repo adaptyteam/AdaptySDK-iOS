@@ -1,6 +1,6 @@
 //
 //  AdaptyEligibility.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 26.09.2022.
 //
@@ -9,7 +9,6 @@ import Foundation
 
 /// Defines offers eligibility state (e.g. introductory offers or promotional offers.)
 public enum AdaptyEligibility {
-
     /// User is not eligible to get any offer, you should't present it in your UI.
     case ineligible
 
@@ -36,7 +35,7 @@ extension AdaptyEligibility: Codable {
     }
 
     public init(from decoder: Decoder) throws {
-        let value = CodingValues(rawValue: try decoder.singleValueContainer().decode(String.self))
+        let value = try CodingValues(rawValue: decoder.singleValueContainer().decode(String.self))
         switch value {
         case .some(.ineligible): self = .ineligible
         case .some(.eligible): self = .eligible
@@ -47,12 +46,12 @@ extension AdaptyEligibility: Codable {
     }
 
     public var rawStringValue: String {
-        let value: CodingValues
-        switch self {
-        case .ineligible: value = .ineligible
-        case .eligible: value = .eligible
-        case .notApplicable: value = .notApplicable
-        }
+        let value: CodingValues =
+            switch self {
+            case .ineligible: .ineligible
+            case .eligible: .eligible
+            case .notApplicable: .notApplicable
+            }
         return value.rawValue
     }
 

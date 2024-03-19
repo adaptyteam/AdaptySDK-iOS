@@ -1,9 +1,8 @@
 //
 //  Adapty+UpdateAttribution.swift
-//  Adapty
+//  AdaptySDK
 //
-//  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 Adapty. All rights reserved.
+//  Created by Andrey Kyashkin on 28.10.2019.
 //
 
 import Foundation
@@ -29,21 +28,25 @@ extension Adapty {
             "has_network_user_id": .value(networkUserId != nil),
         ]
         async(completion, logName: "update_attribution", logParams: logParams) { manager, completion in
-            manager.updateAttribution(profileId: manager.profileStorage.profileId,
-                                      attribution,
-                                      source: source,
-                                      networkUserId: networkUserId,
-                                      completion)
+            manager.updateAttribution(
+                profileId: manager.profileStorage.profileId,
+                attribution,
+                source: source,
+                networkUserId: networkUserId,
+                completion
+            )
         }
     }
 
     private func updateAttribution(profileId: String, _ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String?, _ completion: AdaptyErrorCompletion? = nil) {
         let oldProfile = state.initialized?.profile
-        httpSession.performSetAttributionRequest(profileId: profileId,
-                                                 networkUserId: networkUserId,
-                                                 source: source,
-                                                 attribution: attribution,
-                                                 responseHash: oldProfile?.hash) { [weak self] result in
+        httpSession.performSetAttributionRequest(
+            profileId: profileId,
+            networkUserId: networkUserId,
+            source: source,
+            attribution: attribution,
+            responseHash: oldProfile?.hash
+        ) { [weak self] result in
 
             _ = result.do { profile in
                 if let profile = profile.flatValue() {
@@ -55,7 +58,7 @@ extension Adapty {
         }
     }
 
-    func updateASATokenIfNeed(for profile:VH<AdaptyProfile>) {
+    func updateASATokenIfNeed(for profile: VH<AdaptyProfile>) {
         #if canImport(AdServices)
             guard
                 #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),
@@ -64,9 +67,11 @@ extension Adapty {
             else { return }
 
             let profileId = profile.value.profileId
-            httpSession.performASATokenRequest(profileId: profileId,
-                                               token: attributionToken,
-                                               responseHash: profile.hash) { [weak self] result in
+            httpSession.performASATokenRequest(
+                profileId: profileId,
+                token: attributionToken,
+                responseHash: profile.hash
+            ) { [weak self] result in
 
                 guard let profile = try? result.get() else { return }
                 if let profile = profile.flatValue() {

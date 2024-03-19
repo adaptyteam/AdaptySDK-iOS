@@ -1,6 +1,6 @@
 //
-//  Fallback.swift
-//  Adapty
+//  FallbackPaywalls.swift
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 30.09.2022.
 //
@@ -40,7 +40,7 @@ extension FallbackPaywalls: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let subcontainer = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
 
-        if let subcontainer = subcontainer,
+        if let subcontainer,
            let v = try subcontainer.decodeIfPresent(Int.self, forKey: .version) {
             version = v
         } else {
@@ -59,7 +59,7 @@ extension FallbackPaywalls: Decodable {
             paywallByPlacementId = [:]
         }
 
-        if let subcontainer = subcontainer,
+        if let subcontainer,
            let productsArray = try subcontainer.decodeIfPresent([ProductContainer].self, forKey: .products),
            !productsArray.isEmpty {
             productVendorIds = productVendorIds.union(productsArray.map { $0.vendorId })

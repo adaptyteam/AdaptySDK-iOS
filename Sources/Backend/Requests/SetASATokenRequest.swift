@@ -1,6 +1,6 @@
 //
 //  SetASATokenRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.03.2024.
 //
@@ -18,13 +18,12 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<AdaptyProfile?, Error>
-
-            if headers.hasSameBackendResponseHash(response.headers) {
-                result = .success(nil)
-            } else {
-                result = jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
-            }
+            let result: Result<AdaptyProfile?, Error> =
+                if headers.hasSameBackendResponseHash(response.headers) {
+                    .success(nil)
+                } else {
+                    jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
+                }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
@@ -52,18 +51,22 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
 }
 
 extension HTTPSession {
-    func performASATokenRequest(profileId: String,
-                                token: String,
-                                responseHash: String?,
-                                _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
-        let request = SetASATokenRequest(profileId: profileId,
-                                         token: token,
-                                         responseHash: responseHash)
-        perform(request,
-                logName: "set_asa_token",
-                logParams: [
-                    "token": .value(token),
-                ]) { (result: SetASATokenRequest.Result) in
+    func performASATokenRequest(
+        profileId: String,
+        token: String,
+        responseHash: String?,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
+    ) {
+        let request = SetASATokenRequest(
+            profileId: profileId,
+            token: token,
+            responseHash: responseHash
+        )
+        perform(
+            request,
+            logName: "set_asa_token",
+            logParams: ["token": .value(token)]
+        ) { (result: SetASATokenRequest.Result) in
             switch result {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))

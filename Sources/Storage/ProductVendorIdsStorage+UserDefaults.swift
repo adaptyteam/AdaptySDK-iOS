@@ -1,6 +1,6 @@
 //
 //  ProductVendorIdsStorage+UserDefaults.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //
@@ -19,7 +19,6 @@ extension UserDefaults: ProductVendorIdsStorage {
             set(data, forKey: Constants.productVendorIdsStorageKey)
         } catch {
             Log.error("UserDefaults: Saving vendor product ids fail. \(error.localizedDescription)")
-
         }
     }
 

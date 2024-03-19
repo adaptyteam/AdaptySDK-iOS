@@ -1,6 +1,6 @@
 //
 //  EventsManager.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 13.10.2022.
 //
@@ -33,20 +33,26 @@ final class EventsManager {
         )
     }
 
-    convenience init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
-                     profileStorage: ProfileIdentifierStorage,
-                     eventStorages: [EventsStorage],
-                     backend: Backend?) {
-        self.init(dispatchQueue: dispatchQueue,
-                  profileStorage: profileStorage,
-                  eventStorages: eventStorages.map { EventCollectionStorage(with: $0) },
-                  backend: backend)
+    convenience init(
+        dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
+        profileStorage: ProfileIdentifierStorage,
+        eventStorages: [EventsStorage],
+        backend: Backend?
+    ) {
+        self.init(
+            dispatchQueue: dispatchQueue,
+            profileStorage: profileStorage,
+            eventStorages: eventStorages.map { EventCollectionStorage(with: $0) },
+            backend: backend
+        )
     }
 
-    init(dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
-         profileStorage: ProfileIdentifierStorage,
-         eventStorages: [EventCollectionStorage],
-         backend: Backend?) {
+    init(
+        dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
+        profileStorage: ProfileIdentifierStorage,
+        eventStorages: [EventCollectionStorage],
+        backend: Backend?
+    ) {
         self.profileStorage = profileStorage
         self.eventStorages = eventStorages
         self.dispatchQueue = dispatchQueue
@@ -54,7 +60,7 @@ final class EventsManager {
         let configuration = EventsBackendConfiguration()
         self.configuration = configuration
 
-        guard let backend = backend else {
+        guard let backend else {
             backendSession = nil
             return
         }
@@ -64,7 +70,7 @@ final class EventsManager {
 
     func trackEvent(_ event: Event, completion: @escaping (EventsError?) -> Void) {
         dispatchQueue.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 completion(nil)
                 return
             }
@@ -94,14 +100,14 @@ final class EventsManager {
 
     private func needSendEvents() {
         dispatchQueue.async { [weak self] in
-            guard let self = self, let session = self.backendSession, !self.sending else { return }
+            guard let self, let session = self.backendSession, !self.sending else { return }
 
             self.sending = true
             self._sendEvents(session) { [weak self] error in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 var retryAt: DispatchTime?
-                if let error = error, !error.isInterrupted {
+                if let error, !error.isInterrupted {
                     retryAt = .now() + .seconds(20)
                 } else if self.eventStorages.hasEvents {
                     retryAt = .now() + .seconds(1)
@@ -123,12 +129,12 @@ final class EventsManager {
     func _sendEvents(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
         _updateBackendConfigurationIfNeed(session) { [weak self] error in
 
-            if let error = error {
+            if let error {
                 completion(error)
                 return
             }
 
-            guard let self = self else {
+            guard let self else {
                 completion(.interrupted())
                 return
             }
@@ -176,7 +182,7 @@ final class EventsManager {
     }
 }
 
-private extension Array where Element == EventCollectionStorage {
+private extension [EventCollectionStorage] {
     var hasEvents: Bool { contains { !$0.isEmpty } }
 
     func getEvents(limit: Int, blackList: Set<String>) -> (elements: [Data], endIndex: [Int?]) {

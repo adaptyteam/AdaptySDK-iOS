@@ -1,6 +1,6 @@
 //
 //  AdaptyPaywall.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //
@@ -86,7 +86,7 @@ extension AdaptyPaywall: Codable {
         hasViewConfiguration = try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false
 
         if let remoteConfig = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig) {
-            locale = (try remoteConfig.decode(AdaptyLocale.self, forKey: .remoteConfigLocale)).id
+            locale = try (remoteConfig.decode(AdaptyLocale.self, forKey: .remoteConfigLocale)).id
             remoteConfigString = try remoteConfig.decodeIfPresent(String.self, forKey: .remoteConfigString)
         } else {
             let requestLocale = decoder.userInfo[Backend.Request.localeCodeUserInfoKey] as? AdaptyLocale
@@ -112,7 +112,7 @@ extension AdaptyPaywall: Codable {
     }
 }
 
-extension Sequence where Element == VH<AdaptyPaywall> {
+extension Sequence<VH<AdaptyPaywall>> {
     var asPaywallByPlacementId: [String: VH<AdaptyPaywall>] {
         Dictionary(map { ($0.value.placementId, $0) }, uniquingKeysWith: { first, second in
             first.value.version > second.value.version ? first : second

@@ -1,6 +1,6 @@
 //
 //  SK2TransactionManager.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 06.02.2024
 //
@@ -23,7 +23,7 @@ internal final class SK2TransactionManager {
 
     internal func syncTransactions(_ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>?>) {
         queue.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
                 return
             }
@@ -39,13 +39,13 @@ internal final class SK2TransactionManager {
             Log.debug("SK2TransactionManager: Start validateReceipt syncTransactionsCompletionHandlers.count = \(self.syncTransactionsCompletionHandlers?.count ?? 0)")
 
             self.getSK2Transaction { [weak self] result in
-                guard let self = self else { return }
+                guard let self else { return }
                 self.queue.async {
                     switch result {
                     case let .failure(error):
                         completedSync(.failure(error))
                     case let .success(transaction):
-                        guard let transaction = transaction else {
+                        guard let transaction else {
                             completedSync(.success(nil))
                             return
                         }
@@ -94,17 +94,16 @@ internal final class SK2TransactionManager {
                 }
             }
 
-            let params: EventParameters?
-
-            if let lastTransaction = lastTransaction {
-                params = [
-                    "original_transaction_id": .valueOrNil(lastTransaction.ext.originalIdentifier),
-                    "transaction_id": .valueOrNil(lastTransaction.ext.identifier),
-                    "purchase_date": .valueOrNil(lastTransaction.purchaseDate),
-                ]
-            } else {
-                params = nil
-            }
+            let params: EventParameters? =
+                if let lastTransaction {
+                    [
+                        "original_transaction_id": .valueOrNil(lastTransaction.ext.originalIdentifier),
+                        "transaction_id": .valueOrNil(lastTransaction.ext.identifier),
+                        "purchase_date": .valueOrNil(lastTransaction.purchaseDate),
+                    ]
+                } else {
+                    nil
+                }
 
             Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: logName, callId: stamp, params: params))
 

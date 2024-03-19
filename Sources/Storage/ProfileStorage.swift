@@ -1,7 +1,6 @@
 //
 //  ProfileStorage.swift
-//  Adapty
-//
+//  AdaptySDK
 //  Created by Aleksei Valiano on 30.09.2022.
 //
 
@@ -31,7 +30,7 @@ extension ProfileStorage {
     func getProfile(profileId: String, withCustomerUserId newCustomerUserId: String?) -> VH<AdaptyProfile>? {
         guard let profile = getProfile() else { return nil }
         guard profile.value.profileId == profileId else { return nil }
-        guard let newCustomerUserId = newCustomerUserId else { return profile }
+        guard let newCustomerUserId else { return profile }
         guard let oldCustomerUserId = profile.value.customerUserId else { return nil }
         guard oldCustomerUserId == newCustomerUserId else { return nil }
         return profile

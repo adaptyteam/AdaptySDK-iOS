@@ -14,7 +14,7 @@ extension Data {
             if let json = try JSONSerialization.jsonObject(with: self, options: []) as? NSDictionary {
                 return json.description
             }
-        } catch let error {
+        } catch {
             return "Error printing payload: " + error.localizedDescription
         }
 
@@ -22,7 +22,7 @@ extension Data {
             if let json = try JSONSerialization.jsonObject(with: self, options: []) as? NSArray {
                 return json.description
             }
-        } catch let error {
+        } catch {
             return "Error printing payload: " + error.localizedDescription
         }
 
@@ -43,7 +43,7 @@ extension Data {
         Unable to represent payload with text.
         Received payload of \(count) bytes.
         """
-        if let response = response {
+        if let response {
             output += "\nExpected payload of \(response.expectedContentLength) bytes."
             if let mimeType = response.mimeType {
                 output += "\nMIME Type: \(mimeType)."

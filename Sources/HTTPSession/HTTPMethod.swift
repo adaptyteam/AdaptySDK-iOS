@@ -1,6 +1,6 @@
 //
 //  HTTPMethod.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 21.09.2022.
 //

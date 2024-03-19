@@ -1,6 +1,6 @@
 //
 //  AdaptyResult.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //
@@ -15,8 +15,8 @@ public typealias AdaptyResultCompletion<Success> = (AdaptyResult<Success>) -> Vo
 extension Result where Failure == AdaptyError {
     public var error: AdaptyError? {
         switch self {
-        case let .failure(error): return error
-        default: return nil
+        case let .failure(error): error
+        default: nil
         }
     }
 
@@ -28,12 +28,12 @@ extension Result where Failure == AdaptyError {
 }
 
 extension Result {
-    @inlinable func flatValue<NewSuccess>() -> Result<NewSuccess, Failure>? where Success == Optional<NewSuccess> {
+    @inlinable func flatValue<NewSuccess>() -> Result<NewSuccess, Failure>? where Success == NewSuccess? {
         switch self {
         case let .failure(error):
             return .failure(error)
         case let .success(v):
-            if let v = v {
+            if let v {
                 return .success(v)
             } else {
                 return nil

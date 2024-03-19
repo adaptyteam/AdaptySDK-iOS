@@ -8,7 +8,7 @@
 
 import Foundation
 
-private struct CurlParameters {
+private enum CurlParameters {
     static let url = " \"%@\""
     static let httpMethod = " -X %@"
     static let verbosity = " -v"
@@ -20,20 +20,22 @@ private struct CurlParameters {
 
 extension URLRequest {
     func curlCommand(session: URLSessionConfiguration? = nil, verbose: Bool = false) -> String {
-        guard let url = url,
+        guard let url,
               let host = url.host,
-              let httpMethod = httpMethod
+              let httpMethod
         else { return "$ curl command could not be created" }
 
         let verboseString = verbose ? CurlParameters.verbosity : ""
 
         var credentialString = ""
         if let credentialStorage = session?.urlCredentialStorage {
-            let protectionSpace = URLProtectionSpace(host: host,
-                                                     port: url.port ?? 0,
-                                                     protocol: url.scheme,
-                                                     realm: host,
-                                                     authenticationMethod: NSURLAuthenticationMethodHTTPBasic)
+            let protectionSpace = URLProtectionSpace(
+                host: host,
+                port: url.port ?? 0,
+                protocol: url.scheme,
+                realm: host,
+                authenticationMethod: NSURLAuthenticationMethodHTTPBasic
+            )
 
             if let credentials = credentialStorage.credentials(for: protectionSpace)?.values {
                 for credential in credentials {
@@ -44,7 +46,7 @@ extension URLRequest {
         }
 
         var cookieString = ""
-        if let session = session, session.httpShouldSetCookies {
+        if let session, session.httpShouldSetCookies {
             if
                 let cookieStorage = session.httpCookieStorage,
                 let cookies = cookieStorage.cookies(for: url), !cookies.isEmpty {
@@ -68,7 +70,7 @@ extension URLRequest {
         }
 
         var dataString = ""
-        if let httpBody = httpBody {
+        if let httpBody {
             if let d = String(data: httpBody, encoding: String.Encoding.utf8) {
                 dataString = String(format: CurlParameters.data, d)
             }

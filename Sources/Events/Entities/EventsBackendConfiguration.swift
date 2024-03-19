@@ -1,6 +1,6 @@
 //
 //  EventsBackendConfiguration.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //
@@ -36,8 +36,8 @@ extension EventsBackendConfiguration: Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        blacklist = Set(try container.decode([String].self, forKey: .blacklist))
-        expiration = Date(timeIntervalSince1970: (try container.decode(Double.self, forKey: .expiration)) / 1000.0)
+        blacklist = try Set(container.decode([String].self, forKey: .blacklist))
+        expiration = try Date(timeIntervalSince1970: (container.decode(Double.self, forKey: .expiration)) / 1000.0)
     }
 
     func encode(to encoder: Encoder) throws {

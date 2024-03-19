@@ -1,9 +1,8 @@
 //
 //  AdaptyDelegate.swift
-//  Adapty
+//  AdaptySDK
 //
-//  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 Adapty. All rights reserved.
+//  Created by Andrey Kyashkin on 28.10.2019.
 //
 
 import Foundation
@@ -23,7 +22,7 @@ public protocol AdaptyDelegate: AnyObject {
 }
 
 extension AdaptyDelegate {
-    public func shouldAddStorePayment(for product: AdaptyDeferredProduct, defermentCompletion makeDeferredPurchase: @escaping (AdaptyResultCompletion<AdaptyPurchasedInfo>?) -> Void) -> Bool {
+    public func shouldAddStorePayment(for _: AdaptyDeferredProduct, defermentCompletion _: @escaping (AdaptyResultCompletion<AdaptyPurchasedInfo>?) -> Void) -> Bool {
         true
     }
 }
@@ -36,7 +35,7 @@ extension Adapty {
 extension Adapty {
     static func callDelegate(_ call: @escaping (AdaptyDelegate) -> Void) {
         (dispatchQueue ?? .main).async {
-            guard let delegate = delegate else { return }
+            guard let delegate else { return }
             call(delegate)
         }
     }

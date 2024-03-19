@@ -1,6 +1,6 @@
 //
 //  HTTPCancelable.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 14.09.2022.
 //
@@ -19,4 +19,4 @@ extension HTTPSession {
     }
 }
 
-extension URLSessionDataTask: HTTPCancelable { }
+extension URLSessionDataTask: HTTPCancelable {}

@@ -1,6 +1,6 @@
 //
 //  BackendProductState.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //
@@ -34,13 +34,13 @@ extension BackendProductState: Codable {
         if let value = try? container.decode(AdaptyEligibility.self, forKey: .introductoryOfferEligibility) {
             introductoryOfferEligibility = value
         } else {
-            introductoryOfferEligibility = (try container.decode(Bool.self, forKey: .introductoryOfferEligibility)) ? .eligible : .ineligible
+            introductoryOfferEligibility = try (container.decode(Bool.self, forKey: .introductoryOfferEligibility)) ? .eligible : .ineligible
         }
         version = try container.decode(Int64.self, forKey: .version)
     }
 }
 
-extension Sequence where Element == BackendProductState {
+extension Sequence<BackendProductState> {
     var asDictionary: [String: BackendProductState] {
         Dictionary(map { ($0.vendorId, $0) }, uniquingKeysWith: { first, second in
             first.version > second.version ? first : second

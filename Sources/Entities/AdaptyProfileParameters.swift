@@ -1,6 +1,6 @@
 //
 //  AdaptyProfileParameters.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 26.09.2022.
 //
@@ -51,7 +51,7 @@ public struct AdaptyProfileParameters {
 }
 
 extension AdaptyProfileParameters {
-    public static let empty: AdaptyProfileParameters = AdaptyProfileParameters()
+    public static let empty: AdaptyProfileParameters = .init()
     public func builder() -> Builder { Builder(self) }
 }
 

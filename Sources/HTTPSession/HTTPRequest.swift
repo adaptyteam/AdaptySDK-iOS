@@ -1,6 +1,6 @@
 //
 //  HTTPRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.08.2022.
 //
@@ -85,7 +85,7 @@ extension HTTPRequest {
         if let params = self as? HTTPDataRequest {
             do {
                 request.httpBody = try params.getData(configuration: configuration)
-            } catch let error {
+            } catch {
                 return .failure(HTTPError.perform(endpoint, error: error))
             }
         }

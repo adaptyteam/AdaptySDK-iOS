@@ -1,6 +1,6 @@
 //
 //  Backend.QueryItems.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.09.2022.
 //
@@ -13,11 +13,11 @@ extension Backend.Request {
     fileprivate static let vendorProductIdQueryItemName = "product"
 }
 
-extension Array where Element == HTTPRequest.QueryItems.Element {
+extension [HTTPRequest.QueryItems.Element] {
     func setBackendProfileId(_ profileId: String?) -> Self {
         var queryItems = filter { $0.name != Backend.Request.profileIdQueryItemName }
 
-        if let profileId = profileId {
+        if let profileId {
             queryItems.append(URLQueryItem(name: Backend.Request.profileIdQueryItemName, value: profileId))
         }
         return queryItems
@@ -26,7 +26,7 @@ extension Array where Element == HTTPRequest.QueryItems.Element {
     func setVendorProductId(_ vendorProductId: String?) -> Self {
         var queryItems = filter { $0.name != Backend.Request.vendorProductIdQueryItemName }
 
-        if let vendorProductId = vendorProductId {
+        if let vendorProductId {
             queryItems.append(URLQueryItem(name: Backend.Request.vendorProductIdQueryItemName, value: vendorProductId))
         }
         return queryItems
@@ -35,7 +35,7 @@ extension Array where Element == HTTPRequest.QueryItems.Element {
     func setDiscountId(_ discountId: String?) -> Self {
         var queryItems = filter { $0.name != Backend.Request.discountIdQueryItemName }
 
-        if let discountId = discountId {
+        if let discountId {
             queryItems.append(URLQueryItem(name: Backend.Request.discountIdQueryItemName, value: discountId))
         }
         return queryItems

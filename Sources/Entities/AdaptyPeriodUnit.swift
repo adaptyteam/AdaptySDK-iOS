@@ -1,6 +1,6 @@
 //
 //  AdaptyPeriodUnit.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2022.
 //
@@ -18,47 +18,39 @@ public enum AdaptyPeriodUnit: UInt {
 
 extension AdaptyPeriodUnit {
     init(unit: SK1Product.PeriodUnit) {
-        switch unit {
-        case .day:
-            self = .day
-        case .week:
-            self = .week
-        case .month:
-            self = .month
-        case .year:
-            self = .year
-        @unknown default:
-            self = .unknown
-        }
+        self =
+            switch unit {
+            case .day: .day
+            case .week: .week
+            case .month: .month
+            case .year: .year
+            @unknown default: .unknown
+            }
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     init(unit: SK2Product.SubscriptionPeriod.Unit) {
-        switch unit {
-        case .day:
-            self = .day
-        case .week:
-            self = .week
-        case .month:
-            self = .month
-        case .year:
-            self = .year
-        @unknown default:
-            self = .unknown
-        }
+        self =
+            switch unit {
+            case .day: .day
+            case .week: .week
+            case .month: .month
+            case .year: .year
+            @unknown default: .unknown
+            }
     }
 }
 
 extension AdaptyPeriodUnit: CustomStringConvertible {
     public var description: String {
-        let value: CodingValues
-        switch self {
-        case .day: value = .day
-        case .week: value = .week
-        case .month: value = .month
-        case .year: value = .year
-        case .unknown: value = .unknown
-        }
+        let value: CodingValues =
+            switch self {
+            case .day: .day
+            case .week: .week
+            case .month: .month
+            case .year: .year
+            case .unknown: .unknown
+            }
         return value.rawValue
     }
 }
@@ -75,25 +67,26 @@ extension AdaptyPeriodUnit: Codable {
     }
 
     public init(from decoder: Decoder) throws {
-        let value = CodingValues(rawValue: try decoder.singleValueContainer().decode(String.self))
-        switch value {
-        case .day: self = .day
-        case .week: self = .week
-        case .month: self = .month
-        case .year: self = .year
-        default: self = .unknown
-        }
+        let value = try CodingValues(rawValue: decoder.singleValueContainer().decode(String.self))
+        self =
+            switch value {
+            case .day: .day
+            case .week: .week
+            case .month: .month
+            case .year: .year
+            default: .unknown
+            }
     }
 
     public func encode(to encoder: Encoder) throws {
-        let value: CodingValues
-        switch self {
-        case .day: value = .day
-        case .week: value = .week
-        case .month: value = .month
-        case .year: value = .year
-        case .unknown: value = .unknown
-        }
+        let value: CodingValues =
+            switch self {
+            case .day: .day
+            case .week: .week
+            case .month: .month
+            case .year: .year
+            case .unknown: .unknown
+            }
         var container = encoder.singleValueContainer()
         try container.encode(value.rawValue)
     }

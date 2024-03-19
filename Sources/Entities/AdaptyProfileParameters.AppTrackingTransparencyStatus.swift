@@ -3,7 +3,6 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.12.2022
-//  Copyright © 2022 Adapty. All rights reserved.
 //
 
 import Foundation
@@ -36,26 +35,26 @@ extension AdaptyProfileParameters.AppTrackingTransparencyStatus {
     }
 
     var intRawValue: Int {
-        let value: CodingIntValues
-        switch self {
-        case .notDetermined: value = .notDetermined
-        case .restricted: value = .restricted
-        case .denied: value = .denied
-        case .authorized: value = .authorized
-        case .unknown: value = .unknown
-        }
+        let value: CodingIntValues =
+            switch self {
+            case .notDetermined: .notDetermined
+            case .restricted: .restricted
+            case .denied: .denied
+            case .authorized: .authorized
+            case .unknown: .unknown
+            }
         return value.rawValue
     }
 
     var stringRawValue: String {
-        let value: CodingStringValues
-        switch self {
-        case .notDetermined: value = .notDetermined
-        case .restricted: value = .restricted
-        case .denied: value = .denied
-        case .authorized: value = .authorized
-        case .unknown: value = .unknown
-        }
+        let value: CodingStringValues =
+            switch self {
+            case .notDetermined: .notDetermined
+            case .restricted: .restricted
+            case .denied: .denied
+            case .authorized: .authorized
+            case .unknown: .unknown
+            }
         return value.rawValue
     }
 
@@ -88,7 +87,7 @@ extension AdaptyProfileParameters.AppTrackingTransparencyStatus: Codable {
         if let value = try? container.decode(Int.self) {
             self.init(from: value)
         } else {
-            self.init(from: try container.decode(String.self))
+            try self.init(from: container.decode(String.self))
         }
     }
 

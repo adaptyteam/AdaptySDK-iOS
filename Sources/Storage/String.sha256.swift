@@ -1,6 +1,6 @@
 //
 //  String.sha256.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 10.10.2022.
 //

@@ -1,6 +1,6 @@
 //
 //  AnyCodingKeys.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 05.04.2023
 //

@@ -3,7 +3,6 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 27.04.2023
-//  Copyright © 2023 Adapty. All rights reserved.
 //
 
 import StoreKit
@@ -21,7 +20,7 @@ final class SK1ProductsFetcher: NSObject {
 
     func fetchProducts(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK1Product]>) {
         queue.async { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
                 return
             }
@@ -64,7 +63,7 @@ final class SK1ProductsFetcher: NSObject {
 
     fileprivate func saveProducts(_ sk1Products: [SK1Product]) {
         queue.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             sk1Products.forEach { self.sk1Products[$0.productIdentifier] = $0 }
         }
     }
@@ -79,7 +78,8 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
                 params: [
                     "products_ids": .value(response.products.map { $0.productIdentifier }),
                     "invalid_products": .valueOrNil(response.invalidProductIdentifiers),
-                ]))
+                ]
+            ))
 
             if response.products.isEmpty {
                 Log.verbose("SK1ProductsFetcher: SKProductsResponse don't have any product")
@@ -89,7 +89,7 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
                 Log.verbose("SK1ProductsFetcher: found product \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
             }
 
-            guard let self = self else { return }
+            guard let self else { return }
             if !response.invalidProductIdentifiers.isEmpty {
                 Log.warn("SK1ProductsFetcher: InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
             }
@@ -122,7 +122,9 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
     }
 
     func requestDidFinish(_ request: SKRequest) {
-        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "fetch_products_did_finish", callId: "SKR\(request.hash)"
+        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+            eventName: "fetch_products_did_finish",
+            callId: "SKR\(request.hash)"
         ))
         request.cancel()
     }
@@ -130,12 +132,14 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
     func request(_ request: SKRequest, didFailWithError error: Error) {
         defer { request.cancel() }
         queue.async { [weak self] in
-            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "fetch_products",
-                                                                callId: "SKR\(request.hash)",
-                                                                error: "\(error.localizedDescription). Detail: \(error)"))
+            Adapty.logSystemEvent(AdaptyAppleResponseParameters(
+                methodName: "fetch_products",
+                callId: "SKR\(request.hash)",
+                error: "\(error.localizedDescription). Detail: \(error)"
+            ))
 
             Log.error("SK1ProductsFetcher: Can't fetch products from Store \(error)")
-            guard let self = self else { return }
+            guard let self else { return }
             guard let (productIds, retryCount) = self.requests[request] else {
                 Log.error("SK1ProductsFetcher: Not found SKRequest in self.requests")
                 return

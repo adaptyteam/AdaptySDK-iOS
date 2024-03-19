@@ -1,6 +1,6 @@
 //
 //  FallbackBackend.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.09.2022.
 //
@@ -14,7 +14,7 @@ struct FallbackBackend: HTTPCodableConfiguration {
     func configure(decoder: JSONDecoder) { Backend.configure(decoder: decoder) }
     func configure(encoder: JSONEncoder) { Backend.configure(encoder: encoder) }
 
-    init(secretKey: String, baseURL url: URL, withProxy: (host: String, port: Int)? = nil) {
+    init(secretKey _: String, baseURL url: URL, withProxy: (host: String, port: Int)? = nil) {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -32,13 +32,17 @@ struct FallbackBackend: HTTPCodableConfiguration {
 }
 
 extension FallbackBackend {
-    func createHTTPSession(responseQueue: DispatchQueue,
-                           errorHandler: ((HTTPError) -> Void)? = nil) -> HTTPSession {
-        HTTPSession(configuration: self,
-                    responseQueue: responseQueue,
-                    requestAdditional: nil,
-                    responseValidator: validator,
-                    errorHandler: errorHandler)
+    func createHTTPSession(
+        responseQueue: DispatchQueue,
+        errorHandler: ((HTTPError) -> Void)? = nil
+    ) -> HTTPSession {
+        HTTPSession(
+            configuration: self,
+            responseQueue: responseQueue,
+            requestAdditional: nil,
+            responseValidator: validator,
+            errorHandler: errorHandler
+        )
     }
 
     func validator(_ response: HTTPDataResponse) -> HTTPError? {

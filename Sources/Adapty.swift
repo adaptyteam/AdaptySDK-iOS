@@ -1,9 +1,8 @@
 //
 //  Adapty.swift
-//  Adapty
+//  AdaptySDK
 //
-//  Created by Andrey Kyashkin on 28/10/2019.
-//  Copyright © 2019 Adapty. All rights reserved.
+//  Created by Andrey Kyashkin on 28.10.2019.
 //
 
 import StoreKit
@@ -26,11 +25,13 @@ extension Adapty {
     /// - Parameter customerUserId: User identifier in your system
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
-    public static func activate(_ apiKey: String,
-                                observerMode: Bool = false,
-                                customerUserId: String? = nil,
-                                dispatchQueue: DispatchQueue = .main,
-                                _ completion: AdaptyErrorCompletion? = nil) {
+    public static func activate(
+        _ apiKey: String,
+        observerMode: Bool = false,
+        customerUserId: String? = nil,
+        dispatchQueue: DispatchQueue = .main,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
         let logName = "activate"
@@ -59,12 +60,14 @@ extension Adapty {
 
             Adapty.eventsManager = EventsManager(profileStorage: UserDefaults.standard, backend: backend)
 
-            shared = Adapty(apiKeyPrefix: String(apiKey.prefix(while: { $0 != "." })),
-                            profileStorage: UserDefaults.standard,
-                            vendorIdsStorage: UserDefaults.standard,
-                            backend: backend,
-                            fallbackBackend: fallbackBackend,
-                            customerUserId: customerUserId)
+            shared = Adapty(
+                apiKeyPrefix: String(apiKey.prefix(while: { $0 != "." })),
+                profileStorage: UserDefaults.standard,
+                vendorIdsStorage: UserDefaults.standard,
+                backend: backend,
+                fallbackBackend: fallbackBackend,
+                customerUserId: customerUserId
+            )
             LifecycleManager.shared.initialize()
             Log.info("Adapty activated withObserverMode:\(observerMode), withCustomerUserId: \(customerUserId != nil)")
             completion(nil)
@@ -80,8 +83,10 @@ extension Adapty {
     /// - Parameters:
     ///   - customerUserId: User identifier in your system.
     ///   - completion: Result callback.
-    public static func identify(_ customerUserId: String,
-                                _ completion: AdaptyErrorCompletion? = nil) {
+    public static func identify(
+        _ customerUserId: String,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         async(completion, logName: "identify") { manager, completion in
             manager.identify(toCustomerUserId: customerUserId, completion)
         }
@@ -120,8 +125,10 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
     ///
     /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
-    public static func updateProfile(params: AdaptyProfileParameters,
-                                     _ completion: AdaptyErrorCompletion? = nil) {
+    public static func updateProfile(
+        params: AdaptyProfileParameters,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         async(completion, logName: "update_profile") { manager, completion in
             if let analyticsDisabled = params.analyticsDisabled {
                 manager.profileStorage.setExternalAnalyticsDisabled(analyticsDisabled)
@@ -137,9 +144,11 @@ extension Adapty {
     }
 
     /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
-    public static func setVariationId(from decoder: JSONDecoder,
-                                      data: Data,
-                                      _ completion: AdaptyErrorCompletion? = nil) {
+    public static func setVariationId(
+        from decoder: JSONDecoder,
+        data: Data,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         struct PrivateParameters: Decodable {
             let variationId: String
             let transactionId: String
@@ -180,9 +189,11 @@ extension Adapty {
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
     ///   - completion: A result containing an optional error.
-    public static func setVariationId(_ variationId: String,
-                                      forPurchasedTransaction transaction: SKPaymentTransaction,
-                                      _ completion: AdaptyErrorCompletion? = nil) {
+    public static func setVariationId(
+        _ variationId: String,
+        forPurchasedTransaction transaction: SKPaymentTransaction,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         let logParams: EventParameters = [
             "variation_id": .value(variationId),
             "transaction_id": .valueOrNil(transaction.transactionIdentifier),
@@ -207,9 +218,11 @@ extension Adapty {
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - completion: A result containing an optional error.
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public static func setVariationId(_ variationId: String,
-                                      forPurchasedTransaction transaction: Transaction,
-                                      _ completion: AdaptyErrorCompletion? = nil) {
+    public static func setVariationId(
+        _ variationId: String,
+        forPurchasedTransaction transaction: Transaction,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         let logParams: EventParameters = [
             "variation_id": .value(variationId),
             "transaction_id": .value(transaction.ext.identifier),
@@ -232,8 +245,10 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
-    public static func getPaywallProducts(paywall: AdaptyPaywall,
-                                          _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
+    public static func getPaywallProducts(
+        paywall: AdaptyPaywall,
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
+    ) {
         async(completion, logName: "get_paywall_products", logParams: ["placement_id": .value(paywall.placementId)]) { manager, completion in
             manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SK1Product]>) in
                 completion(result.map { sk1Products in
@@ -244,9 +259,11 @@ extension Adapty {
     }
 
     /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
-    public static func getPaywallProduct(from decoder: JSONDecoder,
-                                         data: Data,
-                                         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallProduct>) {
+    public static func getPaywallProduct(
+        from decoder: JSONDecoder,
+        data: Data,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallProduct>
+    ) {
         async(completion) { manager, completion in
             let object: AdaptyPaywallProduct.PrivateObject
             do {
@@ -258,7 +275,7 @@ extension Adapty {
 
             manager.skProductsManager.fetchSK1Product(productIdentifier: object.vendorProductId, fetchPolicy: .returnCacheDataElseLoad) { result in
                 completion(result.flatMap { (sk1Product: SK1Product?) -> AdaptyResult<AdaptyPaywallProduct> in
-                    guard let sk1Product = sk1Product else {
+                    guard let sk1Product else {
                         return .failure(SKManagerError.noProductIDsFound().asAdaptyError)
                     }
                     return .success(AdaptyPaywallProduct(from: object, sk1Product: sk1Product))
@@ -274,11 +291,15 @@ extension Adapty {
     /// - Parameters:
     ///   - products: The ``AdaptyPaywallProduct`` array, for which information will be retrieved.
     ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-    public static func getProductsIntroductoryOfferEligibility(products: [AdaptyPaywallProduct],
-                                                               _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
-        async(completion,
-              logName: "get_products_introductory_offer_eligibility",
-              logParams: ["products": .value(products.map { $0.vendorProductId })]) { manager, completion in
+    public static func getProductsIntroductoryOfferEligibility(
+        products: [AdaptyPaywallProduct],
+        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
+    ) {
+        async(
+            completion,
+            logName: "get_products_introductory_offer_eligibility",
+            logParams: ["products": .value(products.map { $0.vendorProductId })]
+        ) { manager, completion in
             manager.skProductsManager.getIntroductoryOfferEligibility(sk1Products: products.map { $0.skProduct }) {
                 completionGetIntroductoryOfferEligibility($0, manager, completion)
             }
@@ -292,11 +313,15 @@ extension Adapty {
     /// - Parameters:
     ///   - products: The products ids `String` array, for which information will be retrieved
     ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-    public static func getProductsIntroductoryOfferEligibility(vendorProductIds: [String],
-                                                               _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
-        async(completion,
-              logName: "get_products_introductory_offer_eligibility",
-              logParams: ["products": .value(vendorProductIds)]) { manager, completion in
+    public static func getProductsIntroductoryOfferEligibility(
+        vendorProductIds: [String],
+        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
+    ) {
+        async(
+            completion,
+            logName: "get_products_introductory_offer_eligibility",
+            logParams: ["products": .value(vendorProductIds)]
+        ) { manager, completion in
             manager.skProductsManager.getIntroductoryOfferEligibility(vendorProductIds: Set(vendorProductIds)) {
                 completionGetIntroductoryOfferEligibility($0, manager, completion)
             }
@@ -365,8 +390,10 @@ extension Adapty {
     /// - Parameters:
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
     ///   - completion: A result containing the ``AdaptyPurchasedInfo`` object.
-    public static func makePurchase(product: AdaptyPaywallProduct,
-                                    _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>) {
+    public static func makePurchase(
+        product: AdaptyPaywallProduct,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>
+    ) {
         let logName = "make_purchase"
         let logParams: EventParameters = [
             "paywall_name": .value(product.paywallName),

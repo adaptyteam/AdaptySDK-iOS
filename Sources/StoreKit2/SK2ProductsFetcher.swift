@@ -1,5 +1,5 @@
 //
-//  SK2ProductsManager.swift
+//  SK2ProductsFetcher.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 25.04.2023
@@ -11,7 +11,7 @@ import StoreKit
 actor SK2ProductsFetcher {
     private var sk2Products = [String: SK2Product]()
 
-    func fetchProducts(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> [SK2Product] {
+    func fetchProducts(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount _: Int = 3) async throws -> [SK2Product] {
         guard !productIds.isEmpty else {
             throw SKManagerError.noProductIDsFound().asAdaptyError
         }
@@ -32,7 +32,8 @@ actor SK2ProductsFetcher {
             callId: callId,
             params: [
                 "products_ids": .value(productIds),
-            ]))
+            ]
+        ))
 
         let sk2Products: [SK2Product]
         do {
@@ -62,7 +63,8 @@ actor SK2ProductsFetcher {
             callId: callId,
             params: [
                 "products_ids": .value(sk2Products.map { $0.id }),
-            ]))
+            ]
+        ))
 
         guard !sk2Products.isEmpty else {
             throw SKManagerError.noProductIDsFound().asAdaptyError

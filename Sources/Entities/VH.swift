@@ -1,6 +1,6 @@
 //
 //  VH.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //
@@ -42,7 +42,7 @@ extension VH: Encodable where Value: Encodable {}
 extension VH: Decodable where Value: Decodable {}
 
 extension VH {
-    @inlinable func flatValue<T>() -> VH<T>? where Value == Optional<T> {
+    @inlinable func flatValue<T>() -> VH<T>? where Value == T? {
         switch value {
         case .none:
             return .none

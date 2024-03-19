@@ -1,6 +1,6 @@
 //
 //  FetchProductStatesRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2022.
 //
@@ -18,13 +18,12 @@ private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<[BackendProductState]?, Error>
-
-            if headers.hasSameBackendResponseHash(response.headers) {
-                result = .success(nil)
-            } else {
-                result = jsonDecoder.decode(Backend.Response.ValueOfData<[BackendProductState]>.self, response.body).map { $0.value }
-            }
+            let result: Result<[BackendProductState]?, Error> =
+                if headers.hasSameBackendResponseHash(response.headers) {
+                    .success(nil)
+                } else {
+                    jsonDecoder.decode(Backend.Response.ValueOfData<[BackendProductState]>.self, response.body).map { $0.value }
+                }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
@@ -39,9 +38,11 @@ private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPSession {
-    func performFetchProductStatesRequest(profileId: String,
-                                          responseHash: String?,
-                                          _ completion: @escaping AdaptyResultCompletion<VH<[BackendProductState]?>>) {
+    func performFetchProductStatesRequest(
+        profileId: String,
+        responseHash: String?,
+        _ completion: @escaping AdaptyResultCompletion<VH<[BackendProductState]?>>
+    ) {
         let request = FetchProductStatesRequest(profileId: profileId, responseHash: responseHash)
         perform(request, logName: "get_products") { (result: FetchProductStatesRequest.Result) in
             switch result {

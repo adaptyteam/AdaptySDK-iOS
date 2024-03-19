@@ -1,6 +1,6 @@
 //
 //  Application.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Dmitry Obukhov on 3/17/20.
 //

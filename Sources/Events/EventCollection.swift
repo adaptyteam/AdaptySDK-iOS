@@ -1,6 +1,6 @@
 //
 //  EventCollection.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //
@@ -49,5 +49,4 @@ struct EventCollection<Element> {
         guard toLimit >= 0 else { return }
         removeFirst(elements.count - toLimit)
     }
-
 }

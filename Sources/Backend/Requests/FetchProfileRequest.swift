@@ -1,6 +1,6 @@
 //
 //  FetchProfileRequest.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2022.
 //
@@ -14,13 +14,12 @@ private struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            let result: Result<AdaptyProfile?, Error>
-
-            if headers.hasSameBackendResponseHash(response.headers) {
-                result = .success(nil)
-            } else {
-                result = jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
-            }
+            let result: Result<AdaptyProfile?, Error> =
+                if headers.hasSameBackendResponseHash(response.headers) {
+                    .success(nil)
+                } else {
+                    jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
+                }
             return result.map { response.replaceBody(Backend.Response.Body($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
@@ -39,11 +38,15 @@ private struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPSession {
-    func performFetchProfileRequest(profileId: String,
-                                    responseHash: String?,
-                                    _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>) {
-        let request = FetchProfileRequest(profileId: profileId,
-                                          responseHash: responseHash)
+    func performFetchProfileRequest(
+        profileId: String,
+        responseHash: String?,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
+    ) {
+        let request = FetchProfileRequest(
+            profileId: profileId,
+            responseHash: responseHash
+        )
         perform(request, logName: "get_profile") { (result: FetchProfileRequest.Result) in
             switch result {
             case let .failure(error):

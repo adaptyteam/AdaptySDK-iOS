@@ -1,6 +1,6 @@
 //
 //  AdaptyProductDiscount.PaymentMode.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2022.
 //
@@ -65,10 +65,10 @@ extension AdaptyProductDiscount.PaymentMode {
 extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .payAsYouGo: return "payAsYouGo"
-        case .payUpFront: return "payUpFront"
-        case .freeTrial: return "freeTrial"
-        case .unknown: return "unknown"
+        case .payAsYouGo: "payAsYouGo"
+        case .payUpFront: "payUpFront"
+        case .freeTrial: "freeTrial"
+        case .unknown: "unknown"
         }
     }
 }
@@ -84,13 +84,13 @@ extension AdaptyProductDiscount.PaymentMode: Encodable {
     }
 
     public func encode(to encoder: Encoder) throws {
-        let value: CodingValues
-        switch self {
-        case .payAsYouGo: value = .payAsYouGo
-        case .payUpFront: value = .payUpFront
-        case .freeTrial: value = .freeTrial
-        case .unknown: value = .unknown
-        }
+        let value: CodingValues =
+            switch self {
+            case .payAsYouGo: .payAsYouGo
+            case .payUpFront: .payUpFront
+            case .freeTrial: .freeTrial
+            case .unknown: .unknown
+            }
 
         var container = encoder.singleValueContainer()
         try container.encode(value.rawValue)

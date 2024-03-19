@@ -1,6 +1,6 @@
 //
-//  Version.swift
-//  Adapty
+//  Versions.swift
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.08.2022.
 //
@@ -14,7 +14,6 @@ extension Adapty {
         Environment.CrossPlatformSDK.name = name
         Environment.CrossPlatformSDK.version = version
     }
-
 }
 
 extension Environment {

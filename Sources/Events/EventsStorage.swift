@@ -1,6 +1,6 @@
 //
 //  EventsStorage.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //
@@ -73,7 +73,6 @@ final class EventCollectionStorage {
         storage.setEvents(events.elements.map { $0.data })
     }
 }
-
 
 extension EventsStorage {
     fileprivate func getEvents() -> [Event.Info]? {

@@ -1,6 +1,6 @@
 //
 //  PaywallsCache.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 22.10.2022.
 //
@@ -12,7 +12,7 @@ protocol PaywallsStorage {
     func getPaywalls() -> [VH<AdaptyPaywall>]?
 }
 
-fileprivate extension VH<AdaptyPaywall> {
+private extension VH<AdaptyPaywall> {
     func equalLanguageCode(_ locale: AdaptyLocale) -> Bool {
         AdaptyLocale(id: value.locale).equalLanguageCode(locale)
     }
@@ -33,7 +33,7 @@ final class PaywallsCache {
 
     func getPaywallByLocale(_ locale: AdaptyLocale?, withPlacementId placementId: String) -> VH<AdaptyPaywall>? {
         guard let paywall = paywallByPlacementId[placementId] else { return nil }
-        guard let locale = locale else { return paywall }
+        guard let locale else { return paywall }
         guard paywall.equalLanguageCode(locale) else { return nil }
         return paywall
     }
@@ -41,7 +41,7 @@ final class PaywallsCache {
     func getPaywallByLocaleOrDefault(_ locale: AdaptyLocale?, withPlacementId placementId: String) -> VH<AdaptyPaywall>? {
         guard let paywall = paywallByPlacementId[placementId] else { return nil }
         if paywall.equalLanguageCode(.defaultPaywallLocale) { return paywall }
-        guard let locale = locale else { return nil }
+        guard let locale else { return nil }
         if paywall.equalLanguageCode(locale) { return paywall }
         return nil
     }

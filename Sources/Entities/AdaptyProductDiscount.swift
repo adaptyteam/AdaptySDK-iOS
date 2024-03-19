@@ -1,6 +1,6 @@
 //
 //  AdaptyProductDiscount.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2022.
 //
@@ -38,13 +38,15 @@ public struct AdaptyProductDiscount {
 
 extension AdaptyProductDiscount {
     init(discount: SKProductDiscount, locale: Locale) {
-        self.init(priceValue: AdaptyPrice(value: discount.price, locale: locale),
-                  identifier: discount.identifier,
-                  subscriptionPeriod: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
-                  numberOfPeriods: discount.numberOfPeriods,
-                  paymentMode: PaymentMode(mode: discount.paymentMode),
-                  localizedSubscriptionPeriod: locale.ext.localized(period: discount.subscriptionPeriod),
-                  localizedNumberOfPeriods: locale.ext.localized(numberOfPeriods: discount))
+        self.init(
+            priceValue: AdaptyPrice(value: discount.price, locale: locale),
+            identifier: discount.identifier,
+            subscriptionPeriod: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
+            numberOfPeriods: discount.numberOfPeriods,
+            paymentMode: PaymentMode(mode: discount.paymentMode),
+            localizedSubscriptionPeriod: locale.ext.localized(period: discount.subscriptionPeriod),
+            localizedNumberOfPeriods: locale.ext.localized(numberOfPeriods: discount)
+        )
     }
 }
 

@@ -1,6 +1,6 @@
 //
 //  SK1QueueManager.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 25.10.2022
 //
@@ -82,13 +82,13 @@ internal final class SK1QueueManager: NSObject {
         SKPaymentQueue.default().add(self)
 
         NotificationCenter.default.addObserver(forName: Application.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
-            if let self = self { SKPaymentQueue.default().remove(self) }
+            if let self { SKPaymentQueue.default().remove(self) }
         }
     }
 }
 
 extension SK1QueueManager: SKPaymentTransactionObserver {
-    func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+    func paymentQueue(_: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         transactions.forEach { transaction in
 
             let logParams = transaction.ext.logParams
@@ -117,7 +117,7 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
     }
 
     #if !os(watchOS)
-        func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
+        func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
             guard let delegate = Adapty.delegate else { return true }
 
             let deferredProduct = AdaptyDeferredProduct(sk1Product: product, payment: payment)
@@ -129,17 +129,17 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
         }
     #endif
 
-    func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+    func paymentQueueRestoreCompletedTransactionsFinished(_: SKPaymentQueue) {
         Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_finished"))
         Log.verbose("SK1QueueManager: Restore сompleted transactions finished.")
     }
 
-    func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
+    func paymentQueue(_: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
         Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_failed", error: "\(error.localizedDescription). Detail: \(error)"))
         Log.error("SK1QueueManager: Restore сompleted transactions failed with error: \(error)")
     }
 
-    func paymentQueue(_ queue: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
+    func paymentQueue(_: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
         Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": .value(productIdentifiers)]))
 
         // TODO: validate receipt

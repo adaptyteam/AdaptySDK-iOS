@@ -1,6 +1,6 @@
 //
 //  AdaptyProfile.Gender.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 26.09.2022.
 //
@@ -18,9 +18,9 @@ extension AdaptyProfile {
 extension AdaptyProfile.Gender: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .female: return "female"
-        case .male: return "male"
-        case .other: return "other"
+        case .female: "female"
+        case .male: "male"
+        case .other: "other"
         }
     }
 }
@@ -35,7 +35,7 @@ extension AdaptyProfile.Gender: Codable {
     }
 
     public init(from decoder: Decoder) throws {
-        let value = CodingValues(rawValue: try decoder.singleValueContainer().decode(String.self))
+        let value = try CodingValues(rawValue: decoder.singleValueContainer().decode(String.self))
         switch value {
         case .female: self = .female
         case .male: self = .male
@@ -45,12 +45,12 @@ extension AdaptyProfile.Gender: Codable {
     }
 
     public func encode(to encoder: Encoder) throws {
-        let value: CodingValues
-        switch self {
-        case .female: value = .female
-        case .male: value = .male
-        case .other: value = .other
-        }
+        let value: CodingValues =
+            switch self {
+            case .female: .female
+            case .male: .male
+            case .other: .other
+            }
         var container = encoder.singleValueContainer()
         try container.encode(value.rawValue)
     }

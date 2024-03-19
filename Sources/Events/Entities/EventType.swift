@@ -1,6 +1,6 @@
 //
 //  EventType.swift
-//  Adapty
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 07.10.2022.
 //
@@ -27,13 +27,13 @@ extension EventType {
     var name: String {
         switch self {
         case .appOpened:
-            return Name.appOpened
+            Name.appOpened
         case .paywallShowed:
-            return Name.paywallShowed
+            Name.paywallShowed
         case .onboardingScreenShowed:
-            return Name.onboardingScreenShowed
+            Name.onboardingScreenShowed
         case .system:
-            return Name.system
+            Name.system
         }
     }
 }
