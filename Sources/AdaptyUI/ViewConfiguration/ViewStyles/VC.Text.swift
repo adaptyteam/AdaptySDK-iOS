@@ -12,7 +12,6 @@ extension AdaptyUI.ViewConfiguration {
         let stringId: String
         let textAttributes: TextAttributes?
         let paragraphAttributes: ParagraphAttributes?
-        let imageInTextAttributes: ImageInTextAttributes?
     }
 }
 
@@ -21,8 +20,7 @@ extension AdaptyUI.ViewConfiguration.RichText {
         convert(
             assetById,
             defTextAttributes: def?.textAttributes,
-            defParagraphAttributes: def?.paragraphAttributes,
-            defImageInTextAttributes: def?.imageInTextAttributes
+            defParagraphAttributes: def?.paragraphAttributes
         )
     }
 }
@@ -30,8 +28,6 @@ extension AdaptyUI.ViewConfiguration.RichText {
 extension AdaptyUI.ViewConfiguration.Text: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
-        case paragraphAttributes = "paragraph_attributes"
-        case imageInTextAttributes = "image_attributes"
     }
 
     init(from decoder: Decoder) throws {
@@ -39,7 +35,6 @@ extension AdaptyUI.ViewConfiguration.Text: Decodable {
             stringId = id
             textAttributes = nil
             paragraphAttributes = nil
-            imageInTextAttributes = nil
             return
         }
 
@@ -47,7 +42,6 @@ extension AdaptyUI.ViewConfiguration.Text: Decodable {
         stringId = try container.decode(String.self, forKey: .stringId)
 
         textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
-        paragraphAttributes = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.ParagraphAttributes.self, forKey: .paragraphAttributes)
-        imageInTextAttributes = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.ImageInTextAttributes.self, forKey: .imageInTextAttributes)
+        paragraphAttributes = try AdaptyUI.ViewConfiguration.ParagraphAttributes(from: decoder)
     }
 }

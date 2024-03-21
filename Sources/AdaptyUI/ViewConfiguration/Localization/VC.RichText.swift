@@ -27,14 +27,6 @@ extension AdaptyUI.ViewConfiguration {
         let indent: Double?
     }
 
-    struct ImageInTextAttributes {
-        let size: Double?
-        let tintAssetId: String?
-        let backgroundAssetId: String?
-        let strike: Bool?
-        let underline: Bool?
-    }
-
     struct RichText {
         let items: [RichText.Item]
 
@@ -44,7 +36,7 @@ extension AdaptyUI.ViewConfiguration {
             case text(String, TextAttributes?)
             case tag(String, TextAttributes?)
             case paragraph(ParagraphAttributes?)
-            case image(String, ImageInTextAttributes?)
+            case image(String, TextAttributes?)
             case unknown
         }
     }
@@ -72,8 +64,7 @@ extension AdaptyUI.ViewConfiguration.RichText {
     func convert(
         _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?,
         defTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes? = nil,
-        defParagraphAttributes: AdaptyUI.ViewConfiguration.ParagraphAttributes? = nil,
-        defImageInTextAttributes: AdaptyUI.ViewConfiguration.ImageInTextAttributes? = nil
+        defParagraphAttributes: AdaptyUI.ViewConfiguration.ParagraphAttributes? = nil
     ) -> [AdaptyUI.RichText.Item] {
         items.compactMap { item in
             switch item {
@@ -84,7 +75,7 @@ extension AdaptyUI.ViewConfiguration.RichText {
             case let .paragraph(attr):
                 .paragraph(attr.map { $0.convert(assetById, def: defParagraphAttributes) })
             case let .image(assetId, attr):
-                .image(assetById(assetId)?.asFilling?.asImage, attr.map { $0.convert(assetById, def: defImageInTextAttributes) })
+                .image(assetById(assetId)?.asFilling?.asImage, attr.map { $0.convert(assetById, def: defTextAttributes) })
             default:
                 nil
             }
@@ -111,18 +102,6 @@ extension AdaptyUI.ViewConfiguration.ParagraphAttributes {
             horizontalAlign: horizontalAlign ?? def?.horizontalAlign,
             firstIndent: firstIndent ?? def?.firstIndent,
             indent: indent ?? def?.indent
-        )
-    }
-}
-
-extension AdaptyUI.ViewConfiguration.ImageInTextAttributes {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?, def: Self?) -> AdaptyUI.RichText.ImageInTextAttributes {
-        .init(
-            size: size ?? def?.size,
-            tint: assetById(tintAssetId ?? def?.tintAssetId)?.asFilling,
-            background: assetById(backgroundAssetId ?? def?.backgroundAssetId)?.asFilling,
-            strike: strike ?? def?.strike,
-            underline: underline ?? def?.underline
         )
     }
 }
@@ -169,7 +148,7 @@ extension AdaptyUI.ViewConfiguration.RichText.Item: Decodable {
         } else if container.contains(.image) {
             self = try .image(
                 container.decode(String.self, forKey: .image),
-                container.decodeIfPresent(AdaptyUI.ViewConfiguration.ImageInTextAttributes.self, forKey: .attributes)
+                container.decodeIfPresent(AdaptyUI.ViewConfiguration.TextAttributes.self, forKey: .attributes)
             )
         } else {
             self = .unknown
@@ -193,15 +172,5 @@ extension AdaptyUI.ViewConfiguration.ParagraphAttributes: Decodable {
         case horizontalAlign = "align"
         case firstIndent = "first_indent"
         case indent
-    }
-}
-
-extension AdaptyUI.ViewConfiguration.ImageInTextAttributes: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case size
-        case tintAssetId = "tint"
-        case backgroundAssetId = "background"
-        case strike
-        case underline
     }
 }

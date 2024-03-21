@@ -20,7 +20,7 @@ extension AdaptyUI {
             case text(String, TextAttributes?)
             case tag(String, TextAttributes?)
             case paragraph(ParagraphAttributes?)
-            case image(AdaptyUI.Image?, ImageInTextAttributes?)
+            case image(AdaptyUI.Image?, TextAttributes?)
         }
 
         public struct TextAttributes {
@@ -36,14 +36,6 @@ extension AdaptyUI {
             let horizontalAlign: AdaptyUI.HorizontalAlign?
             let firstIndent: Double?
             let indent: Double?
-        }
-
-        public struct ImageInTextAttributes {
-            let size: Double?
-            let tint: AdaptyUI.Filling?
-            let background: AdaptyUI.Filling?
-            let strike: Bool?
-            let underline: Bool?
         }
     }
 }
