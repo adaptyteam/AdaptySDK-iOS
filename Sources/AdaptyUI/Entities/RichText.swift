@@ -14,7 +14,7 @@ extension AdaptyUI {
         public let items: [RichText.Item]
         public let fallback: [RichText.Item]?
 
-        var isEmpty: Bool { items.isEmpty }
+        public var isEmpty: Bool { items.isEmpty }
 
         public enum Item {
             case text(String, TextAttributes?)
@@ -24,18 +24,26 @@ extension AdaptyUI {
         }
 
         public struct TextAttributes {
-            let font: AdaptyUI.Font?
-            let size: Double?
-            let color: AdaptyUI.Filling?
-            let background: AdaptyUI.Filling?
-            let strike: Bool?
-            let underline: Bool?
+            public let font: AdaptyUI.Font?
+            public let size: Double?
+            public let color: AdaptyUI.Filling?
+            public let background: AdaptyUI.Filling?
+            public let strike: Bool?
+            public let underline: Bool?
         }
 
         public struct ParagraphAttributes {
-            let horizontalAlign: AdaptyUI.HorizontalAlign?
-            let firstIndent: Double?
-            let indent: Double?
+            public let horizontalAlign: AdaptyUI.HorizontalAlign?
+            public let firstIndent: Double?
+            public let indent: Double?
+        }
+
+        public struct ImageInTextAttributes {
+            public let size: Double?
+            public let tint: AdaptyUI.Filling?
+            public let background: AdaptyUI.Filling?
+            public let strike: Bool?
+            public let underline: Bool?
         }
     }
 }
@@ -44,12 +52,9 @@ extension [AdaptyUI.RichText.Item] {
     var asString: String? {
         let string = compactMap {
             switch $0 {
-            case let .text(value, _), let .tag(value, _):
-                value
-            case .paragraph:
-                "\n"
-            default:
-                nil
+            case let .text(value, _), let .tag(value, _): value
+            case .paragraph: "\n"
+            default: nil
             }
         }.joined()
 
@@ -58,11 +63,11 @@ extension [AdaptyUI.RichText.Item] {
 }
 
 extension AdaptyUI.RichText {
-    var asString: String? {
+    public var asString: String? {
         items.asString
     }
 
-    var asFallbackString: String? {
+    public var asFallbackString: String? {
         fallback?.asString
     }
 }
