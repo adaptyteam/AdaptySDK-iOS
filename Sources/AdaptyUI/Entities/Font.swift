@@ -9,20 +9,21 @@ import Foundation
 
 extension AdaptyUI {
     public struct Font {
+        static let `default` = Font(
+            alias: "adapty_system",
+            familyName: "adapty_system",
+            weight: 400,
+            italic: false,
+            defaultSize: 10,
+            defaultFilling: .color(AdaptyUI.Color.black)
+        )
+
         public let alias: String
         public let familyName: String
-        public let weight: Int?
+        public let weight: Int
         public let italic: Bool
-        public let defaultSize: Double?
-        public let defaultColor: AdaptyUI.Color?
-        public let defaultHorizontalAlign: AdaptyUI.HorizontalAlign?
-    }
-}
-
-extension AdaptyUI.Font {
-    var defaultFilling: AdaptyUI.Filling? {
-        guard let color = defaultColor else { return nil }
-        return .color(color)
+        let defaultSize: Double
+        let defaultFilling: AdaptyUI.Filling
     }
 }
 
@@ -34,7 +35,6 @@ extension AdaptyUI.Font: Decodable {
         case italic
         case defaultSize = "size"
         case defaultColor = "color"
-        case defaultHorizontalAlign = "horizontal_align"
     }
 
     public init(from decoder: Decoder) throws {
@@ -47,12 +47,12 @@ extension AdaptyUI.Font: Decodable {
         if let v = (try? container.decode([String].self, forKey: .familyName))?.first {
             familyName = v
         } else {
-            familyName = try container.decodeIfPresent(String.self, forKey: .familyName) ?? "adapty_system"
+            familyName = try container.decodeIfPresent(String.self, forKey: .familyName) ?? AdaptyUI.Font.default.familyName
         }
-        weight = try container.decodeIfPresent(Int.self, forKey: .weight)
-        italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? false
-        defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize)
-        defaultColor = try container.decodeIfPresent(AdaptyUI.Color.self, forKey: .defaultColor)
-        defaultHorizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .defaultHorizontalAlign)
+        weight = try container.decodeIfPresent(Int.self, forKey: .weight) ?? AdaptyUI.Font.default.weight
+        italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? AdaptyUI.Font.default.italic
+
+        defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? AdaptyUI.Font.default.defaultSize
+        defaultFilling = try container.decodeIfPresent(AdaptyUI.Color.self, forKey: .defaultColor).map { .color($0) } ?? AdaptyUI.Font.default.defaultFilling
     }
 }

@@ -32,9 +32,9 @@ extension AdaptyUI.ViewConfiguration {
             return localization?.assets?[id] ?? assets[id]
         }
 
-        func getLocalizedString(_ id: String?) -> String? {
+        func getLocalizedUrl(_ id: String?) -> String? {
             guard let id, let item = localization?.strings?[id] else { return nil }
-            return item.value.asString ?? item.fallback?.asString
+            return item.value.asUrlString ?? item.fallback?.asUrlString
         }
 
         func getLocalizedRichText(_ id: String?) -> AdaptyUI.RichText? {
@@ -48,14 +48,14 @@ extension AdaptyUI.ViewConfiguration {
         func getLocalizedRichText(_ text: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText? {
             guard let item = localization?.strings?[text.stringId] else { return nil }
             return AdaptyUI.RichText(
-                items: item.value.convert(getLocalizedAsset, def: text),
-                fallback: item.fallback.map { $0.convert(getLocalizedAsset, def: text) }
+                items: item.value.convert(getLocalizedAsset, defaultAttributes: text),
+                fallback: item.fallback.map { $0.convert(getLocalizedAsset, defaultAttributes: text) }
             )
         }
 
         func convertButtonAction(from value: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
             guard case let .openUrl(id) = value else { return value }
-            return .openUrl(getLocalizedString(id))
+            return .openUrl(getLocalizedUrl(id))
         }
 
         func convert(_ items: [String: ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {

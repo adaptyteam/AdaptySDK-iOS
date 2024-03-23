@@ -9,6 +9,8 @@ import Foundation
 
 extension AdaptyUI {
     public struct Color {
+        static let black = Color(data: 0x000000FF)
+
         let data: UInt64
 
         public var red: Double { Double((data & 0xFF000000) >> 24) / 255 }

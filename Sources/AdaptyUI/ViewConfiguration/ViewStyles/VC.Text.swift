@@ -16,11 +16,14 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.RichText {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?, def: AdaptyUI.ViewConfiguration.Text?) -> [AdaptyUI.RichText.Item] {
+    func convert(
+        _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?,
+        defaultAttributes text: AdaptyUI.ViewConfiguration.Text?
+    ) -> [AdaptyUI.RichText.Item] {
         convert(
             assetById,
-            defTextAttributes: def?.textAttributes,
-            defParagraphAttributes: def?.paragraphAttributes
+            defaultTextAttributes: text?.textAttributes,
+            defaultParagraphAttributes: text?.paragraphAttributes
         )
     }
 }
@@ -41,7 +44,9 @@ extension AdaptyUI.ViewConfiguration.Text: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         stringId = try container.decode(String.self, forKey: .stringId)
 
-        textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
-        paragraphAttributes = try AdaptyUI.ViewConfiguration.ParagraphAttributes(from: decoder)
+        let textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
+        self.textAttributes = textAttributes.isEmpty ? nil : textAttributes
+        let paragraphAttributes = try AdaptyUI.ViewConfiguration.ParagraphAttributes(from: decoder)
+        self.paragraphAttributes = paragraphAttributes.isEmpty ? nil : paragraphAttributes
     }
 }
