@@ -34,7 +34,7 @@ extension AdaptyUI.ViewConfiguration {
 
         func getLocalizedUrl(_ id: String?) -> String? {
             guard let id, let item = localization?.strings?[id] else { return nil }
-            return item.value.asUrlString ?? item.fallback?.asUrlString
+            return item.value.asString ?? item.fallback?.asString
         }
 
         func getLocalizedRichText(_ id: String?) -> AdaptyUI.RichText? {
@@ -45,13 +45,14 @@ extension AdaptyUI.ViewConfiguration {
             )
         }
 
-        func getLocalizedRichText(_ text: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText? {
-            guard let item = localization?.strings?[text.stringId] else { return nil }
-            return AdaptyUI.RichText(
-                items: item.value.convert(getLocalizedAsset, defaultAttributes: text),
-                fallback: item.fallback.map { $0.convert(getLocalizedAsset, defaultAttributes: text) }
-            )
+        func getLocalizedRichText(_ textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText {
+            guard let item = localization?.strings?[textBlock.stringId] else { return AdaptyUI.RichText.empty }
+            return textBlock.convert(getLocalizedAsset, item: item)
         }
+
+//        func getLocalizedRichText(_ text: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText {
+//            text.convert(getLocalizedAsset) { localization?.strings?[$0] }
+//        }
 
         func convertButtonAction(from value: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
             guard case let .openUrl(id) = value else { return value }
@@ -107,7 +108,7 @@ extension AdaptyUI.ViewConfiguration {
                     transitionIn: value.transitionIn
                 ))
             case let .text(value):
-                return .text(getLocalizedRichText(value) ?? AdaptyUI.RichText(items: [], fallback: nil))
+                return .text(getLocalizedRichText(value))
             case let .object(value):
                 return .object(AdaptyUI.CustomObject(type: value.type, orderedProperties: convert(value.properties)))
             case .unknown:

@@ -14,7 +14,7 @@ extension AdaptyUI {
             familyName: "adapty_system",
             weight: 400,
             italic: false,
-            defaultSize: 10,
+            defaultSize: 15,
             defaultFilling: .color(AdaptyUI.Color.black)
         )
 

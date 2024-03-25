@@ -11,6 +11,8 @@ extension AdaptyUI {
     public struct RichText {
         public let items: [RichText.Item]
         public let fallback: [RichText.Item]?
+        public let maxRows: Int?
+        public let overflowMode: Set<OverflowMode>
 
         public var isEmpty: Bool { items.isEmpty }
 
@@ -42,5 +44,21 @@ extension AdaptyUI {
             public let bulletSpace: Double?
             public let bullet: Bullet?
         }
+
+        public enum OverflowMode: String {
+            static let empty = Set<OverflowMode>()
+            case truncate
+            case scale
+        }
     }
 }
+
+extension AdaptyUI.RichText {
+    static let empty = AdaptyUI.RichText(items: [], fallback: nil, maxRows: nil, overflowMode: OverflowMode.empty)
+
+    init(items: [Item], fallback: [Item]?) {
+        self.init(items: items, fallback: fallback, maxRows: nil, overflowMode: OverflowMode.empty)
+    }
+}
+
+extension AdaptyUI.RichText.OverflowMode: Decodable {}

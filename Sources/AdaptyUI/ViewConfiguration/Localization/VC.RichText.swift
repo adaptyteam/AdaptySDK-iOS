@@ -63,9 +63,9 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.RichText {
-    var asUrlString: String? {
+    var asString: String? {
         items.first.flatMap {
-            if case let .text(value, _) = $0 { value } else { nil }
+            if case let .text(value, attr) = $0 , attr == nil { value } else { nil }
         }
     }
 
