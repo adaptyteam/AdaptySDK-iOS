@@ -38,7 +38,7 @@ extension AdaptyUI {
         }
 
         public struct ParagraphAttributes {
-            public let horizontalAlign: AdaptyUI.HorizontalAlign
+            public let horizontalAlign: AdaptyUI.HorizontalAlignment
             public let firstIndent: Double
             public let indent: Double
             public let bulletSpace: Double?

@@ -53,7 +53,7 @@ extension AdaptyUI.ViewConfiguration.Shape: Decodable {
             }
 
         if case .rectangle = shape,
-           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.Shape.CornerRadius.self, forKey: .rectangleCornerRadius) {
+           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.CornerRadius.self, forKey: .rectangleCornerRadius) {
             type = .rectangle(cornerRadius: rectangleCornerRadius)
         } else {
             type = shape

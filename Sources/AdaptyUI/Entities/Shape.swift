@@ -9,7 +9,7 @@ import Foundation
 
 extension AdaptyUI {
     public struct Shape {
-        static let defaultType: ShapeType = .rectangle(cornerRadius: .none)
+        static let defaultType: ShapeType = .rectangle(cornerRadius: CornerRadius.zero)
 
         public let background: Filling?
         public let border: Border?

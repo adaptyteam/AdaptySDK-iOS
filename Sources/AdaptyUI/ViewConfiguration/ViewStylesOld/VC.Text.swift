@@ -15,7 +15,7 @@ extension AdaptyUI.ViewConfiguration {
         let size: Double?
         let fillAssetId: String?
         let items: [Item]
-        let horizontalAlign: AdaptyUI.HorizontalAlign?
+        let horizontalAlign: AdaptyUI.HorizontalAlignment?
         let bulletSpace: Double?
 
         enum Item {
@@ -30,7 +30,7 @@ extension AdaptyUI.ViewConfiguration {
             let fontAssetId: String?
             let size: Double?
             let fillAssetId: String?
-            let horizontalAlign: AdaptyUI.HorizontalAlign?
+            let horizontalAlign: AdaptyUI.HorizontalAlignment?
             let isBullet: Bool
         }
 
@@ -69,7 +69,7 @@ extension AdaptyUI.ViewConfiguration.OldText.TextItem: Decodable {
         fontAssetId = try container.decodeIfPresent(String.self, forKey: .fontAssetId)
         size = try container.decodeIfPresent(Double.self, forKey: .size)
         fillAssetId = try container.decodeIfPresent(String.self, forKey: .fillAssetId)
-        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .horizontalAlign)
+        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlign)
         isBullet = try container.decodeIfPresent(Bool.self, forKey: .isBullet) ?? false
     }
 }
@@ -131,7 +131,7 @@ extension AdaptyUI.ViewConfiguration.OldText: Decodable {
 
         size = try container.decodeIfPresent(Double.self, forKey: .size)
         fillAssetId = try container.decodeIfPresent(String.self, forKey: .fillAssetId)
-        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlign.self, forKey: .horizontalAlign)
+        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlign)
 
         if container.contains(.items) {
             items = try container.decode([AdaptyUI.ViewConfiguration.OldText.Item].self, forKey: .items)

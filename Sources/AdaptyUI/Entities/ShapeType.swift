@@ -9,7 +9,7 @@ import Foundation
 
 extension AdaptyUI {
     public enum ShapeType {
-        case rectangle(cornerRadius: Shape.CornerRadius)
+        case rectangle(cornerRadius: CornerRadius)
         case circle
         case curveUp
         case curveDown
@@ -34,7 +34,7 @@ extension AdaptyUI.ShapeType: Decodable {
         case .curveDown:
             self = .curveDown
         case .rectangle:
-            self = .rectangle(cornerRadius: .none)
+            self = .rectangle(cornerRadius: AdaptyUI.CornerRadius.zero)
         case .circle:
             self = .circle
         }

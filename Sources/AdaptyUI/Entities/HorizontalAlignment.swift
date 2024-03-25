@@ -1,5 +1,5 @@
 //
-//  HorizontalAlign.swift
+//  HorizontalAlignment.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 29.06.2023
@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum HorizontalAlign: String {
+    public enum HorizontalAlignment: String {
         case left
         case center
         case right
@@ -16,4 +16,4 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.HorizontalAlign: Decodable {}
+extension AdaptyUI.HorizontalAlignment: Decodable {}
