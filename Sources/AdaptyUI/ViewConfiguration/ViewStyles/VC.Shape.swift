@@ -17,10 +17,10 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Shape {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.Shape {
-        var border: AdaptyUI.Shape.Border?
+    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.OldShape {
+        var border: AdaptyUI.OldShape.Border?
         if let filling = assetById(borderAssetId)?.asFilling {
-            border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.Shape.Border.defaultThickness)
+            border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.OldShape.Border.defaultThickness)
         }
         return .init(
             background: assetById(backgroundAssetId)?.asFilling,
@@ -49,7 +49,7 @@ extension AdaptyUI.ViewConfiguration.Shape: Decodable {
             } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
                 value
             } else {
-                AdaptyUI.Shape.defaultType
+                AdaptyUI.OldShape.defaultType
             }
 
         if case .rectangle = shape,

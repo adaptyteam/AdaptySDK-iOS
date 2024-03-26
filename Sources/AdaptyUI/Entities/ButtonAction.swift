@@ -12,7 +12,15 @@ extension AdaptyUI {
         case openUrl(String?)
         case restore
         case custom(String?)
+        case selectProduct(ProductIndexOrId)
+        case purchaseProduct(ProductIndexOrId)
+        case purchaseSelectedProduct
         case close
+
+        public enum ProductIndexOrId {
+            case index(Int)
+            case id(String)
+        }
     }
 }
 
@@ -21,6 +29,8 @@ extension AdaptyUI.ButtonAction: Decodable {
         case type
         case url
         case customId = "custom_id"
+        case productIndex = "product_index"
+        case productId = "product_id"
     }
 
     enum Types: String {
@@ -28,6 +38,9 @@ extension AdaptyUI.ButtonAction: Decodable {
         case restore
         case custom
         case close
+        case selectProduct = "select_product"
+        case purchaseProduct = "purchase_product"
+        case purchaseSelectedProduct = "purchase_selected_product"
     }
 
     public init(from decoder: Decoder) throws {
@@ -43,6 +56,22 @@ extension AdaptyUI.ButtonAction: Decodable {
             self = .close
         case .custom:
             self = try .custom(container.decode(String.self, forKey: .customId))
+        case .purchaseSelectedProduct:
+            self = .purchaseSelectedProduct
+        case .selectProduct:
+            self = try .selectProduct(productIndexOrId())
+        case .purchaseProduct:
+            self = try .purchaseProduct(productIndexOrId())
+        }
+
+        func productIndexOrId() throws -> ProductIndexOrId {
+            if let id = try container.decodeIfPresent(String.self, forKey: .productId) {
+                .id(id)
+            } else if let index = try container.decodeIfPresent(Int.self, forKey: .productIndex) {
+                .index(index)
+            } else {
+                try .id(container.decode(String.self, forKey: .productId))
+            }
         }
     }
 }

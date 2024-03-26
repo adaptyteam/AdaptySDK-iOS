@@ -60,7 +60,7 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
         case .font:
             self = try .font(AdaptyUI.Font(from: decoder))
         case .image:
-            self = try .filling(.image(AdaptyUI.Image(from: decoder)))
+            self = try .filling(.image(AdaptyUI.ImageData(from: decoder)))
         default:
             self = .unknown("asset.type: \(type)")
         }

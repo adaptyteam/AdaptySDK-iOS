@@ -67,8 +67,8 @@ extension AdaptyUI.ViewConfiguration {
             item?.map { (key: $0.key, value: convert($0.value)) } ?? []
         }
 
-        func convert(_ item: ProductObject) -> AdaptyUI.ProductObject {
-            AdaptyUI.ProductObject(productId: item.productId, orderedProperties: convert(item.properties))
+        func convert(_ item: ProductObject) -> AdaptyUI.OldProductObject {
+            AdaptyUI.OldProductObject(productId: item.productId, orderedProperties: convert(item.properties))
         }
 
         func convert(_ item: ViewItem) -> AdaptyUI.LocalizedViewItem {
@@ -89,20 +89,20 @@ extension AdaptyUI.ViewConfiguration {
                 return .shape(value.convert(getLocalizedAsset))
             case let .button(value):
 
-                let normal: AdaptyUI.Button.State = .init(
+                let normal: AdaptyUI.OldButton.State = .init(
                     shape: value.shape.map { $0.convert(getLocalizedAsset) },
                     title: value.title.flatMap(getLocalizedRichText)
                 )
 
-                let selected = AdaptyUI.Button.State(
+                let selected = AdaptyUI.OldButton.State(
                     shape: value.selectedShape.map { $0.convert(getLocalizedAsset) },
                     title: value.selectedTitle.flatMap(getLocalizedRichText)
                 )
 
-                return .button(AdaptyUI.Button(
+                return .button(AdaptyUI.OldButton(
                     normal: normal.isEmpty ? nil : normal,
                     selected: selected.isEmpty ? nil : selected,
-                    align: value.align ?? AdaptyUI.Button.defaultAlign,
+                    align: value.align ?? AdaptyUI.OldButton.defaultAlign,
                     action: value.action.map(convertButtonAction),
                     visibility: value.visibility,
                     transitionIn: value.transitionIn
@@ -110,7 +110,7 @@ extension AdaptyUI.ViewConfiguration {
             case let .text(value):
                 return .text(getLocalizedRichText(value))
             case let .object(value):
-                return .object(AdaptyUI.CustomObject(type: value.type, orderedProperties: convert(value.properties)))
+                return .object(AdaptyUI.OldCustomObject(type: value.type, orderedProperties: convert(value.properties)))
             case .unknown:
                 return .unknown("unsupported type")
             }
@@ -122,12 +122,12 @@ extension AdaptyUI.ViewConfiguration {
         for style in self.styles {
             styles[style.key] = AdaptyUI.LocalizedViewStyle(
                 featureBlock: style.value.featuresBlock.map {
-                    AdaptyUI.FeaturesBlock(
+                    AdaptyUI.OldFeaturesBlock(
                         type: $0.type,
                         orderedItems: convert($0.orderedItems)
                     )
                 },
-                productBlock: AdaptyUI.ProductsBlock(
+                productBlock: AdaptyUI.OldProductsBlock(
                     type: style.value.productsBlock.type,
                     mainProductIndex: style.value.productsBlock.mainProductIndex,
                     initiatePurchaseOnTap: style.value.productsBlock.initiatePurchaseOnTap,
@@ -135,7 +135,7 @@ extension AdaptyUI.ViewConfiguration {
                     orderedItems: convert(style.value.productsBlock.orderedItems)
                 ),
                 footerBlock: style.value.footerBlock.map {
-                    AdaptyUI.FooterBlock(
+                    AdaptyUI.OldFooterBlock(
                         orderedItems: convert($0.orderedItems)
                     )
                 },

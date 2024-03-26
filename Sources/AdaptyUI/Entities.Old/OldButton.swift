@@ -1,5 +1,5 @@
 //
-//  Button.swift
+//  OldButton.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 30.06.2023
@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Button {
+    public struct OldButton {
         static let defaultAlign = Align.center
 
         public let normal: State?
@@ -22,9 +22,9 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Button {
+extension AdaptyUI.OldButton {
     public struct State {
-        public let shape: AdaptyUI.Shape?
+        public let shape: AdaptyUI.OldShape?
         public let title: AdaptyUI.RichText?
 
         var isEmpty: Bool {
@@ -40,4 +40,4 @@ extension AdaptyUI.Button {
     }
 }
 
-extension AdaptyUI.Button.Align: Decodable {}
+extension AdaptyUI.OldButton.Align: Decodable {}

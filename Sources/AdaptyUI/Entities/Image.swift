@@ -1,37 +1,18 @@
 //
-//  Image.swift
-//  AdaptySDK
+//  File.swift
 //
-//  Created by Aleksei Valiano on 19.01.2023
+//
+//  Created by Aleksei Valiano on 25.03.2024
+//
 //
 
 import Foundation
 
 extension AdaptyUI {
-    public enum Image {
-        case raster(Data)
-        case url(URL, previewRaster: Data?)
-    }
-}
-
-extension AdaptyUI.Image: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case data = "value"
-        case url
-        case previewData = "preview_value"
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        if let data = try container.decodeIfPresent(Data.self, forKey: .data) {
-            self = .raster(data)
-            return
-        }
-
-        self = try .url(
-            container.decode(URL.self, forKey: .url),
-            previewRaster: container.decodeIfPresent(Data.self, forKey: .previewData)
-        )
+    public struct Image {
+        static let defaultAspect = AspectRatio.fit
+        public let asset: ImageData
+        public let aspect: AspectRatio
+        public let tint: Filling?
     }
 }

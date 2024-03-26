@@ -11,7 +11,7 @@ extension AdaptyUI {
     public enum Filling {
         case color(AdaptyUI.Color)
         case colorGradient(AdaptyUI.ColorGradient)
-        case image(AdaptyUI.Image)
+        case image(AdaptyUI.ImageData)
 
         public var asColor: AdaptyUI.Color? {
             switch self {
@@ -27,7 +27,7 @@ extension AdaptyUI {
             }
         }
 
-        public var asImage: AdaptyUI.Image? {
+        public var asImage: AdaptyUI.ImageData? {
             switch self {
             case let .image(value): value
             default: nil

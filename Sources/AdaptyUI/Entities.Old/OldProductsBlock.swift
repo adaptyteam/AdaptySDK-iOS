@@ -1,5 +1,5 @@
 //
-//  ProductsBlock.swift
+//  OldProductsBlock.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 29.06.2023
@@ -8,19 +8,19 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct ProductsBlock {
+    public struct OldProductsBlock {
         public let type: ProductsBlockType
         public let mainProductIndex: Int
         public let initiatePurchaseOnTap: Bool
-        public let products: [String: AdaptyUI.ProductObject]
+        public let products: [String: AdaptyUI.OldProductObject]
         public let items: [String: AdaptyUI.LocalizedViewItem]
         public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
 
-        init(type: ProductsBlockType, mainProductIndex: Int, initiatePurchaseOnTap: Bool, products: [AdaptyUI.ProductObject], orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+        init(type: ProductsBlockType, mainProductIndex: Int, initiatePurchaseOnTap: Bool, products: [AdaptyUI.OldProductObject], orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
             self.type = type
             self.mainProductIndex = mainProductIndex
             self.initiatePurchaseOnTap = initiatePurchaseOnTap
-            self.products = [String: AdaptyUI.ProductObject](products.map { ($0.productId, $0) }, uniquingKeysWith: { f, _ in f })
+            self.products = [String: AdaptyUI.OldProductObject](products.map { ($0.productId, $0) }, uniquingKeysWith: { f, _ in f })
             items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
             self.orderedItems = orderedItems
         }
@@ -33,12 +33,12 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.ProductsBlock {
-    public func product(by: AdaptyPaywallProduct) -> AdaptyUI.ProductObject? {
+extension AdaptyUI.OldProductsBlock {
+    public func product(by: AdaptyPaywallProduct) -> AdaptyUI.OldProductObject? {
         products[by.adaptyProductId]
     }
 
-    public func products(by: AdaptyPaywall) -> [AdaptyUI.ProductObject] {
+    public func products(by: AdaptyPaywall) -> [AdaptyUI.OldProductObject] {
         by.products.compactMap { products[$0.adaptyProductId] }
     }
 }

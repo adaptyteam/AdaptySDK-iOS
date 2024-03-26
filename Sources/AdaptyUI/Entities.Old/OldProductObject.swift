@@ -1,5 +1,5 @@
 //
-//  ProductObject.swift
+//  OldProductObject.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 03.01.2024
@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct ProductObject {
+    public struct OldProductObject {
         public let productId: String
         public let properties: [String: AdaptyUI.LocalizedViewItem]
         public let orderedProperties: [(key: String, value: AdaptyUI.LocalizedViewItem)]

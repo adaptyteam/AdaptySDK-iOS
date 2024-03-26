@@ -22,7 +22,7 @@ extension AdaptyUI.ViewConfiguration.TextBlock {
         _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?,
         item: AdaptyUI.ViewConfiguration.Localization.Item
     ) -> AdaptyUI.RichText {
-        AdaptyUI.RichText(
+        .init(
             items: item.value.convert(
                 assetById,
                 defaultTextAttributes: textAttributes,

@@ -13,7 +13,7 @@ extension AdaptyUI.ViewConfiguration {
         let selectedShape: Shape?
         let title: Text?
         let selectedTitle: Text?
-        let align: AdaptyUI.Button.Align?
+        let align: AdaptyUI.OldButton.Align?
         let action: AdaptyUI.ButtonAction?
         let visibility: Bool
         let transitionIn: [AdaptyUI.Transition]
@@ -38,7 +38,7 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
         selectedShape = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Shape.self, forKey: .selectedShape)
         selectedTitle = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Text.self, forKey: .selectedTitle)
         title = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Text.self, forKey: .title)
-        align = try container.decodeIfPresent(AdaptyUI.Button.Align.self, forKey: .align)
+        align = try container.decodeIfPresent(AdaptyUI.OldButton.Align.self, forKey: .align)
         action = try container.decodeIfPresent(AdaptyUI.ButtonAction.self, forKey: .action)
         visibility = try container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true
 
