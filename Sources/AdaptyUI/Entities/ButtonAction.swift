@@ -12,15 +12,10 @@ extension AdaptyUI {
         case openUrl(String?)
         case restore
         case custom(String?)
-        case selectProduct(ProductIndexOrId)
-        case purchaseProduct(ProductIndexOrId)
+        case selectProductId(String)
+        case purchaseProductId(String)
         case purchaseSelectedProduct
         case close
-
-        public enum ProductIndexOrId {
-            case index(Int)
-            case id(String)
-        }
     }
 }
 
@@ -29,7 +24,6 @@ extension AdaptyUI.ButtonAction: Decodable {
         case type
         case url
         case customId = "custom_id"
-        case productIndex = "product_index"
         case productId = "product_id"
     }
 
@@ -38,8 +32,8 @@ extension AdaptyUI.ButtonAction: Decodable {
         case restore
         case custom
         case close
-        case selectProduct = "select_product"
-        case purchaseProduct = "purchase_product"
+        case selectProductId = "select_product"
+        case purchaseProductId = "purchase_product"
         case purchaseSelectedProduct = "purchase_selected_product"
     }
 
@@ -58,20 +52,10 @@ extension AdaptyUI.ButtonAction: Decodable {
             self = try .custom(container.decode(String.self, forKey: .customId))
         case .purchaseSelectedProduct:
             self = .purchaseSelectedProduct
-        case .selectProduct:
-            self = try .selectProduct(productIndexOrId())
-        case .purchaseProduct:
-            self = try .purchaseProduct(productIndexOrId())
-        }
-
-        func productIndexOrId() throws -> ProductIndexOrId {
-            if let id = try container.decodeIfPresent(String.self, forKey: .productId) {
-                .id(id)
-            } else if let index = try container.decodeIfPresent(Int.self, forKey: .productIndex) {
-                .index(index)
-            } else {
-                try .id(container.decode(String.self, forKey: .productId))
-            }
+        case .selectProductId:
+            self = try .selectProductId(container.decode(String.self, forKey: .productId))
+        case .purchaseProductId:
+            self = try .purchaseProductId(container.decode(String.self, forKey: .productId))
         }
     }
 }

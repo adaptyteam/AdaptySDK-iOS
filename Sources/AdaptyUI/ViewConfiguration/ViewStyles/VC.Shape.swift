@@ -18,9 +18,9 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.Shape {
     func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.OldShape {
-        var border: AdaptyUI.OldShape.Border?
+        var border: AdaptyUI.Border?
         if let filling = assetById(borderAssetId)?.asFilling {
-            border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.OldShape.Border.defaultThickness)
+            border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.Border.defaultThickness)
         }
         return .init(
             background: assetById(backgroundAssetId)?.asFilling,
