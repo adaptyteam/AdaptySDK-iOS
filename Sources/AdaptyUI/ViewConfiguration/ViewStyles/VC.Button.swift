@@ -17,20 +17,18 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Button {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Button {
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func button(from: AdaptyUI.ViewConfiguration.Button) -> AdaptyUI.Button {
         .init(
-            action: action.map { $0.convert(localizer) },
-            isSelected: isSelected,
-            normalState: normalState.map { $0.convert(localizer) },
-            selectedState: selectedState.map { $0.convert(localizer) }
+            action: from.action.map(buttonAction),
+            isSelected: from.isSelected,
+            normalState: from.normalState.map(element),
+            selectedState: from.selectedState.map(element)
         )
     }
-}
 
-extension AdaptyUI.ButtonAction {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.ButtonAction {
-        guard case let .openUrl(stringId) = self else { return self }
-        return .openUrl(localizer.urlIfPresent(stringId))
+    func buttonAction(from: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
+        guard case let .openUrl(stringId) = from else { return from }
+        return .openUrl(self.urlIfPresent(stringId))
     }
 }

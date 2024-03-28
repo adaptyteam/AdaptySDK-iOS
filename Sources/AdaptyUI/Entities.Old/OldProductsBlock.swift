@@ -13,15 +13,15 @@ extension AdaptyUI {
         public let mainProductIndex: Int
         public let initiatePurchaseOnTap: Bool
         public let products: [String: AdaptyUI.OldProductObject]
-        public let items: [String: AdaptyUI.LocalizedViewItem]
-        public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
+        public let items: [String: AdaptyUI.OldViewItem]
+        public let orderedItems: [(key: String, value: AdaptyUI.OldViewItem)]
 
-        init(type: ProductsBlockType, mainProductIndex: Int, initiatePurchaseOnTap: Bool, products: [AdaptyUI.OldProductObject], orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+        init(type: ProductsBlockType, mainProductIndex: Int, initiatePurchaseOnTap: Bool, products: [AdaptyUI.OldProductObject], orderedItems: [(key: String, value: AdaptyUI.OldViewItem)]) {
             self.type = type
             self.mainProductIndex = mainProductIndex
             self.initiatePurchaseOnTap = initiatePurchaseOnTap
             self.products = [String: AdaptyUI.OldProductObject](products.map { ($0.productId, $0) }, uniquingKeysWith: { f, _ in f })
-            items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
+            items = [String: AdaptyUI.OldViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
             self.orderedItems = orderedItems
         }
     }

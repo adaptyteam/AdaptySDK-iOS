@@ -8,7 +8,7 @@
 @testable import Adapty
 import XCTest
 
-func XCTAssertEqual(_ expression: AdaptyUI.ViewConfiguration.ViewStyle?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
+func XCTAssertEqual(_ expression: AdaptyUI.ViewConfiguration.OldViewStyle?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
     let object = jsonValue.objectOrFail(file: file, line: line)
     print(value)
@@ -17,8 +17,8 @@ func XCTAssertEqual(_ expression: AdaptyUI.ViewConfiguration.ViewStyle?, withJSO
 
 final class AdaptyUIViewStyleTests: XCTestCase {
     func testDecodeValidJSON() throws {
-        let all = try AdaptyUI.ViewConfiguration.ViewStyle.ValidJSON.all.map {
-            let result = try $0.jsonData().decode(AdaptyUI.ViewConfiguration.ViewStyle.self)
+        let all = try AdaptyUI.ViewConfiguration.OldViewStyle.ValidJSON.all.map {
+            let result = try $0.jsonData().decode(AdaptyUI.ViewConfiguration.OldViewStyle.self)
             XCTAssertEqual(result, withJSONValue: $0)
             return result
         }
@@ -26,12 +26,12 @@ final class AdaptyUIViewStyleTests: XCTestCase {
     }
 
     func testDecodeInvalidJSON() throws {
-        let all = AdaptyUI.ViewConfiguration.ViewStyle.InvalidJSON.all
+        let all = AdaptyUI.ViewConfiguration.OldViewStyle.InvalidJSON.all
         XCTAssertFalse(all.isEmpty)
         try all.forEach {
             let data = try $0.jsonData()
             do {
-                _ = try data.decode(AdaptyUI.ViewConfiguration.ViewStyle.self)
+                _ = try data.decode(AdaptyUI.ViewConfiguration.OldViewStyle.self)
                 XCTFail("Must be decoding error for \($0)")
             } catch { }
         }

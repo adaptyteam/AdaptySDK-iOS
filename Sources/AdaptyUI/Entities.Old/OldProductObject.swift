@@ -10,11 +10,11 @@ import Foundation
 extension AdaptyUI {
     public struct OldProductObject {
         public let productId: String
-        public let properties: [String: AdaptyUI.LocalizedViewItem]
-        public let orderedProperties: [(key: String, value: AdaptyUI.LocalizedViewItem)]
-        init(productId: String, orderedProperties: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+        public let properties: [String: AdaptyUI.OldViewItem]
+        public let orderedProperties: [(key: String, value: AdaptyUI.OldViewItem)]
+        init(productId: String, orderedProperties: [(key: String, value: AdaptyUI.OldViewItem)]) {
             self.productId = productId
-            properties = [String: AdaptyUI.LocalizedViewItem](orderedProperties, uniquingKeysWith: { f, _ in f })
+            properties = [String: AdaptyUI.OldViewItem](orderedProperties, uniquingKeysWith: { f, _ in f })
             self.orderedProperties = orderedProperties
         }
     }

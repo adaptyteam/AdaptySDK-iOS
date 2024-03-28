@@ -7,7 +7,7 @@
 
 @testable import Adapty
 
-extension AdaptyUI.ViewConfiguration.ViewStyle {
+extension AdaptyUI.ViewConfiguration.OldViewStyle {
     enum ValidJSON {
         static let all = [short, example_1, full]
 

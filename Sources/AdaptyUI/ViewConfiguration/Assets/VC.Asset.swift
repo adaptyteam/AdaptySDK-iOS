@@ -15,15 +15,33 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Asset {
-    var asFont: AdaptyUI.Font? {
-        guard case let .font(value) = self else { return nil }
+extension AdaptyUI.ViewConfiguration.Localizer {
+    @inlinable
+    func assetIfPresent(_ assetId: String?) -> AdaptyUI.ViewConfiguration.Asset? {
+        guard let assetId else { return nil }
+        return localization?.assets?[assetId] ?? source.assets[assetId]
+    }
+
+    @inlinable
+    func fillingIfPresent(_ assetId: String?) -> AdaptyUI.Filling? {
+        guard let asset = assetIfPresent(assetId), case let .filling(value) = asset else { return nil }
         return value
     }
 
-    var asFilling: AdaptyUI.Filling? {
-        guard case let .filling(value) = self else { return nil }
+    @inlinable
+    func imageData(_ assetId: String?) -> AdaptyUI.ImageData {
+        fillingIfPresent(assetId)?.asImage ?? .none
+    }
+
+    @inlinable
+    func fontIfPresent(_ assetId: String?) -> AdaptyUI.Font? {
+        guard let asset = assetIfPresent(assetId), case let .font(value) = asset else { return nil }
         return value
+    }
+
+    @inlinable
+    func font(_ assetId: String?) -> AdaptyUI.Font {
+        fontIfPresent(assetId) ?? AdaptyUI.Font.default
     }
 }
 

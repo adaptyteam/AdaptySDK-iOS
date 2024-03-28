@@ -15,12 +15,12 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Image {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Image {
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func image(from: AdaptyUI.ViewConfiguration.Image) -> AdaptyUI.Image {
         .init(
-            asset: localizer.image(assetId),
-            aspect: aspect,
-            tint: localizer.fillingIfPresent(tintAssetId)
+            asset: imageData(from.assetId),
+            aspect: from.aspect,
+            tint: fillingIfPresent(from.tintAssetId)
         )
     }
 }

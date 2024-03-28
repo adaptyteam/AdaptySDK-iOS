@@ -17,16 +17,14 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Decorator {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Decorator {
-        var border: AdaptyUI.Border?
-        if let filling = localizer.fillingIfPresent(borderAssetId) {
-            border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.Border.defaultThickness)
-        }
-        return .init(
-            type: type,
-            background: localizer.fillingIfPresent(backgroundAssetId),
-            border: border
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func decorator(from: AdaptyUI.ViewConfiguration.Decorator) -> AdaptyUI.Decorator {
+        .init(
+            type: from.type,
+            background: fillingIfPresent(from.backgroundAssetId),
+            border: fillingIfPresent(from.borderAssetId).map {
+                AdaptyUI.Border(filling: $0, thickness: from.borderThickness ?? AdaptyUI.Border.defaultThickness)
+            }
         )
     }
 }
@@ -38,7 +36,7 @@ extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
         case borderAssetId = "border"
         case borderThickness = "thickness"
         case type
-        case value
+        case value // old version 2
     }
 
     init(from decoder: Decoder) throws {

@@ -62,6 +62,21 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func urlIfPresent(_ stringId: String?) -> String? {
+        guard let stringId, let item = self.localization?.strings?[stringId] else { return nil }
+        return item.value.asString ?? item.fallback?.asString
+    }
+
+    func richTextIfPresent(_ stringId: String?) -> AdaptyUI.RichText? {
+        guard let stringId, let item = localization?.strings?[stringId] else { return nil }
+        return AdaptyUI.RichText(
+            items: item.value.convert(self),
+            fallback: item.fallback.map { $0.convert(self) }
+        )
+    }
+}
+
 extension AdaptyUI.ViewConfiguration.RichText {
     var asString: String? {
         items.first.flatMap {
@@ -85,7 +100,7 @@ extension AdaptyUI.ViewConfiguration.RichText {
                     bullet.flatMap { $0.convert(localizer, defaultTextAttributes: defaultTextAttributes) }
                 ))
             case let .image(assetId, attr):
-                .image(localizer.image(assetId), attr.add(defaultTextAttributes).convert(localizer))
+                .image(localizer.imageData(assetId), attr.add(defaultTextAttributes).convert(localizer))
             default:
                 nil
             }
@@ -102,7 +117,7 @@ private extension AdaptyUI.ViewConfiguration.RichText.Bullet {
         case let .text(value, attr):
             .text(value, attr.add(defaultTextAttributes).convert(localizer))
         case let .image(assetId, attr):
-                .image(localizer.image(assetId), attr.add(defaultTextAttributes).convert(localizer))
+            .image(localizer.imageData(assetId), attr.add(defaultTextAttributes).convert(localizer))
         default:
             nil
         }

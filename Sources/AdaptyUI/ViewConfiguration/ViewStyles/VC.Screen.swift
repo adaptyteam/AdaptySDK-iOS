@@ -17,13 +17,13 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Screen {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Screen {
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func screen(from: AdaptyUI.ViewConfiguration.Screen) -> AdaptyUI.Screen {
         .init(
-            background: localizer.fillingIfPresent(backgroundAssetId) ?? AdaptyUI.Screen.default.background,
-            mainImage: mainImage.map { $0.convert(localizer) },
-            mainBlock: mainBlock.map { $0.convert(localizer) },
-            footerBlock: footerBlock.map { $0.convert(localizer) }
+            background: fillingIfPresent(from.backgroundAssetId) ?? AdaptyUI.Screen.default.background,
+            mainImage: from.mainImage.map(image),
+            mainBlock: from.mainBlock.map(stack),
+            footerBlock: from.footerBlock.map(stack)
         )
     }
 }

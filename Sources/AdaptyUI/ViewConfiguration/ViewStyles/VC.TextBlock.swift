@@ -17,24 +17,26 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.TextBlock {
-    func convert(
-        _ localizer: AdaptyUI.ViewConfiguration.Localizer,
-        item: AdaptyUI.ViewConfiguration.Localization.Item
-    ) -> AdaptyUI.RichText {
-        .init(
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func richText(from textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText {
+        richTextIfPresent(from: textBlock) ?? AdaptyUI.RichText.empty
+    }
+
+    func richTextIfPresent(from textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText? {
+        guard let item = localization?.strings?[textBlock.stringId] else { return nil }
+        return .init(
             items: item.value.convert(
-                localizer,
-                defaultTextAttributes: textAttributes,
-                defaultParagraphAttributes: paragraphAttributes
+                self,
+                defaultTextAttributes: textBlock.textAttributes,
+                defaultParagraphAttributes: textBlock.paragraphAttributes
             ),
             fallback: item.fallback.map { $0.convert(
-                localizer,
-                defaultTextAttributes: textAttributes,
-                defaultParagraphAttributes: paragraphAttributes
+                self,
+                defaultTextAttributes: textBlock.textAttributes,
+                defaultParagraphAttributes: textBlock.paragraphAttributes
             ) },
-            maxRows: maxRows,
-            overflowMode: overflowMode
+            maxRows: textBlock.maxRows,
+            overflowMode: textBlock.overflowMode
         )
     }
 }

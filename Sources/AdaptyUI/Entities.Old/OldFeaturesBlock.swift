@@ -10,13 +10,13 @@ import Foundation
 extension AdaptyUI {
     public struct OldFeaturesBlock {
         public let type: OldFeaturesBlockType
-        public let items: [String: AdaptyUI.LocalizedViewItem]
+        public let items: [String: AdaptyUI.OldViewItem]
 
-        public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
+        public let orderedItems: [(key: String, value: AdaptyUI.OldViewItem)]
 
-        init(type: OldFeaturesBlockType, orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
+        init(type: OldFeaturesBlockType, orderedItems: [(key: String, value: AdaptyUI.OldViewItem)]) {
             self.type = type
-            items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
+            items = [String: AdaptyUI.OldViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
             self.orderedItems = orderedItems
         }
     }

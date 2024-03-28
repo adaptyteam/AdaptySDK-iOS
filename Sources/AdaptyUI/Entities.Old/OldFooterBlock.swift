@@ -9,10 +9,10 @@ import Foundation
 
 extension AdaptyUI {
     public struct OldFooterBlock {
-        public let items: [String: AdaptyUI.LocalizedViewItem]
-        public let orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]
-        init(orderedItems: [(key: String, value: AdaptyUI.LocalizedViewItem)]) {
-            items = [String: AdaptyUI.LocalizedViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
+        public let items: [String: AdaptyUI.OldViewItem]
+        public let orderedItems: [(key: String, value: AdaptyUI.OldViewItem)]
+        init(orderedItems: [(key: String, value: AdaptyUI.OldViewItem)]) {
+            items = [String: AdaptyUI.OldViewItem](orderedItems, uniquingKeysWith: { f, _ in f })
             self.orderedItems = orderedItems
         }
     }

@@ -44,8 +44,8 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.OldText {
-    func convert(_: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.RichText {
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func richText(from _: AdaptyUI.ViewConfiguration.OldText) -> AdaptyUI.RichText {
         AdaptyUI.RichText.empty
     }
 }

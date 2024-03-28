@@ -40,40 +40,33 @@ extension AdaptyUI.ViewConfiguration.Element {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Element {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Element {
-        return switch self {
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func element(from: AdaptyUI.ViewConfiguration.Element) -> AdaptyUI.Element {
+        switch from {
         case let .space(value):
             .space(value)
         case let .stack(value, properties):
-            .stack(value.convert(localizer), convert(properties))
+            .stack(stack(from: value), properties.flatMap(elementProperties))
         case let .text(value, properties):
-            .text(localizer.richText(from: value), convert(properties))
+            .text(richText(from: value), properties.flatMap(elementProperties))
         case let .image(value, properties):
-            .image(value.convert(localizer), convert(properties))
+            .image(image(from: value), properties.flatMap(elementProperties))
         case let .button(value, properties):
-            .button(value.convert(localizer), convert(properties))
+            .button(button(from: value), properties.flatMap(elementProperties))
         case let .unknown(value, properties):
-            .unknown(value, convert(properties))
-        }
-
-        func convert(_ value: AdaptyUI.ViewConfiguration.Element.Properties?) -> AdaptyUI.Element.Properties? {
-            guard let value else { return nil }
-            return value.convert(localizer)
+            .unknown(value, properties.flatMap(elementProperties))
         }
     }
-}
 
-extension AdaptyUI.ViewConfiguration.Element.Properties {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Element.Properties? {
-        guard !isZero else { return nil }
+    private func elementProperties(from: AdaptyUI.ViewConfiguration.Element.Properties) -> AdaptyUI.Element.Properties? {
+        guard !from.isZero else { return nil }
         return .init(
-            decorastor: decorastor.map { $0.convert(localizer) },
-            frsme: frsme,
-            padding: padding,
-            offset: offset,
-            visibility: visibility,
-            transitionIn: transitionIn
+            decorastor: from.decorastor.map(decorator),
+            frsme: from.frsme,
+            padding: from.padding,
+            offset: from.offset,
+            visibility: from.visibility,
+            transitionIn: from.transitionIn
         )
     }
 }

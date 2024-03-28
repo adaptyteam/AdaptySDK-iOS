@@ -10,7 +10,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     struct OldCustomObject {
         let type: String
-        let properties: [(key: String, value: ViewItem)]
+        let properties: [(key: String, value: OldViewItem)]
     }
 }
 
@@ -21,7 +21,7 @@ extension AdaptyUI.ViewConfiguration.OldCustomObject: Decodable {
     }
 
     init(from decoder: Decoder) throws {
-        typealias CodingKeys = AdaptyUI.ViewConfiguration.ViewStyle.CodingKeys
+        typealias CodingKeys = AdaptyUI.ViewConfiguration.OldViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
         properties = try container.toOrderedItems { PropertyKeys(rawValue: $0) == nil }
         type = try container.decode(String.self, forKey: CodingKeys(PropertyKeys.type))

@@ -1,5 +1,5 @@
 //
-//  VC.ViewItem.swift
+//  VC.OldViewItem.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    enum ViewItem {
+    enum OldViewItem {
         case asset(String)
         case shape(Decorator)
         case button(OldButton)
@@ -18,7 +18,7 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.ViewItem: Decodable {
+extension AdaptyUI.ViewConfiguration.OldViewItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
     }

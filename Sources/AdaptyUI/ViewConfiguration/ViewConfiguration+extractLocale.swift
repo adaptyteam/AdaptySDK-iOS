@@ -15,11 +15,11 @@ extension AdaptyUI.ViewConfiguration {
     func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
         let localizer = Localizer(from: self, withLocale: locale)
 
-        func convert(_ items: [String: ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {
+        func convert(_ items: [String: OldViewItem]?) -> [String: AdaptyUI.OldViewItem] {
             items?.mapValues(convert) ?? [:]
         }
 
-        func convert(_ item: [(key: String, value: ViewItem)]?) -> [(key: String, value: AdaptyUI.LocalizedViewItem)] {
+        func convert(_ item: [(key: String, value: OldViewItem)]?) -> [(key: String, value: AdaptyUI.OldViewItem)] {
             item?.map { (key: $0.key, value: convert($0.value)) } ?? []
         }
 
@@ -27,7 +27,7 @@ extension AdaptyUI.ViewConfiguration {
             AdaptyUI.OldProductObject(productId: item.productId, orderedProperties: convert(item.properties))
         }
 
-        func convert(_ item: ViewItem) -> AdaptyUI.LocalizedViewItem {
+        func convert(_ item: OldViewItem) -> AdaptyUI.OldViewItem {
             switch item {
             case let .asset(id):
                 guard let asset = localizer.assetIfPresent(id) else {
@@ -42,16 +42,16 @@ extension AdaptyUI.ViewConfiguration {
                     return .unknown("unsupported asset {type: font, id: \(id)}")
                 }
             case let .shape(value):
-                return .shape(value.convert(localizer))
+                return .shape(localizer.decorator(from: value))
             case let .button(value):
 
                 let normal: AdaptyUI.OldButton.State = .init(
-                    shape: value.shape.map { $0.convert(localizer) },
+                    shape: value.shape.map(localizer.decorator),
                     title: value.title.flatMap(localizer.richText)
                 )
 
                 let selected = AdaptyUI.OldButton.State(
-                    shape: value.selectedShape.map { $0.convert(localizer) },
+                    shape: value.selectedShape.map(localizer.decorator),
                     title: value.selectedTitle.flatMap(localizer.richText)
                 )
 
@@ -59,7 +59,7 @@ extension AdaptyUI.ViewConfiguration {
                     normal: normal.isEmpty ? nil : normal,
                     selected: selected.isEmpty ? nil : selected,
                     align: value.align ?? AdaptyUI.OldButton.defaultAlign,
-                    action: value.action.map { $0.convert(localizer) },
+                    action: value.action.map(localizer.buttonAction),
                     visibility: value.visibility,
                     transitionIn: value.transitionIn
                 ))
@@ -72,11 +72,11 @@ extension AdaptyUI.ViewConfiguration {
             }
         }
 
-        var styles = [String: AdaptyUI.LocalizedViewStyle]()
+        var styles = [String: AdaptyUI.OldViewStyle]()
         styles.reserveCapacity(self.styles.count)
 
         for style in self.styles {
-            styles[style.key] = AdaptyUI.LocalizedViewStyle(
+            styles[style.key] = AdaptyUI.OldViewStyle(
                 featureBlock: style.value.featuresBlock.map {
                     AdaptyUI.OldFeaturesBlock(
                         type: $0.type,

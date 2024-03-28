@@ -17,13 +17,13 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Stack {
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Stack {
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func stack(from: AdaptyUI.ViewConfiguration.Stack) -> AdaptyUI.Stack {
         .init(
-            type: type,
-            horizontalAlignment: horizontalAlignment,
-            verticalAlignment: verticalAlignment,
-            elements: elements.map { $0.convert(localizer) }
+            type: from.type,
+            horizontalAlignment: from.horizontalAlignment,
+            verticalAlignment: from.verticalAlignment,
+            elements: from.elements.map(element) 
         )
     }
 }

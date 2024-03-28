@@ -16,7 +16,7 @@ extension AdaptyUI {
         let assets: [String: Asset]
         let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
-        let styles: [String: ViewStyle]
+        let styles: [String: OldViewStyle]
 
         let isHard: Bool
         let mainImageRelativeHeight: Double?
@@ -69,7 +69,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
             defaultLocalization = nil
         }
 
-        styles = try container.decode([String: ViewStyle].self, forKey: .styles)
+        styles = try container.decode([String: OldViewStyle].self, forKey: .styles)
 
         isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
         mainImageRelativeHeight = try container.decodeIfPresent(Double.self, forKey: .mainImageRelativeHeight)

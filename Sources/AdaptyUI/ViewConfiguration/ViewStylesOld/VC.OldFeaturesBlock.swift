@@ -10,7 +10,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     struct OldFeaturesBlock {
         let type: AdaptyUI.OldFeaturesBlockType
-        let orderedItems: [(key: String, value: ViewItem)]
+        let orderedItems: [(key: String, value: OldViewItem)]
     }
 }
 
@@ -20,7 +20,7 @@ extension AdaptyUI.ViewConfiguration.OldFeaturesBlock: Decodable {
     }
 
     init(from decoder: Decoder) throws {
-        typealias CodingKeys = AdaptyUI.ViewConfiguration.ViewStyle.CodingKeys
+        typealias CodingKeys = AdaptyUI.ViewConfiguration.OldViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
         orderedItems = try container.toOrderedItems {
             PropertyKeys(rawValue: $0) == nil

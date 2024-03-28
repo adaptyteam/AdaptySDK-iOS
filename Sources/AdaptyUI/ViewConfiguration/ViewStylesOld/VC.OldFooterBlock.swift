@@ -9,13 +9,13 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct OldFooterBlock {
-        let orderedItems: [(key: String, value: ViewItem)]
+        let orderedItems: [(key: String, value: OldViewItem)]
     }
 }
 
 extension AdaptyUI.ViewConfiguration.OldFooterBlock: Decodable {
     init(from decoder: Decoder) throws {
-        typealias CodingKeys = AdaptyUI.ViewConfiguration.ViewStyle.CodingKeys
+        typealias CodingKeys = AdaptyUI.ViewConfiguration.OldViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
         orderedItems = try container.toOrderedItems { _ in true }
     }
