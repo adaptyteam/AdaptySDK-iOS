@@ -67,7 +67,7 @@ extension AdaptyUI.ViewConfiguration {
             item?.map { (key: $0.key, value: convert($0.value)) } ?? []
         }
 
-        func convert(_ item: ProductObject) -> AdaptyUI.OldProductObject {
+        func convert(_ item: OldProductObject) -> AdaptyUI.OldProductObject {
             AdaptyUI.OldProductObject(productId: item.productId, orderedProperties: convert(item.properties))
         }
 

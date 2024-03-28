@@ -1,5 +1,5 @@
 //
-//  VC.ProductsBlock.swift
+//  VC.OldProductsBlock.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -8,23 +8,23 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct ProductsBlock {
+    struct OldProductsBlock {
         let type: AdaptyUI.ProductsBlockType
         let mainProductIndex: Int
         let initiatePurchaseOnTap: Bool
-        let products: [ProductObject]
+        let products: [OldProductObject]
         let orderedItems: [(key: String, value: ViewItem)]
     }
 }
 
 extension AdaptyUI.ViewConfiguration {
-    struct ProductObject {
+    struct OldProductObject {
         let productId: String
         let properties: [(key: String, value: ViewItem)]
     }
 }
 
-extension AdaptyUI.ViewConfiguration.ProductsBlock: Decodable {
+extension AdaptyUI.ViewConfiguration.OldProductsBlock: Decodable {
     enum PropertyKeys: String {
         case type
         case mainProductIndex = "main_product_index"
@@ -41,11 +41,11 @@ extension AdaptyUI.ViewConfiguration.ProductsBlock: Decodable {
         type = try container.decode(AdaptyUI.ProductsBlockType.self, forKey: CodingKeys(PropertyKeys.type))
         mainProductIndex = try container.decodeIfPresent(Int.self, forKey: CodingKeys(PropertyKeys.mainProductIndex)) ?? 0
         initiatePurchaseOnTap = try container.decodeIfPresent(Bool.self, forKey: CodingKeys(PropertyKeys.initiatePurchaseOnTap)) ?? false
-        products = try container.decodeIfPresent([AdaptyUI.ViewConfiguration.ProductObject].self, forKey: CodingKeys(PropertyKeys.products)) ?? []
+        products = try container.decodeIfPresent([AdaptyUI.ViewConfiguration.OldProductObject].self, forKey: CodingKeys(PropertyKeys.products)) ?? []
     }
 }
 
-extension AdaptyUI.ViewConfiguration.ProductObject: Decodable {
+extension AdaptyUI.ViewConfiguration.OldProductObject: Decodable {
     enum PropertyKeys: String {
         case type
         case productId = "product_id"

@@ -1,5 +1,5 @@
 //
-//  VC.CustomObject.swift
+//  VC.OldCustomObject.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -8,13 +8,13 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct CustomObject {
+    struct OldCustomObject {
         let type: String
         let properties: [(key: String, value: ViewItem)]
     }
 }
 
-extension AdaptyUI.ViewConfiguration.CustomObject: Decodable {
+extension AdaptyUI.ViewConfiguration.OldCustomObject: Decodable {
     enum PropertyKeys: String {
         case type
         case order

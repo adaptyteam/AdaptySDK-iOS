@@ -9,9 +9,9 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct ViewStyle {
-        let featuresBlock: FeaturesBlock?
-        let productsBlock: ProductsBlock
-        let footerBlock: FooterBlock?
+        let featuresBlock: OldFeaturesBlock?
+        let productsBlock: OldProductsBlock
+        let footerBlock: OldFooterBlock?
         let items: [String: ViewItem]
     }
 }
@@ -53,9 +53,9 @@ extension AdaptyUI.ViewConfiguration.ViewStyle: Decodable {
                 },
             uniquingKeysWith: { $1 }
         )
-        footerBlock = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.FooterBlock.self, forKey: CodingKeys(BlockKeys.footerBlock))
-        featuresBlock = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.FeaturesBlock.self, forKey: CodingKeys(BlockKeys.featuresBlock))
-        productsBlock = try container.decode(AdaptyUI.ViewConfiguration.ProductsBlock.self, forKey: CodingKeys(BlockKeys.productsBlock))
+        footerBlock = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.OldFooterBlock.self, forKey: CodingKeys(BlockKeys.footerBlock))
+        featuresBlock = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.OldFeaturesBlock.self, forKey: CodingKeys(BlockKeys.featuresBlock))
+        productsBlock = try container.decode(AdaptyUI.ViewConfiguration.OldProductsBlock.self, forKey: CodingKeys(BlockKeys.productsBlock))
     }
 }
 

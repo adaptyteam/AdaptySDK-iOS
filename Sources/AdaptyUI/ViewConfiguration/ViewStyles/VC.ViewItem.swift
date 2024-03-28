@@ -11,9 +11,9 @@ extension AdaptyUI.ViewConfiguration {
     enum ViewItem {
         case asset(String)
         case shape(Decorator)
-        case button(Button)
+        case button(OldButton)
         case text(Text)
-        case object(CustomObject)
+        case object(OldCustomObject)
         case unknown
     }
 }
@@ -51,11 +51,11 @@ extension AdaptyUI.ViewConfiguration.ViewItem: Decodable {
         case .shape, .rectangle, .circle, .curveUp, .curveDown:
             self = try .shape(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Decorator.self))
         case .button:
-            self = try .button(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Button.self))
+            self = try .button(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.OldButton.self))
         case .text:
             self = try .text(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Text.self))
         default:
-            self = try .object(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.CustomObject.self))
+            self = try .object(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.OldCustomObject.self))
         }
     }
 }

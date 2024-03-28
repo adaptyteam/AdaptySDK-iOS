@@ -9,6 +9,7 @@ import Foundation
 
 extension AdaptyUI {
     public enum ImageData {
+        case none
         case raster(Data)
         case url(URL, previewRaster: Data?)
     }

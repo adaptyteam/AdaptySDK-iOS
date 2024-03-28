@@ -1,5 +1,5 @@
 //
-//  VC.FeaturesBlock.swift
+//  VC.OldFeaturesBlock.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -8,13 +8,13 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct FeaturesBlock {
+    struct OldFeaturesBlock {
         let type: AdaptyUI.OldFeaturesBlockType
         let orderedItems: [(key: String, value: ViewItem)]
     }
 }
 
-extension AdaptyUI.ViewConfiguration.FeaturesBlock: Decodable {
+extension AdaptyUI.ViewConfiguration.OldFeaturesBlock: Decodable {
     enum PropertyKeys: String {
         case type
     }

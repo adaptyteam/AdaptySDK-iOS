@@ -14,6 +14,7 @@ extension AdaptyUI {
         case text(AdaptyUI.RichText, Properties?)
         case image(AdaptyUI.Image, Properties?)
         indirect case button(AdaptyUI.Button, Properties?)
+        case unknown(String, Properties?)
 
         var properties: Properties? {
             switch self {
@@ -21,7 +22,8 @@ extension AdaptyUI {
             case let .stack(_, properties),
                  let .text(_, properties),
                  let .image(_, properties),
-                 let .button(_, properties):
+                 let .button(_, properties),
+                 let .unknown(_, properties):
                 properties
             }
         }
@@ -30,14 +32,6 @@ extension AdaptyUI {
 
 extension AdaptyUI.Element {
     public struct Properties {
-        static let zero = Properties(
-            decorastor: nil,
-            frsme: nil,
-            padding: AdaptyUI.EdgeInsets.zero,
-            offset: AdaptyUI.Offset.zero,
-            visibility: true,
-            transitionIn: []
-        )
         public let decorastor: AdaptyUI.Decorator?
         public let frsme: AdaptyUI.Frame?
         public let padding: AdaptyUI.EdgeInsets

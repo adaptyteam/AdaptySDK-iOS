@@ -18,10 +18,9 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration.Image {
     func convert(
         _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?
-    ) -> AdaptyUI.Image? {
-        guard let asset = assetById(assetId)?.asFilling?.asImage else { return nil }
-        return .init(
-            asset: asset,
+    ) -> AdaptyUI.Image {
+        .init(
+            asset: assetById(assetId)?.asFilling?.asImage ?? .none,
             aspect: aspect,
             tint: assetById(tintAssetId)?.asFilling
         )
@@ -38,14 +37,14 @@ extension AdaptyUI.ViewConfiguration.Image: Decodable {
     init(from decoder: Decoder) throws {
         if let id = try? decoder.singleValueContainer().decode(String.self) {
             assetId = id
-            aspect = AdaptyUI.Image.defaultAspect
+            aspect = AdaptyUI.Image.default.aspect
             tintAssetId = nil
             return
         }
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
         assetId = try container.decode(String.self, forKey: .assetId)
-        aspect = try container.decodeIfPresent(AdaptyUI.AspectRatio.self, forKey: .aspect) ?? AdaptyUI.Image.defaultAspect
+        aspect = try container.decodeIfPresent(AdaptyUI.AspectRatio.self, forKey: .aspect) ?? AdaptyUI.Image.default.aspect
         tintAssetId = try container.decodeIfPresent(String.self, forKey: .tintAssetId)
     }
 }
