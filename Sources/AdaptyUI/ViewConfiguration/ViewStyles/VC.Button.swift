@@ -9,8 +9,8 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct Button {
-        let shape: Shape?
-        let selectedShape: Shape?
+        let shape: Decorator?
+        let selectedShape: Decorator?
         let title: Text?
         let selectedTitle: Text?
         let align: AdaptyUI.OldButton.Align?
@@ -34,8 +34,8 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        shape = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Shape.self, forKey: .shape)
-        selectedShape = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Shape.self, forKey: .selectedShape)
+        shape = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .shape)
+        selectedShape = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .selectedShape)
         selectedTitle = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Text.self, forKey: .selectedTitle)
         title = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Text.self, forKey: .title)
         align = try container.decodeIfPresent(AdaptyUI.OldButton.Align.self, forKey: .align)

@@ -29,7 +29,7 @@ extension AdaptyUI {
 
     public enum LocalizedViewItem {
         case filling(AdaptyUI.Filling)
-        case shape(AdaptyUI.OldShape)
+        case shape(AdaptyUI.Decorator)
         case button(AdaptyUI.OldButton)
         case text(AdaptyUI.RichText)
         case object(AdaptyUI.OldCustomObject)
@@ -46,7 +46,7 @@ extension AdaptyUI {
         public var asColorGradient: AdaptyUI.ColorGradient? { asFilling?.asColorGradient }
         public var asImage: AdaptyUI.ImageData? { asFilling?.asImage }
 
-        public var asShape: AdaptyUI.OldShape? {
+        public var asShape: AdaptyUI.Decorator? {
             switch self {
             case let .shape(value): value
             default: nil
@@ -80,7 +80,7 @@ extension [String: AdaptyUI.LocalizedViewItem] {
     public func getFilling(_ key: Key) -> AdaptyUI.Filling? { self[key]?.asFilling }
     public func getColor(_ key: Key) -> AdaptyUI.Color? { self[key]?.asFilling?.asColor }
     public func getColorGradient(_ key: Key) -> AdaptyUI.ColorGradient? { self[key]?.asFilling?.asColorGradient }
-    public func getShape(_ key: Key) -> AdaptyUI.OldShape? { self[key]?.asShape }
+    public func getShape(_ key: Key) -> AdaptyUI.Decorator? { self[key]?.asShape }
     public func getButton(_ key: Key) -> AdaptyUI.OldButton? { self[key]?.asButton }
     public func getImage(_ key: Key) -> AdaptyUI.ImageData? { self[key]?.asFilling?.asImage }
     public func getText(_ key: Key) -> AdaptyUI.RichText? { self[key]?.asText }

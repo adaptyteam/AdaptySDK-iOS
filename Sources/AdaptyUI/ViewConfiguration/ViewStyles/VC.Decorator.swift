@@ -1,36 +1,37 @@
 //
-//  VC.Shape.swift
+//  VC.Decorator.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 20.01.2023
+//  Created by Aleksei Valiano on 28.03.2024
+//
 //
 
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Shape {
-        let backgroundAssetId: String?
+    struct Decorator {
         let type: AdaptyUI.ShapeType
+        let backgroundAssetId: String?
         let borderAssetId: String?
         let borderThickness: Double?
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Shape {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.OldShape {
+extension AdaptyUI.ViewConfiguration.Decorator {
+    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.Decorator {
         var border: AdaptyUI.Border?
         if let filling = assetById(borderAssetId)?.asFilling {
             border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.Border.defaultThickness)
         }
         return .init(
+            type: type,
             background: assetById(backgroundAssetId)?.asFilling,
-            border: border,
-            type: type
+            border: border
         )
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Shape: Decodable {
+extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
     enum CodingKeys: String, CodingKey {
         case backgroundAssetId = "background"
         case rectangleCornerRadius = "rect_corner_radius"
@@ -49,7 +50,7 @@ extension AdaptyUI.ViewConfiguration.Shape: Decodable {
             } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .value) {
                 value
             } else {
-                AdaptyUI.OldShape.defaultType
+                AdaptyUI.Decorator.defaultType
             }
 
         if case .rectangle = shape,

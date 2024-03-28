@@ -24,7 +24,7 @@ extension AdaptyUI {
 
 extension AdaptyUI.OldButton {
     public struct State {
-        public let shape: AdaptyUI.OldShape?
+        public let shape: AdaptyUI.Decorator?
         public let title: AdaptyUI.RichText?
 
         var isEmpty: Bool {
