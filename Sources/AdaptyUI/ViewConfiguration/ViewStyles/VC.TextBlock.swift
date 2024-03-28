@@ -19,17 +19,17 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.TextBlock {
     func convert(
-        _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?,
+        _ localizer: AdaptyUI.ViewConfiguration.Localizer,
         item: AdaptyUI.ViewConfiguration.Localization.Item
     ) -> AdaptyUI.RichText {
         .init(
             items: item.value.convert(
-                assetById,
+                localizer,
                 defaultTextAttributes: textAttributes,
                 defaultParagraphAttributes: paragraphAttributes
             ),
             fallback: item.fallback.map { $0.convert(
-                assetById,
+                localizer,
                 defaultTextAttributes: textAttributes,
                 defaultParagraphAttributes: paragraphAttributes
             ) },

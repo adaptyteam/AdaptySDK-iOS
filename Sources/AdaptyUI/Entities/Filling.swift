@@ -9,6 +9,8 @@ import Foundation
 
 extension AdaptyUI {
     public enum Filling {
+        static let `default` = Filling.color(Color.black)
+
         case color(AdaptyUI.Color)
         case colorGradient(AdaptyUI.ColorGradient)
         case image(AdaptyUI.ImageData)

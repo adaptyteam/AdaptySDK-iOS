@@ -24,6 +24,17 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
+//extension AdaptyUI.ViewConfiguration.OldProductObject {
+//    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) ->   AdaptyUI.OldProductObject {
+//        .init(
+//            productId: productId,
+//            orderedProperties: convert(properties)
+//        )
+//    }
+//}
+
+
+
 extension AdaptyUI.ViewConfiguration.OldProductsBlock: Decodable {
     enum PropertyKeys: String {
         case type

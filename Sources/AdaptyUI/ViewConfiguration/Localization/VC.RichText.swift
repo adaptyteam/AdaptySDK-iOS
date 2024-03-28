@@ -65,27 +65,27 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration.RichText {
     var asString: String? {
         items.first.flatMap {
-            if case let .text(value, attr) = $0 , attr == nil { value } else { nil }
+            if case let .text(value, attr) = $0, attr == nil { value } else { nil }
         }
     }
 
     func convert(
-        _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?,
+        _ localizer: AdaptyUI.ViewConfiguration.Localizer,
         defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes? = nil,
         defaultParagraphAttributes: AdaptyUI.ViewConfiguration.ParagraphAttributes? = nil
     ) -> [AdaptyUI.RichText.Item] {
         items.compactMap { item in
             switch item {
             case let .text(value, attr):
-                .text(value, attr.add(defaultTextAttributes).convert(assetById))
+                .text(value, attr.add(defaultTextAttributes).convert(localizer))
             case let .tag(value, attr):
-                .tag(value, attr.add(defaultTextAttributes).convert(assetById))
+                .tag(value, attr.add(defaultTextAttributes).convert(localizer))
             case let .paragraph(attr, bullet):
                 .paragraph(attr.add(defaultParagraphAttributes).convert(
-                    bullet.flatMap { $0.convert(assetById, defaultTextAttributes: defaultTextAttributes) }
+                    bullet.flatMap { $0.convert(localizer, defaultTextAttributes: defaultTextAttributes) }
                 ))
             case let .image(assetId, attr):
-                .image(assetById(assetId)?.asFilling?.asImage, attr.add(defaultTextAttributes).convert(assetById))
+                .image(localizer.image(assetId), attr.add(defaultTextAttributes).convert(localizer))
             default:
                 nil
             }
@@ -95,14 +95,14 @@ extension AdaptyUI.ViewConfiguration.RichText {
 
 private extension AdaptyUI.ViewConfiguration.RichText.Bullet {
     func convert(
-        _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?,
+        _ localizer: AdaptyUI.ViewConfiguration.Localizer,
         defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes? = nil
     ) -> AdaptyUI.RichText.Bullet? {
         switch self {
         case let .text(value, attr):
-            .text(value, attr.add(defaultTextAttributes).convert(assetById))
+            .text(value, attr.add(defaultTextAttributes).convert(localizer))
         case let .image(assetId, attr):
-            .image(assetById(assetId)?.asFilling?.asImage, attr.add(defaultTextAttributes).convert(assetById))
+                .image(localizer.image(assetId), attr.add(defaultTextAttributes).convert(localizer))
         default:
             nil
         }
@@ -159,16 +159,14 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
         }
     }
 
-    func convert(
-        _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?
-    ) -> AdaptyUI.RichText.TextAttributes {
+    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.RichText.TextAttributes {
         let attr = self
-        let font = assetById(attr?.fontAssetId)?.asFont ?? AdaptyUI.Font.default
+        let font = localizer.font(attr?.fontAssetId)
         return AdaptyUI.RichText.TextAttributes(
             font: font,
             size: attr?.size ?? font.defaultSize,
-            color: assetById(attr?.colorAssetId)?.asFilling ?? font.defaultFilling,
-            background: assetById(attr?.backgroundAssetId)?.asFilling,
+            color: localizer.fillingIfPresent(attr?.colorAssetId) ?? font.defaultFilling,
+            background: localizer.fillingIfPresent(attr?.backgroundAssetId),
             strike: attr?.strike ?? false,
             underline: attr?.underline ?? false
         )

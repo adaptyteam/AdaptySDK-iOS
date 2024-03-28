@@ -18,14 +18,14 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Decorator {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.Decorator {
+    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Decorator {
         var border: AdaptyUI.Border?
-        if let filling = assetById(borderAssetId)?.asFilling {
+        if let filling = localizer.fillingIfPresent(borderAssetId) {
             border = .init(filling: filling, thickness: borderThickness ?? AdaptyUI.Border.defaultThickness)
         }
         return .init(
             type: type,
-            background: assetById(backgroundAssetId)?.asFilling,
+            background: localizer.fillingIfPresent(backgroundAssetId),
             border: border
         )
     }

@@ -41,35 +41,34 @@ extension AdaptyUI.ViewConfiguration.Element {
 }
 
 extension AdaptyUI.ViewConfiguration.Element {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.Element {
+    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Element {
         return switch self {
         case let .space(value):
             .space(value)
         case let .stack(value, properties):
-            .stack(value.convert(assetById), convert(properties))
+            .stack(value.convert(localizer), convert(properties))
         case let .text(value, properties):
-            .space(0)
-        //  .text(value.convert(assetById, item: <#T##AdaptyUI.ViewConfiguration.Localization.Item#>),  convert(properties))
+            .text(localizer.richText(from: value), convert(properties))
         case let .image(value, properties):
-            .image(value.convert(assetById), convert(properties))
+            .image(value.convert(localizer), convert(properties))
         case let .button(value, properties):
-            .button(value.convert(assetById), convert(properties))
+            .button(value.convert(localizer), convert(properties))
         case let .unknown(value, properties):
             .unknown(value, convert(properties))
         }
 
         func convert(_ value: AdaptyUI.ViewConfiguration.Element.Properties?) -> AdaptyUI.Element.Properties? {
             guard let value else { return nil }
-            return value.convert(assetById)
+            return value.convert(localizer)
         }
     }
 }
 
 extension AdaptyUI.ViewConfiguration.Element.Properties {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.Element.Properties? {
+    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Element.Properties? {
         guard !isZero else { return nil }
         return .init(
-            decorastor: decorastor.map { $0.convert(assetById) },
+            decorastor: decorastor.map { $0.convert(localizer) },
             frsme: frsme,
             padding: padding,
             offset: offset,

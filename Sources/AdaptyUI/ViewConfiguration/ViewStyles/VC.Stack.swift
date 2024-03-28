@@ -18,12 +18,12 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Stack {
-    func convert(_ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?) -> AdaptyUI.Stack {
+    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Stack {
         .init(
             type: type,
             horizontalAlignment: horizontalAlignment,
             verticalAlignment: verticalAlignment,
-            elements: elements.map { $0.convert(assetById) }
+            elements: elements.map { $0.convert(localizer) }
         )
     }
 }

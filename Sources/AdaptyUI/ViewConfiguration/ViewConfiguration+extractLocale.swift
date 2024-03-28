@@ -8,56 +8,12 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    func getLocalization(_ locale: AdaptyLocale) -> Localization? {
-        if let value = localizations[locale] {
-            if defaultLocalization?.id == value.id {
-                value
-            } else {
-                value.addDefault(localization: defaultLocalization)
-            }
-        } else {
-            defaultLocalization
-        }
-    }
-
     public func extractLocale(_ locale: String) -> AdaptyUI.LocalizedViewConfiguration {
         extractLocale(AdaptyLocale(id: locale))
     }
 
     func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
-        let localization = getLocalization(locale)
-
-        func getLocalizedAsset(_ id: String?) -> Asset? {
-            guard let id else { return nil }
-            return localization?.assets?[id] ?? assets[id]
-        }
-
-        func getLocalizedUrl(_ id: String?) -> String? {
-            guard let id, let item = localization?.strings?[id] else { return nil }
-            return item.value.asString ?? item.fallback?.asString
-        }
-
-        func getLocalizedRichText(_ id: String?) -> AdaptyUI.RichText? {
-            guard let id, let item = localization?.strings?[id] else { return nil }
-            return AdaptyUI.RichText(
-                items: item.value.convert(getLocalizedAsset),
-                fallback: item.fallback.map { $0.convert(getLocalizedAsset) }
-            )
-        }
-
-        func getLocalizedRichText(_ textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText {
-            guard let item = localization?.strings?[textBlock.stringId] else { return AdaptyUI.RichText.empty }
-            return textBlock.convert(getLocalizedAsset, item: item)
-        }
-
-//        func getLocalizedRichText(_ text: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText {
-//            text.convert(getLocalizedAsset) { localization?.strings?[$0] }
-//        }
-
-        func convertButtonAction(from value: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
-            guard case let .openUrl(id) = value else { return value }
-            return .openUrl(getLocalizedUrl(id))
-        }
+        let localizer = Localizer(from: self, withLocale: locale)
 
         func convert(_ items: [String: ViewItem]?) -> [String: AdaptyUI.LocalizedViewItem] {
             items?.mapValues(convert) ?? [:]
@@ -74,7 +30,7 @@ extension AdaptyUI.ViewConfiguration {
         func convert(_ item: ViewItem) -> AdaptyUI.LocalizedViewItem {
             switch item {
             case let .asset(id):
-                guard let asset = getLocalizedAsset(id) else {
+                guard let asset = localizer.assetIfPresent(id) else {
                     return .unknown("asset.id: \(id)")
                 }
                 switch asset {
@@ -86,29 +42,29 @@ extension AdaptyUI.ViewConfiguration {
                     return .unknown("unsupported asset {type: font, id: \(id)}")
                 }
             case let .shape(value):
-                return .shape(value.convert(getLocalizedAsset))
+                return .shape(value.convert(localizer))
             case let .button(value):
 
                 let normal: AdaptyUI.OldButton.State = .init(
-                    shape: value.shape.map { $0.convert(getLocalizedAsset) },
-                    title: value.title.flatMap(getLocalizedRichText)
+                    shape: value.shape.map { $0.convert(localizer) },
+                    title: value.title.flatMap(localizer.richText)
                 )
 
                 let selected = AdaptyUI.OldButton.State(
-                    shape: value.selectedShape.map { $0.convert(getLocalizedAsset) },
-                    title: value.selectedTitle.flatMap(getLocalizedRichText)
+                    shape: value.selectedShape.map { $0.convert(localizer) },
+                    title: value.selectedTitle.flatMap(localizer.richText)
                 )
 
                 return .button(AdaptyUI.OldButton(
                     normal: normal.isEmpty ? nil : normal,
                     selected: selected.isEmpty ? nil : selected,
                     align: value.align ?? AdaptyUI.OldButton.defaultAlign,
-                    action: value.action.map(convertButtonAction),
+                    action: value.action.map { $0.convert(localizer) },
                     visibility: value.visibility,
                     transitionIn: value.transitionIn
                 ))
             case let .text(value):
-                return .text(getLocalizedRichText(value))
+                return .text(localizer.richText(from: value))
             case let .object(value):
                 return .object(AdaptyUI.OldCustomObject(type: value.type, orderedProperties: convert(value.properties)))
             case .unknown:
@@ -146,33 +102,11 @@ extension AdaptyUI.ViewConfiguration {
         return AdaptyUI.LocalizedViewConfiguration(
             id: id,
             templateId: templateId,
-            locale: (localization?.id ?? locale).id,
+            locale: localizer.locale.id,
             styles: styles,
             isHard: isHard,
             mainImageRelativeHeight: mainImageRelativeHeight,
             version: version
-        )
-    }
-}
-
-extension AdaptyUI.ViewConfiguration.Localization {
-    fileprivate func addDefault(localization: Self?) -> Self {
-        guard let localization else { return self }
-
-        var strings = self.strings ?? [:]
-        if let other = localization.strings {
-            strings = strings.merging(other, uniquingKeysWith: { current, _ in current })
-        }
-
-        var assets = self.assets ?? [:]
-        if let other = localization.assets {
-            assets = assets.merging(other, uniquingKeysWith: { current, _ in current })
-        }
-
-        return .init(
-            id: id,
-            strings: strings.isEmpty ? nil : strings,
-            assets: assets.isEmpty ? nil : assets
         )
     }
 }

@@ -16,13 +16,11 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Image {
-    func convert(
-        _ assetById: (String?) -> AdaptyUI.ViewConfiguration.Asset?
-    ) -> AdaptyUI.Image {
+    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.Image {
         .init(
-            asset: assetById(assetId)?.asFilling?.asImage ?? .none,
+            asset: localizer.image(assetId),
             aspect: aspect,
-            tint: assetById(tintAssetId)?.asFilling
+            tint: localizer.fillingIfPresent(tintAssetId)
         )
     }
 }

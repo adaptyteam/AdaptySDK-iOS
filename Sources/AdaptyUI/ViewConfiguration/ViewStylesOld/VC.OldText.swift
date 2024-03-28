@@ -45,10 +45,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.OldText {
-    func convert(
-        _: (String?) -> AdaptyUI.ViewConfiguration.Asset?,
-        _: (String) -> AdaptyUI.ViewConfiguration.Localization.Item?
-    ) -> AdaptyUI.RichText {
+    func convert(_: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.RichText {
         AdaptyUI.RichText.empty
     }
 }

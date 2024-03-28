@@ -20,12 +20,12 @@ extension AdaptyUI {
             case text(String, TextAttributes)
             case tag(String, TextAttributes)
             case paragraph(ParagraphAttributes)
-            case image(AdaptyUI.ImageData?, TextAttributes)
+            case image(AdaptyUI.ImageData, TextAttributes)
         }
 
         public enum Bullet {
             case text(String, TextAttributes?)
-            case image(AdaptyUI.ImageData?, TextAttributes?)
+            case image(AdaptyUI.ImageData, TextAttributes?)
         }
 
         public struct TextAttributes {

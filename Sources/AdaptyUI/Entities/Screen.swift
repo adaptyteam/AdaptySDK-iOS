@@ -9,6 +9,12 @@ import Foundation
 
 extension AdaptyUI {
     public struct Screen {
+        static let `default` = Screen(
+            background: .color(AdaptyUI.Color.black),
+            mainImage: nil,
+            mainBlock: nil,
+            footerBlock: nil
+        )
         public let background: AdaptyUI.Filling
         public let mainImage: Image?
         public let mainBlock: Stack?
