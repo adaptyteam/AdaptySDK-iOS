@@ -1,6 +1,6 @@
 //
 //  VC.OldFooterBlock.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -10,6 +10,14 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     struct OldFooterBlock {
         let orderedItems: [(key: String, value: OldViewItem)]
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func oldFooterBlock(_ from: AdaptyUI.ViewConfiguration.OldFooterBlock) -> AdaptyUI.OldFooterBlock {
+        .init(
+            orderedItems: orderedOldViewItems(from.orderedItems)
+        )
     }
 }
 

@@ -1,6 +1,6 @@
 //
 //  OldViewStyle.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //

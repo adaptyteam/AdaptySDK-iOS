@@ -1,6 +1,6 @@
 //
 //  VC.Image.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -16,7 +16,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func image(from: AdaptyUI.ViewConfiguration.Image) -> AdaptyUI.Image {
+    func image(_ from: AdaptyUI.ViewConfiguration.Image) -> AdaptyUI.Image {
         .init(
             asset: imageData(from.assetId),
             aspect: from.aspect,

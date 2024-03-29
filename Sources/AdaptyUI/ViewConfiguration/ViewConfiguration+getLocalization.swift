@@ -1,27 +1,21 @@
 //
-//  Localizer.swift
-//  AdaptySDK
+//  ViewConfiguration+getLocalization.swift
+//  AdaptyUI
 //
-//  Created by Aleksei Valiano on 20.01.2023
+//  Created by Aleksei Valiano on 29.03.2024
+//
 //
 
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Localizer {
-        let localization: Localization?
-        let source: AdaptyUI.ViewConfiguration
-        let locale: AdaptyLocale
-
-        init(from: AdaptyUI.ViewConfiguration, withLocale: AdaptyLocale) {
-            self.source = from
-            self.localization = from.getLocalization(withLocale)
-            self.locale = self.localization?.id ?? withLocale
-        }
+    public func extractLocale(_ locale: String) -> AdaptyUI.LocalizedViewConfiguration {
+        Localizer(
+            source: self,
+            withLocale: AdaptyLocale(id: locale)
+        ).localize()
     }
-}
 
-extension AdaptyUI.ViewConfiguration {
     func getLocalization(_ locale: AdaptyLocale) -> Localization? {
         if let value = localizations[locale] {
             if defaultLocalization?.id == value.id {

@@ -1,6 +1,6 @@
 //
 //  VC.OldButton.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -17,6 +17,29 @@ extension AdaptyUI.ViewConfiguration {
         let action: AdaptyUI.ButtonAction?
         let visibility: Bool
         let transitionIn: [AdaptyUI.Transition]
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func oldButton(_ from: AdaptyUI.ViewConfiguration.OldButton) -> AdaptyUI.OldButton {
+        let normal: AdaptyUI.OldButton.State = .init(
+            shape: from.shape.map(decorator),
+            title: from.title.flatMap(richText)
+        )
+
+        let selected = AdaptyUI.OldButton.State(
+            shape: from.selectedShape.map(decorator),
+            title: from.selectedTitle.flatMap(richText)
+        )
+
+        return .init(
+            normal: normal.isEmpty ? nil : normal,
+            selected: selected.isEmpty ? nil : selected,
+            align: from.align ?? AdaptyUI.OldButton.defaultAlign,
+            action: from.action.map(buttonAction),
+            visibility: from.visibility,
+            transitionIn: from.transitionIn
+        )
     }
 }
 

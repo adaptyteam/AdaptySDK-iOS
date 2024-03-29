@@ -1,6 +1,6 @@
 //
 //  VC.TextBlock.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -18,11 +18,11 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func richText(from textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText {
-        richTextIfPresent(from: textBlock) ?? AdaptyUI.RichText.empty
+    func richText(_ textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText {
+        richTextIfPresent(textBlock) ?? AdaptyUI.RichText.empty
     }
 
-    func richTextIfPresent(from textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText? {
+    func richTextIfPresent(_ textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText? {
         guard let item = localization?.strings?[textBlock.stringId] else { return nil }
         return .init(
             items: item.value.convert(

@@ -1,6 +1,6 @@
 //
 //  VC.OldFeaturesBlock.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -11,6 +11,15 @@ extension AdaptyUI.ViewConfiguration {
     struct OldFeaturesBlock {
         let type: AdaptyUI.OldFeaturesBlockType
         let orderedItems: [(key: String, value: OldViewItem)]
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func oldFeaturesBlock(_ from: AdaptyUI.ViewConfiguration.OldFeaturesBlock) -> AdaptyUI.OldFeaturesBlock {
+        .init(
+            type: from.type,
+            orderedItems: orderedOldViewItems(from.orderedItems)
+        )
     }
 }
 

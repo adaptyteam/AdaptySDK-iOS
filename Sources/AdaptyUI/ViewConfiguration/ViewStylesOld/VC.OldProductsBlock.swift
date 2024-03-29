@@ -1,6 +1,6 @@
 //
 //  VC.OldProductsBlock.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -20,20 +20,28 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration {
     struct OldProductObject {
         let productId: String
-        let properties: [(key: String, value: OldViewItem)]
+        let orderedItems: [(key: String, value: OldViewItem)]
     }
 }
 
-//extension AdaptyUI.ViewConfiguration.OldProductObject {
-//    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) ->   AdaptyUI.OldProductObject {
-//        .init(
-//            productId: productId,
-//            orderedProperties: convert(properties)
-//        )
-//    }
-//}
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func oldProductBlock(_ from: AdaptyUI.ViewConfiguration.OldProductsBlock) -> AdaptyUI.OldProductsBlock {
+        .init(
+            type: from.type,
+            mainProductIndex: from.mainProductIndex,
+            initiatePurchaseOnTap: from.initiatePurchaseOnTap,
+            products: from.products.map(oldProductObject),
+            orderedItems: orderedOldViewItems(from.orderedItems)
+        )
+    }
 
-
+    private func oldProductObject(_ from: AdaptyUI.ViewConfiguration.OldProductObject) -> AdaptyUI.OldProductObject {
+        .init(
+            productId: from.productId,
+            orderedItems: orderedOldViewItems(from.orderedItems)
+        )
+    }
+}
 
 extension AdaptyUI.ViewConfiguration.OldProductsBlock: Decodable {
     enum PropertyKeys: String {
@@ -66,7 +74,7 @@ extension AdaptyUI.ViewConfiguration.OldProductObject: Decodable {
     init(from decoder: Decoder) throws {
         typealias CodingKeys = AdaptyUI.ViewConfiguration.OldViewStyle.CodingKeys
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        properties = try container.toOrderedItems { PropertyKeys(rawValue: $0) == nil }
+        orderedItems = try container.toOrderedItems { PropertyKeys(rawValue: $0) == nil }
         productId = try container.decode(String.self, forKey: CodingKeys(PropertyKeys.productId))
     }
 }

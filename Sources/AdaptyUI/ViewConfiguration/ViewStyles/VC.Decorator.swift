@@ -1,6 +1,6 @@
 //
 //  VC.Decorator.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
 //
@@ -18,7 +18,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func decorator(from: AdaptyUI.ViewConfiguration.Decorator) -> AdaptyUI.Decorator {
+    func decorator(_ from: AdaptyUI.ViewConfiguration.Decorator) -> AdaptyUI.Decorator {
         .init(
             type: from.type,
             background: fillingIfPresent(from.backgroundAssetId),

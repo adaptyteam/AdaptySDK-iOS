@@ -1,6 +1,6 @@
 //
 //  VC.OldViewStyle.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -13,6 +13,17 @@ extension AdaptyUI.ViewConfiguration {
         let productsBlock: OldProductsBlock
         let footerBlock: OldFooterBlock?
         let items: [String: OldViewItem]
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func oldViewStyle(_ from: AdaptyUI.ViewConfiguration.OldViewStyle) -> AdaptyUI.OldViewStyle {
+        .init(
+            featureBlock: from.featuresBlock.map(oldFeaturesBlock),
+            productBlock: oldProductBlock(from.productsBlock),
+            footerBlock: from.footerBlock.map(oldFooterBlock),
+            items: from.items.mapValues(oldViewItem)
+        )
     }
 }
 

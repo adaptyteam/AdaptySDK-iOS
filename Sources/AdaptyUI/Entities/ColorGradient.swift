@@ -1,6 +1,6 @@
 //
 //  ColorGradient.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 29.06.2023
 //

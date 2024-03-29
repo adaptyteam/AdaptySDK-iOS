@@ -1,6 +1,6 @@
 //
 //  VC.OldCustomObject.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -11,6 +11,15 @@ extension AdaptyUI.ViewConfiguration {
     struct OldCustomObject {
         let type: String
         let properties: [(key: String, value: OldViewItem)]
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func oldCustomObject(_ from: AdaptyUI.ViewConfiguration.OldCustomObject) -> AdaptyUI.OldCustomObject {
+        .init(
+            type: from.type,
+            orderedItems: orderedOldViewItems(from.properties)
+        )
     }
 }
 

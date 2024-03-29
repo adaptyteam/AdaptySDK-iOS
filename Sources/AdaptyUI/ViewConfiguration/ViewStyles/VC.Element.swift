@@ -1,6 +1,6 @@
 //
 //  Element.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
 //
@@ -41,24 +41,24 @@ extension AdaptyUI.ViewConfiguration.Element {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func element(from: AdaptyUI.ViewConfiguration.Element) -> AdaptyUI.Element {
+    func element(_ from: AdaptyUI.ViewConfiguration.Element) -> AdaptyUI.Element {
         switch from {
         case let .space(value):
             .space(value)
         case let .stack(value, properties):
-            .stack(stack(from: value), properties.flatMap(elementProperties))
+            .stack(stack(value), properties.flatMap(elementProperties))
         case let .text(value, properties):
-            .text(richText(from: value), properties.flatMap(elementProperties))
+            .text(richText(value), properties.flatMap(elementProperties))
         case let .image(value, properties):
-            .image(image(from: value), properties.flatMap(elementProperties))
+            .image(image(value), properties.flatMap(elementProperties))
         case let .button(value, properties):
-            .button(button(from: value), properties.flatMap(elementProperties))
+            .button(button(value), properties.flatMap(elementProperties))
         case let .unknown(value, properties):
             .unknown(value, properties.flatMap(elementProperties))
         }
     }
 
-    private func elementProperties(from: AdaptyUI.ViewConfiguration.Element.Properties) -> AdaptyUI.Element.Properties? {
+    private func elementProperties(_ from: AdaptyUI.ViewConfiguration.Element.Properties) -> AdaptyUI.Element.Properties? {
         guard !from.isZero else { return nil }
         return .init(
             decorastor: from.decorastor.map(decorator),

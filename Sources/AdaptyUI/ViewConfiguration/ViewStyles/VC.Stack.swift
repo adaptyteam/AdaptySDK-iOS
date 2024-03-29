@@ -1,6 +1,6 @@
 //
 //  Stack.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
 //
@@ -18,12 +18,12 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func stack(from: AdaptyUI.ViewConfiguration.Stack) -> AdaptyUI.Stack {
+    func stack(_ from: AdaptyUI.ViewConfiguration.Stack) -> AdaptyUI.Stack {
         .init(
             type: from.type,
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
-            elements: from.elements.map(element) 
+            elements: from.elements.map(element)
         )
     }
 }

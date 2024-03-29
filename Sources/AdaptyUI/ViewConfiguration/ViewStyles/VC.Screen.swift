@@ -1,6 +1,6 @@
 //
 //  VC.Screen.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
 //
@@ -18,7 +18,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func screen(from: AdaptyUI.ViewConfiguration.Screen) -> AdaptyUI.Screen {
+    func screen(_ from: AdaptyUI.ViewConfiguration.Screen) -> AdaptyUI.Screen {
         .init(
             background: fillingIfPresent(from.backgroundAssetId) ?? AdaptyUI.Screen.default.background,
             mainImage: from.mainImage.map(image),

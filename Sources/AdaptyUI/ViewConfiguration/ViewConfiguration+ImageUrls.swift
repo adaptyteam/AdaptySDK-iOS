@@ -1,6 +1,6 @@
 //
 //  ViewConfiguration+ImageUrls.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 06.03.2024
 //

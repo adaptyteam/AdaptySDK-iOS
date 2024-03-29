@@ -1,6 +1,6 @@
 //
 //  Transition.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 16.01.2024
 //

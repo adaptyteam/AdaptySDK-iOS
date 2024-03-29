@@ -1,6 +1,6 @@
 //
 //  Screen.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
 //

@@ -1,6 +1,6 @@
 //
 //  Font.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 19.01.2023
 //

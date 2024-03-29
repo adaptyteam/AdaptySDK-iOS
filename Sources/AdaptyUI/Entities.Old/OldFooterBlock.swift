@@ -1,6 +1,6 @@
 //
 //  OldFooterBlock.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 03.07.2023
 //

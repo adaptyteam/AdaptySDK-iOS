@@ -1,6 +1,6 @@
 //
 //  VC.OldViewItem.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
 //
@@ -15,6 +15,39 @@ extension AdaptyUI.ViewConfiguration {
         case text(Text)
         case object(OldCustomObject)
         case unknown
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func orderedOldViewItems(_ from: [(key: String, value: AdaptyUI.ViewConfiguration.OldViewItem)]) -> [(key: String, value: AdaptyUI.OldViewItem)] {
+        from.map { (key: $0.key, value: oldViewItem($0.value)) }
+    }
+
+    func oldViewItem(_ from: AdaptyUI.ViewConfiguration.OldViewItem) -> AdaptyUI.OldViewItem {
+        switch from {
+        case let .asset(id):
+            guard let asset = assetIfPresent(id) else {
+                return .unknown("asset.id: \(id)")
+            }
+            switch asset {
+            case let .filling(value):
+                return .filling(value)
+            case let .unknown(value):
+                return .unknown(value)
+            case .font:
+                return .unknown("unsupported asset {type: font, id: \(id)}")
+            }
+        case let .shape(value):
+            return .shape(decorator(value))
+        case let .button(value):
+            return .button(oldButton(value))
+        case let .text(value):
+            return .text(richText(value))
+        case let .object(value):
+            return .object(oldCustomObject(value))
+        case .unknown:
+            return .unknown("unsupported type")
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 //
 //  VC.RichText.swift
-//
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 15.03.2024
 //

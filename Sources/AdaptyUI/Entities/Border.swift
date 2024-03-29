@@ -1,6 +1,6 @@
 //
 //  Border.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 27.03.2024
 //

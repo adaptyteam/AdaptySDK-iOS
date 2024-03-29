@@ -1,6 +1,6 @@
 //
 //  Button.swift
-//  AdaptySDK
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
 //
@@ -18,7 +18,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func button(from: AdaptyUI.ViewConfiguration.Button) -> AdaptyUI.Button {
+    func button(_ from: AdaptyUI.ViewConfiguration.Button) -> AdaptyUI.Button {
         .init(
             action: from.action.map(buttonAction),
             isSelected: from.isSelected,
@@ -27,7 +27,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 
-    func buttonAction(from: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
+    func buttonAction(_ from: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
         guard case let .openUrl(stringId) = from else { return from }
         return .openUrl(self.urlIfPresent(stringId))
     }
