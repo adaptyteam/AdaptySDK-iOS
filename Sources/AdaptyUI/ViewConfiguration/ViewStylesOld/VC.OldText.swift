@@ -9,7 +9,6 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    typealias Text = TextBlock
     struct OldText {
         let fontAssetId: String?
         let size: Double?
@@ -45,8 +44,20 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func richText(from _: AdaptyUI.ViewConfiguration.OldText) -> AdaptyUI.RichText {
-        AdaptyUI.RichText.empty
+    func richText(_: AdaptyUI.ViewConfiguration.OldText) -> AdaptyUI.RichText {
+        AdaptyUI.RichText(
+            items: [
+                .text("Under construction", .init(
+                    font: AdaptyUI.Font.default,
+                    size: 15,
+                    color: .color(AdaptyUI.Color.black),
+                    background: .color(AdaptyUI.Color(data: 0xFFFF00FF)),
+                    strike: true,
+                    underline: true
+                )),
+            ],
+            fallback: nil
+        )
     }
 }
 

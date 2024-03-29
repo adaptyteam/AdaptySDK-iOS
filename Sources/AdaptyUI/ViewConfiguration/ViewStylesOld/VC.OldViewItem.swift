@@ -12,7 +12,7 @@ extension AdaptyUI.ViewConfiguration {
         case asset(String)
         case shape(Decorator)
         case button(OldButton)
-        case text(Text)
+        case text(OldText)
         case object(OldCustomObject)
         case unknown
     }
@@ -86,7 +86,7 @@ extension AdaptyUI.ViewConfiguration.OldViewItem: Decodable {
         case .button:
             self = try .button(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.OldButton.self))
         case .text:
-            self = try .text(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.Text.self))
+            self = try .text(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.OldText.self))
         default:
             self = try .object(decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.OldCustomObject.self))
         }

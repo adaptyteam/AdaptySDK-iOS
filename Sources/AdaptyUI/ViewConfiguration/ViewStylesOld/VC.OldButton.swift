@@ -11,8 +11,8 @@ extension AdaptyUI.ViewConfiguration {
     struct OldButton {
         let shape: Decorator?
         let selectedShape: Decorator?
-        let title: Text?
-        let selectedTitle: Text?
+        let title: OldText?
+        let selectedTitle: OldText?
         let align: AdaptyUI.OldButton.Align?
         let action: AdaptyUI.ButtonAction?
         let visibility: Bool
@@ -59,8 +59,8 @@ extension AdaptyUI.ViewConfiguration.OldButton: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         shape = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .shape)
         selectedShape = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .selectedShape)
-        selectedTitle = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Text.self, forKey: .selectedTitle)
-        title = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Text.self, forKey: .title)
+        selectedTitle = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.OldText.self, forKey: .selectedTitle)
+        title = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.OldText.self, forKey: .title)
         align = try container.decodeIfPresent(AdaptyUI.OldButton.Align.self, forKey: .align)
         action = try container.decodeIfPresent(AdaptyUI.ButtonAction.self, forKey: .action)
         visibility = try container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true

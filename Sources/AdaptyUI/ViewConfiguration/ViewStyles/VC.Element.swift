@@ -12,7 +12,7 @@ extension AdaptyUI.ViewConfiguration {
     enum Element {
         case space(Int)
         indirect case stack(AdaptyUI.ViewConfiguration.Stack, Properties?)
-        case text(AdaptyUI.ViewConfiguration.TextBlock, Properties?)
+        case text(AdaptyUI.ViewConfiguration.Text, Properties?)
         case image(AdaptyUI.ViewConfiguration.Image, Properties?)
         indirect case button(AdaptyUI.ViewConfiguration.Button, Properties?)
         case unknown(String, Properties?)
@@ -104,7 +104,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         case .button:
             self = try .button(AdaptyUI.ViewConfiguration.Button(from: decoder), propertyOrNil())
         case .text:
-            self = try .text(AdaptyUI.ViewConfiguration.TextBlock(from: decoder), propertyOrNil())
+            self = try .text(AdaptyUI.ViewConfiguration.Text(from: decoder), propertyOrNil())
         case .image:
             self = try .image(AdaptyUI.ViewConfiguration.Image(from: decoder), propertyOrNil())
         }

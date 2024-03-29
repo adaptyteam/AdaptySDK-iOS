@@ -1,5 +1,5 @@
 //
-//  VC.TextBlock.swift
+//  VC.Text.swift
 //  AdaptyUI
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct TextBlock {
+    struct Text {
         let stringId: String
         let maxRows: Int?
         let overflowMode: Set<AdaptyUI.RichText.OverflowMode>
@@ -18,11 +18,11 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func richText(_ textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText {
+    func richText(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText {
         richTextIfPresent(textBlock) ?? AdaptyUI.RichText.empty
     }
 
-    func richTextIfPresent(_ textBlock: AdaptyUI.ViewConfiguration.TextBlock) -> AdaptyUI.RichText? {
+    func richTextIfPresent(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText? {
         guard let item = localization?.strings?[textBlock.stringId] else { return nil }
         return .init(
             items: item.value.convert(
@@ -41,7 +41,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.TextBlock: Decodable {
+extension AdaptyUI.ViewConfiguration.Text: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case maxRows = "max_rows"
