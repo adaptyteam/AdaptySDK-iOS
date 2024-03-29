@@ -12,8 +12,8 @@ extension AdaptyUI.ViewConfiguration {
     struct Screen {
         let backgroundAssetId: String
         let mainImage: Image?
-        let mainBlock: Stack?
-        let footerBlock: Stack?
+        let mainBlock: Element?
+        let footerBlock: Element?
     }
 }
 
@@ -22,8 +22,17 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         .init(
             background: fillingIfPresent(from.backgroundAssetId) ?? AdaptyUI.Screen.default.background,
             mainImage: from.mainImage.map(image),
-            mainBlock: from.mainBlock.map(stack),
-            footerBlock: from.footerBlock.map(stack)
+            mainBlock: from.mainBlock.map(element),
+            footerBlock: from.footerBlock.map(element)
         )
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Screen: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case backgroundAssetId = "background"
+        case mainImage = "main_image"
+        case mainBlock = "main_block"
+        case footerBlock = "footer_block"
     }
 }

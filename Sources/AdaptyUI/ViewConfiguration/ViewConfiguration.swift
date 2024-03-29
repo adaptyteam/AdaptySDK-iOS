@@ -17,7 +17,7 @@ extension AdaptyUI {
         let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
         let styles: [String: OldViewStyle]
-
+        let screens: [String: Screen]
         let isHard: Bool
         let mainImageRelativeHeight: Double?
     }
@@ -52,7 +52,8 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         id = try superContainer.decode(String.self, forKey: .id)
         let container = try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
 
-        _ = try container.decode(String.self, forKey: .format) // TODO: "2.0.0"
+        let format = try (container.decode(String.self, forKey: .format).split(separator: ".").first).flatMap { Int($0) } ?? 2
+
         templateId = try container.decode(String.self, forKey: .templateId)
         version = try container.decode(Int64.self, forKey: .version)
 
@@ -69,7 +70,13 @@ extension AdaptyUI.ViewConfiguration: Decodable {
             defaultLocalization = nil
         }
 
-        styles = try container.decode([String: OldViewStyle].self, forKey: .styles)
+        if format > 3 {
+            screens = try container.decode([String: Screen].self, forKey: .styles)
+            styles = [:]
+        } else {
+            screens = [:]
+            styles = try container.decode([String: OldViewStyle].self, forKey: .styles)
+        }
 
         isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
         mainImageRelativeHeight = try container.decodeIfPresent(Double.self, forKey: .mainImageRelativeHeight)

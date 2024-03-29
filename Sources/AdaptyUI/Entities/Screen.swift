@@ -17,7 +17,7 @@ extension AdaptyUI {
         )
         public let background: AdaptyUI.Filling
         public let mainImage: Image?
-        public let mainBlock: Stack?
-        public let footerBlock: Stack?
+        public let mainBlock: Element?
+        public let footerBlock: Element?
     }
 }

@@ -27,3 +27,25 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 }
+
+extension AdaptyUI.ViewConfiguration.Stack: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case type
+        case horizontalAlignment = "h_align"
+        case verticalAlignment = "v_align"
+        case elements
+    }
+
+    init(from decoder: any Decoder) throws {
+        let def = AdaptyUI.Stack.default
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            type: container.decodeIfPresent(AdaptyUI.StackType.self, forKey: .type) ?? def.type,
+            horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
+            verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
+            elements: container.decodeIfPresent([AdaptyUI.ViewConfiguration.Element].self, forKey: .elements) ?? []
+        )
+    }
+}
+
+extension AdaptyUI.StackType: Decodable {}

@@ -70,3 +70,81 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 }
+
+extension AdaptyUI.ViewConfiguration.Element: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case type
+        case count
+    }
+
+    enum ContentType: String, Codable {
+        case text
+        case image
+        case button
+        case space
+        case vStack = "v_stack"
+        case hStack = "h_stack"
+        case zStack = "z_stack"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+
+        guard let contentType = ContentType(rawValue: type) else {
+            self = .unknown(type, propertyOrNil())
+            return
+        }
+
+        switch contentType {
+        case .space:
+            self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
+        case .vStack, .hStack, .zStack:
+            self = try .stack(AdaptyUI.ViewConfiguration.Stack(from: decoder), propertyOrNil())
+        case .button:
+            self = try .button(AdaptyUI.ViewConfiguration.Button(from: decoder), propertyOrNil())
+        case .text:
+            self = try .text(AdaptyUI.ViewConfiguration.TextBlock(from: decoder), propertyOrNil())
+        case .image:
+            self = try .image(AdaptyUI.ViewConfiguration.Image(from: decoder), propertyOrNil())
+        }
+
+        func propertyOrNil() -> Properties? {
+            guard let value = try? Properties(from: decoder) else { return nil }
+            return value.isZero ? nil : value
+        }
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case decorastor
+        case frsme
+        case padding
+        case offset
+        case visibility
+        case transitionIn = "transition_in"
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let transitionIn: [AdaptyUI.Transition] =
+            if let array = try? container.decodeIfPresent([AdaptyUI.Transition].self, forKey: .transitionIn) {
+                array
+            } else if let union = try? container.decodeIfPresent(AdaptyUI.TransitionUnion.self, forKey: .transitionIn) {
+                union.items
+            } else if let transition = try container.decodeIfPresent(AdaptyUI.Transition.self, forKey: .transitionIn) {
+                [transition]
+            } else {
+                []
+            }
+        try self.init(
+            decorastor: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorastor),
+            frsme: container.decodeIfPresent(AdaptyUI.Frame.self, forKey: .frsme),
+            padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.EdgeInsets.zero,
+            offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Offset.zero,
+            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true,
+            transitionIn: transitionIn
+        )
+    }
+}

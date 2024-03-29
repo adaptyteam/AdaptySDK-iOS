@@ -32,3 +32,22 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         return .openUrl(self.urlIfPresent(stringId))
     }
 }
+
+extension AdaptyUI.ViewConfiguration.Button: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case action
+        case isSelected = "is_selected"
+        case normalState = "normal"
+        case selectedState = "selected"
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            action: container.decodeIfPresent(AdaptyUI.ButtonAction.self, forKey: .action),
+            isSelected: container.decodeIfPresent(Bool.self, forKey: .isSelected) ?? false,
+            normalState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
+            selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState)
+        )
+    }
+}
