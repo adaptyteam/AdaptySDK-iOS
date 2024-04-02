@@ -37,7 +37,7 @@ extension Adapty {
     ///   - paywall: A `AdaptyPaywall` object.
     ///   - completion: Result callback.
     public static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
-        trackEvent(.paywallShowed(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
+        trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
     }
 
     /// Call this method to keep track of the user's steps while onboarding
@@ -74,6 +74,6 @@ extension Adapty {
 
 extension AdaptyUI {
     public static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
-        Adapty.trackEvent(.paywallShowed(AdaptyPaywallShowedParameters(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)), completion)
+        Adapty.trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)), completion)
     }
 }

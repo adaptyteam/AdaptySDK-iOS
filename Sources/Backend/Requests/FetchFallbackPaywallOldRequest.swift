@@ -1,5 +1,5 @@
 //
-//  FetchFallbackPaywallRequest.swift
+//  FetchFallbackPaywallOldRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-private struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
+private struct FetchFallbackPaywallOldRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
 
     let endpoint: HTTPEndpoint
@@ -37,7 +37,7 @@ extension HTTPSession {
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>
     ) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
-        let request = FetchFallbackPaywallRequest(
+        let request = FetchFallbackPaywallOldRequest(
             apiKeyPrefix: apiKeyPrefix,
             placementId: placementId,
             locale: locale
@@ -51,7 +51,7 @@ extension HTTPSession {
                 "placement_id": .value(placementId),
                 "language_code": .valueOrNil(locale.languageCode),
             ]
-        ) { [weak self] (result: FetchFallbackPaywallRequest.Result) in
+        ) { [weak self] (result: FetchFallbackPaywallOldRequest.Result) in
             switch result {
             case let .failure(error):
                 guard let queue = self?.responseQueue,

@@ -75,7 +75,7 @@ extension Backend.Response {
             value = try dataObject.decode(T.self, forKey: .attributes)
         }
     }
-
+    
     struct ValueOfData<T: Decodable>: Decodable {
         let value: T
 

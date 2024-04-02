@@ -145,7 +145,7 @@ private extension AdaptyProfileManager {
         _ locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        manager.httpSession.performFetchPaywallRequest(
+        manager.httpSession.performFetchPaywallOldRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
