@@ -31,7 +31,5 @@ extension AdaptyResult<AdaptyUI.ViewConfiguration> {
                 observer.extractedImageUrls(urls)
             }
         }
-
-        return self
     }
 }
