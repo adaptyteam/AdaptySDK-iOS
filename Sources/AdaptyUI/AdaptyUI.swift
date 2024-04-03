@@ -49,9 +49,14 @@ public enum AdaptyUI {
                 locale: parameters.locale,
                 builderVersion: parameters.builderVersion,
                 adaptyUISDKVersion: parameters.adaptyUISDKVersion,
-                loadTimeout: (parameters.loadTimeout?.allowedLoadPaywallTimeout ?? .defaultLoadPaywallTimeout).dispatchTimeInterval,
-                completion
-            )
+                loadTimeout: (parameters.loadTimeout?.allowedLoadPaywallTimeout ?? .defaultLoadPaywallTimeout).dispatchTimeInterval
+            ) { result in
+                _ = result.do { value in
+                    let urls = value.extractImageUrls(parameters.locale)
+                    AdaptyUI.extractedImageUrls(urls)
+                }
+                completion(result)
+            }
         }
     }
 }
