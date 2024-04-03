@@ -19,11 +19,19 @@ extension AdaptyUI {
         imageUrlObserver = observer
         self.dispatchQueue = dispatchQueue
     }
+}
 
-    static func extractedImageUrls(_ urls: Set<URL>) {
-        guard let observer = self.imageUrlObserver, !urls.isEmpty else { return }
-        (dispatchQueue ?? .main).async {
-            observer.extractedImageUrls(urls)
+extension AdaptyResult<AdaptyUI.ViewConfiguration> {
+    func sendImageUrlsToObserver(forLocale local: AdaptyLocale) {
+        if let observer = AdaptyUI.imageUrlObserver,
+           case let .success(value) = self {
+            (AdaptyUI.dispatchQueue ?? .main).async {
+                let urls = value.extractImageUrls(local)
+                guard !urls.isEmpty else { return }
+                observer.extractedImageUrls(urls)
+            }
         }
+
+        return self
     }
 }

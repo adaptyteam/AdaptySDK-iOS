@@ -52,10 +52,7 @@ public enum AdaptyUI {
                 adaptyUISDKVersion: parameters.adaptyUISDKVersion,
                 loadTimeout: (parameters.loadTimeout?.allowedLoadPaywallTimeout ?? .defaultLoadPaywallTimeout).dispatchTimeInterval
             ) { result in
-                _ = result.do { value in
-                    let urls = value.extractImageUrls(parameters.locale)
-                    AdaptyUI.extractedImageUrls(urls)
-                }
+                result.sendImageUrlsToObserver(forLocale: parameters.locale)
                 completion(result)
             }
         }
