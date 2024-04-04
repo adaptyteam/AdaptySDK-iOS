@@ -31,7 +31,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.resource_bundles = {"Adapty" => ["Sources/Resources/PrivacyInfo.xcprivacy"]}
 
   s.frameworks = 'Foundation', 'StoreKit'
-  s.ios.framework = 'UIKit', 'iAd', 'AdSupport'
+  s.ios.framework = 'UIKit', 'AdSupport'
   s.ios.weak_frameworks = 'AdServices'
   s.osx.frameworks = 'AppKit'
   s.osx.weak_frameworks = 'AdSupport', 'AdServices'
