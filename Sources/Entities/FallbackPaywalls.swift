@@ -69,6 +69,8 @@ extension FallbackPaywalls: Decodable {
     }
 
     init(from data: Data) throws {
-        self = try Backend.decoder.decode(FallbackPaywalls.self, from: data)
+        let decoder = JSONDecoder()
+        Backend.configure(decoder: decoder)
+        self = try decoder.decode(FallbackPaywalls.self, from: data)
     }
 }

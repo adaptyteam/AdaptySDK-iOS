@@ -12,20 +12,18 @@ extension UserDefaults: ProductVendorIdsStorage {
         static let productVendorIdsStorageKey = "AdaptySDK_Cached_ProductVendorIds"
     }
 
-    func setProductVendorIds(_ vendorIds: VH<[String]>) {
+    func setProductVendorIds(_ vendorIds: [String]) {
         do {
-            let data = try Backend.encoder.encode(vendorIds)
+            try setJSON(vendorIds, forKey: Constants.productVendorIdsStorageKey)
             Log.debug("UserDefaults: Saving vendor product ids success.")
-            set(data, forKey: Constants.productVendorIdsStorageKey)
         } catch {
             Log.error("UserDefaults: Saving vendor product ids fail. \(error.localizedDescription)")
         }
     }
 
-    func getProductVendorIds() -> VH<[String]>? {
-        guard let data = data(forKey: Constants.productVendorIdsStorageKey) else { return nil }
+    func getProductVendorIds() -> [String]? {
         do {
-            return try Backend.decoder.decode(VH<[String]>.self, from: data)
+            return try getJSON([String].self, forKey: Constants.productVendorIdsStorageKey)
         } catch {
             Log.warn(error.localizedDescription)
             return nil

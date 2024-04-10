@@ -55,7 +55,7 @@ extension Adapty {
 extension PaywallsCache {
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale?) -> AdaptyPaywall? {
         let fallback = Adapty.Configuration.fallbackPaywalls?.paywallByPlacementId[placementId]
-        guard let cache = getPaywallByLocaleOrDefault(locale, withPlacementId: placementId)?.value else { return fallback }
+        guard let cache = getPaywallByLocale(locale, withPlacementId: placementId)?.value else { return fallback }
         guard let fallback else { return cache }
         if cache.version >= fallback.version {
             return cache
@@ -68,6 +68,12 @@ extension PaywallsCache {
 
 extension ProductVendorIdsCache {
     var allProductVendorIdsWithFallback: Set<String> {
-        Set(allProductVendorIds?.value ?? []).union(Adapty.Configuration.fallbackPaywalls?.allProductVendorIds ?? [])
+        guard let fallback = Adapty.Configuration.fallbackPaywalls?.allProductVendorIds else {
+            return Set(allProductVendorIds ?? [])
+        }
+        guard let cache = allProductVendorIds else {
+            return Set(fallback)
+        }
+        return Set(cache).union(fallback)
     }
 }

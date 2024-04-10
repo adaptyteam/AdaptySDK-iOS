@@ -21,6 +21,10 @@ extension BackendProductState: CustomStringConvertible {
 
 extension BackendProductState: Sendable, Equatable {}
 
+extension [BackendProductState]: ValueHashable {}
+
+extension [String: BackendProductState]: ValueHashable {}
+
 extension BackendProductState: Codable {
     enum CodingKeys: String, CodingKey {
         case vendorId = "vendor_product_id"

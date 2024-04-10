@@ -118,7 +118,7 @@ final class SKProductsManager {
                 guard let self else { return }
                 switch result {
                 case let .success(response):
-                    self.cache.setProductVendorIds(VH(response.body.value, time: Date()))
+                    self.cache.setProductVendorIds(response.body.value)
                     self.fetchSK1Products(productIdentifiers: self.cache.allProductVendorIdsWithFallback) { _ in }
                     if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                         self.fetchSK2Products(productIdentifiers: self.cache.allProductVendorIdsWithFallback) { _ in }

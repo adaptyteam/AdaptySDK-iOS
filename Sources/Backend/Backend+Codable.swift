@@ -1,5 +1,5 @@
 //
-//  Backend.Codable.swift
+//  Backend+Codable.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.09.2022.
@@ -8,15 +8,28 @@
 import Foundation
 
 extension Backend {
+    fileprivate static let isBackendCodableUserInfoKey = CodingUserInfoKey(rawValue: "adapty_backend")!
+
     static func configure(decoder: JSONDecoder) {
         decoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
         decoder.dataDecodingStrategy = .base64
+        decoder.setIsBackend()
     }
 
     static func configure(encoder: JSONEncoder) {
-        encoder.dateEncodingStrategy = .formatted(Backend.dateFormatter)
+        encoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
         encoder.dataEncodingStrategy = .base64
+        encoder.setIsBackend()
     }
+
+    static var inUTCDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        return formatter
+    }()
 
     static var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -25,17 +38,17 @@ extension Backend {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         return formatter
     }()
+}
 
-    static var decoder: JSONDecoder {
-        let decoder = JSONDecoder()
-        configure(decoder: decoder)
-        return decoder
+private extension CodingUserInfoСontainer {
+    func setIsBackend() {
+        userInfo[Backend.isBackendCodableUserInfoKey] = true
     }
+}
 
-    static var encoder: JSONEncoder {
-        let encoder = JSONEncoder()
-        configure(encoder: encoder)
-        return encoder
+extension [CodingUserInfoKey: Any] {
+    var isBackend: Bool {
+        [Backend.isBackendCodableUserInfoKey] as? Bool ?? false
     }
 }
 
@@ -57,10 +70,6 @@ extension Encoder {
     }
 }
 
-extension Backend.Request {
-    static let localeCodeUserInfoKey = CodingUserInfoKey(rawValue: "request_paywall_locale")!
-}
-
 extension Backend.Response {
     struct Body<T: Decodable>: Decodable {
         let value: T
@@ -75,7 +84,7 @@ extension Backend.Response {
             value = try dataObject.decode(T.self, forKey: .attributes)
         }
     }
-    
+
     struct ValueOfData<T: Decodable>: Decodable {
         let value: T
 

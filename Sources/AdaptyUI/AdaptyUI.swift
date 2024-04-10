@@ -14,6 +14,7 @@ import Foundation
 public enum AdaptyUI {
     /// This method is intended to be used directly. Read [AdaptyUI Documentation](https://docs.adapty.io/docs/paywall-builder-installation-ios) first.
     public static func getViewConfiguration(
+        from decoder: JSONDecoder,
         data: Data,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
     ) {
@@ -37,7 +38,7 @@ public enum AdaptyUI {
 
         let parameters: PrivateParameters
         do {
-            parameters = try Backend.decoder.decode(PrivateParameters.self, from: data)
+            parameters = try decoder.decode(PrivateParameters.self, from: data)
         } catch {
             completion(.failure(.decodingGetViewConfiguration(error)))
             return

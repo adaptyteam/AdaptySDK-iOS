@@ -15,6 +15,7 @@ extension AdaptyUI {
         public let templateId: String
         let version: Int64
         let assets: [String: Asset]
+        let responseLocale: AdaptyLocale?
         let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
         let styles: [String: ViewStyle]
@@ -33,6 +34,7 @@ extension AdaptyUI.ViewConfiguration: CustomStringConvertible {
 extension AdaptyUI.ViewConfiguration: Decodable {
     enum ContainerCodingKeys: String, CodingKey {
         case container = "paywall_builder_config"
+        case responseLocale = "lang"
         case id = "paywall_builder_id"
     }
 
@@ -51,13 +53,14 @@ extension AdaptyUI.ViewConfiguration: Decodable {
     public init(from decoder: Decoder) throws {
         let superContainer = try decoder.container(keyedBy: ContainerCodingKeys.self)
         id = try superContainer.decode(String.self, forKey: .id)
+        responseLocale = try superContainer.decodeIfPresent(AdaptyLocale.self, forKey: .responseLocale)
         let container = try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
 
         _ = try container.decode(String.self, forKey: .format) // TODO: "2.0.0"
         templateId = try container.decode(String.self, forKey: .templateId)
         version = try container.decode(Int64.self, forKey: .version)
 
-        assets = (try container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value ?? [:]
+        assets = try (container.decodeIfPresent(AdaptyUI.Assets.self, forKey: .assets))?.value ?? [:]
 
         let localizationsArray = try container.decodeIfPresent([AdaptyUI.Localization].self, forKey: .localizations) ?? []
         let localizations = try [AdaptyLocale: AdaptyUI.Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in

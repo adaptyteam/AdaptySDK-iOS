@@ -12,18 +12,8 @@ private struct FetchPaywallOldRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
     let headers: Headers
-    let locale: AdaptyLocale
-
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        { response in
-            jsonDecoder.userInfo[Backend.Request.localeCodeUserInfoKey] = locale
-            return jsonDecoder.decode(ResponseBody.self, response)
-        }
-    }
 
     init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String) {
-        self.locale = locale
-
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(placementId)/\(md5Hash)/"
