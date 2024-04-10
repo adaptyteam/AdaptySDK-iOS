@@ -32,8 +32,8 @@ extension AdaptyUI {
 
 extension AdaptyUI.Element {
     public struct Properties {
-        public let decorastor: AdaptyUI.Decorator?
-        public let frsme: AdaptyUI.Frame?
+        public let decorator: AdaptyUI.Decorator?
+        public let frame: AdaptyUI.Frame?
         public let padding: AdaptyUI.EdgeInsets
         public let offset: AdaptyUI.Offset
 

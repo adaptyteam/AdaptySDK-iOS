@@ -21,8 +21,8 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.Element {
     struct Properties {
-        let decorastor: AdaptyUI.ViewConfiguration.Decorator?
-        let frsme: AdaptyUI.Frame?
+        let decorator: AdaptyUI.ViewConfiguration.Decorator?
+        let frame: AdaptyUI.Frame?
         let padding: AdaptyUI.EdgeInsets
         let offset: AdaptyUI.Offset
 
@@ -30,8 +30,8 @@ extension AdaptyUI.ViewConfiguration.Element {
         let transitionIn: [AdaptyUI.Transition]
 
         var isZero: Bool {
-            decorastor == nil
-                && frsme == nil
+            decorator == nil
+                && frame == nil
                 && padding.isZero
                 && offset.isZero
                 && visibility
@@ -61,8 +61,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     private func elementProperties(_ from: AdaptyUI.ViewConfiguration.Element.Properties) -> AdaptyUI.Element.Properties? {
         guard !from.isZero else { return nil }
         return .init(
-            decorastor: from.decorastor.map(decorator),
-            frsme: from.frsme,
+            decorator: from.decorator.map(decorator),
+            frame: from.frame,
             padding: from.padding,
             offset: from.offset,
             visibility: from.visibility,
@@ -118,8 +118,8 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
 
 extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
     enum CodingKeys: String, CodingKey {
-        case decorastor
-        case frsme
+        case decorator
+        case frame
         case padding
         case offset
         case visibility
@@ -139,8 +139,8 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
                 []
             }
         try self.init(
-            decorastor: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorastor),
-            frsme: container.decodeIfPresent(AdaptyUI.Frame.self, forKey: .frsme),
+            decorator: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorator),
+            frame: container.decodeIfPresent(AdaptyUI.Frame.self, forKey: .frame),
             padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.EdgeInsets.zero,
             offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Offset.zero,
             visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true,
