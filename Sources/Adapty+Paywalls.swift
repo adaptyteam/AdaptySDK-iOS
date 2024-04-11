@@ -108,7 +108,7 @@ extension Adapty {
         _ locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        httpFallbackSession.performFetchFallbackPaywallRequest(
+        httpFallbackSession.performFetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
             placementId: placementId,
             locale: locale
@@ -145,12 +145,13 @@ private extension AdaptyProfileManager {
         _ locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        manager.httpSession.performFetchPaywallOldRequest(
+        manager.httpSession.performFetchPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            segmentId: profile.value.segmentId
+            segmentId: profile.value.segmentId,
+            adaptyUISDKVersion: nil
         ) { [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
             completion(result.map {
                 if let self, self.isActive {
@@ -167,7 +168,7 @@ private extension AdaptyProfileManager {
         _ locale: AdaptyLocale? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        manager.httpFallbackSession.performFetchFallbackPaywallRequest(
+        manager.httpFallbackSession.performFetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
             placementId: placementId,
             locale: locale
