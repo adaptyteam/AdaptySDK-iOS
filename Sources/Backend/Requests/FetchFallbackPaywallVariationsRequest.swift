@@ -12,10 +12,10 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
 
     let endpoint: HTTPEndpoint
 
-    init(apiKeyPrefix: String, placementId: String, locale: AdaptyLocale, builderVersion: String) {
+    init(apiKeyPrefix: String, placementId: String, locale: AdaptyLocale) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(builderVersion)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyUI.builderVersion)/fallback.json"
         )
     }
 }
@@ -25,15 +25,13 @@ extension HTTPSession {
         apiKeyPrefix: String,
         placementId: String,
         locale: AdaptyLocale?,
-        builderVersion: String,
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>
     ) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         let request = FetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
             placementId: placementId,
-            locale: locale,
-            builderVersion: builderVersion
+            locale: locale
         )
 
         perform(
@@ -43,7 +41,7 @@ extension HTTPSession {
                 "api_prefix": .value(apiKeyPrefix),
                 "placement_id": .value(placementId),
                 "language_code": .valueOrNil(locale.languageCode),
-                "builder_version": .value(builderVersion),
+                "builder_version": .value(AdaptyUI.builderVersion),
             ]
         ) { [weak self] (result: FetchFallbackPaywallVariationsRequest.Result) in
             switch result {
@@ -64,7 +62,6 @@ extension HTTPSession {
                         apiKeyPrefix: apiKeyPrefix,
                         placementId: placementId,
                         locale: nil,
-                        builderVersion: builderVersion,
                         completion
                     )
                 }

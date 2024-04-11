@@ -14,7 +14,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     let endpoint: HTTPEndpoint
     let headers: Headers
 
-    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, builderVersion: String, adaptyUISDKVersion: String) {
+    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, adaptyUISDKVersion: String) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
@@ -22,7 +22,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
         headers = Headers()
             .setViewConfigurationLocale(locale)
-            .setVisualBuilderVersion(builderVersion)
+            .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setAdaptyUISDKVersion(adaptyUISDKVersion)
     }
 }
@@ -32,18 +32,16 @@ extension HTTPSession {
         apiKeyPrefix: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
-        builderVersion: String,
         adaptyUISDKVersion: String,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
     ) {
-        let md5Hash = "{\"builder_version\":\"\(builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
 
         let request = FetchViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallVariationId: paywallVariationId,
             locale: locale,
             md5Hash: md5Hash,
-            builderVersion: builderVersion,
             adaptyUISDKVersion: adaptyUISDKVersion
         )
 

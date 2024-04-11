@@ -13,10 +13,10 @@ struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
 
-    init(apiKeyPrefix: String, paywallInstanceIdentity: String, builderVersion: String, locale: AdaptyLocale) {
+    init(apiKeyPrefix: String, paywallInstanceIdentity: String, locale: AdaptyLocale) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(builderVersion)/\(locale.languageCode)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(AdaptyUI.builderVersion)/\(locale.languageCode)/fallback.json"
         )
     }
 }
@@ -26,19 +26,17 @@ extension HTTPSession {
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale?,
-        builderVersion: String,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         let request = FetchFallbackViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
                                                             paywallInstanceIdentity: paywallInstanceIdentity,
-                                                            builderVersion: builderVersion,
                                                             locale: locale)
         perform(request,
                 logName: "get_fallback_paywall_builder",
                 logParams: [
                     "api_prefix": .value(apiKeyPrefix),
                     "paywall_instance_id": .value(paywallInstanceIdentity),
-                    "builder_version": .value(builderVersion),
+                    "builder_version": .value(AdaptyUI.builderVersion),
                     "language_code": .valueOrNil(locale.languageCode),
                 ]) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in
             switch result {
@@ -59,7 +57,6 @@ extension HTTPSession {
                     session.performFetchFallbackViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
                                                                          paywallInstanceIdentity: paywallInstanceIdentity,
                                                                          locale: nil,
-                                                                         builderVersion: builderVersion,
                                                                          completion)
                 }
 

@@ -16,6 +16,10 @@ extension Adapty {
     }
 }
 
+extension AdaptyUI {
+    static let builderVersion = "3"
+}
+
 extension Environment {
     enum CrossPlatformSDK {
         static var name: String?

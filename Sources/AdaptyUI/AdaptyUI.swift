@@ -22,7 +22,6 @@ public enum AdaptyUI {
             let paywallVariationId: String
             let paywallInstanceIdentity: String
             let locale: AdaptyLocale
-            let builderVersion: String
             let adaptyUISDKVersion: String
             let loadTimeout: TimeInterval?
 
@@ -30,7 +29,6 @@ public enum AdaptyUI {
                 case paywallVariationId = "paywall_variation_id"
                 case paywallInstanceIdentity = "paywall_instance_id"
                 case locale
-                case builderVersion = "builder_version"
                 case adaptyUISDKVersion = "ui_sdk_version"
                 case loadTimeout = "load_timeout"
             }
@@ -49,7 +47,6 @@ public enum AdaptyUI {
                 paywallVariationId: parameters.paywallVariationId,
                 paywallInstanceIdentity: parameters.paywallInstanceIdentity,
                 locale: parameters.locale,
-                builderVersion: parameters.builderVersion,
                 adaptyUISDKVersion: parameters.adaptyUISDKVersion,
                 loadTimeout: (parameters.loadTimeout?.allowedLoadPaywallTimeout ?? .defaultLoadPaywallTimeout).dispatchTimeInterval
             ) { result in
@@ -64,14 +61,12 @@ extension Adapty {
     private func getFallbackViewConfiguration(
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
-        builderVersion: String,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
     ) {
         httpFallbackSession.performFetchFallbackViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
             locale: locale,
-            builderVersion: builderVersion,
             completion
         )
     }
@@ -80,7 +75,6 @@ extension Adapty {
         paywallVariationId: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
-        builderVersion: String,
         adaptyUISDKVersion: String,
         loadTimeout: DispatchTimeInterval,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
@@ -106,7 +100,6 @@ extension Adapty {
                 self.getFallbackViewConfiguration(
                     paywallInstanceIdentity: paywallInstanceIdentity,
                     locale: locale,
-                    builderVersion: builderVersion,
                     completion
                 )
             }
@@ -116,7 +109,6 @@ extension Adapty {
             apiKeyPrefix: apiKeyPrefix,
             paywallVariationId: paywallVariationId,
             locale: locale,
-            builderVersion: builderVersion,
             adaptyUISDKVersion: adaptyUISDKVersion,
             termination
         )

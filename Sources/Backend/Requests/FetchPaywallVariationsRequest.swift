@@ -14,7 +14,7 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
     let endpoint: HTTPEndpoint
     let headers: Headers
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, builderVersion: String, adaptyUISDKVersion: String?) {
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, adaptyUISDKVersion: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
@@ -23,7 +23,7 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
         headers = Headers()
             .setPaywallLocale(locale)
             .setBackendProfileId(profileId)
-            .setVisualBuilderVersion(builderVersion)
+            .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setAdaptyUISDKVersion(adaptyUISDKVersion)
             .setSegmentId(segmentId)
     }
@@ -36,13 +36,12 @@ extension HTTPSession {
         placementId: String,
         locale: AdaptyLocale?,
         segmentId: String,
-        builderVersion: String,
         adaptyUISDKVersion: String?,
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>
     ) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
 
-        let md5Hash = "{\"builder_version\":\"\(builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
 
         let request = FetchPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -51,7 +50,6 @@ extension HTTPSession {
             locale: locale,
             md5Hash: md5Hash,
             segmentId: segmentId,
-            builderVersion: builderVersion,
             adaptyUISDKVersion: adaptyUISDKVersion
         )
 
@@ -63,7 +61,7 @@ extension HTTPSession {
                 "placement_id": .value(placementId),
                 "locale": .value(locale),
                 "segment_id": .value(segmentId),
-                "builder_version": .value(builderVersion),
+                "builder_version": .value(AdaptyUI.builderVersion),
                 "md5": .value(md5Hash),
             ]
         ) { (result: FetchPaywallVariationsRequest.Result) in
