@@ -145,21 +145,64 @@ private extension AdaptyProfileManager {
         _ locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
+        let segmentId = profile.value.segmentId
         manager.httpSession.performFetchPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            segmentId: profile.value.segmentId,
+            segmentId: segmentId,
             adaptyUISDKVersion: nil
         ) { [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
-            completion(result.map {
-                if let self, self.isActive {
-                    self.paywallsCache.savedPaywall($0)
-                } else {
-                    $0.value
+
+            guard let strongSelf = self, strongSelf.isActive else {
+                completion(result.map(\.value))
+                return
+            }
+
+            let result = result.map {
+                strongSelf.paywallsCache.savedPaywall($0)
+            }
+
+            guard case let .failure(error) = result,
+                  error.wrongProfileSegmentId
+            else {
+                completion(result)
+                return
+            }
+
+            if segmentId != strongSelf.profile.value.segmentId {
+                strongSelf.getPaywall(placementId, locale, completion)
+                return
+            }
+
+            strongSelf._fetchSegmentId {
+                if let error = $0 {
+                    completion(.failure(error))
+                    return
                 }
-            })
+
+                guard let strongSelf = self,
+                      strongSelf.isActive,
+                      segmentId != strongSelf.profile.value.segmentId
+                else {
+                    completion(result)
+                    return
+                }
+
+                strongSelf.getPaywall(placementId, locale, completion)
+            }
+        }
+    }
+
+    private func _fetchSegmentId(_ completion: @escaping AdaptyErrorCompletion) {
+        manager.httpSession.performFetchProfileRequest(profileId: profileId, responseHash: profile.hash) { [weak self] result in
+            completion(result
+                .do {
+                    self?.saveResponse($0.flatValue())
+                }
+                .error
+            )
         }
     }
 
@@ -213,5 +256,21 @@ extension TimeInterval {
         guard isNormal else { return .never }
         let milliseconds = Int64(self * TimeInterval(1000.0))
         return milliseconds < Int.max ? .milliseconds(Int(milliseconds)) : .seconds(Int(self))
+    }
+}
+
+extension AdaptyError {
+    var canUseFallbackServer: Bool {
+        if let error = wrapped as? InternalAdaptyError {
+            if case .fetchTimeoutError = error { return true }
+        } else if let error = wrapped as? HTTPError {
+            return Backend.canUseFallbackServer(error)
+        }
+        return false
+    }
+
+    var wrongProfileSegmentId: Bool {
+        guard let error = wrapped as? HTTPError else { return false }
+        return Backend.wrongProfileSegmentId(error)
     }
 }

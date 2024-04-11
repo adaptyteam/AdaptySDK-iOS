@@ -9,6 +9,7 @@ import Foundation
 
 struct ErrorResponse: Codable, Error, Equatable {
     let body: String
+    let errorCodes: [String]
     let requestId: String?
 }
 
@@ -19,6 +20,18 @@ extension ErrorResponse: CustomStringConvertible {
 }
 
 extension Backend {
+    static func wrongProfileSegmentId(_ error: HTTPError) -> Bool {
+        backendErrorCodes(error).contains("INCORRECT_SEGMENT_HASH_ERROR")
+    }
+
+    static func backendErrorCodes(_ error: HTTPError) -> [String] {
+        switch error {
+        case let .backend(_, _, _, _, value):
+            (value as? ErrorResponse)?.errorCodes ?? []
+        default: []
+        }
+    }
+
     static func canUseFallbackServer(_ error: HTTPError) -> Bool {
         switch error {
         case .perform:
