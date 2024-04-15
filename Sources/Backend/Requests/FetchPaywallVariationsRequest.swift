@@ -9,12 +9,22 @@
 import Foundation
 
 private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyPaywallChosen>
 
     let endpoint: HTTPEndpoint
     let headers: Headers
+    let profileId: String
+
+    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
+        { response in
+            jsonDecoder.setProfileId(profileId)
+            return jsonDecoder.decode(ResponseBody.self, response)
+        }
+    }
 
     init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, adaptyUISDKVersion: String?) {
+        self.profileId = profileId
+
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
@@ -37,7 +47,7 @@ extension HTTPSession {
         locale: AdaptyLocale?,
         segmentId: String,
         adaptyUISDKVersion: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
 
@@ -69,7 +79,7 @@ extension HTTPSession {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))
             case let .success(response):
-                completion(.success(VH(response.body.value, time: Date())))
+                completion(.success(response.body.value))
             }
         }
     }

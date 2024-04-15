@@ -36,6 +36,6 @@ private extension CodingUserInfoСontainer {
 
 extension [CodingUserInfoKey: Any] {
     var isEvents: Bool {
-        [Event.isEventsCodableUserInfoKey] as? Bool ?? false
+        self[Event.isEventsCodableUserInfoKey] as? Bool ?? false
     }
 }

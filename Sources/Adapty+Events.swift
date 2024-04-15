@@ -40,6 +40,10 @@ extension Adapty {
         trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
     }
 
+    static func logPaywallVariationChose(_ parameters: AdaptyPaywallVariationChoseParameters, _ completion: AdaptyErrorCompletion? = nil) {
+        trackEvent(.paywallVariationChose(parameters), completion)
+    }
+
     /// Call this method to keep track of the user's steps while onboarding
     ///
     /// The onboarding stage is a very common situation in modern mobile apps. The quality of its implementation, content, and number of steps can have a rather significant influence on further user behavior, especially on his desire to become a subscriber or simply make some purchases.

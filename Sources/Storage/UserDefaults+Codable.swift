@@ -45,6 +45,6 @@ private extension CodingUserInfoСontainer {
 
 extension [CodingUserInfoKey: Any] {
     var isStorage: Bool {
-        [UserDefaults.isStorageCodableUserInfoKey] as? Bool ?? false
+        self[UserDefaults.isStorageCodableUserInfoKey] as? Bool ?? false
     }
 }

@@ -8,31 +8,75 @@
 import Foundation
 
 struct FallbackPaywalls {
-    let paywallByPlacementId: [String: AdaptyPaywall]
-    let allProductVendorIds: [String]
+    private let source: Source
     let version: Int
+
+    func getPaywall(byPlacmentId id: String, profileId: String) -> AdaptyPaywall? {
+        do {
+            switch source {
+            case let .dataByPlacementId(value):
+                return try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
+            case let .data(value):
+                return try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
+            case .unknown:
+                return nil
+            }
+        } catch {
+            Log.error(error.localizedDescription)
+            return nil
+        }
+    }
+}
+
+private extension FallbackPaywalls {
+    enum Source {
+        case data(Data)
+        case dataByPlacementId([String: Data])
+        case unknown
+    }
+
+    private static func getPaywall(byPlacmentId id: String, profileId: String, from: [String: Data]) throws -> AdaptyPaywall? {
+        guard let data = from[id] else { return nil }
+        let decoder = FallbackPaywalls.decoder(profileId: profileId)
+        let chosen = try decoder.decode(AdaptyPaywallChosen.self, from: data)
+        return chosen.value
+    }
+
+    private static func getPaywall(byPlacmentId id: String, profileId: String, from data: Data) throws -> AdaptyPaywall? {
+        let decoder = FallbackPaywalls.decoder(profileId: profileId, placmentId: id)
+
+        struct Structure: Decodable {
+            let chosen: AdaptyPaywallChosen?
+            init(from decoder: any Decoder) throws {
+                let placmentId = CustomCodingKeys(decoder.userInfo.placmentId ?? "")
+                chosen = try decoder
+                    .container(keyedBy: FallbackPaywalls.CodingKeys.self)
+                    .nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .data)
+                    .decodeIfPresent(AdaptyPaywallChosen.self, forKey: placmentId)
+            }
+        }
+        let chosen = try decoder.decode(Structure.self, from: data).chosen
+        return chosen?.value
+    }
 }
 
 extension FallbackPaywalls: Decodable {
     enum CodingKeys: String, CodingKey {
         case data
         case meta
-        case products
         case version
     }
 
-    private struct PaywallContainer: Decodable {
-        let paywall: AdaptyPaywall
+    init(from data: Data) throws {
+        let decoder = JSONDecoder()
+        Backend.configure(decoder: decoder)
+        let obj = try decoder.decode(FallbackPaywalls.self, from: data)
 
-        enum CodingKeys: String, CodingKey {
-            case paywall = "attributes"
-        }
-    }
-
-    private struct ProductContainer: Decodable {
-        let vendorId: String
-        enum CodingKeys: String, CodingKey {
-            case vendorId = "vendor_product_id"
+        switch obj.source {
+        case .unknown:
+            self = .init(source: .data(data), version: obj.version)
+        default:
+            self = obj
         }
     }
 
@@ -47,30 +91,54 @@ extension FallbackPaywalls: Decodable {
             version = 0
         }
 
-        var productVendorIds = Set<String>()
-
-        if let containers = try container.decodeIfPresent([PaywallContainer].self, forKey: .data) {
-            let paywallsArray = containers.map { $0.paywall }
-            paywallByPlacementId = try [String: AdaptyPaywall](paywallsArray.map { ($0.placementId, $0) }, uniquingKeysWith: { _, _ in
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.data], debugDescription: "Duplicate paywalls placementId"))
-            })
-            productVendorIds = Set(paywallsArray.flatMap { $0.products.map { $0.vendorId } })
-        } else {
-            paywallByPlacementId = [:]
+        guard
+            let stringByPlacementId = try? container.decode([String: String].self, forKey: .data)
+        else {
+            source = .unknown
+            return
         }
 
-        if let subcontainer,
-           let productsArray = try subcontainer.decodeIfPresent([ProductContainer].self, forKey: .products),
-           !productsArray.isEmpty {
-            productVendorIds = productVendorIds.union(productsArray.map { $0.vendorId })
-        }
-
-        allProductVendorIds = Array(productVendorIds)
+        source = .dataByPlacementId(stringByPlacementId.compactMapValues { $0.data(using: .utf8) })
     }
+}
 
-    init(from data: Data) throws {
+private extension [CodingUserInfoKey: Any] {
+    var placmentId: String? {
+        self[FallbackPaywalls.placmentIdUserInfoKey] as? String
+    }
+}
+
+private extension FallbackPaywalls {
+    static let placmentIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_placment_id")!
+
+    static func decoder(profileId: String) -> JSONDecoder {
         let decoder = JSONDecoder()
         Backend.configure(decoder: decoder)
-        self = try decoder.decode(FallbackPaywalls.self, from: data)
+        decoder.setProfileId(profileId)
+        return decoder
+    }
+
+    static func decoder(profileId: String, placmentId: String) -> JSONDecoder {
+        let decoder = decoder(profileId: profileId)
+        decoder.userInfo[FallbackPaywalls.placmentIdUserInfoKey] = placmentId
+        return decoder
+    }
+
+    struct CustomCodingKeys: CodingKey {
+        let stringValue: String
+        let intValue: Int?
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+            intValue = nil
+        }
+
+        init(_ value: String) {
+            stringValue = value
+            intValue = nil
+        }
+
+        init?(intValue _: Int) {
+            nil
+        }
     }
 }

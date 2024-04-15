@@ -25,7 +25,7 @@ final class AdaptyProfileManager {
         self.manager = manager
         profileId = profile.value.profileId
         self.profile = profile
-        paywallsCache = PaywallsCache(storage: paywallStorage)
+        paywallsCache = PaywallsCache(storage: paywallStorage, profileId: profileId)
         productStatesCache = ProductStatesCache(storage: productStorage)
 
         manager.updateASATokenIfNeed(for: profile)

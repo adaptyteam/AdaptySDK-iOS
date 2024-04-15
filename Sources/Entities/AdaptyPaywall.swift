@@ -62,10 +62,16 @@ extension AdaptyPaywall: Codable {
         case version = "paywall_updated_at"
         case viewConfiguration = "paywall_builder"
         case hasViewConfiguration = "use_paywall_builder"
+
+        case attributes
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        var container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.attributes) {
+            container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+        }
+
         placementId = try container.decode(String.self, forKey: .placementId)
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
@@ -75,7 +81,6 @@ extension AdaptyPaywall: Codable {
         abTestName = try container.decode(String.self, forKey: .abTestName)
         products = try container.decode([ProductReference].self, forKey: .products)
         remoteConfig = try container.decodeIfPresent(RemouteConfig.self, forKey: .remoteConfig)
-
         viewConfiguration =
             if let value = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.self, forKey: .viewConfiguration) {
                 .data(value)

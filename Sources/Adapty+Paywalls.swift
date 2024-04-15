@@ -108,17 +108,19 @@ extension Adapty {
         _ locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
+        let profileId = profileStorage.profileId
         httpFallbackSession.performFetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
+            profileId: profileId,
             placementId: placementId,
             locale: locale
-        ) { result in
+        ) { (result: AdaptyResult<AdaptyPaywallChosen>) in
             completion(
                 result.map { paywall in
                     paywall.value
                 }
                 .flatMapError { error in
-                    if let fallback = Adapty.Configuration.fallbackPaywalls?.paywallByPlacementId[placementId] {
+                    if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId) {
                         .success(fallback)
                     } else {
                         .failure(error)
@@ -153,7 +155,7 @@ private extension AdaptyProfileManager {
             locale: locale,
             segmentId: segmentId,
             adaptyUISDKVersion: nil
-        ) { [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
+        ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
 
             guard let strongSelf = self, strongSelf.isActive else {
                 completion(result.map(\.value))
@@ -161,7 +163,7 @@ private extension AdaptyProfileManager {
             }
 
             let result = result.map {
-                strongSelf.paywallsCache.savedPaywall($0)
+                strongSelf.paywallsCache.savedPaywall($0.value)
             }
 
             guard case let .failure(error) = result,
@@ -213,9 +215,10 @@ private extension AdaptyProfileManager {
     ) {
         manager.httpFallbackSession.performFetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
+            profileId: profileId,
             placementId: placementId,
             locale: locale
-        ) { [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
+        ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
 
             switch result {
             case let .failure(error):
@@ -234,7 +237,7 @@ private extension AdaptyProfileManager {
                     completion(.success(paywall.value))
                     return
                 }
-                completion(.success(self.paywallsCache.savedPaywall(paywall)))
+                completion(.success(self.paywallsCache.savedPaywall(paywall.value)))
             }
         }
     }

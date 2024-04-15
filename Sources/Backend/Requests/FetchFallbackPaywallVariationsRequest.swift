@@ -8,11 +8,20 @@
 import Foundation
 
 private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyPaywallChosen>
 
     let endpoint: HTTPEndpoint
+    let profileId: String
 
-    init(apiKeyPrefix: String, placementId: String, locale: AdaptyLocale) {
+    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
+        { response in
+            jsonDecoder.setProfileId(profileId)
+            return jsonDecoder.decode(ResponseBody.self, response)
+        }
+    }
+
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale) {
+        self.profileId = profileId
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyUI.builderVersion)/fallback.json"
@@ -23,13 +32,15 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
 extension HTTPSession {
     func performFetchFallbackPaywallVariationsRequest(
         apiKeyPrefix: String,
+        profileId: String,
         placementId: String,
         locale: AdaptyLocale?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         let request = FetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
+            profileId: profileId,
             placementId: placementId,
             locale: locale
         )
@@ -60,6 +71,7 @@ extension HTTPSession {
                     }
                     session.performFetchFallbackPaywallVariationsRequest(
                         apiKeyPrefix: apiKeyPrefix,
+                        profileId: profileId,
                         placementId: placementId,
                         locale: nil,
                         completion
@@ -67,8 +79,7 @@ extension HTTPSession {
                 }
 
             case let .success(response):
-                let paywall = response.body.value
-                completion(.success(VH(paywall, time: Date())))
+                completion(.success(response.body.value))
             }
         }
     }

@@ -19,5 +19,12 @@ extension AdaptyPaywall {
             case let .data(data): data.responseLocale
             }
         }
+
+        var id: String? {
+            switch self {
+            case .noData: nil
+            case let .data(data): data.id
+            }
+        }
     }
 }

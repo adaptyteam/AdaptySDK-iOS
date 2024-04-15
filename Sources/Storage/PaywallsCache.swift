@@ -36,10 +36,12 @@ private extension AdaptyPaywall {
 }
 
 final class PaywallsCache {
+    let profileId: String
     private let storage: PaywallsStorage
     private var paywallByPlacementId: [String: VH<AdaptyPaywall>]
 
-    init(storage: PaywallsStorage) {
+    init(storage: PaywallsStorage, profileId: String) {
+        self.profileId = profileId
         self.storage = storage
         paywallByPlacementId = storage.getPaywalls()?.asPaywallByPlacementId ?? [:]
     }
@@ -62,10 +64,10 @@ final class PaywallsCache {
         return paywall.version >= cached.version ? nil : cached
     }
 
-    func savedPaywall(_ paywall: VH<AdaptyPaywall>) -> AdaptyPaywall {
-        if let newer = getNewerPaywall(than: paywall.value) { return newer }
-        paywallByPlacementId[paywall.value.placementId] = paywall
+    func savedPaywall(_ paywall: AdaptyPaywall) -> AdaptyPaywall {
+        if let newer = getNewerPaywall(than: paywall) { return newer }
+        paywallByPlacementId[paywall.placementId] = VH(paywall, time: Date())
         storage.setPaywalls(Array(paywallByPlacementId.values))
-        return paywall.value
+        return paywall
     }
 }

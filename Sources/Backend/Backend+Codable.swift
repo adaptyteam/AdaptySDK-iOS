@@ -9,6 +9,7 @@ import Foundation
 
 extension Backend {
     fileprivate static let isBackendCodableUserInfoKey = CodingUserInfoKey(rawValue: "adapty_backend")!
+    fileprivate static let profileIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_profile_id")!
 
     static func configure(decoder: JSONDecoder) {
         decoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
@@ -40,15 +41,23 @@ extension Backend {
     }()
 }
 
-private extension CodingUserInfoСontainer {
-    func setIsBackend() {
+extension CodingUserInfoСontainer {
+    fileprivate func setIsBackend() {
         userInfo[Backend.isBackendCodableUserInfoKey] = true
+    }
+
+    func setProfileId(_ value: String) {
+        userInfo[Backend.profileIdUserInfoKey] = value
     }
 }
 
 extension [CodingUserInfoKey: Any] {
     var isBackend: Bool {
-        [Backend.isBackendCodableUserInfoKey] as? Bool ?? false
+        self[Backend.isBackendCodableUserInfoKey] as? Bool ?? false
+    }
+
+    var profileId: String? {
+        [Backend.profileIdUserInfoKey] as? String
     }
 }
 
