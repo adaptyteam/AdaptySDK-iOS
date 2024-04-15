@@ -108,17 +108,19 @@ extension Adapty {
         _ locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        httpFallbackSession.performFetchFallbackPaywallRequest(
+        let profileId = profileStorage.profileId
+        httpFallbackSession.performFetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
+            profileId: profileId,
             placementId: placementId,
             locale: locale
-        ) { result in
+        ) { (result: AdaptyResult<AdaptyPaywallChosen>) in
             completion(
                 result.map { paywall in
                     paywall.value
                 }
                 .flatMapError { error in
-                    if let fallback = Adapty.Configuration.fallbackPaywalls?.paywallByPlacementId[placementId] {
+                    if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId) {
                         .success(fallback)
                     } else {
                         .failure(error)
@@ -145,20 +147,64 @@ private extension AdaptyProfileManager {
         _ locale: AdaptyLocale?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        manager.httpSession.performFetchPaywallRequest(
+        let segmentId = profile.value.segmentId
+        manager.httpSession.performFetchPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            segmentId: profile.value.segmentId
-        ) { [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
-            completion(result.map {
-                if let self, self.isActive {
-                    self.paywallsCache.savedPaywall($0)
-                } else {
-                    $0.value
+            segmentId: segmentId,
+            adaptyUISDKVersion: nil
+        ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
+
+            guard let strongSelf = self, strongSelf.isActive else {
+                completion(result.map(\.value))
+                return
+            }
+
+            let result = result.map {
+                strongSelf.paywallsCache.savedPaywall($0.value)
+            }
+
+            guard case let .failure(error) = result,
+                  error.wrongProfileSegmentId
+            else {
+                completion(result)
+                return
+            }
+
+            if segmentId != strongSelf.profile.value.segmentId {
+                strongSelf.getPaywall(placementId, locale, completion)
+                return
+            }
+
+            strongSelf._fetchSegmentId {
+                if let error = $0 {
+                    completion(.failure(error))
+                    return
                 }
-            })
+
+                guard let strongSelf = self,
+                      strongSelf.isActive,
+                      segmentId != strongSelf.profile.value.segmentId
+                else {
+                    completion(result)
+                    return
+                }
+
+                strongSelf.getPaywall(placementId, locale, completion)
+            }
+        }
+    }
+
+    private func _fetchSegmentId(_ completion: @escaping AdaptyErrorCompletion) {
+        manager.httpSession.performFetchProfileRequest(profileId: profileId, responseHash: profile.hash) { [weak self] result in
+            completion(result
+                .do {
+                    self?.saveResponse($0.flatValue())
+                }
+                .error
+            )
         }
     }
 
@@ -167,11 +213,12 @@ private extension AdaptyProfileManager {
         _ locale: AdaptyLocale? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        manager.httpFallbackSession.performFetchFallbackPaywallRequest(
+        manager.httpFallbackSession.performFetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
+            profileId: profileId,
             placementId: placementId,
             locale: locale
-        ) { [weak self] (result: AdaptyResult<VH<AdaptyPaywall>>) in
+        ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
 
             switch result {
             case let .failure(error):
@@ -190,7 +237,7 @@ private extension AdaptyProfileManager {
                     completion(.success(paywall.value))
                     return
                 }
-                completion(.success(self.paywallsCache.savedPaywall(paywall)))
+                completion(.success(self.paywallsCache.savedPaywall(paywall.value)))
             }
         }
     }
@@ -212,5 +259,21 @@ extension TimeInterval {
         guard isNormal else { return .never }
         let milliseconds = Int64(self * TimeInterval(1000.0))
         return milliseconds < Int.max ? .milliseconds(Int(milliseconds)) : .seconds(Int(self))
+    }
+}
+
+extension AdaptyError {
+    var canUseFallbackServer: Bool {
+        if let error = wrapped as? InternalAdaptyError {
+            if case .fetchTimeoutError = error { return true }
+        } else if let error = wrapped as? HTTPError {
+            return Backend.canUseFallbackServer(error)
+        }
+        return false
+    }
+
+    var wrongProfileSegmentId: Bool {
+        guard let error = wrapped as? HTTPError else { return false }
+        return Backend.wrongProfileSegmentId(error)
     }
 }

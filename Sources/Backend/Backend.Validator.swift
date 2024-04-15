@@ -10,16 +10,17 @@ import Foundation
 extension Backend {
     private struct _ErrorResponse: Decodable {
         let errors: [Error]?
-        struct Error: Decodable {}
+        struct Error: Decodable {
+            let code: String?
+        }
     }
 
     func validator(_ response: HTTPDataResponse) -> HTTPError? {
         if let data = response.body, !data.isEmpty {
-            if let body = try? decoder.decode(_ErrorResponse.self, from: data),
-               !(body.errors?.isEmpty ?? true),
-               let string = String(data: data, encoding: .utf8) {
+            if let errors = try? decoder.decode(_ErrorResponse.self, from: data).errors, !errors.isEmpty {
                 return HTTPError.backend(response, error: ErrorResponse(
-                    body: string,
+                    body: String(data: data, encoding: .utf8) ?? "unknown",
+                    errorCodes: errors.compactMap(\.code),
                     requestId: response.headers.getBackendRequestId()
                 ))
             }

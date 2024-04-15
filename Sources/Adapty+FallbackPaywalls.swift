@@ -12,7 +12,7 @@ extension Adapty.Configuration {
 }
 
 extension Adapty {
-    fileprivate static var currentFallbackPaywallsVersion = 4
+    fileprivate static var currentFallbackPaywallsVersion = 5
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///
     /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
@@ -54,8 +54,8 @@ extension Adapty {
 
 extension PaywallsCache {
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale?) -> AdaptyPaywall? {
-        let fallback = Adapty.Configuration.fallbackPaywalls?.paywallByPlacementId[placementId]
-        guard let cache = getPaywallByLocaleOrDefault(locale, withPlacementId: placementId)?.value else { return fallback }
+        let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId)
+        guard let cache = getPaywallByLocale(locale, withPlacementId: placementId)?.value else { return fallback }
         guard let fallback else { return cache }
         if cache.version >= fallback.version {
             return cache
@@ -63,11 +63,5 @@ extension PaywallsCache {
             Log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
             return fallback
         }
-    }
-}
-
-extension ProductVendorIdsCache {
-    var allProductVendorIdsWithFallback: Set<String> {
-        Set(allProductVendorIds?.value ?? []).union(Adapty.Configuration.fallbackPaywalls?.allProductVendorIds ?? [])
     }
 }

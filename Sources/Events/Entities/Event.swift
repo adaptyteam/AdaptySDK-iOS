@@ -61,33 +61,6 @@ extension Event: Encodable {
 }
 
 extension Event {
-    fileprivate enum Default {
-        static var dateFormatter: DateFormatter = {
-            let formatter = DateFormatter()
-            formatter.calendar = Calendar(identifier: .iso8601)
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(abbreviation: "UTC")
-            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-            return formatter
-        }()
-
-        static var encoder: JSONEncoder = {
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .formatted(dateFormatter)
-            encoder.dataEncodingStrategy = .base64
-            return encoder
-        }()
-
-        static var decoder: JSONDecoder = {
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .formatted(dateFormatter)
-            decoder.dataDecodingStrategy = .base64
-            return decoder
-        }()
-    }
-
-    func encodeToData() throws -> Data { try Default.encoder.encode(self) }
-
     struct Info: Decodable {
         static let emptyData = Data()
         let type: String
@@ -99,7 +72,7 @@ extension Event {
             type = event.type.name
             id = event.id
             counter = event.counter
-            data = try event.encodeToData()
+            data = try Event.encoder.encode(event)
         }
 
         init(from decoder: Decoder) throws {
@@ -112,7 +85,7 @@ extension Event {
     }
 
     static func decodeFromData(_ data: Data) throws -> Info {
-        var info = try Default.decoder.decode(Info.self, from: data)
+        var info = try Event.decoder.decode(Info.self, from: data)
         info.data = data
         return info
     }

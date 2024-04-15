@@ -37,9 +37,8 @@ extension UserDefaults: ProfileStorage {
     }
 
     func getProfile() -> VH<AdaptyProfile>? {
-        guard let data = data(forKey: Constants.profileKey) else { return nil }
         do {
-            return try Backend.decoder.decode(VH<AdaptyProfile>.self, from: data)
+            return try getJSON(VH<AdaptyProfile>.self, forKey: Constants.profileKey)
         } catch {
             Log.warn(error.localizedDescription)
             return nil
@@ -67,9 +66,8 @@ extension UserDefaults: ProfileStorage {
 
     func setProfile(_ profile: VH<AdaptyProfile>) {
         do {
-            let data = try Backend.encoder.encode(profile)
+            try setJSON(profile, forKey: Constants.profileKey)
             Log.debug("UserDefaults: saving profile success.")
-            set(data, forKey: Constants.profileKey)
         } catch {
             Log.error("UserDefaults: saving profile fail. \(error.localizedDescription)")
         }

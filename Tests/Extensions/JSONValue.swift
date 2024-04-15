@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 22.11.2022
 //
 
-@testable import Adapty
 import Foundation
+@testable import Adapty
 
 enum JSONValue: Equatable, Encodable {
     case null
@@ -19,51 +19,51 @@ enum JSONValue: Equatable, Encodable {
 
     var isNull: Bool {
         switch self {
-        case .null: return true
-        default: return false
+        case .null: true
+        default: false
         }
     }
 
     var asStringOrNil: String? {
         switch self {
-        case let .string(value): return value
-        default: return nil
+        case let .string(value): value
+        default: nil
         }
     }
 
     var asIntOrNil: Int? {
         switch self {
-        case let .int(value): return value
-        default: return nil
+        case let .int(value): value
+        default: nil
         }
     }
 
     var asFloatOrNil: Double? {
         switch self {
-        case let .float(value): return value
-        case let .int(value): return Double(value)
-        default: return nil
+        case let .float(value): value
+        case let .int(value): Double(value)
+        default: nil
         }
     }
 
     var asBoolOrNil: Bool? {
         switch self {
-        case let .bool(value): return value
-        default: return nil
+        case let .bool(value): value
+        default: nil
         }
     }
 
     var asArrayOrNil: [JSONValue]? {
         switch self {
-        case let .array(value): return value
-        default: return nil
+        case let .array(value): value
+        default: nil
         }
     }
 
     var asObjectOrNil: [String: JSONValue]? {
         switch self {
-        case let .object(value): return value
-        default: return nil
+        case let .object(value): value
+        default: nil
         }
     }
 
@@ -88,7 +88,7 @@ extension JSONValue: ExpressibleByNilLiteral,
     ExpressibleByBooleanLiteral,
     ExpressibleByArrayLiteral,
     ExpressibleByDictionaryLiteral {
-    init(nilLiteral: ()) {
+    init(nilLiteral _: ()) {
         self = .null
     }
 
@@ -127,8 +127,9 @@ enum JSONValueError: Error {
 
 extension JSONValue {
     func jsonData(outputFormatting: JSONEncoder.OutputFormatting? = nil) throws -> Data {
-        let encoder = Backend.encoder
-        if let outputFormatting = outputFormatting {
+        let encoder = JSONEncoder()
+        Backend.configure(encoder: encoder)
+        if let outputFormatting {
             encoder.outputFormatting = outputFormatting
         }
         return try jsonData(encoder: encoder)
@@ -139,7 +140,7 @@ extension JSONValue {
     }
 
     func jsonString(outputFormatting: JSONEncoder.OutputFormatting? = nil) throws -> String {
-        guard let string = String(data: try jsonData(outputFormatting: outputFormatting), encoding: .utf8) else {
+        guard let string = try String(data: jsonData(outputFormatting: outputFormatting), encoding: .utf8) else {
             throw JSONValueError.stringNoBeParsedFromData
         }
         return string
@@ -148,6 +149,8 @@ extension JSONValue {
 
 extension Data {
     func decode<T: Decodable>(_ type: T.Type) throws -> T {
-        return try Backend.decoder.decode(type, from: self)
+        let decoder = JSONDecoder()
+        Backend.configure(decoder: decoder)
+        return try decoder.decode(type, from: self)
     }
 }

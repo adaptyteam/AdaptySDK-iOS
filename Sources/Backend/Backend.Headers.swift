@@ -13,7 +13,9 @@ extension Backend.Request {
     fileprivate static let paywallLocaleHeaderKey = "adapty-paywall-locale"
     fileprivate static let viewConfigurationLocaleHeaderKey = "adapty-paywall-builder-locale"
     fileprivate static let adaptyUISDKVersionHeaderKey = "adapty-ui-version"
-    fileprivate static let visualBuilderVersion = "adapty-paywall-builder-version"
+    fileprivate static let visualBuilderVersionHeaderKey = "adapty-paywall-builder-version"
+
+    fileprivate static let segmentIdHeaderKey = "adapty-profile-segment-hash"
 
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
@@ -73,7 +75,11 @@ extension [HTTPRequest.Headers.Key: HTTPRequest.Headers.Value] {
     }
 
     func setVisualBuilderVersion(_ version: String?) -> Self {
-        updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderVersion)
+        updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderVersionHeaderKey)
+    }
+
+    func setSegmentId(_ id: String?) -> Self {
+        updateOrRemoveValue(id, forKey: Backend.Request.segmentIdHeaderKey)
     }
 
     func setBackendResponseHash(_ hash: String?) -> Self {

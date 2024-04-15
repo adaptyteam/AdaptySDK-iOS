@@ -7,7 +7,11 @@
 
 import Foundation
 
-struct VH<Value> {
+protocol ValueHashable {}
+
+extension Optional: ValueHashable where Wrapped: ValueHashable {}
+
+struct VH<Value: ValueHashable> {
     let value: Value
     let hash: String?
     let time: Date?
@@ -26,22 +30,10 @@ struct VH<Value> {
         self.init(value, hash: nil, time: time)
     }
 
-    enum CodingKeys: String, CodingKey {
-        case value = "v"
-        case hash = "h"
-        case time = "t"
-    }
-
     @inlinable func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
         VH<U>(transform(value), hash: hash, time: time)
     }
-}
 
-extension VH: Encodable where Value: Encodable {}
-
-extension VH: Decodable where Value: Decodable {}
-
-extension VH {
     @inlinable func flatValue<T>() -> VH<T>? where Value == T? {
         switch value {
         case .none:
@@ -51,3 +43,15 @@ extension VH {
         }
     }
 }
+
+extension VH {
+    enum CodingKeys: String, CodingKey {
+        case value = "v"
+        case hash = "h"
+        case time = "t"
+    }
+}
+
+extension VH: Encodable where Value: Encodable {}
+
+extension VH: Decodable where Value: Decodable {}

@@ -25,24 +25,14 @@ public struct AdaptyPaywall {
     /// Current revision (version) of a paywall. Every change within a paywall creates a new revision.
     public let revision: Int
 
+    public let remoteConfig: AdaptyPaywall.RemouteConfig?
+
     /// If `true`, it is possible to fetch the view ``AdaptyUI.ViewConfiguration`` object and use it with ``AdaptyUI`` library.
-    public let hasViewConfiguration: Bool
+    public var hasViewConfiguration: Bool { viewConfiguration != nil }
 
-    /// And identifier of a paywall locale.
-    public let locale: String
+    let viewConfiguration: ViewConfiguration?
 
-    /// A custom JSON string configured in Adapty Dashboard for this paywall.
-    public let remoteConfigString: String?
-
-    /// A custom dictionary configured in Adapty Dashboard for this paywall (same as `remoteConfigString`)
-    public var remoteConfig: [String: Any]? {
-        guard let data = remoteConfigString?.data(using: .utf8),
-              let remoteConfig = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-        else { return nil }
-        return remoteConfig
-    }
-
-    var products: [ProductReference]
+    let products: [ProductReference]
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
@@ -51,11 +41,13 @@ public struct AdaptyPaywall {
 
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
-        "(placementId: \(placementId), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), locale: \(locale), "
-            + (remoteConfigString.map { "remoteConfig: \($0), " } ?? "")
+        "(placementId: \(placementId), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), "
+            + (remoteConfig.map { "remoteConfig: \($0), " } ?? "")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }
 }
+
+extension AdaptyPaywall: ValueHashable {}
 
 extension AdaptyPaywall: Codable {
     enum CodingKeys: String, CodingKey {
@@ -67,14 +59,19 @@ extension AdaptyPaywall: Codable {
         case name = "paywall_name"
         case products
         case remoteConfig = "remote_config"
-        case remoteConfigLocale = "lang"
-        case remoteConfigString = "data"
         case version = "paywall_updated_at"
+        case viewConfiguration = "paywall_builder"
         case hasViewConfiguration = "use_paywall_builder"
+
+        case attributes
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        var container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.attributes) {
+            container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+        }
+
         placementId = try container.decode(String.self, forKey: .placementId)
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
@@ -83,16 +80,15 @@ extension AdaptyPaywall: Codable {
         variationId = try container.decode(String.self, forKey: .variationId)
         abTestName = try container.decode(String.self, forKey: .abTestName)
         products = try container.decode([ProductReference].self, forKey: .products)
-        hasViewConfiguration = try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false
-
-        if let remoteConfig = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig) {
-            locale = try (remoteConfig.decode(AdaptyLocale.self, forKey: .remoteConfigLocale)).id
-            remoteConfigString = try remoteConfig.decodeIfPresent(String.self, forKey: .remoteConfigString)
-        } else {
-            let requestLocale = decoder.userInfo[Backend.Request.localeCodeUserInfoKey] as? AdaptyLocale
-            locale = (requestLocale ?? AdaptyLocale.defaultPaywallLocale).languageCode.lowercased()
-            remoteConfigString = nil
-        }
+        remoteConfig = try container.decodeIfPresent(RemouteConfig.self, forKey: .remoteConfig)
+        viewConfiguration =
+            if let value = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.self, forKey: .viewConfiguration) {
+                .data(value)
+            } else if !decoder.userInfo.isBackend, try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false {
+                .noData
+            } else {
+                nil
+            }
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -105,10 +101,8 @@ extension AdaptyPaywall: Codable {
         try container.encode(variationId, forKey: .variationId)
         try container.encode(abTestName, forKey: .abTestName)
         try container.encode(products, forKey: .products)
+        try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
         try container.encode(hasViewConfiguration, forKey: .hasViewConfiguration)
-        var remoteConfig = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .remoteConfig)
-        try remoteConfig.encode(locale, forKey: .remoteConfigLocale)
-        try remoteConfig.encodeIfPresent(remoteConfigString, forKey: .remoteConfigString)
     }
 }
 

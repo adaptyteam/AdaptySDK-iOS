@@ -222,13 +222,6 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request ViewConfiguration timeout").asAdaptyError
     }
-
-    var canUseFallbackServer: Bool {
-        if let error = wrapped as? InternalAdaptyError {
-            if case .fetchTimeoutError = error { return true }
-        } else if let error = wrapped as? HTTPError {
-            return Backend.canUseFallbackServer(error)
-        }
-        return false
-    }
 }
+
+

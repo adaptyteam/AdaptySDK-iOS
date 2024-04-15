@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 22.11.2022
 //
 
-@testable import Adapty
 import XCTest
+@testable import Adapty
 
 func XCTAssertEqual(_ expression: AdaptyPaywall?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
@@ -21,11 +21,11 @@ func XCTAssertEqual(_ expression: AdaptyPaywall?, withJSONValue jsonValue: JSONV
     XCTAssertEqual(Int(value.version), withJSONValue: object["paywall_updated_at"])
 
     if let remouteConfig = object["remote_config"]?.asObjectOrNil {
-        XCTAssertEqual(value.locale, withJSONValue: remouteConfig["lang"])
-        XCTAssertEqual(value.remoteConfigString, withJSONValue: remouteConfig["data"])
+        XCTAssertNotNil(value.remoteConfig)
+        XCTAssertEqual(value.remoteConfig?.locale, withJSONValue: remouteConfig["lang"])
+        XCTAssertEqual(value.remoteConfig?.jsonString, withJSONValue: remouteConfig["data"])
     } else {
-        XCTAssertEqual(value.locale, AdaptyLocale.defaultPaywallLocale.id)
-        XCTAssertNil(value.remoteConfigString)
+        XCTAssertNil(value.remoteConfig)
     }
 
     let products = object["products"]?.arrayOrFail(file: file, line: line)
@@ -43,7 +43,7 @@ final class AdaptyPaywallTests: XCTestCase {
             return result
         }
         XCTAssertFalse(all.isEmpty)
-        XCTAssertNotNil(all.first(where: { $0.remoteConfigString != nil }))
+        XCTAssertNotNil(all.first(where: { $0.remoteConfig != nil }))
     }
 
     func testDecodeInvalidJSON() throws {
@@ -54,7 +54,7 @@ final class AdaptyPaywallTests: XCTestCase {
             do {
                 _ = try data.decode(AdaptyPaywall.self)
                 XCTFail("Must be decoding error for \($0)")
-            } catch { }
+            } catch {}
         }
     }
 }

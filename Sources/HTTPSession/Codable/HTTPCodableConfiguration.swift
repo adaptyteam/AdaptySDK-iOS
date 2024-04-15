@@ -42,9 +42,11 @@ extension HTTPCodableConfiguration {
 
     func configure(decoder: JSONDecoder) {
         decoder.dateDecodingStrategy = JSONDecoder.DateDecodingStrategy.millisecondsSince1970
+        decoder.dataDecodingStrategy = JSONDecoder.DataDecodingStrategy.base64
     }
 
     func configure(encoder: JSONEncoder) {
         encoder.dateEncodingStrategy = JSONEncoder.DateEncodingStrategy.millisecondsSince1970
+        encoder.dataEncodingStrategy = JSONEncoder.DataEncodingStrategy.base64
     }
 }

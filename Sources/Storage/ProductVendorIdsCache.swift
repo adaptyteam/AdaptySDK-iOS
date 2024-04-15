@@ -8,13 +8,13 @@
 import Foundation
 
 protocol ProductVendorIdsStorage {
-    func setProductVendorIds(_: VH<[String]>)
-    func getProductVendorIds() -> VH<[String]>?
+    func setProductVendorIds(_: [String])
+    func getProductVendorIds() -> [String]?
 }
 
 final class ProductVendorIdsCache {
     private let storage: ProductVendorIdsStorage
-    private(set) var allProductVendorIds: VH<[String]>?
+    private(set) var allProductVendorIds: [String]?
 
     init(storage: ProductVendorIdsStorage) {
         self.storage = storage
@@ -22,7 +22,7 @@ final class ProductVendorIdsCache {
         allProductVendorIds = storage.getProductVendorIds()
     }
 
-    func setProductVendorIds(_ values: VH<[String]>) {
+    func setProductVendorIds(_ values: [String]) {
         allProductVendorIds = values
         storage.setProductVendorIds(values)
     }

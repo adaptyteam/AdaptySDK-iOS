@@ -2,56 +2,59 @@
 //  FetchFallbackPaywallRequest.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 23.09.2022.
+//  Created by Aleksei Valiano on 26.03.2024
 //
 
 import Foundation
 
-private struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyPaywall>
+private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyPaywallChosen>
 
     let endpoint: HTTPEndpoint
-    let locale: AdaptyLocale
+    let profileId: String
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
-            jsonDecoder.userInfo[Backend.Request.localeCodeUserInfoKey] = locale
+            jsonDecoder.setProfileId(profileId)
             return jsonDecoder.decode(ResponseBody.self, response)
         }
     }
 
-    init(apiKeyPrefix: String, placementId: String, locale: AdaptyLocale) {
-        self.locale = locale
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale) {
+        self.profileId = profileId
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/\(placementId)/app_store/\(locale.languageCode.lowercased())/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyUI.builderVersion)/fallback.json"
         )
     }
 }
 
 extension HTTPSession {
-    func performFetchFallbackPaywallRequest(
+    func performFetchFallbackPaywallVariationsRequest(
         apiKeyPrefix: String,
+        profileId: String,
         placementId: String,
         locale: AdaptyLocale?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyPaywall>>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
         let locale = locale ?? AdaptyLocale.defaultPaywallLocale
-        let request = FetchFallbackPaywallRequest(
+        let request = FetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
+            profileId: profileId,
             placementId: placementId,
             locale: locale
         )
 
         perform(
             request,
-            logName: "get_fallback_paywall",
+            logName: "get_fallback_paywall_variations",
             logParams: [
                 "api_prefix": .value(apiKeyPrefix),
                 "placement_id": .value(placementId),
                 "language_code": .valueOrNil(locale.languageCode),
+                "builder_version": .value(AdaptyUI.builderVersion),
             ]
-        ) { [weak self] (result: FetchFallbackPaywallRequest.Result) in
+        ) { [weak self] (result: FetchFallbackPaywallVariationsRequest.Result) in
             switch result {
             case let .failure(error):
                 guard let queue = self?.responseQueue,
@@ -66,8 +69,9 @@ extension HTTPSession {
                         completion(.failure(error.asAdaptyError))
                         return
                     }
-                    session.performFetchFallbackPaywallRequest(
+                    session.performFetchFallbackPaywallVariationsRequest(
                         apiKeyPrefix: apiKeyPrefix,
+                        profileId: profileId,
                         placementId: placementId,
                         locale: nil,
                         completion
@@ -75,8 +79,7 @@ extension HTTPSession {
                 }
 
             case let .success(response):
-                let paywall = response.body.value
-                completion(.success(VH(paywall, time: Date())))
+                completion(.success(response.body.value))
             }
         }
     }

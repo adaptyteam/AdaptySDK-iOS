@@ -19,19 +19,17 @@ extension UserDefaults: PaywallsStorage {
             return
         }
         do {
-            let data = try Backend.encoder.encode(paywalls)
+            try setJSON(paywalls, forKey: Constants.paywallsStorageKey)
             Log.debug("UserDefaults: Saving paywalls success.")
 
-            set(data, forKey: Constants.paywallsStorageKey)
         } catch {
             Log.error("UserDefaults: Saving paywalls fail. \(error.localizedDescription)")
         }
     }
 
     func getPaywalls() -> [VH<AdaptyPaywall>]? {
-        guard let data = data(forKey: Constants.paywallsStorageKey) else { return nil }
         do {
-            return try Backend.decoder.decode([VH<AdaptyPaywall>].self, from: data)
+            return try getJSON([VH<AdaptyPaywall>].self, forKey: Constants.paywallsStorageKey)
         } catch {
             Log.error(error.localizedDescription)
             return nil

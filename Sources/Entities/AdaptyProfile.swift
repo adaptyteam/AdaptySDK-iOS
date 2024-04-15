@@ -55,6 +55,8 @@ extension AdaptyProfile: CustomStringConvertible {
     }
 }
 
+extension AdaptyProfile: ValueHashable {}
+
 extension AdaptyProfile: Codable {
     enum CodingKeys: String, CodingKey {
         case profileId = "profile_id"
