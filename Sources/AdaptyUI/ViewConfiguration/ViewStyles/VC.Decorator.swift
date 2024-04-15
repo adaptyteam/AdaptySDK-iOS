@@ -36,7 +36,6 @@ extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
         case borderAssetId = "border"
         case borderThickness = "thickness"
         case shapeType = "type"
-        case oldShapeType = "value"
     }
 
     init(from decoder: Decoder) throws {
@@ -44,8 +43,6 @@ extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
         backgroundAssetId = try container.decodeIfPresent(String.self, forKey: .backgroundAssetId)
         let shape: AdaptyUI.ShapeType =
             if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .shapeType) {
-                value
-            } else if let value = try container.decodeIfPresent(AdaptyUI.ShapeType.self, forKey: .oldShapeType) {
                 value
             } else {
                 AdaptyUI.Decorator.defaultType

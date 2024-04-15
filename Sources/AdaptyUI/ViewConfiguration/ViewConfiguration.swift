@@ -17,7 +17,6 @@ extension AdaptyUI {
         let responseLocale: AdaptyLocale?
         let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
-        let styles: [String: OldViewStyle]
         let screens: [String: Screen]
         let isHard: Bool
         let mainImageRelativeHeight: Double?
@@ -73,13 +72,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
             defaultLocalization = nil
         }
 
-        if format > 3 {
-            screens = try container.decode([String: Screen].self, forKey: .styles)
-            styles = [:]
-        } else {
-            screens = [:]
-            styles = try container.decode([String: OldViewStyle].self, forKey: .styles)
-        }
+        screens = try container.decode([String: Screen].self, forKey: .styles)
 
         isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
         mainImageRelativeHeight = try container.decodeIfPresent(Double.self, forKey: .mainImageRelativeHeight)

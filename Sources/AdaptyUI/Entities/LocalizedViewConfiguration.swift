@@ -12,7 +12,6 @@ extension AdaptyUI {
         public let id: String
         public let templateId: String
         public let locale: String
-        public let styles: [String: OldViewStyle]
         public let screens: [String: Screen]
         public let isHard: Bool
         public let mainImageRelativeHeight: Double?

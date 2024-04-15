@@ -27,7 +27,6 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             id: source.id,
             templateId: source.templateId,
             locale: locale.id,
-            styles: source.styles.mapValues(oldViewStyle),
             screens: source.screens.mapValues(screen),
             isHard: source.isHard,
             mainImageRelativeHeight: source.mainImageRelativeHeight,
