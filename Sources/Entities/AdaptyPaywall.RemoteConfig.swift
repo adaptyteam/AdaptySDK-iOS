@@ -16,12 +16,12 @@ extension AdaptyPaywall {
         /// A custom JSON string configured in Adapty Dashboard for this paywall.
         public let jsonString: String?
         /// A custom dictionary configured in Adapty Dashboard for this paywall (same as `jsonString`)
-        public lazy var dictionary: [String: Any]? = {
+        public var dictionary: [String: Any]? {
             guard let data = jsonString?.data(using: .utf8),
                   let remoteConfig = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
             else { return nil }
             return remoteConfig
-        }()
+        }
     }
 }
 
