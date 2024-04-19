@@ -26,10 +26,10 @@ extension Adapty {
             do {
                 let fallbackPaywalls = try FallbackPaywalls(from: paywalls)
                 let hasErrorVersion: Bool
-                if fallbackPaywalls.version < FallbackPaywalls.currentFormatVersion {
+                if fallbackPaywalls.formatVersion < FallbackPaywalls.currentFormatVersion {
                     hasErrorVersion = true
                     Log.error("The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard.")
-                } else if fallbackPaywalls.version > FallbackPaywalls.currentFormatVersion {
+                } else if fallbackPaywalls.formatVersion > FallbackPaywalls.currentFormatVersion {
                     hasErrorVersion = true
                     Log.error("The fallback paywalls version is not correct. Please update the AdaptySDK.")
                 } else {
@@ -37,7 +37,7 @@ extension Adapty {
                 }
                 if hasErrorVersion {
                     Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
-                        "in_version": .value(fallbackPaywalls.version),
+                        "in_version": .value(fallbackPaywalls.formatVersion),
                         "expected_version": .value(FallbackPaywalls.currentFormatVersion),
                     ]))
                 }
@@ -53,14 +53,17 @@ extension Adapty {
 
 extension PaywallsCache {
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale) -> AdaptyPaywall? {
-        let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId)
-        guard let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?.value else { return fallback }
-        guard let fallback else { return cache }
-        if cache.version >= fallback.version {
+        if let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?.value,
+           cache.version >= Adapty.Configuration.fallbackPaywalls?.getPaywallVersion(byPlacmentId: placementId) ?? 0 {
             return cache
-        } else {
-            Log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
-            return fallback
         }
+
+        guard let chosen = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId)
+        else {
+            return nil
+        }
+        Adapty.logIfNeed(chosen)
+        Log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
+        return chosen.value
     }
 }
