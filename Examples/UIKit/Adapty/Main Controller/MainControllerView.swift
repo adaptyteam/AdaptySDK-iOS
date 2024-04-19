@@ -186,7 +186,7 @@ struct MainControllerView: View {
                                             introEligibilities: [String: AdaptyEligibility]?) -> some View {
         ListItemView(title: "Variation", subtitle: paywall.variationId)
         ListItemView(title: "Revision", subtitle: "\(paywall.revision)")
-        ListItemView(title: "Locale", subtitle: paywall.locale)
+        ListItemView(title: "Remote Config", subtitle: paywall.remoteConfig?.locale ?? "null")
 
         if let products = products {
             ForEach(products, id: \.vendorProductId) { p in
