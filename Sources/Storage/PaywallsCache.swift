@@ -18,7 +18,7 @@ private extension AdaptyPaywall {
         if let locale = remoteConfigLocale, locale.equalLanguageCode(.defaultPaywallLocale) {
             remoteConfigLocale = nil
         }
-        var viewConfigurationLocale = viewConfiguration?.locale
+        var viewConfigurationLocale = viewConfiguration?.responseLocale
         if let locale = viewConfigurationLocale, locale.equalLanguageCode(.defaultPaywallLocale) {
             viewConfigurationLocale = nil
         }

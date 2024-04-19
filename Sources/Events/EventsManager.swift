@@ -22,7 +22,6 @@ final class EventsManager {
     private let backendSession: HTTPSession?
     private var sending: Bool = false
 
-    
     convenience init(profileStorage: ProfileIdentifierStorage, backend: Backend? = nil) {
         self.init(
             profileStorage: profileStorage,

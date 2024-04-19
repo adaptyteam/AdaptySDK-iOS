@@ -57,7 +57,7 @@ extension [CodingUserInfoKey: Any] {
     }
 
     var profileId: String? {
-        [Backend.profileIdUserInfoKey] as? String
+        self[Backend.profileIdUserInfoKey] as? String
     }
 }
 

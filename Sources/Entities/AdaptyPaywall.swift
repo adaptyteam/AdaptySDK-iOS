@@ -79,14 +79,7 @@ extension AdaptyPaywall: Codable {
         abTestName = try container.decode(String.self, forKey: .abTestName)
         products = try container.decode([ProductReference].self, forKey: .products)
         remoteConfig = try container.decodeIfPresent(RemoteConfig.self, forKey: .remoteConfig)
-        viewConfiguration =
-            if let value = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.self, forKey: .viewConfiguration) {
-                .data(value)
-            } else if !decoder.userInfo.isBackend, let value = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration) {
-                value
-            } else {
-                nil
-            }
+        viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
     }
 
     public func encode(to encoder: Encoder) throws {

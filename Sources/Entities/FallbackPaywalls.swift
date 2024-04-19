@@ -8,6 +8,8 @@
 import Foundation
 
 struct FallbackPaywalls {
+    static var currentFormatVersion = 5
+
     private let source: Source
     let version: Int
 
@@ -64,7 +66,8 @@ extension FallbackPaywalls: Decodable {
     enum CodingKeys: String, CodingKey {
         case data
         case meta
-        case version
+        case formatVersion = "version"
+        case versionByPlacement = "placement_audience_version_updated_at_map"
     }
 
     init(from data: Data) throws {
@@ -82,14 +85,16 @@ extension FallbackPaywalls: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let subcontainer = try? container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
+        var meta = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
 
-        if let subcontainer,
-           let v = try subcontainer.decodeIfPresent(Int.self, forKey: .version) {
-            version = v
-        } else {
-            version = 0
+        version = try meta.decode(Int.self, forKey: .formatVersion)
+
+        guard version == FallbackPaywalls.currentFormatVersion else {
+            source = .unknown
+            return
         }
+        
+        
 
         guard
             let stringByPlacementId = try? container.decode([String: String].self, forKey: .data)
