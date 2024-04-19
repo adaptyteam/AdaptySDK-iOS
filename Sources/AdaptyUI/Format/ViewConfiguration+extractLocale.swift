@@ -9,29 +9,23 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    public func extractLocale(_ locale: String) -> AdaptyUI.LocalizedViewConfiguration {
-        extractLocale(AdaptyLocale(id: locale))
-    }
-
     func getLocalization(_ locale: AdaptyLocale) -> AdaptyUI.Localization? {
         if let value = localizations[locale] {
             if defaultLocalization?.id == value.id {
-                return value
+                value
             } else {
-                return value.addDefault(localization: defaultLocalization)
+                value.addDefault(localization: defaultLocalization)
             }
         } else {
-            return defaultLocalization
+            defaultLocalization
         }
     }
-
-
 
     func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
         let localization = getLocalization(locale)
 
         func getAsset(_ id: String?) -> AdaptyUI.Asset? {
-            guard let id = id else { return nil }
+            guard let id else { return nil }
             return localization?.assets?[id] ?? assets[id]
         }
 
@@ -56,7 +50,7 @@ extension AdaptyUI.ViewConfiguration {
         }
 
         func getString(_ id: String?) -> AdaptyUI.Localization.Item? {
-            guard let id = id else { return nil }
+            guard let id else { return nil }
             return localization?.strings?[id]
         }
         func getShapeOrNil(from value: AdaptyUI.ViewItem.Shape?) -> AdaptyUI.Shape? {
@@ -95,7 +89,7 @@ extension AdaptyUI.ViewConfiguration {
             let defaultFilling = getAssetFilling(group.fillAssetId)
 
             return AdaptyUI.CompoundText(
-                items: group.items.map({
+                items: group.items.map {
                     switch $0 {
                     case let .text(item):
                         let font = getAssetFont(item.fontAssetId) ?? defaultFont
@@ -114,14 +108,15 @@ extension AdaptyUI.ViewConfiguration {
                         let image = AdaptyUI.Text.Image(
                             src: getAssetFilling(item.imageAssetId)?.asImage,
                             tint: getAssetFilling(item.colorAssetId)?.asColor,
-                            size: AdaptyUI.Size(width: item.width, height: item.height))
+                            size: AdaptyUI.Size(width: item.width, height: item.height)
+                        )
                         return item.isBullet ? .imageBullet(image) : .image(image)
                     case let .space(value):
                         return .space(value)
                     case .newline:
                         return .newline
                     }
-                }),
+                },
                 bulletSpace: group.bulletSpace
             )
         }
@@ -205,7 +200,8 @@ extension AdaptyUI.ViewConfiguration {
                         orderedItems: convert($0.orderedItems)
                     )
                 },
-                items: convert(style.value.items))
+                items: convert(style.value.items)
+            )
         }
 
         return AdaptyUI.LocalizedViewConfiguration(
@@ -222,7 +218,7 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.Localization {
     fileprivate func addDefault(localization: Self?) -> Self {
-        guard let localization = localization else { return self }
+        guard let localization else { return self }
 
         var strings = self.strings ?? [:]
         if let other = localization.strings {

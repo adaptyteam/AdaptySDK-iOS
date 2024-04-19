@@ -8,9 +8,6 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    public func extractImageUrls(_ locale: String) -> Set<URL> {
-        extractImageUrls(AdaptyLocale(id: locale))
-    }
 
     func extractImageUrls(_ locale: AdaptyLocale) -> Set<URL> {
         let assets: [String: AdaptyUI.Asset]

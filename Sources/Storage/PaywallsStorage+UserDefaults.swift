@@ -34,7 +34,6 @@ extension UserDefaults: PaywallsStorage {
         guard integer(forKey: Constants.paywallsStorageVersionKey) == Constants.currentPaywallsStorageVersion else {
             return nil
         }
-
         do {
             return try getJSON([VH<AdaptyPaywall>].self, forKey: Constants.paywallsStorageKey)
         } catch {

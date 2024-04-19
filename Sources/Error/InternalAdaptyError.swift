@@ -222,6 +222,12 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request ViewConfiguration timeout").asAdaptyError
     }
+
+    static func isNoViewConfigurationInPaywall(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "AdaptyPaywall.viewConfiguration is nil").asAdaptyError
+    }
 }
-
-

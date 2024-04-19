@@ -12,7 +12,7 @@ private struct SetTransactionVariationIdRequest: HTTPEncodableRequest {
 
     let endpoint = HTTPEndpoint(
         method: .post,
-        path: "/sdk/in-apps/transaction-variation-id/"
+        path: "/sdk/purchase/transaction/variation-id/set/"
     )
     let headers: Headers
     let transactionId: String
@@ -51,7 +51,7 @@ extension HTTPSession {
             transactionId: transactionId,
             variationId: variationId
         )
-        
+
         perform(
             request,
             logName: "set_variation_id",
