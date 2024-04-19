@@ -117,17 +117,18 @@ extension Adapty {
             version: nil
         ) { (result: AdaptyResult<AdaptyPaywallChosen>) in
             completion(
-                result.map {
-                    Adapty.logIfNeed($0)
-                    return $0.value
-                }
-                .flatMapError { error in
-                    if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId) {
-                        .success(fallback)
-                    } else {
-                        .failure(error)
+                result
+                    .flatMapError { error in
+                        if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId) {
+                            .success(fallback)
+                        } else {
+                            .failure(error)
+                        }
                     }
-                }
+                    .map {
+                        Adapty.logIfNeed($0)
+                        return $0.value
+                    }
             )
         }
     }

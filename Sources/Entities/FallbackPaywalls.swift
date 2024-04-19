@@ -11,21 +11,35 @@ struct FallbackPaywalls {
     static var currentFormatVersion = 5
 
     private let source: Source
-    let version: Int
+    let formatVersion: Int
+    private let versionByPlacement: [String: Int64]
 
-    func getPaywall(byPlacmentId id: String, profileId: String) -> AdaptyPaywall? {
+    func getPaywallVersion(byPlacmentId id: String) -> Int64 {
+        versionByPlacement[id] ?? 0
+    }
+
+    func getPaywall(byPlacmentId id: String, profileId: String) -> AdaptyPaywallChosen? {
+        let chosen: AdaptyPaywallChosen?
+
         do {
-            switch source {
-            case let .dataByPlacementId(value):
-                return try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
-            case let .data(value):
-                return try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
-            case .unknown:
-                return nil
-            }
+            chosen =
+                switch source {
+                case let .dataByPlacementId(value):
+                    try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
+                case let .data(value):
+                    try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
+                case .unknown:
+                    nil
+                }
         } catch {
             Log.error(error.localizedDescription)
-            return nil
+            chosen = nil
+        }
+
+        return chosen.map {
+            var v = $0
+            v.value.version = versionByPlacement[id] ?? 0
+            return v
         }
     }
 }
@@ -37,14 +51,13 @@ private extension FallbackPaywalls {
         case unknown
     }
 
-    private static func getPaywall(byPlacmentId id: String, profileId: String, from: [String: Data]) throws -> AdaptyPaywall? {
+    private static func getPaywall(byPlacmentId id: String, profileId: String, from: [String: Data]) throws -> AdaptyPaywallChosen? {
         guard let data = from[id] else { return nil }
         let decoder = FallbackPaywalls.decoder(profileId: profileId)
-        let chosen = try decoder.decode(AdaptyPaywallChosen.self, from: data)
-        return chosen.value
+        return try decoder.decode(AdaptyPaywallChosen.self, from: data)
     }
 
-    private static func getPaywall(byPlacmentId id: String, profileId: String, from data: Data) throws -> AdaptyPaywall? {
+    private static func getPaywall(byPlacmentId id: String, profileId: String, from data: Data) throws -> AdaptyPaywallChosen? {
         let decoder = FallbackPaywalls.decoder(profileId: profileId, placmentId: id)
 
         struct Structure: Decodable {
@@ -57,8 +70,8 @@ private extension FallbackPaywalls {
                     .decodeIfPresent(AdaptyPaywallChosen.self, forKey: placmentId)
             }
         }
-        let chosen = try decoder.decode(Structure.self, from: data).chosen
-        return chosen?.value
+
+        return try decoder.decode(Structure.self, from: data).chosen
     }
 }
 
@@ -76,8 +89,12 @@ extension FallbackPaywalls: Decodable {
         let obj = try decoder.decode(FallbackPaywalls.self, from: data)
 
         switch obj.source {
-        case .unknown:
-            self = .init(source: .data(data), version: obj.version)
+        case .unknown where !obj.versionByPlacement.isEmpty:
+            self = .init(
+                source: .data(data),
+                formatVersion: obj.formatVersion,
+                versionByPlacement: obj.versionByPlacement
+            )
         default:
             self = obj
         }
@@ -85,19 +102,26 @@ extension FallbackPaywalls: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        var meta = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
+        let meta = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
 
-        version = try meta.decode(Int.self, forKey: .formatVersion)
+        formatVersion = try meta.decode(Int.self, forKey: .formatVersion)
 
-        guard version == FallbackPaywalls.currentFormatVersion else {
+        guard formatVersion == FallbackPaywalls.currentFormatVersion else {
             source = .unknown
+            versionByPlacement = [:]
             return
         }
-        
-        
 
-        guard
-            let stringByPlacementId = try? container.decode([String: String].self, forKey: .data)
+        let versionsСontainer = try meta.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .versionByPlacement)
+
+        versionByPlacement = try [String: Int64](
+            versionsСontainer.allKeys.map {
+                try ($0.stringValue, versionsСontainer.decode(Int64.self, forKey: $0))
+            },
+            uniquingKeysWith: { $1 }
+        )
+
+        guard let stringByPlacementId = try? container.decode([String: String].self, forKey: .data)
         else {
             source = .unknown
             return
