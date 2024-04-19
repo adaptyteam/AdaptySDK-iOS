@@ -8,11 +8,11 @@
 import Foundation
 
 private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyPaywallChosen>
+    typealias ResponseBody = Backend.Response.ValueOfDataWithMeta<AdaptyPaywallChosen, AdaptyPaywallChosen.Meta>
 
     let endpoint: HTTPEndpoint
     let profileId: String
-
+    let version: Int64?
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
             jsonDecoder.setProfileId(profileId)
@@ -20,8 +20,9 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
         }
     }
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale) {
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, version: Int64?) {
         self.profileId = profileId
+        self.version = version
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyUI.builderVersion)/fallback.json"
@@ -34,15 +35,16 @@ extension HTTPSession {
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
-        locale: AdaptyLocale?,
+        locale: AdaptyLocale,
+        version: Int64?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
-        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
         let request = FetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
-            locale: locale
+            locale: locale,
+            version: version
         )
 
         perform(
@@ -73,13 +75,17 @@ extension HTTPSession {
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
-                        locale: nil,
+                        locale: .defaultPaywallLocale,
+                        version: version,
                         completion
                     )
                 }
 
             case let .success(response):
-                completion(.success(response.body.value))
+                
+                var chosen = response.body.value
+                chosen.value.version = response.body.meta.version
+                completion(.success(chosen))
             }
         }
     }

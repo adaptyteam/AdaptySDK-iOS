@@ -8,7 +8,7 @@
 import Foundation
 
 private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyProfile>
 
     let endpoint: HTTPEndpoint
     let headers: Headers

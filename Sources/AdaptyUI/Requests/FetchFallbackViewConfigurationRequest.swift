@@ -25,20 +25,24 @@ extension HTTPSession {
     func performFetchFallbackViewConfigurationRequest(
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,
-        locale: AdaptyLocale?,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>) {
-        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
-        let request = FetchFallbackViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
-                                                            paywallInstanceIdentity: paywallInstanceIdentity,
-                                                            locale: locale)
-        perform(request,
-                logName: "get_fallback_paywall_builder",
-                logParams: [
-                    "api_prefix": .value(apiKeyPrefix),
-                    "paywall_instance_id": .value(paywallInstanceIdentity),
-                    "builder_version": .value(AdaptyUI.builderVersion),
-                    "language_code": .valueOrNil(locale.languageCode),
-                ]) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in
+        locale: AdaptyLocale,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
+    ) {
+        let request = FetchFallbackViewConfigurationRequest(
+            apiKeyPrefix: apiKeyPrefix,
+            paywallInstanceIdentity: paywallInstanceIdentity,
+            locale: locale
+        )
+        perform(
+            request,
+            logName: "get_fallback_paywall_builder",
+            logParams: [
+                "api_prefix": .value(apiKeyPrefix),
+                "paywall_instance_id": .value(paywallInstanceIdentity),
+                "builder_version": .value(AdaptyUI.builderVersion),
+                "language_code": .valueOrNil(locale.languageCode),
+            ]
+        ) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):
 
@@ -54,10 +58,12 @@ extension HTTPSession {
                         completion(.failure(error.asAdaptyError))
                         return
                     }
-                    session.performFetchFallbackViewConfigurationRequest(apiKeyPrefix: apiKeyPrefix,
-                                                                         paywallInstanceIdentity: paywallInstanceIdentity,
-                                                                         locale: nil,
-                                                                         completion)
+                    session.performFetchFallbackViewConfigurationRequest(
+                        apiKeyPrefix: apiKeyPrefix,
+                        paywallInstanceIdentity: paywallInstanceIdentity,
+                        locale: .defaultPaywallLocale,
+                        completion
+                    )
                 }
 
             case let .success(response):

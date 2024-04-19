@@ -8,10 +8,10 @@
 import Foundation
 
 private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<[BackendProductState]?>
+    typealias ResponseBody = Backend.Response.ValueOfData<[BackendProductState]?>
     let endpoint = HTTPEndpoint(
         method: .get,
-        path: "/sdk/in-apps/purchase-products/"
+        path: "/sdk/in-apps/products/"
     )
     let headers: Headers
     let queryItems: QueryItems
@@ -24,7 +24,7 @@ private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
                 } else {
                     jsonDecoder.decode(Backend.Response.ValueOfData<[BackendProductState]>.self, response.body).map { $0.value }
                 }
-            return result.map { response.replaceBody(Backend.Response.Body($0)) }
+            return result.map { response.replaceBody(Backend.Response.ValueOfData($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
     }

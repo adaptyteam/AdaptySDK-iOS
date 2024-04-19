@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywall.RemouteConfig.swift
+//  AdaptyPaywall.RemoteConfig.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 06.04.2024
@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyPaywall {
-    public struct RemouteConfig {
+    public struct RemoteConfig {
         let adaptyLocale: AdaptyLocale
 
         public var locale: String { adaptyLocale.id }
@@ -25,16 +25,22 @@ extension AdaptyPaywall {
     }
 }
 
-extension AdaptyPaywall.RemouteConfig: CustomStringConvertible {
+extension AdaptyPaywall.RemoteConfig: CustomStringConvertible {
     public var description: String {
         "(locale: \(locale)"
             + (jsonString.map { ", jsonString: \($0))" } ?? ")")
     }
 }
 
-extension AdaptyPaywall.RemouteConfig: Codable {
+extension AdaptyPaywall.RemoteConfig: Codable {
     enum CodingKeys: String, CodingKey {
         case adaptyLocale = "lang"
         case jsonString = "data"
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        adaptyLocale = try container.decodeIfPresent(AdaptyLocale.self, forKey: .adaptyLocale) ?? .defaultPaywallLocale
+        jsonString = try container.decodeIfPresent(String.self, forKey: .jsonString)
     }
 }

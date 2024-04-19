@@ -15,7 +15,7 @@ public protocol AdaptyUIImageUrlObserver {
 extension AdaptyUI {
     static var dispatchQueue: DispatchQueue?
     static var imageUrlObserver: AdaptyUIImageUrlObserver?
-    static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver, dispatchQueue: DispatchQueue) {
+    public static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver, dispatchQueue: DispatchQueue) {
         imageUrlObserver = observer
         self.dispatchQueue = dispatchQueue
     }

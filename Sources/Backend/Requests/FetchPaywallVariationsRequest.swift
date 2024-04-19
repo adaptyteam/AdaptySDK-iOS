@@ -9,11 +9,12 @@
 import Foundation
 
 private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyPaywallChosen>
+    typealias ResponseBody = Backend.Response.ValueOfDataWithMeta<AdaptyPaywallChosen, AdaptyPaywallChosen.Meta>
 
     let endpoint: HTTPEndpoint
     let headers: Headers
     let profileId: String
+    let version: Int64?
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         { response in
@@ -22,8 +23,9 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
         }
     }
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, adaptyUISDKVersion: String?) {
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, version: Int64?) {
         self.profileId = profileId
+        self.version = version
 
         endpoint = HTTPEndpoint(
             method: .get,
@@ -34,7 +36,6 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
             .setPaywallLocale(locale)
             .setBackendProfileId(profileId)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
-            .setAdaptyUISDKVersion(adaptyUISDKVersion)
             .setSegmentId(segmentId)
     }
 }
@@ -44,13 +45,11 @@ extension HTTPSession {
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
-        locale: AdaptyLocale?,
+        locale: AdaptyLocale,
         segmentId: String,
-        adaptyUISDKVersion: String?,
+        version: Int64?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
-        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
-
         let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
 
         let request = FetchPaywallVariationsRequest(
@@ -60,7 +59,7 @@ extension HTTPSession {
             locale: locale,
             md5Hash: md5Hash,
             segmentId: segmentId,
-            adaptyUISDKVersion: adaptyUISDKVersion
+            version: version
         )
 
         perform(
@@ -79,7 +78,9 @@ extension HTTPSession {
             case let .failure(error):
                 completion(.failure(error.asAdaptyError))
             case let .success(response):
-                completion(.success(response.body.value))
+                var chosen = response.body.value
+                chosen.value.version = response.body.meta.version
+                completion(.success(chosen))
             }
         }
     }

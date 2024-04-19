@@ -67,6 +67,7 @@ extension Backend {
         case type
         case id
         case attributes
+        case meta
     }
 }
 
@@ -80,20 +81,6 @@ extension Encoder {
 }
 
 extension Backend.Response {
-    struct Body<T: Decodable>: Decodable {
-        let value: T
-
-        init(_ value: T) {
-            self.value = value
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            let dataObject = try container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
-            value = try dataObject.decode(T.self, forKey: .attributes)
-        }
-    }
-
     struct ValueOfData<T: Decodable>: Decodable {
         let value: T
 
@@ -104,6 +91,17 @@ extension Backend.Response {
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
             value = try container.decode(T.self, forKey: .data)
+        }
+    }
+
+    struct ValueOfDataWithMeta<T: Decodable, Meta: Decodable>: Decodable {
+        let value: T
+        let meta: Meta
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
+            value = try container.decode(T.self, forKey: .data)
+            meta = try container.decode(Meta.self, forKey: .meta)
         }
     }
 }

@@ -67,10 +67,16 @@ extension AdaptyProfile: Codable {
         case subscriptions
         case nonSubscriptions = "non_subscriptions"
         case version = "timestamp"
+
+        case attributes
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        var container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.attributes) {
+            container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+        }
+
         profileId = try container.decode(String.self, forKey: .profileId)
         customerUserId = try container.decodeIfPresent(String.self, forKey: .customerUserId)
         segmentId = try container.decode(String.self, forKey: .segmentId)
