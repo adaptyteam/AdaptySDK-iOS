@@ -24,7 +24,7 @@ extension Adapty {
     public static func setFallbackPaywalls(fileURL url: URL, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion, logName: "set_fallback_paywalls") { completion in
             do {
-                Configuration.fallbackPaywalls = try FallbackPaywalls(from: url)
+                Configuration.fallbackPaywalls = try FallbackPaywalls(fileURL: url)
             } catch let error as AdaptyError {
                 completion(error)
                 return

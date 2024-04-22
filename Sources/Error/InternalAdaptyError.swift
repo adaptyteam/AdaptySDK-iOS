@@ -140,6 +140,16 @@ extension AdaptyError {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding Fallback Paywalls failed", error: error).asAdaptyError
     }
 
+    static func isNotFileUrl(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(
+            AdaptyError.Source(file: file, function: function, line: line), "Is not file URL"
+        ).asAdaptyError
+    }
+
     static func wrongVersionFallback(
         _ text: String,
         file: String = #fileID,

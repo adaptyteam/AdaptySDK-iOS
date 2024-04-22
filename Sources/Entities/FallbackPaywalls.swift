@@ -14,7 +14,10 @@ struct FallbackPaywalls {
     private let head: Head
     var formatVersion: Int { head.formatVersion }
 
-    init(from url: URL) throws {
+    init(fileURL url: URL) throws {
+        guard url.isFileURL else {
+            throw AdaptyError.isNotFileUrl()
+        }
         let decoder = FallbackPaywalls.decoder()
         head = try decoder.decode(Head.self, from: Data(contentsOf: url))
         fileURL = url
