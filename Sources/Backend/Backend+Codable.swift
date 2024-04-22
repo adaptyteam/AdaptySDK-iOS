@@ -56,8 +56,14 @@ extension [CodingUserInfoKey: Any] {
         self[Backend.isBackendCodableUserInfoKey] as? Bool ?? false
     }
 
-    var profileId: String? {
-        self[Backend.profileIdUserInfoKey] as? String
+    var profileId: String {
+        get throws {
+            if let value = self[Backend.profileIdUserInfoKey] as? String {
+                return value
+            }
+
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(Backend.profileIdUserInfoKey) parameter"))
+        }
     }
 }
 

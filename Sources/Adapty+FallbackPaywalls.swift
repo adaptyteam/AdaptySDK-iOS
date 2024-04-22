@@ -19,29 +19,15 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#fallback-paywalls)
     ///
     /// - Parameters:
-    ///   - paywalls: a JSON representation of your paywalls/products list in the exact same format as provided by Adapty backend.
+    ///   - fileURL:
     ///   - completion: Result callback.
-    public static func setFallbackPaywalls(_ paywalls: Data, _ completion: AdaptyErrorCompletion? = nil) {
+    public static func setFallbackPaywalls(fileURL url: URL, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion, logName: "set_fallback_paywalls") { completion in
             do {
-                let fallbackPaywalls = try FallbackPaywalls(from: paywalls)
-                let hasErrorVersion: Bool
-                if fallbackPaywalls.formatVersion < FallbackPaywalls.currentFormatVersion {
-                    hasErrorVersion = true
-                    Log.error("The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard.")
-                } else if fallbackPaywalls.formatVersion > FallbackPaywalls.currentFormatVersion {
-                    hasErrorVersion = true
-                    Log.error("The fallback paywalls version is not correct. Please update the AdaptySDK.")
-                } else {
-                    hasErrorVersion = false
-                }
-                if hasErrorVersion {
-                    Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
-                        "in_version": .value(fallbackPaywalls.formatVersion),
-                        "expected_version": .value(FallbackPaywalls.currentFormatVersion),
-                    ]))
-                }
-                Configuration.fallbackPaywalls = fallbackPaywalls
+                Configuration.fallbackPaywalls = try FallbackPaywalls(from: url)
+            } catch let error as AdaptyError {
+                completion(error)
+                return
             } catch {
                 completion(.decodingFallback(error))
                 return

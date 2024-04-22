@@ -279,11 +279,11 @@ import StoreKit
         /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#fallback-paywalls)
         ///
         /// - Parameters:
-        ///   - paywalls: a JSON representation of your paywalls/products list in the exact same format as provided by Adapty backend.
+        ///   - fileURL:
         /// - Throws: An ``AdaptyError`` object
-        public static func setFallbackPaywalls(_ paywalls: Data) async throws {
+        public static func setFallbackPaywalls(fileURL url: URL) async throws {
             return try await withCheckedThrowingContinuation { continuation in
-                Adapty.setFallbackPaywalls(paywalls) { error in
+                Adapty.setFallbackPaywalls(fileURL: url) { error in
                     if let error {
                         return continuation.resume(throwing: error)
                     }

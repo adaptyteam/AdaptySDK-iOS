@@ -18,45 +18,6 @@ final class FallbackPaywallsTests: XCTestCase {
             let thisDirectory = thisSourceFile.deletingLastPathComponent()
             return thisDirectory.appendingPathComponent("\(self.rawValue)")
         }
-
-        func getData() throws -> Data {
-            let startTime = CFAbsoluteTimeGetCurrent()
-            let data = try Data(contentsOf: self.url)
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-            print("# Time elapsed for loadData: \(String(format: "%.6f", timeElapsed)) s.")
-            return data
-        }
-
-        func test(_ case: XCTestCase, paywallsId: String) throws {
-            try test(`case`, paywallsIds: [paywallsId])
-        }
-
-        func test(_ case: XCTestCase, paywallsIds: [String]) throws {
-            let expectation = `case`.expectation(description: "wait setFallbackPaywalls")
-
-            let data = try getData()
-
-            let startTime = CFAbsoluteTimeGetCurrent()
-            Adapty.setFallbackPaywalls(data) { _ in
-                let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                print("## Time elapsed for setFallbackPaywalls: \(String(format: "%.6f", timeElapsed)) s.")
-
-                expectation.fulfill()
-            }
-
-            `case`.wait(for: [expectation], timeout: 10.0)
-
-            let fallbackPaywalls = Adapty.Configuration.fallbackPaywalls!
-
-            paywallsIds.forEach {
-                let startTime = CFAbsoluteTimeGetCurrent()
-                let paywall = fallbackPaywalls.getPaywall(byPlacmentId: $0, profileId: "unknown")
-                let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-                print("### Time elapsed for paywall[\($0)] \(paywall?.value.viewConfiguration != nil ? "paywall_builder" : ""): \(String(format: "%.6f", timeElapsed)) s.")
-
-                XCTAssertNotNil(paywall)
-            }
-        }
     }
 
     let paywallsIds = [
@@ -82,29 +43,40 @@ final class FallbackPaywallsTests: XCTestCase {
         "yealy-onboarding",
     ]
 
-    func testFallback_serialized_inMemorry() throws {
-        try Json.fallback_serialized.test(self, paywallsIds: paywallsIds)
+    func test(fileURL url: URL, paywallsId: String) throws {
+        try test(fileURL: url, paywallsIds: [paywallsId])
     }
 
-    func testFallback_inMemorry() throws {
-        try Json.fallback.test(self, paywallsIds: paywallsIds)
-    }
+    func test(fileURL url: URL, paywallsIds: [String]) throws {
+        let expectation = expectation(description: "wait setFallbackPaywalls")
 
-    func testFallback_serialized_reloadFile() throws {
-        try paywallsIds.forEach { id in
-            let startTime = CFAbsoluteTimeGetCurrent()
-            try Json.fallback_serialized.test(self, paywallsId: id)
+        let startTime = CFAbsoluteTimeGetCurrent()
+        Adapty.setFallbackPaywalls(fileURL: url) { _ in
             let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-            print("#### Total time elapsed for paywall[\(id)]: \(String(format: "%.6f", timeElapsed)) s.")
+            print("## Time elapsed for setFallbackPaywalls: \(String(format: "%.6f", timeElapsed)) s.")
+
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 10.0)
+
+        let fallbackPaywalls = Adapty.Configuration.fallbackPaywalls!
+
+        paywallsIds.forEach {
+            let startTime = CFAbsoluteTimeGetCurrent()
+            let paywall = fallbackPaywalls.getPaywall(byPlacmentId: $0, profileId: "unknown")
+            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            print("### Time elapsed for paywall[\($0)] \(paywall?.value.viewConfiguration != nil ? "paywall_builder" : ""): \(String(format: "%.6f", timeElapsed)) s.")
+
+            XCTAssertNotNil(paywall)
         }
     }
 
-    func testFallback_reloadFile() throws {
-        try paywallsIds.forEach { id in
-            let startTime = CFAbsoluteTimeGetCurrent()
-            try Json.fallback.test(self, paywallsId: id)
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-            print("#### Total time elapsed for paywall[\(id)]: \(String(format: "%.6f", timeElapsed)) s.")
-        }
+    func testFallback_serialized() throws {
+        try test(fileURL: Json.fallback_serialized.url, paywallsIds: paywallsIds)
+    }
+
+    func testFallback() throws {
+        try test(fileURL: Json.fallback.url, paywallsIds: paywallsIds)
     }
 }

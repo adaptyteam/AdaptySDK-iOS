@@ -30,7 +30,7 @@ extension AdaptyPaywallChosen: Decodable {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Paywalls collection is empty"))
         }
 
-        let profileId = decoder.userInfo.profileId ?? ""
+        let profileId = try decoder.userInfo.profileId
         let paywall =
             if items.count == 1 {
                 try paywall(from: decoder, index: 0)

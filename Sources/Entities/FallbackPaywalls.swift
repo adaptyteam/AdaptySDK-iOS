@@ -8,29 +8,29 @@
 import Foundation
 
 struct FallbackPaywalls {
-    static var currentFormatVersion = 5
+    fileprivate static var currentFormatVersion = 5
 
-    private let source: Source
-    let formatVersion: Int
-    private let versionByPlacement: [String: Int64]
+    private let fileURL: URL
+    private let head: Head
+    var formatVersion: Int { head.formatVersion }
 
-    func getPaywallVersion(byPlacmentId id: String) -> Int64 {
-        versionByPlacement[id] ?? 0
+    init(from url: URL) throws {
+        let decoder = FallbackPaywalls.decoder()
+        head = try decoder.decode(Head.self, from: Data(contentsOf: url))
+        fileURL = url
+    }
+
+    func getPaywallVersion(byPlacmentId id: String) -> Int64? {
+        head.versionByPlacement[id]
     }
 
     func getPaywall(byPlacmentId id: String, profileId: String) -> AdaptyPaywallChosen? {
-        let chosen: AdaptyPaywallChosen?
+        guard let version = getPaywallVersion(byPlacmentId: id) else { return nil }
 
+        let decoder = FallbackPaywalls.decoder(profileId: profileId, placmentId: id)
+        let chosen: AdaptyPaywallChosen?
         do {
-            chosen =
-                switch source {
-                case let .dataByPlacementId(value):
-                    try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
-                case let .data(value):
-                    try FallbackPaywalls.getPaywall(byPlacmentId: id, profileId: profileId, from: value)
-                case .unknown:
-                    nil
-                }
+            chosen = try decoder.decode(Body.self, from: Data(contentsOf: fileURL)).chosen
         } catch {
             Log.error(error.localizedDescription)
             chosen = nil
@@ -38,111 +38,90 @@ struct FallbackPaywalls {
 
         return chosen.map {
             var v = $0
-            v.value.version = versionByPlacement[id] ?? 0
+            v.value.version = version
             return v
         }
     }
 }
 
-private extension FallbackPaywalls {
-    enum Source {
-        case data(Data)
-        case dataByPlacementId([String: Data])
-        case unknown
-    }
-
-    private static func getPaywall(byPlacmentId id: String, profileId: String, from: [String: Data]) throws -> AdaptyPaywallChosen? {
-        guard let data = from[id] else { return nil }
-        let decoder = FallbackPaywalls.decoder(profileId: profileId)
-        return try decoder.decode(AdaptyPaywallChosen.self, from: data)
-    }
-
-    private static func getPaywall(byPlacmentId id: String, profileId: String, from data: Data) throws -> AdaptyPaywallChosen? {
-        let decoder = FallbackPaywalls.decoder(profileId: profileId, placmentId: id)
-
-        struct Structure: Decodable {
-            let chosen: AdaptyPaywallChosen?
-            init(from decoder: any Decoder) throws {
-                let placmentId = CustomCodingKeys(decoder.userInfo.placmentId ?? "")
-                chosen = try decoder
-                    .container(keyedBy: FallbackPaywalls.CodingKeys.self)
-                    .nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .data)
-                    .decodeIfPresent(AdaptyPaywallChosen.self, forKey: placmentId)
-            }
-        }
-
-        return try decoder.decode(Structure.self, from: data).chosen
-    }
-}
-
-extension FallbackPaywalls: Decodable {
-    enum CodingKeys: String, CodingKey {
+extension FallbackPaywalls {
+    private enum CodingKeys: String, CodingKey {
         case data
         case meta
         case formatVersion = "version"
         case versionByPlacement = "placement_audience_version_updated_at_map"
     }
 
-    init(from data: Data) throws {
-        let decoder = JSONDecoder()
-        Backend.configure(decoder: decoder)
-        let obj = try decoder.decode(FallbackPaywalls.self, from: data)
+    struct Head: Decodable {
+        let versionByPlacement: [String: Int64]
+        let formatVersion: Int
 
-        switch obj.source {
-        case .unknown where !obj.versionByPlacement.isEmpty:
-            self = .init(
-                source: .data(data),
-                formatVersion: obj.formatVersion,
-                versionByPlacement: obj.versionByPlacement
+        init(from decoder: any Decoder) throws {
+            let container = try decoder
+                .container(keyedBy: CodingKeys.self)
+                .nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
+
+            formatVersion = try container.decode(Int.self, forKey: .formatVersion)
+
+            guard formatVersion == FallbackPaywalls.currentFormatVersion else {
+                let error = formatVersion < FallbackPaywalls.currentFormatVersion
+                    ? "The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard."
+                    : "The fallback paywalls version is not correct. Please update the AdaptySDK."
+                Log.error(error)
+
+                Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
+                    "in_version": .value(formatVersion),
+                    "expected_version": .value(FallbackPaywalls.currentFormatVersion),
+                ]))
+
+                throw AdaptyError.wrongVersionFallback(error)
+            }
+
+            let versionsСontainer = try container.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .versionByPlacement)
+
+            versionByPlacement = try [String: Int64](
+                versionsСontainer.allKeys.map {
+                    try ($0.stringValue, versionsСontainer.decode(Int64.self, forKey: $0))
+                },
+                uniquingKeysWith: { $1 }
             )
-        default:
-            self = obj
         }
     }
 
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let meta = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
+    struct Body: Decodable {
+        let chosen: AdaptyPaywallChosen?
+        init(from decoder: any Decoder) throws {
+            let placmentId = try CustomCodingKeys(decoder.userInfo.placmentId)
+            let container = try decoder
+                .container(keyedBy: CodingKeys.self)
+                .nestedContainer(keyedBy: FallbackPaywalls.CustomCodingKeys.self, forKey: .data)
+            guard container.contains(placmentId) else {
+                chosen = nil
+                return
+            }
 
-        formatVersion = try meta.decode(Int.self, forKey: .formatVersion)
-
-        guard formatVersion == FallbackPaywalls.currentFormatVersion else {
-            source = .unknown
-            versionByPlacement = [:]
-            return
+            if let string = try? container.decode(String.self, forKey: placmentId) {
+                let decoder = try FallbackPaywalls.decoder(profileId: decoder.userInfo.profileId)
+                let data = string.data(using: .utf8) ?? Data()
+                chosen = try decoder.decode(AdaptyPaywallChosen.self, from: data)
+            } else {
+                chosen = try container.decodeIfPresent(AdaptyPaywallChosen.self, forKey: placmentId)
+            }
         }
-
-        let versionsСontainer = try meta.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .versionByPlacement)
-
-        versionByPlacement = try [String: Int64](
-            versionsСontainer.allKeys.map {
-                try ($0.stringValue, versionsСontainer.decode(Int64.self, forKey: $0))
-            },
-            uniquingKeysWith: { $1 }
-        )
-
-        guard let stringByPlacementId = try? container.decode([String: String].self, forKey: .data)
-        else {
-            source = .unknown
-            return
-        }
-
-        source = .dataByPlacementId(stringByPlacementId.compactMapValues { $0.data(using: .utf8) })
     }
 }
 
-private extension [CodingUserInfoKey: Any] {
-    var placmentId: String? {
-        self[FallbackPaywalls.placmentIdUserInfoKey] as? String
-    }
-}
-
-private extension FallbackPaywalls {
+extension FallbackPaywalls {
     static let placmentIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_placment_id")!
 
-    static func decoder(profileId: String) -> JSONDecoder {
+    static func decoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         Backend.configure(decoder: decoder)
+        return decoder
+    }
+
+    static func decoder(profileId: String) -> JSONDecoder {
+        let decoder = decoder()
         decoder.setProfileId(profileId)
         return decoder
     }
@@ -168,6 +147,18 @@ private extension FallbackPaywalls {
 
         init?(intValue _: Int) {
             nil
+        }
+    }
+}
+
+private extension [CodingUserInfoKey: Any] {
+    var placmentId: String {
+        get throws {
+            if let value = self[FallbackPaywalls.placmentIdUserInfoKey] as? String {
+                return value
+            }
+
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(FallbackPaywalls.placmentIdUserInfoKey) parameter"))
         }
     }
 }
