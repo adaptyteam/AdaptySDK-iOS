@@ -58,6 +58,7 @@ extension Adapty {
         let logParams: EventParameters = [
             "observer_mode": .value(configuration.observerMode),
             "has_customer_user_id": .value(configuration.customerUserId != nil),
+            "idfa_collection_disabled": .value(configuration.idfaCollectionDisabled),
         ]
 
         async(completion, logName: logName, logParams: logParams) { completion in
