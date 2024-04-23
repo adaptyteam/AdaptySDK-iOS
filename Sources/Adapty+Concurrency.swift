@@ -39,6 +39,23 @@ import StoreKit
         }
         
         public static func activate(
+            with builder: Adapty.Configuration.Builder
+        ) async throws {
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.activate(
+                    with: builder
+                ) { error in
+                    if let error {
+                        return continuation.resume(throwing: error)
+                    }
+                    continuation.resume(
+                        returning: ()
+                    )
+                }
+            }
+        }
+        
+        public static func activate(
             with configuration: Adapty.Configuration
         ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
