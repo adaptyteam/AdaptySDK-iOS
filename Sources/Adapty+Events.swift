@@ -40,11 +40,7 @@ extension Adapty {
         trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
     }
 
-    static func logIfNeed(_ chosen: AdaptyPaywallChosen, _ completion: AdaptyErrorCompletion? = nil) {
-        guard chosen.count > 1 else {
-            completion?(nil)
-            return
-        }
+    static func logEvent(_ chosen: AdaptyPaywallChosen, _ completion: AdaptyErrorCompletion? = nil) {
         trackEvent(.paywallVariationChose(chosen.parameters), profileId: chosen.profileId, completion)
     }
 

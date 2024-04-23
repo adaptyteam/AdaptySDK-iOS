@@ -29,15 +29,35 @@ extension Adapty {
         _ apiKey: String,
         observerMode: Bool = false,
         customerUserId: String? = nil,
-        dispatchQueue: DispatchQueue = .main,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
+        activate(
+            with: Configuration
+                .builder(withAPIKey: apiKey)
+                .with(customerUserId: customerUserId)
+                .with(observerMode: observerMode)
+                .build(),
+            completion
+        )
+    }
+
+    public static func activate(
+        with builder: Adapty.Configuration.Builder,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        activate(with: builder.build(), completion)
+    }
+
+    public static func activate(
+        with configuration: Adapty.Configuration,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         let logName = "activate"
         let logParams: EventParameters = [
-            "observer_mode": .value(observerMode),
-            "has_customer_user_id": .value(customerUserId != nil),
+            "observer_mode": .value(configuration.observerMode),
+            "has_customer_user_id": .value(configuration.customerUserId != nil),
         ]
 
         async(completion, logName: logName, logParams: logParams) { completion in
@@ -48,28 +68,37 @@ extension Adapty {
                 return
             }
 
-            UserDefaults.standard.clearAllDataIfDifferent(apiKey: apiKey)
+            UserDefaults.standard.clearAllDataIfDifferent(apiKey: configuration.apiKey)
 
-            Adapty.dispatchQueue = dispatchQueue
+            Adapty.dispatchQueue = configuration.dispatchQueue
+            Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled
+            Configuration.observerMode = configuration.observerMode
 
-            Configuration.observerMode = observerMode
+            let backend = Backend(
+                secretKey: configuration.apiKey,
+                baseURL: configuration.backendBaseUrl,
+                withProxy: configuration.backendProxy
+            )
 
-            let backend = Backend(secretKey: apiKey, baseURL: Configuration.backendBaseUrl ?? Backend.publicEnvironmentBaseUrl, withProxy: Configuration.backendProxy)
-
-            let fallbackBackend = FallbackBackend(secretKey: apiKey, baseURL: Configuration.backendFallbackBaseUrl ?? Backend.publicEnvironmentFallbackBaseUrl, withProxy: Configuration.backendProxy)
+            let fallbackBackend = FallbackBackend(
+                secretKey: configuration.apiKey,
+                baseURL: configuration.backendFallbackBaseUrl,
+                withProxy: configuration.backendProxy
+            )
 
             Adapty.eventsManager = EventsManager(profileStorage: UserDefaults.standard, backend: backend)
 
             shared = Adapty(
-                apiKeyPrefix: String(apiKey.prefix(while: { $0 != "." })),
+                apiKeyPrefix: String(configuration.apiKey.prefix(while: { $0 != "." })),
                 profileStorage: UserDefaults.standard,
                 vendorIdsStorage: UserDefaults.standard,
                 backend: backend,
                 fallbackBackend: fallbackBackend,
-                customerUserId: customerUserId
+                customerUserId: configuration.customerUserId
             )
+
             LifecycleManager.shared.initialize()
-            Log.info("Adapty activated withObserverMode:\(observerMode), withCustomerUserId: \(customerUserId != nil)")
+            Log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
             completion(nil)
         }
     }

@@ -126,7 +126,7 @@ extension Adapty {
                         }
                     }
                     .map {
-                        Adapty.logIfNeed($0)
+                        Adapty.logEvent($0)
                         return $0.value
                     }
             )
@@ -168,7 +168,7 @@ private extension AdaptyProfileManager {
 
             guard let strongSelf = self, strongSelf.isActive else {
                 completion(result.map {
-                    Adapty.logIfNeed($0)
+                    Adapty.logEvent($0)
                     return $0.value
                 })
                 return
@@ -179,7 +179,7 @@ private extension AdaptyProfileManager {
                     return newer
                 } else {
                     strongSelf.paywallsCache.savePaywall($0.value)
-                    Adapty.logIfNeed($0)
+                    Adapty.logEvent($0)
                     return $0.value
                 }
             }
@@ -261,7 +261,7 @@ private extension AdaptyProfileManager {
                     }
                     self.paywallsCache.savePaywall(paywall.value)
                 }
-                Adapty.logIfNeed(paywall)
+                Adapty.logEvent(paywall)
                 completion(.success(paywall.value))
             }
         }

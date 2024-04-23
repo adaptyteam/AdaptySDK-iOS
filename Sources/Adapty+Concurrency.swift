@@ -17,19 +17,33 @@ import StoreKit
         /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
         /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
         /// - Parameter customerUserId: User identifier in your system
-        /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
         public static func activate(
             _ apiKey: String,
             observerMode: Bool = false,
-            customerUserId: String? = nil,
-            dispatchQueue: DispatchQueue = .main
+            customerUserId: String? = nil
         ) async throws {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.activate(
                     apiKey,
                     observerMode: observerMode,
-                    customerUserId: customerUserId,
-                    dispatchQueue: dispatchQueue
+                    customerUserId: customerUserId
+                ) { error in
+                    if let error {
+                        return continuation.resume(throwing: error)
+                    }
+                    continuation.resume(
+                        returning: ()
+                    )
+                }
+            }
+        }
+        
+        public static func activate(
+            with configuration: Adapty.Configuration
+        ) async throws {
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.activate(
+                    with: configuration
                 ) { error in
                     if let error {
                         return continuation.resume(throwing: error)
