@@ -59,6 +59,7 @@ extension Adapty {
             "observer_mode": .value(configuration.observerMode),
             "has_customer_user_id": .value(configuration.customerUserId != nil),
             "idfa_collection_disabled": .value(configuration.idfaCollectionDisabled),
+            "ip_address_collection_disabled": .value(configuration.ipAddressCollectionDisabled),
         ]
 
         async(completion, logName: logName, logParams: logParams) { completion in
@@ -73,19 +74,11 @@ extension Adapty {
 
             Adapty.dispatchQueue = configuration.dispatchQueue
             Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled
+            Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled
             Configuration.observerMode = configuration.observerMode
 
-            let backend = Backend(
-                secretKey: configuration.apiKey,
-                baseURL: configuration.backendBaseUrl,
-                withProxy: configuration.backendProxy
-            )
-
-            let fallbackBackend = FallbackBackend(
-                secretKey: configuration.apiKey,
-                baseURL: configuration.backendFallbackBaseUrl,
-                withProxy: configuration.backendProxy
-            )
+            let backend = Backend(with: configuration)
+            let fallbackBackend = FallbackBackend(with: configuration)
 
             Adapty.eventsManager = EventsManager(profileStorage: UserDefaults.standard, backend: backend)
 
@@ -99,6 +92,7 @@ extension Adapty {
             )
 
             LifecycleManager.shared.initialize()
+
             Log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
             completion(nil)
         }

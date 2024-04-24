@@ -14,6 +14,7 @@ extension Adapty.Configuration {
             customerUserId: builder.customerUserId,
             observerMode: builder.observerMode,
             idfaCollectionDisabled: builder.idfaCollectionDisabled,
+            ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled,
             dispatchQueue: builder.dispatchQueue,
             backendBaseUrl: builder.backendBaseUrl,
             backendFallbackBaseUrl: builder.backendFallbackBaseUrl,
@@ -30,6 +31,7 @@ extension Adapty.Configuration {
         public private(set) var customerUserId: String?
         public private(set) var observerMode: Bool = false
         public private(set) var idfaCollectionDisabled: Bool = false
+        public private(set) var ipAddressCollectionDisabled: Bool = false
         public private(set) var dispatchQueue: DispatchQueue = .main
         public private(set) var backendBaseUrl: URL = Backend.publicEnvironmentBaseUrl
         public private(set) var backendFallbackBaseUrl: URL = Backend.publicEnvironmentFallbackBaseUrl
@@ -45,6 +47,7 @@ extension Adapty.Configuration {
             self.customerUserId = configuration.customerUserId
             self.observerMode = configuration.observerMode
             self.idfaCollectionDisabled = configuration.idfaCollectionDisabled
+            self.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled
             self.dispatchQueue = configuration.dispatchQueue
             self.backendBaseUrl = configuration.backendBaseUrl
             self.backendFallbackBaseUrl = configuration.backendFallbackBaseUrl
@@ -71,6 +74,11 @@ extension Adapty.Configuration {
 
         public func with(idfaCollectionDisabled value: Bool) -> Builder {
             idfaCollectionDisabled = value
+            return self
+        }
+        
+        public func with(ipAddressCollectionDisabled value: Bool) -> Builder {
+            ipAddressCollectionDisabled = value
             return self
         }
 
