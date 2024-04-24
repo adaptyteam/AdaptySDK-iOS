@@ -14,7 +14,7 @@ extension AdaptyUI {
         public let templateId: String
         let version: Int64
         let assets: [String: Asset]
-        let responseLocale: AdaptyLocale?
+        let responseLocale: AdaptyLocale
         let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
         let screens: [String: Screen]
@@ -51,7 +51,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
     public init(from decoder: Decoder) throws {
         let superContainer = try decoder.container(keyedBy: ContainerCodingKeys.self)
         id = try superContainer.decode(String.self, forKey: .id)
-        responseLocale = try superContainer.decodeIfPresent(AdaptyLocale.self, forKey: .responseLocale)
+        responseLocale = try superContainer.decode(AdaptyLocale.self, forKey: .responseLocale)
         let container = try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
 
         let format = try (container.decode(String.self, forKey: .format).split(separator: ".").first).flatMap { Int($0) } ?? 2

@@ -18,7 +18,7 @@ private extension AdaptyPaywall {
         if let locale = remoteConfigLocale, locale.equalLanguageCode(.defaultPaywallLocale) {
             remoteConfigLocale = nil
         }
-        var viewConfigurationLocale = viewConfiguration?.adaptyLocale
+        var viewConfigurationLocale = viewConfiguration?.responseLocale
         if let locale = viewConfigurationLocale, locale.equalLanguageCode(.defaultPaywallLocale) {
             viewConfigurationLocale = nil
         }
@@ -46,28 +46,26 @@ final class PaywallsCache {
         paywallByPlacementId = storage.getPaywalls()?.asPaywallByPlacementId ?? [:]
     }
 
-    func getPaywallByLocale(_ locale: AdaptyLocale?, withPlacementId placementId: String) -> VH<AdaptyPaywall>? {
+    func getPaywallByLocale(_ locale: AdaptyLocale, orDefaultLocale: Bool, withPlacementId placementId: String) -> VH<AdaptyPaywall>? {
         guard let paywall = paywallByPlacementId[placementId] else { return nil }
         let paywallLocale = paywall.value.localeOrDefault
-        if paywallLocale.equalLanguageCode(.defaultPaywallLocale) { return paywall }
-        guard let locale else { return paywall }
         return if paywallLocale.equalLanguageCode(locale) {
+            paywall
+        } else if orDefaultLocale, paywallLocale.equalLanguageCode(.defaultPaywallLocale) {
             paywall
         } else {
             nil
         }
     }
 
-    private func getNewerPaywall(than paywall: AdaptyPaywall) -> AdaptyPaywall? {
+    func getNewerPaywall(than paywall: AdaptyPaywall) -> AdaptyPaywall? {
         guard let cached: AdaptyPaywall = paywallByPlacementId[paywall.placementId]?.value,
-              paywall.equalLanguageCode(cached) else { return nil }
+              cached.equalLanguageCode(paywall) else { return nil }
         return paywall.version >= cached.version ? nil : cached
     }
 
-    func savedPaywall(_ paywall: AdaptyPaywall) -> AdaptyPaywall {
-        if let newer = getNewerPaywall(than: paywall) { return newer }
+    func savePaywall(_ paywall: AdaptyPaywall) {
         paywallByPlacementId[paywall.placementId] = VH(paywall, time: Date())
         storage.setPaywalls(Array(paywallByPlacementId.values))
-        return paywall
     }
 }

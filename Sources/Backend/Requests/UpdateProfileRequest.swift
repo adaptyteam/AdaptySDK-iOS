@@ -16,7 +16,7 @@ extension Backend.Request {
 }
 
 private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyProfile?>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyProfile?>
     let endpoint: HTTPEndpoint
     let headers: Headers
     let profileId: String
@@ -29,9 +29,9 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
                 if headers.hasSameBackendResponseHash(response.headers) {
                     .success(nil)
                 } else {
-                    jsonDecoder.decode(Backend.Response.Body<AdaptyProfile>.self, response.body).map { $0.value }
+                    jsonDecoder.decode(Backend.Response.ValueOfData<AdaptyProfile>.self, response.body).map { $0.value }
                 }
-            return result.map { response.replaceBody(Backend.Response.Body($0)) }
+            return result.map { response.replaceBody(Backend.Response.ValueOfData($0)) }
                 .mapError { .decoding(response, error: $0) }
         }
     }

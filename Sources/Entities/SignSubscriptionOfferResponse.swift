@@ -17,10 +17,16 @@ struct SignSubscriptionOfferResponse: Decodable, Equatable {
         case signature
         case nonce
         case timestamp
+        
+        case attributes
     }
 
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        var container = try decoder.container(keyedBy: CodingKeys.self)
+        if container.contains(.attributes) {
+            container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+        }
+        
         keyIdentifier = try container.decode(String.self, forKey: .keyIdentifier)
         nonce = try container.decode(UUID.self, forKey: .nonce)
         signature = try container.decode(String.self, forKey: .signature)

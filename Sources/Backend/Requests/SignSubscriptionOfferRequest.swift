@@ -8,7 +8,7 @@
 import Foundation
 
 private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<SignSubscriptionOfferResponse>
+    typealias ResponseBody = Backend.Response.ValueOfData<SignSubscriptionOfferResponse>
 
     let endpoint = HTTPEndpoint(
         method: .get,

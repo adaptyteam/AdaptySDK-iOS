@@ -8,7 +8,7 @@
 import Foundation
 
 private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Body<AdaptyProfile>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyProfile>
 
     let endpoint = HTTPEndpoint(
         method: .post,
@@ -17,6 +17,7 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     let headers: Headers
     let profileId: String
 
+    
     let requestSource: RequestSource
 
     init(profileId: String, requestSource: RequestSource) {

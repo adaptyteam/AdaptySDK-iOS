@@ -25,7 +25,7 @@ public struct AdaptyPaywall {
     /// Current revision (version) of a paywall. Every change within a paywall creates a new revision.
     public let revision: Int
 
-    public let remoteConfig: AdaptyPaywall.RemouteConfig?
+    public let remoteConfig: AdaptyPaywall.RemoteConfig?
 
     /// If `true`, it is possible to fetch the view ``AdaptyUI.ViewConfiguration`` object and use it with ``AdaptyUI`` library.
     public var hasViewConfiguration: Bool { viewConfiguration != nil }
@@ -36,7 +36,7 @@ public struct AdaptyPaywall {
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
-    let version: Int64
+    var version: Int64
 }
 
 extension AdaptyPaywall: CustomStringConvertible {
@@ -59,10 +59,8 @@ extension AdaptyPaywall: Codable {
         case name = "paywall_name"
         case products
         case remoteConfig = "remote_config"
-        case version = "paywall_updated_at"
+        case version = "placement_audience_version_updated_at"
         case viewConfiguration = "paywall_builder"
-        case hasViewConfiguration = "use_paywall_builder"
-
         case attributes
     }
 
@@ -75,20 +73,13 @@ extension AdaptyPaywall: Codable {
         placementId = try container.decode(String.self, forKey: .placementId)
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
-        version = try container.decode(Int64.self, forKey: .version)
+        version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
         revision = try container.decode(Int.self, forKey: .revision)
         variationId = try container.decode(String.self, forKey: .variationId)
         abTestName = try container.decode(String.self, forKey: .abTestName)
         products = try container.decode([ProductReference].self, forKey: .products)
-        remoteConfig = try container.decodeIfPresent(RemouteConfig.self, forKey: .remoteConfig)
-        viewConfiguration =
-            if let value = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.self, forKey: .viewConfiguration) {
-                .data(value)
-            } else if !decoder.userInfo.isBackend, try container.decodeIfPresent(Bool.self, forKey: .hasViewConfiguration) ?? false {
-                .noData
-            } else {
-                nil
-            }
+        remoteConfig = try container.decodeIfPresent(RemoteConfig.self, forKey: .remoteConfig)
+        viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -102,7 +93,7 @@ extension AdaptyPaywall: Codable {
         try container.encode(abTestName, forKey: .abTestName)
         try container.encode(products, forKey: .products)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
-        try container.encode(hasViewConfiguration, forKey: .hasViewConfiguration)
+        try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
     }
 }
 

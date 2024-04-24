@@ -9,7 +9,18 @@
 import Foundation
 
 struct AdaptyPaywallChosen {
-    let value: AdaptyPaywall
+    var value: AdaptyPaywall
+    let placementAudienceVersionId: String
+    let profileId: String
+    let count: Int
+
+    var parameters: AdaptyPaywallVariationChoseParameters {
+        .init(
+            paywallVariationId: value.variationId,
+            viewConfigurationId: value.viewConfiguration?.id,
+            placementAudienceVersionId: placementAudienceVersionId
+        )
+    }
 }
 
 extension AdaptyPaywallChosen: Decodable {
@@ -19,6 +30,7 @@ extension AdaptyPaywallChosen: Decodable {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Paywalls collection is empty"))
         }
 
+        let profileId = try decoder.userInfo.profileId
         let paywall =
             if items.count == 1 {
                 try paywall(from: decoder, index: 0)
@@ -26,17 +38,16 @@ extension AdaptyPaywallChosen: Decodable {
                 try paywall(from: decoder, index: Self.choose(
                     items: items,
                     placementAudienceVersionId: firstItem.placementAudienceVersionId,
-                    profileId: decoder.userInfo.profileId ?? ""
+                    profileId: profileId
                 ))
             }
 
-        Adapty.logPaywallVariationChose(.init(
-            paywallVariationId: paywall.variationId,
-            viewConfigurationId: paywall.viewConfiguration?.id,
-            placementAudienceVersionId: firstItem.placementAudienceVersionId
-        ))
-
-        self.init(value: paywall)
+        self.init(
+            value: paywall,
+            placementAudienceVersionId: firstItem.placementAudienceVersionId,
+            profileId: profileId,
+            count: items.count
+        )
 
         func paywall(from decoder: any Decoder, index: Int) throws -> AdaptyPaywall {
             struct Empty: Decodable {}
@@ -105,5 +116,15 @@ extension AdaptyPaywallChosen {
         } ?? (items.count - 1)
 
         return sortedItems[index].offset
+    }
+}
+
+extension AdaptyPaywallChosen {
+    struct Meta: Decodable {
+        let version: Int64
+
+        enum CodingKeys: String, CodingKey {
+            case version = "placement_audience_version_updated_at"
+        }
     }
 }

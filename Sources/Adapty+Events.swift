@@ -10,9 +10,9 @@ import Foundation
 extension Adapty {
     static var eventsManager = EventsManager(profileStorage: UserDefaults.standard)
 
-    fileprivate static func trackEvent(_ eventType: EventType, _ completion: AdaptyErrorCompletion? = nil) {
+    fileprivate static func trackEvent(_ eventType: EventType, profileId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in
-            Adapty.eventsManager.trackEvent(Event(type: eventType, profileId: manager.profileStorage.profileId)) { error in
+            Adapty.eventsManager.trackEvent(Event(type: eventType, profileId: profileId ?? manager.profileStorage.profileId)) { error in
                 completion(error?.asAdaptyError)
             }
         }
@@ -40,8 +40,8 @@ extension Adapty {
         trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
     }
 
-    static func logPaywallVariationChose(_ parameters: AdaptyPaywallVariationChoseParameters, _ completion: AdaptyErrorCompletion? = nil) {
-        trackEvent(.paywallVariationChose(parameters), completion)
+    static func logEvent(_ chosen: AdaptyPaywallChosen, _ completion: AdaptyErrorCompletion? = nil) {
+        trackEvent(.paywallVariationChose(chosen.parameters), profileId: chosen.profileId, completion)
     }
 
     /// Call this method to keep track of the user's steps while onboarding

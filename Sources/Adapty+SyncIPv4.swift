@@ -9,7 +9,10 @@ import Foundation
 
 extension Adapty {
     func syncIPv4IfNeed() {
-        guard Environment.Device.ipV4Address == nil else { return }
+        guard
+            !Adapty.Configuration.ipAddressCollectionDisabled,
+            Environment.Device.ipV4Address == nil
+        else { return }
         fetchIPv4(afterMilliseconds: 0) { [weak self] ipV4Address in
             self?.send(ipV4Address: ipV4Address) { _ in }
         }

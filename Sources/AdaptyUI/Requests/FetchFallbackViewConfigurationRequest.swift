@@ -24,17 +24,14 @@ extension HTTPSession {
     func performFetchFallbackViewConfigurationRequest(
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,
-        locale: AdaptyLocale?,
+        locale: AdaptyLocale,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
     ) {
-        let locale = locale ?? AdaptyLocale.defaultPaywallLocale
-
         let request = FetchFallbackViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
             locale: locale
         )
-
         perform(
             request,
             logName: "get_fallback_paywall_builder",
@@ -45,7 +42,6 @@ extension HTTPSession {
                 "language_code": .valueOrNil(locale.languageCode),
             ]
         ) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in
-
             switch result {
             case let .failure(error):
 
@@ -61,11 +57,10 @@ extension HTTPSession {
                         completion(.failure(error.asAdaptyError))
                         return
                     }
-
                     session.performFetchFallbackViewConfigurationRequest(
                         apiKeyPrefix: apiKeyPrefix,
                         paywallInstanceIdentity: paywallInstanceIdentity,
-                        locale: nil,
+                        locale: .defaultPaywallLocale,
                         completion
                     )
                 }
