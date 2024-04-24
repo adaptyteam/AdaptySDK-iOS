@@ -9,11 +9,8 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    public func extractLocale(_ locale: String) -> AdaptyUI.LocalizedViewConfiguration {
-        Localizer(
-            source: self,
-            withLocale: AdaptyLocale(id: locale)
-        ).localize()
+    func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
+        Localizer(source: self, withLocale: locale).localize()
     }
 
     func getLocalization(_ locale: AdaptyLocale) -> Localization? {
