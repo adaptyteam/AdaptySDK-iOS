@@ -26,9 +26,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // in case you have / want to use fallback paywalls
-        if let urlPath = Bundle.main.url(forResource: "fallback_paywalls", withExtension: "json"),
-           let paywallsData = try? Data(contentsOf: urlPath) {
-            Adapty.setFallbackPaywalls(paywallsData) { _ in
+        if let urlPath = Bundle.main.url(forResource: "fallback_paywalls", withExtension: "json") {
+            Adapty.setFallbackPaywalls(fileURL: urlPath) { _ in
                 // handle error
             }
         }

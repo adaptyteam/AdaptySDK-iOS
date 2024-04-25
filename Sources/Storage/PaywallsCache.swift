@@ -58,14 +58,18 @@ final class PaywallsCache {
         }
     }
 
-    func getNewerPaywall(than paywall: AdaptyPaywall) -> AdaptyPaywall? {
+    private func getNewerPaywall(than paywall: AdaptyPaywall) -> AdaptyPaywall? {
         guard let cached: AdaptyPaywall = paywallByPlacementId[paywall.placementId]?.value,
               cached.equalLanguageCode(paywall) else { return nil }
         return paywall.version >= cached.version ? nil : cached
     }
 
-    func savePaywall(_ paywall: AdaptyPaywall) {
+    func savedPaywallChosen(_ chosen: AdaptyPaywallChosen) -> AdaptyPaywallChosen {
+        let paywall = chosen.value
+        if let newer = getNewerPaywall(than: paywall) { return AdaptyPaywallChosen(value: newer, kind: .restore) }
+
         paywallByPlacementId[paywall.placementId] = VH(paywall, time: Date())
         storage.setPaywalls(Array(paywallByPlacementId.values))
+        return chosen
     }
 }

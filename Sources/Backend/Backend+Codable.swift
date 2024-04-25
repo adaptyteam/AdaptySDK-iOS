@@ -87,26 +87,28 @@ extension Encoder {
 }
 
 extension Backend.Response {
-    struct ValueOfData<T: Decodable>: Decodable {
-        let value: T
+    struct ValueOfData<Value: Decodable>: Decodable {
+        let value: Value
 
-        init(_ value: T) {
+        init(_ value: Value) {
             self.value = value
         }
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            value = try container.decode(T.self, forKey: .data)
+            value = try container.decode(Value.self, forKey: .data)
         }
     }
 
-    struct ValueOfDataWithMeta<T: Decodable, Meta: Decodable>: Decodable {
-        let value: T
+    struct ValueOfMeta<Meta: Decodable>: Decodable {
         let meta: Meta
+
+        init(_ meta: Meta) {
+            self.meta = meta
+        }
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            value = try container.decode(T.self, forKey: .data)
             meta = try container.decode(Meta.self, forKey: .meta)
         }
     }

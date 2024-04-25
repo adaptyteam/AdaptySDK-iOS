@@ -10,16 +10,11 @@ import Foundation
 
 struct AdaptyPaywallChosen {
     var value: AdaptyPaywall
-    let placementAudienceVersionId: String
-    let profileId: String
-    let count: Int
+    let kind: Kind
 
-    var parameters: AdaptyPaywallVariationChoseParameters {
-        .init(
-            paywallVariationId: value.variationId,
-            viewConfigurationId: value.viewConfiguration?.id,
-            placementAudienceVersionId: placementAudienceVersionId
-        )
+    enum Kind {
+        case restore
+        case draw(placementAudienceVersionId: String, profileId: String)
     }
 }
 
@@ -44,9 +39,10 @@ extension AdaptyPaywallChosen: Decodable {
 
         self.init(
             value: paywall,
-            placementAudienceVersionId: firstItem.placementAudienceVersionId,
-            profileId: profileId,
-            count: items.count
+            kind: .draw(
+                placementAudienceVersionId: firstItem.placementAudienceVersionId,
+                profileId: profileId
+            )
         )
 
         func paywall(from decoder: any Decoder, index: Int) throws -> AdaptyPaywall {
