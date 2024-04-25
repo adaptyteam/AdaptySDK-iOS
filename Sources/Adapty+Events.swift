@@ -40,8 +40,18 @@ extension Adapty {
         trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
     }
 
-    static func logEvent(_ chosen: AdaptyPaywallChosen, _ completion: AdaptyErrorCompletion? = nil) {
-        trackEvent(.paywallVariationChose(chosen.parameters), profileId: chosen.profileId, completion)
+    static func logIfNeed(_ chosen: AdaptyPaywallChosen, _ completion: AdaptyErrorCompletion? = nil) {
+        switch chosen.kind {
+        case let .draw(placementAudienceVersionId, profileId):
+            let parameters = AdaptyPaywallVariationChoseParameters(
+                paywallVariationId: chosen.value.variationId,
+                viewConfigurationId: chosen.value.viewConfiguration?.id,
+                placementAudienceVersionId: placementAudienceVersionId
+            )
+            trackEvent(.paywallVariationChose(parameters), profileId: profileId, completion)
+        default:
+            completion?(nil)
+        }
     }
 
     /// Call this method to keep track of the user's steps while onboarding

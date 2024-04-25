@@ -48,7 +48,7 @@ extension PaywallsCache {
         else {
             return nil
         }
-        Adapty.logEvent(chosen)
+        Adapty.logIfNeed(chosen)
         Log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
         return chosen.value
     }

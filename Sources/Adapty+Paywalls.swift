@@ -114,7 +114,7 @@ extension Adapty {
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            version: nil
+            cached: nil
         ) { (result: AdaptyResult<AdaptyPaywallChosen>) in
             completion(
                 result
@@ -126,7 +126,7 @@ extension Adapty {
                         }
                     }
                     .map {
-                        Adapty.logEvent($0)
+                        Adapty.logIfNeed($0)
                         return $0.value
                     }
             )
@@ -156,32 +156,28 @@ private extension AdaptyProfileManager {
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
         let segmentId = profile.value.segmentId
-        let old = paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value
+        let cached = paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value
         manager.httpSession.performFetchPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
             locale: locale,
             segmentId: segmentId,
-            version: old?.version
+            cached: cached
         ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
 
             guard let strongSelf = self, strongSelf.isActive else {
                 completion(result.map {
-                    Adapty.logEvent($0)
+                    Adapty.logIfNeed($0)
                     return $0.value
                 })
                 return
             }
 
             let result = result.map {
-                if let newer = strongSelf.paywallsCache.getNewerPaywall(than: $0.value) {
-                    return newer
-                } else {
-                    strongSelf.paywallsCache.savePaywall($0.value)
-                    Adapty.logEvent($0)
-                    return $0.value
-                }
+                let paywall = strongSelf.paywallsCache.savedPaywallChosen($0)
+                Adapty.logIfNeed(paywall)
+                return paywall.value
             }
 
             guard case let .failure(error) = result,
@@ -231,13 +227,13 @@ private extension AdaptyProfileManager {
         _ locale: AdaptyLocale,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        let old = paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value
+        let cached = paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value
         manager.httpFallbackSession.performFetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: manager.apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            version: old?.version
+            cached: cached
         ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
 
             switch result {
@@ -252,16 +248,12 @@ private extension AdaptyProfileManager {
 
                 completion(.success(value))
 
-            case let .success(paywall):
+            case var .success(paywall):
 
                 if let self, self.isActive {
-                    if let newer = self.paywallsCache.getNewerPaywall(than: paywall.value) {
-                        completion(.success(newer))
-                        return
-                    }
-                    self.paywallsCache.savePaywall(paywall.value)
+                    paywall = self.paywallsCache.savedPaywallChosen(paywall)
                 }
-                Adapty.logEvent(paywall)
+                Adapty.logIfNeed(paywall)
                 completion(.success(paywall.value))
             }
         }

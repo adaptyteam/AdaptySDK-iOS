@@ -9,23 +9,20 @@
 import Foundation
 
 private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfDataWithMeta<AdaptyPaywallChosen, AdaptyPaywallChosen.Meta>
+    typealias ResponseBody = AdaptyPaywallChosen
 
     let endpoint: HTTPEndpoint
     let headers: Headers
     let profileId: String
-    let version: Int64?
+    let cached: AdaptyPaywall?
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        { response in
-            jsonDecoder.setProfileId(profileId)
-            return jsonDecoder.decode(ResponseBody.self, response)
-        }
+    func getDecoder(_ jsonDecoder: JSONDecoder) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
+        createDecoder(jsonDecoder, profileId, cached)
     }
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, version: Int64?) {
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, cached: AdaptyPaywall?) {
         self.profileId = profileId
-        self.version = version
+        self.cached = cached
 
         endpoint = HTTPEndpoint(
             method: .get,
@@ -40,6 +37,52 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
+extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyPaywallChosen {
+    func createDecoder(
+        _ jsonDecoder: JSONDecoder,
+        _ profileId: String,
+        _ cached: AdaptyPaywall?
+    ) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
+        { response in
+            decodeResponse(response, jsonDecoder, profileId, cached)
+        }
+    }
+
+    func decodeResponse(
+        _ response: HTTPDataResponse,
+        _ jsonDecoder: JSONDecoder,
+        _ profileId: String,
+        _ cached: AdaptyPaywall?
+    ) -> HTTPResponse<ResponseBody>.Result {
+        jsonDecoder.setProfileId(profileId)
+
+        typealias ResponseMeta = Backend.Response.ValueOfMeta<AdaptyPaywallChosen.Meta>
+        typealias ResponseData = Backend.Response.ValueOfData<AdaptyPaywallChosen>
+
+        let version: Int64
+
+        switch jsonDecoder.decode(ResponseMeta.self, response) {
+        case let .failure(error):
+            return .failure(error)
+        case let .success(value):
+            version = value.body.meta.version
+        }
+
+        if let cached, cached.version > version {
+            return .success(response.replaceBody(AdaptyPaywallChosen(
+                value: cached,
+                kind: .restore
+            )))
+        }
+
+        return jsonDecoder.decode(ResponseData.self, response).map {
+            var chosen = $0.body.value
+            chosen.value.version = version
+            return response.replaceBody(chosen)
+        }
+    }
+}
+
 extension HTTPSession {
     func performFetchPaywallVariationsRequest(
         apiKeyPrefix: String,
@@ -47,7 +90,7 @@ extension HTTPSession {
         placementId: String,
         locale: AdaptyLocale,
         segmentId: String,
-        version: Int64?,
+        cached: AdaptyPaywall?,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
         let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
@@ -59,7 +102,7 @@ extension HTTPSession {
             locale: locale,
             md5Hash: md5Hash,
             segmentId: segmentId,
-            version: version
+            cached: cached
         )
 
         perform(
@@ -74,14 +117,7 @@ extension HTTPSession {
                 "md5": .value(md5Hash),
             ]
         ) { (result: FetchPaywallVariationsRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error.asAdaptyError))
-            case let .success(response):
-                var chosen = response.body.value
-                chosen.value.version = response.body.meta.version
-                completion(.success(chosen))
-            }
+            completion(result.map { $0.body }.mapError { $0.asAdaptyError })
         }
     }
 }
