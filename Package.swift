@@ -24,13 +24,13 @@ let package = Package(
             name: "Adapty",
             dependencies: [],
             path: "Sources",
-            resources: [.process("PrivacyInfo.xcprivacy")]
+            resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
             name: "AdaptyUI",
             dependencies: ["Adapty"],
             path: "AdaptyUI",
-            resources: [.process("PrivacyInfo.xcprivacy")]
+            resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .testTarget(
             name: "AdaptyTests",
