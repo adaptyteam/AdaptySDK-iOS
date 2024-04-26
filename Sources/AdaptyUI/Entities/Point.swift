@@ -8,16 +8,16 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Point {
-        public let x: Double
-        public let y: Double
+    package struct Point {
+        package let x: Double
+        package let y: Double
     }
 }
 
 extension AdaptyUI.Point {
-    public static let zero = AdaptyUI.Point(x: 0.0, y: 0.0)
+    package static let zero = AdaptyUI.Point(x: 0.0, y: 0.0)
 
-    public var isZero: Bool {
+    package var isZero: Bool {
         x == 0.0 && y == 0.0
     }
 }
@@ -28,7 +28,7 @@ extension AdaptyUI.Point: Decodable {
         case y
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Double.self) {
             self.init(x: 0.0, y: value)

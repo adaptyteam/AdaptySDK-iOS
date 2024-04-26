@@ -8,5 +8,5 @@
 import Foundation
 
 extension AdaptyUI {
-    public typealias Offset = Point
+    package typealias Offset = Point
 }

@@ -10,13 +10,13 @@ import UIKit
 
 @available(iOS 13.0, *)
 extension AdaptyUI {
-    // This enum describes user initiated actions.
+    /// This enum describes user initiated actions.
     public enum Action {
-        // User pressed Close Button
+        /// User pressed Close Button
         case close
-        // User pressed any button with URL
+        /// User pressed any button with URL
         case openURL(url: URL)
-        // User pressed any button with custom action (e.g. login)
+        /// User pressed any button with custom action (e.g. login)
         case custom(id: String)
     }
 }
@@ -29,24 +29,30 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     /// - Parameters:
     ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///     - action: an ``AdaptyUI.Action`` value.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didPerform action: AdaptyUI.Action)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didPerform action: AdaptyUI.Action
+    )
 
     /// If product was selected for purchase (by user or by system), this method will be invoked.
     ///
     /// - Parameters:
     ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///     - product: an ``AdaptyPaywallProduct`` which was selected.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didSelectProduct product: AdaptyPaywallProduct)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didSelectProduct product: AdaptyPaywallProduct
+    )
 
     /// If user initiates the purchase process, this method will be invoked.
     ///
     /// - Parameters:
     ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didStartPurchase product: AdaptyPaywallProduct)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didStartPurchase product: AdaptyPaywallProduct
+    )
 
     /// This method is invoked when a successful purchase is made.
     ///
@@ -58,25 +64,31 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
     ///   - purchasedInfo: an ``AdaptyPurchasedInfo`` object containing up to date information about successful purchase.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFinishPurchase product: AdaptyPaywallProduct,
-                           purchasedInfo: AdaptyPurchasedInfo)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFinishPurchase product: AdaptyPaywallProduct,
+        purchasedInfo: AdaptyPurchasedInfo
+    )
 
     /// This method is invoked when the purchase process fails.
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
     ///   - error: an ``AdaptyError`` object representing the error.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFailPurchase product: AdaptyPaywallProduct,
-                           error: AdaptyError)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailPurchase product: AdaptyPaywallProduct,
+        error: AdaptyError
+    )
 
     /// This method is invoked when user cancel the purchase manually.
     /// - Parameters
     ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didCancelPurchase product: AdaptyPaywallProduct)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didCancelPurchase product: AdaptyPaywallProduct
+    )
 
     /// If user initiates the restore process, this method will be invoked.
     ///
@@ -94,36 +106,42 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - profile: an ``AdaptyProfile`` object containing up to date information about the user.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFinishRestoreWith profile: AdaptyProfile)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFinishRestoreWith profile: AdaptyProfile
+    )
 
     /// This method is invoked when the restore process fails.
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - error: an ``AdaptyError`` object representing the error.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFailRestoreWith error: AdaptyError)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailRestoreWith error: AdaptyError
+    )
 
     /// This method will be invoked in case of errors during the screen rendering process.
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - error: an ``AdaptyError`` object representing the error.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFailRenderingWith error: AdaptyError)
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailRenderingWith error: AdaptyError
+    )
 
     /// This method is invoked in case of errors during the products loading process.
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - error: an ``AdaptyError`` object representing the error.
     /// - Returns: Return `true`, if you want to retry products fetching.
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFailLoadingProductsWith error: AdaptyError) -> Bool
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailLoadingProductsWith error: AdaptyError
+    ) -> Bool
 }
 
 @available(iOS 13.0, *)
 extension AdaptyUI {
-    public static let SDKVersion = "3.0.0"
-
     /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
     ///
     /// - Parameters:
@@ -137,18 +155,11 @@ extension AdaptyUI {
     ) {
         ImageUrlPrefetcher.shared.initialize()
 
-        AdaptyUI.getViewConfiguration([
-            "paywall": paywall,
-            "ui_sdk_version": AdaptyUI.SDKVersion,
-            "load_timeout": loadTimeout,
-        ]) { result in
-            switch result {
-            case let .success(viewConfiguration):
-                completion(.success(viewConfiguration))
-            case let .failure(error):
-                completion(.failure(error))
-            }
-        }
+        Adapty.getViewConfiguration(
+            paywall: paywall,
+            loadTimeout: loadTimeout,
+            completion
+        )
     }
 
     /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
@@ -178,6 +189,7 @@ extension AdaptyUI {
 }
 
 // MARK: - PB3
+
 @available(iOS 13.0, *)
 extension AdaptyUI {
     public static func paywallController3(

@@ -8,9 +8,9 @@
 import Foundation
 
 extension AdaptyUI.Color {
-    public var asHexString: String { String(format: "#%08x", data) }
+    package var asHexString: String { String(format: "#%08x", data) }
 
-    public init(hex: String) throws {
+    package init(hex: String) throws {
         guard hex.hasPrefix("#") else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Wrong format of hex color string, don`t found prefix '#'"))
         }
@@ -34,7 +34,7 @@ extension AdaptyUI.Color {
 }
 
 extension AdaptyUI.Color: Decodable {
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let hex = try container.decode(String.self)
         try self.init(hex: hex)

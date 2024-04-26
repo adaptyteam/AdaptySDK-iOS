@@ -8,25 +8,25 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct CornerRadius {
-        public let topLeft: Double
-        public let topRight: Double
-        public let bottomRight: Double
-        public let bottomLeft: Double
+    package struct CornerRadius {
+        package let topLeft: Double
+        package let topRight: Double
+        package let bottomRight: Double
+        package let bottomLeft: Double
     }
 }
 
 extension AdaptyUI.CornerRadius {
-    public static let zero = AdaptyUI.CornerRadius(same: 0.0)
-    public init(same value: Double) {
+    package static let zero = AdaptyUI.CornerRadius(same: 0.0)
+    package init(same value: Double) {
         self.init(topLeft: value, topRight: value, bottomRight: value, bottomLeft: value)
     }
 
-    public var isZeroRadius: Bool {
+    package var isZeroRadius: Bool {
         topLeft == 0.0 && topRight == 0.0 && bottomRight == 0.0 && bottomLeft == 0.0
     }
 
-    public var isSameRadius: Bool {
+    package var isSameRadius: Bool {
         (topLeft == topRight) && (bottomLeft == bottomRight) && (topLeft == bottomLeft)
     }
 }
@@ -39,7 +39,7 @@ extension AdaptyUI.CornerRadius: Decodable {
         case bottomLeft = "bl"
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Double.self) {
             self.init(same: value)

@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum ShapeType {
+    package enum ShapeType {
         case rectangle(cornerRadius: CornerRadius)
         case circle
         case curveUp
@@ -24,7 +24,7 @@ extension AdaptyUI.ShapeType: Decodable {
         case curveDown = "curve_down"
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         switch try Types(rawValue: container.decode(String.self)) {
         case .none:

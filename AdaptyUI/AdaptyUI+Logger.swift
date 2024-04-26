@@ -25,7 +25,7 @@ extension AdaptyUI {
                                 function: String = #function,
                                 line: UInt = #line) {
         Adapty.writeLog(level: level,
-                        message: "[UI \(AdaptyUI.SDKVersion)] \(message)",
+                        message: "[UI \(Adapty.SDKVersion)] \(message)",
                         file: file,
                         function: function,
                         line: line)

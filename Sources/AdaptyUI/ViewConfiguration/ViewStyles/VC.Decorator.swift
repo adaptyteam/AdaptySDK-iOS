@@ -45,7 +45,7 @@ extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
             if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .shapeType) {
                 value
             } else {
-                AdaptyUI.Decorator.defaultType
+                AdaptyUI.Decorator.defaultShapeType
             }
 
         if case .rectangle = shape,

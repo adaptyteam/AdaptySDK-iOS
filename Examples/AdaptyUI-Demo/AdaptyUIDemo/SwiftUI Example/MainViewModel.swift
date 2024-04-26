@@ -32,6 +32,7 @@ class MainViewModel: ObservableObject {
 
         do {
             let viewConfig = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
+//            let viewConfig = try await Adapty.getViewConfiguration(forPaywall: paywall)
             self.viewConfig = viewConfig
         } catch {
             onError?(error)

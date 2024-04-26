@@ -8,21 +8,21 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct ColorGradient {
-        public let kind: Kind
-        public let start: Point
-        public let end: Point
-        public let items: [Item]
+    package struct ColorGradient {
+        package let kind: Kind
+        package let start: Point
+        package let end: Point
+        package let items: [Item]
     }
 }
 
 extension AdaptyUI.ColorGradient {
-    public struct Item {
-        public let color: AdaptyUI.Color
-        public let p: Double
+    package struct Item {
+        package let color: AdaptyUI.Color
+        package let p: Double
     }
 
-    public enum Kind {
+    package enum Kind {
         case linear
         case conic
         case radial
@@ -51,7 +51,7 @@ extension AdaptyUI.ColorGradient: Decodable {
         }
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decode([Item].self, forKey: .items)
         let points = try container.decode(Points.self, forKey: .points)
@@ -75,7 +75,7 @@ extension AdaptyUI.ColorGradient.Item: Decodable {
         case p
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         color = try container.decode(AdaptyUI.Color.self, forKey: .color)
         p = try container.decode(Double.self, forKey: .p)

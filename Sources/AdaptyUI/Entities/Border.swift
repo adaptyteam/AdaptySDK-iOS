@@ -8,9 +8,9 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Border {
+    package struct Border {
         static let defaultThickness = 1.0
-        public let filling: AdaptyUI.Filling
-        public let thickness: Double
+        package let filling: AdaptyUI.Filling
+        package let thickness: Double
     }
 }

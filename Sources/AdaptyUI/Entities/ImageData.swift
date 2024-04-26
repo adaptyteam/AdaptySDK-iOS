@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum ImageData {
+    package enum ImageData {
         case none
         case raster(Data)
         case url(URL, previewRaster: Data?)
@@ -22,7 +22,7 @@ extension AdaptyUI.ImageData: Decodable {
         case previewData = "preview_value"
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         if let data = try container.decodeIfPresent(Data.self, forKey: .data) {

@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Stack {
+    package struct Stack {
         static let `default` = Stack(
             type: .vertical,
             horizontalAlignment: .center,
@@ -16,13 +16,13 @@ extension AdaptyUI {
             elements: []
         )
 
-        public let type: StackType
-        public let horizontalAlignment: HorizontalAlignment
-        public let verticalAlignment: VerticalAlignment
-        public let elements: [Element]
+        package let type: StackType
+        package let horizontalAlignment: HorizontalAlignment
+        package let verticalAlignment: VerticalAlignment
+        package let elements: [Element]
     }
 
-    public enum StackType: String {
+    package enum StackType: String {
         case vertical = "v_stack"
         case horizontal = "h_stack"
         case z = "z_stack"

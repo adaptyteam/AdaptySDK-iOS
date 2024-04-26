@@ -35,7 +35,7 @@ class UIKitViewController: UIViewController {
     }
 
     private var paywall: AdaptyPaywall?
-    private var viewConfiguration: AdaptyUI.ViewConfiguration?
+    private var viewConfiguration: AdaptyUI.LocalizedViewConfiguration?
 
     private func setInProgress(_ inProgress: Bool) {
         spinner.isHidden = !inProgress

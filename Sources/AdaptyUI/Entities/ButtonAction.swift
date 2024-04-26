@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum ButtonAction {
+    package enum ButtonAction {
         case openUrl(String?)
         case restore
         case custom(String?)
@@ -37,7 +37,7 @@ extension AdaptyUI.ButtonAction: Decodable {
         case purchaseSelectedProduct = "purchase_selected_product"
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         switch try Types(rawValue: container.decode(String.self, forKey: .type)) {
         case .none:

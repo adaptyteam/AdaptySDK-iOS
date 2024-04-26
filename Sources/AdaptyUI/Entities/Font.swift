@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Font {
+    package struct Font {
         static let `default` = Font(
             alias: "adapty_system",
             familyName: "adapty_system",
@@ -18,10 +18,10 @@ extension AdaptyUI {
             defaultFilling: .color(AdaptyUI.Color.black)
         )
 
-        public let alias: String
-        public let familyName: String
-        public let weight: Int
-        public let italic: Bool
+        package let alias: String
+        package let familyName: String
+        package let weight: Int
+        package let italic: Bool
         let defaultSize: Double
         let defaultFilling: AdaptyUI.Filling
     }
@@ -37,7 +37,7 @@ extension AdaptyUI.Font: Decodable {
         case defaultColor = "color"
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         if let v = (try? container.decode([String].self, forKey: .alias))?.first {
             alias = v

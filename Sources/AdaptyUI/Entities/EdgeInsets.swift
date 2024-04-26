@@ -8,25 +8,25 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct EdgeInsets {
-        public let left: Double
-        public let top: Double
-        public let right: Double
-        public let bottom: Double
+    package struct EdgeInsets {
+        package let left: Double
+        package let top: Double
+        package let right: Double
+        package let bottom: Double
     }
 }
 
 extension AdaptyUI.EdgeInsets {
-    public static let zero = AdaptyUI.EdgeInsets(same: 0.0)
-    public init(same value: Double) {
+    package static let zero = AdaptyUI.EdgeInsets(same: 0.0)
+    package init(same value: Double) {
         self.init(left: value, top: value, right: value, bottom: value)
     }
 
-    public var isZero: Bool {
+    package var isZero: Bool {
         left == 0.0 && top == 0.0 && right == 0.0 && bottom == 0.0
     }
 
-    public var isSame: Bool {
+    package var isSame: Bool {
         (left == top) && (right == bottom) && (left == right)
     }
 }
@@ -39,7 +39,7 @@ extension AdaptyUI.EdgeInsets: Decodable {
         case bottom
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Double.self) {
             self.init(same: value)

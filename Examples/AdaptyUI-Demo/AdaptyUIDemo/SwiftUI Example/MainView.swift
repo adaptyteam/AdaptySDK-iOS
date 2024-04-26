@@ -47,7 +47,8 @@ struct MainView: View {
                     HStack {
                         Text("Template")
                         Spacer()
-                        Text(viewConfig.templateId)
+                        Text("null")
+//                        Text(viewConfig.templateId)
                     }
 
                     Button("Present") {

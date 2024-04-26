@@ -8,14 +8,14 @@
 
 import Foundation
 
-public protocol AdaptyUIImageUrlObserver {
+package protocol AdaptyUIImageUrlObserver {
     func extractedImageUrls(_: Set<URL>)
 }
 
 extension AdaptyUI {
     static var dispatchQueue: DispatchQueue?
     static var imageUrlObserver: AdaptyUIImageUrlObserver?
-    public static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver, dispatchQueue: DispatchQueue) {
+    package static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver, dispatchQueue: DispatchQueue) {
         imageUrlObserver = observer
         self.dispatchQueue = dispatchQueue
     }

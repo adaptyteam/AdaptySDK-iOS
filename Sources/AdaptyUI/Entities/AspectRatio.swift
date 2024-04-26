@@ -10,7 +10,7 @@ import Foundation
 import Foundation
 
 extension AdaptyUI {
-    public enum AspectRatio: String {
+    package enum AspectRatio: String {
         case fit
         case fill
         case stretch
