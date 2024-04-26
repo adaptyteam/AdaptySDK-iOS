@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum VerticalAlignment: String {
+    package enum VerticalAlignment: String {
         case top
         case center
         case bottom

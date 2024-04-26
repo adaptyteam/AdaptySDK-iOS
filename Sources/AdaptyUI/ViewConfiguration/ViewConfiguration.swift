@@ -8,10 +8,10 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct ViewConfiguration {
-        public let id: String
+    struct ViewConfiguration {
+        let id: String
         /// An identifier for the template, used for ViewConfiguration creation.
-        public let templateId: String
+        let templateId: String
         let version: Int64
         let assets: [String: Asset]
         let responseLocale: AdaptyLocale
@@ -24,7 +24,7 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.ViewConfiguration: CustomStringConvertible {
-    public var description: String {
+    var description: String {
         "(id: \(id), templateId: \(templateId), version: \(version), isHard: \(isHard))"
     }
 }
@@ -48,7 +48,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         case mainImageRelativeHeight = "main_image_relative_height"
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let superContainer = try decoder.container(keyedBy: ContainerCodingKeys.self)
         id = try superContainer.decode(String.self, forKey: .id)
         responseLocale = try superContainer.decode(AdaptyLocale.self, forKey: .responseLocale)

@@ -8,10 +8,10 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Button {
-        public let action: ButtonAction?
-        public let isSelected: Bool
-        public let normalState: AdaptyUI.Element?
-        public let selectedState: AdaptyUI.Element?
+    package struct Button {
+        package let action: ButtonAction?
+        package let isSelected: Bool
+        package let normalState: AdaptyUI.Element?
+        package let selectedState: AdaptyUI.Element?
     }
 }

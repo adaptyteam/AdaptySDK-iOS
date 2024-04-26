@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum Element {
+    package enum Element {
         case space(Int)
         indirect case stack(AdaptyUI.Stack, Properties?)
         case text(AdaptyUI.RichText, Properties?)
@@ -31,13 +31,13 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.Element {
-    public struct Properties {
-        public let decorator: AdaptyUI.Decorator?
-        public let frame: AdaptyUI.Frame?
-        public let padding: AdaptyUI.EdgeInsets
-        public let offset: AdaptyUI.Offset
+    package struct Properties {
+        package let decorator: AdaptyUI.Decorator?
+        package let frame: AdaptyUI.Frame?
+        package let padding: AdaptyUI.EdgeInsets
+        package let offset: AdaptyUI.Offset
 
-        public let visibility: Bool
-        public let transitionIn: [AdaptyUI.Transition]
+        package let visibility: Bool
+        package let transitionIn: [AdaptyUI.Transition]
     }
 }

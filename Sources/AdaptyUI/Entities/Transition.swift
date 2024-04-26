@@ -8,11 +8,11 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum Transition {
+    package enum Transition {
         case fade(TransitionFade)
         case unknown(String)
 
-        public enum Interpolator {
+        package enum Interpolator {
             static let `default`: AdaptyUI.Transition.Interpolator = .easeInOut
 
             case easeInOut
@@ -22,14 +22,14 @@ extension AdaptyUI {
         }
     }
 
-    public struct TransitionFade {
+    package struct TransitionFade {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultDuration: TimeInterval = 0.3
         static let defaultInterpolator = AdaptyUI.Transition.Interpolator.default
 
-        public let startDelay: TimeInterval
-        public let duration: TimeInterval
-        public let interpolator: AdaptyUI.Transition.Interpolator
+        package let startDelay: TimeInterval
+        package let duration: TimeInterval
+        package let interpolator: AdaptyUI.Transition.Interpolator
     }
 }
 
@@ -49,7 +49,7 @@ extension AdaptyUI.Transition: Decodable {
         case fade
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeName = try container.decode(String.self, forKey: .type)
         switch Types(rawValue: typeName) {
@@ -69,7 +69,7 @@ extension AdaptyUI.Transition.Interpolator: Decodable {
         case linear
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         switch try Values(rawValue: container.decode(String.self)) {
         case .none:
@@ -93,7 +93,7 @@ extension AdaptyUI.TransitionFade: Decodable {
         case interpolator
     }
 
-    public init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         startDelay = try (container.decodeIfPresent(Double.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultStartDelay

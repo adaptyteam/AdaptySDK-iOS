@@ -10,18 +10,20 @@ import Foundation
 extension AdaptyUI {
     public struct LocalizedViewConfiguration {
         public let id: String
-        public let templateId: String
         public let locale: String
-        public let screens: [String: Screen]
-        public let isHard: Bool
-        public let mainImageRelativeHeight: Double?
+        package let templateId: String
+        package let screens: [String: Screen]
+        package let isHard: Bool
+        package let mainImageRelativeHeight: Double?
 
         let version: Int64
+        
+        
     }
 }
 
 extension AdaptyUI.LocalizedViewConfiguration: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), templateId: \(templateId), locale: \(locale), version: \(version), isHard: \(isHard))"
+        "(id: \(id), templateId: \(templateId), locale: \(locale), version: \(version))"
     }
 }

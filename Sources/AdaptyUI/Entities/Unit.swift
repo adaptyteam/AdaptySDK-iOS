@@ -8,14 +8,14 @@
 import Foundation
 
 extension AdaptyUI {
-    public enum Unit {
+    package enum Unit {
         case point(Double)
         case screen(Double)
     }
 }
 
 extension AdaptyUI.Unit {
-    public func points(scrrenInPoints: Double) -> Double {
+    package func points(scrrenInPoints: Double) -> Double {
         switch self {
         case let .point(value): value
         case let .screen(value): value * scrrenInPoints
@@ -31,7 +31,7 @@ extension AdaptyUI.Unit: Decodable {
         case screen
     }
 
-    public init(from decoder: any Decoder) throws {
+    package init(from decoder: any Decoder) throws {
         if let points = try? decoder.singleValueContainer().decode(Double.self) {
             self = .point(points)
         } else {

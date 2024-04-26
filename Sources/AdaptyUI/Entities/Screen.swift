@@ -8,16 +8,16 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Screen {
+    package struct Screen {
         static let `default` = Screen(
             background: .color(AdaptyUI.Color.black),
             mainImage: nil,
             mainBlock: nil,
             footerBlock: nil
         )
-        public let background: AdaptyUI.Filling
-        public let mainImage: Image?
-        public let mainBlock: Element?
-        public let footerBlock: Element?
+        package let background: AdaptyUI.Filling
+        package let mainImage: Image?
+        package let mainBlock: Element?
+        package let footerBlock: Element?
     }
 }

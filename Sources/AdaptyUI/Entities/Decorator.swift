@@ -8,10 +8,10 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Decorator {
-        static let defaultType: ShapeType = .rectangle(cornerRadius: CornerRadius.zero)
-        public let shapeType: ShapeType
-        public let background: Filling?
-        public let border: Border?
+    package struct Decorator {
+        static let defaultShapeType: ShapeType = .rectangle(cornerRadius: CornerRadius.zero)
+        package let shapeType: ShapeType
+        package let background: Filling?
+        package let border: Border?
     }
 }

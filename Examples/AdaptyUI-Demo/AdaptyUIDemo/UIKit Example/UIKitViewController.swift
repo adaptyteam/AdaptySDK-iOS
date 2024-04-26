@@ -112,7 +112,7 @@ class UIKitViewController: UIViewController {
 
         setInProgress(true)
 
-        AdaptyUI.getViewConfiguration3(forPaywall: paywall, locale: "en") { [weak self] result in
+        AdaptyUI.getViewConfiguration(forPaywall: paywall) { [weak self] result in
             self?.setInProgress(false)
 
             switch result {

@@ -8,18 +8,18 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct Frame {
-        public let height: Unit?
-        public let width: Unit?
-        public let minHeight: Unit?
-        public let maxHeight: Unit?
-        public let minWidth: Unit?
-        public let maxWidth: Unit?
+    package struct Frame {
+        package let height: Unit?
+        package let width: Unit?
+        package let minHeight: Unit?
+        package let maxHeight: Unit?
+        package let minWidth: Unit?
+        package let maxWidth: Unit?
     }
 }
 
 extension AdaptyUI.Frame {
-    public var isEmpty: Bool {
+    package var isEmpty: Bool {
         height == nil
             && width == nil
             && minHeight == nil

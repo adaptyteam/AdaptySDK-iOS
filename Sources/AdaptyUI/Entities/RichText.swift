@@ -8,44 +8,44 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct RichText {
-        public let items: [RichText.Item]
-        public let fallback: [RichText.Item]?
-        public let maxRows: Int?
-        public let overflowMode: Set<OverflowMode>
+    package struct RichText {
+        package let items: [RichText.Item]
+        package let fallback: [RichText.Item]?
+        package let maxRows: Int?
+        package let overflowMode: Set<OverflowMode>
 
-        public var isEmpty: Bool { items.isEmpty }
+        package var isEmpty: Bool { items.isEmpty }
 
-        public enum Item {
+        package enum Item {
             case text(String, TextAttributes)
             case tag(String, TextAttributes)
             case paragraph(ParagraphAttributes)
             case image(AdaptyUI.ImageData, TextAttributes)
         }
 
-        public enum Bullet {
+        package enum Bullet {
             case text(String, TextAttributes?)
             case image(AdaptyUI.ImageData, TextAttributes?)
         }
 
-        public struct TextAttributes {
-            public let font: AdaptyUI.Font
-            public let size: Double
-            public let color: AdaptyUI.Filling
-            public let background: AdaptyUI.Filling?
-            public let strike: Bool
-            public let underline: Bool
+        package struct TextAttributes {
+            package let font: AdaptyUI.Font
+            package let size: Double
+            package let color: AdaptyUI.Filling
+            package let background: AdaptyUI.Filling?
+            package let strike: Bool
+            package let underline: Bool
         }
 
-        public struct ParagraphAttributes {
-            public let horizontalAlign: AdaptyUI.HorizontalAlignment
-            public let firstIndent: Double
-            public let indent: Double
-            public let bulletSpace: Double?
-            public let bullet: Bullet?
+        package struct ParagraphAttributes {
+            package let horizontalAlign: AdaptyUI.HorizontalAlignment
+            package let firstIndent: Double
+            package let indent: Double
+            package let bulletSpace: Double?
+            package let bullet: Bullet?
         }
 
-        public enum OverflowMode: String {
+        package enum OverflowMode: String {
             static let empty = Set<OverflowMode>()
             case truncate
             case scale

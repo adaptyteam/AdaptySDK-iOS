@@ -25,8 +25,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     func localize() -> AdaptyUI.LocalizedViewConfiguration {
         .init(
             id: source.id,
-            templateId: source.templateId,
             locale: locale.id,
+            templateId: source.templateId,
             screens: source.screens.mapValues(screen),
             isHard: source.isHard,
             mainImageRelativeHeight: source.mainImageRelativeHeight,

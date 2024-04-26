@@ -15,9 +15,9 @@ import Foundation
         ///
         /// - Parameter forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
         /// - Returns: The ``AdaptyUI.LocalizedViewConfiguration`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
-        public static func getViewConfiguration(forPaywall paywall: AdaptyPaywall, locale: String) async throws -> AdaptyUI.LocalizedViewConfiguration {
+        public static func getViewConfiguration(forPaywall paywall: AdaptyPaywall) async throws -> AdaptyUI.LocalizedViewConfiguration {
             return try await withCheckedThrowingContinuation { continuation in
-                AdaptyUI.getViewConfiguration(forPaywall: paywall, locale: locale) { result in
+                AdaptyUI.getViewConfiguration(forPaywall: paywall) { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)
