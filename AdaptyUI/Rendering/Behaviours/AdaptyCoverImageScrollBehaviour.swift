@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 struct AdaptyCoverImageScrollBehaviour: AdaptyScrollViewBehaviour {
     let coverView: UIView
 

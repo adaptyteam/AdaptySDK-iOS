@@ -8,6 +8,7 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
 extension AdaptyUI {
     enum DebugElement: String {
         case circle
@@ -34,6 +35,7 @@ extension AdaptyUI {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.DebugElement: View {
     var body: some View {
         switch self {
@@ -46,6 +48,7 @@ extension AdaptyUI.DebugElement: View {
     }
 }
 
+@available(iOS 13.0, *)
 struct AdaptyUIUnknownElementView: View {
     var value: String
 
@@ -64,6 +67,7 @@ struct AdaptyUIUnknownElementView: View {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.Element {
     var testCircle: Self {
         .unknown("circle", nil)
@@ -74,6 +78,7 @@ extension AdaptyUI.Element {
     }
 }
 
+@available(iOS 13.0, *)
 #Preview {
     AdaptyUIUnknownElementView(value: AdaptyUI.DebugElement.rectangle.rawValue)
 }

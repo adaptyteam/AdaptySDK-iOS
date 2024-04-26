@@ -8,6 +8,7 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
 struct AdaptyUIElementView: View {
     var element: AdaptyUI.Element
 

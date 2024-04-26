@@ -8,6 +8,7 @@
 import Adapty
 import Foundation
 
+@available(iOS 13.0, *)
 extension AdaptyUI {
     static func generateLogId() -> String {
         var result = ""

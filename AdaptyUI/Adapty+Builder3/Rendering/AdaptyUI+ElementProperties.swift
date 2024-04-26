@@ -8,14 +8,17 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
 extension AdaptyUI.Point {
     var unitPoint: UnitPoint { UnitPoint(x: x, y: y) }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.ColorGradient.Item {
     var gradientStop: Gradient.Stop { Gradient.Stop(color: color.swiftuiColor, location: p) }
 }
 
+@available(iOS 13.0, *)
 struct AdaptyUIGradient: View {
     var gradient: AdaptyUI.ColorGradient
 
@@ -50,6 +53,7 @@ struct AdaptyUIGradient: View {
     }
 }
 
+@available(iOS 13.0, *)
 struct AdaptyUIDecoratorView: View {
     var decorator: AdaptyUI.Decorator
 
@@ -89,6 +93,7 @@ struct AdaptyUIDecoratorView: View {
     }
 }
 
+@available(iOS 13.0, *)
 struct AdaptyUIOverlayBorderView: View {
     var border: AdaptyUI.Border
     var shape: AdaptyUI.ShapeType
@@ -126,6 +131,7 @@ struct AdaptyUIOverlayBorderView: View {
     }
 }
 
+@available(iOS 13.0, *)
 extension Shape {
     @ViewBuilder
     func fillBackground(_ background: AdaptyUI.Filling?) -> some View {
@@ -156,6 +162,7 @@ extension Shape {
     }
 }
 
+@available(iOS 13.0, *)
 extension View {
     @ViewBuilder
     func overlayBorder(_ border: AdaptyUI.Border?, shape: AdaptyUI.ShapeType) -> some View {
@@ -169,6 +176,7 @@ extension View {
 
 // TODO: check decoration option
 // TODO: check inlinable
+@available(iOS 13.0, *)
 extension View {
     @ViewBuilder
     func applyingProperties(_ props: AdaptyUI.Element.Properties?) -> some View {
@@ -237,10 +245,12 @@ extension View {
 }
 
 // TODO: move out
+@available(iOS 13.0, *)
 extension AdaptyUI.Color {
     var swiftuiColor: Color { Color(red: red, green: green, blue: blue, opacity: alpha) }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.Unit {
     public func points(screenInPoints: CGFloat = 1024.0) -> CGFloat {
         switch self {
@@ -253,6 +263,7 @@ extension AdaptyUI.Unit {
 #if DEBUG
     @testable import Adapty
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.Decorator {
         static var test: Self {
             .init(shapeType: .rectangle(cornerRadius: .init(same: 10)),
@@ -262,6 +273,7 @@ extension AdaptyUI.Unit {
         }
     }
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.Element.Properties {
         static var test: Self {
             .init(
@@ -275,6 +287,7 @@ extension AdaptyUI.Unit {
         }
     }
 
+    @available(iOS 13.0, *)
     #Preview {
         AdaptyUIElementView(.text(.testBodyLong, .test))
 //    AdaptyUIRichTextView(.testBodyLong)

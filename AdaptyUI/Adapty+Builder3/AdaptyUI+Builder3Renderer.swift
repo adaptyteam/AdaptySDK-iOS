@@ -9,6 +9,7 @@ import Adapty
 import SwiftUI
 import UIKit
 
+@available(iOS 13.0, *)
 public class AdaptyBuilder3PaywallController: UIViewController {
     fileprivate let logId: String
 
@@ -89,6 +90,7 @@ public class AdaptyBuilder3PaywallController: UIViewController {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyBuilder3PaywallController {
     func log(_ level: AdaptyLogLevel, _ message: String) {
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")

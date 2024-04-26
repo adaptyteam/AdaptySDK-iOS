@@ -8,6 +8,7 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
 extension Text {
     func withAttributes(_ attributes: AdaptyUI.RichText.TextAttributes) -> Text {
         font(Font(attributes.font.uiFont(size: attributes.size)))
@@ -23,6 +24,7 @@ extension Text {
     }
 }
 
+@available(iOS 13.0, *)
 struct AdaptyUIRichTextView: View {
     var text: AdaptyUI.RichText
 
@@ -75,6 +77,7 @@ struct AdaptyUIRichTextView: View {
 #if DEBUG
     @testable import Adapty
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.Color {
         static let testClear = AdaptyUI.Color(data: 0xFFFFFF00)
         static let testRed = AdaptyUI.Color(data: 0xFF0000FF)
@@ -82,12 +85,14 @@ struct AdaptyUIRichTextView: View {
         static let testBlue = AdaptyUI.Color(data: 0x0000FFFF)
     }
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.RichText.ParagraphAttributes {
         static var test: Self {
             .init(horizontalAlign: .left, firstIndent: 0.0, indent: 0.0, bulletSpace: nil, bullet: nil)
         }
     }
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.RichText.TextAttributes {
         static var testTitle: Self {
             .init(font: .default, size: 24.0, color: .color(.testRed), background: nil, strike: false, underline: false)
@@ -98,15 +103,16 @@ struct AdaptyUIRichTextView: View {
         }
     }
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.RichText {
         static var testBodyShort: Self {
             .init(items: [.text("Hello world!", .testBody)], fallback: nil)
         }
-        
+
         static var testBodyShortAlignRight: Self {
             .init(items: [
                 .paragraph(.init(horizontalAlign: .right, firstIndent: 0, indent: 0, bulletSpace: nil, bullet: nil)),
-                .text("Hello world!", .testBody)
+                .text("Hello world!", .testBody),
             ], fallback: nil)
         }
 
@@ -119,6 +125,7 @@ struct AdaptyUIRichTextView: View {
         }
     }
 
+    @available(iOS 13.0, *)
     #Preview {
 //    HStack {
         AdaptyUIRichTextView(.testBodyLong)

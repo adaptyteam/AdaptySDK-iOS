@@ -8,6 +8,7 @@
 import Adapty
 import UIKit
 
+@available(iOS 13.0, *)
 class AdaptyShapeWithFillingView: UIView {
     private var gradientLayer: CAGradientLayer?
     private var imageView: UIImageView?

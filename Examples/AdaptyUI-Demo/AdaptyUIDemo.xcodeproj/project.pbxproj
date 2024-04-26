@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,6 +18,8 @@
 		747602032B18B1A900801629 /* UIViewController+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747602022B18B1A900801629 /* UIViewController+SwiftUI.swift */; };
 		747602072B18B1D900801629 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747602062B18B1D900801629 /* MainView.swift */; };
 		747602092B18B33A00801629 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747602082B18B33A00801629 /* MainViewModel.swift */; };
+		74C06E1F2BDBED2D0073BD12 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 74C06E1E2BDBED2D0073BD12 /* Adapty */; };
+		74C06E212BDBED2E0073BD12 /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 74C06E202BDBED2E0073BD12 /* AdaptyUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,7 +36,6 @@
 		7455E4E229881CB400F97FEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7455E4E529881CB400F97FEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7455E4E729881CB400F97FEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7455E4EE29881CE800F97FEF /* adapty-ios-ui */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "adapty-ios-ui"; path = ..; sourceTree = "<group>"; };
 		747602022B18B1A900801629 /* UIViewController+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+SwiftUI.swift"; sourceTree = "<group>"; };
 		747602062B18B1D900801629 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		747602082B18B33A00801629 /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
@@ -45,7 +46,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74C06E212BDBED2E0073BD12 /* AdaptyUI in Frameworks */,
 				7455E4F129881CFD00F97FEF /* AdaptyUI in Frameworks */,
+				74C06E1F2BDBED2D0073BD12 /* Adapty in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,7 +66,6 @@
 		7455E4CD29881CB400F97FEF = {
 			isa = PBXGroup;
 			children = (
-				7455E4ED29881CE800F97FEF /* Packages */,
 				7455E4D829881CB400F97FEF /* AdaptyUIDemo */,
 				7455E4D729881CB400F97FEF /* Products */,
 				7455E4EF29881CFD00F97FEF /* Frameworks */,
@@ -91,14 +93,6 @@
 				7455E4E729881CB400F97FEF /* Info.plist */,
 			);
 			path = AdaptyUIDemo;
-			sourceTree = "<group>";
-		};
-		7455E4ED29881CE800F97FEF /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				7455E4EE29881CE800F97FEF /* adapty-ios-ui */,
-			);
-			name = Packages;
 			sourceTree = "<group>";
 		};
 		7455E4EF29881CFD00F97FEF /* Frameworks */ = {
@@ -137,6 +131,8 @@
 			name = AdaptyUIDemo;
 			packageProductDependencies = (
 				7455E4F029881CFD00F97FEF /* AdaptyUI */,
+				74C06E1E2BDBED2D0073BD12 /* Adapty */,
+				74C06E202BDBED2E0073BD12 /* AdaptyUI */,
 			);
 			productName = AdaptyUIDemo;
 			productReference = 7455E4D629881CB400F97FEF /* AdaptyUIDemo.app */;
@@ -168,6 +164,9 @@
 				"en-GB",
 			);
 			mainGroup = 7455E4CD29881CB400F97FEF;
+			packageReferences = (
+				74C06E1D2BDBED2D0073BD12 /* XCLocalSwiftPackageReference "../.." */,
+			);
 			productRefGroup = 7455E4D729881CB400F97FEF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -436,8 +435,23 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		74C06E1D2BDBED2D0073BD12 /* XCLocalSwiftPackageReference "../.." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		7455E4F029881CFD00F97FEF /* AdaptyUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AdaptyUI;
+		};
+		74C06E1E2BDBED2D0073BD12 /* Adapty */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Adapty;
+		};
+		74C06E202BDBED2E0073BD12 /* AdaptyUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AdaptyUI;
 		};

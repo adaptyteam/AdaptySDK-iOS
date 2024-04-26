@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 struct AdaptyPurchaseButtonShadeBehaviour: AdaptyScrollViewBehaviour {
     let button: UIView
     let buttonPlaceholder: UIView
@@ -31,6 +32,5 @@ struct AdaptyPurchaseButtonShadeBehaviour: AdaptyScrollViewBehaviour {
         
         let intersection = buttonGlobalFrame.intersection(shadeGlobalFrame)
         shadeView.alpha = intersection.height / button.frame.height
-//        print("## intersects: \(intersects)")
     }
 }

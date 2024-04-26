@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 
+@available(iOS 13.0, *)
 extension UIViewController {
     /// Add a SwiftUI `View` as a child of the input `UIView`.
     /// - Parameters:

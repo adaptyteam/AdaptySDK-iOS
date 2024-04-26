@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 class AdaptyInsetLabel: UILabel {
     var topInset: CGFloat = 0.0
     var leftInset: CGFloat = 0.0

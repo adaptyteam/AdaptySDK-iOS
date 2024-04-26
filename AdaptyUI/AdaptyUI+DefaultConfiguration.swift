@@ -8,6 +8,7 @@
 import Adapty
 import UIKit
 
+@available(iOS 13.0, *)
 extension AdaptyPaywallControllerDelegate {
     func paywallController(_ controller: AdaptyPaywallController,
                            didPerform action: AdaptyUI.Action) {

@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 struct AdaptyLimitOverscrollScrollBehaviour: AdaptyScrollViewBehaviour {
     let maxOffsetTop: CGFloat?
     let maxOffsetBottom: CGFloat?

@@ -8,6 +8,7 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
 extension AdaptyUI.Button: View {
     var currentStateView: AdaptyUI.Element? {
         if isSelected {

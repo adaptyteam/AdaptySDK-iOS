@@ -8,6 +8,7 @@
 import Adapty
 import Foundation
 
+@available(iOS 13.0, *)
 extension AdaptyUI {
     static let imageCache = ImageCache(name: "Adapty")
     static let imageDownloader = ImageDownloader(name: "Adapty")
@@ -67,27 +68,39 @@ extension AdaptyUI {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI {
-    static func chacheImagesIfNeeded(viewConfiguration: AdaptyUI.ViewConfiguration, locale: String) {
-        configureMediaCacheIfNeeded()
+    class ImageUrlPrefetcher: AdaptyUIImageUrlObserver {
+        static let queue = DispatchQueue(label: "AdaptyUI.SDK.ImageUrlPrefetcher")
+        static let shared = ImageUrlPrefetcher()
 
-        let urls = viewConfiguration.extractImageUrls(locale)
+        private var initialized = false
 
-        let logId = AdaptyUI.generateLogId()
+        func initialize() {
+            defer { initialized = true }
+            guard !initialized else { return }
 
-        AdaptyUI.writeLog(level: .verbose, message: "#AdaptyMediaCache# chacheImagesIfNeeded: \(urls) [\(logId)]")
+            AdaptyUI.writeLog(level: .verbose, message: "#ImageUrlPrefetcher# initialize")
+            AdaptyUI.setImageUrlObserver(self, dispatchQueue: Self.queue)
+        }
 
-        let prefetcher = ImagePrefetcher(
-            sources: urls.map { .network($0) },
-            options: [
-                .targetCache(imageCache),
-                .downloader(imageDownloader),
-            ],
-            completionHandler: { skipped, failed, completed in
-                AdaptyUI.writeLog(level: .verbose, message: "#AdaptyMediaCache# chacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
-            }
-        )
+        func extractedImageUrls(_ urls: Set<URL>) {
+            let logId = AdaptyUI.generateLogId()
 
-        prefetcher.start()
+            AdaptyUI.writeLog(level: .verbose, message: "#ImageUrlPrefetcher# chacheImagesIfNeeded: \(urls) [\(logId)]")
+
+            let prefetcher = ImagePrefetcher(
+                sources: urls.map { .network($0) },
+                options: [
+                    .targetCache(imageCache),
+                    .downloader(imageDownloader),
+                ],
+                completionHandler: { skipped, failed, completed in
+                    AdaptyUI.writeLog(level: .verbose, message: "#ImageUrlPrefetcher# chacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
+                }
+            )
+
+            prefetcher.start()
+        }
     }
 }

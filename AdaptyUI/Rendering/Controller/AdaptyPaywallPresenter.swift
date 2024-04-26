@@ -9,10 +9,12 @@ import Adapty
 import Combine
 import Foundation
 
+@available(iOS 13.0, *)
 protocol AdaptyPaywallPresenterDelegate: NSObject {
     func didFailLoadingProducts(with error: AdaptyError) -> Bool
 }
 
+@available(iOS 13.0, *)
 class AdaptyPaywallPresenter {
     fileprivate let logId: String
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.PaywallPresenterQueue")
@@ -67,11 +69,11 @@ class AdaptyPaywallPresenter {
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
 
-        if let style = try? viewConfiguration.extractDefaultStyle() {
-            initiatePurchaseOnTap = style.productBlock.initiatePurchaseOnTap
-        } else {
+//        if let style = try? viewConfiguration.extractDefaultStyle() {
+//            initiatePurchaseOnTap = style.productBlock.initiatePurchaseOnTap
+//        } else {
             initiatePurchaseOnTap = false
-        }
+//        }
 
         self.products = Self.generateProductsInfos(paywall: paywall,
                                                    products: products,
@@ -218,6 +220,7 @@ class AdaptyPaywallPresenter {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyPaywallPresenter {
     func log(_ level: AdaptyLogLevel, _ message: String) {
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")

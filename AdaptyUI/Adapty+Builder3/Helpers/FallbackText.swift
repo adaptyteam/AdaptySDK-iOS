@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 
+@available(iOS 13.0, *)
 struct FallbackText: UIViewRepresentable {
     typealias FallbackView = UILabel
 

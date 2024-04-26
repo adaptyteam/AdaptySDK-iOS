@@ -8,6 +8,14 @@
 import Adapty
 import UIKit
 
+// TODO: move out
+extension Collection where Indices.Iterator.Element == Index {
+    subscript(safe index: Index) -> Iterator.Element? {
+        (startIndex <= index && index < endIndex) ? self[index] : nil
+    }
+}
+
+@available(iOS 13.0, *)
 extension AdaptyUI.RichText.Item {
     var uiFont: UIFont? {
         switch self {
@@ -17,6 +25,7 @@ extension AdaptyUI.RichText.Item {
     }
 }
 
+@available(iOS 13.0, *)
 extension Array where Element == AdaptyUI.RichText.Item {
     func closestItemFont(at index: Int) -> UIFont? {
         if let prevItemFont = self[safe: index - 1]?.uiFont { return prevItemFont }
@@ -27,6 +36,7 @@ extension Array where Element == AdaptyUI.RichText.Item {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.RichText {
     func attributedString(
         paragraph: AdaptyUI.RichText.ParagraphStyle = .init(),
@@ -78,6 +88,7 @@ extension AdaptyUI.RichText {
     }
 }
 
+@available(iOS 13.0, *)
 extension String {
     func calculatedWidth(_ attributes: AdaptyUI.RichText.TextAttributes?) -> CGFloat {
         let str = self // Compiler Bug
@@ -88,6 +99,7 @@ extension String {
     }
 }
 
+@available(iOS 13.0, *)
 extension NSAttributedString {
     static func newLine(paragraphStyle: NSParagraphStyle?) -> NSAttributedString {
         NSMutableAttributedString(
@@ -186,6 +198,7 @@ extension NSAttributedString {
     }
 }
 
+@available(iOS 13.0, *)
 extension NSMutableAttributedString {
     func addAttributes(
         paragraphStyle: NSParagraphStyle?,
@@ -211,6 +224,7 @@ extension NSMutableAttributedString {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.ImageData {
     func formAttachment(
         attributes: AdaptyUI.RichText.TextAttributes?
@@ -240,6 +254,7 @@ extension AdaptyUI.ImageData {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.RichText.ParagraphAttributes {
     var paragraphStyle: NSParagraphStyle {
         let result = NSMutableParagraphStyle()
@@ -250,6 +265,7 @@ extension AdaptyUI.RichText.ParagraphAttributes {
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyUI.HorizontalAlignment {
     var textAlignment: NSTextAlignment {
         switch self {

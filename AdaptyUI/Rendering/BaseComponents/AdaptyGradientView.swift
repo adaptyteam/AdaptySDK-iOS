@@ -7,6 +7,8 @@
 
 import UIKit
 
+// TODO: OLD REMOVE
+@available(iOS 13.0, *)
 class AdaptyGradientView: UIView {
     enum Position {
         case top

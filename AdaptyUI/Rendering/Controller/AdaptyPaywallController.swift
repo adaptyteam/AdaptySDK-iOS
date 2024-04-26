@@ -9,6 +9,7 @@ import Adapty
 import Combine
 import UIKit
 
+@available(iOS 13.0, *)
 public class AdaptyPaywallController: UIViewController {
     fileprivate let logId: String
 
@@ -18,7 +19,7 @@ public class AdaptyPaywallController: UIViewController {
 
     public weak var delegate: AdaptyPaywallControllerDelegate?
 
-    private var layoutBuilder: LayoutBuilder?
+//    private var layoutBuilder: LayoutBuilder?
     private let presenter: AdaptyPaywallPresenter
     private var cancellable = Set<AnyCancellable>()
     private let tagResolver: AdaptyTagResolver?
@@ -38,12 +39,12 @@ public class AdaptyPaywallController: UIViewController {
         self.delegate = delegate
 
         let selectedProductIndex: Int
-
-        if let style = try? viewConfiguration.extractDefaultStyle() {
-            selectedProductIndex = style.productBlock.mainProductIndex
-        } else {
+//
+//        if let style = try? viewConfiguration.extractDefaultStyle() {
+//            selectedProductIndex = style.productBlock.mainProductIndex
+//        } else {
             selectedProductIndex = 0
-        }
+//        }
 
         presenter = AdaptyPaywallPresenter(logId: logId,
                                            paywall: paywall,
@@ -91,7 +92,7 @@ public class AdaptyPaywallController: UIViewController {
         super.viewDidAppear(animated)
 
         log(.verbose, "viewDidAppear")
-        layoutBuilder?.closeButtonView?.performTransitionIn()
+//        layoutBuilder?.closeButtonView?.performTransitionIn()
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
@@ -103,33 +104,33 @@ public class AdaptyPaywallController: UIViewController {
     override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        layoutBuilder?.viewDidLayoutSubviews(view)
+//        layoutBuilder?.viewDidLayoutSubviews(view)
     }
 
     private func buildInterface() {
-        view.backgroundColor = .white
-
-        let tagConverter: AdaptyUI.CustomTagConverter?
-
-        if let tagResolver = tagResolver {
-            tagConverter = { tagResolver.replacement(for: $0) }
-        } else {
-            tagConverter = nil
-        }
-
-        do {
-            layoutBuilder = try TemplateLayoutBuilderFabric.createLayoutFromConfiguration(
-                presenter.paywall,
-                presenter.viewConfiguration,
-                products: presenter.products,
-                tagConverter: tagConverter
-            )
-
-            try layoutBuilder?.buildInterface(on: view)
-
-        } catch {
-            handleRenderingError(error)
-        }
+//        view.backgroundColor = .white
+//
+//        let tagConverter: AdaptyUI.CustomTagConverter?
+//
+//        if let tagResolver = tagResolver {
+//            tagConverter = { tagResolver.replacement(for: $0) }
+//        } else {
+//            tagConverter = nil
+//        }
+//
+//        do {
+//            layoutBuilder = try TemplateLayoutBuilderFabric.createLayoutFromConfiguration(
+//                presenter.paywall,
+//                presenter.viewConfiguration,
+//                products: presenter.products,
+//                tagConverter: tagConverter
+//            )
+//
+//            try layoutBuilder?.buildInterface(on: view)
+//
+//        } catch {
+//            handleRenderingError(error)
+//        }
     }
 
     private func handleRenderingError(_ error: Error) {
@@ -166,26 +167,26 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     private func subscribeForDataChange() {
-        presenter.$products
-            .receive(on: RunLoop.main)
-            .sink { [weak self] value in
-                guard let self = self else { return }
-
-                do {
-                    try self.layoutBuilder?.productsView?.updateProducts(
-                        value,
-                        selectedProductId: self.presenter.selectedProductId
-                    )
-                } catch {
-                    self.handleRenderingError(error)
-                }
-
-                if let selectedProductId = self.presenter.selectedProductId,
-                   let product = value.first(where: { $0.id == selectedProductId }) {
-                    self.layoutBuilder?.continueButtonShowIntroCallToAction(product.isEligibleForFreeTrial)
-                }
-            }
-            .store(in: &cancellable)
+//        presenter.$products
+//            .receive(on: RunLoop.main)
+//            .sink { [weak self] value in
+//                guard let self = self else { return }
+//
+//                do {
+//                    try self.layoutBuilder?.productsView?.updateProducts(
+//                        value,
+//                        selectedProductId: self.presenter.selectedProductId
+//                    )
+//                } catch {
+//                    self.handleRenderingError(error)
+//                }
+//
+//                if let selectedProductId = self.presenter.selectedProductId,
+//                   let product = value.first(where: { $0.id == selectedProductId }) {
+//                    self.layoutBuilder?.continueButtonShowIntroCallToAction(product.isEligibleForFreeTrial)
+//                }
+//            }
+//            .store(in: &cancellable)
 
         presenter.$selectedProductId
             .receive(on: RunLoop.main)
@@ -228,33 +229,33 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     private func subscribeForActions() {
-        layoutBuilder?.productsView?.onProductSelected = { [weak self] product in
-            guard let self = self else { return }
-
-            self.presenter.selectProduct(id: product.id)
-            self.layoutBuilder?.continueButtonShowIntroCallToAction(product.isEligibleForFreeTrial)
-
-            if self.presenter.initiatePurchaseOnTap {
-                self.presenter.makePurchase()
-            }
-        }
-
-        layoutBuilder?.addListeners(
-            onContinue: { [weak self] in
-                guard let self = self else { return }
-
-                self.presenter.makePurchase()
-
-                if let delegate = self.delegate, let product = self.presenter.selectedAdaptyProduct {
-                    delegate.paywallController(self, didStartPurchase: product)
-                }
-
-            },
-            onAction: { [weak self] action in
-                guard let action = action else { return }
-                self?.handleAction(action)
-            }
-        )
+//        layoutBuilder?.productsView?.onProductSelected = { [weak self] product in
+//            guard let self = self else { return }
+//
+//            self.presenter.selectProduct(id: product.id)
+//            self.layoutBuilder?.continueButtonShowIntroCallToAction(product.isEligibleForFreeTrial)
+//
+//            if self.presenter.initiatePurchaseOnTap {
+//                self.presenter.makePurchase()
+//            }
+//        }
+//
+//        layoutBuilder?.addListeners(
+//            onContinue: { [weak self] in
+//                guard let self = self else { return }
+//
+//                self.presenter.makePurchase()
+//
+//                if let delegate = self.delegate, let product = self.presenter.selectedAdaptyProduct {
+//                    delegate.paywallController(self, didStartPurchase: product)
+//                }
+//
+//            },
+//            onAction: { [weak self] action in
+//                guard let action = action else { return }
+//                self?.handleAction(action)
+//            }
+//        )
     }
 
     private func handlePurchaseResult(_ result: AdaptyResult<AdaptyPurchasedInfo>,
@@ -283,29 +284,31 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     private func updateSelectedProductId(_ productId: String) {
-        layoutBuilder?.productsView?.updateSelectedState(productId)
+//        layoutBuilder?.productsView?.updateSelectedState(productId)
     }
 
     private func updatePurchaseInProgress(_ inProgress: Bool) {
-        layoutBuilder?.productsView?.isUserInteractionEnabled = !inProgress
-        layoutBuilder?.continueButton?.updateInProgress(inProgress)
+//        layoutBuilder?.productsView?.isUserInteractionEnabled = !inProgress
+//        layoutBuilder?.continueButton?.updateInProgress(inProgress)
     }
 
     private func updateGlobalLoadingIndicator(restoreInProgress: Bool, animated: Bool) {
-        if restoreInProgress {
-            layoutBuilder?.activityIndicator?.show(animated: animated)
-        } else {
-            layoutBuilder?.activityIndicator?.hide(animated: animated)
-        }
+//        if restoreInProgress {
+//            layoutBuilder?.activityIndicator?.show(animated: animated)
+//        } else {
+//            layoutBuilder?.activityIndicator?.hide(animated: animated)
+//        }
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyPaywallController: AdaptyPaywallPresenterDelegate {
     func didFailLoadingProducts(with error: AdaptyError) -> Bool {
         delegate?.paywallController(self, didFailLoadingProductsWith: error) ?? false
     }
 }
 
+@available(iOS 13.0, *)
 extension AdaptyPaywallController {
     func log(_ level: AdaptyLogLevel, _ message: String) {
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")

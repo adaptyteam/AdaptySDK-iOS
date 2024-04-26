@@ -8,6 +8,7 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
 extension View {
     @ViewBuilder
     func aspectRatio(_ aspect: AdaptyUI.AspectRatio) -> some View {
@@ -22,6 +23,7 @@ extension View {
     }
 }
 
+@available(iOS 13.0, *)
 struct AdaptyUIImageView: View {
     var image: AdaptyUI.Image
 
@@ -86,6 +88,7 @@ struct AdaptyUIImageView: View {
 #if DEBUG
     @testable import Adapty
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.ImageData {
         static var urlDog: Self {
             .url(URL(string: "https://media.istockphoto.com/id/1411469044/photo/brown-dog-beagle-sitting-on-path-in-autumn-natural-park-location-among-orange-yellow-fallen.jpg?s=612x612&w=0&k=20&c=Ul6dwTVshdIYOACMbUEbA0WDiNbbTamtXL5GOL0KKK0=")!,
@@ -93,6 +96,7 @@ struct AdaptyUIImageView: View {
         }
     }
 
+    @available(iOS 13.0, *)
     extension AdaptyUI.Image {
         static var test: Self {
             .init(asset: .urlDog,
@@ -101,6 +105,7 @@ struct AdaptyUIImageView: View {
         }
     }
 
+    @available(iOS 13.0, *)
     #Preview {
         AdaptyUIImageView(.test)
     }

@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 final class AdaptyBaseScrollView: UIScrollView {
     init() {
         super.init(frame: .zero)
