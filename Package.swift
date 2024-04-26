@@ -14,6 +14,10 @@ let package = Package(
             name: "Adapty",
             targets: ["Adapty"]
         ),
+        .library(
+            name: "AdaptyUI",
+            targets: ["AdaptyUI"]
+        ),
     ],
     targets: [
         .target(
@@ -21,6 +25,11 @@ let package = Package(
             dependencies: [],
             path: "Sources",
             resources: [.process("Resources/PrivacyInfo.xcprivacy")]
+        ),
+        .target(
+            name: "AdaptyUI",
+            dependencies: ["Adapty"],
+            path: "AdaptyUI"
         ),
         .testTarget(
             name: "AdaptyTests",

@@ -7,32 +7,28 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'Adapty'
+  s.name             = 'AdaptyUI'
   s.version          = '3.0.0-SNAPSHOT'
   s.summary          = 'Adapty SDK for iOS.'
 
   s.description      = <<-DESC
 Win back churned subscribers in your iOS app.
 Adapty helps you track business metrics, and lets you run ad campaigns targeted at churned users faster
+
+AdaptyUI is an extension for AdaptySDK.
                        DESC
 
   s.homepage         = 'https://adapty.io/'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Adapty' => 'contact@adapty.io' }
-  s.source           = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/adaptyteam/AdaptyUI-iOS.git', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '12.2'
-  s.osx.deployment_target = '10.14.4'
-  s.visionos.deployment_target = '1.0'
-
+  s.ios.deployment_target = '13.0'
   s.swift_version = '5.9'
 
-  s.source_files = 'Sources/**/*.swift'
-  s.resource_bundles = {"Adapty" => ["Sources/Resources/PrivacyInfo.xcprivacy"]}
+  s.source_files = 'AdaptyUI/**/*.swift'
 
-  s.frameworks = 'StoreKit'
-  s.ios.framework = 'UIKit', 'AdSupport'
-  s.ios.weak_frameworks = 'AdServices'
-  s.osx.frameworks = 'AppKit'
-  s.osx.weak_frameworks = 'AdSupport', 'AdServices'
+  s.dependency 'Adapty', s.version.to_s
+
+  s.frameworks = 'SwiftUI'
 end

@@ -1,0 +1,39 @@
+
+/* Class = "UILabel"; text = "Visual"; ObjectID = "2Uk-vg-g3p"; */
+"2Uk-vg-g3p.text" = "Visual";
+
+/* Class = "UITextField"; placeholder = "Enter paywall id"; ObjectID = "7sx-uv-qTk"; */
+"7sx-uv-qTk.placeholder" = "Enter paywall id";
+
+/* Class = "UILabel"; text = "Revision"; ObjectID = "LAt-37-VpK"; */
+"LAt-37-VpK.text" = "Revision";
+
+/* Class = "UILabel"; text = "en"; ObjectID = "OVT-bd-n1h"; */
+"OVT-bd-n1h.text" = "en";
+
+/* Class = "UILabel"; text = "Locale"; ObjectID = "UDu-Fd-i9j"; */
+"UDu-Fd-i9j.text" = "Locale";
+
+/* Class = "UILabel"; text = "Variation"; ObjectID = "UQZ-5a-DxN"; */
+"UQZ-5a-DxN.text" = "Variation";
+
+/* Class = "UILabel"; text = "123123-123123-123123-123123"; ObjectID = "cpJ-wa-x72"; */
+"cpJ-wa-x72.text" = "123123-123123-123123-123123";
+
+/* Class = "UILabel"; text = "Welcome to AdaptyUI!"; ObjectID = "f2g-L5-7rl"; */
+"f2g-L5-7rl.text" = "Welcome to AdaptyUI!";
+
+/* Class = "UIButton"; configuration.title = "Present Paywall"; ObjectID = "qyS-V9-8Du"; */
+"qyS-V9-8Du.configuration.title" = "Present Paywall";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "qyS-V9-8Du"; */
+"qyS-V9-8Du.normalTitle" = "Button";
+
+/* Class = "UIButton"; configuration.title = "Load"; ObjectID = "y70-W1-jwl"; */
+"y70-W1-jwl.configuration.title" = "Load";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "y70-W1-jwl"; */
+"y70-W1-jwl.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "zBi-EW-UXa"; */
+"zBi-EW-UXa.text" = "1";

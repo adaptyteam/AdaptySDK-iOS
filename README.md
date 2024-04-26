@@ -32,7 +32,7 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 <a href="https://adapty.io/schedule-demo?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS_schedule-demo">Talk to Us to Learn More</a>
 </h3>
 
-## Integrate IAPs Within a Few Hours Without Server Coding 
+## Integrate IAPs Within a Few Hours Without Server Coding
 
 **Adapty handles everything, from free trials to refunds, in a simple, developer-friendly SDK.**
 
@@ -85,8 +85,8 @@ Adapty.makePurchase(product: product) { [weak self] result in
 
 This is a demo applications for Adapty. Before running the app, you will need to configure the project.
 
-### 1. [UIKit](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/UIKit)
-### 2. [SwiftUI](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/SwiftUI)
+### 1. [UIKit](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/UIKit-Demo)
+### 2. [SwiftUI](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/SwiftUI-Demo)
 
 ![Adapty: An example of the paywall is changed on the fly](https://adapty-portal-media-production.s3.amazonaws.com/github/swift-ui-example.jpg)
 
@@ -130,7 +130,7 @@ Adapty.getPaywall("YOUR_PAYWALL_ID") { result in
 Once you have the paywall, you can query the product array that corresponds to it:
 
 ```swift
-Adapty.getPaywallProducts(paywall: paywall) { result in    
+Adapty.getPaywallProducts(paywall: paywall) { result in
     switch result {
     case let .success(products):
         // the requested products array
@@ -161,7 +161,7 @@ Adapty.makePurchase(product: product) { result in
 With the Adapty iOS App SDK you don't have to hardcode product IDs to check the subscription status. You just have to verify that the user has an active access level. To do this, you have to call `.getProfile()` method:
 ```swift
 Adapty.getProfile { result in
-    if let profile = try? result.get(), 
+    if let profile = try? result.get(),
            profile.accessLevels["premium"]?.isActive ?? false {
         // grant access to premium features
     }
@@ -193,11 +193,10 @@ Adapty sends all subscription events to analytical services, such as Amplitude, 
 - Feel free to open an issue, we check all of them or drop us an email at [support@adapty.io](mailto:support@adapty.io) and tell us everything you want.
 - Want to suggest a feature? Just contact us or open an issue in the repo.
 
-## Like Adapty SDK? 
+## Like Adapty SDK?
 
 So do we! Feel free to star the repo ⭐️⭐️⭐️ and make our developers happy!
 
 ## License
 
 Adapty is available under the MIT license. [Click here](https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE) for details.
-
