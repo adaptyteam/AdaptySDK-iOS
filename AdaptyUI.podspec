@@ -21,7 +21,7 @@ AdaptyUI is an extension for AdaptySDK.
   s.homepage         = 'https://adapty.io/'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Adapty' => 'contact@adapty.io' }
-  s.source           = { :git => 'https://github.com/adaptyteam/AdaptyUI-iOS.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '13.0'
   s.swift_version = '5.9'
