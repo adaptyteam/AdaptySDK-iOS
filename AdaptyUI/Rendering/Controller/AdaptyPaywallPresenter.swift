@@ -105,7 +105,7 @@ class AdaptyPaywallPresenter {
     func logShowPaywall() {
         log(.verbose, "logShowPaywall begin")
 
-        AdaptyUI.logShowPaywall(paywall,
+        Adapty.logShowPaywall(paywall,
                                 viewConfiguration: viewConfiguration) { [weak self] error in
             if let error = error {
                 self?.log(.error, "logShowPaywall fail: \(error)")

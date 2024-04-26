@@ -39,6 +39,10 @@ extension Adapty {
     public static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
         trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)), completion)
     }
+    
+    package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
+        Adapty.trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)), completion)
+    }
 
     static func logIfNeed(_ chosen: AdaptyPaywallChosen, _ completion: AdaptyErrorCompletion? = nil) {
         switch chosen.kind {
@@ -83,11 +87,5 @@ extension Adapty {
         }
 
         trackEvent(.onboardingScreenShowed(params), completion)
-    }
-}
-
-extension AdaptyUI {
-    public static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion? = nil) {
-        Adapty.trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)), completion)
     }
 }
