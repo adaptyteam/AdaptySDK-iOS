@@ -12,6 +12,7 @@ extension Adapty {
         static let appleSearchAdsAttributionCollectionEnabled: Bool = Bundle.main.infoDictionary?["AdaptyAppleSearchAdsAttributionCollectionEnabled"] as? Bool ?? false
 
         static var idfaCollectionDisabled: Bool = false
+        static var ipAddressCollectionDisabled: Bool = false
 
         static var observerMode: Bool = false
 
@@ -34,6 +35,16 @@ extension Adapty {
         set {
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: "idfa_collection_disabled", callId: Log.stamp, params: ["value": .value(newValue)]))
             Configuration.idfaCollectionDisabled = newValue
+        }
+    }
+
+    public static var ipAddressCollectionDisabled: Bool {
+        get {
+            Configuration.ipAddressCollectionDisabled
+        }
+        set {
+            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: "ip_address_collection_disabled", callId: Log.stamp, params: ["value": .value(newValue)]))
+            Configuration.ipAddressCollectionDisabled = newValue
         }
     }
 
