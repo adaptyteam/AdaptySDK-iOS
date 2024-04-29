@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Adapty'
-  s.version          = '2.10.3'
+  s.version          = '2.10.4'
   s.summary          = 'Adapty SDK for iOS.'
 
   s.description      = <<-DESC
@@ -26,7 +26,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.visionos.deployment_target = '1.0'
 
   s.swift_version = '5.9'
-  
+
   s.source_files = 'Sources/**/*.swift'
   s.resource_bundles = {"Adapty" => ["Sources/Resources/PrivacyInfo.xcprivacy"]}
 

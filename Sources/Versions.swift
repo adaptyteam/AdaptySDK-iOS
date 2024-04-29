@@ -8,7 +8,7 @@
 import Foundation
 
 extension Adapty {
-    public static let SDKVersion = "2.10.3"
+    public static let SDKVersion = "2.10.4"
 
     public static func setCrossPlatformSDK(version: String, name: String) {
         Environment.CrossPlatformSDK.name = name
