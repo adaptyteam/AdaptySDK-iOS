@@ -26,10 +26,14 @@ AdaptyUI is an extension for AdaptySDK.
   s.ios.deployment_target = '13.0'
   s.swift_version = '5.9'
 
-  s.source_files = 'Sources/**/*.swift','AdaptyUI/**/*.swift'
+  s.source_files = 'AdaptyUI/**/*.swift'
   s.resource_bundles = {"AdaptyUI" => ["AdaptyUI/PrivacyInfo.xcprivacy"]}
 
-  # s.dependency 'Adapty', s.version.to_s
+  s.dependency 'Adapty', s.version.to_s
 
   s.frameworks = 'SwiftUI'
+  s.pod_target_xcconfig = {
+    'OTHER_SWIFT_FLAGS' => '-package-name adapty'
+  }
+  
 end
