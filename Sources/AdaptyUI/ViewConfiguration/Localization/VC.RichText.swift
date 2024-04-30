@@ -12,7 +12,8 @@ extension AdaptyUI.ViewConfiguration {
     struct TextAttributes {
         let fontAssetId: String?
         let size: Double?
-        let colorAssetId: String?
+        let txtColorAssetId: String?
+        let imgTintColorAssetId: String?
         let backgroundAssetId: String?
         let strike: Bool?
         let underline: Bool?
@@ -20,7 +21,8 @@ extension AdaptyUI.ViewConfiguration {
         var isEmpty: Bool {
             fontAssetId == nil
                 && size == nil
-                && colorAssetId == nil
+                && txtColorAssetId == nil
+                && imgTintColorAssetId == nil
                 && backgroundAssetId == nil
                 && strike == nil
                 && underline == nil
@@ -130,7 +132,8 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes {
         return .init(
             fontAssetId: fontAssetId ?? other.fontAssetId,
             size: size ?? other.size,
-            colorAssetId: colorAssetId ?? other.colorAssetId,
+            txtColorAssetId: txtColorAssetId ?? other.txtColorAssetId,
+            imgTintColorAssetId: imgTintColorAssetId ?? other.imgTintColorAssetId,
             backgroundAssetId: backgroundAssetId ?? other.backgroundAssetId,
             strike: strike ?? other.strike,
             underline: underline ?? other.underline
@@ -180,7 +183,8 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
         return AdaptyUI.RichText.TextAttributes(
             font: font,
             size: attr?.size ?? font.defaultSize,
-            color: localizer.fillingIfPresent(attr?.colorAssetId) ?? font.defaultFilling,
+            txtColor: localizer.fillingIfPresent(attr?.txtColorAssetId) ?? font.defaultColor,
+            imgTintColor: localizer.fillingIfPresent(attr?.imgTintColorAssetId),
             background: localizer.fillingIfPresent(attr?.backgroundAssetId),
             strike: attr?.strike ?? false,
             underline: attr?.underline ?? false
@@ -258,7 +262,8 @@ extension AdaptyUI.ViewConfiguration.TextAttributes: Decodable {
     enum CodingKeys: String, CodingKey {
         case size
         case fontAssetId = "font"
-        case colorAssetId = "color"
+        case txtColorAssetId = "color"
+        case imgTintColorAssetId = "tint"
         case backgroundAssetId = "background"
         case strike
         case underline

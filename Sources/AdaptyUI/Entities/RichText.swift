@@ -31,7 +31,8 @@ extension AdaptyUI {
         package struct TextAttributes {
             package let font: AdaptyUI.Font
             package let size: Double
-            package let color: AdaptyUI.Filling
+            package let txtColor: AdaptyUI.Filling
+            package let imgTintColor: AdaptyUI.Filling?
             package let background: AdaptyUI.Filling?
             package let strike: Bool
             package let underline: Bool
