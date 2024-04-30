@@ -20,6 +20,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Adapty' => 'contact@adapty.io' }
   s.source           = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
+  s.documentation_url = "https://docs.adapty.io"
 
   s.ios.deployment_target = '12.2'
   s.osx.deployment_target = '10.14.4'
@@ -37,6 +38,6 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.osx.weak_frameworks = 'AdSupport', 'AdServices'
   
   s.pod_target_xcconfig = {
-    'OTHER_SWIFT_FLAGS' => '-package-name adapty'
+    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk'
   }
 end
