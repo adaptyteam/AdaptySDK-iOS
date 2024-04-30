@@ -5,6 +5,8 @@
 //  Created by Aleksey Goncharov on 20.3.24..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import UIKit
 
@@ -276,3 +278,5 @@ extension AdaptyUI.HorizontalAlignment {
         }
     }
 }
+
+#endif

@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 2023-01-17.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import Combine
 import UIKit
@@ -314,3 +316,5 @@ extension AdaptyPaywallController {
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
     }
 }
+
+#endif

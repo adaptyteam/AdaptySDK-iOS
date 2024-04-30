@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 2023-01-18.
 //
 
+#if canImport(UIKit)
+
 import UIKit
 
 @available(iOS 13.0, *)
@@ -20,3 +22,5 @@ class AdaptyCompoundScrollViewDelegate: NSObject, UIScrollViewDelegate {
         behaviours.forEach { $0.scrollViewDidScroll(scrollView) }
     }
 }
+
+#endif

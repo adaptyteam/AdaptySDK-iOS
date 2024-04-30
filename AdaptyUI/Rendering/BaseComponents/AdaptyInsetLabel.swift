@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 2023-01-19.
 //
 
+#if canImport(UIKit)
+
 import UIKit
 
 @available(iOS 13.0, *)
@@ -46,3 +48,5 @@ class AdaptyInsetLabel: UILabel {
         return contentSize
     }
 }
+
+#endif

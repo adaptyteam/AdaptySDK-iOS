@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 27.7.23..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import UIKit
 
@@ -104,3 +106,5 @@ extension ProductInfoModel {
         RealProductInfo(product: product, introEligibility: introEligibility)
     }
 }
+
+#endif

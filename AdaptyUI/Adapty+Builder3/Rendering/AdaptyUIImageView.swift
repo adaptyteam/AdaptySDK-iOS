@@ -5,8 +5,11 @@
 //  Created by Aleksey Goncharov on 2.4.24..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import SwiftUI
+import UIKit
 
 @available(iOS 13.0, *)
 extension View {
@@ -85,6 +88,7 @@ struct AdaptyUIImageView: View {
     }
 }
 
+
 #if DEBUG
     @testable import Adapty
 
@@ -109,4 +113,6 @@ struct AdaptyUIImageView: View {
     #Preview {
         AdaptyUIImageView(.test)
     }
+#endif
+
 #endif

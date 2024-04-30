@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 16.8.23..
 //
 
+#if canImport(UIKit)
+
 import UIKit
 
 @available(iOS 13.0, *)
@@ -34,3 +36,5 @@ struct AdaptyPurchaseButtonShadeBehaviour: AdaptyScrollViewBehaviour {
         shadeView.alpha = intersection.height / button.frame.height
     }
 }
+
+#endif

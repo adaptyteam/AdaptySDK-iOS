@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 2023-01-24.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import Combine
 import Foundation
@@ -226,3 +228,5 @@ extension AdaptyPaywallPresenter {
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
     }
 }
+
+#endif

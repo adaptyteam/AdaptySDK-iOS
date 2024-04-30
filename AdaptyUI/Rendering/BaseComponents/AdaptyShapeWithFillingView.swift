@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 29.8.23..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import UIKit
 
@@ -71,3 +73,5 @@ class AdaptyShapeWithFillingView: UIView {
         }
     }
 }
+
+#endif

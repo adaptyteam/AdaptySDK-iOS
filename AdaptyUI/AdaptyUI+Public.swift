@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 27.1.23..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import UIKit
 
@@ -208,3 +210,5 @@ extension AdaptyUI {
         )
     }
 }
+
+#endif
