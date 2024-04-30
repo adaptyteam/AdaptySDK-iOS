@@ -59,7 +59,7 @@ extension AdaptyPaywall: Codable {
         case name = "paywall_name"
         case products
         case remoteConfig = "remote_config"
-        case version = "placement_audience_version_updated_at"
+        case version = "response_created_at"
         case viewConfiguration = "paywall_builder"
         case attributes
     }

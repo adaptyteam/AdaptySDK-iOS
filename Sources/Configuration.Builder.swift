@@ -29,16 +29,17 @@ extension Adapty.Configuration {
     public final class Builder {
         public private(set) var apiKey: String
         public private(set) var customerUserId: String?
-        public private(set) var observerMode: Bool = false
-        public private(set) var idfaCollectionDisabled: Bool = false
-        public private(set) var ipAddressCollectionDisabled: Bool = false
-        public private(set) var dispatchQueue: DispatchQueue = .main
-        public private(set) var backendBaseUrl: URL = Backend.publicEnvironmentBaseUrl
-        public private(set) var backendFallbackBaseUrl: URL = Backend.publicEnvironmentFallbackBaseUrl
+        public private(set) var observerMode: Bool
+        public private(set) var idfaCollectionDisabled: Bool
+        public private(set) var ipAddressCollectionDisabled: Bool
+        public private(set) var dispatchQueue: DispatchQueue
+        public private(set) var backendBaseUrl: URL
+        public private(set) var backendFallbackBaseUrl: URL
         public private(set) var backendProxy: (host: String, port: Int)?
 
-        public init(withAPIKey key: String) {
+        public convenience init(withAPIKey key: String) {
             assert(key.count >= 41 && key.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
+            self.init(Adapty.Configuration.default)
             apiKey = key
         }
 
@@ -76,7 +77,7 @@ extension Adapty.Configuration {
             idfaCollectionDisabled = value
             return self
         }
-        
+
         public func with(ipAddressCollectionDisabled value: Bool) -> Builder {
             ipAddressCollectionDisabled = value
             return self

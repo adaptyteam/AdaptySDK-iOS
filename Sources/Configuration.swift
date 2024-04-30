@@ -9,6 +9,18 @@ import Foundation
 
 extension Adapty {
     public struct Configuration {
+        static let `default` = Configuration(
+            apiKey: "",
+            customerUserId: nil,
+            observerMode: false,
+            idfaCollectionDisabled: false,
+            ipAddressCollectionDisabled: false,
+            dispatchQueue: .main,
+            backendBaseUrl: Backend.publicEnvironmentBaseUrl,
+            backendFallbackBaseUrl: Backend.publicEnvironmentFallbackBaseUrl,
+            backendProxy: nil
+        )
+
         let apiKey: String
         let customerUserId: String?
         let observerMode: Bool
@@ -22,16 +34,9 @@ extension Adapty {
 }
 
 extension Adapty.Configuration {
-    static let appleSearchAdsAttributionCollectionEnabled: Bool = Bundle.main.infoDictionary?["AdaptyAppleSearchAdsAttributionCollectionEnabled"] as? Bool ?? false
-
-    static var idfaCollectionDisabled: Bool = false
-    static var ipAddressCollectionDisabled: Bool = false
-    static var observerMode: Bool = false
-
-    static var storeKit2Enabled: String {
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else { return "unavailable" }
-        return "enabled"
-    }
+    static var idfaCollectionDisabled: Bool = `default`.idfaCollectionDisabled
+    static var ipAddressCollectionDisabled: Bool = `default`.ipAddressCollectionDisabled
+    static var observerMode: Bool = `default`.observerMode
 }
 
 extension Backend {
@@ -51,5 +56,44 @@ extension FallbackBackend {
             baseURL: configuration.backendFallbackBaseUrl,
             withProxy: configuration.backendProxy
         )
+    }
+}
+
+extension Adapty.Configuration: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case apiKey = "api_key"
+        case customerUserId = "customer_user_id"
+        case observerMode = "observer_mode"
+        case idfaCollectionDisabled = "idfa_collection_disabled"
+        case ipAddressCollectionDisabled = "ip_address_collection_disabled"
+
+        case backendBaseUrl = "backend_base_url"
+        case backendFallbackBaseUrl = "backend_fallback_base_url"
+        case backendProxyHost = "backend_proxy_host"
+        case backendProxyPort = "backend_proxy_port"
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        apiKey = try container.decode(String.self, forKey: .apiKey)
+        customerUserId = try container.decodeIfPresent(String.self, forKey: .customerUserId)
+            ?? Self.default.customerUserId
+        observerMode = try container.decodeIfPresent(Bool.self, forKey: .observerMode)
+            ?? Self.default.observerMode
+        idfaCollectionDisabled = try container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled)
+            ?? Self.default.idfaCollectionDisabled
+        ipAddressCollectionDisabled = try container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled)
+            ?? Self.default.ipAddressCollectionDisabled
+        dispatchQueue = Self.default.dispatchQueue
+        backendBaseUrl = try container.decodeIfPresent(URL.self, forKey: .backendBaseUrl)
+            ?? Self.default.backendBaseUrl
+        backendFallbackBaseUrl = try container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl)
+            ?? Self.default.backendFallbackBaseUrl
+        if let host = try container.decodeIfPresent(String.self, forKey: .backendProxyHost),
+           let port = try container.decodeIfPresent(Int.self, forKey: .backendProxyPort) {
+            backendProxy = (host: host, port: port)
+        } else {
+            backendProxy = Self.default.backendProxy
+        }
     }
 }

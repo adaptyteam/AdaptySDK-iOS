@@ -39,15 +39,23 @@ extension Adapty {
 
 extension PaywallsCache {
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale) -> AdaptyPaywall? {
-        if let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?.value,
-           cache.version >= Adapty.Configuration.fallbackPaywalls?.getPaywallVersion(byPlacmentId: placementId) ?? 0 {
+        let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?.value
+
+        guard let fallback = Adapty.Configuration.fallbackPaywalls,
+              fallback.contains(placmentId: placementId) ?? true
+        else {
             return cache
         }
 
-        guard let chosen = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId)
-        else {
-            return nil
+        if let cache, cache.version >= fallback.version {
+            return cache
         }
+
+        guard let chosen = fallback.getPaywall(byPlacmentId: placementId, profileId: profileId)
+        else {
+            return cache
+        }
+
         Adapty.logIfNeed(chosen)
         Log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
         return chosen.value

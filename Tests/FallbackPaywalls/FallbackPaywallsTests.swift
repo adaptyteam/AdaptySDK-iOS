@@ -51,7 +51,10 @@ final class FallbackPaywallsTests: XCTestCase {
         let expectation = expectation(description: "wait setFallbackPaywalls")
 
         let startTime = CFAbsoluteTimeGetCurrent()
-        Adapty.setFallbackPaywalls(fileURL: url) { _ in
+        Adapty.setFallbackPaywalls(fileURL: url) { error in
+
+            XCTAssertNil(error)
+
             let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
             print("## Time elapsed for setFallbackPaywalls: \(String(format: "%.6f", timeElapsed)) s.")
 
