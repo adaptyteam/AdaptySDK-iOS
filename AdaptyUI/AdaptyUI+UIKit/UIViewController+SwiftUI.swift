@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 30.11.23..
 //
 
+#if canImport(UIKit)
+
 import SwiftUI
 import UIKit
 
@@ -86,3 +88,5 @@ extension UIViewController {
         return hostingController
     }
 }
+
+#endif

@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 30.11.23..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import SwiftUI
 
@@ -225,3 +227,5 @@ class AdaptyPaywallDelegate_SwiftUI: NSObject, AdaptyPaywallControllerDelegate {
         didFailLoadingProducts(error)
     }
 }
+
+#endif

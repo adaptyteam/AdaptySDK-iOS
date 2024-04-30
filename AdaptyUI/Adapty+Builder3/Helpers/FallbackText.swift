@@ -5,6 +5,8 @@
 //  Created by Aleksey Goncharov on 4.4.24..
 //
 
+#if canImport(UIKit)
+
 import SwiftUI
 import UIKit
 
@@ -31,3 +33,5 @@ struct FallbackText: UIViewRepresentable {
     func updateUIView(_ uiView: FallbackView, context: UIViewRepresentableContext<Self>) {
     }
 }
+
+#endif

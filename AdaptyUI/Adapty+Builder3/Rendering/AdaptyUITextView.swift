@@ -5,6 +5,8 @@
 //  Created by Aleksey Goncharov on 2.4.24..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import SwiftUI
 
@@ -136,4 +138,6 @@ struct AdaptyUIRichTextView: View {
 //            .background(Color.yellow)
 //    }
     }
+#endif
+
 #endif

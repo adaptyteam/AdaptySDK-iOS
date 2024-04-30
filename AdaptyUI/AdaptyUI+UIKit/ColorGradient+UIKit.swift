@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 10.8.23..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import UIKit
 
@@ -31,3 +33,5 @@ extension CAGradientLayer {
         return layer
     }
 }
+
+#endif

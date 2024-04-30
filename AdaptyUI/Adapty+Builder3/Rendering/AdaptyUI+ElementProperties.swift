@@ -5,6 +5,8 @@
 //  Created by Aleksey Goncharov on 3.4.24..
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import SwiftUI
 
@@ -293,4 +295,6 @@ extension AdaptyUI.Unit {
 //    AdaptyUIRichTextView(.testBodyLong)
 //        .applyingProperties(.test)
     }
+#endif
+
 #endif

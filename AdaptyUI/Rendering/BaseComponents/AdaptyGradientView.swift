@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 2023-01-25.
 //
 
+#if canImport(UIKit)
+
 import UIKit
 
 // TODO: OLD REMOVE
@@ -65,3 +67,5 @@ class AdaptyGradientView: UIView {
         gradientLayer.frame = bounds
     }
 }
+
+#endif
