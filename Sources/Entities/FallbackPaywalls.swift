@@ -13,6 +13,7 @@ struct FallbackPaywalls {
     private let fileURL: URL
     private let head: Head
     var formatVersion: Int { head.formatVersion }
+    var version: Int64 { head.version }
 
     init(fileURL url: URL) throws {
         guard url.isFileURL else {
@@ -23,13 +24,13 @@ struct FallbackPaywalls {
         fileURL = url
     }
 
-    func getPaywallVersion(byPlacmentId id: String) -> Int64? {
-        head.versionByPlacement[id]
+    func contains(placmentId id: String) -> Bool? {
+        head.placementIds?.contains(id)
     }
 
     func getPaywall(byPlacmentId id: String, profileId: String) -> AdaptyPaywallChosen? {
-        guard let version = getPaywallVersion(byPlacmentId: id) else { return nil }
-
+        guard contains(placmentId: id) ?? true else { return nil }
+        
         let decoder = FallbackPaywalls.decoder(profileId: profileId, placmentId: id)
         let chosen: AdaptyPaywallChosen?
         do {
@@ -52,11 +53,13 @@ extension FallbackPaywalls {
         case data
         case meta
         case formatVersion = "version"
-        case versionByPlacement = "placement_audience_version_updated_at_map"
+        case version = "response_created_at"
+        case placementIds = "developer_ids"
     }
 
     struct Head: Decodable {
-        let versionByPlacement: [String: Int64]
+        let placementIds: Set<String>?
+        let version: Int64
         let formatVersion: Int
 
         init(from decoder: any Decoder) throws {
@@ -80,14 +83,8 @@ extension FallbackPaywalls {
                 throw AdaptyError.wrongVersionFallback(error)
             }
 
-            let versionsСontainer = try container.nestedContainer(keyedBy: CustomCodingKeys.self, forKey: .versionByPlacement)
-
-            versionByPlacement = try [String: Int64](
-                versionsСontainer.allKeys.map {
-                    try ($0.stringValue, versionsСontainer.decode(Int64.self, forKey: $0))
-                },
-                uniquingKeysWith: { $1 }
-            )
+            version = try container.decode(Int64.self, forKey: .version)
+            placementIds = try container.decodeIfPresent(Set<String>.self, forKey: .placementIds)
         }
     }
 
@@ -98,6 +95,7 @@ extension FallbackPaywalls {
             let container = try decoder
                 .container(keyedBy: CodingKeys.self)
                 .nestedContainer(keyedBy: FallbackPaywalls.CustomCodingKeys.self, forKey: .data)
+            
             guard container.contains(placmentId) else {
                 chosen = nil
                 return

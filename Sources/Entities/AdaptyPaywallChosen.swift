@@ -120,7 +120,7 @@ extension AdaptyPaywallChosen {
         let version: Int64
 
         enum CodingKeys: String, CodingKey {
-            case version = "placement_audience_version_updated_at"
+            case version = "response_created_at"
         }
     }
 }
