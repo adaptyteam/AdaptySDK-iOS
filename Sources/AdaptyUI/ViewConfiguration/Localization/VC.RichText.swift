@@ -65,12 +65,12 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func urlIfPresent(_ stringId: String?) -> String? {
+    func urlIfPresent(_ stringId: AdaptyUI.ViewConfiguration.StringId?) -> String? {
         guard let stringId, let item = self.localization?.strings?[stringId] else { return nil }
         return item.value.asString ?? item.fallback?.asString
     }
 
-    func richTextIfPresent(_ stringId: String?) -> AdaptyUI.RichText? {
+    func richTextIfPresent(_ stringId: AdaptyUI.ViewConfiguration.StringId?) -> AdaptyUI.RichText? {
         guard let stringId, let item = localization?.strings?[stringId] else { return nil }
         return AdaptyUI.RichText(
             items: item.value.convert(self),

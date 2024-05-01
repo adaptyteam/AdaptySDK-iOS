@@ -1,5 +1,5 @@
 //
-//  Button.swift
+//  VC.Button.swift
 //  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct Button {
-        let action: AdaptyUI.ButtonAction?
+        let action: AdaptyUI.ViewConfiguration.ButtonAction?
         let isSelected: Bool
         let normalState: AdaptyUI.ViewConfiguration.Element?
         let selectedState: AdaptyUI.ViewConfiguration.Element?
@@ -44,7 +44,7 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            action: container.decodeIfPresent(AdaptyUI.ButtonAction.self, forKey: .action),
+            action: container.decodeIfPresent(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action),
             isSelected: container.decodeIfPresent(Bool.self, forKey: .isSelected) ?? false,
             normalState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
             selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState)

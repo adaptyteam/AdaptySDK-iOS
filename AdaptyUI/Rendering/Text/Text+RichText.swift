@@ -39,6 +39,29 @@
     }
 
     @available(iOS 13.0, *)
+    extension AdaptyUI.Text {
+        func attributedString(
+            paragraph: AdaptyUI.RichText.ParagraphStyle = .init(),
+            kern: CGFloat? = nil,
+            tagConverter: AdaptyUI.CustomTagConverter?,
+            productTagConverter: AdaptyUI.ProductTagConverter? = nil
+        ) -> NSAttributedString {
+            switch value {
+            case .empty:
+                NSAttributedString()
+            case let .text(value),
+                 let .productDescription(value):
+                value.attributedString(
+                    paragraph: paragraph,
+                    kern: kern,
+                    tagConverter: tagConverter,
+                    productTagConverter: productTagConverter
+                )
+            }
+        }
+    }
+
+    @available(iOS 13.0, *)
     extension AdaptyUI.RichText {
         func attributedString(
             paragraph _: AdaptyUI.RichText.ParagraphStyle = .init(),

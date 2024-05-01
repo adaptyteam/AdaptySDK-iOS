@@ -1,5 +1,5 @@
 //
-//  Element.swift
+//  VC.Element.swift
 //  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
@@ -48,7 +48,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         case let .stack(value, properties):
             .stack(stack(value), properties.flatMap(elementProperties))
         case let .text(value, properties):
-            .text(richText(value), properties.flatMap(elementProperties))
+            .text(text(value), properties.flatMap(elementProperties))
         case let .image(value, properties):
             .image(image(value), properties.flatMap(elementProperties))
         case let .button(value, properties):

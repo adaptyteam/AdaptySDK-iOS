@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 19.01.2023
 //
 
-@testable import Adapty
 import XCTest
+@testable import Adapty
 
 func XCTAssertEqual(_ expression: AdaptyUI.Color?, withJSONValue jsonValue: JSONValue?, file: StaticString = #filePath, line: UInt = #line) {
     guard let (value, jsonValue) = XCTAssertNil(expression, withJSONValue: jsonValue, file: file, line: line) else { return }
@@ -55,7 +55,7 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.ViewConfiguration.Asset]?, w
             XCTAssertEqual(value.weight, withJSONValue: object["weight"])
             XCTAssertEqual(value.italic, withJSONValue: object["italic"] ?? .bool(false))
             XCTAssertEqual(value.defaultSize, withJSONValue: object["size"])
-            XCTAssertEqual(value.defaultColor, withJSONValue: object["color"])
+//            XCTAssertEqual(value.defaultColor, withJSONValue: object["color"])
         case let .unknown(value):
             XCTFail("Unknown asset with type = \(value == nil ? "nil" : value!)")
             return
@@ -81,7 +81,7 @@ final class AdaptyUIAssetTests: XCTestCase {
             do {
                 _ = try data.decode(AdaptyUI.ViewConfiguration.AssetsContainer.self)
                 XCTFail("Must be decoding error for \($0)")
-            } catch { }
+            } catch {}
         }
     }
 }

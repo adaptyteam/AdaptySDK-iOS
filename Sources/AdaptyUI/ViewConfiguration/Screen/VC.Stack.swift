@@ -1,5 +1,5 @@
 //
-//  Stack.swift
+//  VC.Stack.swift
 //  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024

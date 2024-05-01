@@ -9,22 +9,23 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct Text {
-        let stringId: String
+        let stringId: StringId
         let maxRows: Int?
-        let overflowMode: Set<AdaptyUI.RichText.OverflowMode>
+        let overflowMode: Set<AdaptyUI.Text.OverflowMode>
         let textAttributes: TextAttributes?
         let paragraphAttributes: ParagraphAttributes?
     }
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func richText(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText {
-        richTextIfPresent(textBlock) ?? AdaptyUI.RichText.empty
+    func text(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.Text {
+        textIfPresent(textBlock) ?? AdaptyUI.Text.empty
     }
 
-    func richTextIfPresent(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.RichText? {
+    func textIfPresent(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.Text? {
         guard let item = localization?.strings?[textBlock.stringId] else { return nil }
-        return .init(
+
+        let text = AdaptyUI.RichText(
             items: item.value.convert(
                 self,
                 defaultTextAttributes: textBlock.textAttributes,
@@ -34,7 +35,13 @@ extension AdaptyUI.ViewConfiguration.Localizer {
                 self,
                 defaultTextAttributes: textBlock.textAttributes,
                 defaultParagraphAttributes: textBlock.paragraphAttributes
-            ) },
+            ) }
+        )
+
+        let value: AdaptyUI.Text.Value = text.isEmpty ? .empty : .text(text)
+
+        return AdaptyUI.Text(
+            value: value,
             maxRows: textBlock.maxRows,
             overflowMode: textBlock.overflowMode
         )
@@ -54,18 +61,18 @@ extension AdaptyUI.ViewConfiguration.Text: Decodable {
             textAttributes = nil
             paragraphAttributes = nil
             maxRows = nil
-            overflowMode = AdaptyUI.RichText.OverflowMode.empty
+            overflowMode = AdaptyUI.Text.OverflowMode.empty
             return
         }
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        stringId = try container.decode(String.self, forKey: .stringId)
+        stringId = try container.decode(AdaptyUI.ViewConfiguration.StringId.self, forKey: .stringId)
         maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)
         overflowMode =
-            if let value = try? container.decode(AdaptyUI.RichText.OverflowMode.self, forKey: .overflowMode) {
+            if let value = try? container.decode(AdaptyUI.Text.OverflowMode.self, forKey: .overflowMode) {
                 Set([value])
             } else {
-                try Set(container.decodeIfPresent([AdaptyUI.RichText.OverflowMode].self, forKey: .overflowMode) ?? [])
+                try Set(container.decodeIfPresent([AdaptyUI.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
             }
         let textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
         self.textAttributes = textAttributes.isEmpty ? nil : textAttributes

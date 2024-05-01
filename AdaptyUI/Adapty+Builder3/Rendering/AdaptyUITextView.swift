@@ -27,10 +27,10 @@
     }
 
     @available(iOS 13.0, *)
-    struct AdaptyUIRichTextView: View {
-        var text: AdaptyUI.RichText
+    struct AdaptyUITextView: View {
+        var text: AdaptyUI.Text
 
-        init(_ text: AdaptyUI.RichText) {
+        init(_ text: AdaptyUI.Text) {
             self.text = text
         }
 
@@ -122,31 +122,44 @@
         }
 
         @available(iOS 13.0, *)
-        extension AdaptyUI.RichText {
+        extension AdaptyUI.Text {
+            init(_ items: [AdaptyUI.RichText.Item]) {
+                self.init(
+                    value: .text(.init(
+                        items: items,
+                        fallback: nil
+                    )),
+                    maxRows: nil,
+                    overflowMode: Set<OverflowMode>()
+                )
+            }
+
             static var testBodyShort: Self {
-                .init(items: [.text("Hello world!", .testBody)], fallback: nil)
+                .init([
+                    .text("Hello world!", .testBody),
+                ])
             }
 
             static var testBodyShortAlignRight: Self {
-                .init(items: [
+                .init([
                     .paragraph(.init(horizontalAlign: .right, firstIndent: 0, indent: 0, bulletSpace: nil, bullet: nil)),
                     .text("Hello world!", .testBody),
-                ], fallback: nil)
+                ])
             }
 
             static var testBodyLong: Self {
-                .init(items: [
+                .init([
                     .text("Hello world!", .testTitle),
                     .paragraph(.test),
                     .text("Hello world!", .testBody),
-                ], fallback: nil)
+                ])
             }
         }
 
         @available(iOS 13.0, *)
         #Preview {
 //    HStack {
-            AdaptyUIRichTextView(.testBodyLong)
+            AdaptyUITextView(.testBodyLong)
                 .background(Color.yellow)
 //        Spacer()
 //

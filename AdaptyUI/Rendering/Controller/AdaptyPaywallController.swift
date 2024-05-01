@@ -160,8 +160,7 @@ public class AdaptyPaywallController: UIViewController {
             presenter.restorePurchases()
             delegate?.paywallControllerDidStartRestore(self)
         case let .custom(id):
-            log(.verbose, "custom (\(id ?? "null") tap")
-            guard let id = id else { return }
+            log(.verbose, "custom (\(id)) tap")
             delegate?.paywallController(self, didPerform: .custom(id: id))
         case .selectProductId, .purchaseProductId, .purchaseSelectedProduct:
             break

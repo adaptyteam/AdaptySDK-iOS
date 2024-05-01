@@ -29,7 +29,7 @@ struct AdaptyUIElementView: View {
         case let .stack(stack, properties):
             AdaptyUIStackView(stack, properties)
         case let .text(text, properties):
-            AdaptyUIRichTextView(text)
+            AdaptyUITextView(text)
                 .applyingProperties(properties)
         case let .image(image, properties):
             AdaptyUIImageView(image)

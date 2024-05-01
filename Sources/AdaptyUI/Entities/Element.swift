@@ -11,7 +11,7 @@ extension AdaptyUI {
     package enum Element {
         case space(Int)
         indirect case stack(AdaptyUI.Stack, Properties?)
-        case text(AdaptyUI.RichText, Properties?)
+        case text(AdaptyUI.Text, Properties?)
         case image(AdaptyUI.Image, Properties?)
         indirect case button(AdaptyUI.Button, Properties?)
         case unknown(String, Properties?)
