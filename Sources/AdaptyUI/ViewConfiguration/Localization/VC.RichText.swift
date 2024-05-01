@@ -129,7 +129,7 @@ private extension AdaptyUI.ViewConfiguration.RichText.Bullet {
 private extension AdaptyUI.ViewConfiguration.TextAttributes {
     func _add(_ other: AdaptyUI.ViewConfiguration.TextAttributes?) -> AdaptyUI.ViewConfiguration.TextAttributes {
         guard let other else { return self }
-        return .init(
+        return AdaptyUI.ViewConfiguration.TextAttributes(
             fontAssetId: fontAssetId ?? other.fontAssetId,
             size: size ?? other.size,
             txtColorAssetId: txtColorAssetId ?? other.txtColorAssetId,
@@ -144,7 +144,7 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes {
 private extension AdaptyUI.ViewConfiguration.ParagraphAttributes {
     func add(_ other: AdaptyUI.ViewConfiguration.ParagraphAttributes?) -> AdaptyUI.ViewConfiguration.ParagraphAttributes {
         guard let other else { return self }
-        return .init(
+        return AdaptyUI.ViewConfiguration.ParagraphAttributes(
             horizontalAlign: horizontalAlign ?? other.horizontalAlign,
             firstIndent: firstIndent ?? other.firstIndent,
             indent: indent ?? other.indent,
