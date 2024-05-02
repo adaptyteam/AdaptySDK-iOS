@@ -49,7 +49,7 @@ extension Adapty {
 
             completion(result.map {
                 $0.sendImageUrlsToObserver()
-                return $0.extractLocale($0.responseLocale)
+                return $0.extractLocale()
             })
         }
 

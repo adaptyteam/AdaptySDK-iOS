@@ -18,14 +18,12 @@ extension AdaptyUI {
         let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
         let screens: [String: Screen]
-        let isHard: Bool
-        let mainImageRelativeHeight: Double?
     }
 }
 
 extension AdaptyUI.ViewConfiguration: CustomStringConvertible {
     var description: String {
-        "(id: \(id), templateId: \(templateId), version: \(version), isHard: \(isHard))"
+        "(id: \(id), templateId: \(templateId), version: \(version))"
     }
 }
 
@@ -43,9 +41,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         case assets
         case localizations
         case defaultLocalization = "default_localization"
-        case isHard = "is_hard_paywall"
-        case styles
-        case mainImageRelativeHeight = "main_image_relative_height"
+        case screens = "styles"
     }
 
     init(from decoder: Decoder) throws {
@@ -72,9 +68,6 @@ extension AdaptyUI.ViewConfiguration: Decodable {
             defaultLocalization = nil
         }
 
-        screens = try container.decode([String: Screen].self, forKey: .styles)
-
-        isHard = try container.decodeIfPresent(Bool.self, forKey: .isHard) ?? false
-        mainImageRelativeHeight = try container.decodeIfPresent(Double.self, forKey: .mainImageRelativeHeight)
+        screens = try container.decode([String: Screen].self, forKey: .screens)
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     enum ButtonAction {
-        case openUrl(StringId)
+        case openUrl(String)
         case restore
         case custom(id: String)
         case select(productId: String)
@@ -65,7 +65,7 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
         case .none:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.type], debugDescription: "unknown value"))
         case .openUrl:
-            self = try .openUrl(container.decode(AdaptyUI.ViewConfiguration.StringId.self, forKey: .url))
+            self = try .openUrl(container.decode(String.self, forKey: .url))
         case .restore:
             self = .restore
         case .close:

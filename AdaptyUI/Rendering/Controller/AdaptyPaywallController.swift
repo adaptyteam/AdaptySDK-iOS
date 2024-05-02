@@ -284,7 +284,7 @@ public class AdaptyPaywallController: UIViewController {
         }
     }
 
-    private func updateSelectedProductId(_ productId: String) {
+    private func updateSelectedProductId(_ adaptyProductId: String) {
 //        layoutBuilder?.productsView?.updateSelectedState(productId)
     }
 

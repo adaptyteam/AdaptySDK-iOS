@@ -65,21 +65,33 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func urlIfPresent(_ stringId: AdaptyUI.ViewConfiguration.StringId?) -> String? {
+    func urlIfPresent(_ stringId: String?) -> String? {
         guard let stringId, let item = self.localization?.strings?[stringId] else { return nil }
         return item.value.asString ?? item.fallback?.asString
     }
 
-    func richTextIfPresent(_ stringId: AdaptyUI.ViewConfiguration.StringId?) -> AdaptyUI.RichText? {
-        guard let stringId, let item = localization?.strings?[stringId] else { return nil }
+    func richText(
+        stringId: String,
+        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?,
+        defaultParagraphAttributes: AdaptyUI.ViewConfiguration.ParagraphAttributes?
+    ) -> AdaptyUI.RichText {
+        guard let item = localization?.strings?[stringId] else { return .empty }
         return AdaptyUI.RichText(
-            items: item.value.convert(self),
-            fallback: item.fallback.map { $0.convert(self) }
+            items: item.value.convert(
+                self,
+                defaultTextAttributes: defaultTextAttributes,
+                defaultParagraphAttributes: defaultParagraphAttributes
+            ),
+            fallback: item.fallback.map { $0.convert(
+                self,
+                defaultTextAttributes: defaultTextAttributes,
+                defaultParagraphAttributes: defaultParagraphAttributes
+            ) }
         )
     }
 }
 
-extension AdaptyUI.ViewConfiguration.RichText {
+private extension AdaptyUI.ViewConfiguration.RichText {
     var asString: String? {
         items.first.flatMap {
             if case let .text(value, attr) = $0, attr == nil { value } else { nil }
@@ -88,8 +100,8 @@ extension AdaptyUI.ViewConfiguration.RichText {
 
     func convert(
         _ localizer: AdaptyUI.ViewConfiguration.Localizer,
-        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes? = nil,
-        defaultParagraphAttributes: AdaptyUI.ViewConfiguration.ParagraphAttributes? = nil
+        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?,
+        defaultParagraphAttributes: AdaptyUI.ViewConfiguration.ParagraphAttributes?
     ) -> [AdaptyUI.RichText.Item] {
         items.compactMap { item in
             switch item {
@@ -113,7 +125,7 @@ extension AdaptyUI.ViewConfiguration.RichText {
 private extension AdaptyUI.ViewConfiguration.RichText.Bullet {
     func convert(
         _ localizer: AdaptyUI.ViewConfiguration.Localizer,
-        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes? = nil
+        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?
     ) -> AdaptyUI.RichText.Bullet? {
         switch self {
         case let .text(value, attr):
@@ -127,7 +139,9 @@ private extension AdaptyUI.ViewConfiguration.RichText.Bullet {
 }
 
 private extension AdaptyUI.ViewConfiguration.TextAttributes {
-    func _add(_ other: AdaptyUI.ViewConfiguration.TextAttributes?) -> AdaptyUI.ViewConfiguration.TextAttributes {
+    func _add(
+        _ other: AdaptyUI.ViewConfiguration.TextAttributes?
+    ) -> AdaptyUI.ViewConfiguration.TextAttributes {
         guard let other else { return self }
         return AdaptyUI.ViewConfiguration.TextAttributes(
             fontAssetId: fontAssetId ?? other.fontAssetId,
@@ -142,7 +156,9 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes {
 }
 
 private extension AdaptyUI.ViewConfiguration.ParagraphAttributes {
-    func add(_ other: AdaptyUI.ViewConfiguration.ParagraphAttributes?) -> AdaptyUI.ViewConfiguration.ParagraphAttributes {
+    func add(
+        _ other: AdaptyUI.ViewConfiguration.ParagraphAttributes?
+    ) -> AdaptyUI.ViewConfiguration.ParagraphAttributes {
         guard let other else { return self }
         return AdaptyUI.ViewConfiguration.ParagraphAttributes(
             horizontalAlign: horizontalAlign ?? other.horizontalAlign,
@@ -168,7 +184,9 @@ private extension AdaptyUI.ViewConfiguration.ParagraphAttributes {
 }
 
 private extension AdaptyUI.ViewConfiguration.TextAttributes? {
-    func add(_ other: AdaptyUI.ViewConfiguration.TextAttributes?) -> AdaptyUI.ViewConfiguration.TextAttributes? {
+    func add(
+        _ other: AdaptyUI.ViewConfiguration.TextAttributes?
+    ) -> AdaptyUI.ViewConfiguration.TextAttributes? {
         switch self {
         case .none:
             other
@@ -177,7 +195,9 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
         }
     }
 
-    func convert(_ localizer: AdaptyUI.ViewConfiguration.Localizer) -> AdaptyUI.RichText.TextAttributes {
+    func convert(
+        _ localizer: AdaptyUI.ViewConfiguration.Localizer
+    ) -> AdaptyUI.RichText.TextAttributes {
         let attr = self
         let font = localizer.font(attr?.fontAssetId)
         return AdaptyUI.RichText.TextAttributes(

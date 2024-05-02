@@ -46,18 +46,24 @@
             tagConverter: AdaptyUI.CustomTagConverter?,
             productTagConverter: AdaptyUI.ProductTagConverter? = nil
         ) -> NSAttributedString {
+            let richText: AdaptyUI.RichText
+
             switch value {
-            case .empty:
-                NSAttributedString()
-            case let .text(value),
-                 let .productDescription(value):
-                value.attributedString(
-                    paragraph: paragraph,
-                    kern: kern,
-                    tagConverter: tagConverter,
-                    productTagConverter: productTagConverter
-                )
+            case let .text(value):
+                richText = value
+            case let .productText(value):
+                let adaptyProductId = value.adaptyProductId
+                richText = value.richText(byPaymentMode: .freeTrial)
+            case let .selectedProductText(value):
+                richText = value.richText(adaptyProductId: "example_product_id", byPaymentMode: .freeTrial)
             }
+
+            return richText.attributedString(
+                paragraph: paragraph,
+                kern: kern,
+                tagConverter: tagConverter,
+                productTagConverter: productTagConverter
+            )
         }
     }
 

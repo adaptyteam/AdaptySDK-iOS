@@ -34,7 +34,13 @@ final class PaywallResponseTests: XCTestCase {
 
         guard case let .data(viewConfiguration) = data.value.value.viewConfiguration else { return }
 
-        let _ = viewConfiguration
+        let locolized = viewConfiguration.extractLocale()
+        let fakeLocolized = viewConfiguration.extractLocale(AdaptyLocale(id: "fake"))
+
+        let x = viewConfiguration
+        
+        let _ = locolized
+        let _ = fakeLocolized
     }
 
     func testPaywalls() throws {

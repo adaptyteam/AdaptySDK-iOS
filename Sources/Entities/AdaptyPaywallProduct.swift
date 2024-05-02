@@ -11,7 +11,7 @@ public struct AdaptyPaywallProduct: AdaptyProduct {
     /// Unique identifier of a product from App Store Connect or Google Play Console.
     public let vendorProductId: String
 
-    let adaptyProductId: String
+    package let adaptyProductId: String
 
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?

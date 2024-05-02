@@ -9,6 +9,8 @@ import Foundation
 
 extension AdaptyUI {
     package struct RichText {
+        static let empty = RichText(items: [], fallback: nil)
+
         package let items: [RichText.Item]
         package let fallback: [RichText.Item]?
 

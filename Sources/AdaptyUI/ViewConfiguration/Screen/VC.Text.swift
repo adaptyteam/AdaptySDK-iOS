@@ -12,33 +12,40 @@ extension AdaptyUI.ViewConfiguration {
         let stringId: StringId
         let maxRows: Int?
         let overflowMode: Set<AdaptyUI.Text.OverflowMode>
-        let textAttributes: TextAttributes?
-        let paragraphAttributes: ParagraphAttributes?
+        let defaultTextAttributes: TextAttributes?
+        let defaultParagraphAttributes: ParagraphAttributes?
     }
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
     func text(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.Text {
-        textIfPresent(textBlock) ?? AdaptyUI.Text.empty
-    }
+        let value: AdaptyUI.Text.Value =
+            switch textBlock.stringId {
+            case let .basic(stringId):
+                .text(richText(
+                    stringId: stringId,
+                    defaultTextAttributes: textBlock.defaultTextAttributes,
+                    defaultParagraphAttributes: textBlock.defaultParagraphAttributes
+                ))
 
-    func textIfPresent(_ textBlock: AdaptyUI.ViewConfiguration.Text) -> AdaptyUI.Text? {
-        guard let item = localization?.strings?[textBlock.stringId] else { return nil }
-
-        let text = AdaptyUI.RichText(
-            items: item.value.convert(
-                self,
-                defaultTextAttributes: textBlock.textAttributes,
-                defaultParagraphAttributes: textBlock.paragraphAttributes
-            ),
-            fallback: item.fallback.map { $0.convert(
-                self,
-                defaultTextAttributes: textBlock.textAttributes,
-                defaultParagraphAttributes: textBlock.paragraphAttributes
-            ) }
-        )
-
-        let value: AdaptyUI.Text.Value = text.isEmpty ? .empty : .text(text)
+            case let .product(info):
+                if let adaptyProductId = info.adaptyProductId {
+                    .productText(AdaptyUI.LazyLocalisedProductText(
+                        adaptyProductId: adaptyProductId,
+                        sufix: info.sufix,
+                        localizer: self,
+                        defaultTextAttributes: textBlock.defaultTextAttributes,
+                        defaultParagraphAttributes: textBlock.defaultParagraphAttributes
+                    ))
+                } else {
+                    .selectedProductText(AdaptyUI.LazyLocalisedUnknownProductText(
+                        sufix: info.sufix,
+                        localizer: self,
+                        defaultTextAttributes: textBlock.defaultTextAttributes,
+                        defaultParagraphAttributes: textBlock.defaultParagraphAttributes
+                    ))
+                }
+            }
 
         return AdaptyUI.Text(
             value: value,
@@ -56,12 +63,12 @@ extension AdaptyUI.ViewConfiguration.Text: Decodable {
     }
 
     init(from decoder: Decoder) throws {
-        if let id = try? decoder.singleValueContainer().decode(String.self) {
+        if let id = try? decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.StringId.self) {
             stringId = id
-            textAttributes = nil
-            paragraphAttributes = nil
+            defaultTextAttributes = nil
+            defaultParagraphAttributes = nil
             maxRows = nil
-            overflowMode = AdaptyUI.Text.OverflowMode.empty
+            overflowMode = .empty
             return
         }
 
@@ -75,8 +82,8 @@ extension AdaptyUI.ViewConfiguration.Text: Decodable {
                 try Set(container.decodeIfPresent([AdaptyUI.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
             }
         let textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
-        self.textAttributes = textAttributes.isEmpty ? nil : textAttributes
+        defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes
         let paragraphAttributes = try AdaptyUI.ViewConfiguration.ParagraphAttributes(from: decoder)
-        self.paragraphAttributes = paragraphAttributes.isEmpty ? nil : paragraphAttributes
+        defaultParagraphAttributes = paragraphAttributes.isEmpty ? nil : paragraphAttributes
     }
 }

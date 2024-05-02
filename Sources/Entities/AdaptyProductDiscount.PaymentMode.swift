@@ -83,16 +83,20 @@ extension AdaptyProductDiscount.PaymentMode: Encodable {
         case unknown
     }
 
-    public func encode(to encoder: Encoder) throws {
-        let value: CodingValues =
+    var asString: String? {
+        let value: CodingValues? =
             switch self {
             case .payAsYouGo: .payAsYouGo
             case .payUpFront: .payUpFront
             case .freeTrial: .freeTrial
-            case .unknown: .unknown
+            case .unknown: nil
             }
 
+        return value.map { $0.rawValue }
+    }
+
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(value.rawValue)
+        try container.encode(asString ?? CodingValues.unknown.rawValue)
     }
 }

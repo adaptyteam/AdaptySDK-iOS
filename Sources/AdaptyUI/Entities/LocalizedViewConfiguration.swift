@@ -13,12 +13,7 @@ extension AdaptyUI {
         public let locale: String
         package let templateId: String
         package let screens: [String: Screen]
-        package let isHard: Bool
-        package let mainImageRelativeHeight: Double?
-
         let version: Int64
-        
-        
     }
 }
 
