@@ -11,20 +11,20 @@ import Foundation
 extension AdaptyUI {
     package struct LazyLocalisedProductText {
         package let adaptyProductId: String
-        private let sufix: String?
+        private let suffix: String?
         private let localizer: ViewConfiguration.Localizer
         private let defaultTextAttributes: ViewConfiguration.TextAttributes?
         private let defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
 
         init(
             adaptyProductId: String,
-            sufix: String?,
+            suffix: String?,
             localizer: ViewConfiguration.Localizer,
             defaultTextAttributes: ViewConfiguration.TextAttributes?,
             defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
         ) {
             self.adaptyProductId = adaptyProductId
-            self.sufix = sufix
+            self.suffix = suffix
             self.localizer = localizer
             self.defaultTextAttributes = defaultTextAttributes
             self.defaultParagraphAttributes = defaultParagraphAttributes
@@ -37,7 +37,7 @@ extension AdaptyUI {
                 stringId: ViewConfiguration.StringId.Product.calculate(
                     adaptyProductId: adaptyProductId,
                     byPaymentMode: mode,
-                    sufix: sufix
+                    suffix: suffix
                 ),
                 defaultTextAttributes: defaultTextAttributes,
                 defaultParagraphAttributes: defaultParagraphAttributes
@@ -46,18 +46,18 @@ extension AdaptyUI {
     }
 
     package struct LazyLocalisedUnknownProductText {
-        private let sufix: String?
+        private let suffix: String?
         private let localizer: ViewConfiguration.Localizer
         private let defaultTextAttributes: ViewConfiguration.TextAttributes?
         private let defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
 
         init(
-            sufix: String?,
+            suffix: String?,
             localizer: ViewConfiguration.Localizer,
             defaultTextAttributes: ViewConfiguration.TextAttributes?,
             defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
         ) {
-            self.sufix = sufix
+            self.suffix = suffix
             self.localizer = localizer
             self.defaultTextAttributes = defaultTextAttributes
             self.defaultParagraphAttributes = defaultParagraphAttributes
@@ -71,7 +71,7 @@ extension AdaptyUI {
                 stringId: ViewConfiguration.StringId.Product.calculate(
                     adaptyProductId: adaptyProductId,
                     byPaymentMode: mode,
-                    sufix: sufix
+                    suffix: suffix
                 ),
                 defaultTextAttributes: defaultTextAttributes,
                 defaultParagraphAttributes: defaultParagraphAttributes

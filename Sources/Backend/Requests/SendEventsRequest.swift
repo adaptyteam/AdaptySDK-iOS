@@ -36,14 +36,14 @@ struct SendEventsRequest: HTTPDataRequest {
         ].joined(separator: "\"").data(using: .utf8)!
 
         static let separator = ",".data(using: .utf8)!
-        static let sufix = "]}}}".data(using: .utf8)!
+        static let suffix = "]}}}".data(using: .utf8)!
     }
 
     func getData(configuration _: HTTPConfiguration) throws -> Data? {
         var data = Data()
         data.append(Constants.prefix)
         data.append(contentsOf: events.joined(separator: Constants.separator))
-        data.append(Constants.sufix)
+        data.append(Constants.suffix)
         return data
     }
 }

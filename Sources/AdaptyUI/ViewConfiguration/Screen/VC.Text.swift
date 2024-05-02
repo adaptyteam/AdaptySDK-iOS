@@ -32,14 +32,14 @@ extension AdaptyUI.ViewConfiguration.Localizer {
                 if let adaptyProductId = info.adaptyProductId {
                     .productText(AdaptyUI.LazyLocalisedProductText(
                         adaptyProductId: adaptyProductId,
-                        sufix: info.sufix,
+                        suffix: info.suffix,
                         localizer: self,
                         defaultTextAttributes: textBlock.defaultTextAttributes,
                         defaultParagraphAttributes: textBlock.defaultParagraphAttributes
                     ))
                 } else {
                     .selectedProductText(AdaptyUI.LazyLocalisedUnknownProductText(
-                        sufix: info.sufix,
+                        suffix: info.suffix,
                         localizer: self,
                         defaultTextAttributes: textBlock.defaultTextAttributes,
                         defaultParagraphAttributes: textBlock.defaultParagraphAttributes
