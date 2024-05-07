@@ -33,9 +33,9 @@ extension AdaptyUI.Frame: Decodable {
     enum CodingKeys: String, CodingKey {
         case height
         case width
-        case minHeight
-        case maxHeight
-        case minWidth
-        case maxWidth
+        case minHeight = "min_height"
+        case maxHeight = "max_height"
+        case minWidth = "min_width"
+        case maxWidth = "max_width"
     }
 }
