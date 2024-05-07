@@ -36,7 +36,7 @@ extension Adapty {
 extension Adapty.Configuration {
     static var idfaCollectionDisabled: Bool = `default`.idfaCollectionDisabled
     static var ipAddressCollectionDisabled: Bool = `default`.ipAddressCollectionDisabled
-    static var observerMode: Bool = `default`.observerMode
+    package internal(set) static var observerMode: Bool = `default`.observerMode
 }
 
 extension Backend {
