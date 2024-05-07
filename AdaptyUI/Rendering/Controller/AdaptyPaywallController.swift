@@ -7,40 +7,41 @@
 
 #if canImport(UIKit)
 
-import Adapty
-import Combine
-import UIKit
+    import Adapty
+    import Combine
+    import SwiftUI
+    import UIKit
 
-@available(iOS 13.0, *)
-public class AdaptyPaywallController: UIViewController {
-    fileprivate let logId: String
+    @available(iOS 13.0, *)
+    public class AdaptyPaywallController: UIViewController {
+        fileprivate let logId: String
 
-    public let id = UUID()
-    public var paywall: AdaptyPaywall { presenter.paywall }
-    public var viewConfiguration: AdaptyUI.LocalizedViewConfiguration { presenter.viewConfiguration }
+        public let id = UUID()
+        public var paywall: AdaptyPaywall { presenter.paywall }
+        public var viewConfiguration: AdaptyUI.LocalizedViewConfiguration { presenter.viewConfiguration }
 
-    public weak var delegate: AdaptyPaywallControllerDelegate?
+        public weak var delegate: AdaptyPaywallControllerDelegate?
 
 //    private var layoutBuilder: LayoutBuilder?
-    private let presenter: AdaptyPaywallPresenter
-    private var cancellable = Set<AnyCancellable>()
-    private let tagResolver: AdaptyTagResolver?
+        private let presenter: AdaptyPaywallPresenter
+        private var cancellable = Set<AnyCancellable>()
+        private let tagResolver: AdaptyTagResolver?
 
-    init(
-        paywall: AdaptyPaywall,
-        products: [AdaptyPaywallProduct]?,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
-        delegate: AdaptyPaywallControllerDelegate,
-        tagResolver: AdaptyTagResolver?
-    ) {
-        let logId = AdaptyUI.generateLogId()
+        init(
+            paywall: AdaptyPaywall,
+            products: [AdaptyPaywallProduct]?,
+            viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
+            delegate: AdaptyPaywallControllerDelegate,
+            tagResolver: AdaptyTagResolver?
+        ) {
+            let logId = AdaptyUI.generateLogId()
 
-        AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0)")
+            AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0)")
 
-        self.logId = logId
-        self.delegate = delegate
+            self.logId = logId
+            self.delegate = delegate
 
-        let selectedProductIndex: Int
+            let selectedProductIndex: Int
 //
 //        if let style = try? viewConfiguration.extractDefaultStyle() {
 //            selectedProductIndex = style.productBlock.mainProductIndex
@@ -48,69 +49,115 @@ public class AdaptyPaywallController: UIViewController {
             selectedProductIndex = 0
 //        }
 
-        presenter = AdaptyPaywallPresenter(logId: logId,
-                                           paywall: paywall,
-                                           products: products,
-                                           selectedProductIndex: selectedProductIndex,
-                                           viewConfiguration: viewConfiguration)
+            presenter = AdaptyPaywallPresenter(logId: logId,
+                                               paywall: paywall,
+                                               products: products,
+                                               selectedProductIndex: selectedProductIndex,
+                                               viewConfiguration: viewConfiguration)
 
-        self.tagResolver = tagResolver
+            self.tagResolver = tagResolver
 
-        super.init(nibName: nil, bundle: nil)
+            super.init(nibName: nil, bundle: nil)
 
-        modalPresentationStyle = .fullScreen
+            modalPresentationStyle = .fullScreen
 
-        presenter.delegate = self
-        presenter.loadProductsIfNeeded()
-    }
+            presenter.delegate = self
+            presenter.loadProductsIfNeeded()
+        }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
 
-    override public var preferredStatusBarStyle: UIStatusBarStyle {
-        .lightContent
-    }
+        override public var preferredStatusBarStyle: UIStatusBarStyle {
+            .lightContent
+        }
 
-    deinit {
-        log(.verbose, "deinit")
-    }
+        deinit {
+            log(.verbose, "deinit")
+        }
 
-    override public func viewDidLoad() {
-        super.viewDidLoad()
+        override public func viewDidLoad() {
+            super.viewDidLoad()
 
-        log(.verbose, "viewDidLoad begin")
+            log(.verbose, "viewDidLoad begin")
 
-        subscribeForDataChange()
-        subscribeForEvents()
-        buildInterface()
-        subscribeForActions()
+            subscribeForDataChange()
+            subscribeForEvents()
+            buildInterface()
+            subscribeForActions()
 
-        presenter.logShowPaywall()
-        log(.verbose, "viewDidLoad end")
-    }
+            presenter.logShowPaywall()
+            log(.verbose, "viewDidLoad end")
+        }
 
-    override public func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        override public func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
 
-        log(.verbose, "viewDidAppear")
+            log(.verbose, "viewDidAppear")
 //        layoutBuilder?.closeButtonView?.performTransitionIn()
-    }
+        }
 
-    override public func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+        override public func viewDidDisappear(_ animated: Bool) {
+            super.viewDidDisappear(animated)
 
-        log(.verbose, "viewDidDisappear")
-    }
+            log(.verbose, "viewDidDisappear")
+        }
 
-    override public func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+        override public func viewDidLayoutSubviews() {
+            super.viewDidLayoutSubviews()
 
 //        layoutBuilder?.viewDidLayoutSubviews(view)
-    }
+        }
 
-    private func buildInterface() {
+        private func buildInterface() {
 //        view.backgroundColor = .white
+
+            if let screen = viewConfiguration.screens.first?.value {
+                view.backgroundColor = screen.background.asColor?.uiColor ?? .white
+
+                switch viewConfiguration.templateId {
+                case "basic":
+                    addSubSwiftUIView(
+                        AdaptyUIBasicContainerView(
+                            screen: screen,
+                            closeButtonBuilder: {
+                                Button("Dismiss") { [weak self] in
+                                    self?.dismiss(animated: true)
+                                }
+                            }
+                        ),
+                        to: view
+                    )
+                case "flat":
+                    addSubSwiftUIView(
+                        AdaptyUIFlatContainerView(
+                            screen: screen,
+                            closeButtonBuilder: {
+                                Button("Dismiss") { [weak self] in
+                                    self?.dismiss(animated: true)
+                                }
+                            }
+                        ),
+                        to: view
+                    )
+                default:
+                    addSubSwiftUIView(Text("Not Supported Template: \(viewConfiguration.templateId)"),
+                                      to: view)
+                }
+            } else {
+                view.backgroundColor = .white // TODO: remove
+
+                addSubSwiftUIView(
+                    VStack {
+                        Text("Rendering Failed!")
+                        Button("Dismiss") { [weak self] in
+                            self?.dismiss(animated: true)
+                        }
+                    },
+                    to: view
+                )
+            }
 //
 //        let tagConverter: AdaptyUI.CustomTagConverter?
 //
@@ -133,41 +180,41 @@ public class AdaptyPaywallController: UIViewController {
 //        } catch {
 //            handleRenderingError(error)
 //        }
-    }
-
-    private func handleRenderingError(_ error: Error) {
-        if let error = error as? AdaptyUIError {
-            log(.error, "Rendering Error = \(error)")
-            delegate?.paywallController(self, didFailRenderingWith: AdaptyError(error))
-        } else {
-            log(.error, "Unknown Rendering Error = \(error)")
-            let adaptyError = AdaptyError(AdaptyUIError.rendering(error))
-            delegate?.paywallController(self, didFailRenderingWith: adaptyError)
         }
-    }
 
-    private func handleAction(_ action: AdaptyUI.ButtonAction) {
-        switch action {
-        case .close:
-            log(.verbose, "close tap")
-            delegate?.paywallController(self, didPerform: .close)
-        case let .openUrl(urlString):
-            log(.verbose, "openUrl tap")
-            guard let urlString, let url = URL(string: urlString) else { return }
-            delegate?.paywallController(self, didPerform: .openURL(url: url))
-        case .restore:
-            log(.verbose, "restore tap")
-            presenter.restorePurchases()
-            delegate?.paywallControllerDidStartRestore(self)
-        case let .custom(id):
-            log(.verbose, "custom (\(id)) tap")
-            delegate?.paywallController(self, didPerform: .custom(id: id))
-        case .selectProductId, .purchaseProductId, .purchaseSelectedProduct:
-            break
+        private func handleRenderingError(_ error: Error) {
+            if let error = error as? AdaptyUIError {
+                log(.error, "Rendering Error = \(error)")
+                delegate?.paywallController(self, didFailRenderingWith: AdaptyError(error))
+            } else {
+                log(.error, "Unknown Rendering Error = \(error)")
+                let adaptyError = AdaptyError(AdaptyUIError.rendering(error))
+                delegate?.paywallController(self, didFailRenderingWith: adaptyError)
+            }
         }
-    }
 
-    private func subscribeForDataChange() {
+        private func handleAction(_ action: AdaptyUI.ButtonAction) {
+            switch action {
+            case .close:
+                log(.verbose, "close tap")
+                delegate?.paywallController(self, didPerform: .close)
+            case let .openUrl(urlString):
+                log(.verbose, "openUrl tap")
+                guard let urlString, let url = URL(string: urlString) else { return }
+                delegate?.paywallController(self, didPerform: .openURL(url: url))
+            case .restore:
+                log(.verbose, "restore tap")
+                presenter.restorePurchases()
+                delegate?.paywallControllerDidStartRestore(self)
+            case let .custom(id):
+                log(.verbose, "custom (\(id)) tap")
+                delegate?.paywallController(self, didPerform: .custom(id: id))
+            case .selectProductId, .purchaseProductId, .purchaseSelectedProduct:
+                break
+            }
+        }
+
+        private func subscribeForDataChange() {
 //        presenter.$products
 //            .receive(on: RunLoop.main)
 //            .sink { [weak self] value in
@@ -189,47 +236,47 @@ public class AdaptyPaywallController: UIViewController {
 //            }
 //            .store(in: &cancellable)
 
-        presenter.$selectedProductId
-            .receive(on: RunLoop.main)
-            .dropFirst()
-            .sink { [weak self] value in
-                guard let self = self,
-                      let delegate = self.delegate,
-                      let product = self.presenter.adaptyProducts?.first(where: { $0.vendorProductId == value }) else {
-                    return
+            presenter.$selectedProductId
+                .receive(on: RunLoop.main)
+                .dropFirst()
+                .sink { [weak self] value in
+                    guard let self = self,
+                          let delegate = self.delegate,
+                          let product = self.presenter.adaptyProducts?.first(where: { $0.vendorProductId == value }) else {
+                        return
+                    }
+
+                    self.updateSelectedProductId(product.vendorProductId)
+                    delegate.paywallController(self, didSelectProduct: product)
                 }
+                .store(in: &cancellable)
 
-                self.updateSelectedProductId(product.vendorProductId)
-                delegate.paywallController(self, didSelectProduct: product)
-            }
-            .store(in: &cancellable)
+            presenter.$purchaseInProgress
+                .receive(on: RunLoop.main)
+                .sink { [weak self] value in
+                    self?.updatePurchaseInProgress(value)
+                }
+                .store(in: &cancellable)
 
-        presenter.$purchaseInProgress
-            .receive(on: RunLoop.main)
-            .sink { [weak self] value in
-                self?.updatePurchaseInProgress(value)
-            }
-            .store(in: &cancellable)
-
-        presenter.$restoreInProgress
-            .receive(on: RunLoop.main)
-            .sink { [weak self] value in
-                self?.updateGlobalLoadingIndicator(restoreInProgress: value, animated: true)
-            }
-            .store(in: &cancellable)
-    }
-
-    private func subscribeForEvents() {
-        presenter.onPurchase = { [weak self] result, product in
-            self?.handlePurchaseResult(result, product)
+            presenter.$restoreInProgress
+                .receive(on: RunLoop.main)
+                .sink { [weak self] value in
+                    self?.updateGlobalLoadingIndicator(restoreInProgress: value, animated: true)
+                }
+                .store(in: &cancellable)
         }
 
-        presenter.onRestore = { [weak self] result in
-            self?.handleRestoreResult(result)
-        }
-    }
+        private func subscribeForEvents() {
+            presenter.onPurchase = { [weak self] result, product in
+                self?.handlePurchaseResult(result, product)
+            }
 
-    private func subscribeForActions() {
+            presenter.onRestore = { [weak self] result in
+                self?.handleRestoreResult(result)
+            }
+        }
+
+        private func subscribeForActions() {
 //        layoutBuilder?.productsView?.onProductSelected = { [weak self] product in
 //            guard let self = self else { return }
 //
@@ -257,63 +304,63 @@ public class AdaptyPaywallController: UIViewController {
 //                self?.handleAction(action)
 //            }
 //        )
-    }
+        }
 
-    private func handlePurchaseResult(_ result: AdaptyResult<AdaptyPurchasedInfo>,
-                                      _ product: AdaptyPaywallProduct) {
-        switch result {
-        case let .success(info):
-            delegate?.paywallController(self,
-                                        didFinishPurchase: product,
-                                        purchasedInfo: info)
-        case let .failure(error):
-            if error.adaptyErrorCode == .paymentCancelled {
-                delegate?.paywallController(self, didCancelPurchase: product)
-            } else {
-                delegate?.paywallController(self, didFailPurchase: product, error: error)
+        private func handlePurchaseResult(_ result: AdaptyResult<AdaptyPurchasedInfo>,
+                                          _ product: AdaptyPaywallProduct) {
+            switch result {
+            case let .success(info):
+                delegate?.paywallController(self,
+                                            didFinishPurchase: product,
+                                            purchasedInfo: info)
+            case let .failure(error):
+                if error.adaptyErrorCode == .paymentCancelled {
+                    delegate?.paywallController(self, didCancelPurchase: product)
+                } else {
+                    delegate?.paywallController(self, didFailPurchase: product, error: error)
+                }
             }
         }
-    }
 
-    private func handleRestoreResult(_ result: AdaptyResult<AdaptyProfile>) {
-        switch result {
-        case let .success(profile):
-            delegate?.paywallController(self, didFinishRestoreWith: profile)
-        case let .failure(error):
-            delegate?.paywallController(self, didFailRestoreWith: error)
+        private func handleRestoreResult(_ result: AdaptyResult<AdaptyProfile>) {
+            switch result {
+            case let .success(profile):
+                delegate?.paywallController(self, didFinishRestoreWith: profile)
+            case let .failure(error):
+                delegate?.paywallController(self, didFailRestoreWith: error)
+            }
         }
-    }
 
-    private func updateSelectedProductId(_ adaptyProductId: String) {
+        private func updateSelectedProductId(_ adaptyProductId: String) {
 //        layoutBuilder?.productsView?.updateSelectedState(productId)
-    }
+        }
 
-    private func updatePurchaseInProgress(_ inProgress: Bool) {
+        private func updatePurchaseInProgress(_ inProgress: Bool) {
 //        layoutBuilder?.productsView?.isUserInteractionEnabled = !inProgress
 //        layoutBuilder?.continueButton?.updateInProgress(inProgress)
-    }
+        }
 
-    private func updateGlobalLoadingIndicator(restoreInProgress: Bool, animated: Bool) {
+        private func updateGlobalLoadingIndicator(restoreInProgress: Bool, animated: Bool) {
 //        if restoreInProgress {
 //            layoutBuilder?.activityIndicator?.show(animated: animated)
 //        } else {
 //            layoutBuilder?.activityIndicator?.hide(animated: animated)
 //        }
+        }
     }
-}
 
-@available(iOS 13.0, *)
-extension AdaptyPaywallController: AdaptyPaywallPresenterDelegate {
-    func didFailLoadingProducts(with error: AdaptyError) -> Bool {
-        delegate?.paywallController(self, didFailLoadingProductsWith: error) ?? false
+    @available(iOS 13.0, *)
+    extension AdaptyPaywallController: AdaptyPaywallPresenterDelegate {
+        func didFailLoadingProducts(with error: AdaptyError) -> Bool {
+            delegate?.paywallController(self, didFailLoadingProductsWith: error) ?? false
+        }
     }
-}
 
-@available(iOS 13.0, *)
-extension AdaptyPaywallController {
-    func log(_ level: AdaptyLogLevel, _ message: String) {
-        AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
+    @available(iOS 13.0, *)
+    extension AdaptyPaywallController {
+        func log(_ level: AdaptyLogLevel, _ message: String) {
+            AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
+        }
     }
-}
 
 #endif

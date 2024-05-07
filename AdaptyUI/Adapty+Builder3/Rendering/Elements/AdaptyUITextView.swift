@@ -55,21 +55,7 @@
             } else {
                 FallbackText(nsAttributedString)
                     .fixedSize(horizontal: true, vertical: true)
-                    .background(Color.green)
-//            items.reduce(Text("")) { partialResult, item in
-//                switch item {
-//                case let .text(value, attr):
-//                    return partialResult + Text(value).withAttributes(attr)
-//                case let .tag(value, attr):
-//                    // TODO: replace tags
-//                    return partialResult + Text(value).withAttributes(attr)
-//                case let .paragraph(attr):
-//                    return partialResult.withAttributes(attr) + Text("\n")
-//                case let .image(imageData, attributes):
-//                    // TODO: implement
-//                    return partialResult // + Text(Image("123"))
-//                }
-//            }
+//                    .background(Color.green)
             }
         }
     }
@@ -81,6 +67,7 @@
 
         @available(iOS 13.0, *)
         extension AdaptyUI.Color {
+            static let testWhite = AdaptyUI.Color(data: 0xFFFFFFFF)
             static let testClear = AdaptyUI.Color(data: 0xFFFFFF00)
             static let testRed = AdaptyUI.Color(data: 0xFF0000FF)
             static let testGreen = AdaptyUI.Color(data: 0x00FF00FF)
