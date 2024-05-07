@@ -4,6 +4,7 @@
 //
 //  Created by Aleksey Goncharov on 03.05.2024.
 //
+#if canImport(UIKit)
 
 import SwiftUI
 
@@ -74,3 +75,5 @@ struct AdaptyUIFlatContainerView<CloseButton: View>: View {
         }
     )
 }
+
+#endif
