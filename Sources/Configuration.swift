@@ -39,6 +39,10 @@ extension Adapty.Configuration {
     static var observerMode: Bool = `default`.observerMode
 }
 
+extension Adapty {
+    public var observerMode: Bool { Configuration.observerMode }
+}
+
 extension Backend {
     init(with configuration: Adapty.Configuration) {
         self.init(
