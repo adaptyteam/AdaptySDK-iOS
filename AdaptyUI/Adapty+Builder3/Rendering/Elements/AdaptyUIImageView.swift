@@ -47,6 +47,7 @@ struct AdaptyUIImageView: View {
             } else {
                 Image(uiImage: uiImage)
                     .resizable()
+                    .aspectRatio(contentMode: .fill)
                     .aspectRatio(image.aspect)
             }
         } else {
@@ -105,6 +106,12 @@ struct AdaptyUIImageView: View {
         static var test: Self {
             .init(asset: .urlDog,
                   aspect: .fit,
+                  tint: nil)
+        }
+        
+        static var testFill: Self {
+            .init(asset: .urlDog,
+                  aspect: .fill,
                   tint: nil)
         }
     }
