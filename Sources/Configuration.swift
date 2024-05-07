@@ -40,7 +40,7 @@ extension Adapty.Configuration {
 }
 
 extension Adapty {
-    public var observerMode: Bool { Configuration.observerMode }
+    public static var observerMode: Bool { Configuration.observerMode }
 }
 
 extension Backend {
