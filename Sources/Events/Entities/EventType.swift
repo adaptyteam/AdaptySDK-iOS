@@ -10,7 +10,7 @@ import Foundation
 enum EventType {
     case appOpened
     case paywallShowed(AdaptyPaywallShowedParameters)
-    case paywallVariationChose(AdaptyPaywallVariationChoseParameters)
+    case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)
     case onboardingScreenShowed(AdaptyOnboardingScreenParameters)
     case system(AdaptySystemEventParameters)
 }
@@ -21,7 +21,7 @@ extension EventType {
         static let paywallShowed = "paywall_showed"
         static let onboardingScreenShowed = "onboarding_screen_showed"
         static let system = "system_log"
-        static let paywallVariationChose = "paywall_variation_chose"
+        static let paywallVariationAssigned = "paywall_variation_assigned"
     }
 
     static let systemEvents = [Name.system]
@@ -36,8 +36,8 @@ extension EventType {
             Name.onboardingScreenShowed
         case .system:
             Name.system
-        case .paywallVariationChose:
-            Name.paywallVariationChose
+        case .paywallVariationAssigned:
+            Name.paywallVariationAssigned
         }
     }
 }
@@ -54,8 +54,8 @@ extension EventType: Encodable {
         case let .onboardingScreenShowed(value):
             try container.encode(Name.onboardingScreenShowed, forKey: .type)
             try value.encode(to: encoder)
-        case let .paywallVariationChose(value):
-            try container.encode(Name.paywallVariationChose, forKey: .type)
+        case let .paywallVariationAssigned(value):
+            try container.encode(Name.paywallVariationAssigned, forKey: .type)
             try value.encode(to: encoder)
         case let .system(value):
             try container.encode(Name.system, forKey: .type)
