@@ -6,6 +6,7 @@
 //
 #if canImport(UIKit)
 
+import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
@@ -71,6 +72,8 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
     }
 }
 
+#if DEBUG
+
 @testable import Adapty
 
 @available(iOS 13.0, *)
@@ -87,5 +90,6 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
         }
     )
 }
+#endif
 
 #endif

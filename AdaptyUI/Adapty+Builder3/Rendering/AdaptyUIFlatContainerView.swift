@@ -4,8 +4,10 @@
 //
 //  Created by Aleksey Goncharov on 03.05.2024.
 //
+
 #if canImport(UIKit)
 
+import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
@@ -31,20 +33,20 @@ struct AdaptyUIFlatContainerView<CloseButton: View>: View {
                 if let mainBlock = screen.mainBlock {
                     ScrollView {
                         Spacer().frame(height: p.safeAreaInsets.top)
-                        
+
                         AdaptyUIElementView(mainBlock)
                             .padding(.bottom, footerSize.height)
-                        
+
                         Spacer().frame(height: p.safeAreaInsets.bottom)
                     }
                 }
-                
+
                 if let footerBlock = screen.footerBlock {
                     AdaptyUIElementView(footerBlock)
                         .background(GeometryReader(content: set(proxy:)))
                         .padding(.bottom, p.safeAreaInsets.bottom)
                 }
-                
+
                 if let closeButtonBuilder {
                     closeButtonBuilder()
                         .frame(maxWidth: .infinity,
@@ -58,6 +60,8 @@ struct AdaptyUIFlatContainerView<CloseButton: View>: View {
 //        .ignoresSafeArea()
     }
 }
+
+#if DEBUG
 
 @testable import Adapty
 
@@ -75,5 +79,7 @@ struct AdaptyUIFlatContainerView<CloseButton: View>: View {
         }
     )
 }
+
+#endif
 
 #endif
