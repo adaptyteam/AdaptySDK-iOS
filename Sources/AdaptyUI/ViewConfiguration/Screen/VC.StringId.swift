@@ -63,7 +63,7 @@ extension AdaptyUI.ViewConfiguration.StringId.Product: Decodable {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.type], debugDescription: "is not equeal \"\(Self.typeValue)\" "))
         }
 
-        adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
-        suffix = try container.decode(String.self, forKey: .suffix)
+        adaptyProductId = try container.decodeIfPresent(String.self, forKey: .adaptyProductId)
+        suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
     }
 }
