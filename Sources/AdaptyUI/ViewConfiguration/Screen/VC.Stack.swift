@@ -40,7 +40,7 @@ extension AdaptyUI.ViewConfiguration.Stack: Decodable {
         let def = AdaptyUI.Stack.default
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            type: container.decodeIfPresent(AdaptyUI.StackType.self, forKey: .type) ?? def.type,
+            type: container.decode(AdaptyUI.StackType.self, forKey: .type),
             horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
             elements: container.decodeIfPresent([AdaptyUI.ViewConfiguration.Element].self, forKey: .elements) ?? []

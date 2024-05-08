@@ -131,8 +131,6 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
         let transitionIn: [AdaptyUI.Transition] =
             if let array = try? container.decodeIfPresent([AdaptyUI.Transition].self, forKey: .transitionIn) {
                 array
-            } else if let union = try? container.decodeIfPresent(AdaptyUI.TransitionUnion.self, forKey: .transitionIn) {
-                union.items
             } else if let transition = try container.decodeIfPresent(AdaptyUI.Transition.self, forKey: .transitionIn) {
                 [transition]
             } else {

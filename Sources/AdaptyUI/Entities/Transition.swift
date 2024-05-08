@@ -33,12 +33,6 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI {
-    struct TransitionUnion: Decodable {
-        let type: String
-        let items: [AdaptyUI.Transition]
-    }
-}
 
 extension AdaptyUI.Transition: Decodable {
     enum CodingKeys: String, CodingKey {

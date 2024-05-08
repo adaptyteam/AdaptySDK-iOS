@@ -10,6 +10,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     struct Localization {
         let id: AdaptyLocale
+        let isRightToLeft: Bool?
         let strings: [String: Item]?
         let assets: [String: Asset]?
 
@@ -25,6 +26,7 @@ extension AdaptyUI.ViewConfiguration.Localization: Decodable {
         case id
         case strings
         case assets
+        case isRightToLeft = "is_right_to_left"
     }
 
     enum ItemCodingKeys: String, CodingKey {
@@ -36,6 +38,7 @@ extension AdaptyUI.ViewConfiguration.Localization: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(AdaptyLocale.self, forKey: .id)
+        isRightToLeft = try container.decodeIfPresent(Bool.self, forKey: .isRightToLeft)
 
         assets = try (container.decodeIfPresent(AdaptyUI.ViewConfiguration.AssetsContainer.self, forKey: .assets))?.value
 

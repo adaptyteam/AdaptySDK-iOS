@@ -9,10 +9,12 @@ import Foundation
 
 extension AdaptyUI {
     package enum HorizontalAlignment: String {
+        case leading
+        case trailing
         case left
         case center
         case right
-        case fill
+        case justified
     }
 }
 

@@ -12,7 +12,7 @@ extension AdaptyUI {
         case top
         case center
         case bottom
-        case fill
+        case justified
     }
 }
 

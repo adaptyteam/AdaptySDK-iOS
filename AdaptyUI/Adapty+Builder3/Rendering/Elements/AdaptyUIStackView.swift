@@ -32,10 +32,12 @@ extension AdaptyUI.Stack {
 extension AdaptyUI.HorizontalAlignment {
     var swiftuiValue: SwiftUI.HorizontalAlignment {
         switch self {
-        case .left: .leading
+        case .left: .leading // TODO:
+        case .right: .trailing // TODO: 
+        case .leading: .leading
+        case .trailing: .trailing
         case .center: .center
-        case .right: .trailing
-        case .fill: .center
+        case .justified: .center
         }
     }
 }
@@ -47,7 +49,7 @@ extension AdaptyUI.VerticalAlignment {
         case .top: .top
         case .center: .center
         case .bottom: .bottom
-        case .fill: .center
+        case .justified: .center
         }
     }
 }
@@ -56,7 +58,7 @@ extension AdaptyUI.VerticalAlignment {
 extension View {
     @ViewBuilder
     func fixedVerticalSizeIfFill(_ alignment: AdaptyUI.VerticalAlignment) -> some View {
-        if alignment == .fill {
+        if alignment == .justified {
             fixedSize(horizontal: false, vertical: true)
         } else {
             self
@@ -65,7 +67,7 @@ extension View {
 
     @ViewBuilder
     func fixedHorizontalSizeIfFill(_ alignment: AdaptyUI.HorizontalAlignment) -> some View {
-        if alignment == .fill {
+        if alignment == .justified {
             fixedSize(horizontal: true, vertical: false)
         } else {
             self
@@ -74,7 +76,7 @@ extension View {
 
     @ViewBuilder
     func infiniteHeightIfFill(_ alignment: AdaptyUI.VerticalAlignment) -> some View {
-        if alignment == .fill {
+        if alignment == .justified {
             frame(maxHeight: .infinity)
         } else {
             self
@@ -83,7 +85,7 @@ extension View {
 
     @ViewBuilder
     func infiniteWidthIfFill(_ alignment: AdaptyUI.HorizontalAlignment) -> some View {
-        if alignment == .fill {
+        if alignment == .justified {
             frame(maxWidth: .infinity)
         } else {
             self
@@ -157,7 +159,7 @@ struct AdaptyUIStackView: View {
             AdaptyUI.Stack(
                 type: .horizontal,
                 horizontalAlignment: .left,
-                verticalAlignment: .fill,
+                verticalAlignment: .justified,
                 elements: [
                     .button(
                         .init(

@@ -26,6 +26,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         .init(
             id: source.id,
             locale: locale.id,
+            isRightToLeft: localization?.isRightToLeft ?? false,
             templateId: source.templateId,
             screens: source.screens.mapValues(screen),
             version: source.version

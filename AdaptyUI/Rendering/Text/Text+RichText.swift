@@ -310,10 +310,12 @@
     extension AdaptyUI.HorizontalAlignment {
         var textAlignment: NSTextAlignment {
             switch self {
-            case .left: .natural
+            case .leading: .natural // TODO: inspect
+            case .trailing: .right // TODO: inspect
+            case .left: .left
             case .center: .center
             case .right: .right
-            case .fill: .center // TODO: inspect
+            case .justified: .center // TODO: inspect
             }
         }
     }

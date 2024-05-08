@@ -41,12 +41,7 @@ extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         backgroundAssetId = try container.decodeIfPresent(String.self, forKey: .backgroundAssetId)
-        let shape: AdaptyUI.ShapeType =
-            if let value = try? container.decode(AdaptyUI.ShapeType.self, forKey: .shapeType) {
-                value
-            } else {
-                AdaptyUI.Decorator.defaultShapeType
-            }
+        let shape = (try? container.decode(AdaptyUI.ShapeType.self, forKey: .shapeType)) ?? AdaptyUI.Decorator.defaultShapeType
 
         if case .rectangle = shape,
            let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.CornerRadius.self, forKey: .rectangleCornerRadius) {

@@ -46,6 +46,7 @@ private extension AdaptyUI.ViewConfiguration.Localization {
 
         return .init(
             id: id,
+            isRightToLeft: isRightToLeft ?? localization.isRightToLeft,
             strings: strings.isEmpty ? nil : strings,
             assets: assets.isEmpty ? nil : assets
         )
