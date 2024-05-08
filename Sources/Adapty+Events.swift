@@ -47,12 +47,12 @@ extension Adapty {
     static func logIfNeed(_ chosen: AdaptyPaywallChosen, _ completion: AdaptyErrorCompletion? = nil) {
         switch chosen.kind {
         case let .draw(placementAudienceVersionId, profileId):
-            let parameters = AdaptyPaywallVariationChoseParameters(
+            let parameters = AdaptyPaywallVariationAssignedParameters(
                 paywallVariationId: chosen.value.variationId,
                 viewConfigurationId: chosen.value.viewConfiguration?.id,
                 placementAudienceVersionId: placementAudienceVersionId
             )
-            trackEvent(.paywallVariationChose(parameters), profileId: profileId, completion)
+            trackEvent(.paywallVariationAssigned(parameters), profileId: profileId, completion)
         default:
             completion?(nil)
         }
