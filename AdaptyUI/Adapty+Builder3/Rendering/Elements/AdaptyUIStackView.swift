@@ -107,7 +107,7 @@ struct AdaptyUIStackView: View {
     var body: some View {
         switch stack.type {
         case .vertical:
-            VStack(alignment: stack.horizontalAlignment.swiftuiValue, spacing: 0) {
+            VStack(alignment: stack.horizontalAlignment.swiftuiValue, spacing: stack.spacing) {
                 ForEach(0 ..< stack.elements.count, id: \.self) {
                     AdaptyUIElementView(stack.elements[$0])
                         .infiniteWidthIfFill(stack.horizontalAlignment)
@@ -116,7 +116,7 @@ struct AdaptyUIStackView: View {
             .fixedHorizontalSizeIfFill(stack.horizontalAlignment)
             .applyingProperties(properties)
         case .horizontal:
-            HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: 0) {
+            HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
                 ForEach(0 ..< stack.elements.count, id: \.self) {
                     AdaptyUIElementView(stack.elements[$0])
                         .infiniteHeightIfFill(stack.verticalAlignment)
@@ -160,6 +160,7 @@ struct AdaptyUIStackView: View {
                 type: .horizontal,
                 horizontalAlignment: .left,
                 verticalAlignment: .justified,
+                spacing: 0,
                 elements: [
                     .button(
                         .init(
@@ -210,6 +211,7 @@ struct AdaptyUIStackView: View {
                 type: .z,
                 horizontalAlignment: .right,
                 verticalAlignment: .top,
+                spacing: 0,
                 elements: [
                     .text(
                         .testBodyLong,
@@ -245,6 +247,7 @@ struct AdaptyUIStackView: View {
                 type: .z,
                 horizontalAlignment: .left,
                 verticalAlignment: .top,
+                spacing: 0,
                 elements: [
                     // Green Rect 128x128
                     .unknown(
@@ -282,6 +285,7 @@ struct AdaptyUIStackView: View {
                 type: .vertical,
                 horizontalAlignment: .left,
                 verticalAlignment: .center,
+                spacing: 0,
                 elements: [
 //                .space(1),
                     .text(.testBodyShort, nil),
