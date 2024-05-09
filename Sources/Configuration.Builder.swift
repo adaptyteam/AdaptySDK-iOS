@@ -55,34 +55,41 @@ extension Adapty.Configuration {
             self.backendProxy = configuration.backendProxy
         }
 
+        /// Call this method to get the ``Adapty.Configuration`` object.
         public func build() -> Adapty.Configuration { .init(with: self) }
 
+        /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
         public func with(apiKey key: String) -> Builder {
             assert(key.count >= 41 && key.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
             apiKey = key
             return self
         }
 
+        /// - Parameter customerUserId: User identifier in your system
         public func with(customerUserId id: String?) -> Builder {
             customerUserId = id
             return self
         }
 
+        /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/docs/observer-vs-full-mode/). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
         public func with(observerMode mode: Bool) -> Builder {
             observerMode = mode
             return self
         }
 
+        /// - Parameter idfaCollectionDisabled: A boolean value controlling idfa collection logic
         public func with(idfaCollectionDisabled value: Bool) -> Builder {
             idfaCollectionDisabled = value
             return self
         }
 
+        /// - Parameter ipAddressCollectionDisabled: A boolean value controlling ip-address collection logic
         public func with(ipAddressCollectionDisabled value: Bool) -> Builder {
             ipAddressCollectionDisabled = value
             return self
         }
 
+        /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
         public func with(dispatchQueue queue: DispatchQueue) -> Builder {
             dispatchQueue = queue
             return self

@@ -21,7 +21,7 @@ extension Adapty {
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
-    /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
+    /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     /// - Parameter completion: Result callback
@@ -43,6 +43,12 @@ extension Adapty {
         )
     }
 
+    /// Use this method to initialize the Adapty SDK.
+    ///
+    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
+    ///
+    /// - Parameter builder: `Adapty.Configuration.Builder` which allows to configure Adapty SDK
+    /// - Parameter completion: Result callback
     public static func activate(
         with builder: Adapty.Configuration.Builder,
         _ completion: AdaptyErrorCompletion? = nil
@@ -50,6 +56,12 @@ extension Adapty {
         activate(with: builder.build(), completion)
     }
 
+    /// Use this method to initialize the Adapty SDK.
+    ///
+    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
+    ///
+    /// - Parameter configuration: `Adapty.Configuration` which allows to configure Adapty SDK
+    /// - Parameter completion: Result callback
     public static func activate(
         with configuration: Adapty.Configuration,
         _ completion: AdaptyErrorCompletion? = nil
