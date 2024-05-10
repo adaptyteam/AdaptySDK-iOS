@@ -9,34 +9,34 @@ import Foundation
 
 extension AdaptyUI {
     package struct CornerRadius {
-        package let topLeft: Double
-        package let topRight: Double
-        package let bottomRight: Double
-        package let bottomLeft: Double
+        package let topLeading: Double
+        package let topTrailing: Double
+        package let bottomTrailing: Double
+        package let bottomLeading: Double
     }
 }
 
 extension AdaptyUI.CornerRadius {
     package static let zero = AdaptyUI.CornerRadius(same: 0.0)
     package init(same value: Double) {
-        self.init(topLeft: value, topRight: value, bottomRight: value, bottomLeft: value)
+        self.init(topLeading: value, topTrailing: value, bottomTrailing: value, bottomLeading: value)
     }
 
     package var isZeroRadius: Bool {
-        topLeft == 0.0 && topRight == 0.0 && bottomRight == 0.0 && bottomLeft == 0.0
+        topLeading == 0.0 && topTrailing == 0.0 && bottomTrailing == 0.0 && bottomLeading == 0.0
     }
 
     package var isSameRadius: Bool {
-        (topLeft == topRight) && (bottomLeft == bottomRight) && (topLeft == bottomLeft)
+        (topLeading == topTrailing) && (bottomLeading == bottomTrailing) && (topLeading == bottomLeading)
     }
 }
 
 extension AdaptyUI.CornerRadius: Decodable {
     enum CodingKeys: String, CodingKey {
-        case topLeft = "tl"
-        case topRight = "tr"
-        case bottomRight = "br"
-        case bottomLeft = "bl"
+        case topLeading = "top_leading"
+        case topTrailing = "top_trailing"
+        case bottomTrailing = "bottom_trailing"
+        case bottomLeading = "bottom_leading"
     }
 
     package init(from decoder: Decoder) throws {
@@ -47,17 +47,17 @@ extension AdaptyUI.CornerRadius: Decodable {
             switch values.count {
             case 0: self.init(same: 0.0)
             case 1: self.init(same: values[0])
-            case 2: self.init(topLeft: values[0], topRight: values[1], bottomRight: 0.0, bottomLeft: 0.0)
-            case 3: self.init(topLeft: values[0], topRight: values[1], bottomRight: values[2], bottomLeft: 0.0)
-            default: self.init(topLeft: values[0], topRight: values[1], bottomRight: values[2], bottomLeft: values[3])
+            case 2: self.init(topLeading: values[0], topTrailing: values[1], bottomTrailing: 0.0, bottomLeading: 0.0)
+            case 3: self.init(topLeading: values[0], topTrailing: values[1], bottomTrailing: values[2], bottomLeading: 0.0)
+            default: self.init(topLeading: values[0], topTrailing: values[1], bottomTrailing: values[2], bottomLeading: values[3])
             }
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             try self.init(
-                topLeft: container.decodeIfPresent(Double.self, forKey: .topLeft) ?? 0.0,
-                topRight: container.decodeIfPresent(Double.self, forKey: .topRight) ?? 0.0,
-                bottomRight: container.decodeIfPresent(Double.self, forKey: .bottomRight) ?? 0.0,
-                bottomLeft: container.decodeIfPresent(Double.self, forKey: .bottomLeft) ?? 0.0
+                topLeading: container.decodeIfPresent(Double.self, forKey: .topLeading) ?? 0.0,
+                topTrailing: container.decodeIfPresent(Double.self, forKey: .topTrailing) ?? 0.0,
+                bottomTrailing: container.decodeIfPresent(Double.self, forKey: .bottomTrailing) ?? 0.0,
+                bottomLeading: container.decodeIfPresent(Double.self, forKey: .bottomLeading) ?? 0.0
             )
         }
     }

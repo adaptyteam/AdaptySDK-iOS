@@ -62,7 +62,7 @@
             switch shape {
             case let .rectangle(radius):
                 // TODO: different radius
-                clipShape(RoundedRectangle(cornerRadius: radius.topLeft))
+                clipShape(RoundedRectangle(cornerRadius: radius.topLeading))
             case .circle:
                 clipShape(Circle())
             case .curveUp:
@@ -83,9 +83,9 @@
 
         private func roundedRectangle(radius: AdaptyUI.CornerRadius) -> RoundedRectangle {
             if radius.isSameRadius {
-                return RoundedRectangle(cornerRadius: radius.topLeft)
+                RoundedRectangle(cornerRadius: radius.topLeading)
             } else {
-                return RoundedRectangle(cornerRadius: 0.0)
+                RoundedRectangle(cornerRadius: 0.0)
             }
         }
 
@@ -125,9 +125,9 @@
 
         private func roundedRectangle(radius: AdaptyUI.CornerRadius) -> RoundedRectangle {
             if radius.isSameRadius {
-                return RoundedRectangle(cornerRadius: radius.topLeft)
+                RoundedRectangle(cornerRadius: radius.topLeading)
             } else {
-                return RoundedRectangle(cornerRadius: 0.0)
+                RoundedRectangle(cornerRadius: 0.0)
             }
         }
 
@@ -220,10 +220,12 @@
         @ViewBuilder
         func padding(_ insets: AdaptyUI.EdgeInsets?) -> some View {
             if let insets {
-                padding(.leading, insets.left)
-                    .padding(.top, insets.top)
-                    .padding(.trailing, insets.right)
-                    .padding(.bottom, insets.bottom)
+                padding(EdgeInsets(
+                    top: insets.top,
+                    leading: insets.leading,
+                    bottom: insets.bottom,
+                    trailing: insets.trailing
+                ))
             } else {
                 self
             }
@@ -287,9 +289,10 @@
         @available(iOS 13.0, *)
         extension AdaptyUI.Decorator {
             static var test: Self {
-                .init(shapeType: .rectangle(cornerRadius: .init(same: 10)),
-                      background: .color(.testGreen),
-                      border: .init(filling: .color(.testRed), thickness: 2.0)
+                .init(
+                    shapeType: .rectangle(cornerRadius: .init(same: 10)),
+                    background: .color(.testGreen),
+                    border: .init(filling: .color(.testRed), thickness: 2.0)
                 )
             }
         }

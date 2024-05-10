@@ -81,15 +81,15 @@ extension CALayer {
         let maxRadius = maxCornerRadius
 
         if radius.isSameRadius {
-            cornerRadius = min(radius.topLeft, maxRadius)
+            cornerRadius = min(radius.topLeading, maxRadius)
         } else {
             let maskLayer = CAShapeLayer()
             maskLayer.path = UIBezierPath.customRoundedRect(
                 in: bounds,
-                min(radius.topLeft, maxRadius),
-                min(radius.topRight, maxRadius),
-                min(radius.bottomLeft, maxRadius),
-                min(radius.bottomRight, maxRadius)
+                min(radius.topLeading, maxRadius),
+                min(radius.topTrailing, maxRadius),
+                min(radius.bottomLeading, maxRadius),
+                min(radius.bottomTrailing, maxRadius)
             ).cgPath
             
             mask = maskLayer

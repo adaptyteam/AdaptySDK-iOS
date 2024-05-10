@@ -9,9 +9,9 @@ import Foundation
 
 extension AdaptyUI {
     package struct EdgeInsets {
-        package let left: Double
+        package let leading: Double
         package let top: Double
-        package let right: Double
+        package let trailing: Double
         package let bottom: Double
     }
 }
@@ -19,23 +19,23 @@ extension AdaptyUI {
 extension AdaptyUI.EdgeInsets {
     package static let zero = AdaptyUI.EdgeInsets(same: 0.0)
     package init(same value: Double) {
-        self.init(left: value, top: value, right: value, bottom: value)
+        self.init(leading: value, top: value, trailing: value, bottom: value)
     }
 
     package var isZero: Bool {
-        left == 0.0 && top == 0.0 && right == 0.0 && bottom == 0.0
+        leading == 0.0 && top == 0.0 && trailing == 0.0 && bottom == 0.0
     }
 
     package var isSame: Bool {
-        (left == top) && (right == bottom) && (left == right)
+        (leading == top) && (trailing == bottom) && (leading == trailing)
     }
 }
 
 extension AdaptyUI.EdgeInsets: Decodable {
     enum CodingKeys: String, CodingKey {
         case top
-        case left
-        case right
+        case leading
+        case trailing
         case bottom
     }
 
@@ -47,16 +47,16 @@ extension AdaptyUI.EdgeInsets: Decodable {
             switch values.count {
             case 0: self.init(same: 0.0)
             case 1: self.init(same: values[0])
-            case 2: self.init(left: values[1], top: values[0], right: values[1], bottom: values[0])
-            case 3: self.init(left: values[0], top: values[1], right: values[2], bottom: 0.0)
-            default: self.init(left: values[0], top: values[1], right: values[2], bottom: values[3])
+            case 2: self.init(leading: values[1], top: values[0], trailing: values[1], bottom: values[0])
+            case 3: self.init(leading: values[0], top: values[1], trailing: values[2], bottom: 0.0)
+            default: self.init(leading: values[0], top: values[1], trailing: values[2], bottom: values[3])
             }
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             try self.init(
-                left: container.decodeIfPresent(Double.self, forKey: .left) ?? 0.0,
+                leading: container.decodeIfPresent(Double.self, forKey: .leading) ?? 0.0,
                 top: container.decodeIfPresent(Double.self, forKey: .top) ?? 0.0,
-                right: container.decodeIfPresent(Double.self, forKey: .right) ?? 0.0,
+                trailing: container.decodeIfPresent(Double.self, forKey: .trailing) ?? 0.0,
                 bottom: container.decodeIfPresent(Double.self, forKey: .bottom) ?? 0.0
             )
         }
