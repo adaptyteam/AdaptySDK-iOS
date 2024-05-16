@@ -17,7 +17,7 @@ protocol AdaptyPaywallPresenterDelegate: NSObject {
 }
 
 @available(iOS 13.0, *)
-class AdaptyPaywallPresenter {
+class AdaptyPaywallPresenter: ObservableObject {
     fileprivate let logId: String
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.PaywallPresenterQueue")
 

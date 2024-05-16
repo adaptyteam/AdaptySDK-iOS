@@ -60,6 +60,7 @@ struct MainView: View {
     }
 
     @State var paywallPresented = false
+    @Environment(\.layoutDirection) var dir: LayoutDirection
 
     var body: some View {
         NavigationView {

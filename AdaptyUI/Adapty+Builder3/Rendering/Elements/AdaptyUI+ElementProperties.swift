@@ -257,17 +257,16 @@ extension View {
     }
 }
 
-// TODO: move out
 @available(iOS 13.0, *)
 extension AdaptyUI.Color {
     var swiftuiColor: Color { Color(red: red, green: green, blue: blue, opacity: alpha) }
 }
 
 extension AdaptyUI.Unit {
-    func points(screenInPoints: CGFloat = 1024.0) -> CGFloat {
+    func points(screenSizeInPoints: CGFloat) -> CGFloat {
         switch self {
         case let .point(value): value
-        case let .screen(value): value * screenInPoints
+        case let .screen(value): value * screenSizeInPoints
         }
     }
 }

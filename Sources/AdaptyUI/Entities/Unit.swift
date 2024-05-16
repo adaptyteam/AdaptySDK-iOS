@@ -15,10 +15,10 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.Unit {
-    package func points(scrrenInPoints: Double) -> Double {
+    package func points(screenSize: Double) -> Double {
         switch self {
         case let .point(value): value
-        case let .screen(value): value * scrrenInPoints
+        case let .screen(value): value * screenSize
         }
     }
 }
