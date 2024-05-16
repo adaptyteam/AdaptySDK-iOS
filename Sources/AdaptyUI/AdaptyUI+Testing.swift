@@ -13,7 +13,7 @@ package extension AdaptyUI.LocalizedViewConfiguration {
         templateId: String = "transparent",
         locale: String = "en",
         isRightToLeft: Bool = false,
-        images: [String: String] = [:],
+        images: [String] = [],
         colors: [String: String] = [:],
         strings: [String: String] = [:],
         content: String
@@ -38,8 +38,9 @@ package extension AdaptyUI.LocalizedViewConfiguration {
                 "$font": .font(AdaptyUI.Font.default),
             ]) { current, _ in current }
 
-        let assets = images
-            .mapValues { AdaptyUI.ViewConfiguration.Asset.filling(.image(.resorces($0))) }
+        let assets = Dictionary(
+            images.map { ($0, AdaptyUI.ViewConfiguration.Asset.filling(.image(.resorces($0)))) }
+        ) { current, _ in current }
             .merging(colors) { current, _ in current }
 
         let data = content.data(using: .utf8) ?? Data()
