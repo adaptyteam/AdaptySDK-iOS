@@ -10,38 +10,14 @@
 import Adapty
 import SwiftUI
 
-extension AdaptyUI.Box {
-    typealias Constraints = (min: CGFloat?, max: CGFloat?)
-
-    static var emptyConstraints: Constraints { (min: nil, max: nil) }
-
-    static func isEmptyConstraints(_ constraints: Constraints) -> Bool {
-        switch constraints {
-        case (nil, nil): true
-        default: false
-        }
-    }
-}
-
-extension AdaptyUI.Box.Length {
-    var constraints: AdaptyUI.Box.Constraints {
-        switch self {
-        case let .min(unit): (min: unit.points(), max: nil)
-        case .fillMax: (min: nil, max: .infinity)
-        default: (min: nil, max: nil)
-        }
-    }
-}
-
 @available(iOS 13.0, *)
-extension View {
+fileprivate extension View {
     @ViewBuilder
-    func boxFixedFrameIfNeeded(
-        width: AdaptyUI.Box.Length?,
-        height: AdaptyUI.Box.Length?,
-        alignment: Alignment
-    ) -> some View {
-        switch (width, height) {
+    func fixedFrameIfNeeded(box: AdaptyUI.Box) -> some View {
+        let alignment = Alignment.from(horizontal: box.horizontalAlignment,
+                                       vertical: box.verticalAlignment)
+
+        switch (box.width, box.height) {
         case let (.fixed(w), .fixed(h)):
             self.frame(width: w.points(),
                        height: h.points(),
@@ -59,25 +35,40 @@ extension View {
         }
     }
 
-    @ViewBuilder
-    func boxRangedFrameIfNeeded(
-        width: AdaptyUI.Box.Length?,
-        height: AdaptyUI.Box.Length?,
-        alignment: Alignment
-    ) -> some View {
-        let wConstraints = width?.constraints ?? AdaptyUI.Box.emptyConstraints
-        let hConstraints = height?.constraints ?? AdaptyUI.Box.emptyConstraints
-
-        if AdaptyUI.Box.isEmptyConstraints(wConstraints) && AdaptyUI.Box.isEmptyConstraints(hConstraints) {
-            self
-        } else {
-            self
-                .frame(minWidth: wConstraints.min,
-                       maxWidth: wConstraints.max,
-                       minHeight: hConstraints.min,
-                       maxHeight: hConstraints.max,
-                       alignment: alignment)
+    func rangedFrameIfNeeded(box: AdaptyUI.Box) -> some View {
+        func constraints(for lenght: AdaptyUI.Box.Length?) -> (CGFloat?, CGFloat?) {
+            switch lenght {
+            case let .min(unit): (unit.points(), nil)
+            case .fillMax: (nil, .infinity)
+            default: (nil, nil)
+            }
         }
+
+        @ViewBuilder
+        func selfORFrame(_ wConstraints: (CGFloat?, CGFloat?),
+                         _ hConstraints: (CGFloat?, CGFloat?)) -> some View
+        {
+            if wConstraints.0 == nil &&
+                wConstraints.1 == nil &&
+                hConstraints.0 == nil &&
+                hConstraints.1 == nil
+            {
+                self
+            } else {
+                self
+                    .frame(
+                        minWidth: wConstraints.0,
+                        maxWidth: wConstraints.1,
+                        minHeight: hConstraints.0,
+                        maxHeight: hConstraints.1,
+                        alignment: .from(horizontal: box.horizontalAlignment,
+                                         vertical: box.verticalAlignment)
+                    )
+            }
+        }
+
+        return selfORFrame(constraints(for: box.width),
+                           constraints(for: box.height))
     }
 }
 
@@ -94,17 +85,50 @@ struct AdaptyUIBoxView: View {
                                        vertical: self.box.verticalAlignment)
 
         AdaptyUIElementView(self.box.content)
-            .boxFixedFrameIfNeeded(
-                width: self.box.width,
-                height: self.box.heght,
-                alignment: alignment
-            )
-            .boxRangedFrameIfNeeded(
-                width: self.box.width,
-                height: self.box.heght,
-                alignment: alignment
-            )
+            .fixedFrameIfNeeded(box: self.box)
+            .rangedFrameIfNeeded(box: self.box)
     }
+}
+
+#endif
+
+#if DEBUG && canImport(UIKit)
+@testable import Adapty
+
+@available(iOS 13.0, *)
+extension AdaptyUI.Decorator {
+    static var greenBG: Self {
+        .init(shapeType: .rectangle(cornerRadius: .zero),
+              background: .color(.testGreen),
+              border: nil)
+    }
+}
+
+@available(iOS 13.0, *)
+extension AdaptyUI.Element.Properties {
+    static var greenBG: Self {
+        .init(decorator: .greenBG,
+              padding: .zero,
+              offset: .zero,
+              visibility: true,
+              transitionIn: [])
+    }
+}
+
+@available(iOS 13.0, *)
+extension AdaptyUI.Box {
+    static var test: Self {
+        .init(width: .fillMax,
+              height: .min(.point(48)),
+              horizontalAlignment: .right,
+              verticalAlignment: .center,
+              content: .text(.testBodyShort, nil))
+    }
+}
+
+@available(iOS 13.0, *)
+#Preview {
+    AdaptyUIElementView(.box(.test, .greenBG))
 }
 
 #endif
