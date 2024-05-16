@@ -10,8 +10,8 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct Box {
-        let heght: AdaptyUI.Box.Length?
         let width: AdaptyUI.Box.Length?
+        let height: AdaptyUI.Box.Length?
         let horizontalAlignment: AdaptyUI.HorizontalAlignment
         let verticalAlignment: AdaptyUI.VerticalAlignment
         let content: AdaptyUI.ViewConfiguration.Element
@@ -21,8 +21,8 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration.Localizer {
     func box(_ from: AdaptyUI.ViewConfiguration.Box) -> AdaptyUI.Box {
         .init(
-            heght: from.heght,
             width: from.width,
+            height: from.height,
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
             content: element(from.content)
@@ -32,8 +32,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
 extension AdaptyUI.ViewConfiguration.Box: Decodable {
     enum CodingKeys: String, CodingKey {
-        case heght
         case width
+        case height
         case horizontalAlignment = "h_align"
         case verticalAlignment = "v_align"
         case content
@@ -43,8 +43,8 @@ extension AdaptyUI.ViewConfiguration.Box: Decodable {
         let def = AdaptyUI.Stack.default
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            heght: try? container.decodeIfPresent(AdaptyUI.Box.Length.self, forKey: .heght),
             width: try? container.decodeIfPresent(AdaptyUI.Box.Length.self, forKey: .width),
+            height: try? container.decodeIfPresent(AdaptyUI.Box.Length.self, forKey: .height),
             horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
             content: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .content)

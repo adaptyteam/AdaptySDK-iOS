@@ -19,7 +19,7 @@ struct AdaptyUIElementView: View {
     }
 
     var body: some View {
-        switch element {
+        switch self.element {
         case let .space(count):
             if count > 0 {
                 ForEach(0 ..< count, id: \.self) { _ in
@@ -27,7 +27,7 @@ struct AdaptyUIElementView: View {
                 }
             }
         case let .box(box, properties):
-            AdaptyUIUnknownElementView(value: "box")
+            AdaptyUIBoxView(box)
                 .applyingProperties(properties)
         case let .stack(stack, properties):
             AdaptyUIStackView(stack, properties)
