@@ -29,7 +29,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             isRightToLeft: localization?.isRightToLeft ?? false,
             templateId: source.templateId,
             screens: source.screens.mapValues(screen),
-            version: source.version
+            templateRevision: source.templateRevision
         )
     }
 }

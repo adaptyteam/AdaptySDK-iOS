@@ -19,6 +19,8 @@ extension UIImageView {
             break
         case let .raster(data):
             image = UIImage(data: data)?.withRenderingMode(renderingMode)
+        case let .resorces(name):
+            image = UIImage(named: name)?.withRenderingMode(renderingMode)
         case let .url(url, previewData):
             let previewImage: UIImage? = if let previewData { UIImage(data: previewData) } else { nil }
 
@@ -57,6 +59,8 @@ extension UIButton {
             break
         case let .raster(data):
             setBackgroundImage(UIImage(data: data), for: state)
+        case let .resorces(name):
+            setBackgroundImage(UIImage(named: name), for: state)
         case let .url(url, previewData):
             let previewImage: UIImage? = if let previewData { UIImage(data: previewData) } else { nil }
 

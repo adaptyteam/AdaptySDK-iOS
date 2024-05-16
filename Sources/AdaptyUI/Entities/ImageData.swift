@@ -12,6 +12,7 @@ extension AdaptyUI {
         case none
         case raster(Data)
         case url(URL, previewRaster: Data?)
+        case resorces(String)
     }
 }
 

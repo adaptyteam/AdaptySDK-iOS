@@ -14,12 +14,12 @@ extension AdaptyUI {
         public let isRightToLeft: Bool
         package let templateId: String
         package let screens: [String: Screen]
-        let version: Int64
+        package let templateRevision: Int64
     }
 }
 
 extension AdaptyUI.LocalizedViewConfiguration: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), templateId: \(templateId), locale: \(locale), isRightToLeft: \(isRightToLeft), version: \(version))"
+        "(id: \(id), templateId: \(templateId), templateRevision: \(templateRevision), locale: \(locale), isRightToLeft: \(isRightToLeft))"
     }
 }
