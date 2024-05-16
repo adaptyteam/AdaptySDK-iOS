@@ -14,7 +14,7 @@ extension AdaptyUI.ViewConfiguration {
         let horizontalAlignment: AdaptyUI.HorizontalAlignment
         let verticalAlignment: AdaptyUI.VerticalAlignment
         let spacing: Double
-        let elements: [AdaptyUI.ViewConfiguration.Element]
+        let content: [AdaptyUI.ViewConfiguration.Element]
     }
 }
 
@@ -25,7 +25,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
             spacing: from.spacing,
-            elements: from.elements.map(element)
+            content: from.content.map(element)
         )
     }
 }
@@ -36,7 +36,7 @@ extension AdaptyUI.ViewConfiguration.Stack: Decodable {
         case horizontalAlignment = "h_align"
         case verticalAlignment = "v_align"
         case spacing
-        case elements
+        case content
     }
 
     init(from decoder: any Decoder) throws {
@@ -47,7 +47,7 @@ extension AdaptyUI.ViewConfiguration.Stack: Decodable {
             horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
-            elements: container.decodeIfPresent([AdaptyUI.ViewConfiguration.Element].self, forKey: .elements) ?? []
+            content: container.decodeIfPresent([AdaptyUI.ViewConfiguration.Element].self, forKey: .content) ?? []
         )
     }
 }

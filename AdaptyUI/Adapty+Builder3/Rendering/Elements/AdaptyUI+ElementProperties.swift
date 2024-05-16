@@ -200,17 +200,18 @@
     extension View {
         @ViewBuilder
         func applyingProperties(_ props: AdaptyUI.Element.Properties?) -> some View {
-            frame(
-                width: props?.frame?.width?.points(),
-                height: props?.frame?.height?.points()
-            )
-            .frame(
-                minWidth: props?.frame?.minWidth?.points(),
-                maxWidth: props?.frame?.maxWidth?.points(),
-                minHeight: props?.frame?.minHeight?.points(),
-                maxHeight: props?.frame?.maxHeight?.points()
-            )
-            .offset(x: props?.offset.x ?? 0.0, y: props?.offset.y ?? 0.0)
+//            frame(
+//                width: props?.frame?.width?.points(),
+//                height: props?.frame?.height?.points()
+//            )
+//            .frame(
+//                minWidth: props?.frame?.minWidth?.points(),
+//                maxWidth: props?.frame?.maxWidth?.points(),
+//                minHeight: props?.frame?.minHeight?.points(),
+//                maxHeight: props?.frame?.maxHeight?.points()
+//            )
+//            .
+            offset(x: props?.offset.x ?? 0.0, y: props?.offset.y ?? 0.0)
             .backgroundDecorator(props?.decorator)
 //        .background(props?.decorator?.background)
 //        .border(props?.decorator?.border)
@@ -302,7 +303,6 @@
             static var test: Self {
                 .init(
                     decorator: .test,
-                    frame: nil,
                     padding: .init(same: 12),
                     offset: .zero,
                     visibility: true,

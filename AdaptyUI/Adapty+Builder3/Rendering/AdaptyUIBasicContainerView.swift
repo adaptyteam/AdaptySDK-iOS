@@ -37,18 +37,17 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(spacing: 0) {
-                    if let mainImage = screen.mainImage {
-                        imageView(mainImage)
+                    if case let .image(cover,_) = screen.cover {
+                        imageView(cover)
                     }
 
-                    if let mainBlock = screen.mainBlock {
-                        AdaptyUIElementView(mainBlock)
-                    }
+                        AdaptyUIElementView(screen.content)
+                    
                 }
                 .padding(.bottom, footerSize.height)
             }
 
-            if let footerBlock = screen.footerBlock {
+            if let footer = screen.footer {
                 // TODO: find a better solution
                 GeometryReader { p in
                     Path { _ in
@@ -57,7 +56,7 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
                         }
                     }
 
-                    AdaptyUIElementView(footerBlock)
+                    AdaptyUIElementView(footer)
                 }
                 .fixedSize(horizontal: false, vertical: true)
             }
@@ -81,9 +80,10 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
     AdaptyUIBasicContainerView(
         screen: .init(
             background: .color(.testWhite),
-            mainImage: .testFill,
-            mainBlock: .stack(.testVStack, nil),
-            footerBlock: .stack(.testHStack, nil)
+            cover: .image(.testFill, nil),
+            content: .stack(.testVStack, nil),
+            footer: .stack(.testHStack, nil),
+            overlay: nil
         ),
         closeButtonBuilder: {
             Button(action: {}, label: { Text("Dismiss") })

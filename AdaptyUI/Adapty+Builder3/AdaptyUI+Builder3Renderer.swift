@@ -51,10 +51,9 @@ public class AdaptyBuilder3PaywallController: UIViewController {
         if let screen = viewConfiguration.screens.first?.value {
             view.backgroundColor = screen.background.asColor?.uiColor ?? .white
 
-            if let mainBlock = screen.mainBlock {
                 addSubSwiftUIView(
                     ZStack(alignment: .center) {
-                        AdaptyUIElementView(mainBlock)
+                        AdaptyUIElementView(screen.content)
                         
                         VStack {
                             HStack {
@@ -68,10 +67,7 @@ public class AdaptyBuilder3PaywallController: UIViewController {
                     },
                     to: view
                 )
-            } else {
-                addSubSwiftUIView(Text("No main block found"),
-                                  to: view)
-            }
+           
         } else {
             view.backgroundColor = .white // TODO: remove
 

@@ -14,14 +14,14 @@ extension AdaptyUI {
             horizontalAlignment: .center,
             verticalAlignment: .center,
             spacing: 0,
-            elements: []
+            content: []
         )
 
         package let type: StackType
         package let horizontalAlignment: HorizontalAlignment
         package let verticalAlignment: VerticalAlignment
         package let spacing: Double
-        package let elements: [Element]
+        package let content: [Element]
     }
 
     package enum StackType: String {

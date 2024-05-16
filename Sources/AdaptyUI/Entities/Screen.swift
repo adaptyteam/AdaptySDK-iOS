@@ -9,15 +9,12 @@ import Foundation
 
 extension AdaptyUI {
     package struct Screen {
-        static let `default` = Screen(
-            background: .color(AdaptyUI.Color.black),
-            mainImage: nil,
-            mainBlock: nil,
-            footerBlock: nil
-        )
+        static let defaultBackground: AdaptyUI.Filling = .color(AdaptyUI.Color.black)
+
         package let background: AdaptyUI.Filling
-        package let mainImage: Image?
-        package let mainBlock: Element?
-        package let footerBlock: Element?
+        package let cover: Element?
+        package let content: Element
+        package let footer: Element?
+        package let overlay: Element?
     }
 }

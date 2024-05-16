@@ -14,6 +14,7 @@ extension AdaptyUI {
         case text(AdaptyUI.Text, Properties?)
         case image(AdaptyUI.Image, Properties?)
         indirect case button(AdaptyUI.Button, Properties?)
+        indirect case box(AdaptyUI.Box, Properties?)
         case unknown(String, Properties?)
 
         var properties: Properties? {
@@ -23,6 +24,7 @@ extension AdaptyUI {
                  let .text(_, properties),
                  let .image(_, properties),
                  let .button(_, properties),
+                 let .box(_, properties),
                  let .unknown(_, properties):
                 properties
             }
@@ -33,7 +35,6 @@ extension AdaptyUI {
 extension AdaptyUI.Element {
     package struct Properties {
         package let decorator: AdaptyUI.Decorator?
-        package let frame: AdaptyUI.Frame?
         package let padding: AdaptyUI.EdgeInsets
         package let offset: AdaptyUI.Offset
 

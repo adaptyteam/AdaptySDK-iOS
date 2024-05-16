@@ -15,6 +15,7 @@ extension AdaptyUI.ViewConfiguration {
         case text(AdaptyUI.ViewConfiguration.Text, Properties?)
         case image(AdaptyUI.ViewConfiguration.Image, Properties?)
         indirect case button(AdaptyUI.ViewConfiguration.Button, Properties?)
+        indirect case box(AdaptyUI.ViewConfiguration.Box, Properties?)
         case unknown(String, Properties?)
     }
 }
@@ -22,7 +23,6 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration.Element {
     struct Properties {
         let decorator: AdaptyUI.ViewConfiguration.Decorator?
-        let frame: AdaptyUI.Frame?
         let padding: AdaptyUI.EdgeInsets
         let offset: AdaptyUI.Offset
 
@@ -31,7 +31,6 @@ extension AdaptyUI.ViewConfiguration.Element {
 
         var isZero: Bool {
             decorator == nil
-                && frame == nil
                 && padding.isZero
                 && offset.isZero
                 && visibility
@@ -53,6 +52,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             .image(image(value), properties.flatMap(elementProperties))
         case let .button(value, properties):
             .button(button(value), properties.flatMap(elementProperties))
+        case let .box(value, properties):
+            .box(box(value), properties.flatMap(elementProperties))
         case let .unknown(value, properties):
             .unknown(value, properties.flatMap(elementProperties))
         }
@@ -62,7 +63,6 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         guard !from.isZero else { return nil }
         return .init(
             decorator: from.decorator.map(decorator),
-            frame: from.frame,
             padding: from.padding,
             offset: from.offset,
             visibility: from.visibility,
@@ -81,6 +81,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         case text
         case image
         case button
+        case box
         case space
         case vStack = "v_stack"
         case hStack = "h_stack"
@@ -99,6 +100,8 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         switch contentType {
         case .space:
             self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
+        case .box:
+            self = try .box(AdaptyUI.ViewConfiguration.Box(from: decoder), propertyOrNil())
         case .vStack, .hStack, .zStack:
             self = try .stack(AdaptyUI.ViewConfiguration.Stack(from: decoder), propertyOrNil())
         case .button:
@@ -119,7 +122,6 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
 extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
     enum CodingKeys: String, CodingKey {
         case decorator
-        case frame
         case padding
         case offset
         case visibility
@@ -138,7 +140,6 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
             }
         try self.init(
             decorator: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorator),
-            frame: container.decodeIfPresent(AdaptyUI.Frame.self, forKey: .frame),
             padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.EdgeInsets.zero,
             offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Offset.zero,
             visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true,

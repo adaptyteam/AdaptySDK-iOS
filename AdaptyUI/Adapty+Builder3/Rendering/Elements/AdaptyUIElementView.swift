@@ -26,6 +26,9 @@ struct AdaptyUIElementView: View {
                     Spacer()
                 }
             }
+        case let .box(box, properties):
+            AdaptyUIUnknownElementView(value: "box")
+                .applyingProperties(properties)
         case let .stack(stack, properties):
             AdaptyUIStackView(stack, properties)
         case let .text(text, properties):

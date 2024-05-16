@@ -108,8 +108,8 @@ struct AdaptyUIStackView: View {
         switch stack.type {
         case .vertical:
             VStack(alignment: stack.horizontalAlignment.swiftuiValue, spacing: stack.spacing) {
-                ForEach(0 ..< stack.elements.count, id: \.self) {
-                    AdaptyUIElementView(stack.elements[$0])
+                ForEach(0 ..< stack.content.count, id: \.self) {
+                    AdaptyUIElementView(stack.content[$0])
                         .infiniteWidthIfFill(stack.horizontalAlignment)
                 }
             }
@@ -117,8 +117,8 @@ struct AdaptyUIStackView: View {
             .applyingProperties(properties)
         case .horizontal:
             HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
-                ForEach(0 ..< stack.elements.count, id: \.self) {
-                    AdaptyUIElementView(stack.elements[$0])
+                ForEach(0 ..< stack.content.count, id: \.self) {
+                    AdaptyUIElementView(stack.content[$0])
                         .infiniteHeightIfFill(stack.verticalAlignment)
                 }
             }
@@ -127,8 +127,8 @@ struct AdaptyUIStackView: View {
         case .z:
             // TODO: implement fill-fill scenario
             ZStack(alignment: stack.alignment) {
-                ForEach(0 ..< stack.elements.count, id: \.self) {
-                    AdaptyUIElementView(stack.elements[$0])
+                ForEach(0 ..< stack.content.count, id: \.self) {
+                    AdaptyUIElementView(stack.content[$0])
                 }
             }
             .applyingProperties(properties)
@@ -139,19 +139,19 @@ struct AdaptyUIStackView: View {
 #if DEBUG
     @testable import Adapty
 
-    @available(iOS 13.0, *)
-    extension AdaptyUI.Frame {
-        static func fixed(width: Double, height: Double) -> Self {
-            .init(
-                height: .point(height),
-                width: .point(width),
-                minHeight: nil,
-                maxHeight: nil,
-                minWidth: nil,
-                maxWidth: nil
-            )
-        }
-    }
+//    @available(iOS 13.0, *)
+//    extension AdaptyUI.Frame {
+//        static func fixed(width: Double, height: Double) -> Self {
+//            .init(
+//                height: .point(height),
+//                width: .point(width),
+//                minHeight: nil,
+//                maxHeight: nil,
+//                minWidth: nil,
+//                maxWidth: nil
+//            )
+//        }
+//    }
 
     @available(iOS 13.0, *)
     extension AdaptyUI.Stack {
@@ -161,7 +161,7 @@ struct AdaptyUIStackView: View {
                 horizontalAlignment: .left,
                 verticalAlignment: .justified,
                 spacing: 0,
-                elements: [
+                content: [
                     .button(
                         .init(
                             action: .close,
@@ -174,7 +174,6 @@ struct AdaptyUIStackView: View {
                                         background: .color(.testGreen),
                                         border: nil
                                     ),
-                                    frame: nil,
                                     padding: .zero,
                                     offset: .zero,
                                     visibility: true,
@@ -195,7 +194,6 @@ struct AdaptyUIStackView: View {
                                 background: .color(.testGreen),
                                 border: nil
                             ),
-                            frame: nil,
                             padding: .zero,
                             offset: .zero,
                             visibility: true,
@@ -212,7 +210,7 @@ struct AdaptyUIStackView: View {
                 horizontalAlignment: .right,
                 verticalAlignment: .top,
                 spacing: 0,
-                elements: [
+                content: [
                     .text(
                         .testBodyLong,
                         .init(
@@ -221,7 +219,6 @@ struct AdaptyUIStackView: View {
                                 background: .color(.testGreen),
                                 border: nil
                             ),
-                            frame: nil,
                             padding: .zero,
                             offset: .zero,
                             visibility: true,
@@ -231,7 +228,7 @@ struct AdaptyUIStackView: View {
                     .unknown("circle",
                              .init(
                                  decorator: nil,
-                                 frame: .fixed(width: 32, height: 32),
+//                                 frame: .fixed(width: 32, height: 32),
                                  padding: .zero,
                                  offset: .init(x: 20, y: -20),
                                  visibility: true,
@@ -248,7 +245,7 @@ struct AdaptyUIStackView: View {
                 horizontalAlignment: .left,
                 verticalAlignment: .top,
                 spacing: 0,
-                elements: [
+                content: [
                     // Green Rect 128x128
                     .unknown(
                         "rectangle_green",
@@ -258,7 +255,7 @@ struct AdaptyUIStackView: View {
                                 background: .color(.testClear),
                                 border: nil
                             ),
-                            frame: .fixed(width: 128, height: 128),
+//                            frame: .fixed(width: 128, height: 128),
                             padding: .zero,
                             offset: .zero,
                             visibility: true,
@@ -269,7 +266,7 @@ struct AdaptyUIStackView: View {
                     .unknown("circle_red",
                              .init(
                                  decorator: nil,
-                                 frame: .fixed(width: 64, height: 64),
+//                                 frame: .fixed(width: 64, height: 64),
                                  padding: .zero,
                                  offset: .zero,
                                  visibility: true,
@@ -286,7 +283,7 @@ struct AdaptyUIStackView: View {
                 horizontalAlignment: .left,
                 verticalAlignment: .center,
                 spacing: 0,
-                elements: [
+                            content: [
 //                .space(1),
                     .text(.testBodyShort, nil),
                     .text(
