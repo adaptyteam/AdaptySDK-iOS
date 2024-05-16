@@ -35,8 +35,8 @@ struct AdaptyUIImageView: View {
     }
 
     @ViewBuilder
-    private func rasterImage(_ data: Data, tint: AdaptyUI.Filling?) -> some View {
-        if let uiImage = UIImage(data: data) {
+    private func rasterImage(_ uiImage: UIImage?, tint: AdaptyUI.Filling?) -> some View {
+        if let uiImage  {
             if let tint = image.tint?.asColor?.swiftuiColor {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -57,8 +57,10 @@ struct AdaptyUIImageView: View {
 
     var body: some View {
         switch image.asset {
+        case let .resorces(name):
+            rasterImage(UIImage(named: name), tint: image.tint)
         case let .raster(data):
-            rasterImage(data, tint: image.tint)
+            rasterImage(UIImage(data: data), tint: image.tint)
         case let .url(url, preview):
             if #available(iOS 14.0, *) {
                 // TODO: Add support for tint
@@ -68,7 +70,7 @@ struct AdaptyUIImageView: View {
                     .fade(duration: 0.25)
                     .placeholder {
                         if let preview {
-                            rasterImage(preview, tint: image.tint)
+                            rasterImage(UIImage(data: preview), tint: image.tint)
                         } else {
                             EmptyView()
                         }

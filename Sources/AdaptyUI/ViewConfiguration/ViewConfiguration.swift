@@ -10,9 +10,8 @@ import Foundation
 extension AdaptyUI {
     struct ViewConfiguration {
         let id: String
-        /// An identifier for the template, used for ViewConfiguration creation.
         let templateId: String
-        let version: Int64
+        let templateRevision: Int64
         let assets: [String: Asset]
         let responseLocale: AdaptyLocale
         let localizations: [AdaptyLocale: Localization]
@@ -23,7 +22,7 @@ extension AdaptyUI {
 
 extension AdaptyUI.ViewConfiguration: CustomStringConvertible {
     var description: String {
-        "(id: \(id), templateId: \(templateId), version: \(version))"
+        "(id: \(id), templateId: \(templateId), templateRevision: \(templateRevision))"
     }
 }
 
@@ -37,7 +36,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
     enum CodingKeys: String, CodingKey {
         case format
         case templateId = "template_id"
-        case version = "template_revision"
+        case templateRevision = "template_revision"
         case assets
         case localizations
         case defaultLocalization = "default_localization"
@@ -53,7 +52,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         let _ = try (container.decode(String.self, forKey: .format).split(separator: ".").first).flatMap { Int($0) } ?? 2
 
         templateId = try container.decode(String.self, forKey: .templateId)
-        version = try container.decode(Int64.self, forKey: .version)
+        templateRevision = try container.decode(Int64.self, forKey: .templateRevision)
 
         assets = try (container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
 

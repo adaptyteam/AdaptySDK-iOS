@@ -18,8 +18,11 @@ extension AdaptyUI.ViewConfiguration {
             let value: RichText
             let fallback: RichText?
         }
+        
+       
     }
 }
+
 
 extension AdaptyUI.ViewConfiguration.Localization: Decodable {
     enum CodingKeys: String, CodingKey {
