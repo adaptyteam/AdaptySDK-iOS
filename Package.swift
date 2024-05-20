@@ -19,6 +19,10 @@ let package = Package(
             targets: ["AdaptyUI"]
         ),
         .library(
+            name: "AdaptyUITesting",
+            targets: ["AdaptyUITesting"]
+        ),
+        .library(
             name: "AdaptyCrossPlatformCommon",
             targets: ["AdaptyCrossPlatformCommon"]
         ),
@@ -35,6 +39,11 @@ let package = Package(
             dependencies: ["Adapty"],
             path: "AdaptyUI",
             resources: [.copy("PrivacyInfo.xcprivacy")]
+        ),
+        .target(
+            name: "AdaptyUITesting",
+            dependencies: ["Adapty", "AdaptyUI"],
+            path: "AdaptyUITesting"
         ),
         .target(
             name: "AdaptyCrossPlatformCommon",
