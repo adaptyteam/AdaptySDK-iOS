@@ -120,24 +120,14 @@
                 case "basic":
                     addSubSwiftUIView(
                         AdaptyUIBasicContainerView(
-                            screen: screen,
-                            closeButtonBuilder: {
-                                Button("Dismiss") { [weak self] in
-                                    self?.dismiss(animated: true)
-                                }
-                            }
+                            screen: screen
                         ),
                         to: view
                     )
                 case "flat":
                     addSubSwiftUIView(
                         AdaptyUIFlatContainerView(
-                            screen: screen,
-                            closeButtonBuilder: {
-                                Button("Dismiss") { [weak self] in
-                                    self?.dismiss(animated: true)
-                                }
-                            }
+                            screen: screen
                         ),
                         to: view
                     )

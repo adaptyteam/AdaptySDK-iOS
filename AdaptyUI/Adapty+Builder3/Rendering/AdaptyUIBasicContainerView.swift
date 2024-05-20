@@ -10,11 +10,9 @@ import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
-struct AdaptyUIBasicContainerView<CloseButton: View>: View {
+struct AdaptyUIBasicContainerView: View {
     var screen: AdaptyUI.Screen
     var mainImageHeight: Double = 320 // TODO: remove
-
-    var closeButtonBuilder: (() -> CloseButton)?
 
     @ViewBuilder
     func imageView(_ image: AdaptyUI.Image) -> some View {
@@ -37,12 +35,11 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(spacing: 0) {
-                    if case let .image(cover,_) = screen.cover {
+                    if case let .image(cover, _) = screen.cover {
                         imageView(cover)
                     }
 
-                        AdaptyUIElementView(screen.content)
-                    
+                    AdaptyUIElementView(screen.content)
                 }
                 .padding(.bottom, footerSize.height)
             }
@@ -59,13 +56,6 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
                     AdaptyUIElementView(footer)
                 }
                 .fixedSize(horizontal: false, vertical: true)
-            }
-
-            if let closeButtonBuilder {
-                closeButtonBuilder()
-                    .frame(maxWidth: .infinity,
-                           maxHeight: .infinity,
-                           alignment: .topLeading)
             }
         }
     }
@@ -84,10 +74,7 @@ struct AdaptyUIBasicContainerView<CloseButton: View>: View {
             content: .stack(.testVStack, nil),
             footer: .stack(.testHStack, nil),
             overlay: nil
-        ),
-        closeButtonBuilder: {
-            Button(action: {}, label: { Text("Dismiss") })
-        }
+        )
     )
 }
 #endif

@@ -11,10 +11,8 @@ import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
-struct AdaptyUIFlatContainerView<CloseButton: View>: View {
+struct AdaptyUIFlatContainerView: View {
     var screen: AdaptyUI.Screen
-
-    var closeButtonBuilder: (() -> CloseButton)?
 
     @State var footerSize: CGSize = .zero
 
@@ -30,28 +28,19 @@ struct AdaptyUIFlatContainerView<CloseButton: View>: View {
     var body: some View {
         GeometryReader { p in
             ZStack(alignment: .bottom) {
-                    ScrollView {
-                        Spacer().frame(height: p.safeAreaInsets.top)
+                ScrollView {
+                    Spacer().frame(height: p.safeAreaInsets.top)
 
-                        AdaptyUIElementView(screen.content)
-                            .padding(.bottom, footerSize.height)
+                    AdaptyUIElementView(screen.content)
+                        .padding(.bottom, footerSize.height)
 
-                        Spacer().frame(height: p.safeAreaInsets.bottom)
-                    }
-                
+                    Spacer().frame(height: p.safeAreaInsets.bottom)
+                }
 
                 if let footer = screen.footer {
                     AdaptyUIElementView(footer)
                         .background(GeometryReader(content: set(proxy:)))
                         .padding(.bottom, p.safeAreaInsets.bottom)
-                }
-
-                if let closeButtonBuilder {
-                    closeButtonBuilder()
-                        .frame(maxWidth: .infinity,
-                               maxHeight: .infinity,
-                               alignment: .topLeading)
-                        .padding(.top, p.safeAreaInsets.top)
                 }
             }
             .edgesIgnoringSafeArea(.all)
@@ -73,10 +62,7 @@ struct AdaptyUIFlatContainerView<CloseButton: View>: View {
             content: .stack(.testVStack, nil),
             footer: .stack(.testHStack, nil),
             overlay: nil
-        ),
-        closeButtonBuilder: {
-            Button(action: {}, label: { Text("Dismiss") })
-        }
+        )
     )
 }
 

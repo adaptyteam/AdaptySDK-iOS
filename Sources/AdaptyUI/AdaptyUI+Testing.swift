@@ -74,7 +74,7 @@ package extension AdaptyUI.LocalizedViewConfiguration {
                 assets: nil
             )],
             defaultLocalization: nil,
-            screens: ["dafault": screen]
+            screens: ["default": screen]
         ).extractLocale()
     }
 }
