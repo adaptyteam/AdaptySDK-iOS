@@ -12,21 +12,51 @@ import SwiftUI
 @available(iOS 13.0, *)
 struct AdaptyUIBasicContainerView: View {
     var screen: AdaptyUI.Screen
-    var mainImageHeight: Double = 320 // TODO: remove
 
+//    @ViewBuilder
+//    func imageView(_ image: AdaptyUI.Image, height: CGFloat) -> some View {
+//        GeometryReader { p in
+//            let minY = p.frame(in: .global).minY
+//            let isScrolling = minY > 0
+//
+//            AdaptyUIImageView(image)
+//                .frame(width: p.size.width,
+//                       height: isScrolling ? height + minY : height)
+//                .clipped()
+//                .offset(y: isScrolling ? -minY : 0)
+//        }
+//        .frame(height: height)
+//    }
+//    
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+    
     @ViewBuilder
-    func imageView(_ image: AdaptyUI.Image) -> some View {
+    func coverView(_ box: AdaptyUI.Box,
+                   _ properties: AdaptyUI.Element.Properties?) -> some View {
+        let height: CGFloat = {
+            if let boxHeight = box.height, case .fixed(let unit) = boxHeight {
+                return unit.points(screenSize: screenSize.height)
+            } else {
+                return 0.0
+            }
+        }()
+                
         GeometryReader { p in
             let minY = p.frame(in: .global).minY
             let isScrolling = minY > 0
+            
 
-            AdaptyUIImageView(image)
+            AdaptyUIElementView(box.content)
+//                .fixedFrame(box: box)
+//                .rangedFrame(box: box)
                 .frame(width: p.size.width,
-                       height: isScrolling ? mainImageHeight + minY : mainImageHeight)
+                       height: isScrolling ? height + minY : height)
+                .applyingProperties(properties)
                 .clipped()
                 .offset(y: isScrolling ? -minY : 0)
         }
-        .frame(height: mainImageHeight)
+        .frame(height: height)
     }
 
     @State var footerSize: CGSize = .zero
@@ -35,8 +65,12 @@ struct AdaptyUIBasicContainerView: View {
         ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(spacing: 0) {
-                    if case let .image(cover, _) = screen.cover {
-                        imageView(cover)
+//                    if case let .image(cover, _) = screen.cover {
+//                        imageView(cover, height: 200.0)
+//                    }
+                    
+                    if case let .box(box, properties) = screen.cover {
+                        coverView(box, properties)
                     }
 
                     AdaptyUIElementView(screen.content)
@@ -61,22 +95,22 @@ struct AdaptyUIBasicContainerView: View {
     }
 }
 
-#if DEBUG
-
-@testable import Adapty
-
-@available(iOS 13.0, *)
-#Preview {
-    AdaptyUIBasicContainerView(
-        screen: .init(
-            background: .color(.testWhite),
-            cover: .image(.testFill, nil),
-            content: .stack(.testVStack, nil),
-            footer: .stack(.testHStack, nil),
-            overlay: nil
-        )
-    )
-}
-#endif
-
+//#if DEBUG
+//
+//@testable import Adapty
+//
+//@available(iOS 13.0, *)
+//#Preview {
+//    AdaptyUIBasicContainerView(
+//        screen: .init(
+//            background: .color(.testWhite),
+//            cover: .image(.testFill, nil),
+//            content: .stack(.testVStack, nil),
+//            footer: .stack(.testHStack, nil),
+//            overlay: nil
+//        )
+//    )
+//}
+//#endif
+//
 #endif
