@@ -11,6 +11,24 @@ import Adapty
 import SwiftUI
 import UIKit
 
+// TODO: move out
+@available(iOS 13.0, *)
+public struct AdaptyUITestRendererView: View {
+    var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+
+    public init(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) {
+        self.viewConfiguration = viewConfiguration
+    }
+    
+    public var body: some View {
+        if let screen = viewConfiguration.screens.first?.value {
+            AdaptyUIElementView(screen.content)
+        } else {
+            Text("No screens to render")
+        }
+    }
+}
+
 @available(iOS 13.0, *)
 public class AdaptyBuilder3PaywallController: UIViewController {
     fileprivate let logId: String
@@ -37,6 +55,7 @@ public class AdaptyBuilder3PaywallController: UIViewController {
         modalPresentationStyle = .fullScreen
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -51,23 +70,23 @@ public class AdaptyBuilder3PaywallController: UIViewController {
         if let screen = viewConfiguration.screens.first?.value {
             view.backgroundColor = screen.background.asColor?.uiColor ?? .white
 
-                addSubSwiftUIView(
-                    ZStack(alignment: .center) {
-                        AdaptyUIElementView(screen.content)
-                        
-                        VStack {
-                            HStack {
-                                Button("Dismiss") { [weak self] in
-                                    self?.dismiss(animated: true)
-                                }
-                                Spacer()
+            addSubSwiftUIView(
+                ZStack(alignment: .center) {
+                    AdaptyUIElementView(screen.content)
+
+                    VStack {
+                        HStack {
+                            Button("Dismiss") { [weak self] in
+                                self?.dismiss(animated: true)
                             }
                             Spacer()
                         }
-                    },
-                    to: view
-                )
-           
+                        Spacer()
+                    }
+                },
+                to: view
+            )
+
         } else {
             view.backgroundColor = .white // TODO: remove
 
