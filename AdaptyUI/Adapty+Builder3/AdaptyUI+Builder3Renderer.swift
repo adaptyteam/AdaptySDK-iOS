@@ -12,6 +12,21 @@ import SwiftUI
 import UIKit
 
 // TODO: move out
+public extension AdaptyUI.LocalizedViewConfiguration {
+    static func createTest(
+        templateId: String = "transparent",
+        locale: String = "en",
+        isRightToLeft: Bool = false,
+        images: [String] = [],
+        colors: [String: String] = [:],
+        strings: [String: String] = [:],
+        content: String
+    ) throws -> Self {
+        try create(templateId: templateId, locale: locale, isRightToLeft: isRightToLeft, images: images, colors: colors, strings: strings, content: content)
+    }
+}
+    
+// TODO: move out
 @available(iOS 13.0, *)
 public struct AdaptyUITestRendererView: View {
     var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
