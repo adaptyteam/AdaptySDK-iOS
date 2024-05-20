@@ -25,6 +25,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             PurchasesObserver.shared.loadInitialPaywallData()
         }
 
+        let configurationBuilder =
+            Adapty.Configuration
+                .Builder(withAPIKey: AppConstants.adaptyApiKey)
+                .with(observerMode: false)
+                .with(customerUserId: nil)
+                .with(idfaCollectionDisabled: false)
+                .with(ipAddressCollectionDisabled: false)
+
+        Adapty.activate(with: configurationBuilder) { _ in
+            PurchasesObserver.shared.loadInitialProfileData()
+            PurchasesObserver.shared.loadInitialPaywallData()
+        }
+
         // in case you have / want to use fallback paywalls
         if let urlPath = Bundle.main.url(forResource: "fallback_paywalls", withExtension: "json") {
             Adapty.setFallbackPaywalls(fileURL: urlPath) { _ in
