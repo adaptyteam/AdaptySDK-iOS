@@ -11,14 +11,14 @@ import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
-struct AdaptyUIElementView: View {
+package struct AdaptyUIElementView: View {
     var element: AdaptyUI.Element
 
-    init(_ element: AdaptyUI.Element) {
+    package init(_ element: AdaptyUI.Element) {
         self.element = element
     }
 
-    var body: some View {
+    package var body: some View {
         switch element {
         case let .space(count):
             if count > 0 {
