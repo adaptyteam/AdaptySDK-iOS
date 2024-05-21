@@ -11,11 +11,25 @@ import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
+extension View {
+    @ViewBuilder
+    func paddingIfNeeded(_ insets: EdgeInsets?) -> some View {
+        if let insets {
+            padding(insets)
+        } else {
+            self
+        }
+    }
+}
+
+@available(iOS 13.0, *)
 package struct AdaptyUIElementView: View {
     var element: AdaptyUI.Element
+    var additionalPadding: EdgeInsets?
 
-    package init(_ element: AdaptyUI.Element) {
+    package init(_ element: AdaptyUI.Element, additionalPadding: EdgeInsets? = nil) {
         self.element = element
+        self.additionalPadding = additionalPadding
     }
 
     package var body: some View {
@@ -30,19 +44,27 @@ package struct AdaptyUIElementView: View {
             AdaptyUIElementView(box.content)
                 .fixedFrame(box: box)
                 .rangedFrame(box: box)
+                .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .stack(stack, properties):
-            AdaptyUIStackView(stack, properties)
+            AdaptyUIStackView(stack)
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
         case let .text(text, properties):
             AdaptyUITextView(text)
+                .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .image(image, properties):
             AdaptyUIImageView(image)
+                .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .button(button, properties):
-            button.applyingProperties(properties)
+            AdaptyUIButtonView(button)
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
         case let .unknown(value, properties):
             AdaptyUIUnknownElementView(value: value)
+                .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         }
     }
