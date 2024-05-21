@@ -55,9 +55,8 @@ struct AdaptyUIFlatContainerView: View {
         _ element: AdaptyUI.Element,
         globalProxy: GeometryProxy
     ) -> some View {
-        if footerSize.height > globalProxy.size.height {
+        if footerSize.height >= globalProxy.size.height - globalProxy.safeAreaInsets.bottom {
             scrollableFooterView(element, globalProxy: globalProxy)
-
         } else {
             staticFooterView(element, globalProxy: globalProxy)
         }

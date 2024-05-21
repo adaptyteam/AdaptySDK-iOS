@@ -62,9 +62,9 @@ package struct AdaptyUITemplateResolverView: View {
     private var templateContainerView: some View {
         switch template {
         case .basic:
-            AdaptyUIBasicContainerView(screen: screen, footerSize: .zero)
+            AdaptyUIBasicContainerView(screen: screen)
         case .flat:
-            AdaptyUIFlatContainerView(screen: screen, footerSize: .zero)
+            AdaptyUIFlatContainerView(screen: screen)
         }
     }
 
