@@ -13,7 +13,6 @@
 extension AdaptyUI.Box {
     static var testBasicDog: Self {
         .init(
-            //            width: .fixed(.screen(0.8)),
             width: nil,
             height: .fixed(.screen(0.5)),
             horizontalAlignment: .right,
@@ -21,6 +20,21 @@ extension AdaptyUI.Box {
             content: .image(.init(asset: .urlDog,
                                   aspect: .fill,
                                   tint: nil), nil)
+        )
+    }
+
+    static var testCircleDog: Self {
+        .init(
+            width: .fixed(.point(280)),
+            height: .fixed(.point(280)),
+            horizontalAlignment: .center,
+            verticalAlignment: .center,
+            content: .image(
+                .init(asset: .urlDog,
+                      aspect: .fill,
+                      tint: nil),
+                nil
+            )
         )
     }
 }

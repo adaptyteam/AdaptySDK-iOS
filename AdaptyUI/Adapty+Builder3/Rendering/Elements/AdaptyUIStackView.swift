@@ -334,6 +334,37 @@ extension AdaptyUI.Stack {
             ]
         )
     }
+    
+    static var testVStackBigAndDog: AdaptyUI.Stack {
+        AdaptyUI.Stack(
+            type: .vertical,
+            horizontalAlignment: .left,
+            verticalAlignment: .center,
+            spacing: 0,
+            content: [
+                .box(.testCircleDog,
+                     .init(decorator: .init(shapeType: .circle, background: nil, border: nil), padding: .init(leading: 0, top: 0, trailing: 0, bottom: 24), offset: .zero, visibility: true, transitionIn: [])),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+            ]
+        )
+    }
 }
 
 @available(iOS 13.0, *)

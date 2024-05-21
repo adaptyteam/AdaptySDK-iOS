@@ -56,7 +56,6 @@ struct AdaptyUIBasicContainerView: View {
                 )
         }
         .frame(height: height)
-//        .background(Color.red) // TODO: remove
     }
 
     @State var footerSize: CGSize = .zero
@@ -123,7 +122,7 @@ extension View {
 @available(iOS 13.0, *)
 #Preview {
     AdaptyUIBasicContainerView(
-        screen: .testDog
+        screen: .testBasicDog
     )
     .environmentObject(AdaptyUIActionResolver(logId: "preview"))
 }

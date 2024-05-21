@@ -59,7 +59,7 @@ public struct AdaptyUITestRendererView: View {
             case .template:
                 if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
                     AdaptyUITemplateResolverView(
-                        template: .basic,
+                        template: template,
                         screen: screen,
                         isRightToLeft: viewConfiguration.isRightToLeft
                     )

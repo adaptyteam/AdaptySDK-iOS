@@ -14,58 +14,61 @@ import SwiftUI
 struct AdaptyUIFlatContainerView: View {
     var screen: AdaptyUI.Screen
 
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+
     @State var footerSize: CGSize = .zero
-
-    private func set(proxy: GeometryProxy) -> some View {
-        DispatchQueue.main.async {
-            footerSize = proxy.size
-        }
-
-//        safeAreaInsets = geometry.safeAreaInsets
-        return Color.clear
-    }
 
     var body: some View {
         GeometryReader { p in
             ZStack(alignment: .bottom) {
                 ScrollView {
-                    Spacer().frame(height: p.safeAreaInsets.top)
-
                     AdaptyUIElementView(screen.content)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, p.safeAreaInsets.top)
                         .padding(.bottom, footerSize.height)
-
-                    Spacer().frame(height: p.safeAreaInsets.bottom)
                 }
 
                 if let footer = screen.footer {
-                    AdaptyUIElementView(footer)
-                        .background(GeometryReader(content: set(proxy:)))
-                        .padding(.bottom, p.safeAreaInsets.bottom)
+                    AdaptyUIElementView(
+                        footer,
+                        additionalPadding: EdgeInsets(top: 0,
+                                                      leading: 0,
+                                                      bottom: p.safeAreaInsets.bottom,
+                                                      trailing: 0)
+                    )
+                    .background(
+                        GeometryReader { geometry in
+                            Color.clear
+                                .onAppear {
+                                    footerSize = geometry.size
+                                }
+                        }
+                    )
+                }
+
+                if let overlay = screen.overlay {
+                    AdaptyUIElementView(
+                        overlay,
+                        additionalPadding: p.safeAreaInsets
+                    )
                 }
             }
-            .edgesIgnoringSafeArea(.all)
+            .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
+            .ignoresSafeArea_fallback()
         }
-//        .ignoresSafeArea()
     }
 }
 
 #if DEBUG
 
-@testable import Adapty
-
 @available(iOS 13.0, *)
 #Preview {
     AdaptyUIFlatContainerView(
-        screen: .init(
-            background: .color(.testWhite),
-            cover: nil,
-            content: .stack(.testVStack, nil),
-            footer: .stack(.testHStack, nil),
-            overlay: nil
-        )
+        screen: .testFlatDog
     )
+    .environmentObject(AdaptyUIActionResolver(logId: "preview"))
 }
-
 #endif
 
 #endif
