@@ -50,7 +50,8 @@
         }
 
         var body: some View {
-            if false, #available(iOS 15, *) {
+            // TODO: remove
+            if #available(iOS 15, *) {
                 Text(attributedString)
             } else {
                 FallbackText(nsAttributedString)

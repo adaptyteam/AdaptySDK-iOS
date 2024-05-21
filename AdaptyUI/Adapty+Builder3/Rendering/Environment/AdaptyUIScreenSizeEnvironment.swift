@@ -22,8 +22,9 @@ extension EnvironmentValues {
     }
 }
 
+// TODO: make private
 @available(iOS 13.0, *)
-extension View {
+public extension View {
     func withScreenSize(_ value: CGSize) -> some View {
         environment(\.adaptyScreenSize, value)
     }

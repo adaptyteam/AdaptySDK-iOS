@@ -37,6 +37,7 @@ public class AdaptyBuilder3PaywallController: UIViewController {
         modalPresentationStyle = .fullScreen
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -51,23 +52,23 @@ public class AdaptyBuilder3PaywallController: UIViewController {
         if let screen = viewConfiguration.screens.first?.value {
             view.backgroundColor = screen.background.asColor?.uiColor ?? .white
 
-                addSubSwiftUIView(
-                    ZStack(alignment: .center) {
-                        AdaptyUIElementView(screen.content)
-                        
-                        VStack {
-                            HStack {
-                                Button("Dismiss") { [weak self] in
-                                    self?.dismiss(animated: true)
-                                }
-                                Spacer()
+            addSubSwiftUIView(
+                ZStack(alignment: .center) {
+                    AdaptyUIElementView(screen.content)
+
+                    VStack {
+                        HStack {
+                            Button("Dismiss") { [weak self] in
+                                self?.dismiss(animated: true)
                             }
                             Spacer()
                         }
-                    },
-                    to: view
-                )
-           
+                        Spacer()
+                    }
+                },
+                to: view
+            )
+
         } else {
             view.backgroundColor = .white // TODO: remove
 
