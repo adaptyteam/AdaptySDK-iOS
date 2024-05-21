@@ -14,10 +14,54 @@ import SwiftUI
 struct AdaptyUIFlatContainerView: View {
     var screen: AdaptyUI.Screen
 
-    @Environment(\.adaptyScreenSize)
-    private var screenSize: CGSize
-
     @State var footerSize: CGSize = .zero
+
+    @ViewBuilder
+    private func staticFooterView(
+        _ element: AdaptyUI.Element,
+        globalProxy: GeometryProxy
+    ) -> some View {
+        AdaptyUIElementView(
+            element,
+            additionalPadding: EdgeInsets(
+                top: 0,
+                leading: 0,
+                bottom: globalProxy.safeAreaInsets.bottom,
+                trailing: 0
+            )
+        )
+    }
+
+    @ViewBuilder
+    private func scrollableFooterView(
+        _ element: AdaptyUI.Element,
+        globalProxy: GeometryProxy
+    ) -> some View {
+        ScrollView {
+            AdaptyUIElementView(
+                element,
+                additionalPadding: EdgeInsets(
+                    top: globalProxy.safeAreaInsets.top,
+                    leading: 0,
+                    bottom: globalProxy.safeAreaInsets.bottom,
+                    trailing: 0
+                )
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func footerView(
+        _ element: AdaptyUI.Element,
+        globalProxy: GeometryProxy
+    ) -> some View {
+        if footerSize.height > globalProxy.size.height {
+            scrollableFooterView(element, globalProxy: globalProxy)
+
+        } else {
+            staticFooterView(element, globalProxy: globalProxy)
+        }
+    }
 
     var body: some View {
         GeometryReader { p in
@@ -30,21 +74,15 @@ struct AdaptyUIFlatContainerView: View {
                 }
 
                 if let footer = screen.footer {
-                    AdaptyUIElementView(
-                        footer,
-                        additionalPadding: EdgeInsets(top: 0,
-                                                      leading: 0,
-                                                      bottom: p.safeAreaInsets.bottom,
-                                                      trailing: 0)
-                    )
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear
-                                .onAppear {
-                                    footerSize = geometry.size
-                                }
-                        }
-                    )
+                    footerView(footer, globalProxy: p)
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onAppear {
+                                        footerSize = geometry.size
+                                    }
+                            }
+                        )
                 }
 
                 if let overlay = screen.overlay {
@@ -65,7 +103,9 @@ struct AdaptyUIFlatContainerView: View {
 @available(iOS 13.0, *)
 #Preview {
     AdaptyUIFlatContainerView(
-        screen: .testFlatDog
+        //        screen: .testFlatDog
+        screen: .testTransparentScroll
+//        screen: .testTransparent
     )
     .environmentObject(AdaptyUIActionResolver(logId: "preview"))
 }

@@ -31,6 +31,26 @@ extension AdaptyUI.Screen {
             overlay: .text(.testBodyLong, nil)
         )
     }
+    
+    static var testTransparent: Self {
+        .init(
+            background: .color(.testWhite),
+            cover: nil,
+            content: .box(.testBasicDog, nil),
+            footer: .stack(.testVStackMediumAndDog, .greenBG),
+            overlay: .text(.testBodyShort, nil)
+        )
+    }
+    
+    static var testTransparentScroll: Self {
+        .init(
+            background: .color(.testWhite),
+            cover: nil,
+            content: .box(.testBasicDog, nil),
+            footer: .stack(.testVStackBigAndDog, .greenBG),
+            overlay: .text(.testBodyShort, nil)
+        )
+    }
 }
 
 #endif
