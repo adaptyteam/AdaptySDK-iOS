@@ -63,15 +63,6 @@ extension AdaptyUI.ViewConfiguration.Text: Decodable {
     }
 
     init(from decoder: Decoder) throws {
-        if let id = try? decoder.singleValueContainer().decode(AdaptyUI.ViewConfiguration.StringId.self) {
-            stringId = id
-            defaultTextAttributes = nil
-            defaultParagraphAttributes = nil
-            maxRows = nil
-            overflowMode = .empty
-            return
-        }
-
         let container = try decoder.container(keyedBy: CodingKeys.self)
         stringId = try container.decode(AdaptyUI.ViewConfiguration.StringId.self, forKey: .stringId)
         maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)

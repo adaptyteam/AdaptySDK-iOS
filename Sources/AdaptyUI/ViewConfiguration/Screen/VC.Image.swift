@@ -27,19 +27,12 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
 extension AdaptyUI.ViewConfiguration.Image: Decodable {
     enum CodingKeys: String, CodingKey {
-        case assetId = "asset"
+        case assetId = "asset_id"
         case aspect
         case tintAssetId = "tint"
     }
 
     init(from decoder: Decoder) throws {
-        if let id = try? decoder.singleValueContainer().decode(String.self) {
-            assetId = id
-            aspect = AdaptyUI.Image.default.aspect
-            tintAssetId = nil
-            return
-        }
-
         let container = try decoder.container(keyedBy: CodingKeys.self)
         assetId = try container.decode(String.self, forKey: .assetId)
         aspect = try container.decodeIfPresent(AdaptyUI.AspectRatio.self, forKey: .aspect) ?? AdaptyUI.Image.default.aspect
