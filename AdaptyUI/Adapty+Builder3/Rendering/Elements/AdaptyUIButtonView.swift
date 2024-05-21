@@ -11,17 +11,28 @@ import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
-extension AdaptyUI.Button: View {
-    var currentStateView: AdaptyUI.Element? {
-        if isSelected {
-            selectedState ?? normalState
+struct AdaptyUIButtonView: View {
+    private var button: AdaptyUI.Button
+
+    @EnvironmentObject var actionResolver: AdaptyUIActionResolver
+
+    init(_ button: AdaptyUI.Button) {
+        self.button = button
+    }
+
+    private var currentStateView: AdaptyUI.Element? {
+        if button.isSelected {
+            return button.selectedState ?? button.normalState
         } else {
-            normalState
+            return button.normalState
         }
     }
 
     public var body: some View {
         Button {
+            if let action = button.action {
+                actionResolver.actionOccured(action)
+            }
         } label: {
             if let currentStateView {
                 AdaptyUIElementView(currentStateView)

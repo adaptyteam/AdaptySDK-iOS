@@ -63,11 +63,13 @@ public struct AdaptyUITestRendererView: View {
                         screen: screen,
                         isRightToLeft: viewConfiguration.isRightToLeft
                     )
+                    .environmentObject(AdaptyUIActionResolver(logId: "AdaptyUITesting"))
                 } else {
                     AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
                 }
             case .element:
                 AdaptyUIElementView(screen.content)
+                    .environmentObject(AdaptyUIActionResolver(logId: "AdaptyUITesting"))
             }
         } else {
             AdaptyUIRenderingErrorView(text: "No 'default' Screen Found", forcePresent: true)
