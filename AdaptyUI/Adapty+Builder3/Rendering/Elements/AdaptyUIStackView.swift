@@ -109,13 +109,9 @@ extension View {
 @available(iOS 13.0, *)
 struct AdaptyUIStackView: View {
     var stack: AdaptyUI.Stack
-    var properties: AdaptyUI.Element.Properties?
 
-    init(_ stack: AdaptyUI.Stack,
-         _ properties: AdaptyUI.Element.Properties?)
-    {
+    init(_ stack: AdaptyUI.Stack) {
         self.stack = stack
-        self.properties = properties
     }
 
     var body: some View {
@@ -124,20 +120,20 @@ struct AdaptyUIStackView: View {
             VStack(alignment: stack.horizontalAlignment.swiftuiValue, spacing: stack.spacing) {
                 ForEach(0 ..< stack.content.count, id: \.self) {
                     AdaptyUIElementView(stack.content[$0])
-                        .infiniteWidthIfFill(stack.horizontalAlignment)
+//                        .infiniteWidthIfFill(stack.horizontalAlignment)
                 }
             }
-            .fixedHorizontalSizeIfFill(stack.horizontalAlignment)
-            .applyingProperties(properties)
+        // TODO: inspect this
+//            .fixedHorizontalSizeIfFill(stack.horizontalAlignment)
         case .horizontal:
             HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
                 ForEach(0 ..< stack.content.count, id: \.self) {
                     AdaptyUIElementView(stack.content[$0])
-                        .infiniteHeightIfFill(stack.verticalAlignment)
+//                        .infiniteHeightIfFill(stack.verticalAlignment)
                 }
             }
-            .fixedVerticalSizeIfFill(stack.verticalAlignment)
-            .applyingProperties(properties)
+        // TODO: inspect this
+//            .fixedVerticalSizeIfFill(stack.verticalAlignment)
         case .z:
             // TODO: implement fill-fill scenario
             ZStack(alignment: stack.alignment) {
@@ -145,7 +141,6 @@ struct AdaptyUIStackView: View {
                     AdaptyUIElementView(stack.content[$0])
                 }
             }
-            .applyingProperties(properties)
         }
     }
 }
@@ -173,7 +168,7 @@ extension AdaptyUI.Stack {
         AdaptyUI.Stack(
             type: .horizontal,
             horizontalAlignment: .left,
-            verticalAlignment: .justified,
+            verticalAlignment: .center,
             spacing: 0,
             content: [
                 .button(
@@ -310,13 +305,92 @@ extension AdaptyUI.Stack {
             ]
         )
     }
+
+    static var testVStackBig: AdaptyUI.Stack {
+        AdaptyUI.Stack(
+            type: .vertical,
+            horizontalAlignment: .left,
+            verticalAlignment: .center,
+            spacing: 0,
+            content: [
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+            ]
+        )
+    }
+    
+    static var testVStackMediumAndDog: AdaptyUI.Stack {
+        AdaptyUI.Stack(
+            type: .vertical,
+            horizontalAlignment: .left,
+            verticalAlignment: .center,
+            spacing: 0,
+            content: [
+                .box(.testCircleDog,
+                     .init(decorator: .init(shapeType: .circle, background: nil, border: nil), padding: .init(leading: 0, top: 0, trailing: 0, bottom: 24), offset: .zero, visibility: true, transitionIn: [])),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+            ]
+        )
+    }
+    
+    static var testVStackBigAndDog: AdaptyUI.Stack {
+        AdaptyUI.Stack(
+            type: .vertical,
+            horizontalAlignment: .left,
+            verticalAlignment: .center,
+            spacing: 0,
+            content: [
+                .box(.testCircleDog,
+                     .init(decorator: .init(shapeType: .circle, background: nil, border: nil), padding: .init(leading: 0, top: 0, trailing: 0, bottom: 24), offset: .zero, visibility: true, transitionIn: [])),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+                .text(.testBodyLong, nil),
+            ]
+        )
+    }
 }
 
 @available(iOS 13.0, *)
 #Preview {
     AdaptyUIStackView(
-        .testVStack,
-        nil
+        .testVStack
 //            .init(
 //                decorator: .init(
 //                    shapeType: .rectangle(cornerRadius: .zero),

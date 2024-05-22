@@ -17,12 +17,40 @@ extension AdaptyUI.Decorator {
               background: .color(.testGreen),
               border: nil)
     }
+    
+    static var blueBG: Self {
+        .init(shapeType: .rectangle(cornerRadius: .zero),
+              background: .color(.testBlue),
+              border: nil)
+    }
+    
+    static var redBG: Self {
+        .init(shapeType: .rectangle(cornerRadius: .zero),
+              background: .color(.testRed),
+              border: nil)
+    }
 }
 
 @available(iOS 13.0, *)
 extension AdaptyUI.Element.Properties {
     static var greenBG: Self {
         .init(decorator: .greenBG,
+              padding: .zero,
+              offset: .zero,
+              visibility: true,
+              transitionIn: [])
+    }
+    
+    static var blueBG: Self {
+        .init(decorator: .blueBG,
+              padding: .zero,
+              offset: .zero,
+              visibility: true,
+              transitionIn: [])
+    }
+    
+    static var redBG: Self {
+        .init(decorator: .redBG,
               padding: .zero,
               offset: .zero,
               visibility: true,

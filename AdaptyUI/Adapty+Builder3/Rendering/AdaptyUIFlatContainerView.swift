@@ -11,75 +11,103 @@ import Adapty
 import SwiftUI
 
 @available(iOS 13.0, *)
-struct AdaptyUIFlatContainerView<CloseButton: View>: View {
+struct AdaptyUIFlatContainerView: View {
     var screen: AdaptyUI.Screen
-
-    var closeButtonBuilder: (() -> CloseButton)?
 
     @State var footerSize: CGSize = .zero
 
-    private func set(proxy: GeometryProxy) -> some View {
-        DispatchQueue.main.async {
-            footerSize = proxy.size
-        }
+    @ViewBuilder
+    private func staticFooterView(
+        _ element: AdaptyUI.Element,
+        globalProxy: GeometryProxy
+    ) -> some View {
+        AdaptyUIElementView(
+            element,
+            additionalPadding: EdgeInsets(
+                top: 0,
+                leading: 0,
+                bottom: globalProxy.safeAreaInsets.bottom,
+                trailing: 0
+            )
+        )
+    }
 
-//        safeAreaInsets = geometry.safeAreaInsets
-        return Color.clear
+    @ViewBuilder
+    private func scrollableFooterView(
+        _ element: AdaptyUI.Element,
+        globalProxy: GeometryProxy
+    ) -> some View {
+        ScrollView {
+            AdaptyUIElementView(
+                element,
+                additionalPadding: EdgeInsets(
+                    top: globalProxy.safeAreaInsets.top,
+                    leading: 0,
+                    bottom: globalProxy.safeAreaInsets.bottom,
+                    trailing: 0
+                )
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func footerView(
+        _ element: AdaptyUI.Element,
+        globalProxy: GeometryProxy
+    ) -> some View {
+        if footerSize.height >= globalProxy.size.height - globalProxy.safeAreaInsets.bottom {
+            scrollableFooterView(element, globalProxy: globalProxy)
+        } else {
+            staticFooterView(element, globalProxy: globalProxy)
+        }
     }
 
     var body: some View {
         GeometryReader { p in
             ZStack(alignment: .bottom) {
-                    ScrollView {
-                        Spacer().frame(height: p.safeAreaInsets.top)
-
-                        AdaptyUIElementView(screen.content)
-                            .padding(.bottom, footerSize.height)
-
-                        Spacer().frame(height: p.safeAreaInsets.bottom)
-                    }
-                
+                ScrollView {
+                    AdaptyUIElementView(screen.content)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, p.safeAreaInsets.top)
+                        .padding(.bottom, footerSize.height)
+                }
 
                 if let footer = screen.footer {
-                    AdaptyUIElementView(footer)
-                        .background(GeometryReader(content: set(proxy:)))
-                        .padding(.bottom, p.safeAreaInsets.bottom)
+                    footerView(footer, globalProxy: p)
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onAppear {
+                                        footerSize = geometry.size
+                                    }
+                            }
+                        )
                 }
 
-                if let closeButtonBuilder {
-                    closeButtonBuilder()
-                        .frame(maxWidth: .infinity,
-                               maxHeight: .infinity,
-                               alignment: .topLeading)
-                        .padding(.top, p.safeAreaInsets.top)
+                if let overlay = screen.overlay {
+                    AdaptyUIElementView(
+                        overlay,
+                        additionalPadding: p.safeAreaInsets
+                    )
                 }
             }
-            .edgesIgnoringSafeArea(.all)
+            .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
+            .ignoresSafeArea_fallback()
         }
-//        .ignoresSafeArea()
     }
 }
 
 #if DEBUG
 
-@testable import Adapty
-
 @available(iOS 13.0, *)
 #Preview {
     AdaptyUIFlatContainerView(
-        screen: .init(
-            background: .color(.testWhite),
-            cover: nil,
-            content: .stack(.testVStack, nil),
-            footer: .stack(.testHStack, nil),
-            overlay: nil
-        ),
-        closeButtonBuilder: {
-            Button(action: {}, label: { Text("Dismiss") })
-        }
+        //        screen: .testFlatDog
+        screen: .testTransparentScroll
+//        screen: .testTransparent
     )
+    .environmentObject(AdaptyUIActionResolver(logId: "preview"))
 }
-
 #endif
 
 #endif
