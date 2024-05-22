@@ -20,3 +20,19 @@ extension AdaptyUI {
         package let tint: Filling?
     }
 }
+
+#if DEBUG
+    package extension AdaptyUI.Image {
+        static func create(
+            asset: AdaptyUI.ImageData = `default`.asset,
+            aspect: AdaptyUI.AspectRatio = `default`.aspect,
+            tint: AdaptyUI.Filling? = `default`.tint
+        ) -> Self {
+            .init(
+                asset: asset,
+                aspect: aspect,
+                tint: tint
+            )
+        }
+    }
+#endif

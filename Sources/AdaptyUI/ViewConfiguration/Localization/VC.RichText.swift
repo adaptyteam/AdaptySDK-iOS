@@ -174,7 +174,7 @@ private extension AdaptyUI.ViewConfiguration.ParagraphAttributes {
         let indent = self.indent ?? 0
         let firstIndent = self.firstIndent ?? indent
         return AdaptyUI.RichText.ParagraphAttributes(
-            horizontalAlign: self.horizontalAlign ?? .left,
+            horizontalAlign: self.horizontalAlign ?? .leading,
             firstIndent: firstIndent,
             indent: indent,
             bulletSpace: self.bulletSpace,

@@ -29,6 +29,36 @@ extension AdaptyUI.ColorGradient {
     }
 }
 
+#if DEBUG
+package extension AdaptyUI.ColorGradient {
+    static func create(
+        kind: AdaptyUI.ColorGradient.Kind,
+        start: AdaptyUI.Point,
+        end: AdaptyUI.Point,
+        items: [AdaptyUI.ColorGradient.Item]
+    )-> Self {
+        .init(
+            kind: kind,
+            start: start,
+            end: end,
+            items: items
+        )
+    }
+}
+
+package extension AdaptyUI.ColorGradient.Item {
+    static func create(
+        color: AdaptyUI.Color,
+        p: Double
+    )-> Self {
+        .init(
+            color: color,
+            p: p
+        )
+    }
+}
+#endif
+
 extension AdaptyUI.ColorGradient: Decodable {
     enum CodingKeys: String, CodingKey {
         case points

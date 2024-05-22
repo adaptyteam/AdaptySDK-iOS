@@ -140,9 +140,9 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
             }
         try self.init(
             decorator: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorator),
-            padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.EdgeInsets.zero,
-            offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Offset.zero,
-            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true,
+            padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.Element.Properties.defaultPadding,
+            offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Element.Properties.defaultOffset,
+            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? AdaptyUI.Element.Properties.defaultVisibility,
             transitionIn: transitionIn
         )
     }

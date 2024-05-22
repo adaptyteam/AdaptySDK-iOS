@@ -30,3 +30,23 @@ extension AdaptyUI {
         case z = "z_stack"
     }
 }
+
+#if DEBUG
+    package extension AdaptyUI.Stack {
+        static func create(
+            type: AdaptyUI.StackType = `default`.type,
+            horizontalAlignment: AdaptyUI.HorizontalAlignment = `default`.horizontalAlignment,
+            verticalAlignment: AdaptyUI.VerticalAlignment = `default`.verticalAlignment,
+            spacing: Double = `default`.spacing,
+            content: [AdaptyUI.Element] = `default`.content
+        ) -> Self {
+            .init(
+                type: type,
+                horizontalAlignment: horizontalAlignment,
+                verticalAlignment: verticalAlignment,
+                spacing: spacing,
+                content: content
+            )
+        }
+    }
+#endif

@@ -18,3 +18,23 @@ extension AdaptyUI {
         package let overlay: Element?
     }
 }
+
+#if DEBUG
+    package extension AdaptyUI.Screen {
+        static func create(
+            background: AdaptyUI.Filling = AdaptyUI.Screen.defaultBackground,
+            cover: AdaptyUI.Element? = nil,
+            content: AdaptyUI.Element,
+            footer: AdaptyUI.Element? = nil,
+            overlay: AdaptyUI.Element? = nil
+        ) -> Self {
+            .init(
+                background: background,
+                cover: cover,
+                content: content,
+                footer: footer,
+                overlay: overlay
+            )
+        }
+    }
+#endif

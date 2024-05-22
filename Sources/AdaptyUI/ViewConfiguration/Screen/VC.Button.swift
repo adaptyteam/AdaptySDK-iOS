@@ -45,7 +45,7 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             action: container.decodeIfPresent(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action),
-            isSelected: container.decodeIfPresent(Bool.self, forKey: .isSelected) ?? false,
+            isSelected: container.decodeIfPresent(Bool.self, forKey: .isSelected) ?? AdaptyUI.Button.defaultIsSelected,
             normalState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
             selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState)
         )

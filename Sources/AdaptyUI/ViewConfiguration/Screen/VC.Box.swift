@@ -40,13 +40,12 @@ extension AdaptyUI.ViewConfiguration.Box: Decodable {
     }
 
     init(from decoder: any Decoder) throws {
-        let def = AdaptyUI.Stack.default
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             width: try? container.decodeIfPresent(AdaptyUI.Box.Length.self, forKey: .width),
             height: try? container.decodeIfPresent(AdaptyUI.Box.Length.self, forKey: .height),
-            horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
-            verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
+            horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? AdaptyUI.Box.defaultHorizontalAlignment,
+            verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? AdaptyUI.Box.defaultVerticalAlignment,
             content: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .content)
         )
     }

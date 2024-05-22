@@ -34,6 +34,10 @@ extension AdaptyUI {
 
 extension AdaptyUI.Element {
     package struct Properties {
+        static let defaultPadding = AdaptyUI.EdgeInsets(same: 0)
+        static let defaultOffset = AdaptyUI.Offset.zero
+        static let defaultVisibility = false
+
         package let decorator: AdaptyUI.Decorator?
         package let padding: AdaptyUI.EdgeInsets
         package let offset: AdaptyUI.Offset
@@ -42,3 +46,23 @@ extension AdaptyUI.Element {
         package let transitionIn: [AdaptyUI.Transition]
     }
 }
+
+#if DEBUG
+    package extension AdaptyUI.Element.Properties {
+        static func create(
+            decorator: AdaptyUI.Decorator? = nil,
+            padding: AdaptyUI.EdgeInsets = AdaptyUI.Element.Properties.defaultPadding,
+            offset: AdaptyUI.Offset = AdaptyUI.Element.Properties.defaultOffset,
+            visibility: Bool = AdaptyUI.Element.Properties.defaultVisibility,
+            transitionIn: [AdaptyUI.Transition] = []
+        ) -> Self {
+            .init(
+                decorator: decorator,
+                padding: padding,
+                offset: offset,
+                visibility: visibility,
+                transitionIn: transitionIn
+            )
+        }
+    }
+#endif

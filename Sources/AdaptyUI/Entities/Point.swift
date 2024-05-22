@@ -22,6 +22,20 @@ extension AdaptyUI.Point {
     }
 }
 
+#if DEBUG
+    package extension AdaptyUI.Point {
+        static func create(
+            x: Double = 0.0,
+            y: Double = 0.0
+        ) -> Self {
+            .init(
+                x: x,
+                y: y
+            )
+        }
+    }
+#endif
+
 extension AdaptyUI.Point: Decodable {
     enum CodingKeys: String, CodingKey {
         case x
