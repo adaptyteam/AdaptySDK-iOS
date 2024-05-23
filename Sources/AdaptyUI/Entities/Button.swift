@@ -19,7 +19,7 @@ extension AdaptyUI {
 
 #if DEBUG
     package extension AdaptyUI.Button {
-        static func debugCreate(
+        static func create(
             action: AdaptyUI.ButtonAction? = nil,
             isSelected: Bool = defaultIsSelected,
             normalState: AdaptyUI.Element? = nil,
