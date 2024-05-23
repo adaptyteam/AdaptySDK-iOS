@@ -24,6 +24,7 @@ struct AdaptyUIBasicContainerView: View {
 
     @ViewBuilder
     func coverView(_ box: AdaptyUI.Box,
+                   _ content: AdaptyUI.Element,
                    _ properties: AdaptyUI.Element.Properties?) -> some View
     {
         let height: CGFloat = {
@@ -39,7 +40,7 @@ struct AdaptyUIBasicContainerView: View {
             let isScrollingDown = minY > 0
             let isScrollingUp = minY < 0
 
-            AdaptyUIElementView(box.content)
+            AdaptyUIElementView(content)
                 .frame(width : p.size.width,
                        height: isScrollingDown ? height + minY: height)
                 .applyingProperties(properties)
@@ -65,8 +66,8 @@ struct AdaptyUIBasicContainerView: View {
             ZStack(alignment: .bottom) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        if case let .box(box, properties) = screen.cover {
-                            coverView(box, properties)
+                        if case let .box(box, properties) = screen.cover, let content = box.content {
+                            coverView(box, content, properties)
                         }
 
                         AdaptyUIElementView(screen.content)
