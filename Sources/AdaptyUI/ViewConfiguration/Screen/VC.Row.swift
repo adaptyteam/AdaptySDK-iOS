@@ -61,7 +61,7 @@ extension AdaptyUI.ViewConfiguration.Row: Decodable {
 extension AdaptyUI.ViewConfiguration.RowOrColumnItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case fixed
-        case flexable
+        case flexable = "weight"
         case content
     }
 
