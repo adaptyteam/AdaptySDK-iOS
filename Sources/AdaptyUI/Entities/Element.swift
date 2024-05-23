@@ -17,6 +17,7 @@ extension AdaptyUI {
         indirect case box(AdaptyUI.Box, Properties?)
         indirect case row(AdaptyUI.Row, Properties?)
         indirect case column(AdaptyUI.Column, Properties?)
+        indirect case section(AdaptyUI.Section, Properties?)
 
         case unknown(String, Properties?)
 
@@ -30,6 +31,7 @@ extension AdaptyUI {
                  let .box(_, properties),
                  let .row(_, properties),
                  let .column(_, properties),
+                 let .section(_, properties),
                  let .unknown(_, properties):
                 properties
             }

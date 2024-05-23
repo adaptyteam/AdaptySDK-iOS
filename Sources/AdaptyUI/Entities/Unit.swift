@@ -35,21 +35,21 @@ extension AdaptyUI.Unit: Decodable {
         if let points = try? decoder.singleValueContainer().decode(Double.self) {
             self = .point(points)
         } else {
-            let conteineer = try decoder.container(keyedBy: CodingKeys.self)
-            if let value = try conteineer.decodeIfPresent(Double.self, forKey: .screen) {
+            let conteiner = try decoder.container(keyedBy: CodingKeys.self)
+            if let value = try conteiner.decodeIfPresent(Double.self, forKey: .screen) {
                 self = .screen(value)
-            } else if let value = try conteineer.decodeIfPresent(Double.self, forKey: .point) {
+            } else if let value = try conteiner.decodeIfPresent(Double.self, forKey: .point) {
                 self = .point(value)
             } else {
-                let value = try conteineer.decode(Double.self, forKey: .value)
-                let unit = try conteineer.decodeIfPresent(String.self, forKey: .unit)
+                let value = try conteiner.decode(Double.self, forKey: .value)
+                let unit = try conteiner.decodeIfPresent(String.self, forKey: .unit)
                 switch unit {
                 case .some(CodingKeys.screen.rawValue):
                     self = .screen(value)
                 case .some(CodingKeys.point.rawValue), .none:
                     self = .point(value)
                 default:
-                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: conteineer.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit ?? "null")"))
+                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: conteiner.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit ?? "null")"))
                 }
             }
         }

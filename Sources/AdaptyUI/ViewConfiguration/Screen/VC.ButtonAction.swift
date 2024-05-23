@@ -16,6 +16,9 @@ extension AdaptyUI.ViewConfiguration {
         case select(productId: String)
         case purchase(productId: String)
         case purchaseSelectedProduct
+        case switchSection(sectionId: String, index: Int)
+        case open(screenId: String)
+        case closeScreen
         case close
     }
 }
@@ -35,6 +38,12 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             .purchaseProductId(id: productId)
         case .purchaseSelectedProduct:
             .purchaseSelectedProduct
+        case let .switchSection(sectionId, index):
+            .switchSection(id: sectionId, index: index)
+        case let .open(screenId):
+            .openScreen(id: screenId)
+        case .closeScreen:
+            .closeScreen
         case .close:
             .close
         }
@@ -47,10 +56,16 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
         case url
         case customId = "custom_id"
         case productId = "product_id"
+        case sectionId = "section_id"
+        case screenId = "screen_id"
+        case index
     }
 
     enum Types: String {
         case openUrl = "open_url"
+        case openScreen = "open_screen"
+        case closeScreen = "close_screen"
+        case switchSection = "switch"
         case restore
         case custom
         case close
@@ -78,6 +93,12 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
             self = try .select(productId: container.decode(String.self, forKey: .productId))
         case .purchaseProductId:
             self = try .purchase(productId: container.decode(String.self, forKey: .productId))
+        case .switchSection:
+            self = try .switchSection(sectionId: container.decode(String.self, forKey: .sectionId), index: container.decode(Int.self, forKey: .index))
+        case .openScreen:
+            self = try .open(screenId: container.decode(String.self, forKey: .screenId))
+        case .closeScreen:
+            self = .closeScreen
         }
     }
 }

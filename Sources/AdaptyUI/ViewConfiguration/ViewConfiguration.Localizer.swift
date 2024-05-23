@@ -28,7 +28,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             locale: locale.id,
             isRightToLeft: localization?.isRightToLeft ?? false,
             templateId: source.templateId,
-            screens: source.screens.mapValues(screen),
+            screen: screen(source.defaultScreen),
+            bottomSheets: source.screens.mapValues(bottomSheet),
             templateRevision: source.templateRevision
         )
     }

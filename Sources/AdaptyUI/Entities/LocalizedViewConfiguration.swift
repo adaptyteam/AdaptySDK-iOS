@@ -13,7 +13,8 @@ extension AdaptyUI {
         public let locale: String
         public let isRightToLeft: Bool
         package let templateId: String
-        package let screens: [String: Screen]
+        package let screen: Screen
+        package let bottomSheets: [String: BottomSheet]
         package let templateRevision: Int64
     }
 }
@@ -26,24 +27,7 @@ extension AdaptyUI {
             isRightToLeft: Bool = false,
             templateId: String,
             screen: AdaptyUI.Screen,
-            templateRevision: Int64 = 0
-        ) -> Self {
-            create(
-                id: id,
-                locale: locale,
-                isRightToLeft: isRightToLeft,
-                templateId: templateId,
-                screens: ["default": screen],
-                templateRevision: templateRevision
-            )
-        }
-
-        static func create(
-            id: String = UUID().uuidString,
-            locale: String = AdaptyLocale.defaultPaywallLocale.id,
-            isRightToLeft: Bool = false,
-            templateId: String,
-            screens: [String: AdaptyUI.Screen],
+            bottomSheets: [String: AdaptyUI.BottomSheet] = [:],
             templateRevision: Int64 = 0
         ) -> Self {
             .init(
@@ -51,7 +35,8 @@ extension AdaptyUI {
                 locale: locale,
                 isRightToLeft: isRightToLeft,
                 templateId: templateId,
-                screens: screens,
+                screen: screen,
+                bottomSheets: bottomSheets,
                 templateRevision: templateRevision
             )
         }

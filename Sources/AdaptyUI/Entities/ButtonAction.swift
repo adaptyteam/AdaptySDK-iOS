@@ -16,5 +16,9 @@ extension AdaptyUI {
         case purchaseProductId(id: String)
         case purchaseSelectedProduct
         case close
+        case switchSection(id: String, index: Int)
+        case openScreen(id: String)
+        case closeScreen
+
     }
 }

@@ -16,6 +16,7 @@ extension AdaptyUI {
         let responseLocale: AdaptyLocale
         let localizations: [AdaptyLocale: Localization]
         let defaultLocalization: Localization?
+        let defaultScreen: Screen
         let screens: [String: Screen]
     }
 }
@@ -41,6 +42,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         case localizations
         case defaultLocalization = "default_localization"
         case screens = "styles"
+        case defaultScreen = "default"
     }
 
     init(from decoder: Decoder) throws {
@@ -67,6 +69,11 @@ extension AdaptyUI.ViewConfiguration: Decodable {
             defaultLocalization = nil
         }
 
-        screens = try container.decode([String: Screen].self, forKey: .screens)
+        let screens = try container.decode([String: Screen].self, forKey: .screens)
+        guard let defaultScreen = screens[CodingKeys.defaultScreen.rawValue] else {
+            throw DecodingError.valueNotFound(Screen.self, DecodingError.Context(codingPath: container.codingPath + [CodingKeys.screens, CodingKeys.defaultScreen], debugDescription: "Expected Screen value but do not found"))
+        }
+        self.defaultScreen = defaultScreen
+        self.screens = screens.filter { $0.key != CodingKeys.defaultScreen.rawValue }
     }
 }
