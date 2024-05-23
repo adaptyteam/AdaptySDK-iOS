@@ -113,7 +113,7 @@
         private func buildInterface() {
 //        view.backgroundColor = .white
 
-            if let screen = viewConfiguration.screens.first?.value {
+             let screen = viewConfiguration.screen
                 view.backgroundColor = screen.background.asColor?.uiColor ?? .white
 
                 switch viewConfiguration.templateId {
@@ -135,19 +135,7 @@
                     addSubSwiftUIView(Text("Not Supported Template: \(viewConfiguration.templateId)"),
                                       to: view)
                 }
-            } else {
-                view.backgroundColor = .white // TODO: remove
 
-                addSubSwiftUIView(
-                    VStack {
-                        Text("Rendering Failed!")
-                        Button("Dismiss") { [weak self] in
-                            self?.dismiss(animated: true)
-                        }
-                    },
-                    to: view
-                )
-            }
 //
 //        let tagConverter: AdaptyUI.CustomTagConverter?
 //
@@ -200,6 +188,12 @@
                 log(.verbose, "custom (\(id)) tap")
                 delegate?.paywallController(self, didPerform: .custom(id: id))
             case .selectProductId, .purchaseProductId, .purchaseSelectedProduct:
+                break
+            case let .openScreen(id):
+                break
+            case .closeScreen:
+                break
+            case let .switchSection(id, index):
                 break
             }
         }

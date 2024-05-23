@@ -54,7 +54,7 @@ public struct AdaptyUITestRendererView: View {
     }
 
     public var body: some View {
-        if let screen = viewConfiguration.screens["default"] {
+         let screen = viewConfiguration.screen
             switch renderingMode {
             case .template:
                 if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
@@ -71,9 +71,7 @@ public struct AdaptyUITestRendererView: View {
                 AdaptyUIElementView(screen.content)
                     .environmentObject(AdaptyUIActionResolver(logId: "AdaptyUITesting"))
             }
-        } else {
-            AdaptyUIRenderingErrorView(text: "No 'default' Screen Found", forcePresent: true)
-        }
+     
     }
 }
 

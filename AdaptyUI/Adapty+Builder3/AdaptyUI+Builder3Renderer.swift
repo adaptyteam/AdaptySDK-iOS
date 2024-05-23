@@ -49,7 +49,7 @@ public class AdaptyBuilder3PaywallController: UIViewController {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        if let screen = viewConfiguration.screens.first?.value {
+         let screen = viewConfiguration.screen
             view.backgroundColor = screen.background.asColor?.uiColor ?? .white
 
             addSubSwiftUIView(
@@ -69,19 +69,7 @@ public class AdaptyBuilder3PaywallController: UIViewController {
                 to: view
             )
 
-        } else {
-            view.backgroundColor = .white // TODO: remove
-
-            addSubSwiftUIView(
-                VStack {
-                    Text("Rendering Failed!")
-                    Button("Dismiss") { [weak self] in
-                        self?.dismiss(animated: true)
-                    }
-                },
-                to: view
-            )
-        }
+      
     }
 
     deinit {

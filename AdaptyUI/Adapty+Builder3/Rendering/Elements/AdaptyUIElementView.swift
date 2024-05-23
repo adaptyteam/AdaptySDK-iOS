@@ -31,6 +31,15 @@ package struct AdaptyUIElementView: View {
         self.element = element
         self.additionalPadding = additionalPadding
     }
+    
+    @ViewBuilder
+    private func elementOrEmpty(_ content: AdaptyUI.Element?) -> some View {
+        if let content {
+            AdaptyUIElementView(content)
+        } else {
+            Color.clear
+        }
+    }
 
     package var body: some View {
         switch element {
@@ -41,7 +50,7 @@ package struct AdaptyUIElementView: View {
                 }
             }
         case let .box(box, properties):
-            AdaptyUIElementView(box.content)
+            elementOrEmpty(box.content)
                 .fixedFrame(box: box)
                 .rangedFrame(box: box)
                 .paddingIfNeeded(additionalPadding)
@@ -64,6 +73,18 @@ package struct AdaptyUIElementView: View {
                 .applyingProperties(properties)
         case let .unknown(value, properties):
             AdaptyUIUnknownElementView(value: value)
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
+        case let .row(row, properties):
+            AdaptyUIUnknownElementView(value: "row")
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
+        case let .column(column, properties):
+            AdaptyUIUnknownElementView(value: "column")
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
+        case let .section(section, properties):
+            AdaptyUIUnknownElementView(value: "section")
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         }

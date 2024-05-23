@@ -60,9 +60,12 @@ extension View {
     @ViewBuilder
     func clipShape(_ shape: AdaptyUI.ShapeType) -> some View {
         switch shape {
-        case let .rectangle(radius):
-            // TODO: different radius
-            clipShape(RoundedRectangle(cornerRadius: radius.topLeading))
+        case let .rectangle(radii):
+            if #available(iOS 16.0, *) {
+                clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
+            } else {
+                clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
+            }
         case .circle:
             clipShape(Circle())
         case .curveUp:
