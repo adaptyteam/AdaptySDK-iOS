@@ -19,6 +19,5 @@ extension AdaptyUI {
         case switchSection(id: String, index: Int)
         case openScreen(id: String)
         case closeScreen
-
     }
 }

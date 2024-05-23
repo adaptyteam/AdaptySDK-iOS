@@ -10,41 +10,18 @@ import Foundation
 
 extension AdaptyUI {
     package struct Row {
-        static let `default` = Row(
-            verticalAlignment: .center,
-            spacing: 0,
-            items: []
-        )
-
-        package let verticalAlignment: VerticalAlignment
         package let spacing: Double
-        package let items: [RowOrColumnItem]
-    }
-
-    package enum RowOrColumnItem {
-        case fixed(length: Unit, content: Element)
-        case flexable(weight: Int, content: Element)
-
-        var content: Element {
-            switch self {
-            case let .fixed(_, content):
-                content
-            case let .flexable(_, content):
-                content
-            }
-        }
+        package let items: [GridItem]
     }
 }
 
 #if DEBUG
     package extension AdaptyUI.Row {
         static func create(
-            verticalAlignment: AdaptyUI.VerticalAlignment = `default`.verticalAlignment,
-            spacing: Double = `default`.spacing,
-            items: [AdaptyUI.RowOrColumnItem] = `default`.items
+            spacing: Double = 0,
+            items: [AdaptyUI.GridItem]
         ) -> Self {
             .init(
-                verticalAlignment: verticalAlignment,
                 spacing: spacing,
                 items: items
             )
