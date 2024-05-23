@@ -47,7 +47,7 @@ extension AdaptyUI.ViewConfiguration.Stack: Decodable {
             horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
-            content: container.decodeIfPresent([AdaptyUI.ViewConfiguration.Element].self, forKey: .content) ?? []
+            content: container.decode([AdaptyUI.ViewConfiguration.Element].self, forKey: .content)
         )
     }
 }

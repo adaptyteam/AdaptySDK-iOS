@@ -16,7 +16,7 @@ extension AdaptyUI {
         package let height: Length?
         package let horizontalAlignment: HorizontalAlignment
         package let verticalAlignment: VerticalAlignment
-        package let content: Element
+        package let content: Element?
     }
 }
 
@@ -27,7 +27,7 @@ extension AdaptyUI {
             height: Length? = nil,
             horizontalAlignment: AdaptyUI.HorizontalAlignment = defaultHorizontalAlignment,
             verticalAlignment: AdaptyUI.VerticalAlignment = defaultVerticalAlignment,
-            content: AdaptyUI.Element
+            content: AdaptyUI.Element? = nil
         ) -> Self {
             .init(
                 width: width,
