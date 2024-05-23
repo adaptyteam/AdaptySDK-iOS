@@ -27,3 +27,19 @@ extension AdaptyUI {
         }
     }
 }
+
+#if DEBUG
+    package extension AdaptyUI.Text {
+        static func create(
+            value: AdaptyUI.Text.Value = empty.value,
+            maxRows: Int? = empty.maxRows,
+            overflowMode: Set<AdaptyUI.Text.OverflowMode> = empty.overflowMode
+        ) -> Self {
+            .init(
+                value: value,
+                maxRows: maxRows,
+                overflowMode: overflowMode
+            )
+        }
+    }
+#endif

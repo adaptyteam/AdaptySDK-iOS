@@ -27,6 +27,28 @@ extension AdaptyUI {
     }
 }
 
+#if DEBUG
+    package extension AdaptyUI.Font {
+        static func create(
+            alias: String = `default`.alias,
+            familyName: String = `default`.familyName,
+            weight: Int = `default`.weight,
+            italic: Bool = `default`.italic,
+            defaultSize: Double = `default`.defaultSize,
+            defaultColor: AdaptyUI.Filling = `default`.defaultColor
+        ) -> Self {
+            .init(
+                alias: alias,
+                familyName: familyName,
+                weight: weight,
+                italic: italic,
+                defaultSize: defaultSize,
+                defaultColor: defaultColor
+            )
+        }
+    }
+#endif
+
 extension AdaptyUI.Font: Decodable {
     enum CodingKeys: String, CodingKey {
         case alias = "value"

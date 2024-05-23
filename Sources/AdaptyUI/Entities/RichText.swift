@@ -47,3 +47,57 @@ extension AdaptyUI {
         }
     }
 }
+
+#if DEBUG
+    package extension AdaptyUI.RichText {
+        static func create(
+            items: [AdaptyUI.RichText.Item],
+            fallback: [AdaptyUI.RichText.Item]? = nil
+        ) -> Self {
+            .init(
+                items: items,
+                fallback: fallback
+            )
+        }
+    }
+
+    package extension AdaptyUI.RichText.TextAttributes {
+        static func create(
+            font: AdaptyUI.Font,
+            size: Double? = nil,
+            txtColor: AdaptyUI.Filling? = nil,
+            imgTintColor: AdaptyUI.Filling? = nil,
+            background: AdaptyUI.Filling? = nil,
+            strike: Bool = false,
+            underline: Bool = false
+        ) -> Self {
+            .init(
+                font: font,
+                size: size ?? font.defaultSize,
+                txtColor: txtColor ?? font.defaultColor,
+                imgTintColor: imgTintColor,
+                background: background,
+                strike: strike,
+                underline: underline
+            )
+        }
+    }
+
+    package extension AdaptyUI.RichText.ParagraphAttributes {
+        static func create(
+            horizontalAlign: AdaptyUI.HorizontalAlignment = .leading,
+            firstIndent: Double = 0,
+            indent: Double = 0,
+            bulletSpace: Double? = nil,
+            bullet: AdaptyUI.RichText.Bullet? = nil
+        ) -> Self {
+            .init(
+                horizontalAlign: horizontalAlign,
+                firstIndent: firstIndent,
+                indent: indent,
+                bulletSpace: bulletSpace,
+                bullet: bullet
+            )
+        }
+    }
+#endif

@@ -16,6 +16,8 @@ extension AdaptyUI.ViewConfiguration {
         case image(AdaptyUI.ViewConfiguration.Image, Properties?)
         indirect case button(AdaptyUI.ViewConfiguration.Button, Properties?)
         indirect case box(AdaptyUI.ViewConfiguration.Box, Properties?)
+        indirect case row(AdaptyUI.ViewConfiguration.Row, Properties?)
+        indirect case column(AdaptyUI.ViewConfiguration.Column, Properties?)
         case unknown(String, Properties?)
     }
 }
@@ -54,6 +56,10 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             .button(button(value), properties.flatMap(elementProperties))
         case let .box(value, properties):
             .box(box(value), properties.flatMap(elementProperties))
+        case let .row(value, properties):
+            .row(row(value), properties.flatMap(elementProperties))
+        case let .column(value, properties):
+            .column(column(value), properties.flatMap(elementProperties))
         case let .unknown(value, properties):
             .unknown(value, properties.flatMap(elementProperties))
         }
@@ -86,6 +92,8 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         case vStack = "v_stack"
         case hStack = "h_stack"
         case zStack = "z_stack"
+        case row
+        case column
     }
 
     init(from decoder: Decoder) throws {
@@ -110,6 +118,10 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
             self = try .text(AdaptyUI.ViewConfiguration.Text(from: decoder), propertyOrNil())
         case .image:
             self = try .image(AdaptyUI.ViewConfiguration.Image(from: decoder), propertyOrNil())
+        case .row:
+            self = try .row(AdaptyUI.ViewConfiguration.Row(from: decoder), propertyOrNil())
+        case .column:
+            self = try .column(AdaptyUI.ViewConfiguration.Column(from: decoder), propertyOrNil())
         }
 
         func propertyOrNil() -> Properties? {
@@ -140,9 +152,9 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
             }
         try self.init(
             decorator: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorator),
-            padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.EdgeInsets.zero,
-            offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Offset.zero,
-            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true,
+            padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.Element.Properties.defaultPadding,
+            offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Element.Properties.defaultOffset,
+            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? AdaptyUI.Element.Properties.defaultVisibility,
             transitionIn: transitionIn
         )
     }

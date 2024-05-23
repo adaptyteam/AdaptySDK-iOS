@@ -33,6 +33,21 @@ extension AdaptyUI {
     }
 }
 
+#if DEBUG
+    package extension AdaptyUI.TransitionFade {
+        static func create(
+            startDelay: TimeInterval = defaultStartDelay,
+            duration: TimeInterval = defaultDuration,
+            interpolator: AdaptyUI.Transition.Interpolator = defaultInterpolator
+        ) -> Self {
+            .init(
+                startDelay: startDelay,
+                duration: duration,
+                interpolator: interpolator
+            )
+        }
+    }
+#endif
 
 extension AdaptyUI.Transition: Decodable {
     enum CodingKeys: String, CodingKey {
