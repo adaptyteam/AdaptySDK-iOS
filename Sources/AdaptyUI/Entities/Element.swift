@@ -15,6 +15,9 @@ extension AdaptyUI {
         case image(AdaptyUI.Image, Properties?)
         indirect case button(AdaptyUI.Button, Properties?)
         indirect case box(AdaptyUI.Box, Properties?)
+        indirect case row(AdaptyUI.Row, Properties?)
+        indirect case column(AdaptyUI.Column, Properties?)
+
         case unknown(String, Properties?)
 
         var properties: Properties? {
@@ -25,6 +28,8 @@ extension AdaptyUI {
                  let .image(_, properties),
                  let .button(_, properties),
                  let .box(_, properties),
+                 let .row(_, properties),
+                 let .column(_, properties),
                  let .unknown(_, properties):
                 properties
             }
