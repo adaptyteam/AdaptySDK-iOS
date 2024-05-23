@@ -23,13 +23,12 @@ extension AdaptyUI {
 
     package enum RowOrColumnItem {
         case fixed(length: Unit, content: Element)
-        case flexable(weight: Int, content: Element)
+        case flexible(weight: Int, content: Element)
 
-        var content: Element {
+        package var content: Element {
             switch self {
-            case let .fixed(_, content):
-                content
-            case let .flexable(_, content):
+            case let .fixed(_, content),
+                let .flexible(_, content):
                 content
             }
         }

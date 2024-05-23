@@ -17,7 +17,7 @@ extension AdaptyUI.ViewConfiguration {
 
     package enum RowOrColumnItem {
         case fixed(length: AdaptyUI.Unit, content: AdaptyUI.ViewConfiguration.Element)
-        case flexable(weight: Int, content: AdaptyUI.ViewConfiguration.Element)
+        case flexible(weight: Int, content: AdaptyUI.ViewConfiguration.Element)
     }
 }
 
@@ -26,8 +26,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         switch from {
         case let .fixed(length, content):
             .fixed(length: length, content: element(content))
-        case let .flexable(weight, content):
-            .flexable(weight: weight, content: element(content))
+        case let .flexible(weight, content):
+            .flexible(weight: weight, content: element(content))
         }
     }
 
@@ -61,15 +61,15 @@ extension AdaptyUI.ViewConfiguration.Row: Decodable {
 extension AdaptyUI.ViewConfiguration.RowOrColumnItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case fixed
-        case flexable = "weight"
+        case flexible = "weight"
         case content
     }
 
     init(from decoder: any Decoder) throws {
         let conteineer = try decoder.container(keyedBy: CodingKeys.self)
         let content = try conteineer.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .content)
-        if let weight = try conteineer.decodeIfPresent(Int.self, forKey: .flexable) {
-            self = .flexable(weight: weight, content: content)
+        if let weight = try conteineer.decodeIfPresent(Int.self, forKey: .flexible) {
+            self = .flexible(weight: weight, content: content)
         } else {
             self = try .fixed(length: conteineer.decode(AdaptyUI.Unit.self, forKey: .fixed), content: content)
         }
