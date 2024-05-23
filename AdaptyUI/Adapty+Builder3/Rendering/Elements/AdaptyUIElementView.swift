@@ -31,7 +31,7 @@ package struct AdaptyUIElementView: View {
         self.element = element
         self.additionalPadding = additionalPadding
     }
-    
+
     @ViewBuilder
     private func elementOrEmpty(_ content: AdaptyUI.Element?) -> some View {
         if let content {
@@ -76,9 +76,11 @@ package struct AdaptyUIElementView: View {
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .row(row, properties):
-            AdaptyUIUnknownElementView(value: "row")
-                .paddingIfNeeded(additionalPadding)
-                .applyingProperties(properties)
+            if #available(iOS 15.0, *) {
+                AdaptyUIRowView(row)
+                    .paddingIfNeeded(additionalPadding)
+                    .applyingProperties(properties)
+            }
         case let .column(column, properties):
             AdaptyUIUnknownElementView(value: "column")
                 .paddingIfNeeded(additionalPadding)
