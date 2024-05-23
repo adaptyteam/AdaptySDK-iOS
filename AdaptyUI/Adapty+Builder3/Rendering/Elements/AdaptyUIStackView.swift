@@ -67,6 +67,7 @@ extension AdaptyUI.VerticalAlignment {
     }
 }
 
+// TODO: remove
 @available(iOS 13.0, *)
 extension View {
     @ViewBuilder
@@ -334,7 +335,7 @@ extension AdaptyUI.Stack {
             ]
         )
     }
-    
+
     static var testVStackMediumAndDog: AdaptyUI.Stack {
         AdaptyUI.Stack(
             type: .vertical,
@@ -354,7 +355,7 @@ extension AdaptyUI.Stack {
             ]
         )
     }
-    
+
     static var testVStackBigAndDog: AdaptyUI.Stack {
         AdaptyUI.Stack(
             type: .vertical,
