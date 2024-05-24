@@ -44,7 +44,7 @@ struct AdaptyUIRowView: View {
         return (totalWeight, reservedLength)
     }
 
-    @State private var contentsSize = CGSize(width: CGFloat.infinity, height: CGFloat.infinity)
+    @State private var contentsSize: CGSize = .zero
 
     var body: some View {
         GeometryReader { proxy in

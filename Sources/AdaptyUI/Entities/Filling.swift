@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+package extension AdaptyUI {
     package enum Filling {
         static let `default` = Filling.color(Color.black)
 
@@ -37,3 +37,19 @@ extension AdaptyUI {
         }
     }
 }
+
+#if DEBUG
+package extension AdaptyUI.Filling {
+    static func createColor(value: AdaptyUI.Color) -> Self {
+        .color(value)
+    }
+
+    static func createGradient(value: AdaptyUI.ColorGradient) -> Self {
+        .colorGradient(value)
+    }
+
+    static func createImage(value: AdaptyUI.ImageData) -> Self {
+        .image(value)
+    }
+}
+#endif

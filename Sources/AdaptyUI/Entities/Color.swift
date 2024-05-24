@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+package extension AdaptyUI {
     package struct Color {
         static let black = Color(data: 0x000000FF)
 
@@ -19,3 +19,11 @@ extension AdaptyUI {
         package var alpha: Double { Double(data & 0x000000FF) / 255 }
     }
 }
+
+#if DEBUG
+package extension AdaptyUI.Color {
+    static func create(data: UInt64) -> Self {
+        .init(data: data)
+    }
+}
+#endif

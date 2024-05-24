@@ -7,10 +7,18 @@
 
 import Foundation
 
-extension AdaptyUI {
+package extension AdaptyUI {
     package struct Border {
         static let defaultThickness = 1.0
         package let filling: AdaptyUI.Filling
         package let thickness: Double
     }
 }
+
+#if DEBUG
+package extension AdaptyUI.Border {
+    static func createColor(filling: AdaptyUI.Filling, thickness: Double) -> Self {
+        .init(filling: filling, thickness: thickness)
+    }
+}
+#endif
