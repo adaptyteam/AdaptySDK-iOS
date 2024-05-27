@@ -41,6 +41,8 @@
             self.logId = logId
             self.delegate = delegate
 
+            actionResolver = AdaptyUIActionResolver(logId: logId)
+            
             let selectedProductIndex: Int
 //
 //        if let style = try? viewConfiguration.extractDefaultStyle() {
@@ -65,6 +67,7 @@
             presenter.loadProductsIfNeeded()
         }
 
+        @available(*, unavailable)
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
@@ -80,6 +83,17 @@
         override public func viewDidLoad() {
             super.viewDidLoad()
 
+            actionResolver.onActionOccured = { [weak self] action in
+                guard let self else { return }
+                
+                switch action {
+                case .close:
+                    self.delegate?.paywallController(self, didPerform: .close)
+                default:
+                    break
+                }
+            }
+            
             log(.verbose, "viewDidLoad begin")
 
             subscribeForDataChange()
@@ -110,31 +124,18 @@
 //        layoutBuilder?.viewDidLayoutSubviews(view)
         }
 
+        private let actionResolver: AdaptyUIActionResolver
+
         private func buildInterface() {
-//        view.backgroundColor = .white
+            view.backgroundColor = .white
 
-             let screen = viewConfiguration.screen
-                view.backgroundColor = screen.background.asColor?.uiColor ?? .white
+            addSubSwiftUIView(
+                AdaptyPaywallRendererView(viewConfiguration: viewConfiguration)
+                    .withScreenSize(view.bounds.size)
+                    .environmentObject(actionResolver),
 
-                switch viewConfiguration.templateId {
-                case "basic":
-                    addSubSwiftUIView(
-                        AdaptyUIBasicContainerView(
-                            screen: screen
-                        ),
-                        to: view
-                    )
-                case "flat":
-                    addSubSwiftUIView(
-                        AdaptyUIFlatContainerView(
-                            screen: screen
-                        ),
-                        to: view
-                    )
-                default:
-                    addSubSwiftUIView(Text("Not Supported Template: \(viewConfiguration.templateId)"),
-                                      to: view)
-                }
+                to: view
+            )
 
 //
 //        let tagConverter: AdaptyUI.CustomTagConverter?
@@ -226,7 +227,8 @@
                 .sink { [weak self] value in
                     guard let self = self,
                           let delegate = self.delegate,
-                          let product = self.presenter.adaptyProducts?.first(where: { $0.vendorProductId == value }) else {
+                          let product = self.presenter.adaptyProducts?.first(where: { $0.vendorProductId == value })
+                    else {
                         return
                     }
 
@@ -291,7 +293,8 @@
         }
 
         private func handlePurchaseResult(_ result: AdaptyResult<AdaptyPurchasedInfo>,
-                                          _ product: AdaptyPaywallProduct) {
+                                          _ product: AdaptyPaywallProduct)
+        {
             switch result {
             case let .success(info):
                 delegate?.paywallController(self,

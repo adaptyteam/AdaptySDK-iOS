@@ -20,7 +20,12 @@ package class AdaptyUIActionResolver: ObservableObject {
 
     func actionOccured(_ action: AdaptyUI.ButtonAction) {
         AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# actionOccured \(action)")
+        
+        onActionOccured?(action)
     }
+    
+    // TODO: remove
+    var onActionOccured: ((AdaptyUI.ButtonAction) -> Void)?
 }
 
 #endif
