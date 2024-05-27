@@ -41,7 +41,7 @@ package extension AdaptyUI.LocalizedViewConfiguration {
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
                     items: [
-                        .create(color: .create(data: 0xFF0000CC), p: 0.0),
+                        .create(color: .create(data: 0xFF000099), p: 0.0),
                         .create(color: .create(data: 0xFF000000), p: 1.0),
                     ]
                 ))),
@@ -50,7 +50,7 @@ package extension AdaptyUI.LocalizedViewConfiguration {
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
                     items: [
-                        .create(color: .create(data: 0x0000FFCC), p: 0.0),
+                        .create(color: .create(data: 0x0000FF99), p: 0.0),
                         .create(color: .create(data: 0x0000FF00), p: 1.0),
                     ]
                 ))),
@@ -59,7 +59,7 @@ package extension AdaptyUI.LocalizedViewConfiguration {
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
                     items: [
-                        .create(color: .create(data: 0x00FF00CC), p: 0.0),
+                        .create(color: .create(data: 0x00FF0099), p: 0.0),
                         .create(color: .create(data: 0x00FF0000), p: 1.0),
                     ]
                 ))),

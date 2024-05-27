@@ -67,46 +67,6 @@ extension AdaptyUI.VerticalAlignment {
     }
 }
 
-// TODO: remove
-@available(iOS 13.0, *)
-extension View {
-    @ViewBuilder
-    func fixedVerticalSizeIfFill(_ alignment: AdaptyUI.VerticalAlignment) -> some View {
-        if alignment == .justified {
-            fixedSize(horizontal: false, vertical: true)
-        } else {
-            self
-        }
-    }
-
-    @ViewBuilder
-    func fixedHorizontalSizeIfFill(_ alignment: AdaptyUI.HorizontalAlignment) -> some View {
-        if alignment == .justified {
-            fixedSize(horizontal: true, vertical: false)
-        } else {
-            self
-        }
-    }
-
-    @ViewBuilder
-    func infiniteHeightIfFill(_ alignment: AdaptyUI.VerticalAlignment) -> some View {
-        if alignment == .justified {
-            frame(maxHeight: .infinity)
-        } else {
-            self
-        }
-    }
-
-    @ViewBuilder
-    func infiniteWidthIfFill(_ alignment: AdaptyUI.HorizontalAlignment) -> some View {
-        if alignment == .justified {
-            frame(maxWidth: .infinity)
-        } else {
-            self
-        }
-    }
-}
-
 @available(iOS 13.0, *)
 struct AdaptyUIStackView: View {
     var stack: AdaptyUI.Stack
@@ -121,22 +81,15 @@ struct AdaptyUIStackView: View {
             VStack(alignment: stack.horizontalAlignment.swiftuiValue, spacing: stack.spacing) {
                 ForEach(0 ..< stack.content.count, id: \.self) {
                     AdaptyUIElementView(stack.content[$0])
-//                        .infiniteWidthIfFill(stack.horizontalAlignment)
                 }
             }
-        // TODO: inspect this
-//            .fixedHorizontalSizeIfFill(stack.horizontalAlignment)
         case .horizontal:
             HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
                 ForEach(0 ..< stack.content.count, id: \.self) {
                     AdaptyUIElementView(stack.content[$0])
-//                        .infiniteHeightIfFill(stack.verticalAlignment)
                 }
             }
-        // TODO: inspect this
-//            .fixedVerticalSizeIfFill(stack.verticalAlignment)
         case .z:
-            // TODO: implement fill-fill scenario
             ZStack(alignment: stack.alignment) {
                 ForEach(0 ..< stack.content.count, id: \.self) {
                     AdaptyUIElementView(stack.content[$0])

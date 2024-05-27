@@ -36,7 +36,6 @@ extension Shape {
                         )
                     )
                 case .conic:
-                    // TODO: check implementation
                     self.fill(
                         AngularGradient(
                             gradient: .init(stops: gradient.items.map { $0.gradientStop }),
@@ -45,7 +44,6 @@ extension Shape {
                         )
                     )
                 case .radial:
-                    // TODO: check implementation
                     self.fill(
                         RadialGradient(
                             gradient: .init(stops: gradient.items.map { $0.gradientStop }),
@@ -180,22 +178,29 @@ extension AdaptyUI.ShapeType {
 struct AdaptyUIDecoratorModifier: ViewModifier {
     var decorator: AdaptyUI.Decorator
 
-    func body(content: Content) -> some View {
-        content
-            .background {
-                if let background = decorator.background {
+    @ViewBuilder
+    private func bodyWithBackground(content: Content, background: AdaptyUI.Filling?) -> some View {
+        switch background {
+        case .image(let imageData):
+            content
+                .background {
+                    AdaptyUIImageView(asset: imageData,
+                                      aspect: .fill,
+                                      tint: nil)
+                }
+        default:
+            content
+                .background {
                     self.decorator.shapeType
                         .swiftUIShapeFill(self.decorator.background)
-                        .overlay {
-                            if let border = decorator.border {
-                                self.decorator.shapeType
-                                    .swiftUIShapeStroke(
-                                        border.filling,
-                                        lineWidth: border.thickness
-                                    )
-                            }
-                        }
-                } else if let border = decorator.border {
+                }
+        }
+    }
+
+    func body(content: Content) -> some View {
+        self.bodyWithBackground(content: content, background: self.decorator.background)
+            .overlay {
+                if let border = decorator.border {
                     self.decorator.shapeType
                         .swiftUIShapeStroke(
                             border.filling,
@@ -223,37 +228,62 @@ extension View {
 
 @available(iOS 13.0, *)
 #Preview {
-    Text("Hello world!")
-        .foregroundColor(.white)
-        .bold()
-        .padding()
-        .decorate(with:
-            .create(
-                //                shapeType: .circle,
-                shapeType: .rectangle(cornerRadius: .create(topLeading: 24,
-                                                            bottomTrailing: 24)),
-//                background: .color(.testGreen),
-                background: .colorGradient(.create(
-                    kind: .conic,
-                    start: .create(x: 0.0, y: 0.0),
-                    end: .create(x: 1.0, y: 1.0),
-                    items: [
-                        .create(color: .testBlue, p: 0.0),
-                        .create(color: .testRed, p: 1.0),
-                    ]
-                )),
-                border: .createColor(filling: .colorGradient(.create(
-                    kind: .linear,
-                    start: .create(x: 0.0, y: 1.0),
-                    end: .create(x: 1.0, y: 0.0),
-                    items: [
-                        .create(color: .testGreen, p: 0.0),
-                        .create(color: .testBlack, p: 1.0),
-                    ]
-                )), thickness: 4.0)
-//                border: .createColor(filling: .color(.testBlack), thickness: 5.0)
+    VStack {
+        Text("Color BG + Gradient Border")
+            .foregroundColor(.white)
+            .bold()
+            .padding()
+            .decorate(with:
+                .create(
+                    shapeType: .rectangle(cornerRadius: .create(topLeading: 24,
+                                                                bottomTrailing: 24)),
+                    background: .color(.testGreen),
+                    border: .createColor(filling: .colorGradient(.create(
+                        kind: .linear,
+                        start: .create(x: 0.0, y: 1.0),
+                        end: .create(x: 1.0, y: 0.0),
+                        items: [
+                            .create(color: .testGreen, p: 0.0),
+                            .create(color: .testBlack, p: 1.0),
+                        ]
+                    )), thickness: 4.0)
+                )
             )
-        )
+
+        Text("Angular BG + Color Border")
+            .foregroundColor(.white)
+            .bold()
+            .padding()
+            .decorate(with:
+                .create(
+                    shapeType: .rectangle(cornerRadius: .create(topLeading: 24,
+                                                                bottomTrailing: 24)),
+                    background: .colorGradient(.create(
+                        kind: .conic,
+                        start: .create(x: 0.0, y: 0.0),
+                        end: .create(x: 1.0, y: 1.0),
+                        items: [
+                            .create(color: .testBlue, p: 0.0),
+                            .create(color: .testRed, p: 1.0),
+                        ]
+                    )),
+                    border: .createColor(filling: .color(.testGreen), thickness: 5.0)
+                )
+            )
+
+        Text("Image BG")
+            .foregroundColor(.white)
+            .bold()
+            .padding()
+            .decorate(with:
+                .create(
+                    shapeType: .rectangle(cornerRadius: .create(topLeading: 24,
+                                                                bottomTrailing: 24)),
+                    background: .image(.resorces("beagle")),
+                    border: .createColor(filling: .color(.testGreen), thickness: 5.0)
+                )
+            )
+    }
 }
 
 #endif

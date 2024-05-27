@@ -24,8 +24,8 @@ extension AdaptyUI.ColorGradient.Item {
 extension View {
     @ViewBuilder
     func applyingProperties(_ props: AdaptyUI.Element.Properties?) -> some View {
-        offset(x: props?.offset.x ?? 0.0, y: props?.offset.y ?? 0.0)
-            .decorate(with: props?.decorator)
+        decorate(with: props?.decorator)
+            .offset(x: props?.offset.x ?? 0.0, y: props?.offset.y ?? 0.0)
             .padding(props?.padding)
     }
 

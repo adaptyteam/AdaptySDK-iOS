@@ -28,27 +28,37 @@ extension View {
 
 @available(iOS 13.0, *)
 struct AdaptyUIImageView: View {
-    var image: AdaptyUI.Image
+    var asset: AdaptyUI.ImageData
+    var aspect: AdaptyUI.AspectRatio
+    var tint: AdaptyUI.Filling?
+
+    init(asset: AdaptyUI.ImageData, aspect: AdaptyUI.AspectRatio, tint: AdaptyUI.Filling? = nil) {
+        self.asset = asset
+        self.aspect = aspect
+        self.tint = tint
+    }
 
     init(_ image: AdaptyUI.Image) {
-        self.image = image
+        self.asset = image.asset
+        self.aspect = image.aspect
+        self.tint = image.tint
     }
 
     @ViewBuilder
     private func rasterImage(_ uiImage: UIImage?, tint: AdaptyUI.Filling?) -> some View {
-        if let uiImage  {
-            if let tint = image.tint?.asColor?.swiftuiColor {
+        if let uiImage {
+            if let tint = tint?.asColor?.swiftuiColor {
                 Image(uiImage: uiImage)
                     .resizable()
                     .renderingMode(.template)
                     .foregroundColor(tint)
-                    .aspectRatio(image.aspect)
+                    .aspectRatio(aspect)
 
             } else {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .aspectRatio(image.aspect)
+                    .aspectRatio(aspect)
             }
         } else {
             EmptyView()
@@ -56,11 +66,11 @@ struct AdaptyUIImageView: View {
     }
 
     var body: some View {
-        switch image.asset {
+        switch asset {
         case let .resorces(name):
-            rasterImage(UIImage(named: name), tint: image.tint)
+            rasterImage(UIImage(named: name), tint: tint)
         case let .raster(data):
-            rasterImage(UIImage(data: data), tint: image.tint)
+            rasterImage(UIImage(data: data), tint: tint)
         case let .url(url, preview):
             if #available(iOS 14.0, *) {
                 // TODO: Add support for tint
@@ -70,17 +80,17 @@ struct AdaptyUIImageView: View {
                     .fade(duration: 0.25)
                     .placeholder {
                         if let preview {
-                            rasterImage(UIImage(data: preview), tint: image.tint)
+                            rasterImage(UIImage(data: preview), tint: tint)
                         } else {
                             EmptyView()
                         }
                     }
-                    .aspectRatio(image.aspect)
+                    .aspectRatio(aspect)
             } else {
                 // TODO: implement AsyncImage logic
                 if let preview, let uiImage = UIImage(data: preview) {
                     Image(uiImage: uiImage)
-                        .aspectRatio(image.aspect)
+                        .aspectRatio(aspect)
                 } else {
                     EmptyView()
                 }
@@ -91,16 +101,13 @@ struct AdaptyUIImageView: View {
     }
 }
 
-
 #if DEBUG
-    @testable import Adapty
+@testable import Adapty
 
-
-
-    @available(iOS 13.0, *)
-    #Preview {
-        AdaptyUIImageView(.test)
-    }
+@available(iOS 13.0, *)
+#Preview {
+    AdaptyUIImageView(.test)
+}
 #endif
 
 #endif
