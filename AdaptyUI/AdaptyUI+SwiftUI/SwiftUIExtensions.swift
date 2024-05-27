@@ -50,7 +50,7 @@ extension View {
             didFailLoadingProducts: didFailLoadingProducts
         )
 
-        if fullScreen, #available(iOS 14.0, *) {
+        if fullScreen {
             fullScreenCover(
                 isPresented: isPresented,
                 content: {

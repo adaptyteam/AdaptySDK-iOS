@@ -92,7 +92,7 @@ struct AdaptyUIFlatContainerView: View {
                 }
             }
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
-            .ignoresSafeArea_fallback()
+            .ignoresSafeArea()
         }
     }
 }

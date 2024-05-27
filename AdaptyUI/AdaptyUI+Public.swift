@@ -190,25 +190,4 @@ extension AdaptyUI {
     }
 }
 
-// MARK: - PB3
-
-@available(iOS 15.0, *)
-extension AdaptyUI {
-    public static func paywallController3(
-        for paywall: AdaptyPaywall,
-        products: [AdaptyPaywallProduct]? = nil,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
-        delegate: AdaptyPaywallControllerDelegate,
-        tagResolver: AdaptyTagResolver? = nil
-    ) -> AdaptyBuilder3PaywallController {
-        AdaptyBuilder3PaywallController(
-            paywall: paywall,
-            products: products,
-            viewConfiguration: viewConfiguration,
-            delegate: delegate,
-            tagResolver: tagResolver
-        )
-    }
-}
-
 #endif
