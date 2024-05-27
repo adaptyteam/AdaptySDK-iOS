@@ -9,12 +9,12 @@
 
 import UIKit
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 protocol AdaptyScrollViewBehaviour {
     func scrollViewDidScroll(_ scrollView: UIScrollView)
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 class AdaptyCompoundScrollViewDelegate: NSObject, UIScrollViewDelegate {
     var behaviours = [AdaptyScrollViewBehaviour]()
 

@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 package extension AdaptyUI {
     enum Template: String {
         case basic
@@ -18,7 +18,7 @@ package extension AdaptyUI {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 package struct AdaptyUIRenderingErrorView: View {
     var text: String
     var forcePresent: Bool
@@ -46,7 +46,7 @@ package struct AdaptyUIRenderingErrorView: View {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 package struct AdaptyUITemplateResolverView: View {
     var template: AdaptyUI.Template
     var screen: AdaptyUI.Screen

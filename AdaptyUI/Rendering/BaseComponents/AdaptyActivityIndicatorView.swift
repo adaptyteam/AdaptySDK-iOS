@@ -9,7 +9,7 @@
 
 import UIKit
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 class AdaptyActivityIndicatorView: UIView {
     private let indicatorColor: UIColor
 

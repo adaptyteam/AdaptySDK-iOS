@@ -9,7 +9,7 @@
 
 @testable import Adapty
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Box {
     static var testBasicDog: Self {
         .init(

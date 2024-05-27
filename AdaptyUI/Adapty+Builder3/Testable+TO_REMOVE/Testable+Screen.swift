@@ -10,7 +10,7 @@
 @testable import Adapty
 import Foundation
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Screen {
     static var testBasicDog: Self {
         .init(

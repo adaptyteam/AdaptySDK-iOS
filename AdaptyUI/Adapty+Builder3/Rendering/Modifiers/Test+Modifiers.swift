@@ -10,7 +10,7 @@
 @testable import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Decorator {
     static var greenBG: Self {
         .init(shapeType: .rectangle(cornerRadius: .zero),
@@ -31,7 +31,7 @@ extension AdaptyUI.Decorator {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Element.Properties {
     static var greenBG: Self {
         .init(decorator: .greenBG,
@@ -58,7 +58,7 @@ extension AdaptyUI.Element.Properties {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Box {
     static var test: Self {
         .init(width: .fixed(.screen(0.8)),
@@ -69,7 +69,7 @@ extension AdaptyUI.Box {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 #Preview {
     AdaptyUIElementView(.box(.test, .greenBG))
         .withScreenSize(UIScreen.main.bounds.size)

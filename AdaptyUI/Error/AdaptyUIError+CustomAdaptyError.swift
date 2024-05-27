@@ -9,12 +9,12 @@
 import Adapty
 import Foundation
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyError {
     public static let AdaptyUIErrorDomain = "AdaptyUIErrorDomain"
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUIError: CustomAdaptyError {
     public static let errorDomain = AdaptyError.AdaptyUIErrorDomain
 

@@ -10,7 +10,7 @@
 import Adapty
 import AdaptyUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Color {
     static let testBlack: AdaptyUI.Color = .create(data: 0x000000FF)
     static let testWhite: AdaptyUI.Color = .create(data: 0xFFFFFFFF)

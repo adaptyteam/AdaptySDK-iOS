@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 struct AdaptyUIFlatContainerView: View {
     var screen: AdaptyUI.Screen
 
@@ -99,7 +99,7 @@ struct AdaptyUIFlatContainerView: View {
 
 #if DEBUG
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 #Preview {
     AdaptyUIFlatContainerView(
         //        screen: .testFlatDog

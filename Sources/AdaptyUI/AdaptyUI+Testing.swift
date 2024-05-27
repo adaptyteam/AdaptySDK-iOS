@@ -8,6 +8,8 @@
 
 import Foundation
 
+#if DEBUG
+
 package extension AdaptyUI.LocalizedViewConfiguration {
     static func create(
         templateId: String = "transparent",
@@ -106,3 +108,5 @@ package extension AdaptyUI.LocalizedViewConfiguration {
         ).extractLocale()
     }
 }
+
+#endif

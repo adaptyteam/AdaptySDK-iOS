@@ -10,7 +10,7 @@
     import Adapty
     import SwiftUI
 
-    @available(iOS 13.0, *)
+    @available(iOS 15.0, *)
     extension Text {
         func withAttributes(_ attributes: AdaptyUI.RichText.TextAttributes) -> Text {
             font(Font(attributes.font.uiFont(size: attributes.size)))
@@ -26,7 +26,7 @@
         }
     }
 
-    @available(iOS 13.0, *)
+    @available(iOS 15.0, *)
     struct AdaptyUITextView: View {
         var text: AdaptyUI.Text
 
@@ -50,14 +50,7 @@
         }
 
         var body: some View {
-            // TODO: remove
-            if #available(iOS 15, *) {
-                Text(attributedString)
-            } else {
-                FallbackText(nsAttributedString)
-                    .fixedSize(horizontal: true, vertical: true)
-//                    .background(Color.green)
-            }
+            Text(attributedString)
         }
     }
 
@@ -66,7 +59,7 @@
     #if DEBUG
         @testable import Adapty
 
-//        @available(iOS 13.0, *)
+//        @available(iOS 15.0, *)
 //        extension AdaptyUI.Color {
 //            static let testWhite = AdaptyUI.Color(data: 0xFFFFFFFF)
 //            static let testClear = AdaptyUI.Color(data: 0xFFFFFF00)
@@ -75,14 +68,14 @@
 //            static let testBlue = AdaptyUI.Color(data: 0x0000FFFF)
 //        }
 
-        @available(iOS 13.0, *)
+        @available(iOS 15.0, *)
         extension AdaptyUI.RichText.ParagraphAttributes {
             static var test: Self {
                 .init(horizontalAlign: .left, firstIndent: 0.0, indent: 0.0, bulletSpace: nil, bullet: nil)
             }
         }
 
-        @available(iOS 13.0, *)
+        @available(iOS 15.0, *)
         extension AdaptyUI.RichText.TextAttributes {
             static var testTitle: Self {
                 .init(
@@ -109,7 +102,7 @@
             }
         }
 
-        @available(iOS 13.0, *)
+        @available(iOS 15.0, *)
         extension AdaptyUI.Text {
             init(_ items: [AdaptyUI.RichText.Item]) {
                 self.init(
@@ -144,7 +137,7 @@
             }
         }
 
-        @available(iOS 13.0, *)
+        @available(iOS 15.0, *)
         #Preview {
 //    HStack {
             AdaptyUITextView(.testBodyLong)

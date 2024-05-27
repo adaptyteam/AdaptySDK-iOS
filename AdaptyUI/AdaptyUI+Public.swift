@@ -10,7 +10,7 @@
 import Adapty
 import UIKit
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI {
     /// This enum describes user initiated actions.
     public enum Action {
@@ -24,7 +24,7 @@ extension AdaptyUI {
 }
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 public protocol AdaptyPaywallControllerDelegate: NSObject {
     /// If user performs an action process, this method will be invoked.
     ///
@@ -142,7 +142,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ) -> Bool
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI {
     /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
     ///
@@ -192,7 +192,7 @@ extension AdaptyUI {
 
 // MARK: - PB3
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI {
     public static func paywallController3(
         for paywall: AdaptyPaywall,

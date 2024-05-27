@@ -9,7 +9,7 @@ import Adapty
 import Foundation
 
 #if canImport(UIKit) && canImport(_Concurrency) && compiler(>=5.5.2)
-    @available(iOS 13.0, *)
+    @available(iOS 15.0, *)
     extension AdaptyUI {
         /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
         ///

@@ -8,7 +8,7 @@
 import Adapty
 import Foundation
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI {
     static let imageCache = ImageCache(name: "Adapty")
     static let imageDownloader = ImageDownloader(name: "Adapty")
@@ -68,7 +68,7 @@ extension AdaptyUI {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI {
     class ImageUrlPrefetcher: AdaptyUIImageUrlObserver {
         static let queue = DispatchQueue(label: "AdaptyUI.SDK.ImageUrlPrefetcher")

@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension Alignment {
     static func from(
         horizontal: AdaptyUI.HorizontalAlignment,
@@ -31,7 +31,7 @@ extension Alignment {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Stack {
     var alignment: Alignment {
         Alignment.from(
@@ -41,7 +41,7 @@ extension AdaptyUI.Stack {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.HorizontalAlignment {
     var swiftuiValue: SwiftUI.HorizontalAlignment {
         switch self {
@@ -55,7 +55,7 @@ extension AdaptyUI.HorizontalAlignment {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.VerticalAlignment {
     var swiftuiValue: SwiftUI.VerticalAlignment {
         switch self {
@@ -67,7 +67,7 @@ extension AdaptyUI.VerticalAlignment {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 struct AdaptyUIStackView: View {
     var stack: AdaptyUI.Stack
 
@@ -102,7 +102,7 @@ struct AdaptyUIStackView: View {
 #if DEBUG
 @testable import Adapty
 
-//    @available(iOS 13.0, *)
+//    @available(iOS 15.0, *)
 //    extension AdaptyUI.Frame {
 //        static func fixed(width: Double, height: Double) -> Self {
 //            .init(
@@ -116,7 +116,7 @@ struct AdaptyUIStackView: View {
 //        }
 //    }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Stack {
     static var testHStack: AdaptyUI.Stack {
         AdaptyUI.Stack(
@@ -341,7 +341,7 @@ extension AdaptyUI.Stack {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 #Preview {
     AdaptyUIStackView(
         .testVStack

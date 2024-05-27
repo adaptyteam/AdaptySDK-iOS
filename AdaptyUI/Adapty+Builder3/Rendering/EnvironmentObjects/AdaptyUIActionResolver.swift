@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 package class AdaptyUIActionResolver: ObservableObject {
     let logId: String
 

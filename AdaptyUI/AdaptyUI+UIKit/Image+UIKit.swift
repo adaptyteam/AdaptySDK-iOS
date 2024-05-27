@@ -10,7 +10,7 @@
 import Adapty
 import UIKit
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension UIImageView {
     func setImage(_ img: AdaptyUI.ImageData,
                   renderingMode: UIImage.RenderingMode = .automatic) {
@@ -49,7 +49,7 @@ extension UIImageView {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension UIButton {
     func setBackgroundImage(_ img: AdaptyUI.ImageData,
                             for state: UIControl.State,

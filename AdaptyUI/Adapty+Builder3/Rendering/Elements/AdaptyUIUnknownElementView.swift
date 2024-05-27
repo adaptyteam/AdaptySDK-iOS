@@ -67,7 +67,7 @@ struct AdaptyUIUnknownElementView: View {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.Element {
     var testCircle: Self {
         .unknown("circle", nil)

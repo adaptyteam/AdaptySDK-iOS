@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 struct AdaptyUIFixedFrameModifier: ViewModifier {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
@@ -40,7 +40,7 @@ struct AdaptyUIFixedFrameModifier: ViewModifier {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension View {
     func fixedFrame(box: AdaptyUI.Box) -> some View {
         modifier(AdaptyUIFixedFrameModifier(box: box))

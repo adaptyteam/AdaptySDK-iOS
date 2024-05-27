@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension Shape {
     @ViewBuilder
     func fill(filling: AdaptyUI.Filling?) -> some View {
@@ -109,7 +109,7 @@ extension Shape {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension View {
     @ViewBuilder
     func clipShape(_ shape: AdaptyUI.ShapeType) -> some View {
@@ -130,7 +130,7 @@ extension View {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension AdaptyUI.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(_ filling: AdaptyUI.Filling?) -> some View {
@@ -212,11 +212,11 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension View {
     @ViewBuilder
     func decorate(with decorator: AdaptyUI.Decorator?) -> some View {
-        if #available(iOS 15.0, *), let decorator {
+        if let decorator {
             modifier(AdaptyUIDecoratorModifier(decorator: decorator))
         } else {
             self
@@ -226,7 +226,7 @@ extension View {
 
 #if DEBUG
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 #Preview {
     VStack {
         Text("Color BG + Gradient Border")

@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension View {
     @ViewBuilder
     func paddingIfNeeded(_ insets: EdgeInsets?) -> some View {
@@ -22,7 +22,7 @@ extension View {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 package struct AdaptyUIElementView: View {
     var element: AdaptyUI.Element
     var additionalPadding: EdgeInsets?
@@ -76,11 +76,9 @@ package struct AdaptyUIElementView: View {
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .row(row, properties):
-            if #available(iOS 15.0, *) {
-                AdaptyUIRowView(row)
-                    .paddingIfNeeded(additionalPadding)
-                    .applyingProperties(properties)
-            }
+            AdaptyUIRowView(row)
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
         case let .column(column, properties):
             AdaptyUIUnknownElementView(value: "column")
                 .paddingIfNeeded(additionalPadding)

@@ -9,13 +9,13 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension CoordinateSpace {
     static let adaptyBasicName = "adapty.container.basic"
     static let adaptyBasic = CoordinateSpace.named(adaptyBasicName)
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 struct AdaptyUIBasicContainerView: View {
     var screen: AdaptyUI.Screen
 
@@ -101,26 +101,14 @@ struct AdaptyUIBasicContainerView: View {
                 }
             }
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
-            .ignoresSafeArea_fallback()
-        }
-    }
-}
-
-@available(iOS 13.0, *)
-extension View {
-    @ViewBuilder
-    func ignoresSafeArea_fallback() -> some View {
-        if #available(iOS 14.0, *) {
-            ignoresSafeArea()
-        } else {
-            self
+            .ignoresSafeArea()
         }
     }
 }
 
 #if DEBUG
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 #Preview {
     AdaptyUIBasicContainerView(
         screen: .testBasicDog

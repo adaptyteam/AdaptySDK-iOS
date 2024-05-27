@@ -7,12 +7,12 @@
 
 import Foundation
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 public protocol AdaptyTagResolver {
     func replacement(for tag: String) -> String?
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension Dictionary<String, String>: AdaptyTagResolver {
     public func replacement(for tag: String) -> String? { self[tag] }
 }

@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 extension View {
     @ViewBuilder
     public func paywall(
@@ -69,7 +69,7 @@ extension View {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 struct AdaptyPaywallView: UIViewControllerRepresentable {
     let paywall: AdaptyPaywall
     let products: [AdaptyPaywallProduct]?
@@ -128,7 +128,7 @@ struct AdaptyPaywallView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) { }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 class AdaptyPaywallDelegate_SwiftUI: NSObject, AdaptyPaywallControllerDelegate {
     private let didPerformAction: (AdaptyUI.Action) -> Void
 
