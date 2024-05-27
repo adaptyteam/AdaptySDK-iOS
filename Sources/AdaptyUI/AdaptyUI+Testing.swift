@@ -36,6 +36,33 @@ package extension AdaptyUI.LocalizedViewConfiguration {
                 "$blue": .filling(.color(AdaptyUI.Color(data: 0x0000FFFF))),
                 "$light": .filling(.color(AdaptyUI.Color(data: 0xF4D13BFF))),
                 "$font": .font(AdaptyUI.Font.default),
+                "$red_to_transparent_top_to_bottom": .filling(.colorGradient(.create(
+                    kind: .linear,
+                    start: .create(x: 0.5, y: 0.0),
+                    end: .create(x: 0.5, y: 1.0),
+                    items: [
+                        .create(color: .create(data: 0xFF0000CC), p: 0.0),
+                        .create(color: .create(data: 0xFF000000), p: 1.0),
+                    ]
+                ))),
+                "$blue_to_transparent_top_to_bottom": .filling(.colorGradient(.create(
+                    kind: .linear,
+                    start: .create(x: 0.5, y: 0.0),
+                    end: .create(x: 0.5, y: 1.0),
+                    items: [
+                        .create(color: .create(data: 0x0000FFCC), p: 0.0),
+                        .create(color: .create(data: 0x0000FF00), p: 1.0),
+                    ]
+                ))),
+                "$green_to_transparent_top_to_bottom": .filling(.colorGradient(.create(
+                    kind: .linear,
+                    start: .create(x: 0.5, y: 0.0),
+                    end: .create(x: 0.5, y: 1.0),
+                    items: [
+                        .create(color: .create(data: 0x00FF00CC), p: 0.0),
+                        .create(color: .create(data: 0x00FF0000), p: 1.0),
+                    ]
+                ))),
             ]) { current, _ in current }
 
         let assets = Dictionary(
