@@ -25,8 +25,11 @@ public class AdaptyPaywallController: UIViewController {
     // private var layoutBuilder: LayoutBuilder?
     private let presenter: AdaptyPaywallPresenter
     private var cancellable = Set<AnyCancellable>()
-    private let tagResolver: AdaptyTagResolver?
 
+    private let productsViewModel: AdaptyProductsViewModel
+    private let actionsViewModel: AdaptyUIActionsViewModel
+    private let tagResolverViewModel: AdaptyTagResolverViewModel
+    
     init(
         paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]?,
@@ -41,7 +44,12 @@ public class AdaptyPaywallController: UIViewController {
         self.logId = logId
         self.delegate = delegate
 
-        actionResolver = AdaptyUIActionResolver(logId: logId)
+        tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
+        actionsViewModel = AdaptyUIActionsViewModel(logId: logId)
+        productsViewModel = AdaptyProductsViewModel(logId: logId,
+                                                    paywall: paywall,
+                                                    products: products,
+                                                    viewConfiguration: viewConfiguration)
 
         let selectedProductIndex: Int
 //
@@ -57,14 +65,14 @@ public class AdaptyPaywallController: UIViewController {
                                            selectedProductIndex: selectedProductIndex,
                                            viewConfiguration: viewConfiguration)
 
-        self.tagResolver = tagResolver
-
         super.init(nibName: nil, bundle: nil)
 
         modalPresentationStyle = .fullScreen
 
         presenter.delegate = self
         presenter.loadProductsIfNeeded()
+
+        productsViewModel.loadProductsIfNeeded()
     }
 
     @available(*, unavailable)
@@ -83,7 +91,7 @@ public class AdaptyPaywallController: UIViewController {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        actionResolver.onActionOccured = { [weak self] action in
+        actionsViewModel.onActionOccured = { [weak self] action in
             guard let self else { return }
 
             switch action {
@@ -124,41 +132,18 @@ public class AdaptyPaywallController: UIViewController {
         // layoutBuilder?.viewDidLayoutSubviews(view)
     }
 
-    private let actionResolver: AdaptyUIActionResolver
-
     private func buildInterface() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
 
         addSubSwiftUIView(
             AdaptyPaywallRendererView(viewConfiguration: viewConfiguration)
                 .withScreenSize(view.bounds.size)
-                .environmentObject(actionResolver),
-
+                .environmentObject(productsViewModel)
+                .environmentObject(actionsViewModel)
+                .environmentObject(tagResolverViewModel)
+            ,
             to: view
         )
-
-//
-        // let tagConverter: AdaptyUI.CustomTagConverter?
-//
-        // if let tagResolver = tagResolver {
-        // tagConverter = { tagResolver.replacement(for: $0) }
-        // } else {
-        // tagConverter = nil
-        // }
-//
-        // do {
-        // layoutBuilder = try TemplateLayoutBuilderFabric.createLayoutFromConfiguration(
-        // presenter.paywall,
-        // presenter.viewConfiguration,
-        // products: presenter.products,
-        // tagConverter: tagConverter
-        // )
-//
-        // try layoutBuilder?.buildInterface(on: view)
-//
-        // } catch {
-        // handleRenderingError(error)
-        // }
     }
 
     private func handleRenderingError(_ error: Error) {
@@ -263,6 +248,10 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     private func subscribeForActions() {
+        productsViewModel.onFailLoadingProducts = { [weak self] error in
+            guard let self else { return false }
+            return self.delegate?.paywallController(self, didFailLoadingProductsWith: error) ?? false
+        }
         // layoutBuilder?.productsView?.onProductSelected = { [weak self] product in
         // guard let self = self else { return }
 //

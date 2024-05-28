@@ -1,5 +1,5 @@
 //
-//  AdaptyUIActionResolver.swift
+//  AdaptyUIActionsViewModel.swift
 //
 //
 //  Created by Aleksey Goncharov on 21.05.2024.
@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-package class AdaptyUIActionResolver: ObservableObject {
+package class AdaptyUIActionsViewModel: ObservableObject {
     let logId: String
 
     package init(logId: String) {
