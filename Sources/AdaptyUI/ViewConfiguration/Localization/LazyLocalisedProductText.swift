@@ -29,16 +29,29 @@ extension AdaptyUI {
             self.defaultTextAttributes = defaultTextAttributes
             self.defaultParagraphAttributes = defaultParagraphAttributes
         }
-        
+
         package func richText(
             byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
         ) -> RichText {
+            if let value = richTextOrNil(byPaymentMode: mode) {
+                value
+            } else if mode == .unknown {
+                .empty
+            } else {
+                richTextOrNil(byPaymentMode: .unknown) ?? .empty
+            }
+        }
+
+        private func richTextOrNil(
+            byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
+        ) -> RichText? {
             localizer.richText(
                 stringId: ViewConfiguration.StringId.Product.calculate(
                     adaptyProductId: adaptyProductId,
                     byPaymentMode: mode,
                     suffix: suffix
                 ),
+
                 defaultTextAttributes: defaultTextAttributes,
                 defaultParagraphAttributes: defaultParagraphAttributes
             )
@@ -62,7 +75,7 @@ extension AdaptyUI {
             self.defaultTextAttributes = defaultTextAttributes
             self.defaultParagraphAttributes = defaultParagraphAttributes
         }
-        
+
         package func richText() -> RichText {
             localizer.richText(
                 stringId: ViewConfiguration.StringId.Product.calculate(
@@ -70,13 +83,26 @@ extension AdaptyUI {
                 ),
                 defaultTextAttributes: defaultTextAttributes,
                 defaultParagraphAttributes: defaultParagraphAttributes
-            )
+            ) ?? .empty
         }
-        
+
         package func richText(
             adaptyProductId: String,
             byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
         ) -> RichText {
+            if let value = richTextOrNil(adaptyProductId: adaptyProductId, byPaymentMode: mode) {
+                value
+            } else if mode == .unknown {
+                .empty
+            } else {
+                richTextOrNil(adaptyProductId: adaptyProductId, byPaymentMode: .unknown) ?? .empty
+            }
+        }
+
+        private func richTextOrNil(
+            adaptyProductId: String,
+            byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
+        ) -> RichText? {
             localizer.richText(
                 stringId: ViewConfiguration.StringId.Product.calculate(
                     adaptyProductId: adaptyProductId,

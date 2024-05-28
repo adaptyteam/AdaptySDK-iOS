@@ -26,7 +26,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
                     stringId: stringId,
                     defaultTextAttributes: textBlock.defaultTextAttributes,
                     defaultParagraphAttributes: textBlock.defaultParagraphAttributes
-                ))
+                ) ?? .empty)
 
             case let .product(info):
                 if let adaptyProductId = info.adaptyProductId {

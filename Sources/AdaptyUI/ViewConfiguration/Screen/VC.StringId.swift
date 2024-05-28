@@ -29,7 +29,7 @@ extension AdaptyUI.ViewConfiguration.StringId {
         }
 
         static func calculate(adaptyProductId: String, byPaymentMode mode: AdaptyProductDiscount.PaymentMode, suffix: String?) -> String {
-            let mode = mode.asString ?? "none"
+            let mode = mode.asString ?? "default"
             return if let suffix {
                 "PRODUCT_\(adaptyProductId)_\(mode)_\(suffix)"
             } else {
