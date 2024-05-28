@@ -14,25 +14,52 @@ import SwiftUI
 struct AdaptyUIButtonView: View {
     private var button: AdaptyUI.Button
 
-    @EnvironmentObject var actionResolver: AdaptyUIActionsViewModel
+    @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
+    @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
 
     init(_ button: AdaptyUI.Button) {
         self.button = button
     }
 
     private var currentStateView: AdaptyUI.Element? {
-//        if button.isSelected {
-//            return button.selectedState ?? button.normalState
-//        } else {
+        switch button.action {
+        case .selectProductId(let productId):
+            if productId == productsViewModel.selectedProductId {
+                return button.selectedState ?? button.normalState
+            } else {
+                return button.normalState
+            }
+        case .switchSection(let sectionId, let selectedIndexId):
+            // TODO: choose selected if needed
             return button.normalState
-//        }
+        default:
+            return button.normalState
+        }
+    }
+    
+    private func actionOccured() {
+        guard let action = button.action else { return }
+        
+        switch action {
+        case .selectProductId(let id):
+            productsViewModel.selectProduct(id: id)
+        case .switchSection(let id, let index):
+            // TODO: implement
+            break
+        case .openScreen(let id):
+            // TODO: implement
+            break
+        case .closeScreen:
+            // TODO: implement
+            break
+        default:
+            actionsViewModel.actionOccured(action)
+        }
     }
 
     public var body: some View {
         Button {
-            if let action = button.action {
-                actionResolver.actionOccured(action)
-            }
+            actionOccured()
         } label: {
             if let currentStateView {
                 AdaptyUIElementView(currentStateView)

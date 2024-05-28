@@ -106,6 +106,10 @@ class AdaptyProductsViewModel: ObservableObject {
         loadProductsIntroductoryEligibilities()
     }
     
+    func selectProduct(id: String) {
+        selectedProductId = id
+    }
+    
     private func loadProducts() {
         productsLoadingInProgress = true
 
