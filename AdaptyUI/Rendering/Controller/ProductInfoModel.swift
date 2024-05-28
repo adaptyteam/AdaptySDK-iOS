@@ -33,7 +33,13 @@ struct EmptyProductInfo: ProductInfoModel {
 
     var paymentMode: AdaptyProductDiscount.PaymentMode { .unknown }
 
-    func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement? { nil }
+    func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement? {
+        #if DEBUG
+        return .value("DEBUG_LOADING")
+        #else
+        nil
+        #endif
+    }
 }
 
 extension AdaptyPaywallProduct {
