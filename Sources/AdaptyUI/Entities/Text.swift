@@ -31,7 +31,31 @@ extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.Text {
         static func create(
-            value: AdaptyUI.Text.Value = empty.value,
+            text: [AdaptyUI.RichText.Item],
+            maxRows: Int? = empty.maxRows,
+            overflowMode: Set<AdaptyUI.Text.OverflowMode> = empty.overflowMode
+        ) -> Self {
+            .init(
+                value: .text(.create(items: text)),
+                maxRows: maxRows,
+                overflowMode: overflowMode
+            )
+        }
+
+        static func create(
+            text: AdaptyUI.RichText,
+            maxRows: Int? = empty.maxRows,
+            overflowMode: Set<AdaptyUI.Text.OverflowMode> = empty.overflowMode
+        ) -> Self {
+            .init(
+                value: .text(text),
+                maxRows: maxRows,
+                overflowMode: overflowMode
+            )
+        }
+
+        static func create(
+            value: AdaptyUI.Text.Value,
             maxRows: Int? = empty.maxRows,
             overflowMode: Set<AdaptyUI.Text.OverflowMode> = empty.overflowMode
         ) -> Self {

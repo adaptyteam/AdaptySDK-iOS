@@ -16,6 +16,7 @@ extension AdaptyUI {
         package let content: Element
         package let footer: Element?
         package let overlay: Element?
+        package let selectedAdaptyProductId: String?
     }
 }
 
@@ -26,14 +27,16 @@ extension AdaptyUI {
             cover: AdaptyUI.Element? = nil,
             content: AdaptyUI.Element,
             footer: AdaptyUI.Element? = nil,
-            overlay: AdaptyUI.Element? = nil
+            overlay: AdaptyUI.Element? = nil,
+            selectedAdaptyProductId: String? = nil
         ) -> Self {
             .init(
                 background: background,
                 cover: cover,
                 content: content,
                 footer: footer,
-                overlay: overlay
+                overlay: overlay,
+                selectedAdaptyProductId: selectedAdaptyProductId
             )
         }
     }

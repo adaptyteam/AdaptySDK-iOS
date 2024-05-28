@@ -11,7 +11,6 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     struct Button {
         let action: AdaptyUI.ViewConfiguration.ButtonAction?
-        let isSelected: Bool
         let normalState: AdaptyUI.ViewConfiguration.Element?
         let selectedState: AdaptyUI.ViewConfiguration.Element?
     }
@@ -21,7 +20,6 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     func button(_ from: AdaptyUI.ViewConfiguration.Button) -> AdaptyUI.Button {
         .init(
             action: from.action.map(buttonAction),
-            isSelected: from.isSelected,
             normalState: from.normalState.map(element),
             selectedState: from.selectedState.map(element)
         )
@@ -36,7 +34,6 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 extension AdaptyUI.ViewConfiguration.Button: Decodable {
     enum CodingKeys: String, CodingKey {
         case action
-        case isSelected = "is_selected"
         case normalState = "normal"
         case selectedState = "selected"
     }
@@ -45,7 +42,6 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             action: container.decodeIfPresent(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action),
-            isSelected: container.decodeIfPresent(Bool.self, forKey: .isSelected) ?? AdaptyUI.Button.defaultIsSelected,
             normalState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
             selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState)
         )

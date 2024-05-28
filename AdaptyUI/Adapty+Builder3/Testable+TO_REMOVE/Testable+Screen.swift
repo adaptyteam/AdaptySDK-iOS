@@ -13,19 +13,17 @@ import Foundation
 @available(iOS 15.0, *)
 extension AdaptyUI.Screen {
     static var testBasicDog: Self {
-        .init(
+        .create(
             background: .color(.testWhite),
             cover: .box(.testBasicDog, nil),
             content: .stack(.testVStackBig, .blueBG),
-            footer: .stack(.testHStack, .redBG),
-            overlay: nil
+            footer: .stack(.testHStack, .redBG)
         )
     }
     
     static var testFlatDog: Self {
-        .init(
+        .create(
             background: .color(.testWhite),
-            cover: nil,
             content: .stack(.testVStackBigAndDog, .blueBG),
             footer: .stack(.testHStack, .redBG),
             overlay: .text(.testBodyLong, nil)
@@ -33,9 +31,8 @@ extension AdaptyUI.Screen {
     }
     
     static var testTransparent: Self {
-        .init(
+        .create(
             background: .color(.testWhite),
-            cover: nil,
             content: .box(.testBasicDog, nil),
             footer: .stack(.testVStackMediumAndDog, .greenBG),
             overlay: .text(.testBodyShort, nil)
@@ -43,9 +40,8 @@ extension AdaptyUI.Screen {
     }
     
     static var testTransparentScroll: Self {
-        .init(
+        .create(
             background: .color(.testWhite),
-            cover: nil,
             content: .box(.testBasicDog, nil),
             footer: .stack(.testVStackBigAndDog, .greenBG),
             overlay: .text(.testBodyShort, nil)

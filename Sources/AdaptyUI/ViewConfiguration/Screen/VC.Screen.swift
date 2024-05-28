@@ -15,6 +15,7 @@ extension AdaptyUI.ViewConfiguration {
         let content: Element
         let footer: Element?
         let overlay: Element?
+        let selectedAdaptyProductId: String?
     }
 }
 
@@ -25,13 +26,15 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             cover: from.cover.map(element),
             content: element(from.content),
             footer: from.footer.map(element),
-            overlay: from.overlay.map(element)
+            overlay: from.overlay.map(element),
+            selectedAdaptyProductId: from.selectedAdaptyProductId
         )
     }
 
     func bottomSheet(_ from: AdaptyUI.ViewConfiguration.Screen) -> AdaptyUI.BottomSheet {
         .init(
-            content: element(from.content)
+            content: element(from.content),
+            selectedAdaptyProductId: from.selectedAdaptyProductId
         )
     }
 }
@@ -43,5 +46,6 @@ extension AdaptyUI.ViewConfiguration.Screen: Decodable {
         case content
         case footer
         case overlay
+        case selectedAdaptyProductId = "selected_product"
     }
 }

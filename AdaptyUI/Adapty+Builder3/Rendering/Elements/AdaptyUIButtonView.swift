@@ -21,11 +21,11 @@ struct AdaptyUIButtonView: View {
     }
 
     private var currentStateView: AdaptyUI.Element? {
-        if button.isSelected {
-            return button.selectedState ?? button.normalState
-        } else {
+//        if button.isSelected {
+//            return button.selectedState ?? button.normalState
+//        } else {
             return button.normalState
-        }
+//        }
     }
 
     public var body: some View {
