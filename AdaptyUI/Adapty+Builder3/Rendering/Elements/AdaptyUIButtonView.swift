@@ -30,9 +30,7 @@ struct AdaptyUIButtonView: View {
 
     public var body: some View {
         Button {
-            if let action = button.action {
-                actionResolver.actionOccured(action)
-            }
+            actionResolver.actionOccured(button.action)
         } label: {
             if let currentStateView {
                 AdaptyUIElementView(currentStateView)

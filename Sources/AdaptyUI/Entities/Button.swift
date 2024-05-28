@@ -9,8 +9,8 @@ import Foundation
 
 extension AdaptyUI {
     package struct Button {
-        package let action: ButtonAction?
-        package let normalState: AdaptyUI.Element?
+        package let action: ButtonAction
+        package let normalState: AdaptyUI.Element
         package let selectedState: AdaptyUI.Element?
     }
 }
@@ -18,8 +18,8 @@ extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.Button {
         static func create(
-            action: AdaptyUI.ButtonAction? = nil,
-            normalState: AdaptyUI.Element? = nil,
+            action: AdaptyUI.ButtonAction,
+            normalState: AdaptyUI.Element,
             selectedState: AdaptyUI.Element? = nil
         ) -> Self {
             .init(

@@ -10,8 +10,8 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct Button {
-        let action: AdaptyUI.ViewConfiguration.ButtonAction?
-        let normalState: AdaptyUI.ViewConfiguration.Element?
+        let action: AdaptyUI.ViewConfiguration.ButtonAction
+        let normalState: AdaptyUI.ViewConfiguration.Element
         let selectedState: AdaptyUI.ViewConfiguration.Element?
     }
 }
@@ -19,8 +19,8 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration.Localizer {
     func button(_ from: AdaptyUI.ViewConfiguration.Button) -> AdaptyUI.Button {
         .init(
-            action: from.action.map(buttonAction),
-            normalState: from.normalState.map(element),
+            action: buttonAction(from.action),
+            normalState: element(from.normalState),
             selectedState: from.selectedState.map(element)
         )
     }
@@ -41,8 +41,8 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            action: container.decodeIfPresent(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action),
-            normalState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
+            action: container.decode(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action),
+            normalState: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
             selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState)
         )
     }
