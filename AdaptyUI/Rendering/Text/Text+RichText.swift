@@ -65,9 +65,7 @@ extension AdaptyUI.Text {
             productInfo = product
         case let .selectedProductText(value):
             guard let product = productsInfoProvider.selectedProductInfo, let adaptyProductId = product.adaptyProduct?.adaptyProductId else {
-                // TODO: implement
-//                value.notSelectedRichText()
-                richText = nil
+                richText = value.richText()
                 productInfo = nil
                 break
             }
