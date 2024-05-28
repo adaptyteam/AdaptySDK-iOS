@@ -18,7 +18,7 @@ extension AdaptyProductDiscount {
 }
 
 extension AdaptyProductDiscount.PaymentMode {
-    init(mode: SKProductDiscount.PaymentMode) {
+    package init(mode: SKProductDiscount.PaymentMode) {
         switch mode {
         case .payAsYouGo:
             self = .payAsYouGo

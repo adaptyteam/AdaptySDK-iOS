@@ -14,7 +14,7 @@ import SwiftUI
 struct AdaptyUIButtonView: View {
     private var button: AdaptyUI.Button
 
-    @EnvironmentObject var actionResolver: AdaptyUIActionResolver
+    @EnvironmentObject var actionResolver: AdaptyUIActionsViewModel
 
     init(_ button: AdaptyUI.Button) {
         self.button = button

@@ -106,7 +106,7 @@ struct AdaptyUIFlatContainerView: View {
         screen: .testTransparentScroll
 //        screen: .testTransparent
     )
-    .environmentObject(AdaptyUIActionResolver(logId: "preview"))
+    .environmentObject(AdaptyUIActionsViewModel(logId: "preview"))
 }
 #endif
 

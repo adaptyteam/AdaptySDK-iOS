@@ -9,7 +9,7 @@ import Foundation
 
 extension AdaptyUI {
     package struct Font {
-        static let `default` = Font(
+        package static let `default` = Font(
             alias: "adapty_system",
             familyName: "adapty_system",
             weight: 400,

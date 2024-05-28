@@ -113,7 +113,7 @@ struct AdaptyUIBasicContainerView: View {
     AdaptyUIBasicContainerView(
         screen: .testBasicDog
     )
-    .environmentObject(AdaptyUIActionResolver(logId: "preview"))
+    .environmentObject(AdaptyUIActionsViewModel(logId: "preview"))
 }
 #endif
 
