@@ -82,7 +82,8 @@ package extension AdaptyUI.LocalizedViewConfiguration {
                     cover: nil,
                     content: element,
                     footer: nil,
-                    overlay: nil
+                    overlay: nil,
+                    selectedAdaptyProductId: nil
                 )
             } else {
                 try decoder.decode(AdaptyUI.ViewConfiguration.Screen.self, from: data)

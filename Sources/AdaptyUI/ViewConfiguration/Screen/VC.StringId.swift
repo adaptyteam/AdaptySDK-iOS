@@ -20,6 +20,14 @@ extension AdaptyUI.ViewConfiguration.StringId {
         let adaptyProductId: String?
         let suffix: String?
 
+        static func calculate(suffix: String?) -> String {
+            if let suffix {
+                "PRODUCT_not_selected_\(suffix)"
+            } else {
+                "PRODUCT_not_selected"
+            }
+        }
+
         static func calculate(adaptyProductId: String, byPaymentMode mode: AdaptyProductDiscount.PaymentMode, suffix: String?) -> String {
             let mode = mode.asString ?? "none"
             return if let suffix {

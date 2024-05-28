@@ -71,65 +71,49 @@
         @available(iOS 15.0, *)
         extension AdaptyUI.RichText.ParagraphAttributes {
             static var test: Self {
-                .init(horizontalAlign: .left, firstIndent: 0.0, indent: 0.0, bulletSpace: nil, bullet: nil)
+                .create(
+                    horizontalAlign: .left
+                )
             }
         }
 
         @available(iOS 15.0, *)
         extension AdaptyUI.RichText.TextAttributes {
             static var testTitle: Self {
-                .init(
+                .create(
                     font: .default,
                     size: 24.0,
-                    txtColor: .color(.testRed),
-                    imgTintColor: nil,
-                    background: nil,
-                    strike: false,
-                    underline: false
+                    txtColor: .color(.testRed)
                 )
             }
 
             static var testBody: Self {
-                .init(
+                .create(
                     font: .default,
                     size: 15.0,
-                    txtColor: .color(.testRed),
-                    imgTintColor: nil,
-                    background: nil,
-                    strike: false,
-                    underline: false
+                    txtColor: .color(.testRed)
                 )
             }
         }
 
         @available(iOS 15.0, *)
         extension AdaptyUI.Text {
-            init(_ items: [AdaptyUI.RichText.Item]) {
-                self.init(
-                    value: .text(.init(
-                        items: items,
-                        fallback: nil
-                    )),
-                    maxRows: nil,
-                    overflowMode: Set<OverflowMode>()
-                )
-            }
 
             static var testBodyShort: Self {
-                .init([
-                    .text("Hello world!", .testBody),
+                .create(text:[
+                    .text("Hello world!", .testBody)
                 ])
             }
 
             static var testBodyShortAlignRight: Self {
-                .init([
-                    .paragraph(.init(horizontalAlign: .right, firstIndent: 0, indent: 0, bulletSpace: nil, bullet: nil)),
+                .create(text:[
+                    .paragraph(.create(horizontalAlign: .right)),
                     .text("Hello world!", .testBody),
                 ])
             }
 
             static var testBodyLong: Self {
-                .init([
+                .create(text:[
                     .text("Hello world!", .testTitle),
                     .paragraph(.test),
                     .text("Hello world!", .testBody),

@@ -13,59 +13,49 @@ import SwiftUI
 @available(iOS 15.0, *)
 extension AdaptyUI.Decorator {
     static var greenBG: Self {
-        .init(shapeType: .rectangle(cornerRadius: .zero),
-              background: .color(.testGreen),
-              border: nil)
+        .create(
+            background: .color(.testGreen)
+        )
     }
     
     static var blueBG: Self {
-        .init(shapeType: .rectangle(cornerRadius: .zero),
-              background: .color(.testBlue),
-              border: nil)
+        .create(
+            background: .color(.testBlue)
+        )
     }
     
     static var redBG: Self {
-        .init(shapeType: .rectangle(cornerRadius: .zero),
-              background: .color(.testRed),
-              border: nil)
+        .create(
+            background: .color(.testRed)
+        )
     }
 }
 
 @available(iOS 15.0, *)
 extension AdaptyUI.Element.Properties {
     static var greenBG: Self {
-        .init(decorator: .greenBG,
-              padding: .zero,
-              offset: .zero,
-              visibility: true,
-              transitionIn: [])
+        .create(decorator: .greenBG)
     }
     
     static var blueBG: Self {
-        .init(decorator: .blueBG,
-              padding: .zero,
-              offset: .zero,
-              visibility: true,
-              transitionIn: [])
+        .create(decorator: .blueBG)
     }
     
     static var redBG: Self {
-        .init(decorator: .redBG,
-              padding: .zero,
-              offset: .zero,
-              visibility: true,
-              transitionIn: [])
+        .create(decorator: .redBG)
     }
 }
 
 @available(iOS 15.0, *)
 extension AdaptyUI.Box {
     static var test: Self {
-        .init(width: .fixed(.screen(0.8)),
-              height: .min(.point(48)),
-              horizontalAlignment: .right,
-              verticalAlignment: .center,
-              content: .text(.testBodyShort, nil))
+        .create(
+            width: .fixed(.screen(0.8)),
+            height: .min(.point(48)),
+            horizontalAlignment: .right,
+            verticalAlignment: .center,
+            content: .text(.testBodyShort, nil)
+        )
     }
 }
 

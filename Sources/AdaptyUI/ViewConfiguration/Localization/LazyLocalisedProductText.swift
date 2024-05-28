@@ -63,6 +63,16 @@ extension AdaptyUI {
             self.defaultParagraphAttributes = defaultParagraphAttributes
         }
         
+        package func richText() -> RichText {
+            localizer.richText(
+                stringId: ViewConfiguration.StringId.Product.calculate(
+                    suffix: suffix
+                ),
+                defaultTextAttributes: defaultTextAttributes,
+                defaultParagraphAttributes: defaultParagraphAttributes
+            )
+        }
+        
         package func richText(
             adaptyProductId: String,
             byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown

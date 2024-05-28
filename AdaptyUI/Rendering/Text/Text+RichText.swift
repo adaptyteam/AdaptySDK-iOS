@@ -55,7 +55,10 @@
                 let adaptyProductId = value.adaptyProductId
                 richText = value.richText(byPaymentMode: .freeTrial)
             case let .selectedProductText(value):
+               // richText = value.richText() - for not selected product
+
                 richText = value.richText(adaptyProductId: "example_product_id", byPaymentMode: .freeTrial)
+                
             }
 
             return richText.attributedString(

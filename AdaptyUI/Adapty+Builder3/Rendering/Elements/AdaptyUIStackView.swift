@@ -105,7 +105,7 @@ struct AdaptyUIStackView: View {
 //    @available(iOS 15.0, *)
 //    extension AdaptyUI.Frame {
 //        static func fixed(width: Double, height: Double) -> Self {
-//            .init(
+//            .create(
 //                height: .point(height),
 //                width: .point(width),
 //                minHeight: nil,
@@ -119,31 +119,22 @@ struct AdaptyUIStackView: View {
 @available(iOS 15.0, *)
 extension AdaptyUI.Stack {
     static var testHStack: AdaptyUI.Stack {
-        AdaptyUI.Stack(
+        .create(
             type: .horizontal,
             horizontalAlignment: .left,
-            verticalAlignment: .center,
-            spacing: 0,
             content: [
                 .button(
-                    .init(
+                    .create(
                         action: .close,
-                        isSelected: false,
                         normalState: .text(
                             .testBodyLong,
-                            .init(
-                                decorator: .init(
+                            .create(
+                                decorator: .create(
                                     shapeType: .rectangle(cornerRadius: .zero),
-                                    background: .color(.testGreen),
-                                    border: nil
-                                ),
-                                padding: .zero,
-                                offset: .zero,
-                                visibility: true,
-                                transitionIn: []
+                                    background: .color(.testGreen)
+                                )
                             )
-                        ),
-                        selectedState: nil
+                        )
                     ),
                     nil
                 ),
@@ -152,16 +143,11 @@ extension AdaptyUI.Stack {
                 .space(1),
                 .text(
                     .testBodyLong,
-                    .init(
-                        decorator: .init(
+                    .create(
+                        decorator: .create(
                             shapeType: .rectangle(cornerRadius: .zero),
-                            background: .color(.testGreen),
-                            border: nil
-                        ),
-                        padding: .zero,
-                        offset: .zero,
-                        visibility: true,
-                        transitionIn: []
+                            background: .color(.testGreen)
+                        )
                     )
                 ),
             ]
@@ -169,89 +155,62 @@ extension AdaptyUI.Stack {
     }
 
     static var testZStack: AdaptyUI.Stack {
-        AdaptyUI.Stack(
+        .create(
             type: .z,
             horizontalAlignment: .right,
             verticalAlignment: .top,
-            spacing: 0,
             content: [
                 .text(
                     .testBodyLong,
-                    .init(
-                        decorator: .init(
+                    .create(
+                        decorator: .create(
                             shapeType: .rectangle(cornerRadius: .zero),
-                            background: .color(.testGreen),
-                            border: nil
-                        ),
-                        padding: .zero,
-                        offset: .zero,
-                        visibility: true,
-                        transitionIn: []
+                            background: .color(.testGreen)
+                        )
                     )
                 ),
                 .unknown("circle",
-                         .init(
-                             decorator: nil,
-//                                 frame: .fixed(width: 32, height: 32),
-                             padding: .zero,
-                             offset: .init(x: 20, y: -20),
-                             visibility: true,
-                             transitionIn: []
+                         .create(
+                             offset: .create(x: 20, y: -20)
                          )),
             ]
         )
     }
 
     static var testZStackMykola: AdaptyUI.Stack {
-        AdaptyUI.Stack(
+        .create(
             type: .z,
             horizontalAlignment: .left,
             verticalAlignment: .top,
-            spacing: 0,
             content: [
                 // Green Rect 128x128
                 .unknown(
                     "rectangle_green",
-                    .init(
-                        decorator: .init(
+                    .create(
+                        decorator: .create(
                             shapeType: .rectangle(cornerRadius: .zero),
-                            background: .color(.testClear),
-                            border: nil
-                        ),
-//                            frame: .fixed(width: 128, height: 128),
-                        padding: .zero,
-                        offset: .zero,
-                        visibility: true,
-                        transitionIn: []
+                            background: .color(.testClear)
+                        )
                     )
                 ),
                 // Red Circle 64x64
                 .unknown("circle_red",
-                         .init(
-                             decorator: nil,
-//                                 frame: .fixed(width: 64, height: 64),
-                             padding: .zero,
-                             offset: .zero,
-                             visibility: true,
-                             transitionIn: []
-                         )),
+                         .create()
+                ),
             ]
         )
     }
 
     static var testVStack: AdaptyUI.Stack {
-        AdaptyUI.Stack(
-            type: .vertical,
+        .create(
             horizontalAlignment: .left,
-            verticalAlignment: .center,
-            spacing: 0,
             content: [
                 //                .space(1),
                 .text(.testBodyShort, nil),
                 .text(
                     .testBodyShortAlignRight,
                     nil
-//                        .init(decorator: nil, frame: .init(height: nil, width: nil, minHeight: nil, maxHeight: nil, minWidth: nil, maxWidth: .point(10000000)), padding: .zero, offset: .zero, visibility: true, transitionIn: [])
+//                        .create(decorator: nil, frame: .create(height: nil, width: nil, minHeight: nil, maxHeight: nil, minWidth: nil, maxWidth: .point(10000000)), padding: .zero, offset: .zero, visibility: true, transitionIn: [])
                 ),
 //                .text(.testBodyLong, nil),
 //                .space(1),
@@ -261,11 +220,8 @@ extension AdaptyUI.Stack {
     }
 
     static var testVStackBig: AdaptyUI.Stack {
-        AdaptyUI.Stack(
-            type: .vertical,
+        .create(
             horizontalAlignment: .left,
-            verticalAlignment: .center,
-            spacing: 0,
             content: [
                 .text(.testBodyLong, nil),
                 .text(.testBodyLong, nil),
@@ -290,14 +246,15 @@ extension AdaptyUI.Stack {
     }
 
     static var testVStackMediumAndDog: AdaptyUI.Stack {
-        AdaptyUI.Stack(
-            type: .vertical,
+        .create(
             horizontalAlignment: .left,
-            verticalAlignment: .center,
-            spacing: 0,
             content: [
                 .box(.testCircleDog,
-                     .init(decorator: .init(shapeType: .circle, background: nil, border: nil), padding: .init(leading: 0, top: 0, trailing: 0, bottom: 24), offset: .zero, visibility: true, transitionIn: [])),
+                     .create(
+                        decorator: .create(shapeType: .circle),
+                        padding: .create(bottom: 24)
+                     )
+                ),
                 .text(.testBodyLong, nil),
                 .text(.testBodyLong, nil),
                 .text(.testBodyLong, nil),
@@ -310,14 +267,15 @@ extension AdaptyUI.Stack {
     }
 
     static var testVStackBigAndDog: AdaptyUI.Stack {
-        AdaptyUI.Stack(
-            type: .vertical,
+        .create(
             horizontalAlignment: .left,
-            verticalAlignment: .center,
-            spacing: 0,
             content: [
                 .box(.testCircleDog,
-                     .init(decorator: .init(shapeType: .circle, background: nil, border: nil), padding: .init(leading: 0, top: 0, trailing: 0, bottom: 24), offset: .zero, visibility: true, transitionIn: [])),
+                     .create(
+                        decorator: .create(shapeType: .circle), 
+                        padding: .create(bottom: 24)
+                     )
+                ),
                 .text(.testBodyLong, nil),
                 .text(.testBodyLong, nil),
                 .text(.testBodyLong, nil),
@@ -345,8 +303,8 @@ extension AdaptyUI.Stack {
 #Preview {
     AdaptyUIStackView(
         .testVStack
-//            .init(
-//                decorator: .init(
+//            .create(
+//                decorator: .create(
 //                    shapeType: .rectangle(cornerRadius: .zero),
 //                    background: .color(.testBlue),
 //                    border: nil

@@ -12,29 +12,24 @@
 @available(iOS 15.0, *)
 extension AdaptyUI.Box {
     static var testBasicDog: Self {
-        .init(
-            width: nil,
+        .create(
             height: .fixed(.screen(0.5)),
             horizontalAlignment: .right,
-            verticalAlignment: .center,
-            content: .image(.init(asset: .urlDog,
-                                  aspect: .fill,
-                                  tint: nil), nil)
+            content: .image(.create(
+                asset: .urlDog,
+                aspect: .fill
+            ), nil)
         )
     }
 
     static var testCircleDog: Self {
-        .init(
+        .create(
             width: .fixed(.point(280)),
             height: .fixed(.point(280)),
-            horizontalAlignment: .center,
-            verticalAlignment: .center,
-            content: .image(
-                .init(asset: .urlDog,
-                      aspect: .fill,
-                      tint: nil),
-                nil
-            )
+            content: .image(.create(
+                asset: .urlDog,
+                aspect: .fill
+            ), nil)
         )
     }
 }

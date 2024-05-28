@@ -21,15 +21,11 @@ extension AdaptyUI.ImageData {
 @available(iOS 15.0, *)
 extension AdaptyUI.Image {
     static var test: Self {
-        .init(asset: .urlDog,
-              aspect: .fit,
-              tint: nil)
+        .create(asset: .urlDog)
     }
 
     static var testFill: Self {
-        .init(asset: .urlDog,
-              aspect: .fill,
-              tint: nil)
+        .create(asset: .urlDog, aspect: .fill)
     }
 }
 
