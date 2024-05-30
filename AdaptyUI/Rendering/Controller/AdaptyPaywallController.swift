@@ -28,6 +28,7 @@ public class AdaptyPaywallController: UIViewController {
 
     private let productsViewModel: AdaptyProductsViewModel
     private let actionsViewModel: AdaptyUIActionsViewModel
+    private let sectionsViewModel: AdaptySectionsViewModel
     private let tagResolverViewModel: AdaptyTagResolverViewModel
     
     init(
@@ -46,6 +47,7 @@ public class AdaptyPaywallController: UIViewController {
 
         tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
         actionsViewModel = AdaptyUIActionsViewModel(logId: logId)
+        sectionsViewModel = AdaptySectionsViewModel(logId: logId)
         productsViewModel = AdaptyProductsViewModel(logId: logId,
                                                     paywall: paywall,
                                                     products: products,
@@ -140,6 +142,7 @@ public class AdaptyPaywallController: UIViewController {
                 .withScreenSize(view.bounds.size)
                 .environmentObject(productsViewModel)
                 .environmentObject(actionsViewModel)
+                .environmentObject(sectionsViewModel)
                 .environmentObject(tagResolverViewModel)
             ,
             to: view

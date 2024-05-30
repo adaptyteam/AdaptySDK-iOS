@@ -32,13 +32,13 @@ public extension AdaptyUI.LocalizedViewConfiguration {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 public enum AdaptyUIPreviewRenderingMode: String, CaseIterable {
     case template
     case element
 }
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, *)
 public struct AdaptyUITestRendererView: View {
     var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
     var renderingMode: AdaptyUIPreviewRenderingMode
@@ -63,13 +63,14 @@ public struct AdaptyUITestRendererView: View {
                         screen: screen,
                         isRightToLeft: viewConfiguration.isRightToLeft
                     )
-                    .environmentObject(AdaptyUIActionResolver(logId: "AdaptyUITesting"))
+                    .environmentObject(AdaptyUIActionsViewModel(logId: "AdaptyUITesting"))
+                    .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
                 } else {
                     AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
                 }
             case .element:
                 AdaptyUIElementView(screen.content)
-                    .environmentObject(AdaptyUIActionResolver(logId: "AdaptyUITesting"))
+                    .environmentObject(AdaptyUIActionsViewModel(logId: "AdaptyUITesting"))
             }
      
     }
