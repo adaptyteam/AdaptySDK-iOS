@@ -20,26 +20,9 @@ extension AdaptyUI {
         indirect case section(AdaptyUI.Section, Properties?)
         case toggle(AdaptyUI.Toggle, Properties?)
         case timer(AdaptyUI.Timer, Properties?)
+        indirect case pager(AdaptyUI.Pager, Properties?)
 
         case unknown(String, Properties?)
-
-//        var properties: Properties? {
-//            switch self {
-//            case .space: nil
-//            case let .stack(_, properties),
-//                 let .text(_, properties),
-//                 let .image(_, properties),
-//                 let .button(_, properties),
-//                 let .toggle(_, properties),
-//                 let .box(_, properties),
-//                 let .row(_, properties),
-//                 let .column(_, properties),
-//                 let .section(_, properties),
-//                 let .timer(_, properties),
-//                 let .unknown(_, properties):
-//                properties
-//            }
-//        }
     }
 }
 
