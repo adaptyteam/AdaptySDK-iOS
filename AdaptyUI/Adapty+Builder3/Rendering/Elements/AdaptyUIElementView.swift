@@ -87,6 +87,14 @@ package struct AdaptyUIElementView: View {
             AdaptyUIUnknownElementView(value: "section")
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
+        case let .toggle(section, properties):
+            AdaptyUIUnknownElementView(value: "toggle")
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
+        case let .timer(section, properties):
+            AdaptyUIUnknownElementView(value: "timer")
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
         }
     }
 }
