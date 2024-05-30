@@ -84,7 +84,7 @@ package struct AdaptyUIElementView: View {
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .toggle(toggle, properties):
-            AdaptyUIUnknownElementView(value: "toggle")
+            AdaptyUIToggleView(toggle)
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .timer(timer, properties):

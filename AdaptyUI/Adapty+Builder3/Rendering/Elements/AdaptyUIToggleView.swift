@@ -10,22 +10,13 @@
 import Adapty
 import SwiftUI
 
-extension AdaptyUI {
-    struct ToggleMock {
-        var color: Color?
-        var sectionId: String = "toggle_test"
-        var onIndex: Int = 0
-        var offIndex: Int = -1
-    }
-}
-
 @available(iOS 15.0, *)
 struct AdaptyUIToggleView: View {
     @EnvironmentObject var viewModel: AdaptySectionsViewModel
 
-    private var toggle: AdaptyUI.ToggleMock
+    private var toggle: AdaptyUI.Toggle
 
-    init(_ toggle: AdaptyUI.ToggleMock) {
+    init(_ toggle: AdaptyUI.Toggle) {
         self.toggle = toggle
     }
 
@@ -38,7 +29,7 @@ struct AdaptyUIToggleView: View {
         })) {
             EmptyView()
         }
-        .tint(toggle.color?.swiftuiColor)
+        .tint(toggle.color?.asColor?.swiftuiColor)
     }
 }
 
@@ -46,7 +37,7 @@ struct AdaptyUIToggleView: View {
 
 @available(iOS 15.0, *)
 #Preview {
-    AdaptyUIToggleView(.init())
+    AdaptyUIToggleView(.create(sectionId: "toggle_preview"))
         .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
 }
 
