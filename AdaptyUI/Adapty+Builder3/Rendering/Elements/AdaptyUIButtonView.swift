@@ -16,7 +16,8 @@
 
         @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
         @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
-
+        @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
+        
         init(_ button: AdaptyUI.Button) {
             self.button = button
         }
@@ -29,9 +30,12 @@
                 } else {
                     button.normalState
                 }
-            case let .switchSection(sectionId, selectedIndexId):
-                // TODO: choose selected if needed
-                button.normalState
+            case let .switchSection(sectionId, index):
+                if index == sectionsViewModel.selectedIndex(for: sectionId) {
+                    button.selectedState ?? button.normalState
+                } else {
+                    button.normalState
+                }
             default:
                 button.normalState
             }
@@ -43,9 +47,8 @@
             switch action {
             case let .selectProductId(id):
                 productsViewModel.selectProduct(id: id)
-            case let .switchSection(id, index):
-                // TODO: implement
-                break
+            case let .switchSection(sectionId, index):
+                sectionsViewModel.updateSelection(for: sectionId, index: index)
             case let .openScreen(id):
                 // TODO: implement
                 break

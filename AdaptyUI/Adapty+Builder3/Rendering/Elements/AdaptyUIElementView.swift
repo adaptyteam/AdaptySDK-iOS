@@ -84,7 +84,7 @@ package struct AdaptyUIElementView: View {
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .section(section, properties):
-            AdaptyUIUnknownElementView(value: "section")
+            AdaptyUISectionView(section)
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         }
