@@ -1,8 +1,8 @@
 //
-//  AdaptyUIRowView.swift
+//  AdaptyUIColumnView.swift
+//  
 //
-//
-//  Created by Aleksey Goncharov on 23.05.2024.
+//  Created by Aleksey Goncharov on 30.05.2024.
 //
 
 #if canImport(UIKit)
@@ -11,14 +11,14 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct AdaptyUIRowView: View {
+struct AdaptyUIColumnView: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
 
-    var row: AdaptyUI.Row
+    var column: AdaptyUI.Column
 
-    init(_ row: AdaptyUI.Row) {
-        self.row = row
+    init(_ column: AdaptyUI.Column) {
+        self.column = column
     }
 
     private func calculateTotalWeight(
@@ -31,14 +31,14 @@ struct AdaptyUIRowView: View {
         for item in items {
             switch item.length {
             case let .fixed(value):
-                reservedLength += value.points(screenSize: screenSize.width)
+                reservedLength += value.points(screenSize: screenSize.height)
             case let .weight(value):
                 totalWeight += value
             }
         }
 
-        if row.spacing > 0 {
-            reservedLength += CGFloat(row.spacing * Double(items.count - 1))
+        if column.spacing > 0 {
+            reservedLength += CGFloat(column.spacing * Double(items.count - 1))
         }
 
         return (totalWeight, reservedLength)
@@ -48,23 +48,23 @@ struct AdaptyUIRowView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items, in: proxy)
-            let weightsAvailableLength = proxy.size.width - reservedLength
+            let (totalWeight, reservedLength) = calculateTotalWeight(for: column.items, in: proxy)
+            let weightsAvailableLength = proxy.size.height - reservedLength
 
-            LazyVGrid(
-                columns: row.items.map { item in
+            LazyHGrid(
+                rows: column.items.map { item in
                     switch item.length {
                     case let .fixed(length):
                         .init(
-                            .fixed(length.points(screenSize: screenSize.width)),
-                            spacing: row.spacing,
+                            .fixed(length.points(screenSize: screenSize.height)),
+                            spacing: column.spacing,
                             alignment: .from(horizontal: item.horizontalAlignment,
                                              vertical: item.verticalAlignment)
                         )
                     case let .weight(weight):
                         .init(
                             .fixed((Double(weight) / Double(totalWeight)) * weightsAvailableLength),
-                            spacing: row.spacing,
+                            spacing: column.spacing,
                             alignment: .from(horizontal: item.horizontalAlignment,
                                              vertical: item.verticalAlignment)
                         )
@@ -72,14 +72,14 @@ struct AdaptyUIRowView: View {
                 },
                 spacing: 0.0,
                 content: {
-                    ForEach(0 ..< row.items.count, id: \.self) { idx in
-                        AdaptyUIElementView(row.items[idx].content)
+                    ForEach(0 ..< column.items.count, id: \.self) { idx in
+                        AdaptyUIElementView(column.items[idx].content)
                     }
                 }
             )
             .onGeometrySizeChange { contentsSize = $0 }
         }
-        .frame(height: contentsSize.height)
+        .frame(width: contentsSize.width)
     }
 }
 
@@ -91,9 +91,9 @@ struct AdaptyUIRowView: View {
         VStack {
             Text("Top")
 
-            AdaptyUIRowView(
-                AdaptyUI.Row.create(
-                    spacing: 6.0,
+            AdaptyUIColumnView(
+                AdaptyUI.Column.create(
+                    spacing: 10.0,
                     items: [
                         .create(
                             length: .fixed(.point(32)),
@@ -110,6 +110,7 @@ struct AdaptyUIRowView: View {
                     ]
                 )
             )
+            .frame(height: 500) // Important!!!
             .background(Color.green)
 
             Text("Bottom")

@@ -1,6 +1,6 @@
 //
 //  AdaptyProductsViewModel.swift
-//  
+//
 //
 //  Created by Aleksey Goncharov on 27.05.2024.
 //
@@ -13,7 +13,7 @@ import Foundation
 @available(iOS 15.0, *)
 protocol ProductsInfoProvider {
     var selectedProductInfo: ProductInfoModel? { get }
-    
+
     func productInfo(by adaptyId: String) -> ProductInfoModel?
 }
 
@@ -23,7 +23,7 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
         guard let selectedProductId else { return nil }
         return productInfo(by: selectedProductId)
     }
-    
+
     func productInfo(by adaptyId: String) -> ProductInfoModel? {
         products.first(where: { $0.adaptyProduct?.adaptyProductId == adaptyId })
     }
@@ -33,12 +33,12 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
 class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
-    let logId: String
-    let paywall: AdaptyPaywall
-    let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+    private let logId: String
+    private let paywall: AdaptyPaywall?
+    private let viewConfiguration: AdaptyUI.LocalizedViewConfiguration?
 
     var onFailLoadingProducts: ((AdaptyError) -> Bool)?
-    
+
     @Published var products: [ProductInfoModel]
     @Published var selectedProductId: String?
     @Published var productsLoadingInProgress: Bool = false
@@ -47,6 +47,7 @@ class AdaptyProductsViewModel: ObservableObject {
 
     var adaptyProducts: [AdaptyPaywallProduct]? {
         didSet {
+            guard let paywall else { return }
             products = Self.generateProductsInfos(paywall: paywall,
                                                   products: adaptyProducts,
                                                   eligibilities: introductoryOffersEligibilities)
@@ -55,12 +56,23 @@ class AdaptyProductsViewModel: ObservableObject {
 
     var introductoryOffersEligibilities: [String: AdaptyEligibility]? {
         didSet {
+            guard let paywall else { return }
             products = Self.generateProductsInfos(paywall: paywall,
                                                   products: adaptyProducts,
                                                   eligibilities: introductoryOffersEligibilities)
         }
     }
-    
+
+    #if DEBUG
+    init(logId: String) {
+        self.logId = logId
+        products = ["test_product_1", "test_product_2"].map { EmptyProductInfo(id: $0) }
+
+        paywall = nil
+        viewConfiguration = nil
+    }
+    #endif
+
     init(
         logId: String,
         paywall: AdaptyPaywall,
@@ -75,7 +87,7 @@ class AdaptyProductsViewModel: ObservableObject {
                                                    products: products,
                                                    eligibilities: nil)
     }
-    
+
     private func log(_ level: AdaptyLogLevel, _ message: String) {
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
     }
@@ -94,7 +106,7 @@ class AdaptyProductsViewModel: ObservableObject {
                             introEligibility: eligibilities?[$0.vendorProductId] ?? .ineligible)
         }
     }
-    
+
     func loadProductsIfNeeded() {
         guard !productsLoadingInProgress else { return }
 
@@ -105,12 +117,14 @@ class AdaptyProductsViewModel: ObservableObject {
 
         loadProductsIntroductoryEligibilities()
     }
-    
+
     func selectProduct(id: String) {
         selectedProductId = id
     }
-    
+
     private func loadProducts() {
+        guard let paywall else { return }
+
         productsLoadingInProgress = true
 
         log(.verbose, "loadProducts begin")
@@ -118,7 +132,7 @@ class AdaptyProductsViewModel: ObservableObject {
         queue.async { [weak self] in
             guard let self = self else { return }
 
-            Adapty.getPaywallProducts(paywall: self.paywall) { [weak self] result in
+            Adapty.getPaywallProducts(paywall: paywall) { [weak self] result in
                 switch result {
                 case let .success(products):
                     self?.log(.verbose, "loadProducts success")
