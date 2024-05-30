@@ -19,7 +19,7 @@ extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.Section {
         static func create(
-            id: String,
+            id: String = UUID().uuidString,
             index: Int = 0,
             content: [AdaptyUI.Element]
         ) -> Self {

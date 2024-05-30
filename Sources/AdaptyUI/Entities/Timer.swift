@@ -10,10 +10,23 @@ import Foundation
 
 extension AdaptyUI {
     package struct Timer {
+        static let defaultStartBehaviour = StartBehaviour.firstAppear
+
         package let id: String
         package let duration: TimeInterval
         package let startBehaviour: StartBehaviour
         package let format: [Item]
+
+        package func format(byValue: TimeInterval) -> RichText {
+            let index =
+                if let index = format.firstIndex(where: { byValue > $0.from }) {
+                    index > 0 ? index - 1 : index
+                } else {
+                    format.count - 1
+                }
+            guard format.indices.contains(index) else { return .empty }
+            return format[index].value
+        }
 
         init(id: String, duration: TimeInterval, startBehaviour: StartBehaviour, format: [Item]) {
             self.id = id
@@ -32,7 +45,7 @@ extension AdaptyUI {
 
         package struct Item {
             package let from: TimeInterval
-            package let stringId: String
+            package let value: RichText
         }
     }
 }
@@ -42,21 +55,21 @@ extension AdaptyUI {
         static func create(
             id: String = UUID().uuidString,
             duration: TimeInterval,
-            startBehaviour: StartBehaviour = .firstAppear,
-            format: String
+            startBehaviour: StartBehaviour = AdaptyUI.Timer.defaultStartBehaviour,
+            format: AdaptyUI.RichText
         ) -> Self {
             .init(
                 id: id,
                 duration: duration,
                 startBehaviour: startBehaviour,
-                format: [.init(from: 0, stringId: format)]
+                format: [.init(from: 0, value: format)]
             )
         }
 
         static func create(
             id: String = UUID().uuidString,
             duration: TimeInterval,
-            startBehaviour: StartBehaviour = .firstAppear,
+            startBehaviour: StartBehaviour = AdaptyUI.Timer.defaultStartBehaviour,
             format: [Item]
         ) -> Self {
             .init(
@@ -71,11 +84,11 @@ extension AdaptyUI {
     package extension AdaptyUI.Timer.Item {
         static func create(
             from: TimeInterval,
-            stringId: String
+            value: AdaptyUI.RichText
         ) -> Self {
             .init(
                 from: from,
-                stringId: stringId
+                value: value
             )
         }
     }

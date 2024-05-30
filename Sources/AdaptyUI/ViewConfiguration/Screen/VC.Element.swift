@@ -11,6 +11,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     enum Element {
         case space(Int)
+        case reference(String)
         indirect case stack(AdaptyUI.ViewConfiguration.Stack, Properties?)
         case text(AdaptyUI.ViewConfiguration.Text, Properties?)
         case image(AdaptyUI.ViewConfiguration.Image, Properties?)
@@ -18,6 +19,11 @@ extension AdaptyUI.ViewConfiguration {
         indirect case box(AdaptyUI.ViewConfiguration.Box, Properties?)
         indirect case row(AdaptyUI.ViewConfiguration.Row, Properties?)
         indirect case column(AdaptyUI.ViewConfiguration.Column, Properties?)
+        indirect case section(AdaptyUI.ViewConfiguration.Section, Properties?)
+        case toggle(AdaptyUI.ViewConfiguration.Toggle, Properties?)
+        case timer(AdaptyUI.ViewConfiguration.Timer, Properties?)
+        indirect case pager(AdaptyUI.ViewConfiguration.Pager, Properties?)
+
         case unknown(String, Properties?)
     }
 }
@@ -46,6 +52,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         switch from {
         case let .space(value):
             .space(value)
+        case let .reference(id):
+            .unknown("reference to `\(id)`", nil)
         case let .stack(value, properties):
             .stack(stack(value), properties.flatMap(elementProperties))
         case let .text(value, properties):
@@ -60,6 +68,15 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             .row(row(value), properties.flatMap(elementProperties))
         case let .column(value, properties):
             .column(column(value), properties.flatMap(elementProperties))
+        case let .section(value, properties):
+            .section(section(value), properties.flatMap(elementProperties))
+        case let .toggle(value, properties):
+            .toggle(toggle(value), properties.flatMap(elementProperties))
+        case let .timer(value, properties):
+            .timer(timer(value), properties.flatMap(elementProperties))
+        case let .pager(value, properties):
+            .pager(pager(value), properties.flatMap(elementProperties))
+
         case let .unknown(value, properties):
             .unknown(value, properties.flatMap(elementProperties))
         }
@@ -81,6 +98,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case count
+        case id
     }
 
     enum ContentType: String, Codable {
@@ -94,6 +112,12 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         case zStack = "z_stack"
         case row
         case column
+        case section
+        case toggle
+        case timer
+        case `if`
+        case reference
+        case pager
     }
 
     init(from decoder: Decoder) throws {
@@ -106,6 +130,10 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         }
 
         switch contentType {
+        case .if:
+            self = try AdaptyUI.ViewConfiguration.If(from: decoder).content
+        case .reference:
+            self = try .reference(container.decode(String.self, forKey: .id))
         case .space:
             self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
         case .box:
@@ -122,6 +150,14 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
             self = try .row(AdaptyUI.ViewConfiguration.Row(from: decoder), propertyOrNil())
         case .column:
             self = try .column(AdaptyUI.ViewConfiguration.Column(from: decoder), propertyOrNil())
+        case .section:
+            self = try .section(AdaptyUI.ViewConfiguration.Section(from: decoder), propertyOrNil())
+        case .toggle:
+            self = try .toggle(AdaptyUI.ViewConfiguration.Toggle(from: decoder), propertyOrNil())
+        case .timer:
+            self = try .timer(AdaptyUI.ViewConfiguration.Timer(from: decoder), propertyOrNil())
+        case .pager:
+            self = try .pager(AdaptyUI.ViewConfiguration.Pager(from: decoder), propertyOrNil())
         }
 
         func propertyOrNil() -> Properties? {
