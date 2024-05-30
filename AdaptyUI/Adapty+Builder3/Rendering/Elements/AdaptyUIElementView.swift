@@ -71,10 +71,6 @@ package struct AdaptyUIElementView: View {
             AdaptyUIButtonView(button)
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
-        case let .unknown(value, properties):
-            AdaptyUIUnknownElementView(value: value)
-                .paddingIfNeeded(additionalPadding)
-                .applyingProperties(properties)
         case let .row(row, properties):
             AdaptyUIRowView(row)
                 .paddingIfNeeded(additionalPadding)
@@ -85,6 +81,10 @@ package struct AdaptyUIElementView: View {
                 .applyingProperties(properties)
         case let .section(section, properties):
             AdaptyUISectionView(section)
+                .paddingIfNeeded(additionalPadding)
+                .applyingProperties(properties)
+        case let .unknown(value, properties):
+            AdaptyUIUnknownElementView(value: value)
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         }
