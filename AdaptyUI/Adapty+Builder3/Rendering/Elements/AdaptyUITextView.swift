@@ -41,6 +41,9 @@ struct AdaptyUITextView: View {
 #Preview {
     AdaptyUITextView(.testBodyLong)
         .background(Color.yellow)
+        .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
+        .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
+        .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
         .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
 }
 #endif

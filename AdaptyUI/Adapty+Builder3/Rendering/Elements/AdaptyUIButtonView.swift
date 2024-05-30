@@ -22,7 +22,7 @@
             self.button = button
         }
 
-        private var currentStateView: AdaptyUI.Element? {
+        private var currentStateView: AdaptyUI.Element {
             switch button.action {
             case let .selectProductId(productId):
                 if productId == productsViewModel.selectedProductId {
@@ -64,11 +64,7 @@
             Button {
                 actionOccured()
             } label: {
-                if let currentStateView {
-                    AdaptyUIElementView(currentStateView)
-                } else {
-                    EmptyView()
-                }
+                AdaptyUIElementView(currentStateView)
             }
         }
     }
