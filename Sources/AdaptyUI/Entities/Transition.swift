@@ -105,8 +105,8 @@ extension AdaptyUI.TransitionFade: Decodable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        startDelay = try (container.decodeIfPresent(Double.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultStartDelay
-        duration = try (container.decodeIfPresent(Double.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultDuration
+        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultStartDelay
+        duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultDuration
         interpolator = try (container.decodeIfPresent(AdaptyUI.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyUI.TransitionFade.defaultInterpolator
     }
 }
