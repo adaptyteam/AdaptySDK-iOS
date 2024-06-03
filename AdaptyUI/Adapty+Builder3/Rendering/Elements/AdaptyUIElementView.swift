@@ -88,7 +88,7 @@ package struct AdaptyUIElementView: View {
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .timer(timer, properties):
-            AdaptyUIUnknownElementView(value: "timer")
+            AdaptyUITimerView(timer)
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .pager(pager, properties):
