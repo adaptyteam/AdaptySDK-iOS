@@ -30,6 +30,7 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.Element {
     struct Properties {
+        let elementId: String?
         let decorator: AdaptyUI.ViewConfiguration.Decorator?
         let padding: AdaptyUI.EdgeInsets
         let offset: AdaptyUI.Offset
@@ -169,6 +170,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
 
 extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
     enum CodingKeys: String, CodingKey {
+        case elementId = "element_id"
         case decorator
         case padding
         case offset
@@ -187,6 +189,7 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
                 []
             }
         try self.init(
+            elementId: container.decodeIfPresent(String.self, forKey: .elementId),
             decorator: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorator),
             padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.Element.Properties.defaultPadding,
             offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Element.Properties.defaultOffset,
