@@ -11,185 +11,185 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct AdaptyPageControlConfiguration {
-    enum Position {
-        case none
-        case outerTop(offset: CGFloat)
-        case outerBottom(offset: CGFloat)
-        case innerTop(offset: CGFloat)
-        case innerBottom(offset: CGFloat)
-    }
-
-    var position: Position
-    var dotSize: CGFloat
-    var selectedColor: Color
-    var unselectedColor: Color
-}
-
-@available(iOS 15.0, *)
-struct AutoScrollConfiguration {
-    var startDelay: TimeInterval
-    var duration: TimeInterval
-    var delay: TimeInterval
-    var interpolator: Animation
-    var repeatScroll: Bool
-    var interruptionBehaviour: InterruptionBehaviour
-
-    enum InterruptionBehaviour {
-        case stop
-        case `continue`
-    }
-}
-
-@available(iOS 15.0, *)
-struct AdaptyUIPagerView<PageContent: View>: View {
-    enum PageSize {
-        case fix(CGFloat)
-        case padding(CGFloat)
-        case fraction(CGFloat)
-
-        func valueWith(total: CGFloat) -> CGFloat {
-            switch self {
-            case let .fix(value):
-                return value
-            case let .padding(value):
-                return total - 2.0 * value
-            case let .fraction(value):
-                return total * value
-            }
+extension AdaptyUI.VerticalAlignment {
+    var swiftUIAlignment: Alignment {
+        switch self {
+        case .top: .top
+        case .center: .center
+        case .bottom: .bottom
+        case .justified: .center
         }
     }
+}
 
-    var spacing: CGFloat
-    var pageWidth: PageSize
-    var pageHeight: PageSize
-    var pageControlConfiguration: AdaptyPageControlConfiguration
-    var autoScrollConfiguration: AutoScrollConfiguration?
-    var userInteractionEnabled: Bool
+@available(iOS 15.0, *)
+extension AdaptyUI.Pager.Length {
+    func valueWith(parent: Double, screen: Double) -> CGFloat {
+        switch self {
+        case let .fixed(unit): unit.points(screenSize: screen)
+        case let .parent(value): parent * value
+        }
+    }
+}
 
-    var itemsCount: Int
-    var itemsBuilder: (Int) -> PageContent
+@available(iOS 15.0, *)
+extension AdaptyUI.TransitionSlide {
+    var swiftUIAnimation: Animation {
+        switch interpolator {
+        case .easeInOut: .easeInOut(duration: duration)
+        case .easeIn: .easeIn(duration: duration)
+        case .easeOut: .easeOut(duration: duration)
+        case .linear: .linear(duration: duration)
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+extension View {
+    @ViewBuilder
+    func dragGesture(condition: Bool,
+                     onChanged: @escaping (DragGesture.Value) -> Void,
+                     onEnded: @escaping (DragGesture.Value) -> Void) -> some View
+    {
+        if condition {
+            gesture(
+                DragGesture()
+                    .onChanged { onChanged($0) }
+                    .onEnded { onEnded($0) }
+            )
+        } else {
+            self
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+struct AdaptyUIPagerView: View {
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+
+    var pager: AdaptyUI.Pager
 
     @State private var currentPage: Int = 0
     @State private var offset = CGFloat.zero
     @State private var isInteracting = false
     @State private var timer: Timer?
 
-    init(
-        spacing: CGFloat,
-        pageWidth: PageSize,
-        pageHeight: PageSize,
-        pageControlConfiguration: AdaptyPageControlConfiguration,
-        autoScrollConfiguration: AutoScrollConfiguration?,
-        userInteractionEnabled: Bool,
-        itemsCount: Int,
-        @ViewBuilder itemsBuilder: @escaping (Int) -> PageContent
-    ) {
-        self.spacing = spacing
-        self.pageWidth = pageWidth
-        self.pageHeight = pageHeight
-        self.pageControlConfiguration = pageControlConfiguration
-        self.autoScrollConfiguration = autoScrollConfiguration
-        self.userInteractionEnabled = userInteractionEnabled
-        self.itemsCount = itemsCount
-        self.itemsBuilder = itemsBuilder
+    init(_ pager: AdaptyUI.Pager) {
+        self.pager = pager
+    }
+
+    @ViewBuilder
+    private var viewportWithPageControl: some View {
+        if let pageControl = pager.pageControl {
+            switch pageControl.layout {
+            case .overlaid:
+                ZStack(alignment: pageControl.verticalAlignment.swiftUIAlignment) {
+                    pagerView
+                    pageControlView(pageControl)
+                        .padding(pageControl.padding)
+                }
+            case .stacked:
+                VStack(spacing: 0.0) {
+                    switch pageControl.verticalAlignment {
+                    case .top:
+                        pageControlView(pageControl)
+                            .padding(pageControl.padding)
+                        pagerView
+                    default:
+                        pagerView
+                        pageControlView(pageControl)
+                            .padding(pageControl.padding)
+                    }
+                }
+            }
+        } else {
+            pagerView
+        }
     }
 
     var body: some View {
-        VStack {
-            switch pageControlConfiguration.position {
-            case .none:
-                pagerView
-            case let .outerTop(offset):
-                VStack(spacing: offset) {
-                    pageControl
-                    pagerView
-                }
-            case let .outerBottom(offset):
-                VStack(spacing: offset) {
-                    pagerView
-                    pageControl
-                }
-            case let .innerTop(offset):
-                ZStack(alignment: .top) {
-                    pagerView
-                    pageControl
-                        .padding(.top, offset)
-                }
-            case let .innerBottom(offset):
-                ZStack(alignment: .bottom) {
-                    pagerView
-                    pageControl
-                        .padding(.bottom, offset)
-                }
+        viewportWithPageControl
+            .onAppear {
+                startAutoScroll()
             }
-        }
-        .onAppear {
-            startAutoScroll()
-        }
-        .onDisappear {
-            stopAutoScroll()
-        }
+            .onDisappear {
+                stopAutoScroll()
+            }
     }
 
     // View for the Pager
     @ViewBuilder
     private var pagerView: some View {
         GeometryReader { proxy in
-            let width = pageWidth.valueWith(total: proxy.size.width)
-            let height = pageHeight.valueWith(total: proxy.size.height)
+            let width = pager.pageWidth.valueWith(parent: proxy.size.width,
+                                                  screen: screenSize.width)
+                - pager.pagePadding.leading
+                - pager.pagePadding.trailing
+
+            let height = pager.pageHeight.valueWith(parent: proxy.size.height,
+                                                    screen: screenSize.height)
+                - pager.pagePadding.top
+                - pager.pagePadding.bottom
+
             let hPadding = (proxy.size.width - width) / 2.0
 
-            LazyHStack(spacing: spacing) {
-                ForEach(0 ..< itemsCount, id: \.self) { idx in
-                    itemsBuilder(idx)
+            LazyHStack(spacing: pager.spacing) {
+                ForEach(0 ..< pager.content.count, id: \.self) { idx in
+                    AdaptyUIElementView(pager.content[idx])
                         .frame(width: width, height: height)
                         .padding(.leading, idx == 0 ? hPadding : 0)
-                        .padding(.trailing, idx == itemsCount - 1 ? hPadding : 0)
+                        .padding(.trailing, idx == pager.content.count - 1 ? hPadding : 0)
                 }
             }
-            .offset(x: CGFloat(-currentPage) * (width + spacing) + offset)
-            .animation(autoScrollConfiguration?.interpolator ?? .linear, value: currentPage)
-            .gesture(
-                userInteractionEnabled ?
-                DragGesture()
-                    .onChanged { value in
-                        offset = value.translation.width
-                        isInteracting = true
-                        stopAutoScroll() // Stop the autoscroll while interacting
-                    }
-                    .onEnded { value in
-                        withAnimation(.easeOut) {
-                            offset = value.predictedEndTranslation.width
-                            currentPage -= Int((offset / width).rounded())
-                            currentPage = max(0, min(currentPage, itemsCount - 1))
-                            offset = 0
-                            isInteracting = false
-                            if autoScrollConfiguration?.interruptionBehaviour == .continue {
-                                scheduleAutoScroll()
-                            }
+            .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
+            .animation(
+                pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut,
+                value: currentPage
+            )
+            .dragGesture(
+                condition: pager.interactionBehaviour != .none,
+                onChanged: { value in
+                    offset = value.translation.width
+                    isInteracting = true
+                    stopAutoScroll() // Stop the autoscroll while interacting
+                },
+                onEnded: { value in
+                    withAnimation(.easeOut) {
+                        offset = value.predictedEndTranslation.width
+                        currentPage -= Int((offset / width).rounded())
+                        currentPage = max(0, min(currentPage, pager.content.count - 1))
+                        offset = 0
+                        isInteracting = false
+
+                        if pager.interactionBehaviour == .pauseAnimation {
+                            scheduleAutoScroll()
                         }
                     }
-                : nil
+                }
             )
         }
     }
 
-    // View for the Page Control
     @ViewBuilder
-    private var pageControl: some View {
-        HStack {
-            ForEach(0 ..< itemsCount, id: \.self) { idx in
+    private func pageControlView(_ pageControl: AdaptyUI.Pager.PageControl) -> some View {
+        HStack(spacing: pageControl.spacing) {
+            ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()
-                    .fill(idx == currentPage ? pageControlConfiguration.selectedColor : pageControlConfiguration.unselectedColor)
-                    .frame(width: pageControlConfiguration.dotSize,
-                           height: pageControlConfiguration.dotSize)
+                    .fill(
+                        (idx == currentPage ?
+                            pageControl.selectedColor?.asColor?.swiftuiColor :
+                            pageControl.color?.asColor?.swiftuiColor) ?? .white
+                    )
+                    .frame(width: pageControl.dotSize,
+                           height: pageControl.dotSize)
             }
         }
     }
 
     private func startAutoScroll() {
-        guard let config = autoScrollConfiguration else { return }
+        guard let config = pager.animation else { return }
+
         stopAutoScroll()
         timer = Timer.scheduledTimer(withTimeInterval: config.startDelay, repeats: false) { _ in
             scheduleAutoScroll()
@@ -197,17 +197,22 @@ struct AdaptyUIPagerView<PageContent: View>: View {
     }
 
     private func scheduleAutoScroll() {
-        guard let config = autoScrollConfiguration else { return }
-        timer = Timer.scheduledTimer(withTimeInterval: config.duration + config.delay, repeats: true) { _ in
+        guard let config = pager.animation else { return }
+
+        timer = Timer.scheduledTimer(withTimeInterval: config.pageTransition.duration + config.pageTransition.startDelay, repeats: true) { _ in
+
             guard !isInteracting else { return }
-            withAnimation(config.interpolator) {
-                if currentPage < itemsCount - 1 {
+
+            if currentPage < pager.content.count - 1 {
+                withAnimation(config.pageTransition.swiftUIAnimation) {
                     currentPage += 1
-                } else if config.repeatScroll {
-                    currentPage = 0
-                } else {
-                    stopAutoScroll()
                 }
+            } else if let repeatTransition = config.repeatTransition {
+                withAnimation(repeatTransition.swiftUIAnimation) {
+                    currentPage == 0
+                }
+            } else {
+                stopAutoScroll()
             }
         }
     }
@@ -223,35 +228,50 @@ struct AdaptyUIPagerView<PageContent: View>: View {
 @available(iOS 15.0, *)
 #Preview {
     AdaptyUIPagerView(
-        spacing: 24.0,
-        pageWidth: .padding(40),
-        pageHeight: .fraction(1.0),
-        pageControlConfiguration: .init(
-            position: .outerBottom(offset: 6.0),
-            dotSize: 6.0,
-            selectedColor: .blue,
-            unselectedColor: .white
-        ),
-        autoScrollConfiguration: .init(
-            startDelay: 3.0,
-            duration: 0.3,
-            delay: 1.0,
-            interpolator: .easeInOut,
-            repeatScroll: true,
-            interruptionBehaviour: .continue
-        ),
-        userInteractionEnabled: true,
-        itemsCount: 5
-    ) { idx in
-        Text("Index \(idx)")
-            .font(.title)
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.yellow)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-    }
+        .create(
+            pageWidth: .parent(0.9),
+            pageHeight: .parent(1.0),
+            pagePadding: .create(leading: 20, trailing: 20),
+            spacing: 10.0,
+            content: [
+                .box(.testUnconstrainedText, .create(decorator: .create(shapeType: .rectangle(cornerRadius: .zero)))),
+
+                .box(.testUnconstrainedText, .create(decorator: .create(shapeType: .rectangle(cornerRadius: .zero)))),
+
+                .box(.testUnconstrainedText, .create(decorator: .create(shapeType: .rectangle(cornerRadius: .zero)))),
+            ],
+            pageControl: .create(
+                layout: .stacked,
+                verticalAlignment: .bottom,
+                padding: .create(same: 6),
+                dotSize: 6,
+                spacing: 6,
+                color: .color(.testBlue),
+                selectedColor: .color(.testRed)
+            ),
+            animation: .create(
+                startDelay: 1.0,
+                pageTransition: .create(
+                    startDelay: 1.0,
+                    duration: 0.3,
+                    interpolator: .easeInOut
+                ),
+                repeatTransition: .create(
+                    startDelay: 1.0,
+                    duration: 0.3,
+                    interpolator: .easeInOut
+                ),
+                afterInteractionDelay: 1.0
+            ),
+            interactionBehaviour: .pauseAnimation
+        )
+    )
     .background(Color.green)
     .frame(height: 300)
+    .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
+    .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
+    .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
+    .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
 }
 
 #endif

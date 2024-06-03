@@ -92,7 +92,7 @@ package struct AdaptyUIElementView: View {
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .pager(pager, properties):
-            AdaptyUIUnknownElementView(value: "pager")
+            AdaptyUIPagerView(pager)
                 .paddingIfNeeded(additionalPadding)
                 .applyingProperties(properties)
         case let .unknown(value, properties):

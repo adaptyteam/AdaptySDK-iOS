@@ -49,13 +49,4 @@ extension AdaptyUI.Color {
     var swiftuiColor: Color { Color(red: red, green: green, blue: blue, opacity: alpha) }
 }
 
-extension AdaptyUI.Unit {
-    func points(screenSizeInPoints: CGFloat) -> CGFloat {
-        switch self {
-        case let .point(value): value
-        case let .screen(value): value * screenSizeInPoints
-        }
-    }
-}
-
 #endif

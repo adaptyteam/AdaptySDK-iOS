@@ -22,6 +22,27 @@ extension AdaptyUI.Box {
         )
     }
 
+    static var testUnconstrainedDog: Self {
+        .create(
+//            width: .fixed(.point(280)),
+//            height: .fixed(.point(280)),
+            content: .image(.create(
+                asset: .urlDog,
+                aspect: .fill
+            ), nil)
+        )
+    }
+    
+    static var testUnconstrainedText: Self {
+        .create(
+            width: .fillMax,
+            height: .fillMax,
+//            width: .fixed(.point(280)),
+//            height: .fixed(.point(280)),
+            content: .text(.testBodyLong, .blueBG)
+        )
+    }
+    
     static var testCircleDog: Self {
         .create(
             width: .fixed(.point(280)),
