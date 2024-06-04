@@ -134,7 +134,7 @@ struct AdaptyUIPagerView: View {
 
             let hPadding = (proxy.size.width - width) / 2.0
 
-            LazyHStack(spacing: pager.spacing) {
+            HStack(spacing: pager.spacing) {
                 ForEach(0 ..< pager.content.count, id: \.self) { idx in
                     AdaptyUIElementView(pager.content[idx])
                         .frame(width: width, height: height)
@@ -209,7 +209,7 @@ struct AdaptyUIPagerView: View {
                 }
             } else if let repeatTransition = config.repeatTransition {
                 withAnimation(repeatTransition.swiftUIAnimation) {
-                    currentPage == 0
+                    currentPage = 0
                 }
             } else {
                 stopAutoScroll()
