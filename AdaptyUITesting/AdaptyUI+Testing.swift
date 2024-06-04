@@ -65,14 +65,20 @@ public struct AdaptyUITestRendererView: View {
                     )
                     .environmentObject(AdaptyUIActionsViewModel(logId: "AdaptyUITesting"))
                     .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
+                    .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
+                    .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
+                    .environmentObject(AdaptyTimerViewModel())
                 } else {
                     AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
                 }
             case .element:
                 AdaptyUIElementView(screen.content)
                     .environmentObject(AdaptyUIActionsViewModel(logId: "AdaptyUITesting"))
+                    .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
+                    .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
+                    .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
+                    .environmentObject(AdaptyTimerViewModel())
             }
-     
     }
 }
 

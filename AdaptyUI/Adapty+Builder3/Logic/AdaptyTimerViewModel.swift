@@ -11,9 +11,13 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-class AdaptyTimerViewModel: ObservableObject {
+package class AdaptyTimerViewModel: ObservableObject {
     private static var globalTimers = [String: Date]()
     private var timers = [String: Date]()
+    
+    package init() {
+        
+    }
     
     private func initializeTimer(_ timer: AdaptyUI.Timer, at: Date) -> Date {
         switch timer.startBehaviour {

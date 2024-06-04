@@ -21,14 +21,14 @@ extension Dictionary<String, String>: AdaptyTagResolver {
 }
 
 @available(iOS 15.0, *)
-class AdaptyTagResolverViewModel: ObservableObject, AdaptyTagResolver {
+package class AdaptyTagResolverViewModel: ObservableObject, AdaptyTagResolver {
     let tagResolver: AdaptyTagResolver?
     
-    init(tagResolver: AdaptyTagResolver?) {
+    package init(tagResolver: AdaptyTagResolver?) {
         self.tagResolver = tagResolver
     }
     
-    func replacement(for tag: String) -> String? {
+    package func replacement(for tag: String) -> String? {
         tagResolver?.replacement(for: tag)
     }
 }

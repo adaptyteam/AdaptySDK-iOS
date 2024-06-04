@@ -30,7 +30,7 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
 }
 
 @available(iOS 15.0, *)
-class AdaptyProductsViewModel: ObservableObject {
+package class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
     private let logId: String
@@ -64,7 +64,7 @@ class AdaptyProductsViewModel: ObservableObject {
     }
 
     #if DEBUG
-    init(logId: String) {
+    package init(logId: String) {
         self.logId = logId
         products = ["test_product_1", "test_product_2"].map { EmptyProductInfo(id: $0) }
 
