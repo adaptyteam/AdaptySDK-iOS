@@ -30,6 +30,7 @@ public class AdaptyPaywallController: UIViewController {
     private let actionsViewModel: AdaptyUIActionsViewModel
     private let sectionsViewModel: AdaptySectionsViewModel
     private let tagResolverViewModel: AdaptyTagResolverViewModel
+    private let timerViewModel: AdaptyTimerViewModel
     
     init(
         paywall: AdaptyPaywall,
@@ -52,7 +53,8 @@ public class AdaptyPaywallController: UIViewController {
                                                     paywall: paywall,
                                                     products: products,
                                                     viewConfiguration: viewConfiguration)
-
+        timerViewModel = AdaptyTimerViewModel()
+        
         let selectedProductIndex: Int
 //
         // if let style = try? viewConfiguration.extractDefaultStyle() {
@@ -144,6 +146,7 @@ public class AdaptyPaywallController: UIViewController {
                 .environmentObject(actionsViewModel)
                 .environmentObject(sectionsViewModel)
                 .environmentObject(tagResolverViewModel)
+                .environmentObject(timerViewModel)
             ,
             to: view
         )

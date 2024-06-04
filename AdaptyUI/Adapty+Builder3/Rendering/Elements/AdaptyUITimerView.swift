@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  AdaptyUITimerView.swift
 //
 //
 //  Created by Aleksey Goncharov on 30.05.2024.
@@ -9,9 +9,6 @@
 
 import Adapty
 import SwiftUI
-
-@available(iOS 15.0, *)
-class AdaptyTimerViewModel: ObservableObject {}
 
 @available(iOS 15.0, *)
 extension AdaptyUI {
@@ -143,6 +140,8 @@ extension AdaptyUI.RichText {
 
 @available(iOS 15.0, *)
 struct AdaptyUITimerView: View, AdaptyTagResolver {
+    @EnvironmentObject var viewModel: AdaptyTimerViewModel
+    
     var timer: AdaptyUI.Timer
 
     init(_ timer: AdaptyUI.Timer) {
@@ -203,10 +202,9 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
     }
 
     private func updateTime() {
-        let timeElapsed = Date().timeIntervalSince1970 - startTime.timeIntervalSince1970
-        var timeLeft = timer.duration - timeElapsed
+        var timeLeft = viewModel.timeLeft(for: timer, at: Date())
 
-        guard timeLeft >= 0 else {
+        guard timeLeft > 0 else {
             timeLeft = 0
 
             stopTimer()
@@ -267,6 +265,7 @@ extension AdaptyUI.RichText {
     .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
     .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
     .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
+    .environmentObject(AdaptyTimerViewModel())
 }
 #endif
 
