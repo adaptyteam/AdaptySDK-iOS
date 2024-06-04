@@ -10,12 +10,10 @@ import Foundation
 
 extension AdaptyUI {
     package struct Timer {
-        static let defaultStartBehaviour = StartBehaviour.firstAppear
-
         package let id: String
-        package let duration: TimeInterval
-        package let startBehaviour: StartBehaviour
+        package let state: State
         package let format: [Item]
+        package let action: ButtonAction?
 
         package func format(byValue: TimeInterval) -> RichText {
             let index =
@@ -28,18 +26,23 @@ extension AdaptyUI {
             return format[index].value
         }
 
-        init(id: String, duration: TimeInterval, startBehaviour: StartBehaviour, format: [Item]) {
+        init(id: String, state: State, format: [Item], action: ButtonAction?) {
             self.id = id
-            self.duration = duration
-            self.startBehaviour = startBehaviour
+            self.state = state
             self.format = format.sorted(by: { $0.from > $1.from })
+            self.action = action
+        }
+
+        package enum State {
+            case endedAt(Date)
+            case duration(TimeInterval, start: StartBehaviour)
         }
 
         package enum StartBehaviour {
+            static let `default` = StartBehaviour.firstAppear
             case everyAppear
             case firstAppear
             case firstAppearPersisted
-            case specifiedTime(Date)
             case custom
         }
 
@@ -54,29 +57,60 @@ extension AdaptyUI {
     package extension AdaptyUI.Timer {
         static func create(
             id: String = UUID().uuidString,
-            duration: TimeInterval,
-            startBehaviour: StartBehaviour = AdaptyUI.Timer.defaultStartBehaviour,
-            format: AdaptyUI.RichText
+            endedAt: Date,
+            format: AdaptyUI.RichText,
+            action: AdaptyUI.ButtonAction? = nil
+        ) -> Self {
+            .create(
+                id: id,
+                endedAt: endedAt,
+                format: [.init(from: 0, value: format)],
+                action: action
+            )
+        }
+
+        static func create(
+            id: String = UUID().uuidString,
+            endedAt: Date,
+            format: [Item],
+            action: AdaptyUI.ButtonAction? = nil
         ) -> Self {
             .init(
                 id: id,
-                duration: duration,
-                startBehaviour: startBehaviour,
-                format: [.init(from: 0, value: format)]
+                state: .endedAt(endedAt),
+                format: format,
+                action: action
             )
         }
 
         static func create(
             id: String = UUID().uuidString,
             duration: TimeInterval,
-            startBehaviour: StartBehaviour = AdaptyUI.Timer.defaultStartBehaviour,
-            format: [Item]
+            startBehaviour: StartBehaviour = .default,
+            format: AdaptyUI.RichText,
+            action: AdaptyUI.ButtonAction? = nil
         ) -> Self {
-            .init(
+            .create(
                 id: id,
                 duration: duration,
                 startBehaviour: startBehaviour,
-                format: format
+                format: [.init(from: 0, value: format)],
+                action: action
+            )
+        }
+
+        static func create(
+            id: String = UUID().uuidString,
+            duration: TimeInterval,
+            startBehaviour: StartBehaviour = .default,
+            format: [Item],
+            action: AdaptyUI.ButtonAction? = nil
+        ) -> Self {
+            .init(
+                id: id,
+                state: .duration(duration, start: startBehaviour),
+                format: format,
+                action: action
             )
         }
     }
