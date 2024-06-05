@@ -17,7 +17,7 @@ extension Adapty {
 }
 
 extension AdaptyUI {
-    static let builderVersion = "3"
+    static let builderVersion = "4"
 }
 
 extension Environment {

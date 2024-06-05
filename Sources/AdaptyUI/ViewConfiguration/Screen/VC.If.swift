@@ -23,13 +23,39 @@ extension AdaptyUI.ViewConfiguration {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             content = if
                 try container.decodeIfPresent(String.self, forKey: .platform).map({ $0 == "ios" }) ?? true,
-                try container.decodeIfPresent(String.self, forKey: .version).map(checkVersionFormat) ?? true {
+                try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUI.builderVersion.isSameOrNewerVersion) ?? true {
                 try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .then)
             } else {
                 try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .else)
             }
-
-            func checkVersionFormat(version _: String) -> Bool { true }
         }
+    }
+}
+
+extension String {
+    func isSameOrNewerVersion(than older: Self) -> Bool {
+        func stringVersionToArray(_ value: String) -> [Int] {
+            value.components(separatedBy: CharacterSet(charactersIn: " -.")).map { Int($0) ?? 0 }
+        }
+        return stringVersionToArray(self).isSameOrNewerVersion(than: stringVersionToArray(older))
+    }
+}
+
+private extension [Int] {
+    func isSameOrNewerVersion(than older: Self) -> Bool {
+        var newer = self
+        let diffCount = older.count - newer.count
+        if diffCount > 0 {
+            newer.append(contentsOf: repeatElement(0, count: diffCount))
+        }
+
+        for (index, newerElement) in newer.enumerated() {
+            guard older.indices.contains(index) else { return true }
+            let olderElement = older[index]
+            if newerElement > olderElement { return true }
+            if newerElement < olderElement { return false }
+        }
+
+        return true
     }
 }
