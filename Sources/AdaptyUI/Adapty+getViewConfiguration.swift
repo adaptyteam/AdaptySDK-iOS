@@ -47,10 +47,16 @@ extension Adapty {
 
         let completion: AdaptyResultCompletion<AdaptyUI.ViewConfiguration> = { result in
 
-            completion(result.map {
-                $0.sendImageUrlsToObserver()
-                return $0.extractLocale()
-            })
+            completion(
+                result.flatMap {
+                    $0.sendImageUrlsToObserver()
+                    do {
+                        return try .success($0.extractLocale())
+                    } catch {
+                        return .failure(.decodingViewConfiguration(error))
+                    }
+                }
+            )
         }
 
         switch viewConfiguration {

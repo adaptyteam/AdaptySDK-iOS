@@ -39,7 +39,8 @@ extension AdaptyUI.ViewConfiguration.Element {
         let transitionIn: [AdaptyUI.Transition]
 
         var isZero: Bool {
-            decorator == nil
+            elementId == nil
+                && decorator == nil
                 && padding.isZero
                 && offset.isZero
                 && visibility
@@ -49,43 +50,62 @@ extension AdaptyUI.ViewConfiguration.Element {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func element(_ from: AdaptyUI.ViewConfiguration.Element) -> AdaptyUI.Element {
+    private func elementFromReference(_ id: String) throws -> AdaptyUI.Element {
+        guard !self.elementIds.contains(id) else {
+            throw AdaptyUI.LocalizerError.referenceCycle(id)
+        }
+        guard let value = source.referencedElemnts[id] else {
+            throw AdaptyUI.LocalizerError.unknownReference(id)
+        }
+        elementIds.insert(id)
+        let result: AdaptyUI.Element
+        do {
+            result = try element(value)
+            elementIds.remove(id)
+        } catch {
+            elementIds.remove(id)
+            throw error
+        }
+        return result
+    }
+
+    func element(_ from: AdaptyUI.ViewConfiguration.Element) throws -> AdaptyUI.Element {
         switch from {
         case let .space(value):
             .space(value)
         case let .reference(id):
-            .unknown("reference to `\(id)`", nil)
+            try elementFromReference(id)
         case let .stack(value, properties):
-            .stack(stack(value), properties.flatMap(elementProperties))
+            try .stack(stack(value), properties.flatMap(elementProperties))
         case let .text(value, properties):
-            .text(text(value), properties.flatMap(elementProperties))
+            try .text(text(value), properties.flatMap(elementProperties))
         case let .image(value, properties):
-            .image(image(value), properties.flatMap(elementProperties))
+            try .image(image(value), properties.flatMap(elementProperties))
         case let .button(value, properties):
-            .button(button(value), properties.flatMap(elementProperties))
+            try .button(button(value), properties.flatMap(elementProperties))
         case let .box(value, properties):
-            .box(box(value), properties.flatMap(elementProperties))
+            try .box(box(value), properties.flatMap(elementProperties))
         case let .row(value, properties):
-            .row(row(value), properties.flatMap(elementProperties))
+            try .row(row(value), properties.flatMap(elementProperties))
         case let .column(value, properties):
-            .column(column(value), properties.flatMap(elementProperties))
+            try .column(column(value), properties.flatMap(elementProperties))
         case let .section(value, properties):
-            .section(section(value), properties.flatMap(elementProperties))
+            try .section(section(value), properties.flatMap(elementProperties))
         case let .toggle(value, properties):
-            .toggle(toggle(value), properties.flatMap(elementProperties))
+            try .toggle(toggle(value), properties.flatMap(elementProperties))
         case let .timer(value, properties):
-            .timer(timer(value), properties.flatMap(elementProperties))
+            try .timer(timer(value), properties.flatMap(elementProperties))
         case let .pager(value, properties):
-            .pager(pager(value), properties.flatMap(elementProperties))
+            try .pager(pager(value), properties.flatMap(elementProperties))
 
         case let .unknown(value, properties):
-            .unknown(value, properties.flatMap(elementProperties))
+            try .unknown(value, properties.flatMap(elementProperties))
         }
     }
 
-    private func elementProperties(_ from: AdaptyUI.ViewConfiguration.Element.Properties) -> AdaptyUI.Element.Properties? {
+    private func elementProperties(_ from: AdaptyUI.ViewConfiguration.Element.Properties) throws -> AdaptyUI.Element.Properties? {
         guard !from.isZero else { return nil }
-        return .init(
+        return try .init(
             decorator: from.decorator.map(decorator),
             padding: from.padding,
             offset: from.offset,
@@ -99,7 +119,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case count
-        case id
+        case elementId = "element_id"
     }
 
     enum ContentType: String, Codable {
@@ -134,7 +154,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         case .if:
             self = try AdaptyUI.ViewConfiguration.If(from: decoder).content
         case .reference:
-            self = try .reference(container.decode(String.self, forKey: .id))
+            self = try .reference(container.decode(String.self, forKey: .elementId))
         case .space:
             self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
         case .box:

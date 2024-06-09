@@ -19,8 +19,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func stack(_ from: AdaptyUI.ViewConfiguration.Stack) -> AdaptyUI.Stack {
-        .init(
+    func stack(_ from: AdaptyUI.ViewConfiguration.Stack) throws -> AdaptyUI.Stack {
+        try .init(
             type: from.type,
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,

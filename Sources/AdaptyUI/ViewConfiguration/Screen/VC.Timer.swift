@@ -23,8 +23,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func timer(_ from: AdaptyUI.ViewConfiguration.Timer) -> AdaptyUI.Timer {
-        AdaptyUI.Timer(
+    func timer(_ from: AdaptyUI.ViewConfiguration.Timer) throws -> AdaptyUI.Timer {
+        try .init(
             id: from.id,
             state: from.state,
             format: from.format.compactMap {

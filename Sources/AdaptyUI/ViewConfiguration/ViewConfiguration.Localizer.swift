@@ -8,10 +8,11 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Localizer {
+    class Localizer {
         let localization: Localization?
         let source: AdaptyUI.ViewConfiguration
         let locale: AdaptyLocale
+        var elementIds = Set<String>()
 
         init(source: AdaptyUI.ViewConfiguration, withLocale: AdaptyLocale) {
             self.source = source
@@ -22,8 +23,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func localize() -> AdaptyUI.LocalizedViewConfiguration {
-        .init(
+    func localize() throws -> AdaptyUI.LocalizedViewConfiguration {
+        try .init(
             id: source.id,
             locale: locale.id,
             isRightToLeft: localization?.isRightToLeft ?? false,
@@ -32,5 +33,12 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             bottomSheets: source.screens.mapValues(bottomSheet),
             templateRevision: source.templateRevision
         )
+    }
+}
+
+extension AdaptyUI {
+    package enum LocalizerError: Swift.Error {
+        case unknownReference(String)
+        case referenceCycle(String)
     }
 }

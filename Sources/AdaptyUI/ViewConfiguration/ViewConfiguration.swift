@@ -18,6 +18,7 @@ extension AdaptyUI {
         let defaultLocalization: Localization?
         let defaultScreen: Screen
         let screens: [String: Screen]
+        let referencedElemnts: [String: Element]
     }
 }
 
@@ -75,5 +76,8 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         }
         self.defaultScreen = defaultScreen
         self.screens = screens.filter { $0.key != CodingKeys.defaultScreen.rawValue }
+        self.referencedElemnts = try [String: Element](screens.flatMap { $0.value.referencedElemnts }, uniquingKeysWith: { _, _ in
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate element_id"))
+        })
     }
 }

@@ -18,7 +18,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func toggle(_ from: AdaptyUI.ViewConfiguration.Toggle) -> AdaptyUI.Toggle {
+    func toggle(_ from: AdaptyUI.ViewConfiguration.Toggle) throws -> AdaptyUI.Toggle {
         .init(
             sectionId: from.sectionId,
             onIndex: from.onIndex,

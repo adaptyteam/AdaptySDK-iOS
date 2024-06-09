@@ -18,8 +18,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func gridItem(_ from: AdaptyUI.ViewConfiguration.GridItem) -> AdaptyUI.GridItem {
-        .init(
+    func gridItem(_ from: AdaptyUI.ViewConfiguration.GridItem) throws -> AdaptyUI.GridItem {
+        try .init(
             length: from.length,
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
