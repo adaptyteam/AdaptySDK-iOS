@@ -9,12 +9,12 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    func extractLocale() -> AdaptyUI.LocalizedViewConfiguration {
-        extractLocale(responseLocale)
+    func extractLocale() throws -> AdaptyUI.LocalizedViewConfiguration {
+        try extractLocale(responseLocale)
     }
-    
-    func extractLocale(_ locale: AdaptyLocale) -> AdaptyUI.LocalizedViewConfiguration {
-        Localizer(source: self, withLocale: locale).localize()
+
+    func extractLocale(_ locale: AdaptyLocale) throws -> AdaptyUI.LocalizedViewConfiguration {
+        try Localizer(source: self, withLocale: locale).localize()
     }
 
     func getLocalization(_ locale: AdaptyLocale) -> Localization? {

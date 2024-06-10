@@ -75,7 +75,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?,
         defaultParagraphAttributes: AdaptyUI.ViewConfiguration.ParagraphAttributes?
     ) -> AdaptyUI.RichText? {
-        guard let item = localization?.strings?[stringId]  else { return nil }
+        guard let item = localization?.strings?[stringId] else { return nil }
         return AdaptyUI.RichText(
             items: item.value.convert(
                 self,

@@ -24,10 +24,10 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func buttonAction(_ from: AdaptyUI.ViewConfiguration.ButtonAction) -> AdaptyUI.ButtonAction {
+    func buttonAction(_ from: AdaptyUI.ViewConfiguration.ButtonAction) throws -> AdaptyUI.ButtonAction {
         switch from {
         case let .openUrl(stringId):
-            .openUrl(self.urlIfPresent(stringId))
+            .openUrl(urlIfPresent(stringId))
         case .restore:
             .restore
         case let .custom(id: id):

@@ -17,8 +17,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func section(_ from: AdaptyUI.ViewConfiguration.Section) -> AdaptyUI.Section {
-        .init(
+    func section(_ from: AdaptyUI.ViewConfiguration.Section) throws -> AdaptyUI.Section {
+        try .init(
             id: from.id,
             index: from.index,
             content: from.content.map(element)

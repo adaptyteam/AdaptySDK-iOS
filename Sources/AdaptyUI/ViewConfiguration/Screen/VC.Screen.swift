@@ -20,8 +20,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func screen(_ from: AdaptyUI.ViewConfiguration.Screen) -> AdaptyUI.Screen {
-        .init(
+    func screen(_ from: AdaptyUI.ViewConfiguration.Screen) throws -> AdaptyUI.Screen {
+        try .init(
             background: from.backgroundAssetId.flatMap(fillingIfPresent) ?? AdaptyUI.Screen.defaultBackground,
             cover: from.cover.map(element),
             content: element(from.content),
@@ -31,8 +31,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 
-    func bottomSheet(_ from: AdaptyUI.ViewConfiguration.Screen) -> AdaptyUI.BottomSheet {
-        .init(
+    func bottomSheet(_ from: AdaptyUI.ViewConfiguration.Screen) throws -> AdaptyUI.BottomSheet {
+        try .init(
             content: element(from.content),
             selectedAdaptyProductId: from.selectedAdaptyProductId
         )

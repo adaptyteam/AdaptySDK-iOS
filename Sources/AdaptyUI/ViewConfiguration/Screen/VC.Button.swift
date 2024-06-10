@@ -17,17 +17,17 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func button(_ from: AdaptyUI.ViewConfiguration.Button) -> AdaptyUI.Button {
-        .init(
+    func button(_ from: AdaptyUI.ViewConfiguration.Button) throws -> AdaptyUI.Button {
+        try .init(
             action: buttonAction(from.action),
             normalState: element(from.normalState),
             selectedState: from.selectedState.map(element)
         )
     }
 
-    func buttonAction(_ from: AdaptyUI.ButtonAction) -> AdaptyUI.ButtonAction {
+    func buttonAction(_ from: AdaptyUI.ButtonAction) throws -> AdaptyUI.ButtonAction {
         guard case let .openUrl(stringId) = from else { return from }
-        return .openUrl(self.urlIfPresent(stringId))
+        return .openUrl(urlIfPresent(stringId))
     }
 }
 

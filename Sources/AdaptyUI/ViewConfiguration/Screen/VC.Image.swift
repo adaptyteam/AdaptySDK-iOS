@@ -16,7 +16,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func image(_ from: AdaptyUI.ViewConfiguration.Image) -> AdaptyUI.Image {
+    func image(_ from: AdaptyUI.ViewConfiguration.Image) throws -> AdaptyUI.Image {
         .init(
             asset: imageData(from.assetId),
             aspect: from.aspect,

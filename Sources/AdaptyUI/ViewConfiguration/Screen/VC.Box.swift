@@ -19,8 +19,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func box(_ from: AdaptyUI.ViewConfiguration.Box) -> AdaptyUI.Box {
-        .init(
+    func box(_ from: AdaptyUI.ViewConfiguration.Box) throws -> AdaptyUI.Box {
+        try .init(
             width: from.width,
             height: from.height,
             horizontalAlignment: from.horizontalAlignment,

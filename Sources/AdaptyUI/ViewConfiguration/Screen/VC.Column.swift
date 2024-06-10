@@ -16,8 +16,8 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func column(_ from: AdaptyUI.ViewConfiguration.Column) -> AdaptyUI.Column {
-        .init(
+    func column(_ from: AdaptyUI.ViewConfiguration.Column) throws -> AdaptyUI.Column {
+        try .init(
             spacing: from.spacing,
             items: from.items.map(gridItem)
         )

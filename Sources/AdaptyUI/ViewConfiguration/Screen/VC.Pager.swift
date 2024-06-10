@@ -34,8 +34,8 @@ extension AdaptyUI.ViewConfiguration.Pager {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func pager(_ from: AdaptyUI.ViewConfiguration.Pager) -> AdaptyUI.Pager {
-        .init(
+    func pager(_ from: AdaptyUI.ViewConfiguration.Pager) throws -> AdaptyUI.Pager {
+        try .init(
             pageWidth: from.pageWidth,
             pageHeight: from.pageHeight,
             pagePadding: from.pagePadding,
@@ -47,7 +47,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 
-    private func pageControl(_ from: AdaptyUI.ViewConfiguration.Pager.PageControl) -> AdaptyUI.Pager.PageControl {
+    private func pageControl(_ from: AdaptyUI.ViewConfiguration.Pager.PageControl) throws -> AdaptyUI.Pager.PageControl {
         .init(
             layout: from.layout,
             verticalAlignment: from.verticalAlignment,
@@ -81,7 +81,7 @@ extension AdaptyUI.ViewConfiguration.Pager: Decodable {
         spacing = try container.decodeIfPresent(Double.self, forKey: .spacing) ?? def.spacing
         content = try container.decode([AdaptyUI.ViewConfiguration.Element].self, forKey: .content)
         pageControl = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Pager.PageControl.self, forKey: .pageControl)
-        animation = try container.decodeIfPresent(AdaptyUI.Pager.Animation.self, forKey: .animation) 
+        animation = try container.decodeIfPresent(AdaptyUI.Pager.Animation.self, forKey: .animation)
         interactionBehaviour = try container.decodeIfPresent(AdaptyUI.Pager.InteractionBehaviour.self, forKey: .interactionBehaviour) ?? def.interactionBehaviour
     }
 }

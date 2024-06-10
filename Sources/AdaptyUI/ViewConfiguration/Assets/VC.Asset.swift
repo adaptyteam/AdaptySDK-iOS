@@ -35,7 +35,10 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
     @inlinable
     func fontIfPresent(_ assetId: String?) -> AdaptyUI.Font? {
-        guard let asset = assetIfPresent(assetId), case let .font(value) = asset else { return nil }
+        guard
+            let asset = assetIfPresent(assetId),
+            case let .font(value) = asset
+        else { return nil }
         return value
     }
 
