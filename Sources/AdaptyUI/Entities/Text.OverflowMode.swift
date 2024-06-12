@@ -10,13 +10,19 @@ import Foundation
 
 extension AdaptyUI.Text {
     package enum OverflowMode: String {
-        case truncate
         case scale
+        case unknown
     }
 }
 
-extension Set<AdaptyUI.Text.OverflowMode> {
-    static let empty: Self = []
+extension AdaptyUI.Text.OverflowMode: Decodable {
+    package init(from decoder: any Decoder) throws {
+        self =
+            switch try decoder.singleValueContainer().decode(String.self) {
+            case "scale":
+                .scale
+            default:
+                .unknown
+            }
+    }
 }
-
-extension AdaptyUI.Text.OverflowMode: Decodable {}

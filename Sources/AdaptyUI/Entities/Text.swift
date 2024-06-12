@@ -14,7 +14,7 @@ extension AdaptyUI {
             value: .text(.empty),
             horizontalAlign: .leading,
             maxRows: nil,
-            overflowMode: .empty
+            overflowMode: []
         )
 
         package let value: Value
