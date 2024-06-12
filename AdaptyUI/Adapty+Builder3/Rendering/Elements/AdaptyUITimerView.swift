@@ -46,32 +46,32 @@ extension AdaptyUI.TimerTag {
         case "TIMER_SSS": return .TIMER_SSS
         default: break
         }
-        
+
         if value.starts(with: "TIMER_Total_Days_") {
             let nString = value.replacingOccurrences(of: "TIMER_Total_Days_", with: "")
             return .TIMER_Total_Days(Int(nString) ?? 0)
         }
-        
+
         if value.starts(with: "TIMER_Total_Hours_") {
             let nString = value.replacingOccurrences(of: "TIMER_Total_Hours_", with: "")
             return .TIMER_Total_Hours(Int(nString) ?? 0)
         }
-        
+
         if value.starts(with: "TIMER_Total_Minutes_") {
             let nString = value.replacingOccurrences(of: "TIMER_Total_Minutes_", with: "")
             return .TIMER_Total_Minutes(Int(nString) ?? 0)
         }
-        
+
         if value.starts(with: "TIMER_Total_Seconds_") {
             let nString = value.replacingOccurrences(of: "TIMER_Total_Seconds_", with: "")
             return .TIMER_Total_Seconds(Int(nString) ?? 0)
         }
-        
+
         if value.starts(with: "TIMER_Total_Milliseconds_") {
             let nString = value.replacingOccurrences(of: "TIMER_Total_Milliseconds_", with: "")
             return .TIMER_Total_Milliseconds(Int(nString) ?? 0)
         }
-        
+
         return nil
     }
 
@@ -141,8 +141,9 @@ extension AdaptyUI.RichText {
 @available(iOS 15.0, *)
 struct AdaptyUITimerView: View, AdaptyTagResolver {
     @EnvironmentObject var viewModel: AdaptyTimerViewModel
-    
-    var timer: AdaptyUI.Timer
+    @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
+
+    private var timer: AdaptyUI.Timer
 
     init(_ timer: AdaptyUI.Timer) {
         self.timer = timer
@@ -155,23 +156,29 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
 
     func replacement(for tag: String) -> String? {
         guard let timerTag = AdaptyUI.TimerTag.createFromString(tag) else {
-            return nil // TODO: support for custom tag
+            return customTagResolverViewModel.replacement(for: tag)
         }
 
         return timerTag.string(for: timeLeft)
     }
 
-    private var attributedString: AttributedString {
-        AttributedString(
-            text?.attributedString_legacy(
-                tagResolver: self,
-                productInfo: nil
-            ) ?? .init()
-        )
+    @ViewBuilder
+    private var timerOrEmpty: some View {
+        if let text {
+            text
+                .convertToSwiftUIText(
+                    tagResolver: self,
+                    productInfo: nil
+                )
+                .multilineTextAlignment(timer.horizontalAlign)
+                .minimumScaleFactor(0.5)
+        } else {
+            Text("")
+        }
     }
 
     var body: some View {
-        Text(attributedString)
+        timerOrEmpty
             .onAppear {
                 updateTime()
                 startTimer()

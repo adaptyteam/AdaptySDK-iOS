@@ -15,7 +15,7 @@ struct AdaptyUITextView: View {
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
 
-    var text: AdaptyUI.Text
+    private var text: AdaptyUI.Text
 
     init(_ text: AdaptyUI.Text) {
         self.text = text
@@ -31,7 +31,6 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
-            .background(Color.yellow)
         } else {
             EmptyView()
         }
@@ -44,12 +43,10 @@ extension AdaptyUI.RichText {
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?
     ) -> Text {
-        var result = Text("")
-
-        for item in items {
+        items.reduce(Text("")) { partialResult, item in
             switch item {
             case let .text(value, attr):
-                result = result + Text(
+                return partialResult + Text(
                     AttributedString.createFrom(
                         value: value,
                         attributes: attr
@@ -73,19 +70,69 @@ extension AdaptyUI.RichText {
                 } else {
                     tagReplacementResult = ""
                 }
-                
-                result = result + Text(
+
+                return partialResult + Text(
                     AttributedString.createFrom(
                         value: tagReplacementResult,
                         attributes: attr
                     )
                 )
             case let .image(value, attr):
-                result = result + Text("img")
+                guard let uiImage = value.textAttachmentImage(
+                    font: attr.uiFont ?? .systemFont(ofSize: 15.0),
+                    tint: attr.imgTintColor?.asColor?.uiColor
+                ) else {
+                    return partialResult
+                }
+
+                return partialResult + Text(
+                    Image(
+                        uiImage: uiImage
+                    )
+                )
             }
         }
+    }
+}
 
-        return result
+@available(iOS 15.0, *)
+extension AdaptyUI.ImageData {
+    private var uiImage: UIImage? {
+        switch self {
+        case let .raster(data):
+            UIImage(data: data)
+        case let .resorces(value):
+            UIImage(named: value)
+        default:
+            nil
+        }
+    }
+
+    func textAttachmentImage(font: UIFont, tint: UIColor?) -> UIImage? {
+        guard var image = uiImage else { return nil }
+
+        let size = CGSize(width: image.size.width * font.capHeight / image.size.height,
+                          height: font.capHeight)
+
+        image = image.imageWith(newSize: size)
+
+        if let tint {
+            image = image
+                .withRenderingMode(.alwaysTemplate)
+                .withTintColor(tint, renderingMode: .alwaysTemplate)
+        }
+
+        return image
+    }
+}
+
+extension UIImage {
+    func imageWith(newSize: CGSize) -> UIImage {
+        let image = UIGraphicsImageRenderer(size: newSize).image { _ in
+            draw(in: CGRect(origin: .zero, size: newSize))
+        }
+
+        return image.withRenderingMode(renderingMode)
     }
 }
 
@@ -172,9 +219,13 @@ extension AdaptyUI.RichText.TextAttributes {
 extension AdaptyUI.RichText {
     static var testTitleA: Self {
         .create(
-            
             items: [
-                .text("Title A!", .testTitleA),
+                .text("Title A!\n", .testTitleA),
+                .tag("TEST_TAG", .testTitleA),
+                .text("\n", .testTitleA),
+                .image(.resorces("star.fill"), .testTitleA),
+                .text(" - image?", .testTitleA),
+                .text("\n", .testTitleA),
                 .text("Body A, Body A, Body A\nBody AAA Body AAA Body AAA Body AAA Body AAA", .testBodyA),
             ]
         )
@@ -186,7 +237,7 @@ extension AdaptyUI.Text {
     static var testTitle: Self {
         .create(
             value: .text(.testTitleA),
-            horizontalAlign: .justified,
+            horizontalAlign: .leading,
             maxRows: nil,
             overflowMode: [.scale]
         )
@@ -196,7 +247,6 @@ extension AdaptyUI.Text {
 @available(iOS 15.0, *)
 #Preview {
     AdaptyUITextView(.testTitle)
-//        .background(Color.yellow)
         .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
         .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
         .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
