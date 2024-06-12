@@ -57,7 +57,6 @@ struct AdaptyUIImageView: View {
             } else {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
                     .aspectRatio(aspect)
             }
         } else {
