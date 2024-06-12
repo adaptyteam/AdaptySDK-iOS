@@ -10,13 +10,15 @@ import Foundation
 
 extension AdaptyUI {
     package struct Text {
-        static let empty = AdaptyUI.Text(
+        static let `default` = AdaptyUI.Text(
             value: .text(.empty),
+            horizontalAlign: .leading,
             maxRows: nil,
             overflowMode: .empty
         )
 
         package let value: Value
+        package let horizontalAlign: AdaptyUI.HorizontalAlignment
         package let maxRows: Int?
         package let overflowMode: Set<OverflowMode>
 
@@ -32,11 +34,13 @@ extension AdaptyUI {
     package extension AdaptyUI.Text {
         static func create(
             text: [AdaptyUI.RichText.Item],
-            maxRows: Int? = empty.maxRows,
-            overflowMode: Set<AdaptyUI.Text.OverflowMode> = empty.overflowMode
+            horizontalAlign: AdaptyUI.HorizontalAlignment = `default`.horizontalAlign,
+            maxRows: Int? = `default`.maxRows,
+            overflowMode: Set<AdaptyUI.Text.OverflowMode> = `default`.overflowMode
         ) -> Self {
             .init(
                 value: .text(.create(items: text)),
+                horizontalAlign: horizontalAlign,
                 maxRows: maxRows,
                 overflowMode: overflowMode
             )
@@ -44,11 +48,13 @@ extension AdaptyUI {
 
         static func create(
             text: AdaptyUI.RichText,
-            maxRows: Int? = empty.maxRows,
-            overflowMode: Set<AdaptyUI.Text.OverflowMode> = empty.overflowMode
+            horizontalAlign: AdaptyUI.HorizontalAlignment = `default`.horizontalAlign,
+            maxRows: Int? = `default`.maxRows,
+            overflowMode: Set<AdaptyUI.Text.OverflowMode> = `default`.overflowMode
         ) -> Self {
             .init(
                 value: .text(text),
+                horizontalAlign: horizontalAlign,
                 maxRows: maxRows,
                 overflowMode: overflowMode
             )
@@ -56,11 +62,13 @@ extension AdaptyUI {
 
         static func create(
             value: AdaptyUI.Text.Value,
-            maxRows: Int? = empty.maxRows,
-            overflowMode: Set<AdaptyUI.Text.OverflowMode> = empty.overflowMode
+            horizontalAlign: AdaptyUI.HorizontalAlignment = `default`.horizontalAlign,
+            maxRows: Int? = `default`.maxRows,
+            overflowMode: Set<AdaptyUI.Text.OverflowMode> = `default`.overflowMode
         ) -> Self {
             .init(
                 value: value,
+                horizontalAlign: horizontalAlign,
                 maxRows: maxRows,
                 overflowMode: overflowMode
             )

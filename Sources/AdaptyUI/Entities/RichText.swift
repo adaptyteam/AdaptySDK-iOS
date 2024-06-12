@@ -19,13 +19,7 @@ extension AdaptyUI {
         package enum Item {
             case text(String, TextAttributes)
             case tag(String, TextAttributes)
-            case paragraph(ParagraphAttributes)
             case image(AdaptyUI.ImageData, TextAttributes)
-        }
-
-        package enum Bullet {
-            case text(String, TextAttributes?)
-            case image(AdaptyUI.ImageData, TextAttributes?)
         }
 
         package struct TextAttributes {
@@ -36,14 +30,6 @@ extension AdaptyUI {
             package let background: AdaptyUI.Filling?
             package let strike: Bool
             package let underline: Bool
-        }
-
-        package struct ParagraphAttributes {
-            package let horizontalAlign: AdaptyUI.HorizontalAlignment
-            package let firstIndent: Double
-            package let indent: Double
-            package let bulletSpace: Double?
-            package let bullet: Bullet?
         }
     }
 }
@@ -79,24 +65,6 @@ extension AdaptyUI {
                 background: background,
                 strike: strike,
                 underline: underline
-            )
-        }
-    }
-
-    package extension AdaptyUI.RichText.ParagraphAttributes {
-        static func create(
-            horizontalAlign: AdaptyUI.HorizontalAlignment = .leading,
-            firstIndent: Double = 0,
-            indent: Double = 0,
-            bulletSpace: Double? = nil,
-            bullet: AdaptyUI.RichText.Bullet? = nil
-        ) -> Self {
-            .init(
-                horizontalAlign: horizontalAlign,
-                firstIndent: firstIndent,
-                indent: indent,
-                bulletSpace: bulletSpace,
-                bullet: bullet
             )
         }
     }

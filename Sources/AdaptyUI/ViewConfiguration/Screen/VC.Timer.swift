@@ -13,6 +13,7 @@ extension AdaptyUI.ViewConfiguration {
         let state: AdaptyUI.Timer.State
         let format: [Item]
         let action: AdaptyUI.ViewConfiguration.ButtonAction?
+        let horizontalAlign: AdaptyUI.HorizontalAlignment
         let defaultTextAttributes: TextAttributes?
 
         struct Item {
@@ -30,8 +31,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             format: from.format.compactMap {
                 guard let value = richText(
                     stringId: $0.stringId,
-                    defaultTextAttributes: from.defaultTextAttributes,
-                    defaultParagraphAttributes: nil
+                    defaultTextAttributes: from.defaultTextAttributes
                 ) else { return nil }
 
                 return AdaptyUI.Timer.Item(
@@ -39,7 +39,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
                     value: value
                 )
             },
-            action: from.action.map(buttonAction)
+            action: from.action.map(buttonAction),
+            horizontalAlign: from.horizontalAlign
         )
     }
 }
@@ -52,6 +53,7 @@ extension AdaptyUI.ViewConfiguration.Timer: Decodable {
         case format
         case endTime = "end_time"
         case action
+        case horizontalAlign = "align"
     }
 
     enum BehaviourType: String, Codable {
@@ -98,7 +100,7 @@ extension AdaptyUI.ViewConfiguration.Timer: Decodable {
             }
 
         action = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action)
-
+        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         let textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes
     }

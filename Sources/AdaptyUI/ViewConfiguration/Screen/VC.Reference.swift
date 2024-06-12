@@ -8,6 +8,34 @@
 
 import Foundation
 
+extension AdaptyUI {
+    package enum LocalizerError: Swift.Error {
+        case unknownReference(String)
+        case referenceCycle(String)
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer {
+    func reference(_ id: String) throws -> AdaptyUI.Element {
+        guard !self.elementIds.contains(id) else {
+            throw AdaptyUI.LocalizerError.referenceCycle(id)
+        }
+        guard let value = source.referencedElemnts[id] else {
+            throw AdaptyUI.LocalizerError.unknownReference(id)
+        }
+        elementIds.insert(id)
+        let result: AdaptyUI.Element
+        do {
+            result = try element(value)
+            elementIds.remove(id)
+        } catch {
+            elementIds.remove(id)
+            throw error
+        }
+        return result
+    }
+}
+
 extension AdaptyUI.ViewConfiguration.Screen {
     var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
         [cover, content, footer, overlay].compactMap { $0 }.flatMap { $0.referencedElemnts }
