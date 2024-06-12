@@ -10,6 +10,7 @@
 import Adapty
 import UIKit
 
+@available(iOS 15.0, *)
 protocol ProductInfoModel {
     var id: String { get } // TODO: inspect usage
     var adaptyProduct: AdaptyPaywallProduct? { get }
@@ -21,6 +22,7 @@ protocol ProductInfoModel {
     func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement?
 }
 
+@available(iOS 15.0, *)
 struct EmptyProductInfo: ProductInfoModel {
     let id: String
     var adaptyProduct: AdaptyPaywallProduct? { nil }
@@ -42,6 +44,7 @@ struct EmptyProductInfo: ProductInfoModel {
     }
 }
 
+@available(iOS 15.0, *)
 extension AdaptyPaywallProduct {
     func isApplicableForTag(_ tag: AdaptyUI.ProductTag) -> Bool {
         switch tag {
@@ -54,6 +57,7 @@ extension AdaptyPaywallProduct {
     }
 }
 
+@available(iOS 15.0, *)
 struct RealProductInfo: ProductInfoModel {
     let product: AdaptyPaywallProduct
     let introEligibility: AdaptyEligibility
@@ -108,6 +112,7 @@ struct RealProductInfo: ProductInfoModel {
     }
 }
 
+@available(iOS 15.0, *)
 extension ProductInfoModel {
     static func empty(id: String) -> ProductInfoModel {
         EmptyProductInfo(id: id)
