@@ -12,16 +12,19 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyUIRangedFrameModifier: ViewModifier {
+    typealias Constraints = (min: CGFloat?, max: CGFloat?, shrink: Bool)
+
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
 
     var box: AdaptyUI.Box
 
-    private func constraints(for lenght: AdaptyUI.Box.Length?, screenSize: CGFloat) -> (CGFloat?, CGFloat?) {
+    private func constraints(for lenght: AdaptyUI.Box.Length?, screenSize: CGFloat) -> Constraints {
         switch lenght {
-        case let .min(unit): (unit.points(screenSize: screenSize), nil)
-        case .fillMax: (nil, .infinity)
-        default: (nil, nil)
+        case let .min(unit): (min: unit.points(screenSize: screenSize), max: nil, false)
+        case let .shrink(unit): (min: unit.points(screenSize: screenSize), max: nil, true)
+        case .fillMax: (min: nil, max: .infinity, false)
+        default: (min: nil, max: nil, false)
         }
     }
 
@@ -29,21 +32,31 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
         let wConstraints = self.constraints(for: self.box.width, screenSize: self.screenSize.width)
         let hConstraints = self.constraints(for: self.box.height, screenSize: self.screenSize.height)
 
-        if wConstraints.0 == nil &&
-            wConstraints.1 == nil &&
-            hConstraints.0 == nil &&
-            hConstraints.1 == nil
+        if wConstraints.min == nil && wConstraints.max == nil && wConstraints.shrink == false &&
+            hConstraints.min == nil && hConstraints.max == nil && hConstraints.shrink == false
         {
             content
+        } else if wConstraints.min == nil && wConstraints.max == nil &&
+            hConstraints.min == nil && hConstraints.max == nil
+        {
+            content
+                .fixedSize(
+                    horizontal: wConstraints.shrink,
+                    vertical: hConstraints.shrink
+                )
         } else {
             content
                 .frame(
-                    minWidth: wConstraints.0,
-                    maxWidth: wConstraints.1,
-                    minHeight: hConstraints.0,
-                    maxHeight: hConstraints.1,
-                    alignment: .from(horizontal: self.box.horizontalAlignment,
+                    minWidth: wConstraints.min,
+                    maxWidth: wConstraints.max,
+                    minHeight: hConstraints.min,
+                    maxHeight: hConstraints.max,
+                    alignment: .from(horizontal: box.horizontalAlignment,
                                      vertical: self.box.verticalAlignment)
+                )
+                .fixedSize(
+                    horizontal: wConstraints.shrink,
+                    vertical: hConstraints.shrink
                 )
         }
     }
