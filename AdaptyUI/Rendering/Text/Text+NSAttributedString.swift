@@ -40,7 +40,7 @@ extension [AdaptyUI.RichText.Item] {
 
 @available(iOS 15.0, *)
 extension AdaptyUI.Text {
-    func attributedString(
+    func attributedString_legacy(
         paragraph: AdaptyUI.RichText.ParagraphStyle = .init(),
         kern: CGFloat? = nil,
         tagResolver: AdaptyTagResolver,
@@ -76,7 +76,7 @@ extension AdaptyUI.Text {
 
         guard let richText else { return NSAttributedString() }
 
-        return richText.attributedString(
+        return richText.attributedString_legacy(
             paragraph: paragraph,
             kern: kern,
             tagResolver: tagResolver,
@@ -85,9 +85,10 @@ extension AdaptyUI.Text {
     }
 }
 
+
 @available(iOS 15.0, *)
 extension AdaptyUI.RichText {
-    func attributedString(
+    func attributedString_legacy(
         paragraph _: AdaptyUI.RichText.ParagraphStyle = .init(),
         kern _: CGFloat? = nil,
         tagResolver: AdaptyTagResolver,
@@ -171,6 +172,7 @@ extension String {
         ]).width
     }
 }
+
 
 @available(iOS 15.0, *)
 extension NSAttributedString {

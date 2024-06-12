@@ -163,7 +163,7 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
 
     private var attributedString: AttributedString {
         AttributedString(
-            text?.attributedString(
+            text?.attributedString_legacy(
                 tagResolver: self,
                 productInfo: nil
             ) ?? .init()
