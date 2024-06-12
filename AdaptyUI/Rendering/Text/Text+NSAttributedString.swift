@@ -263,18 +263,4 @@ extension AdaptyUI.ImageData {
     }
 }
 
-@available(iOS 15.0, *)
-extension AdaptyUI.HorizontalAlignment {
-    var textAlignment: NSTextAlignment {
-        switch self {
-        case .leading: .natural // TODO: inspect
-        case .trailing: .right // TODO: inspect
-        case .left: .left
-        case .center: .center
-        case .right: .right
-        case .justified: .center // TODO: inspect
-        }
-    }
-}
-
 #endif

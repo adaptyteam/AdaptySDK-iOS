@@ -11,38 +11,9 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct AdaptyUIRichTextView: View {
-    @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
-    @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
-
-    var text: AdaptyUI.RichText
-    var productInfo: ProductInfoModel?
-    var maxRows: Int?
-    var overflowMode: Set<AdaptyUI.Text.OverflowMode>
-
-    init(
-        text: AdaptyUI.RichText,
-        productInfo: ProductInfoModel?,
-        maxRows: Int?,
-        overflowMode: Set<AdaptyUI.Text.OverflowMode>
-    ) {
-        self.text = text
-        self.productInfo = productInfo
-        self.maxRows = maxRows
-        self.overflowMode = overflowMode
-    }
-
-    var body: some View {
-        text
-            .convertToSwiftUIText()
-            .lineLimit(maxRows)
-            .minimumScaleFactor(overflowMode.contains(.scale) ? 0.5 : 1.0)
-    }
-}
-
-@available(iOS 15.0, *)
 struct AdaptyUITextView: View {
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
+    @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
 
     var text: AdaptyUI.Text
 
@@ -50,23 +21,16 @@ struct AdaptyUITextView: View {
         self.text = text
     }
 
-//    private var attributedString: AttributedString {
-//        AttributedString(
-//            text.attributedString_legacy(
-//                tagResolver: customTagResolverViewModel,
-//                productsInfoProvider: productsViewModel
-//            )
-//        )
-//    }
-
     var body: some View {
         if let (richText, productInfo) = text.extract(productsInfoProvider: productsViewModel) {
-            AdaptyUIRichTextView(
-                text: richText,
-                productInfo: productInfo,
-                maxRows: text.maxRows,
-                overflowMode: text.overflowMode
-            )
+            richText
+                .convertToSwiftUIText(
+                    tagResolver: customTagResolverViewModel,
+                    productInfo: productInfo
+                )
+                .multilineTextAlignment(text.horizontalAlign)
+                .lineLimit(text.maxRows)
+                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
             .background(Color.yellow)
         } else {
             EmptyView()
@@ -76,14 +40,13 @@ struct AdaptyUITextView: View {
 
 @available(iOS 15.0, *)
 extension AdaptyUI.RichText {
-    func convertToSwiftUIText() -> Text {
+    func convertToSwiftUIText(
+        tagResolver: AdaptyTagResolver,
+        productInfo: ProductInfoModel?
+    ) -> Text {
         var result = Text("")
 
-        for i in 0 ..< items.count {
-            let item = items[i]
-
-//            result = result + item.convertToSwiftUIText(isFirstItem: i == 0)
-            
+        for item in items {
             switch item {
             case let .text(value, attr):
                 result = result + Text(
@@ -93,38 +56,36 @@ extension AdaptyUI.RichText {
                     )
                 )
             case let .tag(value, attr):
-                result = result + Text(value)
-            case let .paragraph(attr):
-                if i > 0 {
-                    result = result + Text("\n")
+                let tagReplacementResult: String
+
+                if let customTagResult = tagResolver.replacement(for: value) {
+                    tagReplacementResult = customTagResult
+                } else if let productTag = AdaptyUI.ProductTag(rawValue: value),
+                          let productTagResult = productInfo?.stringByTag(productTag)
+                {
+                    switch productTagResult {
+                    case .notApplicable:
+                        tagReplacementResult = ""
+                    case let .value(string):
+                        tagReplacementResult = string
+                    }
+
+                } else {
+                    tagReplacementResult = ""
                 }
+                
+                result = result + Text(
+                    AttributedString.createFrom(
+                        value: tagReplacementResult,
+                        attributes: attr
+                    )
+                )
             case let .image(value, attr):
                 result = result + Text("img")
             }
         }
 
         return result
-    }
-}
-
-@available(iOS 15.0, *)
-extension AdaptyUI.RichText.Item {
-    func convertToSwiftUIText(isFirstItem: Bool) -> Text {
-        switch self {
-        case let .text(value, attr):
-            Text(
-                AttributedString.createFrom(
-                    value: value,
-                    attributes: attr
-                )
-            )
-        case let .tag(value, attr):
-            Text(value)
-        case let .paragraph(attr):
-            isFirstItem ? Text("") : Text("\n")
-        case let .image(value, attr):
-            Text("img")
-        }
     }
 }
 
@@ -161,16 +122,6 @@ extension AttributedString {
 
         result.foregroundColor = attributes?.uiColor ?? .darkText
         result.font = attributes?.uiFont ?? .systemFont(ofSize: 15.0) // TODO: move to constant
-
-//        if let paragraph {
-//            ???
-//            package let horizontalAlign: AdaptyUI.HorizontalAlignment
-//            package let firstIndent: Double
-//            package let indent: Double
-//            package let bulletSpace: Double?
-//            package let bullet: Bullet?
-//            addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: length))
-//        }
 
         if let background = attributes?.background?.asColor {
             result.backgroundColor = background.swiftuiColor
@@ -221,14 +172,9 @@ extension AdaptyUI.RichText.TextAttributes {
 extension AdaptyUI.RichText {
     static var testTitleA: Self {
         .create(
+            
             items: [
-                .paragraph(.create(
-                    horizontalAlign: .right
-                )),
                 .text("Title A!", .testTitleA),
-                .paragraph(.create(
-                    horizontalAlign: .leading
-                )),
                 .text("Body A, Body A, Body A\nBody AAA Body AAA Body AAA Body AAA Body AAA", .testBodyA),
             ]
         )
@@ -240,6 +186,7 @@ extension AdaptyUI.Text {
     static var testTitle: Self {
         .create(
             value: .text(.testTitleA),
+            horizontalAlign: .justified,
             maxRows: nil,
             overflowMode: [.scale]
         )
@@ -254,6 +201,7 @@ extension AdaptyUI.Text {
         .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
         .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
         .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
+        .environment(\.layoutDirection, .leftToRight)
 }
 #endif
 
