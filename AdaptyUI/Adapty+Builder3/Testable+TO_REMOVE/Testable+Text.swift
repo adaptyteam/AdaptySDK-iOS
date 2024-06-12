@@ -11,19 +11,6 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-extension AdaptyUI.RichText.ParagraphAttributes {
-    static var test: Self {
-        .create(
-            horizontalAlign: .left,
-            firstIndent: 0.0,
-            indent: 0.0,
-            bulletSpace: nil,
-            bullet: nil
-        )
-    }
-}
-
-@available(iOS 15.0, *)
 extension AdaptyUI.RichText.TextAttributes {
     static var testTitle: Self {
         .create(
@@ -58,7 +45,6 @@ extension AdaptyUI.RichText {
 
     static var testBodyShortAlignRight: Self {
         .create(items: [
-            .paragraph(.create(horizontalAlign: .right, firstIndent: 0, indent: 0, bulletSpace: nil, bullet: nil)),
             .text("Hello world!", .testBody),
         ])
     }
@@ -66,9 +52,7 @@ extension AdaptyUI.RichText {
     static var testBodyLong: Self {
         .create(items: [
             .text("Hello world!", .testTitle),
-            .paragraph(.test),
             .text("Hello world!", .testBody),
-            .paragraph(.test),
             .tag("TEST_TAG", .testBody),
         ])
     }

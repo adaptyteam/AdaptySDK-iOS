@@ -44,6 +44,7 @@ extension AdaptyUI.Box {
     package enum Length {
         case fixed(AdaptyUI.Unit)
         case min(AdaptyUI.Unit)
+        case shrink(AdaptyUI.Unit)
         case fillMax
     }
 }

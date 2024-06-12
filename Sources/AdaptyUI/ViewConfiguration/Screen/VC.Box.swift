@@ -54,6 +54,7 @@ extension AdaptyUI.ViewConfiguration.Box: Decodable {
 extension AdaptyUI.Box.Length: Decodable {
     enum CodingKeys: String, CodingKey {
         case min
+        case shrink
         case fillMax = "fill_max"
     }
 
@@ -66,6 +67,8 @@ extension AdaptyUI.Box.Length: Decodable {
                 self = .fillMax
             } else if let value = try container.decodeIfPresent(AdaptyUI.Unit.self, forKey: .min) {
                 self = .min(value)
+            } else if let value = try container.decodeIfPresent(AdaptyUI.Unit.self, forKey: .shrink) {
+                self = .shrink(value)
             } else {
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "don't found fill_max:true or min"))
             }

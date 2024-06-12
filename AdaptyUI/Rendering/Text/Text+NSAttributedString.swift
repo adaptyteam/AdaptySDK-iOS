@@ -97,7 +97,6 @@ extension AdaptyUI.RichText {
         guard !isEmpty else { return NSAttributedString() }
 
         let result = NSMutableAttributedString(string: "")
-        var paragraphStyle: NSParagraphStyle?
 
         for i in 0 ..< items.count {
             let item = items[i]
@@ -106,8 +105,7 @@ extension AdaptyUI.RichText {
             case let .text(value, attr):
                 result.append(.fromText(
                     value,
-                    attributes: attr,
-                    paragraphStyle: paragraphStyle
+                    attributes: attr
                 ))
             case let .tag(value, attr):
                 let tagReplacementResult: String
@@ -130,29 +128,13 @@ extension AdaptyUI.RichText {
 
                 result.append(.fromText(
                     tagReplacementResult,
-                    attributes: attr,
-                    paragraphStyle: paragraphStyle
+                    attributes: attr
                 ))
-            case let .paragraph(attr):
-                if result.length > 0 {
-                    result.append(.newLine(paragraphStyle: paragraphStyle))
-                }
-
-                paragraphStyle = attr.paragraphStyle
-
-                if let bullet = attr.bullet {
-                    result.append(.bullet(
-                        bullet,
-                        bulletSpace: attr.bulletSpace,
-                        paragraphStyle: paragraphStyle
-                    ))
-                }
             case let .image(value, attr):
                 result.append(
                     .fromImage(
                         value,
-                        attributes: attr,
-                        paragraphStyle: paragraphStyle
+                        attributes: attr
                     ).0
                 )
             }
@@ -185,52 +167,10 @@ extension NSAttributedString {
         )
     }
 
-    static func bullet(
-        _ bullet: AdaptyUI.RichText.Bullet,
-        bulletSpace: Double?,
-        paragraphStyle: NSParagraphStyle?
-    ) -> NSAttributedString {
-        let result = NSMutableAttributedString()
-        let reservedSpace: CGFloat
-
-        switch bullet {
-        case let .text(value, attr):
-            result.append(
-                .fromText(
-                    value,
-                    attributes: attr,
-                    paragraphStyle: paragraphStyle
-                )
-            )
-
-            reservedSpace = value.calculatedWidth(attr)
-        case let .image(value, attr):
-            let (string, attachmentSize) = NSAttributedString.fromImage(
-                value,
-                attributes: attr,
-                paragraphStyle: paragraphStyle
-            )
-
-            result.append(string)
-            reservedSpace = attachmentSize.width
-        }
-
-        if let bulletSpace, bulletSpace > 0 {
-            let additionalSpace = bulletSpace - reservedSpace
-
-            let padding = NSTextAttachment()
-            padding.bounds = CGRect(x: 0, y: 0, width: additionalSpace, height: 0)
-            result.append(NSAttributedString(attachment: padding))
-        }
-
-        // TODO: consider bulletSpace
-        return result
-    }
 
     static func fromText(
         _ value: String,
-        attributes: AdaptyUI.RichText.TextAttributes?,
-        paragraphStyle: NSParagraphStyle?
+        attributes: AdaptyUI.RichText.TextAttributes?
     ) -> NSAttributedString {
         let foregroundColor = attributes?.uiColor ?? .darkText
 
@@ -243,7 +183,6 @@ extension NSAttributedString {
         )
 
         result.addAttributes(
-            paragraphStyle: paragraphStyle,
             background: attributes?.background,
             strike: attributes?.strike,
             underline: attributes?.underline
@@ -254,8 +193,7 @@ extension NSAttributedString {
 
     static func fromImage(
         _ value: AdaptyUI.ImageData,
-        attributes: AdaptyUI.RichText.TextAttributes?,
-        paragraphStyle: NSParagraphStyle?
+        attributes: AdaptyUI.RichText.TextAttributes?
     ) -> (NSAttributedString, CGSize) {
         guard let (attachment, attachmentSize) = value.formAttachment(attributes: attributes) else {
             return (NSAttributedString(string: ""), .zero)
@@ -265,7 +203,6 @@ extension NSAttributedString {
         result.append(NSAttributedString(attachment: attachment))
 
         result.addAttributes(
-            paragraphStyle: paragraphStyle,
             background: attributes?.background,
             strike: attributes?.strike,
             underline: attributes?.underline
@@ -278,15 +215,10 @@ extension NSAttributedString {
 @available(iOS 15.0, *)
 extension NSMutableAttributedString {
     func addAttributes(
-        paragraphStyle: NSParagraphStyle?,
         background: AdaptyUI.Filling?,
         strike: Bool?,
         underline: Bool?
     ) {
-        if let paragraphStyle {
-            addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: length))
-        }
-
         if let background = background?.asColor {
             addAttribute(.backgroundColor, value: background.uiColor, range: NSRange(location: 0, length: length))
         }
@@ -328,17 +260,6 @@ extension AdaptyUI.ImageData {
             imageAttachment,
             CGSize(width: width, height: height)
         )
-    }
-}
-
-@available(iOS 15.0, *)
-extension AdaptyUI.RichText.ParagraphAttributes {
-    var paragraphStyle: NSParagraphStyle {
-        let result = NSMutableParagraphStyle()
-        result.firstLineHeadIndent = firstIndent
-        result.headIndent = indent
-        result.alignment = horizontalAlign.textAlignment
-        return result
     }
 }
 

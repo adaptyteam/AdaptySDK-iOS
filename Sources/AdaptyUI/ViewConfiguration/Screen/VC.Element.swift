@@ -50,31 +50,12 @@ extension AdaptyUI.ViewConfiguration.Element {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    private func elementFromReference(_ id: String) throws -> AdaptyUI.Element {
-        guard !self.elementIds.contains(id) else {
-            throw AdaptyUI.LocalizerError.referenceCycle(id)
-        }
-        guard let value = source.referencedElemnts[id] else {
-            throw AdaptyUI.LocalizerError.unknownReference(id)
-        }
-        elementIds.insert(id)
-        let result: AdaptyUI.Element
-        do {
-            result = try element(value)
-            elementIds.remove(id)
-        } catch {
-            elementIds.remove(id)
-            throw error
-        }
-        return result
-    }
-
     func element(_ from: AdaptyUI.ViewConfiguration.Element) throws -> AdaptyUI.Element {
         switch from {
         case let .space(value):
             .space(value)
         case let .reference(id):
-            try elementFromReference(id)
+            try reference(id)
         case let .stack(value, properties):
             try .stack(stack(value), properties.flatMap(elementProperties))
         case let .text(value, properties):

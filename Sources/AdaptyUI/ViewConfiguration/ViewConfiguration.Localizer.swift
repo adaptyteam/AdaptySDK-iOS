@@ -24,7 +24,8 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.Localizer {
     func localize() throws -> AdaptyUI.LocalizedViewConfiguration {
-        try .init(
+        elementIds.removeAll()
+        return try .init(
             id: source.id,
             locale: locale.id,
             isRightToLeft: localization?.isRightToLeft ?? false,
@@ -36,9 +37,4 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI {
-    package enum LocalizerError: Swift.Error {
-        case unknownReference(String)
-        case referenceCycle(String)
-    }
-}
+

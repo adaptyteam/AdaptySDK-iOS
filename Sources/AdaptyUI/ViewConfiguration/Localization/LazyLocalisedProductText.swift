@@ -14,20 +14,17 @@ extension AdaptyUI {
         private let suffix: String?
         private let localizer: ViewConfiguration.Localizer
         private let defaultTextAttributes: ViewConfiguration.TextAttributes?
-        private let defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
 
         init(
             adaptyProductId: String,
             suffix: String?,
             localizer: ViewConfiguration.Localizer,
-            defaultTextAttributes: ViewConfiguration.TextAttributes?,
-            defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
+            defaultTextAttributes: ViewConfiguration.TextAttributes?
         ) {
             self.adaptyProductId = adaptyProductId
             self.suffix = suffix
             self.localizer = localizer
             self.defaultTextAttributes = defaultTextAttributes
-            self.defaultParagraphAttributes = defaultParagraphAttributes
         }
 
         package func richText(
@@ -52,8 +49,7 @@ extension AdaptyUI {
                     suffix: suffix
                 ),
 
-                defaultTextAttributes: defaultTextAttributes,
-                defaultParagraphAttributes: defaultParagraphAttributes
+                defaultTextAttributes: defaultTextAttributes
             )
         }
     }
@@ -62,18 +58,15 @@ extension AdaptyUI {
         private let suffix: String?
         private let localizer: ViewConfiguration.Localizer
         private let defaultTextAttributes: ViewConfiguration.TextAttributes?
-        private let defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
 
         init(
             suffix: String?,
             localizer: ViewConfiguration.Localizer,
-            defaultTextAttributes: ViewConfiguration.TextAttributes?,
-            defaultParagraphAttributes: ViewConfiguration.ParagraphAttributes?
+            defaultTextAttributes: ViewConfiguration.TextAttributes?
         ) {
             self.suffix = suffix
             self.localizer = localizer
             self.defaultTextAttributes = defaultTextAttributes
-            self.defaultParagraphAttributes = defaultParagraphAttributes
         }
 
         package func richText() -> RichText {
@@ -81,8 +74,7 @@ extension AdaptyUI {
                 stringId: ViewConfiguration.StringId.Product.calculate(
                     suffix: suffix
                 ),
-                defaultTextAttributes: defaultTextAttributes,
-                defaultParagraphAttributes: defaultParagraphAttributes
+                defaultTextAttributes: defaultTextAttributes
             ) ?? .empty
         }
 
@@ -109,8 +101,7 @@ extension AdaptyUI {
                     byPaymentMode: mode,
                     suffix: suffix
                 ),
-                defaultTextAttributes: defaultTextAttributes,
-                defaultParagraphAttributes: defaultParagraphAttributes
+                defaultTextAttributes: defaultTextAttributes
             )
         }
     }
