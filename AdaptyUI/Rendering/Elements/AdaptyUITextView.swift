@@ -186,73 +186,10 @@ extension AttributedString {
     }
 }
 
-#if DEBUG
-
-@available(iOS 15.0, *)
 extension AdaptyUI.RichText.TextAttributes {
-    static var testTitleA: Self {
-        .create(
-            font: .default,
-            size: 24.0,
-            txtColor: .color(.testRed),
-            imgTintColor: nil,
-            background: nil,
-            strike: false,
-            underline: false
-        )
-    }
-
-    static var testBodyA: Self {
-        .create(
-            font: .default,
-            size: 17.0,
-            txtColor: .color(.testBlue),
-            imgTintColor: nil,
-            background: nil,
-            strike: false,
-            underline: false
-        )
-    }
+    var uiFont: UIFont { font.uiFont(size: size) }
+    var uiColor: UIColor? { txtColor.asColor?.uiColor }
+    var backgroundUIColor: UIColor? { background?.asColor?.uiColor }
 }
-
-@available(iOS 15.0, *)
-extension AdaptyUI.RichText {
-    static var testTitleA: Self {
-        .create(
-            items: [
-                .text("Title A!\n", .testTitleA),
-                .tag("TEST_TAG", .testTitleA),
-                .text("\n", .testTitleA),
-                .image(.resorces("star.fill"), .testTitleA),
-                .text(" - image?", .testTitleA),
-                .text("\n", .testTitleA),
-                .text("Body A, Body A, Body A\nBody AAA Body AAA Body AAA Body AAA Body AAA", .testBodyA),
-            ]
-        )
-    }
-}
-
-@available(iOS 15.0, *)
-extension AdaptyUI.Text {
-    static var testTitle: Self {
-        .create(
-            value: .text(.testTitleA),
-            horizontalAlign: .leading,
-            maxRows: nil,
-            overflowMode: [.scale]
-        )
-    }
-}
-
-@available(iOS 15.0, *)
-#Preview {
-    AdaptyUITextView(.testTitle)
-        .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
-        .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
-        .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
-        .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
-        .environment(\.layoutDirection, .leftToRight)
-}
-#endif
 
 #endif

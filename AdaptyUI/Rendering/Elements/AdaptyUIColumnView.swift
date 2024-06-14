@@ -86,46 +86,4 @@ struct AdaptyUIColumnView: View {
     }
 }
 
-#if DEBUG
-
-@available(iOS 15.0, *)
-#Preview {
-    ScrollView {
-        VStack {
-            Text("Top")
-
-            AdaptyUIColumnView(
-                AdaptyUI.Column.create(
-                    spacing: 10.0,
-                    items: [
-                        .create(
-                            length: .fixed(.point(32)),
-                            content: .text(.testBodyShort, nil)
-                        ),
-                        .create(
-                            length: .weight(2),
-                            content: .text(.testBodyShort, nil)
-                        ),
-                        .create(
-                            length: .weight(3),
-                            content: .text(.testBodyShort, nil)
-                        ),
-                    ]
-                )
-            )
-            .frame(height: 500) // Important!!!
-            .background(Color.green)
-
-            Text("Bottom")
-        }
-        .withScreenSize(.init(width: 320, height: 240))
-        .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
-        .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
-        .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
-        .environmentObject(AdaptyTagResolverViewModel(tagResolver: nil))
-    }
-}
-
-#endif
-
 #endif

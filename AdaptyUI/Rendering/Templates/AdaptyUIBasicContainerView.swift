@@ -106,15 +106,4 @@ struct AdaptyUIBasicContainerView: View {
     }
 }
 
-#if DEBUG
-
-@available(iOS 15.0, *)
-#Preview {
-    AdaptyUIBasicContainerView(
-        screen: .testBasicDog
-    )
-    .environmentObject(AdaptyUIActionsViewModel(logId: "preview"))
-}
-#endif
-
 #endif

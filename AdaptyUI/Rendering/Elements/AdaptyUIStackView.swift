@@ -52,27 +52,4 @@ struct AdaptyUIStackView: View {
     }
 }
 
-#if DEBUG
-
-@available(iOS 15.0, *)
-#Preview {
-    AdaptyUIStackView(
-        .create(
-            type: .vertical,
-            horizontalAlignment: .trailing,
-            content: [
-                .text(.testTitle, nil),
-                .box(.testCircleDog, nil)
-//                .text(.testTitle, nil),
-            ]
-        )
-    )
-    .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
-    .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
-    .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
-    .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
-    .environment(\.layoutDirection, .rightToLeft)
-}
-#endif
-
 #endif

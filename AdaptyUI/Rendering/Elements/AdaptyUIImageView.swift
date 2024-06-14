@@ -89,12 +89,4 @@ struct AdaptyUIImageView: View {
     }
 }
 
-#if DEBUG
-
-@available(iOS 15.0, *)
-#Preview {
-    AdaptyUIImageView(.test)
-}
-#endif
-
 #endif

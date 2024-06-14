@@ -97,17 +97,4 @@ struct AdaptyUIFlatContainerView: View {
     }
 }
 
-#if DEBUG
-
-@available(iOS 15.0, *)
-#Preview {
-    AdaptyUIFlatContainerView(
-        //        screen: .testFlatDog
-        screen: .testTransparentScroll
-//        screen: .testTransparent
-    )
-    .environmentObject(AdaptyUIActionsViewModel(logId: "preview"))
-}
-#endif
-
 #endif
