@@ -1,6 +1,6 @@
 //
 //  AdaptyUIColumnView.swift
-//  
+//
 //
 //  Created by Aleksey Goncharov on 30.05.2024.
 //
@@ -14,8 +14,10 @@ import SwiftUI
 struct AdaptyUIColumnView: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
+    @Environment(\.layoutDirection)
+    private var layoutDirection: LayoutDirection
 
-    var column: AdaptyUI.Column
+    private var column: AdaptyUI.Column
 
     init(_ column: AdaptyUI.Column) {
         self.column = column
@@ -53,22 +55,23 @@ struct AdaptyUIColumnView: View {
 
             LazyHGrid(
                 rows: column.items.map { item in
+                    let size: GridItem.Size
+                    
                     switch item.length {
                     case let .fixed(length):
-                        .init(
-                            .fixed(length.points(screenSize: screenSize.height)),
-                            spacing: column.spacing,
-                            alignment: .from(horizontal: item.horizontalAlignment,
-                                             vertical: item.verticalAlignment)
-                        )
+                        size = .fixed(length.points(screenSize: screenSize.width))
                     case let .weight(weight):
-                        .init(
-                            .fixed((Double(weight) / Double(totalWeight)) * weightsAvailableLength),
-                            spacing: column.spacing,
-                            alignment: .from(horizontal: item.horizontalAlignment,
-                                             vertical: item.verticalAlignment)
-                        )
+                        size = .fixed((Double(weight) / Double(totalWeight)) * weightsAvailableLength)
                     }
+
+                    return GridItem(
+                        size,
+                        spacing: column.spacing,
+                        alignment: Alignment.from(
+                            horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                            vertical: item.verticalAlignment.swiftuiValue
+                        )
+                    )
                 },
                 spacing: 0.0,
                 content: {

@@ -24,7 +24,7 @@ extension AdaptyUI.Box {
 
     static var testUnconstrainedDog: Self {
         .create(
-//            width: .fixed(.point(280)),
+            //            width: .fixed(.point(280)),
 //            height: .fixed(.point(280)),
             content: .image(.create(
                 asset: .urlDog,
@@ -32,7 +32,7 @@ extension AdaptyUI.Box {
             ), nil)
         )
     }
-    
+
     static var testUnconstrainedText: Self {
         .create(
             width: .fillMax,
@@ -42,7 +42,7 @@ extension AdaptyUI.Box {
             content: .text(.testBodyLong, .blueBG)
         )
     }
-    
+
     static var testCircleDog: Self {
         .create(
             width: .fixed(.point(280)),
@@ -50,7 +50,8 @@ extension AdaptyUI.Box {
             content: .image(.create(
                 asset: .urlDog,
                 aspect: .fill
-            ), nil)
+            ),
+            .create(decorator: .create(shapeType: .circle)))
         )
     }
 }

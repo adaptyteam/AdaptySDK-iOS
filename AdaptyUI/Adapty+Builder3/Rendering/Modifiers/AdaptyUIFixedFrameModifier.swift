@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  AdaptyUIFixedFrameModifier.swift
+//
 //
 //  Created by Aleksey Goncharov on 16.05.2024.
 //
@@ -14,14 +14,18 @@ import SwiftUI
 struct AdaptyUIFixedFrameModifier: ViewModifier {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
+    @Environment(\.layoutDirection)
+    private var layoutDirection: LayoutDirection
 
     var box: AdaptyUI.Box
 
     func body(content: Content) -> some View {
-        let alignment = Alignment.from(horizontal: self.box.horizontalAlignment,
-                                       vertical: self.box.verticalAlignment)
+        let alignment = Alignment.from(
+            horizontal: box.horizontalAlignment.swiftuiValue(with: layoutDirection),
+            vertical: box.verticalAlignment.swiftuiValue
+        )
 
-        switch (self.box.width, self.box.height) {
+        switch (box.width, box.height) {
         case let (.fixed(w), .fixed(h)):
             content.frame(width: w.points(screenSize: screenSize.width),
                           height: h.points(screenSize: screenSize.height),

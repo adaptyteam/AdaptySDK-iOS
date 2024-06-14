@@ -90,7 +90,6 @@ struct AdaptyUIImageView: View {
 }
 
 #if DEBUG
-@testable import Adapty
 
 @available(iOS 15.0, *)
 #Preview {

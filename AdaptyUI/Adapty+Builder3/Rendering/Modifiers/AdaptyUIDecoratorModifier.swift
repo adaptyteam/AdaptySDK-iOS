@@ -118,14 +118,14 @@ extension View {
             if #available(iOS 16.0, *) {
                 clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
             } else {
-                self.clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
+                clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
             }
         case .circle:
-            self.clipShape(Circle())
+            clipShape(Circle())
         case .curveUp:
-            self
+            clipShape(CurveUpShape(curveHeight: 32.0))
         case .curveDown:
-            self
+            clipShape(CurveDownShape(curveHeight: 32.0))
         }
     }
 }
@@ -229,6 +229,14 @@ extension View {
 @available(iOS 15.0, *)
 #Preview {
     VStack {
+        Color.yellow
+            .frame(width: 300, height: 200)
+            .decorate(with: .create(shapeType: .curveUp))
+        
+        Color.yellow
+            .frame(width: 300, height: 200)
+            .decorate(with: .create(shapeType: .curveDown))
+        
         Text("Color BG + Gradient Border")
             .foregroundColor(.white)
             .bold()

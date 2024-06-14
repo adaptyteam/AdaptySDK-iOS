@@ -14,8 +14,9 @@ import SwiftUI
 struct AdaptyUIRowView: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
-
-    var row: AdaptyUI.Row
+    @Environment(\.layoutDirection)
+    private var layoutDirection: LayoutDirection
+    private var row: AdaptyUI.Row
 
     init(_ row: AdaptyUI.Row) {
         self.row = row
@@ -53,22 +54,23 @@ struct AdaptyUIRowView: View {
 
             LazyVGrid(
                 columns: row.items.map { item in
+                    let size: GridItem.Size
+                    
                     switch item.length {
                     case let .fixed(length):
-                        .init(
-                            .fixed(length.points(screenSize: screenSize.width)),
-                            spacing: row.spacing,
-                            alignment: .from(horizontal: item.horizontalAlignment,
-                                             vertical: item.verticalAlignment)
-                        )
+                        size = .fixed(length.points(screenSize: screenSize.width))
                     case let .weight(weight):
-                        .init(
-                            .fixed((Double(weight) / Double(totalWeight)) * weightsAvailableLength),
-                            spacing: row.spacing,
-                            alignment: .from(horizontal: item.horizontalAlignment,
-                                             vertical: item.verticalAlignment)
-                        )
+                        size = .fixed((Double(weight) / Double(totalWeight)) * weightsAvailableLength)
                     }
+                    
+                    return GridItem(
+                        size,
+                        spacing: row.spacing,
+                        alignment: Alignment.from(
+                            horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                            vertical: item.verticalAlignment.swiftuiValue
+                        )
+                    )
                 },
                 spacing: 0.0,
                 content: {

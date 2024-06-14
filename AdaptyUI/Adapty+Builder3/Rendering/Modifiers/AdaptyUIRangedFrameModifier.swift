@@ -16,7 +16,9 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
 
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
-
+    @Environment(\.layoutDirection)
+    private var layoutDirection: LayoutDirection
+    
     var box: AdaptyUI.Box
 
     private func constraints(for lenght: AdaptyUI.Box.Length?, screenSize: CGFloat) -> Constraints {
@@ -51,8 +53,10 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
                     maxWidth: wConstraints.max,
                     minHeight: hConstraints.min,
                     maxHeight: hConstraints.max,
-                    alignment: .from(horizontal: box.horizontalAlignment,
-                                     vertical: self.box.verticalAlignment)
+                    alignment: .from(
+                        horizontal: box.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: box.verticalAlignment.swiftuiValue
+                    )
                 )
                 .fixedSize(
                     horizontal: wConstraints.shrink,
