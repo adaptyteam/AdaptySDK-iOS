@@ -14,8 +14,6 @@ import UIKit
 
 @available(iOS 15.0, *)
 public class AdaptyPaywallController: UIViewController {
-    fileprivate let logId: String
-
     public let id = UUID()
     public var paywall: AdaptyPaywall { presenter.paywall }
     public var viewConfiguration: AdaptyUI.LocalizedViewConfiguration { presenter.viewConfiguration }
@@ -26,12 +24,13 @@ public class AdaptyPaywallController: UIViewController {
     private let presenter: AdaptyPaywallPresenter
     private var cancellable = Set<AnyCancellable>()
 
+    private let eventsHandler: AdaptyEventsHandler
     private let productsViewModel: AdaptyProductsViewModel
     private let actionsViewModel: AdaptyUIActionsViewModel
     private let sectionsViewModel: AdaptySectionsViewModel
     private let tagResolverViewModel: AdaptyTagResolverViewModel
     private let timerViewModel: AdaptyTimerViewModel
-    
+
     init(
         paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]?,
@@ -43,18 +42,18 @@ public class AdaptyPaywallController: UIViewController {
 
         AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0)")
 
-        self.logId = logId
         self.delegate = delegate
 
+        eventsHandler = AdaptyEventsHandler(logId: logId)
         tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
-        actionsViewModel = AdaptyUIActionsViewModel(logId: logId)
+        actionsViewModel = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
         sectionsViewModel = AdaptySectionsViewModel(logId: logId)
-        productsViewModel = AdaptyProductsViewModel(logId: logId,
+        productsViewModel = AdaptyProductsViewModel(eventsHandler: eventsHandler,
                                                     paywall: paywall,
                                                     products: products,
                                                     viewConfiguration: viewConfiguration)
         timerViewModel = AdaptyTimerViewModel()
-        
+
         let selectedProductIndex: Int
 //
         // if let style = try? viewConfiguration.extractDefaultStyle() {
@@ -73,6 +72,54 @@ public class AdaptyPaywallController: UIViewController {
 
         modalPresentationStyle = .fullScreen
 
+        eventsHandler.didPerformAction = { [weak self] action in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didPerform: action)
+        }
+        eventsHandler.didSelectProduct = { [weak self] product in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didSelectProduct: product)
+        }
+        eventsHandler.didStartPurchase = { [weak self] product in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didStartPurchase: product)
+        }
+        eventsHandler.didFinishPurchase = { [weak self] product, purchasedInfo in
+            guard let self else { return }
+            self.delegate?.paywallController(self,
+                                             didFinishPurchase: product,
+                                             purchasedInfo: purchasedInfo)
+        }
+        eventsHandler.didFailPurchase = { [weak self] product, error in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFailPurchase: product, error: error)
+        }
+        eventsHandler.didCancelPurchase = { [weak self] product in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didCancelPurchase: product)
+        }
+        eventsHandler.didStartRestore = { [weak self] in
+            guard let self else { return }
+            self.delegate?.paywallControllerDidStartRestore(self)
+        }
+        eventsHandler.didFinishRestore = { [weak self] profile in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFinishRestoreWith: profile)
+        }
+        eventsHandler.didFailRestore = { [weak self] error in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFailRestoreWith: error)
+        }
+        eventsHandler.didFailRendering = { [weak self] error in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFailRenderingWith: error)
+        }
+        eventsHandler.didFailLoadingProducts = { [weak self] error in
+            guard let self else { return false }
+            guard let delegate = self.delegate else { return true }
+            return delegate.paywallController(self, didFailLoadingProductsWith: error)
+        }
+
         presenter.delegate = self
         presenter.loadProductsIfNeeded()
 
@@ -89,24 +136,24 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     deinit {
-        log(.verbose, "deinit")
+        eventsHandler.log(.verbose, "deinit")
     }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
+//
+//        actionsViewModel.onActionOccured = { [weak self] action in
+//            guard let self else { return }
+//
+//            switch action {
+//            case .close:
+//                self.delegate?.paywallController(self, didPerform: .close)
+//            default:
+//                break
+//            }
+//        }
 
-        actionsViewModel.onActionOccured = { [weak self] action in
-            guard let self else { return }
-
-            switch action {
-            case .close:
-                self.delegate?.paywallController(self, didPerform: .close)
-            default:
-                break
-            }
-        }
-
-        log(.verbose, "viewDidLoad begin")
+        eventsHandler.log(.verbose, "viewDidLoad begin")
 
         subscribeForDataChange()
         subscribeForEvents()
@@ -114,20 +161,20 @@ public class AdaptyPaywallController: UIViewController {
         subscribeForActions()
 
         presenter.logShowPaywall()
-        log(.verbose, "viewDidLoad end")
+        eventsHandler.log(.verbose, "viewDidLoad end")
     }
 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        log(.verbose, "viewDidAppear")
+        eventsHandler.log(.verbose, "viewDidAppear")
         // layoutBuilder?.closeButtonView?.performTransitionIn()
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        log(.verbose, "viewDidDisappear")
+        eventsHandler.log(.verbose, "viewDidDisappear")
     }
 
     override public func viewDidLayoutSubviews() {
@@ -146,18 +193,18 @@ public class AdaptyPaywallController: UIViewController {
                 .environmentObject(actionsViewModel)
                 .environmentObject(sectionsViewModel)
                 .environmentObject(tagResolverViewModel)
-                .environmentObject(timerViewModel)
-            ,
+                .environmentObject(timerViewModel),
+
             to: view
         )
     }
 
     private func handleRenderingError(_ error: Error) {
         if let error = error as? AdaptyUIError {
-            log(.error, "Rendering Error = \(error)")
+            eventsHandler.log(.error, "Rendering Error = \(error)")
             delegate?.paywallController(self, didFailRenderingWith: AdaptyError(error))
         } else {
-            log(.error, "Unknown Rendering Error = \(error)")
+            eventsHandler.log(.error, "Unknown Rendering Error = \(error)")
             let adaptyError = AdaptyError(AdaptyUIError.rendering(error))
             delegate?.paywallController(self, didFailRenderingWith: adaptyError)
         }
@@ -166,18 +213,18 @@ public class AdaptyPaywallController: UIViewController {
     private func handleAction(_ action: AdaptyUI.ButtonAction) {
         switch action {
         case .close:
-            log(.verbose, "close tap")
+            eventsHandler.log(.verbose, "close tap")
             delegate?.paywallController(self, didPerform: .close)
         case let .openUrl(urlString):
-            log(.verbose, "openUrl tap")
+            eventsHandler.log(.verbose, "openUrl tap")
             guard let urlString, let url = URL(string: urlString) else { return }
             delegate?.paywallController(self, didPerform: .openURL(url: url))
         case .restore:
-            log(.verbose, "restore tap")
+            eventsHandler.log(.verbose, "restore tap")
             presenter.restorePurchases()
             delegate?.paywallControllerDidStartRestore(self)
         case let .custom(id):
-            log(.verbose, "custom (\(id)) tap")
+            eventsHandler.log(.verbose, "custom (\(id)) tap")
             delegate?.paywallController(self, didPerform: .custom(id: id))
         case .selectProductId, .purchaseProductId, .purchaseSelectedProduct:
             break
@@ -254,10 +301,10 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     private func subscribeForActions() {
-        productsViewModel.onFailLoadingProducts = { [weak self] error in
-            guard let self else { return false }
-            return self.delegate?.paywallController(self, didFailLoadingProductsWith: error) ?? false
-        }
+//        productsViewModel.onFailLoadingProducts = { [weak self] error in
+//            guard let self else { return false }
+//            return self.delegate?.paywallController(self, didFailLoadingProductsWith: error) ?? false
+//        }
         // layoutBuilder?.productsView?.onProductSelected = { [weak self] product in
         // guard let self = self else { return }
 //
@@ -338,11 +385,11 @@ extension AdaptyPaywallController: AdaptyPaywallPresenterDelegate {
     }
 }
 
-@available(iOS 15.0, *)
-extension AdaptyPaywallController {
-    func log(_ level: AdaptyLogLevel, _ message: String) {
-        AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
-    }
-}
+//@available(iOS 15.0, *)
+//extension AdaptyPaywallController {
+//    func log(_ level: AdaptyLogLevel, _ message: String) {
+//        AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
+//    }
+//}
 
 #endif

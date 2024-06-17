@@ -79,7 +79,6 @@ extension Shape {
                         lineWidth: lineWidth
                     )
                 case .conic:
-                    // TODO: check implementation
                     self.stroke(
                         AngularGradient(
                             gradient: .init(stops: gradient.items.map { $0.gradientStop }),
@@ -89,7 +88,6 @@ extension Shape {
                         lineWidth: lineWidth
                     )
                 case .radial:
-                    // TODO: check implementation
                     self.stroke(
                         RadialGradient(
                             gradient: .init(stops: gradient.items.map { $0.gradientStop }),
@@ -123,9 +121,9 @@ extension View {
         case .circle:
             clipShape(Circle())
         case .curveUp:
-            clipShape(CurveUpShape(curveHeight: 32.0))
+            clipShape(CurveUpShape())
         case .curveDown:
-            clipShape(CurveDownShape(curveHeight: 32.0))
+            clipShape(CurveDownShape())
         }
     }
 }
@@ -141,11 +139,11 @@ extension AdaptyUI.ShapeType {
         case .circle:
             Circle()
                 .fill(filling: filling)
-        case .curveUp: // TODO: implement shape
-            Rectangle()
+        case .curveUp:
+            CurveUpShape()
                 .fill(filling: filling)
-        case .curveDown: // TODO: implement shape
-            Rectangle()
+        case .curveDown:
+            CurveDownShape()
                 .fill(filling: filling)
         }
     }
@@ -164,11 +162,11 @@ extension AdaptyUI.ShapeType {
         case .circle:
             Circle()
                 .stroke(filling: filling, lineWidth: lineWidth)
-        case .curveUp: // TODO: implement shape
-            Rectangle()
+        case .curveUp:
+            CurveUpShape()
                 .stroke(filling: filling, lineWidth: lineWidth)
-        case .curveDown: // TODO: implement shape
-            Rectangle()
+        case .curveDown:
+            CurveDownShape()
                 .stroke(filling: filling, lineWidth: lineWidth)
         }
     }

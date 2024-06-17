@@ -12,7 +12,7 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct CurveDownShape: Shape {
-    var curveHeight: CGFloat
+    var curveHeight: CGFloat = 32.0
     
     func path(in rect: CGRect) -> Path {
         var path = Path()
