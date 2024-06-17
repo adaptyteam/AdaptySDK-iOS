@@ -34,8 +34,8 @@ package class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
     private let eventsHandler: AdaptyEventsHandler
-    private let paywall: AdaptyPaywall
-    private let viewConfiguration: AdaptyUI.LocalizedViewConfiguration?
+    internal let paywall: AdaptyPaywall
+    internal let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     @Published var products: [ProductInfoModel]
     @Published var selectedProductId: String?
@@ -178,6 +178,20 @@ package class AdaptyProductsViewModel: ObservableObject {
             eventsHandler.event_didFinishRestore(with: profile)
         case let .failure(error):
             eventsHandler.event_didFailRestore(with: error)
+        }
+    }
+
+    func logShowPaywall() {
+        eventsHandler.log(.verbose, "logShowPaywall begin")
+
+        Adapty.logShowPaywall(paywall,
+                              viewConfiguration: viewConfiguration)
+        { [weak self] error in
+            if let error = error {
+                self?.eventsHandler.log(.error, "logShowPaywall fail: \(error)")
+            } else {
+                self?.eventsHandler.log(.verbose, "logShowPaywall success")
+            }
         }
     }
 

@@ -12,15 +12,12 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyPaywallRendererView: View {
+    @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
+
     var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     init(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) {
         self.viewConfiguration = viewConfiguration
-    }
-
-    @ViewBuilder
-    private func drawAsElement(screen: AdaptyUI.Screen) -> some View {
-        AdaptyUIElementView(screen.content)
     }
 
     public var body: some View {
@@ -31,6 +28,9 @@ struct AdaptyPaywallRendererView: View {
                 isRightToLeft: viewConfiguration.isRightToLeft
             )
             .decorate(with: viewConfiguration.screen.background)
+            .onAppear {
+                productsViewModel.logShowPaywall()
+            }
         } else {
             AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
         }
