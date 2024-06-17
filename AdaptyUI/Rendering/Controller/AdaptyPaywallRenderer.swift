@@ -30,6 +30,7 @@ struct AdaptyPaywallRendererView: View {
                 screen: viewConfiguration.screen,
                 isRightToLeft: viewConfiguration.isRightToLeft
             )
+            .decorate(with: viewConfiguration.screen.background)
         } else {
             AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
         }

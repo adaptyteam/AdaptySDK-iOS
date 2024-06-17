@@ -116,14 +116,14 @@ extension View {
             if #available(iOS 16.0, *) {
                 clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
             } else {
-                clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
+                self.clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
             }
         case .circle:
-            clipShape(Circle())
+            self.clipShape(Circle())
         case .curveUp:
-            clipShape(CurveUpShape())
+            self.clipShape(CurveUpShape())
         case .curveDown:
-            clipShape(CurveDownShape())
+            self.clipShape(CurveDownShape())
         }
     }
 }
