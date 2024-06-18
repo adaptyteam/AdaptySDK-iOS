@@ -30,9 +30,9 @@ extension View {
 struct AdaptyUIImageView: View {
     var asset: AdaptyUI.ImageData
     var aspect: AdaptyUI.AspectRatio
-    var tint: AdaptyUI.Filling?
+    var tint: AdaptyUI.ColorFilling?
 
-    init(asset: AdaptyUI.ImageData, aspect: AdaptyUI.AspectRatio, tint: AdaptyUI.Filling? = nil) {
+    init(asset: AdaptyUI.ImageData, aspect: AdaptyUI.AspectRatio, tint: AdaptyUI.ColorFilling? = nil) {
         self.asset = asset
         self.aspect = aspect
         self.tint = tint
@@ -45,7 +45,7 @@ struct AdaptyUIImageView: View {
     }
 
     @ViewBuilder
-    private func rasterImage(_ uiImage: UIImage?, tint: AdaptyUI.Filling?) -> some View {
+    private func rasterImage(_ uiImage: UIImage?, tint: AdaptyUI.ColorFilling?) -> some View {
         if let uiImage {
             if let tint = tint?.asColor?.swiftuiColor {
                 Image(uiImage: uiImage)
@@ -83,8 +83,6 @@ struct AdaptyUIImageView: View {
                     }
                 }
                 .aspectRatio(aspect)
-        case .none:
-            EmptyView()
         }
     }
 }

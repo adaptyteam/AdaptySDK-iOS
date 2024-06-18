@@ -62,7 +62,7 @@ extension Shape {
     }
 
     @ViewBuilder
-    func stroke(filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
+    func stroke(filling: AdaptyUI.ColorFilling?, lineWidth: CGFloat) -> some View {
         if let filling {
             switch filling {
             case .color(let color):
@@ -98,8 +98,6 @@ extension Shape {
                         lineWidth: lineWidth
                     )
                 }
-            case .image(let imageData):
-                self
             }
         } else {
             self
@@ -149,7 +147,7 @@ extension AdaptyUI.ShapeType {
     }
 
     @ViewBuilder
-    func swiftUIShapeStroke(_ filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
+    func swiftUIShapeStroke(_ filling: AdaptyUI.ColorFilling?, lineWidth: CGFloat) -> some View {
         switch self {
         case .rectangle(let radii):
             if #available(iOS 16.0, *) {

@@ -78,7 +78,7 @@ extension AdaptyUI.RichText {
                     )
                 )
             case let .image(value, attr):
-                guard let uiImage = value.textAttachmentImage(
+                guard let uiImage = value?.textAttachmentImage(
                     font: attr.uiFont ?? .systemFont(ofSize: 15.0),
                     tint: attr.imgTintColor?.asColor?.uiColor
                 ) else {
