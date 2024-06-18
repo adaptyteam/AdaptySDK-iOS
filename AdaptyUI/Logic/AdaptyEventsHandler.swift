@@ -12,8 +12,9 @@ import Foundation
 
 @available(iOS 15.0, *)
 package class AdaptyEventsHandler { // TODO: make internal
-    let logId: String 
+    let logId: String = AdaptyUI.generateLogId()
 
+    // TODO: make private
     var didPerformAction: ((AdaptyUI.Action) -> Void)!
     var didSelectProduct: ((AdaptyPaywallProduct) -> Void)!
     var didStartPurchase: ((AdaptyPaywallProduct) -> Void)!
@@ -26,10 +27,39 @@ package class AdaptyEventsHandler { // TODO: make internal
     var didFailRendering: ((AdaptyError) -> Void)!
     var didFailLoadingProducts: ((AdaptyError) -> Bool)!
 
-    init(
-        logId: String
+    // TODO: remove
+    package init(
+//        logId: String
     ) {
-        self.logId = logId
+//        self.logId = logId
+    }
+
+    package init(
+        logId: String,
+        didPerformAction: @escaping (AdaptyUI.Action) -> Void,
+        didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
+        didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
+        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,
+        didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
+        didCancelPurchase: @escaping (AdaptyPaywallProduct) -> Void,
+        didStartRestore: @escaping () -> Void,
+        didFinishRestore: @escaping (AdaptyProfile) -> Void,
+        didFailRestore: @escaping (AdaptyError) -> Void,
+        didFailRendering: @escaping (AdaptyError) -> Void,
+        didFailLoadingProducts: @escaping (AdaptyError) -> Bool
+    ) {
+//        self.logId = logId
+        self.didPerformAction = didPerformAction
+        self.didSelectProduct = didSelectProduct
+        self.didStartPurchase = didStartPurchase
+        self.didFinishPurchase = didFinishPurchase
+        self.didFailPurchase = didFailPurchase
+        self.didCancelPurchase = didCancelPurchase
+        self.didStartRestore = didStartRestore
+        self.didFinishRestore = didFinishRestore
+        self.didFailRestore = didFailRestore
+        self.didFailRendering = didFailRendering
+        self.didFailLoadingProducts = didFailLoadingProducts
     }
 
     func log(_ level: AdaptyLogLevel, _ message: String) {

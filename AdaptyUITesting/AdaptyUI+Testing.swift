@@ -40,12 +40,17 @@ public enum AdaptyUIPreviewRenderingMode: String, CaseIterable {
 
 @available(iOS 15.0, *)
 public struct AdaptyUITestRendererView: View {
+    var eventsHandler: AdaptyEventsHandler
     var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
     var renderingMode: AdaptyUIPreviewRenderingMode
 
-    public init(viewConfiguration: AdaptyUI.LocalizedViewConfiguration, renderingMode: AdaptyUIPreviewRenderingMode) {
+    public init(
+        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
+        renderingMode: AdaptyUIPreviewRenderingMode
+    ) {
         self.viewConfiguration = viewConfiguration
         self.renderingMode = renderingMode
+        self.eventsHandler = AdaptyEventsHandler(logId: "Preview")
     }
 
     @ViewBuilder
@@ -54,31 +59,45 @@ public struct AdaptyUITestRendererView: View {
     }
 
     public var body: some View {
-         let screen = viewConfiguration.screen
-            switch renderingMode {
-            case .template:
-                if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
-                    AdaptyUITemplateResolverView(
-                        template: template,
-                        screen: screen,
-                        isRightToLeft: viewConfiguration.isRightToLeft
+        let screen = viewConfiguration.screen
+        switch renderingMode {
+        case .template:
+            if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
+                AdaptyUITemplateResolverView(
+                    template: template,
+                    screen: screen,
+                    isRightToLeft: viewConfiguration.isRightToLeft
+                )
+                .environmentObject(AdaptyUIActionsViewModel(eventsHandler: eventsHandler))
+                .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
+                .environmentObject(
+                    AdaptyProductsViewModel(
+                        eventsHandler: eventsHandler,
+                        paywall: AdaptyMockPaywall(),
+                        products: nil,
+                        viewConfiguration: viewConfiguration
                     )
-                    .environmentObject(AdaptyUIActionsViewModel(logId: "AdaptyUITesting"))
-                    .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
-                    .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
-                    .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
-                    .environmentObject(AdaptyTimerViewModel())
-                } else {
-                    AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
-                }
-            case .element:
-                AdaptyUIElementView(screen.content)
-                    .environmentObject(AdaptyUIActionsViewModel(logId: "AdaptyUITesting"))
-                    .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
-                    .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
-                    .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
-                    .environmentObject(AdaptyTimerViewModel())
+                )
+                .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
+                .environmentObject(AdaptyTimerViewModel())
+            } else {
+                AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
             }
+        case .element:
+            AdaptyUIElementView(screen.content)
+                .environmentObject(AdaptyUIActionsViewModel(eventsHandler: eventsHandler))
+                .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
+                .environmentObject(
+                    AdaptyProductsViewModel(
+                        eventsHandler: eventsHandler,
+                        paywall: AdaptyMockPaywall(),
+                        products: nil,
+                        viewConfiguration: viewConfiguration
+                    )
+                )
+                .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
+                .environmentObject(AdaptyTimerViewModel())
+        }
     }
 }
 

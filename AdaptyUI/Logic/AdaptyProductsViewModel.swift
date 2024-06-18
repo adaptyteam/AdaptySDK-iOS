@@ -34,8 +34,9 @@ package class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
     private let eventsHandler: AdaptyEventsHandler
-    internal let paywall: AdaptyPaywall
-    internal let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+
+    let paywall: AdaptyPaywallInterface
+    let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     @Published var products: [ProductInfoModel]
     @Published var selectedProductId: String?
@@ -59,10 +60,10 @@ package class AdaptyProductsViewModel: ObservableObject {
         }
     }
 
-    init(eventsHandler: AdaptyEventsHandler,
-         paywall: AdaptyPaywall,
-         products: [AdaptyPaywallProduct]?,
-         viewConfiguration: AdaptyUI.LocalizedViewConfiguration)
+    package init(eventsHandler: AdaptyEventsHandler,
+                 paywall: AdaptyPaywallInterface,
+                 products: [AdaptyPaywallProduct]?,
+                 viewConfiguration: AdaptyUI.LocalizedViewConfiguration)
     {
         self.eventsHandler = eventsHandler
         self.paywall = paywall
@@ -73,7 +74,7 @@ package class AdaptyProductsViewModel: ObservableObject {
                                                    eligibilities: nil)
     }
 
-    private static func generateProductsInfos(paywall: AdaptyPaywall,
+    private static func generateProductsInfos(paywall: AdaptyPaywallInterface,
                                               products: [AdaptyPaywallProduct]?,
                                               eligibilities: [String: AdaptyEligibility]?) -> [ProductInfoModel]
     {
@@ -114,7 +115,7 @@ package class AdaptyProductsViewModel: ObservableObject {
         queue.async { [weak self] in
             guard let self = self else { return }
 
-            Adapty.getPaywallProducts(paywall: paywall) { [weak self] result in
+            self.paywall.getPaywallProducts { [weak self] result in
                 switch result {
                 case let .success(products):
                     self?.eventsHandler.log(.verbose, "loadProducts success")
@@ -184,9 +185,7 @@ package class AdaptyProductsViewModel: ObservableObject {
     func logShowPaywall() {
         eventsHandler.log(.verbose, "logShowPaywall begin")
 
-        Adapty.logShowPaywall(paywall,
-                              viewConfiguration: viewConfiguration)
-        { [weak self] error in
+        paywall.logShowPaywall(viewConfiguration: viewConfiguration) { [weak self] error in
             if let error = error {
                 self?.eventsHandler.log(.error, "logShowPaywall fail: \(error)")
             } else {

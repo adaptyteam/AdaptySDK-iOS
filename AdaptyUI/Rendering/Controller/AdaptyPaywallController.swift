@@ -8,105 +8,43 @@
 #if canImport(UIKit)
 
 import Adapty
-import Combine
 import SwiftUI
 import UIKit
 
 @available(iOS 15.0, *)
 public class AdaptyPaywallController: UIViewController {
     public let id = UUID()
+    public let logId: String
 
-    // TODO: consider remove
-    public var paywall: AdaptyPaywall { productsViewModel.paywall }
-    public var viewConfiguration: AdaptyUI.LocalizedViewConfiguration { productsViewModel.viewConfiguration }
+    public let paywall: AdaptyPaywall
+    public let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+
+    let products: [AdaptyPaywallProduct]?
+    let tagResolver: AdaptyTagResolver?
 
     public weak var delegate: AdaptyPaywallControllerDelegate?
-
-    private var cancellable = Set<AnyCancellable>()
-
-    private let eventsHandler: AdaptyEventsHandler
-    private let productsViewModel: AdaptyProductsViewModel
-    private let actionsViewModel: AdaptyUIActionsViewModel
-    private let sectionsViewModel: AdaptySectionsViewModel
-    private let tagResolverViewModel: AdaptyTagResolverViewModel
-    private let timerViewModel: AdaptyTimerViewModel
 
     init(
         paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]?,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
-        delegate: AdaptyPaywallControllerDelegate,
+        delegate: AdaptyPaywallControllerDelegate?,
         tagResolver: AdaptyTagResolver?
     ) {
         let logId = AdaptyUI.generateLogId()
 
         AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0)")
 
+        self.logId = logId
+        self.paywall = paywall
+        self.viewConfiguration = viewConfiguration
+        self.products = products
+        self.tagResolver = tagResolver
         self.delegate = delegate
-
-        eventsHandler = AdaptyEventsHandler(logId: logId)
-        tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
-        actionsViewModel = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
-        sectionsViewModel = AdaptySectionsViewModel(logId: logId)
-        productsViewModel = AdaptyProductsViewModel(eventsHandler: eventsHandler,
-                                                    paywall: paywall,
-                                                    products: products,
-                                                    viewConfiguration: viewConfiguration)
-        timerViewModel = AdaptyTimerViewModel()
 
         super.init(nibName: nil, bundle: nil)
 
         modalPresentationStyle = .fullScreen
-
-        eventsHandler.didPerformAction = { [weak self] action in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didPerform: action)
-        }
-        eventsHandler.didSelectProduct = { [weak self] product in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didSelectProduct: product)
-        }
-        eventsHandler.didStartPurchase = { [weak self] product in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didStartPurchase: product)
-        }
-        eventsHandler.didFinishPurchase = { [weak self] product, purchasedInfo in
-            guard let self else { return }
-            self.delegate?.paywallController(self,
-                                             didFinishPurchase: product,
-                                             purchasedInfo: purchasedInfo)
-        }
-        eventsHandler.didFailPurchase = { [weak self] product, error in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didFailPurchase: product, error: error)
-        }
-        eventsHandler.didCancelPurchase = { [weak self] product in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didCancelPurchase: product)
-        }
-        eventsHandler.didStartRestore = { [weak self] in
-            guard let self else { return }
-            self.delegate?.paywallControllerDidStartRestore(self)
-        }
-        eventsHandler.didFinishRestore = { [weak self] profile in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didFinishRestoreWith: profile)
-        }
-        eventsHandler.didFailRestore = { [weak self] error in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didFailRestoreWith: error)
-        }
-        eventsHandler.didFailRendering = { [weak self] error in
-            guard let self else { return }
-            self.delegate?.paywallController(self, didFailRenderingWith: error)
-        }
-        eventsHandler.didFailLoadingProducts = { [weak self] error in
-            guard let self else { return false }
-            guard let delegate = self.delegate else { return true }
-            return delegate.paywallController(self, didFailLoadingProductsWith: error)
-        }
-
-        productsViewModel.loadProductsIfNeeded()
     }
 
     @available(*, unavailable)
@@ -119,41 +57,91 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     deinit {
-        eventsHandler.log(.verbose, "deinit")
+        log(.verbose, "deinit")
     }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        eventsHandler.log(.verbose, "viewDidLoad begin")
+        log(.verbose, "viewDidLoad begin")
 
         view.backgroundColor = .systemBackground
 
         addSubSwiftUIView(
-            AdaptyPaywallRendererView(viewConfiguration: viewConfiguration)
-                .withScreenSize(view.bounds.size)
-                .environmentObject(productsViewModel)
-                .environmentObject(actionsViewModel)
-                .environmentObject(sectionsViewModel)
-                .environmentObject(tagResolverViewModel)
-                .environmentObject(timerViewModel),
-
+            AdaptyPaywallView(
+                logId: logId,
+                paywall: paywall,
+                products: products,
+                configuration: viewConfiguration,
+                tagResolver: tagResolver,
+                didPerformAction: { [weak self] action in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didPerform: action)
+                },
+                didSelectProduct: { [weak self] product in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didSelectProduct: product)
+                },
+                didStartPurchase: { [weak self] product in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didStartPurchase: product)
+                },
+                didFinishPurchase: { [weak self] product, purchasedInfo in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self,
+                                                     didFinishPurchase: product,
+                                                     purchasedInfo: purchasedInfo)
+                },
+                didFailPurchase: { [weak self] product, error in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didFailPurchase: product, error: error)
+                },
+                didCancelPurchase: { [weak self] product in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didCancelPurchase: product)
+                },
+                didStartRestore: { [weak self] in
+                    guard let self else { return }
+                    self.delegate?.paywallControllerDidStartRestore(self)
+                },
+                didFinishRestore: { [weak self] profile in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didFinishRestoreWith: profile)
+                },
+                didFailRestore: { [weak self] error in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didFailRestoreWith: error)
+                },
+                didFailRendering: { [weak self] error in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didFailRenderingWith: error)
+                },
+                didFailLoadingProducts: { [weak self] error in
+                    guard let self else { return false }
+                    guard let delegate = self.delegate else { return true }
+                    return delegate.paywallController(self, didFailLoadingProductsWith: error)
+                }
+            ),
             to: view
         )
 
-        eventsHandler.log(.verbose, "viewDidLoad end")
+        log(.verbose, "viewDidLoad end")
     }
 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        eventsHandler.log(.verbose, "viewDidAppear")
+        log(.verbose, "viewDidAppear")
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        eventsHandler.log(.verbose, "viewDidDisappear")
+        log(.verbose, "viewDidDisappear")
+    }
+    
+    func log(_ level: AdaptyLogLevel, _ message: String) {
+        AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
     }
 }
 
