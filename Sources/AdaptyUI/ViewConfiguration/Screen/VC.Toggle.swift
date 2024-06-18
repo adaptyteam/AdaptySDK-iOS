@@ -23,7 +23,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             sectionId: from.sectionId,
             onIndex: from.onIndex,
             offIndex: from.offIndex,
-            color: fillingIfPresent(from.colorAssetId)
+            color: colorIfPresent(from.colorAssetId)
         )
     }
 }

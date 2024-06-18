@@ -177,9 +177,9 @@ struct AdaptyUIPagerView: View {
             ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()
                     .fill(
-                        (idx == currentPage ?
-                            pageControl.selectedColor?.asColor?.swiftuiColor :
-                            pageControl.color?.asColor?.swiftuiColor) ?? .white
+                        idx == currentPage ?
+                            pageControl.selectedColor.swiftuiColor :
+                            pageControl.color.swiftuiColor
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)

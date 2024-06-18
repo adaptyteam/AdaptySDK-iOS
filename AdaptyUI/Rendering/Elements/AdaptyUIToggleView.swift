@@ -29,7 +29,7 @@ struct AdaptyUIToggleView: View {
         })) {
             EmptyView()
         }
-        .tint(toggle.color?.asColor?.swiftuiColor)
+        .tint(toggle.color?.swiftuiColor)
     }
 }
 

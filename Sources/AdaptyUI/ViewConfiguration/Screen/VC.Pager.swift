@@ -54,8 +54,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             padding: from.padding,
             dotSize: from.dotSize,
             spacing: from.spacing,
-            color: fillingIfPresent(from.colorAssetId),
-            selectedColor: fillingIfPresent(from.selectedColorAssetId)
+            color: colorIfPresent(from.colorAssetId) ?? AdaptyUI.Pager.PageControl.default.color,
+            selectedColor: colorIfPresent(from.selectedColorAssetId) ?? AdaptyUI.Pager.PageControl.default.selectedColor
         )
     }
 }
@@ -113,23 +113,17 @@ extension AdaptyUI.ViewConfiguration.Pager.PageControl: Decodable {
 extension AdaptyUI.Pager.Length: Decodable {
     enum CodingKeys: String, CodingKey {
         case parent
-        case value
-        case unit
     }
 
     package init(from decoder: any Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(AdaptyUI.Unit.self) {
             self = .fixed(value)
         } else {
-            let conteiner = try decoder.container(keyedBy: CodingKeys.self)
-            if let value = try conteiner.decodeIfPresent(Double.self, forKey: .parent) {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            if let value = try container.decodeIfPresent(Double.self, forKey: .parent) {
                 self = .parent(value)
             } else {
-                let unit = try conteiner.decode(String.self, forKey: .unit)
-                guard unit == CodingKeys.parent.rawValue else {
-                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: conteiner.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit)"))
-                }
-                self = try .parent(conteiner.decode(Double.self, forKey: .value))
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "don't found parent"))
             }
         }
     }

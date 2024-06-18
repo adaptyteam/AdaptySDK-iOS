@@ -38,19 +38,19 @@ extension AdaptyUI.ViewConfiguration.GridItem: Decodable {
     }
 
     init(from decoder: any Decoder) throws {
-        let conteiner = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
         let length: AdaptyUI.GridItem.Length =
-            if let value = try conteiner.decodeIfPresent(Int.self, forKey: .weight) {
+            if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
                 .weight(value)
             } else {
-                try .fixed(conteiner.decode(AdaptyUI.Unit.self, forKey: .fixed))
+                try .fixed(container.decode(AdaptyUI.Unit.self, forKey: .fixed))
             }
 
         try self.init(
             length: length,
-            horizontalAlignment: conteiner.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? AdaptyUI.GridItem.defaultHorizontalAlignment,
-            verticalAlignment: conteiner.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? AdaptyUI.GridItem.defaultVerticalAlignment,
-            content: conteiner.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .content)
+            horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? AdaptyUI.GridItem.defaultHorizontalAlignment,
+            verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? AdaptyUI.GridItem.defaultVerticalAlignment,
+            content: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .content)
         )
     }
 }
