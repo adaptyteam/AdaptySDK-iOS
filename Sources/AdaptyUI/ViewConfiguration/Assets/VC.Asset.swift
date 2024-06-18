@@ -29,6 +29,22 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 
     @inlinable
+    func colorIfPresent(_ assetId: String?) -> AdaptyUI.Color? {
+        fillingIfPresent(assetId)?.asColor
+    }
+
+    @inlinable
+    func fillingWithoutImageIfPresent(_ assetId: String?) -> AdaptyUI.Filling? {
+        guard let value = fillingIfPresent(assetId) else { return nil }
+        switch value {
+        case .image:
+            return nil
+        default:
+            return value
+        }
+    }
+
+    @inlinable
     func imageData(_ assetId: String?) -> AdaptyUI.ImageData {
         fillingIfPresent(assetId)?.asImage ?? .none
     }

@@ -13,7 +13,7 @@ extension AdaptyUI {
         package let sectionId: String
         package let onIndex: Int
         package let offIndex: Int
-        package let color: Filling?
+        package let color: AdaptyUI.Color?
     }
 }
 
@@ -23,7 +23,7 @@ extension AdaptyUI {
             sectionId: String,
             onIndex: Int = 0,
             offIndex: Int = -1,
-            color: AdaptyUI.Filling? = nil
+            color: AdaptyUI.Color? = nil
         ) -> Self {
             .init(
                 sectionId: sectionId,
