@@ -29,6 +29,7 @@ extension AdaptyPaywallProduct {
         let numberOfPeriodsDecimal = Decimal(floatLiteral: numberOfPeriods)
         let pricePerPeriod = price / numberOfPeriodsDecimal
 
+        // TODO: update logic
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = skProduct.priceLocale
