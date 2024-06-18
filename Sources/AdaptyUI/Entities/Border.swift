@@ -9,15 +9,22 @@ import Foundation
 
 package extension AdaptyUI {
     struct Border {
-        static let defaultThickness = 1.0
-        package let filling: AdaptyUI.Filling
+        static let `default` = Border(
+            filling: .color(AdaptyUI.Color.transparent),
+            thickness: 1.0
+        )
+
+        package let filling: AdaptyUI.ColorFilling
         package let thickness: Double
     }
 }
 
 #if DEBUG
     package extension AdaptyUI.Border {
-        static func createColor(filling: AdaptyUI.Filling, thickness: Double) -> Self {
+        static func create(
+            filling: AdaptyUI.ColorFilling = `default`.filling,
+            thickness: Double = `default`.thickness
+        ) -> Self {
             .init(filling: filling, thickness: thickness)
         }
     }

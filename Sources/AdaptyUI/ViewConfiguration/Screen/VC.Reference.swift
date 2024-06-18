@@ -8,13 +8,6 @@
 
 import Foundation
 
-extension AdaptyUI {
-    package enum LocalizerError: Swift.Error {
-        case unknownReference(String)
-        case referenceCycle(String)
-    }
-}
-
 extension AdaptyUI.ViewConfiguration.Localizer {
     func reference(_ id: String) throws -> AdaptyUI.Element {
         guard !self.elementIds.contains(id) else {

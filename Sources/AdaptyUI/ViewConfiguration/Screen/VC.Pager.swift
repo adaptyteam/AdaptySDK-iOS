@@ -54,8 +54,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             padding: from.padding,
             dotSize: from.dotSize,
             spacing: from.spacing,
-            color: colorIfPresent(from.colorAssetId) ?? AdaptyUI.Pager.PageControl.default.color,
-            selectedColor: colorIfPresent(from.selectedColorAssetId) ?? AdaptyUI.Pager.PageControl.default.selectedColor
+            color: from.colorAssetId.flatMap { try? color($0) } ?? AdaptyUI.Pager.PageControl.default.color,
+            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? AdaptyUI.Pager.PageControl.default.selectedColor
         )
     }
 }

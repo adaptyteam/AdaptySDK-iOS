@@ -23,7 +23,7 @@ extension AdaptyUI {
         package let weight: Int
         package let italic: Bool
         let defaultSize: Double
-        let defaultColor: AdaptyUI.Filling
+        let defaultColor: AdaptyUI.ColorFilling
     }
 }
 
@@ -35,7 +35,7 @@ extension AdaptyUI {
             weight: Int = `default`.weight,
             italic: Bool = `default`.italic,
             defaultSize: Double = `default`.defaultSize,
-            defaultColor: AdaptyUI.Filling = `default`.defaultColor
+            defaultColor: AdaptyUI.ColorFilling = `default`.defaultColor
         ) -> Self {
             .init(
                 alias: alias,
@@ -75,6 +75,7 @@ extension AdaptyUI.Font: Decodable {
         italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? AdaptyUI.Font.default.italic
 
         defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? AdaptyUI.Font.default.defaultSize
+  
         defaultColor = try container.decodeIfPresent(AdaptyUI.Color.self, forKey: .defaultColor).map { .color($0) } ?? AdaptyUI.Font.default.defaultColor
     }
 }

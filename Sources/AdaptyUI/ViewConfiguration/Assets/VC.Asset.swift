@@ -16,51 +16,51 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    @inlinable
-    func assetIfPresent(_ assetId: String?) -> AdaptyUI.ViewConfiguration.Asset? {
-        guard let assetId else { return nil }
-        return localization?.assets?[assetId] ?? source.assets[assetId]
-    }
-
-    @inlinable
-    func fillingIfPresent(_ assetId: String?) -> AdaptyUI.Filling? {
-        guard let asset = assetIfPresent(assetId), case let .filling(value) = asset else { return nil }
-        return value
-    }
-
-    @inlinable
-    func colorIfPresent(_ assetId: String?) -> AdaptyUI.Color? {
-        fillingIfPresent(assetId)?.asColor
-    }
-
-    @inlinable
-    func fillingWithoutImageIfPresent(_ assetId: String?) -> AdaptyUI.Filling? {
-        guard let value = fillingIfPresent(assetId) else { return nil }
-        switch value {
-        case .image:
-            return nil
-        default:
-            return value
+    private func asset(_ assetId: String) throws -> AdaptyUI.ViewConfiguration.Asset {
+        guard let value = localization?.assets?[assetId] ?? source.assets[assetId] else {
+            throw AdaptyUI.LocalizerError.notFoundAsset(assetId)
         }
-    }
-
-    @inlinable
-    func imageData(_ assetId: String?) -> AdaptyUI.ImageData {
-        fillingIfPresent(assetId)?.asImage ?? .none
-    }
-
-    @inlinable
-    func fontIfPresent(_ assetId: String?) -> AdaptyUI.Font? {
-        guard
-            let asset = assetIfPresent(assetId),
-            case let .font(value) = asset
-        else { return nil }
         return value
     }
 
     @inlinable
-    func font(_ assetId: String?) -> AdaptyUI.Font {
-        fontIfPresent(assetId) ?? AdaptyUI.Font.default
+    func filling(_ assetId: String) throws -> AdaptyUI.Filling {
+        guard case let .filling(value) = try asset(assetId) else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+        }
+        return value
+    }
+
+    @inlinable
+    func color(_ assetId: String) throws -> AdaptyUI.Color {
+        guard let value = try filling(assetId).asColor else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+        }
+        return value
+    }
+
+    @inlinable
+    func colorFilling(_ assetId: String) throws -> AdaptyUI.ColorFilling {
+        guard let value = try filling(assetId).asColorFilling else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+        }
+        return value
+    }
+
+    @inlinable
+    func imageData(_ assetId: String) throws -> AdaptyUI.ImageData {
+        guard let value = try filling(assetId).asImage else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+        }
+        return value
+    }
+
+    @inlinable
+    func font(_ assetId: String) throws -> AdaptyUI.Font {
+        guard case let .font(value) = try asset(assetId) else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+        }
+        return value
     }
 }
 

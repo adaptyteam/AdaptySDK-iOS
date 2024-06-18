@@ -17,10 +17,10 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.Localizer {
     func image(_ from: AdaptyUI.ViewConfiguration.Image) throws -> AdaptyUI.Image {
-        .init(
+        try .init(
             asset: imageData(from.assetId),
             aspect: from.aspect,
-            tint: fillingIfPresent(from.tintAssetId)
+            tint: from.tintAssetId.flatMap { try? colorFilling($0) }
         )
     }
 }
@@ -35,7 +35,7 @@ extension AdaptyUI.ViewConfiguration.Image: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         assetId = try container.decode(String.self, forKey: .assetId)
-        aspect = try container.decodeIfPresent(AdaptyUI.AspectRatio.self, forKey: .aspect) ?? AdaptyUI.Image.default.aspect
+        aspect = try container.decodeIfPresent(AdaptyUI.AspectRatio.self, forKey: .aspect) ?? AdaptyUI.Image.defaultAspectRatio
         tintAssetId = try container.decodeIfPresent(String.self, forKey: .tintAssetId)
     }
 }

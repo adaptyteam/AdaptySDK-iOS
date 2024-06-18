@@ -9,24 +9,20 @@ import Foundation
 
 extension AdaptyUI {
     package struct Image {
-        static let `default` = Image(
-            asset: .none,
-            aspect: AspectRatio.fit,
-            tint: nil
-        )
+        static let defaultAspectRatio = AspectRatio.fit
 
         package let asset: ImageData
         package let aspect: AspectRatio
-        package let tint: Filling?
+        package let tint: ColorFilling?
     }
 }
 
 #if DEBUG
     package extension AdaptyUI.Image {
         static func create(
-            asset: AdaptyUI.ImageData = `default`.asset,
-            aspect: AdaptyUI.AspectRatio = `default`.aspect,
-            tint: AdaptyUI.Filling? = `default`.tint
+            asset: AdaptyUI.ImageData,
+            aspect: AdaptyUI.AspectRatio = defaultAspectRatio,
+            tint: AdaptyUI.ColorFilling? = nil
         ) -> Self {
             .init(
                 asset: asset,

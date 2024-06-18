@@ -85,7 +85,7 @@ private extension AdaptyUI.ViewConfiguration.RichText {
             case let .tag(value, attr):
                 .tag(value, attr.add(defaultTextAttributes).convert(localizer))
             case let .image(assetId, attr):
-                .image(localizer.imageData(assetId), attr.add(defaultTextAttributes).convert(localizer))
+                .image(try? localizer.imageData(assetId), attr.add(defaultTextAttributes).convert(localizer))
             default:
                 nil
             }
@@ -126,13 +126,13 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
         _ localizer: AdaptyUI.ViewConfiguration.Localizer
     ) -> AdaptyUI.RichText.TextAttributes {
         let attr = self
-        let font = localizer.font(attr?.fontAssetId)
+        let font = (try? attr?.fontAssetId.map(localizer.font)) ?? AdaptyUI.Font.default
         return AdaptyUI.RichText.TextAttributes(
             font: font,
             size: attr?.size ?? font.defaultSize,
-            txtColor: localizer.fillingIfPresent(attr?.txtColorAssetId) ?? font.defaultColor,
-            imgTintColor: localizer.fillingIfPresent(attr?.imgTintColorAssetId),
-            background: localizer.fillingIfPresent(attr?.backgroundAssetId),
+            txtColor: (try? attr?.txtColorAssetId.map(localizer.colorFilling)) ?? font.defaultColor,
+            imgTintColor: try? attr?.imgTintColorAssetId.map(localizer.colorFilling),
+            background: try? attr?.backgroundAssetId.map(localizer.colorFilling),
             strike: attr?.strike ?? false,
             underline: attr?.underline ?? false
         )

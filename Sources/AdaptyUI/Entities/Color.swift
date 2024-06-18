@@ -9,6 +9,7 @@ import Foundation
 
 package extension AdaptyUI {
     struct Color {
+        static let transparent = Color(data: 0x00000000)
         static let white = Color(data: 0xFFFFFFFF)
         static let lightGray = Color(data: 0xD3D3D3FF)
         static let black = Color(data: 0x000000FF)
