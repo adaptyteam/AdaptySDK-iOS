@@ -50,7 +50,7 @@ public struct AdaptyUITestRendererView: View {
     ) {
         self.viewConfiguration = viewConfiguration
         self.renderingMode = renderingMode
-        self.eventsHandler = AdaptyEventsHandler(logId: "Preview")
+        self.eventsHandler = AdaptyEventsHandler()
     }
 
     @ViewBuilder
