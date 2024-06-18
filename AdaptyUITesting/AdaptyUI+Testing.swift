@@ -80,6 +80,10 @@ public struct AdaptyUITestRendererView: View {
                 )
                 .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
                 .environmentObject(AdaptyTimerViewModel())
+                .environmentObject(
+                    AdaptyScreensViewModel(eventsHandler: eventsHandler,
+                                           viewConfiguration: viewConfiguration)
+                )
             } else {
                 AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
             }
@@ -97,6 +101,10 @@ public struct AdaptyUITestRendererView: View {
                 )
                 .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
                 .environmentObject(AdaptyTimerViewModel())
+                .environmentObject(
+                    AdaptyScreensViewModel(eventsHandler: eventsHandler,
+                                           viewConfiguration: viewConfiguration)
+                )
         }
     }
 }

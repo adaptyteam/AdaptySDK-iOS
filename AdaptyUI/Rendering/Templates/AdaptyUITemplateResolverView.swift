@@ -18,6 +18,7 @@ package extension AdaptyUI {
     }
 }
 
+// TODO: move to testing
 @available(iOS 15.0, *)
 package struct AdaptyUIRenderingErrorView: View {
     var text: String
@@ -50,27 +51,19 @@ package struct AdaptyUIRenderingErrorView: View {
 package struct AdaptyUITemplateResolverView: View {
     var template: AdaptyUI.Template
     var screen: AdaptyUI.Screen
-    var isRightToLeft: Bool
 
-    package init(template: AdaptyUI.Template, screen: AdaptyUI.Screen, isRightToLeft: Bool) {
+    package init(template: AdaptyUI.Template, screen: AdaptyUI.Screen) {
         self.template = template
         self.screen = screen
-        self.isRightToLeft = isRightToLeft
     }
 
-    @ViewBuilder
-    private var templateContainerView: some View {
+    package var body: some View {
         switch template {
         case .basic:
             AdaptyUIBasicContainerView(screen: screen)
         case .flat:
             AdaptyUIFlatContainerView(screen: screen)
         }
-    }
-
-    package var body: some View {
-        templateContainerView
-            .environment(\.layoutDirection, isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }
 

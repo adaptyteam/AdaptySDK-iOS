@@ -10,7 +10,6 @@
 import Adapty
 import SwiftUI
 
-
 @available(iOS 15.0, *)
 struct AdaptyPaywallView: View {
     @Environment(\.presentationMode) private var presentationMode
@@ -24,6 +23,7 @@ struct AdaptyPaywallView: View {
     private let sectionsViewModel: AdaptySectionsViewModel
     private let tagResolverViewModel: AdaptyTagResolverViewModel
     private let timerViewModel: AdaptyTimerViewModel
+    private let screensViewModel: AdaptyScreensViewModel
 
     init(
         logId: String,
@@ -72,6 +72,8 @@ struct AdaptyPaywallView: View {
                                                     products: products,
                                                     viewConfiguration: configuration)
         timerViewModel = AdaptyTimerViewModel()
+        screensViewModel = AdaptyScreensViewModel(eventsHandler: eventsHandler,
+                                                  viewConfiguration: configuration)
         
         productsViewModel.loadProductsIfNeeded()
     }
@@ -85,6 +87,7 @@ struct AdaptyPaywallView: View {
                 .environmentObject(sectionsViewModel)
                 .environmentObject(tagResolverViewModel)
                 .environmentObject(timerViewModel)
+                .environmentObject(screensViewModel)
         }
     }
 }
