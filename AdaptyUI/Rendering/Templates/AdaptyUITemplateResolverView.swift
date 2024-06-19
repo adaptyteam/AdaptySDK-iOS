@@ -15,6 +15,7 @@ package extension AdaptyUI {
     enum Template: String {
         case basic
         case flat
+        case transparent
     }
 }
 
@@ -63,6 +64,8 @@ package struct AdaptyUITemplateResolverView: View {
             AdaptyUIBasicContainerView(screen: screen)
         case .flat:
             AdaptyUIFlatContainerView(screen: screen)
+        case .transparent:
+            AdaptyUITransparentContainerView(screen: screen)
         }
     }
 }

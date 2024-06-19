@@ -59,6 +59,35 @@ struct AdaptyUIBasicContainerView: View {
         .frame(height: height)
     }
 
+    @ViewBuilder
+    func contentView(box: AdaptyUI.Box,
+                     coverBox: AdaptyUI.Box,
+                     content: AdaptyUI.Element,
+                     properties: AdaptyUI.Element.Properties?,
+                     additionalBottomPadding: Double) -> some View
+    {
+        let coverHeight: CGFloat = {
+            if let boxHeight = coverBox.height, case let .fixed(unit) = boxHeight {
+                return unit.points(screenSize: screenSize.height)
+            } else {
+                return 0.0
+            }
+        }()
+
+        let selfHeight = screenSize.height - coverHeight
+        let offsetY = properties?.offset.y ?? 0
+
+        // TODO: refactor
+        AdaptyUIElementView(content)
+            .background(Color.blue)
+            .padding(.bottom, additionalBottomPadding)
+            .background(Color.brown)
+            .frame(minHeight: selfHeight + additionalBottomPadding - offsetY + 120,
+                   alignment: .top)
+            .applyingProperties(properties)
+            .padding(.bottom, -120)
+    }
+
     @State var footerSize: CGSize = .zero
 
     var body: some View {
@@ -66,13 +95,28 @@ struct AdaptyUIBasicContainerView: View {
             ZStack(alignment: .bottom) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        if case let .box(box, properties) = screen.cover, let content = box.content {
-                            coverView(box, content, properties)
+                        if case let .box(coverBox, coverProperties) = screen.cover,
+                           let coverContent = coverBox.content,
+                           case let .box(contentBox, contentProperties) = screen.content, let contentContent = contentBox.content
+                        {
+                            coverView(coverBox,
+                                      coverContent,
+                                      coverProperties)
+
+                            contentView(
+                                box: contentBox,
+                                coverBox: coverBox,
+                                content: contentContent,
+                                properties: contentProperties,
+                                additionalBottomPadding: footerSize.height
+                            )
                         }
 
-                        AdaptyUIElementView(screen.content)
+//                        if  {
+//                            contentView(box, content, properties, additionalBottomPadding: footerSize.height)
+//                        }
                     }
-                    .padding(.bottom, footerSize.height)
+//                    .padding(.bottom, footerSize.height)
                 }
 
                 if let footer = screen.footer {
