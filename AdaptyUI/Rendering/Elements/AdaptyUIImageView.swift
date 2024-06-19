@@ -19,7 +19,11 @@ extension View {
         case .fit:
             aspectRatio(contentMode: .fit)
         case .fill:
-            aspectRatio(contentMode: .fill)
+            GeometryReader { proxy in
+                self
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: proxy.size.width)
+            }
         case .stretch:
             self
         }
@@ -74,7 +78,6 @@ struct AdaptyUIImageView: View {
             KFImage
                 .url(url)
                 .resizable()
-                .fade(duration: 0.25)
                 .placeholder {
                     if let preview {
                         rasterImage(UIImage(data: preview), tint: tint)
