@@ -30,25 +30,10 @@ extension AdaptyUI {
         package func richText(
             byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
         ) -> RichText {
-            if let value = richTextOrNil(byPaymentMode: mode) {
-                value
-            } else if mode == .unknown {
-                .empty
-            } else {
-                richTextOrNil(byPaymentMode: .unknown) ?? .empty
-            }
-        }
-
-        private func richTextOrNil(
-            byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
-        ) -> RichText? {
             localizer.richText(
-                stringId: ViewConfiguration.StringId.Product.calculate(
-                    adaptyProductId: adaptyProductId,
-                    byPaymentMode: mode,
-                    suffix: suffix
-                ),
-
+                adaptyProductId: adaptyProductId,
+                byPaymentMode: mode,
+                suffix: suffix,
                 defaultTextAttributes: defaultTextAttributes
             )
         }
@@ -82,27 +67,65 @@ extension AdaptyUI {
             adaptyProductId: String,
             byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
         ) -> RichText {
-            if let value = richTextOrNil(adaptyProductId: adaptyProductId, byPaymentMode: mode) {
-                value
-            } else if mode == .unknown {
-                .empty
-            } else {
-                richTextOrNil(adaptyProductId: adaptyProductId, byPaymentMode: .unknown) ?? .empty
-            }
-        }
-
-        private func richTextOrNil(
-            adaptyProductId: String,
-            byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
-        ) -> RichText? {
             localizer.richText(
-                stringId: ViewConfiguration.StringId.Product.calculate(
+                adaptyProductId: adaptyProductId,
+                byPaymentMode: mode,
+                suffix: suffix,
+                defaultTextAttributes: defaultTextAttributes
+            )
+        }
+    }
+}
+
+private extension AdaptyUI.ViewConfiguration.Localizer {
+    func richText(
+        adaptyProductId: String,
+        byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown,
+        suffix: String?,
+        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?
+    ) -> AdaptyUI.RichText {
+        if
+            let value = richText(
+                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
                     adaptyProductId: adaptyProductId,
                     byPaymentMode: mode,
                     suffix: suffix
                 ),
                 defaultTextAttributes: defaultTextAttributes
-            )
+            ) {
+            value
+        } else if
+            mode != .unknown,
+            let value = richText(
+                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
+                    adaptyProductId: adaptyProductId,
+                    byPaymentMode: .unknown,
+                    suffix: suffix
+                ),
+                defaultTextAttributes: defaultTextAttributes
+            ) {
+            value
+        } else if
+            let value = richText(
+                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
+                    byPaymentMode: mode,
+                    suffix: suffix
+                ),
+                defaultTextAttributes: defaultTextAttributes
+            ) {
+            value
+        } else if
+            mode != .unknown,
+            let value = richText(
+                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
+                    byPaymentMode: .unknown,
+                    suffix: suffix
+                ),
+                defaultTextAttributes: defaultTextAttributes
+            ) {
+            value
+        } else {
+            .empty
         }
     }
 }
