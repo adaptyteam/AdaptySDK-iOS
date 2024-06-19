@@ -7,221 +7,232 @@
 
 #if canImport(UIKit)
 
-import Adapty
-import Foundation
+    import Adapty
+    import Foundation
 
-@available(iOS 15.0, *)
-protocol ProductsInfoProvider {
-    var selectedProductInfo: ProductInfoModel? { get }
+    @available(iOS 15.0, *)
+    protocol ProductsInfoProvider {
+        var selectedProductInfo: ProductInfoModel? { get }
 
-    func productInfo(by adaptyId: String) -> ProductInfoModel?
-}
-
-@available(iOS 15.0, *)
-extension AdaptyProductsViewModel: ProductsInfoProvider {
-    var selectedProductInfo: ProductInfoModel? {
-        guard let selectedProductId else { return nil }
-        return productInfo(by: selectedProductId)
+        func productInfo(by adaptyId: String) -> ProductInfoModel?
     }
 
-    func productInfo(by adaptyId: String) -> ProductInfoModel? {
-        products.first(where: { $0.adaptyProduct?.adaptyProductId == adaptyId })
-    }
-}
+    @available(iOS 15.0, *)
+    extension AdaptyProductsViewModel: ProductsInfoProvider {
+        var selectedProductInfo: ProductInfoModel? {
+            guard let selectedProductId else { return nil }
+            return productInfo(by: selectedProductId)
+        }
 
-@available(iOS 15.0, *)
-package class AdaptyProductsViewModel: ObservableObject {
-    private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
-
-    private let eventsHandler: AdaptyEventsHandler
-
-    let paywall: AdaptyPaywallInterface
-    let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
-
-    @Published var products: [ProductInfoModel]
-    @Published var selectedProductId: String?
-    @Published var productsLoadingInProgress: Bool = false
-    @Published var purchaseInProgress: Bool = false // TODO: loading indicator
-    @Published var restoreInProgress: Bool = false // TODO: loading indicator
-
-    var adaptyProducts: [AdaptyPaywallProduct]? {
-        didSet {
-            products = Self.generateProductsInfos(paywall: paywall,
-                                                  products: adaptyProducts,
-                                                  eligibilities: introductoryOffersEligibilities)
+        func productInfo(by adaptyId: String) -> ProductInfoModel? {
+            products.first(where: { $0.adaptyProduct?.adaptyProductId == adaptyId })
         }
     }
 
-    var introductoryOffersEligibilities: [String: AdaptyEligibility]? {
-        didSet {
-            products = Self.generateProductsInfos(paywall: paywall,
-                                                  products: adaptyProducts,
-                                                  eligibilities: introductoryOffersEligibilities)
-        }
-    }
+    @available(iOS 15.0, *)
+    package class AdaptyProductsViewModel: ObservableObject {
+        private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
-    package init(eventsHandler: AdaptyEventsHandler,
-                 paywall: AdaptyPaywallInterface,
-                 products: [AdaptyPaywallProduct]?,
-                 viewConfiguration: AdaptyUI.LocalizedViewConfiguration)
-    {
-        self.eventsHandler = eventsHandler
-        self.paywall = paywall
-        self.viewConfiguration = viewConfiguration
+        private let eventsHandler: AdaptyEventsHandler
 
-        self.products = Self.generateProductsInfos(paywall: paywall,
-                                                   products: products,
-                                                   eligibilities: nil)
-    }
+        let paywall: AdaptyPaywallInterface
+        let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
-    private static func generateProductsInfos(paywall: AdaptyPaywallInterface,
-                                              products: [AdaptyPaywallProduct]?,
-                                              eligibilities: [String: AdaptyEligibility]?) -> [ProductInfoModel]
-    {
-        guard let products = products else {
-            return paywall.vendorProductIds.map { EmptyProductInfo(id: $0) }
+        @Published var products: [ProductInfoModel]
+        @Published var selectedProductId: String?
+        @Published var productsLoadingInProgress: Bool = false
+        @Published var purchaseInProgress: Bool = false // TODO: loading indicator
+        @Published var restoreInProgress: Bool = false // TODO: loading indicator
+
+        var adaptyProducts: [AdaptyPaywallProduct]? {
+            didSet {
+                products = Self.generateProductsInfos(
+                    paywall: paywall,
+                    products: adaptyProducts,
+                    eligibilities: introductoryOffersEligibilities
+                )
+            }
         }
 
-        return products.map {
-            RealProductInfo(product: $0,
-                            introEligibility: eligibilities?[$0.vendorProductId] ?? .ineligible)
-        }
-    }
-
-    func loadProductsIfNeeded() {
-        guard !productsLoadingInProgress else { return }
-
-        guard adaptyProducts != nil, introductoryOffersEligibilities == nil else {
-            loadProducts()
-            return
+        var introductoryOffersEligibilities: [String: AdaptyEligibility]? {
+            didSet {
+                products = Self.generateProductsInfos(
+                    paywall: paywall,
+                    products: adaptyProducts,
+                    eligibilities: introductoryOffersEligibilities
+                )
+            }
         }
 
-        loadProductsIntroductoryEligibilities()
-    }
+        package init(
+            eventsHandler: AdaptyEventsHandler,
+            paywall: AdaptyPaywallInterface,
+            products: [AdaptyPaywallProduct]?,
+            viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+        ) {
+            self.eventsHandler = eventsHandler
+            self.paywall = paywall
+            self.viewConfiguration = viewConfiguration
 
-    func selectProduct(id: String) {
-        selectedProductId = id
-
-        if let selectedProduct = adaptyProducts?.first(where: { $0.adaptyProductId == id }) {
-            eventsHandler.event_didSelectProduct(selectedProduct)
+            self.products = Self.generateProductsInfos(
+                paywall: paywall,
+                products: products,
+                eligibilities: nil
+            )
         }
-    }
 
-    private func loadProducts() {
-        productsLoadingInProgress = true
+        private static func generateProductsInfos(
+            paywall: AdaptyPaywallInterface,
+            products: [AdaptyPaywallProduct]?,
+            eligibilities: [String: AdaptyEligibility]?
+        ) -> [ProductInfoModel] {
+            guard let products else {
+                return paywall.vendorProductIds.map { EmptyProductInfo(id: $0) }
+            }
 
-        eventsHandler.log(.verbose, "loadProducts begin")
+            return products.map {
+                RealProductInfo(
+                    product: $0,
+                    introEligibility: eligibilities?[$0.vendorProductId] ?? .ineligible
+                )
+            }
+        }
 
-        queue.async { [weak self] in
-            guard let self = self else { return }
+        func loadProductsIfNeeded() {
+            guard !productsLoadingInProgress else { return }
 
-            self.paywall.getPaywallProducts { [weak self] result in
-                switch result {
-                case let .success(products):
-                    self?.eventsHandler.log(.verbose, "loadProducts success")
+            guard adaptyProducts != nil, introductoryOffersEligibilities == nil else {
+                loadProducts()
+                return
+            }
 
-                    self?.adaptyProducts = products
+            loadProductsIntroductoryEligibilities()
+        }
 
-                    if self?.selectedProductId == nil {
-                        self?.selectedProductId = products.first?.vendorProductId
-                    }
+        func selectProduct(id: String, forGroupId groupId: String) {
+            selectedProductId = id
 
-                    self?.productsLoadingInProgress = false
-                    self?.loadProductsIntroductoryEligibilities()
-                case let .failure(error):
-                    self?.eventsHandler.log(.error, "loadProducts fail: \(error)")
-                    self?.productsLoadingInProgress = false
+            if let selectedProduct = adaptyProducts?.first(where: { $0.adaptyProductId == id }) {
+                eventsHandler.event_didSelectProduct(selectedProduct)
+            }
+        }
 
-                    if self?.eventsHandler.event_didFailLoadingProducts(with: error) ?? false {
-                        self?.queue.asyncAfter(deadline: .now() + .seconds(2)) { [weak self] in
-                            self?.loadProducts()
+        private func loadProducts() {
+            productsLoadingInProgress = true
+
+            eventsHandler.log(.verbose, "loadProducts begin")
+
+            queue.async { [weak self] in
+                guard let self else { return }
+
+                self.paywall.getPaywallProducts { [weak self] result in
+                    switch result {
+                    case let .success(products):
+                        self?.eventsHandler.log(.verbose, "loadProducts success")
+
+                        self?.adaptyProducts = products
+
+                        if self?.selectedProductId == nil {
+                            self?.selectedProductId = products.first?.vendorProductId
+                        }
+
+                        self?.productsLoadingInProgress = false
+                        self?.loadProductsIntroductoryEligibilities()
+                    case let .failure(error):
+                        self?.eventsHandler.log(.error, "loadProducts fail: \(error)")
+                        self?.productsLoadingInProgress = false
+
+                        if self?.eventsHandler.event_didFailLoadingProducts(with: error) ?? false {
+                            self?.queue.asyncAfter(deadline: .now() + .seconds(2)) { [weak self] in
+                                self?.loadProducts()
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    private func loadProductsIntroductoryEligibilities() {
-        guard let products = adaptyProducts else { return }
+        private func loadProductsIntroductoryEligibilities() {
+            guard let products = adaptyProducts else { return }
 
-        eventsHandler.log(.verbose, "loadProductsIntroductoryEligibilities begin")
+            eventsHandler.log(.verbose, "loadProductsIntroductoryEligibilities begin")
 
-        Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
+            Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
+                switch result {
+                case let .success(eligibilities):
+                    self?.introductoryOffersEligibilities = eligibilities
+                    self?.eventsHandler.log(.verbose, "loadProductsIntroductoryEligibilities success: \(eligibilities)")
+                case let .failure(error):
+                    self?.eventsHandler.log(.error, "loadProductsIntroductoryEligibilities fail: \(error)")
+                }
+            }
+        }
+
+        private func handlePurchasedResult(
+            product: AdaptyPaywallProduct,
+            result: AdaptyResult<AdaptyPurchasedInfo>
+        ) {
             switch result {
-            case let .success(eligibilities):
-                self?.introductoryOffersEligibilities = eligibilities
-                self?.eventsHandler.log(.verbose, "loadProductsIntroductoryEligibilities success: \(eligibilities)")
+            case let .success(info):
+                eventsHandler.event_didFinishPurchase(product: product, purchasedInfo: info)
             case let .failure(error):
-                self?.eventsHandler.log(.error, "loadProductsIntroductoryEligibilities fail: \(error)")
+                if error.adaptyErrorCode == .paymentCancelled {
+                    eventsHandler.event_didCancelPurchase(product: product)
+                } else {
+                    eventsHandler.event_didFailPurchase(product: product, error: error)
+                }
+            }
+        }
+
+        private func handleRestoreResult(result: AdaptyResult<AdaptyProfile>) {
+            switch result {
+            case let .success(profile):
+                eventsHandler.event_didFinishRestore(with: profile)
+            case let .failure(error):
+                eventsHandler.event_didFailRestore(with: error)
+            }
+        }
+
+        func logShowPaywall() {
+            eventsHandler.log(.verbose, "logShowPaywall begin")
+
+            paywall.logShowPaywall(viewConfiguration: viewConfiguration) { [weak self] error in
+                if let error {
+                    self?.eventsHandler.log(.error, "logShowPaywall fail: \(error)")
+                } else {
+                    self?.eventsHandler.log(.verbose, "logShowPaywall success")
+                }
+            }
+        }
+
+        // MARK: Actions
+
+        func purchaseSelectedProduct(fromGgoupId groupId: String) {
+            guard let selectedProductId else { return }
+            purchaseProduct(id: selectedProductId)
+        }
+
+        func purchaseProduct(id productId: String) {
+            guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
+
+            eventsHandler.event_didStartPurchase(product: product)
+            purchaseInProgress = true
+
+            Adapty.makePurchase(product: product) { [weak self] result in
+                self?.handlePurchasedResult(product: product, result: result)
+                self?.purchaseInProgress = false
+            }
+        }
+
+        func restorePurchases() {
+            eventsHandler.event_didStartRestore()
+
+            restoreInProgress = true
+            Adapty.restorePurchases { [weak self] result in
+                self?.handleRestoreResult(result: result)
+                self?.restoreInProgress = false
             }
         }
     }
-
-    private func handlePurchasedResult(product: AdaptyPaywallProduct,
-                                       result: AdaptyResult<AdaptyPurchasedInfo>)
-    {
-        switch result {
-        case let .success(info):
-            eventsHandler.event_didFinishPurchase(product: product, purchasedInfo: info)
-        case let .failure(error):
-            if error.adaptyErrorCode == .paymentCancelled {
-                eventsHandler.event_didCancelPurchase(product: product)
-            } else {
-                eventsHandler.event_didFailPurchase(product: product, error: error)
-            }
-        }
-    }
-
-    private func handleRestoreResult(result: AdaptyResult<AdaptyProfile>) {
-        switch result {
-        case let .success(profile):
-            eventsHandler.event_didFinishRestore(with: profile)
-        case let .failure(error):
-            eventsHandler.event_didFailRestore(with: error)
-        }
-    }
-
-    func logShowPaywall() {
-        eventsHandler.log(.verbose, "logShowPaywall begin")
-
-        paywall.logShowPaywall(viewConfiguration: viewConfiguration) { [weak self] error in
-            if let error = error {
-                self?.eventsHandler.log(.error, "logShowPaywall fail: \(error)")
-            } else {
-                self?.eventsHandler.log(.verbose, "logShowPaywall success")
-            }
-        }
-    }
-
-    // MARK: Actions
-
-    func purchaseSelectedProduct() {
-        guard let selectedProductId else { return }
-        purchaseProduct(id: selectedProductId)
-    }
-
-    func purchaseProduct(id productId: String) {
-        guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
-
-        eventsHandler.event_didStartPurchase(product: product)
-        purchaseInProgress = true
-
-        Adapty.makePurchase(product: product) { [weak self] result in
-            self?.handlePurchasedResult(product: product, result: result)
-            self?.purchaseInProgress = false
-        }
-    }
-
-    func restorePurchases() {
-        eventsHandler.event_didStartRestore()
-
-        restoreInProgress = true
-        Adapty.restorePurchases { [weak self] result in
-            self?.handleRestoreResult(result: result)
-            self?.restoreInProgress = false
-        }
-    }
-}
 
 #endif

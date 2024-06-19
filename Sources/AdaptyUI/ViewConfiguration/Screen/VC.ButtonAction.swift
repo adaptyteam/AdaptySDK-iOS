@@ -13,9 +13,9 @@ extension AdaptyUI.ViewConfiguration {
         case openUrl(String)
         case restore
         case custom(id: String)
-        case select(productId: String)
+        case select(productId: String, groupId: String?)
         case purchase(productId: String)
-        case purchaseSelectedProduct
+        case purchaseSelectedProduct(groupId: String?)
         case switchSection(sectionId: String, index: Int)
         case open(screenId: String)
         case closeScreen
@@ -32,12 +32,12 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             .restore
         case let .custom(id: id):
             .custom(id: id)
-        case let .select(productId: productId):
-            .selectProductId(id: productId)
+        case let .select(productId, groupId):
+            .selectProductId(id: productId, groupId: groupId ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId)
         case let .purchase(productId: productId):
             .purchaseProductId(id: productId)
-        case .purchaseSelectedProduct:
-            .purchaseSelectedProduct
+        case let .purchaseSelectedProduct(groupId):
+            .purchaseSelectedProduct(groupId: groupId ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId)
         case let .switchSection(sectionId, index):
             .switchSection(id: sectionId, index: index)
         case let .open(screenId):
@@ -56,6 +56,7 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
         case url
         case customId = "custom_id"
         case productId = "product_id"
+        case groupId = "group_id"
         case sectionId = "section_id"
         case screenId = "screen_id"
         case index
@@ -88,9 +89,14 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
         case .custom:
             self = try .custom(id: container.decode(String.self, forKey: .customId))
         case .purchaseSelectedProduct:
-            self = .purchaseSelectedProduct
+            self = try .purchaseSelectedProduct(
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId)
+            )
         case .selectProductId:
-            self = try .select(productId: container.decode(String.self, forKey: .productId))
+            self = try .select(
+                productId: container.decode(String.self, forKey: .productId),
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId)
+            )
         case .purchaseProductId:
             self = try .purchase(productId: container.decode(String.self, forKey: .productId))
         case .switchSection:
