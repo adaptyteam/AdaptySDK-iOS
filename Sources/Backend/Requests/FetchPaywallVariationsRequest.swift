@@ -33,6 +33,7 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
             .setPaywallLocale(locale)
             .setBackendProfileId(profileId)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
+            .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
             .setSegmentId(segmentId)
     }
 }
@@ -114,6 +115,7 @@ extension HTTPSession {
                 "locale": .value(locale),
                 "segment_id": .value(segmentId),
                 "builder_version": .value(AdaptyUI.builderVersion),
+                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
                 "md5": .value(md5Hash),
             ]
         ) { (result: FetchPaywallVariationsRequest.Result) in

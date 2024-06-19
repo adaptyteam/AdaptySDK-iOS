@@ -53,6 +53,7 @@ extension HTTPSession {
                 "placement_id": .value(placementId),
                 "language_code": .valueOrNil(locale.languageCode),
                 "builder_version": .value(AdaptyUI.builderVersion),
+                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
             ]
         ) { [weak self] (result: FetchFallbackPaywallVariationsRequest.Result) in
             switch result {

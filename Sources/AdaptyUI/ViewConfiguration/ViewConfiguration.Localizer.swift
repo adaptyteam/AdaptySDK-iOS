@@ -41,7 +41,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 extension AdaptyUI {
     package enum LocalizerError: Swift.Error {
         case notFoundAsset(String)
-        case wrongTypeAsset(String)
+        case wrongTypeAsset(String, expected: String)
 
         case unknownReference(String)
         case referenceCycle(String)

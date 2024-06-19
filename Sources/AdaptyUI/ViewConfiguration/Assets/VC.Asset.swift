@@ -26,7 +26,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     @inlinable
     func filling(_ assetId: String) throws -> AdaptyUI.Filling {
         guard case let .filling(value) = try asset(assetId) else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color, any-gradient, or image")
         }
         return value
     }
@@ -34,7 +34,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     @inlinable
     func color(_ assetId: String) throws -> AdaptyUI.Color {
         guard let value = try filling(assetId).asColor else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
         }
         return value
     }
@@ -42,7 +42,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     @inlinable
     func colorFilling(_ assetId: String) throws -> AdaptyUI.ColorFilling {
         guard let value = try filling(assetId).asColorFilling else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color or any-gradient")
         }
         return value
     }
@@ -50,7 +50,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     @inlinable
     func imageData(_ assetId: String) throws -> AdaptyUI.ImageData {
         guard let value = try filling(assetId).asImage else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "image")
         }
         return value
     }
@@ -58,7 +58,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     @inlinable
     func font(_ assetId: String) throws -> AdaptyUI.Font {
         guard case let .font(value) = try asset(assetId) else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId)
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "font")
         }
         return value
     }

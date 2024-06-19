@@ -52,8 +52,6 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         responseLocale = try superContainer.decode(AdaptyLocale.self, forKey: .responseLocale)
         let container = try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
 
-        let _ = try (container.decode(String.self, forKey: .format).split(separator: ".").first).flatMap { Int($0) } ?? 2
-
         templateId = try container.decode(String.self, forKey: .templateId)
         templateRevision = try container.decode(Int64.self, forKey: .templateRevision)
 

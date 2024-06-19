@@ -10,19 +10,16 @@ import Foundation
 extension AdaptyUI {
     package struct BottomSheet {
         package let content: Element
-        package let selectedAdaptyProductId: String?
     }
 }
 
 #if DEBUG
     package extension AdaptyUI.BottomSheet {
         static func create(
-            content: AdaptyUI.Element,
-            selectedAdaptyProductId: String? = nil
+            content: AdaptyUI.Element
         ) -> Self {
             .init(
-                content: content,
-                selectedAdaptyProductId: selectedAdaptyProductId
+                content: content
             )
         }
     }

@@ -39,6 +39,7 @@ extension HTTPSession {
                 "api_prefix": .value(apiKeyPrefix),
                 "paywall_instance_id": .value(paywallInstanceIdentity),
                 "builder_version": .value(AdaptyUI.builderVersion),
+                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
                 "language_code": .valueOrNil(locale.languageCode),
             ]
         ) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in

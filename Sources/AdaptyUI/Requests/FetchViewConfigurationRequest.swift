@@ -22,7 +22,8 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
         headers = Headers()
             .setViewConfigurationLocale(locale)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
-            .setAdaptyUISDKVersion(Adapty.SDKVersion)
+            .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
+
     }
 }
 
@@ -45,7 +46,14 @@ extension HTTPSession {
         perform(
             request,
             logName: "get_paywall_builder",
-            logParams: ["variation_id": .value(paywallVariationId)]
+            logParams: [
+                "api_prefix": .value(apiKeyPrefix),
+                "variation_id": .value(paywallVariationId),
+                "locale": .value(locale),
+                "builder_version": .value(AdaptyUI.builderVersion),
+                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
+                "md5": .value(md5Hash),
+            ]
         ) { (result: FetchViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):

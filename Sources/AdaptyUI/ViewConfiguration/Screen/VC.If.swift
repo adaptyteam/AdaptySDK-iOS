@@ -23,7 +23,7 @@ extension AdaptyUI.ViewConfiguration {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             content = if
                 try container.decodeIfPresent(String.self, forKey: .platform).map({ $0 == "ios" }) ?? true,
-                try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUI.builderVersion.isSameOrNewerVersion) ?? true {
+                try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUI.configurationFormatVersion.isSameOrNewerVersion) ?? true {
                 try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .then)
             } else {
                 try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .else)

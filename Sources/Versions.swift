@@ -17,7 +17,8 @@ extension Adapty {
 }
 
 extension AdaptyUI {
-    static let builderVersion = "4"
+    static let configurationFormatVersion = "4.0.0-SNAPSHOT"
+    static let builderVersion = "4_0"
 }
 
 extension Environment {

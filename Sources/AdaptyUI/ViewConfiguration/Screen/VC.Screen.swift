@@ -33,8 +33,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
     func bottomSheet(_ from: AdaptyUI.ViewConfiguration.Screen) throws -> AdaptyUI.BottomSheet {
         try .init(
-            content: element(from.content),
-            selectedAdaptyProductId: from.selectedAdaptyProductId
+            content: element(from.content)
         )
     }
 }
