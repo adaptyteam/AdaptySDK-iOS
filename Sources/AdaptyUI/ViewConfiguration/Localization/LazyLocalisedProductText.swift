@@ -40,15 +40,18 @@ extension AdaptyUI {
     }
 
     package struct LazyLocalisedUnknownProductText {
+        package let productGroupId: String
         private let suffix: String?
         private let localizer: ViewConfiguration.Localizer
         private let defaultTextAttributes: ViewConfiguration.TextAttributes?
 
         init(
+            productGroupId: String,
             suffix: String?,
             localizer: ViewConfiguration.Localizer,
             defaultTextAttributes: ViewConfiguration.TextAttributes?
         ) {
+            self.productGroupId = productGroupId
             self.suffix = suffix
             self.localizer = localizer
             self.defaultTextAttributes = defaultTextAttributes

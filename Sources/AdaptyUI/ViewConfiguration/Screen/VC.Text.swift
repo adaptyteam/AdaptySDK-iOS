@@ -37,6 +37,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
                     ))
                 } else {
                     .selectedProductText(AdaptyUI.LazyLocalisedUnknownProductText(
+                        productGroupId: info.productGroupId ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId,
                         suffix: info.suffix,
                         localizer: self,
                         defaultTextAttributes: textBlock.defaultTextAttributes

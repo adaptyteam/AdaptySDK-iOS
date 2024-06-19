@@ -17,7 +17,9 @@ extension AdaptyUI.ViewConfiguration {
 
 extension AdaptyUI.ViewConfiguration.StringId {
     struct Product {
+        static let defaultProductGroupId = "group_A"
         let adaptyProductId: String?
+        let productGroupId: String?
         let suffix: String?
 
         static func calculate(suffix: String?) -> String {
@@ -36,7 +38,7 @@ extension AdaptyUI.ViewConfiguration.StringId {
                 "PRODUCT_\(adaptyProductId)_\(mode)"
             }
         }
-        
+
         static func calculate(byPaymentMode mode: AdaptyProductDiscount.PaymentMode, suffix: String?) -> String {
             let mode = mode.asString ?? "default"
             return if let suffix {
@@ -69,6 +71,7 @@ extension AdaptyUI.ViewConfiguration.StringId.Product: Decodable {
     static let typeValue = "product"
     enum CodingKeys: String, CodingKey {
         case type
+        case productGroupId = "group_id"
         case adaptyProductId = "id"
         case suffix
     }
@@ -81,6 +84,7 @@ extension AdaptyUI.ViewConfiguration.StringId.Product: Decodable {
         }
 
         adaptyProductId = try container.decodeIfPresent(String.self, forKey: .adaptyProductId)
+        productGroupId = try container.decodeIfPresent(String.self, forKey: .productGroupId)
         suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
     }
 }
