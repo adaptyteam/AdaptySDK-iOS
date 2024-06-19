@@ -12,11 +12,15 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyUIButtonView: View {
+    @Environment(\.adaptyScreenId)
+    private var screenId: String
+    
     private var button: AdaptyUI.Button
 
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
     @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
     @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
+    @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
 
     init(_ button: AdaptyUI.Button) {
         self.button = button
@@ -56,11 +60,13 @@ struct AdaptyUIButtonView: View {
         case let .switchSection(sectionId, index):
             sectionsViewModel.updateSelection(for: sectionId, index: index)
         case let .openScreen(id):
-            // TODO: implement
-            break
+//            withAnimation {
+                screensViewModel.presentScreen(id: id)
+//            }
         case .closeScreen:
-            // TODO: implement
-            break
+//            withAnimation {
+                screensViewModel.dismissScreen(id: screenId)
+//            }
         case .close:
             actionsViewModel.closeActionOccured()
         case let .openUrl(url):
