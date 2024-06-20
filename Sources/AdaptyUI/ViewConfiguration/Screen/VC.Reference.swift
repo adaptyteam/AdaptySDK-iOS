@@ -31,7 +31,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
 extension AdaptyUI.ViewConfiguration.Screen {
     var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
-        [cover, content, footer, overlay].compactMap { $0 }.flatMap { $0.referencedElemnts }
+        [content, footer, overlay].compactMap { $0 }.flatMap { $0.referencedElemnts }
     }
 }
 

@@ -11,7 +11,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     struct Screen {
         let backgroundAssetId: String?
-        let cover: Element?
+        let cover: Box?
         let content: Element
         let footer: Element?
         let overlay: Element?
@@ -23,7 +23,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     func screen(_ from: AdaptyUI.ViewConfiguration.Screen) throws -> AdaptyUI.Screen {
         try .init(
             background: from.backgroundAssetId.flatMap { try? filling($0) } ?? AdaptyUI.Screen.defaultBackground,
-            cover: from.cover.map(element),
+            cover: from.cover.map(box),
             content: element(from.content),
             footer: from.footer.map(element),
             overlay: from.overlay.map(element),
