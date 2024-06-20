@@ -71,8 +71,7 @@ struct AdaptyUIBasicContainerView: View {
     @ViewBuilder
     func contentView(
         content: AdaptyUI.Element,
-        coverBox: AdaptyUI.Box,
-        additionalBottomPadding: Double
+        coverBox: AdaptyUI.Box
     ) -> some View {
         let coverHeight: CGFloat = {
             if let boxHeight = coverBox.height, case let .fixed(unit) = boxHeight {
@@ -82,6 +81,7 @@ struct AdaptyUIBasicContainerView: View {
             }
         }()
 
+        let bottomOverscrollHeight = 120.0
         let properties = content.properties
         let selfHeight = screenSize.height - coverHeight
         let offsetY = properties?.offset.y ?? 0
@@ -122,10 +122,12 @@ struct AdaptyUIBasicContainerView: View {
                 AdaptyUIUnknownElementView(value: value)
             }
         }
-        .frame(minHeight: selfHeight + additionalBottomPadding - offsetY + 120,
+        .padding(.bottom, footerSize.height)
+        .frame(minHeight: selfHeight + footerSize.height - offsetY,
                alignment: .top)
+        .padding(.bottom, bottomOverscrollHeight)
         .applyingProperties(properties)
-        .padding(.bottom, -120)
+        .padding(.bottom, -bottomOverscrollHeight)
     }
 
     @State var footerSize: CGSize = .zero
@@ -144,8 +146,7 @@ struct AdaptyUIBasicContainerView: View {
 
                             contentView(
                                 content: screen.content,
-                                coverBox: coverBox,
-                                additionalBottomPadding: footerSize.height
+                                coverBox: coverBox
                             )
                         }
                     }
