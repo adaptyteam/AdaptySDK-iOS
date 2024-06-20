@@ -11,23 +11,25 @@ extension AdaptyUI {
     package enum Unit {
         case point(Double)
         case screen(Double)
+        case safeArea(SafeArea)
     }
 }
 
 extension AdaptyUI.Unit {
-    package func points(screenSize: Double) -> Double {
-        switch self {
-        case let .point(value): value
-        case let .screen(value): value * screenSize
-        }
+    package enum SafeArea: String {
+        case start
+        case end
     }
 }
+
+extension AdaptyUI.Unit.SafeArea: Decodable {}
 
 extension AdaptyUI.Unit: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
         case unit
         case point
+        case safeArea = "safe_area"
         case screen
     }
 
@@ -40,6 +42,8 @@ extension AdaptyUI.Unit: Decodable {
                 self = .screen(value)
             } else if let value = try container.decodeIfPresent(Double.self, forKey: .point) {
                 self = .point(value)
+            } else if let value = try container.decodeIfPresent(SafeArea.self, forKey: .safeArea) {
+                self = .safeArea(value)
             } else {
                 let value = try container.decode(Double.self, forKey: .value)
                 let unit = try container.decodeIfPresent(String.self, forKey: .unit)
