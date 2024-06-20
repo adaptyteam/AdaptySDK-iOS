@@ -24,7 +24,8 @@ struct AdaptyUIBasicContainerView: View {
 
     @ViewBuilder
     func coverView(_ box: AdaptyUI.Box,
-                   _ content: AdaptyUI.Element) -> some View
+                   _ content: AdaptyUI.Element,
+                   _ properties: AdaptyUI.Element.Properties?) -> some View
     {
         let height: CGFloat = {
             if let boxHeight = box.height, case let .fixed(unit) = boxHeight {
@@ -42,6 +43,7 @@ struct AdaptyUIBasicContainerView: View {
             AdaptyUIElementView(content)
                 .frame(width : p.size.width,
                        height: isScrollingDown ? height + minY: height)
+//                .applyingProperties(properties)
                 .clipped()
                 .offset(
                     y: {
@@ -58,12 +60,20 @@ struct AdaptyUIBasicContainerView: View {
     }
 
     @ViewBuilder
-    func contentView(box: AdaptyUI.Box,
-                     coverBox: AdaptyUI.Box,
-                     content: AdaptyUI.Element,
-                     properties: AdaptyUI.Element.Properties?,
-                     additionalBottomPadding: Double) -> some View
-    {
+    private func elementOrEmpty(_ content: AdaptyUI.Element?) -> some View {
+        if let content {
+            AdaptyUIElementView(content)
+        } else {
+            Color.clear
+        }
+    }
+
+    @ViewBuilder
+    func contentView(
+        content: AdaptyUI.Element,
+        coverBox: AdaptyUI.Box,
+        additionalBottomPadding: Double
+    ) -> some View {
         let coverHeight: CGFloat = {
             if let boxHeight = coverBox.height, case let .fixed(unit) = boxHeight {
                 return unit.points(screenSize: screenSize.height)
@@ -72,18 +82,50 @@ struct AdaptyUIBasicContainerView: View {
             }
         }()
 
+        let properties = content.properties
         let selfHeight = screenSize.height - coverHeight
         let offsetY = properties?.offset.y ?? 0
 
-        // TODO: refactor
-        AdaptyUIElementView(content)
-            .background(Color.blue)
-            .padding(.bottom, additionalBottomPadding)
-            .background(Color.brown)
-            .frame(minHeight: selfHeight + additionalBottomPadding - offsetY + 120,
-                   alignment: .top)
-            .applyingProperties(properties)
-            .padding(.bottom, -120)
+        Group {
+            switch content {
+            case let .space(count):
+                if count > 0 {
+                    ForEach(0 ..< count, id: \.self) { _ in
+                        Spacer()
+                    }
+                }
+            case let .box(box, properties):
+                elementOrEmpty(box.content)
+                    .fixedFrame(box: box)
+                    .rangedFrame(box: box)
+            case let .stack(stack, properties):
+                AdaptyUIStackView(stack)
+            case let .text(text, properties):
+                AdaptyUITextView(text)
+            case let .image(image, properties):
+                AdaptyUIImageView(image)
+            case let .button(button, properties):
+                AdaptyUIButtonView(button)
+            case let .row(row, properties):
+                AdaptyUIRowView(row)
+            case let .column(column, properties):
+                AdaptyUIColumnView(column)
+            case let .section(section, properties):
+                AdaptyUISectionView(section)
+            case let .toggle(toggle, properties):
+                AdaptyUIToggleView(toggle)
+            case let .timer(timer, properties):
+                AdaptyUITimerView(timer)
+            case let .pager(pager, properties):
+                AdaptyUIPagerView(pager)
+            case let .unknown(value, properties):
+                AdaptyUIUnknownElementView(value: value)
+            }
+        }
+        .frame(minHeight: selfHeight + additionalBottomPadding - offsetY + 120,
+               alignment: .top)
+        .applyingProperties(properties)
+        .padding(.bottom, -120)
     }
 
     @State var footerSize: CGSize = .zero
@@ -93,27 +135,20 @@ struct AdaptyUIBasicContainerView: View {
             ZStack(alignment: .bottom) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        if let coverBox = screen.cover,
-                           let coverContent = coverBox.content,
-                           case let .box(contentBox, contentProperties) = screen.content, let contentContent = contentBox.content
-                        {
-                            coverView(coverBox,
-                                      coverContent)
+                        if let coverBox = screen.cover, let coverContent = coverBox.content {
+                            coverView(
+                                coverBox,
+                                coverContent,
+                                nil
+                            )
 
                             contentView(
-                                box: contentBox,
+                                content: screen.content,
                                 coverBox: coverBox,
-                                content: contentContent,
-                                properties: contentProperties,
                                 additionalBottomPadding: footerSize.height
                             )
                         }
-
-//                        if  {
-//                            contentView(box, content, properties, additionalBottomPadding: footerSize.height)
-//                        }
                     }
-//                    .padding(.bottom, footerSize.height)
                 }
 
                 if let footer = screen.footer {
