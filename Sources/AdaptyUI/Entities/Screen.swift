@@ -12,7 +12,7 @@ extension AdaptyUI {
         static let defaultBackground: AdaptyUI.Filling = .color(AdaptyUI.Color.black)
 
         package let background: AdaptyUI.Filling
-        package let cover: Element?
+        package let cover: Box?
         package let content: Element
         package let footer: Element?
         package let overlay: Element?
@@ -24,7 +24,7 @@ extension AdaptyUI {
     package extension AdaptyUI.Screen {
         static func create(
             background: AdaptyUI.Filling = AdaptyUI.Screen.defaultBackground,
-            cover: AdaptyUI.Element? = nil,
+            cover: AdaptyUI.Box? = nil,
             content: AdaptyUI.Element,
             footer: AdaptyUI.Element? = nil,
             overlay: AdaptyUI.Element? = nil,

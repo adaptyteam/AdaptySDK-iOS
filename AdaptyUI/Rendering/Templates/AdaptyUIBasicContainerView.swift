@@ -43,7 +43,7 @@ struct AdaptyUIBasicContainerView: View {
             AdaptyUIElementView(content)
                 .frame(width : p.size.width,
                        height: isScrollingDown ? height + minY: height)
-                .applyingProperties(properties)
+//                .applyingProperties(properties)
                 .clipped()
                 .offset(
                     y: {
@@ -135,10 +135,12 @@ struct AdaptyUIBasicContainerView: View {
             ZStack(alignment: .bottom) {
                 ScrollView {
                     VStack(spacing: 0) {
-                        if case let .box(coverBox, coverProperties) = screen.cover, let coverContent = coverBox.content {
-                            coverView(coverBox,
-                                      coverContent,
-                                      coverProperties)
+                        if let coverBox = screen.cover, let coverContent = coverBox.content {
+                            coverView(
+                                coverBox,
+                                coverContent,
+                                nil
+                            )
 
                             contentView(
                                 content: screen.content,
@@ -146,12 +148,7 @@ struct AdaptyUIBasicContainerView: View {
                                 additionalBottomPadding: footerSize.height
                             )
                         }
-
-//                        if  {
-//                            contentView(box, content, properties, additionalBottomPadding: footerSize.height)
-//                        }
                     }
-//                    .padding(.bottom, footerSize.height)
                 }
 
                 if let footer = screen.footer {
