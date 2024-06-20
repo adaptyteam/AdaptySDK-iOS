@@ -14,6 +14,13 @@ extension AdaptyUI {
         package let topTrailing: Double
         package let bottomTrailing: Double
         package let bottomLeading: Double
+        
+        package init(topLeading: Double, topTrailing: Double, bottomTrailing: Double, bottomLeading: Double) {
+            self.topLeading = topLeading
+            self.topTrailing = topTrailing
+            self.bottomTrailing = bottomTrailing
+            self.bottomLeading = bottomLeading
+        }
     }
 }
 

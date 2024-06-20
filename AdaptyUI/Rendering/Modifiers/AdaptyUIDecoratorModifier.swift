@@ -131,9 +131,14 @@ extension AdaptyUI.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(_ filling: AdaptyUI.Filling?) -> some View {
         switch self {
-        case .rectangle(let cornerRadii):
-            UnevenRoundedRectangleFallback(cornerRadii: cornerRadii)
-                .fill(filling: filling)
+        case .rectangle(let radii):
+            if #available(iOS 16.0, *) {
+                UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
+                    .fill(filling: filling)
+            } else {
+                UnevenRoundedRectangleFallback(cornerRadii: radii)
+                    .fill(filling: filling)
+            }
         case .circle:
             Circle()
                 .fill(filling: filling)
