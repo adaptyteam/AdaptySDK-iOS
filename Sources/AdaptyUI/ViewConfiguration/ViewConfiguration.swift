@@ -19,6 +19,7 @@ extension AdaptyUI {
         let defaultScreen: Screen
         let screens: [String: Screen]
         let referencedElemnts: [String: Element]
+        let selectedProducts: [String: String]
     }
 }
 
@@ -44,6 +45,8 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         case defaultLocalization = "default_localization"
         case screens = "styles"
         case defaultScreen = "default"
+        case products
+        case selected
     }
 
     init(from decoder: Decoder) throws {
@@ -54,6 +57,17 @@ extension AdaptyUI.ViewConfiguration: Decodable {
 
         templateId = try container.decode(String.self, forKey: .templateId)
         templateRevision = try container.decode(Int64.self, forKey: .templateRevision)
+
+        if container.contains(.products) {
+            let products = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
+            if let selected = try? products.decodeIfPresent(String.self, forKey: .selected) {
+                selectedProducts = [AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId: selected]
+            } else {
+                selectedProducts = try products.decode([String: String].self, forKey: .selected)
+            }
+        } else {
+            selectedProducts = [:]
+        }
 
         assets = try (container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
 
