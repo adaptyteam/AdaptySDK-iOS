@@ -21,24 +21,19 @@ struct AdaptyUITransparentContainerView: View {
         _ element: AdaptyUI.Element,
         globalProxy: GeometryProxy
     ) -> some View {
-        let additionalTopPadding = globalProxy.size.height - footerSize.height - globalProxy.safeAreaInsets.top - globalProxy.safeAreaInsets.bottom
-        
+        let additionalTopPadding = globalProxy.size.height - footerSize.height + globalProxy.safeAreaInsets.top + globalProxy.safeAreaInsets.bottom
+
         ScrollViewReader { scrollProxy in
             ScrollView {
                 VStack(spacing: 0) {
                     if additionalTopPadding > 0 {
-                        Spacer()
+                        Color.clear
                             .frame(height: additionalTopPadding)
                     }
-                    
+
                     AdaptyUIElementView(
                         element,
-                        additionalPadding: EdgeInsets(
-                            top: globalProxy.safeAreaInsets.top,
-                            leading: 0,
-                            bottom: globalProxy.safeAreaInsets.bottom,
-                            trailing: 0
-                        )
+                        additionalPadding: globalProxy.safeAreaInsets
                     )
                     .id("content")
                     .background(
@@ -49,7 +44,6 @@ struct AdaptyUITransparentContainerView: View {
                                 }
                         }
                     )
-
                 }
             }
             .onAppear {
@@ -60,25 +54,16 @@ struct AdaptyUITransparentContainerView: View {
         }
     }
 
-    @ViewBuilder
-    private func footerView(
-        _ element: AdaptyUI.Element,
-        globalProxy: GeometryProxy
-    ) -> some View {
-            scrollableFooterView(
-                element,
-                globalProxy: globalProxy
-            )
-    }
-
     var body: some View {
         GeometryReader { p in
             ZStack(alignment: .bottom) {
                 AdaptyUIElementView(screen.content)
-                    .ignoresSafeArea()
 
                 if let footer = screen.footer {
-                    footerView(footer, globalProxy: p)
+                    scrollableFooterView(
+                        footer,
+                        globalProxy: p
+                    )
                 }
 
                 if let overlay = screen.overlay {
@@ -88,7 +73,6 @@ struct AdaptyUITransparentContainerView: View {
                     )
                 }
             }
-            .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
             .ignoresSafeArea()
         }
     }
