@@ -51,6 +51,8 @@
             switch action {
             case let .selectProductId(id, groupId):
                 productsViewModel.selectProduct(id: id, forGroupId: groupId)
+            case let .unselectProduct(groupId): // TODO:  
+                break
             case let .purchaseSelectedProduct(groupId):
                 productsViewModel.purchaseSelectedProduct(fromGgoupId: groupId)
             case let .purchaseProductId(productId):

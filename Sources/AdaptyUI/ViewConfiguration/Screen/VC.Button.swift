@@ -13,6 +13,7 @@ extension AdaptyUI.ViewConfiguration {
         let action: AdaptyUI.ViewConfiguration.ButtonAction
         let normalState: AdaptyUI.ViewConfiguration.Element
         let selectedState: AdaptyUI.ViewConfiguration.Element?
+        let selectedCondition: AdaptyUI.Button.SelectedCondition?
     }
 }
 
@@ -21,7 +22,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         try .init(
             action: buttonAction(from.action),
             normalState: element(from.normalState),
-            selectedState: from.selectedState.map(element)
+            selectedState: from.selectedState.map(element),
+            selectedCondition: from.selectedCondition
         )
     }
 
@@ -36,6 +38,7 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
         case action
         case normalState = "normal"
         case selectedState = "selected"
+        case selectedCondition = "selected_condition"
     }
 
     init(from decoder: any Decoder) throws {
@@ -43,7 +46,8 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
         try self.init(
             action: container.decode(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action),
             normalState: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
-            selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState)
+            selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState),
+            selectedCondition: container.decodeIfPresent(AdaptyUI.Button.SelectedCondition.self, forKey: .selectedCondition)
         )
     }
 }

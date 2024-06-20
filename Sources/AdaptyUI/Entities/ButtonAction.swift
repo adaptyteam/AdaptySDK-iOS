@@ -14,6 +14,7 @@ extension AdaptyUI {
         case custom(id: String)
         case selectProductId(id: String, groupId: String)
         case purchaseProductId(id: String)
+        case unselectProduct(groupId: String)
         case purchaseSelectedProduct(groupId: String)
         case close
         case switchSection(id: String, index: Int)

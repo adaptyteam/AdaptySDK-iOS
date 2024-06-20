@@ -13,9 +13,10 @@ extension AdaptyUI.ViewConfiguration {
         case openUrl(String)
         case restore
         case custom(id: String)
-        case select(productId: String, groupId: String?)
+        case select(productId: String, groupId: String)
         case purchase(productId: String)
-        case purchaseSelectedProduct(groupId: String?)
+        case purchaseSelectedProduct(groupId: String)
+        case unselectProduct(groupId: String)
         case switchSection(sectionId: String, index: Int)
         case open(screenId: String)
         case closeScreen
@@ -33,11 +34,13 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         case let .custom(id: id):
             .custom(id: id)
         case let .select(productId, groupId):
-            .selectProductId(id: productId, groupId: groupId ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId)
+            .selectProductId(id: productId, groupId: groupId)
         case let .purchase(productId: productId):
             .purchaseProductId(id: productId)
+        case let .unselectProduct(groupId):
+            .unselectProduct(groupId: groupId)
         case let .purchaseSelectedProduct(groupId):
-            .purchaseSelectedProduct(groupId: groupId ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId)
+            .purchaseSelectedProduct(groupId: groupId)
         case let .switchSection(sectionId, index):
             .switchSection(id: sectionId, index: index)
         case let .open(screenId):
@@ -73,6 +76,7 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
         case selectProductId = "select_product"
         case purchaseProductId = "purchase_product"
         case purchaseSelectedProduct = "purchase_selected_product"
+        case unselectProduct = "unselect_product"
     }
 
     package init(from decoder: Decoder) throws {
@@ -90,13 +94,18 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
             self = try .custom(id: container.decode(String.self, forKey: .customId))
         case .purchaseSelectedProduct:
             self = try .purchaseSelectedProduct(
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId)
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
+            )
+        case .unselectProduct:
+            self = try .unselectProduct(
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
             )
         case .selectProductId:
             self = try .select(
                 productId: container.decode(String.self, forKey: .productId),
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId)
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
             )
+
         case .purchaseProductId:
             self = try .purchase(productId: container.decode(String.self, forKey: .productId))
         case .switchSection:
