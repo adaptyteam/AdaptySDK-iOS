@@ -29,7 +29,7 @@
         private var currentStateView: AdaptyUI.Element {
             switch button.action {
             case let .selectProductId(productId, groupId):
-                if productId == productsViewModel.selectedProductId {
+                if let selectedProductId = productsViewModel.selectedProductId(by: groupId), productId == selectedProductId {
                     button.selectedState ?? button.normalState
                 } else {
                     button.normalState

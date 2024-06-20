@@ -150,8 +150,8 @@ extension AdaptyUI.Text {
 
             return (value.richText(byPaymentMode: product.paymentMode), product)
         case let .selectedProductText(value):
-            let productGroupId = value.productGroupId // TODO: use selected_product from productGroupId  !!
-            guard let product = productsInfoProvider.selectedProductInfo, let adaptyProductId = product.adaptyProduct?.adaptyProductId else {
+            guard let product = productsInfoProvider.selectedProductInfo(by: value.productGroupId),
+                  let adaptyProductId = product.adaptyProduct?.adaptyProductId else {
                 return (value.richText(), nil)
             }
 
