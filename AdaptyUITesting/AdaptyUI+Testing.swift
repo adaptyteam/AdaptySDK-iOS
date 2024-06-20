@@ -65,8 +65,7 @@ public struct AdaptyUITestRendererView: View {
             if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
                 AdaptyUITemplateResolverView(
                     template: template,
-                    screen: screen,
-                    isRightToLeft: viewConfiguration.isRightToLeft
+                    screen: screen
                 )
                 .environmentObject(AdaptyUIActionsViewModel(eventsHandler: eventsHandler))
                 .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
@@ -84,6 +83,7 @@ public struct AdaptyUITestRendererView: View {
                     AdaptyScreensViewModel(eventsHandler: eventsHandler,
                                            viewConfiguration: viewConfiguration)
                 )
+                .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
             } else {
                 AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
             }
@@ -105,6 +105,7 @@ public struct AdaptyUITestRendererView: View {
                     AdaptyScreensViewModel(eventsHandler: eventsHandler,
                                            viewConfiguration: viewConfiguration)
                 )
+                .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
         }
     }
 }

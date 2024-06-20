@@ -93,7 +93,7 @@ extension AdaptyUI.ViewConfiguration.Pager.PageControl: Decodable {
         case padding
         case dotSize = "dot_size"
         case spacing
-        case colorAssetId
+        case colorAssetId = "color"
         case selectedColorAssetId = "selected_color"
     }
 

@@ -176,20 +176,24 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
 
     @ViewBuilder
     private func bodyWithBackground(content: Content, background: AdaptyUI.Filling?) -> some View {
-        switch background {
-        case .image(let imageData):
+        if let background {
+            switch background {
+            case .image(let imageData):
+                content
+                    .background {
+                        AdaptyUIImageView(asset: imageData,
+                                          aspect: .fill,
+                                          tint: nil)
+                    }
+            default:
+                content
+                    .background {
+                        self.decorator.shapeType
+                            .swiftUIShapeFill(self.decorator.background)
+                    }
+            }
+        } else {
             content
-                .background {
-                    AdaptyUIImageView(asset: imageData,
-                                      aspect: .fill,
-                                      tint: nil)
-                }
-        default:
-            content
-                .background {
-                    self.decorator.shapeType
-                        .swiftUIShapeFill(self.decorator.background)
-                }
         }
     }
 
