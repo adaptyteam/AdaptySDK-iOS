@@ -16,6 +16,7 @@ extension AdaptyUI {
         package let screen: Screen
         package let bottomSheets: [String: BottomSheet]
         package let templateRevision: Int64
+        package let selectedProducts: [String: String]
     }
 }
 
@@ -28,7 +29,8 @@ extension AdaptyUI {
             templateId: String,
             screen: AdaptyUI.Screen,
             bottomSheets: [String: AdaptyUI.BottomSheet] = [:],
-            templateRevision: Int64 = 0
+            templateRevision: Int64 = 0,
+            selectedProducts: [String: String] = [:]
         ) -> Self {
             .init(
                 id: id,
@@ -37,7 +39,8 @@ extension AdaptyUI {
                 templateId: templateId,
                 screen: screen,
                 bottomSheets: bottomSheets,
-                templateRevision: templateRevision
+                templateRevision: templateRevision,
+                selectedProducts: selectedProducts
             )
         }
     }

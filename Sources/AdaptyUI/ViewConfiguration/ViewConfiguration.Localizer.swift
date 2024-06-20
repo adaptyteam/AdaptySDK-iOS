@@ -32,11 +32,11 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             templateId: source.templateId,
             screen: screen(source.defaultScreen),
             bottomSheets: source.screens.mapValues(bottomSheet),
-            templateRevision: source.templateRevision
+            templateRevision: source.templateRevision,
+            selectedProducts: source.selectedProducts
         )
     }
 }
-
 
 extension AdaptyUI {
     package enum LocalizerError: Swift.Error {

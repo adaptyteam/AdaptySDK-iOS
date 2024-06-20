@@ -18,7 +18,8 @@ import Foundation
             images: [String] = [],
             colors: [String: String] = [:],
             strings: [String: String] = [:],
-            content: String
+            content: String,
+            selectedProducts: [String: String] = [:]
         ) throws -> Self {
             let locale = AdaptyLocale(id: locale)
 
@@ -108,8 +109,8 @@ import Foundation
                 screens: [:],
                 referencedElemnts: [String: AdaptyUI.ViewConfiguration.Element](screen.referencedElemnts, uniquingKeysWith: { _, _ in
                     throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate element_id"))
-                })
-
+                }),
+                selectedProducts: selectedProducts
             ).extractLocale()
         }
     }
