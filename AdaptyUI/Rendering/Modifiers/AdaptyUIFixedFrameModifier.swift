@@ -51,4 +51,14 @@ extension View {
     }
 }
 
+@available(iOS 15.0, *)
+extension AdaptyUI.Unit {
+    package func points(screenSize: Double) -> Double {
+        switch self {
+        case let .point(value): value
+        case let .screen(value): value * screenSize
+        case let .safeArea(value): 0
+        }
+    }
+}
 #endif
