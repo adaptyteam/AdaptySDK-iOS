@@ -48,6 +48,7 @@ struct AdaptyUIFlatContainerView: View {
                 )
             )
         }
+        .scrollIndicatorsHidden_compatible()
     }
 
     @ViewBuilder
@@ -71,6 +72,7 @@ struct AdaptyUIFlatContainerView: View {
                         .padding(.top, p.safeAreaInsets.top)
                         .padding(.bottom, footerSize.height)
                 }
+                .scrollIndicatorsHidden_compatible()
 
                 if let footer = screen.footer {
                     footerView(footer, globalProxy: p)

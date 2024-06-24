@@ -151,6 +151,7 @@ struct AdaptyUIBasicContainerView: View {
                         }
                     }
                 }
+                .scrollIndicatorsHidden_compatible()
 
                 if let footer = screen.footer {
                     AdaptyUIElementView(
