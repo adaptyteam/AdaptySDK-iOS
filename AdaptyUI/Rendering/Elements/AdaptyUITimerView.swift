@@ -140,6 +140,9 @@ extension AdaptyUI.RichText {
 
 @available(iOS 15.0, *)
 struct AdaptyUITimerView: View, AdaptyTagResolver {
+    @Environment(\.adaptyScreenId)
+    private var screenId: String
+
     @EnvironmentObject var viewModel: AdaptyTimerViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
 
@@ -209,7 +212,9 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
     }
 
     private func updateTime() {
-        var timeLeft = viewModel.timeLeft(for: timer, at: Date())
+        var timeLeft = viewModel.timeLeft(for: timer,
+                                          at: Date(),
+                                          screenId: screenId)
 
         guard timeLeft > 0 else {
             timeLeft = 0
@@ -227,53 +232,5 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
         self.timeLeft = timeLeft
     }
 }
-
-//#if DEBUG
-//
-//@available(iOS 15.0, *)
-//extension AdaptyUI.RichText {
-//    static var fullTimerFormat: Self {
-//        .create(items: [
-//            .tag("TIMER_hh", .create(font: .default)),
-//            .text(":", .create(font: .default)),
-//            .tag("TIMER_mm", .create(font: .default)),
-//            .text(":", .create(font: .default)),
-//            .tag("TIMER_ss", .create(font: .default)),
-//        ])
-//    }
-//
-//    static var fullTimerFormatMS: Self {
-//        .create(items: [
-//            .tag("TIMER_mm", .create(font: .default)),
-//            .text(":", .create(font: .default)),
-//            .tag("TIMER_ss", .create(font: .default)),
-//            .text(".", .create(font: .default)),
-//            .tag("TIMER_SS", .create(font: .default)),
-//            .text(" = ", .create(font: .default)),
-//            .tag("TIMER_Total_Milliseconds_6", .create(font: .default)),
-//        ])
-//    }
-//}
-//
-//@available(iOS 15.0, *)
-//#Preview {
-//    AdaptyUITimerView(
-//        .create(
-//            id: "Preview",
-//            duration: 15,
-//            startBehaviour: .everyAppear,
-//            format: [
-//                .create(from: 10.0, value: .fullTimerFormat),
-//                .create(from: 8.0, value: .fullTimerFormatMS),
-//            ]
-//        )
-//    )
-//    .environmentObject(AdaptyProductsViewModel(logId: "Preview"))
-//    .environmentObject(AdaptyUIActionsViewModel(logId: "Preview"))
-//    .environmentObject(AdaptySectionsViewModel(logId: "Preview"))
-//    .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
-//    .environmentObject(AdaptyTimerViewModel())
-//}
-//#endif
 
 #endif

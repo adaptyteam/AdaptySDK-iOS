@@ -71,9 +71,14 @@ struct AdaptyPaywallView: View {
                                                     paywall: paywall,
                                                     products: products,
                                                     viewConfiguration: configuration)
-        timerViewModel = AdaptyTimerViewModel()
         screensViewModel = AdaptyScreensViewModel(eventsHandler: eventsHandler,
                                                   viewConfiguration: configuration)
+        timerViewModel = AdaptyTimerViewModel(
+            productsViewModel: productsViewModel,
+            actionsViewModel: actionsViewModel,
+            sectionsViewModel: sectionsViewModel,
+            screensViewModel: screensViewModel
+        )
         
         productsViewModel.loadProductsIfNeeded()
     }

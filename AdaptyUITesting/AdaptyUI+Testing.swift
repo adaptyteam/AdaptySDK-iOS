@@ -58,8 +58,10 @@ public struct AdaptyUITestRendererView: View {
         AdaptyUIElementView(screen.content)
     }
 
-    public var body: some View {
+    @ViewBuilder
+    private func templateOrElement() -> some View {
         let screen = viewConfiguration.screen
+
         switch renderingMode {
         case .template:
             if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
@@ -67,46 +69,42 @@ public struct AdaptyUITestRendererView: View {
                     template: template,
                     screen: screen
                 )
-                .environmentObject(AdaptyUIActionsViewModel(eventsHandler: eventsHandler))
-                .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
-                .environmentObject(
-                    AdaptyProductsViewModel(
-                        eventsHandler: eventsHandler,
-                        paywall: AdaptyMockPaywall(),
-                        products: nil,
-                        viewConfiguration: viewConfiguration
-                    )
-                )
-                .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
-                .environmentObject(AdaptyTimerViewModel())
-                .environmentObject(
-                    AdaptyScreensViewModel(eventsHandler: eventsHandler,
-                                           viewConfiguration: viewConfiguration)
-                )
-                .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
+
             } else {
                 AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
             }
         case .element:
             AdaptyUIElementView(screen.content)
-                .environmentObject(AdaptyUIActionsViewModel(eventsHandler: eventsHandler))
-                .environmentObject(AdaptySectionsViewModel(logId: "AdaptyUITesting"))
-                .environmentObject(
-                    AdaptyProductsViewModel(
-                        eventsHandler: eventsHandler,
-                        paywall: AdaptyMockPaywall(),
-                        products: nil,
-                        viewConfiguration: viewConfiguration
-                    )
-                )
-                .environmentObject(AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"]))
-                .environmentObject(AdaptyTimerViewModel())
-                .environmentObject(
-                    AdaptyScreensViewModel(eventsHandler: eventsHandler,
-                                           viewConfiguration: viewConfiguration)
-                )
-                .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
         }
+    }
+
+    public var body: some View {
+        let actionsVM = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
+        let sectionsVM = AdaptySectionsViewModel(logId: "AdaptyUITesting")
+        let productsVM = AdaptyProductsViewModel(
+            eventsHandler: eventsHandler,
+            paywall: AdaptyMockPaywall(),
+            products: nil,
+            viewConfiguration: viewConfiguration
+        )
+        let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])
+        let screensVM = AdaptyScreensViewModel(eventsHandler: eventsHandler,
+                                               viewConfiguration: viewConfiguration)
+        let timerVM = AdaptyTimerViewModel(
+            productsViewModel: productsVM,
+            actionsViewModel: actionsVM,
+            sectionsViewModel: sectionsVM,
+            screensViewModel: screensVM
+        )
+
+        templateOrElement()
+            .environmentObject(actionsVM)
+            .environmentObject(sectionsVM)
+            .environmentObject(productsVM)
+            .environmentObject(tagResolverVM)
+            .environmentObject(timerVM)
+            .environmentObject(screensVM)
+            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }
 
