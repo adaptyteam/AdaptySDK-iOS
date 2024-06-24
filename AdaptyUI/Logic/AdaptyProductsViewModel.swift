@@ -24,7 +24,8 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
     }
 
     func productInfo(by adaptyId: String) -> ProductInfoModel? {
-        products.first(where: { $0.adaptyProduct?.adaptyProductId == adaptyId })
+        let product = products.first(where: { $0.adaptyProductId == adaptyId })
+        return product
     }
 }
 
@@ -86,7 +87,7 @@ package class AdaptyProductsViewModel: ObservableObject {
         eligibilities: [String: AdaptyEligibility]?
     ) -> [ProductInfoModel] {
         guard let products else {
-            return paywall.vendorProductIds.map { EmptyProductInfo(id: $0) }
+            return paywall.adaptyProductIds.map { EmptyProductInfo(adaptyProductId: $0) }
         }
 
         return products.map {

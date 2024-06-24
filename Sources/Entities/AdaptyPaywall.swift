@@ -36,6 +36,9 @@ public struct AdaptyPaywall {
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
+    
+    package var adaptyProductIds: [String] { products.map { $0.adaptyProductId } }
+    
     var version: Int64
 }
 

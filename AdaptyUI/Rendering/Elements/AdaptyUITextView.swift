@@ -31,6 +31,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
+                .redactedAsPlaceholder(productInfo?.isPlaceholder ?? false)
         } else {
             EmptyView()
         }
@@ -138,13 +139,14 @@ extension UIImage {
 
 @available(iOS 15.0, *)
 extension AdaptyUI.Text {
+    
+    
     func extract(productsInfoProvider: ProductsInfoProvider) -> (AdaptyUI.RichText, ProductInfoModel?)? {
         switch value {
         case let .text(value):
             return (value, nil)
         case let .productText(value):
             guard let product = productsInfoProvider.productInfo(by: value.adaptyProductId) else {
-                // TODO: inspect, shimmer?
                 return nil
             }
 

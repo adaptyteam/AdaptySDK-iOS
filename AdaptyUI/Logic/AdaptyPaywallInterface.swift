@@ -9,6 +9,7 @@ import Adapty
 import Foundation
 
 package protocol AdaptyPaywallInterface {
+    var adaptyProductIds: [String] { get }
     var vendorProductIds: [String] { get }
 
     func getPaywallProducts(completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>)

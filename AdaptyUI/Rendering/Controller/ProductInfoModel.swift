@@ -12,7 +12,9 @@ import UIKit
 
 @available(iOS 15.0, *)
 protocol ProductInfoModel {
-    var id: String { get } // TODO: inspect usage
+    var isPlaceholder: Bool { get }
+    var adaptyProductId: String { get }
+
     var adaptyProduct: AdaptyPaywallProduct? { get }
     var eligibleOffer: AdaptyProductDiscount? { get } // TODO: refactor
     var isEligibleForFreeTrial: Bool { get } // TODO: remove
@@ -24,13 +26,16 @@ protocol ProductInfoModel {
 
 @available(iOS 15.0, *)
 struct EmptyProductInfo: ProductInfoModel {
-    let id: String
+    var isPlaceholder: Bool { true }
+    
+    let adaptyProductId: String
+
     var adaptyProduct: AdaptyPaywallProduct? { nil }
     var eligibleOffer: AdaptyProductDiscount? { nil }
     var isEligibleForFreeTrial: Bool { false }
 
-    init(id: String) {
-        self.id = id
+    init(adaptyProductId: String) {
+        self.adaptyProductId = adaptyProductId
     }
 
     var paymentMode: AdaptyProductDiscount.PaymentMode { .unknown }
@@ -59,6 +64,8 @@ extension AdaptyPaywallProduct {
 
 @available(iOS 15.0, *)
 struct RealProductInfo: ProductInfoModel {
+    var isPlaceholder: Bool { false }
+    
     let product: AdaptyPaywallProduct
     let introEligibility: AdaptyEligibility
 
@@ -74,7 +81,7 @@ struct RealProductInfo: ProductInfoModel {
         self.introEligibility = introEligibility
     }
 
-    var id: String { product.vendorProductId }
+    var adaptyProductId: String { product.adaptyProductId }
     var adaptyProduct: AdaptyPaywallProduct? { product }
     var paymentMode: AdaptyProductDiscount.PaymentMode { eligibleOffer?.paymentMode ?? .unknown }
 
@@ -109,17 +116,6 @@ struct RealProductInfo: ProductInfoModel {
         } else {
             return nil
         }
-    }
-}
-
-@available(iOS 15.0, *)
-extension ProductInfoModel {
-    static func empty(id: String) -> ProductInfoModel {
-        EmptyProductInfo(id: id)
-    }
-
-    static func real(product: AdaptyPaywallProduct, introEligibility: AdaptyEligibility) -> ProductInfoModel {
-        RealProductInfo(product: product, introEligibility: introEligibility)
     }
 }
 
