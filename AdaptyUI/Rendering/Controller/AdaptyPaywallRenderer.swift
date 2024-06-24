@@ -34,6 +34,11 @@ struct AdaptyPaywallRendererView: View {
                 ForEach(screensViewModel.presentedScreensStack) { bottomSheet in
                     AdaptyUIBottomSheetView(bottomSheet)
                 }
+                
+                if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
+                    AdaptyUILoaderView()
+                        .transition(.opacity)
+                }
             }
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
             .onAppear {
