@@ -14,6 +14,9 @@ import SwiftUI
 struct AdaptyUIFlatContainerView: View {
     @State
     private var footerSize: CGSize = .zero
+    
+    @State
+    private var drawFooterBackground = false
 
     var screen: AdaptyUI.Screen
 
@@ -24,26 +27,33 @@ struct AdaptyUIFlatContainerView: View {
     ) -> some View {
         if footerSize.height >= globalProxy.size.height {
             ScrollView {
-                AdaptyUIElementView(element)
+                AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
             }
             .scrollIndicatorsHidden_compatible()
         } else {
-            AdaptyUIElementView(element)
+            AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
         }
     }
 
     var body: some View {
-        GeometryReader { p in
+        GeometryReader { globalProxy in
             ZStack(alignment: .bottom) {
                 ScrollView {
-                    AdaptyUIElementView(screen.content)
-                        .frame(maxWidth: .infinity)
-                        .padding(.bottom, footerSize.height)
+                    VStack {
+                        AdaptyUIElementView(screen.content)
+                            .frame(maxWidth: .infinity)
+
+                        FooterVerticalFillerView(height: footerSize.height) { frame in
+                            withAnimation {
+                                drawFooterBackground = frame.maxY > globalProxy.size.height + globalProxy.safeAreaInsets.bottom
+                            }
+                        }
+                    }
                 }
                 .scrollIndicatorsHidden_compatible()
 
                 if let footer = screen.footer {
-                    footerView(footer, globalProxy: p)
+                    footerView(footer, globalProxy: globalProxy)
                         .onGeometrySizeChange { footerSize = $0 }
                 }
 
@@ -51,9 +61,9 @@ struct AdaptyUIFlatContainerView: View {
                     AdaptyUIElementView(overlay)
                 }
             }
-            .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
             .ignoresSafeArea()
         }
+        .coordinateSpace(name: CoordinateSpace.adaptyFlatName)
     }
 }
 

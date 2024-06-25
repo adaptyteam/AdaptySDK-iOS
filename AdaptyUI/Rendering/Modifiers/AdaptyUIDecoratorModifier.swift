@@ -178,6 +178,7 @@ extension AdaptyUI.ShapeType {
 @available(iOS 15.0, *)
 struct AdaptyUIDecoratorModifier: ViewModifier {
     var decorator: AdaptyUI.Decorator
+    var includeBackground: Bool
 
     @ViewBuilder
     private func bodyWithBackground(content: Content, background: AdaptyUI.Filling?) -> some View {
@@ -186,15 +187,19 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
             case .image(let imageData):
                 content
                     .background {
-                        AdaptyUIImageView(asset: imageData,
-                                          aspect: .fill,
-                                          tint: nil)
+                        if includeBackground {
+                            AdaptyUIImageView(asset: imageData,
+                                              aspect: .fill,
+                                              tint: nil)
+                        }
                     }
             default:
                 content
                     .background {
-                        self.decorator.shapeType
-                            .swiftUIShapeFill(self.decorator.background)
+                        if includeBackground {
+                            self.decorator.shapeType
+                                .swiftUIShapeFill(self.decorator.background)
+                        }
                     }
             }
         } else {
@@ -203,26 +208,34 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        self.bodyWithBackground(content: content, background: self.decorator.background)
-            .overlay {
-                if let border = decorator.border {
-                    self.decorator.shapeType
-                        .swiftUIShapeStroke(
-                            border.filling,
-                            lineWidth: border.thickness
-                        )
-                }
+        self.bodyWithBackground(
+            content: content,
+            background: self.decorator.background
+        )
+        .overlay {
+            if let border = decorator.border {
+                self.decorator.shapeType
+                    .swiftUIShapeStroke(
+                        border.filling,
+                        lineWidth: border.thickness
+                    )
             }
-            .clipShape(self.decorator.shapeType)
+        }
+        .clipShape(self.decorator.shapeType)
     }
 }
 
 @available(iOS 15.0, *)
 extension View {
     @ViewBuilder
-    func decorate(with decorator: AdaptyUI.Decorator?) -> some View {
+    func decorate(with decorator: AdaptyUI.Decorator?,
+                  includeBackground: Bool) -> some View
+    {
         if let decorator {
-            modifier(AdaptyUIDecoratorModifier(decorator: decorator))
+            modifier(AdaptyUIDecoratorModifier(
+                decorator: decorator,
+                includeBackground: includeBackground
+            ))
         } else {
             self
         }

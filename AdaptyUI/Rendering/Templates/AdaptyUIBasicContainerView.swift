@@ -136,7 +136,7 @@ struct AdaptyUIBasicContainerView: View {
             }
         }
         .padding(.bottom, footerSize.height - offsetY + bottomOverscrollHeight)
-        .applyingProperties(properties)
+        .applyingProperties(properties, includeBackground: true)
         .padding(.bottom, offsetY - bottomOverscrollHeight)
     }
 

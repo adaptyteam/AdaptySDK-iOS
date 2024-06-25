@@ -23,8 +23,8 @@ extension AdaptyUI.ColorGradient.Item {
 @available(iOS 15.0, *)
 extension View {
     @ViewBuilder
-    func applyingProperties(_ props: AdaptyUI.Element.Properties?) -> some View {
-        decorate(with: props?.decorator)
+    func applyingProperties(_ props: AdaptyUI.Element.Properties?, includeBackground: Bool) -> some View {
+        decorate(with: props?.decorator, includeBackground: includeBackground)
             .offset(x: props?.offset.x ?? 0.0, y: props?.offset.y ?? 0.0)
             .padding(props?.padding)
     }

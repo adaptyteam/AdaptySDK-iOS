@@ -43,10 +43,16 @@ extension AdaptyUI.Element {
 package struct AdaptyUIElementView: View {
     private var element: AdaptyUI.Element
     private var additionalPadding: EdgeInsets?
+    private var drawDecoratorBackground: Bool
 
-    package init(_ element: AdaptyUI.Element, additionalPadding: EdgeInsets? = nil) {
+    package init(
+        _ element: AdaptyUI.Element,
+        additionalPadding: EdgeInsets? = nil,
+        drawDecoratorBackground: Bool = true
+    ) {
         self.element = element
         self.additionalPadding = additionalPadding
+        self.drawDecoratorBackground = drawDecoratorBackground
     }
 
     package var body: some View {
@@ -54,7 +60,7 @@ package struct AdaptyUIElementView: View {
 
         elementBody
             .paddingIfNeeded(additionalPadding)
-            .applyingProperties(properties)
+            .applyingProperties(properties, includeBackground: drawDecoratorBackground)
             .transitionIn(
                 properties?.transitionIn,
                 visibility: properties?.visibility ?? true
