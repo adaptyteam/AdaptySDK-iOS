@@ -39,10 +39,10 @@ package class AdaptyProductsViewModel: ObservableObject {
     let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     @Published var products: [ProductInfoModel]
-    @Published var selectedProductsIds = [String: String]()
+    @Published var selectedProductsIds: [String: String]
     @Published var productsLoadingInProgress: Bool = false
-    @Published var purchaseInProgress: Bool = false // TODO: loading indicator
-    @Published var restoreInProgress: Bool = false // TODO: loading indicator
+    @Published var purchaseInProgress: Bool = false
+    @Published var restoreInProgress: Bool = false
 
     var adaptyProducts: [AdaptyPaywallProduct]? {
         didSet {
@@ -79,6 +79,8 @@ package class AdaptyProductsViewModel: ObservableObject {
             products: products,
             eligibilities: nil
         )
+
+        selectedProductsIds = viewConfiguration.selectedProducts
     }
 
     private static func generateProductsInfos(
@@ -112,7 +114,7 @@ package class AdaptyProductsViewModel: ObservableObject {
     func selectedProductId(by groupId: String) -> String? {
         selectedProductsIds[groupId]
     }
-    
+
     func selectProduct(id: String, forGroupId groupId: String) {
         selectedProductsIds[groupId] = id
 
