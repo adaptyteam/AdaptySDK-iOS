@@ -27,21 +27,23 @@ struct AdaptyUIButtonView: View {
     }
 
     private var currentStateView: AdaptyUI.Element {
-        switch button.action {
-        case let .selectProductId(productId, groupId):
-            if let selectedProductId = productsViewModel.selectedProductId(by: groupId), productId == selectedProductId {
-                button.selectedState ?? button.normalState
+        guard let selectedCondition = button.selectedCondition else {
+            return button.normalState
+        }
+
+        switch selectedCondition {
+        case let .selectedSection(sectionId, sectionIndex):
+            if sectionIndex == sectionsViewModel.selectedIndex(for: sectionId) {
+                return button.selectedState ?? button.normalState
             } else {
-                button.normalState
+                return button.normalState
             }
-        case let .switchSection(sectionId, index):
-            if index == sectionsViewModel.selectedIndex(for: sectionId) {
-                button.selectedState ?? button.normalState
+        case let .selectedProduct(productId, productsGroupId):
+            if productId == productsViewModel.selectedProductId(by: productsGroupId) {
+                return button.selectedState ?? button.normalState
             } else {
-                button.normalState
+                return button.normalState
             }
-        default:
-            button.normalState
         }
     }
 
