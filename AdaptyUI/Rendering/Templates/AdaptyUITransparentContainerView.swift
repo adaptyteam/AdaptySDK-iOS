@@ -25,26 +25,10 @@ struct AdaptyUITransparentContainerView: View {
 
         ScrollViewReader { scrollProxy in
             ScrollView {
-                VStack(spacing: 0) {
-                    if additionalTopPadding > 0 {
-                        Color.clear
-                            .frame(height: additionalTopPadding)
-                    }
-
-                    AdaptyUIElementView(
-                        element,
-                        additionalPadding: globalProxy.safeAreaInsets
-                    )
+                AdaptyUIElementView(element)
                     .id("content")
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear
-                                .onAppear {
-                                    footerSize = geometry.size
-                                }
-                        }
-                    )
-                }
+                    .onGeometrySizeChange { footerSize = $0 }
+                    .padding(.top, max(0, additionalTopPadding))
             }
             .scrollIndicatorsHidden_compatible()
             .onAppear {
@@ -68,10 +52,7 @@ struct AdaptyUITransparentContainerView: View {
                 }
 
                 if let overlay = screen.overlay {
-                    AdaptyUIElementView(
-                        overlay,
-                        additionalPadding: p.safeAreaInsets
-                    )
+                    AdaptyUIElementView(overlay)
                 }
             }
             .ignoresSafeArea()

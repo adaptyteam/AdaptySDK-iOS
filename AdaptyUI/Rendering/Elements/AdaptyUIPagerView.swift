@@ -24,9 +24,9 @@ extension AdaptyUI.VerticalAlignment {
 
 @available(iOS 15.0, *)
 extension AdaptyUI.Pager.Length {
-    func valueWith(parent: Double, screen: Double) -> CGFloat {
+    func valueWith(parent: Double, screenSize: Double, safeAreaStart: Double, safeAreaEnd: Double) -> CGFloat {
         switch self {
-        case let .fixed(unit): unit.points(screenSize: screen)
+        case let .fixed(unit): unit.points(screenSize: screenSize, safeAreaStart: safeAreaStart, safeAreaEnd: safeAreaEnd)
         case let .parent(value): parent * value
         }
     }
@@ -67,7 +67,9 @@ extension View {
 struct AdaptyUIPagerView: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
-
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
+    
     var pager: AdaptyUI.Pager
 
     @State private var currentPage: Int = 0
@@ -123,12 +125,16 @@ struct AdaptyUIPagerView: View {
     private var pagerView: some View {
         GeometryReader { proxy in
             let width = pager.pageWidth.valueWith(parent: proxy.size.width,
-                                                  screen: screenSize.width)
+                                                  screenSize: screenSize.width,
+                                                  safeAreaStart: safeArea.leading,
+                                                  safeAreaEnd: safeArea.trailing)
                 - pager.pagePadding.leading
                 - pager.pagePadding.trailing
 
             let height = pager.pageHeight.valueWith(parent: proxy.size.height,
-                                                    screen: screenSize.height)
+                                                    screenSize: screenSize.height,
+                                                    safeAreaStart: safeArea.top,
+                                                    safeAreaEnd: safeArea.bottom)
                 - pager.pagePadding.top
                 - pager.pagePadding.bottom
 

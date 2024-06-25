@@ -87,6 +87,7 @@ struct AdaptyPaywallView: View {
         GeometryReader { proxy in
             AdaptyPaywallRendererView(viewConfiguration: configuration)
                 .withScreenSize(proxy.size)
+                .withSafeArea(proxy.safeAreaInsets)
                 .environmentObject(productsViewModel)
                 .environmentObject(actionsViewModel)
                 .environmentObject(sectionsViewModel)

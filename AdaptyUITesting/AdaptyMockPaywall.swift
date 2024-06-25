@@ -10,6 +10,7 @@ import AdaptyUI
 import Foundation
 
 struct AdaptyMockPaywall: AdaptyPaywallInterface {
+    var adaptyProductIds: [String] { [] }
     var vendorProductIds: [String] { [] }
 
     func getPaywallProducts(completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {

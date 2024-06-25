@@ -17,19 +17,24 @@ extension CoordinateSpace {
 
 @available(iOS 15.0, *)
 struct AdaptyUIBasicContainerView: View {
-    var screen: AdaptyUI.Screen
-
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
+    @State
+    private var footerSize: CGSize = .zero
+
+    var screen: AdaptyUI.Screen
 
     @ViewBuilder
-    func coverView(_ box: AdaptyUI.Box,
-                   _ content: AdaptyUI.Element,
-                   _ properties: AdaptyUI.Element.Properties?) -> some View
-    {
+    func coverView(
+        _ box: AdaptyUI.Box,
+        _ content: AdaptyUI.Element,
+        _ properties: AdaptyUI.Element.Properties?
+    ) -> some View {
         let height: CGFloat = {
             if let boxHeight = box.height, case let .fixed(unit) = boxHeight {
-                return unit.points(screenSize: screenSize.height)
+                return unit.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
             } else {
                 return 0.0
             }
@@ -41,17 +46,25 @@ struct AdaptyUIBasicContainerView: View {
             let isScrollingUp = minY < 0
 
             AdaptyUIElementView(content)
-                .frame(width : p.size.width,
-                       height: isScrollingDown ? height + minY: height)
-//                .applyingProperties(properties)
+                .frame(
+                    width : p.size.width,
+                    height: {
+                        if isScrollingDown {
+                            return height + minY
+                        } else {
+                            return height // - minY
+                        }
+                    }()
+                )
                 .clipped()
                 .offset(
                     y: {
-                        // TODO: inspect this behaviour
-                        switch (isScrollingUp, isScrollingDown) {
-                        case (false, true): -minY
-                        case (true, false): -minY / 2.0
-                        default: 0.0
+                        if isScrollingUp {
+                            return -minY / 2.0
+                        } else if isScrollingDown {
+                            return -minY
+                        } else {
+                            return 0.0
                         }
                     }()
                 )
@@ -75,13 +88,13 @@ struct AdaptyUIBasicContainerView: View {
     ) -> some View {
         let coverHeight: CGFloat = {
             if let boxHeight = coverBox.height, case let .fixed(unit) = boxHeight {
-                return unit.points(screenSize: screenSize.height)
+                return unit.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
             } else {
                 return 0.0
             }
         }()
 
-        let bottomOverscrollHeight = 120.0
+        let bottomOverscrollHeight = screenSize.height
         let properties = content.properties
         let selfHeight = screenSize.height - coverHeight
         let offsetY = properties?.offset.y ?? 0
@@ -122,22 +135,17 @@ struct AdaptyUIBasicContainerView: View {
                 AdaptyUIUnknownElementView(value: value)
             }
         }
-        .padding(.bottom, footerSize.height)
-        .frame(minHeight: selfHeight + footerSize.height - offsetY,
-               alignment: .top)
-        .padding(.bottom, bottomOverscrollHeight)
+        .padding(.bottom, footerSize.height - offsetY + bottomOverscrollHeight)
         .applyingProperties(properties)
-        .padding(.bottom, -bottomOverscrollHeight)
+        .padding(.bottom, offsetY - bottomOverscrollHeight)
     }
 
-    @State var footerSize: CGSize = .zero
-
     var body: some View {
-        GeometryReader { p in
+        GeometryReader { _ in
             ZStack(alignment: .bottom) {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        if let coverBox = screen.cover, let coverContent = coverBox.content {
+                if let coverBox = screen.cover, let coverContent = coverBox.content {
+                    ScrollView {
+                        VStack(spacing: 0) {
                             coverView(
                                 coverBox,
                                 coverContent,
@@ -150,32 +158,17 @@ struct AdaptyUIBasicContainerView: View {
                             )
                         }
                     }
+                    .ignoresSafeArea()
+                    .scrollIndicatorsHidden_compatible()
                 }
-                .scrollIndicatorsHidden_compatible()
 
                 if let footer = screen.footer {
-                    AdaptyUIElementView(
-                        footer,
-                        additionalPadding: EdgeInsets(top: 0,
-                                                      leading: 0,
-                                                      bottom: p.safeAreaInsets.bottom,
-                                                      trailing: 0)
-                    )
-                    .background(
-                        GeometryReader { geometry in
-                            Color.clear
-                                .onAppear {
-                                    footerSize = geometry.size
-                                }
-                        }
-                    )
+                    AdaptyUIElementView(footer)
+                        .onGeometrySizeChange { footerSize = $0 }
                 }
 
                 if let overlay = screen.overlay {
-                    AdaptyUIElementView(
-                        overlay,
-                        additionalPadding: p.safeAreaInsets
-                    )
+                    AdaptyUIElementView(overlay)
                 }
             }
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)

@@ -14,6 +14,8 @@ import SwiftUI
 struct AdaptyUIColumnView: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
@@ -33,7 +35,11 @@ struct AdaptyUIColumnView: View {
         for item in items {
             switch item.length {
             case let .fixed(value):
-                reservedLength += value.points(screenSize: screenSize.height)
+                reservedLength += value.points(
+                    screenSize: screenSize.height,
+                    safeAreaStart: safeArea.top,
+                    safeAreaEnd: safeArea.bottom
+                )
             case let .weight(value):
                 totalWeight += value
             }
@@ -56,10 +62,14 @@ struct AdaptyUIColumnView: View {
             LazyHGrid(
                 rows: column.items.map { item in
                     let size: GridItem.Size
-                    
+
                     switch item.length {
                     case let .fixed(length):
-                        size = .fixed(length.points(screenSize: screenSize.width))
+                        size = .fixed(length.points(
+                            screenSize: screenSize.width,
+                            safeAreaStart: safeArea.leading,
+                            safeAreaEnd: safeArea.trailing
+                        ))
                     case let .weight(weight):
                         size = .fixed((Double(weight) / Double(totalWeight)) * weightsAvailableLength)
                     }

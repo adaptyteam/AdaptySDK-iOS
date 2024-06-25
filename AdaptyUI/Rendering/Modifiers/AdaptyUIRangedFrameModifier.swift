@@ -16,23 +16,40 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
 
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
-    
+
     var box: AdaptyUI.Box
 
-    private func constraints(for lenght: AdaptyUI.Box.Length?, screenSize: CGFloat) -> Constraints {
+    private func constraints(
+        for lenght: AdaptyUI.Box.Length?,
+        screenSize: CGFloat,
+        safeAreaStart: Double,
+        safeAreaEnd: Double
+    ) -> Constraints {
         switch lenght {
-        case let .min(unit): (min: unit.points(screenSize: screenSize), max: nil, false)
-        case let .shrink(unit): (min: unit.points(screenSize: screenSize), max: nil, true)
+        case let .min(unit): (min: unit.points(screenSize: screenSize, safeAreaStart: safeAreaStart, safeAreaEnd: safeAreaEnd), max: nil, false)
+        case let .shrink(unit): (min: unit.points(screenSize: screenSize, safeAreaStart: safeAreaStart, safeAreaEnd: safeAreaEnd), max: nil, true)
         case .fillMax: (min: nil, max: .infinity, false)
         default: (min: nil, max: nil, false)
         }
     }
 
     func body(content: Content) -> some View {
-        let wConstraints = self.constraints(for: self.box.width, screenSize: self.screenSize.width)
-        let hConstraints = self.constraints(for: self.box.height, screenSize: self.screenSize.height)
+        let wConstraints = self.constraints(
+            for: self.box.width,
+            screenSize: self.screenSize.width,
+            safeAreaStart: safeArea.leading,
+            safeAreaEnd: safeArea.trailing
+        )
+        let hConstraints = self.constraints(
+            for: self.box.height,
+            screenSize: self.screenSize.height,
+            safeAreaStart: safeArea.top,
+            safeAreaEnd: safeArea.bottom
+        )
 
         if wConstraints.min == nil && wConstraints.max == nil && wConstraints.shrink == false &&
             hConstraints.min == nil && hConstraints.max == nil && hConstraints.shrink == false
@@ -54,8 +71,8 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
                     minHeight: hConstraints.min,
                     maxHeight: hConstraints.max,
                     alignment: .from(
-                        horizontal: box.horizontalAlignment.swiftuiValue(with: layoutDirection),
-                        vertical: box.verticalAlignment.swiftuiValue
+                        horizontal: self.box.horizontalAlignment.swiftuiValue(with: self.layoutDirection),
+                        vertical: self.box.verticalAlignment.swiftuiValue
                     )
                 )
                 .fixedSize(

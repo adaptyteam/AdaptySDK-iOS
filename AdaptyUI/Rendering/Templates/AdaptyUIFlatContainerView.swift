@@ -12,54 +12,23 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyUIFlatContainerView: View {
+    @State
+    private var footerSize: CGSize = .zero
+
     var screen: AdaptyUI.Screen
-
-    @State var footerSize: CGSize = .zero
-
-    @ViewBuilder
-    private func staticFooterView(
-        _ element: AdaptyUI.Element,
-        globalProxy: GeometryProxy
-    ) -> some View {
-        AdaptyUIElementView(
-            element,
-            additionalPadding: EdgeInsets(
-                top: 0,
-                leading: 0,
-                bottom: globalProxy.safeAreaInsets.bottom,
-                trailing: 0
-            )
-        )
-    }
-
-    @ViewBuilder
-    private func scrollableFooterView(
-        _ element: AdaptyUI.Element,
-        globalProxy: GeometryProxy
-    ) -> some View {
-        ScrollView {
-            AdaptyUIElementView(
-                element,
-                additionalPadding: EdgeInsets(
-                    top: globalProxy.safeAreaInsets.top,
-                    leading: 0,
-                    bottom: globalProxy.safeAreaInsets.bottom,
-                    trailing: 0
-                )
-            )
-        }
-        .scrollIndicatorsHidden_compatible()
-    }
 
     @ViewBuilder
     private func footerView(
         _ element: AdaptyUI.Element,
         globalProxy: GeometryProxy
     ) -> some View {
-        if footerSize.height >= globalProxy.size.height - globalProxy.safeAreaInsets.bottom {
-            scrollableFooterView(element, globalProxy: globalProxy)
+        if footerSize.height >= globalProxy.size.height {
+            ScrollView {
+                AdaptyUIElementView(element)
+            }
+            .scrollIndicatorsHidden_compatible()
         } else {
-            staticFooterView(element, globalProxy: globalProxy)
+            AdaptyUIElementView(element)
         }
     }
 
@@ -69,28 +38,17 @@ struct AdaptyUIFlatContainerView: View {
                 ScrollView {
                     AdaptyUIElementView(screen.content)
                         .frame(maxWidth: .infinity)
-                        .padding(.top, p.safeAreaInsets.top)
                         .padding(.bottom, footerSize.height)
                 }
                 .scrollIndicatorsHidden_compatible()
 
                 if let footer = screen.footer {
                     footerView(footer, globalProxy: p)
-                        .background(
-                            GeometryReader { geometry in
-                                Color.clear
-                                    .onAppear {
-                                        footerSize = geometry.size
-                                    }
-                            }
-                        )
+                        .onGeometrySizeChange { footerSize = $0 }
                 }
 
                 if let overlay = screen.overlay {
-                    AdaptyUIElementView(
-                        overlay,
-                        additionalPadding: p.safeAreaInsets
-                    )
+                    AdaptyUIElementView(overlay)
                 }
             }
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)

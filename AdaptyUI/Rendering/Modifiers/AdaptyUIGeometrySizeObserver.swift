@@ -40,6 +40,7 @@ struct AdaptyUIGeometrySizeObserver: ViewModifier {
 
 @available(iOS 15.0, *)
 extension View {
+    // TODO: use everywhere
     func onGeometrySizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
         modifier(AdaptyUIGeometrySizeObserver(action))
     }

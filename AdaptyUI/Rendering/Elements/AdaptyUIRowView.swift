@@ -14,8 +14,11 @@ import SwiftUI
 struct AdaptyUIRowView: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
+    
     private var row: AdaptyUI.Row
 
     init(_ row: AdaptyUI.Row) {
@@ -32,7 +35,11 @@ struct AdaptyUIRowView: View {
         for item in items {
             switch item.length {
             case let .fixed(value):
-                reservedLength += value.points(screenSize: screenSize.width)
+                reservedLength += value.points(
+                    screenSize: screenSize.width,
+                    safeAreaStart: safeArea.leading,
+                    safeAreaEnd: safeArea.trailing
+                )
             case let .weight(value):
                 totalWeight += value
             }
@@ -58,7 +65,9 @@ struct AdaptyUIRowView: View {
                     
                     switch item.length {
                     case let .fixed(length):
-                        size = .fixed(length.points(screenSize: screenSize.width))
+                        size = .fixed(length.points(screenSize: screenSize.width,
+                                                    safeAreaStart: safeArea.leading,
+                                                    safeAreaEnd: safeArea.trailing))
                     case let .weight(weight):
                         size = .fixed((Double(weight) / Double(totalWeight)) * weightsAvailableLength)
                     }

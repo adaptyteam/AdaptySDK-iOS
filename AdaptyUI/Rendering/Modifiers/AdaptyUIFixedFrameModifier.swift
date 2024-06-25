@@ -14,6 +14,8 @@ import SwiftUI
 struct AdaptyUIFixedFrameModifier: ViewModifier {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
@@ -27,16 +29,16 @@ struct AdaptyUIFixedFrameModifier: ViewModifier {
 
         switch (box.width, box.height) {
         case let (.fixed(w), .fixed(h)):
-            content.frame(width: w.points(screenSize: screenSize.width),
-                          height: h.points(screenSize: screenSize.height),
+            content.frame(width: w.points(screenSize: screenSize.width, safeAreaStart: safeArea.leading, safeAreaEnd: safeArea.trailing),
+                          height: h.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom),
                           alignment: alignment)
         case let (.fixed(w), _):
-            content.frame(width: w.points(screenSize: screenSize.width),
+            content.frame(width: w.points(screenSize: screenSize.width, safeAreaStart: safeArea.leading, safeAreaEnd: safeArea.trailing),
                           height: nil,
                           alignment: alignment)
         case let (_, .fixed(h)):
             content.frame(width: nil,
-                          height: h.points(screenSize: screenSize.height),
+                          height: h.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom),
                           alignment: alignment)
         default:
             content
@@ -51,13 +53,18 @@ extension View {
     }
 }
 
+// TODO: Move Out
 @available(iOS 15.0, *)
-extension AdaptyUI.Unit {
-    package func points(screenSize: Double) -> Double {
+package extension AdaptyUI.Unit {
+    package func points(screenSize: Double, safeAreaStart: Double, safeAreaEnd: Double) -> Double {
         switch self {
         case let .point(value): value
         case let .screen(value): value * screenSize
-        case let .safeArea(value): 0
+        case let .safeArea(value):
+            switch value {
+            case .start: safeAreaStart
+            case .end: safeAreaEnd
+            }
         }
     }
 }
