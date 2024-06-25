@@ -22,8 +22,7 @@ struct AdaptyUIToggleView: View {
 
     var body: some View {
         Toggle(isOn: .init(get: {
-            // TODO: check default value
-            (viewModel.selectedIndex(for: toggle.sectionId) ?? toggle.offIndex) == toggle.onIndex
+            toggle.onIndex == viewModel.selectedIndex(for: toggle.sectionId)
         }, set: { value in
             viewModel.updateSelection(for: toggle.sectionId, index: value ? toggle.onIndex : toggle.offIndex)
         })) {
