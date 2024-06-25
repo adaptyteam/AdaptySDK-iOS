@@ -78,17 +78,17 @@ extension AdaptyUI.TimerTag {
     func string(for timeinterval: TimeInterval) -> String? {
         switch self {
         case .TIMER_h:
-            String(format: "%.1d", Int(timeinterval / 3600.0) % 3600)
+            String(format: "%.1d", Int(timeinterval.truncatingRemainder(dividingBy: 86400.0) / 3600.0))
         case .TIMER_hh:
-            String(format: "%.2d", Int(timeinterval / 3600.0) % 3600)
+            String(format: "%.2d", Int(timeinterval.truncatingRemainder(dividingBy: 86400.0) / 3600.0))
         case .TIMER_m:
-            String(format: "%.1d", Int(timeinterval / 60.0) % 60)
+            String(format: "%.1d", Int(timeinterval.truncatingRemainder(dividingBy: 3600.0) / 60.0))
         case .TIMER_mm:
-            String(format: "%.2d", Int(timeinterval / 60.0) % 60)
+            String(format: "%.2d", Int(timeinterval.truncatingRemainder(dividingBy: 3600.0) / 60.0))
         case .TIMER_s:
-            String(format: "%.1d", Int(timeinterval) % 60)
+            String(format: "%.1d", Int(timeinterval.truncatingRemainder(dividingBy: 60.0)))
         case .TIMER_ss:
-            String(format: "%.2d", Int(timeinterval) % 60)
+            String(format: "%.2d", Int(timeinterval.truncatingRemainder(dividingBy: 60.0)))
         case .TIMER_S:
             String(format: "%.1d", Int(timeinterval * 10.0) % 10)
         case .TIMER_SS:
