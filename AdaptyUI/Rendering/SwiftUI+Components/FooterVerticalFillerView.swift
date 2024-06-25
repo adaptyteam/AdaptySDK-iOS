@@ -11,6 +11,7 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 extension CoordinateSpace {
+    // TODO: rename
     static let adaptyFlatName = "adapty.container.flat"
     static let adaptyFlat = CoordinateSpace.named(adaptyFlatName)
 }

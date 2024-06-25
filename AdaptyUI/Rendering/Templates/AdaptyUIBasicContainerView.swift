@@ -23,8 +23,49 @@ struct AdaptyUIBasicContainerView: View {
     private var safeArea: EdgeInsets
     @State
     private var footerSize: CGSize = .zero
+    @State
+    private var drawFooterBackground = false
 
     var screen: AdaptyUI.Screen
+
+    var body: some View {
+        GeometryReader { globalProxy in
+            ZStack(alignment: .bottom) {
+                if let coverBox = screen.cover, let coverContent = coverBox.content {
+                    // TODO: rendering error
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            coverView(
+                                coverBox,
+                                coverContent,
+                                nil
+                            )
+
+                            contentView(
+                                content: screen.content,
+                                coverBox: coverBox,
+                                globalProxy: globalProxy
+                            )
+                        }
+                    }
+                    .ignoresSafeArea()
+                    .scrollIndicatorsHidden_compatible()
+                }
+
+                if let footer = screen.footer {
+                    footerView(footer, globalProxy: globalProxy)
+                        .onGeometrySizeChange { footerSize = $0 }
+                }
+
+                if let overlay = screen.overlay {
+                    AdaptyUIElementView(overlay)
+                }
+            }
+            .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
+            .ignoresSafeArea()
+        }
+        .coordinateSpace(name: CoordinateSpace.adaptyFlatName)
+    }
 
     @ViewBuilder
     func coverView(
@@ -47,12 +88,12 @@ struct AdaptyUIBasicContainerView: View {
 
             AdaptyUIElementView(content)
                 .frame(
-                    width : p.size.width,
+                    width: p.size.width,
                     height: {
                         if isScrollingDown {
                             return height + minY
                         } else {
-                            return height // - minY
+                            return height
                         }
                     }()
                 )
@@ -84,7 +125,8 @@ struct AdaptyUIBasicContainerView: View {
     @ViewBuilder
     func contentView(
         content: AdaptyUI.Element,
-        coverBox: AdaptyUI.Box
+        coverBox: AdaptyUI.Box,
+        globalProxy: GeometryProxy
     ) -> some View {
         let coverHeight: CGFloat = {
             if let boxHeight = coverBox.height, case let .fixed(unit) = boxHeight {
@@ -99,7 +141,8 @@ struct AdaptyUIBasicContainerView: View {
         let selfHeight = screenSize.height - coverHeight
         let offsetY = properties?.offset.y ?? 0
 
-        Group {
+        VStack(spacing: 0) {
+            // TODO: move extract this switch
             switch content {
             case let .space(count):
                 if count > 0 {
@@ -134,45 +177,30 @@ struct AdaptyUIBasicContainerView: View {
             case let .unknown(value, properties):
                 AdaptyUIUnknownElementView(value: value)
             }
+            
+            FooterVerticalFillerView(height: footerSize.height) { frame in
+                withAnimation {
+                    drawFooterBackground = frame.maxY > globalProxy.size.height + globalProxy.safeAreaInsets.bottom
+                }
+            }
         }
-        .padding(.bottom, footerSize.height - offsetY + bottomOverscrollHeight)
+        .padding(.bottom, bottomOverscrollHeight - offsetY)
         .applyingProperties(properties, includeBackground: true)
         .padding(.bottom, offsetY - bottomOverscrollHeight)
     }
 
-    var body: some View {
-        GeometryReader { _ in
-            ZStack(alignment: .bottom) {
-                if let coverBox = screen.cover, let coverContent = coverBox.content {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            coverView(
-                                coverBox,
-                                coverContent,
-                                nil
-                            )
-
-                            contentView(
-                                content: screen.content,
-                                coverBox: coverBox
-                            )
-                        }
-                    }
-                    .ignoresSafeArea()
-                    .scrollIndicatorsHidden_compatible()
-                }
-
-                if let footer = screen.footer {
-                    AdaptyUIElementView(footer)
-                        .onGeometrySizeChange { footerSize = $0 }
-                }
-
-                if let overlay = screen.overlay {
-                    AdaptyUIElementView(overlay)
-                }
+    @ViewBuilder
+    private func footerView(
+        _ element: AdaptyUI.Element,
+        globalProxy: GeometryProxy
+    ) -> some View {
+        if footerSize.height >= globalProxy.size.height {
+            ScrollView {
+                AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
             }
-            .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
-            .ignoresSafeArea()
+            .scrollIndicatorsHidden_compatible()
+        } else {
+            AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
         }
     }
 }
