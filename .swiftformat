@@ -2,8 +2,8 @@
 --allman false
 --anonymousforeach convert
 --assetliterals visual-width
---asynccapturing 
---beforemarks 
+--asynccapturing
+--beforemarks
 --binarygrouping ignore
 --categorymark "MARK: %c"
 --classthreshold 0
@@ -24,27 +24,27 @@
 --fractiongrouping disabled
 --fragment false
 --funcattributes preserve
---generictypes 
+--generictypes
 --groupedextension "MARK: %c"
 --guardelse auto
 --hexgrouping ignore
 --hexliteralcase uppercase
---ifdef indent
+--ifdef no-indent
 --importgrouping testable-last
 --indent 4
 --indentcase false
 --indentstrings false
---lifecycle 
+--lifecycle
 --lineaftermarks true
 --linebreaks lf
 --markcategories true
 --markextensions always
 --marktypes always
 --maxwidth none
---modifierorder 
---nevertrailing 
---nospaceoperators 
---nowrapoperators 
+--modifierorder
+--nevertrailing
+--nospaceoperators
+--nowrapoperators
 --octalgrouping ignore
 --onelineforeach ignore
 --operatorfunc spaced
@@ -53,7 +53,7 @@
 --ranges spaced
 --redundanttype infer-locals-only
 --self remove
---selfrequired 
+--selfrequired
 --semicolons never
 --shortoptionals always
 --smarttabs enabled
@@ -62,8 +62,8 @@
 --structthreshold 0
 --swiftversion 5.9
 --tabwidth unspecified
---throwcapturing 
---trailingclosures 
+--throwcapturing
+--trailingclosures
 --trimwhitespace always
 --typeattributes prev-line
 --typeblanklines remove
