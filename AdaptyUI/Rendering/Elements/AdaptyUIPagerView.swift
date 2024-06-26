@@ -144,6 +144,7 @@ struct AdaptyUIPagerView: View {
                 ForEach(0 ..< pager.content.count, id: \.self) { idx in
                     AdaptyUIElementView(pager.content[idx])
                         .frame(width: width, height: height)
+                        .clipped()
                         .padding(.leading, idx == 0 ? hPadding : 0)
                         .padding(.trailing, idx == pager.content.count - 1 ? hPadding : 0)
                 }
