@@ -16,21 +16,26 @@ import Foundation
             locale: String = "en",
             isRightToLeft: Bool = false,
             images: [String] = [],
-            colors: [String: String] = [:],
-            strings: [String: String] = [:],
+            colors: [String: AdaptyUI.ColorFilling] = [:],
+            strings: [String: [String]] = [:],
             content: String,
             selectedProducts: [String: String] = [:]
         ) throws -> Self {
             let locale = AdaptyLocale(id: locale)
 
-            let strings = strings.merging([
-                "$short": "Article.",
-                "$medium": "Article nor prepare chicken you him now.",
-                "$long": "Article nor prepare chicken you him now. Shy merits say advice ten before lovers innate add. ",
-            ]) { current, _ in current }
+            // TODO: Move all strings to UI Gallery
+            let strings = strings
+                .merging([
+                    "$short": ["Article."],
+                    "$medium": ["Article nor prepare chicken you him now."],
+                    "$long": ["Article nor prepare chicken you him now. Shy merits say advice ten before lovers innate add. "],
+                    "$timer": ["#TIMER_Total_Days_1", "d ", "#TIMER_hh", ":", "#TIMER_mm", ":", "TIMER_ss", ".", "#TIMER_SSS"],
+                    "$countdown": ["#TIMER_Total_Seconds_1"],
+                ]) { current, _ in current }
 
-            let colors = try colors
-                .mapValues { try AdaptyUI.ViewConfiguration.Asset.filling(.color(.init(hex: $0))) }
+            let colors = colors
+                .mapValues { AdaptyUI.ViewConfiguration.Asset.filling($0.asFilling) }
+                // TODO: Move all colors & color gradients to UI Gallery
                 .merging([
                     "$black": .filling(.color(AdaptyUI.Color.black)),
                     "$white": .filling(.color(AdaptyUI.Color(data: 0xFFFFFFFF))),
@@ -119,8 +124,15 @@ import Foundation
                 localizations: [locale: .init(
                     id: locale,
                     isRightToLeft: isRightToLeft,
-                    strings: strings.mapValues {
-                        .init(value: .init(items: [.text($0, nil)]), fallback: nil)
+                    strings: strings.mapValues { items in
+                        .init(value: .init(items: items.map {
+                            var v = $0
+                            return if v.remove(at: v.startIndex) == "#" {
+                                .tag(v, nil)
+                            } else {
+                                .text($0, nil)
+                            }
+                        }), fallback: nil)
                     },
                     assets: nil
                 )],

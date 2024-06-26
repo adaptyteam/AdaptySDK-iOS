@@ -64,6 +64,13 @@ package extension AdaptyUI {
             default: nil
             }
         }
+
+        package var asFilling: AdaptyUI.Filling {
+            switch self {
+            case let .color(value): .color(value)
+            case let .colorGradient(value): .colorGradient(value)
+            }
+        }
     }
 }
 
