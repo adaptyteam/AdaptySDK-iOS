@@ -16,6 +16,15 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.Unit {
+    var isZero: Bool {
+        switch self {
+        case let .point(value), let .screen(value):
+            value == 0.0
+        default:
+            false
+        }
+    }
+
     package enum SafeArea: String {
         case start
         case end

@@ -50,7 +50,7 @@ extension AdaptyUI.Pager {
         static let `default`: Self = .init(
             layout: .stacked,
             verticalAlignment: .bottom,
-            padding: .init(same: 6),
+            padding: .init(same: .point(6)),
             dotSize: 6,
             spacing: 6,
             color: AdaptyUI.Color.white,

@@ -9,29 +9,29 @@ import Foundation
 
 extension AdaptyUI {
     package struct EdgeInsets {
-        package static let zero = AdaptyUI.EdgeInsets(same: 0.0)
-        static let defaultValue = 0.0
-        
-        package let leading: Double
-        package let top: Double
-        package let trailing: Double
-        package let bottom: Double
+        package static let zero = AdaptyUI.EdgeInsets(same: .point(0.0))
+        static let defaultValue: AdaptyUI.Unit = .point(0.0)
+
+        package let leading: AdaptyUI.Unit
+        package let top: AdaptyUI.Unit
+        package let trailing: AdaptyUI.Unit
+        package let bottom: AdaptyUI.Unit
     }
 }
 
 #if DEBUG
     package extension AdaptyUI.EdgeInsets {
         static func create(
-            same: Double = defaultValue
+            same: AdaptyUI.Unit = defaultValue
         ) -> Self {
             .init(same: same)
         }
 
         static func create(
-            leading: Double = defaultValue,
-            top: Double = defaultValue,
-            trailing: Double = defaultValue,
-            bottom: Double = defaultValue
+            leading: AdaptyUI.Unit = defaultValue,
+            top: AdaptyUI.Unit = defaultValue,
+            trailing: AdaptyUI.Unit = defaultValue,
+            bottom: AdaptyUI.Unit = defaultValue
         ) -> Self {
             .init(
                 leading: leading,
@@ -44,18 +44,12 @@ extension AdaptyUI {
 #endif
 
 extension AdaptyUI.EdgeInsets {
-    package static let zero1 = AdaptyUI.EdgeInsets(same: defaultValue)
-
-    init(same: Double) {
+    init(same: AdaptyUI.Unit) {
         self.init(leading: same, top: same, trailing: same, bottom: same)
     }
 
     package var isZero: Bool {
-        leading == 0.0 && top == 0.0 && trailing == 0.0 && bottom == 0.0
-    }
-
-    package var isSame: Bool {
-        (leading == top) && (trailing == bottom) && (leading == trailing)
+        leading.isZero && top.isZero && trailing.isZero && bottom.isZero
     }
 }
 
@@ -70,9 +64,9 @@ extension AdaptyUI.EdgeInsets: Decodable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let defaultValue = Self.defaultValue
-        if let value = try? container.decode(Double.self) {
+        if let value = try? container.decode(AdaptyUI.Unit.self) {
             self.init(same: value)
-        } else if let values = try? container.decode([Double].self) {
+        } else if let values = try? container.decode([AdaptyUI.Unit].self) {
             switch values.count {
             case 0: self.init(same: defaultValue)
             case 1: self.init(same: values[0])
@@ -83,10 +77,10 @@ extension AdaptyUI.EdgeInsets: Decodable {
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             try self.init(
-                leading: container.decodeIfPresent(Double.self, forKey: .leading) ?? defaultValue,
-                top: container.decodeIfPresent(Double.self, forKey: .top) ?? defaultValue,
-                trailing: container.decodeIfPresent(Double.self, forKey: .trailing) ?? defaultValue,
-                bottom: container.decodeIfPresent(Double.self, forKey: .bottom) ?? defaultValue
+                leading: container.decodeIfPresent(AdaptyUI.Unit.self, forKey: .leading) ?? defaultValue,
+                top: container.decodeIfPresent(AdaptyUI.Unit.self, forKey: .top) ?? defaultValue,
+                trailing: container.decodeIfPresent(AdaptyUI.Unit.self, forKey: .trailing) ?? defaultValue,
+                bottom: container.decodeIfPresent(AdaptyUI.Unit.self, forKey: .bottom) ?? defaultValue
             )
         }
     }
