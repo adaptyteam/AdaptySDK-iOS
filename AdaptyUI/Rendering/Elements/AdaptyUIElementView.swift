@@ -73,6 +73,7 @@ package struct AdaptyUIElementView: View {
             AdaptyUIElementView(content)
         } else {
             Color.clear
+                .frame(idealWidth: 0, idealHeight: 0)
         }
     }
 

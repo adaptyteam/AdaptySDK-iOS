@@ -25,31 +25,6 @@ protocol ProductInfoModel {
 }
 
 @available(iOS 15.0, *)
-struct EmptyProductInfo: ProductInfoModel {
-    var isPlaceholder: Bool { true }
-    
-    let adaptyProductId: String
-
-    var adaptyProduct: AdaptyPaywallProduct? { nil }
-    var eligibleOffer: AdaptyProductDiscount? { nil }
-    var isEligibleForFreeTrial: Bool { false }
-
-    init(adaptyProductId: String) {
-        self.adaptyProductId = adaptyProductId
-    }
-
-    var paymentMode: AdaptyProductDiscount.PaymentMode { .unknown }
-
-    func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement? {
-        #if DEBUG
-        return .value("DEBUG_LOADING")
-        #else
-        nil
-        #endif
-    }
-}
-
-@available(iOS 15.0, *)
 extension AdaptyPaywallProduct {
     func isApplicableForTag(_ tag: AdaptyUI.ProductTag) -> Bool {
         switch tag {
