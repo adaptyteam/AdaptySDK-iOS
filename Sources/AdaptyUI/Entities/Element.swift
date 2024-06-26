@@ -28,7 +28,7 @@ extension AdaptyUI {
 
 extension AdaptyUI.Element {
     package struct Properties {
-        static let defaultPadding = AdaptyUI.EdgeInsets(same: 0)
+        static let defaultPadding = AdaptyUI.EdgeInsets(same: .point(0))
         static let defaultOffset = AdaptyUI.Offset.zero
         static let defaultVisibility = false
 
