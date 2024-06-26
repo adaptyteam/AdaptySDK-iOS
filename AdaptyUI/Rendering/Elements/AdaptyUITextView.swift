@@ -22,18 +22,37 @@ struct AdaptyUITextView: View {
     }
 
     var body: some View {
-        if let (richText, productInfo) = text.extract(productsInfoProvider: productsViewModel) {
+        let (richText, productInfo) = text.extract(productsInfoProvider: productsViewModel)
+
+        switch productInfo {
+        case .notApplicable:
             richText
                 .convertToSwiftUIText(
                     tagResolver: customTagResolverViewModel,
-                    productInfo: productInfo
+                    productInfo: nil
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
-                .redactedAsPlaceholder(productInfo?.isPlaceholder ?? false)
-        } else {
-            EmptyView()
+        case .notFound:
+            richText
+                .convertToSwiftUIText(
+                    tagResolver: customTagResolverViewModel,
+                    productInfo: nil
+                )
+                .multilineTextAlignment(text.horizontalAlign)
+                .lineLimit(text.maxRows)
+                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
+                .redactedAsPlaceholder(true)
+        case let .found(productInfoModel):
+            richText
+                .convertToSwiftUIText(
+                    tagResolver: customTagResolverViewModel,
+                    productInfo: productInfoModel
+                )
+                .multilineTextAlignment(text.horizontalAlign)
+                .lineLimit(text.maxRows)
+                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
         }
     }
 }
@@ -139,25 +158,30 @@ extension UIImage {
 
 @available(iOS 15.0, *)
 extension AdaptyUI.Text {
-    
-    
-    func extract(productsInfoProvider: ProductsInfoProvider) -> (AdaptyUI.RichText, ProductInfoModel?)? {
+    enum ProductInfoContainer {
+        case notApplicable
+        case notFound
+        case found(ProductInfoModel)
+    }
+
+    func extract(productsInfoProvider: ProductsInfoProvider) -> (AdaptyUI.RichText, ProductInfoContainer) {
         switch value {
         case let .text(value):
-            return (value, nil)
+            return (value, .notApplicable)
         case let .productText(value):
             guard let product = productsInfoProvider.productInfo(by: value.adaptyProductId) else {
-                return nil
+                return (value.richText(byPaymentMode: .unknown), .notFound)
             }
 
-            return (value.richText(byPaymentMode: product.paymentMode), product)
+            return (value.richText(byPaymentMode: product.paymentMode), .found(product))
         case let .selectedProductText(value):
             guard let product = productsInfoProvider.selectedProductInfo(by: value.productGroupId),
-                  let adaptyProductId = product.adaptyProduct?.adaptyProductId else {
-                return (value.richText(), nil)
+                  let adaptyProductId = product.adaptyProduct?.adaptyProductId
+            else {
+                return (value.richText(), .notFound)
             }
 
-            return (value.richText(adaptyProductId: adaptyProductId, byPaymentMode: product.paymentMode), product)
+            return (value.richText(adaptyProductId: adaptyProductId, byPaymentMode: product.paymentMode), .found(product))
         }
     }
 }

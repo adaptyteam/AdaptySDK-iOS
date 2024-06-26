@@ -88,9 +88,7 @@ package class AdaptyProductsViewModel: ObservableObject {
         products: [AdaptyPaywallProduct]?,
         eligibilities: [String: AdaptyEligibility]?
     ) -> [ProductInfoModel] {
-        guard let products else {
-            return paywall.adaptyProductIds.map { EmptyProductInfo(adaptyProductId: $0) }
-        }
+        guard let products else { return [] }
 
         return products.map {
             RealProductInfo(
