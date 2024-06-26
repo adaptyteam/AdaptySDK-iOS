@@ -12,8 +12,9 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
     let headers: Headers
+    let queryItems: QueryItems
 
-    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String) {
+    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String,  disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
@@ -23,7 +24,8 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
             .setViewConfigurationLocale(locale)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
-
+        
+        queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
@@ -32,6 +34,7 @@ extension HTTPSession {
         apiKeyPrefix: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
+        disableServerCache: Bool,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
     ) {
         let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
@@ -40,7 +43,8 @@ extension HTTPSession {
             apiKeyPrefix: apiKeyPrefix,
             paywallVariationId: paywallVariationId,
             locale: locale,
-            md5Hash: md5Hash
+            md5Hash: md5Hash,
+            disableServerCache: disableServerCache
         )
 
         perform(
@@ -53,6 +57,7 @@ extension HTTPSession {
                 "builder_version": .value(AdaptyUI.builderVersion),
                 "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
                 "md5": .value(md5Hash),
+                "disable_server_cache": .value(disableServerCache),
             ]
         ) { (result: FetchViewConfigurationRequest.Result) in
             switch result {

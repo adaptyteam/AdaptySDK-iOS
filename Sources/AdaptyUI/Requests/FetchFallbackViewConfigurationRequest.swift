@@ -11,12 +11,15 @@ struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration>
 
     let endpoint: HTTPEndpoint
+    let queryItems: QueryItems
 
-    init(apiKeyPrefix: String, paywallInstanceIdentity: String, locale: AdaptyLocale) {
+    init(apiKeyPrefix: String, paywallInstanceIdentity: String, locale: AdaptyLocale, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(AdaptyUI.builderVersion)/\(locale.languageCode)/fallback.json"
         )
+
+        queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
@@ -25,12 +28,14 @@ extension HTTPSession {
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
+        disableServerCache: Bool,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
     ) {
         let request = FetchFallbackViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
-            locale: locale
+            locale: locale,
+            disableServerCache: disableServerCache
         )
         perform(
             request,
@@ -41,6 +46,7 @@ extension HTTPSession {
                 "builder_version": .value(AdaptyUI.builderVersion),
                 "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
                 "language_code": .valueOrNil(locale.languageCode),
+                "disable_server_cache": .value(disableServerCache),
             ]
         ) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in
             switch result {
@@ -62,6 +68,7 @@ extension HTTPSession {
                         apiKeyPrefix: apiKeyPrefix,
                         paywallInstanceIdentity: paywallInstanceIdentity,
                         locale: .defaultPaywallLocale,
+                        disableServerCache: disableServerCache,
                         completion
                     )
                 }

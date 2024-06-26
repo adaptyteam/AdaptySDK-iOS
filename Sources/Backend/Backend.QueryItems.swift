@@ -7,10 +7,11 @@
 
 import Foundation
 
-extension Backend.Request {
-    fileprivate static let profileIdQueryItemName = "profile_id"
-    fileprivate static let discountIdQueryItemName = "offer_code"
-    fileprivate static let vendorProductIdQueryItemName = "product"
+private extension Backend.Request {
+    static let profileIdQueryItemName = "profile_id"
+    static let discountIdQueryItemName = "offer_code"
+    static let vendorProductIdQueryItemName = "product"
+    static let disableServerCacheQueryItemName = "disable_cache"
 }
 
 extension [HTTPRequest.QueryItems.Element] {
@@ -37,6 +38,15 @@ extension [HTTPRequest.QueryItems.Element] {
 
         if let discountId {
             queryItems.append(URLQueryItem(name: Backend.Request.discountIdQueryItemName, value: discountId))
+        }
+        return queryItems
+    }
+
+    func setDisableServerCache(_ disableServerCache: Bool) -> Self {
+        var queryItems = filter { $0.name != Backend.Request.disableServerCacheQueryItemName }
+
+        if disableServerCache {
+            queryItems.append(URLQueryItem(name: Backend.Request.disableServerCacheQueryItemName, value: UUID().uuidString))
         }
         return queryItems
     }

@@ -15,12 +15,13 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
     let headers: Headers
     let profileId: String
     let cached: AdaptyPaywall?
+    let queryItems: QueryItems
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
         createDecoder(jsonDecoder, profileId, cached)
     }
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, cached: AdaptyPaywall?) {
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, cached: AdaptyPaywall?, disableServerCache: Bool) {
         self.profileId = profileId
         self.cached = cached
 
@@ -35,6 +36,8 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
             .setSegmentId(segmentId)
+        
+        queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
@@ -92,6 +95,7 @@ extension HTTPSession {
         locale: AdaptyLocale,
         segmentId: String,
         cached: AdaptyPaywall?,
+        disableServerCache: Bool,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
         let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
@@ -103,7 +107,8 @@ extension HTTPSession {
             locale: locale,
             md5Hash: md5Hash,
             segmentId: segmentId,
-            cached: cached
+            cached: cached,
+            disableServerCache: disableServerCache
         )
 
         perform(
@@ -117,6 +122,7 @@ extension HTTPSession {
                 "builder_version": .value(AdaptyUI.builderVersion),
                 "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
                 "md5": .value(md5Hash),
+                "disable_server_cache": .value(disableServerCache),
             ]
         ) { (result: FetchPaywallVariationsRequest.Result) in
             completion(result.map { $0.body }.mapError { $0.asAdaptyError })

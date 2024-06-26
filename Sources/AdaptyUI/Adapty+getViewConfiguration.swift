@@ -14,7 +14,7 @@ extension Adapty {
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
     ) {
         Adapty.async(completion) { manager, completion in
-            manager.getViewConfiguration(
+            manager.getViewConfiguration1(
                 paywall: paywall,
                 loadTimeout: loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval,
                 completion
@@ -31,11 +31,12 @@ extension Adapty {
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
             locale: locale,
+            disableServerCache: profileStorage.getProfile()?.value.isTestUser ?? false,
             completion
         )
     }
 
-    private func getViewConfiguration(
+    private func getViewConfiguration1(
         paywall: AdaptyPaywall,
         loadTimeout: DispatchTimeInterval,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
@@ -129,6 +130,7 @@ extension Adapty {
             apiKeyPrefix: apiKeyPrefix,
             paywallVariationId: paywallVariationId,
             locale: locale,
+            disableServerCache: self.profileStorage.getProfile()?.value.isTestUser ?? false,
             termination
         )
 
