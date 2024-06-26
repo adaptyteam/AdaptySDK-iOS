@@ -69,7 +69,7 @@ struct AdaptyUIPagerView: View {
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
-    
+
     var pager: AdaptyUI.Pager
 
     @State private var currentPage: Int = 0
@@ -124,19 +124,43 @@ struct AdaptyUIPagerView: View {
     @ViewBuilder
     private var pagerView: some View {
         GeometryReader { proxy in
+            let pagePaddingLeading = pager.pagePadding.leading.points(
+                screenSize: screenSize.width,
+                safeAreaStart: safeArea.leading,
+                safeAreaEnd: safeArea.trailing
+            )
+
+            let pagePaddingTrailing = pager.pagePadding.trailing.points(
+                screenSize: screenSize.width,
+                safeAreaStart: safeArea.leading,
+                safeAreaEnd: safeArea.trailing
+            )
+
+            let pagePaddingTop = pager.pagePadding.top.points(
+                screenSize: screenSize.height,
+                safeAreaStart: safeArea.top,
+                safeAreaEnd: safeArea.bottom
+            )
+
+            let pagePaddingBottom = pager.pagePadding.bottom.points(
+                screenSize: screenSize.height,
+                safeAreaStart: safeArea.top,
+                safeAreaEnd: safeArea.bottom
+            )
+
             let width = pager.pageWidth.valueWith(parent: proxy.size.width,
                                                   screenSize: screenSize.width,
                                                   safeAreaStart: safeArea.leading,
                                                   safeAreaEnd: safeArea.trailing)
-                - pager.pagePadding.leading
-                - pager.pagePadding.trailing
+                - pagePaddingLeading
+                - pagePaddingTrailing
 
             let height = pager.pageHeight.valueWith(parent: proxy.size.height,
                                                     screenSize: screenSize.height,
                                                     safeAreaStart: safeArea.top,
                                                     safeAreaEnd: safeArea.bottom)
-                - pager.pagePadding.top
-                - pager.pagePadding.bottom
+                - pagePaddingTop
+                - pagePaddingBottom
 
             let hPadding = (proxy.size.width - width) / 2.0
 

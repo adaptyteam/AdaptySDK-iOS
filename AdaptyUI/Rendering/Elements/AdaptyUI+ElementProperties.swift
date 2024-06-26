@@ -28,20 +28,6 @@ extension View {
             .offset(x: props?.offset.x ?? 0.0, y: props?.offset.y ?? 0.0)
             .padding(props?.padding)
     }
-
-    @ViewBuilder
-    func padding(_ insets: AdaptyUI.EdgeInsets?) -> some View {
-        if let insets {
-            padding(EdgeInsets(
-                top: insets.top,
-                leading: insets.leading,
-                bottom: insets.bottom,
-                trailing: insets.trailing
-            ))
-        } else {
-            self
-        }
-    }
 }
 
 @available(iOS 15.0, *)
