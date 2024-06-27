@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-extension Shape {
+extension InsettableShape {
     @ViewBuilder
     func fill(filling: AdaptyUI.Filling?) -> some View {
         if let filling {
@@ -66,11 +66,11 @@ extension Shape {
         if let filling {
             switch filling {
             case .color(let color):
-                self.stroke(color.swiftuiColor, lineWidth: lineWidth)
+                self.strokeBorder(color.swiftuiColor, lineWidth: lineWidth)
             case .colorGradient(let gradient):
                 switch gradient.kind {
                 case .linear:
-                    self.stroke(
+                    self.strokeBorder(
                         LinearGradient(
                             stops: gradient.items.map { $0.gradientStop },
                             startPoint: gradient.start.unitPoint,
@@ -79,7 +79,7 @@ extension Shape {
                         lineWidth: lineWidth
                     )
                 case .conic:
-                    self.stroke(
+                    self.strokeBorder(
                         AngularGradient(
                             gradient: .init(stops: gradient.items.map { $0.gradientStop }),
                             center: .center,
@@ -88,7 +88,7 @@ extension Shape {
                         lineWidth: lineWidth
                     )
                 case .radial:
-                    self.stroke(
+                    self.strokeBorder(
                         RadialGradient(
                             gradient: .init(stops: gradient.items.map { $0.gradientStop }),
                             center: .center,

@@ -68,8 +68,19 @@ extension AdaptyUI.CornerRadius {
 }
 
 @available(iOS 15.0, *)
-struct UnevenRoundedRectangleFallback: Shape {
+struct UnevenRoundedRectangleFallback: InsettableShape {
     var cornerRadii: AdaptyUI.CornerRadius
+
+    func inset(by amount: CGFloat) -> UnevenRoundedRectangleFallback {
+        UnevenRoundedRectangleFallback(
+            cornerRadii: .create(
+                topLeading: cornerRadii.topLeading - amount,
+                topTrailing: cornerRadii.topTrailing - amount,
+                bottomTrailing: cornerRadii.bottomTrailing - amount,
+                bottomLeading: cornerRadii.bottomLeading - amount
+            )
+        )
+    }
 
     func path(in rect: CGRect) -> Path {
         let normalizedRadii = cornerRadii.normalized(width: rect.width, height: rect.height)
