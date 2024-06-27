@@ -24,9 +24,9 @@ extension AdaptyUI {
         public var diskStorageSizeLimit: UInt
 
         public init(
-            memoryStorageTotalCostLimit: Int = 100 * 1024 * 1024, // 100MB
-            memoryStorageCountLimit: Int = .max,
-            diskStorageSizeLimit: UInt = 100 * 1024 * 1024 // 100MB
+            memoryStorageTotalCostLimit: Int,
+            memoryStorageCountLimit: Int,
+            diskStorageSizeLimit: UInt
         ) {
             self.memoryStorageTotalCostLimit = memoryStorageTotalCostLimit
             self.memoryStorageCountLimit = memoryStorageCountLimit
@@ -36,13 +36,7 @@ extension AdaptyUI {
 
     static var currentCacheConfiguration: MediaCacheConfiguration?
 
-    static func configureMediaCacheIfNeeded() {
-        if currentCacheConfiguration == nil {
-            configureMediaCache(.init())
-        }
-    }
-
-    public static func configureMediaCache(_ configuration: MediaCacheConfiguration) {
+    static func configureMediaCache(_ configuration: MediaCacheConfiguration) {
         AdaptyUI.writeLog(
             level: .verbose,
             message: """
