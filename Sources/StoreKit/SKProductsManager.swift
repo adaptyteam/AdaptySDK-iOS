@@ -112,7 +112,7 @@ final class SKProductsManager {
         queue.async { [weak self] in
             guard let self, !self.sending else { return }
             self.sending = true
-            let request = FetchAllProductVendorIdsRequest(apiKeyPrefix: self.apiKeyPrefix, disableServerCache: false)
+            let request = FetchAllProductVendorIdsRequest(apiKeyPrefix: self.apiKeyPrefix)
             self.session.perform(request, logName: "get_products_ids") { [weak self] (result: FetchAllProductVendorIdsRequest.Result) in
                 defer { self?.sending = false }
                 guard let self else { return }

@@ -165,6 +165,7 @@ public struct AdaptyUITestRendererView: View {
             eventsHandler: eventsHandler,
             paywall: AdaptyMockPaywall(),
             products: nil,
+            introductoryOffersEligibilities: nil,
             viewConfiguration: viewConfiguration
         )
         let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])

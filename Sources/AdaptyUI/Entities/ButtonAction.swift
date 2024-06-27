@@ -12,8 +12,8 @@ extension AdaptyUI {
         case openUrl(String?)
         case restore
         case custom(id: String)
-        case selectProductId(id: String, groupId: String)
-        case purchaseProductId(id: String)
+        case selectProduct(id: String, groupId: String)
+        case purchaseProduct(id: String)
         case unselectProduct(groupId: String)
         case purchaseSelectedProduct(groupId: String)
         case close
