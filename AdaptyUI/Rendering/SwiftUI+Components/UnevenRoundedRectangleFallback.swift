@@ -73,7 +73,7 @@ struct UnevenRoundedRectangleFallback: InsettableShape {
 
     func inset(by amount: CGFloat) -> UnevenRoundedRectangleFallback {
         UnevenRoundedRectangleFallback(
-            cornerRadii: .create(
+            cornerRadii: .init(
                 topLeading: cornerRadii.topLeading - amount,
                 topTrailing: cornerRadii.topTrailing - amount,
                 bottomTrailing: cornerRadii.bottomTrailing - amount,
