@@ -16,6 +16,7 @@ struct AdaptyPaywallView: View {
 
     private let paywall: AdaptyPaywall
     private let products: [AdaptyPaywallProduct]?
+    private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     private let configuration: AdaptyUI.LocalizedViewConfiguration
     private let eventsHandler: AdaptyEventsHandler
     private let productsViewModel: AdaptyProductsViewModel
@@ -29,6 +30,7 @@ struct AdaptyPaywallView: View {
         logId: String,
         paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]?,
+        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         configuration: AdaptyUI.LocalizedViewConfiguration,
         tagResolver: AdaptyTagResolver?,
         didPerformAction: @escaping (AdaptyUI.Action) -> Void,
@@ -45,6 +47,7 @@ struct AdaptyPaywallView: View {
     ) {
         self.paywall = paywall
         self.products = products
+        self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.configuration = configuration
 
         AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(configuration.templateId), products: \(products?.count ?? 0)")
@@ -70,6 +73,7 @@ struct AdaptyPaywallView: View {
         productsViewModel = AdaptyProductsViewModel(eventsHandler: eventsHandler,
                                                     paywall: paywall,
                                                     products: products,
+                                                    introductoryOffersEligibilities: introductoryOffersEligibilities,
                                                     viewConfiguration: configuration)
         screensViewModel = AdaptyScreensViewModel(eventsHandler: eventsHandler,
                                                   viewConfiguration: configuration)
@@ -79,7 +83,7 @@ struct AdaptyPaywallView: View {
             sectionsViewModel: sectionsViewModel,
             screensViewModel: screensViewModel
         )
-        
+
         productsViewModel.loadProductsIfNeeded()
     }
 

@@ -20,6 +20,7 @@ public class AdaptyPaywallController: UIViewController {
     public let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     let products: [AdaptyPaywallProduct]?
+    let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     let tagResolver: AdaptyTagResolver?
 
     public weak var delegate: AdaptyPaywallControllerDelegate?
@@ -27,6 +28,7 @@ public class AdaptyPaywallController: UIViewController {
     init(
         paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]?,
+        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate?,
         tagResolver: AdaptyTagResolver?
@@ -39,6 +41,7 @@ public class AdaptyPaywallController: UIViewController {
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
         self.products = products
+        self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.tagResolver = tagResolver
         self.delegate = delegate
 
@@ -72,6 +75,7 @@ public class AdaptyPaywallController: UIViewController {
                 logId: logId,
                 paywall: paywall,
                 products: products,
+                introductoryOffersEligibilities: introductoryOffersEligibilities,
                 configuration: viewConfiguration,
                 tagResolver: tagResolver,
                 didPerformAction: { [weak self] action in
@@ -139,7 +143,7 @@ public class AdaptyPaywallController: UIViewController {
 
         log(.verbose, "viewDidDisappear")
     }
-    
+
     func log(_ level: AdaptyLogLevel, _ message: String) {
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
     }

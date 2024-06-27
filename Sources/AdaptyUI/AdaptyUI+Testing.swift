@@ -23,75 +23,8 @@ import Foundation
         ) throws -> Self {
             let locale = AdaptyLocale(id: locale)
 
-            // TODO: Move all strings to UI Gallery
-            let strings = strings
-                .merging([
-                    "$short": ["Article."],
-                    "$medium": ["Article nor prepare chicken you him now."],
-                    "$long": ["Article nor prepare chicken you him now. Shy merits say advice ten before lovers innate add. "],
-                    "$timer": ["#TIMER_Total_Days_1", "d ", "#TIMER_hh", ":", "#TIMER_mm", ":", "TIMER_ss", ".", "#TIMER_SSS"],
-                    "$countdown": ["#TIMER_Total_Seconds_1"],
-                ]) { current, _ in current }
-
             let colors = colors
                 .mapValues { AdaptyUI.ViewConfiguration.Asset.filling($0.asFilling) }
-                // TODO: Move all colors & color gradients to UI Gallery
-                .merging([
-                    "$black": .filling(.color(AdaptyUI.Color.black)),
-                    "$white": .filling(.color(AdaptyUI.Color(data: 0xFFFFFFFF))),
-                    "$red": .filling(.color(AdaptyUI.Color(data: 0xFF0000FF))),
-                    "$red_2": .filling(.color(AdaptyUI.Color(data: 0xF3227AFF))),
-                    "$red_2_transparent": .filling(.color(AdaptyUI.Color(data: 0xF3227A44))),
-                    "$green": .filling(.color(AdaptyUI.Color(data: 0x00FF00FF))),
-                    "$blue": .filling(.color(AdaptyUI.Color(data: 0x0000FFFF))),
-                    "$light": .filling(.color(AdaptyUI.Color(data: 0xF4D13BFF))),
-                    "$font": .font(AdaptyUI.Font.default),
-                    "$red_to_transparent_top_to_bottom": .filling(.colorGradient(.create(
-                        kind: .linear,
-                        start: .create(x: 0.5, y: 0.0),
-                        end: .create(x: 0.5, y: 1.0),
-                        items: [
-                            .create(color: .create(data: 0xFF000099), p: 0.0),
-                            .create(color: .create(data: 0xFF000000), p: 1.0),
-                        ]
-                    ))),
-                    "$blue_to_transparent_top_to_bottom": .filling(.colorGradient(.create(
-                        kind: .linear,
-                        start: .create(x: 0.5, y: 0.0),
-                        end: .create(x: 0.5, y: 1.0),
-                        items: [
-                            .create(color: .create(data: 0x0000FF99), p: 0.0),
-                            .create(color: .create(data: 0x0000FF00), p: 1.0),
-                        ]
-                    ))),
-                    "$green_to_transparent_top_to_bottom": .filling(.colorGradient(.create(
-                        kind: .linear,
-                        start: .create(x: 0.5, y: 0.0),
-                        end: .create(x: 0.5, y: 1.0),
-                        items: [
-                            .create(color: .create(data: 0x00FF0099), p: 0.0),
-                            .create(color: .create(data: 0x00FF0000), p: 1.0),
-                        ]
-                    ))),
-                    "$yellow_to_purple_top_to_bottom": .filling(.colorGradient(.create(
-                        kind: .linear,
-                        start: .create(x: 0.5, y: 0.0),
-                        end: .create(x: 0.5, y: 1.0),
-                        items: [
-                            .create(color: .create(data: 0xF9B61AFF), p: 0.0),
-                            .create(color: .create(data: 0x8A4DECFF), p: 1.0),
-                        ]
-                    ))),
-                    "$pink_to_red_top_to_bottom": .filling(.colorGradient(.create(
-                        kind: .linear,
-                        start: .create(x: 0.5, y: 0.0),
-                        end: .create(x: 0.5, y: 1.0),
-                        items: [
-                            .create(color: .create(data: 0xB577BFFF), p: 0.0),
-                            .create(color: .create(data: 0xF3227AFF), p: 1.0),
-                        ]
-                    ))),
-                ]) { current, _ in current }
 
             let assets = Dictionary(
                 images.map { ($0, AdaptyUI.ViewConfiguration.Asset.filling(.image(.resorces($0)))) }

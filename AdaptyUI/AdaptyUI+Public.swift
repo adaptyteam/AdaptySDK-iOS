@@ -11,9 +11,32 @@ import Adapty
 import UIKit
 
 @available(iOS 15.0, *)
-extension AdaptyUI {
+public extension AdaptyUI {
+    /// TODO: add documentation
+    struct Configuration {
+        public static let `default` = Configuration(
+            mediaCacheConfiguration: .init(
+                memoryStorageTotalCostLimit: 100 * 1024 * 1024, // 100MB
+                memoryStorageCountLimit: .max,
+                diskStorageSizeLimit: 100 * 1024 * 1024 // 100MB
+            )
+        )
+
+        /// TODO: add documentation
+        public let mediaCacheConfiguration: MediaCacheConfiguration
+
+        public init(
+            mediaCacheConfiguration: MediaCacheConfiguration
+        ) {
+            self.mediaCacheConfiguration = mediaCacheConfiguration
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+public extension AdaptyUI {
     /// This enum describes user initiated actions.
-    public enum Action {
+    enum Action {
         /// User pressed Close Button
         case close
         /// User pressed any button with URL
@@ -143,20 +166,28 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
 }
 
 @available(iOS 15.0, *)
-extension AdaptyUI {
+public extension AdaptyUI {
+    /// Use this method to initialize the AdaptyUI SDK.
+    ///
+    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)` right after `Adapty.activate()`.
+    ///
+    /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
+    static func activate(configuration: Configuration = .default) {
+        AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration)
+        ImageUrlPrefetcher.shared.initialize()
+    }
+
     /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
     ///
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exeeds.
     ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
-    public static func getViewConfiguration(
+    static func getViewConfiguration(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = 5.0,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
     ) {
-        ImageUrlPrefetcher.shared.initialize()
-
         Adapty.getViewConfiguration(
             paywall: paywall,
             loadTimeout: loadTimeout,
@@ -173,9 +204,10 @@ extension AdaptyUI {
     ///   - delegate: the object that implements the ``AdaptyPaywallControllerDelegate`` protocol. Use it to respond to different events happening inside the purchase screen.
     ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     /// - Returns: an ``AdaptyPaywallController`` object, representing the requested paywall screen.
-    public static func paywallController(
+    static func paywallController(
         for paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]? = nil,
+        introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
         tagResolver: AdaptyTagResolver? = nil
@@ -183,6 +215,7 @@ extension AdaptyUI {
         AdaptyPaywallController(
             paywall: paywall,
             products: products,
+            introductoryOffersEligibilities: introductoryOffersEligibilities,
             viewConfiguration: viewConfiguration,
             delegate: delegate,
             tagResolver: tagResolver
