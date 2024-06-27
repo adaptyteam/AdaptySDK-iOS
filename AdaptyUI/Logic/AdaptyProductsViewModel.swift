@@ -34,9 +34,7 @@ package class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
     private let eventsHandler: AdaptyEventsHandler
-
-    let paywall: AdaptyPaywallInterface
-    let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+    private let paywallViewModel: AdaptyPaywallViewModel
 
     @Published var products: [ProductInfoModel]
     @Published var selectedProductsIds: [String: String]
@@ -47,7 +45,7 @@ package class AdaptyProductsViewModel: ObservableObject {
     var adaptyProducts: [AdaptyPaywallProduct]? {
         didSet {
             products = Self.generateProductsInfos(
-                paywall: paywall,
+                paywall: paywallViewModel.paywall,
                 products: adaptyProducts,
                 eligibilities: introductoryOffersEligibilities
             )
@@ -57,7 +55,7 @@ package class AdaptyProductsViewModel: ObservableObject {
     var introductoryOffersEligibilities: [String: AdaptyEligibility]? {
         didSet {
             products = Self.generateProductsInfos(
-                paywall: paywall,
+                paywall: paywallViewModel.paywall,
                 products: adaptyProducts,
                 eligibilities: introductoryOffersEligibilities
             )
@@ -66,23 +64,21 @@ package class AdaptyProductsViewModel: ObservableObject {
 
     package init(
         eventsHandler: AdaptyEventsHandler,
-        paywall: AdaptyPaywallInterface,
+        paywallViewModel: AdaptyPaywallViewModel,
         products: [AdaptyPaywallProduct]?,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+        introductoryOffersEligibilities: [String: AdaptyEligibility]?
     ) {
         self.eventsHandler = eventsHandler
-        self.paywall = paywall
-        self.viewConfiguration = viewConfiguration
+        self.paywallViewModel = paywallViewModel
 
         self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.products = Self.generateProductsInfos(
-            paywall: paywall,
+            paywall: paywallViewModel.paywall,
             products: products,
             eligibilities: introductoryOffersEligibilities
         )
 
-        selectedProductsIds = viewConfiguration.selectedProducts
+        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
     }
 
     private static func generateProductsInfos(
@@ -131,7 +127,7 @@ package class AdaptyProductsViewModel: ObservableObject {
         queue.async { [weak self] in
             guard let self else { return }
 
-            self.paywall.getPaywallProducts { [weak self] result in
+            self.paywallViewModel.paywall.getPaywallProducts { [weak self] result in
                 switch result {
                 case let .success(products):
                     self?.eventsHandler.log(.verbose, "loadProducts success")
@@ -197,18 +193,6 @@ package class AdaptyProductsViewModel: ObservableObject {
             eventsHandler.event_didFinishRestore(with: profile)
         case let .failure(error):
             eventsHandler.event_didFailRestore(with: error)
-        }
-    }
-
-    func logShowPaywall() {
-        eventsHandler.log(.verbose, "logShowPaywall begin")
-
-        paywall.logShowPaywall(viewConfiguration: viewConfiguration) { [weak self] error in
-            if let error {
-                self?.eventsHandler.log(.error, "logShowPaywall fail: \(error)")
-            } else {
-                self?.eventsHandler.log(.verbose, "logShowPaywall success")
-            }
         }
     }
 

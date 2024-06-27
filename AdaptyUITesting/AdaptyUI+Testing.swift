@@ -149,7 +149,6 @@ public struct AdaptyUITestRendererView: View {
                     template: template,
                     screen: screen
                 )
-
             } else {
                 AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
             }
@@ -161,19 +160,20 @@ public struct AdaptyUITestRendererView: View {
     public var body: some View {
         let actionsVM = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
         let sectionsVM = AdaptySectionsViewModel(logId: "AdaptyUITesting")
-        let productsVM = AdaptyProductsViewModel(
-            eventsHandler: eventsHandler,
-            paywall: AdaptyMockPaywall(),
-            products: nil,
-            introductoryOffersEligibilities: nil,
-            viewConfiguration: viewConfiguration
-        )
+        let paywallVM = AdaptyPaywallViewModel(eventsHandler: eventsHandler,
+                                               paywall: AdaptyMockPaywall(),
+                                               viewConfiguration: viewConfiguration)
+        let productsVM = AdaptyProductsViewModel(eventsHandler: eventsHandler,
+                                                 paywallViewModel: paywallVM,
+                                                 products: nil,
+                                                 introductoryOffersEligibilities: nil)
         let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])
         let screensVM = AdaptyScreensViewModel(
             eventsHandler: eventsHandler,
             viewConfiguration: viewConfiguration
         )
         let timerVM = AdaptyTimerViewModel(
+            paywallViewModel: paywallVM,
             productsViewModel: productsVM,
             actionsViewModel: actionsVM,
             sectionsViewModel: sectionsVM,
@@ -181,6 +181,7 @@ public struct AdaptyUITestRendererView: View {
         )
 
         templateOrElement()
+            .environmentObject(paywallVM)
             .environmentObject(actionsVM)
             .environmentObject(sectionsVM)
             .environmentObject(productsVM)

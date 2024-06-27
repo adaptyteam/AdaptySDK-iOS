@@ -12,16 +12,13 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyPaywallRendererView: View {
+    @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
     @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
 
-    var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
-
-    init(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) {
-        self.viewConfiguration = viewConfiguration
-    }
-
     public var body: some View {
+        let viewConfiguration = paywallViewModel.viewConfiguration
+        
         if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
             ZStack {
                 // TODO: consider move logic here
@@ -42,7 +39,7 @@ struct AdaptyPaywallRendererView: View {
             }
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
             .onAppear {
-                productsViewModel.logShowPaywall()
+                paywallViewModel.logShowPaywall()
             }
         } else {
             AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
