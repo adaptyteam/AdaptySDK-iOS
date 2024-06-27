@@ -19,10 +19,10 @@ extension View {
         case .fit:
             aspectRatio(contentMode: .fit)
         case .fill:
-            GeometryReader { proxy in
+            GeometryReaderWithFitHeight { width in
                 self
                     .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: proxy.size.width)
+                    .frame(maxWidth: width)
             }
         case .stretch:
             self
