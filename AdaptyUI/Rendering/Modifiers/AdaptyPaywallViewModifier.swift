@@ -64,6 +64,7 @@ struct AdaptyPaywallViewModifier: ViewModifier {
             introductoryOffersEligibilities: introductoryOffersEligibilities,
             configuration: configuration,
             tagResolver: tagResolver,
+            showDebugOverlay: false,
             didPerformAction: { action in
                 if let didPerformAction {
                     didPerformAction(action)

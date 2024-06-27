@@ -14,6 +14,7 @@ import SwiftUI
 struct AdaptyPaywallView: View {
     @Environment(\.presentationMode) private var presentationMode
 
+    private let showDebugOverlay: Bool
     private let paywall: AdaptyPaywall
     private let products: [AdaptyPaywallProduct]?
     private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
@@ -33,6 +34,7 @@ struct AdaptyPaywallView: View {
         introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         configuration: AdaptyUI.LocalizedViewConfiguration,
         tagResolver: AdaptyTagResolver?,
+        showDebugOverlay: Bool,
         didPerformAction: @escaping (AdaptyUI.Action) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
@@ -45,6 +47,7 @@ struct AdaptyPaywallView: View {
         didFailRendering: @escaping (AdaptyError) -> Void,
         didFailLoadingProducts: @escaping (AdaptyError) -> Bool
     ) {
+        self.showDebugOverlay = showDebugOverlay
         self.paywall = paywall
         self.products = products
         self.introductoryOffersEligibilities = introductoryOffersEligibilities
@@ -95,6 +98,7 @@ struct AdaptyPaywallView: View {
                            height: proxy.size.height + proxy.safeAreaInsets.top + proxy.safeAreaInsets.bottom)
                 )
                 .withSafeArea(proxy.safeAreaInsets)
+                .withDebugOverlayEnabled(showDebugOverlay)
                 .environmentObject(productsViewModel)
                 .environmentObject(actionsViewModel)
                 .environmentObject(sectionsViewModel)

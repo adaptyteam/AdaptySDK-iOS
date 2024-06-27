@@ -210,7 +210,8 @@ public extension AdaptyUI {
         introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
-        tagResolver: AdaptyTagResolver? = nil
+        tagResolver: AdaptyTagResolver? = nil,
+        showDebugOverlay: Bool = false
     ) -> AdaptyPaywallController {
         AdaptyPaywallController(
             paywall: paywall,
@@ -218,7 +219,8 @@ public extension AdaptyUI {
             introductoryOffersEligibilities: introductoryOffersEligibilities,
             viewConfiguration: viewConfiguration,
             delegate: delegate,
-            tagResolver: tagResolver
+            tagResolver: tagResolver,
+            showDebugOverlay: showDebugOverlay
         )
     }
 }

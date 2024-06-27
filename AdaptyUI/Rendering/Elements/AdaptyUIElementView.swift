@@ -22,6 +22,8 @@ extension View {
     }
 }
 
+
+
 @available(iOS 15.0, *)
 extension AdaptyUI.Element {
     var properties: AdaptyUI.Element.Properties? {
@@ -56,15 +58,16 @@ package struct AdaptyUIElementView: View {
     }
 
     package var body: some View {
-        let properties = element.properties
+        let properties = self.element.properties
 
-        elementBody
-            .paddingIfNeeded(additionalPadding)
-            .applyingProperties(properties, includeBackground: drawDecoratorBackground)
+        self.elementBody
+            .paddingIfNeeded(self.additionalPadding)
+            .applyingProperties(properties, includeBackground: self.drawDecoratorBackground)
             .transitionIn(
                 properties?.transitionIn,
                 visibility: properties?.visibility ?? true
             )
+            .modifier(DebugOverlayModifier())
     }
 
     @ViewBuilder
@@ -79,7 +82,7 @@ package struct AdaptyUIElementView: View {
 
     @ViewBuilder
     private var elementBody: some View {
-        switch element {
+        switch self.element {
         case let .space(count):
             if count > 0 {
                 ForEach(0 ..< count, id: \.self) { _ in
@@ -87,7 +90,7 @@ package struct AdaptyUIElementView: View {
                 }
             }
         case let .box(box, properties):
-            elementOrEmpty(box.content)
+            self.elementOrEmpty(box.content)
                 .fixedFrame(box: box)
                 .rangedFrame(box: box)
         case let .stack(stack, properties):
