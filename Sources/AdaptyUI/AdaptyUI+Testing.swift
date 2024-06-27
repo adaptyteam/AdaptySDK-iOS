@@ -23,9 +23,13 @@ import Foundation
         ) throws -> Self {
             let locale = AdaptyLocale(id: locale)
 
+            let colors = colors
+                .mapValues { AdaptyUI.ViewConfiguration.Asset.filling($0.asFilling) }
+
             let assets = Dictionary(
                 images.map { ($0, AdaptyUI.ViewConfiguration.Asset.filling(.image(.resorces($0)))) }
             ) { current, _ in current }
+                .merging(colors) { current, _ in current }
 
             let data = content.data(using: .utf8) ?? Data()
             let decoder = JSONDecoder()

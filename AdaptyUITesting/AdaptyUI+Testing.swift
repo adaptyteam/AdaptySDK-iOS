@@ -88,7 +88,7 @@ public extension AdaptyUI.LocalizedViewConfiguration {
                 "$short": ["Article."],
                 "$medium": ["Article nor prepare chicken you him now."],
                 "$long": ["Article nor prepare chicken you him now. Shy merits say advice ten before lovers innate add. "],
-                "$timer": ["#TIMER_Total_Days_1", "d ", "#TIMER_hh", ":", "#TIMER_mm", ":", "TIMER_ss", ".", "#TIMER_SSS"],
+                "$timer_basic": ["#TIMER_Total_Days_1", "d ", "#TIMER_hh", ":", "#TIMER_mm", ":", "#TIMER_ss"],
                 "$countdown": ["#TIMER_Total_Seconds_1"],
                 "$card_title": ["Before this app I wasn't able to do anything by myself. Now I am, wow! Highly recommend!"],
                 "$card_subtitle": ["App Store review"],
