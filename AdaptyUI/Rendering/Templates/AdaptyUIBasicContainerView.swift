@@ -85,6 +85,7 @@ struct AdaptyUIBasicContainerView: View {
             let minY = p.frame(in: .adaptyBasic).minY
             let isScrollingDown = minY > 0
             let isScrollingUp = minY < 0
+            let scale = max(1.0, 1.0 + minY / p.size.height)
 
             AdaptyUIElementView(content)
                 .frame(
@@ -97,6 +98,7 @@ struct AdaptyUIBasicContainerView: View {
                         }
                     }()
                 )
+                .scaleEffect(x: scale, y: scale, anchor: .center)
                 .clipped()
                 .offset(
                     y: {
@@ -177,7 +179,7 @@ struct AdaptyUIBasicContainerView: View {
             case let .unknown(value, properties):
                 AdaptyUIUnknownElementView(value: value)
             }
-            
+
             FooterVerticalFillerView(height: footerSize.height) { frame in
                 withAnimation {
                     drawFooterBackground = frame.maxY > globalProxy.size.height + globalProxy.safeAreaInsets.bottom
