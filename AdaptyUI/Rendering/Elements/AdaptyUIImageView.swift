@@ -27,7 +27,6 @@ extension View {
 //                    .frame(maxWidth: width)
                     .frame(maxWidth: proxy.size.width)
             }
-            .background(Color.brown)
         case .stretch:
             self
         }
