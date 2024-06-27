@@ -65,6 +65,8 @@ extension View {
 
 @available(iOS 15.0, *)
 struct AdaptyUIPagerView: View {
+    private static let pageControllTapAnimationDuration = 0.3
+    
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
@@ -82,25 +84,25 @@ struct AdaptyUIPagerView: View {
     }
 
     @ViewBuilder
-    private var viewportWithPageControl: some View {
+    private func viewportWithPageControl(onPageDotTap: @escaping (Int) -> Void) -> some View {
         if let pageControl = pager.pageControl {
             switch pageControl.layout {
             case .overlaid:
                 ZStack(alignment: pageControl.verticalAlignment.swiftUIAlignment) {
                     pagerView
-                    pageControlView(pageControl)
+                    pageControlView(pageControl, onDotTap: onPageDotTap)
                         .padding(pageControl.padding)
                 }
             case .stacked:
                 VStack(spacing: 0.0) {
                     switch pageControl.verticalAlignment {
                     case .top:
-                        pageControlView(pageControl)
+                        pageControlView(pageControl, onDotTap: onPageDotTap)
                             .padding(pageControl.padding)
                         pagerView
                     default:
                         pagerView
-                        pageControlView(pageControl)
+                        pageControlView(pageControl, onDotTap: onPageDotTap)
                             .padding(pageControl.padding)
                     }
                 }
@@ -111,13 +113,47 @@ struct AdaptyUIPagerView: View {
     }
 
     var body: some View {
-        viewportWithPageControl
-            .onAppear {
-                startAutoScroll()
+        viewportWithPageControl {
+            handlePageControlTap(index: $0)
+        }
+        .onAppear {
+            startAutoScroll()
+        }
+        .onDisappear {
+            stopAutoScroll()
+        }
+    }
+
+    private func handlePageControlTap(index: Int) {
+        let shouldScheduleAutoscroll: Bool
+
+        switch pager.interactionBehaviour {
+        case .none:
+            shouldScheduleAutoscroll = false
+            return
+        case .cancelAnimation:
+            shouldScheduleAutoscroll = false
+            stopAutoScroll()
+        case .pauseAnimation:
+            shouldScheduleAutoscroll = true
+            stopAutoScroll()
+        }
+
+        if let config = pager.animation {
+            withAnimation(.easeInOut(duration: Self.pageControllTapAnimationDuration)) {
+                currentPage = index
             }
-            .onDisappear {
-                stopAutoScroll()
+            if shouldScheduleAutoscroll {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.pageControllTapAnimationDuration) {
+                    self.scheduleAutoScroll()
+                }
             }
+        } else {
+            currentPage = index
+            if shouldScheduleAutoscroll {
+                scheduleAutoScroll()
+            }
+        }
     }
 
     // View for the Pager
@@ -174,10 +210,6 @@ struct AdaptyUIPagerView: View {
                 }
             }
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
-            .animation(
-                pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut,
-                value: currentPage
-            )
             .dragGesture(
                 condition: pager.interactionBehaviour != .none,
                 onChanged: { value in
@@ -186,7 +218,7 @@ struct AdaptyUIPagerView: View {
                     stopAutoScroll() // Stop the autoscroll while interacting
                 },
                 onEnded: { value in
-                    withAnimation(.easeOut) {
+                    withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
                         offset = value.predictedEndTranslation.width
                         currentPage -= Int((offset / width).rounded())
                         currentPage = max(0, min(currentPage, pager.content.count - 1))
@@ -203,7 +235,7 @@ struct AdaptyUIPagerView: View {
     }
 
     @ViewBuilder
-    private func pageControlView(_ pageControl: AdaptyUI.Pager.PageControl) -> some View {
+    private func pageControlView(_ pageControl: AdaptyUI.Pager.PageControl, onDotTap: @escaping (Int) -> Void) -> some View {
         HStack(spacing: pageControl.spacing) {
             ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()
@@ -214,6 +246,9 @@ struct AdaptyUIPagerView: View {
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)
+                    .onTapGesture {
+                        onDotTap(idx)
+                    }
             }
         }
     }
