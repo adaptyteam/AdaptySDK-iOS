@@ -10,17 +10,17 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct Button {
-        let action: AdaptyUI.ViewConfiguration.ButtonAction
+        let actions: [AdaptyUI.ViewConfiguration.ButtonAction]
         let normalState: AdaptyUI.ViewConfiguration.Element
         let selectedState: AdaptyUI.ViewConfiguration.Element?
-        let selectedCondition: AdaptyUI.Button.SelectedCondition?
+        let selectedCondition: AdaptyUI.StateCondition?
     }
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
     func button(_ from: AdaptyUI.ViewConfiguration.Button) throws -> AdaptyUI.Button {
         try .init(
-            action: buttonAction(from.action),
+            actions: from.actions.map(buttonAction),
             normalState: element(from.normalState),
             selectedState: from.selectedState.map(element),
             selectedCondition: from.selectedCondition
@@ -43,11 +43,17 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let actions =
+            if let action = try? container.decode(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action) {
+                [action]
+            } else {
+                try container.decode([AdaptyUI.ViewConfiguration.ButtonAction].self, forKey: .action)
+            }
         try self.init(
-            action: container.decode(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action),
+            actions: actions,
             normalState: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
             selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState),
-            selectedCondition: container.decodeIfPresent(AdaptyUI.Button.SelectedCondition.self, forKey: .selectedCondition)
+            selectedCondition: container.decodeIfPresent(AdaptyUI.StateCondition.self, forKey: .selectedCondition)
         )
     }
 }

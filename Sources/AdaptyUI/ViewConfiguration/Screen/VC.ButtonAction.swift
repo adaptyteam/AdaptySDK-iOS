@@ -11,16 +11,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     enum ButtonAction {
         case openUrl(String)
-        case restore
-        case custom(id: String)
-        case select(productId: String, groupId: String)
-        case purchase(productId: String)
-        case purchaseSelectedProduct(groupId: String)
-        case unselectProduct(groupId: String)
-        case switchSection(sectionId: String, index: Int)
-        case open(screenId: String)
-        case closeScreen
-        case close
+        case action(AdaptyUI.ButtonAction)
     }
 }
 
@@ -29,26 +20,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         switch from {
         case let .openUrl(stringId):
             .openUrl(urlIfPresent(stringId))
-        case .restore:
-            .restore
-        case let .custom(id: id):
-            .custom(id: id)
-        case let .select(productId, groupId):
-            .selectProductId(id: productId, groupId: groupId)
-        case let .purchase(productId: productId):
-            .purchaseProductId(id: productId)
-        case let .unselectProduct(groupId):
-            .unselectProduct(groupId: groupId)
-        case let .purchaseSelectedProduct(groupId):
-            .purchaseSelectedProduct(groupId: groupId)
-        case let .switchSection(sectionId, index):
-            .switchSection(id: sectionId, index: index)
-        case let .open(screenId):
-            .openScreen(id: screenId)
-        case .closeScreen:
-            .closeScreen
-        case .close:
-            .close
+        case let .action(action):
+            action
         }
     }
 }
@@ -87,33 +60,33 @@ extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
         case .openUrl:
             self = try .openUrl(container.decode(String.self, forKey: .url))
         case .restore:
-            self = .restore
+            self = .action(.restore)
         case .close:
-            self = .close
+            self = .action(.close)
         case .custom:
-            self = try .custom(id: container.decode(String.self, forKey: .customId))
+            self = try .action(.custom(id: container.decode(String.self, forKey: .customId)))
         case .purchaseSelectedProduct:
-            self = try .purchaseSelectedProduct(
+            self = try .action(.purchaseSelectedProduct(
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
-            )
+            ))
         case .unselectProduct:
-            self = try .unselectProduct(
+            self = try .action(.unselectProduct(
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
-            )
+            ))
         case .selectProductId:
-            self = try .select(
-                productId: container.decode(String.self, forKey: .productId),
+            self = try .action(.selectProduct(
+                id: container.decode(String.self, forKey: .productId),
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
-            )
+            ))
 
         case .purchaseProductId:
-            self = try .purchase(productId: container.decode(String.self, forKey: .productId))
+            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId)))
         case .switchSection:
-            self = try .switchSection(sectionId: container.decode(String.self, forKey: .sectionId), index: container.decode(Int.self, forKey: .index))
+            self = try .action(.switchSection(id: container.decode(String.self, forKey: .sectionId), index: container.decode(Int.self, forKey: .index)))
         case .openScreen:
-            self = try .open(screenId: container.decode(String.self, forKey: .screenId))
+            self = try .action(.openScreen(id: container.decode(String.self, forKey: .screenId)))
         case .closeScreen:
-            self = .closeScreen
+            self = .action(.closeScreen)
         }
     }
 }

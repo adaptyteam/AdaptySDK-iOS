@@ -15,7 +15,7 @@ extension AdaptyUI {
         package let offIndex: Int
         package let color: AdaptyUI.Color?
 
-        package var onCondition: AdaptyUI.Button.SelectedCondition {
+        package var onCondition: AdaptyUI.StateCondition {
             .selectedSection(id: sectionId, index: onIndex)
         }
     }
