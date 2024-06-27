@@ -68,16 +68,18 @@ package class AdaptyProductsViewModel: ObservableObject {
         eventsHandler: AdaptyEventsHandler,
         paywall: AdaptyPaywallInterface,
         products: [AdaptyPaywallProduct]?,
+        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration
     ) {
         self.eventsHandler = eventsHandler
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
 
+        self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.products = Self.generateProductsInfos(
             paywall: paywall,
             products: products,
-            eligibilities: nil
+            eligibilities: introductoryOffersEligibilities
         )
 
         selectedProductsIds = viewConfiguration.selectedProducts

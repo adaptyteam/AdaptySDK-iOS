@@ -19,6 +19,7 @@ struct AdaptyPaywallViewModifier: ViewModifier {
 
     var paywall: AdaptyPaywall
     var products: [AdaptyPaywallProduct]?
+    var introductoryOffersEligibilities: [String: AdaptyEligibility]?
     var configuration: AdaptyUI.LocalizedViewConfiguration
     var tagResolver: AdaptyTagResolver?
 
@@ -60,6 +61,7 @@ struct AdaptyPaywallViewModifier: ViewModifier {
             logId: logId,
             paywall: paywall,
             products: products,
+            introductoryOffersEligibilities: introductoryOffersEligibilities,
             configuration: configuration,
             tagResolver: tagResolver,
             didPerformAction: { action in

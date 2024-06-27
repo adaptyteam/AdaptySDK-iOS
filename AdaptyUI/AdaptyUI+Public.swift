@@ -207,6 +207,7 @@ public extension AdaptyUI {
     static func paywallController(
         for paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]? = nil,
+        introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
         tagResolver: AdaptyTagResolver? = nil
@@ -214,6 +215,7 @@ public extension AdaptyUI {
         AdaptyPaywallController(
             paywall: paywall,
             products: products,
+            introductoryOffersEligibilities: introductoryOffersEligibilities,
             viewConfiguration: viewConfiguration,
             delegate: delegate,
             tagResolver: tagResolver
