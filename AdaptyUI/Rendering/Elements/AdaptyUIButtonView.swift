@@ -101,8 +101,8 @@ extension AdaptyUI.ActionAction {
         switch self {
         case let .selectProduct(id, groupId):
             productsViewModel.selectProduct(id: id, forGroupId: groupId)
-        case let .unselectProduct(groupId): // TODO:
-            break
+        case let .unselectProduct(groupId):
+            productsViewModel.unselectProduct(forGroupId: groupId)
         case let .purchaseSelectedProduct(groupId):
             productsViewModel.purchaseSelectedProduct(fromGgoupId: groupId)
         case let .purchaseProduct(productId):

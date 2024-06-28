@@ -118,6 +118,10 @@ package class AdaptyProductsViewModel: ObservableObject {
             eventsHandler.event_didSelectProduct(selectedProduct)
         }
     }
+    
+    func unselectProduct(forGroupId groupId: String) {
+        selectedProductsIds.removeValue(forKey: groupId)
+    }
 
     private func loadProducts() {
         productsLoadingInProgress = true
