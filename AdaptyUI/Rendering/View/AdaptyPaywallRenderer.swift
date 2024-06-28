@@ -45,13 +45,17 @@ struct AdaptyPaywallRendererView: View {
                 templateResolverView(template, screen: viewConfiguration.screen)
                     .decorate(with: viewConfiguration.screen.background)
 
-                ForEach(screensViewModel.presentedScreensStack) { bottomSheet in
-                    AdaptyUIBottomSheetView(bottomSheet)
-                }
-
                 if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
                     AdaptyUILoaderView()
                         .transition(.opacity)
+                }
+            }
+            .overlay {
+                ForEach(screensViewModel.presentedScreensStack) { bottomSheet in
+                    AdaptyUIBottomSheetView(bottomSheet)
+                        .onAppear {
+                            print("###bottom sheet appear")
+                        }
                 }
             }
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)

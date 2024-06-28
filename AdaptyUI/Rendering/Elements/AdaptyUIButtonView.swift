@@ -76,14 +76,15 @@ extension [AdaptyUI.ActionAction] {
         sectionsViewModel: AdaptySectionsViewModel,
         screensViewModel: AdaptyScreensViewModel
     ) {
-        forEach{
+        forEach {
             $0.fire(
                 screenId: screenId,
                 paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
                 actionsViewModel: actionsViewModel,
                 sectionsViewModel: sectionsViewModel,
-                screensViewModel: screensViewModel)
+                screensViewModel: screensViewModel
+            )
         }
     }
 }
@@ -112,13 +113,9 @@ extension AdaptyUI.ActionAction {
         case let .switchSection(sectionId, index):
             sectionsViewModel.updateSelection(for: sectionId, index: index)
         case let .openScreen(id):
-//            withAnimation {
             screensViewModel.presentScreen(id: id)
-//            }
         case .closeScreen:
-//            withAnimation {
             screensViewModel.dismissScreen(id: screenId)
-//            }
         case .close:
             actionsViewModel.closeActionOccured()
         case let .openUrl(url):

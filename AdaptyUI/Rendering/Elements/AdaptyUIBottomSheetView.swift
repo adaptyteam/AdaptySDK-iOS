@@ -13,47 +13,47 @@ import SwiftUI
 @available(iOS 15.0, *)
 struct AdaptyUIBottomSheetView: View {
     @EnvironmentObject var viewModel: AdaptyScreensViewModel
-    
+
     private let bottomSheet: AdaptyScreensViewModel.BottomSheet
 
     @State private var presented: Bool = false
-    
+
     init(_ bottomSheet: AdaptyScreensViewModel.BottomSheet) {
         self.bottomSheet = bottomSheet
     }
 
     var body: some View {
-        GeometryReader { p in
-            ZStack(alignment: .bottom) {
-                Color.black.opacity(0.7)
-                    .onTapGesture {
-                        withAnimation {
-//                            presented = false
-                            viewModel.dismissScreen(id: bottomSheet.id)
-                        }
+        ZStack(alignment: .bottom) {
+            Color.black
+                .opacity(presented ? 0.4 : 0.0)
+                .onTapGesture {
+                    withAnimation {
+                        viewModel.dismissScreen(id: bottomSheet.id)
                     }
-
-                if presented {
-                    AdaptyUIElementView(
-                        bottomSheet.bottomSheet.content,
-                        additionalPadding: EdgeInsets(top: 0,
-                                                      leading: 0,
-                                                      bottom: p.safeAreaInsets.bottom,
-                                                      trailing: 0)
-                    )
-                    .transition(.asymmetric(insertion: .move(edge: .bottom),
-                                            removal: .opacity))
-//                    .transition(.move(edge: .bottom))
                 }
-            }
+
+            AdaptyUIElementView(bottomSheet.bottomSheet.content)
+                .withScreenId(bottomSheet.id)
         }
         .ignoresSafeArea()
-        .withScreenId(bottomSheet.id)
-        .transition(.opacity)
+        .animation(.default.delay(0.3), value: presented)
+        .animation(.snappy.delay(0.1))
+        .transition(
+            .move(edge: .bottom)
+        )
         .onAppear {
             withAnimation {
                 presented = true
             }
+
+            viewModel.addDismissListener(id: bottomSheet.id) {
+                withAnimation {
+                    presented = false
+                }
+            }
+        }
+        .onDisappear {
+            viewModel.removeDismissListener(id: bottomSheet.id)
         }
     }
 }
