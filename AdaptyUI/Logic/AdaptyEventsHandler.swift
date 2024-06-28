@@ -11,27 +11,33 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-package class AdaptyEventsHandler { // TODO: make internal
+package class AdaptyEventsHandler {
     let logId: String = AdaptyUI.generateLogId()
 
-    // TODO: make private
-    var didPerformAction: ((AdaptyUI.Action) -> Void)?
-    var didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
-    var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
-    var didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)?
-    var didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
-    var didCancelPurchase: ((AdaptyPaywallProduct) -> Void)?
-    var didStartRestore: (() -> Void)?
-    var didFinishRestore: ((AdaptyProfile) -> Void)?
-    var didFailRestore: ((AdaptyError) -> Void)?
-    var didFailRendering: ((AdaptyError) -> Void)?
-    var didFailLoadingProducts: ((AdaptyError) -> Bool)?
+    private let didPerformAction: ((AdaptyUI.Action) -> Void)?
+    private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
+    private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
+    private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)?
+    private let didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
+    private let didCancelPurchase: ((AdaptyPaywallProduct) -> Void)?
+    private let didStartRestore: (() -> Void)?
+    private let didFinishRestore: ((AdaptyProfile) -> Void)?
+    private let didFailRestore: ((AdaptyError) -> Void)?
+    private let didFailRendering: ((AdaptyError) -> Void)?
+    private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
 
-    // TODO: remove
-    package init(
-//        logId: String
-    ) {
-//        self.logId = logId
+    package init() {
+        self.didPerformAction = nil
+        self.didSelectProduct = nil
+        self.didStartPurchase = nil
+        self.didFinishPurchase = nil
+        self.didFailPurchase = nil
+        self.didCancelPurchase = nil
+        self.didStartRestore = nil
+        self.didFinishRestore = nil
+        self.didFailRestore = nil
+        self.didFailRendering = nil
+        self.didFailLoadingProducts = nil
     }
 
     package init(
@@ -48,7 +54,6 @@ package class AdaptyEventsHandler { // TODO: make internal
         didFailRendering: @escaping (AdaptyError) -> Void,
         didFailLoadingProducts: @escaping (AdaptyError) -> Bool
     ) {
-//        self.logId = logId
         self.didPerformAction = didPerformAction
         self.didSelectProduct = didSelectProduct
         self.didStartPurchase = didStartPurchase
@@ -115,9 +120,9 @@ package class AdaptyEventsHandler { // TODO: make internal
         didFailRestore?(error)
     }
 
-    func event_didFailRendering(with error: AdaptyError) {
+    func event_didFailRendering(with error: AdaptyUIError) {
         log(.error, "event_didFailRendering: \(error)")
-        didFailRendering?(error)
+        didFailRendering?(AdaptyError(error))
     }
 
     func event_didFailLoadingProducts(with error: AdaptyError) -> Bool {

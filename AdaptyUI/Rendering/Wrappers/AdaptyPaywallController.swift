@@ -22,6 +22,7 @@ public class AdaptyPaywallController: UIViewController {
     let products: [AdaptyPaywallProduct]?
     let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     let tagResolver: AdaptyTagResolver?
+    let timerResolver: AdaptyTimerResolver?
     let showDebugOverlay: Bool
 
     public weak var delegate: AdaptyPaywallControllerDelegate?
@@ -33,6 +34,7 @@ public class AdaptyPaywallController: UIViewController {
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate?,
         tagResolver: AdaptyTagResolver?,
+        timerResolver: AdaptyTimerResolver?,
         showDebugOverlay: Bool
     ) {
         let logId = AdaptyUI.generateLogId()
@@ -45,6 +47,7 @@ public class AdaptyPaywallController: UIViewController {
         self.products = products
         self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.tagResolver = tagResolver
+        self.timerResolver = timerResolver
         self.delegate = delegate
         self.showDebugOverlay = showDebugOverlay
 
@@ -81,6 +84,7 @@ public class AdaptyPaywallController: UIViewController {
                 introductoryOffersEligibilities: introductoryOffersEligibilities,
                 configuration: viewConfiguration,
                 tagResolver: tagResolver,
+                timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 showDebugOverlay: showDebugOverlay,
                 didPerformAction: { [weak self] action in
                     guard let self else { return }

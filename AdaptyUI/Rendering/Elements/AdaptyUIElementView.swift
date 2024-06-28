@@ -22,8 +22,6 @@ extension View {
     }
 }
 
-
-
 @available(iOS 15.0, *)
 extension AdaptyUI.Element {
     var properties: AdaptyUI.Element.Properties? {
@@ -42,47 +40,17 @@ extension AdaptyUI.Element {
 }
 
 @available(iOS 15.0, *)
-package struct AdaptyUIElementView: View {
+struct AdaptyUIElementWithoutPropertiesView: View {
     private var element: AdaptyUI.Element
-    private var additionalPadding: EdgeInsets?
-    private var drawDecoratorBackground: Bool
 
-    package init(
-        _ element: AdaptyUI.Element,
-        additionalPadding: EdgeInsets? = nil,
-        drawDecoratorBackground: Bool = true
+    init(
+        _ element: AdaptyUI.Element
     ) {
         self.element = element
-        self.additionalPadding = additionalPadding
-        self.drawDecoratorBackground = drawDecoratorBackground
     }
 
-    package var body: some View {
-        let properties = self.element.properties
-
-        self.elementBody
-            .paddingIfNeeded(self.additionalPadding)
-            .applyingProperties(properties, includeBackground: self.drawDecoratorBackground)
-            .transitionIn(
-                properties?.transitionIn,
-                visibility: properties?.visibility ?? true
-            )
-            .modifier(DebugOverlayModifier())
-    }
-
-    @ViewBuilder
-    private func elementOrEmpty(_ content: AdaptyUI.Element?) -> some View {
-        if let content {
-            AdaptyUIElementView(content)
-        } else {
-            Color.clear
-                .frame(idealWidth: 0, idealHeight: 0)
-        }
-    }
-
-    @ViewBuilder
-    private var elementBody: some View {
-        switch self.element {
+    var body: some View {
+        switch element {
         case let .space(count):
             if count > 0 {
                 ForEach(0 ..< count, id: \.self) { _ in
@@ -90,7 +58,7 @@ package struct AdaptyUIElementView: View {
                 }
             }
         case let .box(box, properties):
-            self.elementOrEmpty(box.content)
+            elementOrEmpty(box.content)
                 .fixedFrame(box: box)
                 .rangedFrame(box: box)
         case let .stack(stack, properties):
@@ -116,6 +84,46 @@ package struct AdaptyUIElementView: View {
         case let .unknown(value, properties):
             AdaptyUIUnknownElementView(value: value)
         }
+    }
+
+    @ViewBuilder
+    private func elementOrEmpty(_ content: AdaptyUI.Element?) -> some View {
+        if let content {
+            AdaptyUIElementView(content)
+        } else {
+            Color.clear
+                .frame(idealWidth: 0, idealHeight: 0)
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+package struct AdaptyUIElementView: View {
+    private var element: AdaptyUI.Element
+    private var additionalPadding: EdgeInsets?
+    private var drawDecoratorBackground: Bool
+
+    package init(
+        _ element: AdaptyUI.Element,
+        additionalPadding: EdgeInsets? = nil,
+        drawDecoratorBackground: Bool = true
+    ) {
+        self.element = element
+        self.additionalPadding = additionalPadding
+        self.drawDecoratorBackground = drawDecoratorBackground
+    }
+
+    package var body: some View {
+        let properties = element.properties
+
+        AdaptyUIElementWithoutPropertiesView(element)
+            .paddingIfNeeded(additionalPadding)
+            .applyingProperties(properties, includeBackground: drawDecoratorBackground)
+            .transitionIn(
+                properties?.transitionIn,
+                visibility: properties?.visibility ?? true
+            )
+            .modifier(DebugOverlayModifier())
     }
 }
 

@@ -12,7 +12,7 @@ import Foundation
 
 @available(iOS 15.0, *)
 package class AdaptyPaywallViewModel: ObservableObject {
-    private var eventsHandler: AdaptyEventsHandler
+    let eventsHandler: AdaptyEventsHandler
     
     @Published var paywall: AdaptyPaywallInterface
     @Published var viewConfiguration: AdaptyUI.LocalizedViewConfiguration

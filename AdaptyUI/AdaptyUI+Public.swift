@@ -211,6 +211,7 @@ public extension AdaptyUI {
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
         tagResolver: AdaptyTagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
         showDebugOverlay: Bool = false
     ) -> AdaptyPaywallController {
         AdaptyPaywallController(
@@ -220,6 +221,7 @@ public extension AdaptyUI {
             viewConfiguration: viewConfiguration,
             delegate: delegate,
             tagResolver: tagResolver,
+            timerResolver: timerResolver,
             showDebugOverlay: showDebugOverlay
         )
     }

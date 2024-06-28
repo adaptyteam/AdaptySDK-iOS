@@ -137,12 +137,6 @@ package class AdaptyProductsViewModel: ObservableObject {
                     self?.eventsHandler.log(.verbose, "loadProducts success")
 
                     self?.adaptyProducts = products
-
-                    // TODO: default selected products
-//                    if self?.selectedProductId == nil {
-//                        self?.selectedProductId = products.first?.vendorProductId
-//                    }
-
                     self?.productsLoadingInProgress = false
                     self?.loadProductsIntroductoryEligibilities()
                 case let .failure(error):

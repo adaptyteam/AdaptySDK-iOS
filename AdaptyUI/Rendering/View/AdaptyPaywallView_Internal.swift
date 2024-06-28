@@ -31,6 +31,7 @@ struct AdaptyPaywallView_Internal: View {
         introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         configuration: AdaptyUI.LocalizedViewConfiguration,
         tagResolver: AdaptyTagResolver?,
+        timerResolver: AdaptyTimerResolver,
         showDebugOverlay: Bool,
         didPerformAction: @escaping (AdaptyUI.Action) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
@@ -78,6 +79,7 @@ struct AdaptyPaywallView_Internal: View {
         screensViewModel = AdaptyScreensViewModel(eventsHandler: eventsHandler,
                                                   viewConfiguration: configuration)
         timerViewModel = AdaptyTimerViewModel(
+            timerResolver: timerResolver,
             paywallViewModel: paywallViewModel,
             productsViewModel: productsViewModel,
             actionsViewModel: actionsViewModel,

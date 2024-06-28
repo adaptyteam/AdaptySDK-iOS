@@ -24,6 +24,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
     private let products: [AdaptyPaywallProduct]?
     private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     private let tagResolver: AdaptyTagResolver?
+    private let timerResolver: AdaptyTimerResolver?
 
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
     private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
@@ -45,6 +46,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
         products: [AdaptyPaywallProduct]? = nil,
         introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         tagResolver: AdaptyTagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
@@ -69,6 +71,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
         self.products = products
         self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.tagResolver = tagResolver
+        self.timerResolver = timerResolver
         self.didPerformAction = didPerformAction
         self.didSelectProduct = didSelectProduct
         self.didStartPurchase = didStartPurchase
@@ -90,6 +93,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
             introductoryOffersEligibilities: introductoryOffersEligibilities,
             configuration: viewConfiguration,
             tagResolver: tagResolver,
+            timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
             showDebugOverlay: false,
             didPerformAction: didPerformAction ?? { action in
                 switch action {
@@ -143,6 +147,7 @@ extension View {
         products: [AdaptyPaywallProduct]? = nil,
         introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         tagResolver: AdaptyTagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
@@ -164,6 +169,7 @@ extension View {
                 products: products,
                 introductoryOffersEligibilities: introductoryOffersEligibilities,
                 tagResolver: tagResolver,
+                timerResolver: timerResolver,
                 didPerformAction: didPerformAction ?? { action in
                     switch action {
                     case .close:

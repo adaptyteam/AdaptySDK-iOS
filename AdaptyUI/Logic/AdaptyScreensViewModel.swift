@@ -16,7 +16,7 @@ package class AdaptyScreensViewModel: ObservableObject {
         var id: String
         var bottomSheet: AdaptyUI.BottomSheet
     }
-    
+
     let eventsHandler: AdaptyEventsHandler
     let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
@@ -31,14 +31,18 @@ package class AdaptyScreensViewModel: ObservableObject {
     @Published var presentedScreensStack = [BottomSheet]()
 
     func presentScreen(id: String) {
-        // TODO: check unique id
         eventsHandler.log(.verbose, "presentScreen \(id)")
-        
-        guard let bottomSheet = viewConfiguration.bottomSheets[id] else {
-            // TODO: Warning
+
+        if presentedScreensStack.contains(where: { $0.id == id }) {
+            eventsHandler.log(.warn, "presentScreen \(id) Already Presented!")
             return
         }
-        
+
+        guard let bottomSheet = viewConfiguration.bottomSheets[id] else {
+            eventsHandler.log(.warn, "presentScreen \(id) Not Found!")
+            return
+        }
+
         presentedScreensStack.append(.init(id: id, bottomSheet: bottomSheet))
     }
 

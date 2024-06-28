@@ -195,7 +195,7 @@ extension AttributedString {
         var result = AttributedString(value)
 
         result.foregroundColor = attributes?.uiColor ?? .darkText
-        result.font = attributes?.uiFont ?? .systemFont(ofSize: 15.0) // TODO: move to constant
+        result.font = attributes?.uiFont ?? .adaptyDefault
 
         if let background = attributes?.background?.asColor {
             result.backgroundColor = background.swiftuiColor
@@ -211,6 +211,10 @@ extension AttributedString {
 
         return result
     }
+}
+
+extension UIFont {
+    static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
 }
 
 extension AdaptyUI.RichText.TextAttributes {

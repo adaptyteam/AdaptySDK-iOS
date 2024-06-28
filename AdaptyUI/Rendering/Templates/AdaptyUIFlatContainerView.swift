@@ -63,7 +63,7 @@ struct AdaptyUIFlatContainerView: View {
             }
             .ignoresSafeArea()
         }
-        .coordinateSpace(name: CoordinateSpace.adaptyFlatName)
+        .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)
     }
 }
 

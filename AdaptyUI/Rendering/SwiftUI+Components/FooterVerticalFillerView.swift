@@ -11,9 +11,8 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 extension CoordinateSpace {
-    // TODO: rename
-    static let adaptyFlatName = "adapty.container.flat"
-    static let adaptyFlat = CoordinateSpace.named(adaptyFlatName)
+    static let adaptyGlobalName = "adapty.container.global"
+    static let adaptyGlobal = CoordinateSpace.named(adaptyGlobalName)
 }
 
 @available(iOS 15.0, *)
@@ -34,7 +33,7 @@ struct FooterVerticalFillerView: View {
         GeometryReader { proxy in
             Color.clear
                 .frame(height: height)
-                .preference(key: AdaptyUIGeometryFramePreferenceKey.self, value: proxy.frame(in: .adaptyFlat))
+                .preference(key: AdaptyUIGeometryFramePreferenceKey.self, value: proxy.frame(in: .adaptyGlobal))
                 .onPreferenceChange(AdaptyUIGeometryFramePreferenceKey.self) { onFrameChange($0) }
         }
         .frame(height: height)

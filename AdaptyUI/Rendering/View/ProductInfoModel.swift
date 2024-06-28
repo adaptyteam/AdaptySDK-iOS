@@ -14,10 +14,7 @@ import UIKit
 protocol ProductInfoModel {
     var isPlaceholder: Bool { get }
     var adaptyProductId: String { get }
-
     var adaptyProduct: AdaptyPaywallProduct? { get }
-    var eligibleOffer: AdaptyProductDiscount? { get } // TODO: refactor
-    var isEligibleForFreeTrial: Bool { get } // TODO: remove
 
     var paymentMode: AdaptyProductDiscount.PaymentMode { get }
 
@@ -44,13 +41,6 @@ struct RealProductInfo: ProductInfoModel {
     let product: AdaptyPaywallProduct
     let introEligibility: AdaptyEligibility
 
-    var eligibleOffer: AdaptyProductDiscount? { product.eligibleDiscount(introEligibility: introEligibility) }
-
-    var isEligibleForFreeTrial: Bool {
-        guard let offer = eligibleOffer else { return false }
-        return offer.paymentMode == .freeTrial
-    }
-
     init(product: AdaptyPaywallProduct, introEligibility: AdaptyEligibility) {
         self.product = product
         self.introEligibility = introEligibility
@@ -58,7 +48,10 @@ struct RealProductInfo: ProductInfoModel {
 
     var adaptyProductId: String { product.adaptyProductId }
     var adaptyProduct: AdaptyPaywallProduct? { product }
-    var paymentMode: AdaptyProductDiscount.PaymentMode { eligibleOffer?.paymentMode ?? .unknown }
+    var paymentMode: AdaptyProductDiscount.PaymentMode {
+        guard let offer = product.eligibleDiscount(introEligibility: introEligibility) else { return .unknown}
+        return offer.paymentMode
+    }
 
     func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement? {
         guard product.isApplicableForTag(tag) else { return .notApplicable }

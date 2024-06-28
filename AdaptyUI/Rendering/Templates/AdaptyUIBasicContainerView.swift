@@ -17,6 +17,8 @@ extension CoordinateSpace {
 
 @available(iOS 15.0, *)
 struct AdaptyUIBasicContainerView: View {
+    @EnvironmentObject
+    private var paywallViewModel: AdaptyPaywallViewModel
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
@@ -32,7 +34,6 @@ struct AdaptyUIBasicContainerView: View {
         GeometryReader { globalProxy in
             ZStack(alignment: .bottom) {
                 if let coverBox = screen.cover, let coverContent = coverBox.content {
-                    // TODO: rendering error
                     ScrollView {
                         VStack(spacing: 0) {
                             coverView(
@@ -50,6 +51,13 @@ struct AdaptyUIBasicContainerView: View {
                     }
                     .ignoresSafeArea()
                     .scrollIndicatorsHidden_compatible()
+                } else {
+                    EmptyView()
+                        .onAppear {
+                            paywallViewModel.eventsHandler.event_didFailRendering(
+                                with: .wrongComponentType("screen.cover")
+                            )
+                        }
                 }
 
                 if let footer = screen.footer {
@@ -64,7 +72,7 @@ struct AdaptyUIBasicContainerView: View {
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
             .ignoresSafeArea()
         }
-        .coordinateSpace(name: CoordinateSpace.adaptyFlatName)
+        .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)
     }
 
     @ViewBuilder
@@ -116,15 +124,6 @@ struct AdaptyUIBasicContainerView: View {
     }
 
     @ViewBuilder
-    private func elementOrEmpty(_ content: AdaptyUI.Element?) -> some View {
-        if let content {
-            AdaptyUIElementView(content)
-        } else {
-            Color.clear
-        }
-    }
-
-    @ViewBuilder
     func contentView(
         content: AdaptyUI.Element,
         coverBox: AdaptyUI.Box,
@@ -144,41 +143,7 @@ struct AdaptyUIBasicContainerView: View {
         let offsetY = properties?.offset.y ?? 0
 
         VStack(spacing: 0) {
-            // TODO: move extract this switch
-            switch content {
-            case let .space(count):
-                if count > 0 {
-                    ForEach(0 ..< count, id: \.self) { _ in
-                        Spacer()
-                    }
-                }
-            case let .box(box, properties):
-                elementOrEmpty(box.content)
-                    .fixedFrame(box: box)
-                    .rangedFrame(box: box)
-            case let .stack(stack, properties):
-                AdaptyUIStackView(stack)
-            case let .text(text, properties):
-                AdaptyUITextView(text)
-            case let .image(image, properties):
-                AdaptyUIImageView(image)
-            case let .button(button, properties):
-                AdaptyUIButtonView(button)
-            case let .row(row, properties):
-                AdaptyUIRowView(row)
-            case let .column(column, properties):
-                AdaptyUIColumnView(column)
-            case let .section(section, properties):
-                AdaptyUISectionView(section)
-            case let .toggle(toggle, properties):
-                AdaptyUIToggleView(toggle)
-            case let .timer(timer, properties):
-                AdaptyUITimerView(timer)
-            case let .pager(pager, properties):
-                AdaptyUIPagerView(pager)
-            case let .unknown(value, properties):
-                AdaptyUIUnknownElementView(value: value)
-            }
+            AdaptyUIElementWithoutPropertiesView(content)
 
             FooterVerticalFillerView(height: footerSize.height) { frame in
                 withAnimation {

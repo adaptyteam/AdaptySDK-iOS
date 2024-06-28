@@ -193,3 +193,42 @@ public struct AdaptyUITestRendererView: View {
 }
 
 #endif
+
+#if canImport(UIKit)
+
+import Adapty
+import SwiftUI
+
+
+
+// TODO: move to testing
+@available(iOS 15.0, *)
+package struct AdaptyUIRenderingErrorView: View {
+    var text: String
+    var forcePresent: Bool
+
+    package init(text: String, forcePresent: Bool = false) {
+        self.text = text
+        self.forcePresent = forcePresent
+    }
+
+    @ViewBuilder
+    private var errorView: some View {
+        Text("⚠️ " + text)
+    }
+
+    package var body: some View {
+        #if DEBUG
+        errorView
+        #else
+        if forcePresent {
+            errorView
+        } else {
+            EmptyView()
+        }
+        #endif
+    }
+}
+
+
+#endif

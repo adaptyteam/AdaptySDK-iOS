@@ -11,23 +11,38 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
+public protocol AdaptyTimerResolver {
+    func timerEndAtDate(for timerId: String) -> Date
+}
+
+struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
+    func timerEndAtDate(for timerId: String) -> Date {
+        Date(timeIntervalSinceNow: 3600.0)
+    }
+}
+
+@available(iOS 15.0, *)
 package class AdaptyTimerViewModel: ObservableObject {
     private static var globalTimers = [String: Date]()
     private var timers = [String: Date]()
-    
+
+    private let timerResolver: AdaptyTimerResolver
+
     private let paywallViewModel: AdaptyPaywallViewModel
     private let productsViewModel: AdaptyProductsViewModel
     private let actionsViewModel: AdaptyUIActionsViewModel
     private let sectionsViewModel: AdaptySectionsViewModel
     private let screensViewModel: AdaptyScreensViewModel
-    
+
     package init(
+        timerResolver: AdaptyTimerResolver,
         paywallViewModel: AdaptyPaywallViewModel,
         productsViewModel: AdaptyProductsViewModel,
         actionsViewModel: AdaptyUIActionsViewModel,
         sectionsViewModel: AdaptySectionsViewModel,
         screensViewModel: AdaptyScreensViewModel
     ) {
+        self.timerResolver = timerResolver
         self.paywallViewModel = paywallViewModel
         self.productsViewModel = productsViewModel
         self.actionsViewModel = actionsViewModel
@@ -40,7 +55,7 @@ package class AdaptyTimerViewModel: ObservableObject {
         case let .endedAt(endAt):
             timers[timer.id] = endAt
             return endAt
-        case let .duration(duration, start: startBehaviour):
+        case let .duration(duration, startBehaviour):
             switch startBehaviour {
             case .everyAppear:
                 let endAt = Date(timeIntervalSince1970: at.timeIntervalSince1970 + duration)
@@ -70,8 +85,7 @@ package class AdaptyTimerViewModel: ObservableObject {
                     return endAt
                 }
             case .custom:
-                // TODO: implement delegate method
-                timers[timer.id] = at
+                timers[timer.id] = timerResolver.timerEndAtDate(for: timer.id)
                 return at
             }
         }
@@ -84,7 +98,7 @@ package class AdaptyTimerViewModel: ObservableObject {
     ) -> TimeInterval {
         let timerEndAt = timers[timer.id] ?? initializeTimer(timer, at: at)
         let timeLeft = max(0.0, timerEndAt.timeIntervalSince1970 - Date().timeIntervalSince1970)
-        
+
         if timeLeft <= 0.0 {
             timer.actions.fire(
                 screenId: screenId,
@@ -95,7 +109,7 @@ package class AdaptyTimerViewModel: ObservableObject {
                 screensViewModel: screensViewModel
             )
         }
-        
+
         return timeLeft
     }
 }
