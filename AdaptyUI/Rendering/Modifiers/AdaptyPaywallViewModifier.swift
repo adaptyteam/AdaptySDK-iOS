@@ -23,7 +23,7 @@ struct AdaptyPaywallViewModifier: ViewModifier {
     var configuration: AdaptyUI.LocalizedViewConfiguration
     var tagResolver: AdaptyTagResolver?
 
-    var didPerformAction: ((AdaptyUI.UserAction) -> Void)?
+    var didPerformAction: ((AdaptyUI.Action) -> Void)?
     var didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     var didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)?
@@ -109,7 +109,7 @@ struct AdaptyPaywallViewModifier: ViewModifier {
 
     // MARK: Default Events Handlers
 
-    private func handleDidPerformAction(_ action: AdaptyUI.UserAction) {
+    private func handleDidPerformAction(_ action: AdaptyUI.Action) {
         switch action {
         case .close:
             isPresented.wrappedValue = false

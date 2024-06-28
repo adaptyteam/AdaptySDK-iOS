@@ -27,7 +27,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 
-    func buttonAction(_ from: AdaptyUI.Action) throws -> AdaptyUI.Action {
+    func buttonAction(_ from: AdaptyUI.ActionAction) throws -> AdaptyUI.ActionAction {
         guard case let .openUrl(stringId) = from else { return from }
         return .openUrl(urlIfPresent(stringId))
     }

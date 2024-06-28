@@ -20,7 +20,7 @@ import SwiftUI
 //        configuration: AdaptyUI.LocalizedViewConfiguration,
 //        tagResolver: AdaptyTagResolver? = nil,
 //        fullScreen: Bool = true,
-//        didPerformAction: @escaping (AdaptyUI.UserAction) -> Void,
+//        didPerformAction: @escaping (AdaptyUI.Action) -> Void,
 //        didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
 //        didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
 //        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,
@@ -73,7 +73,7 @@ import SwiftUI
 //
 //@available(iOS 15.0, *)
 //class AdaptyPaywallDelegate_SwiftUI: NSObject, AdaptyPaywallControllerDelegate {
-//    private let didPerformAction: (AdaptyUI.UserAction) -> Void
+//    private let didPerformAction: (AdaptyUI.Action) -> Void
 //
 //    private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
 //    private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
@@ -89,7 +89,7 @@ import SwiftUI
 //    private let didFailLoadingProducts: (AdaptyError) -> Bool
 //
 //    init(
-//        didPerformAction: @escaping (AdaptyUI.UserAction) -> Void,
+//        didPerformAction: @escaping (AdaptyUI.Action) -> Void,
 //        didSelectProduct: ((AdaptyPaywallProduct) -> Void)?,
 //        didStartPurchase: ((AdaptyPaywallProduct) -> Void)?,
 //        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,
@@ -115,7 +115,7 @@ import SwiftUI
 //    }
 //
 //    func paywallController(_ controller: AdaptyPaywallController,
-//                           didPerform action: AdaptyUI.UserAction) {
+//                           didPerform action: AdaptyUI.Action) {
 //        didPerformAction(action)
 //    }
 //

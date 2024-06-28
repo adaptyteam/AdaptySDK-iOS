@@ -36,7 +36,7 @@ public extension AdaptyUI {
 @available(iOS 15.0, *)
 public extension AdaptyUI {
     /// This enum describes user initiated actions.
-    enum UserAction {
+    enum Action {
         /// User pressed Close Button
         case close
         /// User pressed any button with URL
@@ -53,10 +53,10 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///
     /// - Parameters:
     ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
-    ///     - action: an ``AdaptyUI.UserAction`` value.
+    ///     - action: an ``AdaptyUI.Action`` value.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didPerform action: AdaptyUI.UserAction
+        didPerform action: AdaptyUI.Action
     )
 
     /// If product was selected for purchase (by user or by system), this method will be invoked.

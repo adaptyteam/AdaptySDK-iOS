@@ -13,7 +13,7 @@ extension AdaptyUI {
         package let id: String
         package let state: State
         package let format: [Item]
-        package let actions: [Action]
+        package let actions: [ActionAction]
         package let horizontalAlign: AdaptyUI.HorizontalAlignment
 
         package func format(byValue: TimeInterval) -> RichText {
@@ -27,7 +27,7 @@ extension AdaptyUI {
             return format[index].value
         }
 
-        init(id: String, state: State, format: [Item], actions: [Action], horizontalAlign: AdaptyUI.HorizontalAlignment) {
+        init(id: String, state: State, format: [Item], actions: [ActionAction], horizontalAlign: AdaptyUI.HorizontalAlignment) {
             self.id = id
             self.state = state
             self.format = format.sorted(by: { $0.from > $1.from })
@@ -61,7 +61,7 @@ extension AdaptyUI {
             id: String = UUID().uuidString,
             endedAt: Date,
             format: AdaptyUI.RichText,
-            actions: [AdaptyUI.Action] = [],
+            actions: [AdaptyUI.ActionAction] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .create(
@@ -77,7 +77,7 @@ extension AdaptyUI {
             id: String = UUID().uuidString,
             endedAt: Date,
             format: [Item],
-            actions: [AdaptyUI.Action] = [],
+            actions: [AdaptyUI.ActionAction] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .init(
@@ -94,7 +94,7 @@ extension AdaptyUI {
             duration: TimeInterval,
             startBehaviour: StartBehaviour = .default,
             format: AdaptyUI.RichText,
-            actions: [AdaptyUI.Action] = [],
+            actions: [AdaptyUI.ActionAction] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .create(
@@ -112,7 +112,7 @@ extension AdaptyUI {
             duration: TimeInterval,
             startBehaviour: StartBehaviour = .default,
             format: [Item],
-            actions: [AdaptyUI.Action] = [],
+            actions: [AdaptyUI.ActionAction] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .init(

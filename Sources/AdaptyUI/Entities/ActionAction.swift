@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package enum Action {
+    package enum ActionAction {
         case openUrl(String?)
         case restore
         case custom(id: String)

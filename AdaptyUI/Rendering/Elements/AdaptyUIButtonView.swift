@@ -67,7 +67,7 @@ struct AdaptyUIButtonView: View {
 }
 
 @available(iOS 15.0, *)
-extension [AdaptyUI.Action] {
+extension [AdaptyUI.ActionAction] {
     func fire(
         screenId: String,
         paywallViewModel: AdaptyPaywallViewModel,
@@ -89,7 +89,7 @@ extension [AdaptyUI.Action] {
 }
 
 @available(iOS 15.0, *)
-extension AdaptyUI.Action {
+extension AdaptyUI.ActionAction {
     func fire(
         screenId: String,
         paywallViewModel: AdaptyPaywallViewModel,

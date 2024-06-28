@@ -10,8 +10,8 @@ import Foundation
 
 extension AdaptyUI {
     package struct Toggle {
-        package let onActions: [Action]
-        package let offActions: [Action]
+        package let onActions: [ActionAction]
+        package let offActions: [ActionAction]
         package let onCondition: StateCondition
         package let color: Color?
     }
@@ -20,8 +20,8 @@ extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.Toggle {
         static func create(
-            onActions: [AdaptyUI.Action],
-            offActions: [AdaptyUI.Action],
+            onActions: [AdaptyUI.ActionAction],
+            offActions: [AdaptyUI.ActionAction],
             onCondition: AdaptyUI.StateCondition,
             color: AdaptyUI.Color? = nil
         ) -> Self {
