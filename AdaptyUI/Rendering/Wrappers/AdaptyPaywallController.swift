@@ -74,7 +74,7 @@ public class AdaptyPaywallController: UIViewController {
         view.backgroundColor = .systemBackground
 
         addSubSwiftUIView(
-            AdaptyPaywallView(
+            AdaptyPaywallView_Internal(
                 logId: logId,
                 paywall: paywall,
                 products: products,

@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  AdaptyPaywallView_Internal.swift
 //
 //
 //  Created by Aleksey Goncharov on 17.06.2024.
@@ -11,9 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct AdaptyPaywallView: View {
-    @Environment(\.presentationMode) private var presentationMode
-
+struct AdaptyPaywallView_Internal: View {
     private let showDebugOverlay: Bool
     private let products: [AdaptyPaywallProduct]?
     private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
