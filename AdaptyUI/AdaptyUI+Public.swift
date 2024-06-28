@@ -12,7 +12,6 @@ import UIKit
 
 @available(iOS 15.0, *)
 public extension AdaptyUI {
-    /// TODO: add documentation
     struct Configuration {
         public static let `default` = Configuration(
             mediaCacheConfiguration: .init(
@@ -22,8 +21,8 @@ public extension AdaptyUI {
             )
         )
 
-        /// TODO: add documentation
-        public let mediaCacheConfiguration: MediaCacheConfiguration
+        /// Represents the Media Cache configuration used in AdaptyUI
+        let mediaCacheConfiguration: MediaCacheConfiguration
 
         public init(
             mediaCacheConfiguration: MediaCacheConfiguration

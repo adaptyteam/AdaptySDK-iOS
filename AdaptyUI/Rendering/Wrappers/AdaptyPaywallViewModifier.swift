@@ -38,6 +38,28 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
     private let didFailRendering: (AdaptyError) -> Void
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
 
+    /// - Parameters:
+    ///     - isPresented: A binding to a Boolean value that determines whether
+    ///     to present the sheet.
+    ///     - fullScreen: determines whether the screen will `.sheet` or `.fullScreenCover` function.
+    ///     - paywall: an ``AdaptyPaywall`` object, for which you are going to show the screen.
+    ///     - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
+    ///     - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
+    ///     - introductoryOffersEligibilities: optional ``[String: AdaptyEligibility]`` dictionary. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required eligibilities.
+    ///     - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
+    ///     - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
+    ///     - didPerformAction: If user performs an action, this callback will be invoked. There is a default implementation, e.g. `close` action will dismiss the paywall, `openUrl` action will open the URL.
+    ///     - didSelectProduct: If product was selected for purchase (by user or by system), this callback will be invoked.
+    ///     - didStartPurchase: If user initiates the purchase process, this callback will be invoked.
+    ///     - didFinishPurchase: This method is invoked when a successful purchase is made.
+    ///     - didFailPurchase: This method is invoked when the purchase process fails.
+    ///     - didCancelPurchase: This method is invoked when user cancel the purchase manually.
+    ///     - didStartRestore: If user initiates the restore process, this method will be invoked.
+    ///     - didFinishRestore: This method is invoked when a successful restore is made.
+    ///     Check if the ``AdaptyProfile`` object contains the desired access level, and if so, the controller can be dismissed.
+    ///     - didFailRestore: This method is invoked when the restore process fails.
+    ///     - didFailRendering: This method will be invoked in case of errors during the screen rendering process.
+    ///     - didFailLoadingProducts: This method is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
     public init(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
@@ -137,9 +159,34 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
 }
 
 @available(iOS 15.0, *)
-extension View {
+public extension View {
+    /// Presents a paywall when a binding to a Boolean value that you
+    /// provide is true.
+    ///
+    /// - Parameters:
+    ///     - isPresented: A binding to a Boolean value that determines whether
+    ///     to present the sheet.
+    ///     - fullScreen: determines whether the screen will `.sheet` or `.fullScreenCover` function.
+    ///     - paywall: an ``AdaptyPaywall`` object, for which you are going to show the screen.
+    ///     - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
+    ///     - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
+    ///     - introductoryOffersEligibilities: optional ``[String: AdaptyEligibility]`` dictionary. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required eligibilities.
+    ///     - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
+    ///     - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
+    ///     - didPerformAction: If user performs an action, this callback will be invoked. There is a default implementation, e.g. `close` action will dismiss the paywall, `openUrl` action will open the URL.
+    ///     - didSelectProduct: If product was selected for purchase (by user or by system), this callback will be invoked.
+    ///     - didStartPurchase: If user initiates the purchase process, this callback will be invoked.
+    ///     - didFinishPurchase: This method is invoked when a successful purchase is made.
+    ///     - didFailPurchase: This method is invoked when the purchase process fails.
+    ///     - didCancelPurchase: This method is invoked when user cancel the purchase manually.
+    ///     - didStartRestore: If user initiates the restore process, this method will be invoked.
+    ///     - didFinishRestore: This method is invoked when a successful restore is made.
+    ///     Check if the ``AdaptyProfile`` object contains the desired access level, and if so, the controller can be dismissed.
+    ///     - didFailRestore: This method is invoked when the restore process fails.
+    ///     - didFailRendering: This method will be invoked in case of errors during the screen rendering process.
+    ///     - didFailLoadingProducts: This method is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
     @ViewBuilder
-    public func paywall(
+    func paywall(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
         paywall: AdaptyPaywall,
