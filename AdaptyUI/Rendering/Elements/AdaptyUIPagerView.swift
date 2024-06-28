@@ -67,6 +67,8 @@ extension View {
 struct AdaptyUIPagerView: View {
     private static let pageControllTapAnimationDuration = 0.3
     
+    @Environment(\.layoutDirection)
+    private var layoutDirection: LayoutDirection
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
@@ -213,13 +215,13 @@ struct AdaptyUIPagerView: View {
             .dragGesture(
                 condition: pager.interactionBehaviour != .none,
                 onChanged: { value in
-                    offset = value.translation.width
+                    offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
                     isInteracting = true
                     stopAutoScroll() // Stop the autoscroll while interacting
                 },
                 onEnded: { value in
                     withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
-                        offset = value.predictedEndTranslation.width
+                        offset = value.predictedEndTranslation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
                         currentPage -= Int((offset / width).rounded())
                         currentPage = max(0, min(currentPage, pager.content.count - 1))
                         offset = 0
