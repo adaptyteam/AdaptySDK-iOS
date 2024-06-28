@@ -33,7 +33,7 @@ struct AdaptyPaywallView: View {
         introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         configuration: AdaptyUI.LocalizedViewConfiguration,
         tagResolver: AdaptyTagResolver?,
-        didPerformAction: @escaping (AdaptyUI.Action) -> Void,
+        didPerformAction: @escaping (AdaptyUI.UserAction) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
         didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,

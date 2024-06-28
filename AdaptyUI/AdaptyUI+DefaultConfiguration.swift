@@ -13,7 +13,7 @@ import UIKit
 @available(iOS 15.0, *)
 extension AdaptyPaywallControllerDelegate {
     func paywallController(_ controller: AdaptyPaywallController,
-                           didPerform action: AdaptyUI.Action) {
+                           didPerform action: AdaptyUI.UserAction) {
         switch action {
         case .close:
             controller.dismiss(animated: true)

@@ -82,8 +82,8 @@ package class AdaptyTimerViewModel: ObservableObject {
         let timerEndAt = timers[timer.id] ?? initializeTimer(timer, at: at)
         let timeLeft = max(0.0, timerEndAt.timeIntervalSince1970 - Date().timeIntervalSince1970)
         
-        if timeLeft <= 0.0, let action = timer.action {
-            action.fire(
+        if timeLeft <= 0.0 {
+            timer.actions.fire(
                 screenId: screenId,
                 productsViewModel: productsViewModel,
                 actionsViewModel: actionsViewModel,
