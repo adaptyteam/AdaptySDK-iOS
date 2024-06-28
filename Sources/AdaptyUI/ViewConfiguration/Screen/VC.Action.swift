@@ -11,12 +11,12 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     enum Action {
         case openUrl(String)
-        case action(AdaptyUI.Action)
+        case action(AdaptyUI.ActionAction)
     }
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func action(_ from: AdaptyUI.ViewConfiguration.Action) throws -> AdaptyUI.Action {
+    func action(_ from: AdaptyUI.ViewConfiguration.Action) throws -> AdaptyUI.ActionAction {
         switch from {
         case let .openUrl(stringId):
             .openUrl(urlIfPresent(stringId))
