@@ -57,9 +57,21 @@ extension AdaptyUI.ViewConfiguration.Toggle: Decodable {
             return
         }
 
+        let onActions =
+            if let action = try? container.decodeIfPresent(AdaptyUI.ViewConfiguration.Action.self, forKey: .onActions) {
+                [action]
+            } else {
+                try container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .onActions) ?? []
+            }
+        let offActions =
+            if let action = try? container.decodeIfPresent(AdaptyUI.ViewConfiguration.Action.self, forKey: .offActions) {
+                [action]
+            } else {
+                try container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .offActions) ?? []
+            }
         try self.init(
-            onActions: container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .onActions) ?? [],
-            offActions: container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .offActions) ?? [],
+            onActions: onActions,
+            offActions: offActions,
             onCondition: container.decode(AdaptyUI.StateCondition.self, forKey: .onCondition),
             colorAssetId: colorAssetId
         )
