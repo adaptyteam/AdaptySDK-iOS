@@ -32,7 +32,7 @@ struct AdaptyPaywallView_Internal: View {
         configuration: AdaptyUI.LocalizedViewConfiguration,
         tagResolver: AdaptyTagResolver?,
         showDebugOverlay: Bool,
-        didPerformAction: @escaping (AdaptyUI.Action) -> Void,
+        didPerformAction: @escaping (AdaptyUI.UserAction) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
         didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,

@@ -18,7 +18,7 @@ package class AdaptyUIActionsViewModel: ObservableObject {
         self.eventsHandler = eventsHandler
     }
 
-//    func actionOccured(_ action: AdaptyUI.ButtonAction) {
+//    func actionOccured(_ action: AdaptyUI.Action) {
 //        eventsHandler.log(.verbose, "actionOccured \(action)")
 //        onActionOccured?(action)
 //    }

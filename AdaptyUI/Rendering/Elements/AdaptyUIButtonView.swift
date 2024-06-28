@@ -67,7 +67,29 @@ struct AdaptyUIButtonView: View {
 }
 
 @available(iOS 15.0, *)
-extension AdaptyUI.ButtonAction {
+extension [AdaptyUI.Action] {
+    func fire(
+        screenId: String,
+        paywallViewModel: AdaptyPaywallViewModel,
+        productsViewModel: AdaptyProductsViewModel,
+        actionsViewModel: AdaptyUIActionsViewModel,
+        sectionsViewModel: AdaptySectionsViewModel,
+        screensViewModel: AdaptyScreensViewModel
+    ) {
+        forEach{
+            $0.fire(
+                screenId: screenId,
+                paywallViewModel: paywallViewModel,
+                productsViewModel: productsViewModel,
+                actionsViewModel: actionsViewModel,
+                sectionsViewModel: sectionsViewModel,
+                screensViewModel: screensViewModel)
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+extension AdaptyUI.Action {
     func fire(
         screenId: String,
         paywallViewModel: AdaptyPaywallViewModel,

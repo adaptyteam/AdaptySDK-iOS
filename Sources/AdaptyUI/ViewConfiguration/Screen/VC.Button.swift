@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     struct Button {
-        let actions: [AdaptyUI.ViewConfiguration.ButtonAction]
+        let actions: [AdaptyUI.ViewConfiguration.Action]
         let normalState: AdaptyUI.ViewConfiguration.Element
         let selectedState: AdaptyUI.ViewConfiguration.Element?
         let selectedCondition: AdaptyUI.StateCondition?
@@ -20,14 +20,14 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration.Localizer {
     func button(_ from: AdaptyUI.ViewConfiguration.Button) throws -> AdaptyUI.Button {
         try .init(
-            actions: from.actions.map(buttonAction),
+            actions: from.actions.map(action),
             normalState: element(from.normalState),
             selectedState: from.selectedState.map(element),
             selectedCondition: from.selectedCondition
         )
     }
 
-    func buttonAction(_ from: AdaptyUI.ButtonAction) throws -> AdaptyUI.ButtonAction {
+    func buttonAction(_ from: AdaptyUI.Action) throws -> AdaptyUI.Action {
         guard case let .openUrl(stringId) = from else { return from }
         return .openUrl(urlIfPresent(stringId))
     }
@@ -35,7 +35,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
 extension AdaptyUI.ViewConfiguration.Button: Decodable {
     enum CodingKeys: String, CodingKey {
-        case action
+        case actions = "action"
         case normalState = "normal"
         case selectedState = "selected"
         case selectedCondition = "selected_condition"
@@ -44,10 +44,10 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let actions =
-            if let action = try? container.decode(AdaptyUI.ViewConfiguration.ButtonAction.self, forKey: .action) {
+            if let action = try? container.decode(AdaptyUI.ViewConfiguration.Action.self, forKey: .actions) {
                 [action]
             } else {
-                try container.decode([AdaptyUI.ViewConfiguration.ButtonAction].self, forKey: .action)
+                try container.decode([AdaptyUI.ViewConfiguration.Action].self, forKey: .actions)
             }
         try self.init(
             actions: actions,

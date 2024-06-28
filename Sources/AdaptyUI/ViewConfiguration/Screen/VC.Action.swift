@@ -1,5 +1,5 @@
 //
-//  Button.swift
+//  VC.Action.swift
 //  AdaptyUI
 //
 //  Created by Aleksei Valiano on 28.03.2024
@@ -9,14 +9,14 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    enum ButtonAction {
+    enum Action {
         case openUrl(String)
-        case action(AdaptyUI.ButtonAction)
+        case action(AdaptyUI.Action)
     }
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    func buttonAction(_ from: AdaptyUI.ViewConfiguration.ButtonAction) throws -> AdaptyUI.ButtonAction {
+    func action(_ from: AdaptyUI.ViewConfiguration.Action) throws -> AdaptyUI.Action {
         switch from {
         case let .openUrl(stringId):
             .openUrl(urlIfPresent(stringId))
@@ -26,7 +26,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.ButtonAction: Decodable {
+extension AdaptyUI.ViewConfiguration.Action: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case url

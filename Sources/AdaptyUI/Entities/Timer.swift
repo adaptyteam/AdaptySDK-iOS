@@ -13,7 +13,7 @@ extension AdaptyUI {
         package let id: String
         package let state: State
         package let format: [Item]
-        package let action: ButtonAction?
+        package let actions: [Action]
         package let horizontalAlign: AdaptyUI.HorizontalAlignment
 
         package func format(byValue: TimeInterval) -> RichText {
@@ -27,11 +27,11 @@ extension AdaptyUI {
             return format[index].value
         }
 
-        init(id: String, state: State, format: [Item], action: ButtonAction?, horizontalAlign: AdaptyUI.HorizontalAlignment) {
+        init(id: String, state: State, format: [Item], actions: [Action], horizontalAlign: AdaptyUI.HorizontalAlignment) {
             self.id = id
             self.state = state
             self.format = format.sorted(by: { $0.from > $1.from })
-            self.action = action
+            self.actions = actions
             self.horizontalAlign = horizontalAlign
         }
 
@@ -61,14 +61,14 @@ extension AdaptyUI {
             id: String = UUID().uuidString,
             endedAt: Date,
             format: AdaptyUI.RichText,
-            action: AdaptyUI.ButtonAction? = nil,
+            actions: [AdaptyUI.Action] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .create(
                 id: id,
                 endedAt: endedAt,
                 format: [.init(from: 0, value: format)],
-                action: action,
+                actions: actions,
                 horizontalAlign: horizontalAlign
             )
         }
@@ -77,14 +77,14 @@ extension AdaptyUI {
             id: String = UUID().uuidString,
             endedAt: Date,
             format: [Item],
-            action: AdaptyUI.ButtonAction? = nil,
+            actions: [AdaptyUI.Action] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .init(
                 id: id,
                 state: .endedAt(endedAt),
                 format: format,
-                action: action,
+                actions: actions,
                 horizontalAlign: horizontalAlign
             )
         }
@@ -94,7 +94,7 @@ extension AdaptyUI {
             duration: TimeInterval,
             startBehaviour: StartBehaviour = .default,
             format: AdaptyUI.RichText,
-            action: AdaptyUI.ButtonAction? = nil,
+            actions: [AdaptyUI.Action] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .create(
@@ -102,7 +102,7 @@ extension AdaptyUI {
                 duration: duration,
                 startBehaviour: startBehaviour,
                 format: [.init(from: 0, value: format)],
-                action: action,
+                actions: actions,
                 horizontalAlign: horizontalAlign
             )
         }
@@ -112,14 +112,14 @@ extension AdaptyUI {
             duration: TimeInterval,
             startBehaviour: StartBehaviour = .default,
             format: [Item],
-            action: AdaptyUI.ButtonAction? = nil,
+            actions: [AdaptyUI.Action] = [],
             horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
         ) -> Self {
             .init(
                 id: id,
                 state: .duration(duration, start: startBehaviour),
                 format: format,
-                action: action,
+                actions: actions,
                 horizontalAlign: horizontalAlign
             )
         }

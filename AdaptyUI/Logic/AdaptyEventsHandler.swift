@@ -15,7 +15,7 @@ package class AdaptyEventsHandler { // TODO: make internal
     let logId: String = AdaptyUI.generateLogId()
 
     // TODO: make private
-    var didPerformAction: ((AdaptyUI.Action) -> Void)?
+    var didPerformAction: ((AdaptyUI.UserAction) -> Void)?
     var didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     var didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)?
@@ -36,7 +36,7 @@ package class AdaptyEventsHandler { // TODO: make internal
 
     package init(
         logId: String,
-        didPerformAction: @escaping (AdaptyUI.Action) -> Void,
+        didPerformAction: @escaping (AdaptyUI.UserAction) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
         didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,
@@ -66,7 +66,7 @@ package class AdaptyEventsHandler { // TODO: make internal
         AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
     }
 
-    func event_didPerformAction(_ action: AdaptyUI.Action) {
+    func event_didPerformAction(_ action: AdaptyUI.UserAction) {
         log(.verbose, "event_didPerformAction: \(action)")
         didPerformAction?(action)
     }

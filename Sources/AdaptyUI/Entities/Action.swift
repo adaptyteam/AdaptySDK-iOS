@@ -1,5 +1,5 @@
 //
-//  ButtonAction.swift
+//  Action.swift
 //  AdaptyUI
 //
 //  Created by Aleksei Valiano on 03.07.2023
@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package enum ButtonAction {
+    package enum Action {
         case openUrl(String?)
         case restore
         case custom(id: String)
