@@ -12,7 +12,14 @@
 
     @available(iOS 15.0, *)
     struct AdaptyUIToggleView: View {
-        @EnvironmentObject var viewModel: AdaptySectionsViewModel
+        @Environment(\.adaptyScreenId)
+        private var screenId: String
+
+        @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
+        @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
+        @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
+        @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
+        @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
 
         private var toggle: AdaptyUI.Toggle
 
@@ -24,11 +31,19 @@
             Toggle(isOn: .init(get: {
                 switch toggle.onCondition {
                 case let .selectedSection(sectionId, sectionIndex):
-                    sectionIndex == viewModel.selectedIndex(for: sectionId)
+                    sectionIndex == sectionsViewModel.selectedIndex(for: sectionId)
                 default: false
                 }
             }, set: { value in
-                viewModel.updateSelection(for: toggle.sectionId, index: value ? toggle.onIndex : toggle.offIndex)
+                (value ? toggle.onActions : toggle.offActions)
+                    .fire(
+                        screenId: screenId,
+                        paywallViewModel: paywallViewModel,
+                        productsViewModel: productsViewModel,
+                        actionsViewModel: actionsViewModel,
+                        sectionsViewModel: sectionsViewModel,
+                        screensViewModel: screensViewModel
+                    )
             })) {
                 EmptyView()
             }
