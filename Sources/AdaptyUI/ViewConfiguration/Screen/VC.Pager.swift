@@ -69,7 +69,7 @@ extension AdaptyUI.ViewConfiguration.Pager: Decodable {
         case content
         case pageControl = "page_control"
         case animation
-        case interactionBehaviour = "interaction_behaviour"
+        case interactionBehaviour = "interaction"
     }
 
     init(from decoder: any Decoder) throws {

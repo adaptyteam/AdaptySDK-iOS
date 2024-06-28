@@ -15,17 +15,20 @@ package class AdaptyTimerViewModel: ObservableObject {
     private static var globalTimers = [String: Date]()
     private var timers = [String: Date]()
     
+    private let paywallViewModel: AdaptyPaywallViewModel
     private let productsViewModel: AdaptyProductsViewModel
     private let actionsViewModel: AdaptyUIActionsViewModel
     private let sectionsViewModel: AdaptySectionsViewModel
     private let screensViewModel: AdaptyScreensViewModel
     
     package init(
+        paywallViewModel: AdaptyPaywallViewModel,
         productsViewModel: AdaptyProductsViewModel,
         actionsViewModel: AdaptyUIActionsViewModel,
         sectionsViewModel: AdaptySectionsViewModel,
         screensViewModel: AdaptyScreensViewModel
     ) {
+        self.paywallViewModel = paywallViewModel
         self.productsViewModel = productsViewModel
         self.actionsViewModel = actionsViewModel
         self.sectionsViewModel = sectionsViewModel
@@ -85,6 +88,7 @@ package class AdaptyTimerViewModel: ObservableObject {
         if timeLeft <= 0.0 {
             timer.actions.fire(
                 screenId: screenId,
+                paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
                 actionsViewModel: actionsViewModel,
                 sectionsViewModel: sectionsViewModel,

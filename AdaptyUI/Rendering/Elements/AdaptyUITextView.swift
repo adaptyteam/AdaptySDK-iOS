@@ -33,7 +33,7 @@ struct AdaptyUITextView: View {
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
-                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
+                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.01 : 1.0)
         case .notFound:
             richText
                 .convertToSwiftUIText(
@@ -42,7 +42,7 @@ struct AdaptyUITextView: View {
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
-                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
+                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.01 : 1.0)
                 .redactedAsPlaceholder(true)
         case let .found(productInfoModel):
             richText
@@ -52,7 +52,7 @@ struct AdaptyUITextView: View {
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
-                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.5 : 1.0)
+                .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.01 : 1.0)
         }
     }
 }

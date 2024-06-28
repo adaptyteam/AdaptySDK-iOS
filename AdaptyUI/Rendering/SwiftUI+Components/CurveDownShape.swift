@@ -11,8 +11,12 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct CurveDownShape: Shape {
+struct CurveDownShape: InsettableShape {
     var curveHeight: CGFloat = 32.0
+    
+    func inset(by amount: CGFloat) -> some InsettableShape {
+        CurveDownShape()
+    }
     
     func path(in rect: CGRect) -> Path {
         var path = Path()

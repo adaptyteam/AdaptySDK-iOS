@@ -9,6 +9,8 @@ import Adapty
 import Foundation
 
 package protocol AdaptyPaywallInterface {
+    var id: String? { get }
+    var locale: String? { get }
     var vendorProductIds: [String] { get }
 
     func getPaywallProducts(completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>)
@@ -16,6 +18,9 @@ package protocol AdaptyPaywallInterface {
 }
 
 extension AdaptyPaywall: AdaptyPaywallInterface {
+    package var id: String? { placementId }
+    package var locale: String? { remoteConfig?.locale }
+    
     package func getPaywallProducts(completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
         Adapty.getPaywallProducts(paywall: self, completion)
     }

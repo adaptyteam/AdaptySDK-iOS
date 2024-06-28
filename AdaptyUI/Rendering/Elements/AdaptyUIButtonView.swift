@@ -17,6 +17,7 @@ struct AdaptyUIButtonView: View {
 
     private var button: AdaptyUI.Button
 
+    @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
     @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
     @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
@@ -49,9 +50,10 @@ struct AdaptyUIButtonView: View {
 
     public var body: some View {
         Button {
-            button.actions.forEach {
-                $0.fire(
+            for action in button.actions {
+                action.fire(
                     screenId: screenId,
+                    paywallViewModel: paywallViewModel,
                     productsViewModel: productsViewModel,
                     actionsViewModel: actionsViewModel,
                     sectionsViewModel: sectionsViewModel,
@@ -68,19 +70,20 @@ struct AdaptyUIButtonView: View {
 extension [AdaptyUI.Action] {
     func fire(
         screenId: String,
+        paywallViewModel: AdaptyPaywallViewModel,
         productsViewModel: AdaptyProductsViewModel,
         actionsViewModel: AdaptyUIActionsViewModel,
         sectionsViewModel: AdaptySectionsViewModel,
         screensViewModel: AdaptyScreensViewModel
     ) {
-        self.forEach {
+        forEach{
             $0.fire(
                 screenId: screenId,
+                paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
                 actionsViewModel: actionsViewModel,
                 sectionsViewModel: sectionsViewModel,
-                screensViewModel: screensViewModel
-            )
+                screensViewModel: screensViewModel)
         }
     }
 }
@@ -89,6 +92,7 @@ extension [AdaptyUI.Action] {
 extension AdaptyUI.Action {
     func fire(
         screenId: String,
+        paywallViewModel: AdaptyPaywallViewModel,
         productsViewModel: AdaptyProductsViewModel,
         actionsViewModel: AdaptyUIActionsViewModel,
         sectionsViewModel: AdaptySectionsViewModel,
@@ -120,7 +124,12 @@ extension AdaptyUI.Action {
         case let .openUrl(url):
             actionsViewModel.openUrlActionOccured(url: url)
         case let .custom(id):
-            actionsViewModel.customActionOccured(id: id)
+            switch id {
+            case "$adapty_reload_data":
+                paywallViewModel.reloadData()
+            default:
+                actionsViewModel.customActionOccured(id: id)
+            }
         }
     }
 }

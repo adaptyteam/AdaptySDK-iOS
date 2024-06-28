@@ -14,11 +14,11 @@ import SwiftUI
 struct AdaptyPaywallView: View {
     @Environment(\.presentationMode) private var presentationMode
 
-    private let paywall: AdaptyPaywall
+    private let showDebugOverlay: Bool
     private let products: [AdaptyPaywallProduct]?
     private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
-    private let configuration: AdaptyUI.LocalizedViewConfiguration
     private let eventsHandler: AdaptyEventsHandler
+    private let paywallViewModel: AdaptyPaywallViewModel
     private let productsViewModel: AdaptyProductsViewModel
     private let actionsViewModel: AdaptyUIActionsViewModel
     private let sectionsViewModel: AdaptySectionsViewModel
@@ -33,6 +33,7 @@ struct AdaptyPaywallView: View {
         introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         configuration: AdaptyUI.LocalizedViewConfiguration,
         tagResolver: AdaptyTagResolver?,
+        showDebugOverlay: Bool,
         didPerformAction: @escaping (AdaptyUI.UserAction) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
@@ -45,10 +46,9 @@ struct AdaptyPaywallView: View {
         didFailRendering: @escaping (AdaptyError) -> Void,
         didFailLoadingProducts: @escaping (AdaptyError) -> Bool
     ) {
-        self.paywall = paywall
+        self.showDebugOverlay = showDebugOverlay
         self.products = products
         self.introductoryOffersEligibilities = introductoryOffersEligibilities
-        self.configuration = configuration
 
         AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(configuration.templateId), products: \(products?.count ?? 0)")
 
@@ -70,14 +70,17 @@ struct AdaptyPaywallView: View {
         tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
         actionsViewModel = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
         sectionsViewModel = AdaptySectionsViewModel(logId: logId)
+        paywallViewModel = AdaptyPaywallViewModel(eventsHandler: eventsHandler,
+                                                  paywall: paywall,
+                                                  viewConfiguration: configuration)
         productsViewModel = AdaptyProductsViewModel(eventsHandler: eventsHandler,
-                                                    paywall: paywall,
+                                                    paywallViewModel: paywallViewModel,
                                                     products: products,
-                                                    introductoryOffersEligibilities: introductoryOffersEligibilities,
-                                                    viewConfiguration: configuration)
+                                                    introductoryOffersEligibilities: introductoryOffersEligibilities)
         screensViewModel = AdaptyScreensViewModel(eventsHandler: eventsHandler,
                                                   viewConfiguration: configuration)
         timerViewModel = AdaptyTimerViewModel(
+            paywallViewModel: paywallViewModel,
             productsViewModel: productsViewModel,
             actionsViewModel: actionsViewModel,
             sectionsViewModel: sectionsViewModel,
@@ -89,9 +92,14 @@ struct AdaptyPaywallView: View {
 
     var body: some View {
         GeometryReader { proxy in
-            AdaptyPaywallRendererView(viewConfiguration: configuration)
-                .withScreenSize(proxy.size)
+            AdaptyPaywallRendererView()
+                .withScreenSize(
+                    CGSize(width: proxy.size.width + proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing,
+                           height: proxy.size.height + proxy.safeAreaInsets.top + proxy.safeAreaInsets.bottom)
+                )
                 .withSafeArea(proxy.safeAreaInsets)
+                .withDebugOverlayEnabled(showDebugOverlay)
+                .environmentObject(paywallViewModel)
                 .environmentObject(productsViewModel)
                 .environmentObject(actionsViewModel)
                 .environmentObject(sectionsViewModel)
