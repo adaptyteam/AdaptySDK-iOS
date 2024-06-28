@@ -138,25 +138,6 @@ public struct AdaptyUITestRendererView: View {
         AdaptyUIElementView(screen.content)
     }
 
-    @ViewBuilder
-    private func templateOrElement() -> some View {
-        let screen = viewConfiguration.screen
-
-        switch renderingMode {
-        case .template:
-            if let template = AdaptyUI.Template(rawValue: viewConfiguration.templateId) {
-                AdaptyUITemplateResolverView(
-                    template: template,
-                    screen: screen
-                )
-            } else {
-                AdaptyUIRenderingErrorView(text: "Wrong templateId: \(viewConfiguration.templateId)", forcePresent: true)
-            }
-        case .element:
-            AdaptyUIElementView(screen.content)
-        }
-    }
-
     public var body: some View {
         let actionsVM = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
         let sectionsVM = AdaptySectionsViewModel(logId: "AdaptyUITesting")
@@ -173,6 +154,7 @@ public struct AdaptyUITestRendererView: View {
             viewConfiguration: viewConfiguration
         )
         let timerVM = AdaptyTimerViewModel(
+            timerResolver: AdaptyUIDefaultTimerResolver(),
             paywallViewModel: paywallVM,
             productsViewModel: productsVM,
             actionsViewModel: actionsVM,
@@ -180,7 +162,7 @@ public struct AdaptyUITestRendererView: View {
             screensViewModel: screensVM
         )
 
-        templateOrElement()
+        AdaptyUIElementView(viewConfiguration.screen.content)
             .environmentObject(paywallVM)
             .environmentObject(actionsVM)
             .environmentObject(sectionsVM)
@@ -192,43 +174,12 @@ public struct AdaptyUITestRendererView: View {
     }
 }
 
-#endif
-
-#if canImport(UIKit)
-
-import Adapty
-import SwiftUI
-
-
-
-// TODO: move to testing
 @available(iOS 15.0, *)
-package struct AdaptyUIRenderingErrorView: View {
-    var text: String
-    var forcePresent: Bool
-
-    package init(text: String, forcePresent: Bool = false) {
-        self.text = text
-        self.forcePresent = forcePresent
-    }
-
-    @ViewBuilder
-    private var errorView: some View {
-        Text("⚠️ " + text)
-    }
-
-    package var body: some View {
-        #if DEBUG
-        errorView
-        #else
-        if forcePresent {
-            errorView
-        } else {
-            EmptyView()
-        }
-        #endif
+public extension View {
+    func withScreenSizeTestingWrapper(_ value: CGSize) -> some View {
+        withScreenSize(value)
     }
 }
 
-
 #endif
+

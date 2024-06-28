@@ -15,8 +15,10 @@ public protocol AdaptyTimerResolver {
     func timerEndAtDate(for timerId: String) -> Date
 }
 
-struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
-    func timerEndAtDate(for timerId: String) -> Date {
+package struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
+    package init() {}
+    
+    package func timerEndAtDate(for timerId: String) -> Date {
         Date(timeIntervalSinceNow: 3600.0)
     }
 }
