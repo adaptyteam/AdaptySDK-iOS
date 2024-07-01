@@ -138,16 +138,32 @@ enum Environment {
             #endif
         }()
 
-        
-        static let idfa: String? = {
+        static var currentIdfa: String?
+        static var idfa: String? {
             #if !canImport(AdSupport)
                 return nil
             #else
                 guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
+
+                if let currentIdfa { return currentIdfa }
+
                 // Get and return IDFA
-                return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                currentIdfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+
+                return currentIdfa
+
             #endif
-        }()
+        }
+        
+        static var canGetIdfa: Bool {
+            #if !canImport(AdSupport)
+                return false
+            #else
+                return !Adapty.Configuration.idfaCollectionDisabled
+            #endif
+        }
+        
+        
 
         static let idfv: String? = {
             #if os(macOS) || targetEnvironment(macCatalyst)

@@ -23,15 +23,19 @@ extension AdaptyProfileManager.SendedEnvironment {
         case .withIdfa:
             false
         case .withoutIdfa:
-            analyticsDisabled ? false : true
+            Environment.Device.canGetIdfa && !analyticsDisabled
         }
     }
 
     func getValueIfNeedSend(analyticsDisabled: Bool) -> Environment.Meta? {
-        if needSend(analyticsDisabled: analyticsDisabled) {
-            Environment.Meta(includedAnalyticIds: !analyticsDisabled)
-        } else {
-            nil
+        guard needSend(analyticsDisabled: analyticsDisabled) else { return nil }
+
+        let meta = Environment.Meta(includedAnalyticIds: !analyticsDisabled)
+
+        if meta.idfa == nil, self == .withoutIdfa {
+            return nil
         }
+
+        return meta
     }
 }

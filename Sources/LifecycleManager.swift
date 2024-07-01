@@ -43,6 +43,33 @@ final class LifecycleManager {
         initialized = true
     }
 
+    private var needSyncIdfa: Bool? {
+
+        guard let adapty = Adapty.shared else {
+            // not activated  adapty,  wait
+            return nil
+        }
+        
+        guard let manager = adapty.state.initialized else {
+            // not created profileManager,  wait
+            return nil
+        }
+
+        
+        guard manager.onceSentEnvironment.needSend(analyticsDisabled: adapty.profileStorage.externalAnalyticsDisabled) else {
+            // is synced or disabled take idfa
+            return false
+        }
+
+        guard Environment.Device.idfa != nil else {
+            // idfa not exist, wait
+            return nil
+        }
+
+        // idfa  exist  and
+        return true
+    }
+
     private func scheduleProfileUpdate(after delay: TimeInterval) {
         guard !Self.purchaseInfoUpdateScheduled else {
             Log.verbose("LifecycleManager: scheduleProfileUpdate already scheduled")

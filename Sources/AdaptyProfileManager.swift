@@ -13,6 +13,7 @@ final class AdaptyProfileManager {
     var profile: VH<AdaptyProfile>
     let paywallsCache: PaywallsCache
     let productStatesCache: ProductStatesCache
+    var onceSentEnvironment: SendedEnvironment
 
     var isActive: Bool = true
 
@@ -20,7 +21,8 @@ final class AdaptyProfileManager {
         manager: Adapty,
         paywallStorage: PaywallsStorage,
         productStorage: BackendProductStatesStorage,
-        profile: VH<AdaptyProfile>
+        profile: VH<AdaptyProfile>,
+        sendedEnvironment: SendedEnvironment
     ) {
         self.manager = manager
         profileId = profile.value.profileId
@@ -29,12 +31,20 @@ final class AdaptyProfileManager {
         productStatesCache = ProductStatesCache(storage: productStorage)
 
         manager.updateASATokenIfNeed(for: profile)
-        if !manager.profileStorage.syncedTransactions {
+
+        let storage = manager.profileStorage
+        self.onceSentEnvironment = sendedEnvironment
+
+        if sendedEnvironment == .dont {
+            getProfile { _ in }
+        } else if !storage.syncedTransactions {
             manager.syncTransactions(refreshReceiptIfEmpty: true) { _ in }
         }
+
         Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
     }
 }
+
 
 extension AdaptyProfileManager {
     func updateProfileParameters(_ params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
@@ -62,12 +72,12 @@ extension AdaptyProfileManager {
     }
 
     private func syncProfile(params: AdaptyProfileParameters?, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        let environmentMeta = manager.onceSentEnvironment.getValueIfNeedSend(
+        let environmentMeta = onceSentEnvironment.getValueIfNeedSend(
             analyticsDisabled: (params?.analyticsDisabled ?? false) || manager.profileStorage.externalAnalyticsDisabled
         )
 
         let old = profile.value
-        
+
         manager.httpSession.performSyncProfileRequest(
             profileId: profileId,
             parameters: params,
@@ -76,11 +86,10 @@ extension AdaptyProfileManager {
         ) { [weak self] result in
             completion(result
                 .do {
-                    guard let self , self.isActive else { return }
                     if let environmentMeta {
-                        self.manager.onceSentEnvironment = environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
+                        self?.onceSentEnvironment = environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
                     }
-                    self.saveResponse($0.flatValue())
+                    self?.saveResponse($0.flatValue())
                 }
                 .map {
                     $0.value ?? old
@@ -142,44 +151,38 @@ extension AdaptyProfileManager {
 
     func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
         guard !manager.profileStorage.syncedTransactions else {
-            _getBackendProductStates(vendorProductIds: vendorProductIds, completion)
+            fetch(vendorProductIds: vendorProductIds, completion)
             return
         }
-        manager.syncTransactions(refreshReceiptIfEmpty: true) { [weak self] result in
+        manager.syncTransactions(refreshReceiptIfEmpty: true) { result in
             if let error = result.error {
                 completion(.failure(error))
                 return
             }
-
-            guard let self, self.isActive else {
-                completion(.failure(.profileWasChanged()))
-                return
-            }
-
-            self._getBackendProductStates(vendorProductIds: vendorProductIds, completion)
+            fetch(vendorProductIds: vendorProductIds, completion)
         }
-    }
 
-    private func _getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
-        manager.httpSession.performFetchProductStatesRequest(profileId: profileId, responseHash: productStatesCache.productsHash) { [weak self] (result: AdaptyResult<VH<[BackendProductState]?>>) in
+        func fetch(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
+            manager.httpSession.performFetchProductStatesRequest(profileId: profileId, responseHash: productStatesCache.productsHash) { [weak self] (result: AdaptyResult<VH<[BackendProductState]?>>) in
 
-            guard let self, self.isActive else {
-                completion(.failure(.profileWasChanged()))
-                return
-            }
-
-            switch result {
-            case let .failure(error):
-
-                let value = self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)
-                guard !value.isEmpty else {
-                    completion(.failure(error))
+                guard let self, self.isActive else {
+                    completion(.failure(.profileWasChanged()))
                     return
                 }
-                completion(.success(value))
-            case let .success(products):
-                self.productStatesCache.setBackendProductStates(products.flatValue())
-                completion(.success(self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)))
+
+                switch result {
+                case let .failure(error):
+
+                    let value = self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)
+                    guard !value.isEmpty else {
+                        completion(.failure(error))
+                        return
+                    }
+                    completion(.success(value))
+                case let .success(products):
+                    self.productStatesCache.setBackendProductStates(products.flatValue())
+                    completion(.success(self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)))
+                }
             }
         }
     }
