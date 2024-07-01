@@ -69,7 +69,23 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 }
 
 extension HTTPSession {
-    func performUpdateProfileRequest(
+    func performSyncProfileRequest(
+        profileId: String,
+        parameters: AdaptyProfileParameters?,
+        environmentMeta: Environment.Meta?,
+        responseHash: String?,
+        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
+    ) {
+        if parameters == nil, environmentMeta == nil {
+            performFetchProfileRequest(profileId: profileId, responseHash: responseHash, completion)
+            return
+
+        } else {
+            performUpdateProfileRequest(profileId: profileId, parameters: parameters, environmentMeta: environmentMeta, responseHash: responseHash, completion)
+        }
+    }
+
+    private func performUpdateProfileRequest(
         profileId: String,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,

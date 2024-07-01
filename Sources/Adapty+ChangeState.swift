@@ -230,7 +230,7 @@ extension Adapty {
             state = .initialized(manager)
             callProfileManagerCompletionHandlers(.success(manager))
 
-            if !onceSentEnvironment.sended(analyticsDisabled: profileStorage.externalAnalyticsDisabled) {
+            if onceSentEnvironment.needSend(analyticsDisabled: profileStorage.externalAnalyticsDisabled) {
                 manager.getProfile { _ in }
             }
             return
@@ -265,7 +265,7 @@ extension Adapty {
     private func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
         let environmentMeta = Environment.Meta(includedAnalyticIds: !analyticsDisabled)
-        
+
         httpSession.performCreateProfileRequest(
             profileId: profileId,
             customerUserId: customerUserId,
@@ -291,9 +291,7 @@ extension Adapty {
                 storage.setSyncedTransactions(false)
                 storage.setProfile(profile)
 
-                self.syncTransactions(refreshReceiptIfEmpty: false) { result in
-                    completion(.success((try? result.get()) ?? profile))
-                }
+                completion(.success(profile))
             }
         }
     }

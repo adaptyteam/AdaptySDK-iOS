@@ -194,7 +194,7 @@ private extension AdaptyProfileManager {
                 return
             }
 
-            strongSelf._fetchSegmentId {
+            strongSelf.fetchSegmentId {
                 if let error = $0 {
                     completion(.failure(error))
                     return
@@ -213,7 +213,7 @@ private extension AdaptyProfileManager {
         }
     }
 
-    private func _fetchSegmentId(_ completion: @escaping AdaptyErrorCompletion) {
+    private func fetchSegmentId(_ completion: @escaping AdaptyErrorCompletion) {
         manager.httpSession.performFetchProfileRequest(profileId: profileId, responseHash: profile.hash) { [weak self] result in
             completion(result
                 .do {

@@ -103,7 +103,7 @@ final class EventsManager {
             guard let self, let session = self.backendSession, !self.sending else { return }
 
             self.sending = true
-            self._sendEvents(session) { [weak self] error in
+            self.sendEvents(session) { [weak self] error in
                 guard let self else { return }
 
                 var retryAt: DispatchTime?
@@ -126,8 +126,8 @@ final class EventsManager {
         }
     }
 
-    func _sendEvents(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
-        _updateBackendConfigurationIfNeed(session) { [weak self] error in
+    func sendEvents(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
+        updateBackendConfigurationIfNeed(session) { [weak self] error in
 
             if let error {
                 completion(error)
@@ -164,7 +164,7 @@ final class EventsManager {
         }
     }
 
-    func _updateBackendConfigurationIfNeed(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
+    func updateBackendConfigurationIfNeed(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
         guard configuration.isExpired else {
             completion(nil)
             return

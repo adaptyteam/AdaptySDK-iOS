@@ -94,7 +94,7 @@ private extension AdaptyUI.ViewConfiguration.RichText {
 }
 
 private extension AdaptyUI.ViewConfiguration.TextAttributes {
-    func _add(
+    func add(
         _ other: AdaptyUI.ViewConfiguration.TextAttributes?
     ) -> AdaptyUI.ViewConfiguration.TextAttributes {
         guard let other else { return self }
@@ -118,7 +118,7 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
         case .none:
             other
         case let .some(value):
-            value._add(other)
+            value.add(other)
         }
     }
 

@@ -34,32 +34,15 @@ final class AdaptyProfileManager {
         }
         Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
     }
-
-    enum SendedEnvironment {
-        case dont
-        case withIdfa
-        case withoutIdfa
-
-        func sended(analyticsDisabled: Bool) -> Bool {
-            switch self {
-            case .dont:
-                false
-            case .withIdfa:
-                true
-            case .withoutIdfa:
-                analyticsDisabled ? true : false
-            }
-        }
-    }
 }
 
 extension AdaptyProfileManager {
     func updateProfileParameters(_ params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
-        _syncProfile(params: params) { completion($0.error) }
+        syncProfile(params: params) { completion($0.error) }
     }
 
     func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        _syncProfile(params: nil) { [weak self] result in
+        syncProfile(params: nil) { [weak self] result in
             let out: AdaptyResult<AdaptyProfile>
             defer { completion(out) }
 
@@ -78,42 +61,31 @@ extension AdaptyProfileManager {
         }
     }
 
-    private func _syncProfile(params: AdaptyProfileParameters?, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        let analyticsDisabled: Bool = (params?.analyticsDisabled ?? false) || manager.profileStorage.externalAnalyticsDisabled
-        let environmentMeta: Environment.Meta? =
-            if manager.onceSentEnvironment.sended(analyticsDisabled: analyticsDisabled) {
-                nil
-            } else {
-                Environment.Meta(includedAnalyticIds: !analyticsDisabled)
-            }
+    private func syncProfile(params: AdaptyProfileParameters?, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        let environmentMeta = manager.onceSentEnvironment.getValueIfNeedSend(
+            analyticsDisabled: (params?.analyticsDisabled ?? false) || manager.profileStorage.externalAnalyticsDisabled
+        )
 
         let old = profile.value
-        if params == nil, environmentMeta == nil {
-            manager.httpSession.performFetchProfileRequest(profileId: profileId, responseHash: profile.hash) { [weak self] result in
-                completion(result
-                    .do {
-                        self?.saveResponse($0.flatValue())
+        
+        manager.httpSession.performSyncProfileRequest(
+            profileId: profileId,
+            parameters: params,
+            environmentMeta: environmentMeta,
+            responseHash: profile.hash
+        ) { [weak self] result in
+            completion(result
+                .do {
+                    guard let self , self.isActive else { return }
+                    if let environmentMeta {
+                        self.manager.onceSentEnvironment = environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
                     }
-                    .map {
-                        $0.value ?? old
-                    }
-                )
-            }
-
-        } else {
-            manager.httpSession.performUpdateProfileRequest(profileId: profileId, parameters: params, environmentMeta: environmentMeta, responseHash: profile.hash) { [weak self] result in
-                completion(result
-                    .do {
-                        if let environmentMeta {
-                            self?.manager.onceSentEnvironment = environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
-                        }
-                        self?.saveResponse($0.flatValue())
-                    }
-                    .map {
-                        $0.value ?? old
-                    }
-                )
-            }
+                    self.saveResponse($0.flatValue())
+                }
+                .map {
+                    $0.value ?? old
+                }
+            )
         }
     }
 
