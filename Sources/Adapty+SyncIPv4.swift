@@ -24,7 +24,7 @@ extension Adapty {
                 completion(profileManager.error)
                 return
             }
-            profileManager.updateProfile(params: AdaptyProfileParameters(ipV4Address: ipV4Address), completion)
+            profileManager.updateProfileParameters( AdaptyProfileParameters(ipV4Address: ipV4Address), completion)
         }
     }
 

@@ -32,10 +32,6 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         self.profileId = profileId
         self.parameters = parameters
         self.customerUserId = customerUserId
-        var environmentMeta = environmentMeta
-        if let analyticsDisabled = parameters?.analyticsDisabled {
-            environmentMeta.includedAnalyticIds = !analyticsDisabled
-        }
         self.environmentMeta = environmentMeta
     }
 
@@ -68,34 +64,19 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     }
 }
 
-private extension CreateProfileRequest {
-    init(
-        profileId: String,
-        customerUserId: String?,
-        analyticsDisabled: Bool
-    ) {
-        self.init(
-            profileId: profileId,
-            customerUserId: customerUserId,
-            parameters: AdaptyProfileParameters.Builder()
-                .with(analyticsDisabled: analyticsDisabled)
-                .build(),
-            environmentMeta: Environment.Meta(includedAnalyticIds: !analyticsDisabled)
-        )
-    }
-}
-
 extension HTTPSession {
     func performCreateProfileRequest(
         profileId: String,
         customerUserId: String?,
-        analyticsDisabled: Bool,
+        parameters: AdaptyProfileParameters?,
+        environmentMeta: Environment.Meta,
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
     ) {
         let request = CreateProfileRequest(
             profileId: profileId,
             customerUserId: customerUserId,
-            analyticsDisabled: analyticsDisabled
+            parameters: parameters,
+            environmentMeta: environmentMeta
         )
         perform(
             request,

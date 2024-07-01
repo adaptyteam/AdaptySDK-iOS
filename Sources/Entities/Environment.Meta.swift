@@ -11,12 +11,20 @@ extension Environment {
     struct Meta: Encodable, Sendable {
         let locale: AdaptyLocale
         let timezone: String
-        var includedAnalyticIds: Bool
+        let idfv: String?
+        let idfa: String?
 
         init(includedAnalyticIds: Bool) {
             locale = User.locale
             timezone = System.timezone
-            self.includedAnalyticIds = includedAnalyticIds
+
+            if includedAnalyticIds {
+                idfv = Device.idfv
+                idfa = Device.idfa
+            } else {
+                idfv = nil
+                idfa = nil
+            }
         }
 
         var storeCountry: String? { Device.storeCountry }
@@ -60,10 +68,8 @@ extension Environment {
             try container.encode(System.name, forKey: .sysName)
             try container.encodeIfPresent(locale, forKey: .locale)
             try container.encodeIfPresent(timezone, forKey: .timezone)
-            if includedAnalyticIds {
-                try container.encodeIfPresent(Device.idfv, forKey: .idfv)
-                try container.encodeIfPresent(Device.idfa, forKey: .idfa)
-            }
+            try container.encodeIfPresent(idfv, forKey: .idfv)
+            try container.encodeIfPresent(idfa, forKey: .idfa)
         }
     }
 }

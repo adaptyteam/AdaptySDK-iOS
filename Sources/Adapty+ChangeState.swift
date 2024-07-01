@@ -22,7 +22,7 @@ public final class Adapty {
     let _sk2TransactionManager: Any?
     let sk1QueueManager: SK1QueueManager
     let vendorIdsCache: ProductVendorIdsCache
-    var onceSentEnvironment: Bool = false
+    var onceSentEnvironment: AdaptyProfileManager.SendedEnvironment = .dont
     var state: State
 
     init(
@@ -230,7 +230,7 @@ extension Adapty {
             state = .initialized(manager)
             callProfileManagerCompletionHandlers(.success(manager))
 
-            if !onceSentEnvironment {
+            if !onceSentEnvironment.sended(analyticsDisabled: profileStorage.externalAnalyticsDisabled) {
                 manager.getProfile { _ in }
             }
             return
@@ -263,10 +263,16 @@ extension Adapty {
     }
 
     private func createProfile(_ profileId: String, _ customerUserId: String?, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+        let analyticsDisabled = profileStorage.externalAnalyticsDisabled
+        let environmentMeta = Environment.Meta(includedAnalyticIds: !analyticsDisabled)
+        
         httpSession.performCreateProfileRequest(
             profileId: profileId,
             customerUserId: customerUserId,
-            analyticsDisabled: profileStorage.externalAnalyticsDisabled
+            parameters: AdaptyProfileParameters.Builder()
+                .with(analyticsDisabled: analyticsDisabled)
+                .build(),
+            environmentMeta: environmentMeta
         ) { [weak self] result in
             guard let self else { return }
 
@@ -276,7 +282,7 @@ extension Adapty {
             case let .failure(error):
                 completion(.failure(error))
             case let .success(profile):
-                self.onceSentEnvironment = true
+                self.onceSentEnvironment = environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
 
                 let storage = self.profileStorage
                 if profileId != profile.value.profileId {

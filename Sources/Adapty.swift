@@ -174,7 +174,7 @@ extension Adapty {
                     completion(profileManager.error)
                     return
                 }
-                profileManager.updateProfile(params: params, completion)
+                profileManager.updateProfileParameters(params, completion)
             }
         }
     }

@@ -7,14 +7,6 @@
 
 import Foundation
 
-extension Backend.Request {
-    enum SendEnvironment {
-        case dont
-        case withAnalytics
-        case withoutAnalytics
-    }
-}
-
 private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = AdaptyProfile?
     let endpoint: HTTPEndpoint
@@ -25,30 +17,6 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         createDecoder(jsonDecoder)
-    }
-
-    init(
-        profileId: String,
-        parameters: AdaptyProfileParameters? = nil,
-        sendEnvironmentMeta: Backend.Request.SendEnvironment,
-        responseHash: String?
-    ) {
-        let environmentMeta: Environment.Meta? =
-            switch sendEnvironmentMeta {
-            case .dont:
-                nil
-            case .withAnalytics:
-                Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? false))
-            case .withoutAnalytics:
-                Environment.Meta(includedAnalyticIds: !(parameters?.analyticsDisabled ?? true))
-            }
-
-        self.init(
-            profileId: profileId,
-            parameters: parameters,
-            environmentMeta: environmentMeta,
-            responseHash: responseHash
-        )
     }
 
     init(
@@ -68,17 +36,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 
         self.profileId = profileId
         self.parameters = parameters
-
-        guard let analyticsDisabled = parameters?.analyticsDisabled else {
-            self.environmentMeta = environmentMeta
-            return
-        }
-        if var environmentMeta {
-            environmentMeta.includedAnalyticIds = !analyticsDisabled
-            self.environmentMeta = environmentMeta
-        } else {
-            self.environmentMeta = !analyticsDisabled ? Environment.Meta(includedAnalyticIds: true) : nil
-        }
+        self.environmentMeta = environmentMeta
     }
 
     enum CodingKeys: String, CodingKey {
@@ -114,14 +72,14 @@ extension HTTPSession {
     func performUpdateProfileRequest(
         profileId: String,
         parameters: AdaptyProfileParameters?,
-        sendEnvironmentMeta: Backend.Request.SendEnvironment,
+        environmentMeta: Environment.Meta?,
         responseHash: String?,
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
     ) {
         let request = UpdateProfileRequest(
             profileId: profileId,
             parameters: parameters,
-            sendEnvironmentMeta: sendEnvironmentMeta,
+            environmentMeta: environmentMeta,
             responseHash: responseHash
         )
         perform(request, logName: "update_profile") { (result: UpdateProfileRequest.Result) in

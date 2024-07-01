@@ -138,6 +138,7 @@ enum Environment {
             #endif
         }()
 
+        
         static let idfa: String? = {
             #if !canImport(AdSupport)
                 return nil

@@ -34,15 +34,32 @@ final class AdaptyProfileManager {
         }
         Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
     }
+
+    enum SendedEnvironment {
+        case dont
+        case withIdfa
+        case withoutIdfa
+
+        func sended(analyticsDisabled: Bool) -> Bool {
+            switch self {
+            case .dont:
+                false
+            case .withIdfa:
+                true
+            case .withoutIdfa:
+                analyticsDisabled ? true : false
+            }
+        }
+    }
 }
 
 extension AdaptyProfileManager {
-    func updateProfile(params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
-        _updateProfile(params: params, sendEnvironmentMeta: .dont) { completion($0.error) }
+    func updateProfileParameters(_ params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
+        _syncProfile(params: params) { completion($0.error) }
     }
 
     func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        let completion: AdaptyResultCompletion<AdaptyProfile> = { [weak self] result in
+        _syncProfile(params: nil) { [weak self] result in
             let out: AdaptyResult<AdaptyProfile>
             defer { completion(out) }
 
@@ -56,45 +73,47 @@ extension AdaptyProfileManager {
             }
         }
 
-        guard !manager.onceSentEnvironment else {
-            _getProfile(completion)
-            return
-        }
-        let storage = manager.profileStorage
-        let analyticsDisabled = storage.externalAnalyticsDisabled
-        if !storage.syncedTransactions {
+        if !manager.profileStorage.syncedTransactions {
             manager.syncTransactions(refreshReceiptIfEmpty: true) { _ in }
         }
-
-        _updateProfile(params: nil, sendEnvironmentMeta: analyticsDisabled ? .withoutAnalytics : .withAnalytics, completion)
     }
 
-    private func _updateProfile(params: AdaptyProfileParameters?, sendEnvironmentMeta: Backend.Request.SendEnvironment, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        let old = profile.value
-        manager.httpSession.performUpdateProfileRequest(profileId: profileId, parameters: params, sendEnvironmentMeta: sendEnvironmentMeta, responseHash: profile.hash) { [weak self] result in
-            completion(result
-                .do {
-                    self?.manager.onceSentEnvironment = true
-                    self?.saveResponse($0.flatValue())
-                }
-                .map {
-                    $0.value ?? old
-                }
-            )
-        }
-    }
+    private func _syncProfile(params: AdaptyProfileParameters?, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        let analyticsDisabled: Bool = (params?.analyticsDisabled ?? false) || manager.profileStorage.externalAnalyticsDisabled
+        let environmentMeta: Environment.Meta? =
+            if manager.onceSentEnvironment.sended(analyticsDisabled: analyticsDisabled) {
+                nil
+            } else {
+                Environment.Meta(includedAnalyticIds: !analyticsDisabled)
+            }
 
-    private func _getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
         let old = profile.value
-        manager.httpSession.performFetchProfileRequest(profileId: profileId, responseHash: profile.hash) { [weak self] result in
-            completion(result
-                .do {
-                    self?.saveResponse($0.flatValue())
-                }
-                .map {
-                    $0.value ?? old
-                }
-            )
+        if params == nil, environmentMeta == nil {
+            manager.httpSession.performFetchProfileRequest(profileId: profileId, responseHash: profile.hash) { [weak self] result in
+                completion(result
+                    .do {
+                        self?.saveResponse($0.flatValue())
+                    }
+                    .map {
+                        $0.value ?? old
+                    }
+                )
+            }
+
+        } else {
+            manager.httpSession.performUpdateProfileRequest(profileId: profileId, parameters: params, environmentMeta: environmentMeta, responseHash: profile.hash) { [weak self] result in
+                completion(result
+                    .do {
+                        if let environmentMeta {
+                            self?.manager.onceSentEnvironment = environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
+                        }
+                        self?.saveResponse($0.flatValue())
+                    }
+                    .map {
+                        $0.value ?? old
+                    }
+                )
+            }
         }
     }
 
