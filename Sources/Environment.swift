@@ -24,6 +24,10 @@ import Foundation
     import WebKit
 #endif
 
+#if canImport(AppTrackingTransparency)
+    import AppTrackingTransparency
+#endif
+
 import StoreKit
 
 enum Environment {
@@ -140,7 +144,7 @@ enum Environment {
 
         static var currentIdfa: String?
         static var idfa: String? {
-            #if !canImport(AdSupport)
+            #if !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
                 return nil
             #else
                 guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
@@ -148,22 +152,53 @@ enum Environment {
                 if let currentIdfa { return currentIdfa }
 
                 // Get and return IDFA
-                currentIdfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+
+                guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
+                    currentIdfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                    return currentIdfa
+                }
+
+                #if canImport(AppTrackingTransparency)
+                    switch ATTrackingManager.trackingAuthorizationStatus {
+                    case .authorized, .restricted, .denied:
+                        let idfa = ASIdentifierManager.shared().advertisingIdentifier
+                        currentIdfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                    default:
+                        currentIdfa = nil
+                    }
+                #else
+                    currentIdfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                #endif
 
                 return currentIdfa
 
             #endif
         }
-        
-        static var canGetIdfa: Bool {
-            #if !canImport(AdSupport)
+
+        static var canTakeIdfa: Bool {
+            #if !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
                 return false
             #else
-                return !Adapty.Configuration.idfaCollectionDisabled
+                if Adapty.Configuration.idfaCollectionDisabled {
+                    return false
+                }
+
+                guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
+                    return true
+                }
+
+                #if canImport(AppTrackingTransparency)
+                    switch ATTrackingManager.trackingAuthorizationStatus {
+                    case .restricted, .denied:
+                        return false
+                    default:
+                        return true
+                    }
+                #else
+                    return true
+                #endif
             #endif
         }
-        
-        
 
         static let idfv: String? = {
             #if os(macOS) || targetEnvironment(macCatalyst)

@@ -23,7 +23,7 @@ extension AdaptyProfileManager.SendedEnvironment {
         case .withIdfa:
             false
         case .withoutIdfa:
-            Environment.Device.canGetIdfa && !analyticsDisabled
+            Environment.Device.canTakeIdfa && !analyticsDisabled
         }
     }
 

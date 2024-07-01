@@ -35,39 +35,13 @@ final class LifecycleManager {
 
         subscribeForLifecycleEvents()
         scheduleProfileUpdate(after: Self.profileUpdateInterval)
+        scheduleIDFAUpdate()
 
         SKStorefrontManager.subscribeForUpdates { [weak self] countryCode in
             self?.newStorefrontCountryAvailable = countryCode
         }
 
         initialized = true
-    }
-
-    private var needSyncIdfa: Bool? {
-
-        guard let adapty = Adapty.shared else {
-            // not activated  adapty,  wait
-            return nil
-        }
-        
-        guard let manager = adapty.state.initialized else {
-            // not created profileManager,  wait
-            return nil
-        }
-
-        
-        guard manager.onceSentEnvironment.needSend(analyticsDisabled: adapty.profileStorage.externalAnalyticsDisabled) else {
-            // is synced or disabled take idfa
-            return false
-        }
-
-        guard Environment.Device.idfa != nil else {
-            // idfa not exist, wait
-            return nil
-        }
-
-        // idfa  exist  and
-        return true
     }
 
     private func scheduleProfileUpdate(after delay: TimeInterval) {
@@ -109,7 +83,8 @@ final class LifecycleManager {
     @objc
     private func syncProfile(completion: @escaping (Bool) -> Void) {
         if let profileSyncAt,
-           Date().timeIntervalSince(profileSyncAt) < Self.profileUpdateInterval {
+           Date().timeIntervalSince(profileSyncAt) < Self.profileUpdateInterval
+        {
             completion(false)
             return
         }
@@ -162,5 +137,50 @@ final class LifecycleManager {
                 self?.appOpenedSentAt = Date()
             }
         }
+    }
+
+    // MARK: - IDFA Update Logic
+
+    private static let idfaStatusCheckDuration: TimeInterval = 600.0
+    private static let idfaStatusCheckInterval: Int = 5
+    private var idfaUpdateTimerStartedAt: Date?
+
+    private func scheduleIDFAUpdate() {
+        idfaUpdateTimerStartedAt = Date()
+        idfaUpdateTimerTick()
+    }
+
+    private func idfaUpdateTimerTick() {
+        guard let timerStartedAt = idfaUpdateTimerStartedAt else { return }
+
+        let now = Date()
+        if now.timeIntervalSince1970 - timerStartedAt.timeIntervalSince1970 > Self.idfaStatusCheckDuration {
+            Log.verbose("LifecycleManager: stop IdfaUpdateTimer")
+            return
+        }
+
+        Log.verbose("LifecycleManager: idfaUpdateTimer tick")
+
+        guard let needSyncIdfa = needSyncIdfa else {
+            Self.underlayQueue.asyncAfter(deadline: .now() + .seconds(Self.idfaStatusCheckInterval)) { [weak self] in
+                self?.idfaUpdateTimerTick()
+            }
+            return
+        }
+
+        Log.verbose("LifecycleManager: needSyncIdfa = \(needSyncIdfa)")
+
+        if needSyncIdfa {
+            Adapty.getProfile { _ in }
+        }
+    }
+
+    private var needSyncIdfa: Bool? {
+        guard let adapty = Adapty.shared, let manager = adapty.state.initialized else { return nil }
+        guard manager.onceSentEnvironment.needSend(analyticsDisabled: adapty.profileStorage.externalAnalyticsDisabled) else {
+            return false
+        }
+        guard Environment.Device.idfa != nil else { return nil }
+        return true
     }
 }
