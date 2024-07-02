@@ -43,11 +43,13 @@ extension AdaptyUI.HorizontalAlignment {
             switch layoutDirection {
             case .leftToRight: SwiftUI.HorizontalAlignment.leading
             case .rightToLeft: SwiftUI.HorizontalAlignment.trailing
+            @unknown default: SwiftUI.HorizontalAlignment.leading
             }
         case .right:
             switch layoutDirection {
             case .leftToRight: SwiftUI.HorizontalAlignment.trailing
             case .rightToLeft: SwiftUI.HorizontalAlignment.leading
+            @unknown default: SwiftUI.HorizontalAlignment.trailing
             }
         }
     }

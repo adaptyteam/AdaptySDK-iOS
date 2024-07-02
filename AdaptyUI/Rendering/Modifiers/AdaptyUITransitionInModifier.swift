@@ -30,7 +30,7 @@ extension AdaptyUI.Transition {
             params.interpolator
                 .swiftuiAnimation(duration: params.duration)
                 .delay(params.startDelay)
-        case let .unknown(string):
+        case .unknown:
             nil
         }
     }

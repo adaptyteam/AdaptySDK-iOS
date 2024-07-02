@@ -57,31 +57,31 @@ struct AdaptyUIElementWithoutPropertiesView: View {
                     Spacer()
                 }
             }
-        case let .box(box, properties):
+        case let .box(box, _):
             elementOrEmpty(box.content)
                 .fixedFrame(box: box)
                 .rangedFrame(box: box)
-        case let .stack(stack, properties):
+        case let .stack(stack, _):
             AdaptyUIStackView(stack)
-        case let .text(text, properties):
+        case let .text(text, _):
             AdaptyUITextView(text)
-        case let .image(image, properties):
+        case let .image(image, _):
             AdaptyUIImageView(image)
-        case let .button(button, properties):
+        case let .button(button, _):
             AdaptyUIButtonView(button)
-        case let .row(row, properties):
+        case let .row(row, _):
             AdaptyUIRowView(row)
-        case let .column(column, properties):
+        case let .column(column, _):
             AdaptyUIColumnView(column)
-        case let .section(section, properties):
+        case let .section(section, _):
             AdaptyUISectionView(section)
-        case let .toggle(toggle, properties):
+        case let .toggle(toggle, _):
             AdaptyUIToggleView(toggle)
-        case let .timer(timer, properties):
+        case let .timer(timer, _):
             AdaptyUITimerView(timer)
-        case let .pager(pager, properties):
+        case let .pager(pager, _):
             AdaptyUIPagerView(pager)
-        case let .unknown(value, properties):
+        case let .unknown(value, _):
             AdaptyUIUnknownElementView(value: value)
         }
     }

@@ -141,7 +141,7 @@ struct AdaptyUIPagerView: View {
             stopAutoScroll()
         }
 
-        if let config = pager.animation {
+        if pager.animation != nil {
             withAnimation(.easeInOut(duration: Self.pageControllTapAnimationDuration)) {
                 currentPage = index
             }

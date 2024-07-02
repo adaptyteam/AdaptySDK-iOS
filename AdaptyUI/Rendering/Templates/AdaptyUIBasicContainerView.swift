@@ -129,17 +129,8 @@ struct AdaptyUIBasicContainerView: View {
         coverBox: AdaptyUI.Box,
         globalProxy: GeometryProxy
     ) -> some View {
-        let coverHeight: CGFloat = {
-            if let boxHeight = coverBox.height, case let .fixed(unit) = boxHeight {
-                return unit.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
-            } else {
-                return 0.0
-            }
-        }()
-
         let bottomOverscrollHeight = screenSize.height
         let properties = content.properties
-        let selfHeight = screenSize.height - coverHeight
         let offsetY = properties?.offset.y ?? 0
 
         VStack(spacing: 0) {

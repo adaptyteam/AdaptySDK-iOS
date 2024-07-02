@@ -13,7 +13,7 @@ import SwiftUI
 extension View {
     @ViewBuilder
     func redactedAsPlaceholder(_ flag: Bool) -> some View {
-        if #available(iOS 14.0, *), flag {
+        if flag {
             redacted(reason: .placeholder)
         } else {
             self

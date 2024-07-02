@@ -22,11 +22,13 @@ extension AdaptyUI.HorizontalAlignment {
             switch layoutDirection {
             case .leftToRight: TextAlignment.leading
             case .rightToLeft: TextAlignment.trailing
+            @unknown default: TextAlignment.leading
             }
         case .right:
             switch layoutDirection {
             case .leftToRight: TextAlignment.trailing
             case .rightToLeft: TextAlignment.leading
+            @unknown default: TextAlignment.trailing
             }
         }
     }

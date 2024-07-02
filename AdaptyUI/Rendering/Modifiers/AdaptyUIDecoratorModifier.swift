@@ -16,9 +16,9 @@ extension InsettableShape {
     func fill(filling: AdaptyUI.Filling?) -> some View {
         if let filling {
             switch filling {
-            case .color(let color):
+            case let .color(color):
                 self.fill(color.swiftuiColor)
-            case .colorGradient(let gradient):
+            case let .colorGradient(gradient):
                 self.fill(
                     LinearGradient(
                         stops: gradient.items.map { $0.gradientStop },
@@ -53,7 +53,7 @@ extension InsettableShape {
                         )
                     )
                 }
-            case .image(let imageData):
+            case .image:
                 self
             }
         } else {
