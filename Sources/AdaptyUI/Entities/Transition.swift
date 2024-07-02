@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package enum Transition {
+    package enum Transition: Sendable {
         case fade(TransitionFade)
         case unknown(String)
 
@@ -22,7 +22,7 @@ extension AdaptyUI {
         }
     }
 
-    package struct TransitionFade {
+    package struct TransitionFade: Hashable, Sendable {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultDuration: TimeInterval = 0.3
         static let defaultInterpolator = AdaptyUI.Transition.Interpolator.default
@@ -30,6 +30,17 @@ extension AdaptyUI {
         package let startDelay: TimeInterval
         package let duration: TimeInterval
         package let interpolator: AdaptyUI.Transition.Interpolator
+    }
+}
+
+extension AdaptyUI.Transition: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .fade(value):
+            hasher.combine(value)
+        case let .unknown(value):
+            hasher.combine(value)
+        }
     }
 }
 

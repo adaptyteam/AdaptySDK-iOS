@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Screen {
+    struct Screen: Hashable, Sendable {
         let backgroundAssetId: String?
         let cover: Box?
         let content: Element

@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    enum Element {
+    enum Element: Sendable {
         case reference(String)
         indirect case stack(AdaptyUI.ViewConfiguration.Stack, Properties?)
         case text(AdaptyUI.ViewConfiguration.Text, Properties?)
@@ -28,7 +28,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Element {
-    struct Properties {
+    struct Properties: Hashable, Sendable {
         let elementId: String?
         let decorator: AdaptyUI.ViewConfiguration.Decorator?
         let padding: AdaptyUI.EdgeInsets
@@ -44,6 +44,51 @@ extension AdaptyUI.ViewConfiguration.Element {
                 && offset.isZero
                 && visibility
                 && transitionIn.isEmpty
+        }
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Element: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .reference(value):
+            hasher.combine(value)
+        case let .stack(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .text(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .image(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .button(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .box(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .row(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .column(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .section(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .toggle(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .timer(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .pager(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .unknown(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
         }
     }
 }

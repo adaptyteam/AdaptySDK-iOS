@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct ColorGradient {
+    package struct ColorGradient: Hashable, Sendable {
         package let kind: Kind
         package let start: Point
         package let end: Point
@@ -17,7 +17,7 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.ColorGradient {
-    package struct Item {
+    package struct Item: Hashable, Sendable {
         package let color: AdaptyUI.Color
         package let p: Double
     }
@@ -30,33 +30,33 @@ extension AdaptyUI.ColorGradient {
 }
 
 #if DEBUG
-package extension AdaptyUI.ColorGradient {
-    static func create(
-        kind: AdaptyUI.ColorGradient.Kind,
-        start: AdaptyUI.Point,
-        end: AdaptyUI.Point,
-        items: [AdaptyUI.ColorGradient.Item]
-    )-> Self {
-        .init(
-            kind: kind,
-            start: start,
-            end: end,
-            items: items
-        )
+    package extension AdaptyUI.ColorGradient {
+        static func create(
+            kind: AdaptyUI.ColorGradient.Kind,
+            start: AdaptyUI.Point,
+            end: AdaptyUI.Point,
+            items: [AdaptyUI.ColorGradient.Item]
+        ) -> Self {
+            .init(
+                kind: kind,
+                start: start,
+                end: end,
+                items: items
+            )
+        }
     }
-}
 
-package extension AdaptyUI.ColorGradient.Item {
-    static func create(
-        color: AdaptyUI.Color,
-        p: Double
-    )-> Self {
-        .init(
-            color: color,
-            p: p
-        )
+    package extension AdaptyUI.ColorGradient.Item {
+        static func create(
+            color: AdaptyUI.Color,
+            p: Double
+        ) -> Self {
+            .init(
+                color: color,
+                p: p
+            )
+        }
     }
-}
 #endif
 
 extension AdaptyUI.ColorGradient: Decodable {

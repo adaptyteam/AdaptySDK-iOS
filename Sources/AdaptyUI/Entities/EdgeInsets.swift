@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct EdgeInsets {
+    package struct EdgeInsets: Hashable, Sendable {
         package static let zero = AdaptyUI.EdgeInsets(same: .point(0.0))
         static let defaultValue: AdaptyUI.Unit = .point(0.0)
 

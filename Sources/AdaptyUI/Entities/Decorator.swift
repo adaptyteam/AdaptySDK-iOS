@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Decorator {
+    package struct Decorator: Hashable, Sendable {
         static let defaultShapeType: ShapeType = .rectangle(cornerRadius: CornerRadius.zero)
         package let shapeType: ShapeType
         package let background: Filling?
@@ -17,17 +17,17 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-package extension AdaptyUI.Decorator {
-    static func create(
-        shapeType: AdaptyUI.ShapeType = defaultShapeType,
-        background: AdaptyUI.Filling? = nil,
-        border: AdaptyUI.Border? = nil
-    )-> Self {
-        .init(
-            shapeType: shapeType,
-            background: background,
-            border: border
-        )
+    package extension AdaptyUI.Decorator {
+        static func create(
+            shapeType: AdaptyUI.ShapeType = defaultShapeType,
+            background: AdaptyUI.Filling? = nil,
+            border: AdaptyUI.Border? = nil
+        ) -> Self {
+            .init(
+                shapeType: shapeType,
+                background: background,
+                border: border
+            )
+        }
     }
-}
 #endif

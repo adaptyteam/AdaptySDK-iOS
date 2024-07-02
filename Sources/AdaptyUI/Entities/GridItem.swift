@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct GridItem {
+    package struct GridItem: Hashable, Sendable {
         static let defaultHorizontalAlignment: HorizontalAlignment = .center
         static let defaultVerticalAlignment: VerticalAlignment = .center
 
@@ -17,6 +17,24 @@ extension AdaptyUI {
         package let horizontalAlignment: AdaptyUI.HorizontalAlignment
         package let verticalAlignment: AdaptyUI.VerticalAlignment
         package let content: AdaptyUI.Element
+    }
+}
+
+extension AdaptyUI.GridItem {
+    package enum Length: Sendable {
+        case fixed(AdaptyUI.Unit)
+        case weight(Int)
+    }
+}
+
+extension AdaptyUI.GridItem.Length: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .fixed(value):
+            hasher.combine(value)
+        case let .weight(value):
+            hasher.combine(value)
+        }
     }
 }
 
@@ -37,10 +55,3 @@ extension AdaptyUI {
         }
     }
 #endif
-
-extension AdaptyUI.GridItem {
-    package enum Length {
-        case fixed(AdaptyUI.Unit)
-        case weight(Int)
-    }
-}

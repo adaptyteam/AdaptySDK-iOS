@@ -92,7 +92,7 @@ private extension AdaptyUI.ViewConfiguration.Stack {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Stack.Item {
+private extension AdaptyUI.ViewConfiguration.StackItem {
     var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
         switch self {
         case .space:

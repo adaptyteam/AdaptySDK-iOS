@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Section {
+    struct Section: Hashable, Sendable {
         let id: String
         let index: Int
         let content: [AdaptyUI.ViewConfiguration.Element]

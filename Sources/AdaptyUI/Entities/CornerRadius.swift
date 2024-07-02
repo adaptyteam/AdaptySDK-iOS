@@ -8,13 +8,13 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct CornerRadius {
+    package struct CornerRadius: Hashable, Sendable {
         static let defaultValue: Double = 0.0
         package let topLeading: Double
         package let topTrailing: Double
         package let bottomTrailing: Double
         package let bottomLeading: Double
-        
+
         package init(topLeading: Double, topTrailing: Double, bottomTrailing: Double, bottomLeading: Double) {
             self.topLeading = topLeading
             self.topTrailing = topTrailing

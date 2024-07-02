@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct GridItem {
+    struct GridItem: Hashable, Sendable {
         let length: AdaptyUI.GridItem.Length
         let horizontalAlignment: AdaptyUI.HorizontalAlignment
         let verticalAlignment: AdaptyUI.VerticalAlignment

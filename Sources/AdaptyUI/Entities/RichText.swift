@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct RichText {
+    package struct RichText: Hashable, Sendable {
         static let empty = RichText(items: [], fallback: nil)
 
         package let items: [RichText.Item]
@@ -16,13 +16,13 @@ extension AdaptyUI {
 
         package var isEmpty: Bool { items.isEmpty }
 
-        package enum Item {
+        package enum Item: Sendable {
             case text(String, TextAttributes)
             case tag(String, TextAttributes)
             case image(AdaptyUI.ImageData?, TextAttributes)
         }
 
-        package struct TextAttributes {
+        package struct TextAttributes: Hashable, Sendable {
             package let font: AdaptyUI.Font
             package let size: Double
             package let txtColor: AdaptyUI.ColorFilling
@@ -30,6 +30,20 @@ extension AdaptyUI {
             package let background: AdaptyUI.ColorFilling?
             package let strike: Bool
             package let underline: Bool
+        }
+    }
+}
+
+extension AdaptyUI.RichText.Item: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .text(value, attr),
+             let .tag(value, attr):
+            hasher.combine(value)
+            hasher.combine(attr)
+        case let .image(value, attr):
+            hasher.combine(value)
+            hasher.combine(attr)
         }
     }
 }

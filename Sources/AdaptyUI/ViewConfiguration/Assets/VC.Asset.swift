@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    enum Asset {
+    enum Asset: Sendable {
         case filling(AdaptyUI.Filling)
         case font(AdaptyUI.Font)
         case unknown(String?)
@@ -61,6 +61,19 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "font")
         }
         return value
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Asset: Hashable {
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .filling(value):
+            hasher.combine(value)
+        case let .font(value):
+            hasher.combine(value)
+        case let .unknown(value):
+            hasher.combine(value)
+        }
     }
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 
 package extension AdaptyUI {
-    enum Filling {
+    enum Filling: Sendable {
         static let `default` = Filling.color(Color.black)
 
         case color(AdaptyUI.Color)
@@ -45,7 +45,7 @@ package extension AdaptyUI {
         }
     }
 
-    enum ColorFilling {
+    enum ColorFilling: Sendable {
         static let `default` = Filling.color(Color.black)
 
         case color(AdaptyUI.Color)
@@ -70,6 +70,30 @@ package extension AdaptyUI {
             case let .color(value): .color(value)
             case let .colorGradient(value): .colorGradient(value)
             }
+        }
+    }
+}
+
+extension AdaptyUI.Filling: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .color(value):
+            hasher.combine(value)
+        case let .colorGradient(value):
+            hasher.combine(value)
+        case let .image(value):
+            hasher.combine(value)
+        }
+    }
+}
+
+extension AdaptyUI.ColorFilling: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .color(value):
+            hasher.combine(value)
+        case let .colorGradient(value):
+            hasher.combine(value)
         }
     }
 }

@@ -9,29 +9,27 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Stack {
+    struct Stack: Hashable, Sendable {
         let type: AdaptyUI.StackType
         let horizontalAlignment: AdaptyUI.HorizontalAlignment
         let verticalAlignment: AdaptyUI.VerticalAlignment
         let spacing: Double
-        let items: [Item]
+        let items: [StackItem]
     }
-}
 
-extension AdaptyUI.ViewConfiguration.Stack {
-    enum Item {
+    enum StackItem: Sendable {
         case space(Int)
         case element(AdaptyUI.ViewConfiguration.Element)
     }
 }
 
 extension AdaptyUI.ViewConfiguration.Localizer {
-    private func element(_ from: AdaptyUI.ViewConfiguration.Stack.Item) throws -> AdaptyUI.Element {
+    private func stackItem(_ from: AdaptyUI.ViewConfiguration.StackItem) throws -> AdaptyUI.StackItem {
         switch from {
         case let .space(value):
             .space(value)
         case let .element(value):
-            try element(value)
+            try .element(element(value))
         }
     }
 
@@ -41,8 +39,19 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
             spacing: from.spacing,
-            content: from.items.map(element)
+            items: from.items.map(stackItem)
         )
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.StackItem: Hashable {
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .space(value):
+            hasher.combine(value)
+        case let .element(value):
+            hasher.combine(value)
+        }
     }
 }
 
@@ -63,12 +72,12 @@ extension AdaptyUI.ViewConfiguration.Stack: Decodable {
             horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
-            items: container.decode([AdaptyUI.ViewConfiguration.Stack.Item].self, forKey: .content)
+            items: container.decode([AdaptyUI.ViewConfiguration.StackItem].self, forKey: .content)
         )
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Stack.Item: Decodable {
+extension AdaptyUI.ViewConfiguration.StackItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case count
@@ -91,7 +100,6 @@ extension AdaptyUI.ViewConfiguration.Stack.Item: Decodable {
         case .space:
             self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
         }
-
     }
 }
 

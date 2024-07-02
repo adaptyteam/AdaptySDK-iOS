@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Box {
+    struct Box: Hashable, Sendable {
         let width: AdaptyUI.Box.Length?
         let height: AdaptyUI.Box.Length?
         let horizontalAlignment: AdaptyUI.HorizontalAlignment

@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    enum Action {
+    enum Action: Sendable {
         case openUrl(String)
         case action(AdaptyUI.ActionAction)
     }
@@ -22,6 +22,17 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             .openUrl(urlIfPresent(stringId))
         case let .action(action):
             action
+        }
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Action: Hashable {
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .openUrl(value):
+            hasher.combine(value)
+        case let .action(value):
+            hasher.combine(value)
         }
     }
 }

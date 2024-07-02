@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Font {
+    package struct Font: Hashable, Sendable {
         package static let `default` = Font(
             alias: "adapty_system",
             familyName: "adapty_system",
@@ -75,7 +75,7 @@ extension AdaptyUI.Font: Decodable {
         italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? AdaptyUI.Font.default.italic
 
         defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? AdaptyUI.Font.default.defaultSize
-  
+
         defaultColor = try container.decodeIfPresent(AdaptyUI.Color.self, forKey: .defaultColor).map { .color($0) } ?? AdaptyUI.Font.default.defaultColor
     }
 }

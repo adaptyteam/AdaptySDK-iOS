@@ -83,8 +83,8 @@ struct AdaptyUIRowView: View {
                 },
                 spacing: 0.0,
                 content: {
-                    ForEach(0 ..< row.items.count, id: \.self) { idx in
-                        AdaptyUIElementView(row.items[idx].content)
+                    ForEach(row.items, id: \.self) {
+                        AdaptyUIElementView($0.content)
                     }
                 }
             )

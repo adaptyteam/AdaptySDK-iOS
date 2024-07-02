@@ -9,14 +9,14 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    enum StringId {
+    enum StringId: Sendable {
         case basic(String)
         case product(Product)
     }
 }
 
 extension AdaptyUI.ViewConfiguration.StringId {
-    struct Product {
+    struct Product: Hashable, Sendable {
         static let defaultProductGroupId = "group_A"
         let adaptyProductId: String?
         let productGroupId: String?
@@ -46,6 +46,17 @@ extension AdaptyUI.ViewConfiguration.StringId {
             } else {
                 "PRODUCT_\(mode)"
             }
+        }
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.StringId: Hashable {
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .basic(value):
+            hasher.combine(value)
+        case let .product(value):
+            hasher.combine(value)
         }
     }
 }

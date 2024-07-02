@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct LazyLocalisedProductText {
+    package struct LazyLocalisedProductText: Hashable, Sendable {
         package let adaptyProductId: String
         private let suffix: String?
         private let localizer: ViewConfiguration.Localizer
@@ -39,7 +39,7 @@ extension AdaptyUI {
         }
     }
 
-    package struct LazyLocalisedUnknownProductText {
+    package struct LazyLocalisedUnknownProductText: Hashable, Sendable {
         package let productGroupId: String
         private let suffix: String?
         private let localizer: ViewConfiguration.Localizer

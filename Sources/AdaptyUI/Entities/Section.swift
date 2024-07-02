@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Section {
+    package struct Section: Hashable, Sendable {
         package let id: String
         package let index: Int
         package let content: [Element]

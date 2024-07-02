@@ -201,14 +201,14 @@ struct AdaptyUIPagerView: View {
                 - pagePaddingBottom
 
             let hPadding = (proxy.size.width - width) / 2.0
-
+            let pages = pager.content
             HStack(spacing: pager.spacing) {
-                ForEach(0 ..< pager.content.count, id: \.self) { idx in
-                    AdaptyUIElementView(pager.content[idx])
+                ForEach(0 ..< pages.count, id: \.self) { idx in
+                    AdaptyUIElementView(pages[idx])
                         .frame(width: width, height: height)
                         .clipped()
                         .padding(.leading, idx == 0 ? hPadding : 0)
-                        .padding(.trailing, idx == pager.content.count - 1 ? hPadding : 0)
+                        .padding(.trailing, idx == pages.count - 1 ? hPadding : 0)
                 }
             }
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)

@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Column {
+    struct Column: Hashable, Sendable {
         let spacing: Double
         let items: [GridItem]
     }

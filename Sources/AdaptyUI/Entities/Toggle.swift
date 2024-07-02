@@ -1,6 +1,6 @@
 //
 //  Toggle.swift
-//
+//  AdaptyUI
 //
 //  Created by Aleksei Valiano on 30.05.2024
 //
@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Toggle {
+    package struct Toggle: Hashable, Sendable {
         package let onActions: [ActionAction]
         package let offActions: [ActionAction]
         package let onCondition: StateCondition
