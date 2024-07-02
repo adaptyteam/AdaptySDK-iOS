@@ -10,7 +10,6 @@ import Foundation
 
 extension AdaptyUI.ViewConfiguration {
     enum Element {
-        case space(Int)
         case reference(String)
         indirect case stack(AdaptyUI.ViewConfiguration.Stack, Properties?)
         case text(AdaptyUI.ViewConfiguration.Text, Properties?)
@@ -52,8 +51,6 @@ extension AdaptyUI.ViewConfiguration.Element {
 extension AdaptyUI.ViewConfiguration.Localizer {
     func element(_ from: AdaptyUI.ViewConfiguration.Element) throws -> AdaptyUI.Element {
         switch from {
-        case let .space(value):
-            .space(value)
         case let .reference(id):
             try reference(id)
         case let .stack(value, properties):
@@ -108,7 +105,6 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         case image
         case button
         case box
-        case space
         case vStack = "v_stack"
         case hStack = "h_stack"
         case zStack = "z_stack"
@@ -136,8 +132,6 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
             self = try AdaptyUI.ViewConfiguration.If(from: decoder).content
         case .reference:
             self = try .reference(container.decode(String.self, forKey: .elementId))
-        case .space:
-            self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
         case .box:
             self = try .box(AdaptyUI.ViewConfiguration.Box(from: decoder), propertyOrNil())
         case .vStack, .hStack, .zStack:
