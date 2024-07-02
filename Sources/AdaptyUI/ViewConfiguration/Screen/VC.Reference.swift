@@ -44,7 +44,7 @@ private extension AdaptyUI.ViewConfiguration.Button {
 private extension AdaptyUI.ViewConfiguration.Element {
     var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
         switch self {
-        case .space, .reference: []
+        case .reference: []
         case let .stack(value, properties):
             value.referencedElemnts + (properties?.referencedElemnts(self) ?? [])
         case let .text(value, properties):
@@ -88,7 +88,18 @@ private extension AdaptyUI.ViewConfiguration.Box {
 
 private extension AdaptyUI.ViewConfiguration.Stack {
     var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
-        content.flatMap { $0.referencedElemnts }
+        items.flatMap { $0.referencedElemnts }
+    }
+}
+
+private extension AdaptyUI.ViewConfiguration.StackItem {
+    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+        switch self {
+        case .space:
+            []
+        case let .element(value):
+            value.referencedElemnts
+        }
     }
 }
 

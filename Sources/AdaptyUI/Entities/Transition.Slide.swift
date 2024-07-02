@@ -8,13 +8,13 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct TransitionSlide {
+    package struct TransitionSlide: Hashable, Sendable {
         static let `default` = AdaptyUI.TransitionSlide(
             startDelay: 0.0,
             duration: 0.3,
             interpolator: AdaptyUI.Transition.Interpolator.default
         )
-        
+
         package let startDelay: TimeInterval
         package let duration: TimeInterval
         package let interpolator: AdaptyUI.Transition.Interpolator
@@ -36,8 +36,6 @@ extension AdaptyUI {
         }
     }
 #endif
-
-
 
 extension AdaptyUI.TransitionSlide: Decodable {
     enum CodingKeys: String, CodingKey {

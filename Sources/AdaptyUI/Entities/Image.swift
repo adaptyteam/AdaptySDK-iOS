@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Image {
+    package struct Image: Hashable, Sendable {
         static let defaultAspectRatio = AspectRatio.fit
 
         package let asset: ImageData

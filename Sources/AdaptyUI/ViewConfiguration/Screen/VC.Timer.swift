@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Timer {
+    struct Timer: Hashable, Sendable {
         let id: String
         let state: AdaptyUI.Timer.State
         let format: [Item]
@@ -16,7 +16,7 @@ extension AdaptyUI.ViewConfiguration {
         let horizontalAlign: AdaptyUI.HorizontalAlignment
         let defaultTextAttributes: TextAttributes?
 
-        struct Item {
+        struct Item: Hashable, Sendable {
             let from: TimeInterval
             let stringId: String
         }
@@ -100,12 +100,12 @@ extension AdaptyUI.ViewConfiguration.Timer: Decodable {
             }
 
         actions =
-        if let action = try? container.decodeIfPresent(AdaptyUI.ViewConfiguration.Action.self, forKey: .actions) {
-            [action]
-        } else {
-            try container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .actions) ?? []
-        }
-        
+            if let action = try? container.decodeIfPresent(AdaptyUI.ViewConfiguration.Action.self, forKey: .actions) {
+                [action]
+            } else {
+                try container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .actions) ?? []
+            }
+
         horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         let textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes

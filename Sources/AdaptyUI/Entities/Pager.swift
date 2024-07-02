@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Pager {
+    package struct Pager: Hashable, Sendable {
         static let `default` = Pager(
             pageWidth: .default,
             pageHeight: .default,
@@ -33,7 +33,7 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.Pager {
-    package enum Length {
+    package enum Length: Sendable {
         static let `default` = Length.parent(1)
         case fixed(AdaptyUI.Unit)
         case parent(Double)
@@ -46,7 +46,7 @@ extension AdaptyUI.Pager {
         case pauseAnimation
     }
 
-    package struct PageControl {
+    package struct PageControl: Hashable, Sendable {
         static let `default`: Self = .init(
             layout: .stacked,
             verticalAlignment: .bottom,
@@ -71,7 +71,7 @@ extension AdaptyUI.Pager {
         package let selectedColor: AdaptyUI.Color
     }
 
-    package struct Animation {
+    package struct Animation: Hashable, Sendable {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultAfterInteractionDelay: TimeInterval = 3.0
 
@@ -79,6 +79,17 @@ extension AdaptyUI.Pager {
         package let pageTransition: AdaptyUI.TransitionSlide
         package let repeatTransition: AdaptyUI.TransitionSlide?
         package let afterInteractionDelay: TimeInterval
+    }
+}
+
+extension AdaptyUI.Pager.Length: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .fixed(value):
+            hasher.combine(value)
+        case let .parent(value):
+            hasher.combine(value)
+        }
     }
 }
 

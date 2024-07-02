@@ -9,8 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    enum Element {
-        case space(Int)
+    enum Element: Sendable {
         case reference(String)
         indirect case stack(AdaptyUI.ViewConfiguration.Stack, Properties?)
         case text(AdaptyUI.ViewConfiguration.Text, Properties?)
@@ -29,7 +28,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Element {
-    struct Properties {
+    struct Properties: Hashable, Sendable {
         let elementId: String?
         let decorator: AdaptyUI.ViewConfiguration.Decorator?
         let padding: AdaptyUI.EdgeInsets
@@ -49,11 +48,54 @@ extension AdaptyUI.ViewConfiguration.Element {
     }
 }
 
+extension AdaptyUI.ViewConfiguration.Element: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .reference(value):
+            hasher.combine(value)
+        case let .stack(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .text(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .image(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .button(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .box(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .row(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .column(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .section(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .toggle(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .timer(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .pager(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .unknown(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        }
+    }
+}
+
 extension AdaptyUI.ViewConfiguration.Localizer {
     func element(_ from: AdaptyUI.ViewConfiguration.Element) throws -> AdaptyUI.Element {
         switch from {
-        case let .space(value):
-            .space(value)
         case let .reference(id):
             try reference(id)
         case let .stack(value, properties):
@@ -108,7 +150,6 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
         case image
         case button
         case box
-        case space
         case vStack = "v_stack"
         case hStack = "h_stack"
         case zStack = "z_stack"
@@ -136,8 +177,6 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
             self = try AdaptyUI.ViewConfiguration.If(from: decoder).content
         case .reference:
             self = try .reference(container.decode(String.self, forKey: .elementId))
-        case .space:
-            self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
         case .box:
             self = try .box(AdaptyUI.ViewConfiguration.Box(from: decoder), propertyOrNil())
         case .vStack, .hStack, .zStack:

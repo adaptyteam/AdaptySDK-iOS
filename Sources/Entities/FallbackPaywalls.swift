@@ -8,7 +8,6 @@
 import Foundation
 
 struct FallbackPaywalls {
-    fileprivate static var currentFormatVersion = 5
 
     private let fileURL: URL
     private let head: Head
@@ -69,15 +68,15 @@ extension FallbackPaywalls {
 
             formatVersion = try container.decode(Int.self, forKey: .formatVersion)
 
-            guard formatVersion == FallbackPaywalls.currentFormatVersion else {
-                let error = formatVersion < FallbackPaywalls.currentFormatVersion
+            guard formatVersion == Adapty.fallbackFormatVersion else {
+                let error = formatVersion < Adapty.fallbackFormatVersion
                     ? "The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard."
                     : "The fallback paywalls version is not correct. Please update the AdaptySDK."
                 Log.error(error)
 
                 Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
                     "in_version": .value(formatVersion),
-                    "expected_version": .value(FallbackPaywalls.currentFormatVersion),
+                    "expected_version": .value(Adapty.fallbackFormatVersion),
                 ]))
 
                 throw AdaptyError.wrongVersionFallback(error)

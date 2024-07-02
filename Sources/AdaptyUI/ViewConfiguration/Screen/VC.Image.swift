@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Image {
+    struct Image: Hashable, Sendable {
         let assetId: String
         let aspect: AdaptyUI.AspectRatio
         let tintAssetId: String?

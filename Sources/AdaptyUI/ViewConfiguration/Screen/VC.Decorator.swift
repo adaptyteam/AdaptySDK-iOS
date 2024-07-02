@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Decorator {
+    struct Decorator: Hashable, Sendable {
         let shapeType: AdaptyUI.ShapeType
         let backgroundAssetId: String?
         let borderAssetId: String?

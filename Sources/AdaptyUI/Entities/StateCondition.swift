@@ -8,9 +8,22 @@
 import Foundation
 
 extension AdaptyUI {
-    package enum StateCondition {
+    package enum StateCondition: Sendable {
         case selectedSection(id: String, index: Int)
         case selectedProduct(id: String, groupId: String)
+    }
+}
+
+extension AdaptyUI.StateCondition: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .selectedSection(id, index):
+            hasher.combine(id)
+            hasher.combine(index)
+        case let .selectedProduct(id, groupId):
+            hasher.combine(id)
+            hasher.combine(groupId)
+        }
     }
 }
 

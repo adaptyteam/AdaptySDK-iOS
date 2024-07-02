@@ -8,21 +8,18 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Localization {
+    struct Localization: Hashable, Sendable {
         let id: AdaptyLocale
         let isRightToLeft: Bool?
         let strings: [String: Item]?
         let assets: [String: Asset]?
 
-        struct Item {
+        struct Item: Hashable, Sendable {
             let value: RichText
             let fallback: RichText?
         }
-        
-       
     }
 }
-
 
 extension AdaptyUI.ViewConfiguration.Localization: Decodable {
     enum CodingKeys: String, CodingKey {

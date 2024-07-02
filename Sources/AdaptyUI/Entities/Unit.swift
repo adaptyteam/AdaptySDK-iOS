@@ -8,14 +8,25 @@
 import Foundation
 
 extension AdaptyUI {
-    package enum Unit {
+    package enum Unit: Sendable {
         case point(Double)
         case screen(Double)
         case safeArea(SafeArea)
     }
 }
 
-extension AdaptyUI.Unit {
+extension AdaptyUI.Unit: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .point(value):
+            hasher.combine(value)
+        case let .screen(value):
+            hasher.combine(value)
+        case let .safeArea(value):
+            hasher.combine(value)
+        }
+    }
+
     var isZero: Bool {
         switch self {
         case let .point(value), let .screen(value):

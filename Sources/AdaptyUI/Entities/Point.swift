@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Point {
+    package struct Point: Hashable, Sendable {
         package let x: Double
         package let y: Double
     }

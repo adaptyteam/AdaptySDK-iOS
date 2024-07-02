@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Screen {
+    package struct Screen: Hashable, Sendable {
         static let defaultBackground: AdaptyUI.Filling = .color(AdaptyUI.Color.black)
 
         package let background: AdaptyUI.Filling

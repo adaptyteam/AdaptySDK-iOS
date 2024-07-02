@@ -85,8 +85,8 @@ struct AdaptyUIColumnView: View {
                 },
                 spacing: 0.0,
                 content: {
-                    ForEach(0 ..< column.items.count, id: \.self) { idx in
-                        AdaptyUIElementView(column.items[idx].content)
+                    ForEach(column.items, id: \.self) {
+                        AdaptyUIElementView($0.content)
                     }
                 }
             )

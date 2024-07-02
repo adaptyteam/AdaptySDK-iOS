@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct TextAttributes {
+    struct TextAttributes: Hashable, Sendable {
         let fontAssetId: String?
         let size: Double?
         let txtColorAssetId: String?
@@ -29,12 +29,12 @@ extension AdaptyUI.ViewConfiguration {
         }
     }
 
-    struct RichText {
+    struct RichText: Hashable, Sendable {
         let items: [RichText.Item]
 
         var isEmpty: Bool { items.isEmpty }
 
-        enum Item {
+        enum Item: Sendable {
             case text(String, TextAttributes?)
             case tag(String, TextAttributes?)
             case image(String, TextAttributes?)
@@ -136,6 +136,20 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
             strike: attr?.strike ?? false,
             underline: attr?.underline ?? false
         )
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.RichText.Item: Hashable {
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .text(value, attr),
+             let .tag(value, attr),
+             let .image(value, attr):
+            hasher.combine(value)
+            hasher.combine(attr)
+        case .unknown:
+            break
+        }
     }
 }
 

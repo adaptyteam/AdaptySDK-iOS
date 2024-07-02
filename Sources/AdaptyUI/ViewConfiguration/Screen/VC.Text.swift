@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Text {
+    struct Text: Hashable, Sendable {
         let stringId: StringId
         let horizontalAlign: AdaptyUI.HorizontalAlignment
         let maxRows: Int?

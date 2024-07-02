@@ -8,7 +8,8 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    class Localizer {
+    final class Localizer: @unchecked Sendable {
+        let id = UUID()
         let localization: Localization?
         let source: AdaptyUI.ViewConfiguration
         let locale: AdaptyLocale
@@ -19,6 +20,16 @@ extension AdaptyUI.ViewConfiguration {
             self.localization = source.getLocalization(withLocale)
             self.locale = self.localization?.id ?? withLocale
         }
+    }
+}
+
+extension AdaptyUI.ViewConfiguration.Localizer: Hashable {
+    static func == (lhs: AdaptyUI.ViewConfiguration.Localizer, rhs: AdaptyUI.ViewConfiguration.Localizer) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 
@@ -39,7 +50,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 }
 
 extension AdaptyUI {
-    package enum LocalizerError: Swift.Error {
+    package enum LocalizerError: Swift.Error, Sendable {
         case notFoundAsset(String)
         case wrongTypeAsset(String, expected: String)
 

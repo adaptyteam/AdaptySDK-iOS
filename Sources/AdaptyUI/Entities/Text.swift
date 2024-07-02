@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Text {
+    package struct Text: Hashable, Sendable {
         static let `default` = AdaptyUI.Text(
             value: .text(.empty),
             horizontalAlign: .leading,
@@ -18,14 +18,27 @@ extension AdaptyUI {
         )
 
         package let value: Value
-        package let horizontalAlign: AdaptyUI.HorizontalAlignment
+        package let horizontalAlign: HorizontalAlignment
         package let maxRows: Int?
         package let overflowMode: Set<OverflowMode>
 
-        package enum Value {
+        package enum Value: Sendable {
             case text(RichText)
-            case productText(AdaptyUI.LazyLocalisedProductText)
-            case selectedProductText(AdaptyUI.LazyLocalisedUnknownProductText)
+            case productText(LazyLocalisedProductText)
+            case selectedProductText(LazyLocalisedUnknownProductText)
+        }
+    }
+}
+
+extension AdaptyUI.Text.Value: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .text(value):
+            hasher.combine(value)
+        case let .productText(value):
+            hasher.combine(value)
+        case let .selectedProductText(value):
+            hasher.combine(value)
         }
     }
 }

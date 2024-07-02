@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    public struct LocalizedViewConfiguration {
+    public struct LocalizedViewConfiguration: Hashable, Sendable {
         public let id: String
         public let locale: String
         public let isRightToLeft: Bool

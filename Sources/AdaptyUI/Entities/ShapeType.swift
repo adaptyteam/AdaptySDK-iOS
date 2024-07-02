@@ -8,11 +8,22 @@
 import Foundation
 
 extension AdaptyUI {
-    package enum ShapeType {
+    package enum ShapeType: Sendable {
         case rectangle(cornerRadius: CornerRadius)
         case circle
         case curveUp
         case curveDown
+    }
+}
+
+extension AdaptyUI.ShapeType: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .rectangle(value):
+            hasher.combine(value)
+        case .circle, .curveUp, .curveDown:
+            break
+        }
     }
 }
 

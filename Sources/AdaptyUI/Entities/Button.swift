@@ -8,10 +8,10 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Button {
+    package struct Button: Hashable, Sendable {
         package let actions: [ActionAction]
-        package let normalState: AdaptyUI.Element
-        package let selectedState: AdaptyUI.Element?
+        package let normalState: Element
+        package let selectedState: Element?
         package let selectedCondition: StateCondition?
     }
 }

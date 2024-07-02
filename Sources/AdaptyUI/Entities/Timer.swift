@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Timer {
+    package struct Timer: Hashable, Sendable {
         package let id: String
         package let state: State
         package let format: [Item]
@@ -35,7 +35,7 @@ extension AdaptyUI {
             self.horizontalAlign = horizontalAlign
         }
 
-        package enum State {
+        package enum State: Sendable {
             case endedAt(Date)
             case duration(TimeInterval, start: StartBehaviour)
         }
@@ -48,9 +48,21 @@ extension AdaptyUI {
             case custom
         }
 
-        package struct Item {
+        package struct Item: Hashable, Sendable {
             package let from: TimeInterval
             package let value: RichText
+        }
+    }
+}
+
+extension AdaptyUI.Timer.State: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        switch self {
+        case let .endedAt(value):
+            hasher.combine(value)
+        case let .duration(value, start):
+            hasher.combine(value)
+            hasher.combine(start)
         }
     }
 }
