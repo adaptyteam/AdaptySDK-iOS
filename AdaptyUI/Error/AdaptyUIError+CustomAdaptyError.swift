@@ -10,8 +10,8 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-extension AdaptyError {
-    public static let AdaptyUIErrorDomain = "AdaptyUIErrorDomain"
+public extension AdaptyError {
+    static let AdaptyUIErrorDomain = "AdaptyUIErrorDomain"
 }
 
 @available(iOS 15.0, *)
@@ -29,6 +29,10 @@ extension AdaptyUIError: CustomAdaptyError {
 
     public var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
+        case .adaptyNotActivated, .adaptyUINotActivated:
+            return AdaptyError.ErrorCode.notActivated
+        case .activateOnce:
+            return AdaptyError.ErrorCode.activateOnceError
         case .encoding:
             return AdaptyError.ErrorCode.encodingFailed
         case .unsupportedTemplate:
@@ -56,18 +60,24 @@ extension AdaptyUIError: CustomAdaptyError {
 
     public var description: String {
         switch self {
+        case .adaptyNotActivated:
+            "You should activate Adapty SDK before using AdaptyUI"
+        case .adaptyUINotActivated:
+            "You should activate AdaptyUI SDK before using methods"
+        case .activateOnce:
+            "You should activate AdaptyUI SDK only once"
         case let .encoding(error):
-            return "AdaptyUIError.encoding(\(error.localizedDescription))"
+            "AdaptyUIError.encoding(\(error.localizedDescription))"
         case let .unsupportedTemplate(description):
-            return "AdaptyUIError.unsupportedTemplate(\(description))"
+            "AdaptyUIError.unsupportedTemplate(\(description))"
         case let .styleNotFound(description):
-            return "AdaptyUIError.styleNotFound(\(description))"
+            "AdaptyUIError.styleNotFound(\(description))"
         case let .wrongComponentType(description):
-            return "AdaptyUIError.wrongComponentType(\(description))"
+            "AdaptyUIError.wrongComponentType(\(description))"
         case let .componentNotFound(description):
-            return "AdaptyUIError.componentNotFound(\(description))"
+            "AdaptyUIError.componentNotFound(\(description))"
         case let .rendering(error):
-            return "AdaptyUIError.rendering(\(error.localizedDescription))"
+            "AdaptyUIError.rendering(\(error.localizedDescription))"
         }
     }
 }

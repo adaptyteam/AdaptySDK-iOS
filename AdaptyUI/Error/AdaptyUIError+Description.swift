@@ -12,6 +12,9 @@ import Foundation
 extension AdaptyUIError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
+        case .adaptyNotActivated: return "You should activate Adapty SDK before using AdaptyUI"
+        case .adaptyUINotActivated: return "You should activate AdaptyUI SDK before using methods"
+        case .activateOnce: return "You should activate AdaptyUI SDK only once"
         case let .unsupportedTemplate(description): return description
         case let .styleNotFound(description): return description
         case let .wrongComponentType(description): return description

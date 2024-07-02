@@ -54,11 +54,14 @@ extension AdaptyUI {
         currentCacheConfiguration = configuration
     }
 
-    public static func clearMediaCache() {
+    /// Clears the memory storage and the disk storage of this cache. This is an async operation.
+    /// - Parameter completion: A closure which is invoked when the cache clearing operation finishes.
+    ///                      This `handler` will be called from the main queue.
+    public static func clearMediaCache(completion: (() -> Void)? = nil) {
         AdaptyUI.writeLog(level: .verbose, message: "#AdaptyMediaCache# clearMediaCache")
 
         imageCache.clearMemoryCache()
-        imageCache.clearDiskCache()
+        imageCache.clearDiskCache(completion: completion)
     }
 }
 

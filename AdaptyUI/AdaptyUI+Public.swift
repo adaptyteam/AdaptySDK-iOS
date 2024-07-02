@@ -166,14 +166,41 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
 
 @available(iOS 15.0, *)
 public extension AdaptyUI {
+    private static var isActivated: Bool = false
+    private static let underlayQueue = DispatchQueue(label: "AdaptyUI.Main")
+
     /// Use this method to initialize the AdaptyUI SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)` right after `Adapty.activate()`.
     ///
     /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
-    static func activate(configuration: Configuration = .default) {
-        AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration)
-        ImageUrlPrefetcher.shared.initialize()
+    static func activate(
+        configuration: Configuration = .default,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        underlayQueue.async {
+            if AdaptyUI.isActivated {
+                let err = AdaptyUIError.activateOnceError
+                AdaptyUI.writeLog(level: .warn, message: "AdaptyUI activate error: \(err)")
+                completion?(err)
+                return
+            }
+
+            if !Adapty.isActivated {
+                let err = AdaptyUIError.adaptyNotActivatedError
+                AdaptyUI.writeLog(level: .error, message: "AdaptyUI activate error: \(err)")
+                completion?(err)
+                return
+            }
+
+            AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration)
+            ImageUrlPrefetcher.shared.initialize()
+
+            AdaptyUI.isActivated = true
+            AdaptyUI.writeLog(level: .info, message: "AdaptyUI activated with \(configuration)")
+
+            completion?(nil)
+        }
     }
 
     /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
@@ -187,6 +214,13 @@ public extension AdaptyUI {
         loadTimeout: TimeInterval = 5.0,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
     ) {
+        if !AdaptyUI.isActivated {
+            let err = AdaptyUIError.adaptyNotActivatedError
+            AdaptyUI.writeLog(level: .error, message: "AdaptyUI getViewConfiguration error: \(err)")
+            completion(.failure(err))
+            return
+        }
+        
         Adapty.getViewConfiguration(
             paywall: paywall,
             loadTimeout: loadTimeout,
@@ -212,8 +246,14 @@ public extension AdaptyUI {
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         showDebugOverlay: Bool = false
-    ) -> AdaptyPaywallController {
-        AdaptyPaywallController(
+    ) throws -> AdaptyPaywallController {
+        if !AdaptyUI.isActivated {
+            let err = AdaptyUIError.adaptyNotActivatedError
+            AdaptyUI.writeLog(level: .error, message: "AdaptyUI paywallController(for:) error: \(err)")
+            throw err
+        }
+        
+        return AdaptyPaywallController(
             paywall: paywall,
             products: products,
             introductoryOffersEligibilities: introductoryOffersEligibilities,
