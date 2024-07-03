@@ -11,7 +11,7 @@ extension AdaptyUI {
     package enum ImageData: Sendable {
         case raster(Data)
         case url(URL, previewRaster: Data?)
-        case resorces(String)
+        case resources(String)
     }
 }
 
@@ -23,7 +23,7 @@ extension AdaptyUI.ImageData: Hashable {
         case let .url(url, previewRaster: value):
             hasher.combine(url)
             hasher.combine(value)
-        case let .resorces(value):
+        case let .resources(value):
             hasher.combine(value)
         }
     }

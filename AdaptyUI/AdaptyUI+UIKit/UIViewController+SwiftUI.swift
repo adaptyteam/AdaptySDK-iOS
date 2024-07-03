@@ -34,7 +34,7 @@ extension UIViewController {
         /// Add the SwiftUI view to the view controller view hierarchy.
         view.addSubview(hostingController.view)
 
-        /// Setup the contraints to update the SwiftUI view boundaries.
+        /// Setup the constraints to update the SwiftUI view boundaries.
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         hostingController.view.backgroundColor = .clear
 

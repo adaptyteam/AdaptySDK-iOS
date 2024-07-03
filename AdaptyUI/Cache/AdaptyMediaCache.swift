@@ -84,7 +84,7 @@ extension AdaptyUI {
         func extractedImageUrls(_ urls: Set<URL>) {
             let logId = AdaptyUI.generateLogId()
 
-            AdaptyUI.writeLog(level: .verbose, message: "#ImageUrlPrefetcher# chacheImagesIfNeeded: \(urls) [\(logId)]")
+            AdaptyUI.writeLog(level: .verbose, message: "#ImageUrlPrefetcher# cacheImagesIfNeeded: \(urls) [\(logId)]")
 
             let prefetcher = ImagePrefetcher(
                 sources: urls.map { .network($0) },
@@ -93,7 +93,7 @@ extension AdaptyUI {
                     .downloader(imageDownloader),
                 ],
                 completionHandler: { skipped, failed, completed in
-                    AdaptyUI.writeLog(level: .verbose, message: "#ImageUrlPrefetcher# chacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
+                    AdaptyUI.writeLog(level: .verbose, message: "#ImageUrlPrefetcher# cacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
                 }
             )
 

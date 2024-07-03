@@ -71,7 +71,7 @@ struct AdaptyUIImageView: View {
 
     var body: some View {
         switch asset {
-        case let .resorces(name):
+        case let .resources(name):
             rasterImage(UIImage(named: name), tint: tint)
         case let .raster(data):
             rasterImage(UIImage(data: data), tint: tint)

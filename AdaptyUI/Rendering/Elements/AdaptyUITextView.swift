@@ -121,7 +121,7 @@ extension AdaptyUI.ImageData {
         switch self {
         case let .raster(data):
             UIImage(data: data)
-        case let .resorces(value):
+        case let .resources(value):
             UIImage(named: value)
         default:
             nil

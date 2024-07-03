@@ -196,7 +196,7 @@ package class AdaptyProductsViewModel: ObservableObject {
 
     // MARK: Actions
 
-    func purchaseSelectedProduct(fromGgoupId groupId: String) {
+    func purchaseSelectedProduct(fromGroupId groupId: String) {
         guard let productId = selectedProductId(by: groupId) else { return }
         purchaseProduct(id: productId)
     }

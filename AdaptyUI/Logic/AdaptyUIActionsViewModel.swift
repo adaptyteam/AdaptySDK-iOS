@@ -18,16 +18,11 @@ package class AdaptyUIActionsViewModel: ObservableObject {
         self.eventsHandler = eventsHandler
     }
 
-//    func actionOccured(_ action: AdaptyUI.Action) {
-//        eventsHandler.log(.verbose, "actionOccured \(action)")
-//        onActionOccured?(action)
-//    }
-//    
-    func closeActionOccured() {
+    func closeActionOccurred() {
         eventsHandler.event_didPerformAction(.close)
     }
     
-    func openUrlActionOccured(url urlString: String?) {
+    func openUrlActionOccurred(url urlString: String?) {
         guard let urlString, let url = URL(string: urlString) else {
             eventsHandler.log(.warn, "can't parse url: \(urlString ?? "null")")
             return
@@ -35,7 +30,7 @@ package class AdaptyUIActionsViewModel: ObservableObject {
         eventsHandler.event_didPerformAction(.openURL(url: url))
     }
     
-    func customActionOccured(id: String) {
+    func customActionOccurred(id: String) {
         eventsHandler.event_didPerformAction(.custom(id: id))
     }
 }
