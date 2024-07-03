@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AdaptyCrossPlatformCommon'
-  s.version          = '3.0.0-SNAPSHOT'
+  s.version          = '3.0.0-beta.1'
   s.summary          = 'Common files for cross-platform SDKs Adapty'
 
   s.description      = <<-DESC
