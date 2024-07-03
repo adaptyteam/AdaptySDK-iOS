@@ -14,7 +14,7 @@ extension Adapty {
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
     ) {
         Adapty.async(completion) { manager, completion in
-            manager.getViewConfiguration1(
+            manager.getViewConfiguration(
                 paywall: paywall,
                 loadTimeout: loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval,
                 completion
@@ -22,21 +22,7 @@ extension Adapty {
         }
     }
 
-    private func getFallbackViewConfiguration(
-        paywallInstanceIdentity: String,
-        locale: AdaptyLocale,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
-    ) {
-        httpFallbackSession.performFetchFallbackViewConfigurationRequest(
-            apiKeyPrefix: apiKeyPrefix,
-            paywallInstanceIdentity: paywallInstanceIdentity,
-            locale: locale,
-            disableServerCache: profileStorage.getProfile()?.value.isTestUser ?? false,
-            completion
-        )
-    }
-
-    private func getViewConfiguration1(
+    private func getViewConfiguration(
         paywall: AdaptyPaywall,
         loadTimeout: DispatchTimeInterval,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
@@ -76,6 +62,20 @@ extension Adapty {
                 )
             }
         }
+    }
+
+    private func getFallbackViewConfiguration(
+        paywallInstanceIdentity: String,
+        locale: AdaptyLocale,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
+    ) {
+        httpFallbackSession.performFetchFallbackViewConfigurationRequest(
+            apiKeyPrefix: apiKeyPrefix,
+            paywallInstanceIdentity: paywallInstanceIdentity,
+            locale: locale,
+            disableServerCache: profileStorage.getProfile()?.value.isTestUser ?? false,
+            completion
+        )
     }
 
     private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {

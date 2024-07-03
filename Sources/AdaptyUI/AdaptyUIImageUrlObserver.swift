@@ -21,13 +21,6 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyResult<AdaptyUI.ViewConfiguration> {
-    func sendImageUrlsToObserver() {
-        guard case let .success(value) = self else { return }
-        value.sendImageUrlsToObserver()
-    }
-}
-
 extension AdaptyUI.ViewConfiguration {
     func sendImageUrlsToObserver() {
         guard let observer = AdaptyUI.imageUrlObserver else { return }
@@ -37,5 +30,14 @@ extension AdaptyUI.ViewConfiguration {
         (AdaptyUI.dispatchQueue ?? .main).async {
             observer.extractedImageUrls(urls)
         }
+    }
+}
+
+extension AdaptyPaywall {
+    func sendImageUrlsToObserver() {
+        guard let viewConfiguration,
+              case let .data(value) = viewConfiguration
+        else { return }
+        value.sendImageUrlsToObserver()
     }
 }
