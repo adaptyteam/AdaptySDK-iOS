@@ -167,7 +167,6 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
 @available(iOS 15.0, *)
 public extension AdaptyUI {
     private static var isActivated: Bool = false
-    private static let underlayQueue = DispatchQueue(label: "AdaptyUI.Main")
 
     /// Use this method to initialize the AdaptyUI SDK.
     ///
@@ -178,7 +177,7 @@ public extension AdaptyUI {
         configuration: Configuration = .default,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        underlayQueue.async {
+        Adapty.underlayQueue.async {
             if AdaptyUI.isActivated {
                 let err = AdaptyUIError.activateOnceError
                 AdaptyUI.writeLog(level: .warn, message: "AdaptyUI activate error: \(err)")
@@ -207,7 +206,7 @@ public extension AdaptyUI {
     ///
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
-    ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exeeds.
+    ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exceeds.
     ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
     static func getViewConfiguration(
         forPaywall paywall: AdaptyPaywall,

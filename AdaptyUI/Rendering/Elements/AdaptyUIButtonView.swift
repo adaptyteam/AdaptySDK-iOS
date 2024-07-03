@@ -105,7 +105,7 @@ extension AdaptyUI.ActionAction {
         case let .unselectProduct(groupId):
             productsViewModel.unselectProduct(forGroupId: groupId)
         case let .purchaseSelectedProduct(groupId):
-            productsViewModel.purchaseSelectedProduct(fromGgoupId: groupId)
+            productsViewModel.purchaseSelectedProduct(fromGroupId: groupId)
         case let .purchaseProduct(productId):
             productsViewModel.purchaseProduct(id: productId)
         case .restore:
@@ -117,15 +117,15 @@ extension AdaptyUI.ActionAction {
         case .closeScreen:
             screensViewModel.dismissScreen(id: screenId)
         case .close:
-            actionsViewModel.closeActionOccured()
+            actionsViewModel.closeActionOccurred()
         case let .openUrl(url):
-            actionsViewModel.openUrlActionOccured(url: url)
+            actionsViewModel.openUrlActionOccurred(url: url)
         case let .custom(id):
             switch id {
             case "$adapty_reload_data":
                 paywallViewModel.reloadData()
             default:
-                actionsViewModel.customActionOccured(id: id)
+                actionsViewModel.customActionOccurred(id: id)
             }
         }
     }

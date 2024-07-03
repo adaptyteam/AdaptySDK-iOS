@@ -8,7 +8,7 @@
 import Foundation
 
 extension Adapty {
-    static let underlayQueue = DispatchQueue(label: "AdaptySDK.Main")
+    package static let underlayQueue = DispatchQueue(label: "AdaptySDK.Main")
     static var dispatchQueue: DispatchQueue?
 
     @inline(__always)

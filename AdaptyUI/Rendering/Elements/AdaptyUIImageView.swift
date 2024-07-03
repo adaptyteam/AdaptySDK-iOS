@@ -71,22 +71,24 @@ struct AdaptyUIImageView: View {
 
     var body: some View {
         switch asset {
-        case let .resorces(name):
+        case let .resources(name):
             rasterImage(UIImage(named: name), tint: tint)
         case let .raster(data):
             rasterImage(UIImage(data: data), tint: tint)
         case let .url(url, preview):
+            
             KFImage
                 .url(url)
                 .resizable()
-                .placeholder {
+                .aspectRatio(aspect)
+                .background {
                     if let preview {
-                        rasterImage(UIImage(data: preview), tint: tint)
+                        let image = UIImage(data: preview)
+                        rasterImage(image, tint: tint)
                     } else {
                         EmptyView()
                     }
                 }
-                .aspectRatio(aspect)
         }
     }
 }
