@@ -14,12 +14,11 @@
 		7455E4E129881CB400F97FEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7455E4DF29881CB400F97FEF /* Main.storyboard */; };
 		7455E4E329881CB400F97FEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7455E4E229881CB400F97FEF /* Assets.xcassets */; };
 		7455E4E629881CB400F97FEF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7455E4E429881CB400F97FEF /* LaunchScreen.storyboard */; };
-		7455E4F129881CFD00F97FEF /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7455E4F029881CFD00F97FEF /* AdaptyUI */; };
 		747602032B18B1A900801629 /* UIViewController+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747602022B18B1A900801629 /* UIViewController+SwiftUI.swift */; };
 		747602072B18B1D900801629 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747602062B18B1D900801629 /* MainView.swift */; };
 		747602092B18B33A00801629 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 747602082B18B33A00801629 /* MainViewModel.swift */; };
-		74C06E1F2BDBED2D0073BD12 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 74C06E1E2BDBED2D0073BD12 /* Adapty */; };
-		74C06E212BDBED2E0073BD12 /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 74C06E202BDBED2E0073BD12 /* AdaptyUI */; };
+		74D700AE2C35B31B001B40FE /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 74D700AD2C35B31B001B40FE /* Adapty */; };
+		74D700B02C35B31B001B40FE /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 74D700AF2C35B31B001B40FE /* AdaptyUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,9 +45,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74C06E212BDBED2E0073BD12 /* AdaptyUI in Frameworks */,
-				7455E4F129881CFD00F97FEF /* AdaptyUI in Frameworks */,
-				74C06E1F2BDBED2D0073BD12 /* Adapty in Frameworks */,
+				74D700AE2C35B31B001B40FE /* Adapty in Frameworks */,
+				74D700B02C35B31B001B40FE /* AdaptyUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,9 +128,8 @@
 			);
 			name = AdaptyUIDemo;
 			packageProductDependencies = (
-				7455E4F029881CFD00F97FEF /* AdaptyUI */,
-				74C06E1E2BDBED2D0073BD12 /* Adapty */,
-				74C06E202BDBED2E0073BD12 /* AdaptyUI */,
+				74D700AD2C35B31B001B40FE /* Adapty */,
+				74D700AF2C35B31B001B40FE /* AdaptyUI */,
 			);
 			productName = AdaptyUIDemo;
 			productReference = 7455E4D629881CB400F97FEF /* AdaptyUIDemo.app */;
@@ -165,7 +162,7 @@
 			);
 			mainGroup = 7455E4CD29881CB400F97FEF;
 			packageReferences = (
-				74C06E1D2BDBED2D0073BD12 /* XCLocalSwiftPackageReference "../.." */,
+				74D700AC2C35B31B001B40FE /* XCLocalSwiftPackageReference "../.." */,
 			);
 			productRefGroup = 7455E4D729881CB400F97FEF /* Products */;
 			projectDirPath = "";
@@ -353,7 +350,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KGK5UKQJ46;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AdaptyUIDemo/Info.plist;
@@ -367,7 +363,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 2.11.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adapty.adaptyuidemoapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -387,7 +383,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KGK5UKQJ46;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AdaptyUIDemo/Info.plist;
@@ -401,7 +396,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 2.11.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.adapty.adaptyuidemoapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -438,22 +433,18 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		74C06E1D2BDBED2D0073BD12 /* XCLocalSwiftPackageReference "../.." */ = {
+		74D700AC2C35B31B001B40FE /* XCLocalSwiftPackageReference "../.." */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../..;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7455E4F029881CFD00F97FEF /* AdaptyUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AdaptyUI;
-		};
-		74C06E1E2BDBED2D0073BD12 /* Adapty */ = {
+		74D700AD2C35B31B001B40FE /* Adapty */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Adapty;
 		};
-		74C06E202BDBED2E0073BD12 /* AdaptyUI */ = {
+		74D700AF2C35B31B001B40FE /* AdaptyUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AdaptyUI;
 		};

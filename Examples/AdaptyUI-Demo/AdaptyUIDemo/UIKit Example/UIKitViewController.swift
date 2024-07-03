@@ -23,7 +23,7 @@ class UIKitViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        textField.text = "test_alexey"
+
         spinner.isHidden = true
         updatePaywallData()
     }
@@ -74,7 +74,7 @@ class UIKitViewController: UIViewController {
     private func presentPaywall(_ paywall: AdaptyPaywall,
                                 products: [AdaptyPaywallProduct]?,
                                 viewConfiguration: AdaptyUI.LocalizedViewConfiguration) {
-        let vc = AdaptyUI.paywallController(
+        guard let vc = try? AdaptyUI.paywallController(
             for: paywall,
             products: products,
             viewConfiguration: viewConfiguration,
@@ -82,7 +82,7 @@ class UIKitViewController: UIViewController {
             tagResolver: [
                 "USERNAME": "John",
             ]
-        )
+        ) else { return }
 
         vc.modalPresentationStyle = .overCurrentContext
 
