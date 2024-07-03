@@ -167,7 +167,6 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
 @available(iOS 15.0, *)
 public extension AdaptyUI {
     private static var isActivated: Bool = false
-    private static let underlayQueue = DispatchQueue(label: "AdaptyUI.Main")
 
     /// Use this method to initialize the AdaptyUI SDK.
     ///
@@ -178,7 +177,7 @@ public extension AdaptyUI {
         configuration: Configuration = .default,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        underlayQueue.async {
+        Adapty.underlayQueue.async {
             if AdaptyUI.isActivated {
                 let err = AdaptyUIError.activateOnceError
                 AdaptyUI.writeLog(level: .warn, message: "AdaptyUI activate error: \(err)")
