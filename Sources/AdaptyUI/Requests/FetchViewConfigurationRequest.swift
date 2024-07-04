@@ -13,8 +13,9 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
     let headers: Headers
+    let queryItems: QueryItems
 
-    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, adaptyUISDKVersion: String) {
+    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, adaptyUISDKVersion: String, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
@@ -24,6 +25,8 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
             .setViewConfigurationLocale(locale)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setAdaptyUISDKVersion(adaptyUISDKVersion)
+
+        queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
@@ -33,6 +36,7 @@ extension HTTPSession {
         paywallVariationId: String,
         locale: AdaptyLocale,
         adaptyUISDKVersion: String,
+        disableServerCache: Bool,
         _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
     ) {
         let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
@@ -42,13 +46,17 @@ extension HTTPSession {
             paywallVariationId: paywallVariationId,
             locale: locale,
             md5Hash: md5Hash,
-            adaptyUISDKVersion: adaptyUISDKVersion
+            adaptyUISDKVersion: adaptyUISDKVersion,
+            disableServerCache: disableServerCache
         )
 
         perform(
             request,
             logName: "get_paywall_builder",
-            logParams: ["variation_id": .value(paywallVariationId)]
+            logParams: [
+                "variation_id": .value(paywallVariationId),
+                "disable_server_cache": .value(disableServerCache),
+            ]
         ) { (result: FetchViewConfigurationRequest.Result) in
             switch result {
             case let .failure(error):

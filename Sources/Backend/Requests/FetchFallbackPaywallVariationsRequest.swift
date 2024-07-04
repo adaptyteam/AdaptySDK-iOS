@@ -13,18 +13,21 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
     let endpoint: HTTPEndpoint
     let profileId: String
     let cached: AdaptyPaywall?
+    let queryItems: QueryItems
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
         createDecoder(jsonDecoder, profileId, cached)
     }
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, cached: AdaptyPaywall?) {
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, cached: AdaptyPaywall?, disableServerCache: Bool) {
         self.profileId = profileId
         self.cached = cached
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyUI.builderVersion)/fallback.json"
         )
+
+        queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
@@ -35,6 +38,7 @@ extension HTTPSession {
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
+        disableServerCache: Bool,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
     ) {
         let request = FetchFallbackPaywallVariationsRequest(
@@ -42,7 +46,8 @@ extension HTTPSession {
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            cached: cached
+            cached: cached,
+            disableServerCache: disableServerCache
         )
 
         perform(
@@ -53,6 +58,7 @@ extension HTTPSession {
                 "placement_id": .value(placementId),
                 "language_code": .valueOrNil(locale.languageCode),
                 "builder_version": .value(AdaptyUI.builderVersion),
+                "disable_server_cache": .value(disableServerCache),
             ]
         ) { [weak self] (result: FetchFallbackPaywallVariationsRequest.Result) in
             switch result {
@@ -75,6 +81,7 @@ extension HTTPSession {
                         placementId: placementId,
                         locale: .defaultPaywallLocale,
                         cached: cached,
+                        disableServerCache: disableServerCache,
                         completion
                     )
                 }

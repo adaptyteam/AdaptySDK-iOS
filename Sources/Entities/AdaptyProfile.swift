@@ -15,6 +15,7 @@ public struct AdaptyProfile {
     public let customerUserId: String?
 
     let segmentId: String
+    let isTestUser: Bool
 
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
@@ -38,6 +39,7 @@ extension AdaptyProfile: Equatable {
         lhs.profileId == rhs.profileId
             && lhs.customerUserId == rhs.customerUserId
             && lhs.segmentId == rhs.segmentId
+            && lhs.isTestUser == rhs.isTestUser
             && lhs.codableCustomAttributes == rhs.codableCustomAttributes
             && lhs.accessLevels == rhs.accessLevels
             && lhs.subscriptions == rhs.subscriptions
@@ -50,6 +52,7 @@ extension AdaptyProfile: CustomStringConvertible {
         "(profileId: \(profileId), "
             + (customerUserId.map { "customerUserId: \($0), " } ?? "")
             + "segmentId: \(segmentId), "
+            + "segmentId: \(segmentId), isTestuser: \(isTestUser), "
             + (codableCustomAttributes == nil ? "" : "customAttributes: \(customAttributes), ")
             + "accessLevels: \(accessLevels), subscriptions: \(subscriptions), nonSubscriptions: \(nonSubscriptions))"
     }
@@ -68,6 +71,7 @@ extension AdaptyProfile: Codable {
         case nonSubscriptions = "non_subscriptions"
         case version = "timestamp"
 
+        case isTestUser = "is_test_user"
         case attributes
     }
 
@@ -80,6 +84,7 @@ extension AdaptyProfile: Codable {
         profileId = try container.decode(String.self, forKey: .profileId)
         customerUserId = try container.decodeIfPresent(String.self, forKey: .customerUserId)
         segmentId = try container.decode(String.self, forKey: .segmentId)
+        isTestUser = try container.decodeIfPresent(Bool.self, forKey: .isTestUser) ?? false
         version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
         codableCustomAttributes = try container.decodeIfPresent(AdaptyProfile.CustomAttributes.self, forKey: .customAttributes)
         customAttributes = codableCustomAttributes?.convertToSimpleDictionary() ?? [:]
@@ -93,6 +98,7 @@ extension AdaptyProfile: Codable {
         try container.encode(profileId, forKey: .profileId)
         try container.encodeIfPresent(customerUserId, forKey: .customerUserId)
         try container.encode(segmentId, forKey: .segmentId)
+        try container.encode(isTestUser, forKey: .isTestUser)
         try container.encode(version, forKey: .version)
         try container.encodeIfPresent(codableCustomAttributes, forKey: .customAttributes)
         if !accessLevels.isEmpty {

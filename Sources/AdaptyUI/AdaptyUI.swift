@@ -55,6 +55,7 @@ extension Adapty {
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
             locale: locale,
+            disableServerCache: profileStorage.getProfile()?.value.isTestUser ?? false,
             completion
         )
     }
@@ -151,6 +152,7 @@ extension Adapty {
             paywallVariationId: paywallVariationId,
             locale: locale,
             adaptyUISDKVersion: adaptyUISDKVersion,
+            disableServerCache: self.profileStorage.getProfile()?.value.isTestUser ?? false,
             termination
         )
 

@@ -114,7 +114,8 @@ extension Adapty {
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            cached: nil
+            cached: nil,
+            disableServerCache: false // don't loaded profile
         ) { (result: AdaptyResult<AdaptyPaywallChosen>) in
             completion(
                 result
@@ -163,7 +164,8 @@ private extension AdaptyProfileManager {
             placementId: placementId,
             locale: locale,
             segmentId: segmentId,
-            cached: cached
+            cached: cached,
+            disableServerCache: profile.value.isTestUser
         ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
 
             guard let strongSelf = self, strongSelf.isActive else {
@@ -233,7 +235,8 @@ private extension AdaptyProfileManager {
             profileId: profileId,
             placementId: placementId,
             locale: locale,
-            cached: cached
+            cached: cached,
+            disableServerCache: profile.value.isTestUser
         ) { [weak self] (result: AdaptyResult<AdaptyPaywallChosen>) in
 
             switch result {
