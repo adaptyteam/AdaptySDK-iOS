@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AdaptyUI'
-  s.version          = '3.0.0-SNAPSHOT'
+  s.version          = '3.0.1-SNAPSHOT'
   s.summary          = 'Adapty SDK for iOS.'
 
   s.description      = <<-DESC
@@ -38,5 +38,5 @@ AdaptyUI is an extension for AdaptySDK.
   s.pod_target_xcconfig = {
     'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk'
   }
-  
+
 end

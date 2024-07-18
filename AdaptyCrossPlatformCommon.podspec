@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'AdaptyCrossPlatformCommon'
-  s.version          = '3.0.0-SNAPSHOT'
+  s.version          = '3.0.1-SNAPSHOT'
   s.summary          = 'Common files for cross-platform SDKs Adapty'
 
   s.description      = <<-DESC
@@ -23,11 +23,11 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.author           = { 'Adapty' => 'contact@adapty.io' }
   s.source           = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
   s.documentation_url = "https://docs.adapty.io"
-  
+
   s.ios.deployment_target = '12.2'
   s.osx.deployment_target = '10.14.4'
   s.visionos.deployment_target = '1.0'
-  
+
   s.swift_version = '5.9'
 
   s.source_files = 'CrossPlatformCommon/**/*.{h,m,mm,swift}'
@@ -39,5 +39,5 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.pod_target_xcconfig = {
     'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk'
   }
-  
+
 end

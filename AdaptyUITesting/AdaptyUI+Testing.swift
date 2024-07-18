@@ -12,6 +12,7 @@ import AdaptyUI
 import Foundation
 import SwiftUI
 
+#if DEBUG
 public extension AdaptyUI.LocalizedViewConfiguration {
     static func createTest(
         templateId: String = "basic",
@@ -111,6 +112,7 @@ public extension AdaptyUI.LocalizedViewConfiguration {
         )
     }
 }
+#endif
 
 @available(iOS 15.0, *)
 public enum AdaptyUIPreviewRenderingMode: String, CaseIterable {
@@ -182,4 +184,3 @@ public extension View {
 }
 
 #endif
-
