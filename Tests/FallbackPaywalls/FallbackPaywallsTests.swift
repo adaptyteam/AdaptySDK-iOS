@@ -10,8 +10,7 @@ import XCTest
 
 final class FallbackPaywallsTests: XCTestCase {
     enum Json: String {
-        case fallback_serialized = "fallbacks1.json"
-        case fallback = "fallbacks2.json"
+        case fallback = "fallbacks.json"
 
         var url: URL {
             let thisSourceFile = URL(fileURLWithPath: #file)
@@ -21,26 +20,36 @@ final class FallbackPaywallsTests: XCTestCase {
     }
 
     let paywallsIds = [
-        "access.or.subscribe",
-        "accesss",
-        "all-onboarding",
-        "anna-stage-ui-pm-a",
-        "davyd_test_cdn",
-        "example_ab_test",
-        "fonts_migration",
-        "meets.or.access",
-        "meets.subscrubes",
-        "mopnthly-onboarding",
-        "new_placement",
-        "oboarding.access",
-        "onboarding",
-        "onboarding-multiply",
-        "onboarding-workout",
-        "promo",
-        "settings",
+        "test_sergey",
+        "mazda",
+        "VGPM240212-2",
+        "test_anna_bani",
+        "sergey-placement",
+        "VGP240212-1",
         "test_alexey",
-        "weekly-onboarding",
-        "yealy-onboarding",
+        "evgeniy28",
+        "example_ab_test",
+        "vlad",
+        "ilia",
+        "test_mykola",
+        "VGP240214-1",
+        "test_kir",
+        "gk-place-1",
+        "test_anton_2",
+        "test_anna",
+        "vitaly-test-builder",
+        "x2",
+        "volkswagen",
+        "new-placement",
+        "test_anna_gani",
+        "test_anton",
+        "VGP23122801",
+        "x3",
+        "VGP240201",
+        "VGP240131",
+        "migration_test",
+        "vlad1",
+        "3",
     ]
 
     func test(fileURL url: URL, paywallsId: String) throws {
@@ -73,10 +82,6 @@ final class FallbackPaywallsTests: XCTestCase {
 
             XCTAssertNotNil(paywall)
         }
-    }
-
-    func testFallback_serialized() throws {
-        try test(fileURL: Json.fallback_serialized.url, paywallsIds: paywallsIds)
     }
 
     func testFallback() throws {
