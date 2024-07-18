@@ -12,7 +12,7 @@ import StoreKit
 #endif
 
 extension Adapty {
-    package static var isActivated: Bool { shared != nil }
+    public static var isActivated: Bool { shared != nil }
 
     static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
 
