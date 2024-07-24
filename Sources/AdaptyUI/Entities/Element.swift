@@ -13,6 +13,7 @@ extension AdaptyUI {
         indirect case stack(AdaptyUI.Stack, Properties?)
         case text(AdaptyUI.Text, Properties?)
         case image(AdaptyUI.Image, Properties?)
+        case video(AdaptyUI.VideoPlayer, Properties?)
         indirect case button(AdaptyUI.Button, Properties?)
         indirect case box(AdaptyUI.Box, Properties?)
         indirect case row(AdaptyUI.Row, Properties?)
@@ -53,6 +54,9 @@ extension AdaptyUI.Element: Hashable {
             hasher.combine(value)
             hasher.combine(properties)
         case let .image(value, properties):
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .video(value, properties):
             hasher.combine(value)
             hasher.combine(properties)
         case let .button(value, properties):

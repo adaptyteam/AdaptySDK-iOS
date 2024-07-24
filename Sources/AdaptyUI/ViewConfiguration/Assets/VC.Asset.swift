@@ -10,6 +10,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     enum Asset: Sendable {
         case filling(AdaptyUI.Filling)
+        case video(AdaptyUI.VideoData)
         case font(AdaptyUI.Font)
         case unknown(String?)
     }
@@ -56,6 +57,14 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 
     @inlinable
+    func videoData(_ assetId: String) throws -> AdaptyUI.VideoData {
+        guard case let .video(value) = try asset(assetId) else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "video")
+        }
+        return value
+    }
+    
+    @inlinable
     func font(_ assetId: String) throws -> AdaptyUI.Font {
         guard case let .font(value) = try asset(assetId) else {
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "font")
@@ -68,6 +77,8 @@ extension AdaptyUI.ViewConfiguration.Asset: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .filling(value):
+            hasher.combine(value)
+        case let .video(value):
             hasher.combine(value)
         case let .font(value):
             hasher.combine(value)
@@ -86,6 +97,7 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
 
     enum ContentType: String, Codable {
         case color
+        case video
         case image
         case font
         case colorLinearGradient = "linear-gradient"
@@ -109,6 +121,8 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
             self = try .filling(.colorGradient(AdaptyUI.ColorGradient(from: decoder)))
         case .font:
             self = try .font(AdaptyUI.Font(from: decoder))
+        case .video:
+            self = try .video(AdaptyUI.VideoData(from: decoder))
         case .image:
             self = try .filling(.image(AdaptyUI.ImageData(from: decoder)))
         default:

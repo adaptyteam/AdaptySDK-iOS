@@ -12,7 +12,6 @@ extension AdaptyPaywall {
         let adaptyProductId: String
         let vendorId: String
         let promotionalOfferId: String?
-        var promotionalOfferEligibility: Bool { promotionalOfferId != nil }
     }
 }
 

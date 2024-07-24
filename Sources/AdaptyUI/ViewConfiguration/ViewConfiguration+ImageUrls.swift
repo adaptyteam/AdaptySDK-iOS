@@ -8,7 +8,6 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-
     func extractImageUrls(_ locale: AdaptyLocale) -> Set<URL> {
         let assets: [String: Asset] =
             if let localAssets = getLocalization(locale)?.assets {
@@ -18,10 +17,14 @@ extension AdaptyUI.ViewConfiguration {
             }
 
         return Set(assets.values.compactMap {
-            guard case let .filling(.image(.url(url, _))) = $0 else {
-                return nil
+            switch $0 {
+            case let .filling(.image(.url(url, _))):
+                url
+            case let .video(.url(_, image: .url(imageUrl, previewRaster: _))):
+                imageUrl
+            default:
+                nil
             }
-            return url
         })
     }
 }
