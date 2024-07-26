@@ -69,7 +69,7 @@ struct AdaptyUIElementWithoutPropertiesView: View {
         case let .image(image, _):
             AdaptyUIImageView(image)
         case let .video(video, _):
-            AdaptyUIUnknownElementView(value: "video")
+            AdaptyUIVideoView(video: video)
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):
