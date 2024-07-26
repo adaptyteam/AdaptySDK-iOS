@@ -15,7 +15,7 @@ extension AdaptyUI {
 
         package let aspect: AspectRatio
         package let loop: Bool
-        package let tint: ColorFilling?
+        package let background: AdaptyUI.Color
     }
 }
 
@@ -25,13 +25,13 @@ extension AdaptyUI {
             asset: AdaptyUI.VideoData,
             aspect: AdaptyUI.AspectRatio = defaultAspectRatio,
             loop: Bool = true,
-            tint: AdaptyUI.ColorFilling? = nil
+            background: AdaptyUI.Color = .transparent
         ) -> Self {
             .init(
                 asset: asset,
                 aspect: aspect,
                 loop: loop,
-                tint: tint
+                background: background
             )
         }
     }
