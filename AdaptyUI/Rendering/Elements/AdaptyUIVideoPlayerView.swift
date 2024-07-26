@@ -108,9 +108,13 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let playerViewController = AVPlayerViewController()
+        playerViewController.view.backgroundColor = .clear
+        
+        playerViewController.showsPlaybackControls = false
+        playerViewController.updatesNowPlayingInfoCenter = false
+        playerViewController.requiresLinearPlayback = true
         playerViewController.player = player
         playerViewController.videoGravity = videoGravity
-        playerViewController.view.backgroundColor = .clear
 
         return playerViewController
     }
