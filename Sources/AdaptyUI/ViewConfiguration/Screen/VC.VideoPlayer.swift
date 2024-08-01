@@ -12,7 +12,6 @@ extension AdaptyUI.ViewConfiguration {
         let assetId: String
         let aspect: AdaptyUI.AspectRatio
         let loop: Bool
-        let backgroundAssetId: String?
     }
 }
 
@@ -21,8 +20,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         try .init(
             asset: videoData(from.assetId),
             aspect: from.aspect,
-            loop: from.loop,
-            background: from.backgroundAssetId.flatMap { try? color($0) } ?? .transparent
+            loop: from.loop
         )
     }
 }
@@ -32,7 +30,6 @@ extension AdaptyUI.ViewConfiguration.VideoPlayer: Decodable {
         case assetId = "asset_id"
         case aspect
         case loop
-        case backgroundAssetId = "background"
     }
 
     init(from decoder: Decoder) throws {
@@ -40,6 +37,5 @@ extension AdaptyUI.ViewConfiguration.VideoPlayer: Decodable {
         assetId = try container.decode(String.self, forKey: .assetId)
         aspect = try container.decodeIfPresent(AdaptyUI.AspectRatio.self, forKey: .aspect) ?? AdaptyUI.VideoPlayer.defaultAspectRatio
         loop = try container.decodeIfPresent(Bool.self, forKey: .loop) ?? true
-        backgroundAssetId = try container.decodeIfPresent(String.self, forKey: .backgroundAssetId)
     }
 }
