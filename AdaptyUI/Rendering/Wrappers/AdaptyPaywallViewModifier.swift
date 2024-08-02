@@ -204,6 +204,7 @@ public extension View {
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         products: [AdaptyPaywallProduct]? = nil,
         introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
@@ -226,6 +227,7 @@ public extension View {
                 viewConfiguration: viewConfiguration,
                 products: products,
                 introductoryOffersEligibilities: introductoryOffersEligibilities,
+                observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
                 didPerformAction: didPerformAction ?? { action in
