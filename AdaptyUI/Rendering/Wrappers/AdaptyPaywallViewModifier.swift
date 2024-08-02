@@ -23,6 +23,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
 
     private let products: [AdaptyPaywallProduct]?
     private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
+    private let observerModeResolver: AdaptyObserverModeResolver?
     private let tagResolver: AdaptyTagResolver?
     private let timerResolver: AdaptyTimerResolver?
 
@@ -46,6 +47,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
     ///     - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
     ///     - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
     ///     - introductoryOffersEligibilities: optional ``[String: AdaptyEligibility]`` dictionary. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required eligibilities.
+    ///     - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
     ///     - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     ///     - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
     ///     - didPerformAction: If user performs an action, this callback will be invoked. There is a default implementation, e.g. `close` action will dismiss the paywall, `openUrl` action will open the URL.
@@ -67,6 +69,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         products: [AdaptyPaywallProduct]? = nil,
         introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
@@ -83,8 +86,14 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
     ) {
         let logId = AdaptyUI.generateLogId()
 
-        AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0)")
-
+        AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
+        
+        if Adapty.Configuration.observerMode && observerModeResolver == nil {
+            AdaptyUI.writeLog(level: .warn, message: "In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
+        } else if !Adapty.Configuration.observerMode && observerModeResolver != nil {
+            AdaptyUI.writeLog(level: .warn, message: "You should not pass observerModeResolver if you're using Adapty in Full Mode")
+        }
+        
         self.isPresented = isPresented
         self.fullScreen = fullScreen
         self.logId = logId
@@ -92,6 +101,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
         self.viewConfiguration = viewConfiguration
         self.products = products
         self.introductoryOffersEligibilities = introductoryOffersEligibilities
+        self.observerModeResolver = observerModeResolver
         self.tagResolver = tagResolver
         self.timerResolver = timerResolver
         self.didPerformAction = didPerformAction
@@ -114,6 +124,7 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
             products: products,
             introductoryOffersEligibilities: introductoryOffersEligibilities,
             configuration: viewConfiguration,
+            observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
             timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
             showDebugOverlay: false,
