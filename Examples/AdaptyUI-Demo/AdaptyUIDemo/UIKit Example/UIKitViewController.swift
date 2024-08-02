@@ -73,12 +73,14 @@ class UIKitViewController: UIViewController {
 
     private func presentPaywall(_ paywall: AdaptyPaywall,
                                 products: [AdaptyPaywallProduct]?,
-                                viewConfiguration: AdaptyUI.LocalizedViewConfiguration) {
+                                viewConfiguration: AdaptyUI.LocalizedViewConfiguration)
+    {
         guard let vc = try? AdaptyUI.paywallController(
             for: paywall,
             products: products,
             viewConfiguration: viewConfiguration,
             delegate: self,
+//            observerModeResolver: self, // pass observerModeResolver only if necessary
             tagResolver: [
                 "USERNAME": "John",
             ]
@@ -125,9 +127,21 @@ class UIKitViewController: UIViewController {
     }
 }
 
+// Implement AdaptyObserverModeResolver only if necessary
+extension UIKitViewController: AdaptyObserverModeResolver {
+    func observerMode(didInitiatePurchase product: AdaptyPaywallProduct,
+                      onStartPurchase: @escaping () -> Void,
+                      onFinishPurchase: @escaping () -> Void)
+    {
+        // use the product object to handle the purchase
+        // use the onStartPurchase and onFinishPurchase callbacks to notify AdaptyUI about the process of the purchase
+    }
+}
+
 extension UIKitViewController: AdaptyPaywallControllerDelegate {
     func paywallController(_ controller: AdaptyPaywallController,
-                           didPerform action: AdaptyUI.Action) {
+                           didPerform action: AdaptyUI.Action)
+    {
         print("#ExampleUI# paywallController didPerform \(action)")
 
         switch action {
@@ -150,7 +164,8 @@ extension UIKitViewController: AdaptyPaywallControllerDelegate {
     }
 
     public func paywallController(_ controller: AdaptyPaywallController,
-                                  didFinishRestoreWith profile: AdaptyProfile) {
+                                  didFinishRestoreWith profile: AdaptyProfile)
+    {
         print("#ExampleUI# didFinishRestoreWith")
 
         if profile.accessLevels["premium"]?.isActive ?? false {
@@ -159,18 +174,21 @@ extension UIKitViewController: AdaptyPaywallControllerDelegate {
     }
 
     public func paywallController(_ controller: AdaptyPaywallController,
-                                  didFailRestoreWith error: AdaptyError) {
+                                  didFailRestoreWith error: AdaptyError)
+    {
         print("#ExampleUI# didFailRestoreWith \(error)")
     }
 
     public func paywallController(_ controller: AdaptyPaywallController,
-                                  didCancelPurchase product: AdaptyPaywallProduct) {
+                                  didCancelPurchase product: AdaptyPaywallProduct)
+    {
         print("#ExampleUI# paywallControllerDidCancelPurchase")
     }
 
     public func paywallController(_ controller: AdaptyPaywallController,
                                   didFinishPurchase product: AdaptyPaywallProduct,
-                                  purchasedInfo: AdaptyPurchasedInfo) {
+                                  purchasedInfo: AdaptyPurchasedInfo)
+    {
         print("#ExampleUI# didFinishPurchase")
 
         controller.dismiss(animated: true)
@@ -178,12 +196,14 @@ extension UIKitViewController: AdaptyPaywallControllerDelegate {
 
     public func paywallController(_ controller: AdaptyPaywallController,
                                   didFailPurchase product: AdaptyPaywallProduct,
-                                  error: AdaptyError) {
+                                  error: AdaptyError)
+    {
         print("#ExampleUI# didFailPurchaseWith \(error)")
     }
 
     public func paywallController(_ controller: AdaptyPaywallController,
-                                  didFailRenderingWith error: AdaptyError) {
+                                  didFailRenderingWith error: AdaptyError)
+    {
         print("#ExampleUI# didFailRenderingWith \(error)")
 
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
@@ -192,7 +212,8 @@ extension UIKitViewController: AdaptyPaywallControllerDelegate {
     }
 
     public func paywallController(_ controller: AdaptyPaywallController,
-                                  didFailLoadingProductsWith error: AdaptyError) -> Bool {
+                                  didFailLoadingProductsWith error: AdaptyError) -> Bool
+    {
         print("#ExampleUI# didFailLoadingProductsWith \(error)")
         return false
     }
