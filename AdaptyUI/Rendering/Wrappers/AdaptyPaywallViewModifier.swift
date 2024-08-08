@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-public struct AdaptyPaywallViewModifier: ViewModifier {
+public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Identifiable {
     @Environment(\.presentationMode) private var presentationMode
 
     private let isPresented: Binding<Bool>
@@ -38,7 +38,10 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
     private let didFailRestore: (AdaptyError) -> Void
     private let didFailRendering: (AdaptyError) -> Void
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
-
+    
+    private let showAlertItem: Binding<AlertItem?>
+    private let showAlertBuilder: ((AlertItem) -> Alert)?
+    
     /// - Parameters:
     ///     - isPresented: A binding to a Boolean value that determines whether
     ///     to present the sheet.
@@ -82,7 +85,9 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
         didFailRendering: @escaping (AdaptyError) -> Void,
-        didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil
+        didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
+        showAlertItem: Binding<AlertItem?>,
+        showAlertBuilder: ((AlertItem) -> Alert)?
     ) {
         let logId = AdaptyUI.generateLogId()
 
@@ -115,6 +120,8 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
         self.didFailRestore = didFailRestore
         self.didFailRendering = didFailRendering
         self.didFailLoadingProducts = didFailLoadingProducts
+        self.showAlertItem = showAlertItem
+        self.showAlertBuilder = showAlertBuilder
     }
 
     var paywallViewBody: some View {
@@ -149,10 +156,12 @@ public struct AdaptyPaywallViewModifier: ViewModifier {
             didFinishRestore: didFinishRestore,
             didFailRestore: didFailRestore,
             didFailRendering: didFailRendering,
-            didFailLoadingProducts: didFailLoadingProducts ?? { _ in true }
+            didFailLoadingProducts: didFailLoadingProducts ?? { _ in true },
+            showAlertItem: showAlertItem,
+            showAlertBuilder: showAlertBuilder
         )
     }
-
+    
     public func body(content: Content) -> some View {
         if fullScreen {
             content
@@ -196,8 +205,10 @@ public extension View {
     ///     - didFailRestore: This method is invoked when the restore process fails.
     ///     - didFailRendering: This method will be invoked in case of errors during the screen rendering process.
     ///     - didFailLoadingProducts: This method is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
+    ///     - showAlertItem:
+    ///     - showAlertBuilder:
     @ViewBuilder
-    func paywall(
+    func paywall<AlertItem: Identifiable>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
         paywall: AdaptyPaywall,
@@ -217,10 +228,12 @@ public extension View {
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
         didFailRendering: @escaping (AdaptyError) -> Void,
-        didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil
+        didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
+        showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
+        showAlertBuilder: ((AlertItem) -> Alert)? = nil
     ) -> some View {
         modifier(
-            AdaptyPaywallViewModifier(
+            AdaptyPaywallViewModifier<AlertItem>(
                 isPresented: isPresented,
                 fullScreen: fullScreen,
                 paywall: paywall,
@@ -251,7 +264,9 @@ public extension View {
                 didFinishRestore: didFinishRestore,
                 didFailRestore: didFailRestore,
                 didFailRendering: didFailRendering,
-                didFailLoadingProducts: didFailLoadingProducts ?? { _ in true }
+                didFailLoadingProducts: didFailLoadingProducts ?? { _ in true },
+                showAlertItem: showAlertItem,
+                showAlertBuilder: showAlertBuilder
             )
         )
     }

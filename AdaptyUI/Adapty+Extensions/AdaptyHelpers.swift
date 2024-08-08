@@ -12,3 +12,7 @@ extension Collection where Indices.Iterator.Element == Index {
         (startIndex <= index && index < endIndex) ? self[index] : nil
     }
 }
+
+public struct AdaptyIdentifiablePlaceholder: Identifiable {
+    public var id: String { "placeholder" }
+}

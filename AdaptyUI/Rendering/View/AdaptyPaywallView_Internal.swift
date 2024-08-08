@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-struct AdaptyPaywallView_Internal: View {
+struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable {
     private let showDebugOverlay: Bool
     private let products: [AdaptyPaywallProduct]?
     private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
@@ -23,6 +23,9 @@ struct AdaptyPaywallView_Internal: View {
     private let tagResolverViewModel: AdaptyTagResolverViewModel
     private let timerViewModel: AdaptyTimerViewModel
     private let screensViewModel: AdaptyScreensViewModel
+
+    private let showAlertItem: Binding<AlertItem?>
+    private let showAlertBuilder: ((AlertItem) -> Alert)?
 
     init(
         logId: String,
@@ -44,11 +47,16 @@ struct AdaptyPaywallView_Internal: View {
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
         didFailRendering: @escaping (AdaptyError) -> Void,
-        didFailLoadingProducts: @escaping (AdaptyError) -> Bool
+        didFailLoadingProducts: @escaping (AdaptyError) -> Bool,
+        showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
+        showAlertBuilder: ((AlertItem) -> Alert)? = nil
     ) {
         self.showDebugOverlay = showDebugOverlay
         self.products = products
         self.introductoryOffersEligibilities = introductoryOffersEligibilities
+
+        self.showAlertItem = showAlertItem
+        self.showAlertBuilder = showAlertBuilder
 
         AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(configuration.templateId), products: \(products?.count ?? 0)")
 
@@ -94,7 +102,8 @@ struct AdaptyPaywallView_Internal: View {
         productsViewModel.loadProductsIfNeeded()
     }
 
-    var body: some View {
+    @ViewBuilder
+    private var paywallBody: some View {
         GeometryReader { proxy in
             AdaptyPaywallRendererView()
                 .withScreenSize(
@@ -110,6 +119,15 @@ struct AdaptyPaywallView_Internal: View {
                 .environmentObject(tagResolverViewModel)
                 .environmentObject(timerViewModel)
                 .environmentObject(screensViewModel)
+        }
+    }
+
+    var body: some View {
+        if let showAlertBuilder {
+            paywallBody
+                .alert(item: showAlertItem) { showAlertBuilder($0) }
+        } else {
+            paywallBody
         }
     }
 }
