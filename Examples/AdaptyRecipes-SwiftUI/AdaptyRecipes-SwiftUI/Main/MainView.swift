@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct MainView: View {
-//    @EnvironmentObject private var viewModel: MainViewModel
-
     var body: some View {
         TabView {
             NavigationView {
