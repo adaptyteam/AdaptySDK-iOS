@@ -20,12 +20,28 @@
                     </tabBar>
                     <connections>
                         <segue destination="X0K-uZ-lJG" kind="relationship" relationship="viewControllers" id="afo-gd-V0i"/>
-                        <segue destination="QCK-77-6Jg" kind="relationship" relationship="viewControllers" id="CNJ-3d-KZY"/>
+                        <segue destination="kxr-Ur-noJ" kind="relationship" relationship="viewControllers" id="0sl-Kf-3ml"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2gP-cm-FK9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-416" y="-844"/>
+        </scene>
+        <!--Profile-->
+        <scene sceneID="2Zn-aK-KTs">
+            <objects>
+                <viewController id="kxr-Ur-noJ" customClass="ProfileViewController" customModule="AdaptyRecipes_UIKit" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="3G6-MK-Inr">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="mgx-xN-HCy"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Profile" image="person.fill" catalog="system" id="drf-r5-LD0"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7da-Fr-3Id" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="636" y="-348"/>
         </scene>
         <!--Adapty Recipes-->
         <scene sceneID="Ssd-9u-ZWj">
@@ -514,52 +530,6 @@
             </objects>
             <point key="canvasLocation" x="637" y="-1349"/>
         </scene>
-        <!--Root View Controller-->
-        <scene sceneID="0Iu-ls-8qX">
-            <objects>
-                <tableViewController id="FuP-fA-DGn" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="bs2-Ea-NhM">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="0IP-6Y-go4">
-                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0IP-6Y-go4" id="ZIo-1w-arI">
-                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="FuP-fA-DGn" id="mbu-bN-Blv"/>
-                            <outlet property="delegate" destination="FuP-fA-DGn" id="Rfu-EH-2Sg"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="XUT-Ty-IzI"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="p4j-ms-HxZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1585" y="-399"/>
-        </scene>
-        <!--Profile-->
-        <scene sceneID="7Ms-WH-3B6">
-            <objects>
-                <navigationController id="QCK-77-6Jg" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Profile" image="person.fill" catalog="system" id="SCA-He-xp5"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="2SA-bV-12R">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="FuP-fA-DGn" kind="relationship" relationship="rootViewController" id="0gM-Cn-mYh"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ubA-t4-rfZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="636" y="-399"/>
-        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="0sg-UB-CnI"/>
@@ -568,7 +538,7 @@
         <image name="list.bullet" catalog="system" width="128" height="87"/>
         <image name="person.fill" catalog="system" width="128" height="120"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -10,7 +10,6 @@
 		6C4D78909839057069218CF8 /* Pods_AdaptyRecipes_UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3CBD33456F03648FB6DF56AF /* Pods_AdaptyRecipes_UIKit.framework */; };
 		742B27B52C332925006CF0E3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742B27B42C332925006CF0E3 /* AppDelegate.swift */; };
 		742B27B72C332925006CF0E3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742B27B62C332925006CF0E3 /* SceneDelegate.swift */; };
-		742B27B92C332925006CF0E3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742B27B82C332925006CF0E3 /* ViewController.swift */; };
 		742B27BC2C332925006CF0E3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 742B27BA2C332925006CF0E3 /* Main.storyboard */; };
 		742B27BE2C332926006CF0E3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 742B27BD2C332926006CF0E3 /* Assets.xcassets */; };
 		742B27C12C332926006CF0E3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 742B27BF2C332926006CF0E3 /* LaunchScreen.storyboard */; };
@@ -19,6 +18,9 @@
 		742B27CE2C332B05006CF0E3 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742B27CD2C332B05006CF0E3 /* UserManager.swift */; };
 		742B27D22C332B7D006CF0E3 /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742B27D12C332B7D006CF0E3 /* MainViewModel.swift */; };
 		744FE9E82C64DC2C00E2BCBB /* RecipesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744FE9E72C64DC2C00E2BCBB /* RecipesViewController.swift */; };
+		744FE9EA2C64DFFF00E2BCBB /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744FE9E92C64DFFF00E2BCBB /* ProfileViewController.swift */; };
+		744FE9EC2C64E02900E2BCBB /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744FE9EB2C64E02900E2BCBB /* ProfileView.swift */; };
+		744FE9EE2C64E10100E2BCBB /* UIViewController+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744FE9ED2C64E10100E2BCBB /* UIViewController+SwiftUI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +29,6 @@
 		742B27B12C332925006CF0E3 /* AdaptyRecipes-UIKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AdaptyRecipes-UIKit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		742B27B42C332925006CF0E3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		742B27B62C332925006CF0E3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		742B27B82C332925006CF0E3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		742B27BB2C332925006CF0E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		742B27BD2C332926006CF0E3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		742B27C02C332926006CF0E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -37,6 +38,9 @@
 		742B27CD2C332B05006CF0E3 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		742B27D12C332B7D006CF0E3 /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
 		744FE9E72C64DC2C00E2BCBB /* RecipesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipesViewController.swift; sourceTree = "<group>"; };
+		744FE9E92C64DFFF00E2BCBB /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		744FE9EB2C64E02900E2BCBB /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		744FE9ED2C64E10100E2BCBB /* UIViewController+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+SwiftUI.swift"; sourceTree = "<group>"; };
 		EDA297BE76DD8CEE66FDD22C /* Pods-AdaptyRecipes-UIKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AdaptyRecipes-UIKit.debug.xcconfig"; path = "Target Support Files/Pods-AdaptyRecipes-UIKit/Pods-AdaptyRecipes-UIKit.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -89,6 +93,7 @@
 				742B27C92C332AF7006CF0E3 /* Logger.swift */,
 				742B27CB2C332AFF006CF0E3 /* AppConstants.swift */,
 				742B27CD2C332B05006CF0E3 /* UserManager.swift */,
+				744FE9ED2C64E10100E2BCBB /* UIViewController+SwiftUI.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -108,7 +113,8 @@
 			children = (
 				742B27BA2C332925006CF0E3 /* Main.storyboard */,
 				744FE9E72C64DC2C00E2BCBB /* RecipesViewController.swift */,
-				742B27B82C332925006CF0E3 /* ViewController.swift */,
+				744FE9E92C64DFFF00E2BCBB /* ProfileViewController.swift */,
+				744FE9EB2C64E02900E2BCBB /* ProfileView.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -246,11 +252,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				744FE9E82C64DC2C00E2BCBB /* RecipesViewController.swift in Sources */,
+				744FE9EC2C64E02900E2BCBB /* ProfileView.swift in Sources */,
+				744FE9EE2C64E10100E2BCBB /* UIViewController+SwiftUI.swift in Sources */,
 				742B27D22C332B7D006CF0E3 /* MainViewModel.swift in Sources */,
 				742B27CE2C332B05006CF0E3 /* UserManager.swift in Sources */,
-				742B27B92C332925006CF0E3 /* ViewController.swift in Sources */,
 				742B27B52C332925006CF0E3 /* AppDelegate.swift in Sources */,
 				742B27B72C332925006CF0E3 /* SceneDelegate.swift in Sources */,
+				744FE9EA2C64DFFF00E2BCBB /* ProfileViewController.swift in Sources */,
 				742B27CA2C332AF7006CF0E3 /* Logger.swift in Sources */,
 				742B27CC2C332AFF006CF0E3 /* AppConstants.swift in Sources */,
 			);
