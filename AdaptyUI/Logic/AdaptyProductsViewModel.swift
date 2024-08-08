@@ -35,6 +35,7 @@ package class AdaptyProductsViewModel: ObservableObject {
 
     private let eventsHandler: AdaptyEventsHandler
     private let paywallViewModel: AdaptyPaywallViewModel
+    private let observerModeResolver: AdaptyObserverModeResolver?
 
     @Published var products: [ProductInfoModel]
     @Published var selectedProductsIds: [String: String]
@@ -66,7 +67,8 @@ package class AdaptyProductsViewModel: ObservableObject {
         eventsHandler: AdaptyEventsHandler,
         paywallViewModel: AdaptyPaywallViewModel,
         products: [AdaptyPaywallProduct]?,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]?
+        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
+        observerModeResolver: AdaptyObserverModeResolver?
     ) {
         self.eventsHandler = eventsHandler
         self.paywallViewModel = paywallViewModel
@@ -79,6 +81,8 @@ package class AdaptyProductsViewModel: ObservableObject {
         )
 
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
+        
+        self.observerModeResolver = observerModeResolver
     }
 
     private static func generateProductsInfos(
@@ -204,12 +208,26 @@ package class AdaptyProductsViewModel: ObservableObject {
     func purchaseProduct(id productId: String) {
         guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
 
-        eventsHandler.event_didStartPurchase(product: product)
-        purchaseInProgress = true
+        if let observerModeResolver {
+            observerModeResolver.observerMode(
+                didInitiatePurchase: product,
+                onStartPurchase: { [weak self] in
+                    self?.eventsHandler.log(.verbose, "observerDidStartPurchase")
+                    self?.purchaseInProgress = true
+                },
+                onFinishPurchase: { [weak self] in
+                    self?.eventsHandler.log(.verbose, "observerDidFinishPurchase")
+                    self?.purchaseInProgress = false
+                }
+            )
+        } else {
+            eventsHandler.event_didStartPurchase(product: product)
+            purchaseInProgress = true
 
-        Adapty.makePurchase(product: product) { [weak self] result in
-            self?.handlePurchasedResult(product: product, result: result)
-            self?.purchaseInProgress = false
+            Adapty.makePurchase(product: product) { [weak self] result in
+                self?.handlePurchasedResult(product: product, result: result)
+                self?.purchaseInProgress = false
+            }
         }
     }
 

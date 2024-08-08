@@ -165,6 +165,15 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
 }
 
 @available(iOS 15.0, *)
+public protocol AdaptyObserverModeResolver {
+    func observerMode(
+        didInitiatePurchase product: AdaptyPaywallProduct,
+        onStartPurchase: @escaping () -> Void,
+        onFinishPurchase: @escaping () -> Void
+    )
+}
+
+@available(iOS 15.0, *)
 public extension AdaptyUI {
     private static var isActivated: Bool = false
 
@@ -234,6 +243,7 @@ public extension AdaptyUI {
     ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
     ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
     ///   - delegate: the object that implements the ``AdaptyPaywallControllerDelegate`` protocol. Use it to respond to different events happening inside the purchase screen.
+    ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
     ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     /// - Returns: an ``AdaptyPaywallController`` object, representing the requested paywall screen.
     static func paywallController(
@@ -242,6 +252,7 @@ public extension AdaptyUI {
         introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         showDebugOverlay: Bool = false
@@ -258,6 +269,7 @@ public extension AdaptyUI {
             introductoryOffersEligibilities: introductoryOffersEligibilities,
             viewConfiguration: viewConfiguration,
             delegate: delegate,
+            observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
             timerResolver: timerResolver,
             showDebugOverlay: showDebugOverlay

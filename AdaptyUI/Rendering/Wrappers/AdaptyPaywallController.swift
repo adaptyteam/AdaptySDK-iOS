@@ -21,6 +21,7 @@ public class AdaptyPaywallController: UIViewController {
 
     let products: [AdaptyPaywallProduct]?
     let introductoryOffersEligibilities: [String: AdaptyEligibility]?
+    let observerModeResolver: AdaptyObserverModeResolver?
     let tagResolver: AdaptyTagResolver?
     let timerResolver: AdaptyTimerResolver?
     let showDebugOverlay: Bool
@@ -33,14 +34,21 @@ public class AdaptyPaywallController: UIViewController {
         introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate?,
+        observerModeResolver: AdaptyObserverModeResolver?,
         tagResolver: AdaptyTagResolver?,
         timerResolver: AdaptyTimerResolver?,
         showDebugOverlay: Bool
     ) {
         let logId = AdaptyUI.generateLogId()
 
-        AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0)")
+        AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
 
+        if Adapty.Configuration.observerMode && observerModeResolver == nil {
+            AdaptyUI.writeLog(level: .warn, message: "In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
+        } else if !Adapty.Configuration.observerMode && observerModeResolver != nil {
+            AdaptyUI.writeLog(level: .warn, message: "You should not pass observerModeResolver if you're using Adapty in Full Mode")
+        }
+        
         self.logId = logId
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
@@ -49,6 +57,7 @@ public class AdaptyPaywallController: UIViewController {
         self.tagResolver = tagResolver
         self.timerResolver = timerResolver
         self.delegate = delegate
+        self.observerModeResolver = observerModeResolver
         self.showDebugOverlay = showDebugOverlay
 
         super.init(nibName: nil, bundle: nil)
@@ -83,6 +92,7 @@ public class AdaptyPaywallController: UIViewController {
                 products: products,
                 introductoryOffersEligibilities: introductoryOffersEligibilities,
                 configuration: viewConfiguration,
+                observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 showDebugOverlay: showDebugOverlay,
