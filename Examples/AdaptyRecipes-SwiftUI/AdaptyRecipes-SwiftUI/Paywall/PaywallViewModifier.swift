@@ -15,6 +15,17 @@ struct IdentifiableErrorWrapper: Identifiable {
     let error: Error
 }
 
+// ⚠️ Implement ObserverModeResolver to work in ObserverMode
+//class ObserverModeResolver: AdaptyObserverModeResolver {
+//    func observerMode(
+//        didInitiatePurchase product: AdaptyPaywallProduct,
+//        onStartPurchase: @escaping () -> Void,
+//        onFinishPurchase: @escaping () -> Void
+//    ) {
+//        // handle the purchase
+//    }
+//}
+
 struct PaywallViewModifier: ViewModifier {
     private var isPresented: Binding<Bool>
     private var placementId: String
@@ -38,6 +49,8 @@ struct PaywallViewModifier: ViewModifier {
                     isPresented: isPresented,
                     paywall: paywall,
                     viewConfiguration: viewConfig,
+                    // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
+                    // observerModeResolver: ObserverModeResolver(),
                     didFailPurchase: { _, error in
                         alertPaywallError = .init(title: "didFailPurchase error!", error: error)
                     },
