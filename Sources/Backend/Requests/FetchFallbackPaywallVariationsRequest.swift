@@ -31,7 +31,9 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
 }
 
 extension HTTPSession {
-    func performFetchFallbackPaywallVariationsRequest(
+    @inline(__always)
+    private func performFetchFallbackPaywallVariationsRequest(
+        logName: String,
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -90,5 +92,43 @@ extension HTTPSession {
                 completion(.success(response.body))
             }
         }
+    }
+    
+    func performFetchFallbackPaywallVariationsRequest(
+        apiKeyPrefix: String,
+        profileId: String,
+        placementId: String,
+        locale: AdaptyLocale,
+        cached: AdaptyPaywall?,
+        disableServerCache: Bool,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
+    ) {
+        performFetchFallbackPaywallVariationsRequest(
+            logName: "get_fallback_paywall_variations",
+            apiKeyPrefix: apiKeyPrefix,
+            profileId: profileId,
+            placementId: placementId,
+            locale: locale,
+            cached: cached,
+            disableServerCache: disableServerCache, completion)
+    }
+    
+    func performFetchUntargetedPaywallVariationsRequest(
+        apiKeyPrefix: String,
+        profileId: String,
+        placementId: String,
+        locale: AdaptyLocale,
+        cached: AdaptyPaywall?,
+        disableServerCache: Bool,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
+    ) {
+        performFetchFallbackPaywallVariationsRequest(
+            logName: "get_untargeted_paywall_variations",
+            apiKeyPrefix: apiKeyPrefix,
+            profileId: profileId,
+            placementId: placementId,
+            locale: locale,
+            cached: cached,
+            disableServerCache: disableServerCache, completion)
     }
 }

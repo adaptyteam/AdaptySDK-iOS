@@ -18,6 +18,7 @@ extension Adapty.Configuration {
             dispatchQueue: builder.dispatchQueue,
             backendBaseUrl: builder.backendBaseUrl,
             backendFallbackBaseUrl: builder.backendFallbackBaseUrl,
+            backendConfigsBaseUrl: builder.backendConfigsBaseUrl,
             backendProxy: builder.backendProxy
         )
     }
@@ -35,6 +36,7 @@ extension Adapty.Configuration {
         public private(set) var dispatchQueue: DispatchQueue
         public private(set) var backendBaseUrl: URL
         public private(set) var backendFallbackBaseUrl: URL
+        public private(set) var backendConfigsBaseUrl: URL
         public private(set) var backendProxy: (host: String, port: Int)?
 
         public convenience init(withAPIKey key: String) {
@@ -52,6 +54,7 @@ extension Adapty.Configuration {
             self.dispatchQueue = configuration.dispatchQueue
             self.backendBaseUrl = configuration.backendBaseUrl
             self.backendFallbackBaseUrl = configuration.backendFallbackBaseUrl
+            self.backendConfigsBaseUrl = configuration.backendConfigsBaseUrl
             self.backendProxy = configuration.backendProxy
         }
 
@@ -105,6 +108,11 @@ extension Adapty.Configuration {
             return self
         }
 
+        public func with(backendConfigsBaseUrl url: URL) -> Builder {
+            backendConfigsBaseUrl = url
+            return self
+        }
+        
         public func with(proxy host: String, port: Int) -> Builder {
             backendProxy = (host: host, port: port)
             return self
