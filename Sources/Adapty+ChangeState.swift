@@ -14,12 +14,9 @@ public final class Adapty {
     let backend: Backend
 
     let httpSession: HTTPSession
-    lazy var httpFallbackSession: HTTPSession = {
-        backend.fallback.createHTTPSession(responseQueue: Adapty.underlayQueue)
-    }()
-    lazy var httpConfigsSession: HTTPSession = {
-        backend.configs.createHTTPSession(responseQueue: Adapty.underlayQueue)
-    }()
+    lazy var httpFallbackSession: HTTPSession = backend.fallback.createHTTPSession(responseQueue: Adapty.underlayQueue)
+
+    lazy var httpConfigsSession: HTTPSession = backend.configs.createHTTPSession(responseQueue: Adapty.underlayQueue)
 
     let skProductsManager: SKProductsManager
     let sk1ReceiptManager: SK1ReceiptManager
@@ -215,8 +212,6 @@ extension Adapty {
         }
     }
 
-     
-    
     private func initializingProfileManager(toCustomerUserId customerUserId: String?) {
         guard !needBreakInitializing() else { return }
 
@@ -230,7 +225,6 @@ extension Adapty {
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
         let environmentMeta = Environment.Meta(includedAnalyticIds: !analyticsDisabled)
 
-        
         createProfileOnServer(
             profileId,
             customerUserId,
@@ -256,7 +250,7 @@ extension Adapty {
                 )
             }
         }
-        
+
         func createProfileManager(
             _ profile: VH<AdaptyProfile>,
             sendedEnvironment: AdaptyProfileManager.SendedEnvironment
@@ -268,11 +262,11 @@ extension Adapty {
                 profile: profile,
                 sendedEnvironment: sendedEnvironment
             )
-            
+
             state = .initialized(manager)
             callProfileManagerCompletionHandlers(.success(manager))
         }
-   
+
         func createProfileOnServer(
             _ profileId: String,
             _ customerUserId: String?,
@@ -287,21 +281,21 @@ extension Adapty {
                 environmentMeta: environmentMeta
             ) { [weak self] result in
                 guard let self else { return }
-                
+
                 // TODO: Check Cancel
-                
+
                 switch result {
                 case let .failure(error):
                     completion(.failure(error))
                 case let .success(profile):
-                    
+
                     let storage = self.profileStorage
                     if profileId != profile.value.profileId {
                         storage.clearProfile(newProfileId: profile.value.profileId)
                     }
                     storage.setSyncedTransactions(false)
                     storage.setProfile(profile)
-                    
+
                     completion(.success(profile))
                 }
             }

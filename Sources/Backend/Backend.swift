@@ -19,9 +19,9 @@ struct Backend: HTTPCodableConfiguration {
     func configure(encoder: JSONEncoder) { Backend.configure(encoder: encoder) }
 
     init(
-        secretKey: String, 
+        secretKey: String,
         baseURL: URL,
-        baseFallbackURL:URL,
+        baseFallbackURL: URL,
         baseConfigsURL: URL,
         withProxy: (host: String, port: Int)? = nil
     ) {
@@ -39,8 +39,8 @@ struct Backend: HTTPCodableConfiguration {
         }
         self.baseURL = baseURL
         sessionConfiguration = configuration
-        self.fallback =  FallbackBackend(secretKey:secretKey, baseURL: baseFallbackURL, withProxy: withProxy)
-        self.configs =  FallbackBackend(secretKey:secretKey, baseURL: baseConfigsURL, withProxy: withProxy)
+        self.fallback = FallbackBackend(secretKey: secretKey, baseURL: baseFallbackURL, withProxy: withProxy)
+        self.configs = FallbackBackend(secretKey: secretKey, baseURL: baseConfigsURL, withProxy: withProxy)
     }
 }
 

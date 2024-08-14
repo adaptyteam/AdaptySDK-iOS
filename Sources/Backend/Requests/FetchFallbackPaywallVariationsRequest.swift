@@ -53,7 +53,7 @@ extension HTTPSession {
 
         perform(
             request,
-            logName: "get_fallback_paywall_variations",
+            logName: logName,
             logParams: [
                 "api_prefix": .value(apiKeyPrefix),
                 "placement_id": .value(placementId),
@@ -93,7 +93,7 @@ extension HTTPSession {
             }
         }
     }
-    
+
     func performFetchFallbackPaywallVariationsRequest(
         apiKeyPrefix: String,
         profileId: String,
@@ -110,9 +110,10 @@ extension HTTPSession {
             placementId: placementId,
             locale: locale,
             cached: cached,
-            disableServerCache: disableServerCache, completion)
+            disableServerCache: disableServerCache, completion
+        )
     }
-    
+
     func performFetchUntargetedPaywallVariationsRequest(
         apiKeyPrefix: String,
         profileId: String,
@@ -129,6 +130,7 @@ extension HTTPSession {
             placementId: placementId,
             locale: locale,
             cached: cached,
-            disableServerCache: disableServerCache, completion)
+            disableServerCache: disableServerCache, completion
+        )
     }
 }

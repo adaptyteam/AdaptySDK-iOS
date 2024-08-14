@@ -90,7 +90,7 @@ extension Adapty {
             Configuration.observerMode = configuration.observerMode
 
             let backend = Backend(with: configuration)
-  
+
             Adapty.eventsManager = EventsManager(profileStorage: UserDefaults.standard, backend: backend)
 
             shared = Adapty(
