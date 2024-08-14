@@ -12,10 +12,14 @@ public final class Adapty {
     let profileStorage: ProfileStorage
     let apiKeyPrefix: String
     let backend: Backend
-    let fallbackBackend: FallbackBackend
 
     let httpSession: HTTPSession
-    let httpFallbackSession: HTTPSession
+    lazy var httpFallbackSession: HTTPSession = {
+        backend.fallback.createHTTPSession(responseQueue: Adapty.underlayQueue)
+    }()
+    lazy var httpConfigsSession: HTTPSession = {
+        backend.configs.createHTTPSession(responseQueue: Adapty.underlayQueue)
+    }()
 
     let skProductsManager: SKProductsManager
     let sk1ReceiptManager: SK1ReceiptManager
@@ -30,16 +34,14 @@ public final class Adapty {
         profileStorage: ProfileStorage,
         vendorIdsStorage: ProductVendorIdsStorage,
         backend: Backend,
-        fallbackBackend: FallbackBackend,
         customerUserId: String?
     ) {
         self.apiKeyPrefix = apiKeyPrefix
         self.backend = backend
-        self.fallbackBackend = fallbackBackend
+        
         self.profileStorage = profileStorage
         vendorIdsCache = ProductVendorIdsCache(storage: vendorIdsStorage)
         httpSession = backend.createHTTPSession(responseQueue: Adapty.underlayQueue)
-        httpFallbackSession = fallbackBackend.createHTTPSession(responseQueue: Adapty.underlayQueue)
         skProductsManager = SKProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, backend: backend)
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
