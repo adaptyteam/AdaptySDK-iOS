@@ -26,10 +26,9 @@ extension AdaptyUI.AspectRatio {
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     var player: AVPlayer
     var videoGravity: AVLayerVideoGravity
-    var isReadyForDisplay: Binding<Bool>
+    var onReadyForDisplay: () -> Void
 
-    @State private var timer: Timer?
-    @State private var playerController: AVPlayerViewController?
+    @State private var playerStatusObservation: NSKeyValueObservation?
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let playerViewController = AVPlayerViewController()
@@ -41,33 +40,21 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.player = player
         playerViewController.videoGravity = videoGravity
 
-        // TODO: find a better solution
         DispatchQueue.main.async {
-            playerController = playerViewController
-            startTimer()
+            playerStatusObservation = playerViewController.observe(
+                \.isReadyForDisplay,
+                 options: [.old, .new, .initial, .prior],
+                 changeHandler: { playerVC, change in
+                     if playerVC.isReadyForDisplay {
+                         DispatchQueue.main.async {
+                             onReadyForDisplay()
+                         }
+                     }
+                 }
+            )
         }
 
         return playerViewController
-    }
-
-    private func startTimer() {
-        timer = Timer.scheduledTimer(
-            withTimeInterval: 0.1,
-            repeats: true,
-            block: { _ in
-                guard let playerController else { return }
-                isReadyForDisplay.wrappedValue = playerController.isReadyForDisplay
-
-                if playerController.isReadyForDisplay {
-                    stopTimer()
-                }
-            }
-        )
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
     }
 
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
@@ -81,7 +68,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 @available(iOS 15.0, *)
 struct AdaptyUIVideoView: View {
     @EnvironmentObject var viewModel: AdaptyVideoViewModel
-    @State var isReadyForDisplay = false
+    @State var showPlaceholder = true
 
     let id: String = UUID().uuidString
     let video: AdaptyUI.VideoPlayer
@@ -102,19 +89,18 @@ struct AdaptyUIVideoView: View {
                 AdaptyUIVideoPlayerView(
                     player: player,
                     videoGravity: video.aspect.videoGravity,
-                    isReadyForDisplay: $isReadyForDisplay
+                    onReadyForDisplay: {
+                        showPlaceholder = false
+                    }
                 )
-                .zIndex(0)
             }
 
-            if !(viewModel.playerStates[id]?.isReady ?? false) || !isReadyForDisplay {
+            if showPlaceholder {
                 AdaptyUIImageView(
                     asset: placeholderImageAsset,
                     aspect: video.aspect,
                     tint: nil
                 )
-                .zIndex(1)
-                .transition(.opacity)
             }
         }
         .onAppear {
