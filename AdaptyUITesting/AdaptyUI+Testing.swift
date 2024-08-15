@@ -163,6 +163,8 @@ public struct AdaptyUITestRendererView: View {
             sectionsViewModel: sectionsVM,
             screensViewModel: screensVM
         )
+        
+        let videoVM = AdaptyVideoViewModel(eventsHandler: eventsHandler)
 
         AdaptyUIElementView(viewConfiguration.screen.content)
             .environmentObject(paywallVM)
@@ -172,6 +174,7 @@ public struct AdaptyUITestRendererView: View {
             .environmentObject(tagResolverVM)
             .environmentObject(timerVM)
             .environmentObject(screensVM)
+            .environmentObject(videoVM)
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }

@@ -16,6 +16,7 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
     private let products: [AdaptyPaywallProduct]?
     private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     private let eventsHandler: AdaptyEventsHandler
+    
     private let paywallViewModel: AdaptyPaywallViewModel
     private let productsViewModel: AdaptyProductsViewModel
     private let actionsViewModel: AdaptyUIActionsViewModel
@@ -23,6 +24,7 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
     private let tagResolverViewModel: AdaptyTagResolverViewModel
     private let timerViewModel: AdaptyTimerViewModel
     private let screensViewModel: AdaptyScreensViewModel
+    private let videoViewModel: AdaptyVideoViewModel
 
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
@@ -98,6 +100,8 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
             sectionsViewModel: sectionsViewModel,
             screensViewModel: screensViewModel
         )
+        
+        videoViewModel = AdaptyVideoViewModel(eventsHandler: eventsHandler)
 
         productsViewModel.loadProductsIfNeeded()
     }
@@ -119,6 +123,7 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
                 .environmentObject(tagResolverViewModel)
                 .environmentObject(timerViewModel)
                 .environmentObject(screensViewModel)
+                .environmentObject(videoViewModel)
         }
     }
 

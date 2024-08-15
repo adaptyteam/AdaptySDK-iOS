@@ -23,100 +23,51 @@ extension AdaptyUI.AspectRatio {
 }
 
 @available(iOS 15.0, *)
-class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
-    enum PlayerState {
-        case invalid
-
-        case loading
-        case ready
-        case failed(String)
-
-        var title: String {
-            switch self {
-            case .invalid: "Invalid"
-            case .loading: "Loading"
-            case .ready: "Ready"
-            case let .failed(error): "Failed: \(error)"
-            }
-        }
-    }
-
-    @Published var playerState: PlayerState = .invalid
-    @Published var player: AVQueuePlayer?
-
-    private var playerLooper: AVPlayerLooper?
-
-    init(video: AdaptyUI.VideoPlayer) {
-        let playerToObserve: AVQueuePlayer?
-        let playerItemToObserve: AVPlayerItem?
-
-        switch video.asset {
-        case let .url(url, image):
-            let playerItem = AVPlayerItem(url: url)
-            let queuePlayer = AVQueuePlayer(items: [playerItem])
-
-            if video.loop {
-                playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
-            }
-
-            player = queuePlayer
-
-            playerToObserve = queuePlayer
-            playerItemToObserve = playerItem
-
-            queuePlayer.play()
-        case let .resources(string, image):
-            playerToObserve = nil
-            playerItemToObserve = nil
-        }
-
-        super.init()
-
-        if let playerItemToObserve {
-            playerItemToObserve.addObserver(self, forKeyPath: "status", options: [.old, .new], context: nil)
-        }
-    }
-
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "status", let playerItem = object as? AVPlayerItem {
-            switch playerItem.status {
-            case .unknown:
-                playerState = .loading
-            case .readyToPlay:
-                playerState = .ready
-            case .failed:
-                if let error = playerItem.error {
-                    playerState = .failed(error.localizedDescription)
-                } else {
-                    playerState = .failed("unknown error")
-                }
-            }
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
-    }
-
-    deinit {
-        player?.currentItem?.removeObserver(self, forKeyPath: "status")
-    }
-}
-
-@available(iOS 15.0, *)
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     var player: AVPlayer
     var videoGravity: AVLayerVideoGravity
+    var isReadyForDisplay: Binding<Bool>
+
+    @State private var timer: Timer?
+    @State private var playerController: AVPlayerViewController?
 
     func makeUIViewController(context: Context) -> AVPlayerViewController {
         let playerViewController = AVPlayerViewController()
         playerViewController.view.backgroundColor = .clear
-        
+
         playerViewController.showsPlaybackControls = false
         playerViewController.updatesNowPlayingInfoCenter = false
         playerViewController.requiresLinearPlayback = true
         playerViewController.player = player
         playerViewController.videoGravity = videoGravity
 
+        // TODO: find a better solution
+        DispatchQueue.main.async {
+            playerController = playerViewController
+            startTimer()
+        }
+
         return playerViewController
+    }
+
+    private func startTimer() {
+        timer = Timer.scheduledTimer(
+            withTimeInterval: 0.1,
+            repeats: true,
+            block: { _ in
+                guard let playerController else { return }
+                isReadyForDisplay.wrappedValue = playerController.isReadyForDisplay
+
+                if playerController.isReadyForDisplay {
+                    stopTimer()
+                }
+            }
+        )
+    }
+
+    private func stopTimer() {
+        timer?.invalidate()
+        timer = nil
     }
 
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
@@ -129,25 +80,48 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 
 @available(iOS 15.0, *)
 struct AdaptyUIVideoView: View {
-    @StateObject private var videoPlayerManager: AdaptyUIVideoPlayerManager
+    @EnvironmentObject var viewModel: AdaptyVideoViewModel
+    @State var isReadyForDisplay = false
 
-    var video: AdaptyUI.VideoPlayer
+    let id: String = UUID().uuidString
+    let video: AdaptyUI.VideoPlayer
+    let placeholderImageAsset: AdaptyUI.ImageData
 
     init(video: AdaptyUI.VideoPlayer) {
         self.video = video
-        _videoPlayerManager = StateObject(wrappedValue: AdaptyUIVideoPlayerManager(video: video))
+
+        switch video.asset {
+        case let .url(_, image), let .resources(_, image):
+            placeholderImageAsset = image
+        }
     }
 
     var body: some View {
-        VStack {
-            if let player = videoPlayerManager.player {
+        ZStack {
+            if let player = viewModel.playerManagers[id]?.player {
                 AdaptyUIVideoPlayerView(
                     player: player,
-                    videoGravity: video.aspect.videoGravity
+                    videoGravity: video.aspect.videoGravity,
+                    isReadyForDisplay: $isReadyForDisplay
                 )
+                .zIndex(0)
             }
 
-            Text("State: " + videoPlayerManager.playerState.title)
+            if !(viewModel.playerStates[id]?.isReady ?? false) || !isReadyForDisplay {
+                AdaptyUIImageView(
+                    asset: placeholderImageAsset,
+                    aspect: video.aspect,
+                    tint: nil
+                )
+                .zIndex(1)
+                .transition(.opacity)
+            }
+        }
+        .onAppear {
+            viewModel.initializePlayerManager(for: video, id: id)
+        }
+        .onDisappear {
+            viewModel.dismissPlayerManager(id: id)
         }
     }
 }
@@ -162,18 +136,18 @@ extension AdaptyUI.VideoPlayer {
     private static let url3 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%203.mov?alt=media&token=ba0e2ec6-f81e-424f-84e6-e18617bedfbf")!
 
     static let test1 = AdaptyUI.VideoPlayer.create(
-        asset: .url(url1, image: .raster(Data())),
+        asset: .url(url1, image: .resources("video_preview_0")),
         aspect: .stretch,
         loop: true
     )
 
     static let test2 = AdaptyUI.VideoPlayer.create(
-        asset: .url(url2, image: .raster(Data())),
+        asset: .url(url2, image: .resources("general-tab-icon")),
         aspect: .fit,
         loop: false
     )
     static let test3 = AdaptyUI.VideoPlayer.create(
-        asset: .url(url3, image: .raster(Data())),
+        asset: .url(url3, image: .resources("general-tab-icon")),
         aspect: .fill,
         loop: true
     )
