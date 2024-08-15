@@ -37,7 +37,7 @@ extension AdaptyUI.VideoData: Hashable {
 
 extension AdaptyUI.VideoData: Decodable {
     enum CodingKeys: String, CodingKey {
-        case url = "video_url"
+        case url
         case image
     }
 
