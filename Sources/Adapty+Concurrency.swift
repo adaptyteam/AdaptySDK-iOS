@@ -159,7 +159,7 @@ import StoreKit
         ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
         ///             Example: "en" means English, "en-US" represents US English.
         ///             If the parameter is omitted, the paywall will be returned in the default locale.
-        ///   - fetchPolicy:
+        ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
         /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
         /// - Throws: An ``AdaptyError`` object
         public static func getPaywall(
@@ -170,6 +170,34 @@ import StoreKit
         ) async throws -> AdaptyPaywall {
             return try await withCheckedThrowingContinuation { continuation in
                 Adapty.getPaywall(placementId: placementId, locale: locale, fetchPolicy: fetchPolicy, loadTimeout: loadTimeout) { result in
+                    switch result {
+                    case let .failure(error):
+                        continuation.resume(throwing: error)
+                    case let .success(paywall):
+                        continuation.resume(returning: paywall)
+                    }
+                }
+            }
+        }
+        
+        /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
+        ///
+        /// - Parameters:
+        ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
+        ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
+        ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
+        ///             Example: "en" means English, "en-US" represents US English.
+        ///             If the parameter is omitted, the paywall will be returned in the default locale.
+        ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
+        /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+        /// - Throws: An ``AdaptyError`` object
+        public static func getPaywallForDefaultAudience(
+            placementId: String,
+            locale: String? = nil,
+            fetchPolicy: AdaptyPaywall.FetchPolicy = .default
+        ) async throws -> AdaptyPaywall {
+            return try await withCheckedThrowingContinuation { continuation in
+                Adapty.getPaywallForDefaultAudience(placementId: placementId, locale: locale, fetchPolicy: fetchPolicy) { result in
                     switch result {
                     case let .failure(error):
                         continuation.resume(throwing: error)
