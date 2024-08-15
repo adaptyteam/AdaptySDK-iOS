@@ -90,7 +90,6 @@ extension Adapty {
             Configuration.observerMode = configuration.observerMode
 
             let backend = Backend(with: configuration)
-            let fallbackBackend = FallbackBackend(with: configuration)
 
             Adapty.eventsManager = EventsManager(profileStorage: UserDefaults.standard, backend: backend)
 
@@ -99,7 +98,6 @@ extension Adapty {
                 profileStorage: UserDefaults.standard,
                 vendorIdsStorage: UserDefaults.standard,
                 backend: backend,
-                fallbackBackend: fallbackBackend,
                 customerUserId: configuration.customerUserId
             )
 

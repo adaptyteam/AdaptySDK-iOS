@@ -18,6 +18,7 @@ extension Adapty {
             dispatchQueue: .main,
             backendBaseUrl: Backend.publicEnvironmentBaseUrl,
             backendFallbackBaseUrl: Backend.publicEnvironmentFallbackBaseUrl,
+            backendConfigsBaseUrl: Backend.publicEnvironmentConfigsBaseUrl,
             backendProxy: nil
         )
 
@@ -29,6 +30,7 @@ extension Adapty {
         let dispatchQueue: DispatchQueue
         let backendBaseUrl: URL
         let backendFallbackBaseUrl: URL
+        let backendConfigsBaseUrl: URL
         let backendProxy: (host: String, port: Int)?
     }
 }
@@ -44,16 +46,8 @@ extension Backend {
         self.init(
             secretKey: configuration.apiKey,
             baseURL: configuration.backendBaseUrl,
-            withProxy: configuration.backendProxy
-        )
-    }
-}
-
-extension FallbackBackend {
-    init(with configuration: Adapty.Configuration) {
-        self.init(
-            secretKey: configuration.apiKey,
-            baseURL: configuration.backendFallbackBaseUrl,
+            baseFallbackURL: configuration.backendFallbackBaseUrl,
+            baseConfigsURL: configuration.backendConfigsBaseUrl,
             withProxy: configuration.backendProxy
         )
     }
@@ -69,6 +63,8 @@ extension Adapty.Configuration: Decodable {
 
         case backendBaseUrl = "backend_base_url"
         case backendFallbackBaseUrl = "backend_fallback_base_url"
+        case backendConfigsBaseUrl = "backend_configs_base_url"
+
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
     }
@@ -89,6 +85,8 @@ extension Adapty.Configuration: Decodable {
             ?? Self.default.backendBaseUrl
         backendFallbackBaseUrl = try container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl)
             ?? Self.default.backendFallbackBaseUrl
+        backendConfigsBaseUrl = try container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl)
+            ?? Self.default.backendConfigsBaseUrl
         if let host = try container.decodeIfPresent(String.self, forKey: .backendProxyHost),
            let port = try container.decodeIfPresent(Int.self, forKey: .backendProxyPort) {
             backendProxy = (host: host, port: port)
