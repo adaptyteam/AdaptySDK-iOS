@@ -8,6 +8,16 @@
 import Foundation
 
 extension Adapty {
+    /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
+    ///
+    /// - Parameters:
+    ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
+    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
+    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
+    ///             Example: "en" means English, "en-US" represents US English.
+    ///             If the parameter is omitted, the paywall will be returned in the default locale.
+    ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
+    ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     public static func getPaywallForDefaultAudience(
         placementId: String,
         locale: String? = nil,
