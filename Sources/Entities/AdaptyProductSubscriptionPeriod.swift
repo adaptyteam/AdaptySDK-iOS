@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-public struct AdaptyProductSubscriptionPeriod {
+public struct AdaptyProductSubscriptionPeriod: Sendable, Hashable {
     /// A unit of time that a subscription period is specified in.
     public let unit: AdaptyPeriodUnit
 
@@ -32,8 +32,6 @@ extension AdaptyProductSubscriptionPeriod: CustomStringConvertible {
         "\(numberOfUnits) \(unit)"
     }
 }
-
-extension AdaptyProductSubscriptionPeriod: Equatable, Sendable {}
 
 extension AdaptyProductSubscriptionPeriod: Codable {
     enum CodingKeys: String, CodingKey {

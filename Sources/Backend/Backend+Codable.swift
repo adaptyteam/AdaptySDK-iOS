@@ -68,7 +68,7 @@ extension [CodingUserInfoKey: Any] {
 }
 
 extension Backend {
-    enum CodingKeys: CodingKey {
+    enum CodingKeys: String, CodingKey {
         case data
         case type
         case id

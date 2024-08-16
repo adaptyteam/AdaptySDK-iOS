@@ -8,7 +8,7 @@
 import Foundation
 
 extension HTTPSession {
-    struct Logger: Sendable {
+    enum Logger {
         static func request(_ request: URLRequest, endpoint: HTTPEndpoint, session: URLSessionConfiguration? = nil, stamp: String) {
             Log.verbose {
                 let url = request.url

@@ -68,10 +68,13 @@ extension AdaptyUI.ViewConfiguration.Asset: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .filling(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .font(value):
+            hasher.combine(2)
             hasher.combine(value)
         case let .unknown(value):
+            hasher.combine(3)
             hasher.combine(value)
         }
     }

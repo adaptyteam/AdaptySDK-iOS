@@ -8,7 +8,7 @@
 import Foundation
 
 package extension AdaptyUI {
-    struct Color: Hashable, Sendable {
+    struct Color: Sendable, Hashable {
         static let transparent = Color(data: 0x00000000)
         static let white = Color(data: 0xFFFFFFFF)
         static let lightGray = Color(data: 0xD3D3D3FF)

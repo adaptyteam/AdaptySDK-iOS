@@ -14,7 +14,7 @@ protocol VariationIdStorage {
     func setPersistentVariationsIds(_: [String: String])
 }
 
-internal final class SK1QueueManager: NSObject {
+final class SK1QueueManager: NSObject {
     let queue: DispatchQueue
 
     var purchaseValidator: PurchaseValidator! // TODO: need refactoring

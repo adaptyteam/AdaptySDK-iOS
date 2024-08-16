@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Button: Hashable, Sendable {
+    package struct Button: Sendable, Hashable {
         package let actions: [ActionAction]
         package let normalState: Element
         package let selectedState: Element?

@@ -45,7 +45,6 @@ final class AdaptyProfileManager {
     }
 }
 
-
 extension AdaptyProfileManager {
     func updateProfileParameters(_ params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
         syncProfile(params: params) { completion($0.error) }
@@ -98,7 +97,7 @@ extension AdaptyProfileManager {
         }
     }
 
-    internal func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
+    func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
         guard isActive,
               let newProfile,
               profile.value.profileId == newProfile.value.profileId,

@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyPaywall {
-    struct ProductReference {
+    struct ProductReference : Sendable, Hashable{
         let adaptyProductId: String
         let vendorId: String
         let promotionalOfferId: String?
@@ -22,7 +22,6 @@ extension AdaptyPaywall.ProductReference: CustomStringConvertible {
     }
 }
 
-extension AdaptyPaywall.ProductReference: Sendable, Equatable {}
 
 extension AdaptyPaywall.ProductReference: Codable {
     enum CodingKeys: String, CodingKey {

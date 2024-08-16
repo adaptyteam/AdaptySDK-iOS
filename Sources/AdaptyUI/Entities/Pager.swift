@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Pager: Hashable, Sendable {
+    package struct Pager: Sendable, Hashable {
         static let `default` = Pager(
             pageWidth: .default,
             pageHeight: .default,
@@ -46,7 +46,7 @@ extension AdaptyUI.Pager {
         case pauseAnimation
     }
 
-    package struct PageControl: Hashable, Sendable {
+    package struct PageControl: Sendable, Hashable {
         static let `default`: Self = .init(
             layout: .stacked,
             verticalAlignment: .bottom,
@@ -71,7 +71,7 @@ extension AdaptyUI.Pager {
         package let selectedColor: AdaptyUI.Color
     }
 
-    package struct Animation: Hashable, Sendable {
+    package struct Animation: Sendable, Hashable {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultAfterInteractionDelay: TimeInterval = 3.0
 
@@ -86,8 +86,10 @@ extension AdaptyUI.Pager.Length: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fixed(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .parent(value):
+            hasher.combine(2)
             hasher.combine(value)
         }
     }
@@ -159,12 +161,13 @@ extension AdaptyUI.Pager.Length: Hashable {
 
 extension AdaptyUI.Pager.InteractionBehaviour: Decodable {
     package init(from decoder: Decoder) throws {
-        self = switch try decoder.singleValueContainer().decode(String.self) {
-        case "none": .none
-        case "cancel_animation": .cancelAnimation
-        case "pause_animation": .pauseAnimation
-        default: .default
-        }
+        self =
+            switch try decoder.singleValueContainer().decode(String.self) {
+            case "none": .none
+            case "cancel_animation": .cancelAnimation
+            case "pause_animation": .pauseAnimation
+            default: .default
+            }
     }
 }
 

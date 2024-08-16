@@ -8,20 +8,20 @@
 import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-internal final class SK2TransactionManager {
+final class SK2TransactionManager {
     private let queue: DispatchQueue
     private var syncTransactionsCompletionHandlers: [AdaptyResultCompletion<VH<AdaptyProfile>?>]?
 
     private let storage: ProfileIdentifierStorage
     private let session: HTTPSession
 
-    internal init(queue: DispatchQueue, storage: ProfileIdentifierStorage, backend: Backend) {
+    init(queue: DispatchQueue, storage: ProfileIdentifierStorage, backend: Backend) {
         self.queue = queue
         session = backend.createHTTPSession(responseQueue: queue)
         self.storage = storage
     }
 
-    internal func syncTransactions(_ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>?>) {
+    func syncTransactions(_ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>?>) {
         queue.async { [weak self] in
             guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))

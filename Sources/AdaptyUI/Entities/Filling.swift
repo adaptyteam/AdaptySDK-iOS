@@ -78,10 +78,13 @@ extension AdaptyUI.Filling: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .color(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .colorGradient(value):
+            hasher.combine(2)
             hasher.combine(value)
         case let .image(value):
+            hasher.combine(3)
             hasher.combine(value)
         }
     }
@@ -91,8 +94,10 @@ extension AdaptyUI.ColorFilling: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .color(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .colorGradient(value):
+            hasher.combine(2)
             hasher.combine(value)
         }
     }

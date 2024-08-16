@@ -18,9 +18,11 @@ extension AdaptyUI.StateCondition: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .selectedSection(id, index):
+            hasher.combine(1)
             hasher.combine(id)
             hasher.combine(index)
         case let .selectedProduct(id, groupId):
+            hasher.combine(2)
             hasher.combine(id)
             hasher.combine(groupId)
         }

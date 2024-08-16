@@ -55,8 +55,6 @@ extension AdaptyPeriodUnit: CustomStringConvertible {
     }
 }
 
-extension AdaptyPeriodUnit: Equatable, Sendable {}
-
 extension AdaptyPeriodUnit: Codable {
     fileprivate enum CodingValues: String {
         case day

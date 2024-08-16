@@ -5,8 +5,8 @@ let package = Package(
     name: "Adapty",
 
     platforms: [
-        .iOS("12.2"),
-        .macOS("10.14.4"),
+        .iOS(.v13),
+        .macOS(.v10_15),
         .visionOS(.v1),
     ],
     products: [

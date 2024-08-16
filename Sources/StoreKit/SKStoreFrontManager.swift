@@ -8,13 +8,9 @@
 import Foundation
 import StoreKit
 
-class SKStorefrontManager {
+final class SKStorefrontManager {
     static var countryCode: String? {
-        if #available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.2, visionOS 1.0, *) {
-            SKPaymentQueue.default().storefront?.countryCode
-        } else {
-            nil
-        }
+        SKPaymentQueue.default().storefront?.countryCode
     }
 
     static func subscribeForUpdates(_ callback: @escaping (String) -> Void) {

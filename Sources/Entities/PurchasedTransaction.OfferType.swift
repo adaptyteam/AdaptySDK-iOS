@@ -30,8 +30,6 @@ extension PurchasedTransaction.OfferType {
     }
 }
 
-extension PurchasedTransaction.OfferType: Equatable, Sendable {}
-
 extension PurchasedTransaction.OfferType: Encodable {
     private enum CodingValues: String {
         case introductory

@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct AdaptyLocale {
-    static var defaultPaywallLocale = AdaptyLocale(id: "en")
+struct AdaptyLocale: Sendable {
+    static let defaultPaywallLocale = AdaptyLocale(id: "en")
 
     let id: String
     var languageCode: String {
@@ -34,7 +34,7 @@ extension AdaptyLocale: ExpressibleByStringLiteral {
     }
 }
 
-extension AdaptyLocale: Hashable, Sendable {
+extension AdaptyLocale: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

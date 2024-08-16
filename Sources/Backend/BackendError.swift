@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ErrorResponse: Codable, Error, Equatable {
+struct ErrorResponse: Error, Hashable, Codable {
     let body: String
     let errorCodes: [String]
     let requestId: String?

@@ -9,7 +9,7 @@ import Foundation
 
 extension AdaptyProfile {
     /// Information about the user's subscription.
-    public struct Subscription {
+    public struct Subscription: Sendable, Hashable {
         /// A store of the purchase.
         ///
         /// Possible values:
@@ -97,8 +97,6 @@ extension AdaptyProfile {
         public let cancellationReason: String?
     }
 }
-
-extension AdaptyProfile.Subscription: Equatable {}
 
 extension AdaptyProfile.Subscription: CustomStringConvertible {
     public var description: String {

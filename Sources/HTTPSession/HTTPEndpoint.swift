@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct HTTPEndpoint: Sendable, Equatable {
+struct HTTPEndpoint: Sendable, Hashable {
     typealias Path = String
     let method: HTTPMethod
     let path: Path

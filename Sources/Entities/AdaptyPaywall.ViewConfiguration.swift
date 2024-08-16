@@ -42,7 +42,8 @@ extension AdaptyPaywall.ViewConfiguration: Codable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        self = if container.contains(.container) {
+        self =
+            if container.contains(.container) {
             try .data(AdaptyUI.ViewConfiguration(from: decoder))
         } else {
             try .withoutData(

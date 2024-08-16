@@ -17,7 +17,6 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     let headers: Headers
     let profileId: String
 
-    
     let requestSource: RequestSource
 
     init(profileId: String, requestSource: RequestSource) {

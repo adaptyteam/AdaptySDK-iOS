@@ -142,13 +142,20 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
 extension AdaptyUI.ViewConfiguration.RichText.Item: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
-        case let .text(value, attr),
-             let .tag(value, attr),
-             let .image(value, attr):
+        case let .text(value, attr):
+            hasher.combine(1)
+            hasher.combine(value)
+            hasher.combine(attr)
+        case let .tag(value, attr):
+            hasher.combine(2)
+            hasher.combine(value)
+            hasher.combine(attr)
+        case let .image(value, attr):
+            hasher.combine(3)
             hasher.combine(value)
             hasher.combine(attr)
         case .unknown:
-            break
+            hasher.combine(4)
         }
     }
 }

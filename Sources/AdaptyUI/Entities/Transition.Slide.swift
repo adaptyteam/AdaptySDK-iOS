@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct TransitionSlide: Hashable, Sendable {
+    package struct TransitionSlide: Sendable, Hashable {
         static let `default` = AdaptyUI.TransitionSlide(
             startDelay: 0.0,
             duration: 0.3,

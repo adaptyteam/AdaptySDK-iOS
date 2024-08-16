@@ -6,7 +6,7 @@
 //
 import StoreKit
 
-struct PurchasedTransaction {
+struct PurchasedTransaction : Sendable{
     let transactionId: String
     let originalTransactionId: String
     let vendorProductId: String
@@ -18,7 +18,7 @@ struct PurchasedTransaction {
     let subscriptionOffer: SubscriptionOffer?
     let environment: String?
 
-    struct SubscriptionOffer {
+    struct SubscriptionOffer: Sendable {
         let id: String?
         let period: AdaptyProductSubscriptionPeriod?
         let paymentMode: AdaptyProductDiscount.PaymentMode
@@ -48,9 +48,6 @@ struct PurchasedTransaction {
         }
     }
 }
-
-extension PurchasedTransaction: Sendable {}
-extension PurchasedTransaction.SubscriptionOffer: Sendable {}
 
 extension PurchasedTransaction.SubscriptionOffer: Encodable {
     enum CodingKeys: String, CodingKey {

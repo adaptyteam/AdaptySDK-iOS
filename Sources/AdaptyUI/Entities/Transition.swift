@@ -12,7 +12,7 @@ extension AdaptyUI {
         case fade(TransitionFade)
         case unknown(String)
 
-        package enum Interpolator {
+        package enum Interpolator: Sendable, Hashable {
             static let `default`: AdaptyUI.Transition.Interpolator = .easeInOut
 
             case easeInOut
@@ -22,7 +22,7 @@ extension AdaptyUI {
         }
     }
 
-    package struct TransitionFade: Hashable, Sendable {
+    package struct TransitionFade: Sendable, Hashable {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultDuration: TimeInterval = 0.3
         static let defaultInterpolator = AdaptyUI.Transition.Interpolator.default
@@ -37,8 +37,10 @@ extension AdaptyUI.Transition: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fade(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .unknown(value):
+            hasher.combine(2)
             hasher.combine(value)
         }
     }

@@ -54,8 +54,10 @@ extension AdaptyUI.ViewConfiguration.StringId: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .basic(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .product(value):
+            hasher.combine(2)
             hasher.combine(value)
         }
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct ColorGradient: Hashable, Sendable {
+    package struct ColorGradient: Sendable, Hashable {
         package let kind: Kind
         package let start: Point
         package let end: Point
@@ -17,12 +17,12 @@ extension AdaptyUI {
 }
 
 extension AdaptyUI.ColorGradient {
-    package struct Item: Hashable, Sendable {
+    package struct Item: Sendable, Hashable {
         package let color: AdaptyUI.Color
         package let p: Double
     }
 
-    package enum Kind {
+    package enum Kind: Sendable, Hashable {
         case linear
         case conic
         case radial

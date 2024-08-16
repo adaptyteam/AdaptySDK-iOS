@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Box: Hashable, Sendable {
+    package struct Box: Sendable, Hashable {
         static let defaultHorizontalAlignment: HorizontalAlignment = .center
         static let defaultVerticalAlignment: VerticalAlignment = .center
 
@@ -33,13 +33,16 @@ extension AdaptyUI.Box.Length: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fixed(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .min(value):
+            hasher.combine(2)
             hasher.combine(value)
         case let .shrink(value):
+            hasher.combine(3)
             hasher.combine(value)
         case .fillMax:
-            break
+            hasher.combine(4)
         }
     }
 }

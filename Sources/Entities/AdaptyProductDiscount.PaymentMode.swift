@@ -73,8 +73,6 @@ extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
     }
 }
 
-extension AdaptyProductDiscount.PaymentMode: Equatable, Sendable {}
-
 extension AdaptyProductDiscount.PaymentMode: Encodable {
     private enum CodingValues: String {
         case payAsYouGo = "pay_as_you_go"

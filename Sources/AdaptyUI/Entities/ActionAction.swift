@@ -27,25 +27,37 @@ extension AdaptyUI.ActionAction: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .openUrl(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .custom(value):
+            hasher.combine(2)
             hasher.combine(value)
         case let .selectProduct(id, groupId):
+            hasher.combine(3)
             hasher.combine(id)
             hasher.combine(groupId)
         case let .purchaseProduct(id):
+            hasher.combine(4)
             hasher.combine(id)
         case let .unselectProduct(groupId):
+            hasher.combine(5)
             hasher.combine(groupId)
         case let .purchaseSelectedProduct(groupId):
+            hasher.combine(6)
             hasher.combine(groupId)
         case let .switchSection(id, index):
+            hasher.combine(7)
             hasher.combine(id)
             hasher.combine(index)
         case let .openScreen(id):
+            hasher.combine(8)
             hasher.combine(id)
-        case .restore, .close, .closeScreen:
-            break
+        case .restore:
+            hasher.combine(9)
+        case .close:
+            hasher.combine(10)
+        case .closeScreen:
+            hasher.combine(11)
         }
     }
 }

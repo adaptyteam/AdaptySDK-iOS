@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyProfile {
-    public enum Gender {
+    public enum Gender: Sendable, Hashable {
         case female
         case male
         case other
@@ -24,8 +24,6 @@ extension AdaptyProfile.Gender: CustomStringConvertible {
         }
     }
 }
-
-extension AdaptyProfile.Gender: Equatable, Sendable {}
 
 extension AdaptyProfile.Gender: Codable {
     enum CodingValues: String {

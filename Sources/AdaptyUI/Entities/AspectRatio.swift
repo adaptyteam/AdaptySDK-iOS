@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 extension AdaptyUI {
     package enum AspectRatio: String {
         case fit

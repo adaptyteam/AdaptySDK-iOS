@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Stack: Hashable, Sendable {
+    package struct Stack: Sendable, Hashable {
         static let `default` = Stack(
             type: .vertical,
             horizontalAlignment: .center,
@@ -51,8 +51,10 @@ extension AdaptyUI.StackItem: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .space(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .element(value):
+            hasher.combine(2)
             hasher.combine(value)
         }
     }

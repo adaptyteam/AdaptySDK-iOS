@@ -19,11 +19,14 @@ extension AdaptyUI.ImageData: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .raster(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .url(url, previewRaster: value):
+            hasher.combine(2)
             hasher.combine(url)
             hasher.combine(value)
         case let .resources(value):
+            hasher.combine(3)
             hasher.combine(value)
         }
     }

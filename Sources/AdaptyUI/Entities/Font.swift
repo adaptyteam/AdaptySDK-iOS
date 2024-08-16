@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Font: Hashable, Sendable {
+    package struct Font: Sendable, Hashable {
         package static let `default` = Font(
             alias: "adapty_system",
             familyName: "adapty_system",

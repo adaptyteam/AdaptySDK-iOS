@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Decorator: Hashable, Sendable {
+    package struct Decorator: Sendable, Hashable {
         static let defaultShapeType: ShapeType = .rectangle(cornerRadius: CornerRadius.zero)
         package let shapeType: ShapeType
         package let background: Filling?

@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Text: Hashable, Sendable {
+    package struct Text: Sendable, Hashable {
         static let `default` = AdaptyUI.Text(
             value: .text(.empty),
             horizontalAlign: .leading,
@@ -34,10 +34,13 @@ extension AdaptyUI.Text.Value: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .text(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .productText(value):
+            hasher.combine(2)
             hasher.combine(value)
         case let .selectedProductText(value):
+            hasher.combine(3)
             hasher.combine(value)
         }
     }

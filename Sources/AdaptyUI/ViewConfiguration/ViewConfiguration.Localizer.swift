@@ -50,7 +50,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 }
 
 extension AdaptyUI {
-    package enum LocalizerError: Swift.Error, Sendable {
+    package enum LocalizerError: Swift.Error {
         case notFoundAsset(String)
         case wrongTypeAsset(String, expected: String)
 

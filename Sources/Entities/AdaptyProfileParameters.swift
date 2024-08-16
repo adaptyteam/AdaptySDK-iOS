@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyProfileParameters {
+public struct AdaptyProfileParameters: Sendable, Hashable {
     public internal(set) var firstName: String?
     public internal(set) var lastName: String?
     public internal(set) var gender: AdaptyProfile.Gender?
@@ -54,8 +54,6 @@ extension AdaptyProfileParameters {
     public static let empty: AdaptyProfileParameters = .init()
     public func builder() -> Builder { Builder(self) }
 }
-
-extension AdaptyProfileParameters: Equatable, Sendable {}
 
 extension AdaptyProfileParameters: Codable {
     enum CodingKeys: String, CodingKey {

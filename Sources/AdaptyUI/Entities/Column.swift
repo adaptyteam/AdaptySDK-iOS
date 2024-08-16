@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Column: Hashable, Sendable {
+    package struct Column: Sendable, Hashable {
         package let spacing: Double
         package let items: [GridItem]
     }

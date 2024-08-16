@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyProfile {
-    public struct AccessLevel {
+    public struct AccessLevel: Sendable, Hashable {
         /// Unique identifier of the access level configured by you in Adapty Dashboard.
         public let id: String
 
@@ -91,8 +91,6 @@ extension AdaptyProfile {
         public let isRefund: Bool
     }
 }
-
-extension AdaptyProfile.AccessLevel: Equatable {}
 
 extension AdaptyProfile.AccessLevel: CustomStringConvertible {
     public var description: String {

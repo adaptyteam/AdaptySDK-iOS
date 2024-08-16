@@ -8,7 +8,7 @@
 import Foundation
 
 /// Defines offers eligibility state (e.g. introductory offers or promotional offers.)
-public enum AdaptyEligibility {
+public enum AdaptyEligibility: Sendable, Hashable {
     /// User is not eligible to get any offer, you should't present it in your UI.
     case ineligible
 
@@ -24,8 +24,6 @@ extension AdaptyEligibility: ExpressibleByBooleanLiteral {
         self = value ? .eligible : .ineligible
     }
 }
-
-extension AdaptyEligibility: Equatable, Sendable {}
 
 extension AdaptyEligibility: Codable {
     enum CodingValues: String {

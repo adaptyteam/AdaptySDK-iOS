@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct CornerRadius: Hashable, Sendable {
+    package struct CornerRadius: Sendable, Hashable {
         static let defaultValue: Double = 0.0
         package let topLeading: Double
         package let topTrailing: Double

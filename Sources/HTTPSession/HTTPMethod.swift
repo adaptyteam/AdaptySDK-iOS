@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum HTTPMethod: String, ExpressibleByStringLiteral, Sendable, Equatable {
+enum HTTPMethod: String, ExpressibleByStringLiteral, Sendable, Hashable {
     case options = "OPTIONS"
     case get = "GET"
     case head = "HEAD"

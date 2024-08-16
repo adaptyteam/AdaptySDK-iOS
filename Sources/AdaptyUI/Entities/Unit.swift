@@ -19,10 +19,13 @@ extension AdaptyUI.Unit: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .point(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .screen(value):
+            hasher.combine(2)
             hasher.combine(value)
         case let .safeArea(value):
+            hasher.combine(3)
             hasher.combine(value)
         }
     }

@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-public struct AdaptyProductDiscount {
+public struct AdaptyProductDiscount: Sendable, Hashable {
     let priceValue: AdaptyPrice
 
     /// Discount price of a product in a local currency.
@@ -61,8 +61,6 @@ extension AdaptyProductDiscount: CustomStringConvertible {
             + ")"
     }
 }
-
-extension AdaptyProductDiscount: Equatable, Sendable {}
 
 extension AdaptyProductDiscount: Encodable {
     enum CodingKeys: String, CodingKey {

@@ -20,9 +20,14 @@ extension AdaptyUI.ShapeType: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .rectangle(value):
+            hasher.combine(1)
             hasher.combine(value)
-        case .circle, .curveUp, .curveDown:
-            break
+        case .circle:
+            hasher.combine(2)
+        case .curveUp:
+            hasher.combine(3)
+        case .curveDown:
+            hasher.combine(4)
         }
     }
 }

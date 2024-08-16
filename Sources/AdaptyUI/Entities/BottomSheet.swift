@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct BottomSheet: Hashable, Sendable {
+    package struct BottomSheet: Sendable, Hashable {
         package let content: Element
     }
 }

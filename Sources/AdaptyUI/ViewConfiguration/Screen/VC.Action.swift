@@ -30,8 +30,10 @@ extension AdaptyUI.ViewConfiguration.Action: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .openUrl(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .action(value):
+            hasher.combine(2)
             hasher.combine(value)
         }
     }
@@ -89,7 +91,6 @@ extension AdaptyUI.ViewConfiguration.Action: Decodable {
                 id: container.decode(String.self, forKey: .productId),
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
             ))
-
         case .purchaseProductId:
             self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId)))
         case .switchSection:

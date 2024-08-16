@@ -7,7 +7,7 @@
 
 import StoreKit
 
-internal final class SK1ReceiptManager: NSObject {
+final class SK1ReceiptManager: NSObject {
     private let queue: DispatchQueue
     private var refreshCompletionHandlers: [AdaptyResultCompletion<Data>]?
     private var validateCompletionHandlers: [AdaptyResultCompletion<VH<AdaptyProfile>>]?
@@ -15,7 +15,7 @@ internal final class SK1ReceiptManager: NSObject {
     private let storage: ProfileIdentifierStorage
     private let session: HTTPSession
 
-    internal init(queue: DispatchQueue, storage: ProfileIdentifierStorage, backend: Backend, refreshIfEmpty: Bool) {
+    init(queue: DispatchQueue, storage: ProfileIdentifierStorage, backend: Backend, refreshIfEmpty: Bool) {
         self.queue = queue
         session = backend.createHTTPSession(responseQueue: queue)
         self.storage = storage
@@ -25,7 +25,7 @@ internal final class SK1ReceiptManager: NSObject {
         }
     }
 
-    internal func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
+    func validateReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) {
         queue.async { [weak self] in
             guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))
@@ -69,7 +69,7 @@ internal final class SK1ReceiptManager: NSObject {
         }
     }
 
-    internal func getReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<Data>) {
+    func getReceipt(refreshIfEmpty: Bool, _ completion: @escaping AdaptyResultCompletion<Data>) {
         queue.async { [weak self] in
             guard let self else {
                 completion(.failure(SKManagerError.interrupted().asAdaptyError))

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AdaptyPrice {
+struct AdaptyPrice: Sendable, Hashable {
     let value: NSDecimalNumber
     let locale: Locale
 
@@ -16,8 +16,6 @@ struct AdaptyPrice {
     var currencySymbol: String? { locale.currencySymbol }
     var localizedString: String? { locale.ext.localized(price: value) }
 }
-
-extension AdaptyPrice: Equatable, Sendable {}
 
 extension AdaptyPrice: Encodable {
     enum CodingKeys: String, CodingKey {

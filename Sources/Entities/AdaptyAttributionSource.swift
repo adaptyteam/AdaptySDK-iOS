@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum AdaptyAttributionSource: String, Equatable, Sendable {
+public enum AdaptyAttributionSource: String {
     case adjust
     case appsflyer
     case branch

@@ -8,7 +8,7 @@
 import CommonCrypto
 import Foundation
 
-internal extension String {
+extension String {
     func sha256() -> String {
         let data = Data(utf8)
         var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))

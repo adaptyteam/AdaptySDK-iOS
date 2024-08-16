@@ -48,8 +48,10 @@ extension AdaptyUI.ViewConfiguration.StackItem: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .space(value):
+            hasher.combine(1)
             hasher.combine(value)
         case let .element(value):
+            hasher.combine(2)
             hasher.combine(value)
         }
     }

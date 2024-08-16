@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI {
-    package struct Toggle: Hashable, Sendable {
+    package struct Toggle: Sendable, Hashable {
         package let onActions: [ActionAction]
         package let offActions: [ActionAction]
         package let onCondition: StateCondition

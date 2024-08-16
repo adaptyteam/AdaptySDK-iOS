@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BackendProductState {
+struct BackendProductState: Sendable, Hashable {
     let vendorId: String
     var introductoryOfferEligibility: AdaptyEligibility
     let version: Int64
@@ -18,8 +18,6 @@ extension BackendProductState: CustomStringConvertible {
         "(vendorId: \(vendorId), introductoryOfferEligibility: \(introductoryOfferEligibility), version: \(version))"
     }
 }
-
-extension BackendProductState: Sendable, Equatable {}
 
 extension [BackendProductState]: ValueHashable {}
 
