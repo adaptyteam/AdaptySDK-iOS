@@ -7,7 +7,7 @@
 
 import StoreKit
 
-public struct AdaptyDeferredProduct: AdaptyProduct {
+public struct AdaptyDeferredProduct: AdaptyProduct, Sendable {
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?
 

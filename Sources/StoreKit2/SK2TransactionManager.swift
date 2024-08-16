@@ -97,9 +97,9 @@ final class SK2TransactionManager {
             let params: EventParameters? =
                 if let lastTransaction {
                     [
-                        "original_transaction_id": .valueOrNil(lastTransaction.ext.originalIdentifier),
-                        "transaction_id": .valueOrNil(lastTransaction.ext.identifier),
-                        "purchase_date": .valueOrNil(lastTransaction.purchaseDate),
+                        "original_transaction_id": lastTransaction.ext.originalIdentifier,
+                        "transaction_id": lastTransaction.ext.identifier,
+                        "purchase_date": lastTransaction.purchaseDate,
                     ]
                 } else {
                     nil

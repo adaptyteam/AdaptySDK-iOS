@@ -49,7 +49,7 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         }
     }
 
-    enum RequestSource {
+    enum RequestSource: Sendable {
         case restore(String)
         case other(PurchasedTransaction, reason: Adapty.ValidatePurchaseReason)
     }
@@ -77,8 +77,8 @@ extension HTTPSession {
             requestSource: .restore(originalTransactionId)
         )
         let logParams: EventParameters = [
-            "original_transaction_id": .valueOrNil(originalTransactionId),
-            "request_source": .value(Adapty.ValidatePurchaseReason.restoreRawString),
+            "original_transaction_id": originalTransactionId,
+            "request_source": Adapty.ValidatePurchaseReason.restoreRawString,
         ]
         _ = perform(request, logParams, completion)
     }
@@ -94,14 +94,14 @@ extension HTTPSession {
             requestSource: .other(purchasedTransaction, reason: reason)
         )
         let logParams: EventParameters = [
-            "product_id": .value(purchasedTransaction.vendorProductId),
-            "original_transaction_id": .valueOrNil(purchasedTransaction.originalTransactionId),
-            "transaction_id": .valueOrNil(purchasedTransaction.transactionId),
-            "variation_id": .valueOrNil(purchasedTransaction.productVariationId),
-            "variation_id_persistent": .valueOrNil(purchasedTransaction.persistentProductVariationId),
-            "promotional_offer_id": .valueOrNil(purchasedTransaction.subscriptionOffer?.id),
-            "environment": .valueOrNil(purchasedTransaction.environment),
-            "request_source": .value(reason.rawString),
+            "product_id": purchasedTransaction.vendorProductId,
+            "original_transaction_id": purchasedTransaction.originalTransactionId,
+            "transaction_id": purchasedTransaction.transactionId,
+            "variation_id": purchasedTransaction.productVariationId,
+            "variation_id_persistent": purchasedTransaction.persistentProductVariationId,
+            "promotional_offer_id": purchasedTransaction.subscriptionOffer?.id,
+            "environment": purchasedTransaction.environment,
+            "request_source": reason.rawString,
         ]
         _ = perform(request, logParams, completion)
     }

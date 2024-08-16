@@ -35,7 +35,7 @@ final class SKProductsManager {
         fetchAllProducts()
     }
 
-    enum ProductsFetchPolicy {
+    enum ProductsFetchPolicy: Sendable, Hashable {
         case `default`
         case returnCacheDataElseLoad
     }

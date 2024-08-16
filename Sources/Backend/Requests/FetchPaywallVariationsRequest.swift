@@ -115,14 +115,14 @@ extension HTTPSession {
             request,
             logName: "get_paywall_variations",
             logParams: [
-                "api_prefix": .value(apiKeyPrefix),
-                "placement_id": .value(placementId),
-                "locale": .value(locale),
-                "segment_id": .value(segmentId),
-                "builder_version": .value(AdaptyUI.builderVersion),
-                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
-                "md5": .value(md5Hash),
-                "disable_server_cache": .value(disableServerCache),
+                "api_prefix": apiKeyPrefix,
+                "placement_id": placementId,
+                "locale": locale,
+                "segment_id": segmentId,
+                "builder_version": AdaptyUI.builderVersion,
+                "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                "md5": md5Hash,
+                "disable_server_cache": disableServerCache,
             ]
         ) { (result: FetchPaywallVariationsRequest.Result) in
             completion(result.map { $0.body }.mapError { $0.asAdaptyError })

@@ -253,7 +253,7 @@ enum Environment {
                 methodName: methodName,
                 callId: callId,
                 params: [
-                    "token": .value(attributionToken),
+                    "token": attributionToken,
                 ]
             ))
 

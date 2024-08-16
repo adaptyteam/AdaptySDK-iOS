@@ -76,7 +76,7 @@ extension AdaptyProfileParameters.Builder {
 
     @discardableResult
     public func withRemoved(customAttributeForKey key: String) throws -> Self {
-        try with(customAttribute: .nil, forKey: key)
+        try with(customAttribute: .none, forKey: key)
     }
 
     @discardableResult
@@ -86,7 +86,7 @@ extension AdaptyProfileParameters.Builder {
 
     @discardableResult
     public func with(customAttribute value: Double, forKey key: String) throws -> Self {
-        try with(customAttribute: .float(value), forKey: key)
+        try with(customAttribute: .double(value), forKey: key)
     }
 
     func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws -> Self {

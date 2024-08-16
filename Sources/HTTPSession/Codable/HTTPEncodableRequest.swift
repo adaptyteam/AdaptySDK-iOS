@@ -12,6 +12,7 @@ protocol HTTPEncodableRequest: HTTPDataRequest, Encodable {}
 extension HTTPEncodableRequest {
     func getData(configuration: HTTPConfiguration) throws -> Data? {
         let encoder = (configuration as? HTTPCodableConfiguration)?.encoder ?? JSONEncoder()
-        return try encoder.encode(AnyEncodable(self))
+        
+        return try encoder.encode(self)
     }
 }

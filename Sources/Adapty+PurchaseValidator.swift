@@ -38,7 +38,7 @@ extension Adapty: PurchaseValidator {
         }
     }
 
-    enum ValidatePurchaseReason {
+    enum ValidatePurchaseReason: Sendable, Hashable {
         case setVariation
         case observing
         case purchasing

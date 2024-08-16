@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Timer: Hashable, Sendable {
+    struct Timer: Sendable, Hashable {
         let id: String
         let state: AdaptyUI.Timer.State
         let format: [Item]
@@ -16,7 +16,7 @@ extension AdaptyUI.ViewConfiguration {
         let horizontalAlign: AdaptyUI.HorizontalAlignment
         let defaultTextAttributes: TextAttributes?
 
-        struct Item: Hashable, Sendable {
+        struct Item: Sendable, Hashable {
             let from: TimeInterval
             let stringId: String
         }

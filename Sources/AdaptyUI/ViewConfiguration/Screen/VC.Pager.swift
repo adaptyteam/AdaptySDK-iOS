@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Pager: Hashable, Sendable {
+    struct Pager: Sendable, Hashable {
         let pageWidth: AdaptyUI.Pager.Length
         let pageHeight: AdaptyUI.Pager.Length
         let pagePadding: AdaptyUI.EdgeInsets
@@ -22,7 +22,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Pager {
-    struct PageControl: Hashable, Sendable {
+    struct PageControl: Sendable, Hashable {
         let layout: AdaptyUI.Pager.PageControl.Layout
         let verticalAlignment: AdaptyUI.VerticalAlignment
         let padding: AdaptyUI.EdgeInsets

@@ -27,7 +27,7 @@ extension SK1QueueManager {
             self.makePurchasesCompletionHandlers[productId] = [completion]
             SKPaymentQueue.default().add(payment)
             Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "add_payment", params: [
-                "product_id": .value(payment.productIdentifier),
+                "product_id": payment.productIdentifier,
             ]))
         }
     }

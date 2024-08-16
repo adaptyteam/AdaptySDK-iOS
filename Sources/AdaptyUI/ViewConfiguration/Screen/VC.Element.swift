@@ -28,7 +28,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.Element {
-    struct Properties: Hashable, Sendable {
+    struct Properties: Sendable, Hashable {
         let elementId: String?
         let decorator: AdaptyUI.ViewConfiguration.Decorator?
         let padding: AdaptyUI.EdgeInsets

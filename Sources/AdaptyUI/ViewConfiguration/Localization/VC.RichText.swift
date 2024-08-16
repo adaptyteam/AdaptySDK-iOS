@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct TextAttributes: Hashable, Sendable {
+    struct TextAttributes: Sendable, Hashable {
         let fontAssetId: String?
         let size: Double?
         let txtColorAssetId: String?
@@ -29,7 +29,7 @@ extension AdaptyUI.ViewConfiguration {
         }
     }
 
-    struct RichText: Hashable, Sendable {
+    struct RichText: Sendable, Hashable {
         let items: [RichText.Item]
 
         var isEmpty: Bool { items.isEmpty }

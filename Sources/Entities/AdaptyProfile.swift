@@ -34,7 +34,7 @@ public struct AdaptyProfile {
     let version: Int64
 }
 
-extension AdaptyProfile: Equatable {
+extension AdaptyProfile: Hashable {
     public static func == (lhs: AdaptyProfile, rhs: AdaptyProfile) -> Bool {
         lhs.profileId == rhs.profileId
             && lhs.customerUserId == rhs.customerUserId
@@ -44,6 +44,19 @@ extension AdaptyProfile: Equatable {
             && lhs.accessLevels == rhs.accessLevels
             && lhs.subscriptions == rhs.subscriptions
             && lhs.nonSubscriptions == rhs.nonSubscriptions
+            && lhs.version == rhs.version
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(profileId)
+        hasher.combine(customerUserId)
+        hasher.combine(segmentId)
+        hasher.combine(isTestUser)
+        hasher.combine(codableCustomAttributes)
+        hasher.combine(accessLevels)
+        hasher.combine(subscriptions)
+        hasher.combine(nonSubscriptions)
+        hasher.combine(version)
     }
 }
 

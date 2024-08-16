@@ -16,7 +16,7 @@ extension AdaptyUI.ViewConfiguration {
 }
 
 extension AdaptyUI.ViewConfiguration.StringId {
-    struct Product: Hashable, Sendable {
+    struct Product: Sendable, Hashable {
         static let defaultProductGroupId = "group_A"
         let adaptyProductId: String?
         let productGroupId: String?

@@ -56,7 +56,7 @@ extension HTTPSession {
         perform(
             request,
             logName: "set_asa_token",
-            logParams: ["token": .value(token)]
+            logParams: ["token": token]
         ) { (result: SetASATokenRequest.Result) in
             completion(result
                 .map { VH($0.body, hash: $0.headers.getBackendResponseHash()) }

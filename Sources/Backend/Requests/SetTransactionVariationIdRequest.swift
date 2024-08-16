@@ -56,8 +56,8 @@ extension HTTPSession {
             request,
             logName: "set_variation_id",
             logParams: [
-                "transaction_id": .value(transactionId),
-                "variation_id": .value(variationId),
+                "transaction_id": transactionId,
+                "variation_id": variationId,
             ]
         ) { (result: SetTransactionVariationIdRequest.Result) in
             switch result {

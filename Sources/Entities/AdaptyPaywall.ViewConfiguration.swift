@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyPaywall {
-    enum ViewConfiguration {
+    enum ViewConfiguration: Sendable, Hashable {
         case withoutData(AdaptyLocale, String)
         case data(AdaptyUI.ViewConfiguration)
 
@@ -44,13 +44,13 @@ extension AdaptyPaywall.ViewConfiguration: Codable {
 
         self =
             if container.contains(.container) {
-            try .data(AdaptyUI.ViewConfiguration(from: decoder))
-        } else {
-            try .withoutData(
-                container.decode(AdaptyLocale.self, forKey: .responseLocale),
-                container.decode(String.self, forKey: .id)
-            )
-        }
+                try .data(AdaptyUI.ViewConfiguration(from: decoder))
+            } else {
+                try .withoutData(
+                    container.decode(AdaptyLocale.self, forKey: .responseLocale),
+                    container.decode(String.self, forKey: .id)
+                )
+            }
     }
 
     func encode(to encoder: any Encoder) throws {

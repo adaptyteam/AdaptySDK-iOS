@@ -24,8 +24,8 @@ extension Adapty {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attribution, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         }
         let logParams: EventParameters = [
-            "source": .value(source.rawValue),
-            "has_network_user_id": .value(networkUserId != nil),
+            "source": source.rawValue,
+            "has_network_user_id": networkUserId != nil,
         ]
         async(completion, logName: "update_attribution", logParams: logParams) { manager, completion in
             manager.updateAttribution(

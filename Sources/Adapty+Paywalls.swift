@@ -39,10 +39,10 @@ extension Adapty {
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
         let logParams: EventParameters = [
-            "placement_id": .value(placementId),
-            "locale": .value(locale),
-            "fetch_policy": .value(fetchPolicy),
-            "load_timeout": .value(loadTimeout),
+            "placement_id": placementId,
+            "locale": locale,
+            "fetch_policy": fetchPolicy,
+            "load_timeout": loadTimeout,
         ]
 
         Adapty.async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in

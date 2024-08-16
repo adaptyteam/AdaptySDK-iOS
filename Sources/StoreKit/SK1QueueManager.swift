@@ -52,14 +52,14 @@ final class SK1QueueManager: NSObject {
     func setVariationId(_ variationId: String, for productId: String) {
         if variationId != variationsIds.updateValue(variationId, forKey: productId) {
             Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
-                "variation_by_product": .value(variationsIds),
+                "variation_by_product": variationsIds,
             ]))
             storage.setVariationsIds(variationsIds)
         }
 
         if variationId != persistentVariationsIds.updateValue(variationId, forKey: productId) {
             Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids_persistent", params: [
-                "variation_by_product": .value(variationsIds),
+                "variation_by_product": variationsIds,
             ]))
             storage.setPersistentVariationsIds(variationsIds)
         }
@@ -68,7 +68,7 @@ final class SK1QueueManager: NSObject {
     func removeVariationId(for productId: String) {
         guard variationsIds.removeValue(forKey: productId) != nil else { return }
         Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
-            "variation_by_product": .value(variationsIds),
+            "variation_by_product": variationsIds,
         ]))
         storage.setVariationsIds(variationsIds)
     }
@@ -140,7 +140,7 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
     }
 
     func paymentQueue(_: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
-        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": .value(productIdentifiers)]))
+        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": productIdentifiers]))
 
         // TODO: validate receipt
     }

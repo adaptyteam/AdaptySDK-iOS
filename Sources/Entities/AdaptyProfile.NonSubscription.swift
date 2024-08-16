@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyProfile {
-    public struct NonSubscription {
+    public struct NonSubscription: Sendable, Hashable {
         /// An identifier of the purchase in Adapty. You can use it to ensure that you've already processed this purchase (for example tracking one time products).
         public let purchaseId: String
 
@@ -42,8 +42,6 @@ extension AdaptyProfile {
         public var isOneTime: Bool { isConsumable }
     }
 }
-
-extension AdaptyProfile.NonSubscription: Equatable {}
 
 extension AdaptyProfile.NonSubscription: CustomStringConvertible {
     public var description: String {

@@ -8,7 +8,7 @@
 import StoreKit
 
 extension AdaptyProfileManager {
-    enum SendedEnvironment {
+    enum SendedEnvironment: Sendable, Hashable {
         case dont
         case withIdfa
         case withoutIdfa

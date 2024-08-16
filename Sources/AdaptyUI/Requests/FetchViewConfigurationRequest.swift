@@ -14,7 +14,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     let headers: Headers
     let queryItems: QueryItems
 
-    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String,  disableServerCache: Bool) {
+    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
@@ -24,7 +24,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
             .setViewConfigurationLocale(locale)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
-        
+
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
@@ -51,13 +51,13 @@ extension HTTPSession {
             request,
             logName: "get_paywall_builder",
             logParams: [
-                "api_prefix": .value(apiKeyPrefix),
-                "variation_id": .value(paywallVariationId),
-                "locale": .value(locale),
-                "builder_version": .value(AdaptyUI.builderVersion),
-                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
-                "md5": .value(md5Hash),
-                "disable_server_cache": .value(disableServerCache),
+                "api_prefix": apiKeyPrefix,
+                "variation_id": paywallVariationId,
+                "locale": locale,
+                "builder_version": AdaptyUI.builderVersion,
+                "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                "md5": md5Hash,
+                "disable_server_cache": disableServerCache,
             ]
         ) { (result: FetchViewConfigurationRequest.Result) in
             switch result {

@@ -58,7 +58,7 @@ final class SK1ProductsFetcher: NSObject {
         request.delegate = self
         requests[request] = (productIds: productIds, retryCount: retryCount)
         request.start()
-        Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_sk1_products", callId: "SKR\(request.hash)", params: ["products_ids": .value(productIds)]))
+        Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_sk1_products", callId: "SKR\(request.hash)", params: ["products_ids": productIds]))
     }
 
     fileprivate func saveProducts(_ sk1Products: [SK1Product]) {
@@ -76,8 +76,8 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
                 methodName: "fetch_products",
                 callId: "SKR\(request.hash)",
                 params: [
-                    "products_ids": .value(response.products.map { $0.productIdentifier }),
-                    "invalid_products": .valueOrNil(response.invalidProductIdentifiers),
+                    "products_ids": response.products.map { $0.productIdentifier },
+                    "invalid_products": response.invalidProductIdentifiers,
                 ]
             ))
 

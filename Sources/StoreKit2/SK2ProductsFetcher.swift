@@ -31,7 +31,7 @@ actor SK2ProductsFetcher {
             methodName: methodName,
             callId: callId,
             params: [
-                "products_ids": .value(productIds),
+                "products_ids": productIds,
             ]
         ))
 
@@ -62,7 +62,7 @@ actor SK2ProductsFetcher {
             methodName: methodName,
             callId: callId,
             params: [
-                "products_ids": .value(sk2Products.map { $0.id }),
+                "products_ids": sk2Products.map { $0.id },
             ]
         ))
 

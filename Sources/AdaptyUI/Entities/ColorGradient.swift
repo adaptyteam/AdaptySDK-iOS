@@ -66,27 +66,20 @@ extension AdaptyUI.ColorGradient: Decodable {
         case type
     }
 
-    struct Points: Codable {
-        let x0: Double
-        let y0: Double
-        let x1: Double
-        let y1: Double
-
-        var start: AdaptyUI.Point {
-            AdaptyUI.Point(x: x0, y: y0)
-        }
-
-        var end: AdaptyUI.Point {
-            AdaptyUI.Point(x: x1, y: y1)
-        }
-    }
-
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decode([Item].self, forKey: .items)
+
+        struct Points: Codable /*temp*/ {
+            let x0: Double
+            let y0: Double
+            let x1: Double
+            let y1: Double
+        }
+
         let points = try container.decode(Points.self, forKey: .points)
-        start = points.start
-        end = points.end
+        start = .init(x: points.x0, y: points.y0)
+        end = .init(x: points.x1, y: points.y1)
 
         switch try container.decode(String.self, forKey: .type) {
         case AdaptyUI.ViewConfiguration.Asset.ContentType.colorRadialGradient.rawValue:

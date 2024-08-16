@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Toggle: Hashable, Sendable {
+    struct Toggle: Sendable, Hashable {
         let onActions: [AdaptyUI.ViewConfiguration.Action]
         let offActions: [AdaptyUI.ViewConfiguration.Action]
         let onCondition: AdaptyUI.StateCondition

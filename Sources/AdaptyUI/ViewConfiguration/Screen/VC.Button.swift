@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Button: Hashable, Sendable {
+    struct Button: Sendable, Hashable {
         let actions: [AdaptyUI.ViewConfiguration.Action]
         let normalState: AdaptyUI.ViewConfiguration.Element
         let selectedState: AdaptyUI.ViewConfiguration.Element?

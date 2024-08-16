@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyPaywall {
-    public enum FetchPolicy {
+    public enum FetchPolicy: Sendable, Hashable {
         public static let `default`: Self = .reloadRevalidatingCacheData
         case reloadRevalidatingCacheData
         case returnCacheDataElseLoad

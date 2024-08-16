@@ -25,10 +25,10 @@ extension AdaptyExtension where Extended == SK2Transaction {
 
     var logParams: EventParameters {
         [
-            "product_id": .value(this.productID),
-            "transaction_is_upgraded": .value(this.isUpgraded),
-            "transaction_id": .value(identifier),
-            "original_id": .value(originalIdentifier),
+            "product_id": this.productID,
+            "transaction_is_upgraded": this.isUpgraded,
+            "transaction_id": identifier,
+            "original_id": originalIdentifier,
         ]
     }
 

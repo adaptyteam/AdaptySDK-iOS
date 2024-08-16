@@ -68,10 +68,10 @@ extension Adapty {
     ) {
         let logName = "activate"
         let logParams: EventParameters = [
-            "observer_mode": .value(configuration.observerMode),
-            "has_customer_user_id": .value(configuration.customerUserId != nil),
-            "idfa_collection_disabled": .value(configuration.idfaCollectionDisabled),
-            "ip_address_collection_disabled": .value(configuration.ipAddressCollectionDisabled),
+            "observer_mode": configuration.observerMode,
+            "has_customer_user_id": configuration.customerUserId != nil,
+            "idfa_collection_disabled": configuration.idfaCollectionDisabled,
+            "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
         ]
 
         async(completion, logName: logName, logParams: logParams) { completion in
@@ -201,8 +201,8 @@ extension Adapty {
         }
 
         let logParams: EventParameters = [
-            "variation_id": .value(parameters.variationId),
-            "transaction_id": .value(parameters.transactionId),
+            "variation_id": parameters.variationId,
+            "transaction_id": parameters.transactionId,
         ]
         async(completion, logName: "set_variation_id", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
@@ -229,8 +229,8 @@ extension Adapty {
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let logParams: EventParameters = [
-            "variation_id": .value(variationId),
-            "transaction_id": .valueOrNil(transaction.transactionIdentifier),
+            "variation_id": variationId,
+            "transaction_id": transaction.transactionIdentifier,
         ]
         async(completion, logName: "set_variation_id_sk1", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
@@ -258,8 +258,8 @@ extension Adapty {
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let logParams: EventParameters = [
-            "variation_id": .value(variationId),
-            "transaction_id": .value(transaction.ext.identifier),
+            "variation_id": variationId,
+            "transaction_id": transaction.ext.identifier,
         ]
         async(completion, logName: "set_variation_id_sk2", logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
@@ -283,7 +283,7 @@ extension Adapty {
         paywall: AdaptyPaywall,
         _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
     ) {
-        async(completion, logName: "get_paywall_products", logParams: ["placement_id": .value(paywall.placementId)]) { manager, completion in
+        async(completion, logName: "get_paywall_products", logParams: ["placement_id": paywall.placementId]) { manager, completion in
             manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SK1Product]>) in
                 completion(result.map { sk1Products in
                     sk1Products.compactMap { AdaptyPaywallProduct(paywall: paywall, sk1Product: $0) }
@@ -332,7 +332,7 @@ extension Adapty {
         async(
             completion,
             logName: "get_products_introductory_offer_eligibility",
-            logParams: ["products": .value(products.map { $0.vendorProductId })]
+            logParams: ["products": products.map { $0.vendorProductId }]
         ) { manager, completion in
             manager.skProductsManager.getIntroductoryOfferEligibility(sk1Products: products.map { $0.skProduct }) {
                 completionGetIntroductoryOfferEligibility($0, manager, completion)
@@ -354,7 +354,7 @@ extension Adapty {
         async(
             completion,
             logName: "get_products_introductory_offer_eligibility",
-            logParams: ["products": .value(vendorProductIds)]
+            logParams: ["products": vendorProductIds]
         ) { manager, completion in
             manager.skProductsManager.getIntroductoryOfferEligibility(vendorProductIds: Set(vendorProductIds)) {
                 completionGetIntroductoryOfferEligibility($0, manager, completion)
@@ -430,9 +430,9 @@ extension Adapty {
     ) {
         let logName = "make_purchase"
         let logParams: EventParameters = [
-            "paywall_name": .value(product.paywallName),
-            "variation_id": .value(product.variationId),
-            "product_id": .value(product.vendorProductId),
+            "paywall_name": product.paywallName,
+            "variation_id": product.variationId,
+            "product_id": product.vendorProductId,
         ]
 
         guard SK1QueueManager.canMakePayments() else {

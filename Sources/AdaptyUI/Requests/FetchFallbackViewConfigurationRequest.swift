@@ -41,12 +41,12 @@ extension HTTPSession {
             request,
             logName: "get_fallback_paywall_builder",
             logParams: [
-                "api_prefix": .value(apiKeyPrefix),
-                "paywall_instance_id": .value(paywallInstanceIdentity),
-                "builder_version": .value(AdaptyUI.builderVersion),
-                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
-                "language_code": .valueOrNil(locale.languageCode),
-                "disable_server_cache": .value(disableServerCache),
+                "api_prefix": apiKeyPrefix,
+                "paywall_instance_id": paywallInstanceIdentity,
+                "builder_version": AdaptyUI.builderVersion,
+                "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                "language_code": locale.languageCode,
+                "disable_server_cache": disableServerCache,
             ]
         ) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in
             switch result {

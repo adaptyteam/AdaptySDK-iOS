@@ -75,8 +75,8 @@ extension FallbackPaywalls {
                 Log.error(error)
 
                 Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
-                    "in_version": .value(formatVersion),
-                    "expected_version": .value(Adapty.fallbackFormatVersion),
+                    "in_version": formatVersion,
+                    "expected_version": Adapty.fallbackFormatVersion,
                 ]))
 
                 throw AdaptyError.wrongVersionFallback(error)
@@ -90,10 +90,10 @@ extension FallbackPaywalls {
     struct Body: Decodable {
         let chosen: AdaptyPaywallChosen?
         init(from decoder: any Decoder) throws {
-            let placmentId = try CustomCodingKeys(decoder.userInfo.placmentId)
+            let placmentId = try AnyCodingKeys(stringValue: decoder.userInfo.placmentId)
             let container = try decoder
                 .container(keyedBy: CodingKeys.self)
-                .nestedContainer(keyedBy: FallbackPaywalls.CustomCodingKeys.self, forKey: .data)
+                .nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .data)
             
             guard container.contains(placmentId) else {
                 chosen = nil
@@ -130,24 +130,6 @@ extension FallbackPaywalls {
         let decoder = decoder(profileId: profileId)
         decoder.userInfo[FallbackPaywalls.placmentIdUserInfoKey] = placmentId
         return decoder
-    }
-
-    struct CustomCodingKeys: CodingKey {
-        let stringValue: String
-        let intValue: Int?
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-            intValue = nil
-        }
-
-        init(_ value: String) {
-            stringValue = value
-            intValue = nil
-        }
-
-        init?(intValue _: Int) {
-            nil
-        }
     }
 }
 

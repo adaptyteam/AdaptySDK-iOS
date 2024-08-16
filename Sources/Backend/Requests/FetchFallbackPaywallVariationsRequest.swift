@@ -55,12 +55,12 @@ extension HTTPSession {
             request,
             logName: logName,
             logParams: [
-                "api_prefix": .value(apiKeyPrefix),
-                "placement_id": .value(placementId),
-                "language_code": .valueOrNil(locale.languageCode),
-                "builder_version": .value(AdaptyUI.builderVersion),
-                "builder_config_format_version": .value(AdaptyUI.configurationFormatVersion),
-                "disable_server_cache": .value(disableServerCache),
+                "api_prefix": apiKeyPrefix,
+                "placement_id": placementId,
+                "language_code": locale.languageCode,
+                "builder_version": AdaptyUI.builderVersion,
+                "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                "disable_server_cache": disableServerCache,
             ]
         ) { [weak self] (result: FetchFallbackPaywallVariationsRequest.Result) in
             switch result {

@@ -6,7 +6,7 @@
 //
 import StoreKit
 
-struct SignSubscriptionOfferResponse: Decodable, Equatable {
+struct SignSubscriptionOfferResponse: Sendable, Hashable, Decodable {
     let keyIdentifier: String
     let nonce: UUID
     let signature: String

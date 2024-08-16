@@ -23,10 +23,10 @@ extension AdaptyExtension where Extended == SK1Transaction {
 
     var logParams: EventParameters {
         [
-            "product_id": .value(this.payment.productIdentifier),
-            "state": .value(this.transactionState.stringValue),
-            "transaction_id": .valueOrNil(identifier),
-            "original_id": .valueOrNil(originalIdentifier),
+            "product_id": this.payment.productIdentifier,
+            "state": this.transactionState.stringValue,
+            "transaction_id": identifier,
+            "original_id": originalIdentifier,
         ]
     }
 }

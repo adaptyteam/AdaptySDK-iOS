@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum EventType {
+enum EventType: Sendable /* Hashable */ {
     case appOpened
     case paywallShowed(AdaptyPaywallShowedParameters)
     case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)

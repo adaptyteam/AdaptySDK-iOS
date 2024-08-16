@@ -12,7 +12,7 @@ struct AdaptyPaywallChosen {
     var value: AdaptyPaywall
     let kind: Kind
 
-    enum Kind {
+    enum Kind: Sendable, Hashable {
         case restore
         case draw(placementAudienceVersionId: String, profileId: String)
     }

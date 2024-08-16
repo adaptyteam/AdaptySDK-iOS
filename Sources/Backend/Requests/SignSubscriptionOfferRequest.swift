@@ -43,8 +43,8 @@ extension HTTPSession {
             request,
             logName: "sign_offer",
             logParams: [
-                "product_id": .value(vendorProductId),
-                "discount_id": .value(discountId),
+                "product_id": vendorProductId,
+                "discount_id": discountId,
             ]
         ) { (result: SignSubscriptionOfferRequest.Result) in
             switch result {

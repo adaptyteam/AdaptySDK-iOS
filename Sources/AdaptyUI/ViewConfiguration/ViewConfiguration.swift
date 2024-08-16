@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyUI {
-    struct ViewConfiguration: Hashable, Sendable {
+    struct ViewConfiguration: Sendable, Hashable {
         let id: String
         let templateId: String
         let templateRevision: Int64

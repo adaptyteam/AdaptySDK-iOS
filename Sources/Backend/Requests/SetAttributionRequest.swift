@@ -76,8 +76,8 @@ extension HTTPSession {
             request,
             logName: "set_attribution",
             logParams: [
-                "source": .value(source.description),
-                "network_user_id": .valueOrNil(networkUserId),
+                "source": source.description,
+                "network_user_id": networkUserId,
             ]
         ) { (result: SetAttributionRequest.Result) in
             completion(result

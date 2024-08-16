@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AdaptySystemEventParameters: Encodable {}
+protocol AdaptySystemEventParameters: Sendable, Encodable {}
 
 private enum CodingKeys: String, CodingKey {
     case name = "event_name"
@@ -21,7 +21,7 @@ private enum CodingKeys: String, CodingKey {
     case error
 }
 
-typealias EventParameters = [String: AnyEncodable?]
+typealias EventParameters = [String: (any Sendable & Encodable)?]
 
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
     let methodName: String
