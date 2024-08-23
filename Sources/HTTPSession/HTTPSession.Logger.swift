@@ -10,18 +10,16 @@ import Foundation
 extension HTTPSession {
     enum Logger {
         static func request(_ request: URLRequest, endpoint: HTTPEndpoint, session: URLSessionConfiguration? = nil, stamp: String) {
-            Log.verbose {
-                let url = request.url
+            let url = request.url
+            let query = if let data = url?.query { " ?\(data)" } else { "" }
+            let path: String = if endpoint.path.isEmpty, let url { url.relativeString } else { endpoint.path }
 
-                let query: String = if let data = url?.query { " ?\(data)" } else { "" }
-
-                let path: String = if endpoint.path.isEmpty, let url { url.relativeString } else { endpoint.path }
-
-                return "#API# \(endpoint.method) --> \(path)\(query) [\(stamp)]\n"
-                    + "----------REQUEST START----------\n"
-                    + request.curlCommand(session: session, verbose: true)
-                    + "\n----------REQUEST END------------"
-            }
+            Log.verbose("""
+            #API# \(endpoint.method) --> \(path)\(query) [\(stamp)]
+            ----------REQUEST START----------
+            \(request.curlCommand(session: session, verbose: true))
+            ----------REQUEST END------------
+            """)
         }
 
         static func encoding(endpoint: HTTPEndpoint, error: HTTPError) {
@@ -49,13 +47,13 @@ extension HTTPSession {
             }
 
             guard let error else {
-                Log.verbose {
-                    "#API# RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)\n"
-                        + "----------RESPONSE START----------\n"
-                        + responseAsString(response)
-                        + dataAsString(data)
-                        + "\n----------RESPONSE END------------"
-                }
+                Log.verbose("""
+                #API# RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)
+                ----------RESPONSE START----------
+                \(responseAsString(response))
+                \(dataAsString(data))
+                ----------RESPONSE END------------
+                """)
                 return
             }
 
@@ -65,17 +63,16 @@ extension HTTPSession {
             } else if error.isCancelled {
                 Log.verbose("#API# CANCELED <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)")
             } else {
-                Log.error {
-                    if AdaptyLogger.isLogLevel(.verbose), error.statusCode != nil {
-                        "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)\n"
-                            + "----------RESPONSE START----------\n"
-                            + responseAsString(response)
-                            + dataAsString(data)
-                            + "\n----------RESPONSE END------------"
-
-                    } else {
-                        "#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)"
-                    }
+                if Log.isLevel(.verbose), error.statusCode != nil {
+                    Log.error("""
+                    #API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)
+                    ----------RESPONSE START----------
+                    \(responseAsString(response))
+                    \(dataAsString(data))
+                    ----------RESPONSE END------------
+                    """)
+                } else {
+                    Log.error("#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)")
                 }
             }
         }

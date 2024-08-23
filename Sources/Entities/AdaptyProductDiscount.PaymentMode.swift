@@ -9,7 +9,7 @@ import Foundation
 import StoreKit
 
 extension AdaptyProductDiscount {
-    public enum PaymentMode: UInt {
+    public enum PaymentMode: UInt, Sendable {
         case payAsYouGo
         case payUpFront
         case freeTrial

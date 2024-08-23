@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol HTTPCancelable {
+protocol HTTPCancelable: Sendable {
     func cancel()
 }
 

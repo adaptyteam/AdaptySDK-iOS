@@ -12,7 +12,7 @@ import Foundation
 
 @available(iOS 15.0, *)
 package class AdaptyEventsHandler {
-    let logId: String = AdaptyUI.generateLogId()
+    let logId: String = Log.stamp
 
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
     private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
@@ -67,66 +67,64 @@ package class AdaptyEventsHandler {
         self.didFailLoadingProducts = didFailLoadingProducts
     }
 
-    func log(_ level: AdaptyLogLevel, _ message: String) {
-        AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
-    }
-
     func event_didPerformAction(_ action: AdaptyUI.Action) {
-        log(.verbose, "event_didPerformAction: \(action)")
+        Log.verbose("[UI] #\(logId)# event_didPerformAction: \(action)")
         didPerformAction?(action)
     }
 
     func event_didSelectProduct(_ product: AdaptyPaywallProduct) {
-        log(.verbose, "event_didSelectProduct: \(product.vendorProductId)")
+        Log.verbose("[UI] #\(logId)# event_didSelectProduct: \(product.vendorProductId)")
         didSelectProduct?(product)
     }
 
     func event_didStartPurchase(product: AdaptyPaywallProduct) {
-        log(.verbose, "makePurchase begin")
+        Log.verbose("[UI] #\(logId)# makePurchase begin")
         didStartPurchase?(product)
     }
 
     func event_didCancelPurchase(product: AdaptyPaywallProduct) {
-        log(.verbose, "event_didCancelPurchase: \(product.vendorProductId)")
+        Log.verbose("[UI] #\(logId)# event_didCancelPurchase: \(product.vendorProductId)")
         didCancelPurchase?(product)
     }
 
-    func event_didFinishPurchase(product: AdaptyPaywallProduct,
-                                 purchasedInfo: AdaptyPurchasedInfo)
-    {
-        log(.verbose, "event_didFinishPurchase: \(product.vendorProductId)")
+    func event_didFinishPurchase(
+        product: AdaptyPaywallProduct,
+        purchasedInfo: AdaptyPurchasedInfo
+    ) {
+        Log.verbose("[UI] #\(logId)# event_didFinishPurchase: \(product.vendorProductId)")
         didFinishPurchase?(product, purchasedInfo)
     }
 
-    func event_didFailPurchase(product: AdaptyPaywallProduct,
-                               error: AdaptyError)
-    {
-        log(.verbose, "event_didFailPurchase: \(product.vendorProductId), \(error)")
+    func event_didFailPurchase(
+        product: AdaptyPaywallProduct,
+        error: AdaptyError
+    ) {
+        Log.verbose("[UI] #\(logId)# event_didFailPurchase: \(product.vendorProductId), \(error)")
         didFailPurchase?(product, error)
     }
 
     func event_didStartRestore() {
-        log(.verbose, "event_didStartRestore")
+        Log.verbose("[UI] #\(logId)# event_didStartRestore")
         didStartRestore?()
     }
 
     func event_didFinishRestore(with profile: AdaptyProfile) {
-        log(.verbose, "event_didFinishRestore")
+        Log.verbose("[UI] #\(logId)# event_didFinishRestore")
         didFinishRestore?(profile)
     }
 
     func event_didFailRestore(with error: AdaptyError) {
-        log(.error, "event_didFailRestore: \(error)")
+        Log.error("[UI] #\(logId)# event_didFailRestore: \(error)")
         didFailRestore?(error)
     }
 
     func event_didFailRendering(with error: AdaptyUIError) {
-        log(.error, "event_didFailRendering: \(error)")
+        Log.error("[UI] #\(logId)# event_didFailRendering: \(error)")
         didFailRendering?(AdaptyError(error))
     }
 
     func event_didFailLoadingProducts(with error: AdaptyError) -> Bool {
-        log(.error, "event_didFailLoadingProducts: \(error)")
+        Log.error("[UI] #\(logId)# event_didFailLoadingProducts: \(error)")
         return didFailLoadingProducts?(error) ?? false
     }
 }

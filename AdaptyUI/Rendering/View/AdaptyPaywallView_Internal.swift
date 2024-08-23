@@ -58,7 +58,7 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
         self.showAlertItem = showAlertItem
         self.showAlertBuilder = showAlertBuilder
 
-        AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(configuration.templateId), products: \(products?.count ?? 0)")
+        Log.verbose("[UI} #\(logId)# init template: \(configuration.templateId), products: \(products?.count ?? 0)")
 
         eventsHandler = AdaptyEventsHandler(
             logId: logId,

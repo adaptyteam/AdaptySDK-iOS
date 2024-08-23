@@ -8,7 +8,7 @@
 import Foundation
 
 extension Environment {
-    struct Meta: Encodable, Sendable {
+    struct Meta: Sendable, Encodable {
         let locale: AdaptyLocale
         let timezone: String
         let idfv: String?

@@ -27,6 +27,12 @@ extension Adapty {
             "source": source.rawValue,
             "has_network_user_id": networkUserId != nil,
         ]
+        let attribution: [String: any Sendable] = .init(attribution.compactMap {
+            guard let key = $0 as? String else { return nil }
+            return (key, $1)
+        }
+        ) { $1 }
+
         async(completion, logName: "update_attribution", logParams: logParams) { manager, completion in
             manager.updateAttribution(
                 profileId: manager.profileStorage.profileId,
@@ -38,7 +44,7 @@ extension Adapty {
         }
     }
 
-    private func updateAttribution(profileId: String, _ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String?, _ completion: AdaptyErrorCompletion? = nil) {
+    private func updateAttribution(profileId: String, _ attribution: [String: any Sendable], source: AdaptyAttributionSource, networkUserId: String?, _ completion: AdaptyErrorCompletion? = nil) {
         let oldProfile = state.initialized?.profile
         httpSession.performSetAttributionRequest(
             profileId: profileId,

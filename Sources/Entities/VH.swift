@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol ValueHashable {}
+protocol ValueHashable: Sendable {}
 
 extension Optional: ValueHashable where Wrapped: ValueHashable {}
 
-struct VH<Value: ValueHashable> {
+struct VH<Value: ValueHashable>: Sendable {
     let value: Value
     let hash: String?
     let time: Date?
@@ -37,9 +37,9 @@ struct VH<Value: ValueHashable> {
     @inlinable func flatValue<T>() -> VH<T>? where Value == T? {
         switch value {
         case .none:
-            return .none
+            .none
         case let .some(v):
-            return VH<T>(v, hash: hash, time: time)
+            VH<T>(v, hash: hash, time: time)
         }
     }
 }

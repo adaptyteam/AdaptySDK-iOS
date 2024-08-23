@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyPaywall {
+public struct AdaptyPaywall: Sendable {
     /// An identifier of a placement, configured in Adapty Dashboard.
     public let placementId: String
 

@@ -87,7 +87,7 @@ extension Encoder {
 }
 
 extension Backend.Response {
-    struct ValueOfData<Value: Decodable>: Decodable {
+    struct ValueOfData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
         let value: Value
 
         init(_ value: Value) {
@@ -100,7 +100,7 @@ extension Backend.Response {
         }
     }
 
-    struct ValueOfMeta<Meta: Decodable>: Decodable {
+    struct ValueOfMeta<Meta>: Sendable, Decodable where Meta: Decodable, Meta: Sendable {
         let meta: Meta
 
         init(_ meta: Meta) {

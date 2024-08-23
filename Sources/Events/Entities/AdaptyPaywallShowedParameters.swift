@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AdaptyPaywallShowedParameters {
+struct AdaptyPaywallShowedParameters: Sendable {
     let paywallVariationId: String
     let viewConfigurationId: String?
 }

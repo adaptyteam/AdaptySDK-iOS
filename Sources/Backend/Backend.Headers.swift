@@ -72,7 +72,7 @@ extension [HTTPRequest.Headers.Key: HTTPRequest.Headers.Value] {
     func setVisualBuilderVersion(_ version: String?) -> Self {
         updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderVersionHeaderKey)
     }
-    
+
     func setVisualBuilderConfigurationFormatVersion(_ version: String?) -> Self {
         updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderConfigurationFormatVersionHeaderKey)
     }
@@ -110,12 +110,10 @@ extension [HTTPRequest.Headers.Key: HTTPRequest.Headers.Value] {
 
 extension HTTPResponseHeaders {
     func getBackendResponseHash() -> String? {
-        let value = self[Backend.Response.hashHeaderKey] as? String
-        return value
+        value(forHTTPHeaderField: Backend.Response.hashHeaderKey) as? String
     }
 
     func getBackendRequestId() -> String? {
-        let value = self[Backend.Response.requestIdHeaderKey] as? String
-        return value
+        value(forHTTPHeaderField: Backend.Response.requestIdHeaderKey) as? String
     }
 }

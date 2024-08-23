@@ -121,11 +121,11 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
 }
 
 extension AdaptyUI.ViewConfiguration {
-    struct AssetsContainer: Decodable /*temp*/ {
+    struct AssetsContainer: Decodable /* temp */ {
         let value: [String: Asset]
 
         init(from decoder: Decoder) throws {
-            struct Item: Decodable /*temp*/ {
+            struct Item: Decodable /* temp */ {
                 let id: String
                 let value: Asset
 

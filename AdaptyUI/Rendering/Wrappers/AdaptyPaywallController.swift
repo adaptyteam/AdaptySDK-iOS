@@ -39,14 +39,14 @@ public class AdaptyPaywallController: UIViewController {
         timerResolver: AdaptyTimerResolver?,
         showDebugOverlay: Bool
     ) {
-        let logId = AdaptyUI.generateLogId()
+        let logId = Log.stamp
 
-        AdaptyUI.writeLog(level: .verbose, message: "#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
+        Log.verbose("[UI] #\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
 
         if Adapty.Configuration.observerMode && observerModeResolver == nil {
-            AdaptyUI.writeLog(level: .warn, message: "In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
+            Log.warn("[UI] In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
         } else if !Adapty.Configuration.observerMode && observerModeResolver != nil {
-            AdaptyUI.writeLog(level: .warn, message: "You should not pass observerModeResolver if you're using Adapty in Full Mode")
+            Log.warn("[UI] You should not pass observerModeResolver if you're using Adapty in Full Mode")
         }
         
         self.logId = logId
@@ -75,13 +75,13 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     deinit {
-        log(.verbose, "deinit")
+        Log.verbose("[UI] #\(logId)# deinit")
     }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        log(.verbose, "viewDidLoad begin")
+        Log.verbose("[UI] #\(logId)# viewDidLoad begin")
 
         view.backgroundColor = .systemBackground
 
@@ -147,23 +147,17 @@ public class AdaptyPaywallController: UIViewController {
             to: view
         )
 
-        log(.verbose, "viewDidLoad end")
+        Log.verbose("[UI] #\(logId)# viewDidLoad end")
     }
 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        log(.verbose, "viewDidAppear")
+        Log.verbose("[UI] #\(logId)# viewDidAppear")
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-
-        log(.verbose, "viewDidDisappear")
-    }
-
-    func log(_ level: AdaptyLogLevel, _ message: String) {
-        AdaptyUI.writeLog(level: level, message: "#\(logId)# \(message)")
+        Log.verbose("[UI] #\(logId)# viewDidDisappear")
     }
 }
 

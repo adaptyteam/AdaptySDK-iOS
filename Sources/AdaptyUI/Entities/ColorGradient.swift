@@ -70,7 +70,7 @@ extension AdaptyUI.ColorGradient: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decode([Item].self, forKey: .items)
 
-        struct Points: Codable /*temp*/ {
+        struct Points: Codable /* temp */ {
             let x0: Double
             let y0: Double
             let x1: Double

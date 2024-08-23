@@ -7,7 +7,7 @@
 
 import StoreKit
 
-public struct AdaptyPurchasedInfo {
+public struct AdaptyPurchasedInfo: Sendable {
     /// An ``AdaptyProfile`` which contains the up-to-date inforation about the user.
     public let profile: AdaptyProfile
 

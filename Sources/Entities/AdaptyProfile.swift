@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyProfile {
+public struct AdaptyProfile: Sendable {
     /// An identifier of a user in Adapty.
     public let profileId: String
 
@@ -20,7 +20,7 @@ public struct AdaptyProfile {
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
     /// Previously set user custom attributes with `.updateProfile()` method.
-    public let customAttributes: [String: Any]
+    public let customAttributes: [String: any Sendable]
 
     /// The keys are access level identifiers configured by you in Adapty Dashboard. The values are Can be null if the customer has no access levels.
     public let accessLevels: [String: AccessLevel]

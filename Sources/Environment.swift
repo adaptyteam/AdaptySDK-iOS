@@ -44,6 +44,7 @@ enum Environment {
     enum System {
         static var timezone: String { TimeZone.current.identifier }
 
+        @MainActor
         static let version: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)
                 ProcessInfo().operatingSystemVersionString
@@ -52,6 +53,7 @@ enum Environment {
             #endif
         }()
 
+        @MainActor
         static let name: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)
                 "macOS"

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FallbackPaywalls {
+struct FallbackPaywalls: Sendable {
 
     private let fileURL: URL
     private let head: Head
@@ -56,7 +56,7 @@ extension FallbackPaywalls {
         case placementIds = "developer_ids"
     }
 
-    struct Head: Decodable {
+    struct Head: Sendable, Decodable {
         let placementIds: Set<String>?
         let version: Int64
         let formatVersion: Int
@@ -87,7 +87,7 @@ extension FallbackPaywalls {
         }
     }
 
-    struct Body: Decodable {
+    struct Body: Sendable, Decodable {
         let chosen: AdaptyPaywallChosen?
         init(from decoder: any Decoder) throws {
             let placmentId = try AnyCodingKeys(stringValue: decoder.userInfo.placmentId)

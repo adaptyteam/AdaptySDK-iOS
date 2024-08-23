@@ -13,13 +13,13 @@ private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableR
     let headers: Headers
     let networkUserId: String?
     let source: AdaptyAttributionSource
-    let attribution: [AnyHashable: Any]
+    let attribution: [String: any Sendable]
 
     func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
         createDecoder(jsonDecoder)
     }
 
-    init(profileId: String, networkUserId: String?, source: AdaptyAttributionSource, attribution: [AnyHashable: Any], responseHash: String?) {
+    init(profileId: String, networkUserId: String?, source: AdaptyAttributionSource, attribution: [String: any Sendable], responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .post,
             path: "/sdk/analytics/profiles/\(profileId)/attribution/"
@@ -61,7 +61,7 @@ extension HTTPSession {
         profileId: String,
         networkUserId: String?,
         source: AdaptyAttributionSource,
-        attribution: [AnyHashable: Any],
+        attribution: [String: any Sendable],
         responseHash: String?,
         _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
     ) {

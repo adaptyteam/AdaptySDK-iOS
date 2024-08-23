@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol HTTPRequest {
+protocol HTTPRequest: Sendable {
     typealias Headers = [String: String]
 
     var endpoint: HTTPEndpoint { get }

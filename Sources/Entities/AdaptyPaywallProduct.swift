@@ -7,7 +7,7 @@
 
 import StoreKit
 
-public struct AdaptyPaywallProduct: AdaptyProduct {
+public struct AdaptyPaywallProduct: AdaptyProduct, Sendable {
     /// Unique identifier of a product from App Store Connect or Google Play Console.
     public let vendorProductId: String
 
@@ -65,7 +65,7 @@ extension AdaptyPaywallProduct {
 }
 
 extension AdaptyPaywallProduct: Encodable {
-    struct PrivateObject: Decodable {
+    struct PrivateObject: Sendable, Decodable {
         let vendorProductId: String
         let adaptyProductId: String
         let promotionalOfferId: String?
@@ -114,7 +114,7 @@ extension AdaptyPaywallProduct: Encodable {
         )
     }
 
-    private struct SubscriptionDetail: Encodable {
+    private struct SubscriptionDetail: Sendable, Encodable {
         let product: AdaptyPaywallProduct
 
         enum CodingKeys: String, CodingKey {

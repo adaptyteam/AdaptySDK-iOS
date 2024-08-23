@@ -183,7 +183,7 @@ extension Adapty {
         data: Data,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        struct PrivateParameters: Decodable {
+        struct PrivateParameters: Decodable /* temp */ {
             let variationId: String
             let transactionId: String
 

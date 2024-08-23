@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyPaywall {
-    public struct RemoteConfig {
+    public struct RemoteConfig: Sendable {
         let adaptyLocale: AdaptyLocale
 
         public var locale: String { adaptyLocale.id }

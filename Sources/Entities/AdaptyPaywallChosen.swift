@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct AdaptyPaywallChosen {
+struct AdaptyPaywallChosen: Sendable {
     var value: AdaptyPaywall
     let kind: Kind
 
@@ -46,7 +46,7 @@ extension AdaptyPaywallChosen: Decodable {
         )
 
         func paywall(from decoder: any Decoder, index: Int) throws -> AdaptyPaywall {
-            struct Empty: Decodable {}
+            struct Empty: Decodable /* temp */ {}
 
             var array = try decoder.unkeyedContainer()
             while !array.isAtEnd {
@@ -62,7 +62,7 @@ extension AdaptyPaywallChosen: Decodable {
 }
 
 extension AdaptyPaywallChosen {
-    private struct AdaptyPaywallVariation: Decodable {
+    private struct AdaptyPaywallVariation: Sendable, Decodable {
         let placementAudienceVersionId: String
         let variationId: String
         let weight: Int
@@ -116,7 +116,7 @@ extension AdaptyPaywallChosen {
 }
 
 extension AdaptyPaywallChosen {
-    struct Meta: Decodable {
+    struct Meta: Sendable, Decodable {
         let version: Int64
 
         enum CodingKeys: String, CodingKey {

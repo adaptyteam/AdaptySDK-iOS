@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct If: Decodable /*temp*/ {
+    struct If: Decodable /* temp */ {
         let content: AdaptyUI.ViewConfiguration.Element
 
         enum CodingKeys: String, CodingKey {
@@ -21,13 +21,14 @@ extension AdaptyUI.ViewConfiguration {
 
         init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            content = if
-                try container.decodeIfPresent(String.self, forKey: .platform).map({ $0 == "ios" }) ?? true,
-                try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUI.configurationFormatVersion.isSameOrNewerVersion) ?? true {
-                try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .then)
-            } else {
-                try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .else)
-            }
+            content =
+                if
+                    try container.decodeIfPresent(String.self, forKey: .platform).map({ $0 == "ios" }) ?? true,
+                    try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUI.configurationFormatVersion.isSameOrNewerVersion) ?? true {
+                    try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .then)
+                } else {
+                    try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .else)
+                }
         }
     }
 }

@@ -302,7 +302,7 @@ extension Adapty {
         }
     }
 
-    enum State: Sendable /*Hashable*/ {
+    enum State /* Hashable */ {
         case initializingTo(customerUserId: String?)
         case needLogout
         case needIdentifyTo(customerUserId: String)

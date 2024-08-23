@@ -49,7 +49,7 @@ extension AdaptyProfile.CustomAttributeValue {
 }
 
 extension AdaptyProfile.CustomAttributes {
-    func convertToSimpleDictionary() -> [String: Any] {
+    func convertToSimpleDictionary() -> [String: any Sendable] {
         [String: Any](
             compactMap {
                 guard let rawValue = $1.rawValue else { return nil }

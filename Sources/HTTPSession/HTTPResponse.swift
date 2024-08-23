@@ -11,10 +11,9 @@ typealias HTTPDataResponse = HTTPResponse<Data?>
 typealias HTTPStringResponse = HTTPResponse<String?>
 typealias HTTPEmptyResponse = HTTPResponse<Void>
 
-// https://github.com/apple/swift-corelibs-foundation/issues/4338
-typealias HTTPResponseHeaders = NSDictionary
+typealias HTTPResponseHeaders = [String: any Sendable]
 
-struct HTTPResponse<Body> {
+struct HTTPResponse<Body: Sendable>: Sendable {
     let endpoint: HTTPEndpoint
     let statusCode: Int
     let headers: HTTPResponseHeaders
@@ -31,20 +30,27 @@ extension HTTPResponse {
     }
 }
 
-extension HTTPStringResponse {
-    init(endpoint: HTTPEndpoint, response: HTTPURLResponse, string: String?) {
-        self.init(endpoint: endpoint, statusCode: response.statusCode, headers: response.allHeaderFields as HTTPResponseHeaders, body: string)
-    }
-}
-
 extension HTTPDataResponse {
     init(endpoint: HTTPEndpoint, response: HTTPURLResponse, data: Data?) {
-        self.init(endpoint: endpoint, statusCode: response.statusCode, headers: response.allHeaderFields as HTTPResponseHeaders, body: data)
+        self.init(endpoint: endpoint, statusCode: response.statusCode, headers: response.allHeaderFields.asHTTPResponseHeaders, body: data)
     }
 }
 
-extension HTTPEmptyResponse {
-    init(endpoint: HTTPEndpoint, statusCode: Int, headers: HTTPResponseHeaders) {
-        self.init(endpoint: endpoint, statusCode: statusCode, headers: headers, body: ())
+private extension [AnyHashable: Any] {
+    var asHTTPResponseHeaders: HTTPResponseHeaders {
+        let array: [(String, any Sendable)] = self.compactMap { key, value in
+            guard let key = key as? String else { return nil }
+            return (key, value)
+        }
+        return HTTPResponseHeaders(array) { $1 }
+    }
+}
+
+extension HTTPResponseHeaders {
+    func value(forHTTPHeaderField field: String) -> any Sendable {
+        let header = self.first { key, _ in
+            key.caseInsensitiveCompare(field) == .orderedSame
+        }
+        return header.map(\.value)
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-public enum AdaptyPeriodUnit: UInt {
+public enum AdaptyPeriodUnit: UInt, Sendable {
     case day
     case week
     case month

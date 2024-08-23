@@ -24,7 +24,7 @@ extension Adapty {
                 completion(profileManager.error)
                 return
             }
-            profileManager.updateProfileParameters( AdaptyProfileParameters(ipV4Address: ipV4Address), completion)
+            profileManager.updateProfileParameters(AdaptyProfileParameters(ipV4Address: ipV4Address), completion)
         }
     }
 
@@ -53,11 +53,12 @@ extension Adapty {
     }
 
     private static let fetchIPv4Url = URL(string: "https://api.ipify.org?format=json")!
-    private struct FetchIPv4Response: Decodable {
-        let ip: String
-    }
 
     private static func fetchIPv4(completion: @escaping (Result<String, Error>) -> Void) {
+        struct FetchIPv4Response: Decodable /* temp */ {
+            let ip: String
+        }
+
         URLSession.shared.dataTask(with: fetchIPv4Url) { data, _, error in
             completion(error.map { .failure($0) } ?? JSONDecoder().decode(FetchIPv4Response.self, data).map { $0.ip })
         }.resume()

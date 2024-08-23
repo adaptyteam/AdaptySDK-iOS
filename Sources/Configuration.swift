@@ -8,7 +8,7 @@
 import Foundation
 
 extension Adapty {
-    public struct Configuration {
+    public struct Configuration: Sendable {
         static let `default` = Configuration(
             apiKey: "",
             customerUserId: nil,

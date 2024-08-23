@@ -189,14 +189,14 @@ public extension AdaptyUI {
         Adapty.underlayQueue.async {
             if AdaptyUI.isActivated {
                 let err = AdaptyUIError.activateOnceError
-                AdaptyUI.writeLog(level: .warn, message: "AdaptyUI activate error: \(err)")
+                Log.warn("[UI] AdaptyUI activate error: \(err)")
                 completion?(err)
                 return
             }
 
             if !Adapty.isActivated {
                 let err = AdaptyUIError.adaptyNotActivatedError
-                AdaptyUI.writeLog(level: .error, message: "AdaptyUI activate error: \(err)")
+                Log.error("[UI] AdaptyUI activate error: \(err)")
                 completion?(err)
                 return
             }
@@ -205,7 +205,7 @@ public extension AdaptyUI {
             ImageUrlPrefetcher.shared.initialize()
 
             AdaptyUI.isActivated = true
-            AdaptyUI.writeLog(level: .info, message: "AdaptyUI activated with \(configuration)")
+            Log.info("[UI] AdaptyUI activated with \(configuration)")
 
             completion?(nil)
         }
@@ -224,11 +224,11 @@ public extension AdaptyUI {
     ) {
         if !AdaptyUI.isActivated {
             let err = AdaptyUIError.adaptyNotActivatedError
-            AdaptyUI.writeLog(level: .error, message: "AdaptyUI getViewConfiguration error: \(err)")
+            Log.error("[UI] AdaptyUI getViewConfiguration error: \(err)")
             completion(.failure(err))
             return
         }
-        
+
         Adapty.getViewConfiguration(
             paywall: paywall,
             loadTimeout: loadTimeout,
@@ -259,10 +259,10 @@ public extension AdaptyUI {
     ) throws -> AdaptyPaywallController {
         if !AdaptyUI.isActivated {
             let err = AdaptyUIError.adaptyNotActivatedError
-            AdaptyUI.writeLog(level: .error, message: "AdaptyUI paywallController(for:) error: \(err)")
+            Log.error("[UI] AdaptyUI paywallController(for:) error: \(err)")
             throw err
         }
-        
+
         return AdaptyPaywallController(
             paywall: paywall,
             products: products,

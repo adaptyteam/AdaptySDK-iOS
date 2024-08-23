@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct EventCollection<Element> {
+struct EventCollection<Element: Sendable>: Sendable {
     private(set) var elements: [Element]
     private(set) var startIndex: Int
     var endIndex: Int { endIndex(elements.count) }

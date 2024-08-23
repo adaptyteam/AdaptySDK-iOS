@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Event {
+struct Event: Sendable {
     let type: EventType
     let id: String
     let profileId: String
@@ -61,7 +61,7 @@ extension Event: Encodable {
 }
 
 extension Event {
-    struct Info: Decodable {
+    struct Info: Sendable, Decodable {
         static let emptyData = Data()
         let type: String
         let id: String

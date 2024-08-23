@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol HTTPConfiguration {
+protocol HTTPConfiguration: Sendable {
     var baseURL: URL { get }
     var sessionConfiguration: URLSessionConfiguration { get }
 }
