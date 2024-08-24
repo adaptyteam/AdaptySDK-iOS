@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.network
+
 extension HTTPSession {
     enum Logger {
         static func request(_ request: URLRequest, endpoint: HTTPEndpoint, session: URLSessionConfiguration? = nil, stamp: String) {
@@ -14,8 +16,8 @@ extension HTTPSession {
             let query = if let data = url?.query { " ?\(data)" } else { "" }
             let path: String = if endpoint.path.isEmpty, let url { url.relativeString } else { endpoint.path }
 
-            Log.verbose("""
-            #API# \(endpoint.method) --> \(path)\(query) [\(stamp)]
+            log.verbose("""
+            \(endpoint.method) --> \(path)\(query) [\(stamp)]
             ----------REQUEST START----------
             \(request.curlCommand(session: session, verbose: true))
             ----------REQUEST END------------
@@ -23,7 +25,7 @@ extension HTTPSession {
         }
 
         static func encoding(endpoint: HTTPEndpoint, error: HTTPError) {
-            Log.error("#API# ENCODING ERROR !-- \(endpoint) -- \(error)")
+            log.error("ENCODING ERROR !-- \(endpoint) -- \(error)")
         }
 
         static func response(_ response: URLResponse?, data: Data?, endpoint: HTTPEndpoint, error: HTTPError?, request: URLRequest, stamp: String) {
@@ -47,8 +49,8 @@ extension HTTPSession {
             }
 
             guard let error else {
-                Log.verbose("""
-                #API# RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)
+                log.verbose("""
+                RESPONSE <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)
                 ----------RESPONSE START----------
                 \(responseAsString(response))
                 \(dataAsString(data))
@@ -59,20 +61,20 @@ extension HTTPSession {
 
             if case let .network(_, _, error: error) = error,
                (error as NSError).isNetworkConnectionError {
-                Log.verbose("#API# NO CONNECTION <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)")
+                log.verbose("NO CONNECTION <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)")
             } else if error.isCancelled {
-                Log.verbose("#API# CANCELED <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)")
+                log.verbose("CANCELED <-- \(endpoint.method) \(path) [\(stamp)] \(metrics)")
             } else {
                 if Log.isLevel(.verbose), error.statusCode != nil {
-                    Log.error("""
-                    #API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)
+                    log.error("""
+                    ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)
                     ----------RESPONSE START----------
                     \(responseAsString(response))
                     \(dataAsString(data))
                     ----------RESPONSE END------------
                     """)
                 } else {
-                    Log.error("#API# ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)")
+                    log.error("ERROR <-- \(endpoint.method) \(path) [\(stamp)] -- \(error) \(metrics)")
                 }
             }
         }

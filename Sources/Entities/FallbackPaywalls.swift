@@ -7,8 +7,9 @@
 
 import Foundation
 
-struct FallbackPaywalls: Sendable {
+private let log = Log.Category(name: "FallbackPaywalls")
 
+struct FallbackPaywalls: Sendable {
     private let fileURL: URL
     private let head: Head
     var formatVersion: Int { head.formatVersion }
@@ -29,13 +30,13 @@ struct FallbackPaywalls: Sendable {
 
     func getPaywall(byPlacmentId id: String, profileId: String) -> AdaptyPaywallChosen? {
         guard contains(placmentId: id) ?? true else { return nil }
-        
+
         let decoder = FallbackPaywalls.decoder(profileId: profileId, placmentId: id)
         let chosen: AdaptyPaywallChosen?
         do {
             chosen = try decoder.decode(Body.self, from: Data(contentsOf: fileURL)).chosen
         } catch {
-            Log.error(error.localizedDescription)
+            log.error(error.localizedDescription)
             chosen = nil
         }
 
@@ -72,7 +73,7 @@ extension FallbackPaywalls {
                 let error = formatVersion < Adapty.fallbackFormatVersion
                     ? "The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard."
                     : "The fallback paywalls version is not correct. Please update the AdaptySDK."
-                Log.error(error)
+                log.error(error)
 
                 Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
                     "in_version": formatVersion,
@@ -94,7 +95,7 @@ extension FallbackPaywalls {
             let container = try decoder
                 .container(keyedBy: CodingKeys.self)
                 .nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .data)
-            
+
             guard container.contains(placmentId) else {
                 chosen = nil
                 return

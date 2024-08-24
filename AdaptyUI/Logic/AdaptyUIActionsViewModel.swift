@@ -12,10 +12,12 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 package class AdaptyUIActionsViewModel: ObservableObject {
+    let logId: String
     let eventsHandler: AdaptyEventsHandler
 
     package init(eventsHandler: AdaptyEventsHandler) {
         self.eventsHandler = eventsHandler
+        self.logId = eventsHandler.logId
     }
 
     func closeActionOccurred() {
@@ -24,7 +26,7 @@ package class AdaptyUIActionsViewModel: ObservableObject {
     
     func openUrlActionOccurred(url urlString: String?) {
         guard let urlString, let url = URL(string: urlString) else {
-            eventsHandler.log(.warn, "can't parse url: \(urlString ?? "null")")
+            Log.ui.warn("#\(logId)# can't parse url: \(urlString ?? "null")")
             return
         }
         eventsHandler.event_didPerformAction(.openURL(url: url))

@@ -8,7 +8,9 @@
 import Foundation
 import StoreKit
 
-final class SKStorefrontManager {
+private let log = Log.Category(name: "SKStorefrontManager")
+
+enum SKStorefrontManager {
     static var countryCode: String? {
         SKPaymentQueue.default().storefront?.countryCode
     }
@@ -35,11 +37,11 @@ final class SKStorefrontManager {
                 queue: nil
             ) { _ in
                 guard let countryCode = Self.countryCode else {
-                    Log.warn("SKStorefrontManager (SK1): SKStorefrontCountryCodeDidChange to nil")
+                    log.warn("StoreKit1 SKStorefrontCountryCodeDidChange to nil")
                     return
                 }
 
-                Log.verbose("SKStorefrontManager (SK1): SKStorefrontCountryCodeDidChange new value: \(countryCode)")
+                log.verbose("StoreKit1 SKStorefrontCountryCodeDidChange new value: \(countryCode)")
 
                 callback(countryCode)
             }
@@ -52,7 +54,7 @@ final class SKStorefrontManager {
             for await value in Storefront.updates {
                 let countryCode = value.countryCode
 
-                Log.verbose("SKStorefrontManager (SK2): Storefront.updates new value: \(countryCode)")
+                log.verbose("StoreKit2 Storefront.updates new value: \(countryCode)")
 
                 callback(countryCode)
             }

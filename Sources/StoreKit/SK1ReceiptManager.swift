@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SK1ReceiptManager")
+
 final class SK1ReceiptManager: NSObject {
     private let queue: DispatchQueue
     private var refreshCompletionHandlers: [AdaptyResultCompletion<Data>]?
@@ -34,13 +36,13 @@ final class SK1ReceiptManager: NSObject {
 
             if let handlers = self.validateCompletionHandlers {
                 self.validateCompletionHandlers = handlers + [completion]
-                Log.debug("SK1ReceiptManager: Add handler to validateCompletionHandlers.count = \(self.validateCompletionHandlers?.count ?? 0)")
+                log.debug("Add handler to validateCompletionHandlers.count = \(self.validateCompletionHandlers?.count ?? 0)")
 
                 return
             }
             self.validateCompletionHandlers = [completion]
 
-            Log.debug("SK1ReceiptManager: Start validateReceipt validateCompletionHandlers.count = \(self.validateCompletionHandlers?.count ?? 0)")
+            log.debug("Start validateReceipt validateCompletionHandlers.count = \(self.validateCompletionHandlers?.count ?? 0)")
 
             self.getReceipt(refreshIfEmpty: refreshIfEmpty) { [weak self] result in
                 guard let self else { return }
@@ -59,11 +61,11 @@ final class SK1ReceiptManager: NSObject {
 
         func completedValidate(_ result: AdaptyResult<VH<AdaptyProfile>>) {
             guard let handlers = validateCompletionHandlers, !handlers.isEmpty else {
-                Log.error("SK1ReceiptManager: Not found validateCompletionHandlers")
+                log.error("Not found validateCompletionHandlers")
                 return
             }
             validateCompletionHandlers = nil
-            Log.debug("SK1ReceiptManager: Call validateCompletionHandlers.count = \(handlers.count) with result = \(result)")
+            log.debug("Call validateCompletionHandlers.count = \(handlers.count) with result = \(result)")
 
             handlers.forEach { $0(result) }
         }
@@ -100,7 +102,7 @@ final class SK1ReceiptManager: NSObject {
 
     private func bundleReceipt() -> AdaptyResult<Data> {
         guard let url = Bundle.main.appStoreReceiptURL else {
-            Log.error("SK1ReceiptManager: Receipt URL is nil.")
+            log.error("Receipt URL is nil.")
             return .failure(SKManagerError.receiptIsEmpty().asAdaptyError)
         }
 
@@ -108,16 +110,16 @@ final class SK1ReceiptManager: NSObject {
         do {
             data = try Data(contentsOf: url)
         } catch {
-            Log.error("SK1ReceiptManager: The receipt data failed to load. \(error)")
+            log.error("The receipt data failed to load. \(error)")
             return .failure(SKManagerError.receiptIsEmpty(error).asAdaptyError)
         }
 
         if data.isEmpty {
-            Log.error("SK1ReceiptManager: The receipt data is empty.")
+            log.error("The receipt data is empty.")
             return .failure(SKManagerError.receiptIsEmpty().asAdaptyError)
         }
 
-        Log.verbose("SK1ReceiptManager: Loaded receipt")
+        log.verbose("Loaded receipt")
         return .success(data)
     }
 
@@ -130,14 +132,14 @@ final class SK1ReceiptManager: NSObject {
 
             if let handlers = self.refreshCompletionHandlers {
                 self.refreshCompletionHandlers = handlers + [completion]
-                Log.debug("SK1ReceiptManager: Add handler to refreshCompletionHandlers.count = \(self.refreshCompletionHandlers?.count ?? 0)")
+                log.debug("Add handler to refreshCompletionHandlers.count = \(self.refreshCompletionHandlers?.count ?? 0)")
 
                 return
             }
 
             self.refreshCompletionHandlers = [completion]
 
-            Log.verbose("SK1ReceiptManager: Start refresh receipt")
+            log.verbose("Start refresh receipt")
             let request = SKReceiptRefreshRequest()
             request.delegate = self
             request.start()
@@ -154,21 +156,21 @@ final class SK1ReceiptManager: NSObject {
             guard let self else { return }
 
             guard let handlers = self.refreshCompletionHandlers, !handlers.isEmpty else {
-                Log.error("SK1ReceiptManager: Not found refreshCompletionHandlers")
+                log.error("Not found refreshCompletionHandlers")
                 return
             }
             self.refreshCompletionHandlers = nil
 
             let result: AdaptyResult<Data>
             if let error {
-                Log.error("SK1ReceiptManager: Refresh receipt failed. \(error)")
+                log.error("Refresh receipt failed. \(error)")
                 result = .failure(error)
             } else {
-                Log.verbose("SK1ReceiptManager: Refresh receipt success.")
+                log.verbose("Refresh receipt success.")
                 result = self.bundleReceipt()
             }
 
-            Log.debug("SK1ReceiptManager: Call refreshCompletionHandlers.count = \(handlers.count) with result = \(result)")
+            log.debug("Call refreshCompletionHandlers.count = \(handlers.count) with result = \(result)")
 
             handlers.forEach { $0(result) }
         }

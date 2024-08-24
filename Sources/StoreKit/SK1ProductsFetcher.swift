@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SK1ProductsFetcher")
+
 final class SK1ProductsFetcher: NSObject {
     private let queue: DispatchQueue
     private var sk1Products = [String: SK1Product]()
@@ -53,7 +55,7 @@ final class SK1ProductsFetcher: NSObject {
     }
 
     private func startRequest(_ productIds: Set<String>, retryCount: Int) {
-        Log.verbose("SK1ProductsFetcher: Called startRequest productIds:\(productIds) retryCount:\(retryCount)")
+        log.verbose("Called startRequest productIds:\(productIds) retryCount:\(retryCount)")
         let request = SKProductsRequest(productIdentifiers: productIds)
         request.delegate = self
         requests[request] = (productIds: productIds, retryCount: retryCount)
@@ -82,27 +84,27 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
             ))
 
             if response.products.isEmpty {
-                Log.verbose("SK1ProductsFetcher: SKProductsResponse don't have any product")
+                log.verbose("SKProductsResponse don't have any product")
             }
 
             for product in response.products {
-                Log.verbose("SK1ProductsFetcher: found product \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
+                log.verbose("found product \(product.productIdentifier) \(product.localizedTitle) \(product.price.floatValue)")
             }
 
             guard let self else { return }
             if !response.invalidProductIdentifiers.isEmpty {
-                Log.warn("SK1ProductsFetcher: InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
+                log.warn("InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
             }
 
             guard let productIds = self.requests[request]?.productIds else {
-                Log.error("SK1ProductsFetcher: Not found SKRequest in self.requests")
+                log.error("Not found SKRequest in self.requests")
                 return
             }
 
             self.requests.removeValue(forKey: request)
 
             guard let handlers = self.completionHandlers.removeValue(forKey: productIds) else {
-                Log.error("SK1ProductsFetcher: Not found completionHandlers by productIds")
+                log.error("Not found completionHandlers by productIds")
                 return
             }
 
@@ -138,10 +140,10 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
                 error: "\(error.localizedDescription). Detail: \(error)"
             ))
 
-            Log.error("SK1ProductsFetcher: Can't fetch products from Store \(error)")
+            log.error("Can't fetch products from Store \(error)")
             guard let self else { return }
             guard let (productIds, retryCount) = self.requests[request] else {
-                Log.error("SK1ProductsFetcher: Not found SKRequest in self.requests")
+                log.error("Not found SKRequest in self.requests")
                 return
             }
 
@@ -155,7 +157,7 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
             self.requests.removeValue(forKey: request)
 
             guard let handlers = self.completionHandlers.removeValue(forKey: productIds) else {
-                Log.error("SK1ProductsFetcher: Not found completionHandlers by productIds")
+                log.error("Not found completionHandlers by productIds")
                 return
             }
 

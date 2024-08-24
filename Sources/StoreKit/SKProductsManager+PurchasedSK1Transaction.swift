@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SK1QueueManager")
+
 extension SKProductsManager {
     func fillPurchasedTransaction(
         variationId: String?,
@@ -18,7 +20,7 @@ extension SKProductsManager {
 
         fetchSK1Product(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
             if let error = result.error {
-                Log.error("SK1QueueManager: fetch SK1Product \(productId) error: \(error)")
+                log.error("fetch SK1Product \(productId) error: \(error)")
             }
             completion(PurchasedTransaction(
                 sk1Product: try? result.get(),

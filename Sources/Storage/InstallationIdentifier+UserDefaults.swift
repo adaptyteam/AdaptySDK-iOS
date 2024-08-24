@@ -11,6 +11,8 @@ extension Environment.Application {
     static let installationIdentifier = UserDefaults.standard.getAppInstallationIdentifier()
 }
 
+private let log = Log.storage
+
 extension UserDefaults {
     fileprivate enum Constants {
         static let appInstallationIdentifier = "AdaptySDK_Application_Install_Identifier"
@@ -21,7 +23,7 @@ extension UserDefaults {
             return identifier
         }
         let identifier = UUID().uuidString.lowercased()
-        Log.debug("UserDefaults: appInstallationIdentifier = \(identifier).")
+        log.debug("appInstallationIdentifier = \(identifier).")
 
         set(identifier, forKey: Constants.appInstallationIdentifier)
         return identifier

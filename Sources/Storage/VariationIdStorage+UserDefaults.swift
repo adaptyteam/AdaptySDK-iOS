@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 extension UserDefaults: VariationIdStorage {
     fileprivate enum Constants {
         static let variationsIds = "AdaptySDK_Cached_Variations_Ids"
@@ -18,7 +20,7 @@ extension UserDefaults: VariationIdStorage {
     }
 
     func setVariationsIds(_ value: [String: String]) {
-        Log.debug("UserDefaults: Saving variationsIds for purchased product")
+        log.debug("Saving variationsIds for purchased product")
         set(value, forKey: Constants.variationsIds)
     }
 
@@ -31,7 +33,7 @@ extension UserDefaults: VariationIdStorage {
     }
 
     func clearVariationsIds() {
-        Log.debug("UserDefaults: Clear variationsIds for purchased product.")
+        log.debug("Clear variationsIds for purchased product.")
         removeObject(forKey: Constants.variationsIds)
         removeObject(forKey: Constants.persistentVariationsIds)
     }

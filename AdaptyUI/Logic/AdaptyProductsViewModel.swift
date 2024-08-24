@@ -33,6 +33,7 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
 package class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
+    let logId: String
     private let eventsHandler: AdaptyEventsHandler
     private let paywallViewModel: AdaptyPaywallViewModel
     private let observerModeResolver: AdaptyObserverModeResolver?
@@ -70,6 +71,7 @@ package class AdaptyProductsViewModel: ObservableObject {
         introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         observerModeResolver: AdaptyObserverModeResolver?
     ) {
+        self.logId = eventsHandler.logId
         self.eventsHandler = eventsHandler
         self.paywallViewModel = paywallViewModel
 
@@ -81,12 +83,12 @@ package class AdaptyProductsViewModel: ObservableObject {
         )
 
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
-        
+
         self.observerModeResolver = observerModeResolver
     }
 
     private static func generateProductsInfos(
-        paywall: AdaptyPaywallInterface,
+        paywall _: AdaptyPaywallInterface,
         products: [AdaptyPaywallProduct]?,
         eligibilities: [String: AdaptyEligibility]?
     ) -> [ProductInfoModel] {
@@ -122,15 +124,15 @@ package class AdaptyProductsViewModel: ObservableObject {
             eventsHandler.event_didSelectProduct(selectedProduct)
         }
     }
-    
+
     func unselectProduct(forGroupId groupId: String) {
         selectedProductsIds.removeValue(forKey: groupId)
     }
 
     private func loadProducts() {
         productsLoadingInProgress = true
-
-        eventsHandler.log(.verbose, "loadProducts begin")
+        let logId = logId
+        Log.ui.verbose("#\(logId)# loadProducts begin")
 
         queue.async { [weak self] in
             guard let self else { return }
@@ -138,13 +140,13 @@ package class AdaptyProductsViewModel: ObservableObject {
             self.paywallViewModel.paywall.getPaywallProducts { [weak self] result in
                 switch result {
                 case let .success(products):
-                    self?.eventsHandler.log(.verbose, "loadProducts success")
+                    Log.ui.verbose("#\(logId)# loadProducts success")
 
                     self?.adaptyProducts = products
                     self?.productsLoadingInProgress = false
                     self?.loadProductsIntroductoryEligibilities()
                 case let .failure(error):
-                    self?.eventsHandler.log(.error, "loadProducts fail: \(error)")
+                    Log.ui.error("#\(logId)# loadProducts fail: \(error)")
                     self?.productsLoadingInProgress = false
 
                     if self?.eventsHandler.event_didFailLoadingProducts(with: error) ?? false {
@@ -160,15 +162,16 @@ package class AdaptyProductsViewModel: ObservableObject {
     private func loadProductsIntroductoryEligibilities() {
         guard let products = adaptyProducts else { return }
 
-        eventsHandler.log(.verbose, "loadProductsIntroductoryEligibilities begin")
+        let logId = logId
+        Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities begin")
 
         Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
             switch result {
             case let .success(eligibilities):
                 self?.introductoryOffersEligibilities = eligibilities
-                self?.eventsHandler.log(.verbose, "loadProductsIntroductoryEligibilities success: \(eligibilities)")
+                Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities success: \(eligibilities)")
             case let .failure(error):
-                self?.eventsHandler.log(.error, "loadProductsIntroductoryEligibilities fail: \(error)")
+                Log.ui.error("#\(logId)# loadProductsIntroductoryEligibilities fail: \(error)")
             }
         }
     }
@@ -207,16 +210,16 @@ package class AdaptyProductsViewModel: ObservableObject {
 
     func purchaseProduct(id productId: String) {
         guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
-
+        let logId = logId
         if let observerModeResolver {
             observerModeResolver.observerMode(
                 didInitiatePurchase: product,
                 onStartPurchase: { [weak self] in
-                    self?.eventsHandler.log(.verbose, "observerDidStartPurchase")
+                    Log.ui.verbose("#\(logId)# observerDidStartPurchase")
                     self?.purchaseInProgress = true
                 },
                 onFinishPurchase: { [weak self] in
-                    self?.eventsHandler.log(.verbose, "observerDidFinishPurchase")
+                    Log.ui.verbose("#\(logId)# observerDidFinishPurchase")
                     self?.purchaseInProgress = false
                 }
             )

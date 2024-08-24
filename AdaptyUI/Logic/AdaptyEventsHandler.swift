@@ -68,22 +68,22 @@ package class AdaptyEventsHandler {
     }
 
     func event_didPerformAction(_ action: AdaptyUI.Action) {
-        Log.verbose("[UI] #\(logId)# event_didPerformAction: \(action)")
+        Log.ui.verbose("#\(logId)# event_didPerformAction: \(action)")
         didPerformAction?(action)
     }
 
     func event_didSelectProduct(_ product: AdaptyPaywallProduct) {
-        Log.verbose("[UI] #\(logId)# event_didSelectProduct: \(product.vendorProductId)")
+        Log.ui.verbose("#\(logId)# event_didSelectProduct: \(product.vendorProductId)")
         didSelectProduct?(product)
     }
 
     func event_didStartPurchase(product: AdaptyPaywallProduct) {
-        Log.verbose("[UI] #\(logId)# makePurchase begin")
+        Log.ui.verbose("#\(logId)# makePurchase begin")
         didStartPurchase?(product)
     }
 
     func event_didCancelPurchase(product: AdaptyPaywallProduct) {
-        Log.verbose("[UI] #\(logId)# event_didCancelPurchase: \(product.vendorProductId)")
+        Log.ui.verbose("#\(logId)# event_didCancelPurchase: \(product.vendorProductId)")
         didCancelPurchase?(product)
     }
 
@@ -91,7 +91,7 @@ package class AdaptyEventsHandler {
         product: AdaptyPaywallProduct,
         purchasedInfo: AdaptyPurchasedInfo
     ) {
-        Log.verbose("[UI] #\(logId)# event_didFinishPurchase: \(product.vendorProductId)")
+        Log.ui.verbose("#\(logId)# event_didFinishPurchase: \(product.vendorProductId)")
         didFinishPurchase?(product, purchasedInfo)
     }
 
@@ -99,32 +99,32 @@ package class AdaptyEventsHandler {
         product: AdaptyPaywallProduct,
         error: AdaptyError
     ) {
-        Log.verbose("[UI] #\(logId)# event_didFailPurchase: \(product.vendorProductId), \(error)")
+        Log.ui.verbose("#\(logId)# event_didFailPurchase: \(product.vendorProductId), \(error)")
         didFailPurchase?(product, error)
     }
 
     func event_didStartRestore() {
-        Log.verbose("[UI] #\(logId)# event_didStartRestore")
+        Log.ui.verbose("#\(logId)# event_didStartRestore")
         didStartRestore?()
     }
 
     func event_didFinishRestore(with profile: AdaptyProfile) {
-        Log.verbose("[UI] #\(logId)# event_didFinishRestore")
+        Log.ui.verbose("#\(logId)# event_didFinishRestore")
         didFinishRestore?(profile)
     }
 
     func event_didFailRestore(with error: AdaptyError) {
-        Log.error("[UI] #\(logId)# event_didFailRestore: \(error)")
+        Log.ui.error("#\(logId)# event_didFailRestore: \(error)")
         didFailRestore?(error)
     }
 
     func event_didFailRendering(with error: AdaptyUIError) {
-        Log.error("[UI] #\(logId)# event_didFailRendering: \(error)")
+        Log.ui.error("#\(logId)# event_didFailRendering: \(error)")
         didFailRendering?(AdaptyError(error))
     }
 
     func event_didFailLoadingProducts(with error: AdaptyError) -> Bool {
-        Log.error("[UI] #\(logId)# event_didFailLoadingProducts: \(error)")
+        Log.ui.error("#\(logId)# event_didFailLoadingProducts: \(error)")
         return didFailLoadingProducts?(error) ?? false
     }
 }

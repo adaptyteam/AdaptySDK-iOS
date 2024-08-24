@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SK2TransactionObserver")
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 protocol SK2TransactionObserverDelegate: AnyObject {
     func transactionListener(_: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async
@@ -33,7 +35,7 @@ final class SK2TransactionObserver {
                 guard let self, let delegate = self.delegate else { break }
                 switch verificationResult {
                 case let .unverified(transaction, error):
-                    Log.error("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID)) is unverified. Error: \(error.localizedDescription)")
+                    log.error("Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID)) is unverified. Error: \(error.localizedDescription)")
                     continue
                 case let .verified(transaction):
                     await delegate.transactionListener(self, updatedTransaction: transaction)
@@ -46,7 +48,7 @@ final class SK2TransactionObserver {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK1QueueManager: SK2TransactionObserverDelegate {
     func transactionListener(_: SK2TransactionObserver, updatedTransaction transaction: SK2Transaction) async {
-        Log.debug("SK2TransactionObserver: Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
+        log.debug("Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
         guard transaction.ext.justPurchasedRenewed else { return }
         skProductsManager.fillPurchasedTransaction(variationId: nil, purchasedSK2Transaction: transaction) { [weak self] purchasedTransaction in

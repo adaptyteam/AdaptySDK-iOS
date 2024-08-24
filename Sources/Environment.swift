@@ -30,6 +30,8 @@ import Foundation
 
 import StoreKit
 
+private let log = Log.default
+
 enum Environment {
     enum Application {
         static let version: String? = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
@@ -242,7 +244,7 @@ enum Environment {
                 attributionToken = try AAAttribution.attributionToken()
 
             } catch {
-                Log.error("UpdateASAToken: On AAAttribution.attributionToken \(error)")
+                log.error("UpdateASAToken: On AAAttribution.attributionToken \(error)")
                 Adapty.logSystemEvent(AdaptyAppleResponseParameters(
                     methodName: methodName,
                     callId: callId,

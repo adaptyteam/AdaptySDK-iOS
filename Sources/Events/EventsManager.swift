@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.events
+
 final class EventsManager {
     private enum Constants {
         static let sendingLimitEvents = 500
@@ -89,7 +91,7 @@ final class EventsManager {
             } catch {
                 let error = EventsError.encoding(error)
                 completion(error)
-                Log.error(error.description)
+                log.error(error.description)
                 return
             }
 

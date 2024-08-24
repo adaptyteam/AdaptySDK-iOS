@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.events
+
 protocol EventsStorage: AnyObject {
     func setEventCounter(_: Int)
     func getEventCounter() -> Int
@@ -45,7 +47,7 @@ final class EventCollectionStorage {
             if !blackList.contains(item.type) {
                 elements.append(item.data)
             } else {
-                Log.verbose("Events: event \(item.type) #\(item.counter) blacklisted")
+                log.verbose("Event \(item.type) #\(item.counter) blacklisted")
             }
         }
 
@@ -60,7 +62,7 @@ final class EventCollectionStorage {
         let old = events.elements.first
         events.append(info, withLimit: Constants.limitEvents)
         if let item = old, item.id != events.elements.first?.id {
-            Log.verbose("Events: event \(item.type) #\(item.counter) deleted due to exceeded the limit of \(Constants.limitEvents)")
+            log.verbose("Event \(item.type) #\(item.counter) deleted due to exceeded the limit of \(Constants.limitEvents)")
         }
         storage.setEventCounter(eventCounter)
         storage.setEvents(events.elements.map { $0.data })
@@ -83,7 +85,7 @@ extension EventsStorage {
                 return info
             } catch {
                 let error = EventsError.decoding(error)
-                Log.error("Events: event skipped due to error \(error.description)")
+                log.error("Event skipped due to error \(error.description)")
                 return nil
             }
         }

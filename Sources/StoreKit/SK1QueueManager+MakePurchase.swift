@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SK1QueueManager")
+
 extension SK1QueueManager {
     func makePurchase(payment: SKPayment, product: some AdaptyProduct, _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>) {
         queue.async { [weak self] in
@@ -39,7 +41,7 @@ extension SK1QueueManager {
             if !Adapty.Configuration.observerMode {
                 SKPaymentQueue.default().finishTransaction(transaction)
                 Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.ext.logParams))
-                Log.verbose("SK1QueueManager: finish failed transaction \(transaction)")
+                log.verbose("finish failed transaction \(transaction)")
             }
 
             let productId = transaction.payment.productIdentifier
@@ -55,7 +57,7 @@ extension SK1QueueManager {
 
     func receivedPurchasedTransaction(_ transaction: SK1Transaction) {
         guard let transactionIdentifier = transaction.transactionIdentifier else {
-            Log.error("SK1QueueManager: received purchased transaction without identifier")
+            log.error("received purchased transaction without identifier")
             return
         }
 
@@ -96,7 +98,7 @@ extension SK1QueueManager {
                         if !isObserverMode {
                             SKPaymentQueue.default().finishTransaction(transaction)
                             Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.ext.logParams))
-                            Log.info("SK1QueueManager: finish purchased transaction \(transaction)")
+                            log.info("finish purchased transaction \(transaction)")
                         }
                     }
                     self.callMakePurchasesCompletionHandlers(productId, result.map {
@@ -116,13 +118,13 @@ extension SK1QueueManager {
 
             switch result {
             case let .failure(error):
-                Log.error("Failed to purchase product: \(productId) \(error.localizedDescription)")
+                log.error("Failed to purchase product: \(productId) \(error.localizedDescription)")
             case .success:
-                Log.info("Successfully purchased product: \(productId).")
+                log.info("Successfully purchased product: \(productId).")
             }
 
             guard let handlers = self.makePurchasesCompletionHandlers.removeValue(forKey: productId) else {
-                Log.error("Not found makePurchasesCompletionHandlers for \(productId)")
+                log.error("Not found makePurchasesCompletionHandlers for \(productId)")
                 return
             }
 

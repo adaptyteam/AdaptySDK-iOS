@@ -91,12 +91,12 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     ) {
         let logId = Log.stamp
 
-        Log.verbose("[UI] #\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
+        Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
         
         if Adapty.Configuration.observerMode && observerModeResolver == nil {
-            Log.warn("[UI] In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
+            Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
         } else if !Adapty.Configuration.observerMode && observerModeResolver != nil {
-            Log.warn("[UI] You should not pass observerModeResolver if you're using Adapty in Full Mode")
+            Log.ui.warn("You should not pass observerModeResolver if you're using Adapty in Full Mode")
         }
         
         self.isPresented = isPresented

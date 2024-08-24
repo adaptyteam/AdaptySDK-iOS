@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 extension UserDefaults {
     fileprivate enum Constants {
         static let appKeyHash = "AdaptySDK_Application_Key_Hash"
@@ -23,7 +25,7 @@ extension UserDefaults {
 
         if value == hash { return false }
 
-        Log.verbose("UserDefaults: changing apiKeyHash = \(hash).")
+        log.verbose("changing apiKeyHash = \(hash).")
         clearProfile(newProfileId: nil)
         clearEvents()
         clearProductVendorIds()

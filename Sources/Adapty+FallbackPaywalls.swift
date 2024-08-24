@@ -11,6 +11,8 @@ extension Adapty.Configuration {
     static var fallbackPaywalls: FallbackPaywalls?
 }
 
+private let log = Log.Category(name: "PaywallsCache")
+
 extension Adapty {
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///
@@ -57,7 +59,7 @@ extension PaywallsCache {
         }
 
         Adapty.logIfNeed(chosen)
-        Log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
+        log.verbose("PaywallsCache: return from fallback paywall (placementId: \(placementId))")
         return chosen.value
     }
 }

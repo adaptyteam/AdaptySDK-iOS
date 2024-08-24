@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SK2TransactionManager")
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 final class SK2TransactionManager {
     private let queue: DispatchQueue
@@ -30,13 +32,13 @@ final class SK2TransactionManager {
 
             if let handlers = self.syncTransactionsCompletionHandlers {
                 self.syncTransactionsCompletionHandlers = handlers + [completion]
-                Log.debug("SK2TransactionManager: Add handler to syncTransactionsCompletionHandlers.count = \(self.syncTransactionsCompletionHandlers?.count ?? 0)")
+                log.debug("Add handler to syncTransactionsCompletionHandlers.count = \(self.syncTransactionsCompletionHandlers?.count ?? 0)")
 
                 return
             }
             self.syncTransactionsCompletionHandlers = [completion]
 
-            Log.debug("SK2TransactionManager: Start validateReceipt syncTransactionsCompletionHandlers.count = \(self.syncTransactionsCompletionHandlers?.count ?? 0)")
+            log.debug("Start validateReceipt syncTransactionsCompletionHandlers.count = \(self.syncTransactionsCompletionHandlers?.count ?? 0)")
 
             self.getSK2Transaction { [weak self] result in
                 guard let self else { return }
@@ -62,11 +64,11 @@ final class SK2TransactionManager {
 
         func completedSync(_ result: AdaptyResult<VH<AdaptyProfile>?>) {
             guard let handlers = syncTransactionsCompletionHandlers, !handlers.isEmpty else {
-                Log.error("SK2TransactionManager: Not found syncTransactionsCompletionHandlers")
+                log.error("Not found syncTransactionsCompletionHandlers")
                 return
             }
             syncTransactionsCompletionHandlers = nil
-            Log.debug("SK2TransactionManager: Call syncTransactionsCompletionHandlers.count = \(handlers.count) with result = \(result)")
+            log.debug("Call syncTransactionsCompletionHandlers.count = \(handlers.count) with result = \(result)")
 
             handlers.forEach { $0(result) }
         }
@@ -78,14 +80,14 @@ final class SK2TransactionManager {
             let logName = "get_all_transactions"
             let stamp = Log.stamp
             Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: logName, callId: stamp))
-            Log.verbose("SK2TransactionManager: call  SK2Transaction.all")
+            log.verbose("call  SK2Transaction.all")
 
             for await verificationResult in SK2Transaction.all {
                 guard case let .verified(transaction) = verificationResult else {
                     continue
                 }
 
-                Log.verbose("SK2TransactionManager: found transaction original-id: \(transaction.ext.originalIdentifier), purchase date:\(transaction.purchaseDate)")
+                log.verbose("found transaction original-id: \(transaction.ext.originalIdentifier), purchase date:\(transaction.purchaseDate)")
 
                 guard let lasted = lastTransaction,
                       transaction.purchaseDate < lasted.purchaseDate else {

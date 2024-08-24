@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SKProductsManager")
+
 final class SKProductsManager {
     private let queue = DispatchQueue(label: "Adapty.SDK.SKProductsManager")
     private let apiKeyPrefix: String
@@ -91,7 +93,7 @@ final class SKProductsManager {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func fetchSK2Products(productIdentifiers productIds: Set<String>, fetchPolicy: SKProductsManager.ProductsFetchPolicy = .default, retryCount: Int = 3, _ completion: @escaping AdaptyResultCompletion<[SK2Product]>) {
         guard let storeKit2Fetcher else {
-            Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
+            log.error("SK2ProductsFetcher is not initialized!")
             completion(.success([]))
             return
         }
@@ -170,7 +172,7 @@ extension SKProductsManager {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func getSK2IntroductoryOfferEligibility(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
         guard let storeKit2Fetcher else {
-            Log.error("SKProductsManager: SK2ProductsFetcher is not initialized!")
+            log.error("SK2ProductsFetcher is not initialized!")
             completion(.success([:]))
             return
         }

@@ -41,12 +41,12 @@ public class AdaptyPaywallController: UIViewController {
     ) {
         let logId = Log.stamp
 
-        Log.verbose("[UI] #\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
+        Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
 
         if Adapty.Configuration.observerMode && observerModeResolver == nil {
-            Log.warn("[UI] In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
+            Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
         } else if !Adapty.Configuration.observerMode && observerModeResolver != nil {
-            Log.warn("[UI] You should not pass observerModeResolver if you're using Adapty in Full Mode")
+            Log.ui.warn("You should not pass observerModeResolver if you're using Adapty in Full Mode")
         }
         
         self.logId = logId
@@ -75,13 +75,13 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     deinit {
-        Log.verbose("[UI] #\(logId)# deinit")
+        Log.ui.verbose("#\(logId)# deinit")
     }
 
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        Log.verbose("[UI] #\(logId)# viewDidLoad begin")
+        Log.ui.verbose("#\(logId)# viewDidLoad begin")
 
         view.backgroundColor = .systemBackground
 
@@ -147,17 +147,17 @@ public class AdaptyPaywallController: UIViewController {
             to: view
         )
 
-        Log.verbose("[UI] #\(logId)# viewDidLoad end")
+        Log.ui.verbose("#\(logId)# viewDidLoad end")
     }
 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Log.verbose("[UI] #\(logId)# viewDidAppear")
+        Log.ui.verbose("#\(logId)# viewDidAppear")
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        Log.verbose("[UI] #\(logId)# viewDidDisappear")
+        Log.ui.verbose("#\(logId)# viewDidDisappear")
     }
 }
 

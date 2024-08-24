@@ -14,6 +14,8 @@ protocol VariationIdStorage {
     func setPersistentVariationsIds(_: [String: String])
 }
 
+private let log = Log.Category(name: "SK1QueueManager")
+
 final class SK1QueueManager: NSObject {
     let queue: DispatchQueue
 
@@ -108,7 +110,7 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
                 if !Adapty.Configuration.observerMode {
                     SKPaymentQueue.default().finishTransaction(transaction)
                     Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: logParams))
-                    Log.verbose("SK1QueueManager: finish restored transaction \(transaction)")
+                    log.verbose("finish restored transaction \(transaction)")
                 }
             case .deferred, .purchasing: break
             @unknown default: break
@@ -131,12 +133,12 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
 
     func paymentQueueRestoreCompletedTransactionsFinished(_: SKPaymentQueue) {
         Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_finished"))
-        Log.verbose("SK1QueueManager: Restore сompleted transactions finished.")
+        log.verbose("Restore сompleted transactions finished.")
     }
 
     func paymentQueue(_: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
         Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_failed", error: "\(error.localizedDescription). Detail: \(error)"))
-        Log.error("SK1QueueManager: Restore сompleted transactions failed with error: \(error)")
+        log.error("Restore сompleted transactions failed with error: \(error)")
     }
 
     func paymentQueue(_: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {

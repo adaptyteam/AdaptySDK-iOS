@@ -81,7 +81,7 @@ extension Adapty {
     public static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters, _ completion: AdaptyErrorCompletion? = nil) {
         guard params.screenOrder > 0 else {
             let error = AdaptyError.wrongParamOnboardingScreenOrder()
-            Log.error(error.debugDescription)
+            Log.default.error(error.debugDescription)
             completion?(error)
             return
         }

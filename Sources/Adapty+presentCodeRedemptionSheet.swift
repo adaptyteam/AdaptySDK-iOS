@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.default
+
 extension Adapty {
     /// Call this method to have StoreKit present a sheet enabling the user to redeem codes provided by your app.
     public static func presentCodeRedemptionSheet() {
@@ -16,7 +18,7 @@ extension Adapty {
                 if #available(iOS 14.0, visionOS 1.0, *) {
                     SKPaymentQueue.default().presentCodeRedemptionSheet()
                 } else {
-                    Log.error("Presenting code redemption sheet is available only for iOS 14 and higher.")
+                    log.error("Presenting code redemption sheet is available only for iOS 14 and higher.")
                 }
                 completion(nil)
             }

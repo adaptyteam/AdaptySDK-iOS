@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.default
+
 extension Adapty {
     package static let underlayQueue = DispatchQueue(label: "AdaptySDK.Main")
     static var dispatchQueue: DispatchQueue?
@@ -26,7 +28,7 @@ extension Adapty {
         if let logName {
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
         }
-        Log.verbose("Calling now: \(function) [\(stamp)].")
+        log.verbose("Calling now: \(function) [\(stamp)].")
         underlayQueue.async(group: group, qos: qos, flags: flags) {
             work {
                 callCompletion(logName: logName, function, stamp, completion, $0, logLevel: .error)
@@ -49,7 +51,7 @@ extension Adapty {
         if let logName {
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
         }
-        Log.verbose("Calling now: \(function) [\(stamp)].")
+        log.verbose("Calling now: \(function) [\(stamp)].")
         underlayQueue.async(group: group, qos: qos, flags: flags) {
             guard let manager = shared else {
                 callCompletion(logName: logName, function, stamp, completion, AdaptyError.notActivated(), logLevel: .error)
@@ -77,7 +79,7 @@ extension Adapty {
         if let logName {
             Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp, params: logParams))
         }
-        Log.verbose("Calling now: \(function) [\(stamp)].")
+        log.verbose("Calling now: \(function) [\(stamp)].")
         underlayQueue.async(group: group, qos: qos, flags: flags) {
             guard let manager = shared else {
                 callCompletion(logName: logName, function, stamp, completion, .failure(.notActivated()), logLevel: .error)
@@ -97,16 +99,16 @@ extension Adapty {
         _ stamp: String,
         _ completion: AdaptyErrorCompletion?,
         _ error: AdaptyError? = nil,
-        logLevel: AdaptyLogLevel = .verbose
+        logLevel: Log.Level = .verbose
     ) {
         if let logName {
             Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: error?.description))
         }
 
         if let error {
-            Log.message("Completed \(function) [\(stamp)] with error: \(error).", withLevel: logLevel)
+            log.message("Completed \(function) [\(stamp)] with error: \(error).", withLevel: logLevel)
         } else {
-            Log.message("Completed \(function) [\(stamp)] is successful.", withLevel: .verbose)
+            log.message("Completed \(function) [\(stamp)] is successful.", withLevel: .verbose)
         }
         guard let completion else { return }
         (dispatchQueue ?? .main).async {
@@ -115,7 +117,7 @@ extension Adapty {
     }
 
     @inline(__always)
-    private static func callCompletion<T>(logName: String? = nil, _ function: StaticString, _ stamp: String, _ completion: AdaptyResultCompletion<T>?, _ result: AdaptyResult<T>, logLevel: AdaptyLogLevel = .verbose) {
+    private static func callCompletion<T>(logName: String? = nil, _ function: StaticString, _ stamp: String, _ completion: AdaptyResultCompletion<T>?, _ result: AdaptyResult<T>, logLevel: Log.Level = .verbose) {
         let error: AdaptyError? = if case let .failure(e) = result { e } else { nil }
 
         if let logName {
@@ -123,9 +125,9 @@ extension Adapty {
         }
 
         if let error {
-            Log.message("Completed \(function) [\(stamp)]  with error: \(error).", withLevel: logLevel)
+            log.message("Completed \(function) [\(stamp)]  with error: \(error).", withLevel: logLevel)
         } else {
-            Log.message("Completed \(function) [\(stamp)]  is successful.", withLevel: .verbose)
+            log.message("Completed \(function) [\(stamp)]  is successful.", withLevel: .verbose)
         }
         guard let completion else { return }
         (dispatchQueue ?? .main).async {

@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 extension UserDefaults: ProfileStorage {
     fileprivate enum Constants {
         static let profileKey = "AdaptySDK_Purchaser_Info"
@@ -22,7 +24,7 @@ extension UserDefaults: ProfileStorage {
         }
 
         let identifier = UUID().uuidString.lowercased()
-        Log.debug("UserDefaults: profileId = \(identifier)")
+        log.debug("create profileId = \(identifier)")
         set(identifier, forKey: Constants.profileIdKey)
         return identifier
     }
@@ -32,7 +34,7 @@ extension UserDefaults: ProfileStorage {
     }
 
     func setExternalAnalyticsDisabled(_ value: Bool) {
-        Log.debug("UserDefaults: setExternalAnalyticsDisabled = \(value).")
+        log.debug("set externalAnalyticsDisabled = \(value).")
         set(value, forKey: Constants.externalAnalyticsDisabledKey)
     }
 
@@ -40,7 +42,7 @@ extension UserDefaults: ProfileStorage {
         do {
             return try getJSON(VH<AdaptyProfile>.self, forKey: Constants.profileKey)
         } catch {
-            Log.warn(error.localizedDescription)
+            log.warn(error.localizedDescription)
             return nil
         }
     }
@@ -50,7 +52,7 @@ extension UserDefaults: ProfileStorage {
     }
 
     func setSyncedTransactions(_ value: Bool) {
-        Log.debug("UserDefaults: syncedBundleReceipt = \(value).")
+        log.debug("set syncedBundleReceipt = \(value).")
         set(value, forKey: Constants.syncedTransactionsKey)
     }
 
@@ -60,23 +62,23 @@ extension UserDefaults: ProfileStorage {
 
     func setAppleSearchAdsSyncDate() {
         let date = Date()
-        Log.debug("UserDefaults: appleSearchAdsSyncDate = \(date).")
+        log.debug("set appleSearchAdsSyncDate = \(date).")
         set(date, forKey: Constants.appleSearchAdsSyncDateKey)
     }
 
     func setProfile(_ profile: VH<AdaptyProfile>) {
         do {
             try setJSON(profile, forKey: Constants.profileKey)
-            Log.debug("UserDefaults: saving profile success.")
+            log.debug("saving profile success.")
         } catch {
-            Log.error("UserDefaults: saving profile fail. \(error.localizedDescription)")
+            log.error("saving profile fail. \(error.localizedDescription)")
         }
     }
 
     func clearProfile(newProfileId profileId: String?) {
-        Log.debug("UserDefaults: Clear profile")
+        log.debug("Clear profile")
         if let profileId {
-            Log.debug("UserDefaults: profileId = \(profileId)")
+            log.debug("set profileId = \(profileId)")
             set(profileId, forKey: Constants.profileIdKey)
         } else {
             removeObject(forKey: Constants.profileIdKey)

@@ -11,6 +11,8 @@ import StoreKit
     import UIKit
 #endif
 
+private let log = Log.default
+
 extension Adapty {
     public static var isActivated: Bool { shared != nil }
 
@@ -77,7 +79,7 @@ extension Adapty {
         async(completion, logName: logName, logParams: logParams) { completion in
             if isActivated {
                 let err = AdaptyError.activateOnceError()
-                Log.warn("Adapty activate error \(err)")
+                log.warn("Adapty activate error \(err)")
                 completion(err)
                 return
             }
@@ -103,7 +105,7 @@ extension Adapty {
 
             LifecycleManager.shared.initialize()
 
-            Log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
+            log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
             completion(nil)
         }
     }
@@ -396,7 +398,7 @@ extension Adapty {
 
                     let vendorProductIdsWithUnknownEligibility = result.filter { $0.value == nil }.map { $0.key }
                     if !vendorProductIdsWithUnknownEligibility.isEmpty {
-                        Log.verbose("Adapty: products without eligibility  \(vendorProductIdsWithUnknownEligibility)")
+                        log.verbose("Adapty: products without eligibility  \(vendorProductIdsWithUnknownEligibility)")
                     }
 
                     return result.compactMapValues { $0 }

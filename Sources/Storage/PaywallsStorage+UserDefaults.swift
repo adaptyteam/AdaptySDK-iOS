@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 extension UserDefaults: PaywallsStorage {
     fileprivate enum Constants {
         static let paywallsStorageKey = "AdaptySDK_Cached_Purchase_Containers"
@@ -16,17 +18,17 @@ extension UserDefaults: PaywallsStorage {
 
     func setPaywalls(_ paywalls: [VH<AdaptyPaywall>]) {
         guard !paywalls.isEmpty else {
-            Log.debug("UserDefaults: Clear paywalls.")
+            log.debug("Clear paywalls.")
             removeObject(forKey: Constants.paywallsStorageKey)
             return
         }
         do {
             set(Constants.currentPaywallsStorageVersion, forKey: Constants.paywallsStorageVersionKey)
             try setJSON(paywalls, forKey: Constants.paywallsStorageKey)
-            Log.debug("UserDefaults: Saving paywalls success.")
+            log.debug("Saving paywalls success.")
 
         } catch {
-            Log.error("UserDefaults: Saving paywalls fail. \(error.localizedDescription)")
+            log.error("Saving paywalls fail. \(error.localizedDescription)")
         }
     }
 
@@ -37,13 +39,13 @@ extension UserDefaults: PaywallsStorage {
         do {
             return try getJSON([VH<AdaptyPaywall>].self, forKey: Constants.paywallsStorageKey)
         } catch {
-            Log.error(error.localizedDescription)
+            log.error(error.localizedDescription)
             return nil
         }
     }
 
     func clearPaywalls() {
-        Log.debug("UserDefaults: Clear paywalls.")
+        log.debug("Clear paywalls.")
         removeObject(forKey: Constants.paywallsStorageKey)
     }
 }

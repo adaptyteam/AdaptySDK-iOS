@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 extension UserDefaults: BackendProductStatesStorage {
     fileprivate enum Constants {
         static let backendProductStatesStorageKey = "AdaptySDK_Cached_Products"
@@ -15,9 +17,9 @@ extension UserDefaults: BackendProductStatesStorage {
     func setBackendProductStates(_ products: VH<[BackendProductState]>) {
         do {
             try setJSON(products, forKey: Constants.backendProductStatesStorageKey)
-            Log.debug("UserDefaults: Save products success.")
+            log.debug("Save products success.")
         } catch {
-            Log.error("UserDefaults: Save products failed. \(error.localizedDescription)")
+            log.error("Save products failed. \(error.localizedDescription)")
         }
     }
 
@@ -25,13 +27,13 @@ extension UserDefaults: BackendProductStatesStorage {
         do {
             return try getJSON(VH<[BackendProductState]>.self, forKey: Constants.backendProductStatesStorageKey)
         } catch {
-            Log.warn(error.localizedDescription)
+            log.warn(error.localizedDescription)
             return nil
         }
     }
 
     func clearBackendProducts() {
-        Log.debug("UserDefaults: Clear products.")
+        log.debug("Clear products.")
         removeObject(forKey: Constants.backendProductStatesStorageKey)
     }
 }

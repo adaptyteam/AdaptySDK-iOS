@@ -37,9 +37,9 @@ extension AdaptyUI {
     static var currentCacheConfiguration: MediaCacheConfiguration?
 
     static func configureMediaCache(_ configuration: MediaCacheConfiguration) {
-        Log.verbose("""
-            [UI] #AdaptyMediaCache# configure: memoryStorageTotalCostLimit = \(configuration.memoryStorageTotalCostLimit), memoryStorageCountLimit = \(configuration.memoryStorageCountLimit), diskStorageSizeLimit = \(configuration.diskStorageSizeLimit)
-            """)
+        Log.cache.verbose("""
+        configure: memoryStorageTotalCostLimit = \(configuration.memoryStorageTotalCostLimit), memoryStorageCountLimit = \(configuration.memoryStorageCountLimit), diskStorageSizeLimit = \(configuration.diskStorageSizeLimit)
+        """)
 
         imageCache.memoryStorage.config.totalCostLimit = configuration.memoryStorageTotalCostLimit
         imageCache.memoryStorage.config.countLimit = configuration.memoryStorageCountLimit
@@ -55,7 +55,7 @@ extension AdaptyUI {
     /// - Parameter completion: A closure which is invoked when the cache clearing operation finishes.
     ///                      This `handler` will be called from the main queue.
     public static func clearMediaCache(completion: (() -> Void)? = nil) {
-        Log.verbose("[UI] #AdaptyMediaCache# clearMediaCache")
+        Log.cache.verbose("clearMediaCache")
 
         imageCache.clearMemoryCache()
         imageCache.clearDiskCache(completion: completion)
@@ -74,14 +74,14 @@ extension AdaptyUI {
             defer { initialized = true }
             guard !initialized else { return }
 
-            Log.verbose("[UI] #ImageUrlPrefetcher# initialize")
+            Log.prefetcher.verbose("initialize")
             AdaptyUI.setImageUrlObserver(self, dispatchQueue: Self.queue)
         }
 
         func extractedImageUrls(_ urls: Set<URL>) {
             let logId = Log.stamp
 
-            Log.verbose("[UI] #ImageUrlPrefetcher# cacheImagesIfNeeded: \(urls) [\(logId)]")
+            Log.prefetcher.verbose("cacheImagesIfNeeded: \(urls) [\(logId)]")
 
             let prefetcher = ImagePrefetcher(
                 sources: urls.map { .network($0) },
@@ -90,7 +90,7 @@ extension AdaptyUI {
                     .downloader(imageDownloader),
                 ],
                 completionHandler: { skipped, failed, completed in
-                    Log.verbose("[UI] #ImageUrlPrefetcher# cacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
+                    Log.prefetcher.verbose("cacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
                 }
             )
 

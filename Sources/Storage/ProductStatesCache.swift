@@ -12,6 +12,8 @@ protocol BackendProductStatesStorage {
     func getBackendProductStates() -> VH<[BackendProductState]>?
 }
 
+private let log = Log.Category(name: "ProductStatesCache")
+
 final class ProductStatesCache {
     private let storage: BackendProductStatesStorage
     private var products: VH<[String: BackendProductState]>?
@@ -44,7 +46,7 @@ final class ProductStatesCache {
                     updated = true
                     return product
                 } else {
-                    Log.verbose("ProductStatesCache: saved product.version(\(product.version)) is older than cashed.version(\(cached.version) : \(product.vendorId)")
+                    log.verbose("ProductStatesCache: saved product.version(\(product.version)) is older than cashed.version(\(cached.version) : \(product.vendorId)")
                     return cached
                 }
             }

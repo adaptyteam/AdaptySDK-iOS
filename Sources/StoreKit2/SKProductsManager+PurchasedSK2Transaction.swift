@@ -7,6 +7,8 @@
 
 import StoreKit
 
+private let log = Log.Category(name: "SKProductsManager")
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SKProductsManager {
     func fillPurchasedTransaction(
@@ -19,7 +21,7 @@ extension SKProductsManager {
 
         fetchSK2Product(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
             if let error = result.error {
-                Log.error("SK1QueueManager: fetch SK2Product \(productId) error: \(error)")
+                log.error("fetch SK2Product \(productId) error: \(error)")
             }
             completion(PurchasedTransaction(
                 sk2Product: try? result.get(),

@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 extension UserDefaults: ProductVendorIdsStorage {
     fileprivate enum Constants {
         static let productVendorIdsStorageKey = "AdaptySDK_Cached_ProductVendorIds"
@@ -15,9 +17,9 @@ extension UserDefaults: ProductVendorIdsStorage {
     func setProductVendorIds(_ vendorIds: [String]) {
         do {
             try setJSON(vendorIds, forKey: Constants.productVendorIdsStorageKey)
-            Log.debug("UserDefaults: Saving vendor product ids success.")
+            log.debug("Saving vendor product ids success.")
         } catch {
-            Log.error("UserDefaults: Saving vendor product ids fail. \(error.localizedDescription)")
+            log.error("Saving vendor product ids fail. \(error.localizedDescription)")
         }
     }
 
@@ -25,13 +27,13 @@ extension UserDefaults: ProductVendorIdsStorage {
         do {
             return try getJSON([String].self, forKey: Constants.productVendorIdsStorageKey)
         } catch {
-            Log.warn(error.localizedDescription)
+            log.warn(error.localizedDescription)
             return nil
         }
     }
 
     func clearProductVendorIds() {
-        Log.debug("UserDefaults: Clear vendor product ids.")
+        log.debug("Clear vendor product ids.")
         removeObject(forKey: Constants.productVendorIdsStorageKey)
     }
 }

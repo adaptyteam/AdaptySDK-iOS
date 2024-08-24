@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.default
+
 extension Adapty {
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
@@ -277,7 +279,7 @@ extension TimeInterval {
         let minimum: TimeInterval = .minimumLoadPaywallTimeout
 
         guard self < minimum else { return self }
-        Log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
+        log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
         return minimum
     }
 

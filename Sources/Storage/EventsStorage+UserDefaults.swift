@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 extension UserDefaults {
     private enum Constants {
         static let defaultName = ""
@@ -22,7 +24,7 @@ extension UserDefaults {
     }
 
     func clearEvents() {
-        Log.debug("UserDefaults: Clear events.")
+        log.debug("Clear events.")
         [
             Constants.defaultName,
             Constants.syslogName,
@@ -56,14 +58,14 @@ final class UserDefaultsEventsStorage: EventsStorage {
     }
 
     func setEventCounter(_ value: Int) {
-        Log.debug("UserDefaults: Save \(self.name)Event Counter = \(value) success.")
+        log.debug("Save \(self.name)Event Counter = \(value) success.")
         userDefaults.set(value, forKey: eventCounterKey)
     }
 
     func getEventCounter() -> Int { userDefaults.integer(forKey: eventCounterKey) }
 
     func setEvents(_ value: [Data]) {
-        Log.debug("UserDefaults: Save \(self.name)Events success.")
+        log.debug("Save \(self.name)Events success.")
         userDefaults.set(value, forKey: eventsStorageKey)
     }
 

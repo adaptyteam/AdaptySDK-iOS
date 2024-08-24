@@ -189,14 +189,14 @@ public extension AdaptyUI {
         Adapty.underlayQueue.async {
             if AdaptyUI.isActivated {
                 let err = AdaptyUIError.activateOnceError
-                Log.warn("[UI] AdaptyUI activate error: \(err)")
+                Log.ui.warn("AdaptyUI activate error: \(err)")
                 completion?(err)
                 return
             }
 
             if !Adapty.isActivated {
                 let err = AdaptyUIError.adaptyNotActivatedError
-                Log.error("[UI] AdaptyUI activate error: \(err)")
+                Log.ui.error("AdaptyUI activate error: \(err)")
                 completion?(err)
                 return
             }
@@ -205,7 +205,7 @@ public extension AdaptyUI {
             ImageUrlPrefetcher.shared.initialize()
 
             AdaptyUI.isActivated = true
-            Log.info("[UI] AdaptyUI activated with \(configuration)")
+            Log.ui.info("AdaptyUI activated with \(configuration)")
 
             completion?(nil)
         }
@@ -224,7 +224,7 @@ public extension AdaptyUI {
     ) {
         if !AdaptyUI.isActivated {
             let err = AdaptyUIError.adaptyNotActivatedError
-            Log.error("[UI] AdaptyUI getViewConfiguration error: \(err)")
+            Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
             completion(.failure(err))
             return
         }
@@ -259,7 +259,7 @@ public extension AdaptyUI {
     ) throws -> AdaptyPaywallController {
         if !AdaptyUI.isActivated {
             let err = AdaptyUIError.adaptyNotActivatedError
-            Log.error("[UI] AdaptyUI paywallController(for:) error: \(err)")
+            Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
             throw err
         }
 
