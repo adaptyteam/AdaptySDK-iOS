@@ -10,6 +10,18 @@ import StoreKit
 
 extension Locale: AdaptyExtended {}
 
+extension NSDecimalNumber {
+    var isInteger: Bool {
+        return self == rounding(accordingToBehavior: nil)
+    }
+}
+
+package extension Locale {
+    func localized(price: NSDecimalNumber) -> String? {
+        ext.localized(price: price)
+    }
+}
+
 extension AdaptyExtension where Extended == Locale {
     var currencyCode: String? {
         guard #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) else {
@@ -25,12 +37,16 @@ extension AdaptyExtension where Extended == Locale {
         return this.region?.identifier
     }
 
-    func localized(price: NSNumber) -> String? {
+    func localized(price: NSDecimalNumber) -> String? {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = this
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
+
+        if price.isInteger {
+            formatter.minimumFractionDigits = 0
+            formatter.maximumFractionDigits = 0
+        }
+
         return formatter.string(from: price)
     }
 
