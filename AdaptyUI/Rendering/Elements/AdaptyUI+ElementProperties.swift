@@ -32,7 +32,17 @@ extension View {
 
 @available(iOS 15.0, *)
 extension AdaptyUI.Color {
-    var swiftuiColor: Color { Color(red: red, green: green, blue: blue, opacity: alpha) }
+    var swiftuiColor: Color {
+        Color(uiColor)
+    }
+
+    var uiColor: UIColor {
+        UIColor { traits -> UIColor in
+            traits.userInterfaceStyle == .dark ?
+                UIColor(red: 1.0 - red, green: 1.0 - green, blue: 1.0 - blue, alpha: alpha) :
+                UIColor(red: red, green: green, blue: blue, alpha: alpha)
+        }
+    }
 }
 
 #endif

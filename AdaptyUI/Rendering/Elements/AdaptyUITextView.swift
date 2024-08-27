@@ -217,6 +217,7 @@ extension UIFont {
     static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
 }
 
+@available(iOS 15.0, *)
 extension AdaptyUI.RichText.TextAttributes {
     var uiFont: UIFont { font.uiFont(size: size) }
     var uiColor: UIColor? { txtColor.asColor?.uiColor }
