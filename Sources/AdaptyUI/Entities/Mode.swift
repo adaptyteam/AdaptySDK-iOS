@@ -17,7 +17,11 @@ package extension AdaptyUI {
             case light
             case dark
         }
-        
+
+        package var isSame: Bool {
+            if case .same = self { true } else { false }
+        }
+
         package func mode(_ name: Name) -> T {
             switch self {
             case let .same(value):
