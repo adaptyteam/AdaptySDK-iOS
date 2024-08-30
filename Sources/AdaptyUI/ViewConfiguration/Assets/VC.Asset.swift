@@ -10,6 +10,7 @@ import Foundation
 extension AdaptyUI.ViewConfiguration {
     enum Asset: Sendable {
         case filling(AdaptyUI.Filling)
+        case image(AdaptyUI.ImageData)
         case video(AdaptyUI.VideoData)
         case font(AdaptyUI.Font)
         case unknown(String?)
@@ -25,24 +26,28 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 
     @inlinable
-    func filling(_ assetId: String) throws -> AdaptyUI.Filling {
-        guard case let .filling(value) = try asset(assetId) else {
+    func background(_ assetId: String) throws -> AdaptyUI.Background {
+        switch try asset(assetId) {
+        case let .filling(value):
+            .filling(value)
+        case let .image(value):
+            .image(value)
+        default:
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color, any-gradient, or image")
         }
-        return value
     }
 
     @inlinable
     func color(_ assetId: String) throws -> AdaptyUI.Color {
-        guard let value = try filling(assetId).asColor else {
+        guard case let .filling(value) = try asset(assetId), let color = value.asColor else {
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
         }
-        return value
+        return color
     }
 
     @inlinable
-    func colorFilling(_ assetId: String) throws -> AdaptyUI.ColorFilling {
-        guard let value = try filling(assetId).asColorFilling else {
+    func filling(_ assetId: String) throws -> AdaptyUI.Filling {
+        guard case let .filling(value) = try asset(assetId) else {
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color or any-gradient")
         }
         return value
@@ -50,8 +55,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
     @inlinable
     func imageData(_ assetId: String) throws -> AdaptyUI.ImageData {
-        guard let value = try filling(assetId).asImage else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "image")
+        guard case let .image(value) = try asset(assetId) else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
         }
         return value
     }
@@ -63,7 +68,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         }
         return value
     }
-    
+
     @inlinable
     func font(_ assetId: String) throws -> AdaptyUI.Font {
         guard case let .font(value) = try asset(assetId) else {
@@ -77,6 +82,8 @@ extension AdaptyUI.ViewConfiguration.Asset: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .filling(value):
+            hasher.combine(value)
+        case let .image(value):
             hasher.combine(value)
         case let .video(value):
             hasher.combine(value)
@@ -124,7 +131,7 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
         case .video:
             self = try .video(AdaptyUI.VideoData(from: decoder))
         case .image:
-            self = try .filling(.image(AdaptyUI.ImageData(from: decoder)))
+            self = try .image(AdaptyUI.ImageData(from: decoder))
         default:
             self = .unknown("asset.type: \(type)")
         }

@@ -22,7 +22,7 @@ extension AdaptyUI.ViewConfiguration {
 extension AdaptyUI.ViewConfiguration.Localizer {
     func screen(_ from: AdaptyUI.ViewConfiguration.Screen) throws -> AdaptyUI.Screen {
         try .init(
-            background: from.backgroundAssetId.flatMap { try? filling($0) } ?? AdaptyUI.Screen.defaultBackground,
+            background: from.backgroundAssetId.flatMap { try? background($0) } ?? AdaptyUI.Screen.defaultBackground,
             cover: from.cover.map(box),
             content: element(from.content),
             footer: from.footer.map(element),

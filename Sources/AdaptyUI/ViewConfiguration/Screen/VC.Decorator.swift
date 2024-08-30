@@ -21,8 +21,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     func decorator(_ from: AdaptyUI.ViewConfiguration.Decorator) throws -> AdaptyUI.Decorator {
         .init(
             shapeType: from.shapeType,
-            background: from.backgroundAssetId.flatMap { try? filling($0) },
-            border: from.borderAssetId.map { (try? colorFilling($0)) ?? AdaptyUI.Border.default.filling }.map {
+            background: from.backgroundAssetId.flatMap { try? background($0) },
+            border: from.borderAssetId.map { (try? filling($0)) ?? AdaptyUI.Border.default.filling }.map {
                 AdaptyUI.Border(filling: $0, thickness: from.borderThickness ?? AdaptyUI.Border.default.thickness)
             }
         )

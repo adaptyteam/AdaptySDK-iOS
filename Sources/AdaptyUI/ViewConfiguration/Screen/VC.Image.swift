@@ -20,7 +20,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         try .init(
             asset: imageData(from.assetId),
             aspect: from.aspect,
-            tint: from.tintAssetId.flatMap { try? colorFilling($0) }
+            tint: from.tintAssetId.flatMap { try? filling($0) }
         )
     }
 }

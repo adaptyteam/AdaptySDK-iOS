@@ -18,7 +18,7 @@ extension AdaptyUI.ViewConfiguration {
 
         return Set(assets.values.compactMap {
             switch $0 {
-            case let .filling(.image(.url(url, _))):
+            case let .image(.url(url, _)):
                 url
             case let .video(.url(_, image: .url(imageUrl, previewRaster: _))):
                 imageUrl

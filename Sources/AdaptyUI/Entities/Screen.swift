@@ -9,9 +9,9 @@ import Foundation
 
 extension AdaptyUI {
     package struct Screen: Hashable, Sendable {
-        static let defaultBackground: AdaptyUI.Filling = .color(AdaptyUI.Color.black)
+        static let defaultBackground: AdaptyUI.Background = .filling(.color(AdaptyUI.Color.black))
 
-        package let background: AdaptyUI.Filling
+        package let background: AdaptyUI.Background
         package let cover: Box?
         package let content: Element
         package let footer: Element?
@@ -23,7 +23,7 @@ extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.Screen {
         static func create(
-            background: AdaptyUI.Filling = AdaptyUI.Screen.defaultBackground,
+            background: AdaptyUI.Background = AdaptyUI.Screen.defaultBackground,
             cover: AdaptyUI.Box? = nil,
             content: AdaptyUI.Element,
             footer: AdaptyUI.Element? = nil,

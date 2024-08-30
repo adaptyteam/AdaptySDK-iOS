@@ -13,7 +13,7 @@ extension AdaptyUI {
 
         package let asset: ImageData
         package let aspect: AspectRatio
-        package let tint: ColorFilling?
+        package let tint: Filling?
     }
 }
 
@@ -22,7 +22,7 @@ extension AdaptyUI {
         static func create(
             asset: AdaptyUI.ImageData,
             aspect: AdaptyUI.AspectRatio = defaultAspectRatio,
-            tint: AdaptyUI.ColorFilling? = nil
+            tint: AdaptyUI.Filling? = nil
         ) -> Self {
             .init(
                 asset: asset,

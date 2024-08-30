@@ -14,7 +14,7 @@ package extension AdaptyUI {
             thickness: 1.0
         )
 
-        package let filling: AdaptyUI.ColorFilling
+        package let filling: AdaptyUI.Filling
         package let thickness: Double
     }
 }
@@ -22,7 +22,7 @@ package extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.Border {
         static func create(
-            filling: AdaptyUI.ColorFilling = `default`.filling,
+            filling: AdaptyUI.Filling = `default`.filling,
             thickness: Double = `default`.thickness
         ) -> Self {
             .init(filling: filling, thickness: thickness)

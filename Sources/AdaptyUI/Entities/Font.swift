@@ -23,7 +23,7 @@ extension AdaptyUI {
         package let weight: Int
         package let italic: Bool
         let defaultSize: Double
-        let defaultColor: AdaptyUI.ColorFilling
+        let defaultColor: AdaptyUI.Filling
     }
 }
 
@@ -35,7 +35,7 @@ extension AdaptyUI {
             weight: Int = `default`.weight,
             italic: Bool = `default`.italic,
             defaultSize: Double = `default`.defaultSize,
-            defaultColor: AdaptyUI.ColorFilling = `default`.defaultColor
+            defaultColor: AdaptyUI.Filling = `default`.defaultColor
         ) -> Self {
             .init(
                 alias: alias,

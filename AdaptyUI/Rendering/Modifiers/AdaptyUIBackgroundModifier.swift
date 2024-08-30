@@ -12,7 +12,7 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyUIBackgroundModifier: ViewModifier {
-    var background: AdaptyUI.Filling?
+    var background: AdaptyUI.Background?
 
     func body(content: Content) -> some View {
         switch self.background {
@@ -38,7 +38,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
 @available(iOS 15.0, *)
 extension View {
     @ViewBuilder
-    func decorate(with background: AdaptyUI.Filling?) -> some View {
+    func decorate(with background: AdaptyUI.Background?) -> some View {
         if let background {
             modifier(AdaptyUIBackgroundModifier(background: background))
         } else {

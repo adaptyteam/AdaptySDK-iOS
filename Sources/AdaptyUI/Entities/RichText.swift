@@ -25,9 +25,9 @@ extension AdaptyUI {
         package struct TextAttributes: Hashable, Sendable {
             package let font: AdaptyUI.Font
             package let size: Double
-            package let txtColor: AdaptyUI.ColorFilling
-            package let imgTintColor: AdaptyUI.ColorFilling?
-            package let background: AdaptyUI.ColorFilling?
+            package let txtColor: AdaptyUI.Filling
+            package let imgTintColor: AdaptyUI.Filling?
+            package let background: AdaptyUI.Filling?
             package let strike: Bool
             package let underline: Bool
         }
@@ -65,9 +65,9 @@ extension AdaptyUI.RichText.Item: Hashable {
         static func create(
             font: AdaptyUI.Font,
             size: Double? = nil,
-            txtColor: AdaptyUI.ColorFilling? = nil,
-            imgTintColor: AdaptyUI.ColorFilling? = nil,
-            background: AdaptyUI.ColorFilling? = nil,
+            txtColor: AdaptyUI.Filling? = nil,
+            imgTintColor: AdaptyUI.Filling? = nil,
+            background: AdaptyUI.Filling? = nil,
             strike: Bool = false,
             underline: Bool = false
         ) -> Self {

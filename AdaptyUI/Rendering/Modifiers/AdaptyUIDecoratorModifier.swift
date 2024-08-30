@@ -13,12 +13,12 @@ import SwiftUI
 @available(iOS 15.0, *)
 extension InsettableShape {
     @ViewBuilder
-    func fill(filling: AdaptyUI.Filling?) -> some View {
+    func fill(filling: AdaptyUI.Background?) -> some View {
         if let filling {
             switch filling {
-            case let .color(color):
+            case let .filling(.color(color)):
                 self.fill(color.swiftuiColor)
-            case let .colorGradient(gradient):
+            case let .filling(.colorGradient(gradient)):
                 self.fill(
                     LinearGradient(
                         stops: gradient.items.map { $0.gradientStop },
@@ -62,7 +62,7 @@ extension InsettableShape {
     }
 
     @ViewBuilder
-    func stroke(filling: AdaptyUI.ColorFilling?, lineWidth: CGFloat) -> some View {
+    func stroke(filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
         if let filling {
             switch filling {
             case .color(let color):
@@ -129,7 +129,7 @@ extension View {
 @available(iOS 15.0, *)
 extension AdaptyUI.ShapeType {
     @ViewBuilder
-    func swiftUIShapeFill(_ filling: AdaptyUI.Filling?) -> some View {
+    func swiftUIShapeFill(_ filling: AdaptyUI.Background?) -> some View {
         switch self {
         case .rectangle(let radii):
             if #available(iOS 16.0, *) {
@@ -152,7 +152,7 @@ extension AdaptyUI.ShapeType {
     }
 
     @ViewBuilder
-    func swiftUIShapeStroke(_ filling: AdaptyUI.ColorFilling?, lineWidth: CGFloat) -> some View {
+    func swiftUIShapeStroke(_ filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
         switch self {
         case .rectangle(let radii):
             if #available(iOS 16.0, *) {
@@ -181,7 +181,7 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
     var includeBackground: Bool
 
     @ViewBuilder
-    private func bodyWithBackground(content: Content, background: AdaptyUI.Filling?) -> some View {
+    private func bodyWithBackground(content: Content, background: AdaptyUI.Background?) -> some View {
         if let background {
             switch background {
             case .image(let imageData):

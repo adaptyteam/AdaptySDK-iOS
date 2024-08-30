@@ -27,17 +27,17 @@ public extension AdaptyUI.LocalizedViewConfiguration {
             isRightToLeft: isRightToLeft,
             images: images,
             colors: [
-                "$green_figma": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x3EBD78FF)),
-                "$green_figma_cc": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x3EBD78CC)),
-                "$black20": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x01010138)),
-                "$black80": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x010101CC)),
-                "$black": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x000000FF)),
-                "$white": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xFFFFFFFF)),
-                "$red": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xFF0000FF)),
-                "$red_2": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xF3227AFF)),
-                "$red_2_transparent": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xF3227A44)),
-                "$green": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x00FF00FF)),
-                "$blue": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x0000FFFF)),
+                "$green_figma": AdaptyUI.Filling.createColor(value: .create(data: 0x3EBD78FF)),
+                "$green_figma_cc": AdaptyUI.Filling.createColor(value: .create(data: 0x3EBD78CC)),
+                "$black20": AdaptyUI.Filling.createColor(value: .create(data: 0x01010138)),
+                "$black80": AdaptyUI.Filling.createColor(value: .create(data: 0x010101CC)),
+                "$black": AdaptyUI.Filling.createColor(value: .create(data: 0x000000FF)),
+                "$white": AdaptyUI.Filling.createColor(value: .create(data: 0xFFFFFFFF)),
+                "$red": AdaptyUI.Filling.createColor(value: .create(data: 0xFF0000FF)),
+                "$red_2": AdaptyUI.Filling.createColor(value: .create(data: 0xF3227AFF)),
+                "$red_2_transparent": AdaptyUI.Filling.createColor(value: .create(data: 0xF3227A44)),
+                "$green": AdaptyUI.Filling.createColor(value: .create(data: 0x00FF00FF)),
+                "$blue": AdaptyUI.Filling.createColor(value: .create(data: 0x0000FFFF)),
                 "$light": .createColor(value: .create(data: 0xF4D13BFF)),
                 "$red_to_transparent_top_to_bottom": .createGradient(value: .create(
                     kind: .linear,
@@ -149,7 +149,8 @@ public struct AdaptyUITestRendererView: View {
         let productsVM = AdaptyProductsViewModel(eventsHandler: eventsHandler,
                                                  paywallViewModel: paywallVM,
                                                  products: nil,
-                                                 introductoryOffersEligibilities: nil)
+                                                 introductoryOffersEligibilities: nil,
+                                                 observerModeResolver: nil)
         let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])
         let screensVM = AdaptyScreensViewModel(
             eventsHandler: eventsHandler,
