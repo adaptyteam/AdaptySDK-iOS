@@ -27,10 +27,6 @@ package extension AdaptyUI {
             default: nil
             }
         }
-
-        package var asBackground: AdaptyUI.Background {
-            .filling(self)
-        }
     }
 }
 

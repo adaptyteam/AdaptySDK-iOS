@@ -44,9 +44,9 @@ struct AdaptyUIImageView: View {
     }
 
     init(_ image: AdaptyUI.Image) {
-        self.asset = image.asset
+        self.asset = image.asset.NEED_TO_CHOOSE_MODE
         self.aspect = image.aspect
-        self.tint = image.tint
+        self.tint = image.tint?.NEED_TO_CHOOSE_MODE
     }
 
     @ViewBuilder

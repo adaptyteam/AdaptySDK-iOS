@@ -19,15 +19,15 @@ extension AdaptyUI {
         package enum Item: Sendable {
             case text(String, TextAttributes)
             case tag(String, TextAttributes)
-            case image(AdaptyUI.ImageData?, TextAttributes)
+            case image(AdaptyUI.Mode<AdaptyUI.ImageData>?, TextAttributes)
         }
 
         package struct TextAttributes: Hashable, Sendable {
             package let font: AdaptyUI.Font
             package let size: Double
-            package let txtColor: AdaptyUI.Filling
-            package let imgTintColor: AdaptyUI.Filling?
-            package let background: AdaptyUI.Filling?
+            package let txtColor: Mode<Filling>
+            package let imgTintColor: Mode<Filling>?
+            package let background: Mode<Filling>?
             package let strike: Bool
             package let underline: Bool
         }
@@ -65,16 +65,16 @@ extension AdaptyUI.RichText.Item: Hashable {
         static func create(
             font: AdaptyUI.Font,
             size: Double? = nil,
-            txtColor: AdaptyUI.Filling? = nil,
-            imgTintColor: AdaptyUI.Filling? = nil,
-            background: AdaptyUI.Filling? = nil,
+            txtColor: AdaptyUI.Mode<AdaptyUI.Filling>? = nil,
+            imgTintColor: AdaptyUI.Mode<AdaptyUI.Filling>? = nil,
+            background: AdaptyUI.Mode<AdaptyUI.Filling>? = nil,
             strike: Bool = false,
             underline: Bool = false
         ) -> Self {
             .init(
                 font: font,
                 size: size ?? font.defaultSize,
-                txtColor: txtColor ?? font.defaultColor,
+                txtColor: txtColor ?? .same(font.defaultColor),
                 imgTintColor: imgTintColor,
                 background: background,
                 strike: strike,

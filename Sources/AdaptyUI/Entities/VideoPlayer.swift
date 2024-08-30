@@ -11,7 +11,7 @@ extension AdaptyUI {
     package struct VideoPlayer: Hashable, Sendable {
         static let defaultAspectRatio = AspectRatio.fit
 
-        package let asset: VideoData
+        package let asset: Mode<VideoData>
 
         package let aspect: AspectRatio
         package let loop: Bool
@@ -21,7 +21,7 @@ extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.VideoPlayer {
         static func create(
-            asset: AdaptyUI.VideoData,
+            asset: AdaptyUI.Mode<AdaptyUI.VideoData>,
             aspect: AdaptyUI.AspectRatio = defaultAspectRatio,
             loop: Bool = true
         ) -> Self {

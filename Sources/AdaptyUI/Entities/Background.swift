@@ -9,33 +9,19 @@ import Foundation
 
 package extension AdaptyUI {
     enum Background: Sendable {
-        static let `default` = Filling.default.asBackground
+        static let `default` = Background.filling(.same(.default))
 
-        case filling(AdaptyUI.Filling)
-        case image(AdaptyUI.ImageData)
+        case filling(Mode<Filling>)
+        case image(Mode<ImageData>)
 
-        package var asColor: AdaptyUI.Color? {
-            switch self {
-            case let .filling(.color(value)): value
-            default: nil
-            }
-        }
-
-        package var asColorGradient: AdaptyUI.ColorGradient? {
-            switch self {
-            case let .filling(.colorGradient(value)): value
-            default: nil
-            }
-        }
-
-        package var asFilling: AdaptyUI.Filling? {
+        package var asFilling: Mode<Filling>? {
             switch self {
             case let .filling(value): value
             default: nil
             }
         }
 
-        package var asImage: AdaptyUI.ImageData? {
+        package var asImage: Mode<ImageData>? {
             switch self {
             case let .image(value): value
             default: nil
@@ -57,19 +43,11 @@ extension AdaptyUI.Background: Hashable {
 
 #if DEBUG
     package extension AdaptyUI.Background {
-        static func createFilling(value: AdaptyUI.Filling) -> Self {
+        static func createFilling(value: AdaptyUI.Mode<AdaptyUI.Filling>) -> Self {
             .filling(value)
         }
-        
-        static func createColor(value: AdaptyUI.Color) -> Self {
-            .filling(.color(value))
-        }
 
-        static func createGradient(value: AdaptyUI.ColorGradient) -> Self {
-            .filling(.colorGradient(value))
-        }
-
-        static func createImage(value: AdaptyUI.ImageData) -> Self {
+        static func createImage(value: AdaptyUI.Mode<AdaptyUI.ImageData>) -> Self {
             .image(value)
         }
     }

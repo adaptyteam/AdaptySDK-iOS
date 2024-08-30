@@ -47,7 +47,7 @@
             })) {
                 EmptyView()
             }
-            .tint(toggle.color?.swiftuiColor)
+            .tint(toggle.color?.NEED_TO_CHOOSE_MODE.swiftuiColor)
         }
     }
 

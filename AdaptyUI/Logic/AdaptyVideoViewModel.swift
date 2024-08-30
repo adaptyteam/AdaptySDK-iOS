@@ -86,7 +86,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     ) {
         let playerItemToObserve: AVPlayerItem?
 
-        switch video.asset {
+        switch video.asset.NEED_TO_CHOOSE_MODE {
         case let .url(url, image):
             let playerItem = AVPlayerItem(url: url)
             let queuePlayer = AVQueuePlayer(items: [playerItem])

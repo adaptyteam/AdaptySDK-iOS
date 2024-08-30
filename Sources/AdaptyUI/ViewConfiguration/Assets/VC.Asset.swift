@@ -29,44 +29,44 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     func background(_ assetId: String) throws -> AdaptyUI.Background {
         switch try asset(assetId) {
         case let .filling(value):
-            .filling(value)
+                .filling(.same(value))
         case let .image(value):
-            .image(value)
+            .image(.same(value))
         default:
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color, any-gradient, or image")
         }
     }
 
     @inlinable
-    func color(_ assetId: String) throws -> AdaptyUI.Color {
-        guard case let .filling(value) = try asset(assetId), let color = value.asColor else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
-        }
-        return color
-    }
-
-    @inlinable
-    func filling(_ assetId: String) throws -> AdaptyUI.Filling {
+    func filling(_ assetId: String) throws -> AdaptyUI.Mode<AdaptyUI.Filling> {
         guard case let .filling(value) = try asset(assetId) else {
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color or any-gradient")
         }
-        return value
+        return .same(value)
     }
 
     @inlinable
-    func imageData(_ assetId: String) throws -> AdaptyUI.ImageData {
+    func color(_ assetId: String) throws -> AdaptyUI.Mode<AdaptyUI.Color> {
+        guard case let .filling(value) = try asset(assetId), let color = value.asColor else {
+            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
+        }
+        return .same(color)
+    }
+
+    @inlinable
+    func imageData(_ assetId: String) throws ->  AdaptyUI.Mode<AdaptyUI.ImageData> {
         guard case let .image(value) = try asset(assetId) else {
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
         }
-        return value
+        return .same(value)
     }
 
     @inlinable
-    func videoData(_ assetId: String) throws -> AdaptyUI.VideoData {
+    func videoData(_ assetId: String) throws -> AdaptyUI.Mode<AdaptyUI.VideoData> {
         guard case let .video(value) = try asset(assetId) else {
             throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "video")
         }
-        return value
+        return .same(value)
     }
 
     @inlinable

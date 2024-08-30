@@ -19,7 +19,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
         case .image(let imageData):
             content
                 .background {
-                    AdaptyUIImageView(asset: imageData,
+                    AdaptyUIImageView(asset: imageData.NEED_TO_CHOOSE_MODE,
                                       aspect: .fill,
                                       tint: nil)
                         .ignoresSafeArea()
@@ -28,7 +28,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
             content
                 .background {
                     Rectangle()
-                        .fill(filling: self.background)
+                        .fill(background: self.background)
                         .ignoresSafeArea()
                 }
         }

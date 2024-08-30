@@ -15,7 +15,7 @@ extension AdaptyUI {
             weight: 400,
             italic: false,
             defaultSize: 15,
-            defaultColor: .color(AdaptyUI.Color.black)
+            defaultColor: .color(.black)
         )
 
         package let alias: String
@@ -23,7 +23,7 @@ extension AdaptyUI {
         package let weight: Int
         package let italic: Bool
         let defaultSize: Double
-        let defaultColor: AdaptyUI.Filling
+        let defaultColor: Filling
     }
 }
 
