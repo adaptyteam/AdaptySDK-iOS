@@ -40,15 +40,3 @@ extension AdaptyUI.Background: Hashable {
         }
     }
 }
-
-#if DEBUG
-    package extension AdaptyUI.Background {
-        static func createFilling(value: AdaptyUI.Mode<AdaptyUI.Filling>) -> Self {
-            .filling(value)
-        }
-
-        static func createImage(value: AdaptyUI.Mode<AdaptyUI.ImageData>) -> Self {
-            .image(value)
-        }
-    }
-#endif

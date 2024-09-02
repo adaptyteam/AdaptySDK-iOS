@@ -41,15 +41,3 @@ package extension AdaptyUI {
         }
     }
 }
-
-#if DEBUG
-    package extension AdaptyUI.Mode {
-        static func create(_ value: T) -> Self {
-            .same(value)
-        }
-
-        static func create(light: T, dark: T) -> Self {
-            .different(light: light, dark: dark)
-        }
-    }
-#endif

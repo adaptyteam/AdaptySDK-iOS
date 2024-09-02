@@ -10,7 +10,7 @@ import Foundation
 package extension AdaptyUI {
     struct Border: Hashable, Sendable {
         static let `default` = Border(
-            filling: .same(.color(AdaptyUI.Color.transparent)),
+            filling: .same(.solidColor(AdaptyUI.Color.transparent)),
             thickness: 1.0
         )
 

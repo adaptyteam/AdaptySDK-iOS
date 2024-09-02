@@ -25,7 +25,7 @@ extension InsettableShape {
             case let .filling(filling):
 
                 switch filling.NEED_TO_CHOOSE_MODE {
-                case let .color(color):
+                case let .solidColor(color):
                     self.fill(color.swiftuiColor)
                 case let .colorGradient(gradient):
                     self.fill(
@@ -73,7 +73,7 @@ extension InsettableShape {
     func stroke(filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
         if let filling {
             switch filling {
-            case let .color(color):
+            case let .solidColor(color):
                 self.strokeBorder(color.swiftuiColor, lineWidth: lineWidth)
             case let .colorGradient(gradient):
                 switch gradient.kind {

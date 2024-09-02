@@ -39,10 +39,13 @@ func XCTAssertEqual(_ expression: [String: AdaptyUI.ViewConfiguration.Asset]?, w
         }
 
         switch value {
-        case .filling(.image):
+        case .video:
+            XCTAssertEqual("video", type)
+        // TODO: implement check
+        case .image:
             XCTAssertEqual("image", type)
         // TODO: implement check
-        case let .filling(.color(value)):
+        case let .filling(.solidColor(value)):
             XCTAssertEqual("color", type)
             XCTAssertEqual(value, withJSONValue: object["value"])
         case .filling(.colorGradient):

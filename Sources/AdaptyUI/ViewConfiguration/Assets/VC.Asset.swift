@@ -29,7 +29,7 @@ private extension AdaptyUI.ViewConfiguration.Asset {
 
     var asColor: AdaptyUI.Color {
         get throws {
-            guard case let .filling(.color(value)) = self else {
+            guard case let .filling(.solidColor(value)) = self else {
                 throw AdaptyUI.LocalizerError.wrongTypeAsset("color")
             }
             return value

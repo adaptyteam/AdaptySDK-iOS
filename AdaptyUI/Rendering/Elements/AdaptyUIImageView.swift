@@ -52,7 +52,7 @@ struct AdaptyUIImageView: View {
     @ViewBuilder
     private func rasterImage(_ uiImage: UIImage?, tint: AdaptyUI.Filling?) -> some View {
         if let uiImage {
-            if let tint = tint?.asColor?.swiftuiColor {
+            if let tint = tint?.asSolidColor?.swiftuiColor {
                 Image(uiImage: uiImage)
                     .resizable()
                     .renderingMode(.template)

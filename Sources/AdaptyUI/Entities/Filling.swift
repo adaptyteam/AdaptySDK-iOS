@@ -9,21 +9,21 @@ import Foundation
 
 package extension AdaptyUI {
     enum Filling: Sendable {
-        static let `default` = Filling.color(Color.black)
+        static let `default` = Filling.solidColor(Color.black)
 
-        case color(AdaptyUI.Color)
+        case solidColor(AdaptyUI.Color)
         case colorGradient(AdaptyUI.ColorGradient)
 
-        package var asColor: AdaptyUI.Color? {
+        package var asSolidColor: AdaptyUI.Color? {
             switch self {
-            case let .color(value): value
+            case let .solidColor(value): value
             default: nil
             }
         }
 
         package var asColorGradient: AdaptyUI.ColorGradient {
             switch self {
-            case let .color(value):
+            case let .solidColor(value):
                 AdaptyUI.ColorGradient(
                     kind: .linear,
                     start: .zero,
@@ -40,7 +40,7 @@ package extension AdaptyUI {
 extension AdaptyUI.Filling: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
-        case let .color(value):
+        case let .solidColor(value):
             hasher.combine(value)
         case let .colorGradient(value):
             hasher.combine(value)
@@ -48,34 +48,21 @@ extension AdaptyUI.Filling: Hashable {
     }
 }
 
-#if DEBUG
-
-    package extension AdaptyUI.Filling {
-        static func createColor(value: AdaptyUI.Color) -> Self {
-            .color(value)
-        }
-
-        static func createGradient(value: AdaptyUI.ColorGradient) -> Self {
-            .colorGradient(value)
-        }
-    }
-#endif
-
 extension AdaptyUI.Mode<AdaptyUI.Filling> {
-    var isColorGradient: Bool {
+    var hasColorGradient: Bool {
         switch self {
-        case .same(.color), .different(light: .color, dark: .color):
+        case .same(.solidColor), .different(light: .solidColor, dark: .solidColor):
             false
         default:
             false
         }
     }
 
-    var asColor: AdaptyUI.Mode<AdaptyUI.Color>? {
+    var asSolidColor: AdaptyUI.Mode<AdaptyUI.Color>? {
         switch self {
-        case let .same(.color(value)):
+        case let .same(.solidColor(value)):
             .same(value)
-        case let .different(.color(light), .color(dark)):
+        case let .different(.solidColor(light), .solidColor(dark)):
             .different(light: light, dark: dark)
         default:
             nil
@@ -107,7 +94,7 @@ extension AdaptyUI.Filling: Decodable {
 
         switch try container.decode(String.self, forKey: .type) {
         case AdaptyUI.Color.assetType:
-            self = try .color(container.decode(AdaptyUI.Color.self, forKey: .value))
+            self = try .solidColor(container.decode(AdaptyUI.Color.self, forKey: .value))
         case let type where AdaptyUI.ColorGradient.assetType(type):
             self = try .colorGradient(AdaptyUI.ColorGradient(from: decoder))
         default:

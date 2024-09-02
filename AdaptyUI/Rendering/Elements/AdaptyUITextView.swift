@@ -100,7 +100,7 @@ extension AdaptyUI.RichText {
             case let .image(value, attr):
                 guard let uiImage = value?.NEED_TO_CHOOSE_MODE.textAttachmentImage(
                     font: attr.uiFont,
-                    tint: attr.imgTintColor?.NEED_TO_CHOOSE_MODE.asColor?.uiColor
+                    tint: attr.imgTintColor?.NEED_TO_CHOOSE_MODE.asSolidColor?.uiColor
                 ) else {
                     return partialResult
                 }
@@ -197,7 +197,7 @@ extension AttributedString {
         result.foregroundColor = attributes?.uiColor ?? .darkText
         result.font = attributes?.uiFont ?? .adaptyDefault
 
-        if let background = attributes?.background?.NEED_TO_CHOOSE_MODE.asColor {
+        if let background = attributes?.background?.NEED_TO_CHOOSE_MODE.asSolidColor {
             result.backgroundColor = background.swiftuiColor
         }
 
@@ -220,8 +220,8 @@ extension UIFont {
 @available(iOS 15.0, *)
 extension AdaptyUI.RichText.TextAttributes {
     var uiFont: UIFont { font.uiFont(size: size) }
-    var uiColor: UIColor? { txtColor.NEED_TO_CHOOSE_MODE.asColor?.uiColor }
-    var backgroundUIColor: UIColor? { background?.NEED_TO_CHOOSE_MODE.asColor?.uiColor }
+    var uiColor: UIColor? { txtColor.NEED_TO_CHOOSE_MODE.asSolidColor?.uiColor }
+    var backgroundUIColor: UIColor? { background?.NEED_TO_CHOOSE_MODE.asSolidColor?.uiColor }
 }
 
 #endif
