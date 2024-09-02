@@ -36,7 +36,9 @@ extension AdaptyUI.VideoData: Hashable {
 }
 
 extension AdaptyUI.VideoData: Decodable {
-    enum CodingKeys: String, CodingKey {
+    static let assetType = "video"
+
+    private enum CodingKeys: String, CodingKey {
         case url
         case image
     }

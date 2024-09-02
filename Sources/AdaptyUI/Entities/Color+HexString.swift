@@ -32,11 +32,3 @@ extension AdaptyUI.Color {
         }
     }
 }
-
-extension AdaptyUI.Color: Decodable {
-    package init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let hex = try container.decode(String.self)
-        try self.init(hex: hex)
-    }
-}

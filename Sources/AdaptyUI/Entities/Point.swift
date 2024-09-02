@@ -16,6 +16,7 @@ extension AdaptyUI {
 
 extension AdaptyUI.Point {
     package static let zero = AdaptyUI.Point(x: 0.0, y: 0.0)
+    package static let one = AdaptyUI.Point(x: 1.0, y: 1.0)
 
     package var isZero: Bool {
         x == 0.0 && y == 0.0

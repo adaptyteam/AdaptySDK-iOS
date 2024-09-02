@@ -21,10 +21,17 @@ package extension AdaptyUI {
             }
         }
 
-        package var asColorGradient: AdaptyUI.ColorGradient? {
+        package var asColorGradient: AdaptyUI.ColorGradient {
             switch self {
-            case let .colorGradient(value): value
-            default: nil
+            case let .color(value):
+                AdaptyUI.ColorGradient(
+                    kind: .linear,
+                    start: .zero,
+                    end: .one,
+                    items: [.init(color: value, p: 0.5)]
+                )
+            case let .colorGradient(value):
+                value
             }
         }
     }
@@ -53,3 +60,58 @@ extension AdaptyUI.Filling: Hashable {
         }
     }
 #endif
+
+extension AdaptyUI.Mode<AdaptyUI.Filling> {
+    var isColorGradient: Bool {
+        switch self {
+        case .same(.color), .different(light: .color, dark: .color):
+            false
+        default:
+            false
+        }
+    }
+
+    var asColor: AdaptyUI.Mode<AdaptyUI.Color>? {
+        switch self {
+        case let .same(.color(value)):
+            .same(value)
+        case let .different(.color(light), .color(dark)):
+            .different(light: light, dark: dark)
+        default:
+            nil
+        }
+    }
+
+    var asColorGradient: AdaptyUI.Mode<AdaptyUI.ColorGradient> {
+        switch self {
+        case let .same(value):
+            .same(value.asColorGradient)
+        case let .different(light, dark):
+            .different(light: light.asColorGradient, dark: dark.asColorGradient)
+        }
+    }
+}
+
+extension AdaptyUI.Filling: Decodable {
+    static func assetType(_ type: String) -> Bool {
+        type == AdaptyUI.Color.assetType || AdaptyUI.ColorGradient.assetType(type)
+    }
+
+    package init(from decoder: Decoder) throws {
+        enum CodingKeys: String, CodingKey {
+            case type
+            case value
+        }
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        switch try container.decode(String.self, forKey: .type) {
+        case AdaptyUI.Color.assetType:
+            self = try .color(container.decode(AdaptyUI.Color.self, forKey: .value))
+        case let type where AdaptyUI.ColorGradient.assetType(type):
+            self = try .colorGradient(AdaptyUI.ColorGradient(from: decoder))
+        default:
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.type], debugDescription: "unknown color assset type"))
+        }
+    }
+}

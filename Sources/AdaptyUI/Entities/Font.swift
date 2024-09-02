@@ -50,6 +50,8 @@ extension AdaptyUI {
 #endif
 
 extension AdaptyUI.Font: Decodable {
+    static let assetType = "font"
+    
     enum CodingKeys: String, CodingKey {
         case alias = "value"
         case familyName = "family_name"

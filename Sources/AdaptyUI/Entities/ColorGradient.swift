@@ -60,13 +60,17 @@ extension AdaptyUI.ColorGradient {
 #endif
 
 extension AdaptyUI.ColorGradient: Decodable {
-    enum CodingKeys: String, CodingKey {
-        case points
-        case items = "values"
-        case type
+    static func assetType(_ type: String) -> Bool {
+        ContentType(rawValue: type) != nil
     }
 
-    struct Points: Codable {
+    private enum ContentType: String, Sendable {
+        case colorLinearGradient = "linear-gradient"
+        case colorRadialGradient = "radial-gradient"
+        case colorConicGradient = "conic-gradient"
+    }
+
+    private struct Points: Codable {
         let x0: Double
         let y0: Double
         let x1: Double
@@ -81,6 +85,12 @@ extension AdaptyUI.ColorGradient: Decodable {
         }
     }
 
+    private enum CodingKeys: String, CodingKey {
+        case points
+        case items = "values"
+        case type
+    }
+
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decode([Item].self, forKey: .items)
@@ -88,14 +98,15 @@ extension AdaptyUI.ColorGradient: Decodable {
         start = points.start
         end = points.end
 
-        switch try container.decode(String.self, forKey: .type) {
-        case AdaptyUI.ViewConfiguration.Asset.ContentType.colorRadialGradient.rawValue:
-            kind = .radial
-        case AdaptyUI.ViewConfiguration.Asset.ContentType.colorConicGradient.rawValue:
-            kind = .conic
-        default:
-            kind = .linear
-        }
+        kind =
+            switch try container.decode(String.self, forKey: .type) {
+            case AdaptyUI.ColorGradient.ContentType.colorRadialGradient.rawValue:
+                .radial
+            case AdaptyUI.ColorGradient.ContentType.colorConicGradient.rawValue:
+                .conic
+            default:
+                .linear
+            }
     }
 }
 

@@ -18,8 +18,8 @@ package extension AdaptyUI {
             case dark
         }
 
-        package var isSame: Bool {
-            if case .same = self { true } else { false }
+        package var isDifferent: Bool {
+            if case .different = self { true } else { false }
         }
 
         package func mode(_ name: Name) -> T {
@@ -29,6 +29,15 @@ package extension AdaptyUI {
             case let .different(value1, value2):
                 name == .light ? value1 : value2
             }
+        }
+
+        init(light: T, dark: T?) {
+            guard let dark else {
+                self = .same(light)
+                return
+            }
+
+            self = .different(light: light, dark: dark)
         }
     }
 }

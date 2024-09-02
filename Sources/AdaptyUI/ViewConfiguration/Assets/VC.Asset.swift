@@ -17,64 +17,123 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
+private extension AdaptyUI.ViewConfiguration.Asset {
+    var asFilling: AdaptyUI.Filling {
+        get throws {
+            guard case let .filling(value) = self else {
+                throw AdaptyUI.LocalizerError.wrongTypeAsset("color or any-gradient")
+            }
+            return value
+        }
+    }
+
+    var asColor: AdaptyUI.Color {
+        get throws {
+            guard case let .filling(.color(value)) = self else {
+                throw AdaptyUI.LocalizerError.wrongTypeAsset("color")
+            }
+            return value
+        }
+    }
+
+    var asImageData: AdaptyUI.ImageData {
+        get throws {
+            guard case let .image(value) = self else {
+                throw AdaptyUI.LocalizerError.wrongTypeAsset("image")
+            }
+            return value
+        }
+    }
+
+    var asVideoData: AdaptyUI.VideoData {
+        get throws {
+            guard case let .video(value) = self else {
+                throw AdaptyUI.LocalizerError.wrongTypeAsset("video")
+            }
+            return value
+        }
+    }
+
+    var asFont: AdaptyUI.Font {
+        get throws {
+            guard case let .font(value) = self else {
+                throw AdaptyUI.LocalizerError.wrongTypeAsset("font")
+            }
+            return value
+        }
+    }
+}
+
 extension AdaptyUI.ViewConfiguration.Localizer {
-    private func asset(_ assetId: String) throws -> AdaptyUI.ViewConfiguration.Asset {
-        guard let value = localization?.assets?[assetId] ?? source.assets[assetId] else {
+    private enum AssetIdentifySufix: String {
+        case darkMode = "@dark"
+    }
+
+    private func asset(_ assetId: String, darkMode mode: Bool = false) throws -> AdaptyUI.ViewConfiguration.Asset {
+        guard let value = try assetOrNil(assetId, darkMode: mode) else {
             throw AdaptyUI.LocalizerError.notFoundAsset(assetId)
         }
         return value
+    }
+
+    private func assetOrNil(_ assetId: String, darkMode mode: Bool) throws -> AdaptyUI.ViewConfiguration.Asset? {
+        let assetId = mode ? assetId + AssetIdentifySufix.darkMode.rawValue : assetId
+        return localization?.assets?[assetId] ?? source.assets[assetId]
     }
 
     @inlinable
     func background(_ assetId: String) throws -> AdaptyUI.Background {
         switch try asset(assetId) {
         case let .filling(value):
-                .filling(.same(value))
+            try .filling(.init(
+                light: value,
+                dark: assetOrNil(assetId, darkMode: true)?.asFilling
+            ))
         case let .image(value):
-            .image(.same(value))
+            try .image(.init(
+                light: value,
+                dark: assetOrNil(assetId, darkMode: true)?.asImageData
+            ))
         default:
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color, any-gradient, or image")
+            throw AdaptyUI.LocalizerError.wrongTypeAsset("color, any-gradient, or image")
         }
     }
 
     @inlinable
     func filling(_ assetId: String) throws -> AdaptyUI.Mode<AdaptyUI.Filling> {
-        guard case let .filling(value) = try asset(assetId) else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color or any-gradient")
-        }
-        return .same(value)
+        try AdaptyUI.Mode(
+            light: asset(assetId).asFilling,
+            dark: assetOrNil(assetId, darkMode: true)?.asFilling
+        )
     }
 
     @inlinable
     func color(_ assetId: String) throws -> AdaptyUI.Mode<AdaptyUI.Color> {
-        guard case let .filling(value) = try asset(assetId), let color = value.asColor else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
-        }
-        return .same(color)
+        try AdaptyUI.Mode(
+            light: asset(assetId).asColor,
+            dark: try? assetOrNil(assetId, darkMode: true)?.asColor
+        )
     }
 
     @inlinable
-    func imageData(_ assetId: String) throws ->  AdaptyUI.Mode<AdaptyUI.ImageData> {
-        guard case let .image(value) = try asset(assetId) else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "color")
-        }
-        return .same(value)
+    func imageData(_ assetId: String) throws -> AdaptyUI.Mode<AdaptyUI.ImageData> {
+        try AdaptyUI.Mode(
+            light: asset(assetId).asImageData,
+            dark: assetOrNil(assetId, darkMode: true)?.asImageData
+        )
     }
 
     @inlinable
     func videoData(_ assetId: String) throws -> AdaptyUI.Mode<AdaptyUI.VideoData> {
-        guard case let .video(value) = try asset(assetId) else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "video")
-        }
-        return .same(value)
+        try AdaptyUI.Mode(
+            light: asset(assetId).asVideoData,
+            dark: assetOrNil(assetId, darkMode: true)?.asVideoData
+        )
     }
 
     @inlinable
     func font(_ assetId: String) throws -> AdaptyUI.Font {
-        guard case let .font(value) = try asset(assetId) else {
-            throw AdaptyUI.LocalizerError.wrongTypeAsset(assetId, expected: "font")
-        }
-        return value
+        try asset(assetId).asFont
     }
 }
 
@@ -99,17 +158,6 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case type
-        case value
-    }
-
-    enum ContentType: String, Codable {
-        case color
-        case video
-        case image
-        case font
-        case colorLinearGradient = "linear-gradient"
-        case colorRadialGradient = "radial-gradient"
-        case colorConicGradient = "conic-gradient"
     }
 
     init(from decoder: Decoder) throws {
@@ -119,19 +167,16 @@ extension AdaptyUI.ViewConfiguration.Asset: Decodable {
             self = .unknown(nil)
             return
         }
-        switch ContentType(rawValue: type) {
-        case .color:
-            self = try .filling(.color(container.decode(AdaptyUI.Color.self, forKey: .value)))
-        case .colorLinearGradient,
-             .colorRadialGradient,
-             .colorConicGradient:
-            self = try .filling(.colorGradient(AdaptyUI.ColorGradient(from: decoder)))
-        case .font:
+
+        switch type {
+        case let type where AdaptyUI.Filling.assetType(type):
+            self = try .filling(AdaptyUI.Filling(from: decoder))
+        case AdaptyUI.Font.assetType:
             self = try .font(AdaptyUI.Font(from: decoder))
-        case .video:
-            self = try .video(AdaptyUI.VideoData(from: decoder))
-        case .image:
+        case AdaptyUI.ImageData.assetType:
             self = try .image(AdaptyUI.ImageData(from: decoder))
+        case AdaptyUI.VideoData.assetType:
+            self = try .video(AdaptyUI.VideoData(from: decoder))
         default:
             self = .unknown("asset.type: \(type)")
         }
