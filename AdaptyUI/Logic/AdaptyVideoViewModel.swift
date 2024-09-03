@@ -22,13 +22,13 @@ package class AdaptyVideoViewModel: ObservableObject {
     @Published var playerStates = [String: AdaptyUIVideoPlayerManager.PlayerState]()
     @Published var playerManagers = [String: AdaptyUIVideoPlayerManager]()
 
-    func initializePlayerManager(
+    func getOrCreatePlayerManager(
         for video: AdaptyUI.VideoData,
         loop: Bool,
         id: String
-    ) {
-        if playerManagers.keys.contains(id) {
-            return
+    ) -> AdaptyUIVideoPlayerManager {
+        if let manager =  playerManagers[id] {
+            return manager
         }
 
         let manager = AdaptyUIVideoPlayerManager(
@@ -36,11 +36,17 @@ package class AdaptyVideoViewModel: ObservableObject {
             loop: loop,
             eventsHandler: eventsHandler
         ) { [weak self] state in
-            self?.playerStates[id] = state
+            DispatchQueue.main.async { [weak self] in
+                self?.playerStates[id] = state
+            }
         }
 
-        playerManagers[id] = manager
-        playerStates[id] = .loading
+        DispatchQueue.main.async { [weak self] in
+            self?.playerManagers[id] = manager
+            self?.playerStates[id] = .loading
+        }
+        
+        return manager
     }
 
     func dismissPlayerManager(id: String) {

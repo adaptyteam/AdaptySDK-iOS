@@ -67,32 +67,90 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 
 @available(iOS 15.0, *)
 struct AdaptyUIVideoView: View {
-    @EnvironmentObject var viewModel: AdaptyVideoViewModel
-    @State var showPlaceholder = true
+    @EnvironmentObject
+    private var viewModel: AdaptyVideoViewModel
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
 
-    let id: String = UUID().uuidString
-    let video: AdaptyUI.VideoData
-    let aspect: AdaptyUI.AspectRatio
-    let loop: Bool
+    private let video: AdaptyUI.VideoPlayer
 
-    let placeholderImageAsset: AdaptyUI.ImageData
+    init(video: AdaptyUI.VideoPlayer, colorScheme _: ColorScheme) {
+        self.video = video
+    }
 
-    init(video: AdaptyUI.VideoPlayer, colorScheme: ColorScheme) {
-        let videoAsset = video.asset.of(colorScheme)
+    private let id: String = UUID().uuidString
 
-        self.video = videoAsset
-        aspect = video.aspect
-        loop = video.loop
-        
-        switch videoAsset {
+    @ViewBuilder
+    private func colorSchemeVideoView(videoData: AdaptyUI.VideoData, id: String) -> some View {
+        AdaptyUIVideoColorSchemeSpecificView(
+            video: videoData,
+            aspect: video.aspect,
+            loop: video.loop
+        )
+        .environmentObject(viewModel)
+        .environmentObject(
+            viewModel.getOrCreatePlayerManager(
+                for: videoData,
+                loop: video.loop,
+                id: id
+            )
+        )
+        .onDisappear {
+            viewModel.dismissPlayerManager(id: id)
+        }
+    }
+
+    var body: some View {
+        switch colorScheme {
+        case .light:
+            colorSchemeVideoView(
+                videoData: video.asset.mode(.light),
+                id: id
+            )
+        case .dark:
+            colorSchemeVideoView(
+                videoData: video.asset.mode(.dark),
+                id: id
+            )
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+struct AdaptyUIVideoColorSchemeSpecificView: View {
+    @EnvironmentObject
+    private var viewModel: AdaptyVideoViewModel
+    @EnvironmentObject
+    private var playerManager: AdaptyUIVideoPlayerManager
+
+    @State
+    private var showPlaceholder = true
+
+//    private let id: String = UUID().uuidString
+
+    private let video: AdaptyUI.VideoData
+    private let aspect: AdaptyUI.AspectRatio
+    private let loop: Bool
+    private let placeholder: AdaptyUI.ImageData
+
+    init(
+        video: AdaptyUI.VideoData,
+        aspect: AdaptyUI.AspectRatio,
+        loop: Bool
+    ) {
+        self.video = video
+        self.aspect = aspect
+        self.loop = loop
+
+        switch video {
         case let .url(_, image), let .resources(_, image):
-            placeholderImageAsset = image
+            self.placeholder = image
         }
     }
 
     var body: some View {
         ZStack {
-            if let player = viewModel.playerManagers[id]?.player {
+            if let player = playerManager.player {
                 AdaptyUIVideoPlayerView(
                     player: player,
                     videoGravity: aspect.videoGravity,
@@ -104,23 +162,22 @@ struct AdaptyUIVideoView: View {
 
             if showPlaceholder {
                 AdaptyUIImageView(
-                    asset: placeholderImageAsset,
+                    asset: placeholder,
                     aspect: aspect,
                     tint: nil
                 )
             }
         }
-        .onAppear {
-            viewModel.initializePlayerManager(
-                for: video,
-                loop: loop,
-                id: id
-            )
-//            viewModel.initializePlayerManager(for: video, id: id)
-        }
-        .onDisappear {
-            viewModel.dismissPlayerManager(id: id)
-        }
+//        .onAppear {
+//            viewModel.initializePlayerManager(
+//                for: video,
+//                loop: loop,
+//                id: id
+//            )
+//        }
+//        .onDisappear {
+//            viewModel.dismissPlayerManager(id: id)
+//        }
     }
 }
 
