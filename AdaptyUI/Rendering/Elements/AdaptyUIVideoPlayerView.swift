@@ -168,16 +168,6 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
                 )
             }
         }
-//        .onAppear {
-//            viewModel.initializePlayerManager(
-//                for: video,
-//                loop: loop,
-//                id: id
-//            )
-//        }
-//        .onDisappear {
-//            viewModel.dismissPlayerManager(id: id)
-//        }
     }
 }
 
