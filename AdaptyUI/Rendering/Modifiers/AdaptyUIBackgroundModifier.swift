@@ -14,21 +14,29 @@ import SwiftUI
 struct AdaptyUIBackgroundModifier: ViewModifier {
     var background: AdaptyUI.Background?
 
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+
     func body(content: Content) -> some View {
         switch self.background {
         case .image(let imageData):
             content
                 .background {
-                    AdaptyUIImageView(asset: imageData.NEED_TO_CHOOSE_MODE,
-                                      aspect: .fill,
-                                      tint: nil)
-                        .ignoresSafeArea()
+                    AdaptyUIImageView(
+                        asset: imageData.of(self.colorScheme),
+                        aspect: .fill,
+                        tint: nil
+                    )
+                    .ignoresSafeArea()
                 }
         default:
             content
                 .background {
                     Rectangle()
-                        .fill(background: self.background)
+                        .fill(
+                            background: self.background,
+                            colorScheme: self.colorScheme
+                        )
                         .ignoresSafeArea()
                 }
         }

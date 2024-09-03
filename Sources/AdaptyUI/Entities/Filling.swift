@@ -48,7 +48,7 @@ extension AdaptyUI.Filling: Hashable {
     }
 }
 
-extension AdaptyUI.Mode<AdaptyUI.Filling> {
+package extension AdaptyUI.Mode<AdaptyUI.Filling> {
     var hasColorGradient: Bool {
         switch self {
         case .same(.solidColor), .different(light: .solidColor, dark: .solidColor):

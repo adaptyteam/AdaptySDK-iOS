@@ -22,13 +22,18 @@ package class AdaptyVideoViewModel: ObservableObject {
     @Published var playerStates = [String: AdaptyUIVideoPlayerManager.PlayerState]()
     @Published var playerManagers = [String: AdaptyUIVideoPlayerManager]()
 
-    func initializePlayerManager(for video: AdaptyUI.VideoPlayer, id: String) {
+    func initializePlayerManager(
+        for video: AdaptyUI.VideoData,
+        loop: Bool,
+        id: String
+    ) {
         if playerManagers.keys.contains(id) {
             return
         }
 
         let manager = AdaptyUIVideoPlayerManager(
             video: video,
+            loop: loop,
             eventsHandler: eventsHandler
         ) { [weak self] state in
             self?.playerStates[id] = state
@@ -80,18 +85,19 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     private var playerStatusObservation: NSKeyValueObservation?
 
     init(
-        video: AdaptyUI.VideoPlayer,
+        video: AdaptyUI.VideoData,
+        loop: Bool,
         eventsHandler: AdaptyEventsHandler,
         onStateUpdated: @escaping (PlayerState) -> Void
     ) {
         let playerItemToObserve: AVPlayerItem?
 
-        switch video.asset.NEED_TO_CHOOSE_MODE {
+        switch video {
         case let .url(url, image):
             let playerItem = AVPlayerItem(url: url)
             let queuePlayer = AVQueuePlayer(items: [playerItem])
 
-            if video.loop {
+            if loop {
                 playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
             }
 

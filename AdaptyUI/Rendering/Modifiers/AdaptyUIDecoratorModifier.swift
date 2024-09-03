@@ -10,21 +10,26 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
 extension AdaptyUI.Mode {
-    var NEED_TO_CHOOSE_MODE: T { mode(.light) }
+    func of(_ colorScheme: ColorScheme) -> T {
+        switch colorScheme {
+        case .light: mode(.light)
+        case .dark: mode(.dark)
+        }
+    }
 }
 
 @available(iOS 15.0, *)
 extension InsettableShape {
     @ViewBuilder
-    func fill(background: AdaptyUI.Background?) -> some View {
+    func fill(background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
         if let background {
             switch background {
             case .image:
                 self
             case let .filling(filling):
-
-                switch filling.NEED_TO_CHOOSE_MODE {
+                switch filling.of(colorScheme) {
                 case let .solidColor(color):
                     self.fill(color.swiftuiColor)
                 case let .colorGradient(gradient):
@@ -137,25 +142,25 @@ extension View {
 @available(iOS 15.0, *)
 extension AdaptyUI.ShapeType {
     @ViewBuilder
-    func swiftUIShapeFill(_ background: AdaptyUI.Background?) -> some View {
+    func swiftUIShapeFill(_ background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
         switch self {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
-                    .fill(background: background)
+                    .fill(background: background, colorScheme: colorScheme)
             } else {
                 UnevenRoundedRectangleFallback(cornerRadii: radii)
-                    .fill(background: background)
+                    .fill(background: background, colorScheme: colorScheme)
             }
         case .circle:
             Circle()
-                .fill(background: background)
+                .fill(background: background, colorScheme: colorScheme)
         case .curveUp:
             CurveUpShape()
-                .fill(background: background)
+                .fill(background: background, colorScheme: colorScheme)
         case .curveDown:
             CurveDownShape()
-                .fill(background: background)
+                .fill(background: background, colorScheme: colorScheme)
         }
     }
 
@@ -188,6 +193,9 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
     var decorator: AdaptyUI.Decorator
     var includeBackground: Bool
 
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+
     @ViewBuilder
     private func bodyWithBackground(content: Content, background: AdaptyUI.Background?) -> some View {
         if let background {
@@ -195,9 +203,9 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
             case let .image(imageData):
                 content
                     .background {
-                        if includeBackground {
+                        if self.includeBackground {
                             AdaptyUIImageView(
-                                asset: imageData.NEED_TO_CHOOSE_MODE,
+                                asset: imageData.of(self.colorScheme),
                                 aspect: .fill,
                                 tint: nil
                             )
@@ -206,9 +214,9 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
             default:
                 content
                     .background {
-                        if includeBackground {
+                        if self.includeBackground {
                             self.decorator.shapeType
-                                .swiftUIShapeFill(self.decorator.background)
+                                .swiftUIShapeFill(self.decorator.background, colorScheme: self.colorScheme)
                         }
                     }
             }
@@ -226,7 +234,7 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
             if let border = decorator.border {
                 self.decorator.shapeType
                     .swiftUIShapeStroke(
-                        border.filling.NEED_TO_CHOOSE_MODE,
+                        border.filling.of(self.colorScheme),
                         lineWidth: border.thickness
                     )
             }
@@ -243,10 +251,12 @@ extension View {
         includeBackground: Bool
     ) -> some View {
         if let decorator {
-            modifier(AdaptyUIDecoratorModifier(
-                decorator: decorator,
-                includeBackground: includeBackground
-            ))
+            modifier(
+                AdaptyUIDecoratorModifier(
+                    decorator: decorator,
+                    includeBackground: includeBackground
+                )
+            )
         } else {
             self
         }

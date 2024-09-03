@@ -44,6 +44,9 @@ extension AdaptyUI.Element {
 struct AdaptyUIElementWithoutPropertiesView: View {
     private var element: AdaptyUI.Element
 
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+
     init(
         _ element: AdaptyUI.Element
     ) {
@@ -69,7 +72,7 @@ struct AdaptyUIElementWithoutPropertiesView: View {
         case let .image(image, _):
             AdaptyUIImageView(image)
         case let .video(video, _):
-            AdaptyUIVideoView(video: video)
+            AdaptyUIVideoView(video: video, colorScheme: colorScheme)
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):

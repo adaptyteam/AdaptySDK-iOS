@@ -146,6 +146,9 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
     @EnvironmentObject var viewModel: AdaptyTimerViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
 
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+
     private var timer: AdaptyUI.Timer
 
     init(_ timer: AdaptyUI.Timer) {
@@ -171,7 +174,8 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
             text
                 .convertToSwiftUIText(
                     tagResolver: self,
-                    productInfo: nil
+                    productInfo: nil,
+                    colorScheme: colorScheme
                 )
                 .multilineTextAlignment(timer.horizontalAlign)
                 .lineLimit(1)

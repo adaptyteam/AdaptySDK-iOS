@@ -32,7 +32,9 @@ import SwiftUI
                     "$black20": .solidColor(.create(data: 0x01010138)),
                     "$black80": .solidColor(.create(data: 0x010101CC)),
                     "$black": .solidColor(.create(data: 0x000000FF)),
+                    "$black@dark": .solidColor(.create(data: 0xFFFFFFFF)),
                     "$white": .solidColor(.create(data: 0xFFFFFFFF)),
+                    "$white@dark": .solidColor(.create(data: 0x000000FF)),
                     "$red": .solidColor(.create(data: 0xFF0000FF)),
                     "$red_2": .solidColor(.create(data: 0xF3227AFF)),
                     "$red_2_transparent": .solidColor(.create(data: 0xF3227A44)),
@@ -115,29 +117,15 @@ import SwiftUI
 #endif
 
 @available(iOS 15.0, *)
-public enum AdaptyUIPreviewRenderingMode: String, CaseIterable {
-    case template
-    case element
-}
-
-@available(iOS 15.0, *)
 public struct AdaptyUITestRendererView: View {
     var eventsHandler: AdaptyEventsHandler
     var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
-    var renderingMode: AdaptyUIPreviewRenderingMode
 
     public init(
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
-        renderingMode: AdaptyUIPreviewRenderingMode
+        viewConfiguration: AdaptyUI.LocalizedViewConfiguration
     ) {
         self.viewConfiguration = viewConfiguration
-        self.renderingMode = renderingMode
         self.eventsHandler = AdaptyEventsHandler()
-    }
-
-    @ViewBuilder
-    private func drawAsElement(screen: AdaptyUI.Screen) -> some View {
-        AdaptyUIElementView(screen.content)
     }
 
     public var body: some View {

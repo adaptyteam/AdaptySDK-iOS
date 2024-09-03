@@ -71,13 +71,20 @@ struct AdaptyUIVideoView: View {
     @State var showPlaceholder = true
 
     let id: String = UUID().uuidString
-    let video: AdaptyUI.VideoPlayer
+    let video: AdaptyUI.VideoData
+    let aspect: AdaptyUI.AspectRatio
+    let loop: Bool
+
     let placeholderImageAsset: AdaptyUI.ImageData
 
-    init(video: AdaptyUI.VideoPlayer) {
-        self.video = video
+    init(video: AdaptyUI.VideoPlayer, colorScheme: ColorScheme) {
+        let videoAsset = video.asset.of(colorScheme)
 
-        switch video.asset.NEED_TO_CHOOSE_MODE {
+        self.video = videoAsset
+        aspect = video.aspect
+        loop = video.loop
+        
+        switch videoAsset {
         case let .url(_, image), let .resources(_, image):
             placeholderImageAsset = image
         }
@@ -88,7 +95,7 @@ struct AdaptyUIVideoView: View {
             if let player = viewModel.playerManagers[id]?.player {
                 AdaptyUIVideoPlayerView(
                     player: player,
-                    videoGravity: video.aspect.videoGravity,
+                    videoGravity: aspect.videoGravity,
                     onReadyForDisplay: {
                         showPlaceholder = false
                     }
@@ -98,13 +105,18 @@ struct AdaptyUIVideoView: View {
             if showPlaceholder {
                 AdaptyUIImageView(
                     asset: placeholderImageAsset,
-                    aspect: video.aspect,
+                    aspect: aspect,
                     tint: nil
                 )
             }
         }
         .onAppear {
-            viewModel.initializePlayerManager(for: video, id: id)
+            viewModel.initializePlayerManager(
+                for: video,
+                loop: loop,
+                id: id
+            )
+//            viewModel.initializePlayerManager(for: video, id: id)
         }
         .onDisappear {
             viewModel.dismissPlayerManager(id: id)
@@ -114,52 +126,52 @@ struct AdaptyUIVideoView: View {
 
 #if DEBUG
 
-    extension AdaptyUI.VideoPlayer {
-        private static let url1 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%201.mp4?alt=media&token=5e7ac250-091e-4bb3-8a99-6ac4f0735b37")!
+extension AdaptyUI.VideoPlayer {
+    private static let url1 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%201.mp4?alt=media&token=5e7ac250-091e-4bb3-8a99-6ac4f0735b37")!
 
-        private static let url2 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%202.mp4?alt=media&token=8735a549-d035-432f-b609-fe795bfb4efb")!
+    private static let url2 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%202.mp4?alt=media&token=8735a549-d035-432f-b609-fe795bfb4efb")!
 
-        private static let url3 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%203.mov?alt=media&token=ba0e2ec6-f81e-424f-84e6-e18617bedfbf")!
+    private static let url3 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%203.mov?alt=media&token=ba0e2ec6-f81e-424f-84e6-e18617bedfbf")!
 
-        static let test1 = AdaptyUI.VideoPlayer.create(
-            asset: .same(.url(url1, image: .resources("video_preview_0"))),
-            aspect: .stretch,
-            loop: true
-        )
+    static let test1 = AdaptyUI.VideoPlayer.create(
+        asset: .same(.url(url1, image: .resources("video_preview_0"))),
+        aspect: .stretch,
+        loop: true
+    )
 
-        static let test2 = AdaptyUI.VideoPlayer.create(
-            asset: .same(.url(url2, image: .resources("general-tab-icon"))),
-            aspect: .fit,
-            loop: false
-        )
-        static let test3 = AdaptyUI.VideoPlayer.create(
-            asset: .same(.url(url3, image: .resources("general-tab-icon"))),
-            aspect: .fill,
-            loop: true
-        )
+    static let test2 = AdaptyUI.VideoPlayer.create(
+        asset: .same(.url(url2, image: .resources("general-tab-icon"))),
+        aspect: .fit,
+        loop: false
+    )
+    static let test3 = AdaptyUI.VideoPlayer.create(
+        asset: .same(.url(url3, image: .resources("general-tab-icon"))),
+        aspect: .fill,
+        loop: true
+    )
+}
+
+@available(iOS 15.0, *)
+#Preview {
+    VStack {
+        AdaptyUIVideoView(video: .test1, colorScheme: .light)
+        AdaptyUIVideoView(video: .test2, colorScheme: .light)
+        AdaptyUIVideoView(video: .test3, colorScheme: .light)
     }
+}
 
-    @available(iOS 15.0, *)
-    #Preview {
+@available(iOS 15.0, *)
+public struct AdaptyUIVideoTestView: View {
+    public init() {}
+
+    public var body: some View {
         VStack {
-            AdaptyUIVideoView(video: .test1)
-            AdaptyUIVideoView(video: .test2)
-            AdaptyUIVideoView(video: .test3)
+            AdaptyUIVideoView(video: .test1, colorScheme: .light)
+            AdaptyUIVideoView(video: .test2, colorScheme: .light)
+            AdaptyUIVideoView(video: .test3, colorScheme: .light)
         }
     }
-
-    @available(iOS 15.0, *)
-    public struct AdaptyUIVideoTestView: View {
-        public init() {}
-
-        public var body: some View {
-            VStack {
-                AdaptyUIVideoView(video: .test1)
-                AdaptyUIVideoView(video: .test2)
-                AdaptyUIVideoView(video: .test3)
-            }
-        }
-    }
+}
 
 #endif
 
