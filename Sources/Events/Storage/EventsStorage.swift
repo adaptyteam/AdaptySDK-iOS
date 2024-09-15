@@ -7,11 +7,9 @@
 
 import Foundation
 
-@EventsManagerActor
-protocol EventsStorage: AnyObject, Sendable {
+protocol EventsStorage: AnyObject {
     func setEventCounter(_: Int)
     func getEventCounter() -> Int
-
     func setEvents(_: [Data])
     func getEvents() -> [Data]?
 }

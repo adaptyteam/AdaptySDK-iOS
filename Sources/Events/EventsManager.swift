@@ -9,63 +9,48 @@ import Foundation
 
 private let log = Log.events
 
-@EventsManagerActor
-final class EventsManager: Sendable {
+actor EventsManager {
     private enum Constants {
         static let sendingLimitEvents = 500
     }
-
-    typealias ErrorHandler = @Sendable (EventsError) -> Void
 
     private let profileStorage: ProfileIdentifierStorage
     private let eventStorages: [EventCollectionStorage]
     private var configuration: EventsBackendConfiguration
     private var backendSession: HTTPSession?
+    private var sending: Bool = false
 
-    private var sending: Task<Void, Never>?
-
-    convenience init(
-        profileStorage: ProfileIdentifierStorage,
-        backend: Backend? = nil
+    init(
+        profileStorage: ProfileIdentifierStorage
     ) {
         self.init(
             profileStorage: profileStorage,
             eventStorages: [
                 UserDefaults.standard.defaultEventsStorage,
                 UserDefaults.standard.sysLogEventsStorage,
-            ],
-            backend: backend
-        )
-    }
-
-    convenience init(
-        profileStorage: ProfileIdentifierStorage,
-        eventStorages: [EventsStorage],
-        backend: Backend?
-    ) {
-        self.init(
-            profileStorage: profileStorage,
-            eventStorages: eventStorages.map(EventCollectionStorage.init),
-            backend: backend
+            ]
         )
     }
 
     init(
         profileStorage: ProfileIdentifierStorage,
-        eventStorages: [EventCollectionStorage],
-        backend: Backend?
+        eventStorages: [EventsStorage]
+    ) {
+        self.init(
+            profileStorage: profileStorage,
+            eventStorages: eventStorages.map(EventCollectionStorage.init)
+        )
+    }
+
+    init(
+        profileStorage: ProfileIdentifierStorage,
+        eventStorages: [EventCollectionStorage]
     ) {
         self.profileStorage = profileStorage
         self.eventStorages = eventStorages
 
         let configuration = EventsBackendConfiguration()
         self.configuration = configuration
-
-        if let backend {
-            set(backend: backend)
-        } else {
-            backendSession = nil
-        }
     }
 
     func set(backend: Backend) {
@@ -94,15 +79,20 @@ final class EventsManager: Sendable {
         needSendEvents()
     }
 
-    private func needSendEvents() {
-        guard let backendSession, sending == nil else { return }
+    private func hasEvents() -> Bool {
+        eventStorages.hasEvents
+    }
 
-        sending = Task(priority: .utility) { [weak self] in
+    private func needSendEvents() {
+        guard let backendSession, !sending else { return }
+
+        sending = true
+
+        Task(priority: .utility) { [weak self] in
 
             var error: Error?
             do {
                 try await self?.sendEvents(backendSession)
-
             } catch let err {
                 error = err
             }
@@ -110,21 +100,22 @@ final class EventsManager: Sendable {
             let seconds: UInt64? =
                 if let error, !((error as? EventsError)?.isInterrupted ?? false) {
                     20
-                } else if self?.eventStorages.hasEvents ?? false {
+                } else if await (self?.hasEvents()) ?? false {
                     1
                 } else {
                     nil
                 }
 
             guard let seconds else {
-                self?.sending = nil
+                await self?.finishSending()
                 return
             }
 
-            try? await Task.sleep(nanoseconds: seconds * 1_000_000_000)
-
-            self?.sending = nil
-            self?.needSendEvents()
+            Task.detached(priority: .utility) { [weak self] in
+                try? await Task.sleep(nanoseconds: seconds * 1_000_000_000)
+                await self?.finishSending()
+                await self?.needSendEvents()
+            }
         }
     }
 
@@ -152,9 +143,12 @@ final class EventsManager: Sendable {
 
         self.eventStorages.subtract(oldIndexes: events.endIndex)
     }
+
+    private func finishSending() {
+        sending = false
+    }
 }
 
-@EventsManagerActor
 private extension [EventCollectionStorage] {
     var hasEvents: Bool { contains { !$0.isEmpty } }
 

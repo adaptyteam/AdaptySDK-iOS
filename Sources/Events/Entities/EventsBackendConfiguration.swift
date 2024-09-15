@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct EventsBackendConfiguration: Sendable, Hashable {
+struct EventsBackendConfiguration: Sendable {
     var blacklist: Set<String>
     let expiration: Date
 

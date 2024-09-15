@@ -9,8 +9,7 @@ import Foundation
 
 private let log = Log.events
 
-@EventsManagerActor
-final class EventCollectionStorage: Sendable {
+final class EventCollectionStorage {
     private enum Constants {
         static let limitEvents = 500
     }

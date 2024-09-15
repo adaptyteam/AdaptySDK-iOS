@@ -9,67 +9,52 @@ import Foundation
 
 private let log = Log.storage
 
-@EventsManagerActor
-extension UserDefaults {
-    private enum Constants {
-        static let defaultName = ""
-        static let syslogName = "SysLog"
-    }
+private enum EventsGroup: String {
+    case `default` = ""
+    case syslog = "SysLog"
 
+    @inlinable var name: String { rawValue }
+    @inlinable var eventsStorageKey: String { "AdaptySDK_Cached_\(rawValue)Events" }
+    @inlinable var eventCounterKey: String { "AdaptySDK_\(rawValue)Event_Counter" }
+}
+
+extension UserDefaults {
     var defaultEventsStorage: UserDefaultsEventsStorage {
-        UserDefaultsEventsStorage(name: Constants.defaultName, userDefaults: self)
+        UserDefaultsEventsStorage(group: .default, userDefaults: self)
     }
 
     var sysLogEventsStorage: UserDefaultsEventsStorage {
-        UserDefaultsEventsStorage(name: Constants.syslogName, userDefaults: self)
+        UserDefaultsEventsStorage(group: .syslog, userDefaults: self)
     }
 
     func clearEvents() {
-        log.debug("Clear events.")
-        [
-            Constants.defaultName,
-            Constants.syslogName,
-        ]
-        .flatMap {
-            [
-                UserDefaultsEventsStorage.eventsStorageKey($0),
-                UserDefaultsEventsStorage.eventCounterKey($0),
-            ]
-        }
-        .forEach {
-            removeObject(forKey: $0)
-        }
+        removeObject(forKey: EventsGroup.default.eventsStorageKey)
+        removeObject(forKey: EventsGroup.default.eventCounterKey)
+        removeObject(forKey: EventsGroup.syslog.eventsStorageKey)
+        removeObject(forKey: EventsGroup.syslog.eventCounterKey)
     }
 }
 
-@EventsManagerActor
 final class UserDefaultsEventsStorage: EventsStorage {
-    private let eventsStorageKey: String
-    private let eventCounterKey: String
-    private let name: String
+    private let group: EventsGroup
     private let userDefaults: UserDefaults
 
-    fileprivate static func eventsStorageKey(_ name: String) -> String { "AdaptySDK_Cached_\(name)Events" }
-    fileprivate static func eventCounterKey(_ name: String) -> String { "AdaptySDK_\(name)Event_Counter" }
-
-    fileprivate init(name: String, userDefaults: UserDefaults) {
+    fileprivate init(group: EventsGroup, userDefaults: UserDefaults) {
         self.userDefaults = userDefaults
-        self.name = name
-        eventsStorageKey = UserDefaultsEventsStorage.eventsStorageKey(name)
-        eventCounterKey = UserDefaultsEventsStorage.eventCounterKey(name)
+        self.group = group
     }
 
     func setEventCounter(_ value: Int) {
-        log.debug("Save \(self.name)Event Counter = \(value) success.")
-        userDefaults.set(value, forKey: eventCounterKey)
+        log.debug("Save \(group.name)Event Counter = \(value) success.")
+        userDefaults.set(value, forKey: group.eventCounterKey)
     }
 
-    func getEventCounter() -> Int { userDefaults.integer(forKey: eventCounterKey) }
+    func getEventCounter() -> Int { userDefaults.integer(forKey: group.eventCounterKey) }
 
     func setEvents(_ value: [Data]) {
-        log.debug("Save \(self.name)Events success.")
-        userDefaults.set(value, forKey: eventsStorageKey)
+        log.debug("Save \(group.name)Events success.")
+        userDefaults.set(value, forKey: group.eventsStorageKey)
     }
 
-    func getEvents() -> [Data]? { userDefaults.object(forKey: eventsStorageKey) as? [Data] }
+    func getEvents() -> [Data]? { userDefaults.object(forKey: group.eventsStorageKey) as? [Data] }
 }
