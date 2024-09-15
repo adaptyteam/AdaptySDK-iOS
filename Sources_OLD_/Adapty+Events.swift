@@ -8,7 +8,7 @@
 import Foundation
 
 extension Adapty {
-    static var eventsManager = EventsManager(profileStorage: UserDefaults.standard)
+    static let eventsManager = EventsManager(profileStorage: UserDefaults.standard)
 
     fileprivate static func trackEvent(_ eventType: EventType, profileId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
         async(completion) { manager, completion in

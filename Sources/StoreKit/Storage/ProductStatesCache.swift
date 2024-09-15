@@ -7,11 +7,6 @@
 
 import Foundation
 
-protocol BackendProductStatesStorage {
-    func setBackendProductStates(_: VH<[BackendProductState]>)
-    func getBackendProductStates() -> VH<[BackendProductState]>?
-}
-
 private let log = Log.Category(name: "ProductStatesCache")
 
 final class ProductStatesCache {

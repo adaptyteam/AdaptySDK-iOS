@@ -7,10 +7,6 @@
 
 import Foundation
 
-protocol PaywallsStorage {
-    func setPaywalls(_: [VH<AdaptyPaywall>])
-    func getPaywalls() -> [VH<AdaptyPaywall>]?
-}
 
 private extension AdaptyPaywall {
     var localeOrDefault: AdaptyLocale {

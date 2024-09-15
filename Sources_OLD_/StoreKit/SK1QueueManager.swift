@@ -7,13 +7,6 @@
 
 import StoreKit
 
-protocol VariationIdStorage {
-    func getVariationsIds() -> [String: String]?
-    func setVariationsIds(_: [String: String])
-    func getPersistentVariationsIds() -> [String: String]?
-    func setPersistentVariationsIds(_: [String: String])
-}
-
 private let log = Log.Category(name: "SK1QueueManager")
 
 final class SK1QueueManager: NSObject {

@@ -9,21 +9,17 @@
 import Foundation
 
 extension UserDefaults {
-    fileprivate static let isStorageCodableUserInfoKey = CodingUserInfoKey(rawValue: "adapty_storage")!
-
-    static var encoder: JSONEncoder = {
+    static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
         encoder.dataEncodingStrategy = .base64
-        encoder.setIsStorage()
         return encoder
     }()
 
-    static var decoder: JSONDecoder = {
+    static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
         decoder.dataDecodingStrategy = .base64
-        decoder.setIsStorage()
         return decoder
     }()
 
@@ -34,17 +30,5 @@ extension UserDefaults {
     func getJSON<T>(_ type: T.Type, forKey key: String) throws -> T? where T: Decodable {
         guard let data = data(forKey: key) else { return nil }
         return try UserDefaults.decoder.decode(type, from: data)
-    }
-}
-
-private extension CodingUserInfoСontainer {
-    func setIsStorage() {
-        userInfo[UserDefaults.isStorageCodableUserInfoKey] = true
-    }
-}
-
-extension [CodingUserInfoKey: Any] {
-    var isStorage: Bool {
-        self[UserDefaults.isStorageCodableUserInfoKey] as? Bool ?? false
     }
 }

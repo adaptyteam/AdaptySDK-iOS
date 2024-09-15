@@ -7,11 +7,6 @@
 
 import Foundation
 
-protocol ProductVendorIdsStorage {
-    func setProductVendorIds(_: [String])
-    func getProductVendorIds() -> [String]?
-}
-
 final class ProductVendorIdsCache {
     private let storage: ProductVendorIdsStorage
     private(set) var allProductVendorIds: [String]?
