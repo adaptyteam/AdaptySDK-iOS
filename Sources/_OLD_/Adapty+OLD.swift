@@ -6,16 +6,6 @@
 //
 
 import Foundation
-import StoreKit
-
-typealias SK1Product = SKProduct
-typealias SK1Transaction = SKPaymentTransaction
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-typealias SK2Product = Product
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-typealias SK2Transaction = Transaction
 
 public final class Adapty {
     nonisolated(unsafe) static var share: Adapty!

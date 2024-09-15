@@ -9,24 +9,22 @@ import StoreKit
 
 typealias SK1Transaction = SKPaymentTransaction
 
-extension SK1Transaction: AdaptyExtended {}
-
-extension AdaptyExtension where Extended == SK1Transaction {
-    var identifier: String? {
-        this.transactionIdentifier
+extension SK1Transaction {
+    var unfIdentifier: String? {
+        transactionIdentifier
     }
 
-    var originalIdentifier: String? {
+    var unfOriginalIdentifier: String? {
         // https://developer.apple.com/documentation/appstoreserverapi/originaltransactionid
-        this.original?.transactionIdentifier ?? this.transactionIdentifier
+        original?.transactionIdentifier ?? transactionIdentifier
     }
 
     var logParams: EventParameters {
         [
-            "product_id": this.payment.productIdentifier,
-            "state": this.transactionState.stringValue,
-            "transaction_id": identifier,
-            "original_id": originalIdentifier,
+            "product_id": payment.productIdentifier,
+            "state": transactionState.stringValue,
+            "transaction_id": unfIdentifier,
+            "original_id": unfOriginalIdentifier,
         ]
     }
 }

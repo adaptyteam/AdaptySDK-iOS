@@ -39,13 +39,13 @@ extension AdaptyProduct {
     var priceValue: AdaptyPrice { AdaptyPrice(value: skProduct.price, locale: skProduct.priceLocale) }
 
     /// The currency code of the locale used to format the price of the product.
-    public var currencyCode: String? { skProduct.priceLocale.adaptyCurrencyCode }
+    public var currencyCode: String? { skProduct.priceLocale.unfCurrencyCode }
 
     /// The currency symbol of the locale used to format the price of the product.
     public var currencySymbol: String? { skProduct.priceLocale.currencySymbol }
 
     /// The region code of the locale used to format the price of the product.
-    public var regionCode: String? { skProduct.priceLocale.adaptyRegionCode }
+    public var regionCode: String? { skProduct.priceLocale.unfRegionCode }
 
     /// A Boolean value that indicates whether the product is available for family sharing in App Store Connect. (Will be `false` for iOS version below 14.0 and macOS version below 11.0).
     public var isFamilyShareable: Bool {
