@@ -16,5 +16,5 @@ extension Log {
 
     static let events = Log.Category(name: "Events")
     static let storage = Log.Category(name: "Storage")
-    static let network = Log.Category(name: "API")
+    static let http = Log.Category(name: "API")
 }

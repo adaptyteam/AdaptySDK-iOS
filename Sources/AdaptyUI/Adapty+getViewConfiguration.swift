@@ -10,134 +10,101 @@ import Foundation
 extension Adapty {
     package static func getViewConfiguration(
         paywall: AdaptyPaywall,
-        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
-    ) {
-        Adapty.async(completion) { manager, completion in
-            manager.getViewConfiguration(
-                paywall: paywall,
-                loadTimeout: loadTimeout.allowedLoadPaywallTimeout.dispatchTimeInterval,
-                completion
-            )
+        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
+    ) async throws -> AdaptyUI.LocalizedViewConfiguration {
+        try await withSDK { sdk in
+            try await sdk.getViewConfiguration(paywall: paywall, loadTimeout: loadTimeout)
         }
     }
 
     private func getViewConfiguration(
         paywall: AdaptyPaywall,
-        loadTimeout: DispatchTimeInterval,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
-    ) {
-        guard let viewConfiguration = paywall.viewConfiguration else {
-            completion(.failure(.isNoViewConfigurationInPaywall()))
-            return
+        loadTimeout: TimeInterval
+    ) async throws -> AdaptyUI.LocalizedViewConfiguration {
+        guard let container = paywall.viewConfiguration else {
+            throw AdaptyError.isNoViewConfigurationInPaywall()
         }
 
-        let completion: AdaptyResultCompletion<AdaptyUI.ViewConfiguration> = { result in
-
-            completion(
-                result.flatMap {
-                    $0.sendImageUrlsToObserver()
-                    do {
-                        return try .success($0.extractLocale())
-                    } catch {
-                        return .failure(.decodingViewConfiguration(error))
-                    }
+        let viewConfiguration: AdaptyUI.ViewConfiguration =
+            switch container {
+            case let .data(value):
+                value
+            case let .withoutData(locale, _):
+                if let value = restoreViewConfiguration(locale, paywall) {
+                    value
+                } else {
+                    try await fetchViewConfiguration(
+                        paywallVariationId: paywall.variationId,
+                        paywallInstanceIdentity: paywall.instanceIdentity,
+                        locale: locale,
+                        loadTimeout: loadTimeout
+                    )
                 }
-            )
-        }
-
-        switch viewConfiguration {
-        case let .data(data):
-            completion(.success(data))
-        case let .withoutData(locale, _):
-            if let data = restoreViewConfiguration(locale, paywall) {
-                completion(.success(data))
-            } else {
-                fetchViewConfiguration(
-                    paywallVariationId: paywall.variationId,
-                    paywallInstanceIdentity: paywall.instanceIdentity,
-                    locale: locale,
-                    loadTimeout: loadTimeout,
-                    completion
-                )
             }
+
+        AdaptyUI.sendImageUrlsToObserver(viewConfiguration)
+
+        do {
+            return try viewConfiguration.extractLocale()
+        } catch {
+            throw AdaptyError.decodingViewConfiguration(error)
         }
     }
 
-    private func getFallbackViewConfiguration(
-        paywallInstanceIdentity: String,
-        locale: AdaptyLocale,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
-    ) {
-        httpFallbackSession.performFetchFallbackViewConfigurationRequest(
-            apiKeyPrefix: apiKeyPrefix,
-            paywallInstanceIdentity: paywallInstanceIdentity,
-            locale: locale,
-            disableServerCache: profileStorage.getProfile()?.value.isTestUser ?? false,
-            completion
-        )
-    }
-
-    private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {
-        guard
-            let manager = state.initialized, manager.isActive,
-            let cached = manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId)?.value,
-            paywall.variationId == cached.variationId,
-            paywall.instanceIdentity == cached.instanceIdentity,
-            paywall.revision == cached.revision,
-            paywall.version == cached.version,
-            let cachedViewConfiguration = cached.viewConfiguration,
-            case let .data(data) = cachedViewConfiguration
-        else { return nil }
-
-        return data
+    private func restoreViewConfiguration(_: AdaptyLocale, _: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {
+        // TODO:
+        nil
+//        guard
+//            let manager = state.initialized, manager.isActive,
+//            let cached = manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId)?.value,
+//            paywall.variationId == cached.variationId,
+//            paywall.instanceIdentity == cached.instanceIdentity,
+//            paywall.revision == cached.revision,
+//            paywall.version == cached.version,
+//            let cachedViewConfiguration = cached.viewConfiguration,
+//            case let .data(data) = cachedViewConfiguration
+//        else { return nil }
+//
+//        return data
     }
 
     private func fetchViewConfiguration(
         paywallVariationId: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
-        loadTimeout: DispatchTimeInterval,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
-    ) {
-        var isTerminationCalled = false
+        loadTimeout: TimeInterval
+    ) async throws -> AdaptyUI.ViewConfiguration {
+        let httpSession = self.httpSession
+        let apiKeyPrefix = self.apiKeyPrefix
+        let isTestUser = self.profileStorage.getProfile()?.value.isTestUser ?? false
 
-        let termination: AdaptyResultCompletion<AdaptyUI.ViewConfiguration> = { [weak self] result in
-            guard !isTerminationCalled else { return }
-            isTerminationCalled = true
-
-            guard let queue = self?.httpSession.responseQueue,
-                  let error = result.error, error.canUseFallbackServer else {
-                completion(result)
-                return
-            }
-
-            queue.async {
-                guard let self else {
-                    completion(result)
-                    return
-                }
-
-                self.getFallbackViewConfiguration(
-                    paywallInstanceIdentity: paywallInstanceIdentity,
+        do {
+            return try await withThrowingTimeout(seconds: loadTimeout - 0.5) {
+                try await httpSession.performFetchViewConfigurationRequest(
+                    apiKeyPrefix: apiKeyPrefix,
+                    paywallVariationId: paywallVariationId,
                     locale: locale,
-                    completion
+                    disableServerCache: isTestUser
                 )
             }
+        } catch is TimeoutError {
+        } catch let error as HTTPError {
+            guard Backend.canUseFallbackServer(error) else {
+                throw error.asAdaptyError
+            }
+        } catch {
+            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(error)
         }
 
-        httpSession.performFetchViewConfigurationRequest(
-            apiKeyPrefix: apiKeyPrefix,
-            paywallVariationId: paywallVariationId,
-            locale: locale,
-            disableServerCache: self.profileStorage.getProfile()?.value.isTestUser ?? false,
-            termination
-        )
-
-        if loadTimeout != .never, !isTerminationCalled {
-            Adapty.underlayQueue.asyncAfter(deadline: .now() - .milliseconds(500) + loadTimeout) {
-                termination(.failure(.fetchViewConfigurationTimeout()))
-            }
+        do {
+            return try await httpFallbackSession.performFetchFallbackViewConfigurationRequest(
+                apiKeyPrefix: apiKeyPrefix,
+                paywallInstanceIdentity: paywallInstanceIdentity,
+                locale: locale,
+                disableServerCache: isTestUser
+            )
+        } catch {
+            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(error)
         }
     }
 }

@@ -8,45 +8,21 @@
 import Foundation
 
 protocol HTTPCodableConfiguration: HTTPConfiguration {
-    func configure(decoder: JSONDecoder)
-    func configure(encoder: JSONEncoder)
+    func configure(jsonDecoder: JSONDecoder)
+    func configure(jsonEncoder: JSONEncoder)
     var defaultEncodedContentType: String { get }
-}
-
-extension JSONDecoder {
-    func configure(with config: HTTPCodableConfiguration) {
-        config.configure(decoder: self)
-    }
-}
-
-extension JSONEncoder {
-    func configure(with config: HTTPCodableConfiguration) {
-        config.configure(encoder: self)
-    }
 }
 
 extension HTTPCodableConfiguration {
     var defaultEncodedContentType: String { "application/json" }
 
-    var decoder: JSONDecoder {
-        let decoder = JSONDecoder()
-        configure(decoder: decoder)
-        return decoder
+    func configure(jsonDecoder: JSONDecoder) {
+        jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
+        jsonDecoder.dataDecodingStrategy = .base64
     }
 
-    var encoder: JSONEncoder {
-        let encoder = JSONEncoder()
-        configure(encoder: encoder)
-        return encoder
-    }
-
-    func configure(decoder: JSONDecoder) {
-        decoder.dateDecodingStrategy = JSONDecoder.DateDecodingStrategy.millisecondsSince1970
-        decoder.dataDecodingStrategy = JSONDecoder.DataDecodingStrategy.base64
-    }
-
-    func configure(encoder: JSONEncoder) {
-        encoder.dateEncodingStrategy = JSONEncoder.DateEncodingStrategy.millisecondsSince1970
-        encoder.dataEncodingStrategy = JSONEncoder.DataEncodingStrategy.base64
+    func configure(jsonEncoder: JSONEncoder) {
+        jsonEncoder.dateEncodingStrategy = .millisecondsSince1970
+        jsonEncoder.dataEncodingStrategy = .base64
     }
 }

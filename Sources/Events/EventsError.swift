@@ -6,7 +6,7 @@
 //
 
 enum EventsError: Error {
-    case sending(AdaptyError.Source, error: HTTPError)
+    case sending(AdaptyError.Source, error: Error)
     case encoding(AdaptyError.Source, error: Error)
     case decoding(AdaptyError.Source, error: Error)
     case interrupted(AdaptyError.Source)
@@ -40,7 +40,7 @@ extension EventsError {
     var isInterrupted: Bool {
         switch self {
         case .interrupted: true
-        case let .sending(_, error: error): error.isCancelled
+        case let .sending(_, error): (error as? HTTPError)?.isCancelled ?? false
         default: false
         }
     }
@@ -57,7 +57,7 @@ extension EventsError {
 
 extension EventsError {
     static func sending(
-        _ error: HTTPError,
+        _ error: Error,
         file: String = #fileID, function: String = #function, line: UInt = #line
     ) -> Self {
         .sending(

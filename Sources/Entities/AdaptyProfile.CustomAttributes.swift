@@ -27,7 +27,7 @@ extension AdaptyProfile.CustomAttributeValue {
         }
     }
 
-    var rawValue: Any? {
+    var rawValue: (any Sendable)? {
         switch self {
         case .none:
             nil
@@ -50,7 +50,7 @@ extension AdaptyProfile.CustomAttributeValue {
 
 extension AdaptyProfile.CustomAttributes {
     func convertToSimpleDictionary() -> [String: any Sendable] {
-        [String: Any](
+        [String: any Sendable](
             compactMap {
                 guard let rawValue = $1.rawValue else { return nil }
                 return ($0, rawValue)

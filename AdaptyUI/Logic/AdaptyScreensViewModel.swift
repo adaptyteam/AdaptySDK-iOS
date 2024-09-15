@@ -53,7 +53,7 @@ package class AdaptyScreensViewModel: ObservableObject {
 
         dismissListeners[id]?()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+        DispatchQueue.baseUrl.asyncAfter(deadline: .now() + 0.3) { [weak self] in
             self?.presentedScreensStack.removeAll(where: { $0.id == id })
         }
     }

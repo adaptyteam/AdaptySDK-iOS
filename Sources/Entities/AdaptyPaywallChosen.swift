@@ -123,4 +123,10 @@ extension AdaptyPaywallChosen {
             case version = "response_created_at"
         }
     }
+
+    func replaceAdaptyPaywall(version: Int64) -> Self {
+        var mutable = self
+        mutable.value.version = version
+        return mutable
+    }
 }

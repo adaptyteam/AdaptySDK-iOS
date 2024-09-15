@@ -128,7 +128,7 @@ enum JSONValueError: Error {
 extension JSONValue {
     func jsonData(outputFormatting: JSONEncoder.OutputFormatting? = nil) throws -> Data {
         let encoder = JSONEncoder()
-        Backend.configure(encoder: encoder)
+        Backend.configure(jsonEncoder: encoder)
         if let outputFormatting {
             encoder.outputFormatting = outputFormatting
         }
@@ -150,7 +150,7 @@ extension JSONValue {
 extension Data {
     func decode<T: Decodable>(_ type: T.Type) throws -> T {
         let decoder = JSONDecoder()
-        Backend.configure(decoder: decoder)
+        Backend.configure(jsonDecoder: decoder)
         return try decoder.decode(type, from: self)
     }
 }

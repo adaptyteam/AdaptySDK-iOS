@@ -14,12 +14,14 @@ private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDeco
         method: .post,
         path: "/sdk/in-apps/apple/receipt/validate/"
     )
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
+
     let profileId: String
     let receipt: Data
 
     init(profileId: String, receipt: Data) {
-        headers = Headers().setBackendProfileId(profileId)
+        headers = HTTPHeaders().setBackendProfileId(profileId)
         self.profileId = profileId
         self.receipt = receipt
     }
@@ -43,18 +45,15 @@ private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDeco
 extension HTTPSession {
     func performValidateReceiptRequest(
         profileId: String,
-        receipt: Data,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
-    ) {
+        receipt: Data
+    ) async throws -> VH<AdaptyProfile> {
         let request = ValidateReceiptRequest(profileId: profileId, receipt: receipt)
 
-        perform(request, logName: "validate_receipt") { (result: ValidateReceiptRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error.asAdaptyError))
-            case let .success(response):
-                completion(.success(VH(response.body.value, hash: response.headers.getBackendResponseHash())))
-            }
-        }
+        let response = try await perform(
+            request,
+            requestName: .validateReceipt
+        )
+
+        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
     }
 }

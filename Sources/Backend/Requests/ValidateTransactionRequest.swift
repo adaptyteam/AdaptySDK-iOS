@@ -14,13 +14,14 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         method: .post,
         path: "/sdk/purchase/app-store/original-transaction-id/validate/"
     )
-    let headers: Headers
-    let profileId: String
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
 
+    let profileId: String
     let requestSource: RequestSource
 
     init(profileId: String, requestSource: RequestSource) {
-        headers = Headers().setBackendProfileId(profileId)
+        headers = HTTPHeaders().setBackendProfileId(profileId)
         self.profileId = profileId
         self.requestSource = requestSource
     }
@@ -55,23 +56,22 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     }
 }
 
-extension HTTPSession {
-    private func perform(_ request: ValidateTransactionRequest, _ logParams: EventParameters, _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>) -> HTTPCancelable {
-        perform(request, logName: "validate_transaction", logParams: logParams) { (result: ValidateTransactionRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error.asAdaptyError))
-            case let .success(response):
-                completion(.success(VH(response.body.value, hash: response.headers.getBackendResponseHash())))
-            }
+private extension Adapty.ValidatePurchaseReason {
+    static let restoreRawString = "restore"
+    var rawString: String {
+        switch self {
+        case .setVariation: "set_variation"
+        case .observing: "observing"
+        case .purchasing: "purchasing"
         }
     }
+}
 
+extension HTTPSession {
     func performSyncTransactionRequest(
         profileId: String,
-        originalTransactionId: String,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
-    ) {
+        originalTransactionId: String
+    ) async throws -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             profileId: profileId,
             requestSource: .restore(originalTransactionId)
@@ -80,15 +80,20 @@ extension HTTPSession {
             "original_transaction_id": originalTransactionId,
             "request_source": Adapty.ValidatePurchaseReason.restoreRawString,
         ]
-        _ = perform(request, logParams, completion)
+        let response = try await perform(
+            request,
+            requestName: .validateTransaction,
+            logParams: logParams
+        )
+
+        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
     }
 
     func performValidateTransactionRequest(
         profileId: String,
         purchasedTransaction: PurchasedTransaction,
-        reason: Adapty.ValidatePurchaseReason,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
-    ) {
+        reason: Adapty.ValidatePurchaseReason
+    ) async throws -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             profileId: profileId,
             requestSource: .other(purchasedTransaction, reason: reason)
@@ -103,17 +108,12 @@ extension HTTPSession {
             "environment": purchasedTransaction.environment,
             "request_source": reason.rawString,
         ]
-        _ = perform(request, logParams, completion)
-    }
-}
+        let response = try await perform(
+            request,
+            requestName: .validateTransaction,
+            logParams: logParams
+        )
 
-private extension Adapty.ValidatePurchaseReason {
-    static let restoreRawString = "restore"
-    var rawString: String {
-        switch self {
-        case .setVariation: "set_variation"
-        case .observing: "observing"
-        case .purchasing: "purchasing"
-        }
+        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
     }
 }

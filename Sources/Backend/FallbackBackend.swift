@@ -11,10 +11,10 @@ struct FallbackBackend: HTTPCodableConfiguration {
     let baseURL: URL
     let sessionConfiguration: URLSessionConfiguration
 
-    func configure(decoder: JSONDecoder) { Backend.configure(decoder: decoder) }
-    func configure(encoder: JSONEncoder) { Backend.configure(encoder: encoder) }
+    func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
+    func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
 
-    init(secretKey _: String, baseURL url: URL, withProxy: (host: String, port: Int)? = nil) {
+    init(apiKey _: String, baseURL url: URL, withProxy: (host: String, port: Int)? = nil) {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -32,20 +32,7 @@ struct FallbackBackend: HTTPCodableConfiguration {
 }
 
 extension FallbackBackend {
-    func createHTTPSession(
-        responseQueue: DispatchQueue,
-        errorHandler: ((HTTPError) -> Void)? = nil
-    ) -> HTTPSession {
-        HTTPSession(
-            configuration: self,
-            responseQueue: responseQueue,
-            requestAdditional: nil,
-            responseValidator: validator,
-            errorHandler: errorHandler
-        )
-    }
-
-    func validator(_ response: HTTPDataResponse) -> HTTPError? {
-        HTTPResponse.statusCodeValidator(response)
+    func createHTTPSession() -> HTTPSession {
+        HTTPSession(configuration: self)
     }
 }

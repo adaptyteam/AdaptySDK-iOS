@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum HTTPMethod: String, ExpressibleByStringLiteral, Sendable, Hashable {
+enum HTTPMethod: String, Sendable, Hashable {
     case options = "OPTIONS"
     case get = "GET"
     case head = "HEAD"
@@ -17,8 +17,10 @@ enum HTTPMethod: String, ExpressibleByStringLiteral, Sendable, Hashable {
     case delete = "DELETE"
     case trace = "TRACE"
     case connect = "CONNECT"
+}
 
-    init(stringLiteral value: String) {
+extension HTTPMethod: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
         self = HTTPMethod(rawValue: value.uppercased()) ?? .get
     }
 }

@@ -12,11 +12,21 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
 
     let endpoint: HTTPEndpoint
     let profileId: String
+    let stamp = Log.stamp
+
     let cached: AdaptyPaywall?
     let queryItems: QueryItems
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
-        createDecoder(jsonDecoder, profileId, cached)
+    func decodeDataResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeDataResponse(
+            response,
+            withConfiguration: configuration,
+            withProfileId: profileId,
+            withCachedPaywall: cached
+        )
     }
 
     init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, cached: AdaptyPaywall?, disableServerCache: Bool) {
@@ -33,15 +43,14 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
 extension HTTPSession {
     @inline(__always)
     private func performFetchFallbackPaywallVariationsRequest(
-        logName: String,
+        requestName: APIRequestName,
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
-        disableServerCache: Bool,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
-    ) {
+        disableServerCache: Bool
+    ) async throws -> AdaptyPaywallChosen {
         let request = FetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
             profileId: profileId,
@@ -51,46 +60,35 @@ extension HTTPSession {
             disableServerCache: disableServerCache
         )
 
-        perform(
-            request,
-            logName: logName,
-            logParams: [
-                "api_prefix": apiKeyPrefix,
-                "placement_id": placementId,
-                "language_code": locale.languageCode,
-                "builder_version": AdaptyUI.builderVersion,
-                "builder_config_format_version": AdaptyUI.configurationFormatVersion,
-                "disable_server_cache": disableServerCache,
-            ]
-        ) { [weak self] (result: FetchFallbackPaywallVariationsRequest.Result) in
-            switch result {
-            case let .failure(error):
-                guard let queue = self?.responseQueue,
-                      error.statusCode == 404,
-                      !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
-                    completion(.failure(error.asAdaptyError))
-                    break
-                }
-
-                queue.async {
-                    guard let session = self else {
-                        completion(.failure(error.asAdaptyError))
-                        return
-                    }
-                    session.performFetchFallbackPaywallVariationsRequest(
-                        apiKeyPrefix: apiKeyPrefix,
-                        profileId: profileId,
-                        placementId: placementId,
-                        locale: .defaultPaywallLocale,
-                        cached: cached,
-                        disableServerCache: disableServerCache,
-                        completion
-                    )
-                }
-
-            case let .success(response):
-                completion(.success(response.body))
+        do {
+            let response = try await perform(
+                request,
+                requestName: requestName,
+                logParams: [
+                    "api_prefix": apiKeyPrefix,
+                    "placement_id": placementId,
+                    "language_code": locale.languageCode,
+                    "builder_version": AdaptyUI.builderVersion,
+                    "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                    "disable_server_cache": disableServerCache,
+                ]
+            )
+            return response.body
+        } catch {
+            guard (error as? HTTPError)?.statusCode == 404,
+                  !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
+                throw error
             }
+
+            return try await performFetchFallbackPaywallVariationsRequest(
+                requestName: requestName,
+                apiKeyPrefix: apiKeyPrefix,
+                profileId: profileId,
+                placementId: placementId,
+                locale: .defaultPaywallLocale,
+                cached: cached,
+                disableServerCache: disableServerCache
+            )
         }
     }
 
@@ -100,17 +98,16 @@ extension HTTPSession {
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
-        disableServerCache: Bool,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
-    ) {
-        performFetchFallbackPaywallVariationsRequest(
-            logName: "get_fallback_paywall_variations",
+        disableServerCache: Bool
+    ) async throws -> AdaptyPaywallChosen {
+        try await performFetchFallbackPaywallVariationsRequest(
+            requestName: .fetchFallbackPaywallVariations,
             apiKeyPrefix: apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
             locale: locale,
             cached: cached,
-            disableServerCache: disableServerCache, completion
+            disableServerCache: disableServerCache
         )
     }
 
@@ -120,17 +117,16 @@ extension HTTPSession {
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
-        disableServerCache: Bool,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
-    ) {
-        performFetchFallbackPaywallVariationsRequest(
-            logName: "get_untargeted_paywall_variations",
+        disableServerCache: Bool
+    ) async throws -> AdaptyPaywallChosen {
+        try await performFetchFallbackPaywallVariationsRequest(
+            requestName: .fetchUntargetedPaywallVariations,
             apiKeyPrefix: apiKeyPrefix,
             profileId: profileId,
             placementId: placementId,
             locale: locale,
             cached: cached,
-            disableServerCache: disableServerCache, completion
+            disableServerCache: disableServerCache
         )
     }
 }

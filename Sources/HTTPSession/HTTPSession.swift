@@ -7,132 +7,101 @@
 
 import Foundation
 
-final class HTTPSession {
-    let configuration: HTTPCodableConfiguration
-    let responseQueue: DispatchQueue
+final class HTTPSession: Sendable {
+    let configuration: HTTPConfiguration
     let requestAdditional: HTTPRequestAdditional?
+
     private let _responseValidator: HTTPDataResponse.Validator
-    private let _errorHandler: ErrorHandler?
+    private let _errorHandler: HTTPErrorHandlerActor?
     private let _session: URLSession
-    private let requestSign: Sign
+    private let _state: HTTPSessionState
+    private let _delegate: URLSession.Delegate
+    private let _requestSign: Sign?
 
-    var forceLogCurl: Bool
-
-    typealias ErrorHandler = (HTTPError) -> Void
-    typealias Decoder<Body> = (HTTPDataResponse) -> HTTPResponse<Body>.Result
-    typealias Sign = (URLRequest, HTTPEndpoint) -> Result<URLRequest, HTTPError>
+    typealias Sign = @Sendable (URLRequest, HTTPEndpoint) throws -> URLRequest
 
     init(
         configuration: HTTPCodableConfiguration,
-        responseQueue: DispatchQueue = .main,
         requestAdditional: HTTPRequestAdditional? = nil,
         requestSign: Sign? = nil,
         responseValidator: @escaping HTTPDataResponse.Validator = HTTPDataResponse.defaultValidator,
-        errorHandler: ErrorHandler? = nil,
-        forceLogCurl: Bool = false
+        errorHandler: HTTPErrorHandler? = nil
     ) {
         self.configuration = configuration
         self.requestAdditional = requestAdditional
-        self.responseQueue = responseQueue
-        self.forceLogCurl = forceLogCurl
-        self.requestSign = requestSign ?? { r, _ in .success(r) }
+        _requestSign = requestSign
         _responseValidator = responseValidator
-        _errorHandler = errorHandler
-        _session = URLSession(configuration: configuration.sessionConfiguration)
+        _errorHandler = errorHandler.map { HTTPErrorHandlerActor(handler: $0) }
+        let state = HTTPSessionState()
+        _state = state
+        let delegate = URLSession.Delegate(sessionState: state, configuration: configuration)
+
+        _session = URLSession(
+            configuration: configuration.sessionConfiguration,
+            delegate: delegate,
+            delegateQueue: nil
+        )
+        _delegate = delegate
     }
 
-    func invalidateAndCancel() {
-        _session.invalidateAndCancel()
-    }
-
-    @discardableResult
-    final func perform<Body>(
+    func perform<Body>(
         _ request: some HTTPRequest,
-        queue: DispatchQueue? = nil,
-        decoder: @escaping Decoder<Body>,
-        logStamp: String = Log.stamp,
-        _ completionHandler: @escaping (HTTPResponse<Body>.Result) -> Void
-    ) -> HTTPCancelable {
+        withDecoder decoder: @escaping HTTPDecoder<Body>
+    ) async throws -> HTTPResponse<Body> {
+        let state = _state
+        let stamp = request.stamp
         let errorHandler = _errorHandler
-        let queue = queue ?? responseQueue
         let endpoint = request.endpoint
-        let urlRequest: URLRequest
+        var urlRequest: URLRequest
 
-        switch request.tryConvertToURLRequest(configuration: configuration, additional: requestAdditional)
-            .flatMap({ requestSign($0, request.endpoint) }) {
-        case let .success(request):
-            urlRequest = request
-        case let .failure(error):
-            Logger.encoding(endpoint: endpoint, error: error)
-            queue.async {
-                errorHandler?(error)
-                completionHandler(.failure(error))
+        do {
+            urlRequest = try request.convertToURLRequest(configuration: configuration, additional: requestAdditional)
+            if let _requestSign {
+                urlRequest = try _requestSign(urlRequest, request.endpoint)
             }
-            return HTTPSession.emptyCancelable
+        } catch {
+            let httpError = HTTPError.perform(endpoint, error: error)
+            Log.encodingError(httpError, endpoint: endpoint, stamp: stamp)
+            errorHandler?.call(httpError)
+            throw httpError
         }
 
-        let responseValidator = _responseValidator
-//        let forceLogCurl = request.forceLogCurl || forceLogCurl
-        let sessionConfiguration = _session.configuration
-        Logger.request(urlRequest, endpoint: endpoint, session: sessionConfiguration, stamp: logStamp)
-        let task = _session.dataTask(with: urlRequest) { data, response, error in
-            let result: HTTPResponse<Body>.Result
-            if let error {
-                result = .failure(.network(endpoint, error: error))
-            } else if let response = response as? HTTPURLResponse {
-                let dataResponse = HTTPDataResponse(endpoint: endpoint, response: response, data: data)
-                if let apiError = responseValidator(dataResponse) {
-                    result = .failure(apiError)
-                } else {
-                    result = HTTPDataResponse.Result.success(dataResponse).flatMap(decoder)
-                }
-            } else {
-                result = .failure(.network(endpoint, error: DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The given response is nil or not is HTTPURLResponse."))))
-            }
+        Log.request(urlRequest, endpoint: endpoint, session: _session.configuration, stamp: stamp)
 
-            Logger.response(response, data: data, endpoint: endpoint, error: result.error, request: urlRequest, stamp: logStamp)
-            queue.async {
-                if let errorHandler, let error = result.error { errorHandler(error) }
-                completionHandler(result)
-            }
+        let dataResponse: HTTPDataResponse
+        do {
+            let (data, response, metrics) = try await _session.data(with: urlRequest, sessionState: state)
+            dataResponse = HTTPDataResponse(endpoint: endpoint, response: response, metrics: metrics.map(HTTPMetrics.init), data: data)
+        } catch {
+            let wrap = error as? URLErrorWithMetrics
+            let httpError = HTTPError.network(endpoint, metrics: wrap?.metrics.map(HTTPMetrics.init), error: wrap?.error ?? error)
+            Log.responseError(httpError, request: urlRequest, stamp: stamp, response: nil)
+            errorHandler?.call(httpError)
+            throw httpError
         }
-        task.resume()
-        return task
-    }
 
-    @discardableResult
-    final func perform(
-        _ request: some HTTPRequest,
-        queue: DispatchQueue? = nil,
-        logStamp: String = Log.stamp,
-        _ completionHandler: @escaping (HTTPStringResponse.Result) -> Void
-    ) -> HTTPCancelable {
-        perform(request, queue: queue, decoder: { response in
-            let body: String? =
-                if let data = response.body {
-                    String(data: data, encoding: .utf8)
-                } else { nil }
-            return .success(response.replaceBody(body))
-        }, logStamp: logStamp, completionHandler)
-    }
+        if let error = _responseValidator(dataResponse) {
+            let httpError = HTTPError.backend(dataResponse, error: error)
+            Log.responseError(httpError, request: urlRequest, stamp: stamp, response: dataResponse)
+            errorHandler?.call(httpError)
+            throw httpError
+        }
 
-    @discardableResult
-    final func perform(
-        _ request: some HTTPRequest,
-        queue: DispatchQueue? = nil,
-        logStamp: String = Log.stamp,
-        _ completionHandler: @escaping (HTTPDataResponse.Result) -> Void
-    ) -> HTTPCancelable {
-        perform(request, queue: queue, decoder: { .success($0) }, logStamp: logStamp, completionHandler)
-    }
+        let startDercoderTime = DispatchTime.now()
 
-    @discardableResult
-    final func perform(
-        _ request: some HTTPRequest,
-        queue: DispatchQueue? = nil,
-        logStamp: String = Log.stamp,
-        _ completionHandler: @escaping (HTTPEmptyResponse.Result) -> Void
-    ) -> HTTPCancelable {
-        perform(request, queue: queue, decoder: { .success($0.asEmptyResponse) }, logStamp: logStamp, completionHandler)
+        var bodyResponse: HTTPResponse<Body>
+        do {
+            bodyResponse = try decoder(dataResponse)
+
+        } catch {
+            let httpError = HTTPError.decoding(dataResponse, error: error)
+            Log.responseError(httpError, request: urlRequest, stamp: stamp, response: dataResponse)
+            errorHandler?.call(httpError)
+            throw httpError
+        }
+        let endDercoderTime = DispatchTime.now()
+        bodyResponse = bodyResponse.replaceDecodingTime(start: startDercoderTime, end: endDercoderTime)
+        Log.response(dataResponse.replaceMetrics(bodyResponse.metrics), request: urlRequest, stamp: stamp)
+        return bodyResponse
     }
 }

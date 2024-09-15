@@ -11,8 +11,9 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration>
 
     let endpoint: HTTPEndpoint
-    let headers: Headers
+    let headers: HTTPHeaders
     let queryItems: QueryItems
+    let stamp = Log.stamp
 
     init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
@@ -20,7 +21,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
         )
 
-        headers = Headers()
+        headers = HTTPHeaders()
             .setViewConfigurationLocale(locale)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
@@ -34,9 +35,8 @@ extension HTTPSession {
         apiKeyPrefix: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
-        disableServerCache: Bool,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
-    ) {
+        disableServerCache: Bool
+    ) async throws -> AdaptyUI.ViewConfiguration {
         let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
 
         let request = FetchViewConfigurationRequest(
@@ -47,9 +47,9 @@ extension HTTPSession {
             disableServerCache: disableServerCache
         )
 
-        perform(
+        let response = try await perform(
             request,
-            logName: "get_paywall_builder",
+            requestName: .fetchViewConfiguration,
             logParams: [
                 "api_prefix": apiKeyPrefix,
                 "variation_id": paywallVariationId,
@@ -59,13 +59,8 @@ extension HTTPSession {
                 "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]
-        ) { (result: FetchViewConfigurationRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error.asAdaptyError))
-            case let .success(response):
-                completion(.success(response.body.value))
-            }
-        }
+        )
+
+        return response.body.value
     }
 }

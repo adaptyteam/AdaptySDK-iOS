@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyOnboardingScreenParameters: Sendable, Hashable {
+public struct AdaptyOnboardingScreenParameters: Sendable {
     public let name: String?
     public let screenName: String?
     public let screenOrder: UInt

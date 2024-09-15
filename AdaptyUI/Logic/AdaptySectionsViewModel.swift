@@ -32,7 +32,7 @@ package class AdaptySectionsViewModel: ObservableObject {
         if let stateIndex = sectionsStates[section.id] {
             return stateIndex
         } else {
-            DispatchQueue.main.async { [weak self] in
+            DispatchQueue.baseUrl.async { [weak self] in
                 self?.sectionsStates[section.id] = section.index
             }
             

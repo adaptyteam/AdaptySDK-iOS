@@ -30,27 +30,27 @@ extension Backend.Request {
     fileprivate static let crossSDKVersionHeaderKey = "adapty-sdk-crossplatform-version"
     fileprivate static let crossSDKPlatformHeaderKey = "adapty-sdk-crossplatform-name"
 
-    static func globalHeaders(secretKey: String) -> HTTPRequest.Headers {
+    static func globalHeaders(with config: Adapty.Configuration) -> HTTPHeaders {
         var headers = [
-            authorizationHeaderKey: "Api-Key \(secretKey)",
+            authorizationHeaderKey: "Api-Key \(config.apiKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
             sdkPlatformHeaderKey: Environment.System.name,
             sdkStoreHeaderKey: "app_store",
             sessionIDHeaderKey: Environment.Application.sessionIdentifier,
             appInstallIdHeaderKey: Environment.Application.installationIdentifier,
             isSandboxHeaderKey: Environment.System.isSandbox ? "true" : "false",
-            isObserveModeHeaderKey: Adapty.Configuration.observerMode ? "true" : "false",
+            isObserveModeHeaderKey: config.observerMode ? "true" : "false",
             storeKit2EnabledHeaderKey: Environment.System.storeKit2Enabled ? "enabled" : "unavailable",
         ]
         if let ver = Environment.Application.version {
             headers[appVersionHeaderKey] = ver
         }
-        if let ver = Environment.CrossPlatformSDK.version {
-            headers[crossSDKVersionHeaderKey] = ver
+
+        if let crossPlatform = config.crossPlatformSDK {
+            headers[crossSDKPlatformHeaderKey] = crossPlatform.name
+            headers[crossSDKVersionHeaderKey] = crossPlatform.version
         }
-        if let name = Environment.CrossPlatformSDK.name {
-            headers[crossSDKPlatformHeaderKey] = name
-        }
+
         return headers
     }
 }
@@ -60,7 +60,7 @@ extension Backend.Response {
     fileprivate static let requestIdHeaderKey = "request-id"
 }
 
-extension [HTTPRequest.Headers.Key: HTTPRequest.Headers.Value] {
+extension HTTPHeaders {
     func setPaywallLocale(_ locale: AdaptyLocale?) -> Self {
         updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallLocaleHeaderKey)
     }
@@ -99,7 +99,7 @@ extension [HTTPRequest.Headers.Key: HTTPRequest.Headers.Value] {
         return headers
     }
 
-    func hasSameBackendResponseHash(_ responseHeaders: HTTPResponseHeaders) -> Bool {
+    func hasSameBackendResponseHash(_ responseHeaders: HTTPHeaders) -> Bool {
         guard let requestHash = self[Backend.Request.hashHeaderKey],
               let responseHash = responseHeaders.getBackendResponseHash(),
               requestHash == responseHash
@@ -108,12 +108,12 @@ extension [HTTPRequest.Headers.Key: HTTPRequest.Headers.Value] {
     }
 }
 
-extension HTTPResponseHeaders {
+extension HTTPHeaders {
     func getBackendResponseHash() -> String? {
-        value(forHTTPHeaderField: Backend.Response.hashHeaderKey) as? String
+        value(forHTTPHeaderField: Backend.Response.hashHeaderKey)
     }
 
     func getBackendRequestId() -> String? {
-        value(forHTTPHeaderField: Backend.Response.requestIdHeaderKey) as? String
+        value(forHTTPHeaderField: Backend.Response.requestIdHeaderKey)
     }
 }

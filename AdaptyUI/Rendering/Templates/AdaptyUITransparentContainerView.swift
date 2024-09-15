@@ -32,7 +32,7 @@ struct AdaptyUITransparentContainerView: View {
             }
             .scrollIndicatorsHidden_compatible()
             .onAppear {
-                DispatchQueue.main.async {
+                DispatchQueue.baseUrl.async {
                     scrollProxy.scrollTo("content", anchor: .bottom)
                 }
             }

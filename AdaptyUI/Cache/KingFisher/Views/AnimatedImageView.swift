@@ -137,8 +137,8 @@ class AnimatedImageView: KFCrossPlatformImageView {
         willSet {
             guard runLoopMode != newValue else { return }
             stopAnimating()
-            displayLink.remove(from: .main, forMode: runLoopMode)
-            displayLink.add(to: .main, forMode: newValue)
+            displayLink.remove(from: .baseUrl, forMode: runLoopMode)
+            displayLink.add(to: .baseUrl, forMode: newValue)
             startAnimating()
         }
     }
@@ -181,7 +181,7 @@ class AnimatedImageView: KFCrossPlatformImageView {
     private lazy var displayLink: DisplayLinkCompatible = {
         isDisplayLinkInitialized = true
         let displayLink = self.compatibleDisplayLink(target: TargetProxy(target: self), selector: #selector(TargetProxy.onScreenUpdate))
-        displayLink.add(to: .main, forMode: runLoopMode)
+        displayLink.add(to: .baseUrl, forMode: runLoopMode)
         displayLink.isPaused = true
         return displayLink
     }()
@@ -385,7 +385,7 @@ class AnimatedImageView: KFCrossPlatformImageView {
             if #available(iOS 13.0, tvOS 13.0, *) {
                 scale = UITraitCollection.current.displayScale
             } else {
-                scale = UIScreen.main.scale
+                scale = UIScreen.baseUrl.scale
             }
             #endif
             currentFrame = image
@@ -743,7 +743,7 @@ extension AnimatedImageView {
             // ensure the image dealloc in main thread
             defer {
                 if let image = previousFrame?.image {
-                    DispatchQueue.main.async {
+                    DispatchQueue.baseUrl.async {
                         _ = image
                     }
                 }

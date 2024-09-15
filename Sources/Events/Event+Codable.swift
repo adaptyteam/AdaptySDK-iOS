@@ -9,33 +9,17 @@
 import Foundation
 
 extension Event {
-    fileprivate static let isEventsCodableUserInfoKey = CodingUserInfoKey(rawValue: "adapty_events")!
-
-    static var encoder: JSONEncoder = {
+    static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
         encoder.dataEncodingStrategy = .base64
-        encoder.setIsEvents()
         return encoder
     }()
 
-    static var decoder: JSONDecoder = {
+    static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(Backend.inUTCDateFormatter)
         decoder.dataDecodingStrategy = .base64
-        decoder.setIsEvents()
         return decoder
     }()
-}
-
-private extension CodingUserInfoСontainer {
-    func setIsEvents() {
-        userInfo[Event.isEventsCodableUserInfoKey] = true
-    }
-}
-
-extension [CodingUserInfoKey: Any] {
-    var isEvents: Bool {
-        self[Event.isEventsCodableUserInfoKey] as? Bool ?? false
-    }
 }

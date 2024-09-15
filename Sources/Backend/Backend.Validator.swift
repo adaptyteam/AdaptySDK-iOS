@@ -8,13 +8,10 @@
 import Foundation
 
 extension Backend {
-    func validator(_ response: HTTPDataResponse) -> HTTPError? {
-        struct ErrorCodesResponse: Decodable /* temp */ {
-            let codes: [Code]?
-
-            enum CodingKeys: String, CodingKey {
-                case codes = "errors"
-            }
+    private struct ErrorCodesResponse: Decodable /* temp */ {
+        let codes: [Code]?
+        enum CodingKeys: String, CodingKey {
+            case codes = "errors"
         }
 
         struct Code: Decodable /* temp */ {
@@ -24,16 +21,29 @@ extension Backend {
 
             let value: String?
         }
+    }
 
-        if let data = response.body, !data.isEmpty {
-            if let errorCodes = try? decoder.decode(ErrorCodesResponse.self, from: data).codes, !errorCodes.isEmpty {
-                return HTTPError.backend(response, error: ErrorResponse(
-                    body: String(data: data, encoding: .utf8) ?? "unknown",
-                    errorCodes: errorCodes.compactMap(\.value),
-                    requestId: response.headers.getBackendRequestId()
-                ))
-            }
+    private func errorCodesResponse(
+        from data: Data,
+        withConfiguration configuration: HTTPCodableConfiguration
+    ) throws -> ErrorCodesResponse {
+        let jsonDecoder = JSONDecoder()
+        configuration.configure(jsonDecoder: jsonDecoder)
+        return try jsonDecoder.decode(ErrorCodesResponse.self, from: data)
+    }
+
+    @Sendable
+    func validator(_ response: HTTPDataResponse) -> Error? {
+        guard let data = response.body, !data.isEmpty,
+              let errorCodes = try? errorCodesResponse(from: data, withConfiguration: self).codes, !errorCodes.isEmpty
+        else {
+            return HTTPResponse.statusCodeValidator(response)
         }
-        return HTTPResponse.statusCodeValidator(response)
+
+        return HTTPError.backend(response, error: BackendError(
+            body: String(data: data, encoding: .utf8) ?? "unknown",
+            errorCodes: errorCodes.compactMap(\.value),
+            requestId: response.headers.getBackendRequestId()
+        ))
     }
 }

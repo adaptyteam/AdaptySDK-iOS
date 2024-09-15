@@ -11,17 +11,21 @@ import Foundation
 extension Log {
     fileprivate static let stampChars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
-    public static var stamp: String {
+    package static var stamp: String {
         var result = ""
         for _ in 0 ..< 6 {
             result.append(Log.stampChars[Int(arc4random_uniform(62))])
         }
         return result
     }
+
+    package static func stamp(parent: String) -> String {
+        "\(parent)/\(stamp)"
+    }
 }
 
 extension Hashable {
-    public var stamp: String {
+    package var stamp: String {
         let hashValue = self.hashValue
         var value = hashValue >= 0 ? hashValue : -hashValue
         var result = ""

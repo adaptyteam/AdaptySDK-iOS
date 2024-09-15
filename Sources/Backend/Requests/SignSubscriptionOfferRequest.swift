@@ -14,11 +14,12 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
         method: .get,
         path: "/sdk/in-apps/apple/subscription-offer/sign/"
     )
-    let headers: Headers
+    let headers: HTTPHeaders
     let queryItems: QueryItems
+    let stamp = Log.stamp
 
     init(vendorProductId: String, discountId: String, profileId: String) {
-        headers = Headers().setBackendProfileId(profileId)
+        headers = HTTPHeaders().setBackendProfileId(profileId)
 
         queryItems = QueryItems()
             .setBackendProfileId(profileId)
@@ -31,28 +32,22 @@ extension HTTPSession {
     func performSignSubscriptionOfferRequest(
         profileId: String,
         vendorProductId: String,
-        discountId: String,
-        _ completion: @escaping AdaptyResultCompletion<SignSubscriptionOfferResponse>
-    ) {
+        discountId: String
+    ) async throws -> SignSubscriptionOfferResponse {
         let request = SignSubscriptionOfferRequest(
             vendorProductId: vendorProductId,
             discountId: discountId,
             profileId: profileId
         )
-        perform(
+        let response = try await perform(
             request,
-            logName: "sign_offer",
+            requestName: .signSubscriptionOffer,
             logParams: [
                 "product_id": vendorProductId,
                 "discount_id": discountId,
             ]
-        ) { (result: SignSubscriptionOfferRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error.asAdaptyError))
-            case let .success(response):
-                completion(.success(response.body.value))
-            }
-        }
+        )
+
+        return response.body.value
     }
 }

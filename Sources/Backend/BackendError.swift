@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct ErrorResponse: Error, Hashable, Codable {
+struct BackendError: Error, Hashable, Codable {
     let body: String
     let errorCodes: [String]
     let requestId: String?
 }
 
-extension ErrorResponse: CustomStringConvertible {
+extension BackendError: CustomStringConvertible {
     public var description: String {
         (requestId.map { "requestId: \($0), " } ?? "") + "body: \(body)"
     }
@@ -26,8 +26,8 @@ extension Backend {
 
     static func backendErrorCodes(_ error: HTTPError) -> [String] {
         switch error {
-        case let .backend(_, _, _, _, value):
-            (value as? ErrorResponse)?.errorCodes ?? []
+        case let .backend(_, _, _, _, _, value):
+            (value as? BackendError)?.errorCodes ?? []
         default: []
         }
     }
@@ -36,11 +36,11 @@ extension Backend {
         switch error {
         case .perform:
             false
-        case let .network(_, _, error: error):
-            (error as NSError).isTimedOutError
-        case let .decoding(_, _, statusCode: code, _, _),
-             let .backend(_, _, statusCode: code, _, _):
-            switch code {
+        case let .network(_, _, _, value):
+            (value as NSError).isTimedOutError
+        case let .decoding(_, _, statusCode, _, _, _),
+             let .backend(_, _, statusCode, _, _, _):
+            switch statusCode {
             case 499, 500 ... 599:
                 true
             default:
@@ -54,11 +54,11 @@ extension Backend {
         switch error {
         case .perform:
             false
-        case let .network(_, _, error: error):
+        case let .network(_, _, _, error: error):
             (error as NSError).isNetworkConnectionError
-        case let .decoding(_, _, statusCode: code, _, _),
-             let .backend(_, _, statusCode: code, _, _):
-            switch code {
+        case let .decoding(_, _, statusCode, _, _, _),
+             let .backend(_, _, statusCode, _, _, _):
+            switch statusCode {
             case 429, 499, 500 ... 599:
                 true
             default:

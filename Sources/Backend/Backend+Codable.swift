@@ -11,19 +11,19 @@ extension Backend {
     fileprivate static let isBackendCodableUserInfoKey = CodingUserInfoKey(rawValue: "adapty_backend")!
     fileprivate static let profileIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_profile_id")!
 
-    static func configure(decoder: JSONDecoder) {
-        decoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
-        decoder.dataDecodingStrategy = .base64
-        decoder.setIsBackend()
+    static func configure(jsonDecoder: JSONDecoder) {
+        jsonDecoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
+        jsonDecoder.dataDecodingStrategy = .base64
+        jsonDecoder.setIsBackend()
     }
 
-    static func configure(encoder: JSONEncoder) {
-        encoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
-        encoder.dataEncodingStrategy = .base64
-        encoder.setIsBackend()
+    static func configure(jsonEncoder: JSONEncoder) {
+        jsonEncoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
+        jsonEncoder.dataEncodingStrategy = .base64
+        jsonEncoder.setIsBackend()
     }
 
-    static var inUTCDateFormatter: DateFormatter = {
+    static let inUTCDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -32,7 +32,7 @@ extension Backend {
         return formatter
     }()
 
-    static var dateFormatter: DateFormatter = {
+    static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.locale = Locale(identifier: "en_US_POSIX")

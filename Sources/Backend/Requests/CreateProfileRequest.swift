@@ -11,7 +11,9 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     typealias ResponseBody = Backend.Response.ValueOfData<AdaptyProfile>
 
     let endpoint: HTTPEndpoint
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
+
     let profileId: String
     let parameters: AdaptyProfileParameters?
     let customerUserId: String?
@@ -28,7 +30,7 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
             path: "/sdk/analytics/profiles/\(profileId)/"
         )
 
-        headers = Headers().setBackendProfileId(profileId)
+        headers = HTTPHeaders().setBackendProfileId(profileId)
         self.profileId = profileId
         self.parameters = parameters
         self.customerUserId = customerUserId
@@ -69,26 +71,21 @@ extension HTTPSession {
         profileId: String,
         customerUserId: String?,
         parameters: AdaptyProfileParameters?,
-        environmentMeta: Environment.Meta,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile>>
-    ) {
+        environmentMeta: Environment.Meta
+    ) async throws -> VH<AdaptyProfile> {
         let request = CreateProfileRequest(
             profileId: profileId,
             customerUserId: customerUserId,
             parameters: parameters,
             environmentMeta: environmentMeta
         )
-        perform(
+
+        let response = try await perform(
             request,
-            logName: "create_profile",
+            requestName: .createProfile,
             logParams: ["has_customer_user_id": customerUserId != nil]
-        ) { (result: CreateProfileRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error.asAdaptyError))
-            case let .success(response):
-                completion(.success(VH(response.body.value, hash: response.headers.getBackendResponseHash())))
-            }
-        }
+        )
+
+        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
     }
 }

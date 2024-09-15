@@ -18,6 +18,14 @@ extension CustomAdaptyError {
     }
 }
 
+extension Error {
+    var asAdaptyError: AdaptyError? {
+        if let error = self as? AdaptyError { return error }
+        if let error = self as? CustomAdaptyError { return AdaptyError(error) }
+        return nil
+    }
+}
+
 extension InternalAdaptyError: CustomAdaptyError {}
 
 extension HTTPError: CustomAdaptyError {
@@ -46,37 +54,37 @@ extension HTTPError: CustomAdaptyError {
         case .perform: return .encodingFailed
         case .network: return .networkFailed
         case .decoding: return .decodingFailed
-        case let .backend(_, _, code, _, _):
-            return Backend.toAdaptyErrorCode(statusCode: code) ?? .networkFailed
+        case let .backend(_, _, statusCode, _, _, _):
+            return Backend.toAdaptyErrorCode(statusCode: statusCode) ?? .networkFailed
         }
     }
 }
 
-extension EventsError: CustomAdaptyError {
-    static let errorDomain = AdaptyError.EventsErrorDomain
-
-    var errorCode: Int { adaptyErrorCode.rawValue }
-
-    var errorUserInfo: [String: Any] {
-        var data: [String: Any] = [
-            AdaptyError.UserInfoKey.description: debugDescription,
-            AdaptyError.UserInfoKey.source: source.description,
-        ]
-        if let originalError {
-            data[NSUnderlyingErrorKey] = originalError as NSError
-        }
-        return data
-    }
-
-    var adaptyErrorCode: AdaptyError.ErrorCode {
-        switch self {
-        case .sending: .networkFailed
-        case .encoding: .encodingFailed
-        case .decoding: .decodingFailed
-        case .interrupted: .operationInterrupted
-        }
-    }
-}
+// extension EventsError: CustomAdaptyError {
+//    static let errorDomain = AdaptyError.EventsErrorDomain
+//
+//    var errorCode: Int { adaptyErrorCode.rawValue }
+//
+//    var errorUserInfo: [String: Any] {
+//        var data: [String: Any] = [
+//            AdaptyError.UserInfoKey.description: debugDescription,
+//            AdaptyError.UserInfoKey.source: source.description,
+//        ]
+//        if let originalError {
+//            data[NSUnderlyingErrorKey] = originalError as NSError
+//        }
+//        return data
+//    }
+//
+//    var adaptyErrorCode: AdaptyError.ErrorCode {
+//        switch self {
+//        case .sending: .networkFailed
+//        case .encoding: .encodingFailed
+//        case .decoding: .decodingFailed
+//        case .interrupted: .operationInterrupted
+//        }
+//    }
+// }
 
 extension SKManagerError: CustomAdaptyError {
     static let errorDomain = AdaptyError.SKManagerErrorDomain

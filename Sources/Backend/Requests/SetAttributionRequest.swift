@@ -10,13 +10,22 @@ import Foundation
 private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = AdaptyProfile?
     let endpoint: HTTPEndpoint
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
+
     let networkUserId: String?
     let source: AdaptyAttributionSource
     let attribution: [String: any Sendable]
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        createDecoder(jsonDecoder)
+    func decodeDataResponse(
+        response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeResponse(
+            response,
+            withConfiguration: configuration,
+            requestHeaders: headers
+        )
     }
 
     init(profileId: String, networkUserId: String?, source: AdaptyAttributionSource, attribution: [String: any Sendable], responseHash: String?) {
@@ -24,7 +33,7 @@ private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableR
             method: .post,
             path: "/sdk/analytics/profiles/\(profileId)/attribution/"
         )
-        headers = Headers()
+        headers = HTTPHeaders()
             .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
 
@@ -57,14 +66,13 @@ private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableR
 }
 
 extension HTTPSession {
-    func performSetAttributionRequest(
+    func performSendAttributionRequest(
         profileId: String,
         networkUserId: String?,
         source: AdaptyAttributionSource,
         attribution: [String: any Sendable],
-        responseHash: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
-    ) {
+        responseHash: String?
+    ) async throws -> VH<AdaptyProfile?> {
         let request = SetAttributionRequest(
             profileId: profileId,
             networkUserId: networkUserId,
@@ -72,18 +80,15 @@ extension HTTPSession {
             attribution: attribution,
             responseHash: responseHash
         )
-        perform(
+        let response = try await perform(
             request,
-            logName: "set_attribution",
+            requestName: .sendAttribution,
             logParams: [
                 "source": source.description,
                 "network_user_id": networkUserId,
             ]
-        ) { (result: SetAttributionRequest.Result) in
-            completion(result
-                .map { VH($0.body, hash: $0.headers.getBackendResponseHash()) }
-                .mapError { $0.asAdaptyError }
-            )
-        }
+        )
+
+        return VH(response.body, hash: response.headers.getBackendResponseHash())
     }
 }

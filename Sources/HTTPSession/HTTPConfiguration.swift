@@ -11,3 +11,7 @@ protocol HTTPConfiguration: Sendable {
     var baseURL: URL { get }
     var sessionConfiguration: URLSessionConfiguration { get }
 }
+
+extension HTTPConfiguration {
+    var sessionConfiguration: URLSessionConfiguration { .ephemeral }
+}

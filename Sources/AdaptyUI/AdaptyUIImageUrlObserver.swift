@@ -8,36 +8,43 @@
 
 import Foundation
 
-package protocol AdaptyUIImageUrlObserver {
+package protocol AdaptyUIImageUrlObserver: Sendable {
     func extractedImageUrls(_: Set<URL>)
 }
 
 extension AdaptyUI {
-    static var dispatchQueue: DispatchQueue?
-    static var imageUrlObserver: AdaptyUIImageUrlObserver?
-    package static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver, dispatchQueue: DispatchQueue) {
-        imageUrlObserver = observer
-        self.dispatchQueue = dispatchQueue
+    private actor Holder {
+        private(set) var imageUrlObserver: AdaptyUIImageUrlObserver?
+
+        func set(imageUrlObserver observer: AdaptyUIImageUrlObserver) {
+            imageUrlObserver = observer
+        }
     }
-}
 
-extension AdaptyUI.ViewConfiguration {
-    func sendImageUrlsToObserver() {
-        guard let observer = AdaptyUI.imageUrlObserver else { return }
-        let urls = self.extractImageUrls(responseLocale)
-        guard !urls.isEmpty else { return }
+    private static let holder = Holder()
 
-        (AdaptyUI.dispatchQueue ?? .main).async {
+    package static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver) {
+        Task {
+            await holder.set(imageUrlObserver: observer)
+        }
+    }
+
+    static func sendImageUrlsToObserver(_ config: AdaptyUI.ViewConfiguration) {
+        Task {
+            guard let observer = await holder.imageUrlObserver else { return }
+            let urls = config.extractImageUrls(config.responseLocale)
+            guard !urls.isEmpty else { return }
             observer.extractedImageUrls(urls)
         }
     }
-}
 
-extension AdaptyPaywall {
-    func sendImageUrlsToObserver() {
-        guard let viewConfiguration,
-              case let .data(value) = viewConfiguration
-        else { return }
-        value.sendImageUrlsToObserver()
+    private static func sendImageUrlsToObserver(_ config: AdaptyPaywall.ViewConfiguration) {
+        guard case let .data(value) = config else { return }
+        sendImageUrlsToObserver(value)
+    }
+
+    static func sendImageUrlsToObserver(_ paywall: AdaptyPaywall) {
+        guard let config = paywall.viewConfiguration else { return }
+        sendImageUrlsToObserver(config)
     }
 }

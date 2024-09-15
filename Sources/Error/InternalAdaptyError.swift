@@ -14,9 +14,11 @@ enum InternalAdaptyError: Error {
     case notActivated(AdaptyError.Source)
     case profileWasChanged(AdaptyError.Source)
     case profileCreateFailed(AdaptyError.Source, error: HTTPError)
+    case fetchFailed(AdaptyError.Source, String, error: Error)
     case decodingFailed(AdaptyError.Source, String, error: Error)
+
     case wrongParam(AdaptyError.Source, String)
-    case fetchTimeoutError(AdaptyError.Source, String)
+//    case fetchTimeoutError(AdaptyError.Source, String)
 }
 
 extension InternalAdaptyError: CustomStringConvertible {
@@ -32,12 +34,14 @@ extension InternalAdaptyError: CustomStringConvertible {
             "AdaptyError.profileWasChanged(\(source))"
         case let .profileCreateFailed(source, error):
             "AdaptyError.profileCreateFailed(\(source), \(error))"
+        case let .fetchFailed(source, description, error):
+            "AdaptyError.fetchFailed(\(source), \(description), \(error))"
         case let .decodingFailed(source, description, error):
             "AdaptyError.decodingFailed(\(source), \(description), \(error))"
         case let .wrongParam(source, description):
             "AdaptyError.wrongParam(\(source), \(description))"
-        case let .fetchTimeoutError(source, description):
-            "AdaptyError.fetchTimeoutError(\(source), \(description))"
+//        case let .fetchTimeoutError(source, description):
+//            "AdaptyError.fetchTimeoutError(\(source), \(description))"
         }
     }
 }
@@ -50,9 +54,10 @@ extension InternalAdaptyError {
              let .notActivated(src),
              let .profileWasChanged(src),
              let .profileCreateFailed(src, _),
+             let .fetchFailed(src, _, _),
              let .decodingFailed(src, _, _),
-             let .wrongParam(src, _),
-             let .fetchTimeoutError(src, _):
+             let .wrongParam(src, _):
+//             let .fetchTimeoutError(src, _):
             src
         }
     }
@@ -79,9 +84,10 @@ extension InternalAdaptyError: CustomNSError {
         case .notActivated: AdaptyError.ErrorCode.notActivated
         case .profileWasChanged: AdaptyError.ErrorCode.profileWasChanged
         case let .profileCreateFailed(_, error): error.adaptyErrorCode
+        case .fetchFailed: AdaptyError.ErrorCode.networkFailed
         case .decodingFailed: AdaptyError.ErrorCode.decodingFailed
         case .wrongParam: AdaptyError.ErrorCode.wrongParam
-        case .fetchTimeoutError: AdaptyError.ErrorCode.fetchTimeoutError
+//        case .fetchTimeoutError: AdaptyError.ErrorCode.fetchTimeoutError
         }
     }
 
@@ -117,7 +123,9 @@ extension AdaptyError {
         InternalAdaptyError.profileWasChanged(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
     }
 
-    static func profileCreateFailed(_ error: HTTPError, file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+    static func profileCreateFailed(
+        _ error: HTTPError, file: String = #fileID, function: String = #function, line: UInt = #line
+    ) -> Self {
         InternalAdaptyError.profileCreateFailed(AdaptyError.Source(file: file, function: function, line: line), error: error).asAdaptyError
     }
 
@@ -226,20 +234,21 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
 
-    static func fetchPaywallTimeout(
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request Paywall timeout").asAdaptyError
-    }
+//    static func fetchPaywallTimeout(
+//        file: String = #fileID,
+//        function: String = #function,
+//        line: UInt = #line
+//    ) -> Self {
+//        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Request Paywall timeout").asAdaptyError
+//    }
 
-    static func fetchViewConfigurationTimeout(
+    static func fetchViewConfigurationFailed(
+        _ error: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.fetchTimeoutError(AdaptyError.Source(file: file, function: function, line: line), "Request ViewConfiguration timeout").asAdaptyError
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch ViewConfiguration failed", error: error).asAdaptyError
     }
 
     static func isNoViewConfigurationInPaywall(

@@ -8,18 +8,18 @@
 import Foundation
 
 private struct SetTransactionVariationIdRequest: HTTPEncodableRequest {
-    typealias Result = HTTPEmptyResponse.Result
-
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/purchase/transaction/variation-id/set/"
     )
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
+
     let transactionId: String
     let variationId: String
 
     init(profileId: String, transactionId: String, variationId: String) {
-        headers = Headers().setBackendProfileId(profileId)
+        headers = HTTPHeaders().setBackendProfileId(profileId)
         self.transactionId = transactionId
         self.variationId = variationId
     }
@@ -43,29 +43,21 @@ extension HTTPSession {
     func performSetTransactionVariationIdRequest(
         profileId: String,
         transactionId: String,
-        variationId: String,
-        _ completion: AdaptyErrorCompletion?
-    ) {
+        variationId: String
+    ) async throws {
         let request = SetTransactionVariationIdRequest(
             profileId: profileId,
             transactionId: transactionId,
             variationId: variationId
         )
 
-        perform(
+        let _: HTTPEmptyResponse = try await perform(
             request,
-            logName: "set_variation_id",
+            requestName: .setTransactionVariationId,
             logParams: [
                 "transaction_id": transactionId,
                 "variation_id": variationId,
             ]
-        ) { (result: SetTransactionVariationIdRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion?(error.asAdaptyError)
-            case .success:
-                completion?(nil)
-            }
-        }
+        )
     }
 }

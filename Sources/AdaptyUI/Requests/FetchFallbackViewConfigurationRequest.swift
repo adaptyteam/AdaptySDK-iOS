@@ -12,6 +12,7 @@ struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
+    let stamp = Log.stamp
 
     init(apiKeyPrefix: String, paywallInstanceIdentity: String, locale: AdaptyLocale, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
@@ -28,54 +29,41 @@ extension HTTPSession {
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
-        disableServerCache: Bool,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.ViewConfiguration>
-    ) {
+        disableServerCache: Bool
+    ) async throws -> AdaptyUI.ViewConfiguration {
         let request = FetchFallbackViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
             locale: locale,
             disableServerCache: disableServerCache
         )
-        perform(
-            request,
-            logName: "get_fallback_paywall_builder",
-            logParams: [
-                "api_prefix": apiKeyPrefix,
-                "paywall_instance_id": paywallInstanceIdentity,
-                "builder_version": AdaptyUI.builderVersion,
-                "builder_config_format_version": AdaptyUI.configurationFormatVersion,
-                "language_code": locale.languageCode,
-                "disable_server_cache": disableServerCache,
-            ]
-        ) { [weak self] (result: FetchFallbackViewConfigurationRequest.Result) in
-            switch result {
-            case let .failure(error):
 
-                guard let queue = self?.responseQueue,
-                      error.statusCode == 404,
-                      !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
-                    completion(.failure(error.asAdaptyError))
-                    break
-                }
+        do {
+            let response = try await perform(
+                request,
+                requestName: .fetchFallbackViewConfiguration,
+                logParams: [
+                    "api_prefix": apiKeyPrefix,
+                    "paywall_instance_id": paywallInstanceIdentity,
+                    "builder_version": AdaptyUI.builderVersion,
+                    "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                    "language_code": locale.languageCode,
+                    "disable_server_cache": disableServerCache,
+                ]
+            )
 
-                queue.async {
-                    guard let session = self else {
-                        completion(.failure(error.asAdaptyError))
-                        return
-                    }
-                    session.performFetchFallbackViewConfigurationRequest(
-                        apiKeyPrefix: apiKeyPrefix,
-                        paywallInstanceIdentity: paywallInstanceIdentity,
-                        locale: .defaultPaywallLocale,
-                        disableServerCache: disableServerCache,
-                        completion
-                    )
-                }
-
-            case let .success(response):
-                completion(.success(response.body.value))
+            return response.body.value
+        } catch {
+            guard (error as? HTTPError)?.statusCode == 404,
+                  !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
+                throw error
             }
+            return try await performFetchFallbackViewConfigurationRequest(
+                apiKeyPrefix: apiKeyPrefix,
+                paywallInstanceIdentity: paywallInstanceIdentity,
+                locale: .defaultPaywallLocale,
+                disableServerCache: disableServerCache
+            )
         }
     }
 }

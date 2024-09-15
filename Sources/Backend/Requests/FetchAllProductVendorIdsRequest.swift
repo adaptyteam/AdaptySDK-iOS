@@ -10,6 +10,7 @@ import Foundation
 struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.ValueOfData<[String]>
     let endpoint: HTTPEndpoint
+    let stamp = Log.stamp
 
     init(apiKeyPrefix: String) {
         endpoint = HTTPEndpoint(

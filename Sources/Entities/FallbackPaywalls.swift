@@ -117,7 +117,7 @@ extension FallbackPaywalls {
 
     static func decoder() -> JSONDecoder {
         let decoder = JSONDecoder()
-        Backend.configure(decoder: decoder)
+        Backend.configure(jsonDecoder: decoder)
         return decoder
     }
 

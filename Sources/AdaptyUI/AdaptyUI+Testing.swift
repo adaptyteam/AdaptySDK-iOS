@@ -32,10 +32,10 @@ import Foundation
                 .merging(colors) { current, _ in current }
 
             let data = content.data(using: .utf8) ?? Data()
-            let decoder = JSONDecoder()
-            Backend.configure(decoder: decoder)
+            let jsonDecoder = JSONDecoder()
+            Backend.configure(jsonDecoder: jsonDecoder)
             let screen =
-                if let element = try? decoder.decode(AdaptyUI.ViewConfiguration.Element.self, from: data) {
+                if let element = try? jsonDecoder.decode(AdaptyUI.ViewConfiguration.Element.self, from: data) {
                     AdaptyUI.ViewConfiguration.Screen(
                         backgroundAssetId: "$black",
                         cover: nil,
@@ -45,7 +45,7 @@ import Foundation
                         selectedAdaptyProductId: nil
                     )
                 } else {
-                    try decoder.decode(AdaptyUI.ViewConfiguration.Screen.self, from: data)
+                    try jsonDecoder.decode(AdaptyUI.ViewConfiguration.Screen.self, from: data)
                 }
 
             return try AdaptyUI.ViewConfiguration(

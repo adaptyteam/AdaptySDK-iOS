@@ -8,33 +8,39 @@
 import Foundation
 
 extension HTTPSession {
-    @discardableResult
-    final func perform<Request: HTTPRequestWithDecodableResponse>(
+    @inlinable
+    func perform<Request: HTTPRequestWithDecodableResponse>(
         _ request: Request,
-        logName: String,
-        logStamp: String = Log.stamp,
-        logParams: EventParameters? = nil,
-        _ completionHandler: @escaping (Request.Result) -> Void
-    ) -> HTTPCancelable {
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: logName, callId: logStamp, params: logParams))
-        return perform(request, logStamp: logStamp) { (result: Request.Result) in
-            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(methodName: logName, callId: logStamp, result))
-            completionHandler(result)
+        requestName: APIRequestName,
+        logParams: EventParameters? = nil
+    ) async throws -> Request.Response {
+        let stamp = request.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        do {
+            let response: Request.Response = try await perform(request)
+            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
+            return response
+        } catch {
+            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
+            throw error
         }
     }
 
-    @discardableResult
-    final func perform(
+    @inlinable
+    func perform(
         _ request: some HTTPRequest,
-        logName: String,
-        logStamp: String = Log.stamp,
-        logParams: EventParameters? = nil,
-        _ completionHandler: @escaping (HTTPEmptyResponse.Result) -> Void
-    ) -> HTTPCancelable {
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(methodName: logName, callId: logStamp, params: logParams))
-        return perform(request, logStamp: logStamp) { (result: HTTPEmptyResponse.Result) in
-            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(methodName: logName, callId: logStamp, result))
-            completionHandler(result)
+        requestName: APIRequestName,
+        logParams: EventParameters? = nil
+    ) async throws -> HTTPEmptyResponse {
+        let stamp = request.stamp
+        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        do {
+            let response: HTTPEmptyResponse = try await perform(request)
+            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
+            return response
+        } catch {
+            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
+            throw error
         }
     }
 }

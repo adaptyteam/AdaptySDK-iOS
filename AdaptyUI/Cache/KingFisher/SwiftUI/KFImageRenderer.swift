@@ -39,7 +39,7 @@ struct KFImageRenderer<HoldingView> : View where HoldingView: KFImageHoldingView
     var body: some View {
         if context.startLoadingBeforeViewAppear && !binder.loadingOrSucceeded && !binder.animating {
             binder.markLoading()
-            DispatchQueue.main.async { binder.start(context: context) }
+            DispatchQueue.baseUrl.async { binder.start(context: context) }
         }
         
         return ZStack {

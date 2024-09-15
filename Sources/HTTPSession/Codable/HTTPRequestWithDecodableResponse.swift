@@ -8,56 +8,42 @@
 import Foundation
 
 protocol HTTPRequestWithDecodableResponse: HTTPRequest {
-    associatedtype ResponseBody: Decodable
-    typealias Result = HTTPResponse<ResponseBody>.Result
-    func getDecoder(_: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result)
+    associatedtype ResponseBody: Decodable, Sendable
+
+    func decodeDataResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration: HTTPCodableConfiguration?
+    ) throws -> Response
 }
 
 extension HTTPRequestWithDecodableResponse {
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        { response in
-            jsonDecoder.decode(ResponseBody.self, response)
-        }
+    typealias Response = HTTPResponse<ResponseBody>
+
+    func decodeDataResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        let jsonDecoder = JSONDecoder()
+        configuration?.configure(jsonDecoder: jsonDecoder)
+        let body = try jsonDecoder.decode(ResponseBody.self, responseBody: response.body)
+        return response.replaceBody(body)
     }
 }
 
 extension HTTPSession {
-    @discardableResult
-    final func perform<Request: HTTPRequestWithDecodableResponse>(
-        _ request: Request,
-        queue: DispatchQueue? = nil,
-        logStamp: String = Log.stamp,
-        _ completionHandler: @escaping (Request.Result) -> Void
-    ) -> HTTPCancelable {
-        let decoder = request.getDecoder(configuration.decoder)
-        return perform(
-            request,
-            queue: queue,
-            decoder: decoder,
-            logStamp: logStamp,
-            completionHandler
-        )
+    func perform<Request: HTTPRequestWithDecodableResponse>(
+        _ request: Request
+    ) async throws -> Request.Response {
+        let configuration = configuration as? HTTPCodableConfiguration
+        return try await perform(request) { @Sendable response in
+            try request.decodeDataResponse(response, withConfiguration: configuration)
+        }
     }
 }
 
 extension JSONDecoder {
-    func decode<T: Decodable>(_ type: T.Type, _ data: Data?) -> Result<T, Error> {
-        guard let data, !data.isEmpty else {
-            return .failure(DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The given data is nil or empty.")))
-        }
-        let result: T
-        do {
-            result = try decode(type, from: data)
-        } catch let e {
-            return .failure(e)
-        }
-
-        return .success(result)
-    }
-
-    func decode<T: Decodable>(_ type: T.Type, _ response: HTTPDataResponse) -> HTTPResponse<T>.Result {
-        decode(type, response.body)
-            .map { response.replaceBody($0) }
-            .mapError { .decoding(response, error: $0) }
+    func decode<T: Decodable>(_ type: T.Type, responseBody data: Data?) throws -> T {
+        guard let data else { throw URLError(.cannotDecodeRawData) }
+        return try decode(type, from: data)
     }
 }

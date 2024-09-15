@@ -15,9 +15,10 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
         case .notActivated: "The Adapty is not activated"
         case .profileWasChanged: "The user profile was replaced"
         case .profileCreateFailed: "Unable to create user profile"
+        case let .fetchFailed(_, description, _): description
         case let .decodingFailed(_, description, _): description
         case let .wrongParam(_, description): description
-        case let .fetchTimeoutError(_, description): description
+//        case let .fetchTimeoutError(_, description): description
         }
     }
 }

@@ -13,15 +13,24 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
         method: .post,
         path: "/sdk/attribution/asa/"
     )
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
+
     let token: String
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        createDecoder(jsonDecoder)
+    func decodeDataResponse(
+        response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeResponse(
+            response,
+            withConfiguration: configuration,
+            requestHeaders: headers
+        )
     }
 
     init(profileId: String, token: String, responseHash: String?) {
-        headers = Headers()
+        headers = HTTPHeaders()
             .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
 
@@ -42,26 +51,22 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
 }
 
 extension HTTPSession {
-    func performASATokenRequest(
+    func performSendASATokenRequest(
         profileId: String,
         token: String,
-        responseHash: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
-    ) {
+        responseHash: String?
+    ) async throws -> VH<AdaptyProfile?> {
         let request = SetASATokenRequest(
             profileId: profileId,
             token: token,
             responseHash: responseHash
         )
-        perform(
+        let response = try await perform(
             request,
-            logName: "set_asa_token",
+            requestName: .sendASAToken,
             logParams: ["token": token]
-        ) { (result: SetASATokenRequest.Result) in
-            completion(result
-                .map { VH($0.body, hash: $0.headers.getBackendResponseHash()) }
-                .mapError { $0.asAdaptyError }
-            )
-        }
+        )
+
+        return VH(response.body, hash: response.headers.getBackendResponseHash())
     }
 }

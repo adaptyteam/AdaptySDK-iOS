@@ -10,10 +10,18 @@ import Foundation
 private struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = AdaptyProfile?
     let endpoint: HTTPEndpoint
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        createDecoder(jsonDecoder)
+    func decodeDataResponse(
+        response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeResponse(
+            response,
+            withConfiguration: configuration,
+            requestHeaders: headers
+        )
     }
 
     init(profileId: String, responseHash: String?) {
@@ -22,53 +30,50 @@ private struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
             path: "/sdk/analytics/profiles/\(profileId)/"
         )
 
-        headers = Headers()
+        headers = HTTPHeaders()
             .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
     }
 }
 
 extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyProfile? {
-    func createDecoder(
-        _ jsonDecoder: JSONDecoder
-    ) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
-        { decodeResponse($0, jsonDecoder) }
-    }
-
-    func decodeResponse(
+    @inlinable
+    static func decodeResponse(
         _ response: HTTPDataResponse,
-        _ jsonDecoder: JSONDecoder
-    ) -> HTTPResponse<ResponseBody>.Result {
-        typealias ResponseData = Backend.Response.ValueOfData<AdaptyProfile>
+        withConfiguration configuration: HTTPCodableConfiguration?,
+        requestHeaders: HTTPHeaders
+    ) throws -> HTTPResponse<AdaptyProfile?> {
+        guard !requestHeaders.hasSameBackendResponseHash(response.headers) else {
+            return response.replaceBody(nil)
+        }
 
-        let result: Swift.Result<ResponseBody, Error> =
-            if headers.hasSameBackendResponseHash(response.headers) {
-                .success(nil)
-            } else {
-                jsonDecoder.decode(ResponseData.self, response.body).map { $0.value }
-            }
+        let jsonDecoder = JSONDecoder()
+        configuration?.configure(jsonDecoder: jsonDecoder)
 
-        return result
-            .map { response.replaceBody($0) }
-            .mapError { .decoding(response, error: $0) }
+        let body: ResponseBody = try jsonDecoder.decode(
+            Backend.Response.ValueOfData<AdaptyProfile>.self,
+            responseBody: response.body
+        ).value
+
+        return response.replaceBody(body)
     }
 }
 
 extension HTTPSession {
     func performFetchProfileRequest(
         profileId: String,
-        responseHash: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
-    ) {
+        responseHash: String?
+    ) async throws -> VH<AdaptyProfile?> {
         let request = FetchProfileRequest(
             profileId: profileId,
             responseHash: responseHash
         )
-        perform(request, logName: "get_profile") { (result: FetchProfileRequest.Result) in
-            completion(result
-                .map { VH($0.body, hash: $0.headers.getBackendResponseHash()) }
-                .mapError { $0.asAdaptyError }
-            )
-        }
+
+        let response = try await perform(
+            request,
+            requestName: .fetchProfile
+        )
+
+        return VH(response.body, hash: response.headers.getBackendResponseHash())
     }
 }

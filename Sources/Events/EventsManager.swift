@@ -9,22 +9,25 @@ import Foundation
 
 private let log = Log.events
 
-final class EventsManager {
+@EventsManagerActor
+final class EventsManager: Sendable {
     private enum Constants {
         static let sendingLimitEvents = 500
     }
 
-    typealias ErrorHandler = (EventsError) -> Void
-    private static let defaultDispatchQueue = DispatchQueue(label: "Adapty.SDK.SendEvents")
+    typealias ErrorHandler = @Sendable (EventsError) -> Void
 
-    private let dispatchQueue: DispatchQueue
     private let profileStorage: ProfileIdentifierStorage
     private let eventStorages: [EventCollectionStorage]
     private var configuration: EventsBackendConfiguration
-    private let backendSession: HTTPSession?
-    private var sending: Bool = false
+    private var backendSession: HTTPSession?
 
-    convenience init(profileStorage: ProfileIdentifierStorage, backend: Backend? = nil) {
+    private var sending: Task<Void, Never>?
+
+    convenience init(
+        profileStorage: ProfileIdentifierStorage,
+        backend: Backend? = nil
+    ) {
         self.init(
             profileStorage: profileStorage,
             eventStorages: [
@@ -36,154 +39,122 @@ final class EventsManager {
     }
 
     convenience init(
-        dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
         profileStorage: ProfileIdentifierStorage,
         eventStorages: [EventsStorage],
         backend: Backend?
     ) {
         self.init(
-            dispatchQueue: dispatchQueue,
             profileStorage: profileStorage,
-            eventStorages: eventStorages.map { EventCollectionStorage(with: $0) },
+            eventStorages: eventStorages.map(EventCollectionStorage.init),
             backend: backend
         )
     }
 
     init(
-        dispatchQueue: DispatchQueue = EventsManager.defaultDispatchQueue,
         profileStorage: ProfileIdentifierStorage,
         eventStorages: [EventCollectionStorage],
         backend: Backend?
     ) {
         self.profileStorage = profileStorage
         self.eventStorages = eventStorages
-        self.dispatchQueue = dispatchQueue
 
         let configuration = EventsBackendConfiguration()
         self.configuration = configuration
 
-        guard let backend else {
+        if let backend {
+            set(backend: backend)
+        } else {
             backendSession = nil
-            return
         }
-        backendSession = backend.createHTTPSession(responseQueue: dispatchQueue)
-        if eventStorages.hasEvents || configuration.isExpired { needSendEvents() }
     }
 
-    func trackEvent(_ event: Event, completion: @escaping (EventsError?) -> Void) {
-        dispatchQueue.async { [weak self] in
-            guard let self else {
-                completion(nil)
-                return
-            }
+    func set(backend: Backend) {
+        backendSession = backend.createHTTPSession()
+        guard eventStorages.hasEvents || configuration.isExpired else { return }
+        needSendEvents()
+    }
 
-            guard !self.configuration.blacklist.contains(event.type.name) else {
-                completion(nil)
-                return
-            }
-
-            do {
-                if event.lowPriority {
-                    try self.eventStorages.last?.add(event)
-                } else {
-                    try self.eventStorages.first?.add(event)
-                }
-            } catch {
-                let error = EventsError.encoding(error)
-                completion(error)
-                log.error(error.description)
-                return
-            }
-
-            self.needSendEvents()
-            completion(nil)
+    func trackEvent(_ unpacked: Event.Unpacked) throws {
+        guard !configuration.blacklist.contains(unpacked.event.name.rawValue) else {
+            return
         }
+
+        do {
+            if unpacked.event.isLowPriority {
+                try self.eventStorages.last?.add(unpacked)
+            } else {
+                try self.eventStorages.first?.add(unpacked)
+            }
+        } catch {
+            let error = EventsError.encoding(error)
+            log.error(error.description)
+            throw error
+        }
+
+        needSendEvents()
     }
 
     private func needSendEvents() {
-        dispatchQueue.async { [weak self] in
-            guard let self, let session = self.backendSession, !self.sending else { return }
+        guard let backendSession, sending == nil else { return }
 
-            self.sending = true
-            self.sendEvents(session) { [weak self] error in
-                guard let self else { return }
+        sending = Task(priority: .utility) { [weak self] in
 
-                var retryAt: DispatchTime?
-                if let error, !error.isInterrupted {
-                    retryAt = .now() + .seconds(20)
-                } else if self.eventStorages.hasEvents {
-                    retryAt = .now() + .seconds(1)
-                }
+            var error: Error?
+            do {
+                try await self?.sendEvents(backendSession)
 
-                guard let deadline = retryAt else {
-                    self.sending = false
-                    return
-                }
-
-                self.dispatchQueue.asyncAfter(deadline: deadline) { [weak self] in
-                    self?.sending = false
-                    self?.needSendEvents()
-                }
+            } catch let err {
+                error = err
             }
+
+            let seconds: UInt64? =
+                if let error, !((error as? EventsError)?.isInterrupted ?? false) {
+                    20
+                } else if self?.eventStorages.hasEvents ?? false {
+                    1
+                } else {
+                    nil
+                }
+
+            guard let seconds else {
+                self?.sending = nil
+                return
+            }
+
+            try? await Task.sleep(nanoseconds: seconds * 1_000_000_000)
+
+            self?.sending = nil
+            self?.needSendEvents()
         }
     }
 
-    func sendEvents(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
-        updateBackendConfigurationIfNeed(session) { [weak self] error in
-
-            if let error {
-                completion(error)
-                return
-            }
-
-            guard let self else {
-                completion(.interrupted())
-                return
-            }
-
-            let events = self.eventStorages.getEvents(
-                limit: Constants.sendingLimitEvents,
-                blackList: self.configuration.blacklist
+    private func sendEvents(_ session: HTTPSession) async throws {
+        if configuration.isExpired {
+            configuration = try await session.performFetchEventsConfigRequest(
+                profileId: profileStorage.profileId
             )
-
-            guard !events.elements.isEmpty else {
-                self.eventStorages.subtract(oldIndexes: events.endIndex)
-                completion(nil)
-                return
-            }
-
-            let request = SendEventsRequest(profileId: self.profileStorage.profileId, events: events.elements)
-
-            session.perform(request) { (result: SendEventsRequest.Result) in
-                switch result {
-                case let .failure(error):
-                    completion(.sending(error))
-                case .success:
-                    self.eventStorages.subtract(oldIndexes: events.endIndex)
-                    completion(nil)
-                }
-            }
         }
-    }
 
-    func updateBackendConfigurationIfNeed(_ session: HTTPSession, completion: @escaping (EventsError?) -> Void) {
-        guard configuration.isExpired else {
-            completion(nil)
+        let events = self.eventStorages.getEvents(
+            limit: Constants.sendingLimitEvents,
+            blackList: self.configuration.blacklist
+        )
+
+        guard !events.elements.isEmpty else {
+            self.eventStorages.subtract(oldIndexes: events.endIndex)
             return
         }
 
-        session.perform(FetchEventsConfigRequest(profileId: profileStorage.profileId), logName: "get_events_blacklist") { [weak self] (result: FetchEventsConfigRequest.Result) in
-            switch result {
-            case let .failure(error):
-                completion(.sending(error))
-            case let .success(response):
-                self?.configuration = response.body.value
-                completion(nil)
-            }
-        }
+        try await session.performSendEventsRequest(
+            profileId: self.profileStorage.profileId,
+            events: events.elements
+        )
+
+        self.eventStorages.subtract(oldIndexes: events.endIndex)
     }
 }
 
+@EventsManagerActor
 private extension [EventCollectionStorage] {
     var hasEvents: Bool { contains { !$0.isEmpty } }
 

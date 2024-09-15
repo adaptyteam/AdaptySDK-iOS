@@ -15,32 +15,41 @@ struct Backend: HTTPCodableConfiguration {
 
     let defaultEncodedContentType = "application/vnd.api+json"
 
-    func configure(decoder: JSONDecoder) { Backend.configure(decoder: decoder) }
-    func configure(encoder: JSONEncoder) { Backend.configure(encoder: encoder) }
+    func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
+    func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
 
-    init(
-        secretKey: String,
-        baseURL: URL,
-        baseFallbackURL: URL,
-        baseConfigsURL: URL,
-        withProxy: (host: String, port: Int)? = nil
-    ) {
-        let configuration = URLSessionConfiguration.default
-        configuration.httpAdditionalHeaders = Request.globalHeaders(secretKey: secretKey)
-        configuration.timeoutIntervalForRequest = 30
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+    init(with config: Adapty.Configuration) {
+        let baseUrls = config.backend
+        let apiKey = config.apiKey
 
-        if let (host, port) = withProxy {
-            configuration.connectionProxyDictionary = [
+        let sessionConfiguration = URLSessionConfiguration.ephemeral
+        sessionConfiguration.httpAdditionalHeaders = Request.globalHeaders(with: config)
+        sessionConfiguration.timeoutIntervalForRequest = 30
+        sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
+
+        if let (host, port) = baseUrls.proxy {
+            sessionConfiguration.connectionProxyDictionary = [
                 String(kCFNetworkProxiesHTTPEnable): NSNumber(value: 1),
                 String(kCFNetworkProxiesHTTPProxy): host,
                 String(kCFNetworkProxiesHTTPPort): port,
             ]
         }
-        self.baseURL = baseURL
-        sessionConfiguration = configuration
-        self.fallback = FallbackBackend(secretKey: secretKey, baseURL: baseFallbackURL, withProxy: withProxy)
-        self.configs = FallbackBackend(secretKey: secretKey, baseURL: baseConfigsURL, withProxy: withProxy)
+
+        self.sessionConfiguration = sessionConfiguration
+
+        self.baseURL = baseUrls.baseUrl
+
+        self.fallback = FallbackBackend(
+            apiKey: apiKey,
+            baseURL: baseUrls.fallbackUrl,
+            withProxy: baseUrls.proxy
+        )
+
+        self.configs = FallbackBackend(
+            apiKey: apiKey,
+            baseURL: baseUrls.configsUrl,
+            withProxy: baseUrls.proxy
+        )
     }
 }
 
@@ -48,16 +57,7 @@ extension Backend {
     enum Request {}
     enum Response {}
 
-    func createHTTPSession(
-        responseQueue: DispatchQueue,
-        errorHandler: ((HTTPError) -> Void)? = nil
-    ) -> HTTPSession {
-        HTTPSession(
-            configuration: self,
-            responseQueue: responseQueue,
-            requestAdditional: nil,
-            responseValidator: validator,
-            errorHandler: errorHandler
-        )
+    func createHTTPSession() -> HTTPSession {
+        HTTPSession(configuration: self, responseValidator: validator)
     }
 }

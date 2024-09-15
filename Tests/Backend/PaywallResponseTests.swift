@@ -21,7 +21,7 @@ final class PaywallResponseTests: XCTestCase {
 
     var jsonDecoder: JSONDecoder {
         let decoder = JSONDecoder()
-        Backend.configure(decoder: decoder)
+        Backend.configure(jsonDecoder: decoder)
         decoder.setProfileId("profileId")
         return decoder
     }

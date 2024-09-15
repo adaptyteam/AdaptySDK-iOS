@@ -103,7 +103,7 @@ class DisplayLink: DisplayLinkCompatible {
                                      flagsOut: UnsafeMutablePointer<CVOptionFlags>) -> CVReturn
     {
         let outputTime = inOutputTime.pointee
-        DispatchQueue.main.async {
+        DispatchQueue.baseUrl.async {
             guard let selector = self.selector, let target = self.target else { return }
             if outputTime.videoTimeScale != 0 {
                 self.duration = CFTimeInterval(Double(outputTime.videoRefreshPeriod) / Double(outputTime.videoTimeScale))
@@ -138,7 +138,7 @@ class DisplayLink: DisplayLinkCompatible {
     var duration: CFTimeInterval = 0
     
     func add(to runLoop: RunLoop, forMode mode: RunLoop.Mode) {
-        assert(runLoop == .main)
+        assert(runLoop == .baseUrl)
         schedulers[runLoop, default: []].append(mode)
     }
     

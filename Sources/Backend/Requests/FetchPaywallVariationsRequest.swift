@@ -1,9 +1,8 @@
 //
 //  FetchPaywallVariationsRequest.swift
-//
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 26.03.2024
-//
 //
 
 import Foundation
@@ -12,13 +11,23 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = AdaptyPaywallChosen
 
     let endpoint: HTTPEndpoint
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
+
     let profileId: String
     let cached: AdaptyPaywall?
     let queryItems: QueryItems
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
-        createDecoder(jsonDecoder, profileId, cached)
+    func decodeDataResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeDataResponse(
+            response,
+            withConfiguration: configuration,
+            withProfileId: profileId,
+            withCachedPaywall: cached
+        )
     }
 
     init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, cached: AdaptyPaywall?, disableServerCache: Bool) {
@@ -30,60 +39,48 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
         )
 
-        headers = Headers()
+        headers = HTTPHeaders()
             .setPaywallLocale(locale)
             .setBackendProfileId(profileId)
             .setVisualBuilderVersion(AdaptyUI.builderVersion)
             .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
             .setSegmentId(segmentId)
-        
+
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
 extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyPaywallChosen {
-    func createDecoder(
-        _ jsonDecoder: JSONDecoder,
-        _ profileId: String,
-        _ cached: AdaptyPaywall?
-    ) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
-        { response in
-            decodeResponse(response, jsonDecoder, profileId, cached)
-        }
-    }
-
-    func decodeResponse(
+    @inlinable
+    static func decodeDataResponse(
         _ response: HTTPDataResponse,
-        _ jsonDecoder: JSONDecoder,
-        _ profileId: String,
-        _ cached: AdaptyPaywall?
-    ) -> HTTPResponse<ResponseBody>.Result {
+        withConfiguration configuration: HTTPCodableConfiguration?,
+        withProfileId profileId: String,
+        withCachedPaywall cached: AdaptyPaywall?
+    ) throws -> HTTPResponse<AdaptyPaywallChosen> {
+        let jsonDecoder = JSONDecoder()
+        configuration?.configure(jsonDecoder: jsonDecoder)
         jsonDecoder.setProfileId(profileId)
 
-        typealias ResponseMeta = Backend.Response.ValueOfMeta<AdaptyPaywallChosen.Meta>
-        typealias ResponseData = Backend.Response.ValueOfData<AdaptyPaywallChosen>
+        let version: Int64 = try jsonDecoder.decode(
+            Backend.Response.ValueOfMeta<AdaptyPaywallChosen.Meta>.self,
+            responseBody: response.body
+        ).meta.version
 
-        let version: Int64
+        let body: AdaptyPaywallChosen =
+            if let cached, cached.version > version {
+                AdaptyPaywallChosen(
+                    value: cached,
+                    kind: .restore
+                )
+            } else {
+                try jsonDecoder.decode(
+                    Backend.Response.ValueOfData<AdaptyPaywallChosen>.self,
+                    responseBody: response.body
+                ).value.replaceAdaptyPaywall(version: version)
+            }
 
-        switch jsonDecoder.decode(ResponseMeta.self, response) {
-        case let .failure(error):
-            return .failure(error)
-        case let .success(value):
-            version = value.body.meta.version
-        }
-
-        if let cached, cached.version > version {
-            return .success(response.replaceBody(AdaptyPaywallChosen(
-                value: cached,
-                kind: .restore
-            )))
-        }
-
-        return jsonDecoder.decode(ResponseData.self, response).map {
-            var chosen = $0.body.value
-            chosen.value.version = version
-            return response.replaceBody(chosen)
-        }
+        return response.replaceBody(body)
     }
 }
 
@@ -95,9 +92,8 @@ extension HTTPSession {
         locale: AdaptyLocale,
         segmentId: String,
         cached: AdaptyPaywall?,
-        disableServerCache: Bool,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallChosen>
-    ) {
+        disableServerCache: Bool
+    ) async throws -> AdaptyPaywallChosen {
         let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
 
         let request = FetchPaywallVariationsRequest(
@@ -111,9 +107,9 @@ extension HTTPSession {
             disableServerCache: disableServerCache
         )
 
-        perform(
+        let response = try await perform(
             request,
-            logName: "get_paywall_variations",
+            requestName: .fetchPaywallVariations,
             logParams: [
                 "api_prefix": apiKeyPrefix,
                 "placement_id": placementId,
@@ -124,8 +120,8 @@ extension HTTPSession {
                 "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]
-        ) { (result: FetchPaywallVariationsRequest.Result) in
-            completion(result.map { $0.body }.mapError { $0.asAdaptyError })
-        }
+        )
+
+        return response.body
     }
 }

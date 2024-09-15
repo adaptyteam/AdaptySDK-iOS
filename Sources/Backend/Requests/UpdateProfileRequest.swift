@@ -10,15 +10,24 @@ import Foundation
 private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
     typealias ResponseBody = AdaptyProfile?
     let endpoint: HTTPEndpoint
-    let headers: Headers
+    let headers: HTTPHeaders
+    let stamp = Log.stamp
+
     let profileId: String
     let parameters: AdaptyProfileParameters?
     let environmentMeta: Environment.Meta?
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        createDecoder(jsonDecoder)
+    func decodeDataResponse(
+        response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeResponse(
+            response,
+            withConfiguration: configuration,
+            requestHeaders: headers
+        )
     }
-
+    
     init(
         profileId: String,
         parameters: AdaptyProfileParameters?,
@@ -30,7 +39,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
             path: "/sdk/analytics/profiles/\(profileId)/"
         )
 
-        headers = Headers()
+        headers = HTTPHeaders()
             .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
 
@@ -73,15 +82,20 @@ extension HTTPSession {
         profileId: String,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
-        responseHash: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
-    ) {
+        responseHash: String?
+    ) async throws -> VH<AdaptyProfile?> {
         if parameters == nil, environmentMeta == nil {
-            performFetchProfileRequest(profileId: profileId, responseHash: responseHash, completion)
-            return
-
+            try await performFetchProfileRequest(
+                profileId: profileId,
+                responseHash: responseHash
+            )
         } else {
-            performUpdateProfileRequest(profileId: profileId, parameters: parameters, environmentMeta: environmentMeta, responseHash: responseHash, completion)
+            try await performUpdateProfileRequest(
+                profileId: profileId,
+                parameters: parameters,
+                environmentMeta: environmentMeta,
+                responseHash: responseHash
+            )
         }
     }
 
@@ -89,20 +103,20 @@ extension HTTPSession {
         profileId: String,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
-        responseHash: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<AdaptyProfile?>>
-    ) {
+        responseHash: String?
+    ) async throws -> VH<AdaptyProfile?> {
         let request = UpdateProfileRequest(
             profileId: profileId,
             parameters: parameters,
             environmentMeta: environmentMeta,
             responseHash: responseHash
         )
-        perform(request, logName: "update_profile") { (result: UpdateProfileRequest.Result) in
-            completion(result
-                .map { VH($0.body, hash: $0.headers.getBackendResponseHash()) }
-                .mapError { $0.asAdaptyError }
-            )
-        }
+
+        let response = try await perform(
+            request,
+            requestName: .updateProfile
+        )
+
+        return VH(response.body, hash: response.headers.getBackendResponseHash())
     }
 }

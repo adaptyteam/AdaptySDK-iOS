@@ -13,15 +13,23 @@ private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
         method: .get,
         path: "/sdk/in-apps/products/"
     )
-    let headers: Headers
+    let headers: HTTPHeaders
     let queryItems: QueryItems
+    let stamp = Log.stamp
 
-    func getDecoder(_ jsonDecoder: JSONDecoder) -> ((HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result) {
-        createDecoder(jsonDecoder)
+    func decodeDataResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeDataResponse(
+            response,
+            withConfiguration: configuration,
+            requestHeaders: headers
+        )
     }
 
     init(profileId: String, responseHash: String?) {
-        headers = Headers()
+        headers = HTTPHeaders()
             .setBackendProfileId(profileId)
             .setBackendResponseHash(responseHash)
         queryItems = QueryItems().setBackendProfileId(profileId)
@@ -29,43 +37,41 @@ private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendProductState]? {
-    func createDecoder(
-        _ jsonDecoder: JSONDecoder
-    ) -> (HTTPDataResponse) -> HTTPResponse<ResponseBody>.Result {
-        { decodeResponse($0, jsonDecoder) }
-    }
-
-    func decodeResponse(
+    @inlinable
+    static func decodeDataResponse(
         _ response: HTTPDataResponse,
-        _ jsonDecoder: JSONDecoder
-    ) -> HTTPResponse<ResponseBody>.Result {
-        typealias ResponseData = Backend.Response.ValueOfData<[BackendProductState]>
+        withConfiguration configuration: HTTPCodableConfiguration?,
+        requestHeaders: HTTPHeaders
+    ) throws -> HTTPResponse<[BackendProductState]?> {
+        guard !requestHeaders.hasSameBackendResponseHash(response.headers) else {
+            return response.replaceBody(nil)
+        }
 
-        let result: Swift.Result<ResponseBody, Error> =
-            if headers.hasSameBackendResponseHash(response.headers) {
-                .success(nil)
-            } else {
-                jsonDecoder.decode(ResponseData.self, response.body).map { $0.value }
-            }
+        let jsonDecoder = JSONDecoder()
+        configuration?.configure(jsonDecoder: jsonDecoder)
 
-        return result
-            .map { response.replaceBody($0) }
-            .mapError { .decoding(response, error: $0) }
+        let body: [BackendProductState]? = try jsonDecoder.decode(
+            Backend.Response.ValueOfData<[BackendProductState]>.self,
+            responseBody: response.body
+        ).value
+        return response.replaceBody(body)
     }
 }
 
 extension HTTPSession {
     func performFetchProductStatesRequest(
         profileId: String,
-        responseHash: String?,
-        _ completion: @escaping AdaptyResultCompletion<VH<[BackendProductState]?>>
-    ) {
-        let request = FetchProductStatesRequest(profileId: profileId, responseHash: responseHash)
-        perform(request, logName: "get_products") { (result: FetchProductStatesRequest.Result) in
-            completion(result
-                .map { VH($0.body, hash: $0.headers.getBackendResponseHash()) }
-                .mapError { $0.asAdaptyError }
-            )
-        }
+        responseHash: String?
+    ) async throws -> VH<[BackendProductState]?> {
+        let request = FetchProductStatesRequest(
+            profileId: profileId,
+            responseHash: responseHash
+        )
+
+        let response = try await perform(
+            request,
+            requestName: .fetchProductStates
+        )
+        return VH(response.body, hash: response.headers.getBackendResponseHash())
     }
 }
