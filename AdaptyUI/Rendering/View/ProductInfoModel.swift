@@ -38,45 +38,45 @@ extension AdaptyPaywallProduct {
 struct RealProductInfo: ProductInfoModel {
     var isPlaceholder: Bool { false }
     
-    let product: AdaptyPaywallProduct
+    let underlying: AdaptyPaywallProduct
     let introEligibility: AdaptyEligibility
 
-    init(product: AdaptyPaywallProduct, introEligibility: AdaptyEligibility) {
-        self.product = product
+    init(underlying: AdaptyPaywallProduct, introEligibility: AdaptyEligibility) {
+        self.underlying = underlying
         self.introEligibility = introEligibility
     }
 
-    var adaptyProductId: String { product.adaptyProductId }
-    var adaptyProduct: AdaptyPaywallProduct? { product }
+    var adaptyProductId: String { underlying.adaptyProductId }
+    var adaptyProduct: AdaptyPaywallProduct? { underlying }
     var paymentMode: AdaptyProductDiscount.PaymentMode {
-        guard let offer = product.eligibleDiscount(introEligibility: introEligibility) else { return .unknown}
+        guard let offer = underlying.eligibleDiscount(introEligibility: introEligibility) else { return .unknown}
         return offer.paymentMode
     }
 
     func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement? {
-        guard product.isApplicableForTag(tag) else { return .notApplicable }
+        guard underlying.isApplicableForTag(tag) else { return .notApplicable }
 
         let result: String?
 
         switch tag {
         case .title:
-            result = product.localizedTitle
+            result = underlying.localizedTitle
         case .price:
-            result = product.localizedPrice
+            result = underlying.localizedPrice
         case .pricePerDay:
-            result = product.pricePer(period: .day)
+            result = underlying.pricePer(period: .day)
         case .pricePerWeek:
-            result = product.pricePer(period: .week)
+            result = underlying.pricePer(period: .week)
         case .pricePerMonth:
-            result = product.pricePer(period: .month)
+            result = underlying.pricePer(period: .month)
         case .pricePerYear:
-            result = product.pricePer(period: .year)
+            result = underlying.pricePer(period: .year)
         case .offerPrice:
-            result = product.eligibleDiscount(introEligibility: introEligibility)?.localizedPrice
+            result = underlying.eligibleDiscount(introEligibility: introEligibility)?.localizedPrice
         case .offerPeriods:
-            result = product.eligibleDiscount(introEligibility: introEligibility)?.localizedSubscriptionPeriod
+            result = underlying.eligibleDiscount(introEligibility: introEligibility)?.localizedSubscriptionPeriod
         case .offerNumberOfPeriods:
-            result = product.eligibleDiscount(introEligibility: introEligibility)?.localizedNumberOfPeriods
+            result = underlying.eligibleDiscount(introEligibility: introEligibility)?.localizedNumberOfPeriods
         }
 
         if let result = result {

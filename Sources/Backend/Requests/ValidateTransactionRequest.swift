@@ -14,6 +14,7 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         method: .post,
         path: "/sdk/purchase/app-store/original-transaction-id/validate/"
     )
+
     let headers: HTTPHeaders
     let stamp = Log.stamp
 

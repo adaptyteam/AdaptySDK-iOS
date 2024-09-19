@@ -100,7 +100,7 @@ private extension SK2Product {
     func subscriptionOffer(
         byType offerType: SK2Transaction.OfferType,
         withId offerId: String?
-    ) -> SK2Product.SubscriptionOffer? {
+    ) -> SK2ProductDiscount? {
         guard let subscription else { return nil }
 
         switch offerType {

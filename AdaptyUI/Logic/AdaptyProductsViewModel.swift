@@ -24,8 +24,8 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
     }
 
     func productInfo(by adaptyId: String) -> ProductInfoModel? {
-        let product = products.first(where: { $0.adaptyProductId == adaptyId })
-        return product
+        let underlying = products.first(where: { $0.adaptyProductId == adaptyId })
+        return underlying
     }
 }
 
@@ -96,7 +96,7 @@ package class AdaptyProductsViewModel: ObservableObject {
 
         return products.map {
             RealProductInfo(
-                product: $0,
+                underlying: $0,
                 introEligibility: eligibilities?[$0.vendorProductId] ?? .ineligible
             )
         }
@@ -177,17 +177,17 @@ package class AdaptyProductsViewModel: ObservableObject {
     }
 
     private func handlePurchasedResult(
-        product: AdaptyPaywallProduct,
+        underlying: AdaptyPaywallProduct,
         result: AdaptyResult<AdaptyPurchasedInfo>
     ) {
         switch result {
         case let .success(info):
-            eventsHandler.event_didFinishPurchase(product: product, purchasedInfo: info)
+            eventsHandler.event_didFinishPurchase(underlying: underlying, purchasedInfo: info)
         case let .failure(error):
             if error.adaptyErrorCode == .paymentCancelled {
-                eventsHandler.event_didCancelPurchase(product: product)
+                eventsHandler.event_didCancelPurchase(underlying: underlying)
             } else {
-                eventsHandler.event_didFailPurchase(product: product, error: error)
+                eventsHandler.event_didFailPurchase(underlying: underlying, error: error)
             }
         }
     }
@@ -209,11 +209,11 @@ package class AdaptyProductsViewModel: ObservableObject {
     }
 
     func purchaseProduct(id productId: String) {
-        guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
+        guard let underlying = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
         let logId = logId
         if let observerModeResolver {
             observerModeResolver.observerMode(
-                didInitiatePurchase: product,
+                didInitiatePurchase: underlying,
                 onStartPurchase: { [weak self] in
                     Log.ui.verbose("#\(logId)# observerDidStartPurchase")
                     self?.purchaseInProgress = true
@@ -224,11 +224,11 @@ package class AdaptyProductsViewModel: ObservableObject {
                 }
             )
         } else {
-            eventsHandler.event_didStartPurchase(product: product)
+            eventsHandler.event_didStartPurchase(underlying: underlying)
             purchaseInProgress = true
 
-            Adapty.makePurchase(product: product) { [weak self] result in
-                self?.handlePurchasedResult(product: product, result: result)
+            Adapty.makePurchase(underlying: underlying) { [weak self] result in
+                self?.handlePurchasedResult(underlying: underlying, result: result)
                 self?.purchaseInProgress = false
             }
         }

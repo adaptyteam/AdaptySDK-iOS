@@ -6,7 +6,7 @@
 //
 import StoreKit
 
-struct PurchasedTransaction : Sendable{
+struct PurchasedTransaction: Sendable {
     let transactionId: String
     let originalTransactionId: String
     let vendorProductId: String
@@ -17,53 +17,6 @@ struct PurchasedTransaction : Sendable{
     let storeCountry: String?
     let subscriptionOffer: SubscriptionOffer?
     let environment: String?
-
-    struct SubscriptionOffer: Sendable {
-        let id: String?
-        let period: AdaptyProductSubscriptionPeriod?
-        let paymentMode: AdaptyProductDiscount.PaymentMode
-        let type: PurchasedTransaction.OfferType
-        let price: Decimal?
-
-        init(id: String, type: PurchasedTransaction.OfferType) {
-            self.id = id
-            period = nil
-            paymentMode = .unknown
-            self.type = type
-            price = nil
-        }
-
-        init(
-            id: String?,
-            period: AdaptyProductSubscriptionPeriod?,
-            paymentMode: AdaptyProductDiscount.PaymentMode,
-            type: PurchasedTransaction.OfferType,
-            price: Decimal?
-        ) {
-            self.id = id
-            self.period = period
-            self.paymentMode = paymentMode
-            self.type = type
-            self.price = price
-        }
-    }
-}
-
-extension PurchasedTransaction.SubscriptionOffer: Encodable {
-    enum CodingKeys: String, CodingKey {
-        case periodUnit = "period_unit"
-        case numberOfUnits = "number_of_units"
-        case paymentMode = "type"
-        case type = "category"
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(paymentMode, forKey: .paymentMode)
-        try container.encodeIfPresent(period?.unit, forKey: .periodUnit)
-        try container.encodeIfPresent(period?.numberOfUnits, forKey: .numberOfUnits)
-        try container.encodeIfPresent(type, forKey: .type)
-    }
 }
 
 extension PurchasedTransaction: Encodable {

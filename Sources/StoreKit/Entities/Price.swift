@@ -1,23 +1,30 @@
 //
-//  AdaptyPrice.swift
+//  Price.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 25.07.2023
+//  Created by Aleksei Valiano on 18.09.2024
 //
 
 import Foundation
 
-struct AdaptyPrice: Sendable, Hashable {
-    let value: NSDecimalNumber
-    let locale: Locale
-
-    var amount: Decimal { value.decimalValue }
-    var currencyCode: String? { locale.unfCurrencyCode }
-    var currencySymbol: String? { locale.currencySymbol }
-    var localizedString: String? { locale.localized(price: value) }
+struct Price: Sendable, Hashable {
+    let amount: Decimal
+    let currencyCode: String?
+    let currencySymbol: String?
+    let localizedString: String?
 }
 
-extension AdaptyPrice: Encodable {
+extension Price: CustomStringConvertible {
+    public var description: String {
+        "(\(amount)"
+            + (currencyCode.map { ", code: \($0)" } ?? "")
+            + (currencySymbol.map { ", symbol: \($0)" } ?? "")
+            + (localizedString.map { ", localized: \($0)" } ?? "")
+            + ")"
+    }
+}
+
+extension Price: Encodable {
     enum CodingKeys: String, CodingKey {
         case amount
         case currencyCode = "currency_code"

@@ -100,27 +100,27 @@ public class AdaptyPaywallController: UIViewController {
                     guard let self else { return }
                     self.delegate?.paywallController(self, didPerform: action)
                 },
-                didSelectProduct: { [weak self] product in
+                didSelectProduct: { [weak self] underlying in
                     guard let self else { return }
-                    self.delegate?.paywallController(self, didSelectProduct: product)
+                    self.delegate?.paywallController(self, didSelectProduct: underlying)
                 },
-                didStartPurchase: { [weak self] product in
+                didStartPurchase: { [weak self] underlying in
                     guard let self else { return }
-                    self.delegate?.paywallController(self, didStartPurchase: product)
+                    self.delegate?.paywallController(self, didStartPurchase: underlying)
                 },
-                didFinishPurchase: { [weak self] product, purchasedInfo in
+                didFinishPurchase: { [weak self] underlying, purchasedInfo in
                     guard let self else { return }
                     self.delegate?.paywallController(self,
-                                                     didFinishPurchase: product,
+                                                     didFinishPurchase: underlying,
                                                      purchasedInfo: purchasedInfo)
                 },
-                didFailPurchase: { [weak self] product, error in
+                didFailPurchase: { [weak self] underlying, error in
                     guard let self else { return }
-                    self.delegate?.paywallController(self, didFailPurchase: product, error: error)
+                    self.delegate?.paywallController(self, didFailPurchase: underlying, error: error)
                 },
-                didCancelPurchase: { [weak self] product in
+                didCancelPurchase: { [weak self] underlying in
                     guard let self else { return }
-                    self.delegate?.paywallController(self, didCancelPurchase: product)
+                    self.delegate?.paywallController(self, didCancelPurchase: underlying)
                 },
                 didStartRestore: { [weak self] in
                     guard let self else { return }

@@ -85,7 +85,7 @@ private extension PurchasedTransaction {
 }
 
 private extension PurchasedTransaction.SubscriptionOffer {
-    static func promotional(_ discount: SKProductDiscount) -> PurchasedTransaction.SubscriptionOffer {
+    static func promotional(_ discount: SK1ProductDiscount) -> PurchasedTransaction.SubscriptionOffer {
         .init(
             id: discount.identifier,
             period: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),
@@ -97,7 +97,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
 }
 
 private extension PurchasedTransaction.SubscriptionOffer {
-    static func introductory(_ discount: SKProductDiscount) -> PurchasedTransaction.SubscriptionOffer {
+    static func introductory(_ discount: SK1ProductDiscount) -> PurchasedTransaction.SubscriptionOffer {
         .init(
             id: nil,
             period: AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod),

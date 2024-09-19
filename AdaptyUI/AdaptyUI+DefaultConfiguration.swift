@@ -28,25 +28,25 @@ extension AdaptyPaywallControllerDelegate {
 
     public func paywallController(
         _ controller: AdaptyPaywallController,
-        didSelectProduct product: AdaptyPaywallProduct
+        didSelectProduct underlying: AdaptyPaywallProduct
     ) {
     }
 
     public func paywallController(
         _ controller: AdaptyPaywallController,
-        didStartPurchase product: AdaptyPaywallProduct
+        didStartPurchase underlying: AdaptyPaywallProduct
     ) {
     }
 
     public func paywallController(_ controller: AdaptyPaywallController,
-                                  didFinishPurchase product: AdaptyPaywallProduct,
+                                  didFinishPurchase underlying: AdaptyPaywallProduct,
                                   purchasedInfo: AdaptyPurchasedInfo) {
         controller.dismiss(animated: true)
     }
     
     public func paywallController(
         _ controller: AdaptyPaywallController,
-        didCancelPurchase product: AdaptyPaywallProduct
+        didCancelPurchase underlying: AdaptyPaywallProduct
     ) {
     }
 

@@ -18,7 +18,7 @@ extension AdaptyProductDiscount {
 }
 
 extension AdaptyProductDiscount.PaymentMode {
-    package init(mode: SKProductDiscount.PaymentMode) {
+    init(mode: SK1Product.SubscriptionOffer.PaymentMode) {
         switch mode {
         case .payAsYouGo:
             self = .payAsYouGo
@@ -62,16 +62,16 @@ extension AdaptyProductDiscount.PaymentMode {
     #endif
 }
 
-extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
-    public var description: String {
-        switch self {
-        case .payAsYouGo: "payAsYouGo"
-        case .payUpFront: "payUpFront"
-        case .freeTrial: "freeTrial"
-        case .unknown: "unknown"
-        }
-    }
-}
+//extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
+//    public var description: String {
+//        switch self {
+//        case .payAsYouGo: "payAsYouGo"
+//        case .payUpFront: "payUpFront"
+//        case .freeTrial: "freeTrial"
+//        case .unknown: "unknown"
+//        }
+//    }
+//}
 
 extension AdaptyProductDiscount.PaymentMode: Encodable {
     private enum CodingValues: String {

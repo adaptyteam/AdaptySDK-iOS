@@ -15,7 +15,7 @@ final class SK1QueueManager: NSObject {
     var purchaseValidator: PurchaseValidator! // TODO: need refactoring
 
     var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchasedInfo>]]()
-    var makePurchasesProduct = [String: AdaptyProduct]()
+    var makePurchasesProduct = [String: AdaptySK1Product]()
 
     private var storage: VariationIdStorage
     var skProductsManager: SKProductsManager
@@ -112,12 +112,12 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
     }
 
     #if !os(watchOS)
-        func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
+        func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for underlying: SKProduct) -> Bool {
             guard let delegate = Adapty.delegate else { return true }
 
-            let deferredProduct = AdaptyDeferredProduct(sk1Product: product, payment: payment)
+            let deferredProduct = AdaptySK1Product(sk1Product: underlying, payment: payment)
             return delegate.shouldAddStorePayment(for: deferredProduct, defermentCompletion: { [weak self] completion in
-                self?.makePurchase(payment: payment, product: deferredProduct) { result in
+                self?.makePurchase(payment: payment, underlying: deferredProduct) { result in
                     completion?(result)
                 }
             })

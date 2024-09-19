@@ -169,19 +169,19 @@ extension AdaptyUI.Text {
         case let .text(value):
             return (value, .notApplicable)
         case let .productText(value):
-            guard let product = productsInfoProvider.productInfo(by: value.adaptyProductId) else {
+            guard let underlying = productsInfoProvider.productInfo(by: value.adaptyProductId) else {
                 return (value.richText(byPaymentMode: .unknown), .notFound)
             }
 
-            return (value.richText(byPaymentMode: product.paymentMode), .found(product))
+            return (value.richText(byPaymentMode: underlying.paymentMode), .found(underlying))
         case let .selectedProductText(value):
-            guard let product = productsInfoProvider.selectedProductInfo(by: value.productGroupId),
-                  let adaptyProductId = product.adaptyProduct?.adaptyProductId
+            guard let underlying = productsInfoProvider.selectedProductInfo(by: value.productGroupId),
+                  let adaptyProductId = underlying.adaptyProduct?.adaptyProductId
             else {
                 return (value.richText(), .notFound)
             }
 
-            return (value.richText(adaptyProductId: adaptyProductId, byPaymentMode: product.paymentMode), .found(product))
+            return (value.richText(adaptyProductId: adaptyProductId, byPaymentMode: underlying.paymentMode), .found(underlying))
         }
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 import StoreKit
 
-public enum AdaptyPeriodUnit: UInt, Sendable {
+public enum AdaptyPeriodUnit: UInt, Sendable, Hashable {
     case day
     case week
     case month
@@ -17,7 +17,7 @@ public enum AdaptyPeriodUnit: UInt, Sendable {
 }
 
 extension AdaptyPeriodUnit {
-    init(unit: SK1Product.PeriodUnit) {
+    init(unit: SK1Product.SubscriptionPeriod.Unit) {
         self =
             switch unit {
             case .day: .day

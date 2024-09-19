@@ -28,44 +28,37 @@ extension Locale {
     }
 
     @inlinable
-    func localized(price: NSNumber) -> String? {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = self
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 2
-        return formatter.string(from: price)
-    }
-
-    func localized(period: SKProductSubscriptionPeriod) -> String? {
-        switch period.unit {
-        case .day:
-            if period.numberOfUnits == 7 { return localizedComponents(weekOfMonth: 1) }
-            return localizedComponents(day: period.numberOfUnits)
-        case .week:
-            return localizedComponents(weekOfMonth: period.numberOfUnits)
-        case .month:
-            return localizedComponents(month: period.numberOfUnits)
-        case .year:
-            return localizedComponents(year: period.numberOfUnits)
-        @unknown default:
-            return nil
+    var unfLanguageCode: String? {
+        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) {
+            language.languageCode?.identifier
+        } else {
+            languageCode
         }
     }
 
-    func localized(numberOfPeriods discount: SKProductDiscount) -> String? {
-        let resultingNumber = discount.numberOfPeriods * discount.subscriptionPeriod.numberOfUnits
+    @inlinable
+    func localized(sk1Price price: NSDecimalNumber) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = self
+        formatter.minimumFractionDigits = 0 // TODO: ??
+        formatter.maximumFractionDigits = 2 // TODO: ??
+        return formatter.string(from: price)
+    }
 
-        switch discount.subscriptionPeriod.unit {
+    func localized(period: AdaptyProductSubscriptionPeriod, numberOfPeriods: Int = 1) -> String? {
+        let countUnits = period.numberOfUnits * numberOfPeriods
+        switch period.unit {
         case .day:
-            return localizedComponents(day: resultingNumber)
+            if countUnits == 7 { return localizedComponents(weekOfMonth: 1) }
+            return localizedComponents(day: countUnits)
         case .week:
-            return localizedComponents(weekOfMonth: resultingNumber)
+            return localizedComponents(weekOfMonth: countUnits)
         case .month:
-            return localizedComponents(month: resultingNumber)
+            return localizedComponents(month: countUnits)
         case .year:
-            return localizedComponents(year: resultingNumber)
-        @unknown default:
+            return localizedComponents(year: countUnits)
+        default:
             return nil
         }
     }

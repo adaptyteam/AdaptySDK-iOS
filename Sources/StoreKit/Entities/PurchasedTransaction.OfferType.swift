@@ -10,23 +10,23 @@ import StoreKit
 
 extension PurchasedTransaction {
     enum OfferType: Int {
-        case introductory
-        case promotional
-        case code
-        case unknown
+        case unknown = 0 
+        case introductory = 1
+        case promotional = 2
+        case code = 3
+        case winBack = 4
+
     }
 }
 
 extension PurchasedTransaction.OfferType {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     init(type: SK2Transaction.OfferType) {
-        self =
-            switch type {
-            case .introductory: .introductory
-            case .promotional: .promotional
-            case .code: .code
-            default: .unknown
-            }
+        guard let type = PurchasedTransaction.OfferType(rawValue: type.rawValue) else {
+            self = .unknown
+            return
+        }
+        self = type
     }
 }
 
@@ -35,6 +35,7 @@ extension PurchasedTransaction.OfferType: Encodable {
         case introductory
         case promotional
         case code
+        case winBack = "win_back"
         case unknown
     }
 
@@ -44,6 +45,7 @@ extension PurchasedTransaction.OfferType: Encodable {
             case .introductory: .introductory
             case .promotional: .promotional
             case .code: .code
+            case .winBack: .winBack
             case .unknown: .unknown
             }
 

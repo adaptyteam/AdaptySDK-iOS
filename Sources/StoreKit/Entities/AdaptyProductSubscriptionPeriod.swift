@@ -17,7 +17,7 @@ public struct AdaptyProductSubscriptionPeriod: Sendable, Hashable {
 }
 
 extension AdaptyProductSubscriptionPeriod {
-    init(subscriptionPeriod: SKProductSubscriptionPeriod) {
+    init(subscriptionPeriod: SK1Product.SubscriptionPeriod) {
         self.init(unit: AdaptyPeriodUnit(unit: subscriptionPeriod.unit), numberOfUnits: subscriptionPeriod.numberOfUnits)
     }
 
