@@ -60,7 +60,7 @@ final class SK1ProductsFetcher: NSObject {
         request.delegate = self
         requests[request] = (productIds: productIds, retryCount: retryCount)
         request.start()
-        Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_sk1_products", stamp: "SKR\(request.hash)", params: ["products_ids": productIds]))
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: "fetch_sk1_products", stamp: "SKR\(request.hash)", params: ["products_ids": productIds]))
     }
 
     fileprivate func saveProducts(_ sk1Products: [SK1Product]) {
@@ -74,7 +74,7 @@ final class SK1ProductsFetcher: NSObject {
 extension SK1ProductsFetcher: SKProductsRequestDelegate {
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
         queue.async { [weak self] in
-            Adapty.logSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: "fetch_products",
                 stamp: "SKR\(request.hash)",
                 params: [
@@ -124,7 +124,7 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
     }
 
     func requestDidFinish(_ request: SKRequest) {
-        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+        Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
             eventName: "fetch_products_did_finish",
             stamp: "SKR\(request.hash)"
         ))
@@ -134,7 +134,7 @@ extension SK1ProductsFetcher: SKProductsRequestDelegate {
     func request(_ request: SKRequest, didFailWithError error: Error) {
         defer { request.cancel() }
         queue.async { [weak self] in
-            Adapty.logSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: "fetch_products",
                 stamp: "SKR\(request.hash)",
                 error: "\(error.localizedDescription). Detail: \(error)"

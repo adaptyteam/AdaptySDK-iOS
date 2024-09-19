@@ -79,7 +79,7 @@ extension Adapty {
                         }
                     }
                     .map {
-                        Adapty.logIfNeed($0)
+                        Adapty.trackEventIfNeed($0)
                         return $0.value
                     }
             )
@@ -135,7 +135,7 @@ private extension AdaptyProfileManager {
                 if let self, self.isActive {
                     paywall = self.paywallsCache.savedPaywallChosen(paywall)
                 }
-                Adapty.logIfNeed(paywall)
+                Adapty.trackEventIfNeed(paywall)
                 completion(.success(paywall.value))
             }
         }

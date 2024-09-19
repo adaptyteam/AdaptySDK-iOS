@@ -24,8 +24,8 @@ extension Adapty {
             }
         #else
             let stamp = Log.stamp
-            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp))
-            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: "not available"))
+            Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, callId: stamp))
+            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, callId: stamp, error: "not available"))
         #endif
     }
 }

@@ -26,6 +26,22 @@ public struct AdaptyPaywallProduct: Sendable {
 
     /// Same as `name` property of the parent AdaptyPaywall.
     public let paywallName: String
+    
+    init(
+        adaptyProductId: String,
+        underlying: any AdaptyProduct,
+        promotionalOfferId: String?,
+        variationId: String,
+        paywallABTestName: String,
+        paywallName: String
+    ) {
+        self.adaptyProductId = adaptyProductId
+        self.underlying = underlying
+        self.promotionalOfferId = promotionalOfferId
+        self.variationId = variationId
+        self.paywallABTestName = paywallABTestName
+        self.paywallName = paywallName
+    }
 }
 
 extension AdaptyPaywallProduct: AdaptyProduct {
@@ -89,26 +105,7 @@ extension AdaptyPaywallProduct {
 }
 
 extension AdaptyPaywallProduct: Encodable {
-    struct PrivateObject: Sendable, Decodable {
-        let vendorProductId: String
-        let adaptyProductId: String
-        let promotionalOfferId: String?
-        let variationId: String
-        let paywallABTestName: String
-        let paywallName: String
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: ProductCodingKeys.self)
-            vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
-            adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
-            promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
-            variationId = try container.decode(String.self, forKey: .paywallVariationId)
-            paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
-            paywallName = try container.decode(String.self, forKey: .paywallName)
-        }
-    }
-
-    private enum ProductCodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case vendorProductId = "vendor_product_id"
         case adaptyProductId = "adapty_product_id"
 
@@ -124,17 +121,6 @@ extension AdaptyPaywallProduct: Encodable {
         case price
         case regionCode = "region_code"
         case isFamilyShareable = "is_family_shareable"
-    }
-
-    init(from object: PrivateObject, underlying: AdaptyProduct) {
-        self.init(
-            adaptyProductId:  object.adaptyProductId,
-            underlying: underlying,
-            promotionalOfferId: object.promotionalOfferId,
-            variationId: object.variationId,
-            paywallABTestName: object.paywallABTestName,
-            paywallName: object.paywallName
-        )
     }
 
     private struct SubscriptionDetail: Sendable, Encodable {
@@ -168,7 +154,7 @@ extension AdaptyPaywallProduct: Encodable {
     }
 
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: ProductCodingKeys.self)
+        var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(vendorProductId, forKey: .vendorProductId)
         try container.encode(adaptyProductId, forKey: .adaptyProductId)
 

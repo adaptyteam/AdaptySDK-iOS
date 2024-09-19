@@ -234,7 +234,7 @@ enum Environment {
         static func getASAToken() throws -> String {
             let stamp = Log.stamp
             let methodName = "fetch_ASA_Token"
-            Adapty.logSystemEvent(AdaptyAppleRequestParameters(
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                 methodName: methodName,
                 stamp: stamp
             ))
@@ -245,7 +245,7 @@ enum Environment {
 
             } catch {
                 log.error("UpdateASAToken: On AAAttribution.attributionToken \(error)")
-                Adapty.logSystemEvent(AdaptyAppleResponseParameters(
+                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                     methodName: methodName,
                     stamp: stamp,
                     error: "\(error.localizedDescription). Detail: \(error)"
@@ -253,7 +253,7 @@ enum Environment {
                 throw error
             }
 
-            Adapty.logSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: methodName,
                 stamp: stamp,
                 params: [

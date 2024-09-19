@@ -251,6 +251,15 @@ extension AdaptyError {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch ViewConfiguration failed", error: error).asAdaptyError
     }
 
+    static func trackEventFailed(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        EventsError.encoding(error, file: file, function: function, line: line).asAdaptyError
+    }
+
     static func isNoViewConfigurationInPaywall(
         file: String = #fileID,
         function: String = #function,

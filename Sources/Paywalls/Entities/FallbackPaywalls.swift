@@ -75,7 +75,7 @@ extension FallbackPaywalls {
                     : "The fallback paywalls version is not correct. Please update the AdaptySDK."
                 log.error(error)
 
-                Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
+                Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
                     "in_version": formatVersion,
                     "expected_version": Adapty.fallbackFormatVersion,
                 ]))

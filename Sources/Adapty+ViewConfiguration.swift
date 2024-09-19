@@ -52,8 +52,8 @@ extension Adapty {
     }
 
     private func restoreViewConfiguration(_: AdaptyLocale, _: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {
-        // TODO:
         nil
+        // TODO: impliment
 //        guard
 //            let manager = state.initialized, manager.isActive,
 //            let cached = manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId)?.value,

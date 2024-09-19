@@ -79,7 +79,7 @@ final class SK2TransactionManager {
             var lastTransaction: Transaction?
             let logName = "get_all_transactions"
             let stamp = Log.stamp
-            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: logName, callId: stamp))
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: logName, callId: stamp))
             log.verbose("call  SK2Transaction.all")
 
             for await verificationResult in SK2Transaction.all {
@@ -107,7 +107,7 @@ final class SK2TransactionManager {
                     nil
                 }
 
-            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: logName, callId: stamp, params: params))
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: logName, callId: stamp, params: params))
 
             completion(.success(lastTransaction))
         }

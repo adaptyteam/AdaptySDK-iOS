@@ -439,9 +439,9 @@ extension Adapty {
 
         guard SK1QueueManager.canMakePayments() else {
             let stamp = Log.stamp
-            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
+            Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
             let error = AdaptyError.cantMakePayments()
-            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, stamp: stamp, error: error.description))
+            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, stamp: stamp, error: error.description))
             completion(.failure(error))
             return
         }

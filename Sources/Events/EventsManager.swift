@@ -26,23 +26,13 @@ actor EventsManager {
         self.init(
             profileStorage: profileStorage,
             eventStorages: [
-                UserDefaults.standard.defaultEventsStorage,
-                UserDefaults.standard.sysLogEventsStorage,
+                EventCollectionStorage(with: UserDefaults.standard.defaultEventsStorage),
+                EventCollectionStorage(with: UserDefaults.standard.sysLogEventsStorage),
             ]
         )
     }
 
-    init(
-        profileStorage: ProfileIdentifierStorage,
-        eventStorages: [EventsStorage]
-    ) {
-        self.init(
-            profileStorage: profileStorage,
-            eventStorages: eventStorages.map(EventCollectionStorage.init)
-        )
-    }
-
-    init(
+    private init(
         profileStorage: ProfileIdentifierStorage,
         eventStorages: [EventCollectionStorage]
     ) {

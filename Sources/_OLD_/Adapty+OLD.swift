@@ -8,6 +8,8 @@
 import Foundation
 
 public final class Adapty {
+    static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
+
     nonisolated(unsafe) static var share: Adapty!
 
     let profileStorage: ProfileStorage
@@ -30,13 +32,12 @@ public final class Adapty {
         httpSession = backend.createHTTPSession()
     }
 
+    
     static func withSDK<T: Sendable>(
         operation: @Sendable @escaping (Adapty) async throws -> T
     ) async throws -> T {
         try await operation(share)
     }
-
-    static func logSystemEvent(_: AdaptySystemEventParameters) {}
 
     enum ValidatePurchaseReason: Sendable, Hashable {
         case setVariation

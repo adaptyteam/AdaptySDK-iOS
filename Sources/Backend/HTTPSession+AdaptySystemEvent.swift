@@ -1,5 +1,5 @@
 //
-//  HTTPSession+logSystemEvent.swift
+//  HTTPSession+trackSystemEvent.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 04.04.2023
@@ -15,13 +15,13 @@ extension HTTPSession {
         logParams: EventParameters? = nil
     ) async throws -> Request.Response {
         let stamp = request.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
         do {
             let response: Request.Response = try await perform(request)
-            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
+            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
             return response
         } catch {
-            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
+            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
             throw error
         }
     }
@@ -33,13 +33,13 @@ extension HTTPSession {
         logParams: EventParameters? = nil
     ) async throws -> HTTPEmptyResponse {
         let stamp = request.stamp
-        Adapty.logSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
         do {
             let response: HTTPEmptyResponse = try await perform(request)
-            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
+            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
             return response
         } catch {
-            Adapty.logSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
+            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
             throw error
         }
     }

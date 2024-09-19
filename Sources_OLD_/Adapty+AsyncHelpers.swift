@@ -26,7 +26,7 @@ extension Adapty {
     ) {
         let stamp = Log.stamp
         if let logName {
-            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
+            Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
         }
         log.verbose("Calling now: \(function) [\(stamp)].")
         underlayQueue.async(group: group, qos: qos, flags: flags) {
@@ -49,7 +49,7 @@ extension Adapty {
     ) {
         let stamp = Log.stamp
         if let logName {
-            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
+            Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
         }
         log.verbose("Calling now: \(function) [\(stamp)].")
         underlayQueue.async(group: group, qos: qos, flags: flags) {
@@ -77,7 +77,7 @@ extension Adapty {
     ) {
         let stamp = Log.stamp
         if let logName {
-            Adapty.logSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
+            Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: logName, stamp: stamp, params: logParams))
         }
         log.verbose("Calling now: \(function) [\(stamp)].")
         underlayQueue.async(group: group, qos: qos, flags: flags) {
@@ -102,7 +102,7 @@ extension Adapty {
         logLevel: Log.Level = .verbose
     ) {
         if let logName {
-            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, stamp: stamp, error: error?.description))
+            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, stamp: stamp, error: error?.description))
         }
 
         if let error {
@@ -121,7 +121,7 @@ extension Adapty {
         let error: AdaptyError? = if case let .failure(e) = result { e } else { nil }
 
         if let logName {
-            Adapty.logSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, stamp: stamp, error: error?.description))
+            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: logName, stamp: stamp, error: error?.description))
         }
 
         if let error {

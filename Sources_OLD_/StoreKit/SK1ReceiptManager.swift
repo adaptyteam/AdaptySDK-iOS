@@ -80,16 +80,16 @@ final class SK1ReceiptManager: NSObject {
 
             let logName = "get_receipt"
             let stamp = Log.stamp
-            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: logName, stamp: stamp, params: ["refresh_if_empty": refreshIfEmpty]))
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: logName, stamp: stamp, params: ["refresh_if_empty": refreshIfEmpty]))
             let result = self.bundleReceipt()
 
             switch result {
             case .success:
-                Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: logName, stamp: stamp))
+                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: logName, stamp: stamp))
                 completion(result)
                 return
             case let .failure(error):
-                Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: logName, stamp: stamp, error: error.description))
+                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: logName, stamp: stamp, error: error.description))
                 if refreshIfEmpty {
                     self.refresh(completion)
                 } else {
@@ -144,14 +144,14 @@ final class SK1ReceiptManager: NSObject {
             request.delegate = self
             request.start()
 
-            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "refresh_receipt", stamp: "SKR\(request.hash)"))
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: "refresh_receipt", stamp: "SKR\(request.hash)"))
         }
     }
 
     fileprivate func completedRefresh(_ request: SKRequest, _ error: AdaptyError? = nil) {
         queue.async { [weak self] in
 
-            Adapty.logSystemEvent(AdaptyAppleResponseParameters(methodName: "refresh_receipt", stamp: "SKR\(request.hash)", error: error?.description))
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: "refresh_receipt", stamp: "SKR\(request.hash)", error: error?.description))
 
             guard let self else { return }
 

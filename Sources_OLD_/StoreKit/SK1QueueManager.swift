@@ -46,14 +46,14 @@ final class SK1QueueManager: NSObject {
 
     func setVariationId(_ variationId: String, for productId: String) {
         if variationId != variationsIds.updateValue(variationId, forKey: productId) {
-            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
                 "variation_by_product": variationsIds,
             ]))
             storage.setVariationsIds(variationsIds)
         }
 
         if variationId != persistentVariationsIds.updateValue(variationId, forKey: productId) {
-            Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids_persistent", params: [
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids_persistent", params: [
                 "variation_by_product": variationsIds,
             ]))
             storage.setPersistentVariationsIds(variationsIds)
@@ -62,7 +62,7 @@ final class SK1QueueManager: NSObject {
 
     func removeVariationId(for productId: String) {
         guard variationsIds.removeValue(forKey: productId) != nil else { return }
-        Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
+        Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "didset_variations_ids", params: [
             "variation_by_product": variationsIds,
         ]))
         storage.setVariationsIds(variationsIds)
@@ -88,7 +88,7 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
 
             let logParams = transaction.ext.logParams
 
-            Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+            Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
                 eventName: "updated_transaction",
                 params: logParams,
                 error: transaction.error.map { "\($0.localizedDescription). Detail: \($0)" }
@@ -102,7 +102,7 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
             case .restored:
                 if !Adapty.Configuration.observerMode {
                     SKPaymentQueue.default().finishTransaction(transaction)
-                    Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: logParams))
+                    Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: logParams))
                     log.verbose("finish restored transaction \(transaction)")
                 }
             case .deferred, .purchasing: break
@@ -125,17 +125,17 @@ extension SK1QueueManager: SKPaymentTransactionObserver {
     #endif
 
     func paymentQueueRestoreCompletedTransactionsFinished(_: SKPaymentQueue) {
-        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_finished"))
+        Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_finished"))
         log.verbose("Restore сompleted transactions finished.")
     }
 
     func paymentQueue(_: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
-        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_failed", error: "\(error.localizedDescription). Detail: \(error)"))
+        Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "restore_completed_transactions_failed", error: "\(error.localizedDescription). Detail: \(error)"))
         log.error("Restore сompleted transactions failed with error: \(error)")
     }
 
     func paymentQueue(_: SKPaymentQueue, didRevokeEntitlementsForProductIdentifiers productIdentifiers: [String]) {
-        Adapty.logSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": productIdentifiers]))
+        Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(eventName: "did_revoke_entitlements", params: ["product_ids": productIdentifiers]))
 
         // TODO: validate receipt
     }

@@ -73,7 +73,7 @@ final class LifecycleManager {
                 queue: nil
             ) { [weak self] _ in
 
-                Adapty.logSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
+                Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
                 log.verbose("LifecycleManager: didBecomeActiveNotification")
 
                 self?.sendAppOpenedEvent()
@@ -85,8 +85,7 @@ final class LifecycleManager {
     @objc
     private func syncProfile(completion: @escaping (Bool) -> Void) {
         if let profileSyncAt,
-           Date().timeIntervalSince(profileSyncAt) < Self.profileUpdateInterval
-        {
+           Date().timeIntervalSince(profileSyncAt) < Self.profileUpdateInterval {
             completion(false)
             return
         }
@@ -129,15 +128,12 @@ final class LifecycleManager {
 
         log.verbose("LifecycleManager: sendAppOpenedEvent Begin")
 
-        Adapty.logAppOpened { [weak self] error in
-            if case let .encoding(_, error) = error?.originalError as? EventsError {
-                log.error("LifecycleManager: sendAppOpenedEvent Error: \(error)")
-            } else if let error {
-                log.verbose("LifecycleManager: sendAppOpenedEvent Error: \(error)")
-            } else {
-                log.verbose("LifecycleManager: sendAppOpenedEvent Done")
-                self?.appOpenedSentAt = Date()
-            }
+        do {
+            try await Adapty.trackEvent(.appOpened)
+            log.verbose("LifecycleManager: sendAppOpenedEvent Done")
+            self?.appOpenedSentAt = Date()
+        } catch {
+            log.error("LifecycleManager: sendAppOpenedEvent Error: \(error)")
         }
     }
 
@@ -163,7 +159,7 @@ final class LifecycleManager {
 
         log.verbose("LifecycleManager: idfaUpdateTimer tick")
 
-        guard let needSyncIdfa = needSyncIdfa else {
+        guard let needSyncIdfa else {
             Self.underlayQueue.asyncAfter(deadline: .now() + .seconds(Self.idfaStatusCheckInterval)) { [weak self] in
                 self?.idfaUpdateTimerTick()
             }

@@ -60,31 +60,31 @@ extension HTTPError: CustomAdaptyError {
     }
 }
 
-// extension EventsError: CustomAdaptyError {
-//    static let errorDomain = AdaptyError.EventsErrorDomain
-//
-//    var errorCode: Int { adaptyErrorCode.rawValue }
-//
-//    var errorUserInfo: [String: Any] {
-//        var data: [String: Any] = [
-//            AdaptyError.UserInfoKey.description: debugDescription,
-//            AdaptyError.UserInfoKey.source: source.description,
-//        ]
-//        if let originalError {
-//            data[NSUnderlyingErrorKey] = originalError as NSError
-//        }
-//        return data
-//    }
-//
-//    var adaptyErrorCode: AdaptyError.ErrorCode {
-//        switch self {
-//        case .sending: .networkFailed
-//        case .encoding: .encodingFailed
-//        case .decoding: .decodingFailed
-//        case .interrupted: .operationInterrupted
-//        }
-//    }
-// }
+ extension EventsError: CustomAdaptyError {
+    static let errorDomain = AdaptyError.EventsErrorDomain
+
+    var errorCode: Int { adaptyErrorCode.rawValue }
+
+    var errorUserInfo: [String: Any] {
+        var data: [String: Any] = [
+            AdaptyError.UserInfoKey.description: debugDescription,
+            AdaptyError.UserInfoKey.source: source.description,
+        ]
+        if let originalError {
+            data[NSUnderlyingErrorKey] = originalError as NSError
+        }
+        return data
+    }
+
+    var adaptyErrorCode: AdaptyError.ErrorCode {
+        switch self {
+        case .sending: .networkFailed
+        case .encoding: .encodingFailed
+        case .decoding: .decodingFailed
+        case .interrupted: .operationInterrupted
+        }
+    }
+ }
 
 extension SKManagerError: CustomAdaptyError {
     static let errorDomain = AdaptyError.SKManagerErrorDomain

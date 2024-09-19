@@ -28,7 +28,7 @@ extension SK1QueueManager {
 
             self.makePurchasesCompletionHandlers[productId] = [completion]
             SKPaymentQueue.default().add(payment)
-            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "add_payment", params: [
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: "add_payment", params: [
                 "product_id": payment.productIdentifier,
             ]))
         }
@@ -40,7 +40,7 @@ extension SK1QueueManager {
 
             if !Adapty.Configuration.observerMode {
                 SKPaymentQueue.default().finishTransaction(transaction)
-                Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.ext.logParams))
+                Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.ext.logParams))
                 log.verbose("finish failed transaction \(transaction)")
             }
 
@@ -97,7 +97,7 @@ extension SK1QueueManager {
 
                         if !isObserverMode {
                             SKPaymentQueue.default().finishTransaction(transaction)
-                            Adapty.logSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.ext.logParams))
+                            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: "finish_transaction", params: transaction.ext.logParams))
                             log.info("finish purchased transaction \(transaction)")
                         }
                     }

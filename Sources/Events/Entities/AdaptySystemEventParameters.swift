@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AdaptySystemEventParameters: Sendable, Encodable {}
+package protocol AdaptySystemEventParameters: Sendable, Encodable {}
 
 private enum CodingKeys: String, CodingKey {
     case name = "event_name"
