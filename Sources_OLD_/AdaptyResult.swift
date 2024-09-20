@@ -7,18 +7,7 @@
 
 import Foundation
 
-public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
-
-public typealias AdaptyErrorCompletion = (AdaptyError?) -> Void
-public typealias AdaptyResultCompletion<Success> = (AdaptyResult<Success>) -> Void
-
 extension Result where Failure == AdaptyError {
-    public var error: AdaptyError? {
-        switch self {
-        case let .failure(error): error
-        default: nil
-        }
-    }
 
     @inlinable func `do`(_ call: (Success) -> Void) -> Self {
         guard case let .success(value) = self else { return self }

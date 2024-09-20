@@ -20,18 +20,22 @@ struct FallbackPaywalls: Sendable {
             throw AdaptyError.isNotFileUrl()
         }
         let decoder = FallbackPaywalls.decoder()
-        head = try decoder.decode(Head.self, from: Data(contentsOf: url))
+        do {
+            head = try decoder.decode(Head.self, from: Data(contentsOf: url))
+        } catch {
+            throw AdaptyError.decodingFallback(error)
+        }
         fileURL = url
     }
 
-    func contains(placmentId id: String) -> Bool? {
+    func contains(placementId id: String) -> Bool? {
         head.placementIds?.contains(id)
     }
 
-    func getPaywall(byPlacmentId id: String, profileId: String) -> AdaptyPaywallChosen? {
-        guard contains(placmentId: id) ?? true else { return nil }
+    func getPaywall(byPlacementId id: String, profileId: String) -> AdaptyPaywallChosen? {
+        guard contains(placementId: id) ?? true else { return nil }
 
-        let decoder = FallbackPaywalls.decoder(profileId: profileId, placmentId: id)
+        let decoder = FallbackPaywalls.decoder(profileId: profileId, placementId: id)
         let chosen: AdaptyPaywallChosen?
         do {
             chosen = try decoder.decode(Body.self, from: Data(contentsOf: fileURL)).chosen
@@ -91,29 +95,29 @@ extension FallbackPaywalls {
     struct Body: Sendable, Decodable {
         let chosen: AdaptyPaywallChosen?
         init(from decoder: any Decoder) throws {
-            let placmentId = try AnyCodingKeys(stringValue: decoder.userInfo.placmentId)
+            let placementId = try AnyCodingKeys(stringValue: decoder.userInfo.placementId)
             let container = try decoder
                 .container(keyedBy: CodingKeys.self)
                 .nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .data)
 
-            guard container.contains(placmentId) else {
+            guard container.contains(placementId) else {
                 chosen = nil
                 return
             }
 
-            if let string = try? container.decode(String.self, forKey: placmentId) {
+            if let string = try? container.decode(String.self, forKey: placementId) {
                 let decoder = try FallbackPaywalls.decoder(profileId: decoder.userInfo.profileId)
                 let data = string.data(using: .utf8) ?? Data()
                 chosen = try decoder.decode(AdaptyPaywallChosen.self, from: data)
             } else {
-                chosen = try container.decodeIfPresent(AdaptyPaywallChosen.self, forKey: placmentId)
+                chosen = try container.decodeIfPresent(AdaptyPaywallChosen.self, forKey: placementId)
             }
         }
     }
 }
 
 extension FallbackPaywalls {
-    static let placmentIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_placment_id")!
+    static let placementIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_placement_id")!
 
     static func decoder() -> JSONDecoder {
         let decoder = JSONDecoder()
@@ -127,21 +131,21 @@ extension FallbackPaywalls {
         return decoder
     }
 
-    static func decoder(profileId: String, placmentId: String) -> JSONDecoder {
+    static func decoder(profileId: String, placementId: String) -> JSONDecoder {
         let decoder = decoder(profileId: profileId)
-        decoder.userInfo[FallbackPaywalls.placmentIdUserInfoKey] = placmentId
+        decoder.userInfo[FallbackPaywalls.placementIdUserInfoKey] = placementId
         return decoder
     }
 }
 
 private extension [CodingUserInfoKey: Any] {
-    var placmentId: String {
+    var placementId: String {
         get throws {
-            if let value = self[FallbackPaywalls.placmentIdUserInfoKey] as? String {
+            if let value = self[FallbackPaywalls.placementIdUserInfoKey] as? String {
                 return value
             }
 
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(FallbackPaywalls.placmentIdUserInfoKey) parameter"))
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(FallbackPaywalls.placementIdUserInfoKey) parameter"))
         }
     }
 }

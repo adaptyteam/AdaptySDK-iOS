@@ -1,5 +1,5 @@
 //
-//  AdaptyProfileManager.swift
+//  ProfileManager.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.10.2022.
@@ -7,8 +7,8 @@
 
 import StoreKit
 
-final class AdaptyProfileManager {
-    let manager: Adapty
+final class ProfileManager {
+    let sdk: Adapty
     let profileId: String
     var profile: VH<AdaptyProfile>
     let paywallsCache: PaywallsCache
@@ -18,7 +18,7 @@ final class AdaptyProfileManager {
     var isActive: Bool = true
 
     init(
-        manager: Adapty,
+        sdk: Adapty,
         paywallStorage: PaywallsStorage,
         productStorage: BackendProductStatesStorage,
         profile: VH<AdaptyProfile>,
@@ -45,7 +45,7 @@ final class AdaptyProfileManager {
     }
 }
 
-extension AdaptyProfileManager {
+extension ProfileManager {
     func updateProfileParameters(_ params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
         syncProfile(params: params) { completion($0.error) }
     }

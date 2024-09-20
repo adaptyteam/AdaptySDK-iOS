@@ -9,6 +9,7 @@ import Foundation
 import StoreKit
 
 enum InternalAdaptyError: Error {
+    case unknown(AdaptyError.Source, String, error: Error)
     case activateOnceError(AdaptyError.Source)
     case cantMakePayments(AdaptyError.Source)
     case notActivated(AdaptyError.Source)
@@ -24,6 +25,8 @@ enum InternalAdaptyError: Error {
 extension InternalAdaptyError: CustomStringConvertible {
     var description: String {
         switch self {
+        case let .unknown(source, description, error: error):
+            "AdaptyError.unknown(\(source), \(description), \(error))"
         case let .activateOnceError(source):
             "AdaptyError.activateOnceError(\(source))"
         case let .cantMakePayments(source):
@@ -49,7 +52,8 @@ extension InternalAdaptyError: CustomStringConvertible {
 extension InternalAdaptyError {
     var source: AdaptyError.Source {
         switch self {
-        case let .activateOnceError(src),
+        case let .unknown(src, _, _),
+             let .activateOnceError(src),
              let .cantMakePayments(src),
              let .notActivated(src),
              let .profileWasChanged(src),
@@ -66,7 +70,9 @@ extension InternalAdaptyError {
         switch self {
         case let .profileCreateFailed(_, error):
             error
-        case let .decodingFailed(_, _, error):
+        case let .unknown(_, _, error),
+             let .decodingFailed(_, _, error),
+             let .fetchFailed(_, _, error):
             error
         default:
             nil
@@ -79,15 +85,16 @@ extension InternalAdaptyError: CustomNSError {
 
     var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
-        case .activateOnceError: AdaptyError.ErrorCode.activateOnceError
-        case .cantMakePayments: AdaptyError.ErrorCode.cantMakePayments
-        case .notActivated: AdaptyError.ErrorCode.notActivated
-        case .profileWasChanged: AdaptyError.ErrorCode.profileWasChanged
+        case .unknown: .unknown
+        case .activateOnceError: .activateOnceError
+        case .cantMakePayments: .cantMakePayments
+        case .notActivated: .notActivated
+        case .profileWasChanged: .profileWasChanged
         case let .profileCreateFailed(_, error): error.adaptyErrorCode
-        case .fetchFailed: AdaptyError.ErrorCode.networkFailed
-        case .decodingFailed: AdaptyError.ErrorCode.decodingFailed
-        case .wrongParam: AdaptyError.ErrorCode.wrongParam
-//        case .fetchTimeoutError: AdaptyError.ErrorCode.fetchTimeoutError
+        case .fetchFailed: .networkFailed
+        case .decodingFailed: .decodingFailed
+        case .wrongParam: .wrongParam
+//        case .fetchTimeoutError: .fetchTimeoutError
         }
     }
 
@@ -243,21 +250,39 @@ extension AdaptyError {
 //    }
 
     static func fetchViewConfigurationFailed(
-        _ error: Error,
+        unknownError: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch ViewConfiguration failed", error: error).asAdaptyError
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch ViewConfiguration failed", error: unknownError).asAdaptyError
     }
 
     static func trackEventFailed(
-        _ error: Error,
+        unknownError: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        EventsError.encoding(error, file: file, function: function, line: line).asAdaptyError
+        EventsError.encoding(unknownError, file: file, function: function, line: line).asAdaptyError
+    }
+    
+    static func decodingFallbackFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        decodingFallback(unknownError, file: file, function: function, line: line)
+    }
+
+    static func convertToAdaptyErrorFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.unknown(AdaptyError.Source(file: file, function: function, line: line), "Convert to AdaptyError failed", error: unknownError).asAdaptyError
     }
 
     static func isNoViewConfigurationInPaywall(

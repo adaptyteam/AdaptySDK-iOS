@@ -11,35 +11,39 @@ extension Adapty {
     /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
     ///
     /// - Parameters:
-    ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
+    ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
     ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
     ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
     ///             Example: "en" means English, "en-US" represents US English.
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
-    ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
-    ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
+    /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    /// - Throws: An ``AdaptyError`` object
     public static func getPaywallForDefaultAudience(
         placementId: String,
         locale: String? = nil,
-        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
-    ) {
-        getPaywallForDefaultAudience(placementId, locale: locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale, withFetchPolicy: fetchPolicy, completion)
+        fetchPolicy: AdaptyPaywall.FetchPolicy = .default
+    ) async throws -> AdaptyPaywall {
+        try await getPaywallForDefaultAudience(
+            placementId,
+            locale: locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale,
+            withFetchPolicy: fetchPolicy
+        )
     }
 
-    static func getPaywallForDefaultAudience(
+    private static func getPaywallForDefaultAudience(
         _ placementId: String,
         locale: AdaptyLocale,
-        withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
-    ) {
+        withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy
+    ) async throws -> AdaptyPaywall {
         let logParams: EventParameters = [
             "placement_id": placementId,
             "locale": locale,
             "fetch_policy": fetchPolicy,
         ]
 
-        Adapty.async(completion, logName: "get_untargeted_paywall", logParams: logParams) { manager, completion in
+        try await withActivatedSDK(methodName: .getPaywallForDefaultAudience, logParams: logParams) { sdk in
+
             let completion: (AdaptyResult<AdaptyPaywall>) -> Void = { result in
                 _ = result.do {
                     $0.sendImageUrlsToObserver()
@@ -47,10 +51,10 @@ extension Adapty {
                 completion(result)
             }
 
-            if let profileManager = manager.state.initialized {
+            if let profileManager = sdk.state.initialized {
                 profileManager.getUntargetedPaywall(placementId, locale, withFetchPolicy: fetchPolicy, completion)
             } else {
-                manager.getUntargetedPaywall(placementId, locale, completion)
+                sdk.getUntargetedPaywall(placementId, locale, completion)
             }
         }
     }
@@ -72,7 +76,7 @@ extension Adapty {
             completion(
                 result
                     .flatMapError { error in
-                        if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId) {
+                        if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId) {
                             .success(fallback)
                         } else {
                             .failure(error)
@@ -87,7 +91,7 @@ extension Adapty {
     }
 }
 
-private extension AdaptyProfileManager {
+private extension ProfileManager {
     func getUntargetedPaywall(
         _ placementId: String,
         _ locale: AdaptyLocale,

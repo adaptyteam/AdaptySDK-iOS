@@ -17,7 +17,7 @@ extension Adapty {
                 profileId ?? profileIdentifierStorage.profileId
             ))
         } catch {
-            throw error.asAdaptyError ?? .trackEventFailed(error)
+            throw error.asAdaptyError ?? .trackEventFailed(unknownError: error)
         }
     }
 
@@ -52,13 +52,18 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
     ///
     /// - Parameters:
-    ///   - paywall: A `AdaptyPaywall` object.
+    ///   - paywall: A ``AdaptyPaywall`` object.
+    ///  - Throws: An ``AdaptyError`` object
     public static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
-        try await trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)))
+        try await withActivatedSDK(methodName: .logShowPaywall) { _ in
+            try await trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)))
+        }
     }
 
     package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
-        try await trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
+        try await withActivatedSDK(methodName: .logShowPaywall) { _ in
+            try await trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
+        }
     }
 
     /// Call this method to keep track of the user's steps while onboarding
@@ -71,7 +76,7 @@ extension Adapty {
     ///   - name: Name of your onboarding.
     ///   - screenName: Readable name of a particular screen as part of onboarding.
     ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
-    ///   - completion: Result callback.
+    /// - Throws: An ``AdaptyError`` object
     public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
         try await logShowOnboarding(.init(
             name: name,
@@ -81,12 +86,15 @@ extension Adapty {
     }
 
     public static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws {
-        guard params.screenOrder > 0 else {
-            let error = AdaptyError.wrongParamOnboardingScreenOrder()
-            Log.default.error(error.debugDescription)
-            throw error
-        }
+        try await withActivatedSDK(methodName: .logShowOnboarding) { _ in
 
-        try await trackEvent(.onboardingScreenShowed(params))
+            guard params.screenOrder > 0 else {
+                let error = AdaptyError.wrongParamOnboardingScreenOrder()
+                Log.default.error(error.debugDescription)
+                throw error
+            }
+
+            try await trackEvent(.onboardingScreenShowed(params))
+        }
     }
 }

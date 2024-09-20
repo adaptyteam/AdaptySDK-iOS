@@ -116,6 +116,14 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
     }
 }
 
+enum MethodName: String {
+    case getPaywall = "get_paywall"
+    case getPaywallForDefaultAudience = "get_untargeted_paywall"
+    case setFallbackPaywalls = "set_fallback_paywalls"
+    case logShowOnboarding = "log_show_onboarding"
+    case logShowPaywall = "log_show_paywall"
+}
+
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
     let methodName: String
     let stamp: String

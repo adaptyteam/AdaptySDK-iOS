@@ -364,7 +364,7 @@ extension Adapty {
         }
     }
 
-    private static func completionGetIntroductoryOfferEligibility(_ result: AdaptyResult<[String: AdaptyEligibility?]>, _ manager: Adapty, _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
+    private static func completionGetIntroductoryOfferEligibility(_ result: AdaptyResult<[String: AdaptyEligibility?]>, _ sdk: Adapty, _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>) {
         let introductoryOfferEligibilityByVendorProductId: [String: AdaptyEligibility?]
         switch result {
         case let .failure(error):
@@ -382,7 +382,7 @@ extension Adapty {
         }
 
         manager.getProfileManager { result in
-            let profileManager: AdaptyProfileManager
+            let profileManager: ProfileManager
             switch result {
             case let .failure(error):
                 completion(.failure(error))

@@ -8,10 +8,16 @@
 import Foundation
 
 extension Adapty.Configuration {
-    static var fallbackPaywalls: FallbackPaywalls?
-}
+    private final class MutableState: @unchecked Sendable {
+        var fallbackPaywalls: FallbackPaywalls?
+    }
 
-private let log = Log.Category(name: "PaywallsCache")
+    private static let current = MutableState()
+    static var fallbackPaywalls: FallbackPaywalls? {
+        get { current.fallbackPaywalls }
+        set { current.fallbackPaywalls = newValue }
+    }
+}
 
 extension Adapty {
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
@@ -22,29 +28,26 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - fileURL:
-    ///   - completion: Result callback.
-    public static func setFallbackPaywalls(fileURL url: URL, _ completion: AdaptyErrorCompletion? = nil) {
-        async(completion, logName: "set_fallback_paywalls") { completion in
+    /// - Throws: An ``AdaptyError`` object
+    public static func setFallbackPaywalls(fileURL url: URL) async throws {
+        try await withOptioanalSDK(methodName: .setFallbackPaywalls) { _ in
             do {
                 Configuration.fallbackPaywalls = try FallbackPaywalls(fileURL: url)
-            } catch let error as AdaptyError {
-                completion(error)
-                return
             } catch {
-                completion(.decodingFallback(error))
-                return
+                throw error.asAdaptyError ?? .decodingFallbackFailed(unknownError: error)
             }
-            completion(nil)
         }
     }
 }
+
+private let log = Log.Category(name: "PaywallsCache")
 
 extension PaywallsCache {
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale) -> AdaptyPaywall? {
         let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?.value
 
         guard let fallback = Adapty.Configuration.fallbackPaywalls,
-              fallback.contains(placmentId: placementId) ?? true
+              fallback.contains(placementId: placementId) ?? true
         else {
             return cache
         }
@@ -53,7 +56,7 @@ extension PaywallsCache {
             return cache
         }
 
-        guard let chosen = fallback.getPaywall(byPlacmentId: placementId, profileId: profileId)
+        guard let chosen = fallback.getPaywall(byPlacementId: placementId, profileId: profileId)
         else {
             return cache
         }

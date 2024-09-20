@@ -76,7 +76,7 @@ final class FallbackPaywallsTests: XCTestCase {
 
         paywallsIds.forEach {
             let startTime = CFAbsoluteTimeGetCurrent()
-            let paywall = fallbackPaywalls.getPaywall(byPlacmentId: $0, profileId: "unknown")
+            let paywall = fallbackPaywalls.getPaywall(byPlacementId: $0, profileId: "unknown")
             let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
             print("### Time elapsed for paywall[\($0)] \(paywall?.value.viewConfiguration != nil ? "paywall_builder" : ""): \(String(format: "%.6f", timeElapsed)) s.")
 

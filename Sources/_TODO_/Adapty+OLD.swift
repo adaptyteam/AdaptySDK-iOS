@@ -32,8 +32,37 @@ public final class Adapty {
         httpSession = backend.createHTTPSession()
     }
 
-    
-    static func withSDK<T: Sendable>(
+//    static func withOptioanalSDK(
+//        methodName: MethodName? = nil,
+//        logParams: EventParameters? = nil,
+//        function: StaticString = #function,
+//        operation: @Sendable @escaping (Adapty?) async throws -> Void
+//    ) async throws {
+//        try await operation(nil)
+//    }
+
+    static func withOptioanalSDK<T: Sendable>(
+        methodName: MethodName? = nil,
+        logParams: EventParameters? = nil,
+        function: StaticString = #function,
+        operation: @Sendable @escaping (Adapty?) async throws -> T
+    ) async throws -> T {
+        try await operation(nil)
+    }
+
+//    static func withActivatedSDK(
+//        methodName: MethodName? = nil,
+//        logParams: EventParameters? = nil,
+//        function: StaticString = #function,
+//        operation: @Sendable @escaping (Adapty) async throws -> Void
+//    ) async throws {
+//        try await operation(share)
+//    }
+
+    static func withActivatedSDK<T: Sendable>(
+        methodName: MethodName? = nil,
+        logParams: EventParameters? = nil,
+        function: StaticString = #function,
         operation: @Sendable @escaping (Adapty) async throws -> T
     ) async throws -> T {
         try await operation(share)

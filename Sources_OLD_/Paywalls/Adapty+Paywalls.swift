@@ -15,31 +15,35 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
     ///
     /// - Parameters:
-    ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
+    ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
     ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
     ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
     ///             Example: "en" means English, "en-US" represents US English.
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
-    ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
-    ///   - loadTimeout: This value limits the timeout for this method. If the timeout is reached, cached data or local fallback will be returned.
-    ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
+    /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    /// - Throws: An ``AdaptyError`` object
     public static func getPaywall(
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
-    ) {
-        getPaywall(placementId, locale: locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale, withFetchPolicy: fetchPolicy, loadTimeout: loadTimeout, completion)
+        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
+    ) async throws -> AdaptyPaywall {
+        try await getPaywall(
+            placementId,
+            locale: locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale,
+            withFetchPolicy: fetchPolicy,
+            loadTimeout: loadTimeout
+        )
     }
 
-    static func getPaywall(
+    private static func getPaywall(
         _ placementId: String,
         locale: AdaptyLocale,
         withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy,
-        loadTimeout: TimeInterval,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
-    ) {
+        loadTimeout: TimeInterval
+    ) async throws -> AdaptyPaywall {
+        
         let logParams: EventParameters = [
             "placement_id": placementId,
             "locale": locale,
@@ -47,10 +51,10 @@ extension Adapty {
             "load_timeout": loadTimeout,
         ]
 
-        Adapty.async(completion, logName: "get_paywall", logParams: logParams) { manager, completion in
+        try await withActivatedSDK(methodName: .getPaywall, logParams: logParams) { sdk in
 
             var isTerminationCalled = false
-            var loadedProfileManager: AdaptyProfileManager?
+            var loadedProfileManager: ProfileManager?
 
             let completion: (AdaptyResult<AdaptyPaywall>) -> Void = { result in
                 _ = result.do {
@@ -58,18 +62,18 @@ extension Adapty {
                 }
                 completion(result)
             }
-            let termination: (AdaptyResult<AdaptyPaywall>) -> Void = { [weak manager] result in
+            let termination: (AdaptyResult<AdaptyPaywall>) -> Void = { [weak sdk] result in
                 guard !isTerminationCalled else { return }
                 isTerminationCalled = true
 
-                guard case let .failure(error) = result, let manager else {
+                guard case let .failure(error) = result, let sdk else {
                     completion(result)
                     return
                 }
 
                 guard let profileManager = loadedProfileManager, profileManager.isActive else {
                     if error.canUseFallbackServer || error.isProfileCreateFailed {
-                        manager.getFallbackPaywall(placementId, locale, completion)
+                        sdk.getFallbackPaywall(placementId, locale, completion)
                     } else {
                         completion(result)
                     }
@@ -88,7 +92,7 @@ extension Adapty {
                 }
             }
 
-            manager.getProfileManager(waitCreatingProfile: false) { result in
+            sdk.getProfileManager(waitCreatingProfile: false) { result in
                 switch result {
                 case let .success(profileManager):
                     loadedProfileManager = profileManager
@@ -128,7 +132,7 @@ extension Adapty {
             completion(
                 result
                     .flatMapError { error in
-                        if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacmentId: placementId, profileId: profileId) {
+                        if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId) {
                             .success(fallback)
                         } else {
                             .failure(error)
@@ -143,7 +147,7 @@ extension Adapty {
     }
 }
 
-private extension AdaptyProfileManager {
+private extension ProfileManager {
     func getPaywall(
         _ placementId: String,
         _ locale: AdaptyLocale,

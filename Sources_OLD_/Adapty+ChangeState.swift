@@ -56,13 +56,13 @@ public final class Adapty {
         initializingProfileManager(toCustomerUserId: customerUserId)
     }
 
-    private var profileManagerCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
-    private var profileManagerOrFailedCompletionHandlers: [AdaptyResultCompletion<AdaptyProfileManager>]?
+    private var profileManagerCompletionHandlers: [AdaptyResultCompletion<ProfileManager>]?
+    private var profileManagerOrFailedCompletionHandlers: [AdaptyResultCompletion<ProfileManager>]?
 
     private var logoutCompletionHandlers: [AdaptyErrorCompletion]?
 
     @inline(__always)
-    func getProfileManager(waitCreatingProfile: Bool = true, _ completion: @escaping AdaptyResultCompletion<AdaptyProfileManager>) {
+    func getProfileManager(waitCreatingProfile: Bool = true, _ completion: @escaping AdaptyResultCompletion<ProfileManager>) {
         if let result = state.initializedResult {
             completion(result)
             return
@@ -84,8 +84,8 @@ public final class Adapty {
     }
 
     @inline(__always)
-    private func callProfileManagerCompletionHandlers(_ result: AdaptyResult<AdaptyProfileManager>) {
-        let handlers: [AdaptyResultCompletion<AdaptyProfileManager>]
+    private func callProfileManagerCompletionHandlers(_ result: AdaptyResult<ProfileManager>) {
+        let handlers: [AdaptyResultCompletion<ProfileManager>]
         if let error = result.error, error.isProfileCreateFailed {
             handlers = profileManagerOrFailedCompletionHandlers ?? []
             profileManagerOrFailedCompletionHandlers = nil
@@ -253,9 +253,9 @@ extension Adapty {
 
         func createProfileManager(
             _ profile: VH<AdaptyProfile>,
-            sendedEnvironment: AdaptyProfileManager.SendedEnvironment
+            sendedEnvironment: ProfileManager.SendedEnvironment
         ) {
-            let manager = AdaptyProfileManager(
+            let manager = ProfileManager(
                 manager: self,
                 paywallStorage: UserDefaults.standard,
                 productStorage: UserDefaults.standard,
@@ -307,7 +307,7 @@ extension Adapty {
         case needLogout
         case needIdentifyTo(customerUserId: String)
         case failed(AdaptyError)
-        case initialized(AdaptyProfileManager)
+        case initialized(ProfileManager)
 
         var initializing: Bool {
             switch self {
@@ -318,7 +318,7 @@ extension Adapty {
             }
         }
 
-        var initialized: AdaptyProfileManager? {
+        var initialized: ProfileManager? {
             switch self {
             case let .initialized(manager):
                 manager
@@ -327,7 +327,7 @@ extension Adapty {
             }
         }
 
-        var initializedResult: AdaptyResult<AdaptyProfileManager>? {
+        var initializedResult: AdaptyResult<ProfileManager>? {
             switch self {
             case let .failed(error):
                 .failure(error)
@@ -338,7 +338,7 @@ extension Adapty {
             }
         }
 
-//        init(_ result: AdaptyResult<AdaptyProfileManager>) {
+//        init(_ result: AdaptyResult<ProfileManager>) {
 //            switch result {
 //            case let .failure(error):
 //                self = .failed(error)

@@ -1,41 +1,13 @@
 //
-//  Locale+Extensions.swift
-//
+//  Locale+Storekit.swift
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.02.2024
-//
 //
 
 import StoreKit
 
 extension Locale {
-    @inlinable
-    var unfCurrencyCode: String? {
-        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) {
-            currency?.identifier
-        } else {
-            currencyCode
-        }
-    }
-
-    @inlinable
-    var unfRegionCode: String? {
-        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) {
-            region?.identifier
-        } else {
-            regionCode
-        }
-    }
-
-    @inlinable
-    var unfLanguageCode: String? {
-        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) {
-            language.languageCode?.identifier
-        } else {
-            languageCode
-        }
-    }
-
     @inlinable
     func localized(sk1Price price: NSDecimalNumber) -> String? {
         let formatter = NumberFormatter()
@@ -50,7 +22,7 @@ extension Locale {
         let countUnits = period.numberOfUnits * numberOfPeriods
         switch period.unit {
         case .day:
-            if countUnits == 7 { return localizedComponents(weekOfMonth: 1) }
+            if numberOfPeriods == 1, countUnits == 7 { return localizedComponents(weekOfMonth: 1) }
             return localizedComponents(day: countUnits)
         case .week:
             return localizedComponents(weekOfMonth: countUnits)

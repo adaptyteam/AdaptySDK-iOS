@@ -12,7 +12,7 @@ extension Adapty {
         paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
     ) async throws -> AdaptyUI.LocalizedViewConfiguration {
-        try await withSDK { sdk in
+        try await withActivatedSDK { sdk in
             try await sdk.getViewConfiguration(paywall: paywall, loadTimeout: loadTimeout)
         }
     }
@@ -93,7 +93,7 @@ extension Adapty {
                 throw error.asAdaptyError
             }
         } catch {
-            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(error)
+            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
         }
 
         do {
@@ -104,7 +104,7 @@ extension Adapty {
                 disableServerCache: isTestUser
             )
         } catch {
-            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(error)
+            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
         }
     }
 }

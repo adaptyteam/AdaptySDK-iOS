@@ -33,13 +33,13 @@ package enum Log {
         package static let shared = InternalActor()
     }
 
-    private final class Storage: @unchecked Sendable {
+    private final class MutableState: @unchecked Sendable {
         var level: Level = .default
     }
 
-    private static let _storage = Storage()
+    private static let current = MutableState()
     package static var level: Level {
-        _storage.level
+        current.level
     }
 
     package static func isLevel(_ level: Level) -> Bool {
@@ -51,7 +51,7 @@ package enum Log {
 
     @InternalActor
     static func set(level: Level) async {
-        _storage.level = level
+        current.level = level
     }
 
     @InternalActor

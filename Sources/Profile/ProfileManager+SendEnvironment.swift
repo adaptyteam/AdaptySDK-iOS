@@ -1,5 +1,5 @@
 //
-//  AdaptyProfileManager.swift
+//  ProfileManager+SendEvironment.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.10.2022.
@@ -7,7 +7,7 @@
 
 import StoreKit
 
-extension AdaptyProfileManager {
+extension ProfileManager {
     enum SendedEnvironment: Sendable, Hashable {
         case dont
         case withIdfa
@@ -15,7 +15,7 @@ extension AdaptyProfileManager {
     }
 }
 
-extension AdaptyProfileManager.SendedEnvironment {
+extension ProfileManager.SendedEnvironment {
     func needSend(analyticsDisabled: Bool) -> Bool {
         switch self {
         case .dont:

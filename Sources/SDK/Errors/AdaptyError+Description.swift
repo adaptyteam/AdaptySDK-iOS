@@ -10,6 +10,7 @@ import Foundation
 extension InternalAdaptyError: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
+        case let .unknown(_, description, _): description
         case .activateOnceError: "You need to be activate Adapty once"
         case .cantMakePayments: "In-App Purchases are not allowed on this device"
         case .notActivated: "The Adapty is not activated"
