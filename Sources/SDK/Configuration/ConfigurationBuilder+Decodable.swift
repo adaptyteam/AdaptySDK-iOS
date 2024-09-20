@@ -25,7 +25,7 @@ extension Adapty.ConfigurationBuilder: Decodable {
         case crossPlatformSDKVersion = "cross_platform_sdk_version"
     }
 
-    public convenience init(from decoder: any Decoder) throws {
+    public convenience init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let defaultValue = Adapty.Configuration.default

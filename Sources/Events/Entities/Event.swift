@@ -13,7 +13,7 @@ enum Event: Sendable {
     case paywallShowed(AdaptyPaywallShowedParameters)
     case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)
     case onboardingScreenShowed(AdaptyOnboardingScreenParameters)
-    case system(any AdaptySystemEventParameters)
+    case system(AdaptySystemEventParameters)
 }
 
 extension Event {

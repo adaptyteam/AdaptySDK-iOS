@@ -10,7 +10,7 @@ import StoreKit
 public struct AdaptyPaywallProduct: Sendable {
     package let adaptyProductId: String
 
-    private let underlying: any AdaptyProduct
+    private let underlying: AdaptyProduct
 
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?
@@ -26,10 +26,10 @@ public struct AdaptyPaywallProduct: Sendable {
 
     /// Same as `name` property of the parent AdaptyPaywall.
     public let paywallName: String
-    
+
     init(
         adaptyProductId: String,
-        underlying: any AdaptyProduct,
+        underlying: AdaptyProduct,
         promotionalOfferId: String?,
         variationId: String,
         paywallABTestName: String,
@@ -45,10 +45,10 @@ public struct AdaptyPaywallProduct: Sendable {
 }
 
 extension AdaptyPaywallProduct: AdaptyProduct {
-    public var sk1Product: SKProduct? { underlying.sk1Product }
+    public var sk1Product: StoreKit.SKProduct? { underlying.sk1Product }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public var sk2Product: Product? { underlying.sk2Product }
+    public var sk2Product: StoreKit.Product? { underlying.sk2Product }
 
     public var vendorProductId: String { underlying.vendorProductId }
     public var localizedDescription: String { underlying.localizedDescription }
@@ -78,7 +78,7 @@ extension AdaptyPaywallProduct: CustomStringConvertible {
 extension AdaptyPaywallProduct {
     init?(
         paywall: AdaptyPaywall,
-        underlying: any AdaptyProduct
+        underlying: AdaptyProduct
     ) {
         let vendorId = underlying.vendorProductId
         guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
@@ -91,7 +91,7 @@ extension AdaptyPaywallProduct {
     private init(
         paywall: AdaptyPaywall,
         productReference: AdaptyPaywall.ProductReference,
-        underlying: any AdaptyProduct
+        underlying: AdaptyProduct
     ) {
         self.init(
             adaptyProductId: productReference.adaptyProductId,

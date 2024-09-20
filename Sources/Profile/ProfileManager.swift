@@ -19,7 +19,7 @@ final class ProfileManager: Sendable {
     let productStatesCache: ProductStatesCache
 
     init(
-        profileStorage: ProfileStorage,
+        storage: ProfileStorage,
         paywallStorage: PaywallsStorage,
         productStorage: BackendProductStatesStorage,
         profile: VH<AdaptyProfile>,
@@ -29,7 +29,7 @@ final class ProfileManager: Sendable {
         self.profile = profile
         self.onceSentEnvironment = sendedEnvironment
 
-        storage = profileStorage
+        self.storage = storage
         paywallsCache = PaywallsCache(storage: paywallStorage, profileId: profileId)
         productStatesCache = ProductStatesCache(storage: productStorage)
 
@@ -48,11 +48,7 @@ final class ProfileManager: Sendable {
 }
 
 extension ProfileManager {
-    func updateProfileParameters(_ params: AdaptyProfileParameters) async throws {
-        _ = try await syncProfile(params: params)
-    }
-
-    nonisolated func syncTransactionsIfNeed() {
+    nonisolated func syncTransactionsIfNeed() { // TODO: ???
         Task { [weak self] in
             guard let sdk = try? Adapty.sdk(),
                   let self,
@@ -61,6 +57,10 @@ extension ProfileManager {
 
             _ = try? await sdk.syncTransactions(refreshReceiptIfEmpty: true)
         }
+    }
+
+    func updateProfileParameters(_ params: AdaptyProfileParameters) async throws -> AdaptyProfile {
+        try await syncProfile(params: params)
     }
 
     func getProfile() async throws -> AdaptyProfile {
@@ -83,7 +83,7 @@ extension ProfileManager {
                 responseHash: old.hash
             )
 
-            guard isActive else {
+            guard isActive else { // TODO: ??
                 throw AdaptyError.profileWasChanged()
             }
 

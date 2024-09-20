@@ -9,10 +9,10 @@ import StoreKit
 
 public protocol AdaptyProduct: Sendable, CustomStringConvertible {
     /// Underlying system representation of the product.
-    var sk1Product: SKProduct? { get }
+    var sk1Product: StoreKit.SKProduct? { get }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    var sk2Product: Product? { get }
+    var sk2Product: StoreKit.Product? { get }
 
     /// Unique identifier of a product from App Store Connect or Google Play Console.
     var vendorProductId: String { get }
@@ -64,7 +64,7 @@ public protocol AdaptyProduct: Sendable, CustomStringConvertible {
 }
 
 extension Price {
-    init(from product: AdaptyProduct) {
+    init(from product: some AdaptyProduct) {
         self.init(
             amount: product.price,
             currencyCode: product.currencyCode,

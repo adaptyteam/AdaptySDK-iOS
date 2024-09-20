@@ -40,7 +40,7 @@ extension AdaptyUI.ViewConfiguration.Toggle: Decodable {
         case colorAssetId = "color"
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let colorAssetId = try container.decodeIfPresent(String.self, forKey: .colorAssetId)
 

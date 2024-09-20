@@ -14,14 +14,14 @@ extension AdaptyLog.Category: Codable {
         case name
     }
 
-    public init(from decoder: any Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         subsystem = try container.decode(String.self, forKey: .subsystem)
         version = try container.decode(String.self, forKey: .version)
         name = try container.decode(String.self, forKey: .name)
     }
 
-    public func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(subsystem, forKey: .subsystem)
         try container.encode(version, forKey: .version)

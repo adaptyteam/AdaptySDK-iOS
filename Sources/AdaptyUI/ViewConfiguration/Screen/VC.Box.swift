@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct Box: Sendable, Hashable  {
+    struct Box: Sendable, Hashable {
         let width: AdaptyUI.Box.Length?
         let height: AdaptyUI.Box.Length?
         let horizontalAlignment: AdaptyUI.HorizontalAlignment
@@ -39,7 +39,7 @@ extension AdaptyUI.ViewConfiguration.Box: Decodable {
         case content
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             width: try? container.decodeIfPresent(AdaptyUI.Box.Length.self, forKey: .width),
@@ -58,7 +58,7 @@ extension AdaptyUI.Box.Length: Decodable {
         case fillMax = "fill_max"
     }
 
-    package init(from decoder: any Decoder) throws {
+    package init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(AdaptyUI.Unit.self) {
             self = .fixed(value)
         } else {

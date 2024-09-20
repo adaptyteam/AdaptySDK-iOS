@@ -27,12 +27,13 @@ protocol ProfileStorage: ProfileIdentifierStorage {
 }
 
 extension ProfileStorage {
-    func getProfile(profileId: String, withCustomerUserId newCustomerUserId: String?) -> VH<AdaptyProfile>? {
-        guard let profile = getProfile() else { return nil }
-        guard profile.value.profileId == profileId else { return nil }
-        guard let newCustomerUserId else { return profile }
-        guard let oldCustomerUserId = profile.value.customerUserId else { return nil }
-        guard oldCustomerUserId == newCustomerUserId else { return nil }
+    func getProfile(profileId: String, withCustomerUserId customerUserId: String?) -> VH<AdaptyProfile>? {
+        guard let profile = getProfile(),
+              profile.value.profileId == profileId
+        else { return nil }
+
+        guard let customerUserId else { return profile }
+        guard customerUserId == profile.value.customerUserId else { return nil }
         return profile
     }
 }

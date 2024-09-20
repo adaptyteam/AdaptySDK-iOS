@@ -13,7 +13,6 @@ final class ProductVendorIdsCache {
 
     init(storage: ProductVendorIdsStorage) {
         self.storage = storage
-
         allProductVendorIds = storage.getProductVendorIds()
     }
 

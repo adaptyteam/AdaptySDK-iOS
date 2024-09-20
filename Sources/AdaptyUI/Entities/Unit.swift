@@ -56,7 +56,7 @@ extension AdaptyUI.Unit: Decodable {
         case screen
     }
 
-    package init(from decoder: any Decoder) throws {
+    package init(from decoder: Decoder) throws {
         if let points = try? decoder.singleValueContainer().decode(Double.self) {
             self = .point(points)
         } else {

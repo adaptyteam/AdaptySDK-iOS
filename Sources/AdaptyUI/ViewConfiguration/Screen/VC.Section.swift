@@ -33,7 +33,7 @@ extension AdaptyUI.ViewConfiguration.Section: Decodable {
         case content
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             id: container.decode(String.self, forKey: .id),

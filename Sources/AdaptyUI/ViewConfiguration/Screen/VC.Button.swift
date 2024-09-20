@@ -41,7 +41,7 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
         case selectedCondition = "selected_condition"
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let actions =
             if let action = try? container.decode(AdaptyUI.ViewConfiguration.Action.self, forKey: .actions) {

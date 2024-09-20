@@ -37,7 +37,7 @@ extension AdaptyPaywall.RemoteConfig: Codable {
         case jsonString = "data"
     }
 
-    public init(from decoder: any Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         adaptyLocale = try container.decode(AdaptyLocale.self, forKey: .adaptyLocale)
         jsonString = try container.decode(String.self, forKey: .jsonString)

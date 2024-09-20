@@ -16,7 +16,7 @@ extension AdaptyUI.Text {
 }
 
 extension AdaptyUI.Text.OverflowMode: Decodable {
-    package init(from decoder: any Decoder) throws {
+    package init(from decoder: Decoder) throws {
         self =
             switch try decoder.singleValueContainer().decode(String.self) {
             case "scale":

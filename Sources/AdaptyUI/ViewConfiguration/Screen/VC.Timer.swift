@@ -117,7 +117,7 @@ extension AdaptyUI.ViewConfiguration {
         let utc: Date
         let local: Date
 
-        init(from decoder: any Decoder) throws {
+        init(from decoder: Decoder) throws {
             let value = try decoder.singleValueContainer().decode(String.self)
             let arrayString = value.components(separatedBy: CharacterSet(charactersIn: " -:.,;/\\"))
             let array = try arrayString.map {

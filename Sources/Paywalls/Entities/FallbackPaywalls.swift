@@ -66,7 +66,7 @@ extension FallbackPaywalls {
         let version: Int64
         let formatVersion: Int
 
-        init(from decoder: any Decoder) throws {
+        init(from decoder: Decoder) throws {
             let container = try decoder
                 .container(keyedBy: CodingKeys.self)
                 .nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
@@ -94,7 +94,7 @@ extension FallbackPaywalls {
 
     struct Body: Sendable, Decodable {
         let chosen: AdaptyPaywallChosen?
-        init(from decoder: any Decoder) throws {
+        init(from decoder: Decoder) throws {
             let placementId = try AnyCodingKeys(stringValue: decoder.userInfo.placementId)
             let container = try decoder
                 .container(keyedBy: CodingKeys.self)

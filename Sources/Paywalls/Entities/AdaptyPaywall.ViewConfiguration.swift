@@ -39,7 +39,7 @@ extension AdaptyPaywall {
 extension AdaptyPaywall.ViewConfiguration: Codable {
     typealias CodingKeys = AdaptyUI.ViewConfiguration.ContainerCodingKeys
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self =
@@ -53,7 +53,7 @@ extension AdaptyPaywall.ViewConfiguration: Codable {
             }
     }
 
-    func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(responseLocale, forKey: .responseLocale)
         try container.encode(id, forKey: .id)

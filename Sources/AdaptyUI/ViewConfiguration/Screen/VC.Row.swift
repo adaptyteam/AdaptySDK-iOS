@@ -30,7 +30,7 @@ extension AdaptyUI.ViewConfiguration.Row: Decodable {
         case items
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,

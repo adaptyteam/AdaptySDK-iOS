@@ -84,7 +84,7 @@ extension HTTPMetrics: Encodable {
         case decoding
     }
 
-    func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Int(taskInterval.duration * 1000), forKey: .duration)
         if redirectCount > 0 {
@@ -117,7 +117,7 @@ extension HTTPMetrics.Transaction: Encodable {
         case bytesReceived = "received"
     }
 
-    func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(fetchType?.rawValue, forKey: .type)
 

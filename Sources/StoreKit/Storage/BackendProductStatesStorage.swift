@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol BackendProductStatesStorage {
+protocol BackendProductStatesStorage: AnyObject, Sendable {
     func setBackendProductStates(_: VH<[BackendProductState]>)
     func getBackendProductStates() -> VH<[BackendProductState]>?
 }

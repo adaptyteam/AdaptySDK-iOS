@@ -64,7 +64,7 @@ extension AdaptyUI.ViewConfiguration.StringId: Hashable {
 }
 
 extension AdaptyUI.ViewConfiguration.StringId: Decodable {
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(String.self) {
             self = .basic(value)
             return
@@ -89,7 +89,7 @@ extension AdaptyUI.ViewConfiguration.StringId.Product: Decodable {
         case suffix
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         guard type == Self.typeValue else {

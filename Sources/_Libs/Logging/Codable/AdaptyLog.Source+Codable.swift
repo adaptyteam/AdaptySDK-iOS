@@ -15,7 +15,7 @@ extension AdaptyLog.Source: Codable {
         case lineNumber = "line"
     }
 
-    public init(from decoder: any Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         threadName = try container.decode(String.self, forKey: .threadName)
         fileName = try container.decode(String.self, forKey: .fileName)
@@ -23,7 +23,7 @@ extension AdaptyLog.Source: Codable {
         lineNumber = try container.decode(UInt.self, forKey: .lineNumber)
     }
 
-    public func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(threadName, forKey: .threadName)
         try container.encode(fileName, forKey: .fileName)

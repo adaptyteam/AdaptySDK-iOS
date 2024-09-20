@@ -19,7 +19,7 @@ struct AdaptyPaywallChosen: Sendable {
 }
 
 extension AdaptyPaywallChosen: Decodable {
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let items = try [AdaptyPaywallVariation](from: decoder)
         guard let firstItem = items.first else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Paywalls collection is empty"))
@@ -45,7 +45,7 @@ extension AdaptyPaywallChosen: Decodable {
             )
         )
 
-        func paywall(from decoder: any Decoder, index: Int) throws -> AdaptyPaywall {
+        func paywall(from decoder: Decoder, index: Int) throws -> AdaptyPaywall {
             struct Empty: Decodable /* temp */ {}
 
             var array = try decoder.unkeyedContainer()
@@ -75,7 +75,7 @@ extension AdaptyPaywallChosen {
             case attributes
         }
 
-        init(from decoder: any Decoder) throws {
+        init(from decoder: Decoder) throws {
             var container = try decoder.container(keyedBy: CodingKeys.self)
             if container.contains(.attributes) {
                 container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)

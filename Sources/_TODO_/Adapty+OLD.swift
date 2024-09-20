@@ -18,7 +18,7 @@ public final class Adapty {
         }
         return share
     }
-    
+
     let profileStorage: ProfileStorage
     let apiKeyPrefix: String
     let backend: Backend
@@ -43,7 +43,7 @@ public final class Adapty {
     func syncTransactions(refreshReceiptIfEmpty _: Bool) async throws -> VH<AdaptyProfile>? {
         throw AdaptyError.cantMakePayments()
     }
-    
+
 //    static func withOptioanalSDK(
 //        methodName: MethodName? = nil,
 //        logParams: EventParameters? = nil,
@@ -54,9 +54,9 @@ public final class Adapty {
 //    }
 
     static func withOptioanalSDK<T: Sendable>(
-        methodName: MethodName? = nil,
-        logParams: EventParameters? = nil,
-        function: StaticString = #function,
+        methodName _: MethodName? = nil,
+        logParams _: EventParameters? = nil,
+        function _: StaticString = #function,
         operation: @Sendable @escaping (Adapty?) async throws -> T
     ) async throws -> T {
         try await operation(nil)
@@ -72,9 +72,9 @@ public final class Adapty {
 //    }
 
     static func withActivatedSDK<T: Sendable>(
-        methodName: MethodName? = nil,
-        logParams: EventParameters? = nil,
-        function: StaticString = #function,
+        methodName _: MethodName? = nil,
+        logParams _: EventParameters? = nil,
+        function _: StaticString = #function,
         operation: @Sendable @escaping (Adapty) async throws -> T
     ) async throws -> T {
         try await operation(share)

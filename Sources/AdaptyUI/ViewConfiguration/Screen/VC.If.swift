@@ -19,7 +19,7 @@ extension AdaptyUI.ViewConfiguration {
             case `else`
         }
 
-        init(from decoder: any Decoder) throws {
+        init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             content =
                 if

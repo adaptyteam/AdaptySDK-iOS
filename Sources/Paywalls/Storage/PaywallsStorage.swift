@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol PaywallsStorage {
+protocol PaywallsStorage: AnyObject, Sendable {
     func setPaywalls(_: [VH<AdaptyPaywall>])
     func getPaywalls() -> [VH<AdaptyPaywall>]?
 }

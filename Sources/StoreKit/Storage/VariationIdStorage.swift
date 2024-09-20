@@ -7,7 +7,7 @@
 
 import StoreKit
 
-protocol VariationIdStorage {
+protocol VariationIdStorage: AnyObject, Sendable {
     func getVariationsIds() -> [String: String]?
     func setVariationsIds(_: [String: String])
     func getPersistentVariationsIds() -> [String: String]?

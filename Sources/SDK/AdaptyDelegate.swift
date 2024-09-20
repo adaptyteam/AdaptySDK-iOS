@@ -40,7 +40,7 @@ extension Adapty {
         set { current.delegate = newValue }
     }
 
-   nonisolated static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
+    nonisolated static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
         Task.detached {
             guard let delegate else { return }
             call(delegate)

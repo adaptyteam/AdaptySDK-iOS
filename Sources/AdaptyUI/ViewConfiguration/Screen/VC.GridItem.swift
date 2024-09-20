@@ -37,7 +37,7 @@ extension AdaptyUI.ViewConfiguration.GridItem: Decodable {
         case content
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let length: AdaptyUI.GridItem.Length =
             if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {

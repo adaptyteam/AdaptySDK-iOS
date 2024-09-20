@@ -52,7 +52,7 @@ extension AdaptyProductSubscriptionPeriod: Codable {
         case numberOfUnits = "number_of_units"
     }
 
-    public init(from decoder: any Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             unit: container.decode(AdaptyPeriodUnit.self, forKey: .unit),

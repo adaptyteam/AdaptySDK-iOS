@@ -72,7 +72,7 @@ extension AdaptyUI.ViewConfiguration.Pager: Decodable {
         case interactionBehaviour = "interaction"
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let def = AdaptyUI.Pager.default
         pageWidth = try container.decodeIfPresent(AdaptyUI.Pager.Length.self, forKey: .pageWidth) ?? def.pageWidth
@@ -115,7 +115,7 @@ extension AdaptyUI.Pager.Length: Decodable {
         case parent
     }
 
-    package init(from decoder: any Decoder) throws {
+    package init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(AdaptyUI.Unit.self) {
             self = .fixed(value)
         } else {

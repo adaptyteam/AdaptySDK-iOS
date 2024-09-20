@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ProductVendorIdsStorage {
+protocol ProductVendorIdsStorage: AnyObject, Sendable {
     func setProductVendorIds(_: [String])
     func getProductVendorIds() -> [String]?
 }

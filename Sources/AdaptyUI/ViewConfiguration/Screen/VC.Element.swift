@@ -133,7 +133,6 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             try .timer(timer(value), properties.flatMap(elementProperties))
         case let .pager(value, properties):
             try .pager(pager(value), properties.flatMap(elementProperties))
-
         case let .unknown(value, properties):
             try .unknown(value, properties.flatMap(elementProperties))
         }
@@ -231,7 +230,7 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
         case transitionIn = "transition_in"
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let transitionIn: [AdaptyUI.Transition] =
             if let array = try? container.decodeIfPresent([AdaptyUI.Transition].self, forKey: .transitionIn) {

@@ -66,7 +66,7 @@ extension AdaptyUI.ViewConfiguration.Stack: Decodable {
         case content
     }
 
-    init(from decoder: any Decoder) throws {
+    init(from decoder: Decoder) throws {
         let def = AdaptyUI.Stack.default
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
