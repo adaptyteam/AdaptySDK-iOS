@@ -8,7 +8,7 @@
 import Foundation
 import os.log
 
-#if swift(<6.0)
+#if compiler(<6.0)
     extension OSLog: @unchecked Sendable {}
 #endif
 

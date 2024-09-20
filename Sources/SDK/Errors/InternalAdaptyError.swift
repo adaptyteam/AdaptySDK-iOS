@@ -13,6 +13,7 @@ enum InternalAdaptyError: Error {
     case activateOnceError(AdaptyError.Source)
     case cantMakePayments(AdaptyError.Source)
     case notActivated(AdaptyError.Source)
+    
     case profileWasChanged(AdaptyError.Source)
     case profileCreateFailed(AdaptyError.Source, error: HTTPError)
     case fetchFailed(AdaptyError.Source, String, error: Error)
@@ -249,6 +250,15 @@ extension AdaptyError {
 //        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Request Paywall timeout").asAdaptyError
 //    }
 
+    static func syncProfileFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Sync Profile failed", error: unknownError).asAdaptyError
+    }
+    
     static func fetchViewConfigurationFailed(
         unknownError: Error,
         file: String = #fileID,

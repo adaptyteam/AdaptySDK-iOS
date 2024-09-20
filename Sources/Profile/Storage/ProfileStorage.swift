@@ -6,7 +6,7 @@
 
 import Foundation
 
-protocol ProfileIdentifierStorage: Sendable {
+protocol ProfileIdentifierStorage: AnyObject, Sendable {
     var profileId: String { get }
 }
 

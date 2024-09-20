@@ -45,7 +45,7 @@ extension AdaptyProductDiscount.PaymentMode {
         }
     }
 
-    #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
+    #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
         @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
         init(mode: SK2Transaction.Offer.PaymentMode) {
             switch mode {

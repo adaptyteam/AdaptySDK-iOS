@@ -12,6 +12,13 @@ public final class Adapty {
 
     nonisolated(unsafe) static var share: Adapty!
 
+    static func sdk() throws -> Adapty {
+        guard let share else {
+            throw AdaptyError.notActivated()
+        }
+        return share
+    }
+    
     let profileStorage: ProfileStorage
     let apiKeyPrefix: String
     let backend: Backend
@@ -32,6 +39,11 @@ public final class Adapty {
         httpSession = backend.createHTTPSession()
     }
 
+    func updateASATokenIfNeed(for _: VH<AdaptyProfile>) {}
+    func syncTransactions(refreshReceiptIfEmpty _: Bool) async throws -> VH<AdaptyProfile>? {
+        throw AdaptyError.cantMakePayments()
+    }
+    
 //    static func withOptioanalSDK(
 //        methodName: MethodName? = nil,
 //        logParams: EventParameters? = nil,

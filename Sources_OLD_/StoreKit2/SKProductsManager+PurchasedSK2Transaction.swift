@@ -42,7 +42,7 @@ private extension PurchasedTransaction {
         purchasedSK2Transaction transaction: SK2Transaction
     ) {
         let offer: PurchasedTransaction.SubscriptionOffer? = {
-            #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
+            #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
                 if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
                     return .init(transaction.offer, sk2Product: sk2Product)
                 }
@@ -79,7 +79,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
         )
     }
 
-    #if swift(>=5.9.2) && (!os(visionOS) || swift(>=5.10))
+    #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
         @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
         init?(_ transactionOffer: SK2Transaction.Offer?, sk2Product: SK2Product?) {
             guard let transactionOffer else { return nil }

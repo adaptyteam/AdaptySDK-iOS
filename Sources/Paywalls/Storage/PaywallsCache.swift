@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 private extension AdaptyPaywall {
     var localeOrDefault: AdaptyLocale {
         var remoteConfigLocale = remoteConfig?.adaptyLocale
@@ -31,7 +30,8 @@ private extension AdaptyPaywall {
     }
 }
 
-final class PaywallsCache {
+@AdaptyActor
+final class PaywallsCache: Sendable {
     let profileId: String
     private let storage: PaywallsStorage
     private var paywallByPlacementId: [String: VH<AdaptyPaywall>]

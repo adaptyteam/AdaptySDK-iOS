@@ -30,11 +30,13 @@ struct VH<Value: ValueHashable>: Sendable {
         self.init(value, hash: nil, time: time)
     }
 
-    @inlinable func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
+    @inlinable 
+    func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
         VH<U>(transform(value), hash: hash, time: time)
     }
 
-    @inlinable func flatValue<T>() -> VH<T>? where Value == T? {
+    @inlinable
+    func flatValue<T>() -> VH<T>? where Value == T? {
         switch value {
         case .none:
             .none

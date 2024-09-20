@@ -28,13 +28,20 @@ extension AdaptyDelegate {
 }
 
 extension Adapty {
-    /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
-    public weak static var delegate: AdaptyDelegate?
-}
+    private final class MutableState: @unchecked Sendable {
+        weak var delegate: AdaptyDelegate?
+    }
 
-extension Adapty {
-    static func callDelegate(_ call: @escaping (AdaptyDelegate) -> Void) {
-        (dispatchQueue ?? .main).async {
+    private static let current = MutableState()
+
+    /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
+    static var delegate: AdaptyDelegate? {
+        get { current.delegate }
+        set { current.delegate = newValue }
+    }
+
+   nonisolated static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
+        Task.detached {
             guard let delegate else { return }
             call(delegate)
         }

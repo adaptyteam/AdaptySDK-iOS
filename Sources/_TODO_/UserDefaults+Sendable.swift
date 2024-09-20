@@ -7,4 +7,8 @@
 
 import Foundation
 
-extension UserDefaults: @retroactive @unchecked Sendable {}
+#if compiler(>=6.0)
+    extension UserDefaults: @retroactive @unchecked Sendable {}
+#else
+    extension UserDefaults: @unchecked Sendable {}
+#endif

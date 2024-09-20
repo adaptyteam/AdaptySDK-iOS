@@ -5,95 +5,98 @@
 //  Created by Aleksei Valiano on 24.10.2022.
 //
 
-import StoreKit
+import Foundation
 
-final class ProfileManager {
-    let sdk: Adapty
-    let profileId: String
+@AdaptyActor
+final class ProfileManager: Sendable {
+    nonisolated let profileId: String
     var profile: VH<AdaptyProfile>
-    let paywallsCache: PaywallsCache
-    let productStatesCache: ProductStatesCache
     var onceSentEnvironment: SendedEnvironment
-
     var isActive: Bool = true
 
+    let storage: ProfileStorage
+    let paywallsCache: PaywallsCache
+    let productStatesCache: ProductStatesCache
+
     init(
-        sdk: Adapty,
+        profileStorage: ProfileStorage,
         paywallStorage: PaywallsStorage,
         productStorage: BackendProductStatesStorage,
         profile: VH<AdaptyProfile>,
         sendedEnvironment: SendedEnvironment
     ) {
-        self.manager = manager
         profileId = profile.value.profileId
         self.profile = profile
+        self.onceSentEnvironment = sendedEnvironment
+
+        storage = profileStorage
         paywallsCache = PaywallsCache(storage: paywallStorage, profileId: profileId)
         productStatesCache = ProductStatesCache(storage: productStorage)
 
-        manager.updateASATokenIfNeed(for: profile)
+        Task { [weak self] in
+            try? Adapty.sdk().updateASATokenIfNeed(for: profile)
 
-        let storage = manager.profileStorage
-        self.onceSentEnvironment = sendedEnvironment
+            if sendedEnvironment == .dont {
+                _ = try? await self?.getProfile()
+            } else {
+                self?.syncTransactionsIfNeed()
+            }
 
-        if sendedEnvironment == .dont {
-            getProfile { _ in }
-        } else if !storage.syncedTransactions {
-            manager.syncTransactions(refreshReceiptIfEmpty: true) { _ in }
+            Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
         }
-
-        Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
     }
 }
 
 extension ProfileManager {
-    func updateProfileParameters(_ params: AdaptyProfileParameters, _ completion: @escaping AdaptyErrorCompletion) {
-        syncProfile(params: params) { completion($0.error) }
+    func updateProfileParameters(_ params: AdaptyProfileParameters) async throws {
+        _ = try await syncProfile(params: params)
     }
 
-    func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        syncProfile(params: nil) { [weak self] result in
-            let out: AdaptyResult<AdaptyProfile>
-            defer { completion(out) }
+    nonisolated func syncTransactionsIfNeed() {
+        Task { [weak self] in
+            guard let sdk = try? Adapty.sdk(),
+                  let self,
+                  !self.storage.syncedTransactions
+            else { return }
 
-            guard let self, self.isActive else {
-                out = .failure(.profileWasChanged())
-                return
-            }
-
-            out = result.flatMapError { _ in
-                .success(self.profile.value)
-            }
-        }
-
-        if !manager.profileStorage.syncedTransactions {
-            manager.syncTransactions(refreshReceiptIfEmpty: true) { _ in }
+            _ = try? await sdk.syncTransactions(refreshReceiptIfEmpty: true)
         }
     }
 
-    private func syncProfile(params: AdaptyProfileParameters?, _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    func getProfile() async throws -> AdaptyProfile {
+        syncTransactionsIfNeed()
+        return await (try? syncProfile(params: nil)) ?? profile.value
+    }
+
+    private func syncProfile(params: AdaptyProfileParameters?) async throws -> AdaptyProfile {
         let environmentMeta = onceSentEnvironment.getValueIfNeedSend(
-            analyticsDisabled: (params?.analyticsDisabled ?? false) || manager.profileStorage.externalAnalyticsDisabled
+            analyticsDisabled: (params?.analyticsDisabled ?? false) || storage.externalAnalyticsDisabled
         )
 
-        let old = profile.value
+        do {
+            let old = profile
 
-        manager.httpSession.performSyncProfileRequest(
-            profileId: profileId,
-            parameters: params,
-            environmentMeta: environmentMeta,
-            responseHash: profile.hash
-        ) { [weak self] result in
-            completion(result
-                .do {
-                    if let environmentMeta {
-                        self?.onceSentEnvironment = environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
-                    }
-                    self?.saveResponse($0.flatValue())
-                }
-                .map {
-                    $0.value ?? old
-                }
+            let response = try await Adapty.sdk().httpSession.performSyncProfileRequest(
+                profileId: profileId,
+                parameters: params,
+                environmentMeta: environmentMeta,
+                responseHash: old.hash
             )
+
+            guard isActive else {
+                throw AdaptyError.profileWasChanged()
+            }
+
+            if let environmentMeta {
+                onceSentEnvironment = environmentMeta.idfa == nil
+                    ? .withoutIdfa
+                    : .withIdfa
+            }
+
+            saveResponse(response.flatValue())
+            return response.value ?? old.value
+        } catch {
+            throw error.asAdaptyError ?? .syncProfileFailed(unknownError: error)
         }
     }
 
@@ -109,80 +112,8 @@ extension ProfileManager {
            oldHash == newHash { return }
 
         profile = newProfile
-        manager.profileStorage.setProfile(newProfile)
+        storage.setProfile(newProfile)
+
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
-    }
-
-    func setVariationId(_ variationId: String, forTransactionId transactionId: String, _ completion: @escaping AdaptyErrorCompletion) {
-        manager.httpSession.performSetTransactionVariationIdRequest(profileId: profileId, transactionId: transactionId, variationId: variationId, completion)
-    }
-
-    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK1Transaction, _ completion: @escaping AdaptyErrorCompletion) {
-        guard transaction.transactionState == .purchased || transaction.transactionState == .restored,
-              let transactionIdentifier = transaction.transactionIdentifier else {
-            completion(.wrongParamPurchasedTransaction())
-            return
-        }
-
-        manager.skProductsManager.fillPurchasedTransaction(variationId: variationId, purchasedSK1Transaction: (transaction, transactionIdentifier)) { [weak self] purchasedTransaction in
-
-            guard let self, self.isActive else {
-                completion(.profileWasChanged())
-                return
-            }
-
-            self.manager.validatePurchase(transaction: purchasedTransaction, reason: .setVariation) { completion($0.error) }
-        }
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    func setVariationId(_ variationId: String, forPurchasedTransaction transaction: SK2Transaction, _ completion: @escaping AdaptyErrorCompletion) {
-        manager.skProductsManager.fillPurchasedTransaction(variationId: variationId, purchasedSK2Transaction: transaction) { [weak self] purchasedTransaction in
-
-            guard let self, self.isActive else {
-                completion(.profileWasChanged())
-                return
-            }
-
-            self.manager.validatePurchase(transaction: purchasedTransaction, reason: .setVariation) { completion($0.error) }
-        }
-    }
-
-    func getBackendProductStates(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
-        guard !manager.profileStorage.syncedTransactions else {
-            fetch(vendorProductIds: vendorProductIds, completion)
-            return
-        }
-        manager.syncTransactions(refreshReceiptIfEmpty: true) { result in
-            if let error = result.error {
-                completion(.failure(error))
-                return
-            }
-            fetch(vendorProductIds: vendorProductIds, completion)
-        }
-
-        func fetch(vendorProductIds: [String], _ completion: @escaping AdaptyResultCompletion<[BackendProductState]>) {
-            manager.httpSession.performFetchProductStatesRequest(profileId: profileId, responseHash: productStatesCache.productsHash) { [weak self] (result: AdaptyResult<VH<[BackendProductState]?>>) in
-
-                guard let self, self.isActive else {
-                    completion(.failure(.profileWasChanged()))
-                    return
-                }
-
-                switch result {
-                case let .failure(error):
-
-                    let value = self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)
-                    guard !value.isEmpty else {
-                        completion(.failure(error))
-                        return
-                    }
-                    completion(.success(value))
-                case let .success(products):
-                    self.productStatesCache.setBackendProductStates(products.flatValue())
-                    completion(.success(self.productStatesCache.getBackendProductStates(byIds: vendorProductIds)))
-                }
-            }
-        }
     }
 }

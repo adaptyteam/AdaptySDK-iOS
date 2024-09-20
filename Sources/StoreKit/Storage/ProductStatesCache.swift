@@ -9,7 +9,8 @@ import Foundation
 
 private let log = Log.Category(name: "ProductStatesCache")
 
-final class ProductStatesCache {
+@AdaptyActor
+final class ProductStatesCache : Sendable{
     private let storage: BackendProductStatesStorage
     private var products: VH<[String: BackendProductState]>?
 
