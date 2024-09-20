@@ -35,7 +35,7 @@ public extension AdaptyUI {
 @available(iOS 15.0, *)
 public extension AdaptyUI {
     /// This enum describes user initiated actions.
-    enum Action {
+    enum Action: Equatable {
         /// User pressed Close Button
         case close
         /// User pressed any button with URL

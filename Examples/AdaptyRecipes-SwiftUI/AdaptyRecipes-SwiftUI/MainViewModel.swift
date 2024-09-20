@@ -14,6 +14,14 @@ extension MainViewModel {
     var accessLevel: AdaptyProfile.AccessLevel? { profile?.accessLevels[AppConstants.accessLevelId] }
 }
 
+struct PaywallBuilderDataWrapper: Identifiable {
+    var id: String { paywall.placementId }
+
+    var paywall: AdaptyPaywall
+    var viewConfig: AdaptyUI.LocalizedViewConfiguration
+}
+
+
 class MainViewModel: NSObject, ObservableObject, AdaptyDelegate {
     override init() {
         super.init()
@@ -36,6 +44,23 @@ class MainViewModel: NSObject, ObservableObject, AdaptyDelegate {
         }
         
         getProfileInProgress = false
+    }
+    
+    // MARK: Paywall data
+    
+    @Published private(set) var paywallData: PaywallBuilderDataWrapper?
+
+    @MainActor
+    func loadPaywall() async {
+        do {
+            let paywall = try await Adapty.getPaywall(placementId: AppConstants.placementId)
+            let viewConfig = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
+            
+            self.paywallData = .init(paywall: paywall, viewConfig: viewConfig)
+        } catch {
+            Logger.log(.error, "getPaywallAndConfig: \(error)")
+//                alertError = .init(title: "getPaywallAndConfig error!", error: error)
+        }
     }
     
     // MARK: Login and Logout

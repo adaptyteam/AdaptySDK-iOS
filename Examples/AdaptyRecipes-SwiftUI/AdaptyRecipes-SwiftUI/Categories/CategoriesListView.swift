@@ -5,11 +5,13 @@
 //  Created by Aleksey Goncharov on 28.06.2024.
 //
 
+import Adapty
+import AdaptyUI
 import SwiftUI
 
 struct CategoriesListView: View {
     @EnvironmentObject private var viewModel: MainViewModel
-    @State private var showPaywall: Bool = false
+    @State private var presentedPaywallData: PaywallBuilderDataWrapper?
 
     var body: some View {
         List {
@@ -28,7 +30,9 @@ struct CategoriesListView: View {
                         }
                     } else {
                         Button {
-                            self.showPaywall = true
+                            if let paywallData = viewModel.paywallData {
+                                presentedPaywallData = paywallData
+                            }
                         } label: {
                             self.recipeRow(for: category)
                         }
@@ -37,7 +41,30 @@ struct CategoriesListView: View {
             }
         }
         .navigationTitle("Adapty Recipes")
-        .paywall(isPresented: $showPaywall, placementId: AppConstants.placementId)
+        .sheet(item: $presentedPaywallData) { data in
+            AdaptyPaywallView(
+                paywall: data.paywall,
+                configuration: data.viewConfig
+            )
+            .onPaywallDidPerformAction { action in
+                Logger.log(.verbose, "#Test# onPaywallDidPerformAction: \(action)")
+
+                switch action {
+                case .close:
+                    presentedPaywallData = nil
+                case .openURL:
+                    break
+                case .custom:
+                    break
+                }
+            }
+            .onPaywallDidSelectProduct { product in
+                Logger.log(.verbose, "#Test# onPaywallDidSelectProduct: \(product)")
+            }
+        }
+        .task {
+            await viewModel.loadPaywall()
+        }
     }
 
     @ViewBuilder
