@@ -31,7 +31,7 @@ extension Adapty {
     /// Adapty helps you to measure the performance of the paywalls. We automatically collect all the metrics related to purchases except for paywall views. This is because only you know when the paywall was shown to a customer.
     /// Whenever you show a paywall to your user, call .logShowPaywall(paywall) to log the event, and it will be accumulated in the paywall metrics.
     ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
+    /// Read more on the [Adapty Documentation](https://adapty.io/docs/present-remote-config-paywalls#track-paywall-view-events)
     ///
     /// - Parameters:
     ///   - paywall: A `AdaptyPaywall` object.

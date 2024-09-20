@@ -74,7 +74,7 @@ extension Adapty.Configuration {
             return self
         }
 
-        /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/docs/observer-vs-full-mode/). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
+        /// - Parameter observerMode: A boolean value controlling [Observer mode](https://adapty.io/docs/3.0/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
         public func with(observerMode mode: Bool) -> Builder {
             observerMode = mode
             return self
