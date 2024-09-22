@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol AdaptyDelegate: AnyObject {
+public protocol AdaptyDelegate: AnyObject, Sendable {
     /// Implement this delegate method to receive automatic profile updates
     func didLoadLatestProfile(_ profile: AdaptyProfile)
 
@@ -28,21 +28,16 @@ extension AdaptyDelegate {
 }
 
 extension Adapty {
-    private final class MutableState: @unchecked Sendable {
-        weak var delegate: AdaptyDelegate?
-    }
-
-    private static let current = MutableState()
+    public weak static var delegate: AdaptyDelegate?
 
     /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
-    static var delegate: AdaptyDelegate? {
-        get { current.delegate }
-        set { current.delegate = newValue }
+    public static func setDelegate(_ delegate: AdaptyDelegate) {
+        self.delegate = delegate
     }
 
     nonisolated static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
         Task.detached {
-            guard let delegate else { return }
+            guard let delegate = await Adapty.delegate else { return }
             call(delegate)
         }
     }

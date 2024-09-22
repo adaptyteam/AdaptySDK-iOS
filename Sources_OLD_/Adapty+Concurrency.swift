@@ -8,120 +8,10 @@
 import StoreKit
 
 extension Adapty {
-    /// Use this method to initialize the Adapty SDK.
-    ///
-    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
-    ///
-    /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
-    /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
-    /// - Parameter customerUserId: User identifier in your system
-    public static func activate(
-        _ apiKey: String,
-        observerMode: Bool = false,
-        customerUserId: String? = nil
-    ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.activate(
-                apiKey,
-                observerMode: observerMode,
-                customerUserId: customerUserId
-            ) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
 
-    public static func activate(
-        with builder: Adapty.Configuration.Builder
-    ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.activate(
-                with: builder
-            ) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
 
-    public static func activate(
-        with configuration: Adapty.Configuration
-    ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.activate(
-                with: configuration
-            ) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
 
-    /// Use this method for identifying user with it's user id in your system.
-    ///
-    /// If you don't have a user id on SDK configuration, you can set it later at any time with `.identify()` method. The most common cases are after registration/authorization when the user switches from being an anonymous user to an authenticated user.
-    ///
-    /// - Parameters:
-    ///   - customerUserId: User identifier in your system.
-    public static func identify(_ customerUserId: String) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.identify(customerUserId) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
 
-    /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
-    ///
-    /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
-    public static func getProfile() async throws -> AdaptyProfile {
-        try await withCheckedThrowingContinuation { continuation in
-            Adapty.getProfile { result in
-                switch result {
-                case let .failure(error):
-                    continuation.resume(throwing: error)
-                case let .success(profile):
-                    continuation.resume(returning: profile)
-                }
-            }
-        }
-    }
-
-    /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://docs.adapty.io/v2.0.0/docs/segments) or just view them in CRM.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
-    ///
-    /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
-    public static func updateProfile(params: AdaptyProfileParameters) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.updateProfile(params: params) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
 
     /// To set attribution data for the profile, use this method.
     ///
@@ -130,7 +20,7 @@ extension Adapty {
     /// - Parameter attribution: a dictionary containing attribution (conversion) data.
     /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
     /// - Parameter networkUserId: a string profile's identifier from the attribution service.
-    public static func updateAttribution(
+    public nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
         source: AdaptyAttributionSource,
         networkUserId: String? = nil
@@ -160,7 +50,7 @@ extension Adapty {
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
     /// - Returns: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     /// - Throws: An ``AdaptyError`` object
-    public static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct] {
+    public nonisolated static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct] {
         try await withCheckedThrowingContinuation { continuation in
             Adapty.getPaywallProducts(paywall: paywall) { result in
                 switch result {
@@ -182,7 +72,7 @@ extension Adapty {
     ///
     ///  - Returns: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
     ///  - Throws: An ``AdaptyError`` object.
-    public static func getProductsIntroductoryOfferEligibility(products: [AdaptyPaywallProduct]) async throws -> [String: AdaptyEligibility] {
+    public nonisolated static func getProductsIntroductoryOfferEligibility(products: [AdaptyPaywallProduct]) async throws -> [String: AdaptyEligibility] {
         try await withCheckedThrowingContinuation { continuation in
             Adapty.getProductsIntroductoryOfferEligibility(products: products) { result in
                 switch result {
@@ -203,7 +93,7 @@ extension Adapty {
     ///   - vendorProductIds: The products ids `String` array, for which information will be retrieved
     ///  - Returns: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
     ///  - Throws: An ``AdaptyError`` object.
-    public static func getProductsIntroductoryOfferEligibility(vendorProductIds: [String]) async throws -> [String: AdaptyEligibility] {
+    public nonisolated static func getProductsIntroductoryOfferEligibility(vendorProductIds: [String]) async throws -> [String: AdaptyEligibility] {
         try await withCheckedThrowingContinuation { continuation in
             Adapty.getProductsIntroductoryOfferEligibility(vendorProductIds: vendorProductIds) { result in
                 switch result {
@@ -222,7 +112,7 @@ extension Adapty {
     ///
     /// - Returns: The receipt `Data`.
     /// - Throws: An ``AdaptyError`` object.
-    public static func getReceipt() async throws -> Data {
+    public nonisolated static func getReceipt() async throws -> Data {
         try await withCheckedThrowingContinuation { continuation in
             Adapty.getReceipt { result in
                 switch result {
@@ -243,7 +133,7 @@ extension Adapty {
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
     /// - Returns: The ``AdaptyPurchasedInfo`` object.
     /// - Throws: An ``AdaptyError`` object
-    public static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchasedInfo {
+    public nonisolated static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchasedInfo {
         try await withCheckedThrowingContinuation { continuation in
             Adapty.makePurchase(product: product) { result in
                 switch result {
@@ -262,7 +152,7 @@ extension Adapty {
     ///
     /// - Returns: The ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     /// - Throws: An ``AdaptyError`` object
-    public static func restorePurchases() async throws -> AdaptyProfile {
+    public nonisolated static func restorePurchases() async throws -> AdaptyProfile {
         try await withCheckedThrowingContinuation { continuation in
             Adapty.restorePurchases { result in
                 switch result {
@@ -286,7 +176,7 @@ extension Adapty {
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
     /// - Throws: An ``AdaptyError`` object
-    public static func setVariationId(
+    public nonisolated static func setVariationId(
         _ variationId: String,
         forPurchasedTransaction transaction: SKPaymentTransaction
     ) async throws {
@@ -311,7 +201,7 @@ extension Adapty {
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     /// - Throws: An ``AdaptyError`` object
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public static func setVariationId(
+    public nonisolated static func setVariationId(
         _ variationId: String,
         forPurchasedTransaction transaction: Transaction
     ) async throws {
@@ -327,18 +217,4 @@ extension Adapty {
         }
     }
 
-    /// You can logout the user anytime by calling this method.
-    /// - Parameter completion: Result callback.
-    public static func logout() async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.logout { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
 }

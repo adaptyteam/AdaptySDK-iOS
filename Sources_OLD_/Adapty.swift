@@ -14,49 +14,13 @@ import StoreKit
 private let log = Log.default
 
 extension Adapty {
-    public static var isActivated: Bool { shared != nil }
+    public nonisolated static var isActivated: Bool { shared != nil }
 
     static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
 
-    /// Use this method to initialize the Adapty SDK.
-    ///
-    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
-    ///
-    /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
-    /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
-    /// - Parameter customerUserId: User identifier in your system
-    /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
-    /// - Parameter completion: Result callback
-    public static func activate(
-        _ apiKey: String,
-        observerMode: Bool = false,
-        customerUserId: String? = nil,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
-        activate(
-            with: Configuration
-                .builder(withAPIKey: apiKey)
-                .with(customerUserId: customerUserId)
-                .with(observerMode: observerMode)
-                .build(),
-            completion
-        )
-    }
 
-    /// Use this method to initialize the Adapty SDK.
-    ///
-    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
-    ///
-    /// - Parameter builder: `Adapty.Configuration.Builder` which allows to configure Adapty SDK
-    /// - Parameter completion: Result callback
-    public static func activate(
-        with builder: Adapty.Configuration.Builder,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        activate(with: builder.build(), completion)
-    }
+
 
     /// Use this method to initialize the Adapty SDK.
     ///
@@ -64,7 +28,7 @@ extension Adapty {
     ///
     /// - Parameter configuration: `Adapty.Configuration` which allows to configure Adapty SDK
     /// - Parameter completion: Result callback
-    public static func activate(
+    public nonisolated static func activate(
         with configuration: Adapty.Configuration,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
@@ -111,76 +75,14 @@ extension Adapty {
     }
 }
 
-extension Adapty {
-    /// Use this method for identifying user with it's user id in your system.
-    ///
-    /// If you don't have a user id on SDK configuration, you can set it later at any time with `.identify()` method. The most common cases are after registration/authorization when the user switches from being an anonymous user to an authenticated user.
-    ///
-    /// - Parameters:
-    ///   - customerUserId: User identifier in your system.
-    ///   - completion: Result callback.
-    public static func identify(
-        _ customerUserId: String,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        async(completion, logName: "identify") { manager, completion in
-            manager.identify(toCustomerUserId: customerUserId, completion)
-        }
-    }
 
-    /// You can logout the user anytime by calling this method.
-    /// - Parameter completion: Result callback.
-    public static func logout(_ completion: AdaptyErrorCompletion? = nil) {
-        async(completion, logName: "logout") { manager, completion in
-            manager.startLogout(completion)
-        }
-    }
-}
 
 extension Adapty {
-    /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
-    ///
-    /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
-    ///
-    /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public static func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        async(completion, logName: "get_profile") { manager, completion in
-            manager.getProfileManager { result in
-                switch result {
-                case let .failure(error):
-                    completion(.failure(error))
-                case let .success(profileManager):
-                    profileManager.getProfile(completion)
-                }
-            }
-        }
-    }
 
-    /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://docs.adapty.io/v2.0.0/docs/segments) or just view them in CRM.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
-    ///
-    /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
-    public static func updateProfile(
-        params: AdaptyProfileParameters,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        async(completion, logName: "update_profile") { manager, completion in
-            if let analyticsDisabled = params.analyticsDisabled {
-                manager.profileStorage.setExternalAnalyticsDisabled(analyticsDisabled)
-            }
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(profileManager.error)
-                    return
-                }
-                profileManager.updateProfileParameters(params, completion)
-            }
-        }
-    }
+
 
     /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
-    public static func setVariationId(
+    public nonisolated static func setVariationId(
         from decoder: JSONDecoder,
         data: Data,
         _ completion: AdaptyErrorCompletion? = nil
@@ -206,7 +108,7 @@ extension Adapty {
             "variation_id": parameters.variationId,
             "transaction_id": parameters.transactionId,
         ]
-        async(completion, logName: "set_variation_id", logParams: logParams) { manager, completion in
+        async(completion, logName: .setVariationId , logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(profileManager.error)
@@ -225,7 +127,7 @@ extension Adapty {
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
     ///   - completion: A result containing an optional error.
-    public static func setVariationId(
+    public nonisolated static func setVariationId(
         _ variationId: String,
         forPurchasedTransaction transaction: SKPaymentTransaction,
         _ completion: AdaptyErrorCompletion? = nil
@@ -234,7 +136,7 @@ extension Adapty {
             "variation_id": variationId,
             "transaction_id": transaction.transactionIdentifier,
         ]
-        async(completion, logName: "set_variation_id_sk1", logParams: logParams) { manager, completion in
+        async(completion, logName: .setVariationIdSK1, logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(profileManager.error)
@@ -254,7 +156,7 @@ extension Adapty {
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - completion: A result containing an optional error.
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public static func setVariationId(
+    public nonisolated static func setVariationId(
         _ variationId: String,
         forPurchasedTransaction transaction: Transaction,
         _ completion: AdaptyErrorCompletion? = nil
@@ -263,7 +165,7 @@ extension Adapty {
             "variation_id": variationId,
             "transaction_id": transaction.ext.identifier,
         ]
-        async(completion, logName: "set_variation_id_sk2", logParams: logParams) { manager, completion in
+        async(completion, logName: .setVariationIdSK2 , logParams: logParams) { manager, completion in
             manager.getProfileManager { profileManager in
                 guard let profileManager = try? profileManager.get() else {
                     completion(profileManager.error)
@@ -281,11 +183,11 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
-    public static func getPaywallProducts(
+    public s nonisolatedtatic func getPaywallProducts(
         paywall: AdaptyPaywall,
         _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
     ) {
-        async(completion, logName: "get_paywall_products", logParams: ["placement_id": paywall.placementId]) { manager, completion in
+        async(completion, logName: .getPaywallProducts , logParams: ["placement_id": paywall.placementId]) { manager, completion in
             manager.skProductsManager.fetchSK1ProductsInSameOrder(productIdentifiers: paywall.vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { (result: AdaptyResult<[SK1Product]>) in
                 completion(result.map { sk1Products in
                     sk1Products.compactMap { AdaptyPaywallProduct(paywall: paywall, sk1Product: $0) }
@@ -295,7 +197,7 @@ extension Adapty {
     }
 
     /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
-    public static func getPaywallProduct(
+    public nonisolated static func getPaywallProduct(
         from decoder: JSONDecoder,
         data: Data,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywallProduct>
@@ -327,13 +229,13 @@ extension Adapty {
     /// - Parameters:
     ///   - products: The ``AdaptyPaywallProduct`` array, for which information will be retrieved.
     ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-    public static func getProductsIntroductoryOfferEligibility(
+    public nonisolated static func getProductsIntroductoryOfferEligibility(
         products: [AdaptyPaywallProduct],
         _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
     ) {
         async(
             completion,
-            logName: "get_products_introductory_offer_eligibility",
+            logName: .getProductsIntroductoryOfferEligibility ,
             logParams: ["products": products.map { $0.vendorProductId }]
         ) { manager, completion in
             manager.skProductsManager.getIntroductoryOfferEligibility(sk1Products: products.map { $0.skProduct }) {
@@ -349,13 +251,13 @@ extension Adapty {
     /// - Parameters:
     ///   - products: The products ids `String` array, for which information will be retrieved
     ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-    public static func getProductsIntroductoryOfferEligibility(
+    public nonisolated static func getProductsIntroductoryOfferEligibility(
         vendorProductIds: [String],
         _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
     ) {
         async(
             completion,
-            logName: "get_products_introductory_offer_eligibility",
+            logName: .getProductsIntroductoryOfferEligibilityByStrings,
             logParams: ["products": vendorProductIds]
         ) { manager, completion in
             manager.skProductsManager.getIntroductoryOfferEligibility(vendorProductIds: Set(vendorProductIds)) {
@@ -413,8 +315,8 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - completion: A result containing the receipt `Data`.
-    public static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
-        async(completion, logName: "get_reciept") { manager, completion in
+    public nonisolated static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
+        async(completion, logName: .getReceipt ) { manager, completion in
             manager.sk1ReceiptManager.getReceipt(refreshIfEmpty: true, completion)
         }
     }
@@ -426,7 +328,7 @@ extension Adapty {
     /// - Parameters:
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
     ///   - completion: A result containing the ``AdaptyPurchasedInfo`` object.
-    public static func makePurchase(
+    public nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>
     ) {
@@ -474,8 +376,8 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
     ///
     /// - Parameter completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        async(completion, logName: "restore_purchases") { manager, completion in
+    public nonisolated static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        async(completion, logName: .restorePurchases) { manager, completion in
             manager.syncTransactions(refreshReceiptIfEmpty: true) { result in
 
                 if let result = result.flatValue() {

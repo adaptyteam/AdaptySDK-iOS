@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    func extractLocale() throws -> AdaptyUI.LocalizedViewConfiguration {
+    func extractLocale()  throws -> AdaptyUI.LocalizedViewConfiguration {
         try extractLocale(responseLocale)
     }
 

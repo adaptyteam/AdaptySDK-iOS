@@ -54,13 +54,13 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: A ``AdaptyPaywall`` object.
     ///  - Throws: An ``AdaptyError`` object
-    public static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
+    public nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
         try await withActivatedSDK(methodName: .logShowPaywall) { _ in
             try await trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)))
         }
     }
 
-    package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
+    package nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
         try await withActivatedSDK(methodName: .logShowPaywall) { _ in
             try await trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
         }
@@ -77,7 +77,7 @@ extension Adapty {
     ///   - screenName: Readable name of a particular screen as part of onboarding.
     ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
     /// - Throws: An ``AdaptyError`` object
-    public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
+    public nonisolated static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
         try await logShowOnboarding(.init(
             name: name,
             screenName: screenName,
@@ -85,7 +85,7 @@ extension Adapty {
         ))
     }
 
-    public static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws {
+    public nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws {
         try await withActivatedSDK(methodName: .logShowOnboarding) { _ in
 
             guard params.screenOrder > 0 else {

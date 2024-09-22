@@ -22,6 +22,107 @@ extension Result where Failure == AdaptyError {
 }
 
 extension Adapty {
+    /// Use this method to initialize the Adapty SDK.
+    ///
+    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
+    ///
+    /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
+    /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
+    /// - Parameter customerUserId: User identifier in your system
+    /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
+    /// - Parameter completion: Result callback
+    public nonisolated static func activate(
+        _ apiKey: String,
+        observerMode: Bool = false,
+        customerUserId: String? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await activate(apiKey, observerMode: observerMode, customerUserId: customerUserId)
+        }
+    }
+    
+    /// Use this method to initialize the Adapty SDK.
+    ///
+    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
+    ///
+    /// - Parameter builder: `Adapty.ConfigurationBuilder` which allows to configure Adapty SDK
+    /// - Parameter completion: Result callback
+    public nonisolated static func activate(
+        with builder: Adapty.ConfigurationBuilder,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        let configuration = builder.build()
+        withCompletion(completion) {
+            try await activate(with: configuration)
+        }
+    }
+    
+    /// Use this method to initialize the Adapty SDK.
+    ///
+    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
+    ///
+    /// - Parameter configuration: `Adapty.Configuration` which allows to configure Adapty SDK
+    /// - Parameter completion: Result callback
+    public nonisolated static func activate(
+        with configuration: Adapty.Configuration,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await activate(with: configuration)
+        }
+    }
+    
+    
+    /// Use this method for identifying user with it's user id in your system.
+    ///
+    /// If you don't have a user id on SDK configuration, you can set it later at any time with `.identify()` method. The most common cases are after registration/authorization when the user switches from being an anonymous user to an authenticated user.
+    ///
+    /// - Parameters:
+    ///   - customerUserId: User identifier in your system.
+    ///   - completion: Result callback.
+    public nonisolated static func identify(
+        _ customerUserId: String,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await identify(customerUserId)
+        }
+    }
+    
+    /// You can logout the user anytime by calling this method.
+    /// - Parameter completion: Result callback.
+    public nonisolated static func logout(_ completion: AdaptyErrorCompletion? = nil) {
+        withCompletion(completion) {
+            try await logout()
+        }
+    }
+    
+    /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
+    ///
+    /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
+    ///
+    /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    public nonisolated static func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        withCompletion(completion) {
+            try await getProfile()
+        }
+    }
+    
+    /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://docs.adapty.io/v2.0.0/docs/segments) or just view them in CRM.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
+    ///
+    /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
+    public nonisolated static func updateProfile(
+        params: AdaptyProfileParameters,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await updateProfile(params: params)
+        }
+    }
+    
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
@@ -35,7 +136,7 @@ extension Adapty {
     ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     ///   - loadTimeout: This value limits the timeout for this method. If the timeout is reached, cached data or local fallback will be returned.
     ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-//    public static func getPaywall(
+//    public nonisolated static func getPaywall(
 //        placementId: String,
 //        locale: String? = nil,
 //        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
@@ -62,7 +163,7 @@ extension Adapty {
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
     ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-//    public static func getPaywallForDefaultAudience(
+//    public nonisolated static func getPaywallForDefaultAudience(
 //        placementId: String,
 //        locale: String? = nil,
 //        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
@@ -86,7 +187,7 @@ extension Adapty {
     /// - Parameters:
     ///   - fileURL:
     ///   - completion: Result callback.
-    public static func setFallbackPaywalls(fileURL url: URL, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func setFallbackPaywalls(fileURL url: URL, _ completion: AdaptyErrorCompletion? = nil) {
         withCompletion(completion) {
             try await setFallbackPaywalls(fileURL: url)
         }
@@ -102,7 +203,7 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: A `AdaptyPaywall` object.
     ///   - completion: Result callback.
-    public static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
         withCompletion(completion) {
             try await logShowPaywall(paywall)
         }
@@ -119,13 +220,13 @@ extension Adapty {
     ///   - screenName: Readable name of a particular screen as part of onboarding.
     ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
     ///   - completion: Result callback.
-    public static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt, _ completion: AdaptyErrorCompletion? = nil) {
         withCompletion(completion) {
             try await logShowOnboarding(name: name, screenName: screenName, screenOrder: screenOrder)
         }
     }
 
-    public static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters, _ completion: AdaptyErrorCompletion? = nil) {
         withCompletion(completion) {
             try await logShowOnboarding(params)
         }

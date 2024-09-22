@@ -19,7 +19,7 @@ extension Adapty {
     ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     /// - Throws: An ``AdaptyError`` object
-    public static func getPaywallForDefaultAudience(
+    public nonisolated static func getPaywallForDefaultAudience(
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPaywall.FetchPolicy = .default
@@ -31,7 +31,7 @@ extension Adapty {
         )
     }
 
-    private static func getPaywallForDefaultAudience(
+    private nonisolated static func getPaywallForDefaultAudience(
         _ placementId: String,
         locale: AdaptyLocale,
         withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy

@@ -7,8 +7,9 @@
 
 import Foundation
 
+@AdaptyActor
 extension Adapty {
-    package static func getViewConfiguration(
+    package nonisolated static func getViewConfiguration(
         paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
     ) async throws -> AdaptyUI.LocalizedViewConfiguration {
@@ -44,28 +45,30 @@ extension Adapty {
 
         AdaptyUI.sendImageUrlsToObserver(viewConfiguration)
 
-        do {
-            return try viewConfiguration.extractLocale()
-        } catch {
-            throw AdaptyError.decodingViewConfiguration(error)
+        let lacolization = Task {
+            do {
+                return try viewConfiguration.extractLocale()
+            } catch {
+                throw AdaptyError.decodingViewConfiguration(error)
+            }
         }
+
+        return try await lacolization.value
     }
 
-    private func restoreViewConfiguration(_: AdaptyLocale, _: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {
-        nil
-        // TODO: impliment
-//        guard
-//            let manager = state.initialized, manager.isActive,
-//            let cached = manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId)?.value,
-//            paywall.variationId == cached.variationId,
-//            paywall.instanceIdentity == cached.instanceIdentity,
-//            paywall.revision == cached.revision,
-//            paywall.version == cached.version,
-//            let cachedViewConfiguration = cached.viewConfiguration,
-//            case let .data(data) = cachedViewConfiguration
-//        else { return nil }
-//
-//        return data
+    private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {
+        guard
+            let manager = profileManagerOrNil, manager.isActive,
+            let cached = manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId)?.value,
+            paywall.variationId == cached.variationId,
+            paywall.instanceIdentity == cached.instanceIdentity,
+            paywall.revision == cached.revision,
+            paywall.version == cached.version,
+            let cachedViewConfiguration = cached.viewConfiguration,
+            case let .data(data) = cachedViewConfiguration
+        else { return nil }
+
+        return data
     }
 
     private func fetchViewConfiguration(

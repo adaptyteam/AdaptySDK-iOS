@@ -11,8 +11,8 @@ private let log = Log.default
 
 extension Adapty {
     /// Call this method to have StoreKit present a sheet enabling the user to redeem codes provided by your app.
-    public static func presentCodeRedemptionSheet() {
-        let logName = "present_code_redemption_sheet"
+    public nonisolated static func presentCodeRedemptionSheet() {
+        let logName = .presentCodeRedemptionSheet
         #if (os(iOS) || os(visionOS)) && !targetEnvironment(macCatalyst)
             async(nil, logName: logName) { _, completion in
                 if #available(iOS 14.0, visionOS 1.0, *) {

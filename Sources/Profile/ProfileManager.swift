@@ -18,6 +18,7 @@ final class ProfileManager: Sendable {
     let paywallsCache: PaywallsCache
     let productStatesCache: ProductStatesCache
 
+    @AdaptyActor
     init(
         storage: ProfileStorage,
         paywallStorage: PaywallsStorage,
@@ -34,7 +35,7 @@ final class ProfileManager: Sendable {
         productStatesCache = ProductStatesCache(storage: productStorage)
 
         Task { [weak self] in
-            try? Adapty.sdk().updateASATokenIfNeed(for: profile)
+            try? Adapty.sdk.updateASATokenIfNeed(for: profile)
 
             if sendedEnvironment == .dont {
                 _ = try? await self?.getProfile()
@@ -48,9 +49,10 @@ final class ProfileManager: Sendable {
 }
 
 extension ProfileManager {
-    nonisolated func syncTransactionsIfNeed() { // TODO: ???
+    
+    nonisolated func syncTransactionsIfNeed() { // TODO: extruct this code from ProfileManager
         Task { [weak self] in
-            guard let sdk = try? Adapty.sdk(),
+            guard let sdk = try? await Adapty.sdk,
                   let self,
                   !self.storage.syncedTransactions
             else { return }
@@ -59,7 +61,7 @@ extension ProfileManager {
         }
     }
 
-    func updateProfileParameters(_ params: AdaptyProfileParameters) async throws -> AdaptyProfile {
+    func updateProfile(params: AdaptyProfileParameters) async throws -> AdaptyProfile {
         try await syncProfile(params: params)
     }
 
@@ -69,6 +71,10 @@ extension ProfileManager {
     }
 
     private func syncProfile(params: AdaptyProfileParameters?) async throws -> AdaptyProfile {
+        if let analyticsDisabled = params?.analyticsDisabled {
+            storage.setExternalAnalyticsDisabled(analyticsDisabled)
+        }
+
         let environmentMeta = onceSentEnvironment.getValueIfNeedSend(
             analyticsDisabled: (params?.analyticsDisabled ?? false) || storage.externalAnalyticsDisabled
         )
@@ -76,7 +82,7 @@ extension ProfileManager {
         do {
             let old = profile
 
-            let response = try await Adapty.sdk().httpSession.performSyncProfileRequest(
+            let response = try await Adapty.sdk.httpSession.performSyncProfileRequest(
                 profileId: profileId,
                 parameters: params,
                 environmentMeta: environmentMeta,

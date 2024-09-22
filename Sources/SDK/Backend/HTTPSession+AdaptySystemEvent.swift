@@ -8,6 +8,8 @@
 import Foundation
 
 extension HTTPSession {
+    
+    @AdaptyActor
     @inlinable
     func perform<Request: HTTPRequestWithDecodableResponse>(
         _ request: Request,
@@ -26,6 +28,7 @@ extension HTTPSession {
         }
     }
 
+    @AdaptyActor
     @inlinable
     func perform(
         _ request: some HTTPRequest,

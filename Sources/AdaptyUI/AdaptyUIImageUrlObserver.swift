@@ -23,7 +23,7 @@ extension AdaptyUI {
 
     private static let holder = Holder()
 
-    package static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver) {
+    package nonisolated static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver) {
         Task {
             await holder.set(imageUrlObserver: observer)
         }

@@ -7,26 +7,6 @@
 
 import Foundation
 
-extension Adapty {
-    /// Set to the most appropriate level of logging
-    public static var logLevel: AdaptyLog.Level {
-        get { Log.level }
-        set {
-            Task {
-                await Log.set(level: newValue)
-            }
-        }
-    }
-
-    /// Override the default logger behavior using this method
-    /// - Parameter handler: The function will be called for each message with the appropriate `logLevel`
-    public static func setLogHandler(_ handler: AdaptyLog.Handler?) {
-        Task {
-            await Log.set(handler: handler)
-        }
-    }
-}
-
 package enum Log {
     @globalActor
     package actor InternalActor {

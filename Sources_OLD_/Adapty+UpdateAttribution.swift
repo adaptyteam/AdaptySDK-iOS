@@ -19,7 +19,7 @@ extension Adapty {
     /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
     /// - Parameter networkUserId: a string profile's identifier from the attribution service.
     /// - Parameter completion: A result containing an optional error.
-    public static func updateAttribution(_ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func updateAttribution(_ attribution: [AnyHashable: Any], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
         if source == .appsflyer {
             assert(networkUserId != nil, "`networkUserId` is required for AppsFlyer attribution, otherwise we won't be able to send specific events. You can get it by accessing `AppsFlyerLib.shared().getAppsFlyerUID()` or in a similar way according to the official SDK.")
         }
@@ -33,7 +33,7 @@ extension Adapty {
         }
         ) { $1 }
 
-        async(completion, logName: "update_attribution", logParams: logParams) { manager, completion in
+        async(completion, logName: .updateAttribution, logParams: logParams) { manager, completion in
             manager.updateAttribution(
                 profileId: manager.profileStorage.profileId,
                 attribution,

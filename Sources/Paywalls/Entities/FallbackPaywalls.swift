@@ -71,7 +71,7 @@ extension FallbackPaywalls {
                 .container(keyedBy: CodingKeys.self)
                 .nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
 
-            formatVersion = try container.decode(Int.self, forKey: .formatVersion)
+            let formatVersion = try container.decode(Int.self, forKey: .formatVersion)
 
             guard formatVersion == Adapty.fallbackFormatVersion else {
                 let error = formatVersion < Adapty.fallbackFormatVersion
@@ -79,14 +79,17 @@ extension FallbackPaywalls {
                     : "The fallback paywalls version is not correct. Please update the AdaptySDK."
                 log.error(error)
 
-                Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
-                    "in_version": formatVersion,
-                    "expected_version": Adapty.fallbackFormatVersion,
-                ]))
+                Task(priority: .high) {
+                    await Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
+                        "in_version": formatVersion,
+                        "expected_version": Adapty.fallbackFormatVersion,
+                    ]))
+                }
 
                 throw AdaptyError.wrongVersionFallback(error)
             }
 
+            self.formatVersion = formatVersion
             version = try container.decode(Int64.self, forKey: .version)
             placementIds = try container.decodeIfPresent(Set<String>.self, forKey: .placementIds)
         }

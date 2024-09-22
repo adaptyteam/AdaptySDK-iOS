@@ -7,25 +7,17 @@
 
 import Foundation
 
-public final class Adapty {
+@AdaptyActor
+public final class Adapty: Sendable {
     static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
-
-    nonisolated(unsafe) static var share: Adapty!
-
-    static func sdk() throws -> Adapty {
-        guard let share else {
-            throw AdaptyError.notActivated()
-        }
-        return share
-    }
 
     let profileStorage: ProfileStorage
     let apiKeyPrefix: String
     let backend: Backend
 
     let httpSession: HTTPSession
-    lazy var httpFallbackSession: HTTPSession = backend.fallback.createHTTPSession()
-    lazy var httpConfigsSession: HTTPSession = backend.configs.createHTTPSession()
+    let httpFallbackSession: HTTPSession
+    let httpConfigsSession: HTTPSession
 
     init(
         apiKeyPrefix: String,
@@ -37,6 +29,8 @@ public final class Adapty {
         self.backend = backend
         self.profileStorage = profileStorage
         httpSession = backend.createHTTPSession()
+        httpFallbackSession = backend.fallback.createHTTPSession()
+        httpConfigsSession = backend.configs.createHTTPSession()
     }
 
     func updateASATokenIfNeed(for _: VH<AdaptyProfile>) {}
@@ -44,49 +38,36 @@ public final class Adapty {
         throw AdaptyError.cantMakePayments()
     }
 
-//    static func withOptioanalSDK(
-//        methodName: MethodName? = nil,
-//        logParams: EventParameters? = nil,
-//        function: StaticString = #function,
-//        operation: @Sendable @escaping (Adapty?) async throws -> Void
-//    ) async throws {
-//        try await operation(nil)
-//    }
-
-    static func withOptioanalSDK<T: Sendable>(
-        methodName _: MethodName? = nil,
-        logParams _: EventParameters? = nil,
-        function _: StaticString = #function,
-        operation: @Sendable @escaping (Adapty?) async throws -> T
-    ) async throws -> T {
-        try await operation(nil)
-    }
-
-//    static func withActivatedSDK(
-//        methodName: MethodName? = nil,
-//        logParams: EventParameters? = nil,
-//        function: StaticString = #function,
-//        operation: @Sendable @escaping (Adapty) async throws -> Void
-//    ) async throws {
-//        try await operation(share)
-//    }
-
-    static func withActivatedSDK<T: Sendable>(
-        methodName _: MethodName? = nil,
-        logParams _: EventParameters? = nil,
-        function _: StaticString = #function,
-        operation: @Sendable @escaping (Adapty) async throws -> T
-    ) async throws -> T {
-        try await operation(share)
-    }
-
     enum ValidatePurchaseReason: Sendable, Hashable {
         case setVariation
         case observing
         case purchasing
     }
+
+    nonisolated(unsafe) static var share: Adapty!
+
+    static var sdk: Adapty {
+        get throws {
+            guard let share = Adapty.share else {
+                throw AdaptyError.notActivated()
+            }
+            return share
+        }
+    }
+
+    nonisolated(unsafe) var profile: ProfileManager!
+
+    var createdProfileManager: ProfileManager {
+        get async throws {
+            profile
+        }
+    }
+
+    var profileManagerOrNil: ProfileManager? {
+        nil
+    }
 }
 
 extension TimeInterval {
-    public static let defaultLoadPaywallTimeout: TimeInterval = 5.0
+    static let defaultLoadPaywallTimeout: TimeInterval = 5.0
 }
