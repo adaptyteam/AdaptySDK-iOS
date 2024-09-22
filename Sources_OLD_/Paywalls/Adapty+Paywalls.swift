@@ -131,7 +131,7 @@ extension Adapty {
             completion(
                 result
                     .flatMapError { error in
-                        if let fallback = Adapty.Configuration.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId) {
+                        if let fallback = Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId) {
                             .success(fallback)
                         } else {
                             .failure(error)

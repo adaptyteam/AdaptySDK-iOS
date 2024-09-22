@@ -7,19 +7,9 @@
 
 import Foundation
 
-extension Adapty.Configuration {
-    private final class MutableState: @unchecked Sendable {
-        var fallbackPaywalls: FallbackPaywalls?
-    }
-
-    private static let current = MutableState()
-    static var fallbackPaywalls: FallbackPaywalls? {
-        get { current.fallbackPaywalls }
-        set { current.fallbackPaywalls = newValue }
-    }
-}
-
 extension Adapty {
+    static var fallbackPaywalls: FallbackPaywalls?
+
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///
     /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
@@ -30,9 +20,9 @@ extension Adapty {
     ///   - fileURL:
     /// - Throws: An ``AdaptyError`` object
     public nonisolated static func setFallbackPaywalls(fileURL url: URL) async throws {
-        try await withOptioanalSDK(methodName: .setFallbackPaywalls) { _ in
+        try await withOptioanalSDK(methodName: .setFallbackPaywalls) { @AdaptyActor _ in
             do {
-                Configuration.fallbackPaywalls = try FallbackPaywalls(fileURL: url)
+                Adapty.fallbackPaywalls = try FallbackPaywalls(fileURL: url)
             } catch {
                 throw error.asAdaptyError ?? .decodingFallbackFailed(unknownError: error)
             }
@@ -46,7 +36,7 @@ extension PaywallsCache {
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale) -> AdaptyPaywall? {
         let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?.value
 
-        guard let fallback = Adapty.Configuration.fallbackPaywalls,
+        guard let fallback = Adapty.fallbackPaywalls,
               fallback.contains(placementId: placementId) ?? true
         else {
             return cache

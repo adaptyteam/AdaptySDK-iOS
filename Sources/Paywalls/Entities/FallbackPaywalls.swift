@@ -22,6 +22,8 @@ struct FallbackPaywalls: Sendable {
         let decoder = FallbackPaywalls.decoder()
         do {
             head = try decoder.decode(Head.self, from: Data(contentsOf: url))
+        } catch let error as AdaptyError {
+            throw error
         } catch {
             throw AdaptyError.decodingFallback(error)
         }
