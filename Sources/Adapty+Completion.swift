@@ -123,6 +123,20 @@ extension Adapty {
         }
     }
     
+    /// To set attribution data for the profile, use this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
+    ///
+    /// - Parameter attribution: a dictionary containing attribution (conversion) data.
+    /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
+    /// - Parameter networkUserId: a string profile's identifier from the attribution service.
+    /// - Parameter completion: A result containing an optional error.
+    public nonisolated static func updateAttribution(_ attribution: [String: any Sendable], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
+        withCompletion(completion) {
+            try await updateAttribution(attribution, source: source, networkUserId: networkUserId)
+        }
+    }
+    
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)

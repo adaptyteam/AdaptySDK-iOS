@@ -13,31 +13,6 @@ extension Adapty {
 
 
 
-    /// To set attribution data for the profile, use this method.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
-    ///
-    /// - Parameter attribution: a dictionary containing attribution (conversion) data.
-    /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
-    /// - Parameter networkUserId: a string profile's identifier from the attribution service.
-    public nonisolated static func updateAttribution(
-        _ attribution: [AnyHashable: Any],
-        source: AdaptyAttributionSource,
-        networkUserId: String? = nil
-    ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.updateAttribution(attribution, source: source, networkUserId: networkUserId) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
-
-
 
 
 

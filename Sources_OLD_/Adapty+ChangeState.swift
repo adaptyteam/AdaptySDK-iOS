@@ -52,7 +52,7 @@ public final class Adapty {
 
         state = .initializingTo(customerUserId: customerUserId)
         sk1QueueManager.startObserving(purchaseValidator: self)
-        syncIPv4IfNeed()
+        startSyncIPv4OnceIfNeeded()
         initializingProfileManager(toCustomerUserId: customerUserId)
     }
 

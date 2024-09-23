@@ -33,7 +33,6 @@ public final class Adapty: Sendable {
         httpConfigsSession = backend.configs.createHTTPSession()
     }
 
-    func updateASATokenIfNeed(for _: VH<AdaptyProfile>) {}
     func syncTransactions(refreshReceiptIfEmpty _: Bool) async throws -> VH<AdaptyProfile>? {
         throw AdaptyError.cantMakePayments()
     }
@@ -62,6 +61,13 @@ public final class Adapty: Sendable {
             profile
         }
     }
+    
+    var createdProfileManagerOrThrows: ProfileManager {
+        get async throws {
+            profile
+        }
+    }
+    
 
     var profileManagerOrNil: ProfileManager? {
         nil

@@ -45,7 +45,7 @@ extension Adapty {
 
         AdaptyUI.sendImageUrlsToObserver(viewConfiguration)
 
-        let lacolization = Task {
+        let extractLocaleTask = Task {
             do {
                 return try viewConfiguration.extractLocale()
             } catch {
@@ -53,7 +53,7 @@ extension Adapty {
             }
         }
 
-        return try await lacolization.value
+        return try await extractLocaleTask.value
     }
 
     private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {

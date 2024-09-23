@@ -27,6 +27,7 @@ extension ProfileManager.SendedEnvironment {
         }
     }
 
+    @AdaptyActor
     func getValueIfNeedSend(analyticsDisabled: Bool) -> Environment.Meta? {
         guard needSend(analyticsDisabled: analyticsDisabled) else { return nil }
 

@@ -80,8 +80,6 @@ enum Environment {
 
         static var webViewUserAgent: String? { nil }
 
-        static var ipV4Address: String? { nil }
-
         static let name: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)
                 let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))

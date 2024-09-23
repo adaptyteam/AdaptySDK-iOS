@@ -85,7 +85,7 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode("api_response_\(name.rawValue)", forKey: .name)
+        try container.encode("api_response_\(name)", forKey: .name)
         try container.encode(stamp, forKey: .stamp)
         try container.encodeIfPresent(backendRequestId, forKey: .backendRequestId)
         try container.encodeIfPresent(metrics, forKey: .metrics)
@@ -146,32 +146,32 @@ enum MethodName: String {
 }
 
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
-    let methodName: String
+    let name: MethodName
     let stamp: String
     let params: EventParameters?
 
-    init(methodName: String, stamp: String, params: EventParameters? = nil) {
-        self.methodName = methodName
+    init(methodName: MethodName, stamp: String, params: EventParameters? = nil) {
+        self.name = methodName
         self.stamp = stamp
         self.params = params
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode("sdk_request_\(methodName)", forKey: .name)
+        try container.encode("sdk_request_\(name)", forKey: .name)
         try container.encode(stamp, forKey: .stamp)
         try encoder.encode(params)
     }
 }
 
 struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
-    let methodName: String
+    let name: MethodName
     let stamp: String?
     let params: EventParameters?
     let error: String?
 
-    init(methodName: String, stamp: String? = nil, params: EventParameters? = nil, error: String? = nil) {
-        self.methodName = methodName
+    init(methodName: MethodName, stamp: String? = nil, params: EventParameters? = nil, error: String? = nil) {
+        self.name = methodName
         self.stamp = stamp
         self.params = params
         self.error = error
@@ -179,7 +179,7 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode("sdk_response_\(methodName)", forKey: .name)
+        try container.encode("sdk_response_\(name)", forKey: .name)
         try container.encodeIfPresent(stamp, forKey: .stamp)
         if let error {
             try container.encode(false, forKey: .success)

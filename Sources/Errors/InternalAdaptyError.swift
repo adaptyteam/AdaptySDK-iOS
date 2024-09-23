@@ -259,6 +259,15 @@ extension AdaptyError {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Sync Profile failed", error: unknownError).asAdaptyError
     }
     
+    static func updateAttributionFaild(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Sync Profile failed", error: unknownError).asAdaptyError
+    }
+    
     static func fetchViewConfigurationFailed(
         unknownError: Error,
         file: String = #fileID,
