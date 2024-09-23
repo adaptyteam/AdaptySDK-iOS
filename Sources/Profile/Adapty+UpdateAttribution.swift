@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(AdServices)
-    import AdServices
-#endif
 
 extension Adapty {
     /// To set attribution data for the profile, use this method.
@@ -64,35 +61,5 @@ extension Adapty {
         } catch {
             throw error.asAdaptyError ?? .updateAttributionFaild(unknownError: error)
         }
-    }
-
-    func updateASATokenIfNeed(for profile: VH<AdaptyProfile>) {
-        #if canImport(AdServices)
-            guard
-                #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),
-                profileStorage.appleSearchAdsSyncDate == nil, // check if this is an actual first sync
-                let attributionToken = try? Environment.getASAToken()
-            else { return }
-
-            Task {
-                let profileId = profile.value.profileId
-
-                let response = try await httpSession.performSendASATokenRequest(
-                    profileId: profileId,
-                    token: attributionToken,
-                    responseHash: profile.hash
-                )
-
-                if let profile = response.flatValue() {
-                    profileManagerOrNil?.saveResponse(profile)
-                }
-
-                if profileStorage.profileId == profileId {
-                    // mark appleSearchAds attribution data as synced
-                    profileStorage.setAppleSearchAdsSyncDate()
-                }
-            }
-
-        #endif
     }
 }

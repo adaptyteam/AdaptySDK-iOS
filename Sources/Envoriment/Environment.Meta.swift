@@ -13,13 +13,16 @@ extension Environment {
         let timezone: String
         let idfv: String?
         let idfa: String?
-
+        let ipV4Address: String?
+        let storeCountry: String?
+        
         @AdaptyActor
         init(includedAnalyticIds: Bool) {
             locale = User.locale
             timezone = System.timezone
 
             ipV4Address = Device.ipV4Address
+            storeCountry = System.storeCountry
             if includedAnalyticIds {
                 idfv = Device.idfv
                 idfa = Device.idfa
@@ -28,10 +31,6 @@ extension Environment {
                 idfa = nil
             }
         }
-
-        var storeCountry: String? { Device.storeCountry }
-        
-        let ipV4Address: String? // { Device.ipV4Address }
 
         var appTrackingTransparencyStatus: UInt? {
             #if canImport(AppTrackingTransparency)

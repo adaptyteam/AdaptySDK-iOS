@@ -191,33 +191,36 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
     }
 }
 
+enum AppleMethodName: String {
+    case fetchASAToken = "fetch_ASA_Token"
+}
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {
-    let methodName: String
+    let name: AppleMethodName
     let stamp: String?
     let params: EventParameters?
 
-    init(methodName: String, stamp: String? = nil, params: EventParameters? = nil) {
-        self.methodName = methodName
+    init(methodName: AppleMethodName, stamp: String? = nil, params: EventParameters? = nil) {
+        self.name = methodName
         self.stamp = stamp
         self.params = params
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode("apple_request_\(methodName)", forKey: .name)
+        try container.encode("apple_request_\(name)", forKey: .name)
         try container.encodeIfPresent(stamp, forKey: .stamp)
         try encoder.encode(params)
     }
 }
 
 struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
-    let methodName: String
+    let name: AppleMethodName
     let stamp: String?
     let params: EventParameters?
     let error: String?
 
-    init(methodName: String, stamp: String? = nil, params: EventParameters? = nil, error: String? = nil) {
-        self.methodName = methodName
+    init(methodName: AppleMethodName, stamp: String? = nil, params: EventParameters? = nil, error: String? = nil) {
+        self.name = methodName
         self.stamp = stamp
         self.params = params
         self.error = error
@@ -225,7 +228,7 @@ struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode("apple_response_\(methodName)", forKey: .name)
+        try container.encode("apple_response_\(name)", forKey: .name)
         try container.encodeIfPresent(stamp, forKey: .stamp)
         try encoder.encode(params)
         if let error {

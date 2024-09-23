@@ -1,19 +1,12 @@
 //
-// Environment.swift
+//  Environment.swift
 //  AdaptySDK
 //
 //  Created by Andrey Kyashkin on 19.12.2019.
 //
 
-#if canImport(AdSupport)
-    import AdSupport
-#endif
-
-#if canImport(AdServices)
-    import AdServices
-#endif
-
 import Foundation
+
 #if canImport(UIKit)
     import UIKit
 #elseif os(macOS)
@@ -23,12 +16,6 @@ import Foundation
 #if canImport(WebKit)
     import WebKit
 #endif
-
-#if canImport(AppTrackingTransparency)
-    import AppTrackingTransparency
-#endif
-
-import StoreKit
 
 private let log = Log.default
 
@@ -46,39 +33,55 @@ enum Environment {
     enum System {
         static var timezone: String { TimeZone.current.identifier }
 
-        static var version: String { "" }
-
-        static var name: String { "" }
-
-        static let isSandbox: Bool = {
-            guard !Device.isSimulator else { return true }
-
-            guard let path = Bundle.main.appStoreReceiptURL?.path else { return false }
-
-            if path.contains("MASReceipt/receipt") {
-                return path.contains("Xcode/DerivedData")
-            } else {
-                return path.contains("sandboxReceipt")
-            }
+        @MainActor
+        static let version: String = {
+            #if os(macOS) || targetEnvironment(macCatalyst)
+                ProcessInfo().operatingSystemVersionString
+            #else
+                UIDevice.current.systemVersion
+            #endif
         }()
 
-        static var storeKit2Enabled: Bool {
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                true
-            } else {
-                false
-            }
-        }
+        @MainActor
+        static let name: String = {
+            #if os(macOS) || targetEnvironment(macCatalyst)
+                "macOS"
+            #else
+                UIDevice.current.systemName
+            #endif
+        }()
     }
 
     enum Device {
-        typealias DisplayResolution = (width: Int, height: Int)
+        #if targetEnvironment(simulator)
+            static let isSimulator = true
+        #else
+            static let isSimulator = false
+        #endif
 
-        static var displayResolution: DisplayResolution? { nil }
+//        typealias DisplayResolution = (width: Int, height: Int)
+//
+//        @MainActor
+//        static var displayResolution: DisplayResolution? = {
+//            #if os(macOS)
+//                NSScreen.main?.frame.size
+//            #elseif targetEnvironment(macCatalyst)
+//                Optional.some(UIScreen.main.bounds.size)
+//            #elseif os(visionOS)
+//                DisplayResolution?.none
+//            #else
+//                Optional.some(UIScreen.main.bounds.size)
+//            #endif
+//        }().map { (width: Int($0.width), height: Int($0.height)) }
 
-        static var storeCountry: String? { nil }
-
-        static var webViewUserAgent: String? { nil }
+        @MainActor
+        static let webViewUserAgent: String? = {
+            #if canImport(WebKit)
+                WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
+            #else
+                nil
+            #endif
+        }()
 
         static let name: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)
@@ -106,33 +109,5 @@ enum Environment {
                 }
             #endif
         }()
-
-        static var idfa: String? { nil }
-
-        static var canTakeIdfa: Bool { false }
-
-        static var idfv: String? { nil }
-
-        #if targetEnvironment(simulator)
-            static let isSimulator = true
-        #else
-            static let isSimulator = false
-        #endif
     }
-
-    #if canImport(AdServices)
-        @available(iOS 14.3, macOS 11.1, visionOS 1.0, *)
-        static func getASAToken() throws -> String { "" }
-    #endif
 }
-
-#if canImport(AppTrackingTransparency)
-    import AppTrackingTransparency
-
-    extension Environment.Device {
-        @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
-        static var appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus {
-            ATTrackingManager.trackingAuthorizationStatus
-        }
-    }
-#endif
