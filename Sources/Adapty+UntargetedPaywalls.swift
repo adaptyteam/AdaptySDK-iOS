@@ -12,7 +12,7 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
+    ///   - locale: The identifier of the paywall localization.
     ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
     ///             Example: "en" means English, "en-US" represents US English.
     ///             If the parameter is omitted, the paywall will be returned in the default locale.

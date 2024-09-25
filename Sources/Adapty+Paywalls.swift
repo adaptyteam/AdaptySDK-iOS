@@ -10,11 +10,11 @@ import Foundation
 extension Adapty {
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
+    /// Read more on the [Adapty Documentation](https://adapty.io/docs/3.0/fetch-paywalls-and-products#fetch-products)
     ///
     /// - Parameters:
     ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
+    ///   - locale: The identifier of the paywall localization.
     ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
     ///             Example: "en" means English, "en-US" represents US English.
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
