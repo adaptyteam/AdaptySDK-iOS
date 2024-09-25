@@ -1,9 +1,8 @@
 //
-//  File.swift
-//
+//  Adapty+Activate.swift
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 22.09.2024
-//
 //
 
 import Foundation
@@ -47,26 +46,13 @@ extension Adapty {
     ///
     /// - Parameter configuration: `Adapty.Configuration` which allows to configure Adapty SDK
     public nonisolated static func activate(
-        with _: Adapty.Configuration
+        with configuration: Adapty.Configuration
     ) async throws {
         // TODO:
+
+        if let logLevel = configuration.logLevel {
+            await Log.set(level: logLevel)
+        }
     }
     
-    /// Set to the most appropriate level of logging
-    public nonisolated static var logLevel: AdaptyLog.Level {
-        get { Log.level }
-        set {
-            Task {
-                await Log.set(level: newValue)
-            }
-        }
-    }
-
-    /// Override the default logger behavior using this method
-    /// - Parameter handler: The function will be called for each message with the appropriate `logLevel`
-    public nonisolated static func setLogHandler(_ handler: AdaptyLog.Handler?) {
-        Task {
-            await Log.set(handler: handler)
-        }
-    }
 }

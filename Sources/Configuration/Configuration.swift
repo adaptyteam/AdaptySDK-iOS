@@ -9,14 +9,11 @@ import Foundation
 
 extension Adapty {
     public struct Configuration: Sendable {
-        static let `default` = Configuration(
-            apiKey: "",
-            customerUserId: nil,
+        static let `default` = (
             observerMode: false,
             idfaCollectionDisabled: false,
             ipAddressCollectionDisabled: false,
-            backend: Backend.URLs.publicEnvironment,
-            crossPlatformSDK: nil
+            backend: Backend.URLs.publicEnvironment
         )
 
         let apiKey: String
@@ -25,6 +22,9 @@ extension Adapty {
         let idfaCollectionDisabled: Bool
         let ipAddressCollectionDisabled: Bool
         let backend: Backend.URLs
+        let logLevel: AdaptyLog.Level?
         let crossPlatformSDK: (name: String, version: String)?
     }
 }
+
+

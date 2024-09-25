@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 20.10.2022.
 //
 
-import StoreKit
+import Foundation
 
 public struct AdaptyProductSubscriptionPeriod: Sendable, Hashable {
     /// A unit of time that a subscription period is specified in.
@@ -26,17 +26,6 @@ public struct AdaptyProductSubscriptionPeriod: Sendable, Hashable {
             self.numberOfUnits = numberOfUnits
             self.unit = unit
         }
-    }
-}
-
-extension AdaptyProductSubscriptionPeriod {
-    init(subscriptionPeriod: SK1Product.SubscriptionPeriod) {
-        self.init(unit: AdaptyPeriodUnit(unit: subscriptionPeriod.unit), numberOfUnits: subscriptionPeriod.numberOfUnits)
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(subscriptionPeriod: SK2Product.SubscriptionPeriod) {
-        self.init(unit: AdaptyPeriodUnit(unit: subscriptionPeriod.unit), numberOfUnits: subscriptionPeriod.value)
     }
 }
 

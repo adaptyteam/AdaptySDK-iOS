@@ -1,9 +1,8 @@
 //
-//  File.swift
-//
+//  AdaptyUI+Testing.swift
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 16.05.2024
-//
 //
 
 import Foundation

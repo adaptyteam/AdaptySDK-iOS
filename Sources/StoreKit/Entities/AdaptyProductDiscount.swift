@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import StoreKit
 
 public struct AdaptyProductDiscount: Sendable, Hashable {
     fileprivate let _price: Price
@@ -39,58 +38,30 @@ public struct AdaptyProductDiscount: Sendable, Hashable {
 
     /// A formatted price of a discount for a user's locale.
     public var localizedPrice: String? { _price.localizedString }
+    
+    init(_price: Price, 
+         identifier: String?,
+         offerType: OfferType,
+         subscriptionPeriod: AdaptyProductSubscriptionPeriod, 
+         numberOfPeriods: Int,
+         paymentMode: PaymentMode,
+         localizedSubscriptionPeriod: String?,
+         localizedNumberOfPeriods: String?
+    ) {
+        self._price = _price
+        self.identifier = identifier
+        self.offerType = offerType
+        self.subscriptionPeriod = subscriptionPeriod
+        self.numberOfPeriods = numberOfPeriods
+        self.paymentMode = paymentMode
+        self.localizedSubscriptionPeriod = localizedSubscriptionPeriod
+        self.localizedNumberOfPeriods = localizedNumberOfPeriods
+    }
 }
 
 extension Price {
     init(from product: AdaptyProductDiscount) {
         self = product._price
-    }
-}
-
-extension AdaptyProductDiscount {
-    init(discount: SK1Product.SubscriptionOffer, locale: Locale) {
-        let period = AdaptyProductSubscriptionPeriod(subscriptionPeriod: discount.subscriptionPeriod)
-        self.init(
-            _price: Price(
-                amount: discount.price as Decimal,
-                currencyCode: locale.unfCurrencyCode,
-                currencySymbol: locale.currencySymbol,
-                localizedString: locale.localized(sk1Price: discount.price)
-            ),
-            identifier: discount.identifier,
-            offerType: OfferType(type: discount.type),
-            subscriptionPeriod: period,
-            numberOfPeriods: discount.numberOfPeriods,
-            paymentMode: PaymentMode(mode: discount.paymentMode),
-            localizedSubscriptionPeriod: locale.localized(period: period),
-            localizedNumberOfPeriods: locale.localized(period: period, numberOfPeriods: discount.numberOfPeriods)
-        )
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(
-        offer: SK2Product.SubscriptionOffer,
-        currencyCode: String?,
-        priceLocale: Locale,
-        periodLocale: Locale
-    ) {
-        let period = AdaptyProductSubscriptionPeriod(subscriptionPeriod: offer.period)
-
-        self.init(
-            _price: Price(
-                amount: offer.price,
-                currencyCode: currencyCode,
-                currencySymbol: priceLocale.currencySymbol,
-                localizedString: offer.displayPrice
-            ),
-            identifier: offer.id,
-            offerType: OfferType(type: offer.type),
-            subscriptionPeriod: period,
-            numberOfPeriods: offer.periodCount,
-            paymentMode: PaymentMode(mode: offer.paymentMode),
-            localizedSubscriptionPeriod: periodLocale.localized(period: period),
-            localizedNumberOfPeriods: periodLocale.localized(period: period, numberOfPeriods: offer.periodCount)
-        )
     }
 }
 

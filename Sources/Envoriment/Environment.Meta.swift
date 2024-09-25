@@ -14,18 +14,21 @@ extension Environment {
         let idfv: String?
         let idfa: String?
         let ipV4Address: String?
-        let storeCountry: String?
-        
-        @AdaptyActor
-        init(includedAnalyticIds: Bool) {
-            locale = User.locale
-            timezone = System.timezone
+        let storefront: AdaptyStorefront?
+        let webUserAgent: String?
+        let envorinment: Environment
 
+        @AdaptyActor
+        init(includedAnalyticIds: Bool) async {
+            locale = System.locale
+            timezone = System.timezone
             ipV4Address = Device.ipV4Address
-            storeCountry = System.storeCountry
+            storefront = await Environment.Store.storefront
+            webUserAgent = await Device.webUserAgent
+            envorinment = await Environment.instance
             if includedAnalyticIds {
-                idfv = Device.idfv
-                idfa = Device.idfa
+                idfv = await Device.idfv
+                idfa = await Device.idfa
             } else {
                 idfv = nil
                 idfa = nil
@@ -46,7 +49,7 @@ extension Environment {
             case SDKVersion = "adapty_sdk_version"
             case appBuild = "app_build"
             case appVersion = "app_version"
-            case webViewUserAgent = "user_agent"
+            case webUserAgent = "user_agent"
             case device
             case locale
             case sysVersion = "os"
@@ -60,14 +63,14 @@ extension Environment {
 
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Application.installationIdentifier, forKey: .appInstallId)
+            try container.encode(envorinment.application.installationIdentifier, forKey: .appInstallId)
             try container.encode(Adapty.SDKVersion, forKey: .SDKVersion)
-            try container.encodeIfPresent(Application.build, forKey: .appBuild)
-            try container.encodeIfPresent(Application.version, forKey: .appVersion)
-            try container.encodeIfPresent(Device.webViewUserAgent, forKey: .webViewUserAgent)
+            try container.encodeIfPresent(envorinment.application.build, forKey: .appBuild)
+            try container.encodeIfPresent(envorinment.application.version, forKey: .appVersion)
+            try container.encodeIfPresent(webUserAgent, forKey: .webUserAgent)
             try container.encode(Device.name, forKey: .device)
-            try container.encode(System.version, forKey: .sysVersion)
-            try container.encode(System.name, forKey: .sysName)
+            try container.encode(envorinment.system.version, forKey: .sysVersion)
+            try container.encode(envorinment.system.name, forKey: .sysName)
             try container.encodeIfPresent(locale, forKey: .locale)
             try container.encodeIfPresent(timezone, forKey: .timezone)
             try container.encodeIfPresent(idfv, forKey: .idfv)

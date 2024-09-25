@@ -15,15 +15,18 @@ extension Adapty {
         Task.detached {
             let stamp = Log.stamp
             let name = MethodName.presentCodeRedemptionSheet
-            var error: String? = "Presenting code redemption sheet is available only for iOS 14 and higher."
+            var error: String?
 
             await Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: name, stamp: stamp))
 
             #if (os(iOS) || os(visionOS)) && !targetEnvironment(macCatalyst)
                 if #available(iOS 14.0, visionOS 1.0, *) {
                     SKPaymentQueue.default().presentCodeRedemptionSheet()
-                    error = nil
+                } else {
+                    error = "Presenting code redemption sheet is available only for iOS 14 and higher."
                 }
+            #else
+                error = "Presenting code redemption sheet is available only for iOS 14 and higher."
             #endif
 
             if let error { log.error(error) }

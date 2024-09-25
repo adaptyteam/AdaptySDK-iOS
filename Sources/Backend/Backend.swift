@@ -18,12 +18,12 @@ struct Backend: HTTPCodableConfiguration {
     func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
     func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
 
-    init(with config: Adapty.Configuration) {
-        let baseUrls = config.backend
-        let apiKey = config.apiKey
+    init(with configuration: Adapty.Configuration, envorinment: Environment) {
+        let baseUrls = configuration.backend
+        let apiKey = configuration.apiKey
 
         let sessionConfiguration = URLSessionConfiguration.ephemeral
-        sessionConfiguration.httpAdditionalHeaders = Request.globalHeaders(with: config)
+        sessionConfiguration.httpAdditionalHeaders = Request.globalHeaders(  configuration,  envorinment  )
         sessionConfiguration.timeoutIntervalForRequest = 30
         sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
 

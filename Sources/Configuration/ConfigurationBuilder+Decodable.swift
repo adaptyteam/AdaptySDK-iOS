@@ -21,6 +21,8 @@ extension Adapty.ConfigurationBuilder: Decodable {
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
 
+        case logLevel = "log_level"
+
         case crossPlatformSDKName = "cross_platform_sdk_name"
         case crossPlatformSDKVersion = "cross_platform_sdk_version"
     }
@@ -43,7 +45,7 @@ extension Adapty.ConfigurationBuilder: Decodable {
             let version = try container.decodeIfPresent(String.self, forKey: .crossPlatformSDKVersion) {
                 (name: name, version: version)
             } else {
-                defaultValue.crossPlatformSDK
+                nil
             }
 
         try self.init(
@@ -61,6 +63,7 @@ extension Adapty.ConfigurationBuilder: Decodable {
             backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl)
                 ?? defaultValue.backend.configsUrl,
             backendProxy: proxy,
+            logLevel: container.decodeIfPresent(AdaptyLog.Level.self, forKey: .logLevel),
             crossPlatformSDK: crossPlatformSDK
         )
     }

@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import StoreKit
 
 extension AdaptyProductDiscount {
     public enum PaymentMode: UInt, Sendable {
@@ -15,51 +14,6 @@ extension AdaptyProductDiscount {
         case freeTrial
         case unknown
     }
-}
-
-extension AdaptyProductDiscount.PaymentMode {
-    init(mode: SK1Product.SubscriptionOffer.PaymentMode) {
-        switch mode {
-        case .payAsYouGo:
-            self = .payAsYouGo
-        case .payUpFront:
-            self = .payUpFront
-        case .freeTrial:
-            self = .freeTrial
-        @unknown default:
-            self = .unknown
-        }
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(mode: SK2Product.SubscriptionOffer.PaymentMode) {
-        switch mode {
-        case .payAsYouGo:
-            self = .payAsYouGo
-        case .payUpFront:
-            self = .payUpFront
-        case .freeTrial:
-            self = .freeTrial
-        default:
-            self = .unknown
-        }
-    }
-
-    #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
-        @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
-        init(mode: SK2Transaction.Offer.PaymentMode) {
-            switch mode {
-            case .payAsYouGo:
-                self = .payAsYouGo
-            case .payUpFront:
-                self = .payUpFront
-            case .freeTrial:
-                self = .freeTrial
-            default:
-                self = .unknown
-            }
-        }
-    #endif
 }
 
 //extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {

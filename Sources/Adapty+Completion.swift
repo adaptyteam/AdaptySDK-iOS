@@ -52,6 +52,7 @@ extension Adapty {
         with builder: Adapty.ConfigurationBuilder,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
+        
         let configuration = builder.build()
         withCompletion(completion) {
             try await activate(with: configuration)

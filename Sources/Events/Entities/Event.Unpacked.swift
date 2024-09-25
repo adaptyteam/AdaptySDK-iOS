@@ -12,15 +12,20 @@ extension Event {
         let id: String
         let event: Event
         let profileId: String
-        let sessionId: String
+        let environment: Environment
         let createdAt: Date
+    }
+}
 
-        init(from event: Event, _ profileId: String) {
-            self.id = UUID().uuidString.lowercased()
-            self.event = event
-            self.profileId = profileId
-            sessionId = Environment.Application.sessionIdentifier
-            createdAt = Date()
-        }
+extension EventsManager {
+    @AdaptyActor
+    func trackEvent(_ event: Event, profileId: String, createdAt: Date = Date()) async throws {
+        try await self.trackEvent(.init(
+            id: UUID().uuidString.lowercased(),
+            event: event,
+            profileId: profileId,
+            environment: Environment.instance,
+            createdAt: createdAt
+        ))
     }
 }

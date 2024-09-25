@@ -55,10 +55,15 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
             try dataObject.encode(parameters, forKey: .attributes)
         }
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+
         try attributesObject.encodeIfPresent(customerUserId, forKey: .customerUserId)
         try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
-        try attributesObject.encodeIfPresent(environmentMeta.storeCountry, forKey: .storeCountry)
-        try attributesObject.encodeIfPresent(environmentMeta.ipV4Address, forKey: .ipV4Address)
+        if parameters?.storeCountry == nil {
+            try attributesObject.encodeIfPresent(environmentMeta.storefront?.countryCode, forKey: .storeCountry)
+        }
+        if parameters?.ipV4Address == nil {
+            try attributesObject.encodeIfPresent(environmentMeta.ipV4Address, forKey: .ipV4Address)
+        }
 
         if parameters?.appTrackingTransparencyStatus == nil {
             try attributesObject.encodeIfPresent(environmentMeta.appTrackingTransparencyStatus, forKey: .appTrackingTransparencyStatus)

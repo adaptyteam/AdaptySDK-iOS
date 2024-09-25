@@ -10,23 +10,11 @@ import StoreKit
 
 extension PurchasedTransaction {
     enum OfferType: Int {
-        case unknown = 0 
+        case unknown = 0
         case introductory = 1
         case promotional = 2
         case code = 3
         case winBack = 4
-
-    }
-}
-
-extension PurchasedTransaction.OfferType {
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(type: SK2Transaction.OfferType) {
-        guard let type = PurchasedTransaction.OfferType(rawValue: type.rawValue) else {
-            self = .unknown
-            return
-        }
-        self = type
     }
 }
 

@@ -13,8 +13,6 @@ extension Locale {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = self
-        formatter.minimumFractionDigits = 0 // TODO: ??
-        formatter.maximumFractionDigits = 2 // TODO: ??
         return formatter.string(from: price)
     }
 

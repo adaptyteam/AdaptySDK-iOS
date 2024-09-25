@@ -4,7 +4,7 @@
 //
 //  Created by Aleksei Valiano on 08.09.2022.
 //
-import StoreKit
+import Foundation
 
 extension PurchasedTransaction {
     struct SubscriptionOffer: Sendable {

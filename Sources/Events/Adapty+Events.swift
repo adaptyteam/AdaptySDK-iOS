@@ -10,21 +10,19 @@ import Foundation
 extension Adapty {
     static let eventsManager = EventsManager(profileStorage: profileIdentifierStorage)
 
-    private static func trackEvent(_ event: Event, profileId: String? = nil) async throws {
+    private static func trackEvent(_ event: Event) async throws {
         do {
-            try await Adapty.eventsManager.trackEvent(Event.Unpacked(
-                from: event,
-                profileId ?? profileIdentifierStorage.profileId
-            ))
+            try await Adapty.eventsManager.trackEvent(event, profileId: profileIdentifierStorage.profileId)
         } catch {
             throw error.asAdaptyError ?? .trackEventFailed(unknownError: error)
         }
     }
 
     package static func trackSystemEvent(_ params: AdaptySystemEventParameters) {
-        let event = Event.Unpacked(from: .system(params), profileIdentifierStorage.profileId)
+        let now = Date()
+        let profileId = profileIdentifierStorage.profileId
         Task.detached(priority: .utility) {
-            try? await eventsManager.trackEvent(event)
+            try? await eventsManager.trackEvent(.system(params), profileId: profileId, createdAt: now)
         }
     }
 
@@ -32,16 +30,15 @@ extension Adapty {
         guard case let .draw(placementAudienceVersionId, profileId) = chosen.kind else {
             return
         }
-        let event = Event.Unpacked(
-            from: .paywallVariationAssigned(.init(
-                paywallVariationId: chosen.value.variationId,
-                viewConfigurationId: chosen.value.viewConfiguration?.id,
-                placementAudienceVersionId: placementAudienceVersionId
-            )),
-            profileId
-        )
-
-        Task { try? await eventsManager.trackEvent(event) }
+        let event = Event.paywallVariationAssigned(.init(
+            paywallVariationId: chosen.value.variationId,
+            viewConfigurationId: chosen.value.viewConfiguration?.id,
+            placementAudienceVersionId: placementAudienceVersionId
+        ))
+        let now = Date()
+        Task.detached(priority: .utility) {
+            try? await eventsManager.trackEvent(event, profileId: profileId, createdAt: now)
+        }
     }
 
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.

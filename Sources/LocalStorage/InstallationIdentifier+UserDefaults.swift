@@ -8,6 +8,7 @@
 import Foundation
 
 extension Environment.Application {
+    @AdaptyActor
     static let installationIdentifier = UserDefaults.standard.getAppInstallationIdentifier()
 }
 

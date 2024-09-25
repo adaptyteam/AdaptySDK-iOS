@@ -29,14 +29,10 @@ struct AdaptySK1Product: AdaptyProduct {
 
     var regionCode: String? { skProduct.priceLocale.unfRegionCode }
 
-    var isFamilyShareable: Bool {
-        guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, visionOS 1.0, *) else { return false }
-        return skProduct.isFamilyShareable
-    }
+    var isFamilyShareable: Bool { skProduct.unfIsFamilyShareable }
 
     var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
-        guard let period = skProduct.subscriptionPeriod, period.numberOfUnits > 0 else { return nil }
-        return AdaptyProductSubscriptionPeriod(subscriptionPeriod: period)
+        skProduct.subscriptionPeriod?.asAdaptyProductSubscriptionPeriod
     }
 
     var introductoryDiscount: AdaptyProductDiscount? {

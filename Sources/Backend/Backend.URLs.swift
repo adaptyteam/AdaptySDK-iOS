@@ -1,5 +1,5 @@
 //
-//  Backend.BaseUrls.swift
+//  Backend.URLs.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 30.10.2023

@@ -8,7 +8,7 @@
 import Foundation
 
 private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<SignSubscriptionOfferResponse>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyProductDiscount.Signature>
 
     let endpoint = HTTPEndpoint(
         method: .get,
@@ -33,7 +33,7 @@ extension HTTPSession {
         profileId: String,
         vendorProductId: String,
         discountId: String
-    ) async throws -> SignSubscriptionOfferResponse {
+    ) async throws -> AdaptyProductDiscount.Signature {
         let request = SignSubscriptionOfferRequest(
             vendorProductId: vendorProductId,
             discountId: discountId,

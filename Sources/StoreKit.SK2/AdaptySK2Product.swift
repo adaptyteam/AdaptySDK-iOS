@@ -32,8 +32,7 @@ struct AdaptySK2Product: AdaptyProduct {
     var isFamilyShareable: Bool { skProduct.isFamilyShareable }
 
     var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
-        guard let period = skProduct.subscription?.subscriptionPeriod else { return nil }
-        return AdaptyProductSubscriptionPeriod(subscriptionPeriod: period)
+        skProduct.subscription?.subscriptionPeriod.asAdaptyProductSubscriptionPeriod
     }
 
     var introductoryDiscount: AdaptyProductDiscount? {
@@ -46,9 +45,7 @@ struct AdaptySK2Product: AdaptyProduct {
         )
     }
 
-    var subscriptionGroupIdentifier: String? {
-        skProduct.subscription?.subscriptionGroupID
-    }
+    var subscriptionGroupIdentifier: String? { skProduct.subscription?.subscriptionGroupID }
 
     var discounts: [AdaptyProductDiscount] {
         guard let offers = skProduct.subscription?.promotionalOffers, !offers.isEmpty else {
@@ -78,9 +75,7 @@ struct AdaptySK2Product: AdaptyProduct {
         )
     }
 
-    var localizedPrice: String? {
-        skProduct.displayPrice
-    }
+    var localizedPrice: String? { skProduct.displayPrice }
 
     var localizedSubscriptionPeriod: String? {
         guard let period = subscriptionPeriod else { return nil }

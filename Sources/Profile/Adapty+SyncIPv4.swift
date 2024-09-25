@@ -9,7 +9,7 @@ import Foundation
 
 extension Adapty.Configuration {
     @AdaptyActor
-    static var ipAddressCollectionDisabled = false
+    static var ipAddressCollectionDisabled = Self.default.ipAddressCollectionDisabled
 }
 
 extension Environment.Device {

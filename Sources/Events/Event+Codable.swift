@@ -1,9 +1,8 @@
 //
-//  File.swift
-//
+//  Event+Codable.swift
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.04.2024
-//
 //
 
 import Foundation

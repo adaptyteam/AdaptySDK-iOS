@@ -8,7 +8,7 @@
 import StoreKit
 
 extension ProfileManager {
-    enum SendedEnvironment: Sendable, Hashable {
+    enum SendedEnvironment: Sendable, Hashable { // TODO:  need refactoring
         case dont
         case withIdfa
         case withoutIdfa
@@ -16,22 +16,22 @@ extension ProfileManager {
 }
 
 extension ProfileManager.SendedEnvironment {
-    func needSend(analyticsDisabled: Bool) -> Bool {
+    func needSend(analyticsDisabled: Bool) async -> Bool {
         switch self {
         case .dont:
             true
         case .withIdfa:
             false
         case .withoutIdfa:
-            Environment.Device.canTakeIdfa && !analyticsDisabled
+            await Environment.Device.canTakeIdfa && !analyticsDisabled
         }
     }
 
     @AdaptyActor
-    func getValueIfNeedSend(analyticsDisabled: Bool) -> Environment.Meta? {
-        guard needSend(analyticsDisabled: analyticsDisabled) else { return nil }
+    func getValueIfNeedSend(analyticsDisabled: Bool) async -> Environment.Meta? {
+        guard await needSend(analyticsDisabled: analyticsDisabled) else { return nil }
 
-        let meta = Environment.Meta(includedAnalyticIds: !analyticsDisabled)
+        let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
 
         if meta.idfa == nil, self == .withoutIdfa {
             return nil

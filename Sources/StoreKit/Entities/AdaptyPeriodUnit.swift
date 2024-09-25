@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import StoreKit
 
 public enum AdaptyPeriodUnit: UInt, Sendable, Hashable {
     case day
@@ -14,31 +13,6 @@ public enum AdaptyPeriodUnit: UInt, Sendable, Hashable {
     case month
     case year
     case unknown
-}
-
-extension AdaptyPeriodUnit {
-    init(unit: SK1Product.SubscriptionPeriod.Unit) {
-        self =
-            switch unit {
-            case .day: .day
-            case .week: .week
-            case .month: .month
-            case .year: .year
-            @unknown default: .unknown
-            }
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(unit: SK2Product.SubscriptionPeriod.Unit) {
-        self =
-            switch unit {
-            case .day: .day
-            case .week: .week
-            case .month: .month
-            case .year: .year
-            @unknown default: .unknown
-            }
-    }
 }
 
 extension AdaptyPeriodUnit: CustomStringConvertible {

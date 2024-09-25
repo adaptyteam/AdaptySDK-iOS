@@ -30,25 +30,25 @@ extension Backend.Request {
     fileprivate static let crossSDKVersionHeaderKey = "adapty-sdk-crossplatform-version"
     fileprivate static let crossSDKPlatformHeaderKey = "adapty-sdk-crossplatform-name"
 
-    static func globalHeaders(with config: Adapty.Configuration) -> HTTPHeaders {
+    static func globalHeaders(_ configuration: Adapty.Configuration, _ envorinment: Environment) -> HTTPHeaders {
         var headers = [
-            authorizationHeaderKey: "Api-Key \(config.apiKey)",
+            authorizationHeaderKey: "Api-Key \(configuration.apiKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
-            sdkPlatformHeaderKey: Environment.System.name,
-            sdkStoreHeaderKey: "app_store",
-            sessionIDHeaderKey: Environment.Application.sessionIdentifier,
-            appInstallIdHeaderKey: Environment.Application.installationIdentifier,
-            isSandboxHeaderKey: Environment.System.isSandbox ? "true" : "false",
-            isObserveModeHeaderKey: config.observerMode ? "true" : "false",
-            storeKit2EnabledHeaderKey: Environment.System.storeKit2Enabled ? "enabled" : "unavailable",
+            sdkPlatformHeaderKey: envorinment.system.name,
+            sdkStoreHeaderKey: Environment.Store.name,
+            sessionIDHeaderKey: envorinment.sessionIdentifier,
+            appInstallIdHeaderKey: envorinment.application.installationIdentifier,
+            isObserveModeHeaderKey: configuration.observerMode ? "true" : "false",
+            storeKit2EnabledHeaderKey:  Environment.Store.storeKit2Enabled ? "enabled" : "unavailable",
         ]
-        if let ver = Environment.Application.version {
+
+        if let ver = envorinment.application.version {
             headers[appVersionHeaderKey] = ver
         }
 
-        if let crossPlatform = config.crossPlatformSDK {
-            headers[crossSDKPlatformHeaderKey] = crossPlatform.name
-            headers[crossSDKVersionHeaderKey] = crossPlatform.version
+        if let crossPlatformSDK = configuration.crossPlatformSDK {
+            headers[crossSDKPlatformHeaderKey] = crossPlatformSDK.name
+            headers[crossSDKVersionHeaderKey] = crossPlatformSDK.version
         }
 
         return headers

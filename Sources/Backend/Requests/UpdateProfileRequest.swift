@@ -69,7 +69,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         if let environmentMeta {
             try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
             if parameters?.storeCountry == nil {
-                try attributesObject.encodeIfPresent(environmentMeta.storeCountry, forKey: .storeCountry)
+                try attributesObject.encodeIfPresent(environmentMeta.storefront?.countryCode, forKey: .storeCountry)
             }
             if parameters?.ipV4Address == nil {
                 try attributesObject.encodeIfPresent(environmentMeta.ipV4Address, forKey: .ipV4Address)

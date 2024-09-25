@@ -175,7 +175,7 @@ final class LifecycleManager {
 
     private var needSyncIdfa: Bool? {
         guard let adapty = Adapty.shared, let manager = adapty.state.initialized else { return nil }
-        guard manager.onceSentEnvironment.needSend(analyticsDisabled: adapty.profileStorage.externalAnalyticsDisabled) else {
+        guard await manager.onceSentEnvironment.needSend(analyticsDisabled: adapty.profileStorage.externalAnalyticsDisabled) else {
             return false
         }
         guard Environment.Device.idfa != nil else { return nil }

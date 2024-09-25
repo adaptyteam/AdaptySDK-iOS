@@ -75,7 +75,7 @@ extension ProfileManager {
             storage.setExternalAnalyticsDisabled(analyticsDisabled)
         }
 
-        let environmentMeta = onceSentEnvironment.getValueIfNeedSend(
+        let environmentMeta = await onceSentEnvironment.getValueIfNeedSend(
             analyticsDisabled: (params?.analyticsDisabled ?? false) || storage.externalAnalyticsDisabled
         )
 

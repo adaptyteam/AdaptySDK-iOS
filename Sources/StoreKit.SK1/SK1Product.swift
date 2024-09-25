@@ -11,8 +11,6 @@ import StoreKit
 typealias SK1Product = SKProduct
 
 extension SK1Product {
-    typealias SubscriptionOffer = SKProductDiscount
-    typealias SubscriptionPeriod = SKProductSubscriptionPeriod
     
     var introductoryOfferEligibility: AdaptyEligibility? {
         guard let period = subscriptionPeriod,
@@ -23,12 +21,11 @@ extension SK1Product {
 
         return nil
     }
+    
+    @inlinable
+    var unfIsFamilyShareable: Bool {
+        guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, visionOS 1.0, *) else { return false }
+        return isFamilyShareable
+    }
 }
 
-extension SK1Product.SubscriptionPeriod {
-    typealias Unit = SKProduct.PeriodUnit
-}
-
-extension SK1Product.SubscriptionOffer {
-    typealias OfferType = `Type`
-}
