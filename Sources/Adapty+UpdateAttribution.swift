@@ -13,7 +13,7 @@ import Foundation
 extension Adapty {
     /// To set attribution data for the profile, use this method.
     ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
+    /// Read more on the [Adapty Documentation](https://adapty.io/docs/attribution-integration)
     ///
     /// - Parameter attribution: a dictionary containing attribution (conversion) data.
     /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.

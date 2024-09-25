@@ -15,7 +15,7 @@ import StoreKit
         /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
         ///
         /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
-        /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
+        /// - Parameter observerMode: A boolean value controlling [Observer mode](https://adapty.io/docs/3.0/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
         /// - Parameter customerUserId: User identifier in your system
         public static func activate(
             _ apiKey: String,
@@ -107,9 +107,9 @@ import StoreKit
             }
         }
 
-        /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://docs.adapty.io/v2.0.0/docs/segments) or just view them in CRM.
+        /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://adapty.io/docs/3.0/segments) or just view them in CRM.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/3.0/setting-user-attributes)
         ///
         /// - Parameter params: use `AdaptyProfileParameters.Builder` class to build this object.
         public static func updateProfile(params: AdaptyProfileParameters) async throws {
@@ -127,7 +127,7 @@ import StoreKit
 
         /// To set attribution data for the profile, use this method.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/attribution-integration)
         ///
         /// - Parameter attribution: a dictionary containing attribution (conversion) data.
         /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
@@ -151,11 +151,11 @@ import StoreKit
 
         /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/fetch-paywalls-and-products)
         ///
         /// - Parameters:
         ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
-        ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
+        ///   - locale: The identifier of the paywall localization.
         ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
         ///             Example: "en" means English, "en-US" represents US English.
         ///             If the parameter is omitted, the paywall will be returned in the default locale.
@@ -184,7 +184,7 @@ import StoreKit
         ///
         /// - Parameters:
         ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
-        ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
+        ///   - locale: The identifier of the paywall localization.
         ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
         ///             Example: "en" means English, "en-US" represents US English.
         ///             If the parameter is omitted, the paywall will be returned in the default locale.
@@ -210,7 +210,7 @@ import StoreKit
 
         /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/fetch-paywalls-and-products#fetch-products)
         ///
         /// - Parameters:
         ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
@@ -231,7 +231,7 @@ import StoreKit
 
         /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/3.0/fetch-paywalls-and-products#check-intro-offer-eligibility-on-ios)
         ///
         /// - Parameters:
         ///   - products: the ``AdaptyPaywallProduct`` array, for which information will be retrieved
@@ -253,7 +253,7 @@ import StoreKit
 
         /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/3.0/fetch-paywalls-and-products#check-intro-offer-eligibility-on-ios)
         ///
         /// - Parameters:
         ///   - vendorProductIds: The products ids `String` array, for which information will be retrieved
@@ -293,7 +293,7 @@ import StoreKit
 
         /// To make the purchase, you have to call this method.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/3.0/making-purchases)
         ///
         /// - Parameters:
         ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
@@ -314,7 +314,7 @@ import StoreKit
 
         /// To restore purchases, you have to call this method.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/3.0/restore-purchase)
         ///
         /// - Returns: The ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
         /// - Throws: An ``AdaptyError`` object
@@ -335,7 +335,7 @@ import StoreKit
         ///
         /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#fallback-paywalls)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/ios-use-fallback-paywalls)
         ///
         /// - Parameters:
         ///   - fileURL:
@@ -358,7 +358,7 @@ import StoreKit
         /// Adapty helps you to measure the performance of the paywalls. We automatically collect all the metrics related to purchases except for paywall views. This is because only you know when the paywall was shown to a customer.
         /// Whenever you show a paywall to your user, call .logShowPaywall(paywall) to log the event, and it will be accumulated in the paywall metrics.
         ///
-        /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
+        /// Read more on the [Adapty Documentation](https://adapty.io/docs/present-remote-config-paywalls#track-paywall-view-events)
         ///
         /// - Parameters:
         ///   - paywall: A ``AdaptyPaywall`` object.
@@ -408,7 +408,7 @@ import StoreKit
 
         /// Link purchased transaction with paywall's variationId.
         ///
-        /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+        /// In [Observer mode](https://adapty.io/docs/3.0/observer-vs-full-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://adapty.io/docs/associate-paywalls-to-transactions) or [A/B Tests](https://adapty.io/docs/3.0/ab-tests), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
         ///
         /// - Parameters:
         ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
@@ -432,7 +432,7 @@ import StoreKit
 
         /// Link purchased transaction with paywall's variationId.
         ///
-        /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+        /// In [Observer mode](https://adapty.io/docs/3.0/observer-vs-full-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://adapty.io/docs/3.0/paywalls) or [A/B Tests](https://adapty.io/docs/3.0/ab-tests), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
         ///
         /// - Parameters:
         ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.

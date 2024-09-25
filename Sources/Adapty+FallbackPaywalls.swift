@@ -16,7 +16,7 @@ extension Adapty {
     ///
     /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
     ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#fallback-paywalls)
+    /// Read more on the [Adapty Documentation](https://adapty.io/docs/ios-use-fallback-paywalls)
     ///
     /// - Parameters:
     ///   - fileURL:
