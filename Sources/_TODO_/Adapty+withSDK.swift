@@ -21,7 +21,7 @@ extension Adapty {
         methodName _: MethodName? = nil,
         logParams _: EventParameters? = nil,
         function _: StaticString = #function,
-        operation: @Sendable @escaping (Adapty?) async throws -> T
+        operation: @AdaptyActor @Sendable @escaping (Adapty?) async throws -> T
     ) async throws -> T {
         try await operation(nil)
     }
@@ -39,7 +39,7 @@ extension Adapty {
         methodName _: MethodName? = nil,
         logParams _: EventParameters? = nil,
         function _: StaticString = #function,
-        operation: @Sendable @escaping (Adapty) async throws -> T
+        operation: @AdaptyActor @Sendable @escaping (Adapty) async throws -> T
     ) async throws -> T {
         try await operation(share)
     }

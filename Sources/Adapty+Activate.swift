@@ -48,7 +48,7 @@ extension Adapty {
     public nonisolated static func activate(
         with configuration: Adapty.Configuration
     ) async throws {
-        // TODO:
+        // TODO: not implemented
 
         if let logLevel = configuration.logLevel {
             await Log.set(level: logLevel)

@@ -16,6 +16,7 @@ extension Adapty {
     ///   - customerUserId: User identifier in your system.
     public nonisolated static func identify(_ customerUserId: String) async throws {
         try await withActivatedSDK(methodName: .identify) { sdk in
+            
             // TODO:
 //           try await sdk.identify(toCustomerUserId: customerUserId)
         }

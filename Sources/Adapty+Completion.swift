@@ -178,20 +178,20 @@ extension Adapty {
     ///             If the parameter is omitted, the paywall will be returned in the default locale.
     ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-//    public nonisolated static func getPaywallForDefaultAudience(
-//        placementId: String,
-//        locale: String? = nil,
-//        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-//        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
-//    ) {
-//        withCompletion(completion) {
-//            try await getPaywallForDefaultAudience(
-//                placementId: placementId,
-//                locale: locale,
-//                fetchPolicy: fetchPolicy
-//            )
-//        }
-//    }
+    public nonisolated static func getPaywallForDefaultAudience(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
+    ) {
+        withCompletion(completion) {
+            try await getPaywallForDefaultAudience(
+                placementId: placementId,
+                locale: locale,
+                fetchPolicy: fetchPolicy
+            )
+        }
+    }
 
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///

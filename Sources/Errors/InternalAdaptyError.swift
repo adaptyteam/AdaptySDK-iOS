@@ -249,7 +249,17 @@ extension AdaptyError {
 //    ) -> Self {
 //        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Request Paywall timeout").asAdaptyError
 //    }
-
+    
+    
+    static func fetchPaywallFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch Profile failed", error: unknownError).asAdaptyError
+    }
+    
     static func syncProfileFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -265,7 +275,7 @@ extension AdaptyError {
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Sync Profile failed", error: unknownError).asAdaptyError
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Update Attribution failed", error: unknownError).asAdaptyError
     }
     
     static func fetchViewConfigurationFailed(
