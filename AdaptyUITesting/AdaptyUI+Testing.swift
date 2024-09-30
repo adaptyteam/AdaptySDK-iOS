@@ -146,10 +146,13 @@ public struct AdaptyUITestRendererView: View {
         let paywallVM = AdaptyPaywallViewModel(eventsHandler: eventsHandler,
                                                paywall: AdaptyMockPaywall(),
                                                viewConfiguration: viewConfiguration)
-        let productsVM = AdaptyProductsViewModel(eventsHandler: eventsHandler,
-                                                 paywallViewModel: paywallVM,
-                                                 products: nil,
-                                                 introductoryOffersEligibilities: nil)
+        let productsVM = AdaptyProductsViewModel(
+            eventsHandler: eventsHandler,
+            paywallViewModel: paywallVM,
+            products: nil,
+            introductoryOffersEligibilities: nil,
+            observerModeResolver: nil
+        )
         let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])
         let screensVM = AdaptyScreensViewModel(
             eventsHandler: eventsHandler,
