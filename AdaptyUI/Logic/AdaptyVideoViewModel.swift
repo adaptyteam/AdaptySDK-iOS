@@ -90,6 +90,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         case let .url(url, image):
             let playerItem = AVPlayerItem(url: url)
             let queuePlayer = AVQueuePlayer(items: [playerItem])
+            queuePlayer.isMuted = true
 
             if video.loop {
                 playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
