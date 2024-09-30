@@ -166,11 +166,12 @@ extension AdaptyUI.ShapeType {
             Circle()
                 .stroke(filling: filling, lineWidth: lineWidth)
         case .curveUp:
+            // Since there is no way to implement InsettableShape in a correct way, we make this hack with doubling the lineWidth
             CurveUpShape()
-                .stroke(filling: filling, lineWidth: lineWidth)
+                .stroke(filling: filling, lineWidth: lineWidth * 2.0)
         case .curveDown:
             CurveDownShape()
-                .stroke(filling: filling, lineWidth: lineWidth)
+                .stroke(filling: filling, lineWidth: lineWidth * 2.0)
         }
     }
 }

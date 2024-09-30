@@ -128,7 +128,9 @@ package class AdaptyProductsViewModel: ObservableObject {
     }
 
     private func loadProducts() {
-        productsLoadingInProgress = true
+        DispatchQueue.main.async { [weak self] in
+            self?.productsLoadingInProgress = true
+        }
 
         eventsHandler.log(.verbose, "loadProducts begin")
 
@@ -140,12 +142,17 @@ package class AdaptyProductsViewModel: ObservableObject {
                 case let .success(products):
                     self?.eventsHandler.log(.verbose, "loadProducts success")
 
-                    self?.adaptyProducts = products
-                    self?.productsLoadingInProgress = false
-                    self?.loadProductsIntroductoryEligibilities()
+                    DispatchQueue.main.async { [weak self] in
+                        self?.adaptyProducts = products
+                        self?.productsLoadingInProgress = false
+                        self?.loadProductsIntroductoryEligibilities()
+                    }
                 case let .failure(error):
                     self?.eventsHandler.log(.error, "loadProducts fail: \(error)")
-                    self?.productsLoadingInProgress = false
+                    
+                    DispatchQueue.main.async { [weak self] in
+                        self?.productsLoadingInProgress = false
+                    }
 
                     if self?.eventsHandler.event_didFailLoadingProducts(with: error) ?? false {
                         self?.queue.asyncAfter(deadline: .now() + .seconds(2)) { [weak self] in
