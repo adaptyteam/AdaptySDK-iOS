@@ -81,7 +81,7 @@ package class AdaptyProductsViewModel: ObservableObject {
         )
 
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
-        
+
         self.observerModeResolver = observerModeResolver
     }
 
@@ -122,7 +122,7 @@ package class AdaptyProductsViewModel: ObservableObject {
             eventsHandler.event_didSelectProduct(selectedProduct)
         }
     }
-    
+
     func unselectProduct(forGroupId groupId: String) {
         selectedProductsIds.removeValue(forKey: groupId)
     }
@@ -146,11 +146,11 @@ package class AdaptyProductsViewModel: ObservableObject {
                         self?.adaptyProducts = products
                         self?.productsLoadingInProgress = false
                     }
-                    
+
                     self?.loadProductsIntroductoryEligibilities()
                 case let .failure(error):
                     self?.eventsHandler.log(.error, "loadProducts fail: \(error)")
-                    
+
                     DispatchQueue.main.async { [weak self] in
                         self?.productsLoadingInProgress = false
                     }

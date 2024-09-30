@@ -70,61 +70,67 @@ extension AdaptyUI.CornerRadius {
 @available(iOS 15.0, *)
 struct UnevenRoundedRectangleFallback: InsettableShape {
     var cornerRadii: AdaptyUI.CornerRadius
+    var insetAmount: CGFloat = 0
 
     func inset(by amount: CGFloat) -> UnevenRoundedRectangleFallback {
-        UnevenRoundedRectangleFallback(
-            cornerRadii: .init(
-                topLeading: cornerRadii.topLeading - amount,
-                topTrailing: cornerRadii.topTrailing - amount,
-                bottomTrailing: cornerRadii.bottomTrailing - amount,
-                bottomLeading: cornerRadii.bottomLeading - amount
-            )
-        )
+        var shape = self
+        shape.insetAmount += amount
+        return shape
     }
 
     func path(in rect: CGRect) -> Path {
-        let normalizedRadii = cornerRadii.normalized(width: rect.width, height: rect.height)
+        let insetRect = rect.insetBy(dx: insetAmount, dy: insetAmount)
 
-        let topLeading = normalizedRadii.topLeading // min(maxRadius, cornerRadii.topLeading)
-        let topTrailing = normalizedRadii.topTrailing // min(maxRadius, cornerRadii.topTrailing)
-        let bottomTrailing = normalizedRadii.bottomTrailing // min(maxRadius, cornerRadii.bottomTrailing)
-        let bottomLeading = normalizedRadii.bottomLeading // min(maxRadius, cornerRadii.bottomLeading)
+        let normalizedRadii = cornerRadii.normalized(width: insetRect.width, height: insetRect.height)
+
+        let topLeading = normalizedRadii.topLeading
+        let topTrailing = normalizedRadii.topTrailing
+        let bottomTrailing = normalizedRadii.bottomTrailing
+        let bottomLeading = normalizedRadii.bottomLeading
 
         var path = Path()
 
-        path.move(to: CGPoint(x: rect.minX + topLeading, y: rect.minY))
+        path.move(to: CGPoint(x: insetRect.minX + topLeading, y: insetRect.minY))
 
         // Top edge and top right corner
-        path.addLine(to: CGPoint(x: rect.maxX - topTrailing, y: rect.minY))
-        path.addArc(center: CGPoint(x: rect.maxX - topTrailing, y: rect.minY + topTrailing),
-                    radius: topTrailing,
-                    startAngle: .degrees(-90),
-                    endAngle: .degrees(0),
-                    clockwise: false)
+        path.addLine(to: CGPoint(x: insetRect.maxX - topTrailing, y: insetRect.minY))
+        path.addArc(
+            center: CGPoint(x: insetRect.maxX - topTrailing, y: insetRect.minY + topTrailing),
+            radius: topTrailing,
+            startAngle: .degrees(-90),
+            endAngle: .degrees(0),
+            clockwise: false
+        )
 
         // Right edge and bottom right corner
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - bottomTrailing))
-        path.addArc(center: CGPoint(x: rect.maxX - bottomTrailing, y: rect.maxY - bottomTrailing),
-                    radius: bottomTrailing,
-                    startAngle: .degrees(0),
-                    endAngle: .degrees(90),
-                    clockwise: false)
+        path.addLine(to: CGPoint(x: insetRect.maxX, y: insetRect.maxY - bottomTrailing))
+        path.addArc(
+            center: CGPoint(x: insetRect.maxX - bottomTrailing, y: insetRect.maxY - bottomTrailing),
+            radius: bottomTrailing,
+            startAngle: .degrees(0),
+            endAngle: .degrees(90),
+            clockwise: false
+        )
 
         // Bottom edge and bottom left corner
-        path.addLine(to: CGPoint(x: rect.minX + bottomLeading, y: rect.maxY))
-        path.addArc(center: CGPoint(x: rect.minX + bottomLeading, y: rect.maxY - bottomLeading),
-                    radius: bottomLeading,
-                    startAngle: .degrees(90),
-                    endAngle: .degrees(180),
-                    clockwise: false)
+        path.addLine(to: CGPoint(x: insetRect.minX + bottomLeading, y: insetRect.maxY))
+        path.addArc(
+            center: CGPoint(x: insetRect.minX + bottomLeading, y: insetRect.maxY - bottomLeading),
+            radius: bottomLeading,
+            startAngle: .degrees(90),
+            endAngle: .degrees(180),
+            clockwise: false
+        )
 
         // Left edge and top left corner
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + topLeading))
-        path.addArc(center: CGPoint(x: rect.minX + topLeading, y: rect.minY + topLeading),
-                    radius: topLeading,
-                    startAngle: .degrees(180),
-                    endAngle: .degrees(270),
-                    clockwise: false)
+        path.addLine(to: CGPoint(x: insetRect.minX, y: insetRect.minY + topLeading))
+        path.addArc(
+            center: CGPoint(x: insetRect.minX + topLeading, y: insetRect.minY + topLeading),
+            radius: topLeading,
+            startAngle: .degrees(180),
+            endAngle: .degrees(270),
+            clockwise: false
+        )
 
         path.closeSubpath()
         return path
