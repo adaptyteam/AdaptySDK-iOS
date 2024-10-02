@@ -29,6 +29,7 @@ extension Environment.Device {
         ATTrackingManager.trackingAuthorizationStatus
     }
     
+    @AdaptyActor
     static var canTakeIdfa: Bool {
         get async {
             #if !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)

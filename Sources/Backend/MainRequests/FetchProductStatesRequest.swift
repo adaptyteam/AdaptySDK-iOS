@@ -58,7 +58,7 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendProduct
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performFetchProductStatesRequest(
         profileId: String,
         responseHash: String?

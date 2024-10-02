@@ -24,6 +24,14 @@ extension Error {
         if let error = self as? CustomAdaptyError { return AdaptyError(error) }
         return nil
     }
+    
+    var unwrapped: Error {
+        if let adaptyError = self as? AdaptyError {
+            adaptyError.wrapped
+        } else {
+            self
+        }
+    }
 }
 
 extension InternalAdaptyError: CustomAdaptyError {}

@@ -24,117 +24,55 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPaywall.FetchPolicy = .default
     ) async throws -> AdaptyPaywall {
-        try await getPaywallForDefaultAudience(
-            placementId,
-            locale: locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale,
-            withFetchPolicy: fetchPolicy
-        )
-    }
+        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale
 
-    private nonisolated static func getPaywallForDefaultAudience(
-        _ placementId: String,
-        locale: AdaptyLocale,
-        withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy
-    ) async throws -> AdaptyPaywall {
-        try await withActivatedSDK(
-            methodName: .getPaywallForDefaultAudience,
-            logParams: [
-                "placement_id": placementId,
-                "locale": locale,
-                "fetch_policy": fetchPolicy,
-            ]
-        ) { sdk in
+        let logParams: EventParameters = [
+            "placement_id": placementId,
+            "locale": locale,
+            "fetch_policy": fetchPolicy,
+        ]
 
-            let paywall =
-                if let profileManager = sdk.profileManagerOrNil {
-                    try await profileManager.getUntargetedPaywall(
-                        placementId,
-                        locale,
-                        withFetchPolicy: fetchPolicy
-                    )
-                } else {
-                    try await sdk.getUntargetedPaywall(
-                        profileManager: nil,
-                        placementId,
-                        locale
-                    )
-                }
-
-            AdaptyUI.sendImageUrlsToObserver(paywall)
-            return paywall
-        }
-    }
-
-    fileprivate func getUntargetedPaywall(
-        profileManager: ProfileManager?,
-        _ placementId: String,
-        _ locale: AdaptyLocale
-    ) async throws -> AdaptyPaywall {
-        let profileId = profileManager?.profileId ?? profileStorage.profileId
-
-        do {
-            let cached = profileManager?.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value
-
-            var response = try await httpConfigsSession.performFetchUntargetedPaywallVariationsRequest(
-                apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
-                placementId: placementId,
-                locale: locale,
-                cached: cached,
-                disableServerCache: profileManager?.profile.value.isTestUser ?? false
+        return try await withActivatedSDK(methodName: .getPaywallForDefaultAudience, logParams: logParams) { sdk in
+            try await sdk.getPaywallForDefaultAudience(
+                placementId,
+                locale,
+                fetchPolicy
             )
-
-            if let profileManager, profileManager.isActive {
-                response = profileManager.paywallsCache.savedPaywallChosen(response)
-            }
-
-            Adapty.trackEventIfNeed(response)
-
-            return response.value
-        } catch {
-            if let profileManager {
-                guard profileManager.isActive,
-                      let value = profileManager.paywallsCache.getPaywallWithFallback(byPlacementId: placementId, locale: locale)
-                else {
-                    throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
-                }
-                return value
-            }
-
-            if let fallback = Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId) {
-                Adapty.trackEventIfNeed(fallback)
-                return fallback.value
-            } else {
-                throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
-            }
         }
     }
-}
 
-private extension ProfileManager {
-    func getUntargetedPaywall(
+    private func getPaywallForDefaultAudience(
         _ placementId: String,
         _ locale: AdaptyLocale,
-        withFetchPolicy fetchPolicy: AdaptyPaywall.FetchPolicy
+        _ fetchPolicy: AdaptyPaywall.FetchPolicy
     ) async throws -> AdaptyPaywall {
-        let task = Task { [weak self] in
-            guard let self else { throw AdaptyError.profileWasChanged() }
-            return try await Adapty.sdk.getUntargetedPaywall(
-                profileManager: self,
+        let manager = profileManager
+        let profileId = manager?.profileId ?? profileStorage.profileId
+        let session = httpConfigsSession
+
+        let fetchTask = Task {
+            try await fetchFallbackPaywall(
+                profileId,
                 placementId,
-                locale
+                locale,
+                session
             )
         }
 
-        if let cached = paywallsCache.getPaywallByLocale(
-            locale,
-            orDefaultLocale: true,
-            withPlacementId: placementId
-        ),
-            fetchPolicy.canReturn(cached) {
-            return cached.value
-        } else {
-            return try await task.value
-        }
+        let cached = manager?
+            .paywallsCache
+            .getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?
+            .withFetchPolicy(fetchPolicy)?
+            .value
+
+        let paywall =
+            if let cached {
+                cached
+            } else {
+                try await fetchTask.value
+            }
+
+        AdaptyUI.sendImageUrlsToObserver(paywall)
+        return paywall
     }
 }

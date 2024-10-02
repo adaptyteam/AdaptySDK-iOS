@@ -29,7 +29,14 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
         )
     }
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, cached: AdaptyPaywall?, disableServerCache: Bool) {
+    init(
+        apiKeyPrefix: String,
+        profileId: String,
+        placementId: String,
+        locale: AdaptyLocale,
+        cached: AdaptyPaywall?,
+        disableServerCache: Bool
+    ) {
         self.profileId = profileId
         self.cached = cached
         endpoint = HTTPEndpoint(
@@ -40,9 +47,20 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
     }
 }
 
-extension HTTPSession {
+protocol FetchFallbackPaywallVariationsExecutor: BackendExecutor {
+    func performFetchFallbackPaywallVariationsRequest(
+        apiKeyPrefix: String,
+        profileId: String,
+        placementId: String,
+        locale: AdaptyLocale,
+        cached: AdaptyPaywall?,
+        disableServerCache: Bool
+    ) async throws -> AdaptyPaywallChosen
+}
+
+private extension FetchFallbackPaywallVariationsExecutor {
     @inline(__always)
-    private func performFetchFallbackPaywallVariationsRequest(
+    func performFetchFallbackPaywallVariationsRequest(
         requestName: APIRequestName,
         apiKeyPrefix: String,
         profileId: String,
@@ -91,7 +109,9 @@ extension HTTPSession {
             )
         }
     }
+}
 
+extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
     func performFetchFallbackPaywallVariationsRequest(
         apiKeyPrefix: String,
         profileId: String,
@@ -110,8 +130,10 @@ extension HTTPSession {
             disableServerCache: disableServerCache
         )
     }
+}
 
-    func performFetchUntargetedPaywallVariationsRequest(
+extension Backend.ConfigsExecutor: FetchFallbackPaywallVariationsExecutor {
+    func performFetchFallbackPaywallVariationsRequest(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,

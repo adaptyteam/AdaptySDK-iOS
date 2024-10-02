@@ -13,10 +13,19 @@ package func withThrowingTimeout<T: Sendable>(
 ) async throws -> T {
     let task = Task(operation: operation)
 
-    let timeoutTask = Task {
-        defer { task.cancel() }
-        try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-        throw TimeoutError(seconds)
+    var timeoutTask: Task<Void, any Error>?
+
+    if seconds.isNormal {
+        guard seconds > 0 else {
+            task.cancel()
+            throw TimeoutError(seconds)
+        }
+
+        timeoutTask = Task {
+            defer { task.cancel() }
+            try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            throw TimeoutError(seconds)
+        }
     }
 
     let result = await withTaskCancellationHandler {
@@ -25,10 +34,12 @@ package func withThrowingTimeout<T: Sendable>(
         task.cancel()
     }
 
-    timeoutTask.cancel()
+    if let timeoutTask {
+        timeoutTask.cancel()
 
-    if case let .failure(error) = await timeoutTask.result, error is TimeoutError {
-        throw error
+        if case let .failure(error) = await timeoutTask.result, error is TimeoutError {
+            throw error
+        }
     }
 
     return try result.get()

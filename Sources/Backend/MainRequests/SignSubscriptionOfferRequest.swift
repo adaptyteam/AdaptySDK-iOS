@@ -28,7 +28,7 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performSignSubscriptionOfferRequest(
         profileId: String,
         vendorProductId: String,

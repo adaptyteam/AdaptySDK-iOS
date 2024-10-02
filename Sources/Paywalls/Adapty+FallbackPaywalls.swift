@@ -33,6 +33,7 @@ extension Adapty {
 private let log = Log.Category(name: "PaywallsCache")
 
 extension PaywallsCache {
+    // 2
     func getPaywallWithFallback(byPlacementId placementId: String, locale: AdaptyLocale) -> AdaptyPaywall? {
         let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?.value
 
@@ -56,3 +57,5 @@ extension PaywallsCache {
         return chosen.value
     }
 }
+
+

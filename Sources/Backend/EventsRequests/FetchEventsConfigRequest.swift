@@ -22,7 +22,7 @@ private struct FetchEventsConfigRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension HTTPSession {
+extension Backend.EventsExecutor {
     func performFetchEventsConfigRequest(
         profileId: String
     ) async throws -> EventsBackendConfiguration {

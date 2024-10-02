@@ -59,7 +59,7 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyProfile? 
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performFetchProfileRequest(
         profileId: String,
         responseHash: String?

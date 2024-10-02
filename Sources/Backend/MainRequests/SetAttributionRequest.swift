@@ -65,7 +65,7 @@ private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableR
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performSendAttributionRequest(
         profileId: String,
         networkUserId: String?,

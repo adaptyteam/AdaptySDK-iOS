@@ -68,7 +68,7 @@ private extension Adapty.ValidatePurchaseReason {
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performSyncTransactionRequest(
         profileId: String,
         originalTransactionId: String

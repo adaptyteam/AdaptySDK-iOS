@@ -81,7 +81,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performSyncProfileRequest(
         profileId: String,
         parameters: AdaptyProfileParameters?,

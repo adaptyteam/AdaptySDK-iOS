@@ -30,7 +30,7 @@ import Foundation
                 )
 
                 if let profile = response.flatValue() {
-                    profileManagerOrNil?.saveResponse(profile)
+                    profileManager?.saveResponse(profile)
                 }
 
                 if profileStorage.profileId == profileId {

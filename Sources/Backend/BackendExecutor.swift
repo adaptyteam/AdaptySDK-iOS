@@ -1,5 +1,5 @@
 //
-//  HTTPSession+trackSystemEvent.swift
+//  BackendExecutor.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 04.04.2023
@@ -7,8 +7,11 @@
 
 import Foundation
 
-extension HTTPSession {
-    
+protocol BackendExecutor: Sendable {
+    var session: HTTPSession { get }
+}
+
+extension BackendExecutor {
     @AdaptyActor
     @inlinable
     func perform<Request: HTTPRequestWithDecodableResponse>(
@@ -19,7 +22,7 @@ extension HTTPSession {
         let stamp = request.stamp
         Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
         do {
-            let response: Request.Response = try await perform(request)
+            let response: Request.Response = try await session.perform(request)
             Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
             return response
         } catch {
@@ -38,7 +41,7 @@ extension HTTPSession {
         let stamp = request.stamp
         Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
         do {
-            let response: HTTPEmptyResponse = try await perform(request)
+            let response: HTTPEmptyResponse = try await session.perform(request)
             Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
             return response
         } catch {

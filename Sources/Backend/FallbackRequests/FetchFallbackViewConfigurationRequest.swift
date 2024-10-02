@@ -24,7 +24,7 @@ struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension HTTPSession {
+extension Backend.FallbackExecutor {
     func performFetchFallbackViewConfigurationRequest(
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,

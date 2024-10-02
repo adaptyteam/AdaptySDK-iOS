@@ -31,8 +31,3 @@ struct FallbackBackend: HTTPCodableConfiguration {
     }
 }
 
-extension FallbackBackend {
-    func createHTTPSession() -> HTTPSession {
-        HTTPSession(configuration: self)
-    }
-}

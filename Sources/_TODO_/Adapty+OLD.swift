@@ -13,11 +13,13 @@ public final class Adapty: Sendable {
 
     let profileStorage: ProfileStorage
     let apiKeyPrefix: String
-    let backend: Backend
 
-    let httpSession: HTTPSession
-    let httpFallbackSession: HTTPSession
-    let httpConfigsSession: HTTPSession
+    var profileManager: ProfileManager?
+
+    let backend: Backend
+    let httpSession: Backend.MainExecutor
+    let httpFallbackSession: Backend.FallbackExecutor
+    let httpConfigsSession: Backend.ConfigsExecutor
 
     init(
         apiKeyPrefix: String,
@@ -28,9 +30,9 @@ public final class Adapty: Sendable {
         self.apiKeyPrefix = apiKeyPrefix
         self.backend = backend
         self.profileStorage = profileStorage
-        httpSession = backend.createHTTPSession()
-        httpFallbackSession = backend.fallback.createHTTPSession()
-        httpConfigsSession = backend.configs.createHTTPSession()
+        httpSession = backend.createMainExecutor()
+        httpFallbackSession = backend.createFallbackExecutor()
+        httpConfigsSession = backend.createConfigsExecutor()
     }
 
     func syncTransactions(refreshReceiptIfEmpty _: Bool) async throws -> VH<AdaptyProfile>? {
@@ -61,19 +63,31 @@ public final class Adapty: Sendable {
             profile
         }
     }
-    
-    var createdProfileManagerOrThrows: ProfileManager {
-        get async throws {
-            profile
-        }
-    }
-    
+}
 
-    var profileManagerOrNil: ProfileManager? {
-        nil
+extension Adapty {
+    func profileManager(with profileId: String) throws -> ProfileManager? {
+        guard let manager = profileManager else { return nil }
+        guard profileId == manager.profileId else { throw AdaptyError.profileWasChanged() }
+        return manager
+    }
+
+    func tryProfileManagerOrNil(with profileId: String) -> ProfileManager? {
+        guard let manager = profileManager else { return nil }
+        guard profileId == manager.profileId else { return nil }
+        return manager
     }
 }
 
-extension TimeInterval {
-    static let defaultLoadPaywallTimeout: TimeInterval = 5.0
+extension ProfileManager? {
+    var orThrows: ProfileManager {
+        get throws {
+            switch self {
+            case .none:
+                throw AdaptyError.profileWasChanged()
+            case let .some(value):
+                value
+            }
+        }
+    }
 }

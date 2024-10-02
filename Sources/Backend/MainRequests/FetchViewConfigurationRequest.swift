@@ -30,7 +30,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performFetchViewConfigurationRequest(
         apiKeyPrefix: String,
         paywallVariationId: String,

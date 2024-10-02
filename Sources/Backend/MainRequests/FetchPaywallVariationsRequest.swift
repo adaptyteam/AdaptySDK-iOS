@@ -84,7 +84,7 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyPaywallCh
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performFetchPaywallVariationsRequest(
         apiKeyPrefix: String,
         profileId: String,

@@ -55,6 +55,8 @@ enum APIRequestName: String {
     case signSubscriptionOffer = "sign_offer"
 
     case fetchEventsBlacklist = "get_events_blacklist"
+    
+    case fetchAllProductVendorIdsRequest = "get_products_ids"
 }
 
 struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {

@@ -43,7 +43,7 @@ extension Adapty {
         source: AdaptyAttributionSource,
         networkUserId: String?
     ) async throws {
-        let oldProfile = profileManagerOrNil?.profile
+        let oldResponseHash = profileManager?.profile.hash
 
         do {
             let response = try await httpSession.performSendAttributionRequest(
@@ -51,11 +51,11 @@ extension Adapty {
                 networkUserId: networkUserId,
                 source: source,
                 attribution: attribution,
-                responseHash: oldProfile?.hash
+                responseHash: oldResponseHash
             )
 
             if let profile = response.flatValue() {
-                profileManagerOrNil?.saveResponse(profile)
+                profileManager?.saveResponse(profile)
             }
 
         } catch {

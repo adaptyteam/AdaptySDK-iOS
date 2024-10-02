@@ -42,6 +42,7 @@ final class PaywallsCache: Sendable {
         paywallByPlacementId = storage.getPaywalls()?.asPaywallByPlacementId ?? [:]
     }
 
+    //4
     func getPaywallByLocale(_ locale: AdaptyLocale, orDefaultLocale: Bool, withPlacementId placementId: String) -> VH<AdaptyPaywall>? {
         guard let paywall = paywallByPlacementId[placementId] else { return nil }
         let paywallLocale = paywall.value.localeOrDefault

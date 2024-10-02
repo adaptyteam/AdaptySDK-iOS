@@ -20,7 +20,6 @@ enum InternalAdaptyError: Error {
     case decodingFailed(AdaptyError.Source, String, error: Error)
 
     case wrongParam(AdaptyError.Source, String)
-//    case fetchTimeoutError(AdaptyError.Source, String)
 }
 
 extension InternalAdaptyError: CustomStringConvertible {
@@ -44,8 +43,6 @@ extension InternalAdaptyError: CustomStringConvertible {
             "AdaptyError.decodingFailed(\(source), \(description), \(error))"
         case let .wrongParam(source, description):
             "AdaptyError.wrongParam(\(source), \(description))"
-//        case let .fetchTimeoutError(source, description):
-//            "AdaptyError.fetchTimeoutError(\(source), \(description))"
         }
     }
 }
@@ -62,7 +59,6 @@ extension InternalAdaptyError {
              let .fetchFailed(src, _, _),
              let .decodingFailed(src, _, _),
              let .wrongParam(src, _):
-//             let .fetchTimeoutError(src, _):
             src
         }
     }
@@ -95,7 +91,6 @@ extension InternalAdaptyError: CustomNSError {
         case .fetchFailed: .networkFailed
         case .decodingFailed: .decodingFailed
         case .wrongParam: .wrongParam
-//        case .fetchTimeoutError: .fetchTimeoutError
         }
     }
 
@@ -241,15 +236,6 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
-
-//    static func fetchPaywallTimeout(
-//        file: String = #fileID,
-//        function: String = #function,
-//        line: UInt = #line
-//    ) -> Self {
-//        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Request Paywall timeout").asAdaptyError
-//    }
-    
     
     static func fetchPaywallFailed(
         unknownError: Error,

@@ -30,6 +30,13 @@ extension AdaptyPaywall.FetchPolicy {
     }
 }
 
+extension VH<AdaptyPaywall> {
+    @inlinable
+    func withFetchPolicy(_ fetchPolicy: AdaptyPaywall.FetchPolicy) -> Self? {
+        fetchPolicy.canReturn(self) ? self : nil
+    }
+}
+
 extension AdaptyPaywall.FetchPolicy: Codable {
     enum CodingKeys: String, CodingKey {
         case type

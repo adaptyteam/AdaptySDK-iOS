@@ -17,7 +17,7 @@ actor EventsManager {
     private let profileStorage: ProfileIdentifierStorage
     private let eventStorages: [EventCollectionStorage]
     private var configuration: EventsBackendConfiguration
-    private var backendSession: HTTPSession?
+    private var backendSession: Backend.EventsExecutor?
     private var sending: Bool = false
 
     init(
@@ -44,7 +44,7 @@ actor EventsManager {
     }
 
     func set(backend: Backend) {
-        backendSession = backend.createHTTPSession()
+        backendSession = backend.createEventsExecutor()
         guard eventStorages.hasEvents || configuration.isExpired else { return }
         needSendEvents()
     }
@@ -109,7 +109,7 @@ actor EventsManager {
         }
     }
 
-    private func sendEvents(_ session: HTTPSession) async throws {
+    private func sendEvents(_ session: Backend.EventsExecutor) async throws {
         if configuration.isExpired {
             configuration = try await session.performFetchEventsConfigRequest(
                 profileId: profileStorage.profileId

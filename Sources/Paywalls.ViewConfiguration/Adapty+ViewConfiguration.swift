@@ -13,8 +13,12 @@ extension Adapty {
         paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
     ) async throws -> AdaptyUI.LocalizedViewConfiguration {
-        try await withActivatedSDK { sdk in
-            try await sdk.getViewConfiguration(paywall: paywall, loadTimeout: loadTimeout)
+        let loadTimeout = loadTimeout.allowedLoadPaywallTimeout
+        return try await withActivatedSDK { sdk in
+            try await sdk.getViewConfiguration(
+                paywall: paywall,
+                loadTimeout: loadTimeout
+            )
         }
     }
 
@@ -58,8 +62,7 @@ extension Adapty {
 
     private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyUI.ViewConfiguration? {
         guard
-            let manager = profileManagerOrNil, manager.isActive,
-            let cached = manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId)?.value,
+            let cached = profileManager?.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId)?.value,
             paywall.variationId == cached.variationId,
             paywall.instanceIdentity == cached.instanceIdentity,
             paywall.revision == cached.revision,
@@ -77,9 +80,9 @@ extension Adapty {
         locale: AdaptyLocale,
         loadTimeout: TimeInterval
     ) async throws -> AdaptyUI.ViewConfiguration {
-        let httpSession = self.httpSession
-        let apiKeyPrefix = self.apiKeyPrefix
-        let isTestUser = self.profileStorage.getProfile()?.value.isTestUser ?? false
+        let httpSession = httpSession
+        let apiKeyPrefix = apiKeyPrefix
+        let isTestUser = profileManager?.profile.value.isTestUser ?? false
 
         do {
             return try await withThrowingTimeout(seconds: loadTimeout - 0.5) {

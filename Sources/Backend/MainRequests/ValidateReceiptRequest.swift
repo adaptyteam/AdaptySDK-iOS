@@ -42,7 +42,7 @@ private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDeco
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performValidateReceiptRequest(
         profileId: String,
         receipt: Data

@@ -71,7 +71,7 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performCreateProfileRequest(
         profileId: String,
         customerUserId: String?,

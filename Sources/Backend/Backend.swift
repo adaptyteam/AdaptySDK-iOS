@@ -56,8 +56,4 @@ struct Backend: HTTPCodableConfiguration {
 extension Backend {
     enum Request {}
     enum Response {}
-
-    func createHTTPSession() -> HTTPSession {
-        HTTPSession(configuration: self, responseValidator: validator)
-    }
 }

@@ -41,7 +41,7 @@ extension Adapty {
             try await activate(apiKey, observerMode: observerMode, customerUserId: customerUserId)
         }
     }
-    
+
     /// Use this method to initialize the Adapty SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
@@ -52,13 +52,12 @@ extension Adapty {
         with builder: Adapty.ConfigurationBuilder,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        
         let configuration = builder.build()
         withCompletion(completion) {
             try await activate(with: configuration)
         }
     }
-    
+
     /// Use this method to initialize the Adapty SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
@@ -73,8 +72,7 @@ extension Adapty {
             try await activate(with: configuration)
         }
     }
-    
-    
+
     /// Use this method for identifying user with it's user id in your system.
     ///
     /// If you don't have a user id on SDK configuration, you can set it later at any time with `.identify()` method. The most common cases are after registration/authorization when the user switches from being an anonymous user to an authenticated user.
@@ -90,7 +88,7 @@ extension Adapty {
             try await identify(customerUserId)
         }
     }
-    
+
     /// You can logout the user anytime by calling this method.
     /// - Parameter completion: Result callback.
     public nonisolated static func logout(_ completion: AdaptyErrorCompletion? = nil) {
@@ -98,7 +96,7 @@ extension Adapty {
             try await logout()
         }
     }
-    
+
     /// The main function for getting a user profile. Allows you to define the level of access, as well as other parameters.
     ///
     /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
@@ -109,7 +107,7 @@ extension Adapty {
             try await getProfile()
         }
     }
-    
+
     /// You can set optional attributes such as email, phone number, etc, to the user of your app. You can then use attributes to create user [segments](https://docs.adapty.io/v2.0.0/docs/segments) or just view them in CRM.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/setting-user-attributes)
@@ -123,7 +121,7 @@ extension Adapty {
             try await updateProfile(params: params)
         }
     }
-    
+
     /// To set attribution data for the profile, use this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
@@ -137,7 +135,7 @@ extension Adapty {
             try await updateAttribution(attribution, source: source, networkUserId: networkUserId)
         }
     }
-    
+
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
@@ -151,22 +149,22 @@ extension Adapty {
     ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     ///   - loadTimeout: This value limits the timeout for this method. If the timeout is reached, cached data or local fallback will be returned.
     ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-//    public nonisolated static func getPaywall(
-//        placementId: String,
-//        locale: String? = nil,
-//        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-//        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout,
-//        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
-//    ) {
-//        withCompletion(completion) {
-//            try await getPaywall(
-//                placementId: placementId,
-//                locale: locale,
-//                fetchPolicy: fetchPolicy,
-//                loadTimeout: loadTimeout
-//            )
-//        }
-//    }
+    public nonisolated static func getPaywall(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
+    ) {
+        withCompletion(completion) {
+            try await getPaywall(
+                placementId: placementId,
+                locale: locale,
+                fetchPolicy: fetchPolicy,
+                loadTimeout: loadTimeout
+            )
+        }
+    }
 
     /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
     ///

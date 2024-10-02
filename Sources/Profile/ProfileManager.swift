@@ -12,7 +12,6 @@ final class ProfileManager: Sendable {
     nonisolated let profileId: String
     var profile: VH<AdaptyProfile>
     var onceSentEnvironment: SendedEnvironment
-    var isActive: Bool = true
 
     let storage: ProfileStorage
     let paywallsCache: PaywallsCache
@@ -38,7 +37,7 @@ final class ProfileManager: Sendable {
             try? Adapty.sdk.updateASATokenIfNeed(for: profile)
 
             if sendedEnvironment == .dont {
-                _ = try? await self?.getProfile()
+                _ = await self?.getProfile()
             } else {
                 self?.syncTransactionsIfNeed()
             }
@@ -49,7 +48,6 @@ final class ProfileManager: Sendable {
 }
 
 extension ProfileManager {
-    
     nonisolated func syncTransactionsIfNeed() { // TODO: extruct this code from ProfileManager
         Task { [weak self] in
             guard let sdk = try? await Adapty.sdk,
@@ -65,7 +63,7 @@ extension ProfileManager {
         try await syncProfile(params: params)
     }
 
-    func getProfile() async throws -> AdaptyProfile {
+    func getProfile() async -> AdaptyProfile {
         syncTransactionsIfNeed()
         return await (try? syncProfile(params: nil)) ?? profile.value
     }
@@ -75,40 +73,19 @@ extension ProfileManager {
             storage.setExternalAnalyticsDisabled(analyticsDisabled)
         }
 
-        let environmentMeta = await onceSentEnvironment.getValueIfNeedSend(
+        let meta = await onceSentEnvironment.getValueIfNeedSend(
             analyticsDisabled: (params?.analyticsDisabled ?? false) || storage.externalAnalyticsDisabled
         )
 
-        do {
-            let old = profile
-
-            let response = try await Adapty.sdk.httpSession.performSyncProfileRequest(
-                profileId: profileId,
-                parameters: params,
-                environmentMeta: environmentMeta,
-                responseHash: old.hash
-            )
-
-            guard isActive else { // TODO: ??
-                throw AdaptyError.profileWasChanged()
-            }
-
-            if let environmentMeta {
-                onceSentEnvironment = environmentMeta.idfa == nil
-                    ? .withoutIdfa
-                    : .withIdfa
-            }
-
-            saveResponse(response.flatValue())
-            return response.value ?? old.value
-        } catch {
-            throw error.asAdaptyError ?? .syncProfileFailed(unknownError: error)
-        }
+        return try await Adapty.sdk.syncProfile(
+            profile: profile,
+            params: params,
+            environmentMeta: meta
+        )
     }
 
     func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
-        guard isActive,
-              let newProfile,
+        guard let newProfile,
               profile.value.profileId == newProfile.value.profileId,
               profile.value.version <= newProfile.value.version
         else { return }
@@ -121,5 +98,30 @@ extension ProfileManager {
         storage.setProfile(newProfile)
 
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
+    }
+}
+
+private extension Adapty {
+    func syncProfile(profile old: VH<AdaptyProfile>, params: AdaptyProfileParameters?, environmentMeta meta: Environment.Meta?) async throws -> AdaptyProfile {
+        do {
+            let response = try await httpSession.performSyncProfileRequest(
+                profileId: old.value.profileId,
+                parameters: params,
+                environmentMeta: meta,
+                responseHash: old.hash
+            )
+
+            if let manager = try profileManager(with: old.value.profileId) {
+                if let meta {
+                    manager.onceSentEnvironment = meta.idfa == nil
+                        ? .withoutIdfa
+                        : .withIdfa
+                }
+                manager.saveResponse(response.flatValue())
+            }
+            return response.value ?? old.value
+        } catch {
+            throw error.asAdaptyError ?? .syncProfileFailed(unknownError: error)
+        }
     }
 }

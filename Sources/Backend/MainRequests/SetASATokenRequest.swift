@@ -50,7 +50,7 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
     }
 }
 
-extension HTTPSession {
+extension Backend.MainExecutor {
     func performSendASATokenRequest(
         profileId: String,
         token: String,

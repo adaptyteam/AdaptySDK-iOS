@@ -19,7 +19,6 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
         case let .fetchFailed(_, description, _): description
         case let .decodingFailed(_, description, _): description
         case let .wrongParam(_, description): description
-//        case let .fetchTimeoutError(_, description): description
         }
     }
 }

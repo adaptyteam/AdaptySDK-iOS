@@ -48,7 +48,7 @@ struct SendEventsRequest: HTTPDataRequest {
     }
 }
 
-extension HTTPSession {
+extension Backend.EventsExecutor {
     func performSendEventsRequest(
         profileId: String,
         events: [Data]
