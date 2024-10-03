@@ -23,7 +23,7 @@ private struct FetchEventsConfigRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension Backend.EventsExecutor {
-    func performFetchEventsConfigRequest(
+    func fetchEventsConfig(
         profileId: String
     ) async throws -> EventsBackendConfiguration {
         do {
@@ -33,7 +33,7 @@ extension Backend.EventsExecutor {
 
             let response = try await perform(
                 request,
-                requestName: .fetchEventsBlacklist
+                requestName: .fetchEventsConfig
             )
             return response.body.value
 

@@ -104,7 +104,7 @@ extension ProfileManager {
 private extension Adapty {
     func syncProfile(profile old: VH<AdaptyProfile>, params: AdaptyProfileParameters?, environmentMeta meta: Environment.Meta?) async throws -> AdaptyProfile {
         do {
-            let response = try await httpSession.performSyncProfileRequest(
+            let response = try await httpSession.syncProfile(
                 profileId: old.value.profileId,
                 parameters: params,
                 environmentMeta: meta,

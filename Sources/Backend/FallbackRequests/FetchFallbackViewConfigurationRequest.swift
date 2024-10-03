@@ -25,7 +25,7 @@ struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension Backend.FallbackExecutor {
-    func performFetchFallbackViewConfigurationRequest(
+    func fetchFallbackViewConfiguration(
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
@@ -58,7 +58,7 @@ extension Backend.FallbackExecutor {
                   !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale) else {
                 throw error
             }
-            return try await performFetchFallbackViewConfigurationRequest(
+            return try await fetchFallbackViewConfiguration(
                 apiKeyPrefix: apiKeyPrefix,
                 paywallInstanceIdentity: paywallInstanceIdentity,
                 locale: .defaultPaywallLocale,

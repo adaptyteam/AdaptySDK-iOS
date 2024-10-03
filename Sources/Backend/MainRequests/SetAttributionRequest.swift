@@ -66,7 +66,7 @@ private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableR
 }
 
 extension Backend.MainExecutor {
-    func performSendAttributionRequest(
+    func sendAttribution(
         profileId: String,
         networkUserId: String?,
         source: AdaptyAttributionSource,

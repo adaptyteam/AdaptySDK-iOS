@@ -40,12 +40,15 @@ extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getPaywall, logParams: logParams) { sdk in
-            try await sdk.getPaywall(
+            let paywall = try await sdk.getPaywall(
                 placementId,
                 locale,
                 fetchPolicy,
                 loadTimeout
             )
+            AdaptyUI.sendImageUrlsToObserver(paywall)
+
+            return paywall
         }
     }
 
@@ -56,19 +59,16 @@ extension Adapty {
         _ loadTimeout: TimeInterval
     ) async throws -> AdaptyPaywall {
         guard let profileId = profileManager?.profileId else {
-            let paywall = try await fetchFallbackPaywall(
+            return try await fetchFallbackPaywall(
                 profileStorage.profileId,
                 placementId,
                 locale,
                 httpFallbackSession
             )
-            AdaptyUI.sendImageUrlsToObserver(paywall)
-            return paywall
         }
 
-        let paywall: AdaptyPaywall
         do {
-            paywall = try await withThrowingTimeout(seconds: loadTimeout - 0.5) {
+            return try await withThrowingTimeout(seconds: loadTimeout - 0.5) {
                 try await self.fetchPaywall(
                     profileId,
                     placementId,
@@ -77,24 +77,22 @@ extension Adapty {
                 )
             }
         } catch let error where error.canUseFallbackServer {
-            paywall = try await fetchFallbackPaywall(
+            return try await fetchFallbackPaywall(
                 profileId,
                 placementId,
                 locale,
                 httpFallbackSession
             )
         } catch {
-            guard let value = try profileManager(with: profileId).orThrows
+            guard let chosen = try profileManager(with: profileId).orThrows
                 .paywallsCache
                 .getPaywallWithFallback(byPlacementId: placementId, locale: locale)
             else {
                 throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
             }
-            paywall = value
+            Adapty.trackEventIfNeed(chosen)
+            return chosen.value
         }
-
-        AdaptyUI.sendImageUrlsToObserver(paywall)
-        return paywall
     }
 
     private func fetchPaywall(
@@ -126,7 +124,6 @@ extension Adapty {
                 try await fetchTask.value
             }
 
-        AdaptyUI.sendImageUrlsToObserver(paywall)
         return paywall
     }
 
@@ -145,7 +142,7 @@ extension Adapty {
         }()
 
         do {
-            var response = try await httpSession.performFetchPaywallVariationsRequest(
+            var response = try await httpSession.fetchPaywallVariations(
                 apiKeyPrefix: apiKeyPrefix,
                 profileId: profileId,
                 placementId: placementId,
@@ -160,7 +157,6 @@ extension Adapty {
             }
 
             Adapty.trackEventIfNeed(response)
-
             return response.value
 
         } catch {
@@ -186,6 +182,8 @@ extension Adapty {
         _ locale: AdaptyLocale,
         _ session: some FetchFallbackPaywallVariationsExecutor
     ) async throws -> AdaptyPaywall {
+        let result: AdaptyPaywallChosen
+
         do {
             let (cached, isTestUser): (AdaptyPaywall?, Bool) = {
                 guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
@@ -195,7 +193,7 @@ extension Adapty {
                 )
             }()
 
-            var response = try await session.performFetchFallbackPaywallVariationsRequest(
+            var response = try await session.fetchFallbackPaywallVariations(
                 apiKeyPrefix: apiKeyPrefix,
                 profileId: profileId,
                 placementId: placementId,
@@ -208,24 +206,25 @@ extension Adapty {
                 response = manager.paywallsCache.savedPaywallChosen(response)
             }
 
-            Adapty.trackEventIfNeed(response)
-
-            return response.value
+            result = response
 
         } catch {
-            if let manager = tryProfileManagerOrNil(with: profileId) {
-                if let paywall = manager.paywallsCache.getPaywallWithFallback(byPlacementId: placementId, locale: locale) {
-                    return paywall
+            let chosen =
+                if let manager = tryProfileManagerOrNil(with: profileId) {
+                    manager.paywallsCache.getPaywallWithFallback(byPlacementId: placementId, locale: locale)
+                } else {
+                    Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId)
                 }
-            } else {
-                if let paywallChosen = Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId) {
-                    Adapty.trackEventIfNeed(paywallChosen)
-                    return paywallChosen.value
-                }
+
+            guard let chosen else {
+                throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
             }
 
-            throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+            result = chosen
         }
+
+        Adapty.trackEventIfNeed(result)
+        return result.value
     }
 }
 

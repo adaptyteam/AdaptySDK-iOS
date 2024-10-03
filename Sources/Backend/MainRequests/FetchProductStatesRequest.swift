@@ -59,7 +59,7 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendProduct
 }
 
 extension Backend.MainExecutor {
-    func performFetchProductStatesRequest(
+    func fetchProductStates(
         profileId: String,
         responseHash: String?
     ) async throws -> VH<[BackendProductState]?> {

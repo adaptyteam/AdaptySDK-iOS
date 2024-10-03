@@ -49,20 +49,15 @@ struct SendEventsRequest: HTTPDataRequest {
 }
 
 extension Backend.EventsExecutor {
-    func performSendEventsRequest(
+    func sendEvents(
         profileId: String,
         events: [Data]
     ) async throws {
         do {
-            let request = SendEventsRequest(
+            let _: HTTPEmptyResponse = try await session.perform(SendEventsRequest(
                 profileId: profileId,
                 events: events
-            )
-
-            let _: HTTPEmptyResponse = try await perform(
-                request,
-                requestName: .fetchEventsBlacklist
-            )
+            ))
         } catch {
             throw EventsError.sending(error)
         }

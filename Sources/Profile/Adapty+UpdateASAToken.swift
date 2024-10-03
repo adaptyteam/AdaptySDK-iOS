@@ -23,7 +23,7 @@ import Foundation
             Task {
                 let profileId = profile.value.profileId
 
-                let response = try await httpSession.performSendASATokenRequest(
+                let response = try await httpSession.sendASAToken(
                     profileId: profileId,
                     token: attributionToken,
                     responseHash: profile.hash

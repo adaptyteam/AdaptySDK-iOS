@@ -72,7 +72,7 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 }
 
 extension Backend.MainExecutor {
-    func performCreateProfileRequest(
+    func createProfile(
         profileId: String,
         customerUserId: String?,
         parameters: AdaptyProfileParameters?,

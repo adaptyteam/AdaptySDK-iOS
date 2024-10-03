@@ -69,7 +69,7 @@ private extension Adapty.ValidatePurchaseReason {
 }
 
 extension Backend.MainExecutor {
-    func performSyncTransactionRequest(
+    func syncTransaction(
         profileId: String,
         originalTransactionId: String
     ) async throws -> VH<AdaptyProfile> {
@@ -90,7 +90,7 @@ extension Backend.MainExecutor {
         return VH(response.body.value, hash: response.headers.getBackendResponseHash())
     }
 
-    func performValidateTransactionRequest(
+    func validateTransaction(
         profileId: String,
         purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason

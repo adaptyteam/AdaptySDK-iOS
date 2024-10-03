@@ -46,7 +46,7 @@ extension Adapty {
         let oldResponseHash = profileManager?.profile.hash
 
         do {
-            let response = try await httpSession.performSendAttributionRequest(
+            let response = try await httpSession.sendAttribution(
                 profileId: profileId,
                 networkUserId: networkUserId,
                 source: source,

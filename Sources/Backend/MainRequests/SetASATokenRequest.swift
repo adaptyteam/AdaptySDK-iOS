@@ -51,7 +51,7 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
 }
 
 extension Backend.MainExecutor {
-    func performSendASATokenRequest(
+    func sendASAToken(
         profileId: String,
         token: String,
         responseHash: String?

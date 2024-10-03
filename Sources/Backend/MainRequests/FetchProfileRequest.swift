@@ -60,7 +60,7 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyProfile? 
 }
 
 extension Backend.MainExecutor {
-    func performFetchProfileRequest(
+    func fetchProfile(
         profileId: String,
         responseHash: String?
     ) async throws -> VH<AdaptyProfile?> {

@@ -82,19 +82,19 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 }
 
 extension Backend.MainExecutor {
-    func performSyncProfileRequest(
+    func syncProfile(
         profileId: String,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
         responseHash: String?
     ) async throws -> VH<AdaptyProfile?> {
         if parameters == nil, environmentMeta == nil {
-            try await performFetchProfileRequest(
+            try await fetchProfile(
                 profileId: profileId,
                 responseHash: responseHash
             )
         } else {
-            try await performUpdateProfileRequest(
+            try await updateProfile(
                 profileId: profileId,
                 parameters: parameters,
                 environmentMeta: environmentMeta,
@@ -103,7 +103,7 @@ extension Backend.MainExecutor {
         }
     }
 
-    private func performUpdateProfileRequest(
+    private func updateProfile(
         profileId: String,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,

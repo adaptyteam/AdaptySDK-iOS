@@ -33,11 +33,14 @@ extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getPaywallForDefaultAudience, logParams: logParams) { sdk in
-            try await sdk.getPaywallForDefaultAudience(
+            let paywall = try await sdk.getPaywallForDefaultAudience(
                 placementId,
                 locale,
                 fetchPolicy
             )
+            
+            AdaptyUI.sendImageUrlsToObserver(paywall)
+            return paywall
         }
     }
 
@@ -72,7 +75,6 @@ extension Adapty {
                 try await fetchTask.value
             }
 
-        AdaptyUI.sendImageUrlsToObserver(paywall)
         return paywall
     }
 }

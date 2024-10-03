@@ -48,7 +48,7 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
 }
 
 protocol FetchFallbackPaywallVariationsExecutor: BackendExecutor {
-    func performFetchFallbackPaywallVariationsRequest(
+    func fetchFallbackPaywallVariations(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -112,7 +112,7 @@ private extension FetchFallbackPaywallVariationsExecutor {
 }
 
 extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
-    func performFetchFallbackPaywallVariationsRequest(
+    func fetchFallbackPaywallVariations(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -133,7 +133,7 @@ extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
 }
 
 extension Backend.ConfigsExecutor: FetchFallbackPaywallVariationsExecutor {
-    func performFetchFallbackPaywallVariationsRequest(
+    func fetchFallbackPaywallVariations(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,

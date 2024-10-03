@@ -31,7 +31,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension Backend.MainExecutor {
-    func performFetchViewConfigurationRequest(
+    func fetchViewConfiguration(
         apiKeyPrefix: String,
         paywallVariationId: String,
         locale: AdaptyLocale,

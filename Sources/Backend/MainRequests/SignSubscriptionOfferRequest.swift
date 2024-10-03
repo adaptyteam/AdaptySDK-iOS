@@ -29,7 +29,7 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension Backend.MainExecutor {
-    func performSignSubscriptionOfferRequest(
+    func signSubscriptionOffer(
         profileId: String,
         vendorProductId: String,
         discountId: String

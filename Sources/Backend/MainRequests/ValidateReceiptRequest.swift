@@ -43,7 +43,7 @@ private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDeco
 }
 
 extension Backend.MainExecutor {
-    func performValidateReceiptRequest(
+    func validateReceipt(
         profileId: String,
         receipt: Data
     ) async throws -> VH<AdaptyProfile> {

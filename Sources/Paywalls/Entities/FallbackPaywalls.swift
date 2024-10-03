@@ -34,7 +34,7 @@ struct FallbackPaywalls: Sendable {
         head.placementIds?.contains(id)
     }
 
-    //1
+    /// 2
     func getPaywall(byPlacementId id: String, profileId: String) -> AdaptyPaywallChosen? {
         guard contains(placementId: id) ?? true else { return nil }
 

@@ -111,7 +111,7 @@ actor EventsManager {
 
     private func sendEvents(_ session: Backend.EventsExecutor) async throws {
         if configuration.isExpired {
-            configuration = try await session.performFetchEventsConfigRequest(
+            configuration = try await session.fetchEventsConfig(
                 profileId: profileStorage.profileId
             )
         }
@@ -126,7 +126,7 @@ actor EventsManager {
             return
         }
 
-        try await session.performSendEventsRequest(
+        try await session.sendEvents(
             profileId: self.profileStorage.profileId,
             events: events.elements
         )

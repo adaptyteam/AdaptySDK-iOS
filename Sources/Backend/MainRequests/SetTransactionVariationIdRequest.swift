@@ -40,7 +40,7 @@ private struct SetTransactionVariationIdRequest: HTTPEncodableRequest {
 }
 
 extension Backend.MainExecutor {
-    func performSetTransactionVariationIdRequest(
+    func setTransactionVariationId(
         profileId: String,
         transactionId: String,
         variationId: String

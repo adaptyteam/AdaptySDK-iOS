@@ -86,7 +86,7 @@ extension Adapty {
 
         do {
             return try await withThrowingTimeout(seconds: loadTimeout - 0.5) {
-                try await httpSession.performFetchViewConfigurationRequest(
+                try await httpSession.fetchViewConfiguration(
                     apiKeyPrefix: apiKeyPrefix,
                     paywallVariationId: paywallVariationId,
                     locale: locale,
@@ -103,7 +103,7 @@ extension Adapty {
         }
 
         do {
-            return try await httpFallbackSession.performFetchFallbackViewConfigurationRequest(
+            return try await httpFallbackSession.fetchFallbackViewConfiguration(
                 apiKeyPrefix: apiKeyPrefix,
                 paywallInstanceIdentity: paywallInstanceIdentity,
                 locale: locale,

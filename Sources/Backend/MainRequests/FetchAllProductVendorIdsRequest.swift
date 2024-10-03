@@ -21,7 +21,7 @@ private struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse
 }
 
 extension Backend.MainExecutor {
-    func performFetchAllProductVendorIdsRequest(
+    func fetchAllProductVendorIds(
         apiKeyPrefix: String
     ) async throws -> [String] {
         let request = FetchAllProductVendorIdsRequest(
@@ -29,7 +29,7 @@ extension Backend.MainExecutor {
         )
         let response = try await perform(
             request,
-            requestName: .fetchAllProductVendorIdsRequest
+            requestName: .fetchAllProductVendorIds
         )
 
         return response.body.value
