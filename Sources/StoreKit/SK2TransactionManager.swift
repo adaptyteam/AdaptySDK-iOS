@@ -13,8 +13,10 @@ private let log = Log.Category(name: "SK2TransactionManager")
 actor SK2TransactionManager {
     private let storage: ProfileIdentifierStorage
     private let session: Backend.MainExecutor
+
     private var lastTransactionCached: SK2Transaction?
-    private var syncTask: Task<VH<AdaptyProfile>?, any Error>?
+    private var syncTaskCached: Task<VH<AdaptyProfile>?, any Error>?
+    private var syncProfileId: String?
 
     init(storage: ProfileIdentifierStorage, backend: Backend) {
         session = backend.createMainExecutor()
@@ -22,21 +24,23 @@ actor SK2TransactionManager {
     }
 
     func syncTransactions() async throws -> VH<AdaptyProfile>? {
-        let task: Task<VH<AdaptyProfile>?, any Error>
-        if let syncTask = self.syncTask {
-            task = syncTask
+        let syncTask: Task<VH<AdaptyProfile>?, any Error>
+        if let task = syncTaskCached, syncProfileId == nil || syncProfileId == storage.profileId {
+            syncTask = task
         } else {
-            task = Task<VH<AdaptyProfile>?, any Error> {
+            self.syncProfileId = nil
+            syncTask = Task<VH<AdaptyProfile>?, any Error> {
                 try await syncLastTransaction()
             }
-            self.syncTask = task
+            self.syncTaskCached = syncTask
         }
-        return try await task.value
+        return try await syncTask.value
     }
 
     private func syncLastTransaction() async throws -> VH<AdaptyProfile>? {
         defer {
-            self.syncTask = nil
+            self.syncTaskCached = nil
+            self.syncProfileId = nil
         }
 
         let lastTransaction: SK2Transaction
@@ -50,6 +54,7 @@ actor SK2TransactionManager {
             return nil
         }
 
+        syncProfileId = storage.profileId
         return try await session.syncTransaction(
             profileId: storage.profileId,
             originalTransactionId: lastTransaction.unfOriginalIdentifier
