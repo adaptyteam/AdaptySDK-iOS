@@ -16,7 +16,7 @@ extension SK2Transaction {
         String(id)
     }
 
-    var unfOriginalIdentifier: String? {
+    var unfOriginalIdentifier: String {
         String(originalID)
     }
 

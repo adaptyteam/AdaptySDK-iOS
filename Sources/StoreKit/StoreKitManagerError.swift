@@ -1,5 +1,5 @@
 //
-//  SKManagerError.swift
+//  StoreKitManagerError.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 25.10.2022
@@ -7,7 +7,7 @@
 
 import StoreKit
 
-enum SKManagerError: Error {
+enum StoreKitManagerError: Error {
     case interrupted(AdaptyError.Source)
     case noProductIDsFound(AdaptyError.Source)
     case receiptIsEmpty(AdaptyError.Source, error: Error?)
@@ -16,7 +16,7 @@ enum SKManagerError: Error {
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
 }
 
-extension SKManagerError: CustomStringConvertible {
+extension StoreKitManagerError: CustomStringConvertible {
     var description: String {
         switch self {
         case let .interrupted(source):
@@ -43,7 +43,7 @@ extension SKManagerError: CustomStringConvertible {
     }
 }
 
-extension SKManagerError {
+extension StoreKitManagerError {
     var source: AdaptyError.Source {
         switch self {
         case let .productPurchaseFailed(src, _),
@@ -71,7 +71,7 @@ extension SKManagerError {
     }
 }
 
-extension SKManagerError {
+extension StoreKitManagerError {
     static func noProductIDsFound(
         file: String = #fileID,
         function: String = #function,

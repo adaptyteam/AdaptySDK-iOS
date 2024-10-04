@@ -55,7 +55,7 @@ enum APIRequestName: String {
     case signSubscriptionOffer = "sign_offer"
 
     case fetchEventsConfig = "get_events_blacklist"
-    
+
     case fetchAllProductVendorIds = "get_products_ids"
 }
 
@@ -122,11 +122,11 @@ enum MethodName: String {
     case activate
     case identify
     case logout
-    
+
     case getProfile = "get_profile"
     case updateProfile = "update_profile"
     case updateAttribution = "update_attribution"
-    
+
     case setVariationId = "set_variation_id"
     case setVariationIdSK1 = "set_variation_id_sk1"
     case setVariationIdSK2 = "set_variation_id_sk2"
@@ -135,16 +135,16 @@ enum MethodName: String {
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
     case getReceipt = "get_reciept"
     case makePurchase = "make_purchase"
-    case restorePurchases  = "restore_purchases"
-    
+    case restorePurchases = "restore_purchases"
+
     case getPaywall = "get_paywall"
     case getPaywallForDefaultAudience = "get_untargeted_paywall"
     case setFallbackPaywalls = "set_fallback_paywalls"
-    
+
     case logShowOnboarding = "log_show_onboarding"
     case logShowPaywall = "log_show_paywall"
-    
-    case presentCodeRedemptionSheet  = "present_code_redemption_sheet"
+
+    case presentCodeRedemptionSheet = "present_code_redemption_sheet"
 }
 
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
@@ -195,7 +195,14 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
 
 enum AppleMethodName: String {
     case fetchASAToken = "fetch_ASA_Token"
+    case fetchSK1Products = "fetch_sk1_products"
+    case fetchSK2Products = "fetch_sk2_products"
+    
+    case getAllSK1Transactions = "get_all_sk1_transactions"
+    case getAllSK2Transactions = "get_all_sk2_transactions"
+
 }
+
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {
     let name: AppleMethodName
     let stamp: String?

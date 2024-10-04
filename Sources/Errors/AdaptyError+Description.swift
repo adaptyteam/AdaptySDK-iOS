@@ -46,7 +46,7 @@ extension EventsError: CustomDebugStringConvertible {
     }
 }
 
-extension SKManagerError: CustomDebugStringConvertible {
+extension StoreKitManagerError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
         case .interrupted: "Operation interrupted"

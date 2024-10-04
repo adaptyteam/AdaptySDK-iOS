@@ -94,7 +94,7 @@ extension HTTPError: CustomAdaptyError {
     }
  }
 
-extension SKManagerError: CustomAdaptyError {
+extension StoreKitManagerError: CustomAdaptyError {
     static let errorDomain = AdaptyError.SKManagerErrorDomain
 
     var errorCode: Int { adaptyErrorCode.rawValue }

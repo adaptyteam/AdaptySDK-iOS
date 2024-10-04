@@ -21,6 +21,8 @@ public final class Adapty: Sendable {
     let httpFallbackSession: Backend.FallbackExecutor
     let httpConfigsSession: Backend.ConfigsExecutor
 
+
+    
     init(
         apiKeyPrefix: String,
         profileStorage: ProfileStorage,

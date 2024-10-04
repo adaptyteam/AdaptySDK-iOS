@@ -48,6 +48,15 @@ extension Adapty {
     public nonisolated static func activate(
         with configuration: Adapty.Configuration
     ) async throws {
+        let logName = "activate"
+        
+        let logParams: EventParameters = [
+            "observer_mode": configuration.observerMode,
+            "has_customer_user_id": configuration.customerUserId != nil,
+            "idfa_collection_disabled": configuration.idfaCollectionDisabled,
+            "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
+        ]
+        
         // TODO: not implemented
 
         if let logLevel = configuration.logLevel {
