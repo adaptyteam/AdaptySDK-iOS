@@ -1,5 +1,5 @@
 //
-//  Adapty+presentCodeRedemptionSheet.swift
+//  Adapty+CodeRedemptionSheet.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.05.2023

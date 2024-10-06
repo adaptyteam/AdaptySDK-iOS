@@ -14,6 +14,7 @@ actor SK2ProductsManager {
     private let apiKeyPrefix: String
     private var cache: ProductVendorIdsCache
     private let session: Backend.MainExecutor
+
     private var products = [String: SK2Product]()
     private let sk2ProductsFetcher = SK2ProductFetcher()
 
@@ -74,13 +75,18 @@ enum ProductsFetchPolicy: Sendable, Hashable {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
     func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> SK2Product {
-        let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
+        do {
+            let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
 
-        guard let product = products.first else {
-            throw StoreKitManagerError.noProductIDsFound().asAdaptyError
+            guard let product = products.first else {
+                throw StoreKitManagerError.noProductIDsFound().asAdaptyError
+            }
+
+            return product
+        } catch {
+            log.error("fetch SK2Product \(productId) error: \(error)")
+            throw error
         }
-
-        return product
     }
 
     func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> [SK2Product] {

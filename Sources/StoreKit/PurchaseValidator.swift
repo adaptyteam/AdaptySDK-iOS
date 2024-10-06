@@ -7,8 +7,9 @@
 
 import Foundation
 
-protocol PurchaseValidator : Sendable {
+protocol PurchaseValidator: Sendable {
     func validatePurchase(
+        profileId: String?,
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws -> VH<AdaptyProfile>
@@ -22,15 +23,20 @@ enum ValidatePurchaseReason {
 
 extension Adapty: PurchaseValidator {
     func validatePurchase(
+        profileId: String?,
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws -> VH<AdaptyProfile> {
-        let response = try await httpSession.validateTransaction(
-            profileId: profileStorage.profileId,
-            purchasedTransaction: transaction,
-            reason: reason
-        )
-        saveResponse(response, syncedTrunsaction: true)
-        return response
+        do {
+            let response = try await httpSession.validateTransaction(
+                profileId: profileId ?? profileStorage.profileId,
+                purchasedTransaction: transaction,
+                reason: reason
+            )
+            saveResponse(response, syncedTrunsaction: true)
+            return response
+        } catch {
+            throw error.asAdaptyError ?? AdaptyError.validatePurchaseFailed(unknownError: error)
+        }
     }
 }

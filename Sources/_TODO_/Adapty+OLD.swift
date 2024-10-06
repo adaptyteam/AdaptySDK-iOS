@@ -23,7 +23,9 @@ public final class Adapty: Sendable {
 
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
-
+    let sk2ProductsManager: SK2ProductsManager
+    
+    
     init(
         apiKeyPrefix: String,
         profileStorage: ProfileStorage,
