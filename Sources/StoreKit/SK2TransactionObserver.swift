@@ -18,7 +18,7 @@ actor SK2TransactionObserver {
     init(productsManager: SK2ProductsManager, purchaseValidator: PurchaseValidator) {
         self.purchaseValidator = purchaseValidator
         self.productsManager = productsManager
-        self.updates = Task(priority: .utility) { await observing()  }
+        self.updates = Task(priority: .utility) { await observing() }
 
         @Sendable
         func observing() async {
