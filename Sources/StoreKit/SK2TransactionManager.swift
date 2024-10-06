@@ -10,38 +10,31 @@ import StoreKit
 private let log = Log.Category(name: "SK2TransactionManager")
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-actor SK2TransactionManager {
-    private let storage: ProfileIdentifierStorage
+actor SK2TransactionManager: StoreKitTransactionManager {
     private let session: Backend.MainExecutor
 
     private var lastTransactionCached: SK2Transaction?
-    private var syncTaskCached: Task<VH<AdaptyProfile>?, any Error>?
-    private var syncProfileId: String?
+    private var syncing: (task: Task<VH<AdaptyProfile>?, any Error>, profileId: String)?
 
-    init(storage: ProfileIdentifierStorage, backend: Backend) {
-        session = backend.createMainExecutor()
-        self.storage = storage
+    init(session: Backend.MainExecutor) {
+        self.session = session
     }
 
-    func syncTransactions() async throws -> VH<AdaptyProfile>? {
-        let syncTask: Task<VH<AdaptyProfile>?, any Error>
-        if let task = syncTaskCached, syncProfileId == nil || syncProfileId == storage.profileId {
-            syncTask = task
+    func syncTransactions(for profileId: String) async throws -> VH<AdaptyProfile>? {
+        let task: Task<VH<AdaptyProfile>?, any Error>
+        if let syncing, syncing.profileId == profileId {
+            task = syncing.task
         } else {
-            self.syncProfileId = nil
-            syncTask = Task<VH<AdaptyProfile>?, any Error> {
-                try await syncLastTransaction()
+            task = Task<VH<AdaptyProfile>?, any Error> {
+                try await syncLastTransaction(for: profileId)
             }
-            self.syncTaskCached = syncTask
+            syncing = (task, profileId)
         }
-        return try await syncTask.value
+        return try await task.value
     }
 
-    private func syncLastTransaction() async throws -> VH<AdaptyProfile>? {
-        defer {
-            self.syncTaskCached = nil
-            self.syncProfileId = nil
-        }
+    private func syncLastTransaction(for profileId: String) async throws -> VH<AdaptyProfile>? {
+        defer { syncing = nil }
 
         let lastTransaction: SK2Transaction
 
@@ -54,11 +47,14 @@ actor SK2TransactionManager {
             return nil
         }
 
-        syncProfileId = storage.profileId
-        return try await session.syncTransaction(
-            profileId: storage.profileId,
-            originalTransactionId: lastTransaction.unfOriginalIdentifier
-        )
+        do {
+            return try await session.syncTransaction(
+                profileId: profileId,
+                originalTransactionId: lastTransaction.unfOriginalIdentifier
+            )
+        } catch {
+            throw error.asAdaptyError ?? AdaptyError.syncLastTransactionFailed(unknownError: error)
+        }
     }
 
     private static var lastTransaction: SK2Transaction? {

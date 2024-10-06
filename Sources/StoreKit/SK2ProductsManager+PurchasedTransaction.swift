@@ -1,35 +1,37 @@
 //
-//  SKProductsManager+PurchasedSK2Transaction.swift
+//  SK2ProductsManager+PurchasedTransaction.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 01.06.2023
+//  Created by Aleksei Valiano on 06.10.2024
 //
 
-import StoreKit
+import Foundation
 
-private let log = Log.Category(name: "SKProductsManager")
+private let log = Log.Category(name: "SK2ProductsManager")
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension SKProductsManager {
+extension SK2ProductsManager {
     func fillPurchasedTransaction(
         variationId: String?,
         persistentVariationId: String? = nil,
-        purchasedSK2Transaction transaction: SK2Transaction,
-        _ completion: @escaping (PurchasedTransaction) -> Void
-    ) {
+        purchasedSK2Transaction transaction: SK2Transaction
+    ) async -> PurchasedTransaction {
         let productId = transaction.productID
 
-        fetchSK2Product(productIdentifier: productId, fetchPolicy: .returnCacheDataElseLoad) { result in
-            if let error = result.error {
-                log.error("fetch SK2Product \(productId) error: \(error)")
-            }
-            completion(PurchasedTransaction(
-                sk2Product: try? result.get(),
-                variationId: variationId,
-                persistentVariationId: persistentVariationId,
-                purchasedSK2Transaction: transaction
-            ))
+        let sk2Product: SK2Product?
+        do {
+            sk2Product = try await fetchSK2Product(id: productId, fetchPolicy: .returnCacheDataElseLoad)
+        } catch {
+            log.error("fetch SK2Product \(productId) error: \(error)")
+            sk2Product = nil
         }
+
+        return PurchasedTransaction(
+            sk2Product: sk2Product,
+            variationId: variationId,
+            persistentVariationId: persistentVariationId,
+            purchasedSK2Transaction: transaction
+        )
     }
 }
 
@@ -51,16 +53,16 @@ private extension PurchasedTransaction {
         }()
 
         self.init(
-            transactionId: transaction.ext.identifier,
-            originalTransactionId: transaction.ext.originalIdentifier,
+            transactionId: transaction.unfIdentifier,
+            originalTransactionId: transaction.unfOriginalIdentifier,
             vendorProductId: transaction.productID,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: sk2Product?.price,
-            priceLocale: sk2Product?.priceFormatStyle.locale.ext.currencyCode,
-            storeCountry: sk2Product?.priceFormatStyle.locale.ext.regionCode,
+            priceLocale: sk2Product?.priceFormatStyle.locale.unfCurrencyCode,
+            storeCountry: sk2Product?.priceFormatStyle.locale.unfRegionCode,
             subscriptionOffer: offer,
-            environment: transaction.ext.environment
+            environment: transaction.unfEnvironment
         )
     }
 }
@@ -68,13 +70,13 @@ private extension PurchasedTransaction {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     init?(_ transaction: SK2Transaction, sk2Product: SK2Product?) {
-        guard let offerType = transaction.ext.offerType else { return nil }
-        let productOffer = sk2Product?.subscriptionOffer(byType: offerType, withId: transaction.ext.offerId)
+        guard let offerType = transaction.unfOfferType else { return nil }
+        let productOffer = sk2Product?.subscriptionOffer(byType: offerType, withId: transaction.unfOfferId)
         self = .init(
-            id: transaction.ext.offerId,
-            period: (productOffer?.period).map { AdaptyProductSubscriptionPeriod(subscriptionPeriod: $0) },
-            paymentMode: (productOffer?.paymentMode).map { .init(mode: $0) } ?? .unknown,
-            type: .init(type: offerType),
+            id: transaction.unfOfferId,
+            period: (productOffer?.period).map { $0.asAdaptyProductSubscriptionPeriod },
+            paymentMode: (productOffer?.paymentMode).map { $0.asPaymentMode } ?? .unknown,
+            offerType: offerType.asPurchasedTransactionOfferType,
             price: productOffer?.price
         )
     }
@@ -86,9 +88,9 @@ private extension PurchasedTransaction.SubscriptionOffer {
             let productOffer = sk2Product?.subscriptionOffer(byType: transactionOffer.type, withId: transactionOffer.id)
             self = .init(
                 id: transactionOffer.id,
-                period: (productOffer?.period).map { .init(subscriptionPeriod: $0) },
-                paymentMode: transactionOffer.paymentMode.map { .init(mode: $0) } ?? .unknown,
-                type: .init(type: transactionOffer.type),
+                period: (productOffer?.period).map { $0.asAdaptyProductSubscriptionPeriod },
+                paymentMode: transactionOffer.paymentMode.map { $0.asPaymentMode } ?? .unknown,
+                offerType: transactionOffer.type.asPurchasedTransactionOfferType,
                 price: productOffer?.price
             )
         }
@@ -100,7 +102,7 @@ private extension SK2Product {
     func subscriptionOffer(
         byType offerType: SK2Transaction.OfferType,
         withId offerId: String?
-    ) -> SK2ProductDiscount? {
+    ) -> SK2Product.SubscriptionOffer? {
         guard let subscription else { return nil }
 
         switch offerType {

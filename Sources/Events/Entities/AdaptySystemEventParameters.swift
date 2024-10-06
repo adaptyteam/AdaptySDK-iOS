@@ -141,6 +141,7 @@ enum MethodName: String {
     case getPaywallForDefaultAudience = "get_untargeted_paywall"
     case setFallbackPaywalls = "set_fallback_paywalls"
 
+    
     case logShowOnboarding = "log_show_onboarding"
     case logShowPaywall = "log_show_paywall"
 
@@ -200,6 +201,9 @@ enum AppleMethodName: String {
     
     case getAllSK1Transactions = "get_all_sk1_transactions"
     case getAllSK2Transactions = "get_all_sk2_transactions"
+    
+    case getReceipt = "get_receipt"
+    case refreshReceipt = "refresh_receipt"
 
 }
 

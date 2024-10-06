@@ -291,6 +291,24 @@ extension AdaptyError {
         decodingFallback(unknownError, file: file, function: function, line: line)
     }
 
+    static func syncLastTransactionFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sync last transaction  failed", error: unknownError).asAdaptyError
+    }
+    
+    static func syncRecieptFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sync last transaction  failed", error: unknownError).asAdaptyError
+    }
+    
     static func convertToAdaptyErrorFailed(
         unknownError: Error,
         file: String = #fileID,

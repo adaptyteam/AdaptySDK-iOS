@@ -21,8 +21,9 @@ public final class Adapty: Sendable {
     let httpFallbackSession: Backend.FallbackExecutor
     let httpConfigsSession: Backend.ConfigsExecutor
 
+    let receiptManager: StoreKitReceiptManager
+    let transactionManager: StoreKitTransactionManager
 
-    
     init(
         apiKeyPrefix: String,
         profileStorage: ProfileStorage,
@@ -35,10 +36,14 @@ public final class Adapty: Sendable {
         httpSession = backend.createMainExecutor()
         httpFallbackSession = backend.createFallbackExecutor()
         httpConfigsSession = backend.createConfigsExecutor()
-    }
 
-    func syncTransactions(refreshReceiptIfEmpty _: Bool) async throws -> VH<AdaptyProfile>? {
-        throw AdaptyError.cantMakePayments()
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+            receiptManager = StoreKitReceiptManager(session: httpSession)
+            transactionManager = SK2TransactionManager(session: httpSession)
+        } else {
+            receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
+            transactionManager = receiptManager
+        }
     }
 
     enum ValidatePurchaseReason: Sendable, Hashable {

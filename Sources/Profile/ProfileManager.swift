@@ -25,7 +25,8 @@ final class ProfileManager: Sendable {
         profile: VH<AdaptyProfile>,
         sendedEnvironment: SendedEnvironment
     ) {
-        profileId = profile.value.profileId
+        let profileId = profile.value.profileId
+        self.profileId = profileId
         self.profile = profile
         self.onceSentEnvironment = sendedEnvironment
 
@@ -39,7 +40,7 @@ final class ProfileManager: Sendable {
             if sendedEnvironment == .dont {
                 _ = await self?.getProfile()
             } else {
-                self?.syncTransactionsIfNeed()
+                self?.syncTransactionsIfNeed(for: profileId)
             }
 
             Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
@@ -48,14 +49,14 @@ final class ProfileManager: Sendable {
 }
 
 extension ProfileManager {
-    nonisolated func syncTransactionsIfNeed() { // TODO: extruct this code from ProfileManager
+    nonisolated func syncTransactionsIfNeed(for profileId: String) { // TODO: extruct this code from ProfileManager
         Task { [weak self] in
             guard let sdk = try? await Adapty.sdk,
                   let self,
                   !self.storage.syncedTransactions
             else { return }
 
-            _ = try? await sdk.syncTransactions(refreshReceiptIfEmpty: true)
+            try? await sdk.syncTransactions(for: profileId)
         }
     }
 
@@ -64,7 +65,7 @@ extension ProfileManager {
     }
 
     func getProfile() async -> AdaptyProfile {
-        syncTransactionsIfNeed()
+        syncTransactionsIfNeed(for: profileId)
         return await (try? syncProfile(params: nil)) ?? profile.value
     }
 
@@ -87,17 +88,32 @@ extension ProfileManager {
     func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
         guard let newProfile,
               profile.value.profileId == newProfile.value.profileId,
+              !profile.hash.nonOptionalIsEqual(newProfile.hash),
               profile.value.version <= newProfile.value.version
         else { return }
-
-        if let oldHash = profile.hash,
-           let newHash = newProfile.hash,
-           oldHash == newHash { return }
 
         profile = newProfile
         storage.setProfile(newProfile)
 
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
+    }
+}
+
+extension Adapty {
+    func syncTransactions(for profileId: String) async throws {
+        let response = try await transactionManager.syncTransactions(for: profileId)
+
+        if profileStorage.profileId == profileId {
+            profileStorage.setSyncedTransactions(true)
+        }
+        profileManager?.saveResponse(response)
+    }
+
+    func saveResponse(_ newProfile: VH<AdaptyProfile>, syncedTrunsaction: Bool = false) {
+        if syncedTrunsaction, profileStorage.profileId == newProfile.value.profileId {
+            profileStorage.setSyncedTransactions(true)
+        }
+        profileManager?.saveResponse(newProfile)
     }
 }
 

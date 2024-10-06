@@ -205,6 +205,29 @@ extension Adapty {
             try await setFallbackPaywalls(fileURL: url)
         }
     }
+    
+    /// You can fetch the StoreKit receipt by calling this method
+    ///
+    /// If the receipt is not presented on the device, Adapty will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
+    ///
+    /// - Parameters:
+    ///   - completion: A result containing the receipt `Data`.
+    public nonisolated static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
+        withCompletion(completion) {
+            try await getReceipt()
+        }
+    }
+    
+    /// To restore purchases, you have to call this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
+    ///
+    /// - Parameter completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
+    public nonisolated static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+        withCompletion(completion) {
+            try await restorePurchases()
+        }
+    }
 
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
     ///
