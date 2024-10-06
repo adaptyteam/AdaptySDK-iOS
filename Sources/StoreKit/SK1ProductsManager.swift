@@ -21,6 +21,45 @@ actor SK1ProductsManager: StoreKitProductsManager {
         self.session = session
         cache = ProductVendorIdsCache(storage: storage)
     }
+
+    private var fetchingAllProducts = false
+
+    private func finishFetchingAllProducts() {
+        fetchingAllProducts = false
+    }
+
+    private func fetchAllProducts() async {
+        guard !fetchingAllProducts else { return }
+        fetchingAllProducts = true
+
+        do {
+            let response = try await session.fetchAllProductVendorIds(apiKeyPrefix: apiKeyPrefix)
+            cache.setProductVendorIds(response)
+        } catch {
+            guard !error.isCancelled else { return }
+            Task.detached(priority: .utility) { [weak self] in
+                try? await Task.sleep(nanoseconds: 2 * 1_000_000_000 /* second */ )
+                await self?.finishFetchingAllProducts()
+                await self?.fetchAllProducts()
+            }
+            return
+        }
+
+        let allProductVendorIds = Set(cache.allProductVendorIds ?? [])
+
+        Task.detached(priority: .high) { [weak self] in
+            _ = try? await self?.fetchSK1Products(ids: allProductVendorIds)
+            await self?.finishFetchingAllProducts()
+        }
+    }
+}
+
+private extension Error {
+    var isCancelled: Bool {
+        let error = unwrapped
+        if let httpError = error as? HTTPError { return httpError.isCancelled }
+        return false
+    }
 }
 
 extension SK1ProductsManager {
@@ -58,7 +97,7 @@ extension SK1ProductsManager {
             }
         }
 
-        let products = [SK1Product]()
+        let products = [SK1Product]() // TODO: need fetcher
 
         guard !products.isEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
