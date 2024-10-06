@@ -81,100 +81,6 @@ extension Adapty {
 
 
 
-    /// This method is intended to be used by cross-platform SDKs, we do not expect you to use it directly.
-    public nonisolated static func setVariationId(
-        from decoder: JSONDecoder,
-        data: Data,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        struct PrivateParameters: Decodable /* temp */ {
-            let variationId: String
-            let transactionId: String
-
-            enum CodingKeys: String, CodingKey {
-                case variationId = "variation_id"
-                case transactionId = "transaction_id"
-            }
-        }
-        let parameters: PrivateParameters
-        do {
-            parameters = try decoder.decode(PrivateParameters.self, from: data)
-        } catch {
-            completion?(.decodingSetVariationIdParams(error))
-            return
-        }
-
-        let logParams: EventParameters = [
-            "variation_id": parameters.variationId,
-            "transaction_id": parameters.transactionId,
-        ]
-        async(completion, logName: .setVariationId , logParams: logParams) { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(profileManager.error)
-                    return
-                }
-                profileManager.setVariationId(parameters.variationId, forTransactionId: parameters.transactionId, completion)
-            }
-        }
-    }
-
-    /// Link purchased transaction with paywall's variationId.
-    ///
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
-    ///
-    /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
-    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
-    ///   - completion: A result containing an optional error.
-    public nonisolated static func setVariationId(
-        _ variationId: String,
-        forPurchasedTransaction transaction: SKPaymentTransaction,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        let logParams: EventParameters = [
-            "variation_id": variationId,
-            "transaction_id": transaction.transactionIdentifier,
-        ]
-        async(completion, logName: .setVariationIdSK1, logParams: logParams) { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(profileManager.error)
-                    return
-                }
-                profileManager.setVariationId(variationId, forPurchasedTransaction: transaction, completion)
-            }
-        }
-    }
-
-    /// Link purchased transaction with paywall's variationId.
-    ///
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
-    ///
-    /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
-    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
-    ///   - completion: A result containing an optional error.
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public nonisolated static func setVariationId(
-        _ variationId: String,
-        forPurchasedTransaction transaction: Transaction,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        let logParams: EventParameters = [
-            "variation_id": variationId,
-            "transaction_id": transaction.ext.identifier,
-        ]
-        async(completion, logName: .setVariationIdSK2 , logParams: logParams) { manager, completion in
-            manager.getProfileManager { profileManager in
-                guard let profileManager = try? profileManager.get() else {
-                    completion(profileManager.error)
-                    return
-                }
-                profileManager.setVariationId(variationId, forPurchasedTransaction: transaction, completion)
-            }
-        }
-    }
 
     /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
     ///
@@ -309,17 +215,7 @@ extension Adapty {
         }
     }
 
-    /// You can fetch the StoreKit receipt by calling this method
-    ///
-    /// If the receipt is not presented on the device, Adapty will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
-    ///
-    /// - Parameters:
-    ///   - completion: A result containing the receipt `Data`.
-    public nonisolated static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
-        async(completion, logName: .getReceipt ) { manager, completion in
-            manager.sk1ReceiptManager.getReceipt(refreshIfEmpty: true, completion)
-        }
-    }
+
 
     /// To make the purchase, you have to call this method.
     ///
@@ -371,29 +267,5 @@ extension Adapty {
         }
     }
 
-    /// To restore purchases, you have to call this method.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
-    ///
-    /// - Parameter completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public nonisolated static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
-        async(completion, logName: .restorePurchases) { manager, completion in
-            manager.syncTransactions(refreshReceiptIfEmpty: true) { result in
+ }
 
-                if let result = result.flatValue() {
-                    completion(result.map { $0.value })
-                    return
-                }
-
-                manager.getProfileManager { result in
-                    switch result {
-                    case let .failure(error):
-                        completion(.failure(error))
-                    case let .success(manager):
-                        manager.getProfile(completion)
-                    }
-                }
-            }
-        }
-    }
-}

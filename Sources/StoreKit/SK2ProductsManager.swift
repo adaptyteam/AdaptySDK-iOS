@@ -10,23 +10,24 @@ import Foundation
 private let log = Log.Category(name: "SK2ProductsManager")
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-actor SK2ProductsManager {
+actor SK2ProductsManager: StoreKitProductsManager {
     private let apiKeyPrefix: String
     private var cache: ProductVendorIdsCache
     private let session: Backend.MainExecutor
+
     private var products = [String: SK2Product]()
     private let sk2ProductsFetcher = SK2ProductFetcher()
 
-    init(apiKeyPrefix: String, storage: ProductVendorIdsStorage, backend: Backend) {
+    init(apiKeyPrefix: String, storage: ProductVendorIdsStorage, session: Backend.MainExecutor) {
         self.apiKeyPrefix = apiKeyPrefix
+        self.session = session
         cache = ProductVendorIdsCache(storage: storage)
-        session = backend.createMainExecutor()
         Task {
             await fetchAllProducts()
         }
     }
 
-    var fetchingAllProducts = false
+    private var fetchingAllProducts = false
 
     private func finishFetchingAllProducts() {
         fetchingAllProducts = false
@@ -66,21 +67,23 @@ private extension Error {
     }
 }
 
-enum ProductsFetchPolicy: Sendable, Hashable {
-    case `default`
-    case returnCacheDataElseLoad
-}
+
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
     func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> SK2Product {
-        let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
+        do {
+            let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
 
-        guard let product = products.first else {
-            throw StoreKitManagerError.noProductIDsFound().asAdaptyError
+            guard let product = products.first else {
+                throw StoreKitManagerError.noProductIDsFound().asAdaptyError
+            }
+
+            return product
+        } catch {
+            log.error("fetch SK2Product \(productId) error: \(error)")
+            throw error
         }
-
-        return product
     }
 
     func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> [SK2Product] {

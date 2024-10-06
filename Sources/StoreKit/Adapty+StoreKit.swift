@@ -1,11 +1,11 @@
 //
-//  Adapty+Receipt.swift
+//  Adapty+StoreKit.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 06.10.2024
+//  Created by Aleksei Valiano on 23.05.2023
 //
 
-import Foundation
+import StoreKit
 
 extension Adapty {
     /// You can fetch the StoreKit receipt by calling this method

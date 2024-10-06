@@ -8,15 +8,6 @@
 import StoreKit
 
 extension Adapty {
-
-
-
-
-
-
-
-
-
     /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
@@ -101,55 +92,4 @@ extension Adapty {
             }
         }
     }
-
-
-    /// Link purchased transaction with paywall's variationId.
-    ///
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
-    ///
-    /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
-    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
-    /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func setVariationId(
-        _ variationId: String,
-        forPurchasedTransaction transaction: SKPaymentTransaction
-    ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.setVariationId(variationId, forPurchasedTransaction: transaction) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
-
-    /// Link purchased transaction with paywall's variationId.
-    ///
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
-    ///
-    /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
-    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
-    /// - Throws: An ``AdaptyError`` object
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public nonisolated static func setVariationId(
-        _ variationId: String,
-        forPurchasedTransaction transaction: Transaction
-    ) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            Adapty.setVariationId(variationId, forPurchasedTransaction: transaction) { error in
-                if let error {
-                    return continuation.resume(throwing: error)
-                }
-                continuation.resume(
-                    returning: ()
-                )
-            }
-        }
-    }
-
 }

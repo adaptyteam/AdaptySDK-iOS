@@ -16,12 +16,12 @@ extension PurchasedTransaction {
 
         init(
             id: String,
-            type: PurchasedTransaction.OfferType
+            offerType: PurchasedTransaction.OfferType
         ) {
             self.id = id
             period = nil
             paymentMode = .unknown
-            offerType = type
+            self.offerType = offerType
             price = nil
         }
 

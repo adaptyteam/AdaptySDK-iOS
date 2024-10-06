@@ -23,6 +23,7 @@ public final class Adapty: Sendable {
 
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
+    let productsManager: StoreKitProductsManager
 
     init(
         apiKeyPrefix: String,
@@ -40,9 +41,11 @@ public final class Adapty: Sendable {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             receiptManager = StoreKitReceiptManager(session: httpSession)
             transactionManager = SK2TransactionManager(session: httpSession)
+            productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
         } else {
             receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
             transactionManager = receiptManager
+            productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
         }
     }
 

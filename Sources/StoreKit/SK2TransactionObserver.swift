@@ -27,14 +27,22 @@ actor SK2TransactionObserver {
                 case let .unverified(transaction, error):
                     log.error("Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID)) is unverified. Error: \(error.localizedDescription)")
                     continue
-                case let .verified(transaction):
-                    log.debug("Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
+                case let .verified(sk2Transaction):
+                    log.debug("Transaction \(sk2Transaction.id) (originalID: \(sk2Transaction.originalID),  productID: \(sk2Transaction.productID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
 
-                    guard transaction.justPurchasedRenewed else { return }
+                    guard sk2Transaction.justPurchasedRenewed else { return }
 
-                    let purchasedTransaction = await productsManager.fillPurchasedTransaction(variationId: nil, purchasedSK2Transaction: transaction)
+                    let purchasedTransaction = await productsManager.fillPurchasedTransaction(
+                        variationId: nil,
+                        persistentVariationId: nil,
+                        purchasedSK2Transaction: sk2Transaction
+                    )
 
-                    _ = try? await purchaseValidator.validatePurchase(transaction: purchasedTransaction, reason: .observing)
+                    _ = try? await purchaseValidator.validatePurchase(
+                        profileId: nil,
+                        transaction: purchasedTransaction,
+                        reason: .observing
+                    )
                 }
             }
         }

@@ -309,6 +309,24 @@ extension AdaptyError {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sync last transaction  failed", error: unknownError).asAdaptyError
     }
     
+    static func setTransactionVariationIdFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "set transaction variationId failed", error: unknownError).asAdaptyError
+    }
+    
+    static func validatePurchaseFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "validate purchase failed", error: unknownError).asAdaptyError
+    }
+    
     static func convertToAdaptyErrorFailed(
         unknownError: Error,
         file: String = #fileID,
