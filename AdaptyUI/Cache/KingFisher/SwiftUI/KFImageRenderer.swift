@@ -39,7 +39,7 @@ struct KFImageRenderer<HoldingView> : View where HoldingView: KFImageHoldingView
     var body: some View {
         if context.startLoadingBeforeViewAppear && !binder.loadingOrSucceeded && !binder.animating {
             binder.markLoading()
-            DispatchQueue.baseUrl.async { binder.start(context: context) }
+            DispatchQueue.main.async { binder.start(context: context) }
         }
         
         return ZStack {
@@ -58,6 +58,10 @@ struct KFImageRenderer<HoldingView> : View where HoldingView: KFImageHoldingView
                     }
                     if !binder.loadingOrSucceeded {
                         binder.start(context: context)
+                    } else {
+                        if context.reducePriorityOnDisappear {
+                            binder.restorePriorityOnAppear()
+                        }
                     }
                 }
                 .onDisappear { [weak binder = self.binder] in
@@ -66,6 +70,8 @@ struct KFImageRenderer<HoldingView> : View where HoldingView: KFImageHoldingView
                     }
                     if context.cancelOnDisappear {
                         binder.cancel()
+                    } else if context.reducePriorityOnDisappear {
+                        binder.reducePriorityOnDisappear()
                     }
                 }
             }
