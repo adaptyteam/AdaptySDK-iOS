@@ -12,7 +12,6 @@ import SwiftUI
 @available(iOS 15.0, *)
 extension CoordinateSpace {
     static let adaptyBasicName = "adapty.container.basic"
-    static let adaptyBasic = CoordinateSpace.named(adaptyBasicName)
 }
 
 @available(iOS 15.0, *)
@@ -90,7 +89,7 @@ struct AdaptyUIBasicContainerView: View {
         }()
 
         GeometryReader { p in
-            let minY = p.frame(in: .adaptyBasic).minY
+            let minY = p.frame(in: .named(CoordinateSpace.adaptyBasicName)).minY
             let isScrollingDown = minY > 0
             let isScrollingUp = minY < 0
             let scale = max(1.0, 1.0 + minY / p.size.height)

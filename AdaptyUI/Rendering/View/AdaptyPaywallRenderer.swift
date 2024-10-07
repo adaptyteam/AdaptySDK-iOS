@@ -60,7 +60,10 @@ struct AdaptyPaywallRendererView: View {
             }
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
             .onAppear {
-                paywallViewModel.logShowPaywall()
+                // TODO: swift 6
+                Task {
+                    await paywallViewModel.logShowPaywall()
+                }
             }
         } else {
             EmptyView()

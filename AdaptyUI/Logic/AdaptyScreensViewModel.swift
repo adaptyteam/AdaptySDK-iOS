@@ -11,7 +11,8 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-package class AdaptyScreensViewModel: ObservableObject {
+@MainActor // TODO: swift 6
+package final class AdaptyScreensViewModel: ObservableObject {
     struct BottomSheet: Identifiable {
         var id: String
         var bottomSheet: AdaptyUI.BottomSheet
@@ -53,8 +54,17 @@ package class AdaptyScreensViewModel: ObservableObject {
 
         dismissListeners[id]?()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            self?.presentedScreensStack.removeAll(where: { $0.id == id })
+        // TODO: swift 6
+        Task {
+            if #available(iOS 16.0, *) {
+                try? await Task.sleep(for: .milliseconds(300.0))
+            } else {
+                try? await Task.sleep(nanoseconds: UInt64(300_000))
+            }
+
+            await MainActor.run { [weak self] in
+                self?.presentedScreensStack.removeAll(where: { $0.id == id })
+            }
         }
     }
 
