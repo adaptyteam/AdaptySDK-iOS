@@ -13,7 +13,7 @@ enum InternalAdaptyError: Error {
     case activateOnceError(AdaptyError.Source)
     case cantMakePayments(AdaptyError.Source)
     case notActivated(AdaptyError.Source)
-    
+
     case profileWasChanged(AdaptyError.Source)
     case profileCreateFailed(AdaptyError.Source, error: HTTPError)
     case fetchFailed(AdaptyError.Source, String, error: Error)
@@ -236,7 +236,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
-    
+
     static func fetchPaywallFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -245,7 +245,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch Profile failed", error: unknownError).asAdaptyError
     }
-    
+
     static func syncProfileFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -254,7 +254,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Sync Profile failed", error: unknownError).asAdaptyError
     }
-    
+
     static func updateAttributionFaild(
         unknownError: Error,
         file: String = #fileID,
@@ -263,7 +263,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Update Attribution failed", error: unknownError).asAdaptyError
     }
-    
+
     static func fetchViewConfigurationFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -281,7 +281,7 @@ extension AdaptyError {
     ) -> Self {
         EventsError.encoding(unknownError, file: file, function: function, line: line).asAdaptyError
     }
-    
+
     static func decodingFallbackFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -299,7 +299,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sync last transaction  failed", error: unknownError).asAdaptyError
     }
-    
+
     static func syncRecieptFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -308,7 +308,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sync last transaction  failed", error: unknownError).asAdaptyError
     }
-    
+
     static func setTransactionVariationIdFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -317,7 +317,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "set transaction variationId failed", error: unknownError).asAdaptyError
     }
-    
+
     static func validatePurchaseFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -326,7 +326,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "validate purchase failed", error: unknownError).asAdaptyError
     }
-    
+
     static func convertToAdaptyErrorFailed(
         unknownError: Error,
         file: String = #fileID,
@@ -334,6 +334,15 @@ extension AdaptyError {
         line: UInt = #line
     ) -> Self {
         InternalAdaptyError.unknown(AdaptyError.Source(file: file, function: function, line: line), "Convert to AdaptyError failed", error: unknownError).asAdaptyError
+    }
+
+    static func fetchProductStatesFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.unknown(AdaptyError.Source(file: file, function: function, line: line), "fetch product states failed", error: unknownError).asAdaptyError
     }
 
     static func isNoViewConfigurationInPaywall(

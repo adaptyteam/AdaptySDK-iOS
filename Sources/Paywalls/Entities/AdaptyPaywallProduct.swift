@@ -10,7 +10,7 @@ import StoreKit
 public struct AdaptyPaywallProduct: Sendable {
     package let adaptyProductId: String
 
-    private let underlying: AdaptyProduct
+    let underlying: AdaptyProduct
 
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?

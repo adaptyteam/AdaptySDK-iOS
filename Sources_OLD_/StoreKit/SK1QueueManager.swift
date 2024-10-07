@@ -18,14 +18,13 @@ final class SK1QueueManager: NSObject {
     var makePurchasesProduct = [String: AdaptySK1Product]()
 
     private var storage: VariationIdStorage
-    var skProductsManager: SKProductsManager
 
     private(set) var variationsIds: [String: String]
     private(set) var persistentVariationsIds: [String: String]
 
     private(set) var _sk2TransactionObserver: Any?
 
-    init(queue: DispatchQueue, storage: VariationIdStorage, skProductsManager: SKProductsManager) {
+    init(queue: DispatchQueue, storage: VariationIdStorage) {
         self.queue = queue
         self.storage = storage
         variationsIds = storage.getVariationsIds() ?? [:]
@@ -35,7 +34,6 @@ final class SK1QueueManager: NSObject {
             persistentVariationsIds = variationsIds
             storage.setPersistentVariationsIds(variationsIds)
         }
-        self.skProductsManager = skProductsManager
 
         super.init()
 

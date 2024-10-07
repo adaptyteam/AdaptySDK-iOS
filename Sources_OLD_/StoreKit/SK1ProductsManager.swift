@@ -78,35 +78,4 @@ final class SK1ProductsManager {
     }
 }
 
-extension SKProductsManager {
-    func getIntroductoryOfferEligibility(vendorProductIds: Set<String>, _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
-        fetchSK1Products(productIdentifiers: vendorProductIds, fetchPolicy: .returnCacheDataElseLoad) { [weak self] result in
-            switch result {
-            case let .failure(error):
-                completion(.failure(error))
-                return
-            case let .success(value):
-                self?.getIntroductoryOfferEligibility(sk1Products: value, completion)
-            }
-        }
-    }
 
-    func getIntroductoryOfferEligibility(sk1Products: [SK1Product], _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility?]>) {
-        let introductoryOfferEligibilityByVendorProductId = [String: AdaptyEligibility?](sk1Products.map { ($0.productIdentifier, $0.introductoryOfferEligibility) }, uniquingKeysWith: { $1 })
-
-        let vendorProductIdsWithUnknownEligibility = introductoryOfferEligibilityByVendorProductId.filter { $0.value == nil }.map { $0.key }
-
-        guard !vendorProductIdsWithUnknownEligibility.isEmpty,
-              #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-        else {
-            completion(.success(introductoryOfferEligibilityByVendorProductId))
-            return
-        }
-
-        getSK2IntroductoryOfferEligibility(vendorProductIds: vendorProductIdsWithUnknownEligibility) { result in
-            completion(result.map {
-                introductoryOfferEligibilityByVendorProductId.merging($0, uniquingKeysWith: { $1 })
-            })
-        }
-    }
-}

@@ -67,10 +67,22 @@ private extension Error {
     }
 }
 
-
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
+    func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> AdaptyProduct {
+        try await AdaptySK2Product(skProduct:
+            fetchSK2Product(id: productId, fetchPolicy: fetchPolicy)
+        )
+    }
+
+    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [AdaptyProduct] {
+        let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
+
+        return productIds.compactMap { id in
+            products.first { $0.id == id }
+        }.map(AdaptySK2Product.init)
+    }
+
     func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> SK2Product {
         do {
             let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
@@ -83,14 +95,6 @@ extension SK2ProductsManager {
         } catch {
             log.error("fetch SK2Product \(productId) error: \(error)")
             throw error
-        }
-    }
-
-    func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> [SK2Product] {
-        let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: fetchPolicy, retryCount: retryCount)
-
-        return productIds.compactMap { id in
-            products.first { $0.id == id }
         }
     }
 
@@ -120,26 +124,5 @@ extension SK2ProductsManager {
         products.forEach { self.products[$0.id] = $0 }
 
         return products
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension SK2ProductsManager {
-    func getSK2IntroductoryOfferEligibility(
-        productIds: [String]
-    ) async throws -> [String: AdaptyEligibility] {
-        do {
-            let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: .returnCacheDataElseLoad)
-
-            var result = [String: AdaptyEligibility]()
-
-            for product in products {
-                result[product.id] = await product.introductoryOfferEligibility
-            }
-
-            return result
-        } catch {
-            throw error.asAdaptyError ?? StoreKitManagerError.requestSK2ProductsFailed(error).asAdaptyError
-        }
     }
 }
