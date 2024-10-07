@@ -29,44 +29,63 @@ import ImageIO
 
 #if os(macOS)
 import AppKit
-typealias KFCrossPlatformImage = NSImage
-typealias KFCrossPlatformView = NSView
-typealias KFCrossPlatformColor = NSColor
-typealias KFCrossPlatformImageView = NSImageView
-typealias KFCrossPlatformButton = NSButton
+typealias KFCrossPlatformImage       = NSImage
+typealias KFCrossPlatformView        = NSView
+typealias KFCrossPlatformColor       = NSColor
+typealias KFCrossPlatformImageView   = NSImageView
+typealias KFCrossPlatformButton      = NSButton
+
+// `NSImage` is not yet Sendable. We have to assume it sendable to resolve warnings in Kingfisher.
+#if compiler(>=6)
+extension KFCrossPlatformImage: @retroactive @unchecked Sendable { }
 #else
+extension KFCrossPlatformImage: @unchecked Sendable { }
+#endif // compiler(>=6)
+#else // os(macOS)
 import UIKit
-typealias KFCrossPlatformImage = UIImage
-typealias KFCrossPlatformColor = UIColor
+typealias KFCrossPlatformImage       = UIImage
+typealias KFCrossPlatformColor       = UIColor
 #if !os(watchOS)
-typealias KFCrossPlatformImageView = UIImageView
-typealias KFCrossPlatformView = UIView
-typealias KFCrossPlatformButton = UIButton
+typealias KFCrossPlatformImageView   = UIImageView
+typealias KFCrossPlatformView        = UIView
+typealias KFCrossPlatformButton      = UIButton
 #if canImport(TVUIKit)
 import TVUIKit
-#endif
+#endif // canImport(TVUIKit)
 #if canImport(CarPlay) && !targetEnvironment(macCatalyst)
 import CarPlay
-#endif
-#else
+#endif // canImport(CarPlay) && !targetEnvironment(macCatalyst)
+#else // !os(watchOS)
 import WatchKit
-#endif
-#endif
+#endif // !os(watchOS)
+#endif // os(macOS)
 
 /// Wrapper for Kingfisher compatible types. This type provides an extension point for
 /// convenience methods in Kingfisher.
-struct KingfisherWrapper<Base> {
+struct KingfisherWrapper<Base>: @unchecked Sendable {
     let base: Base
     init(_ base: Base) {
         self.base = base
     }
 }
 
-/// Represents an object type that is compatible with Kingfisher. You can use `kf` property to get a
+/// Represents an object type that is compatible with Kingfisher. You can use ``kf`` property to get a
 /// value in the namespace of Kingfisher.
+///
+/// In Kingfisher, most of related classes that contains an image (such as `UIImage`, `UIButton`, `NSImageView` and
+/// more) conform to this protocol, and provides the helper methods for setting an image easily. You can access the `kf`
+/// property and call its `setImage` method with a certain URL:
+///
+/// ```swift
+/// let imageView: UIImageView
+/// let url = URL(string: "https://example.com/image.jpg")
+/// imageView.kf.setImage(with: url)
+/// ```
+///
+/// For more about basic usage of Kingfisher, check the <doc:CommonTasks> documentation.
 protocol KingfisherCompatible: AnyObject { }
 
-/// Represents a value type that is compatible with Kingfisher. You can use `kf` property to get a
+/// Represents a value type that is compatible with Kingfisher. You can use ``kf`` property to get a
 /// value in the namespace of Kingfisher.
 protocol KingfisherCompatibleValue {}
 
@@ -86,21 +105,21 @@ extension KingfisherCompatibleValue {
     }
 }
 
-extension KFCrossPlatformImage: KingfisherCompatible { }
+extension KFCrossPlatformImage      : KingfisherCompatible { }
 #if !os(watchOS)
-extension KFCrossPlatformImageView: KingfisherCompatible { }
-extension KFCrossPlatformButton: KingfisherCompatible { }
-extension NSTextAttachment: KingfisherCompatible { }
+extension KFCrossPlatformImageView  : KingfisherCompatible { }
+extension KFCrossPlatformButton     : KingfisherCompatible { }
+extension NSTextAttachment          : KingfisherCompatible { }
 #else
-extension WKInterfaceImage: KingfisherCompatible { }
+extension WKInterfaceImage          : KingfisherCompatible { }
 #endif
 
 #if os(tvOS) && canImport(TVUIKit)
 @available(tvOS 12.0, *)
-extension TVMonogramView: KingfisherCompatible { }
+extension TVMonogramView            : KingfisherCompatible { }
 #endif
 
 #if canImport(CarPlay) && !targetEnvironment(macCatalyst)
 @available(iOS 14.0, *)
-extension CPListItem: KingfisherCompatible { }
+extension CPListItem                : KingfisherCompatible { }
 #endif

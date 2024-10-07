@@ -146,7 +146,7 @@ struct AdaptyUIPagerView: View {
                 currentPage = index
             }
             if shouldScheduleAutoscroll {
-                DispatchQueue.baseUrl.asyncAfter(deadline: .now() + Self.pageControllTapAnimationDuration) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.pageControllTapAnimationDuration) {
                     self.scheduleAutoScroll()
                 }
             }

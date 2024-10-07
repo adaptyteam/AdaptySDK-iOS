@@ -1,10 +1,10 @@
 //
-//  ImageView+Kingfisher.swift
+//  KingfisherHasImageComponent+Kingfisher.swift
 //  Kingfisher
 //
-//  Created by Wei Wang on 15/4/6.
+//  Created by JH on 2023/12/5.
 //
-//  Copyright (c) 2019 Wei Wang <onevcat@gmail.com>
+//  Copyright (c) 2023 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,82 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#if !os(watchOS)
+protocol KingfisherImageSettable: KingfisherCompatible {
+    @MainActor func setImage(
+        _ image: KFCrossPlatformImage?,
+        options: KingfisherParsedOptionsInfo
+    )
+    @MainActor func getImage() -> KFCrossPlatformImage?
+}
 
-#if os(macOS)
+protocol KingfisherHasImageComponent: KingfisherImageSettable {
+    @MainActor var image: KFCrossPlatformImage? { set get }
+}
+
+extension KingfisherHasImageComponent {
+    @MainActor 
+    func setImage(_ image: KFCrossPlatformImage?, options: KingfisherParsedOptionsInfo) {
+        self.image = image
+    }
+    
+    @MainActor
+    func getImage() -> KFCrossPlatformImage? {
+        image
+    }
+}
+
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
 import AppKit
-#else
-import UIKit
+@available(macOS 13.0, *)
+extension NSComboButton: KingfisherHasImageComponent {}
+@available(macOS 13.0, *)
+extension NSColorWell: KingfisherHasImageComponent {}
+extension NSTableViewRowAction: KingfisherHasImageComponent {}
+extension NSMenuItem: KingfisherHasImageComponent {}
+extension NSPathControlItem: KingfisherHasImageComponent {}
+extension NSToolbarItem: KingfisherHasImageComponent {}
+extension NSTabViewItem: KingfisherHasImageComponent {}
+extension NSStatusItem: KingfisherHasImageComponent {}
+extension NSCell: KingfisherHasImageComponent {}
 #endif
 
+#if canImport(UIKit) && !os(watchOS)
+import UIKit
+@available(iOS 13.0, tvOS 13.0, *)
+extension UIAction: KingfisherHasImageComponent {}
+@available(iOS 13.0, tvOS 13.0, *)
+extension UICommand: KingfisherHasImageComponent {}
+extension UIBarItem: KingfisherHasImageComponent {}
+#endif
+
+#if canImport(WatchKit)
+import WatchKit
+extension WKInterfaceImage: KingfisherHasImageComponent {
+    @MainActor var image: KFCrossPlatformImage? {
+        get { nil }
+        set { setImage(newValue) }
+    }
+}
+#endif
+
+#if canImport(TVUIKit)
+import TVUIKit
+extension TVMonogramView: KingfisherHasImageComponent {}
+#endif
+
+struct ImagePropertyAccessor<ImageType>: Sendable {
+    let setImage: @Sendable @MainActor (ImageType?, KingfisherParsedOptionsInfo) -> Void
+    let getImage: @Sendable @MainActor () -> ImageType?
+}
+
+struct TaskPropertyAccessor: Sendable {
+    let setTaskIdentifier: @Sendable @MainActor (Source.Identifier.Value?) -> Void
+    let getTaskIdentifier: @Sendable @MainActor () -> Source.Identifier.Value?
+    let setTask: @Sendable @MainActor (DownloadTask?) -> Void
+}
+
 @MainActor
-extension KingfisherWrapper where Base: KFCrossPlatformImageView {
+extension KingfisherWrapper where Base: KingfisherImageSettable {
 
     // MARK: Setting Image
 
@@ -76,14 +142,20 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
     @discardableResult
     func setImage(
         with source: Source?,
-        placeholder: (any Placeholder)? = nil,
+        placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
     ) -> DownloadTask?
     {
         let options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions + (options ?? .empty))
-        return setImage(with: source, placeholder: placeholder, parsedOptions: options, progressBlock: progressBlock, completionHandler: completionHandler)
+        return setImage(
+            with: source,
+            placeholder: placeholder,
+            parsedOptions: options,
+            progressBlock: progressBlock,
+            completionHandler: completionHandler
+        )
     }
 
     /// Sets an image to the image view with a ``Source``.
@@ -123,7 +195,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
     @discardableResult
     func setImage(
         with source: Source?,
-        placeholder: (any Placeholder)? = nil,
+        placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
     ) -> DownloadTask?
@@ -164,7 +236,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
     @discardableResult
     func setImage(
         with resource: (any Resource)?,
-        placeholder: (any Placeholder)? = nil,
+        placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
@@ -175,7 +247,8 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
             placeholder: placeholder,
             options: options,
             progressBlock: progressBlock,
-            completionHandler: completionHandler)
+            completionHandler: completionHandler
+        )
     }
 
     /// Sets an image to the image view with a requested ``Resource``.
@@ -203,7 +276,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
     @discardableResult
     func setImage(
         with resource: (any Resource)?,
-        placeholder: (any Placeholder)? = nil,
+        placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
     ) -> DownloadTask?
@@ -235,7 +308,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
     @discardableResult
     func setImage(
         with provider: (any ImageDataProvider)?,
-        placeholder: (any Placeholder)? = nil,
+        placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
@@ -246,7 +319,8 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
             placeholder: placeholder,
             options: options,
             progressBlock: progressBlock,
-            completionHandler: completionHandler)
+            completionHandler: completionHandler
+        )
     }
 
     /// Sets an image to the image view with a ``ImageDataProvider``.
@@ -265,7 +339,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
     @discardableResult
     func setImage(
         with provider: (any ImageDataProvider)?,
-        placeholder: (any Placeholder)? = nil,
+        placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
     ) -> DownloadTask?
@@ -278,40 +352,72 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
             completionHandler: completionHandler
         )
     }
-
+    
     func setImage(
         with source: Source?,
-        placeholder: (any Placeholder)? = nil,
+        placeholder: KFCrossPlatformImage? = nil,
+        parsedOptions: KingfisherParsedOptionsInfo,
+        progressBlock: DownloadProgressBlock? = nil,
+        completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
+    ) -> DownloadTask? {
+        return setImage(
+            with: source, 
+            imageAccessor: ImagePropertyAccessor(
+                setImage: { base.setImage($0, options: $1) },
+                getImage: { base.getImage() }
+            ),
+            taskAccessor: TaskPropertyAccessor(
+                setTaskIdentifier: {
+                    var mutatingSelf = self
+                    mutatingSelf.taskIdentifier = $0
+                },
+                getTaskIdentifier: { self.taskIdentifier },
+                setTask: { task in
+                    var mutatingSelf = self
+                    mutatingSelf.imageTask = task
+                }
+            ),
+            placeholder: placeholder,
+            parsedOptions: parsedOptions,
+            progressBlock: progressBlock,
+            completionHandler: completionHandler
+        )
+    }
+}
+
+@MainActor
+extension KingfisherWrapper {
+    func setImage(
+        with source: Source?,
+        imageAccessor: ImagePropertyAccessor<KFCrossPlatformImage>,
+        taskAccessor: TaskPropertyAccessor,
+        placeholder: KFCrossPlatformImage? = nil,
         parsedOptions: KingfisherParsedOptionsInfo,
         progressBlock: DownloadProgressBlock? = nil,
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
     ) -> DownloadTask?
     {
-        var mutatingSelf = self
         guard let source = source else {
-            mutatingSelf.placeholder = placeholder
-            mutatingSelf.taskIdentifier = nil
+            imageAccessor.setImage(placeholder, parsedOptions)
+            taskAccessor.setTaskIdentifier(nil)
             completionHandler?(.failure(KingfisherError.imageSettingError(reason: .emptySource)))
             return nil
         }
 
         var options = parsedOptions
 
-        let isEmptyImage = base.image == nil && self.placeholder == nil
-        if !options.keepCurrentImageWhileLoading || isEmptyImage {
-            // Always set placeholder while there is no image/placeholder yet.
-            mutatingSelf.placeholder = placeholder
+        // Always set placeholder while there is no image/placeholder yet.
+#if os(watchOS)
+        let usePlaceholderDuringLoading = !options.keepCurrentImageWhileLoading
+#else
+        let usePlaceholderDuringLoading = !options.keepCurrentImageWhileLoading || imageAccessor.getImage() == nil
+#endif
+        if usePlaceholderDuringLoading {
+            imageAccessor.setImage(placeholder, options)
         }
-
-        let maybeIndicator = indicator
-        maybeIndicator?.startAnimatingView()
 
         let issuedIdentifier = Source.Identifier.next()
-        mutatingSelf.taskIdentifier = issuedIdentifier
-
-        if base.shouldPreloadAllAnimation() {
-            options.preloadAllAnimationData = true
-        }
+        taskAccessor.setTaskIdentifier(issuedIdentifier)
 
         if let block = progressBlock {
             options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
@@ -321,14 +427,13 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
             with: source,
             options: options,
             downloadTaskUpdated: { task in
-                Task { @MainActor in mutatingSelf.imageTask = task }
+                Task { @MainActor in taskAccessor.setTask(task) }
             },
-            progressiveImageSetter: { self.base.image = $0 },
-            referenceTaskIdentifierChecker: { issuedIdentifier == self.taskIdentifier },
+            progressiveImageSetter: { imageAccessor.setImage($0, options) },
+            referenceTaskIdentifierChecker: { issuedIdentifier == taskAccessor.getTaskIdentifier() },
             completionHandler: { result in
                 CallbackQueueMain.currentOrAsync {
-                    maybeIndicator?.stopAnimatingView()
-                    guard issuedIdentifier == self.taskIdentifier else {
+                    guard issuedIdentifier == taskAccessor.getTaskIdentifier() else {
                         let reason: KingfisherError.ImageSettingErrorReason
                         do {
                             let value = try result.get()
@@ -341,99 +446,32 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
                         return
                     }
 
-                    mutatingSelf.imageTask = nil
-                    mutatingSelf.taskIdentifier = nil
+                    taskAccessor.setTask(nil)
+                    taskAccessor.setTaskIdentifier(nil)
 
                     switch result {
                     case .success(let value):
-                        guard self.needsTransition(options: options, cacheType: value.cacheType) else {
-                            mutatingSelf.placeholder = nil
-                            self.base.image = value.image
-                            completionHandler?(result)
-                            return
-                        }
-
-                        self.makeTransition(image: value.image, transition: options.transition) {
-                            completionHandler?(result)
-                        }
-
+                        imageAccessor.setImage(value.image, options)
                     case .failure:
                         if let image = options.onFailureImage {
-                            mutatingSelf.placeholder = nil
-                            self.base.image = image
+                            imageAccessor.setImage(image, options)
                         }
-                        completionHandler?(result)
                     }
+                    completionHandler?(result)
                 }
             }
         )
-        mutatingSelf.imageTask = task
+        taskAccessor.setTask(task)
         return task
-    }
-
-    // MARK: Cancelling Downloading Task
-
-    /// Cancels the image download task of the image view if it is running.
-    ///
-    /// Nothing will happen if the downloading has already finished.
-    func cancelDownloadTask() {
-        imageTask?.cancel()
-    }
-
-    private func needsTransition(options: KingfisherParsedOptionsInfo, cacheType: CacheType) -> Bool {
-        switch options.transition {
-        case .none:
-            return false
-        #if os(macOS)
-        case .fade: // Fade is only a placeholder for SwiftUI on macOS.
-            return false
-        #else
-        default:
-            if options.forceTransition { return true }
-            if cacheType == .none { return true }
-            return false
-        #endif
-        }
-    }
-
-    private func makeTransition(image: KFCrossPlatformImage, transition: ImageTransition, done: @escaping () -> Void) {
-        #if !os(macOS)
-        // Force hiding the indicator without transition first.
-        UIView.transition(
-            with: self.base,
-            duration: 0.0,
-            options: [],
-            animations: { self.indicator?.stopAnimatingView() },
-            completion: { _ in
-                var mutatingSelf = self
-                mutatingSelf.placeholder = nil
-                UIView.transition(
-                    with: self.base,
-                    duration: transition.duration,
-                    options: [transition.animationOptions, .allowUserInteraction],
-                    animations: { transition.animations?(self.base, image) },
-                    completion: { finished in
-                        transition.completion?(finished)
-                        done()
-                    }
-                )
-            }
-        )
-        #else
-        done()
-        #endif
     }
 }
 
 // MARK: - Associated Object
 @MainActor private var taskIdentifierKey: Void?
-@MainActor private var indicatorKey: Void?
-@MainActor private var indicatorTypeKey: Void?
-@MainActor private var placeholderKey: Void?
 @MainActor private var imageTaskKey: Void?
 
 @MainActor
-extension KingfisherWrapper where Base: KFCrossPlatformImageView {
+extension KingfisherWrapper where Base: KingfisherImageSettable {
 
     // MARK: Properties
     private(set) var taskIdentifier: Source.Identifier.Value? {
@@ -446,103 +484,16 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
             setRetainedAssociatedObject(base, &taskIdentifierKey, box)
         }
     }
-
-    /// Specifies which indicator type is going to be used.
-    ///
-    /// The default is ``IndicatorType/none``, which means no indicator will be shown while downloading.
-    var indicatorType: IndicatorType {
-        get {
-            return getAssociatedObject(base, &indicatorTypeKey) ?? .none
-        }
-        
-        set {
-            switch newValue {
-            case .none: indicator = nil
-            case .activity: indicator = ActivityIndicator()
-            case .image(let data): indicator = ImageIndicator(imageData: data)
-            case .custom(let anIndicator): indicator = anIndicator
-            }
-
-            setRetainedAssociatedObject(base, &indicatorTypeKey, newValue)
-        }
-    }
-    
-    /// Holds any type that conforms to the protocol ``Indicator``.
-    ///
-    /// The protocol `Indicator` has a `view` property that will be shown when loading an image.
-    /// It will be `nil` if ``KingfisherWrapper/indicatorType`` is ``IndicatorType/none``.
-    private(set) var indicator: (any Indicator)? {
-        get {
-            let box: Box<any Indicator>? = getAssociatedObject(base, &indicatorKey)
-            return box?.value
-        }
-        
-        set {
-            // Remove previous
-            if let previousIndicator = indicator {
-                previousIndicator.view.removeFromSuperview()
-            }
-            
-            // Add new
-            if let newIndicator = newValue {
-                // Set default indicator layout
-                let view = newIndicator.view
-                
-                base.addSubview(view)
-                view.translatesAutoresizingMaskIntoConstraints = false
-                view.centerXAnchor.constraint(
-                    equalTo: base.centerXAnchor, constant: newIndicator.centerOffset.x).isActive = true
-                view.centerYAnchor.constraint(
-                    equalTo: base.centerYAnchor, constant: newIndicator.centerOffset.y).isActive = true
-
-                switch newIndicator.sizeStrategy(in: base) {
-                case .intrinsicSize:
-                    break
-                case .full:
-                    view.heightAnchor.constraint(equalTo: base.heightAnchor, constant: 0).isActive = true
-                    view.widthAnchor.constraint(equalTo: base.widthAnchor, constant: 0).isActive = true
-                case .size(let size):
-                    view.heightAnchor.constraint(equalToConstant: size.height).isActive = true
-                    view.widthAnchor.constraint(equalToConstant: size.width).isActive = true
-                }
-                
-                newIndicator.view.isHidden = true
-            }
-
-            // Save in associated object
-            // Wrap newValue with Box to workaround an issue that Swift does not recognize
-            // and casting protocol for associate object correctly. https://github.com/onevcat/Kingfisher/issues/872
-            setRetainedAssociatedObject(base, &indicatorKey, newValue.map(Box.init))
-        }
-    }
     
     private var imageTask: DownloadTask? {
         get { return getAssociatedObject(base, &imageTaskKey) }
         set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
     }
-
-    /// Represents the ``Placeholder`` used for this image view.
+    
+    /// Cancels the image download task of the image view if it is running.
     ///
-    /// A ``Placeholder`` will be shown in the view while it is downloading an image.
-    private(set) var placeholder: (any Placeholder)? {
-        get { return getAssociatedObject(base, &placeholderKey) }
-        set {
-            if let previousPlaceholder = placeholder {
-                previousPlaceholder.remove(from: base)
-            }
-            
-            if let newPlaceholder = newValue {
-                newPlaceholder.add(to: base)
-            } else {
-                base.image = nil
-            }
-            setRetainedAssociatedObject(base, &placeholderKey, newValue)
-        }
+    /// Nothing will happen if the downloading has already finished.
+    func cancelDownloadTask() {
+        imageTask?.cancel()
     }
 }
-
-extension KFCrossPlatformImageView {
-    @objc func shouldPreloadAllAnimation() -> Bool { return true }
-}
-
-#endif
