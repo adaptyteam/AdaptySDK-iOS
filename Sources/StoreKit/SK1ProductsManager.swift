@@ -63,20 +63,32 @@ private extension Error {
 }
 
 extension SK1ProductsManager {
-    func fetchSK1Product(id productId: String, fetchPolicy _: ProductsFetchPolicy = .default, retryCount _: Int = 3) async throws -> SK1Product {
-        do {
-            throw StoreKitManagerError.noProductIDsFound().asAdaptyError
-        } catch {
-            log.error("fetch SK1Product \(productId) error: \(error)")
-            throw error
-        }
+    func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> AdaptyProduct {
+        try await AdaptySK1Product(skProduct:
+            fetchSK1Product(id: productId, fetchPolicy: fetchPolicy)
+        )
     }
 
-    func fetchSK1ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> [SK1Product] {
-        let products = try await fetchSK1Products(ids: Set(productIds), fetchPolicy: fetchPolicy, retryCount: retryCount)
+    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [AdaptyProduct] {
+        let products = try await fetchSK1Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in
             products.first { $0.productIdentifier == id }
+        }.map(AdaptySK1Product.init)
+    }
+
+    func fetchSK1Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> SK1Product {
+        do {
+            let products = try await fetchSK1Products(ids: Set([productId]), fetchPolicy: fetchPolicy)
+
+            guard let product = products.first else {
+                throw StoreKitManagerError.noProductIDsFound().asAdaptyError
+            }
+
+            return product
+        } catch {
+            log.error("fetch SK1Product \(productId) error: \(error)")
+            throw error
         }
     }
 

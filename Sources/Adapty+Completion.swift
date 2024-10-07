@@ -5,7 +5,6 @@
 //  Created by Aleksei Valiano on 19.09.2024
 //
 
-import Foundation
 import StoreKit
 
 public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
@@ -204,6 +203,86 @@ extension Adapty {
     public nonisolated static func setFallbackPaywalls(fileURL url: URL, _ completion: AdaptyErrorCompletion? = nil) {
         withCompletion(completion) {
             try await setFallbackPaywalls(fileURL: url)
+        }
+    }
+
+    /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products)
+    ///
+    /// - Parameters:
+    ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
+    ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
+    public nonisolated static func getPaywallProducts(
+        paywall: AdaptyPaywall,
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
+    ) {
+        withCompletion(completion) {
+            try await getPaywallProducts(paywall: paywall)
+        }
+    }
+
+    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+    ///
+    /// - Parameters:
+    ///   - products: The ``AdaptyPaywallProduct`` array, for which information will be retrieved.
+    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
+    public nonisolated static func getProductsIntroductoryOfferEligibility(
+        products: [AdaptyPaywallProduct],
+        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
+    ) {
+        withCompletion(completion) {
+            try await getProductsIntroductoryOfferEligibility(products: products)
+        }
+    }
+
+    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+    ///
+    /// - Parameters:
+    ///   - products: The ``AdaptyProduct`` array, for which information will be retrieved.
+    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
+    public nonisolated static func getProductsIntroductoryOfferEligibility(
+        products: [any AdaptyProduct],
+        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
+    ) {
+        withCompletion(completion) {
+            try await getProductsIntroductoryOfferEligibility(products: products)
+        }
+    }
+    
+    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
+    ///
+    /// - Parameters:
+    ///   - products: The products ids `String` array, for which information will be retrieved
+    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
+    public nonisolated static func getProductsIntroductoryOfferEligibility(
+        vendorProductIds: [String],
+        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
+    ) {
+        withCompletion(completion) {
+            try await getProductsIntroductoryOfferEligibility(vendorProductIds: vendorProductIds)
+        }
+    }
+
+    /// To make the purchase, you have to call this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
+    ///
+    /// - Parameters:
+    ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
+    ///   - completion: A result containing the ``AdaptyPurchasedInfo`` object.
+    public nonisolated static func makePurchase(
+        product: AdaptyPaywallProduct,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>
+    ) {
+        withCompletion(completion) {
+            try await makePurchase(product: product)
         }
     }
 
