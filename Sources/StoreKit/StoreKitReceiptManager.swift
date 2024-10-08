@@ -101,7 +101,7 @@ extension StoreKitReceiptManager: StoreKitTransactionManager {
 }
 
 private final class ReceiptRefresher: NSObject, @unchecked Sendable {
-    private let queue = DispatchQueue(label: "Adapty.SDK.ReceiptRefresher.Queue")
+    private let queue = DispatchQueue(label: "Adapty.SDK.ReceiptRefresher")
     private var refreshCompletionHandlers: [AdaptyErrorCompletion]?
 
     func refresh() async throws {

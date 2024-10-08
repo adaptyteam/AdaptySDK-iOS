@@ -198,9 +198,11 @@ private extension SK2Product {
         case .code:
             return nil
         case .winBack:
-            if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *), let offerId {
-                return subscription.winBackOffers.first { $0.id == offerId }
-            }
+            #if compiler(>=6)
+                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *), let offerId {
+                    return subscription.winBackOffers.first { $0.id == offerId }
+                }
+            #endif
         default:
             return nil
         }

@@ -15,6 +15,7 @@ actor SK1ProductsManager: StoreKitProductsManager {
     private let session: Backend.MainExecutor
 
     private var products = [String: SK1Product]()
+    private let sk1ProductsFetcher = SK1ProductFetcher()
 
     init(apiKeyPrefix: String, storage: ProductVendorIdsStorage, session: Backend.MainExecutor) {
         self.apiKeyPrefix = apiKeyPrefix
@@ -92,7 +93,7 @@ extension SK1ProductsManager {
         }
     }
 
-    func fetchSK1Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount _: Int = 3)
+    func fetchSK1Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
         async throws -> [SK1Product] {
         guard !productIds.isEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
@@ -109,7 +110,7 @@ extension SK1ProductsManager {
             }
         }
 
-        let products = [SK1Product]() // TODO: need fetcher
+        let products = try await sk1ProductsFetcher.fetchProducts(ids: productIds, retryCount: retryCount)
 
         guard !products.isEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
