@@ -36,7 +36,7 @@ extension Environment.Device {
             #else
                 guard !Adapty.Configuration.idfaCollectionDisabled else { return false }
 
-                guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
+                guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
                     return true
                 }
 
@@ -66,13 +66,13 @@ extension Environment.Device {
                 // Get and return IDFA
 
                 let result: String? = await MainActor.run {
-                    guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
+                    guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
                         return ASIdentifierManager.shared().advertisingIdentifier.uuidString
                     }
 
                     #if canImport(AppTrackingTransparency)
                         return switch ATTrackingManager.trackingAuthorizationStatus {
-                        case .authorized, .restricted, .denied: // TODO: remove .restricted, .denied
+                        case .authorized:
                             ASIdentifierManager.shared().advertisingIdentifier.uuidString
                         default:
                             String?.none
