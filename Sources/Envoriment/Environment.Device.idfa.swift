@@ -23,12 +23,11 @@ extension Adapty.Configuration {
 }
 
 extension Environment.Device {
-    
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
     static var appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus {
         ATTrackingManager.trackingAuthorizationStatus
     }
-    
+
     @AdaptyActor
     static var canTakeIdfa: Bool {
         get async {
@@ -98,12 +97,7 @@ extension Environment.Device {
     private extension ATTrackingManager {
         @MainActor
         static var canTakeIdfa: Bool {
-            switch ATTrackingManager.trackingAuthorizationStatus {
-            case .restricted, .denied:
-                false
-            default:
-                true
-            }
+            ATTrackingManager.trackingAuthorizationStatus == .authorized
         }
     }
 #endif
