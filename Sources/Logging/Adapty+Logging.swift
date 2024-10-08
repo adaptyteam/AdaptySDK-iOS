@@ -18,10 +18,11 @@ extension Adapty {
         }
     }
 
-    /// Override the default logger behavior using this method
+    /// Register the log handler to define the desired behavior, such as writing logs to files or sending them to your server.
+    /// This will not override the default behavior but will add a new one.
+    ///
     /// - Parameter handler: The function will be called for each message with the appropriate `logLevel`
     public nonisolated static func setLogHandler(_ handler: AdaptyLog.Handler?) { 
-        // TODO: Change comment.  Does not override the default behavior of the logger
         Task {
             await Log.set(handler: handler)
         }
