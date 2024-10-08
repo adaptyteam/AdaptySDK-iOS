@@ -11,6 +11,7 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
+@MainActor // TODO: swift 6
 protocol ProductsInfoProvider {
     func selectedProductInfo(by groupId: String) -> ProductInfoModel?
     func productInfo(by adaptyId: String) -> ProductInfoModel?
@@ -30,7 +31,8 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
 }
 
 @available(iOS 15.0, *)
-package class AdaptyProductsViewModel: ObservableObject {
+@MainActor // TODO: swift 6
+package final class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
     let logId: String
@@ -134,29 +136,30 @@ package class AdaptyProductsViewModel: ObservableObject {
         let logId = logId
         Log.ui.verbose("#\(logId)# loadProducts begin")
 
-        queue.async { [weak self] in
-            guard let self else { return }
-
-            self.paywallViewModel.paywall.getPaywallProducts { [weak self] result in
-                switch result {
-                case let .success(products):
-                    Log.ui.verbose("#\(logId)# loadProducts success")
-
-                    self?.adaptyProducts = products
-                    self?.productsLoadingInProgress = false
-                    self?.loadProductsIntroductoryEligibilities()
-                case let .failure(error):
-                    Log.ui.error("#\(logId)# loadProducts fail: \(error)")
-                    self?.productsLoadingInProgress = false
-
-                    if self?.eventsHandler.event_didFailLoadingProducts(with: error) ?? false {
-                        self?.queue.asyncAfter(deadline: .now() + .seconds(2)) { [weak self] in
-                            self?.loadProducts()
-                        }
-                    }
-                }
-            }
-        }
+        // TODO: swift 6
+//        queue.async { [weak self] in
+//            guard let self else { return }
+//
+//            self.paywallViewModel.paywall.getPaywallProducts { [weak self] result in
+//                switch result {
+//                case let .success(products):
+//                    Log.ui.verbose("#\(logId)# loadProducts success")
+//
+//                    self?.adaptyProducts = products
+//                    self?.productsLoadingInProgress = false
+//                    self?.loadProductsIntroductoryEligibilities()
+//                case let .failure(error):
+//                    Log.ui.error("#\(logId)# loadProducts fail: \(error)")
+//                    self?.productsLoadingInProgress = false
+//
+//                    if self?.eventsHandler.event_didFailLoadingProducts(with: error) ?? false {
+//                        self?.queue.asyncAfter(deadline: .now() + .seconds(2)) { [weak self] in
+//                            self?.loadProducts()
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     private func loadProductsIntroductoryEligibilities() {
@@ -165,15 +168,16 @@ package class AdaptyProductsViewModel: ObservableObject {
         let logId = logId
         Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities begin")
 
-        Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
-            switch result {
-            case let .success(eligibilities):
-                self?.introductoryOffersEligibilities = eligibilities
-                Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities success: \(eligibilities)")
-            case let .failure(error):
-                Log.ui.error("#\(logId)# loadProductsIntroductoryEligibilities fail: \(error)")
-            }
-        }
+        // TODO: swift 6
+//        Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
+//            switch result {
+//            case let .success(eligibilities):
+//                self?.introductoryOffersEligibilities = eligibilities
+//                Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities success: \(eligibilities)")
+//            case let .failure(error):
+//                Log.ui.error("#\(logId)# loadProductsIntroductoryEligibilities fail: \(error)")
+//            }
+//        }
     }
 
     private func handlePurchasedResult(
@@ -227,10 +231,11 @@ package class AdaptyProductsViewModel: ObservableObject {
             eventsHandler.event_didStartPurchase(underlying: underlying)
             purchaseInProgress = true
 
-            Adapty.makePurchase(underlying: underlying) { [weak self] result in
-                self?.handlePurchasedResult(underlying: underlying, result: result)
-                self?.purchaseInProgress = false
-            }
+            // TODO: swift 6
+//            Adapty.makePurchase(underlying: underlying) { [weak self] result in
+//                self?.handlePurchasedResult(underlying: underlying, result: result)
+//                self?.purchaseInProgress = false
+//            }
         }
     }
 
@@ -238,10 +243,11 @@ package class AdaptyProductsViewModel: ObservableObject {
         eventsHandler.event_didStartRestore()
 
         restoreInProgress = true
-        Adapty.restorePurchases { [weak self] result in
-            self?.handleRestoreResult(result: result)
-            self?.restoreInProgress = false
-        }
+        // TODO: swift 6
+//        Adapty.restorePurchases { [weak self] result in
+//            self?.handleRestoreResult(result: result)
+//            self?.restoreInProgress = false
+//        }
     }
 }
 

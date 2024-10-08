@@ -9,11 +9,12 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
+@MainActor // TODO: swift 6
 extension AdaptyUI {
     static let imageCache = ImageCache(name: "Adapty")
     static let imageDownloader = ImageDownloader(name: "Adapty")
 
-    public struct MediaCacheConfiguration {
+    public struct MediaCacheConfiguration: Sendable {
         /// Total cost limit of the storage in bytes.
         public var memoryStorageTotalCostLimit: Int
 
@@ -54,18 +55,26 @@ extension AdaptyUI {
     /// Clears the memory storage and the disk storage of this cache. This is an async operation.
     /// - Parameter completion: A closure which is invoked when the cache clearing operation finishes.
     ///                      This `handler` will be called from the main queue.
-    public static func clearMediaCache(completion: (() -> Void)? = nil) {
+    public static func clearMediaCache() async {
         Log.cache.verbose("clearMediaCache")
 
         imageCache.clearMemoryCache()
-        imageCache.clearDiskCache(completion: completion)
+        await imageCache.clearDiskCache()
+    }
+    
+    // TODO: swift 6
+    public static func clearMediaCache(completion: (() -> Void)? = nil) {
+        Task {
+            await clearMediaCache()
+            completion?()
+        }
     }
 }
 
 @available(iOS 15.0, *)
 extension AdaptyUI {
-    class ImageUrlPrefetcher: AdaptyUIImageUrlObserver {
-        static let queue = DispatchQueue(label: "AdaptyUI.SDK.ImageUrlPrefetcher")
+    @MainActor
+    final class ImageUrlPrefetcher: AdaptyUIImageUrlObserver {
         static let shared = ImageUrlPrefetcher()
 
         private var initialized = false
@@ -75,26 +84,32 @@ extension AdaptyUI {
             guard !initialized else { return }
 
             Log.prefetcher.verbose("initialize")
-            AdaptyUI.setImageUrlObserver(self, dispatchQueue: Self.queue)
+            AdaptyUI.setImageUrlObserver(self)
         }
 
-        func extractedImageUrls(_ urls: Set<URL>) {
-            let logId = Log.stamp
-
-            Log.prefetcher.verbose("cacheImagesIfNeeded: \(urls) [\(logId)]")
-
-            let prefetcher = ImagePrefetcher(
-                sources: urls.map { .network($0) },
-                options: [
-                    .targetCache(imageCache),
-                    .downloader(imageDownloader),
-                ],
-                completionHandler: { skipped, failed, completed in
-                    Log.prefetcher.verbose("cacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
+        // TODO: swift 6
+        nonisolated func extractedImageUrls(_ urls: Set<URL>) {
+            Task {
+                let logId = Log.stamp
+                
+                Log.prefetcher.verbose("cacheImagesIfNeeded: \(urls) [\(logId)]")
+                
+                // TODO: swift 6
+                await MainActor.run {
+                    let prefetcher = ImagePrefetcher(
+                        sources: urls.map { .network($0) },
+                        options: [
+                            .targetCache(imageCache),
+                            .downloader(imageDownloader),
+                        ],
+                        completionHandler: { skipped, failed, completed in
+                            Log.prefetcher.verbose("cacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
+                        }
+                    )
+                    
+                    prefetcher.start()
                 }
-            )
-
-            prefetcher.start()
+            }
         }
     }
 }

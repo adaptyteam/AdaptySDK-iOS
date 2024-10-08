@@ -8,24 +8,28 @@
 import Adapty
 import Foundation
 
+@MainActor // TODO: swift 6
 package protocol AdaptyPaywallInterface {
     var id: String? { get }
     var locale: String? { get }
     var vendorProductIds: [String] { get }
 
-    func getPaywallProducts(completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>)
-    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion?)
+    func getPaywallProducts() async throws -> [AdaptyPaywallProduct]
+    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws
 }
 
 extension AdaptyPaywall: AdaptyPaywallInterface {
     package var id: String? { placementId }
     package var locale: String? { remoteConfig?.locale }
     
-    package func getPaywallProducts(completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        Adapty.getPaywallProducts(paywall: self, completion)
+    package func getPaywallProducts() async throws -> [AdaptyPaywallProduct] {
+        // TODO: swift 6
+        return []
+//        Adapty.getPaywallProducts(paywall: self, completion)
     }
 
-    package func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion?) {
-        Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration, completion)
+    package func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
+        // TODO: swift 6
+//        Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration, completion)
     }
 }

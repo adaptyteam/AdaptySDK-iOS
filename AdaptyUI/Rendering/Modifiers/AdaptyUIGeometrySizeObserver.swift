@@ -11,7 +11,7 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyUIGeometrySizePreferenceKey: PreferenceKey {
-    static var defaultValue: CGSize = .zero
+    static let defaultValue: CGSize = .zero
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
         value = nextValue()
     }

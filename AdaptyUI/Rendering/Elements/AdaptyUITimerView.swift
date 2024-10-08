@@ -199,19 +199,26 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
         }
     }
 
+    @MainActor // TODO: swift 6
     private func startTimer() {
         stopTimer()
 
         timeCounter = Timer.scheduledTimer(withTimeInterval: 0.001, repeats: true) { _ in
-            updateTime()
+            Task {
+                await MainActor.run {
+                    updateTime()
+                }
+            }
         }
     }
 
+    @MainActor
     private func stopTimer() {
         timeCounter?.invalidate()
         timeCounter = nil
     }
 
+    @MainActor
     private func updateTime() {
         var timeLeft = viewModel.timeLeft(for: timer,
                                           at: Date(),

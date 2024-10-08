@@ -66,7 +66,7 @@ extension View {
 @available(iOS 15.0, *)
 struct AdaptyUIPagerView: View {
     private static let pageControllTapAnimationDuration = 0.3
-    
+
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
     @Environment(\.adaptyScreenSize)
@@ -146,8 +146,17 @@ struct AdaptyUIPagerView: View {
                 currentPage = index
             }
             if shouldScheduleAutoscroll {
-                DispatchQueue.main.asyncAfter(deadline: .now() + Self.pageControllTapAnimationDuration) {
-                    self.scheduleAutoScroll()
+                // TODO: swift 6
+                Task {
+                    if #available(iOS 16.0, *) {
+                        try await Task.sleep(for: .milliseconds(Self.pageControllTapAnimationDuration * 1000.0))
+                    } else {
+                        try await Task.sleep(nanoseconds: UInt64(Self.pageControllTapAnimationDuration * 1000000.0))
+                    }
+                    
+                    await MainActor.run {
+                        self.scheduleAutoScroll()
+                    }
                 }
             }
         } else {
@@ -255,32 +264,45 @@ struct AdaptyUIPagerView: View {
         }
     }
 
+    @MainActor
     private func startAutoScroll() {
         guard let config = pager.animation else { return }
 
         stopAutoScroll()
-        timer = Timer.scheduledTimer(withTimeInterval: config.startDelay, repeats: false) { _ in
-            scheduleAutoScroll()
+        timer = Timer.scheduledTimer(
+            withTimeInterval: config.startDelay,
+            repeats: false
+        ) { _ in
+            // TODO: swift 6
+            Task { @MainActor in
+                scheduleAutoScroll()
+            }
         }
     }
 
+    @MainActor
     private func scheduleAutoScroll() {
         guard let config = pager.animation else { return }
 
-        timer = Timer.scheduledTimer(withTimeInterval: config.pageTransition.duration + config.pageTransition.startDelay, repeats: true) { _ in
-
-            guard !isInteracting else { return }
-
-            if currentPage < pager.content.count - 1 {
-                withAnimation(config.pageTransition.swiftUIAnimation) {
-                    currentPage += 1
+        timer = Timer.scheduledTimer(
+            withTimeInterval: config.pageTransition.duration + config.pageTransition.startDelay,
+            repeats: true
+        ) { _ in
+            Task { @MainActor in
+                // TODO: swift 6
+                guard !isInteracting else { return }
+                
+                if currentPage < pager.content.count - 1 {
+                    withAnimation(config.pageTransition.swiftUIAnimation) {
+                        currentPage += 1
+                    }
+                } else if let repeatTransition = config.repeatTransition {
+                    withAnimation(repeatTransition.swiftUIAnimation) {
+                        currentPage = 0
+                    }
+                } else {
+                    stopAutoScroll()
                 }
-            } else if let repeatTransition = config.repeatTransition {
-                withAnimation(repeatTransition.swiftUIAnimation) {
-                    currentPage = 0
-                }
-            } else {
-                stopAutoScroll()
             }
         }
     }

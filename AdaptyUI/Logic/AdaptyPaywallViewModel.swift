@@ -11,7 +11,8 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-package class AdaptyPaywallViewModel: ObservableObject {
+@MainActor // TODO: swift 6
+package final class AdaptyPaywallViewModel: ObservableObject {
     let logId: String
     let eventsHandler: AdaptyEventsHandler
 
@@ -31,36 +32,34 @@ package class AdaptyPaywallViewModel: ObservableObject {
         self.viewConfiguration = viewConfiguration
     }
 
-    func logShowPaywall() {
+    func logShowPaywall() async {
         let logId = logId
         Log.ui.verbose("#\(logId)# logShowPaywall begin")
 
-        paywall.logShowPaywall(viewConfiguration: viewConfiguration) { [weak self] error in
-            if let error {
-                Log.ui.error("#\(logId)# logShowPaywall fail: \(error)")
-            } else {
-                Log.ui.verbose("#\(logId)# logShowPaywall success")
-            }
+        // TODO: swift 6
+        do {
+            try await paywall.logShowPaywall(viewConfiguration: viewConfiguration)
+            Log.ui.verbose("#\(logId)# logShowPaywall success")
+        } catch {
+            Log.ui.error("#\(logId)# logShowPaywall fail: \(error)")
         }
     }
 
-    func reloadData() {
+    func reloadData() async {
         guard let placementId = paywall.id else { return }
 
-        Task { @MainActor in
-            do {
-                Log.ui.verbose("#\(logId)# paywall reloadData begin")
+        do {
+            Log.ui.verbose("#\(logId)# paywall reloadData begin")
 
-                let paywall = try await Adapty.getPaywall(placementId: placementId, locale: paywall.locale)
-                let viewConfiguration = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
+            let paywall = try await Adapty.getPaywall(placementId: placementId, locale: paywall.locale)
+            let viewConfiguration = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
 
-                self.paywall = paywall
-                self.viewConfiguration = viewConfiguration
+            self.paywall = paywall
+            self.viewConfiguration = viewConfiguration
 
-                onViewConfigurationUpdate?(viewConfiguration)
-            } catch {
-                Log.ui.error("#\(logId)# paywall reloadData fail: \(error)")
-            }
+            onViewConfigurationUpdate?(viewConfiguration)
+        } catch {
+            Log.ui.error("#\(logId)# paywall reloadData fail: \(error)")
         }
     }
 }

@@ -24,7 +24,8 @@ package struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
 }
 
 @available(iOS 15.0, *)
-package class AdaptyTimerViewModel: ObservableObject {
+@MainActor // TODO: swift 6
+package final class AdaptyTimerViewModel: ObservableObject {
     private static var globalTimers = [String: Date]()
     private var timers = [String: Date]()
 

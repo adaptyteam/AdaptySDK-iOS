@@ -11,7 +11,8 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-package class AdaptyEventsHandler {
+@MainActor // TODO: swift 6
+package final class AdaptyEventsHandler {
     let logId: String = Log.stamp
 
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
