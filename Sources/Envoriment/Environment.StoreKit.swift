@@ -1,5 +1,5 @@
 //
-//  Environment.Store.swift
+//  Environment.StoreKit.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 25.09.2024
@@ -8,7 +8,7 @@
 import Foundation
 
 extension Environment {
-    enum Store {
+    enum StoreKit {
         static let name = "app_store"
 
         static let storeKit2Enabled: Bool =

@@ -35,11 +35,11 @@ extension Backend.Request {
             authorizationHeaderKey: "Api-Key \(configuration.apiKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
             sdkPlatformHeaderKey: envorinment.system.name,
-            sdkStoreHeaderKey: Environment.Store.name,
+            sdkStoreHeaderKey: Environment.StoreKit.name,
             sessionIDHeaderKey: envorinment.sessionIdentifier,
             appInstallIdHeaderKey: envorinment.application.installationIdentifier,
             isObserveModeHeaderKey: configuration.observerMode ? "true" : "false",
-            storeKit2EnabledHeaderKey:  Environment.Store.storeKit2Enabled ? "enabled" : "unavailable",
+            storeKit2EnabledHeaderKey:  Environment.StoreKit.storeKit2Enabled ? "enabled" : "unavailable",
         ]
 
         if let ver = envorinment.application.version {

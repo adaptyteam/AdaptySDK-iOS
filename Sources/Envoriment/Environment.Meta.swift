@@ -23,7 +23,7 @@ extension Environment {
             locale = System.locale
             timezone = System.timezone
             ipV4Address = Device.ipV4Address
-            storefront = await Environment.Store.storefront
+            storefront = await Environment.StoreKit.storefront
             webUserAgent = await Device.webUserAgent
             envorinment = await Environment.instance
             if includedAnalyticIds {
