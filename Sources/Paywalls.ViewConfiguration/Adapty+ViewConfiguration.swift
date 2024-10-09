@@ -14,12 +14,10 @@ extension Adapty {
         loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
     ) async throws -> AdaptyUI.LocalizedViewConfiguration {
         let loadTimeout = loadTimeout.allowedLoadPaywallTimeout
-        return try await withActivatedSDK { sdk in
-            try await sdk.getViewConfiguration(
-                paywall: paywall,
-                loadTimeout: loadTimeout
-            )
-        }
+        return try await activatedSDK.getViewConfiguration(
+            paywall: paywall,
+            loadTimeout: loadTimeout
+        )
     }
 
     private func getViewConfiguration(

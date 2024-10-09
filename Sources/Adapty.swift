@@ -9,7 +9,6 @@ import Foundation
 
 @AdaptyActor
 public final class Adapty: Sendable {
-    static var shared: Adapty?
 
     static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
 
@@ -87,16 +86,7 @@ public final class Adapty: Sendable {
         case purchasing
     }
 
-    nonisolated(unsafe) static var share: Adapty!
 
-    static var sdk: Adapty {
-        get throws {
-            guard let share = Adapty.share else {
-                throw AdaptyError.notActivated()
-            }
-            return share
-        }
-    }
 
     nonisolated(unsafe) var profile: ProfileManager!
 

@@ -17,24 +17,21 @@ extension Adapty {
         paywallABTestName: String,
         paywallName: String
     ) async throws -> AdaptyPaywallProduct {
-        try await withActivatedSDK { sdk in
+        let product = try await activatedSDK.productsManager.fetchProduct(
+            id: vendorProductId,
+            fetchPolicy: .returnCacheDataElseLoad
+        )
 
-            let product = try await sdk.productsManager.fetchProduct(
-                id: vendorProductId,
-                fetchPolicy: .returnCacheDataElseLoad
-            )
-
-            return AdaptyPaywallProduct(
-                adaptyProductId: adaptyProductId,
-                underlying: product,
-                promotionalOfferId: promotionalOfferId,
-                variationId: variationId,
-                paywallABTestName: paywallABTestName,
-                paywallName: paywallName
-            )
-        }
+        return AdaptyPaywallProduct(
+            adaptyProductId: adaptyProductId,
+            underlying: product,
+            promotionalOfferId: promotionalOfferId,
+            variationId: variationId,
+            paywallABTestName: paywallABTestName,
+            paywallName: paywallName
+        )
     }
-    
+
     /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
@@ -54,5 +51,4 @@ extension Adapty {
             ).compactMap { AdaptyPaywallProduct(paywall: paywall, underlying: $0) }
         }
     }
-
 }

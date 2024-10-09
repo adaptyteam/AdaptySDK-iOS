@@ -85,13 +85,13 @@ extension Adapty {
                 await Adapty.eventsManager.set(backend: backend)
             }
 
-            shared = Adapty(
+            set(shared: Adapty(
                 apiKeyPrefix: String(configuration.apiKey.prefix(while: { $0 != "." })),
                 profileStorage: UserDefaults.standard,
                 backend: backend,
                 customerUserId: configuration.customerUserId,
                 isObserveMode: configuration.observerMode
-            )
+            ))
 
 //            LifecycleManager.shared.initialize()
 
