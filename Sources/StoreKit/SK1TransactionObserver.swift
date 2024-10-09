@@ -84,5 +84,13 @@ extension SK1TransactionObserver {
                 await wrapped.updatedTransactions(transactions)
             }
         }
+
+        #if !os(watchOS)
+            func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for sk1Product: SKProduct) -> Bool {
+                guard let delegate = Adapty.delegate else { return true }
+                let deferredProduct = AdaptyDeferredProduct(sk1Product: sk1Product, payment: payment)
+                return delegate.shouldAddStorePayment(for: deferredProduct)
+            }
+        #endif
     }
 }

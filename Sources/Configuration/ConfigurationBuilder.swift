@@ -18,6 +18,7 @@ extension Adapty.Configuration {
             observerMode: builder.observerMode,
             idfaCollectionDisabled: builder.idfaCollectionDisabled,
             ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled,
+            dispatchQueue: builder.dispatchQueue,
             backend: .init(
                 baseUrl: builder.backendBaseUrl,
                 fallbackUrl: builder.backendFallbackBaseUrl,
@@ -41,6 +42,7 @@ extension Adapty {
         public private(set) var observerMode: Bool
         public private(set) var idfaCollectionDisabled: Bool
         public private(set) var ipAddressCollectionDisabled: Bool
+        public private(set) var dispatchQueue: DispatchQueue?
 
         public private(set) var backendBaseUrl: URL
         public private(set) var backendFallbackBaseUrl: URL
@@ -61,6 +63,7 @@ extension Adapty {
             observerMode: Bool = Configuration.default.observerMode,
             idfaCollectionDisabled: Bool = Configuration.default.idfaCollectionDisabled,
             ipAddressCollectionDisabled: Bool = Configuration.default.ipAddressCollectionDisabled,
+            dispatchQueue: DispatchQueue? = Configuration.default.dispatchQueue,
             backendBaseUrl: URL = Configuration.default.backend.baseUrl,
             backendFallbackBaseUrl: URL = Configuration.default.backend.fallbackUrl,
             backendConfigsBaseUrl: URL = Configuration.default.backend.configsUrl,
@@ -73,6 +76,7 @@ extension Adapty {
             self.observerMode = observerMode
             self.idfaCollectionDisabled = idfaCollectionDisabled
             self.ipAddressCollectionDisabled = ipAddressCollectionDisabled
+            self.dispatchQueue = dispatchQueue
             self.backendBaseUrl = backendBaseUrl
             self.backendFallbackBaseUrl = backendFallbackBaseUrl
             self.backendConfigsBaseUrl = backendConfigsBaseUrl
@@ -121,6 +125,12 @@ extension Adapty.ConfigurationBuilder {
     @discardableResult
     public func with(ipAddressCollectionDisabled value: Bool) -> Self {
         ipAddressCollectionDisabled = value
+        return self
+    }
+    
+    /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
+    public func with(dispatchQueue queue: DispatchQueue?) -> Self {
+        dispatchQueue = queue
         return self
     }
 

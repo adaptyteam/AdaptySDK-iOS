@@ -57,6 +57,7 @@ extension Adapty.ConfigurationBuilder: Decodable {
                 ?? defaultValue.idfaCollectionDisabled,
             ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled)
                 ?? defaultValue.ipAddressCollectionDisabled,
+            dispatchQueue: defaultValue.dispatchQueue,
             backendBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendBaseUrl) ?? defaultValue.backend.baseUrl,
             backendFallbackBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl)
                 ?? defaultValue.backend.fallbackUrl,

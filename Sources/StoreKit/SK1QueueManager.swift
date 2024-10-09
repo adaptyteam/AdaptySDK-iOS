@@ -83,6 +83,13 @@ actor SK1QueueManager: Sendable {
         )
     }
 
+    func makePurchase(
+        product: AdaptyDeferredProduct
+    ) async throws -> AdaptyPurchasedInfo {
+        try await addPayment(product.payment, for: product.underlying.skProduct)
+    }
+
+    @inlinable
     func addPayment(
         _ payment: SKPayment,
         for underlying: SK1Product,
@@ -324,16 +331,11 @@ extension SK1QueueManager {
         }
 
         #if !os(watchOS)
-//            func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for underlying: SKProduct) -> Bool {
-//                guard let delegate = Adapty.delegate else { return true }
-//
-//                let deferredProduct = AdaptySK1Product(sk1Product: underlying, payment: payment)
-//                return delegate.shouldAddStorePayment(for: deferredProduct, defermentCompletion: { [weak self] completion in
-//                    self?.makePurchase(payment: payment, underlying: deferredProduct) { result in
-//                        completion?(result)
-//                    }
-//                })
-//            }
+            func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for sk1Product: SKProduct) -> Bool {
+                guard let delegate = Adapty.delegate else { return true }
+                let deferredProduct = AdaptyDeferredProduct(sk1Product: sk1Product, payment: payment)
+                return delegate.shouldAddStorePayment(for: deferredProduct)
+            }
         #endif
     }
 }

@@ -13,6 +13,7 @@ extension Adapty {
             observerMode: false,
             idfaCollectionDisabled: false,
             ipAddressCollectionDisabled: false,
+            dispatchQueue: DispatchQueue?.none,
             backend: Backend.URLs.publicEnvironment
         )
 
@@ -21,6 +22,7 @@ extension Adapty {
         let observerMode: Bool
         let idfaCollectionDisabled: Bool
         let ipAddressCollectionDisabled: Bool
+        let dispatchQueue: DispatchQueue?
         let backend: Backend.URLs
         let logLevel: AdaptyLog.Level?
         let crossPlatformSDK: (name: String, version: String)?

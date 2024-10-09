@@ -18,26 +18,21 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
     /// Return `false` to defer or cancel the transaction.
     ///
     /// If you return `false`, you can continue the transaction later by manually calling the `defermentCompletion`.
-    func shouldAddStorePayment(for product: AdaptyProduct, defermentCompletion makeDeferredPurchase: @escaping (AdaptyResultCompletion<AdaptyPurchasedInfo>?) -> Void) -> Bool
+    func shouldAddStorePayment(for product: AdaptyDeferredProduct) -> Bool // TODO: Change documentation
 }
 
 extension AdaptyDelegate {
-    public func shouldAddStorePayment(for _: AdaptyProduct, defermentCompletion _: @escaping (AdaptyResultCompletion<AdaptyPurchasedInfo>?) -> Void) -> Bool {
-        true
-    }
+    public func shouldAddStorePayment(for _: AdaptyProduct) -> Bool { true }
 }
 
 extension Adapty {
-    public weak static var delegate: AdaptyDelegate?
-
     /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
-    public static func setDelegate(_ delegate: AdaptyDelegate) {
-        self.delegate = delegate
-    }
+    public nonisolated(unsafe) weak static var delegate: AdaptyDelegate?
 
+    
     nonisolated static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
-        Task.detached {
-            guard let delegate = await Adapty.delegate else { return }
+        guard let delegate = Adapty.delegate else { return }
+        (Adapty.dispatchQueue ?? .main).async {
             call(delegate)
         }
     }

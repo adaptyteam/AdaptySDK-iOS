@@ -14,6 +14,7 @@ import StoreKit
 private let log = Log.default
 
 extension Adapty {
+    
     public nonisolated static var isActivated: Bool { shared != nil }
 
     static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard

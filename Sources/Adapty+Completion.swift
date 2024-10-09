@@ -22,6 +22,8 @@ extension Result where Failure == AdaptyError {
 }
 
 extension Adapty {
+    nonisolated(unsafe) static var dispatchQueue: DispatchQueue?
+
     /// Use this method to initialize the Adapty SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
@@ -91,7 +93,9 @@ extension Adapty {
 
     /// You can logout the user anytime by calling this method.
     /// - Parameter completion: Result callback.
-    public nonisolated static func logout(_ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func logout(
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         withCompletion(completion) {
             try await logout()
         }
@@ -102,7 +106,9 @@ extension Adapty {
     /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
     ///
     /// - Parameter completion: the result containing a `AdaptyProfile` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public nonisolated static func getProfile(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    public nonisolated static func getProfile(
+        _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>
+    ) {
         withCompletion(completion) {
             try await getProfile()
         }
@@ -130,7 +136,12 @@ extension Adapty {
     /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
     /// - Parameter networkUserId: a string profile's identifier from the attribution service.
     /// - Parameter completion: A result containing an optional error.
-    public nonisolated static func updateAttribution(_ attribution: [String: any Sendable], source: AdaptyAttributionSource, networkUserId: String? = nil, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func updateAttribution(
+        _ attribution: [String: any Sendable],
+        source: AdaptyAttributionSource,
+        networkUserId: String? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         withCompletion(completion) {
             try await updateAttribution(attribution, source: source, networkUserId: networkUserId)
         }
@@ -200,7 +211,10 @@ extension Adapty {
     /// - Parameters:
     ///   - fileURL:
     ///   - completion: Result callback.
-    public nonisolated static func setFallbackPaywalls(fileURL url: URL, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func setFallbackPaywalls(
+        fileURL url: URL,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         withCompletion(completion) {
             try await setFallbackPaywalls(fileURL: url)
         }
@@ -253,7 +267,7 @@ extension Adapty {
             try await getProductsIntroductoryOfferEligibility(products: products)
         }
     }
-    
+
     /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
@@ -286,13 +300,24 @@ extension Adapty {
         }
     }
 
+    public nonisolated static func makePurchase(
+        product: AdaptyDeferredProduct,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>
+    ) {
+        withCompletion(completion) {
+            try await makePurchase(product: product)
+        }
+    }
+
     /// You can fetch the StoreKit receipt by calling this method
     ///
     /// If the receipt is not presented on the device, Adapty will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
     ///
     /// - Parameters:
     ///   - completion: A result containing the receipt `Data`.
-    public nonisolated static func getReceipt(_ completion: @escaping AdaptyResultCompletion<Data>) {
+    public nonisolated static func getReceipt(
+        _ completion: @escaping AdaptyResultCompletion<Data>
+    ) {
         withCompletion(completion) {
             try await getReceipt()
         }
@@ -303,7 +328,9 @@ extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)
     ///
     /// - Parameter completion: A result containing the ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
-    public nonisolated static func restorePurchases(_ completion: @escaping AdaptyResultCompletion<AdaptyProfile>) {
+    public nonisolated static func restorePurchases(
+        _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>
+    ) {
         withCompletion(completion) {
             try await restorePurchases()
         }
@@ -356,7 +383,10 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: A `AdaptyPaywall` object.
     ///   - completion: Result callback.
-    public nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func logShowPaywall(
+        _ paywall: AdaptyPaywall,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         withCompletion(completion) {
             try await logShowPaywall(paywall)
         }
@@ -373,13 +403,21 @@ extension Adapty {
     ///   - screenName: Readable name of a particular screen as part of onboarding.
     ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
     ///   - completion: Result callback.
-    public nonisolated static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func logShowOnboarding(
+        name: String?,
+        screenName: String?,
+        screenOrder: UInt,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         withCompletion(completion) {
             try await logShowOnboarding(name: name, screenName: screenName, screenOrder: screenOrder)
         }
     }
 
-    public nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters, _ completion: AdaptyErrorCompletion? = nil) {
+    public nonisolated static func logShowOnboarding(
+        _ params: AdaptyOnboardingScreenParameters,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
         withCompletion(completion) {
             try await logShowOnboarding(params)
         }
@@ -400,9 +438,13 @@ private func withCompletion(
     Task {
         do {
             try await operation()
-            completion(nil)
+            (Adapty.dispatchQueue ?? .main).async {
+                completion(nil)
+            }
         } catch {
-            completion(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error))
+            (Adapty.dispatchQueue ?? .main).async {
+                completion(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error))
+            }
         }
     }
 }
@@ -420,9 +462,14 @@ private func withCompletion<T: Sendable>(
 
     Task {
         do {
-            try await completion(.success(operation()))
+            let result = try await operation()
+            (Adapty.dispatchQueue ?? .main).async {
+                completion(.success(result))
+            }
         } catch {
-            completion(.failure(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error)))
+            (Adapty.dispatchQueue ?? .main).async {
+                completion(.failure(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error)))
+            }
         }
     }
 }
