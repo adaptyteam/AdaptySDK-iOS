@@ -35,7 +35,7 @@ final class ProfileManager: Sendable {
         productStatesCache = ProductStatesCache(storage: productStorage)
 
         Task { [weak self] in
-            try? Adapty.activatedSDK.updateASATokenIfNeed(for: profile)
+            Adapty.optionalSDK?.updateASATokenIfNeed(for: profile)
 
             if sendedEnvironment == .dont {
                 _ = await self?.getProfile()
@@ -51,7 +51,7 @@ final class ProfileManager: Sendable {
 extension ProfileManager {
     nonisolated func syncTransactionsIfNeed(for profileId: String) { // TODO: extruct this code from ProfileManager
         Task { [weak self] in
-            guard let sdk = try? await Adapty.activatedSDK,
+            guard let sdk = await Adapty.optionalSDK,
                   let self,
                   !self.storage.syncedTransactions
             else { return }

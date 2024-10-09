@@ -10,32 +10,42 @@ import Foundation
 private let log = Log.default
 
 extension Adapty {
-    private static var shared: Adapty?
+    public static var isActivated: Bool { shared != nil }
 
-    static func set(shared: Adapty) {
-        self.shared = shared
+    private static var shared: Shared?
+    private enum Shared {
+        case activated(Adapty)
+        case activating(Task<Adapty, Never>)
     }
 
-    static func withOptioanalSDK<T: Sendable>(
-        methodName: MethodName,
-        logParams: EventParameters? = nil,
-        function: StaticString = #function,
-        operation: @AdaptyActor @Sendable @escaping (Adapty?) async throws -> T
-    ) async throws -> T {
-        let stamp = Log.stamp
+    static func set(activatingSDK task: Task<Adapty, Never>) {
+        guard shared == nil else { return }
+        shared = .activating(task)
+    }
 
-        Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))
-        log.verbose("Calling now: \(function) [\(stamp)].  event: \(methodName) logParams: \(logParams?.description ?? "nil")")
+    static func set(shared sdk: Adapty) {
+        if case .activated = shared { return }
+        shared = .activated(sdk)
+    }
 
-        do {
-            let result = try await operation(Adapty.shared)
-            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: methodName, stamp: stamp))
-            log.verbose("Completed \(function) [\(stamp)] is successful.")
-            return result
-        } catch {
-            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: methodName, stamp: stamp, error: error.localizedDescription))
-            log.error("Completed \(function) [\(stamp)] with error: \(error).")
-            throw error
+    static var activatedSDK: Adapty {
+        get async throws {
+            switch shared {
+            case let .some(.activated(sdk)):
+                return sdk
+            case let .some(.activating(task)):
+                return await task.value
+            default:
+                throw AdaptyError.notActivated()
+            }
+        }
+    }
+
+    static var optionalSDK: Adapty? {
+        if case let .some(.activated(sdk)) = shared {
+            sdk
+        } else {
+            nil
         }
     }
 
@@ -48,7 +58,7 @@ extension Adapty {
         let stamp = Log.stamp
 
         Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))
-        log.verbose("Calling now: \(function) [\(stamp)]  methodName: \(methodName) logParams: \(logParams?.description ?? "nil")")
+        log.verbose("Calling now: \(function) [\(stamp)]  \(methodName): \(logParams?.description ?? "nil")")
 
         do {
             let result = try await operation(Adapty.activatedSDK)
@@ -62,12 +72,26 @@ extension Adapty {
         }
     }
 
-    static var activatedSDK: Adapty {
-        get throws {
-            guard let share = Adapty.shared else {
-                throw AdaptyError.notActivated()
-            }
-            return share
+    static func withoutSDK<T: Sendable>(
+        methodName: MethodName,
+        logParams: EventParameters? = nil,
+        function: StaticString = #function,
+        operation: @AdaptyActor @Sendable @escaping () async throws -> T
+    ) async throws -> T {
+        let stamp = Log.stamp
+
+        Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))
+        log.verbose("Calling now: \(function) [\(stamp)].  \(methodName): \(logParams?.description ?? "nil")")
+
+        do {
+            let result = try await operation()
+            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: methodName, stamp: stamp))
+            log.verbose("Completed \(function) [\(stamp)] is successful.")
+            return result
+        } catch {
+            Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: methodName, stamp: stamp, error: error.localizedDescription))
+            log.error("Completed \(function) [\(stamp)] with error: \(error).")
+            throw error
         }
     }
 }

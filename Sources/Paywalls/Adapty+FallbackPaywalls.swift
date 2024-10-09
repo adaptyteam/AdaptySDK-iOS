@@ -20,9 +20,9 @@ extension Adapty {
     ///   - fileURL:
     /// - Throws: An ``AdaptyError`` object
     public nonisolated static func setFallbackPaywalls(fileURL url: URL) async throws {
-        try await withOptioanalSDK(
+        try await withoutSDK(
             methodName: .setFallbackPaywalls
-        ) { @AdaptyActor _ in
+        ) { @AdaptyActor in
             do {
                 Adapty.fallbackPaywalls = try FallbackPaywalls(fileURL: url)
             } catch {

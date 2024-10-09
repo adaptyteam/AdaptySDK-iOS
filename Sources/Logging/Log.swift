@@ -59,7 +59,6 @@ private extension Log.Category {
             message: message,
             category: self,
             source: .init(
-                threadName: Log.currentThreadName,
                 fileName: file,
                 functionName: function,
                 lineNumber: line

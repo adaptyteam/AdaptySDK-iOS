@@ -21,8 +21,12 @@ extension Result where Failure == AdaptyError {
     }
 }
 
+extension Adapty.Configuration {
+    @AdaptyActor
+    static var callbackDispatchQueue: DispatchQueue? 
+}
+
 extension Adapty {
-    nonisolated(unsafe) static var callbackDispatchQueue: DispatchQueue?
 
     /// Use this method to initialize the Adapty SDK.
     ///
@@ -436,13 +440,14 @@ private func withCompletion(
     }
 
     Task {
+        let queue = await Adapty.Configuration.callbackDispatchQueue ?? .main
         do {
             try await operation()
-            (Adapty.callbackDispatchQueue ?? .main).async {
+            queue.async {
                 completion(nil)
             }
         } catch {
-            (Adapty.callbackDispatchQueue ?? .main).async {
+            queue.async {
                 completion(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error))
             }
         }
@@ -461,13 +466,14 @@ private func withCompletion<T: Sendable>(
     }
 
     Task {
+        let queue = await Adapty.Configuration.callbackDispatchQueue ?? .main
         do {
             let result = try await operation()
-            (Adapty.callbackDispatchQueue ?? .main).async {
+            queue.async {
                 completion(.success(result))
             }
         } catch {
-            (Adapty.callbackDispatchQueue ?? .main).async {
+            queue.async {
                 completion(.failure(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error)))
             }
         }

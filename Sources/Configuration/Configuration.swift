@@ -28,4 +28,7 @@ extension Adapty {
     }
 }
 
-
+package extension Adapty.Configuration {
+    @AdaptyActor
+    static var observerMode: Bool?
+}

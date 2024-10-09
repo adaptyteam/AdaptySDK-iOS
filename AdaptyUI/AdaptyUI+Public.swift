@@ -187,7 +187,7 @@ public extension AdaptyUI {
     /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
     static func activate(configuration: AdaptyUI.Configuration = .default) async throws {
         guard await Adapty.isActivated,
-              let isObserverModeEnabled = await Adapty.Configuration.observerModeEnabled
+              let isObserverModeEnabled = await Adapty.Configuration.observerMode
         else {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI activate error: \(err)")

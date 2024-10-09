@@ -29,10 +29,10 @@ extension Adapty {
     /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
     public nonisolated(unsafe) weak static var delegate: AdaptyDelegate?
 
-    
-    nonisolated static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
+    static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
         guard let delegate = Adapty.delegate else { return }
-        (Adapty.callbackDispatchQueue ?? .main).async {
+        let queue = Configuration.callbackDispatchQueue ?? .main
+        queue.async {
             call(delegate)
         }
     }

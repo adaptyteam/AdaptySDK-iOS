@@ -42,43 +42,42 @@ extension Adapty {
         try await activate(with: builder.build())
     }
 
-    public private(set) static var isActivated: Bool = false
-
     /// Use this method to initialize the Adapty SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
     /// - Parameter configuration: `Adapty.Configuration` which allows to configure Adapty SDK
-    public nonisolated static func activate(
+    public static func activate(
         with configuration: Adapty.Configuration
     ) async throws {
-        try await withOptioanalSDK(
-            methodName: .activate,
-            logParams: [
-                "observer_mode": configuration.observerMode,
-                "has_customer_user_id": configuration.customerUserId != nil,
-                "idfa_collection_disabled": configuration.idfaCollectionDisabled,
-                "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
-            ]
-        ) { @AdaptyActor _ in
+        let stamp = Log.stamp
+        let logParams: EventParameters? = [
+            "observer_mode": configuration.observerMode,
+            "has_customer_user_id": configuration.customerUserId != nil,
+            "idfa_collection_disabled": configuration.idfaCollectionDisabled,
+            "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
+        ]
 
-            if Adapty.isActivated {
-                let error = AdaptyError.activateOnceError()
-                log.warn("Adapty activate error \(error)")
-                throw error
-            }
+        trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: .activate, stamp: stamp, params: logParams))
+        log.verbose("Calling Adapty activate [\(stamp)] with params: \(logParams?.description ?? "nil")")
 
-            Adapty.isActivated = true
+        guard !isActivated else {
+            let error = AdaptyError.activateOnceError()
+            trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: .activate, stamp: stamp, error: error.localizedDescription))
+            log.error("Adapty activate [\(stamp)] encountered an error: \(error).")
+            throw error
+        }
 
+        let task = Task<Adapty, Never> { @AdaptyActor in
             if let logLevel = configuration.logLevel { Adapty.logLevel = logLevel }
 
             UserDefaults.standard.clearAllDataIfDifferent(apiKey: configuration.apiKey)
 
-            Adapty.callbackDispatchQueue = configuration.callbackDispatchQueue
+            Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue
             Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled
             Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled
-            Configuration.observerModeEnabled = configuration.observerMode
-            
+            Configuration.observerMode = configuration.observerMode
+
             let environment = await Environment.instance
             let backend = Backend(with: configuration, envorinment: environment)
 
@@ -86,22 +85,24 @@ extension Adapty {
                 await Adapty.eventsManager.set(backend: backend)
             }
 
-            set(shared: Adapty(
+            let sdk = Adapty(
                 apiKeyPrefix: String(configuration.apiKey.prefix(while: { $0 != "." })),
                 profileStorage: UserDefaults.standard,
                 backend: backend,
                 customerUserId: configuration.customerUserId,
                 isObserveMode: configuration.observerMode
-            ))
+            )
 
-            LifecycleManager.shared.initialize()
 
-            log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
+            trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: .activate, stamp: stamp))
+            log.info("Adapty activated successfully. [\(stamp)]")
+            
+            set(shared: sdk)
+            
+//            LifecycleManager.shared.initialize()
+            return sdk
         }
+        set(activatingSDK: task)
+        _ = await task.value
     }
-}
-
-package extension Adapty.Configuration {
-    @AdaptyActor
-    static var observerModeEnabled: Bool?
 }

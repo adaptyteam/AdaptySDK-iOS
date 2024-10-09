@@ -13,7 +13,6 @@ extension Log {
 
 extension AdaptyLog {
     public struct Source: Equatable, Sendable {
-        public let threadName: String
         public let fileName: String
         public let functionName: String
         public let lineNumber: UInt
@@ -21,7 +20,5 @@ extension AdaptyLog {
 }
 
 extension AdaptyLog.Source: CustomStringConvertible {
-    public var description: String {
-        "thrd: \(threadName), func: \(functionName)\t \(fileName)#\(lineNumber)"
-    }
+    public var description: String { "\(fileName)#\(lineNumber)" }
 }
