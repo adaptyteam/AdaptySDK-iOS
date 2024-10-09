@@ -94,7 +94,7 @@ extension Adapty {
                 isObserveMode: configuration.observerMode
             ))
 
-//            LifecycleManager.shared.initialize()
+            LifecycleManager.shared.initialize()
 
             log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
         }

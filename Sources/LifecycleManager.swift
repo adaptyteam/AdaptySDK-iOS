@@ -14,8 +14,8 @@ import StoreKit
 
 private let log = Log.Category(name: "LifecycleManager")
 
+@AdaptyActor
 final class LifecycleManager {
-    private static let underlayQueue = DispatchQueue(label: "Adapty.SDK.Lifecycle")
     private static let appOpenedSendInterval: TimeInterval = 60.0
     private static let profileUpdateInterval: TimeInterval = 60.0
     private static let profileUpdateShortInterval: TimeInterval = 10.0
@@ -37,10 +37,15 @@ final class LifecycleManager {
 
         subscribeForLifecycleEvents()
         scheduleProfileUpdate(after: Self.profileUpdateInterval)
-        scheduleIDFAUpdate()
 
-        SKStorefrontManager.subscribeForUpdates { [weak self] countryCode in
-            self?.newStorefrontCountryAvailable = countryCode
+        Task { [weak self] in
+            await self?.scheduleIDFAUpdate()
+        }
+
+        Task { [weak self] in
+            for await value in AdaptyStorefront.updates {
+                self?.newStorefrontCountryAvailable = value.countryCode
+            }
         }
 
         initialized = true
@@ -56,11 +61,15 @@ final class LifecycleManager {
 
         Self.purchaseInfoUpdateScheduled = true
 
-        Self.underlayQueue.asyncAfter(deadline: .now() + delay) { [weak self] in
-            self?.syncProfile { [weak self] success in
-                Self.purchaseInfoUpdateScheduled = false
+        Task {
+            if delay > 0.0 {
+                try await Task.sleep(seconds: delay)
+            }
 
-                self?.scheduleProfileUpdate(after: success ? Self.profileUpdateInterval : Self.profileUpdateShortInterval)
+            let success = await syncProfile()
+
+            if success {
+                scheduleProfileUpdate(after: success ? Self.profileUpdateInterval : Self.profileUpdateShortInterval)
             }
         }
     }
@@ -72,55 +81,58 @@ final class LifecycleManager {
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-
-                Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
-                log.verbose("LifecycleManager: didBecomeActiveNotification")
-
-                self?.sendAppOpenedEvent()
-                self?.scheduleProfileUpdate(after: 0.0)
+                Task { @AdaptyActor [weak self] in
+                    await self?.handleDidBecomeActiveNotification()
+                }
             }
         #endif
     }
 
-    @objc
-    private func syncProfile(completion: @escaping (Bool) -> Void) {
+    private func handleDidBecomeActiveNotification() async {
+        Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
+        log.verbose("LifecycleManager: didBecomeActiveNotification")
+
+        await sendAppOpenedEvent()
+        scheduleProfileUpdate(after: 0.0)
+    }
+
+    private func syncProfile() async -> Bool {
         if let profileSyncAt,
-           Date().timeIntervalSince(profileSyncAt) < Self.profileUpdateInterval {
-            completion(false)
-            return
+           Date().timeIntervalSince(profileSyncAt) < Self.profileUpdateInterval
+        {
+            return false
         }
 
         log.verbose("LifecycleManager: syncProfile Begin")
 
         if let storeCountry = newStorefrontCountryAvailable {
-            Adapty.updateProfile(params: AdaptyProfileParameters(storeCountry: storeCountry)) { [weak self] error in
-                if let error {
-                    log.verbose("LifecycleManager: syncProfile Error: \(error)")
-                    completion(false)
-                } else {
-                    log.verbose("LifecycleManager: syncProfile Done")
+            let params = AdaptyProfileParameters(storeCountry: storeCountry)
 
-                    self?.newStorefrontCountryAvailable = nil
-                    self?.profileSyncAt = Date()
-                    completion(true)
-                }
+            do {
+                try await Adapty.updateProfile(params: params)
+                log.verbose("LifecycleManager: syncProfile Done")
+
+                newStorefrontCountryAvailable = nil
+                profileSyncAt = Date()
+                return true
+            } catch {
+                log.warn("LifecycleManager: syncProfile Error: \(error)")
+                return false
             }
         } else {
-            Adapty.getProfile { [weak self] result in
-                switch result {
-                case .success:
-                    log.verbose("LifecycleManager: syncProfile Done")
-                    self?.profileSyncAt = Date()
-                    completion(true)
-                case let .failure(error):
-                    log.verbose("LifecycleManager: syncProfile Error: \(error)")
-                    completion(false)
-                }
+            do {
+                try await Adapty.getProfile()
+                log.verbose("LifecycleManager: syncProfile Done")
+                profileSyncAt = Date()
+                return true
+            } catch {
+                log.warn("LifecycleManager: syncProfile Error: \(error)")
+                return false
             }
         }
     }
 
-    private func sendAppOpenedEvent() {
+    private func sendAppOpenedEvent() async {
         if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
             log.verbose("LifecycleManager: sendAppOpenedEvent too early")
             return
@@ -131,7 +143,7 @@ final class LifecycleManager {
         do {
             try await Adapty.trackEvent(.appOpened)
             log.verbose("LifecycleManager: sendAppOpenedEvent Done")
-            self?.appOpenedSentAt = Date()
+            appOpenedSentAt = Date()
         } catch {
             log.error("LifecycleManager: sendAppOpenedEvent Error: \(error)")
         }
@@ -140,15 +152,15 @@ final class LifecycleManager {
     // MARK: - IDFA Update Logic
 
     private static let idfaStatusCheckDuration: TimeInterval = 600.0
-    private static let idfaStatusCheckInterval: Int = 5
+    private static let idfaStatusCheckInterval: TimeInterval = 5.0
     private var idfaUpdateTimerStartedAt: Date?
 
-    private func scheduleIDFAUpdate() {
+    private func scheduleIDFAUpdate() async {
         idfaUpdateTimerStartedAt = Date()
-        idfaUpdateTimerTick()
+        await idfaUpdateTimerTick()
     }
 
-    private func idfaUpdateTimerTick() {
+    private func idfaUpdateTimerTick() async {
         guard let timerStartedAt = idfaUpdateTimerStartedAt else { return }
 
         let now = Date()
@@ -159,9 +171,10 @@ final class LifecycleManager {
 
         log.verbose("LifecycleManager: idfaUpdateTimer tick")
 
-        guard let needSyncIdfa else {
-            Self.underlayQueue.asyncAfter(deadline: .now() + .seconds(Self.idfaStatusCheckInterval)) { [weak self] in
-                self?.idfaUpdateTimerTick()
+        guard let needSyncIdfa = await needSyncIdfa else {
+            Task {
+                try await Task.sleep(seconds: Self.idfaStatusCheckInterval)
+                await idfaUpdateTimerTick()
             }
             return
         }
@@ -174,11 +187,19 @@ final class LifecycleManager {
     }
 
     private var needSyncIdfa: Bool? {
-        guard let adapty = Adapty.shared, let manager = adapty.state.initialized else { return nil }
-        guard await manager.onceSentEnvironment.needSend(analyticsDisabled: adapty.profileStorage.externalAnalyticsDisabled) else {
-            return false
+        get async {
+            guard let adapty = try? Adapty.activatedSDK,
+                  let manager = adapty.profileManager
+            else {
+                return nil
+            }
+
+            guard await manager.onceSentEnvironment.needSend(analyticsDisabled: adapty.profileStorage.externalAnalyticsDisabled) else {
+                return false
+            }
+            
+            guard await Environment.Device.idfa != nil else { return nil }
+            return true
         }
-        guard Environment.Device.idfa != nil else { return nil }
-        return true
     }
 }

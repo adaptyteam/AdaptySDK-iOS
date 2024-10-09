@@ -66,3 +66,13 @@ package extension Task where Failure == Error {
         }
     }
 }
+
+package extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: TimeInterval) async throws {
+        if #available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *) {
+            try await Task.sleep(for: .seconds(seconds))
+        } else {
+            try await Task.sleep(nanoseconds: UInt64(seconds * Double(NSEC_PER_SEC)))
+        }
+    }
+}

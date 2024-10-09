@@ -10,7 +10,8 @@ import Foundation
 extension Adapty {
     static let eventsManager = EventsManager(profileStorage: profileIdentifierStorage)
 
-    private static func trackEvent(_ event: Event) async throws {
+    // TODO: check if need to make private
+    static func trackEvent(_ event: Event) async throws {
         do {
             try await Adapty.eventsManager.trackEvent(event, profileId: profileIdentifierStorage.profileId)
         } catch {
