@@ -7,7 +7,7 @@
 
 import Foundation
 
-private let log = Log.Category(name: "ProductStatesCache")
+private let log = Log.storage
 
 @AdaptyActor
 final class ProductStatesCache: Sendable {

@@ -7,7 +7,7 @@
 
 import StoreKit
 
-private let log = Log.Category(name: "SK2TransactionObserver")
+private let log = Log.sk2TransactionManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 enum SK2TransactionObserver {

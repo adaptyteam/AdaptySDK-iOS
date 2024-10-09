@@ -7,7 +7,7 @@
 
 import StoreKit
 
-private let log = Log.Category(name: "SK1QueueManager")
+private let log = Log.sk1QueueManager
 
 actor SK1QueueManager: Sendable {
     private let purchaseValidator: PurchaseValidator

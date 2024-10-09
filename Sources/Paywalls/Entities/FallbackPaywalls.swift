@@ -7,7 +7,7 @@
 
 import Foundation
 
-private let log = Log.Category(name: "FallbackPaywalls")
+private let log = Log.fallbackPaywalls
 
 struct FallbackPaywalls: Sendable {
     private let fileURL: URL

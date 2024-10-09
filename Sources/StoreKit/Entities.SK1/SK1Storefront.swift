@@ -15,7 +15,7 @@ extension SK1Storefront {
     }
 }
 
-private let log = Log.Category(name: "AdaptyStorefront")
+private let log = Log.storeFront
 
 extension AdaptyStorefront {
     enum StoreKit1 {

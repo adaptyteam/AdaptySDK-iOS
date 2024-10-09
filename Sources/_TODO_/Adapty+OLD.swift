@@ -9,7 +9,8 @@ import Foundation
 
 @AdaptyActor
 public final class Adapty: Sendable {
-    
+    static var shared: Adapty?
+
     static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
 
     let profileStorage: ProfileStorage

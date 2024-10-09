@@ -17,7 +17,7 @@ extension SK2Storefront {
     }
 }
 
-private let log = Log.Category(name: "AdaptyStorefront")
+private let log = Log.storeFront
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyStorefront {

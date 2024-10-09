@@ -7,7 +7,7 @@
 
 import Foundation
 
-private let log = Log.Category(name: "SK1ProductsManager")
+private let log = Log.sk1ProductManager
 
 actor SK1ProductsManager: StoreKitProductsManager {
     private let apiKeyPrefix: String

@@ -7,7 +7,7 @@
 
 import Foundation
 
-private let log = Log.Category(name: "SK2ProductsManager")
+private let log = Log.sk2ProductManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2ProductsManager: StoreKitProductsManager {

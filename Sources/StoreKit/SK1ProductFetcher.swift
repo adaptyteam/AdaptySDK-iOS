@@ -7,7 +7,7 @@
 
 import StoreKit
 
-private let log = Log.Category(name: "SK1ProductsManager")
+private let log = Log.sk1ProductManager
 
 actor SK1ProductFetcher {
     private let fetcher = _SK1ProductFetcher()

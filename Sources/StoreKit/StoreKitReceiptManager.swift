@@ -7,7 +7,7 @@
 
 import StoreKit
 
-private let log = Log.Category(name: "StoreKitReceiptManager")
+private let log = Log.skReceiptManager
 
 actor StoreKitReceiptManager {
     private let session: Backend.MainExecutor

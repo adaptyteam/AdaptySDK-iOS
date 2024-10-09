@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.default
+
 extension Adapty {
     /// Use this method to initialize the Adapty SDK.
     ///
@@ -40,6 +42,8 @@ extension Adapty {
         try await activate(with: builder.build())
     }
 
+    public static var isActivated: Bool { shared != nil }
+
     /// Use this method to initialize the Adapty SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
@@ -48,20 +52,44 @@ extension Adapty {
     public nonisolated static func activate(
         with configuration: Adapty.Configuration
     ) async throws {
-        let logName = "activate"
-        
-        let logParams: EventParameters = [
-            "observer_mode": configuration.observerMode,
-            "has_customer_user_id": configuration.customerUserId != nil,
-            "idfa_collection_disabled": configuration.idfaCollectionDisabled,
-            "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
-        ]
-        
-        // TODO: not implemented
+        try await withOptioanalSDK(
+            methodName: .activate,
+            logParams: [
+                "observer_mode": configuration.observerMode,
+                "has_customer_user_id": configuration.customerUserId != nil,
+                "idfa_collection_disabled": configuration.idfaCollectionDisabled,
+                "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
+            ]
+        ) { @AdaptyActor _ in
 
-        if let logLevel = configuration.logLevel {
-            await Log.set(level: logLevel)
+            if Adapty.isActivated {
+                let error = AdaptyError.activateOnceError()
+                log.warn("Adapty activate error \(error)")
+                throw error
+            }
+
+            if let logLevel = configuration.logLevel { Adapty.logLevel = logLevel }
+
+            UserDefaults.standard.clearAllDataIfDifferent(apiKey: configuration.apiKey)
+
+            Adapty.callbackDispatchQueue = configuration.callbackDispatchQueue
+            Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled
+            Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled
+
+            let environment = await Environment.instance
+            let backend = Backend(with: configuration, envorinment: environment)
+
+            shared = Adapty(
+                apiKeyPrefix: String(configuration.apiKey.prefix(while: { $0 != "." })),
+                profileStorage: UserDefaults.standard,
+                backend: backend,
+                customerUserId: configuration.customerUserId,
+                isObserveMode: configuration.observerMode
+            )
+
+//            LifecycleManager.shared.initialize()
+
+            log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
         }
     }
-    
 }

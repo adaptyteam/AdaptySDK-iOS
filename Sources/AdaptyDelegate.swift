@@ -32,7 +32,7 @@ extension Adapty {
     
     nonisolated static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
         guard let delegate = Adapty.delegate else { return }
-        (Adapty.dispatchQueue ?? .main).async {
+        (Adapty.callbackDispatchQueue ?? .main).async {
             call(delegate)
         }
     }

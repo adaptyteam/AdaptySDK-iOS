@@ -30,7 +30,7 @@ extension Adapty {
     }
 }
 
-private let log = Log.Category(name: "PaywallsCache")
+private let log = Log.fallbackPaywalls
 
 extension PaywallsCache {
     /// 2
