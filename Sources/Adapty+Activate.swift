@@ -42,7 +42,7 @@ extension Adapty {
         try await activate(with: builder.build())
     }
 
-    public static var isActivated: Bool { shared != nil }
+    public private(set) static var isActivated: Bool = false
 
     /// Use this method to initialize the Adapty SDK.
     ///
@@ -68,6 +68,8 @@ extension Adapty {
                 throw error
             }
 
+            Adapty.isActivated = true
+
             if let logLevel = configuration.logLevel { Adapty.logLevel = logLevel }
 
             UserDefaults.standard.clearAllDataIfDifferent(apiKey: configuration.apiKey)
@@ -78,6 +80,10 @@ extension Adapty {
 
             let environment = await Environment.instance
             let backend = Backend(with: configuration, envorinment: environment)
+
+            Task {
+                await Adapty.eventsManager.set(backend: backend)
+            }
 
             shared = Adapty(
                 apiKeyPrefix: String(configuration.apiKey.prefix(while: { $0 != "." })),
