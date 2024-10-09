@@ -141,7 +141,6 @@ enum MethodName: String {
     case getPaywallForDefaultAudience = "get_untargeted_paywall"
     case setFallbackPaywalls = "set_fallback_paywalls"
 
-    
     case logShowOnboarding = "log_show_onboarding"
     case logShowPaywall = "log_show_paywall"
 
@@ -198,13 +197,15 @@ enum AppleMethodName: String {
     case fetchASAToken = "fetch_ASA_Token"
     case fetchSK1Products = "fetch_sk1_products"
     case fetchSK2Products = "fetch_sk2_products"
-    
+
     case getAllSK1Transactions = "get_all_sk1_transactions"
     case getAllSK2Transactions = "get_all_sk2_transactions"
-    
+
     case getReceipt = "get_receipt"
     case refreshReceipt = "refresh_receipt"
 
+    case finishTransaction = "finish_transaction"
+    case addPayment = "add_payment"
 }
 
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {

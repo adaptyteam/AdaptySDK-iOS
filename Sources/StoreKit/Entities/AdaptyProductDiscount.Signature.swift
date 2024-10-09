@@ -40,3 +40,5 @@ extension AdaptyProductDiscount.Signature: Decodable {
         self.timestamp = NSNumber(value: timestamp)
     }
 }
+
+

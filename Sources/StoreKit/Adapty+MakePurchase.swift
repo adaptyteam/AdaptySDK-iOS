@@ -26,37 +26,16 @@ extension Adapty {
             ]
         ) { sdk in
 
-            guard SKPaymentQueue.canMakePayments() else {
-                throw AdaptyError.cantMakePayments()
-            }
+            guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
+                guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
 
-            guard let discountId = product.promotionalOfferId else {
-                return try await sdk.sk1QueueManager.makePurchase(
-                    payment: SKPayment(product: product.skProduct),
+                return try await manager.makePurchase(
+                    profileId: sdk.profileStorage.profileId,
                     product: product
                 )
             }
 
-            let profileId = sdk.profileStorage.profileId
-
-            do {
-                let response = try await sdk.httpSession.signSubscriptionOffer(
-                    profileId: profileId,
-                    vendorProductId: product.vendorProductId,
-                    discountId: discountId
-                )
-
-                let payment = SKMutablePayment(product: product.skProduct)
-                payment.applicationUsername = ""
-                payment.paymentDiscount = response.discount(identifier: discountId)
-
-                return try await sdk.sk1QueueManager.makePurchase(
-                    payment: payment,
-                    product: product
-                )
-            } catch {
-                throw error.asAdaptyError
-            }
+            throw AdaptyError.cantMakePayments()
         }
     }
 

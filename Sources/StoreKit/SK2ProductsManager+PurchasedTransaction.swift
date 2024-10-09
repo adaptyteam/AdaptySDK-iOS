@@ -14,11 +14,11 @@ extension SK2ProductsManager {
     func fillPurchasedTransaction(
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK1Transaction sk1Transaction: (value: SK1Transaction, id: String)
+        sk1Transaction: SK1TransactionWithIdentifier
     ) async -> PurchasedTransaction {
         await .init(
             sk2Product: try? fetchSK2Product(
-                id: sk1Transaction.value.payment.productIdentifier,
+                id: sk1Transaction.unfProductID,
                 fetchPolicy: .returnCacheDataElseLoad
             ),
             variationId: variationId,
@@ -30,11 +30,11 @@ extension SK2ProductsManager {
     func fillPurchasedTransaction(
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK2Transaction sk2Transaction: SK2Transaction
+        sk2Transaction: SK2Transaction
     ) async -> PurchasedTransaction {
         await .init(
             sk2Product: try? fetchSK2Product(
-                id: sk2Transaction.productID,
+                id: sk2Transaction.unfProductID,
                 fetchPolicy: .returnCacheDataElseLoad
             ),
             variationId: variationId,
@@ -45,24 +45,22 @@ extension SK2ProductsManager {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-private extension PurchasedTransaction {
-    init(
+extension PurchasedTransaction {
+    fileprivate init(
         sk2Product: SK2Product?,
         variationId: String?,
         persistentVariationId: String?,
-        sk1Transaction: (value: SK1Transaction, id: String)
+        sk1Transaction: SK1TransactionWithIdentifier
     ) {
-        let (sk1Transaction, transactionIdentifier) = sk1Transaction
-
         let offer = PurchasedTransaction.SubscriptionOffer(
             sk1Transaction: sk1Transaction,
             sk2Product: sk2Product
         )
 
         self.init(
-            transactionId: sk1Transaction.unfIdentifier ?? transactionIdentifier,
-            originalTransactionId: sk1Transaction.unfOriginalIdentifier ?? transactionIdentifier,
-            vendorProductId: sk1Transaction.payment.productIdentifier,
+            transactionId: sk1Transaction.unfIdentifier,
+            originalTransactionId: sk1Transaction.unfOriginalIdentifier,
+            vendorProductId: sk1Transaction.unfProductID,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: sk2Product?.price,
@@ -97,7 +95,7 @@ private extension PurchasedTransaction {
         self.init(
             transactionId: sk2Transaction.unfIdentifier,
             originalTransactionId: sk2Transaction.unfOriginalIdentifier,
-            vendorProductId: sk2Transaction.productID,
+            vendorProductId: sk2Transaction.unfProductID,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: sk2Product?.price,
@@ -112,10 +110,10 @@ private extension PurchasedTransaction {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension PurchasedTransaction.SubscriptionOffer {
     init?(
-        sk1Transaction: SK1Transaction,
+        sk1Transaction: SK1TransactionWithIdentifier,
         sk2Product: SK2Product?
     ) {
-        if let discountIdentifier = sk1Transaction.payment.paymentDiscount?.identifier {
+        if let discountIdentifier = sk1Transaction.unfOfferId {
             if let sk2ProductOffer = sk2Product?.subscriptionOffer(byType: .promotional, withId: discountIdentifier) {
                 self.init(
                     id: discountIdentifier,

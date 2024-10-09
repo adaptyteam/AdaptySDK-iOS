@@ -13,16 +13,16 @@ extension SK1ProductsManager {
     func fillPurchasedTransaction(
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK1Transaction sk1Transaction: (value: SK1Transaction, id: String)
+        sk1Transaction: SK1TransactionWithIdentifier
     ) async -> PurchasedTransaction {
         await PurchasedTransaction(
             sk1Product: try? fetchSK1Product(
-                id: sk1Transaction.value.payment.productIdentifier,
+                id: sk1Transaction.unfProductID,
                 fetchPolicy: .returnCacheDataElseLoad
             ),
             variationId: variationId,
             persistentVariationId: persistentVariationId,
-            purchasedSK1Transaction: sk1Transaction
+            sk1Transaction: sk1Transaction
         )
     }
 
@@ -30,38 +30,36 @@ extension SK1ProductsManager {
     func fillPurchasedTransaction(
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK2Transaction sk2Transaction: SK2Transaction
+        sk2Transaction: SK2Transaction
     ) async -> PurchasedTransaction {
         await PurchasedTransaction(
             sk1Product: try? fetchSK1Product(
-                id: sk2Transaction.productID,
+                id: sk2Transaction.unfProductID,
                 fetchPolicy: .returnCacheDataElseLoad
             ),
             variationId: variationId,
             persistentVariationId: persistentVariationId,
-            purchasedSK2Transaction: sk2Transaction
+            sk2Transaction: sk2Transaction
         )
     }
 }
 
-private extension PurchasedTransaction {
+extension PurchasedTransaction {
     init(
         sk1Product: SK1Product?,
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK1Transaction sk1Transaction: (value: SK1Transaction, id: String)
+        sk1Transaction: SK1TransactionWithIdentifier
     ) {
-        let (sk1Transaction, transactionIdentifier) = sk1Transaction
-
         let offer = SubscriptionOffer(
             sk1Transaction: sk1Transaction,
             sk1Product: sk1Product
         )
 
         self.init(
-            transactionId: sk1Transaction.unfIdentifier ?? transactionIdentifier,
-            originalTransactionId: sk1Transaction.unfOriginalIdentifier ?? transactionIdentifier,
-            vendorProductId: sk1Transaction.payment.productIdentifier,
+            transactionId: sk1Transaction.unfIdentifier,
+            originalTransactionId: sk1Transaction.unfOriginalIdentifier,
+            vendorProductId: sk1Transaction.unfProductID,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: sk1Product?.price.decimalValue,
@@ -73,11 +71,11 @@ private extension PurchasedTransaction {
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(
+    fileprivate init(
         sk1Product: SK1Product?,
         variationId: String?,
         persistentVariationId: String?,
-        purchasedSK2Transaction sk2Transaction: SK2Transaction
+        sk2Transaction: SK2Transaction
     ) {
         let offer: PurchasedTransaction.SubscriptionOffer? = {
             #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
@@ -97,7 +95,7 @@ private extension PurchasedTransaction {
         self.init(
             transactionId: sk2Transaction.unfIdentifier,
             originalTransactionId: sk2Transaction.unfOriginalIdentifier,
-            vendorProductId: sk2Transaction.productID,
+            vendorProductId: sk2Transaction.unfProductID,
             productVariationId: variationId,
             persistentProductVariationId: persistentVariationId,
             price: sk1Product?.price.decimalValue,
@@ -111,10 +109,10 @@ private extension PurchasedTransaction {
 
 private extension PurchasedTransaction.SubscriptionOffer {
     init?(
-        sk1Transaction: SK1Transaction,
+        sk1Transaction: SK1TransactionWithIdentifier,
         sk1Product: SK1Product?
     ) {
-        guard let offerId = sk1Transaction.payment.paymentDiscount?.identifier else {
+        guard let offerId = sk1Transaction.unfOfferId else {
             let sk1ProductOffer = sk1Product?.subscriptionOffer(
                 byType: .introductory
             )

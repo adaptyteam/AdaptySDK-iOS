@@ -327,6 +327,16 @@ extension AdaptyError {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "validate purchase failed", error: unknownError).asAdaptyError
     }
 
+    static func signSubscriptionOfferFailed(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sign subscription offer failed", error: unknownError).asAdaptyError
+    }
+
+    
     static func convertToAdaptyErrorFailed(
         unknownError: Error,
         file: String = #fileID,

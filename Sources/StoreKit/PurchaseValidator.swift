@@ -7,12 +7,18 @@
 
 import Foundation
 
-protocol PurchaseValidator: Sendable {
+protocol PurchaseValidator: AnyObject, Sendable {
     func validatePurchase(
         profileId: String?,
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws -> VH<AdaptyProfile>
+
+    func signSubscriptionOffer(
+        profileId: String,
+        vendorProductId: String,
+        offerId: String
+    ) async throws -> AdaptyProductDiscount.Signature
 }
 
 enum ValidatePurchaseReason {
@@ -37,6 +43,23 @@ extension Adapty: PurchaseValidator {
             return response
         } catch {
             throw error.asAdaptyError ?? AdaptyError.validatePurchaseFailed(unknownError: error)
+        }
+    }
+
+    func signSubscriptionOffer(
+        profileId: String,
+        vendorProductId: String,
+        offerId: String
+    ) async throws -> AdaptyProductDiscount.Signature {
+        do {
+            let response = try await httpSession.signSubscriptionOffer(
+                profileId: profileId,
+                vendorProductId: vendorProductId,
+                offerId: offerId
+            )
+            return response
+        } catch {
+            throw error.asAdaptyError ?? AdaptyError.signSubscriptionOfferFailed(unknownError: error)
         }
     }
 }

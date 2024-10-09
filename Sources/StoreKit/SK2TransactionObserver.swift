@@ -10,47 +10,35 @@ import StoreKit
 private let log = Log.Category(name: "SK2TransactionObserver")
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-actor SK2TransactionObserver {
-    private var updates: Task<Void, Never>?
-    private let productsManager: SK2ProductsManager
-    private let purchaseValidator: PurchaseValidator
-
-    init(productsManager: SK2ProductsManager, purchaseValidator: PurchaseValidator) {
-        self.purchaseValidator = purchaseValidator
-        self.productsManager = productsManager
-        self.updates = Task(priority: .utility) { await observing() }
-
-        @Sendable
-        func observing() async {
+enum SK2TransactionObserver {
+    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager) {
+        Task {
             for await verificationResult in SK2Transaction.updates {
                 switch verificationResult {
-                case let .unverified(transaction, error):
-                    log.error("Transaction \(transaction.id) (originalID: \(transaction.originalID),  productID: \(transaction.productID)) is unverified. Error: \(error.localizedDescription)")
+                case let .unverified(sk2Transaction, error):
+                    log.error("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID)) is unverified. Error: \(error.localizedDescription)")
                     continue
                 case let .verified(sk2Transaction):
-                    log.debug("Transaction \(sk2Transaction.id) (originalID: \(sk2Transaction.originalID),  productID: \(sk2Transaction.productID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
+                    log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
 
                     guard sk2Transaction.justPurchasedRenewed else { return }
 
-                    let purchasedTransaction = await productsManager.fillPurchasedTransaction(
-                        variationId: nil,
-                        persistentVariationId: nil,
-                        purchasedSK2Transaction: sk2Transaction
-                    )
+                    Task.detached {
+                        let purchasedTransaction = await productsManager.fillPurchasedTransaction(
+                            variationId: nil,
+                            persistentVariationId: nil,
+                            sk2Transaction: sk2Transaction
+                        )
 
-                    _ = try? await purchaseValidator.validatePurchase(
-                        profileId: nil,
-                        transaction: purchasedTransaction,
-                        reason: .observing
-                    )
+                        _ = try? await purchaseValidator.validatePurchase(
+                            profileId: nil,
+                            transaction: purchasedTransaction,
+                            reason: .observing
+                        )
+                    }
                 }
             }
         }
-    }
-
-    deinit {
-        updates?.cancel()
-        updates = nil
     }
 }
 

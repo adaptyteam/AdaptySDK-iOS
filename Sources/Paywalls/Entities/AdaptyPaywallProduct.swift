@@ -42,6 +42,7 @@ public struct AdaptyPaywallProduct: Sendable {
         self.paywallABTestName = paywallABTestName
         self.paywallName = paywallName
     }
+    
 }
 
 extension AdaptyPaywallProduct: AdaptyProduct {

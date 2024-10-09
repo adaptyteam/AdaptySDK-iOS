@@ -48,10 +48,11 @@ extension Adapty {
         ]) { sdk in
 
             guard sk1Transaction.transactionState == .purchased || sk1Transaction.transactionState == .restored,
-                  let transactionIdentifier = sk1Transaction.transactionIdentifier else {
+                  let id = sk1Transaction.transactionIdentifier else {
                 throw AdaptyError.wrongParamPurchasedTransaction()
             }
 
+            let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction, id: id)
             let profileId = try await sdk.createdProfileManager.profileId
 
             let purchasedTransaction =
@@ -59,13 +60,13 @@ extension Adapty {
                     await sdk.productsManager.fillPurchasedTransaction(
                         variationId: variationId,
                         persistentVariationId: nil,
-                        purchasedSK1Transaction: (value: sk1Transaction, id: transactionIdentifier)
+                        sk1Transaction: sk1Transaction
                     )
                 } else {
                     await sdk.productsManager.fillPurchasedTransaction(
                         variationId: variationId,
                         persistentVariationId: nil,
-                        purchasedSK1Transaction: (value: sk1Transaction, id: transactionIdentifier)
+                        sk1Transaction: sk1Transaction
                     )
                 }
 
@@ -99,7 +100,7 @@ extension Adapty {
             let purchasedTransaction = await sdk.productsManager.fillPurchasedTransaction(
                 variationId: variationId,
                 persistentVariationId: nil,
-                purchasedSK2Transaction: sk2Transaction
+                sk2Transaction: sk2Transaction
             )
 
             _ = try await sdk.validatePurchase(

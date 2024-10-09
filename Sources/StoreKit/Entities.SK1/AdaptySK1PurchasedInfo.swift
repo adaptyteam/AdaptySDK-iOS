@@ -16,4 +16,14 @@ struct AdaptySK1PurchasedInfo: AdaptyPurchasedInfo {
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     var sk2Transaction: SK2Transaction? { nil }
+    
+    init(profile: AdaptyProfile, sk1Transaction: SK1Transaction) {
+        self.profile = profile
+        self.transaction = sk1Transaction
+    }
+    
+    init(profile: AdaptyProfile, sk1Transaction: SK1TransactionWithIdentifier) {
+        self.profile = profile
+        self.transaction = sk1Transaction.underlay
+    }
 }

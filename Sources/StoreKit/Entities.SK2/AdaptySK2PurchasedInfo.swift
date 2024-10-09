@@ -3,7 +3,7 @@
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 16.09.2024
-//  
+//
 //
 
 import StoreKit
@@ -17,4 +17,9 @@ struct AdaptySK2PurchasedInfo: AdaptyPurchasedInfo {
     var sk1Transaction: SK1Transaction? { nil }
 
     var sk2Transaction: SK2Transaction? { transaction }
+
+    init(profile: AdaptyProfile, sk2Transaction: SK2Transaction) {
+        self.profile = profile
+        self.transaction = sk2Transaction
+    }
 }

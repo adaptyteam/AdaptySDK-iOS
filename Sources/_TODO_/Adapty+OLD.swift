@@ -24,12 +24,14 @@ public final class Adapty: Sendable {
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
     let productsManager: StoreKitProductsManager
+    var sk1QueueManager: SK1QueueManager?
 
     init(
         apiKeyPrefix: String,
         profileStorage: ProfileStorage,
         backend: Backend,
-        customerUserId _: String?
+        customerUserId _: String?,
+        isObserveMode: Bool
     ) {
         self.apiKeyPrefix = apiKeyPrefix
         self.backend = backend
@@ -42,10 +44,38 @@ public final class Adapty: Sendable {
             receiptManager = StoreKitReceiptManager(session: httpSession)
             transactionManager = SK2TransactionManager(session: httpSession)
             productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
+
         } else {
             receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
             transactionManager = receiptManager
             productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
+        }
+        Task {
+            startObserving(isObserveMode: isObserveMode)
+        }
+    }
+
+    func startObserving(isObserveMode: Bool) {
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+            if isObserveMode {
+                SK2TransactionObserver.startObserving(
+                    purchaseValidator: self,
+                    productsManager: productsManager
+                )
+            }
+        } else {
+            if isObserveMode {
+                SK1TransactionObserver.startObserving(
+                    purchaseValidator: self,
+                    productsManager: productsManager
+                )
+            } else {
+                sk1QueueManager = SK1QueueManager.startObserving(
+                    purchaseValidator: self,
+                    productsManager: productsManager,
+                    storage: UserDefaults.standard
+                )
+            }
         }
     }
 

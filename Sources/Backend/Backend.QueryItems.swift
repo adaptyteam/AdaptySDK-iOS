@@ -9,7 +9,7 @@ import Foundation
 
 private extension Backend.Request {
     static let profileIdQueryItemName = "profile_id"
-    static let discountIdQueryItemName = "offer_code"
+    static let offerIdQueryItemName = "offer_code"
     static let vendorProductIdQueryItemName = "product"
     static let disableServerCacheQueryItemName = "disable_cache"
 }
@@ -33,11 +33,11 @@ extension [HTTPRequest.QueryItems.Element] {
         return queryItems
     }
 
-    func setDiscountId(_ discountId: String?) -> Self {
-        var queryItems = filter { $0.name != Backend.Request.discountIdQueryItemName }
+    func setOfferId(_ offerId: String?) -> Self {
+        var queryItems = filter { $0.name != Backend.Request.offerIdQueryItemName }
 
-        if let discountId {
-            queryItems.append(URLQueryItem(name: Backend.Request.discountIdQueryItemName, value: discountId))
+        if let offerId {
+            queryItems.append(URLQueryItem(name: Backend.Request.offerIdQueryItemName, value: offerId))
         }
         return queryItems
     }
