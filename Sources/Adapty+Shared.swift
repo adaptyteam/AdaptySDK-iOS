@@ -12,21 +12,17 @@ private let log = Log.default
 extension Adapty {
     public static var isActivated: Bool { shared != nil }
 
-    private static var shared: Shared?
     private enum Shared {
         case activated(Adapty)
         case activating(Task<Adapty, Never>)
     }
 
+    private static var shared: Shared?
     static func set(activatingSDK task: Task<Adapty, Never>) {
-        guard shared == nil else { return }
-        shared = .activating(task)
+        if shared == nil { shared = .activating(task) }
     }
 
-    static func set(shared sdk: Adapty) {
-        if case .activated = shared { return }
-        shared = .activated(sdk)
-    }
+    static func set(shared sdk: Adapty) { shared = .activated(sdk) }
 
     static var activatedSDK: Adapty {
         get async throws {
@@ -41,7 +37,7 @@ extension Adapty {
         }
     }
 
-    static var optionalSDK: Adapty? {
+    static var optionalSDK: Adapty? { // TODO: Deprecated
         if case let .some(.activated(sdk)) = shared {
             sdk
         } else {
