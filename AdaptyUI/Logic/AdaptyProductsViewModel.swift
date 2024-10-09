@@ -266,14 +266,4 @@ extension Error {
     }
 }
 
-extension Task where Success == Never, Failure == Never {
-    static func sleep(seconds: TimeInterval) async throws {
-        if #available(iOS 16.0, *) {
-            try await Task.sleep(for: .seconds(seconds))
-        } else {
-            try await Task.sleep(nanoseconds: UInt64(seconds * Double(NSEC_PER_SEC)))
-        }
-    }
-}
-
 #endif
