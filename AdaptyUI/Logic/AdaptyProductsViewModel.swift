@@ -11,7 +11,7 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 protocol ProductsInfoProvider {
     func selectedProductInfo(by groupId: String) -> ProductInfoModel?
     func productInfo(by adaptyId: String) -> ProductInfoModel?
@@ -31,7 +31,7 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 package final class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
@@ -73,7 +73,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
         introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         observerModeResolver: AdaptyObserverModeResolver?
     ) {
-        self.logId = eventsHandler.logId
+        logId = eventsHandler.logId
         self.eventsHandler = eventsHandler
         self.paywallViewModel = paywallViewModel
 
@@ -136,30 +136,28 @@ package final class AdaptyProductsViewModel: ObservableObject {
         let logId = logId
         Log.ui.verbose("#\(logId)# loadProducts begin")
 
-        // TODO: swift 6
-//        queue.async { [weak self] in
-//            guard let self else { return }
-//
-//            self.paywallViewModel.paywall.getPaywallProducts { [weak self] result in
-//                switch result {
-//                case let .success(products):
-//                    Log.ui.verbose("#\(logId)# loadProducts success")
-//
-//                    self?.adaptyProducts = products
-//                    self?.productsLoadingInProgress = false
-//                    self?.loadProductsIntroductoryEligibilities()
-//                case let .failure(error):
-//                    Log.ui.error("#\(logId)# loadProducts fail: \(error)")
-//                    self?.productsLoadingInProgress = false
-//
-//                    if self?.eventsHandler.event_didFailLoadingProducts(with: error) ?? false {
-//                        self?.queue.asyncAfter(deadline: .now() + .seconds(2)) { [weak self] in
-//                            self?.loadProducts()
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            do {
+                let products = try await self.paywallViewModel.paywall.getPaywallProducts()
+                Log.ui.verbose("#\(logId)# loadProducts success")
+
+                self.adaptyProducts = products
+                self.productsLoadingInProgress = false
+                self.loadProductsIntroductoryEligibilities()
+            } catch {
+                Log.ui.error("#\(logId)# loadProducts fail: \(error)")
+                self.productsLoadingInProgress = false
+
+                if self.eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) {
+                    Task {
+                        try await Task.sleep(seconds: 2)
+                        self.loadProducts()
+                    }
+                }
+            }
+        }
     }
 
     private func loadProductsIntroductoryEligibilities() {
@@ -168,40 +166,14 @@ package final class AdaptyProductsViewModel: ObservableObject {
         let logId = logId
         Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities begin")
 
-        // TODO: swift 6
-//        Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
-//            switch result {
-//            case let .success(eligibilities):
-//                self?.introductoryOffersEligibilities = eligibilities
-//                Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities success: \(eligibilities)")
-//            case let .failure(error):
-//                Log.ui.error("#\(logId)# loadProductsIntroductoryEligibilities fail: \(error)")
-//            }
-//        }
-    }
-
-    private func handlePurchasedResult(
-        underlying: AdaptyPaywallProduct,
-        result: AdaptyResult<AdaptyPurchasedInfo>
-    ) {
-        switch result {
-        case let .success(info):
-            eventsHandler.event_didFinishPurchase(underlying: underlying, purchasedInfo: info)
-        case let .failure(error):
-            if error.adaptyErrorCode == .paymentCancelled {
-                eventsHandler.event_didCancelPurchase(underlying: underlying)
-            } else {
-                eventsHandler.event_didFailPurchase(underlying: underlying, error: error)
+        Task { @MainActor [weak self] in
+            do {
+                let eligibilities = try await Adapty.getProductsIntroductoryOfferEligibility(products: products)
+                self?.introductoryOffersEligibilities = eligibilities
+                Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities success: \(eligibilities)")
+            } catch {
+                Log.ui.error("#\(logId)# loadProductsIntroductoryEligibilities fail: \(error)")
             }
-        }
-    }
-
-    private func handleRestoreResult(result: AdaptyResult<AdaptyProfile>) {
-        switch result {
-        case let .success(profile):
-            eventsHandler.event_didFinishRestore(with: profile)
-        case let .failure(error):
-            eventsHandler.event_didFailRestore(with: error)
         }
     }
 
@@ -213,11 +185,11 @@ package final class AdaptyProductsViewModel: ObservableObject {
     }
 
     func purchaseProduct(id productId: String) {
-        guard let underlying = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
+        guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
         let logId = logId
         if let observerModeResolver {
             observerModeResolver.observerMode(
-                didInitiatePurchase: underlying,
+                didInitiatePurchase: product,
                 onStartPurchase: { [weak self] in
                     Log.ui.verbose("#\(logId)# observerDidStartPurchase")
                     self?.purchaseInProgress = true
@@ -228,14 +200,25 @@ package final class AdaptyProductsViewModel: ObservableObject {
                 }
             )
         } else {
-            eventsHandler.event_didStartPurchase(underlying: underlying)
+            eventsHandler.event_didStartPurchase(product: product)
             purchaseInProgress = true
 
-            // TODO: swift 6
-//            Adapty.makePurchase(underlying: underlying) { [weak self] result in
-//                self?.handlePurchasedResult(underlying: underlying, result: result)
-//                self?.purchaseInProgress = false
-//            }
+            Task { @MainActor [weak self] in
+                do {
+                    let purchasedInfo = try await Adapty.makePurchase(product: product)
+                    self?.eventsHandler.event_didFinishPurchase(product: product, purchasedInfo: purchasedInfo)
+                } catch {
+                    let adaptyError = error.asAdaptyError
+
+                    if adaptyError.adaptyErrorCode == .paymentCancelled {
+                        self?.eventsHandler.event_didCancelPurchase(product: product)
+                    } else {
+                        self?.eventsHandler.event_didFailPurchase(product: product, error: adaptyError)
+                    }
+                }
+
+                self?.purchaseInProgress = false
+            }
         }
     }
 
@@ -243,11 +226,53 @@ package final class AdaptyProductsViewModel: ObservableObject {
         eventsHandler.event_didStartRestore()
 
         restoreInProgress = true
-        // TODO: swift 6
-//        Adapty.restorePurchases { [weak self] result in
-//            self?.handleRestoreResult(result: result)
-//            self?.restoreInProgress = false
-//        }
+
+        Task { @MainActor [weak self] in
+            do {
+                let profile = try await Adapty.restorePurchases()
+                self?.eventsHandler.event_didFinishRestore(with: profile)
+            } catch {
+                self?.eventsHandler.event_didFailRestore(with: error.asAdaptyError)
+            }
+
+            self?.restoreInProgress = false
+        }
+    }
+}
+
+struct AdaptyUIUnknownError: CustomAdaptyError {
+    let error: Error
+
+    init(error: Error) {
+        self.error = error
+    }
+
+    var originalError: Error? { error }
+    let adaptyErrorCode = AdaptyError.ErrorCode.unknown
+
+    var description: String { error.localizedDescription }
+    var debugDescription: String { error.localizedDescription }
+}
+
+extension Error {
+    var asAdaptyError: AdaptyError {
+        if let adaptyError = self as? AdaptyError {
+            return adaptyError
+        } else if let customError = self as? CustomAdaptyError {
+            return customError.asAdaptyError
+        }
+
+        return AdaptyError(AdaptyUIUnknownError(error: self))
+    }
+}
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(seconds: TimeInterval) async throws {
+        if #available(iOS 16.0, *) {
+            try await Task.sleep(for: .seconds(seconds))
+        } else {
+            try await Task.sleep(nanoseconds: UInt64(seconds * Double(NSEC_PER_SEC)))
+        }
     }
 }
 

@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 package final class AdaptyUIActionsViewModel: ObservableObject {
     let logId: String
     let eventsHandler: AdaptyEventsHandler

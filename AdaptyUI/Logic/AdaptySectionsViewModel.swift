@@ -11,7 +11,7 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-@MainActor  // TODO: swift 6
+@MainActor
 package final class AdaptySectionsViewModel: ObservableObject {
     let logId: String
 
@@ -33,8 +33,7 @@ package final class AdaptySectionsViewModel: ObservableObject {
         if let stateIndex = sectionsStates[section.id] {
             return stateIndex
         } else {
-            // TODO: swift 6
-            Task { @MainActor [weak self] in
+            DispatchQueue.main.async { [weak self] in
                 self?.sectionsStates[section.id] = section.index
             }
             return section.index

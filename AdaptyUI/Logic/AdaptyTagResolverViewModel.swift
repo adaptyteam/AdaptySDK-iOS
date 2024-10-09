@@ -33,7 +33,7 @@ extension AdaptyUI {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 public protocol AdaptyTagResolver {
     func replacement(for tag: String) -> String?
 }
@@ -44,7 +44,7 @@ extension Dictionary<String, String>: AdaptyTagResolver {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 package final class AdaptyTagResolverViewModel: ObservableObject, AdaptyTagResolver {
     let tagResolver: AdaptyTagResolver?
     

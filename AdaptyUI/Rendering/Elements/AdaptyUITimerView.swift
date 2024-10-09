@@ -139,6 +139,7 @@ extension AdaptyUI.RichText {
 }
 
 @available(iOS 15.0, *)
+@MainActor
 struct AdaptyUITimerView: View, AdaptyTagResolver {
     @Environment(\.adaptyScreenId)
     private var screenId: String
@@ -199,26 +200,21 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
         }
     }
 
-    @MainActor // TODO: swift 6
     private func startTimer() {
         stopTimer()
 
         timeCounter = Timer.scheduledTimer(withTimeInterval: 0.001, repeats: true) { _ in
-            Task {
-                await MainActor.run {
-                    updateTime()
-                }
+            Task { @MainActor in
+                updateTime()
             }
         }
     }
 
-    @MainActor
     private func stopTimer() {
         timeCounter?.invalidate()
         timeCounter = nil
     }
 
-    @MainActor
     private func updateTime() {
         var timeLeft = viewModel.timeLeft(for: timer,
                                           at: Date(),

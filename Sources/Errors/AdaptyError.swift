@@ -21,7 +21,7 @@ extension AdaptyError {
         public static let statusCode = "AdaptyHTTPStatusCodeErrorKey"
     }
 
-    public enum ErrorCode: Int {
+    public enum ErrorCode: Int, Sendable {
 
         case unknown = 0
 

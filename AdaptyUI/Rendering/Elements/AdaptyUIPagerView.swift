@@ -64,6 +64,7 @@ extension View {
 }
 
 @available(iOS 15.0, *)
+@MainActor
 struct AdaptyUIPagerView: View {
     private static let pageControllTapAnimationDuration = 0.3
 
@@ -146,17 +147,9 @@ struct AdaptyUIPagerView: View {
                 currentPage = index
             }
             if shouldScheduleAutoscroll {
-                // TODO: swift 6
                 Task {
-                    if #available(iOS 16.0, *) {
-                        try await Task.sleep(for: .milliseconds(Self.pageControllTapAnimationDuration * 1000.0))
-                    } else {
-                        try await Task.sleep(nanoseconds: UInt64(Self.pageControllTapAnimationDuration * 1000000.0))
-                    }
-                    
-                    await MainActor.run {
-                        self.scheduleAutoScroll()
-                    }
+                    try await Task.sleep(seconds: Self.pageControllTapAnimationDuration)
+                    scheduleAutoScroll()
                 }
             }
         } else {
@@ -264,7 +257,6 @@ struct AdaptyUIPagerView: View {
         }
     }
 
-    @MainActor
     private func startAutoScroll() {
         guard let config = pager.animation else { return }
 
@@ -273,14 +265,12 @@ struct AdaptyUIPagerView: View {
             withTimeInterval: config.startDelay,
             repeats: false
         ) { _ in
-            // TODO: swift 6
             Task { @MainActor in
                 scheduleAutoScroll()
             }
         }
     }
 
-    @MainActor
     private func scheduleAutoScroll() {
         guard let config = pager.animation else { return }
 
@@ -289,9 +279,8 @@ struct AdaptyUIPagerView: View {
             repeats: true
         ) { _ in
             Task { @MainActor in
-                // TODO: swift 6
                 guard !isInteracting else { return }
-                
+
                 if currentPage < pager.content.count - 1 {
                     withAnimation(config.pageTransition.swiftUIAnimation) {
                         currentPage += 1

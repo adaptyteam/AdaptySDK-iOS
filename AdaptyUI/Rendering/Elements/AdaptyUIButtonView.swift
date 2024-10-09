@@ -67,7 +67,7 @@ struct AdaptyUIButtonView: View {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 extension [AdaptyUI.ActionAction] {
     func fire(
         screenId: String,
@@ -91,7 +91,7 @@ extension [AdaptyUI.ActionAction] {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 extension AdaptyUI.ActionAction {
     func fire(
         screenId: String,
@@ -125,9 +125,7 @@ extension AdaptyUI.ActionAction {
         case let .custom(id):
             switch id {
             case "$adapty_reload_data":
-                Task {
-                    await paywallViewModel.reloadData()
-                }
+                paywallViewModel.reloadData()
             default:
                 actionsViewModel.customActionOccurred(id: id)
             }

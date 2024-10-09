@@ -47,7 +47,7 @@ public extension AdaptyUI {
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 public protocol AdaptyPaywallControllerDelegate: NSObject {
     /// If user performs an action process, this method will be invoked.
     ///
@@ -175,9 +175,10 @@ public protocol AdaptyObserverModeResolver {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 public extension AdaptyUI {
     private static var isActivated: Bool = false
+    internal static var isObserverModeEnabled: Bool = false
 
     /// Use this method to initialize the AdaptyUI SDK.
     ///
@@ -185,25 +186,28 @@ public extension AdaptyUI {
     ///
     /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
     static func activate(configuration: AdaptyUI.Configuration = .default) async throws {
-        if AdaptyUI.isActivated {
-            let err = AdaptyUIError.activateOnceError
-            Log.ui.warn("AdaptyUI activate error: \(err)")
-
-            throw err
-        }
-
-        // TODO: swift 6
-        if false /*! Adapty.isActivated */ {
+        guard await Adapty.isActivated,
+              let isObserverModeEnabled = await Adapty.Configuration.observerModeEnabled
+        else {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI activate error: \(err)")
 
             throw err
         }
 
+        guard !AdaptyUI.isActivated else {
+            let err = AdaptyUIError.activateOnceError
+            Log.ui.warn("AdaptyUI activate error: \(err)")
+
+            throw err
+        }
+
+        AdaptyUI.isActivated = true
+        AdaptyUI.isObserverModeEnabled = isObserverModeEnabled
+
         AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration)
         ImageUrlPrefetcher.shared.initialize()
 
-        AdaptyUI.isActivated = true
         Log.ui.info("AdaptyUI activated with \(configuration)")
     }
 
@@ -217,7 +221,7 @@ public extension AdaptyUI {
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = 5.0
     ) async throws -> AdaptyUI.LocalizedViewConfiguration {
-        if !AdaptyUI.isActivated {
+        guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
 
@@ -248,10 +252,16 @@ public extension AdaptyUI {
         timerResolver: AdaptyTimerResolver? = nil,
         showDebugOverlay: Bool = false
     ) throws -> AdaptyPaywallController {
-        if !AdaptyUI.isActivated {
+        guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
             throw err
+        }
+
+        if isObserverModeEnabled && observerModeResolver == nil {
+            Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
+        } else if !isObserverModeEnabled && observerModeResolver != nil {
+            Log.ui.warn("You should not pass observerModeResolver if you're using Adapty in Full Mode")
         }
 
         return AdaptyPaywallController(

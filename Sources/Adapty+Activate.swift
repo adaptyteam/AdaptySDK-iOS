@@ -77,7 +77,8 @@ extension Adapty {
             Adapty.callbackDispatchQueue = configuration.callbackDispatchQueue
             Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled
             Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled
-
+            Configuration.observerModeEnabled = configuration.observerMode
+            
             let environment = await Environment.instance
             let backend = Backend(with: configuration, envorinment: environment)
 
@@ -98,4 +99,9 @@ extension Adapty {
             log.info("Adapty activated withObserverMode:\(configuration.observerMode), withCustomerUserId: \(configuration.customerUserId != nil)")
         }
     }
+}
+
+package extension Adapty.Configuration {
+    @AdaptyActor
+    static var observerModeEnabled: Bool?
 }

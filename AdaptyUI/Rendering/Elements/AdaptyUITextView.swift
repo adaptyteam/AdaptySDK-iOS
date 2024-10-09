@@ -58,7 +58,7 @@ struct AdaptyUITextView: View {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 extension AdaptyUI.RichText {
     func convertToSwiftUIText(
         tagResolver: AdaptyTagResolver,
@@ -158,7 +158,7 @@ extension UIImage {
 }
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 extension AdaptyUI.Text {
     enum ProductInfoContainer {
         case notApplicable

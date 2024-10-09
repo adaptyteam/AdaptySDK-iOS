@@ -11,7 +11,7 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-@MainActor // TODO: swift 6
+@MainActor
 package final class AdaptyEventsHandler {
     let logId: String = Log.stamp
 
@@ -73,35 +73,35 @@ package final class AdaptyEventsHandler {
         didPerformAction?(action)
     }
 
-    func event_didSelectProduct(_ underlying: AdaptyPaywallProduct) {
-        Log.ui.verbose("#\(logId)# event_didSelectProduct: \(underlying.vendorProductId)")
-        didSelectProduct?(underlying)
+    func event_didSelectProduct(_ product: AdaptyPaywallProduct) {
+        Log.ui.verbose("#\(logId)# event_didSelectProduct: \(product.vendorProductId)")
+        didSelectProduct?(product)
     }
 
-    func event_didStartPurchase(underlying: AdaptyPaywallProduct) {
+    func event_didStartPurchase(product: AdaptyPaywallProduct) {
         Log.ui.verbose("#\(logId)# makePurchase begin")
-        didStartPurchase?(underlying)
+        didStartPurchase?(product)
     }
 
-    func event_didCancelPurchase(underlying: AdaptyPaywallProduct) {
-        Log.ui.verbose("#\(logId)# event_didCancelPurchase: \(underlying.vendorProductId)")
-        didCancelPurchase?(underlying)
+    func event_didCancelPurchase(product: AdaptyPaywallProduct) {
+        Log.ui.verbose("#\(logId)# event_didCancelPurchase: \(product.vendorProductId)")
+        didCancelPurchase?(product)
     }
 
     func event_didFinishPurchase(
-        underlying: AdaptyPaywallProduct,
+        product: AdaptyPaywallProduct,
         purchasedInfo: AdaptyPurchasedInfo
     ) {
-        Log.ui.verbose("#\(logId)# event_didFinishPurchase: \(underlying.vendorProductId)")
-        didFinishPurchase?(underlying, purchasedInfo)
+        Log.ui.verbose("#\(logId)# event_didFinishPurchase: \(product.vendorProductId)")
+        didFinishPurchase?(product, purchasedInfo)
     }
 
     func event_didFailPurchase(
-        underlying: AdaptyPaywallProduct,
+        product: AdaptyPaywallProduct,
         error: AdaptyError
     ) {
-        Log.ui.verbose("#\(logId)# event_didFailPurchase: \(underlying.vendorProductId), \(error)")
-        didFailPurchase?(underlying, error)
+        Log.ui.verbose("#\(logId)# event_didFailPurchase: \(product.vendorProductId), \(error)")
+        didFailPurchase?(product, error)
     }
 
     func event_didStartRestore() {

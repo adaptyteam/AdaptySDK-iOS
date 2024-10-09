@@ -23,10 +23,7 @@ extension AdaptyPaywallProduct {
     }
 
     func pricePer(period: AdaptyPeriodUnit) -> String? {
-        guard let skProduct = sk2Product else {
-            // TODO: swift 6
-            return nil
-        }
+        guard let skProduct = sk2Product else { return nil }
         guard let subscriptionPeriod = subscriptionPeriod else { return nil }
 
         let numberOfPeriods = subscriptionPeriod.numberOfPeriods(period)

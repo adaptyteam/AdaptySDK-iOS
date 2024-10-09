@@ -38,10 +38,10 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     private let didFailRestore: (AdaptyError) -> Void
     private let didFailRendering: (AdaptyError) -> Void
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
-    
+
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
-    
+
     /// - Parameters:
     ///     - isPresented: A binding to a Boolean value that determines whether
     ///     to present the sheet.
@@ -92,14 +92,13 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         let logId = Log.stamp
 
         Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
-        
-        // TODO: swift 6
-//        if Adapty.Configuration.observerMode && observerModeResolver == nil {
-//            Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
-//        } else if !Adapty.Configuration.observerMode && observerModeResolver != nil {
-//            Log.ui.warn("You should not pass observerModeResolver if you're using Adapty in Full Mode")
-//        }
-        
+
+        if AdaptyUI.isObserverModeEnabled && observerModeResolver == nil {
+            Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
+        } else if !AdaptyUI.isObserverModeEnabled && observerModeResolver != nil {
+            Log.ui.warn("You should not pass observerModeResolver if you're using Adapty in Full Mode")
+        }
+
         self.isPresented = isPresented
         self.fullScreen = fullScreen
         self.logId = logId
@@ -162,7 +161,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
             showAlertBuilder: showAlertBuilder
         )
     }
-    
+
     public func body(content: Content) -> some View {
         if fullScreen {
             content

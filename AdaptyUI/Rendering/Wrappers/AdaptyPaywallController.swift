@@ -42,13 +42,6 @@ public class AdaptyPaywallController: UIViewController {
         let logId = Log.stamp
 
         Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
-
-        // TODO: swift 6
-//        if Adapty.Configuration.observerMode && observerModeResolver == nil {
-//            Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
-//        } else if !Adapty.Configuration.observerMode && observerModeResolver != nil {
-//            Log.ui.warn("You should not pass observerModeResolver if you're using Adapty in Full Mode")
-//        }
         
         self.logId = logId
         self.paywall = paywall

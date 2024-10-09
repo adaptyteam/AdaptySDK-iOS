@@ -8,7 +8,7 @@
 import Adapty
 import Foundation
 
-@MainActor // TODO: swift 6
+@MainActor
 package protocol AdaptyPaywallInterface {
     var id: String? { get }
     var locale: String? { get }
@@ -21,15 +21,12 @@ package protocol AdaptyPaywallInterface {
 extension AdaptyPaywall: AdaptyPaywallInterface {
     package var id: String? { placementId }
     package var locale: String? { remoteConfig?.locale }
-    
+
     package func getPaywallProducts() async throws -> [AdaptyPaywallProduct] {
-        // TODO: swift 6
-        return []
-//        Adapty.getPaywallProducts(paywall: self, completion)
+        try await Adapty.getPaywallProducts(paywall: self)
     }
 
     package func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
-        // TODO: swift 6
-//        Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration, completion)
+        try await Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration)
     }
 }

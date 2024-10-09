@@ -9,16 +9,16 @@ import Adapty
 import AdaptyUI
 import Foundation
 
+// TODO: swift 6
 struct AdaptyMockPaywall: AdaptyPaywallInterface {
     var id: String? { nil }
     var locale: String? { nil }
     var vendorProductIds: [String] { [] }
-
-    func getPaywallProducts(completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>) {
-        completion(.success([]))
+    
+    func getPaywallProducts() async throws -> [AdaptyPaywallProduct] {
+        []
     }
 
-    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration, _ completion: AdaptyErrorCompletion?) {
-        completion?(nil)
+    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
     }
 }
