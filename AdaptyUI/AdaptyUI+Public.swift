@@ -186,15 +186,15 @@ public extension AdaptyUI {
     ///
     /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
     static func activate(configuration: AdaptyUI.Configuration = .default) async throws {
-        guard await Adapty.isActivated,
-              let isObserverModeEnabled = await Adapty.Configuration.observerMode
-        else {
+        let sdk: Adapty
+        do {
+            sdk = try await Adapty.activatedSDK
+        } catch {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI activate error: \(err)")
-
             throw err
         }
-
+ 
         guard !AdaptyUI.isActivated else {
             let err = AdaptyUIError.activateOnceError
             Log.ui.warn("AdaptyUI activate error: \(err)")
@@ -203,7 +203,7 @@ public extension AdaptyUI {
         }
 
         AdaptyUI.isActivated = true
-        AdaptyUI.isObserverModeEnabled = isObserverModeEnabled
+        AdaptyUI.isObserverModeEnabled = sdk.observerMode
 
         AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration)
         ImageUrlPrefetcher.shared.initialize()

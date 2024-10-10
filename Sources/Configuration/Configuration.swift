@@ -27,8 +27,3 @@ extension Adapty {
         let crossPlatformSDK: (name: String, version: String)?
     }
 }
-
-package extension Adapty.Configuration {
-    @AdaptyActor
-    static var observerMode: Bool?
-}

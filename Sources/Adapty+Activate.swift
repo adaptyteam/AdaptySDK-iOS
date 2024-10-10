@@ -76,7 +76,6 @@ extension Adapty {
             Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue
             Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled
             Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled
-            Configuration.observerMode = configuration.observerMode
 
             let environment = await Environment.instance
             let backend = Backend(with: configuration, envorinment: environment)
@@ -86,19 +85,16 @@ extension Adapty {
             }
 
             let sdk = Adapty(
-                apiKeyPrefix: String(configuration.apiKey.prefix(while: { $0 != "." })),
+                configuration: configuration,
                 profileStorage: UserDefaults.standard,
-                backend: backend,
-                customerUserId: configuration.customerUserId,
-                isObserveMode: configuration.observerMode
+                backend: backend
             )
-
 
             trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: .activate, stamp: stamp))
             log.info("Adapty activated successfully. [\(stamp)]")
-            
+
             set(shared: sdk)
-            
+
 //            LifecycleManager.shared.initialize()
             return sdk
         }

@@ -9,13 +9,10 @@ import Foundation
 
 @AdaptyActor
 public final class Adapty: Sendable {
-
     static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
 
     let profileStorage: ProfileStorage
     let apiKeyPrefix: String
-
-    var profileManager: ProfileManager?
 
     let backend: Backend
     let httpSession: Backend.MainExecutor
@@ -27,14 +24,19 @@ public final class Adapty: Sendable {
     let productsManager: StoreKitProductsManager
     var sk1QueueManager: SK1QueueManager?
 
+
+    var profileManager: ProfileManager? // TODO: ???
+
+    let observerMode: Bool
+    
     init(
-        apiKeyPrefix: String,
+        configuration: Configuration,
         profileStorage: ProfileStorage,
-        backend: Backend,
-        customerUserId _: String?,
-        isObserveMode: Bool
+        backend: Backend
     ) {
-        self.apiKeyPrefix = apiKeyPrefix
+        let customerUserId = configuration.customerUserId
+        self.observerMode = configuration.observerMode
+        self.apiKeyPrefix = String(configuration.apiKey.prefix(while: { $0 != "." }))
         self.backend = backend
         self.profileStorage = profileStorage
         httpSession = backend.createMainExecutor()
@@ -52,7 +54,7 @@ public final class Adapty: Sendable {
             productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
         }
         Task {
-            startObserving(isObserveMode: isObserveMode)
+            startObserving(isObserveMode: observerMode)
         }
     }
 
