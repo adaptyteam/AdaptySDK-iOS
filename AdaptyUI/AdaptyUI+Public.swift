@@ -201,9 +201,8 @@ public extension AdaptyUI {
 
             throw err
         }
-
         AdaptyUI.isActivated = true
-        AdaptyUI.isObserverModeEnabled = sdk.observerMode
+        AdaptyUI.isObserverModeEnabled = await sdk.observerMode
 
         AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration)
         ImageUrlPrefetcher.shared.initialize()

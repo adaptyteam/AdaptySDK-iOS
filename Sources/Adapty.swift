@@ -27,7 +27,7 @@ public final class Adapty: Sendable {
 
     var profileManager: ProfileManager? // TODO: ???
 
-    let observerMode: Bool
+    package let observerMode: Bool
     
     init(
         configuration: Configuration,
