@@ -22,7 +22,7 @@ extension Adapty {
 
     private func getViewConfiguration(
         paywall: AdaptyPaywall,
-        loadTimeout: TimeInterval
+        loadTimeout: TaskDuration
     ) async throws -> AdaptyUI.LocalizedViewConfiguration {
         guard let container = paywall.viewConfiguration else {
             throw AdaptyError.isNoViewConfigurationInPaywall()
@@ -76,14 +76,14 @@ extension Adapty {
         paywallVariationId: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
-        loadTimeout: TimeInterval
+        loadTimeout: TaskDuration
     ) async throws -> AdaptyUI.ViewConfiguration {
         let httpSession = httpSession
         let apiKeyPrefix = apiKeyPrefix
         let isTestUser = profileManager?.profile.value.isTestUser ?? false
 
         do {
-            return try await withThrowingTimeout(seconds: loadTimeout - 0.5) {
+            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
                 try await httpSession.fetchViewConfiguration(
                     apiKeyPrefix: apiKeyPrefix,
                     paywallVariationId: paywallVariationId,

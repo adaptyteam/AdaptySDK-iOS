@@ -44,6 +44,10 @@ public struct AdaptyProfileParameters: Sendable, Hashable {
     init(ipV4Address: String) {
         self.ipV4Address = ipV4Address
     }
+    
+    init(analyticsDisabled: Bool) {
+        self.analyticsDisabled = analyticsDisabled
+    }
 
     init(customAttributes: AdaptyProfile.CustomAttributes) {
         codableCustomAttributes = customAttributes

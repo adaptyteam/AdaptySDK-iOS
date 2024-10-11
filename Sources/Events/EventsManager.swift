@@ -87,22 +87,22 @@ actor EventsManager {
                 error = err
             }
 
-            let seconds: UInt64? =
+            let interval: TaskDuration? =
                 if let error, !((error as? EventsError)?.isInterrupted ?? false) {
-                    20
+                    .seconds(20)
                 } else if await (self?.hasEvents()) ?? false {
-                    1
+                    .seconds(1)
                 } else {
                     nil
                 }
 
-            guard let seconds else {
+            guard let interval else {
                 await self?.finishSending()
                 return
             }
 
             Task.detached(priority: .utility) { [weak self] in
-                try? await Task.sleep(nanoseconds: seconds * 1_000_000_000)
+                try? await Task.sleep(duration: interval)
                 await self?.finishSending()
                 await self?.needSendEvents()
             }

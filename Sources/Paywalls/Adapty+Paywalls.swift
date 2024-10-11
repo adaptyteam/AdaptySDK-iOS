@@ -36,7 +36,7 @@ extension Adapty {
             "placement_id": placementId,
             "locale": locale,
             "fetch_policy": fetchPolicy,
-            "load_timeout": loadTimeout,
+            "load_timeout": loadTimeout.asMilliseconds,
         ]
 
         return try await withActivatedSDK(methodName: .getPaywall, logParams: logParams) { sdk in
@@ -56,7 +56,7 @@ extension Adapty {
         _ placementId: String,
         _ locale: AdaptyLocale,
         _ fetchPolicy: AdaptyPaywall.FetchPolicy,
-        _ loadTimeout: TimeInterval
+        _ loadTimeout: TaskDuration
     ) async throws -> AdaptyPaywall {
         guard let profileId = profileManager?.profileId else {
             return try await fetchFallbackPaywall(
@@ -68,7 +68,7 @@ extension Adapty {
         }
 
         do {
-            return try await withThrowingTimeout(seconds: loadTimeout - 0.5) {
+            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
                 try await self.fetchPaywall(
                     profileId,
                     placementId,
@@ -232,11 +232,11 @@ extension TimeInterval {
     public static let defaultLoadPaywallTimeout: TimeInterval = 5.0
     static let minimumLoadPaywallTimeout: TimeInterval = 1.0
 
-    var allowedLoadPaywallTimeout: TimeInterval {
+    var allowedLoadPaywallTimeout: TaskDuration {
         let minimum: TimeInterval = .minimumLoadPaywallTimeout
-        guard self < minimum else { return self }
+        guard self < minimum else { return TaskDuration(self) }
         log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
-        return minimum
+        return TaskDuration(minimum)
     }
 }
 

@@ -28,22 +28,22 @@ extension Adapty {
 
         Adapty.syncIPv4Started = true
         Task(priority: .utility) { [weak self] in
-            await self?.syncIPv4(afterMilliseconds: 0)
+            await self?.syncIPv4(after: .now)
         }
     }
 
-    private func syncIPv4(afterMilliseconds milliseconds: UInt64) async {
-        let milliseconds = min(milliseconds, 10000)
+    private func syncIPv4(after interval: TaskDuration) async {
+        let interval = min(interval, .seconds(10))
 
         do {
-            try await Task.sleep(nanoseconds: milliseconds * 1_000_000)
+            try await Task.sleep(duration: interval)
             let value = try await cachedIPv4OrFetch()
             _ = try await createdProfileManager.updateProfile(
                 params: AdaptyProfileParameters(ipV4Address: value)
             )
         } catch {
             Task(priority: .utility) { [weak self] in
-                await self?.syncIPv4(afterMilliseconds: milliseconds + 1000)
+                await self?.syncIPv4(after: interval + .seconds(1))
             }
         }
     }
