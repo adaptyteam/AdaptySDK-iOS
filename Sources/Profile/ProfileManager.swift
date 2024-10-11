@@ -129,9 +129,7 @@ private extension Adapty {
 
             if let manager = try profileManager(with: old.value.profileId) {
                 if let meta {
-                    manager.onceSentEnvironment = meta.idfa == nil
-                        ? .withoutIdfa
-                        : .withIdfa
+                    manager.onceSentEnvironment = meta.sendedEnvironment
                 }
                 manager.saveResponse(response.flatValue())
             }

@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 protocol PurchaseValidator: AnyObject, Sendable {
     func validatePurchase(
         profileId: String?,
@@ -21,13 +22,14 @@ protocol PurchaseValidator: AnyObject, Sendable {
     ) async throws -> AdaptyProductDiscount.Signature
 }
 
-enum ValidatePurchaseReason {
-    case setVariation
-    case observing
-    case purchasing
-}
 
 extension Adapty: PurchaseValidator {
+    enum ValidatePurchaseReason: Sendable, Hashable {
+        case setVariation
+        case observing
+        case purchasing
+    }
+    
     func validatePurchase(
         profileId: String?,
         transaction: PurchasedTransaction,

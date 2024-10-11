@@ -246,7 +246,7 @@ extension Adapty {
             case let .success(profile):
                 createProfileManager(
                     profile,
-                    sendedEnvironment: environmentMeta.idfa == nil ? .withoutIdfa : .withIdfa
+                    sendedEnvironment: environmentMeta.sendedEnvironment
                 )
             }
         }

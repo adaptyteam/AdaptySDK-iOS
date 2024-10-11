@@ -14,19 +14,16 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - customerUserId: User identifier in your system.
-    public nonisolated static func identify(_: String) async throws {
-        try await withActivatedSDK(methodName: .identify) { _ in
-
-            // TODO:
-//           try await sdk.identify(toCustomerUserId: customerUserId)
+    public nonisolated static func identify(_ customerUserId: String) async throws {
+        try await withActivatedSDK(methodName: .identify) { sdk in
+            try await sdk.identify(toCustomerUserId: customerUserId)
         }
     }
 
     /// You can logout the user anytime by calling this method.
     public nonisolated static func logout() async throws {
-        try await withActivatedSDK(methodName: .logout) { _ in
-            // TODO:
-//            try await sdk.startLogout(completion)
+        try await withActivatedSDK(methodName: .logout) { sdk in
+            try await sdk.logout()
         }
     }
 }

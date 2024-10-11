@@ -73,9 +73,9 @@ extension Adapty {
 
             UserDefaults.standard.clearAllDataIfDifferent(apiKey: configuration.apiKey)
 
-            Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue
-            Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled
-            Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled
+            Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue //TODO: Refactoring
+            Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled //TODO: Refactoring
+            Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled //TODO: Refactoring
 
             let environment = await Environment.instance
             let backend = Backend(with: configuration, envorinment: environment)
@@ -84,7 +84,7 @@ extension Adapty {
                 await Adapty.eventsManager.set(backend: backend)
             }
 
-            let sdk = Adapty(
+            let sdk = await Adapty(
                 configuration: configuration,
                 profileStorage: UserDefaults.standard,
                 backend: backend
