@@ -121,14 +121,14 @@ public final class Adapty: Sendable {
         switch result {
         case let .success(value):
             profile = value
-        case let .failure(error):
+        case .failure:
             // TODO: ???
             // if let error = error.wrapped as? HTTPError {
             //     self.callProfileManagerCompletionHandlers(.failure(.profileCreateFailed(error)))
             // }
 
             // TODO: is wrong api key - return error
-            
+
             return try await createNewProfileOnServer(profileId, customerUserId, after: .milliseconds(100))
         }
 
@@ -145,23 +145,29 @@ public final class Adapty: Sendable {
 }
 
 extension Adapty {
-    func identify(toCustomerUserId _: String) async throws {}
+    func identify(toCustomerUserId newCustomerUserId: String) async throws {
+//        switch sharedProfileManager {
+//        case let .current(manager):
+//            guard manager.profile.value.customerUserId != newCustomerUserId else { return }
+//        case let .creating(_, customerUserId, task):
+//            guard customerUserId != newCustomerUserId else { return }
+//            task.cancel
+//        }
+    }
 
     func logout() async throws {
-//        switch sharedProfileManager {
-//        case .none:
-//            throw AdaptyError.profileWasChanged()
-//        case let .current(manager):
-//            return manager
-//        case let .creating(_, _, task):
-//            task.cancel()
-//
-//            do {
-//                return try await task.value
-//            } catch {
-//                throw AdaptyError.profileWasChanged()
-//            }
-//        }
+        if case let .creating(_, _, task) = sharedProfileManager {
+            task.cancel()
+        }
+
+        profileStorage.clearProfile(newProfileId: nil)
+        let profileId = profileStorage.profileId
+
+        self.sharedProfileManager = .creating(
+            profileId: profileId,
+            withCustomerUserId: nil,
+            task: Task { try await createNewProfileOnServer(profileId, nil) }
+        )
     }
 }
 
