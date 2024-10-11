@@ -44,7 +44,6 @@ public final class Adapty: Sendable {
             self.transactionManager = SK2TransactionManager(session: httpSession)
             self.productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
             self.sk1QueueManager = nil
-
         } else {
             self.receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
             self.transactionManager = receiptManager
@@ -77,7 +76,10 @@ public final class Adapty: Sendable {
         profileId: String,
         customerUserId: String?
     ) -> ProfileManager.Shared {
-        if let profile = profileStorage.getProfile(profileId: profileId, withCustomerUserId: customerUserId) {
+        if let profile = profileStorage.getProfile(
+            profileId: profileId,
+            withCustomerUserId: customerUserId
+        ) {
             .current(
                 ProfileManager(storage: profileStorage, profile: profile, sendedEnvironment: .dont)
             )
@@ -85,7 +87,9 @@ public final class Adapty: Sendable {
             .creating(
                 profileId: profileId,
                 withCustomerUserId: customerUserId,
-                task: Task { try await createNewProfileOnServer(profileId, customerUserId) }
+                task: Task {
+                    try await createNewProfileOnServer(profileId, customerUserId)
+                }
             )
         }
     }
@@ -96,49 +100,56 @@ public final class Adapty: Sendable {
         after delay: TaskDuration = .now
     ) async throws -> ProfileManager {
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
-        let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
 
-        let result = await Task {
-            if delay > .now {
-                try await Task.sleep(duration: delay)
+        var delay = delay
+        var createdProfile: VH<AdaptyProfile>
+        var sendedEnvironment: ProfileManager.SendedEnvironment = .dont
+        
+        repeat {
+            var meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
+            
+            let result = await Task {
+                if delay > .now {
+                    try await Task.sleep(duration: delay)
+                }
+                return try await httpSession.createProfile(
+                    profileId: profileId,
+                    customerUserId: customerUserId,
+                    parameters: AdaptyProfileParameters(analyticsDisabled: analyticsDisabled),
+                    environmentMeta: meta
+                )
+            }.result
+            
+            guard case let .creating(creatingProfileId, creatingCustomerUserId, _) = sharedProfileManager,
+                  profileId == creatingProfileId,
+                  customerUserId == creatingCustomerUserId
+            else {
+                throw AdaptyError.profileWasChanged()
             }
-            return try await httpSession.createProfile(
-                profileId: profileId,
-                customerUserId: customerUserId,
-                parameters: AdaptyProfileParameters(analyticsDisabled: analyticsDisabled),
-                environmentMeta: meta
-            )
-        }.result
 
-        guard case let .creating(creatingProfileId, creatingCustomerUserId, _) = sharedProfileManager,
-              profileId == creatingProfileId,
-              customerUserId == creatingCustomerUserId
-        else {
-            throw AdaptyError.profileWasChanged()
-        }
+            switch result {
+            case let .success(value):
+                createdProfile = value
+                sendedEnvironment = meta.sendedEnvironment
+                break
+            case .failure:
+                // TODO: ???
+                // if let error = error.wrapped as? HTTPError {
+                //     self.callProfileManagerCompletionHandlers(.failure(.profileCreateFailed(error)))
+                // }
+                
+                // TODO: is wrong api key - return error
+                delay = .milliseconds(100)
+            }
+        } while true
 
-        let profile: VH<AdaptyProfile>
-        switch result {
-        case let .success(value):
-            profile = value
-        case .failure:
-            // TODO: ???
-            // if let error = error.wrapped as? HTTPError {
-            //     self.callProfileManagerCompletionHandlers(.failure(.profileCreateFailed(error)))
-            // }
-
-            // TODO: is wrong api key - return error
-
-            return try await createNewProfileOnServer(profileId, customerUserId, after: .milliseconds(100))
-        }
-
-        if profileId != profile.value.profileId {
-            profileStorage.clearProfile(newProfileId: profile.value.profileId)
+        if profileId != createdProfile.value.profileId {
+            profileStorage.clearProfile(newProfileId: createdProfile.value.profileId)
         }
         profileStorage.setSyncedTransactions(false)
-        profileStorage.setProfile(profile)
+        profileStorage.setProfile(createdProfile)
 
-        let manager = ProfileManager(storage: profileStorage, profile: profile, sendedEnvironment: meta.sendedEnvironment)
+        let manager = ProfileManager(storage: profileStorage, profile: createdProfile, sendedEnvironment: sendedEnvironment)
         self.sharedProfileManager = .current(manager)
         return manager
     }
