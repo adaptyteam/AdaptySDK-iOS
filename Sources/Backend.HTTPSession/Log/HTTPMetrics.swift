@@ -61,7 +61,9 @@ struct HTTPMetrics: Sendable, Hashable {
 
             func toMillisecond(_ from: Date?, _ to: Date?) -> UInt64? {
                 guard let from, let to else { return nil }
-                return UInt64(to.timeIntervalSince(from) * 1000)
+                let delta = to.timeIntervalSince(from)
+                guard delta >= 0.0 else { return nil }
+                return UInt64(delta * 1000)
             }
         }
     }
