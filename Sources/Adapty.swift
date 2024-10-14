@@ -171,7 +171,7 @@ extension Adapty {
 
             task.cancel()
         }
-        try await logoutAndCreateNewProfileOnServer()
+        try await logoutAndCreateNewProfileOnServer(customerUserId: newCustomerUserId)
     }
 
     func logout() async throws {
