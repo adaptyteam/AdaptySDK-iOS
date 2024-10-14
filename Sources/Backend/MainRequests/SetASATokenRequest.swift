@@ -19,7 +19,7 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
     let token: String
 
     func decodeDataResponse(
-        response: HTTPDataResponse,
+        _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?
     ) throws -> Response {
         try Self.decodeResponse(

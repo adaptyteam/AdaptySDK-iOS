@@ -18,7 +18,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     let environmentMeta: Environment.Meta?
 
     func decodeDataResponse(
-        response: HTTPDataResponse,
+        _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?
     ) throws -> Response {
         try Self.decodeResponse(

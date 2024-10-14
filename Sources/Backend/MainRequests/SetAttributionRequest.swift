@@ -18,7 +18,7 @@ private struct SetAttributionRequest: HTTPDataRequest, HTTPRequestWithDecodableR
     let attribution: [String: any Sendable]
 
     func decodeDataResponse(
-        response: HTTPDataResponse,
+        _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?
     ) throws -> Response {
         try Self.decodeResponse(
