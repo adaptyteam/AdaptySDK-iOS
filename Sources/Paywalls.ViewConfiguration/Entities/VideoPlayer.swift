@@ -1,33 +1,34 @@
 //
-//  Image.swift
+//  VideoPlayer.swift
 //  AdaptyUI
 //
-//  Created by Aleksei Valiano on 25.03.2024
+//  Created by Aleksei Valiano on 24.07.2024
 //
 
 import Foundation
 
 extension AdaptyUI {
-    package struct Image: Sendable, Hashable {
+    package struct VideoPlayer: Hashable, Sendable {
         static let defaultAspectRatio = AspectRatio.fit
 
-        package let asset: Mode<ImageData>
+        package let asset: Mode<VideoData>
+
         package let aspect: AspectRatio
-        package let tint: Mode<Filling>?
+        package let loop: Bool
     }
 }
 
 #if DEBUG
-    package extension AdaptyUI.Image {
+    package extension AdaptyUI.VideoPlayer {
         static func create(
-            asset: AdaptyUI.Mode<AdaptyUI.ImageData>,
+            asset: AdaptyUI.Mode<AdaptyUI.VideoData>,
             aspect: AdaptyUI.AspectRatio = defaultAspectRatio,
-            tint: AdaptyUI.Mode<AdaptyUI.Filling>? = nil
+            loop: Bool = true
         ) -> Self {
             .init(
                 asset: asset,
                 aspect: aspect,
-                tint: tint
+                loop: loop
             )
         }
     }

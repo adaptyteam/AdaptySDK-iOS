@@ -13,7 +13,7 @@ extension AdaptyUI {
         package let onActions: [ActionAction]
         package let offActions: [ActionAction]
         package let onCondition: StateCondition
-        package let color: Color?
+        package let color: Mode<Color>?
     }
 }
 
@@ -23,7 +23,7 @@ extension AdaptyUI {
             onActions: [AdaptyUI.ActionAction],
             offActions: [AdaptyUI.ActionAction],
             onCondition: AdaptyUI.StateCondition,
-            color: AdaptyUI.Color? = nil
+            color: AdaptyUI.Mode<AdaptyUI.Color>? = nil
         ) -> Self {
             .init(
                 onActions: onActions,
@@ -37,7 +37,7 @@ extension AdaptyUI {
             sectionId: String,
             onIndex: Int = 0,
             offIndex: Int = -1,
-            color: AdaptyUI.Color? = nil
+            color: AdaptyUI.Mode<AdaptyUI.Color>? = nil
         ) -> Self {
             .init(
                 onActions: [.switchSection(id: sectionId, index: onIndex)],

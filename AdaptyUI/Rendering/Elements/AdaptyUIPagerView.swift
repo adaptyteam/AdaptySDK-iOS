@@ -245,7 +245,7 @@ struct AdaptyUIPagerView: View {
                 Circle()
                     .fill(
                         idx == currentPage ?
-                            pageControl.selectedColor.swiftuiColor :
+                        pageControl.selectedColor.swiftuiColor :
                             pageControl.color.swiftuiColor
                     )
                     .frame(width: pageControl.dotSize,

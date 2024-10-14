@@ -17,8 +17,3 @@ extension Collection {
         indices.contains(index) ? self[index] : nil
     }
 }
-
-// TODO: Почему public ?
-public struct AdaptyIdentifiablePlaceholder: Identifiable {
-    public var id: String { "placeholder" }
-}

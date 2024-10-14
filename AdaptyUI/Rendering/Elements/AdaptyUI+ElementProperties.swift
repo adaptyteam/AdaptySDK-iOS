@@ -31,8 +31,36 @@ extension View {
 }
 
 @available(iOS 15.0, *)
+extension AdaptyUI.Mode<AdaptyUI.Color> {
+    private func resolvedColor(style: UIUserInterfaceStyle) -> AdaptyUI.Color {
+        switch style {
+        case .dark:
+            return mode(.dark)
+        default:
+            return mode(.light)
+        }
+    }
+
+    var swiftuiColor: SwiftUI.Color {
+        SwiftUI.Color(uiColor)
+    }
+
+    var uiColor: UIColor {
+        UIColor {
+            resolvedColor(style: $0.userInterfaceStyle).uiColor
+        }
+    }
+}
+
+@available(iOS 15.0, *)
 extension AdaptyUI.Color {
-    var swiftuiColor: Color { Color(red: red, green: green, blue: blue, opacity: alpha) }
+    var swiftuiColor: SwiftUI.Color {
+        SwiftUI.Color(uiColor)
+    }
+
+    var uiColor: UIColor {
+        UIColor(red: red, green: green, blue: blue, alpha: alpha)
+    }
 }
 
 #endif

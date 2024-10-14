@@ -53,8 +53,8 @@ extension AdaptyUI.Pager {
             padding: .init(same: .point(6)),
             dotSize: 6,
             spacing: 6,
-            color: AdaptyUI.Color.white,
-            selectedColor: AdaptyUI.Color.lightGray
+            color: .same(AdaptyUI.Color.white),
+            selectedColor: .same(AdaptyUI.Color.lightGray)
         )
 
         package enum Layout: String {
@@ -67,8 +67,8 @@ extension AdaptyUI.Pager {
         package let padding: AdaptyUI.EdgeInsets
         package let dotSize: Double
         package let spacing: Double
-        package let color: AdaptyUI.Color
-        package let selectedColor: AdaptyUI.Color
+        package let color: AdaptyUI.Mode<AdaptyUI.Color>
+        package let selectedColor: AdaptyUI.Mode<AdaptyUI.Color>
     }
 
     package struct Animation: Sendable, Hashable {
@@ -127,8 +127,8 @@ extension AdaptyUI.Pager.Length: Hashable {
             padding: AdaptyUI.EdgeInsets = `default`.padding,
             dotSize: Double = `default`.dotSize,
             spacing: Double = `default`.spacing,
-            color: AdaptyUI.Color = `default`.color,
-            selectedColor: AdaptyUI.Color = `default`.selectedColor
+            color: AdaptyUI.Mode<AdaptyUI.Color> = `default`.color,
+            selectedColor: AdaptyUI.Mode<AdaptyUI.Color> = `default`.selectedColor
         ) -> Self {
             .init(
                 layout: layout,

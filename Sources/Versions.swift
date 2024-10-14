@@ -13,6 +13,6 @@ extension Adapty {
 }
 
 extension AdaptyUI {
-    static nonisolated let configurationFormatVersion = "4.0.0"
-    static nonisolated let builderVersion = "4_0"
+    static nonisolated let configurationFormatVersion = "4.1.0"
+    static nonisolated let builderVersion = "4_1"
 }

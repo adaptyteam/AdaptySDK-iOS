@@ -51,6 +51,8 @@ private extension AdaptyUI.ViewConfiguration.Element {
             value.referencedElemnts + (properties?.referencedElemnts(self) ?? [])
         case let .image(value, properties):
             value.referencedElemnts + (properties?.referencedElemnts(self) ?? [])
+        case let .video(value, properties):
+            value.referencedElemnts + (properties?.referencedElemnts(self) ?? [])
         case let .button(value, properties):
             value.referencedElemnts + (properties?.referencedElemnts(self) ?? [])
         case let .box(value, properties):
@@ -140,6 +142,12 @@ private extension AdaptyUI.ViewConfiguration.Text {
 }
 
 private extension AdaptyUI.ViewConfiguration.Image {
+    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+        []
+    }
+}
+
+private extension AdaptyUI.ViewConfiguration.VideoPlayer {
     var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
         []
     }

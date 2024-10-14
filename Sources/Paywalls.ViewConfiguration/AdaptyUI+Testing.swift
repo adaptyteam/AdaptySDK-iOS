@@ -15,7 +15,7 @@ import Foundation
             locale: String = "en",
             isRightToLeft: Bool = false,
             images: [String] = [],
-            colors: [String: AdaptyUI.ColorFilling] = [:],
+            colors: [String: AdaptyUI.Filling] = [:],
             strings: [String: [String]] = [:],
             content: String,
             selectedProducts: [String: String] = [:]
@@ -23,10 +23,10 @@ import Foundation
             let locale = AdaptyLocale(id: locale)
 
             let colors = colors
-                .mapValues { AdaptyUI.ViewConfiguration.Asset.filling($0.asFilling) }
+                .mapValues { AdaptyUI.ViewConfiguration.Asset.filling($0) }
 
             let assets = Dictionary(
-                images.map { ($0, AdaptyUI.ViewConfiguration.Asset.filling(.image(.resources($0)))) }
+                images.map { ($0, AdaptyUI.ViewConfiguration.Asset.image(.resources($0))) }
             ) { current, _ in current }
                 .merging(colors) { current, _ in current }
 

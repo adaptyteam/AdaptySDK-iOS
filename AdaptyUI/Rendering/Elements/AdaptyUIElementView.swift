@@ -33,7 +33,8 @@ extension AdaptyUI.Element {
              let .button(_, properties), let .row(_, properties),
              let .column(_, properties), let .section(_, properties),
              let .toggle(_, properties), let .timer(_, properties),
-             let .pager(_, properties), let .unknown(_, properties):
+             let .pager(_, properties), let .unknown(_, properties),
+             let .video(_, properties):
             return properties
         }
     }
@@ -42,6 +43,9 @@ extension AdaptyUI.Element {
 @available(iOS 15.0, *)
 struct AdaptyUIElementWithoutPropertiesView: View {
     private var element: AdaptyUI.Element
+
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
 
     init(
         _ element: AdaptyUI.Element
@@ -67,6 +71,8 @@ struct AdaptyUIElementWithoutPropertiesView: View {
             AdaptyUITextView(text)
         case let .image(image, _):
             AdaptyUIImageView(image)
+        case let .video(video, _):
+            AdaptyUIVideoView(video: video, colorScheme: colorScheme)
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):

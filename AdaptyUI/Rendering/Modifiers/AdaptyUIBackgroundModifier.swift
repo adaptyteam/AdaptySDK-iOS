@@ -12,23 +12,31 @@ import SwiftUI
 
 @available(iOS 15.0, *)
 struct AdaptyUIBackgroundModifier: ViewModifier {
-    var background: AdaptyUI.Filling?
+    var background: AdaptyUI.Background?
+
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
 
     func body(content: Content) -> some View {
         switch self.background {
         case .image(let imageData):
             content
                 .background {
-                    AdaptyUIImageView(asset: imageData,
-                                      aspect: .fill,
-                                      tint: nil)
-                        .ignoresSafeArea()
+                    AdaptyUIImageView(
+                        asset: imageData.of(self.colorScheme),
+                        aspect: .fill,
+                        tint: nil
+                    )
+                    .ignoresSafeArea()
                 }
         default:
             content
                 .background {
                     Rectangle()
-                        .fill(filling: self.background)
+                        .fill(
+                            background: self.background,
+                            colorScheme: self.colorScheme
+                        )
                         .ignoresSafeArea()
                 }
         }
@@ -38,7 +46,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
 @available(iOS 15.0, *)
 extension View {
     @ViewBuilder
-    func decorate(with background: AdaptyUI.Filling?) -> some View {
+    func decorate(with background: AdaptyUI.Background?) -> some View {
         if let background {
             modifier(AdaptyUIBackgroundModifier(background: background))
         } else {

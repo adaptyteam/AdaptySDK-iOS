@@ -17,6 +17,9 @@ struct AdaptyUITextView: View {
 
     private var text: AdaptyUI.Text
 
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+
     init(_ text: AdaptyUI.Text) {
         self.text = text
     }
@@ -29,7 +32,8 @@ struct AdaptyUITextView: View {
             richText
                 .convertToSwiftUIText(
                     tagResolver: customTagResolverViewModel,
-                    productInfo: nil
+                    productInfo: nil,
+                    colorScheme: colorScheme
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -38,7 +42,8 @@ struct AdaptyUITextView: View {
             richText
                 .convertToSwiftUIText(
                     tagResolver: customTagResolverViewModel,
-                    productInfo: nil
+                    productInfo: nil,
+                    colorScheme: colorScheme
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -48,7 +53,8 @@ struct AdaptyUITextView: View {
             richText
                 .convertToSwiftUIText(
                     tagResolver: customTagResolverViewModel,
-                    productInfo: productInfoModel
+                    productInfo: productInfoModel,
+                    colorScheme: colorScheme
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -62,7 +68,8 @@ struct AdaptyUITextView: View {
 extension AdaptyUI.RichText {
     func convertToSwiftUIText(
         tagResolver: AdaptyTagResolver,
-        productInfo: ProductInfoModel?
+        productInfo: ProductInfoModel?,
+        colorScheme: ColorScheme
     ) -> Text {
         items.reduce(Text("")) { partialResult, item in
             switch item {
@@ -99,9 +106,9 @@ extension AdaptyUI.RichText {
                     )
                 )
             case let .image(value, attr):
-                guard let uiImage = value?.textAttachmentImage(
+                guard let uiImage = value?.of(colorScheme).textAttachmentImage(
                     font: attr.uiFont,
-                    tint: attr.imgTintColor?.asColor?.uiColor
+                    tint: attr.imgTintColor?.asSolidColor?.uiColor
                 ) else {
                     return partialResult
                 }
@@ -199,7 +206,7 @@ extension AttributedString {
         result.foregroundColor = attributes?.uiColor ?? .darkText
         result.font = attributes?.uiFont ?? .adaptyDefault
 
-        if let background = attributes?.background?.asColor {
+        if let background = attributes?.background?.asSolidColor {
             result.backgroundColor = background.swiftuiColor
         }
 
@@ -219,10 +226,11 @@ extension UIFont {
     static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
 }
 
+@available(iOS 15.0, *)
 extension AdaptyUI.RichText.TextAttributes {
     var uiFont: UIFont { font.uiFont(size: size) }
-    var uiColor: UIColor? { txtColor.asColor?.uiColor }
-    var backgroundUIColor: UIColor? { background?.asColor?.uiColor }
+    var uiColor: UIColor? { txtColor.asSolidColor?.uiColor }
+    var backgroundUIColor: UIColor? { background?.asSolidColor?.uiColor }
 }
 
 #endif

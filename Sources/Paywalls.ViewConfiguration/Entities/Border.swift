@@ -10,11 +10,11 @@ import Foundation
 package extension AdaptyUI {
     struct Border: Sendable, Hashable {
         static let `default` = Border(
-            filling: .color(AdaptyUI.Color.transparent),
+            filling: .same(.solidColor(AdaptyUI.Color.transparent)),
             thickness: 1.0
         )
 
-        package let filling: AdaptyUI.ColorFilling
+        package let filling: Mode<Filling>
         package let thickness: Double
     }
 }
@@ -22,7 +22,7 @@ package extension AdaptyUI {
 #if DEBUG
     package extension AdaptyUI.Border {
         static func create(
-            filling: AdaptyUI.ColorFilling = `default`.filling,
+            filling: AdaptyUI.Mode<AdaptyUI.Filling> = `default`.filling,
             thickness: Double = `default`.thickness
         ) -> Self {
             .init(filling: filling, thickness: thickness)

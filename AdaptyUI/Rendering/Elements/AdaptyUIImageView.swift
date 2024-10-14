@@ -33,26 +33,38 @@ extension View {
 
 @available(iOS 15.0, *)
 struct AdaptyUIImageView: View {
-    var asset: AdaptyUI.ImageData
-    var aspect: AdaptyUI.AspectRatio
-    var tint: AdaptyUI.ColorFilling?
-
-    init(asset: AdaptyUI.ImageData, aspect: AdaptyUI.AspectRatio, tint: AdaptyUI.ColorFilling? = nil) {
-        self.asset = asset
-        self.aspect = aspect
-        self.tint = tint
+    enum InitializationMode {
+        case image(AdaptyUI.Image)
+        case raw(AdaptyUI.ImageData, AdaptyUI.AspectRatio, AdaptyUI.Filling?)
     }
 
-    init(_ image: AdaptyUI.Image) {
-        self.asset = image.asset
-        self.aspect = image.aspect
-        self.tint = image.tint
+    private var data: InitializationMode
+
+    init(
+        asset: AdaptyUI.ImageData,
+        aspect: AdaptyUI.AspectRatio,
+        tint: AdaptyUI.Filling? = nil
+    ) {
+        data = .raw(asset, aspect, tint)
     }
+
+    init(
+        _ image: AdaptyUI.Image
+    ) {
+        data = .image(image)
+    }
+
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
 
     @ViewBuilder
-    private func rasterImage(_ uiImage: UIImage?, tint: AdaptyUI.ColorFilling?) -> some View {
+    private func rasterImage(
+        _ uiImage: UIImage?,
+        aspect: AdaptyUI.AspectRatio,
+        tint: AdaptyUI.Filling?
+    ) -> some View {
         if let uiImage {
-            if let tint = tint?.asColor?.swiftuiColor {
+            if let tint = tint?.asSolidColor?.swiftuiColor {
                 Image(uiImage: uiImage)
                     .resizable()
                     .renderingMode(.template)
@@ -69,14 +81,18 @@ struct AdaptyUIImageView: View {
         }
     }
 
-    var body: some View {
+    @ViewBuilder
+    private func resolvedSchemeBody(
+        asset: AdaptyUI.ImageData,
+        aspect: AdaptyUI.AspectRatio,
+        tint: AdaptyUI.Filling?
+    ) -> some View {
         switch asset {
         case let .resources(name):
-            rasterImage(UIImage(named: name), tint: tint)
+            rasterImage(UIImage(named: name), aspect: aspect, tint: tint)
         case let .raster(data):
-            rasterImage(UIImage(data: data), tint: tint)
+            rasterImage(UIImage(data: data), aspect: aspect, tint: tint)
         case let .url(url, preview):
-            
             KFImage
                 .url(url)
                 .resizable()
@@ -84,11 +100,24 @@ struct AdaptyUIImageView: View {
                 .background {
                     if let preview {
                         let image = UIImage(data: preview)
-                        rasterImage(image, tint: tint)
+                        rasterImage(image, aspect: aspect, tint: tint)
                     } else {
                         EmptyView()
                     }
                 }
+        }
+    }
+
+    var body: some View {
+        switch data {
+        case let .image(image):
+            resolvedSchemeBody(
+                asset: image.asset.of(colorScheme),
+                aspect: image.aspect,
+                tint: image.tint?.of(colorScheme)
+            )
+        case let .raw(asset, aspect, tint):
+            resolvedSchemeBody(asset: asset, aspect: aspect, tint: tint)
         }
     }
 }

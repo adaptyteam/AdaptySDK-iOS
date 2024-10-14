@@ -54,7 +54,7 @@ package final class AdaptyPaywallViewModel: ObservableObject {
                 Log.ui.verbose("#\(logId)# paywall reloadData begin")
                 
                 let paywall = try await Adapty.getPaywall(placementId: placementId, locale: paywall.locale)
-                let viewConfiguration = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
+                let viewConfiguration = try await Adapty.getViewConfiguration(paywall: paywall)
                 
                 self.paywall = paywall
                 self.viewConfiguration = viewConfiguration

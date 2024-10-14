@@ -33,7 +33,9 @@ extension AdaptyUI.ImageData: Hashable {
 }
 
 extension AdaptyUI.ImageData: Decodable {
-    enum CodingKeys: String, CodingKey {
+    static let assetType = "image"
+
+    private enum CodingKeys: String, CodingKey {
         case data = "value"
         case url
         case previewData = "preview_value"

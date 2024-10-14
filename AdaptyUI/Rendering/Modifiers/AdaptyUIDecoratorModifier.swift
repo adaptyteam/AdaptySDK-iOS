@@ -10,24 +10,30 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 13.0, *)
+extension AdaptyUI.Mode {
+    func of(_ colorScheme: ColorScheme) -> T {
+        switch colorScheme {
+        case .light: mode(.light)
+        case .dark: mode(.dark)
+        @unknown default: mode(.light)
+        }
+    }
+}
+
 @available(iOS 15.0, *)
 extension InsettableShape {
     @ViewBuilder
-    func fill(filling: AdaptyUI.Filling?) -> some View {
-        if let filling {
-            switch filling {
-            case let .color(color):
-                self.fill(color.swiftuiColor)
-            case let .colorGradient(gradient):
-                self.fill(
-                    LinearGradient(
-                        stops: gradient.items.map { $0.gradientStop },
-                        startPoint: gradient.start.unitPoint,
-                        endPoint: gradient.end.unitPoint
-                    )
-                )
-                switch gradient.kind {
-                case .linear:
+    func fill(background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
+        if let background {
+            switch background {
+            case .image:
+                self
+            case let .filling(filling):
+                switch filling.of(colorScheme) {
+                case let .solidColor(color):
+                    self.fill(color.swiftuiColor)
+                case let .colorGradient(gradient):
                     self.fill(
                         LinearGradient(
                             stops: gradient.items.map { $0.gradientStop },
@@ -35,26 +41,34 @@ extension InsettableShape {
                             endPoint: gradient.end.unitPoint
                         )
                     )
-                case .conic:
-                    self.fill(
-                        AngularGradient(
-                            gradient: .init(stops: gradient.items.map { $0.gradientStop }),
-                            center: .center,
-                            angle: .degrees(360)
+                    switch gradient.kind {
+                    case .linear:
+                        self.fill(
+                            LinearGradient(
+                                stops: gradient.items.map { $0.gradientStop },
+                                startPoint: gradient.start.unitPoint,
+                                endPoint: gradient.end.unitPoint
+                            )
                         )
-                    )
-                case .radial:
-                    self.fill(
-                        RadialGradient(
-                            gradient: .init(stops: gradient.items.map { $0.gradientStop }),
-                            center: .center,
-                            startRadius: 0.0,
-                            endRadius: 1.0
+                    case .conic:
+                        self.fill(
+                            AngularGradient(
+                                gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                                center: .center,
+                                angle: .degrees(360)
+                            )
                         )
-                    )
+                    case .radial:
+                        self.fill(
+                            RadialGradient(
+                                gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                                center: .center,
+                                startRadius: 0.0,
+                                endRadius: 1.0
+                            )
+                        )
+                    }
                 }
-            case .image:
-                self
             }
         } else {
             self
@@ -62,12 +76,12 @@ extension InsettableShape {
     }
 
     @ViewBuilder
-    func stroke(filling: AdaptyUI.ColorFilling?, lineWidth: CGFloat) -> some View {
+    func stroke(filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
         if let filling {
             switch filling {
-            case .color(let color):
+            case let .solidColor(color):
                 self.strokeBorder(color.swiftuiColor, lineWidth: lineWidth)
-            case .colorGradient(let gradient):
+            case let .colorGradient(gradient):
                 switch gradient.kind {
                 case .linear:
                     self.strokeBorder(
@@ -110,7 +124,7 @@ extension View {
     @ViewBuilder
     func clipShape(_ shape: AdaptyUI.ShapeType) -> some View {
         switch shape {
-        case .rectangle(let radii):
+        case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
             } else {
@@ -129,32 +143,32 @@ extension View {
 @available(iOS 15.0, *)
 extension AdaptyUI.ShapeType {
     @ViewBuilder
-    func swiftUIShapeFill(_ filling: AdaptyUI.Filling?) -> some View {
+    func swiftUIShapeFill(_ background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
         switch self {
-        case .rectangle(let radii):
+        case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
-                    .fill(filling: filling)
+                    .fill(background: background, colorScheme: colorScheme)
             } else {
                 UnevenRoundedRectangleFallback(cornerRadii: radii)
-                    .fill(filling: filling)
+                    .fill(background: background, colorScheme: colorScheme)
             }
         case .circle:
             Circle()
-                .fill(filling: filling)
+                .fill(background: background, colorScheme: colorScheme)
         case .curveUp:
             CurveUpShape()
-                .fill(filling: filling)
+                .fill(background: background, colorScheme: colorScheme)
         case .curveDown:
             CurveDownShape()
-                .fill(filling: filling)
+                .fill(background: background, colorScheme: colorScheme)
         }
     }
 
     @ViewBuilder
-    func swiftUIShapeStroke(_ filling: AdaptyUI.ColorFilling?, lineWidth: CGFloat) -> some View {
+    func swiftUIShapeStroke(_ filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
         switch self {
-        case .rectangle(let radii):
+        case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
                     .stroke(filling: filling, lineWidth: lineWidth)
@@ -166,11 +180,12 @@ extension AdaptyUI.ShapeType {
             Circle()
                 .stroke(filling: filling, lineWidth: lineWidth)
         case .curveUp:
+            // Since there is no way to implement InsettableShape in a correct way, we make this hack with doubling the lineWidth
             CurveUpShape()
-                .stroke(filling: filling, lineWidth: lineWidth)
+                .stroke(filling: filling, lineWidth: lineWidth * 2.0)
         case .curveDown:
             CurveDownShape()
-                .stroke(filling: filling, lineWidth: lineWidth)
+                .stroke(filling: filling, lineWidth: lineWidth * 2.0)
         }
     }
 }
@@ -180,25 +195,30 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
     var decorator: AdaptyUI.Decorator
     var includeBackground: Bool
 
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+
     @ViewBuilder
-    private func bodyWithBackground(content: Content, background: AdaptyUI.Filling?) -> some View {
+    private func bodyWithBackground(content: Content, background: AdaptyUI.Background?) -> some View {
         if let background {
             switch background {
-            case .image(let imageData):
+            case let .image(imageData):
                 content
                     .background {
-                        if includeBackground {
-                            AdaptyUIImageView(asset: imageData,
-                                              aspect: .fill,
-                                              tint: nil)
+                        if self.includeBackground {
+                            AdaptyUIImageView(
+                                asset: imageData.of(self.colorScheme),
+                                aspect: .fill,
+                                tint: nil
+                            )
                         }
                     }
             default:
                 content
                     .background {
-                        if includeBackground {
+                        if self.includeBackground {
                             self.decorator.shapeType
-                                .swiftUIShapeFill(self.decorator.background)
+                                .swiftUIShapeFill(self.decorator.background, colorScheme: self.colorScheme)
                         }
                     }
             }
@@ -216,7 +236,7 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
             if let border = decorator.border {
                 self.decorator.shapeType
                     .swiftUIShapeStroke(
-                        border.filling,
+                        border.filling.of(self.colorScheme),
                         lineWidth: border.thickness
                     )
             }
@@ -228,14 +248,17 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
 @available(iOS 15.0, *)
 extension View {
     @ViewBuilder
-    func decorate(with decorator: AdaptyUI.Decorator?,
-                  includeBackground: Bool) -> some View
-    {
+    func decorate(
+        with decorator: AdaptyUI.Decorator?,
+        includeBackground: Bool
+    ) -> some View {
         if let decorator {
-            modifier(AdaptyUIDecoratorModifier(
-                decorator: decorator,
-                includeBackground: includeBackground
-            ))
+            modifier(
+                AdaptyUIDecoratorModifier(
+                    decorator: decorator,
+                    includeBackground: includeBackground
+                )
+            )
         } else {
             self
         }

@@ -30,3 +30,12 @@ package extension AdaptyUI {
         }
     }
 #endif
+
+extension AdaptyUI.Color: Decodable {
+    static let assetType = "color"
+    package init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let hex = try container.decode(String.self)
+        try self.init(hex: hex)
+    }
+}

@@ -48,8 +48,8 @@ public extension AdaptyUI {
     ) {
         Task {
             do {
-                let result = try await AdaptyUI.getViewConfiguration(
-                    forPaywall: paywall,
+                let result = try await Adapty.getViewConfiguration(
+                    paywall: paywall,
                     loadTimeout: loadTimeout
                 )
                 completion(.success(result))

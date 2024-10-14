@@ -14,6 +14,7 @@ extension AdaptyUI.ViewConfiguration {
         indirect case stack(AdaptyUI.ViewConfiguration.Stack, Properties?)
         case text(AdaptyUI.ViewConfiguration.Text, Properties?)
         case image(AdaptyUI.ViewConfiguration.Image, Properties?)
+        case video(AdaptyUI.ViewConfiguration.VideoPlayer, Properties?)
         indirect case button(AdaptyUI.ViewConfiguration.Button, Properties?)
         indirect case box(AdaptyUI.ViewConfiguration.Box, Properties?)
         indirect case row(AdaptyUI.ViewConfiguration.Row, Properties?)
@@ -64,6 +65,9 @@ extension AdaptyUI.ViewConfiguration.Element: Hashable {
             hasher.combine(properties)
         case let .image(value, properties):
             hasher.combine(4)
+            hasher.combine(value)
+            hasher.combine(properties)
+        case let .video(value, properties):
             hasher.combine(value)
             hasher.combine(properties)
         case let .button(value, properties):
@@ -117,6 +121,8 @@ extension AdaptyUI.ViewConfiguration.Localizer {
             try .text(text(value), properties.flatMap(elementProperties))
         case let .image(value, properties):
             try .image(image(value), properties.flatMap(elementProperties))
+        case let .video(value, properties):
+            try .video(videoPlayer(value), properties.flatMap(elementProperties))
         case let .button(value, properties):
             try .button(button(value), properties.flatMap(elementProperties))
         case let .box(value, properties):
@@ -160,6 +166,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
     enum ContentType: String, Codable {
         case text
         case image
+        case video
         case button
         case box
         case vStack = "v_stack"
@@ -199,6 +206,8 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
             self = try .text(AdaptyUI.ViewConfiguration.Text(from: decoder), propertyOrNil())
         case .image:
             self = try .image(AdaptyUI.ViewConfiguration.Image(from: decoder), propertyOrNil())
+        case .video:
+            self = try .video(AdaptyUI.ViewConfiguration.VideoPlayer(from: decoder), propertyOrNil())
         case .row:
             self = try .row(AdaptyUI.ViewConfiguration.Row(from: decoder), propertyOrNil())
         case .column:

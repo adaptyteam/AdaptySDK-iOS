@@ -27,19 +27,21 @@ public extension AdaptyUI.LocalizedViewConfiguration {
             isRightToLeft: isRightToLeft,
             images: images,
             colors: [
-                "$green_figma": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x3EBD78FF)),
-                "$green_figma_cc": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x3EBD78CC)),
-                "$black20": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x01010138)),
-                "$black80": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x010101CC)),
-                "$black": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x000000FF)),
-                "$white": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xFFFFFFFF)),
-                "$red": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xFF0000FF)),
-                "$red_2": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xF3227AFF)),
-                "$red_2_transparent": AdaptyUI.ColorFilling.createColor(value: .create(data: 0xF3227A44)),
-                "$green": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x00FF00FF)),
-                "$blue": AdaptyUI.ColorFilling.createColor(value: .create(data: 0x0000FFFF)),
-                "$light": .createColor(value: .create(data: 0xF4D13BFF)),
-                "$red_to_transparent_top_to_bottom": .createGradient(value: .create(
+                "$green_figma": .solidColor(.create(data: 0x3EBD78FF)),
+                "$green_figma_cc": .solidColor(.create(data: 0x3EBD78CC)),
+                "$black20": .solidColor(.create(data: 0x01010138)),
+                "$black80": .solidColor(.create(data: 0x010101CC)),
+                "$black": .solidColor(.create(data: 0x000000FF)),
+                "$black@dark": .solidColor(.create(data: 0xFFFFFFFF)),
+                "$white": .solidColor(.create(data: 0xFFFFFFFF)),
+                "$white@dark": .solidColor(.create(data: 0x000000FF)),
+                "$red": .solidColor(.create(data: 0xFF0000FF)),
+                "$red_2": .solidColor(.create(data: 0xF3227AFF)),
+                "$red_2_transparent": .solidColor(.create(data: 0xF3227A44)),
+                "$green": .solidColor(.create(data: 0x00FF00FF)),
+                "$blue": .solidColor(.create(data: 0x0000FFFF)),
+                "$light": .solidColor(.create(data: 0xF4D13BFF)),
+                "$red_to_transparent_top_to_bottom": .colorGradient(.create(
                     kind: .linear,
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
@@ -48,7 +50,7 @@ public extension AdaptyUI.LocalizedViewConfiguration {
                         .create(color: .create(data: 0xFF000000), p: 1.0),
                     ]
                 )),
-                "$blue_to_transparent_top_to_bottom": .createGradient(value: .create(
+                "$blue_to_transparent_top_to_bottom": .colorGradient(.create(
                     kind: .linear,
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
@@ -57,7 +59,7 @@ public extension AdaptyUI.LocalizedViewConfiguration {
                         .create(color: .create(data: 0x0000FF00), p: 1.0),
                     ]
                 )),
-                "$green_to_transparent_top_to_bottom": .createGradient(value: .create(
+                "$green_to_transparent_top_to_bottom": .colorGradient(.create(
                     kind: .linear,
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
@@ -66,7 +68,7 @@ public extension AdaptyUI.LocalizedViewConfiguration {
                         .create(color: .create(data: 0x00FF0000), p: 1.0),
                     ]
                 )),
-                "$yellow_to_purple_top_to_bottom": .createGradient(value: .create(
+                "$yellow_to_purple_top_to_bottom": .colorGradient(.create(
                     kind: .linear,
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
@@ -75,7 +77,7 @@ public extension AdaptyUI.LocalizedViewConfiguration {
                         .create(color: .create(data: 0x8A4DECFF), p: 1.0),
                     ]
                 )),
-                "$pink_to_red_top_to_bottom": .createGradient(value: .create(
+                "$pink_to_red_top_to_bottom": .colorGradient(.create(
                     kind: .linear,
                     start: .create(x: 0.5, y: 0.0),
                     end: .create(x: 0.5, y: 1.0),
@@ -115,41 +117,34 @@ public extension AdaptyUI.LocalizedViewConfiguration {
 #endif
 
 @available(iOS 15.0, *)
-public enum AdaptyUIPreviewRenderingMode: String, CaseIterable {
-    case template
-    case element
-}
-
-@available(iOS 15.0, *)
 public struct AdaptyUITestRendererView: View {
     var eventsHandler: AdaptyEventsHandler
     var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
-    var renderingMode: AdaptyUIPreviewRenderingMode
 
     public init(
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
-        renderingMode: AdaptyUIPreviewRenderingMode
+        viewConfiguration: AdaptyUI.LocalizedViewConfiguration
     ) {
         self.viewConfiguration = viewConfiguration
-        self.renderingMode = renderingMode
         self.eventsHandler = AdaptyEventsHandler()
-    }
-
-    @ViewBuilder
-    private func drawAsElement(screen: AdaptyUI.Screen) -> some View {
-        AdaptyUIElementView(screen.content)
     }
 
     public var body: some View {
         let actionsVM = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
         let sectionsVM = AdaptySectionsViewModel(logId: "AdaptyUITesting")
-        let paywallVM = AdaptyPaywallViewModel(eventsHandler: eventsHandler,
-                                               paywall: AdaptyMockPaywall(),
-                                               viewConfiguration: viewConfiguration)
-        let productsVM = AdaptyProductsViewModel(eventsHandler: eventsHandler,
-                                                 paywallViewModel: paywallVM,
-                                                 products: nil,
-                                                 introductoryOffersEligibilities: nil)
+
+        let paywallVM = AdaptyPaywallViewModel(
+            eventsHandler: eventsHandler,
+            paywall: AdaptyMockPaywall(),
+            viewConfiguration: viewConfiguration
+        )
+
+        let productsVM = AdaptyProductsViewModel(
+            eventsHandler: eventsHandler,
+            paywallViewModel: paywallVM,
+            products: nil,
+            introductoryOffersEligibilities: nil,
+            observerModeResolver: nil
+        )
         let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])
         let screensVM = AdaptyScreensViewModel(
             eventsHandler: eventsHandler,
@@ -164,6 +159,8 @@ public struct AdaptyUITestRendererView: View {
             screensViewModel: screensVM
         )
 
+        let videoVM = AdaptyVideoViewModel(eventsHandler: eventsHandler)
+
         AdaptyUIElementView(viewConfiguration.screen.content)
             .environmentObject(paywallVM)
             .environmentObject(actionsVM)
@@ -172,6 +169,7 @@ public struct AdaptyUITestRendererView: View {
             .environmentObject(tagResolverVM)
             .environmentObject(timerVM)
             .environmentObject(screensVM)
+            .environmentObject(videoVM)
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }

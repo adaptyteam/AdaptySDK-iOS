@@ -66,7 +66,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///     - product: an ``AdaptyPaywallProduct`` which was selected.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didSelectProduct underlying: AdaptyPaywallProduct
+        didSelectProduct product: AdaptyPaywallProduct
     )
 
     /// If user initiates the purchase process, this method will be invoked.
@@ -76,7 +76,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didStartPurchase underlying: AdaptyPaywallProduct
+        didStartPurchase product: AdaptyPaywallProduct
     )
 
     /// This method is invoked when a successful purchase is made.
@@ -91,7 +91,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///   - purchasedInfo: an ``AdaptyPurchasedInfo`` object containing up to date information about successful purchase.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFinishPurchase underlying: AdaptyPaywallProduct,
+        didFinishPurchase product: AdaptyPaywallProduct,
         purchasedInfo: AdaptyPurchasedInfo
     )
 
@@ -102,7 +102,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///   - error: an ``AdaptyError`` object representing the error.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailPurchase underlying: AdaptyPaywallProduct,
+        didFailPurchase product: AdaptyPaywallProduct,
         error: AdaptyError
     )
 
@@ -112,7 +112,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didCancelPurchase underlying: AdaptyPaywallProduct
+        didCancelPurchase product: AdaptyPaywallProduct
     )
 
     /// If user initiates the restore process, this method will be invoked.
@@ -168,7 +168,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
 @available(iOS 15.0, *)
 public protocol AdaptyObserverModeResolver {
     func observerMode(
-        didInitiatePurchase underlying: AdaptyPaywallProduct,
+        didInitiatePurchase product: AdaptyPaywallProduct,
         onStartPurchase: @escaping () -> Void,
         onFinishPurchase: @escaping () -> Void
     )
@@ -210,7 +210,7 @@ public extension AdaptyUI {
         Log.ui.info("AdaptyUI activated with \(configuration)")
     }
 
-    /// If you are using the [Paywall Builder](https://docs.adapty.io/docs/paywall-builder-getting-started), you can use this method to get a configuration object for your paywall.
+    /// If you are using the [Paywall Builder](https://adapty.io/docs/3.0/adapty-paywall-builder), you can use this method to get a configuration object for your paywall.
     ///
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
