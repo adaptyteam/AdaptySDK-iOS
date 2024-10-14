@@ -96,21 +96,19 @@ public final class Adapty: Sendable {
 
     private func createNewProfileOnServer(
         _ profileId: String,
-        _ customerUserId: String?,
-        after delay: TaskDuration = .now
+        _ customerUserId: String?
     ) async throws -> ProfileManager {
-        let analyticsDisabled = profileStorage.externalAnalyticsDisabled
+        var isFerstLoop = true
 
-        var delay = delay
-        var createdProfile: VH<AdaptyProfile>
-        var sendedEnvironment: ProfileManager.SendedEnvironment = .dont
-        
-        repeat {
-            var meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
-            
+        let analyticsDisabled = profileStorage.externalAnalyticsDisabled
+        while true {
+            let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
+
             let result = await Task {
-                if delay > .now {
-                    try await Task.sleep(duration: delay)
+                if isFerstLoop {
+                    isFerstLoop = false
+                } else {
+                    try await Task.sleep(duration: .milliseconds(100))
                 }
                 return try await httpSession.createProfile(
                     profileId: profileId,
@@ -119,7 +117,7 @@ public final class Adapty: Sendable {
                     environmentMeta: meta
                 )
             }.result
-            
+
             guard case let .creating(creatingProfileId, creatingCustomerUserId, _) = sharedProfileManager,
                   profileId == creatingProfileId,
                   customerUserId == creatingCustomerUserId
@@ -128,57 +126,73 @@ public final class Adapty: Sendable {
             }
 
             switch result {
-            case let .success(value):
-                createdProfile = value
-                sendedEnvironment = meta.sendedEnvironment
-                break
+            case let .success(createdProfile):
+
+                if profileId != createdProfile.value.profileId {
+                    profileStorage.clearProfile(newProfileId: createdProfile.value.profileId)
+                }
+                profileStorage.setSyncedTransactions(false)
+                profileStorage.setProfile(createdProfile)
+
+                let manager = ProfileManager(
+                    storage: profileStorage,
+                    profile: createdProfile,
+                    sendedEnvironment: meta.sendedEnvironment
+                )
+                self.sharedProfileManager = .current(manager)
+                return manager
+
             case .failure:
                 // TODO: ???
                 // if let error = error.wrapped as? HTTPError {
                 //     self.callProfileManagerCompletionHandlers(.failure(.profileCreateFailed(error)))
                 // }
-                
                 // TODO: is wrong api key - return error
-                delay = .milliseconds(100)
+                continue
             }
-        } while true
-
-        if profileId != createdProfile.value.profileId {
-            profileStorage.clearProfile(newProfileId: createdProfile.value.profileId)
         }
-        profileStorage.setSyncedTransactions(false)
-        profileStorage.setProfile(createdProfile)
-
-        let manager = ProfileManager(storage: profileStorage, profile: createdProfile, sendedEnvironment: sendedEnvironment)
-        self.sharedProfileManager = .current(manager)
-        return manager
     }
 }
 
 extension Adapty {
     func identify(toCustomerUserId newCustomerUserId: String) async throws {
-//        switch sharedProfileManager {
-//        case let .current(manager):
-//            guard manager.profile.value.customerUserId != newCustomerUserId else { return }
-//        case let .creating(_, customerUserId, task):
-//            guard customerUserId != newCustomerUserId else { return }
-//            task.cancel
-//        }
+        switch sharedProfileManager {
+        case .none:
+            break
+        case let .current(manager):
+            guard manager.profile.value.customerUserId != newCustomerUserId else {
+                return
+            }
+        case let .creating(_, customerUserId, task):
+            guard customerUserId != newCustomerUserId else {
+                _ = try await task.value
+                return
+            }
+
+            task.cancel()
+        }
+        try await logoutAndCreateNewProfileOnServer()
     }
 
     func logout() async throws {
         if case let .creating(_, _, task) = sharedProfileManager {
             task.cancel()
         }
+        return try await logoutAndCreateNewProfileOnServer()
+    }
 
+    private func logoutAndCreateNewProfileOnServer(customerUserId: String? = nil) async throws {
         profileStorage.clearProfile(newProfileId: nil)
         let profileId = profileStorage.profileId
 
+        let task = Task { try await createNewProfileOnServer(profileId, customerUserId) }
         self.sharedProfileManager = .creating(
             profileId: profileId,
-            withCustomerUserId: nil,
-            task: Task { try await createNewProfileOnServer(profileId, nil) }
+            withCustomerUserId: customerUserId,
+            task: task
         )
+
+        _ = try await task.value
     }
 }
 
