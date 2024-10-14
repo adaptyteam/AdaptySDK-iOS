@@ -95,7 +95,7 @@ extension Adapty {
 
             set(shared: sdk)
 
-//            LifecycleManager.shared.initialize()
+            LifecycleManager.shared.initialize()
             return sdk
         }
         set(activatingSDK: task)

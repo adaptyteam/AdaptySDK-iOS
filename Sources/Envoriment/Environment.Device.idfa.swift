@@ -28,20 +28,31 @@ extension Environment.Device {
         ATTrackingManager.trackingAuthorizationStatus
     }
 
+    enum IdfaRetriavalStatus: Sendable {
+        case notAvailable
+
+        case notDetermined
+
+        case denied
+        case allowed
+    }
+
     @AdaptyActor
-    static var canTakeIdfa: Bool {
+    static var idfaRetriavalStatus: IdfaRetriavalStatus {
         get async {
             #if !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
-                return false
+                return .notAvailable
             #else
-                guard !Adapty.Configuration.idfaCollectionDisabled else { return false }
+                guard !Adapty.Configuration.idfaCollectionDisabled else {
+                    return .notAvailable
+                }
 
                 guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
-                    return true
+                    return .allowed
                 }
 
                 #if !canImport(AppTrackingTransparency)
-                    return true
+                    return .notAvailable
                 #else
                     return await ATTrackingManager.canTakeIdfa
                 #endif
@@ -96,8 +107,13 @@ extension Environment.Device {
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
     private extension ATTrackingManager {
         @MainActor
-        static var canTakeIdfa: Bool {
-            ATTrackingManager.trackingAuthorizationStatus == .authorized
+        static var canTakeIdfa: Environment.Device.IdfaRetriavalStatus {
+            switch ATTrackingManager.trackingAuthorizationStatus {
+            case .notDetermined: return .notDetermined
+            case .restricted, .denied: return .denied
+            case .authorized: return .allowed
+            @unknown default: return .notDetermined
+            }
         }
     }
 #endif

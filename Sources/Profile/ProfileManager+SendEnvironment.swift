@@ -30,7 +30,7 @@ extension ProfileManager.SendedEnvironment {
             return false
         case .withoutIdfa:
             guard !analyticsDisabled else { return false }
-            return await Environment.Device.canTakeIdfa
+            return await Environment.Device.idfaRetriavalStatus == .allowed
         }
     }
 
