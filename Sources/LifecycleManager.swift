@@ -118,7 +118,7 @@ final class LifecycleManager {
         Adapty.trackEvent(.appOpened)
         log.verbose("handleDidBecomeActiveNotification track")
 
-        await syncProfile()
+        try? await syncProfile()
     }
 
     // MARK: - IDFA Update Logic
