@@ -51,12 +51,20 @@ struct AdaptyPaywallRendererView: View {
                 }
             }
             .overlay {
-                ForEach(screensViewModel.presentedScreensStack) { bottomSheet in
-                    AdaptyUIBottomSheetView(bottomSheet)
-                        .onAppear {
-                            print("###bottom sheet appear")
+                ZStack(alignment: .bottom) {
+                    Color.black
+                        .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
+                        .onTapGesture {
+                            withAnimation {
+                                screensViewModel.dismissTopScreen()
+                            }
                         }
+                    
+                    ForEach(screensViewModel.presentedScreensStack) { bottomSheet in
+                        AdaptyUIBottomSheetView(bottomSheet)
+                    }
                 }
+                .ignoresSafeArea()
             }
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
             .onAppear {

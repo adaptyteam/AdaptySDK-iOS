@@ -48,22 +48,13 @@ package class AdaptyScreensViewModel: ObservableObject {
 
     func dismissScreen(id: String) {
         eventsHandler.log(.verbose, "dismissScreen \(id)")
-
-        dismissListeners[id]?()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            self?.presentedScreensStack.removeAll(where: { $0.id == id })
-        }
+        presentedScreensStack.removeAll(where: { $0.id == id })
     }
 
-    private var dismissListeners = [String: () -> Void]()
+    func dismissTopScreen() {
+        guard let topScreenId = presentedScreensStack.last?.id else { return }
 
-    func addDismissListener(id: String, listener: @escaping () -> Void) {
-        dismissListeners[id] = listener
-    }
-
-    func removeDismissListener(id: String) {
-        dismissListeners.removeValue(forKey: id)
+        dismissScreen(id: topScreenId)
     }
 }
 

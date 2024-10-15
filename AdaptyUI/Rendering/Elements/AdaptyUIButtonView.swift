@@ -50,17 +50,15 @@ struct AdaptyUIButtonView: View {
 
     public var body: some View {
         Button {
-            withAnimation(.linear(duration: 0.0)) {
-                for action in button.actions {
-                    action.fire(
-                        screenId: screenId,
-                        paywallViewModel: paywallViewModel,
-                        productsViewModel: productsViewModel,
-                        actionsViewModel: actionsViewModel,
-                        sectionsViewModel: sectionsViewModel,
-                        screensViewModel: screensViewModel
-                    )
-                }
+            for action in button.actions {
+                action.fire(
+                    screenId: screenId,
+                    paywallViewModel: paywallViewModel,
+                    productsViewModel: productsViewModel,
+                    actionsViewModel: actionsViewModel,
+                    sectionsViewModel: sectionsViewModel,
+                    screensViewModel: screensViewModel
+                )
             }
         } label: {
             AdaptyUIElementView(currentStateView)
@@ -103,7 +101,9 @@ extension AdaptyUI.ActionAction {
     ) {
         switch self {
         case let .selectProduct(id, groupId):
-            productsViewModel.selectProduct(id: id, forGroupId: groupId)
+            withAnimation(.linear(duration: 0.0)) {
+                productsViewModel.selectProduct(id: id, forGroupId: groupId)
+            }
         case let .unselectProduct(groupId):
             productsViewModel.unselectProduct(forGroupId: groupId)
         case let .purchaseSelectedProduct(groupId):
@@ -113,9 +113,13 @@ extension AdaptyUI.ActionAction {
         case .restore:
             productsViewModel.restorePurchases()
         case let .switchSection(sectionId, index):
-            sectionsViewModel.updateSelection(for: sectionId, index: index)
+            withAnimation(.linear(duration: 0.0)) {
+                sectionsViewModel.updateSelection(for: sectionId, index: index)
+            }
         case let .openScreen(id):
-            screensViewModel.presentScreen(id: id)
+            withAnimation(.linear(duration: 0.3)) {
+                screensViewModel.presentScreen(id: id)
+            }
         case .closeScreen:
             screensViewModel.dismissScreen(id: screenId)
         case .close:
