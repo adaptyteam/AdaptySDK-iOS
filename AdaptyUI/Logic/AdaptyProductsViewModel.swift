@@ -103,12 +103,12 @@ package class AdaptyProductsViewModel: ObservableObject {
     func loadProductsIfNeeded() {
         guard !productsLoadingInProgress else { return }
 
-        guard adaptyProducts != nil, introductoryOffersEligibilities == nil else {
+        guard let adaptyProducts, introductoryOffersEligibilities == nil else {
             loadProducts()
             return
         }
 
-        loadProductsIntroductoryEligibilities()
+        loadProductsIntroductoryEligibilities(products: adaptyProducts)
     }
 
     func selectedProductId(by groupId: String) -> String? {
@@ -147,7 +147,7 @@ package class AdaptyProductsViewModel: ObservableObject {
                         self?.productsLoadingInProgress = false
                     }
 
-                    self?.loadProductsIntroductoryEligibilities()
+                    self?.loadProductsIntroductoryEligibilities(products: products)
                 case let .failure(error):
                     self?.eventsHandler.log(.error, "loadProducts fail: \(error)")
 
@@ -165,9 +165,7 @@ package class AdaptyProductsViewModel: ObservableObject {
         }
     }
 
-    private func loadProductsIntroductoryEligibilities() {
-        guard let products = adaptyProducts else { return }
-
+    private func loadProductsIntroductoryEligibilities(products: [AdaptyPaywallProduct]) {
         eventsHandler.log(.verbose, "loadProductsIntroductoryEligibilities begin")
 
         Adapty.getProductsIntroductoryOfferEligibility(products: products) { [weak self] result in
