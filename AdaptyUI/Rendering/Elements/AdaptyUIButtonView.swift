@@ -27,37 +27,43 @@ struct AdaptyUIButtonView: View {
         self.button = button
     }
 
+    private var currentStateView: AdaptyUI.Element {
+        guard let selectedCondition = button.selectedCondition else {
+            return button.normalState
+        }
+
+        switch selectedCondition {
+        case let .selectedSection(sectionId, sectionIndex):
+            if sectionIndex == sectionsViewModel.selectedIndex(for: sectionId) {
+                return button.selectedState ?? button.normalState
+            } else {
+                return button.normalState
+            }
+        case let .selectedProduct(productId, productsGroupId):
+            if productId == productsViewModel.selectedProductId(by: productsGroupId) {
+                return button.selectedState ?? button.normalState
+            } else {
+                return button.normalState
+            }
+        }
+    }
+
     public var body: some View {
         Button {
-            for action in button.actions {
-                action.fire(
-                    screenId: screenId,
-                    paywallViewModel: paywallViewModel,
-                    productsViewModel: productsViewModel,
-                    actionsViewModel: actionsViewModel,
-                    sectionsViewModel: sectionsViewModel,
-                    screensViewModel: screensViewModel
-                )
+            withAnimation(.linear(duration: 0.0)) {
+                for action in button.actions {
+                    action.fire(
+                        screenId: screenId,
+                        paywallViewModel: paywallViewModel,
+                        productsViewModel: productsViewModel,
+                        actionsViewModel: actionsViewModel,
+                        sectionsViewModel: sectionsViewModel,
+                        screensViewModel: screensViewModel
+                    )
+                }
             }
         } label: {
-            if let selectedCondition = button.selectedCondition, let selectedState = button.selectedState {
-                switch selectedCondition {
-                case let .selectedSection(sectionId, sectionIndex):
-                    if sectionIndex == sectionsViewModel.selectedIndex(for: sectionId) {
-                        AdaptyUIElementView(selectedState)
-                    } else {
-                        AdaptyUIElementView(button.normalState)
-                    }
-                case let .selectedProduct(productId, productsGroupId):
-                    if productId == productsViewModel.selectedProductId(by: productsGroupId) {
-                        AdaptyUIElementView(selectedState)
-                    } else {
-                        AdaptyUIElementView(button.normalState)
-                    }
-                }
-            } else {
-                AdaptyUIElementView(button.normalState)
-            }
+            AdaptyUIElementView(currentStateView)
         }
     }
 }
