@@ -163,6 +163,16 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
         _ controller: AdaptyPaywallController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool
+
+    /// This method is invoked if there was a propblem with loading a subset of paywall's products.
+    /// - Parameters:
+    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - failedIds: an array with product ids which was failed to load.
+    /// - Returns: Return `true`, if you want to retry products fetching.
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didPartiallyLoadProducts failedIds: [String]
+    )
 }
 
 @available(iOS 15.0, *)
@@ -194,7 +204,7 @@ public extension AdaptyUI {
             Log.ui.error("AdaptyUI activate error: \(err)")
             throw err
         }
- 
+
         guard !AdaptyUI.isActivated else {
             let err = AdaptyUIError.activateOnceError
             Log.ui.warn("AdaptyUI activate error: \(err)")

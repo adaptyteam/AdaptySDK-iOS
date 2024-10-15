@@ -38,6 +38,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     private let didFailRestore: (AdaptyError) -> Void
     private let didFailRendering: (AdaptyError) -> Void
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
+    private let didPartiallyLoadProducts: (([String]) -> Void)?
 
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
@@ -86,6 +87,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         didFailRestore: @escaping (AdaptyError) -> Void,
         didFailRendering: @escaping (AdaptyError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
+        didPartiallyLoadProducts: (([String]) -> Void)? = nil,
         showAlertItem: Binding<AlertItem?>,
         showAlertBuilder: ((AlertItem) -> Alert)?
     ) {
@@ -120,6 +122,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         self.didFailRestore = didFailRestore
         self.didFailRendering = didFailRendering
         self.didFailLoadingProducts = didFailLoadingProducts
+        self.didPartiallyLoadProducts = didPartiallyLoadProducts
         self.showAlertItem = showAlertItem
         self.showAlertBuilder = showAlertBuilder
     }
@@ -157,6 +160,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
             didFailRestore: didFailRestore,
             didFailRendering: didFailRendering,
             didFailLoadingProducts: didFailLoadingProducts ?? { _ in true },
+            didPartiallyLoadProducts: didPartiallyLoadProducts ?? { _ in },
             showAlertItem: showAlertItem,
             showAlertBuilder: showAlertBuilder
         )

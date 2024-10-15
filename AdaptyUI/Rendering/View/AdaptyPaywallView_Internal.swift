@@ -54,6 +54,7 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
         didFailRestore: @escaping (AdaptyError) -> Void,
         didFailRendering: @escaping (AdaptyError) -> Void,
         didFailLoadingProducts: @escaping (AdaptyError) -> Bool,
+        didPartiallyLoadProducts: @escaping ([String]) -> Void,
         showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
         showAlertBuilder: ((AlertItem) -> Alert)? = nil
     ) {
@@ -78,7 +79,8 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
             didFinishRestore: didFinishRestore,
             didFailRestore: didFailRestore,
             didFailRendering: didFailRendering,
-            didFailLoadingProducts: didFailLoadingProducts
+            didFailLoadingProducts: didFailLoadingProducts,
+            didPartiallyLoadProducts: didPartiallyLoadProducts
         )
 
         tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)

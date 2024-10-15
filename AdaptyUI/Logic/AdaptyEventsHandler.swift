@@ -26,6 +26,7 @@ package final class AdaptyEventsHandler {
     private let didFailRestore: ((AdaptyError) -> Void)?
     private let didFailRendering: ((AdaptyError) -> Void)?
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
+    private let didPartiallyLoadProducts: (([String]) -> Void)?
 
     package init() {
         self.didPerformAction = nil
@@ -39,6 +40,7 @@ package final class AdaptyEventsHandler {
         self.didFailRestore = nil
         self.didFailRendering = nil
         self.didFailLoadingProducts = nil
+        self.didPartiallyLoadProducts = nil
     }
 
     package init(
@@ -53,7 +55,8 @@ package final class AdaptyEventsHandler {
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
         didFailRendering: @escaping (AdaptyError) -> Void,
-        didFailLoadingProducts: @escaping (AdaptyError) -> Bool
+        didFailLoadingProducts: @escaping (AdaptyError) -> Bool,
+        didPartiallyLoadProducts: @escaping ([String]) -> Void
     ) {
         self.didPerformAction = didPerformAction
         self.didSelectProduct = didSelectProduct
@@ -66,6 +69,7 @@ package final class AdaptyEventsHandler {
         self.didFailRestore = didFailRestore
         self.didFailRendering = didFailRendering
         self.didFailLoadingProducts = didFailLoadingProducts
+        self.didPartiallyLoadProducts = didPartiallyLoadProducts
     }
 
     func event_didPerformAction(_ action: AdaptyUI.Action) {
@@ -127,6 +131,11 @@ package final class AdaptyEventsHandler {
     func event_didFailLoadingProducts(with error: AdaptyError) -> Bool {
         Log.ui.error("#\(logId)# event_didFailLoadingProducts: \(error)")
         return didFailLoadingProducts?(error) ?? false
+    }
+
+    func event_didPartiallyLoadProducts(failedProductIds: [String]) {
+        Log.ui.error("#\(logId)# event_didPartiallyLoadProducts: \(failedProductIds)")
+        didPartiallyLoadProducts?(failedProductIds)
     }
 }
 

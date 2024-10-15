@@ -136,6 +136,10 @@ public class AdaptyPaywallController: UIViewController {
                     guard let self else { return false }
                     guard let delegate = self.delegate else { return true }
                     return delegate.paywallController(self, didFailLoadingProductsWith: error)
+                },
+                didPartiallyLoadProducts: { [weak self] failedIds in
+                    guard let self else { return }
+                    self.delegate?.paywallController(self, didPartiallyLoadProducts: failedIds)
                 }
             ),
             to: view

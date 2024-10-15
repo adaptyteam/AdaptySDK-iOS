@@ -140,10 +140,22 @@ package final class AdaptyProductsViewModel: ObservableObject {
             guard let self else { return }
 
             do {
-                let products = try await self.paywallViewModel.paywall.getPaywallProducts()
+                let adaptyProducts: [AdaptyPaywallProduct]
+                let productsResult = try await self.paywallViewModel.paywall.getPaywallProducts()
+
+                switch productsResult {
+                case .partial(let products, let failedIds):
+                    Log.ui.warn("#\(logId)# loadProducts partial!")
+                    adaptyProducts = products
+                    self.eventsHandler.event_didPartiallyLoadProducts(failedProductIds: failedIds)
+                case .full(let products):
+                    Log.ui.verbose("#\(logId)# loadProducts success")
+                    adaptyProducts = products
+                }
+
                 Log.ui.verbose("#\(logId)# loadProducts success")
 
-                self.adaptyProducts = products
+                self.adaptyProducts = adaptyProducts
                 self.productsLoadingInProgress = false
                 self.loadProductsIntroductoryEligibilities()
             } catch {
