@@ -97,7 +97,7 @@ extension Adapty {
 
         let response: VH<[BackendProductState]>?
         let responseError: Error?
-        let responseHash = try profileManager(with: profileId)?.productStatesCache.productsHash
+        let responseHash = try profileManager(with: profileId)?.backendProductStatesStorage.productsHash
         do {
             response = try await httpSession.fetchProductStates(
                 profileId: profileId,
@@ -113,9 +113,9 @@ extension Adapty {
             throw AdaptyError.profileWasChanged()
         }
 
-        manager.productStatesCache.setBackendProductStates(response)
+        manager.backendProductStatesStorage.setBackendProductStates(response)
 
-        let value = manager.productStatesCache.getBackendProductStates(byIds: vendorProductIds)
+        let value = manager.backendProductStatesStorage.getBackendProductStates(byIds: vendorProductIds)
 
         if value.isEmpty, let error = responseError {
             throw error.asAdaptyError ?? AdaptyError.fetchProductStatesFailed(unknownError: error)

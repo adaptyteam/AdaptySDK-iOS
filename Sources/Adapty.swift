@@ -100,6 +100,8 @@ public final class Adapty: Sendable {
     ) async throws -> ProfileManager {
         var isFerstLoop = true
 
+
+
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
         while true {
             let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
@@ -124,13 +126,15 @@ public final class Adapty: Sendable {
             else {
                 throw AdaptyError.profileWasChanged()
             }
-
+            
             switch result {
             case let .success(createdProfile):
 
                 if profileId != createdProfile.value.profileId {
                     profileStorage.clearProfile(newProfileId: createdProfile.value.profileId)
                 }
+                
+
                 profileStorage.setSyncedTransactions(false)
                 profileStorage.setProfile(createdProfile)
 
@@ -197,20 +201,6 @@ extension Adapty {
 }
 
 private extension ProfileManager {
-    convenience init(
-        storage: ProfileStorage,
-        profile: VH<AdaptyProfile>,
-        sendedEnvironment: ProfileManager.SendedEnvironment
-    ) {
-        self.init(
-            storage: storage,
-            paywallStorage: UserDefaults.standard,
-            productStorage: UserDefaults.standard,
-            profile: profile,
-            sendedEnvironment: sendedEnvironment
-        )
-    }
-
     enum Shared {
         case current(ProfileManager)
         case creating(profileId: String, withCustomerUserId: String?, task: Task<ProfileManager, Error>)

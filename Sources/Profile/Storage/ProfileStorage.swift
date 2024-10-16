@@ -23,7 +23,8 @@ protocol ProfileStorage: ProfileIdentifierStorage {
     var appleSearchAdsSyncDate: Date? { get }
     func setAppleSearchAdsSyncDate()
 
-    func clearProfile(newProfileId: String?)
+    @AdaptyActor
+    func clearProfile(newProfileId: String?) 
 }
 
 extension ProfileStorage {

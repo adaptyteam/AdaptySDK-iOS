@@ -15,13 +15,11 @@ final class ProfileManager: Sendable {
 
     let storage: ProfileStorage
     let paywallsCache: PaywallsCache
-    let productStatesCache: ProductStatesCache
+    let backendProductStatesStorage = BackendProductStatesStorage()
 
     @AdaptyActor
     init(
         storage: ProfileStorage,
-        paywallStorage: PaywallsStorage,
-        productStorage: BackendProductStatesStorage,
         profile: VH<AdaptyProfile>,
         sendedEnvironment: SendedEnvironment
     ) {
@@ -31,8 +29,7 @@ final class ProfileManager: Sendable {
         self.onceSentEnvironment = sendedEnvironment
 
         self.storage = storage
-        paywallsCache = PaywallsCache(storage: paywallStorage, profileId: profileId)
-        productStatesCache = ProductStatesCache(storage: productStorage)
+        paywallsCache = PaywallsCache(storage: UserDefaults.standard, profileId: profileId)
 
         Task { [weak self] in
             Adapty.optionalSDK?.updateASATokenIfNeed(for: profile)

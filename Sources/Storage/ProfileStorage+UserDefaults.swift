@@ -75,7 +75,8 @@ extension UserDefaults: ProfileStorage {
         }
     }
 
-    func clearProfile(newProfileId profileId: String?) {
+    @AdaptyActor
+    func clearProfile(newProfileId profileId: String?)  {
         log.debug("Clear profile")
         if let profileId {
             log.debug("set profileId = \(profileId)")
@@ -89,6 +90,6 @@ extension UserDefaults: ProfileStorage {
         removeObject(forKey: Constants.appleSearchAdsSyncDateKey)
         removeObject(forKey: Constants.profileKey)
         clearPaywalls()
-        clearBackendProducts()
+        BackendProductStatesStorage.clear()
     }
 }
