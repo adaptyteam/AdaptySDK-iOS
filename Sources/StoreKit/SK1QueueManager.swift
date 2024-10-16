@@ -17,22 +17,10 @@ actor SK1QueueManager: Sendable {
     private var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchasedInfo>]]()
     private var makePurchasesProduct = [String: SK1Product]()
 
-    private var variationsIds: [String: String]
-    private var persistentVariationsIds: [String: String]
-
     fileprivate init(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager, storage: VariationIdStorage) {
         self.purchaseValidator = purchaseValidator
         self.productsManager = productsManager
         self.storage = storage
-
-        self.variationsIds = storage.getVariationsIds() ?? [:]
-
-        if let persistent = storage.getPersistentVariationsIds() {
-            self.persistentVariationsIds = persistent
-        } else {
-            self.persistentVariationsIds = variationsIds
-            storage.setPersistentVariationsIds(variationsIds)
-        }
     }
 
     func makePurchase(
@@ -110,10 +98,6 @@ actor SK1QueueManager: Sendable {
     ) {
         let productId = payment.productIdentifier
 
-        if let variationId {
-            self.setVariationId(variationId, for: productId)
-        }
-
         makePurchasesProduct[productId] = underlying
 
         if let handlers = self.makePurchasesCompletionHandlers[productId] {
@@ -123,9 +107,13 @@ actor SK1QueueManager: Sendable {
 
         self.makePurchasesCompletionHandlers[productId] = [completion]
 
-        SKPaymentQueue.default().add(payment)
-
         Task {
+            if let variationId {
+                await self.setVariationId(variationId, for: productId)
+            }
+
+            SKPaymentQueue.default().add(payment)
+
             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                 methodName: .addPayment,
                 params: [
@@ -135,10 +123,11 @@ actor SK1QueueManager: Sendable {
         }
     }
 
+    @VariationIdStorage.InternalActor
     private func setVariationId(_ variationId: String, for productId: String) {
-        if variationId != variationsIds.updateValue(variationId, forKey: productId) {
+        if storage.setVariationId(variationId, for: productId) {
             let params: EventParameters = [
-                "variation_by_product": variationsIds,
+                "variation_by_product": storage.variationsIds,
             ]
             Task {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
@@ -146,12 +135,11 @@ actor SK1QueueManager: Sendable {
                     params: params
                 ))
             }
-            storage.setVariationsIds(variationsIds)
         }
 
-        if variationId != persistentVariationsIds.updateValue(variationId, forKey: productId) {
+        if storage.setPersistentVariationId(variationId, for: productId) {
             let params: EventParameters = [
-                "variation_by_product": variationsIds,
+                "variation_by_product": storage.persistentVariationsIds,
             ]
             Task {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
@@ -159,14 +147,14 @@ actor SK1QueueManager: Sendable {
                     params: params
                 ))
             }
-            storage.setPersistentVariationsIds(variationsIds)
         }
     }
 
+    @VariationIdStorage.InternalActor
     private func removeVariationId(for productId: String) {
-        guard variationsIds.removeValue(forKey: productId) != nil else { return }
+        guard storage.removeVariationId(for: productId) else { return }
         let params: EventParameters = [
-            "variation_by_product": variationsIds,
+            "variation_by_product": storage.variationsIds,
         ]
         Task {
             await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
@@ -174,7 +162,6 @@ actor SK1QueueManager: Sendable {
                 params: params
             ))
         }
-        storage.setVariationsIds(variationsIds)
     }
 
     fileprivate func updatedTransactions(_ transactions: [SKPaymentTransaction]) async {
@@ -218,8 +205,10 @@ actor SK1QueueManager: Sendable {
 
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
         let productId = sk1Transaction.unfProductID
-        let variationId = variationsIds[productId]
-        let persistentVariationId = persistentVariationsIds[productId]
+
+        let (variationId, persistentVariationId) = await { @VariationIdStorage.InternalActor in
+            (storage.variationsIds[productId], storage.persistentVariationsIds[productId])
+        }()
 
         let purchasedTransaction: PurchasedTransaction =
             if let sk1Product = makePurchasesProduct[productId] {
@@ -245,7 +234,7 @@ actor SK1QueueManager: Sendable {
                 reason: .purchasing
             )
 
-            removeVariationId(for: productId)
+            Task { await removeVariationId(for: productId) }
             makePurchasesProduct.removeValue(forKey: productId)
 
             SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
@@ -268,7 +257,7 @@ actor SK1QueueManager: Sendable {
 
     private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction) {
         let productId = sk1Transaction.unfProductID
-        removeVariationId(for: productId)
+        Task { await removeVariationId(for: productId) }
         makePurchasesProduct.removeValue(forKey: productId)
         let error = StoreKitManagerError.productPurchaseFailed(sk1Transaction.error).asAdaptyError
         callMakePurchasesCompletionHandlers(productId, .failure(error))
@@ -301,13 +290,13 @@ extension SK1QueueManager {
     private static var observer: SK1PaymentTransactionObserver?
 
     @AdaptyActor
-    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager, storage: VariationIdStorage) -> SK1QueueManager? {
+    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager) -> SK1QueueManager? {
         guard observer == nil else { return nil }
 
         let manager = SK1QueueManager(
             purchaseValidator: purchaseValidator,
             productsManager: productsManager,
-            storage: storage
+            storage: VariationIdStorage()
         )
 
         let observer = SK1PaymentTransactionObserver(manager)

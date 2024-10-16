@@ -81,7 +81,7 @@ extension Adapty {
             let backend = Backend(with: configuration, envorinment: environment)
 
             Task {
-                await Adapty.eventsManager.set(backend: backend)
+                await eventsManager.set(backend: backend)
             }
 
             let sdk = await Adapty(

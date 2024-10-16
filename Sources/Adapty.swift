@@ -65,7 +65,7 @@ public final class Adapty: Sendable {
                 SK1TransactionObserver.startObserving(purchaseValidator: self, productsManager: productsManager)
                 self.sk1QueueManager = nil
             } else {
-                self.sk1QueueManager = observerMode ? nil : SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager, storage: UserDefaults.standard)
+                self.sk1QueueManager = observerMode ? nil : SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager)
             }
         }
     }

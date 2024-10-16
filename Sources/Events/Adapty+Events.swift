@@ -22,12 +22,13 @@ extension Adapty {
         let now = Date()
         let profileId = profileId ?? profileIdentifierStorage.profileId
         Task.detached(priority: .utility) {
-            try? await eventsManager.trackEvent(.init(
+            let event = await Event.Unpacked(
                 event: event,
                 profileId: profileId,
                 environment: Environment.instance,
                 createdAt: now
-            ))
+            )
+            try? await eventsManager.trackEvent(event)
         }
     }
 
@@ -55,11 +56,12 @@ extension Adapty {
 extension Adapty {
     private static func _trackEvent(_ event: Event) async throws {
         do {
-            try await eventsManager.trackEvent(.init(
+            let event = await Event.Unpacked(
                 event: event,
                 profileId: profileIdentifierStorage.profileId,
                 environment: Environment.instance
-            ))
+            )
+            try await eventsManager.trackEvent(event)
         } catch {
             throw error.asAdaptyError ?? .trackEventFailed(unknownError: error)
         }
