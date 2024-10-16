@@ -48,7 +48,7 @@ private enum Kind: Sendable, Hashable, CaseIterable {
 
 @EventsManagerActor
 private final class AllEventsStorage: Sendable {
-    private static let userDefaults = UserDefaults.standard
+    private static let userDefaults = Storage.userDefaults
 
     static var eventsCount: [Kind: Int] = Dictionary(Kind.allCases.map {
         ($0, userDefaults.integer(forKey: $0.counterKey))
