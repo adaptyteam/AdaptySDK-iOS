@@ -45,8 +45,8 @@ final class ProfileManager: Sendable {
 
 extension ProfileManager {
     nonisolated func syncTransactionsIfNeed(for profileId: String) { // TODO: extruct this code from ProfileManager
-        Task { [weak self] in
-            guard let sdk = await Adapty.optionalSDK,
+        Task { @AdaptyActor [weak self] in
+            guard let sdk = Adapty.optionalSDK,
                   let self,
                   !self.storage.syncedTransactions
             else { return }

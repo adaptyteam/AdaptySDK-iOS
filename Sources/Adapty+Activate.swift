@@ -86,7 +86,6 @@ extension Adapty {
 
             let sdk = await Adapty(
                 configuration: configuration,
-                profileStorage: UserDefaults.standard,
                 backend: backend
             )
 

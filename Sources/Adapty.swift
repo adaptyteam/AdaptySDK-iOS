@@ -9,7 +9,6 @@ import Foundation
 
 @AdaptyActor
 public final class Adapty: Sendable {
-    static let profileIdentifierStorage: ProfileIdentifierStorage = UserDefaults.standard
     let profileStorage: ProfileStorage
 
     let apiKeyPrefix: String
@@ -28,13 +27,12 @@ public final class Adapty: Sendable {
 
     init(
         configuration: Configuration,
-        profileStorage: ProfileStorage,
         backend: Backend
     ) async {
         self.observerMode = configuration.observerMode
         self.apiKeyPrefix = String(configuration.apiKey.prefix(while: { $0 != "." }))
         self.backend = backend
-        self.profileStorage = profileStorage
+        self.profileStorage = ProfileStorage()
         self.httpSession = backend.createMainExecutor()
         self.httpFallbackSession = backend.createFallbackExecutor()
         self.httpConfigsSession = backend.createConfigsExecutor()

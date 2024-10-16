@@ -8,19 +8,13 @@
 import Foundation
 
 extension Adapty {
+
     @EventsManagerActor
-    static var eventsManager: EventsManager {
-        get async {
-            if let manager = EventsManager.shared { return manager }
-            let manager = await EventsManager(profileStorage: profileIdentifierStorage)
-            EventsManager.shared = manager
-            return manager
-        }
-    }
+    static let eventsManager = EventsManager()
 
     static func trackEvent(_ event: Event, for profileId: String? = nil) {
         let now = Date()
-        let profileId = profileId ?? profileIdentifierStorage.profileId
+        let profileId = profileId ?? ProfileStorage.profileId
         Task.detached(priority: .utility) {
             let event = await Event.Unpacked(
                 event: event,
@@ -58,7 +52,7 @@ extension Adapty {
         do {
             let event = await Event.Unpacked(
                 event: event,
-                profileId: profileIdentifierStorage.profileId,
+                profileId: ProfileStorage.profileId,
                 environment: Environment.instance
             )
             try await eventsManager.trackEvent(event)

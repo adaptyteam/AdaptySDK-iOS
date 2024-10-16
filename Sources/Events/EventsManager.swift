@@ -17,31 +17,10 @@ final class EventsManager {
         static let sendingLimitEvents = 500
     }
 
-    private let profileStorage: ProfileIdentifierStorage
-    private let eventStorages: [EventCollectionStorage]
-    private var configuration: EventsBackendConfiguration
+    private let eventStorages = EventsStorage.all.map { EventCollectionStorage(with: $0) }
+    private var configuration = EventsBackendConfiguration()
     private var backendSession: Backend.EventsExecutor?
     private var sending: Bool = false
-
-    convenience init(
-        profileStorage: ProfileIdentifierStorage
-    ) {
-        self.init(
-            profileStorage: profileStorage,
-            eventStorages: EventsStorage.all.map { EventCollectionStorage(with: $0) }
-        )
-    }
-
-    private init(
-        profileStorage: ProfileIdentifierStorage,
-        eventStorages: [EventCollectionStorage]
-    ) {
-        self.profileStorage = profileStorage
-        self.eventStorages = eventStorages
-
-        let configuration = EventsBackendConfiguration()
-        self.configuration = configuration
-    }
 
     func set(backend: Backend) {
         backendSession = backend.createEventsExecutor()
@@ -112,7 +91,7 @@ final class EventsManager {
     private func sendEvents(_ session: Backend.EventsExecutor) async throws {
         if configuration.isExpired {
             configuration = try await session.fetchEventsConfig(
-                profileId: profileStorage.profileId
+                profileId: ProfileStorage.profileId
             )
         }
 
@@ -127,7 +106,7 @@ final class EventsManager {
         }
 
         try await session.sendEvents(
-            profileId: self.profileStorage.profileId,
+            profileId: ProfileStorage.profileId,
             events: events.elements
         )
 
