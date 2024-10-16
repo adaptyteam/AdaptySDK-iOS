@@ -89,7 +89,7 @@ extension UserDefaults: ProfileStorage {
         removeObject(forKey: Constants.syncedTransactionsKey)
         removeObject(forKey: Constants.appleSearchAdsSyncDateKey)
         removeObject(forKey: Constants.profileKey)
-        clearPaywalls()
         BackendProductStatesStorage.clear()
+        PaywallsStorage.clear()
     }
 }

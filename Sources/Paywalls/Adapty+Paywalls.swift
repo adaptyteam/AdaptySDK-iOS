@@ -85,8 +85,8 @@ extension Adapty {
             )
         } catch {
             guard let chosen = try profileManager(with: profileId).orThrows
-                .paywallsCache
-                .getPaywallWithFallback(byPlacementId: placementId, locale: locale)
+                .paywallsStorage
+                .getPaywallWithFallback(byPlacementId: placementId, profileId: profileId, locale: locale)
             else {
                 throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
             }
@@ -112,7 +112,7 @@ extension Adapty {
         }
 
         let cached = manager
-            .paywallsCache
+            .paywallsStorage
             .getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?
             .withFetchPolicy(fetchPolicy)?
             .value
@@ -136,7 +136,7 @@ extension Adapty {
             let manager = try profileManager(with: profileId).orThrows
             return (
                 manager.profile.value.segmentId,
-                manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
+                manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
                 manager.profile.value.isTestUser
             )
         }()
@@ -153,7 +153,7 @@ extension Adapty {
             )
 
             if let manager = tryProfileManagerOrNil(with: profileId) {
-                response = manager.paywallsCache.savedPaywallChosen(response)
+                response = manager.paywallsStorage.savedPaywallChosen(response)
             }
 
             Adapty.trackEventIfNeed(response)
@@ -188,7 +188,7 @@ extension Adapty {
             let (cached, isTestUser): (AdaptyPaywall?, Bool) = {
                 guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
                 return (
-                    manager.paywallsCache.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
+                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
                     manager.profile.value.isTestUser
                 )
             }()
@@ -203,7 +203,7 @@ extension Adapty {
             )
 
             if let manager = tryProfileManagerOrNil(with: profileId) {
-                response = manager.paywallsCache.savedPaywallChosen(response)
+                response = manager.paywallsStorage.savedPaywallChosen(response)
             }
 
             result = response
@@ -211,7 +211,7 @@ extension Adapty {
         } catch {
             let chosen =
                 if let manager = tryProfileManagerOrNil(with: profileId) {
-                    manager.paywallsCache.getPaywallWithFallback(byPlacementId: placementId, locale: locale)
+                    manager.paywallsStorage.getPaywallWithFallback(byPlacementId: placementId, profileId: profileId, locale: locale)
                 } else {
                     Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId)
                 }

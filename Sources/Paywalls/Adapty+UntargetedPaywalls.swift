@@ -63,7 +63,7 @@ extension Adapty {
         }
 
         let cached = manager?
-            .paywallsCache
+            .paywallsStorage
             .getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?
             .withFetchPolicy(fetchPolicy)?
             .value
