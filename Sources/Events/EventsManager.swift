@@ -83,7 +83,7 @@ final class EventsManager {
             Task.detached(priority: .utility) { [weak self] in
                 try? await Task.sleep(duration: interval)
                 await self?.finishSending()
-                await self?.needSendEvents() // TODO: recursion
+                await self?.needSendEvents() // TODO: recursion ???
             }
         }
     }

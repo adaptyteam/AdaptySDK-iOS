@@ -44,7 +44,7 @@ actor SK2ProductsManager: StoreKitProductsManager {
             Task.detached(priority: .utility) { [weak self] in
                 try? await Task.sleep(duration: .seconds(2))
                 await self?.finishFetchingAllProducts()
-                await self?.fetchAllProducts()
+                await self?.fetchAllProducts() // TODO: recursion ???
             }
             return
         }
