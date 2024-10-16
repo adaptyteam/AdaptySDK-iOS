@@ -71,7 +71,7 @@ extension Adapty {
         let task = Task<Adapty, Never> { @AdaptyActor in
             if let logLevel = configuration.logLevel { Adapty.logLevel = logLevel }
 
-            UserDefaults.standard.clearAllDataIfDifferent(apiKey: configuration.apiKey)
+            await UserDefaults.standard.clearAllDataIfDifferent(apiKey: configuration.apiKey)
 
             Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue //TODO: Refactoring
             Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled //TODO: Refactoring

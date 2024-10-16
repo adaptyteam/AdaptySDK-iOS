@@ -14,18 +14,19 @@ extension Event {
         let profileId: String
         let environment: Environment
         let createdAt: Date
-    }
-}
-
-extension EventsManager {
-    @AdaptyActor
-    func trackEvent(_ event: Event, profileId: String, createdAt: Date = Date()) async throws {
-        try await self.trackEvent(.init(
-            id: UUID().uuidString.lowercased(),
-            event: event,
-            profileId: profileId,
-            environment: Environment.instance,
-            createdAt: createdAt
-        ))
+        
+        init(
+            id: String = UUID().uuidString.lowercased(),
+            event: Event,
+            profileId: String,
+            environment: Environment,
+            createdAt: Date = Date()
+        ) {
+            self.id = id
+            self.event = event
+            self.profileId = profileId
+            self.environment = environment
+            self.createdAt = createdAt
+        }
     }
 }

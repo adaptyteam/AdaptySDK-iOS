@@ -9,6 +9,7 @@ import Foundation
 
 private let log = Log.events
 
+@EventsManagerActor
 final class EventCollectionStorage {
     private enum Constants {
         static let limitEvents = 500
@@ -16,13 +17,11 @@ final class EventCollectionStorage {
 
     private let storage: EventsStorage
     private var events: EventCollection<Event.Packed>
-    private var eventCounter: Int
 
     var isEmpty: Bool { events.isEmpty }
 
     init(with storage: EventsStorage) {
         self.storage = storage
-        eventCounter = storage.getEventCounter()
         var events = EventCollection<Event.Packed>(elements: storage.getEvents() ?? [], startIndex: 0)
         events.remove(toLimit: Constants.limitEvents)
         self.events = events
@@ -47,14 +46,13 @@ final class EventCollectionStorage {
     }
 
     func add(_ event: Event.Unpacked) throws {
-        let event = try Event.Packed(from: event, counter: eventCounter)
-        eventCounter += 1
+        let event = try Event.Packed(from: event, counter: storage.eventsCount)
+        storage.incrimentEventCount()
         let old = events.elements.first
         events.append(event, withLimit: Constants.limitEvents)
         if let old, old.id != events.elements.first?.id {
             log.verbose("Event \(old.name) #\(old.counter) deleted due to exceeded the limit of \(Constants.limitEvents)")
         }
-        storage.setEventCounter(eventCounter)
         storage.setEvents(events.elements.map { $0.data })
     }
 
@@ -68,7 +66,7 @@ final class EventCollectionStorage {
 
 private extension EventsStorage {
     func getEvents() -> [Event.Packed]? {
-        guard let array: [Data] = getEvents() else { return nil }
+        guard let array: [Data] = events else { return nil }
         return array.compactMap {
             do {
                 return try Event.Packed(from: $0)

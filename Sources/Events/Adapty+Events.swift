@@ -8,13 +8,26 @@
 import Foundation
 
 extension Adapty {
-    static let eventsManager = EventsManager(profileStorage: profileIdentifierStorage)
+    @EventsManagerActor
+    static var eventsManager: EventsManager {
+        get async {
+            if let manager = EventsManager.shared { return manager }
+            let manager = await EventsManager(profileStorage: profileIdentifierStorage)
+            EventsManager.shared = manager
+            return manager
+        }
+    }
 
     static func trackEvent(_ event: Event, for profileId: String? = nil) {
         let now = Date()
         let profileId = profileId ?? profileIdentifierStorage.profileId
         Task.detached(priority: .utility) {
-            try? await eventsManager.trackEvent(event, profileId: profileId, createdAt: now)
+            try? await eventsManager.trackEvent(.init(
+                event: event,
+                profileId: profileId,
+                environment: Environment.instance,
+                createdAt: now
+            ))
         }
     }
 
@@ -42,7 +55,11 @@ extension Adapty {
 extension Adapty {
     private static func _trackEvent(_ event: Event) async throws {
         do {
-            try await Adapty.eventsManager.trackEvent(event, profileId: profileIdentifierStorage.profileId)
+            try await eventsManager.trackEvent(.init(
+                event: event,
+                profileId: profileIdentifierStorage.profileId,
+                environment: Environment.instance
+            ))
         } catch {
             throw error.asAdaptyError ?? .trackEventFailed(unknownError: error)
         }

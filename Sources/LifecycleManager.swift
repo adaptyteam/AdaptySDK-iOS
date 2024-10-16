@@ -29,8 +29,9 @@ final class LifecycleManager {
 
     func initialize() {
         log.info("LifecycleManager initialize")
-
-        subscribeForLifecycleEvents()
+        Task {
+            await subscribeForLifecycleEvents()
+        }
         subscribeForStorefrontUpdate()
         scheduleProfileUpdate()
         scheduleIDFAUpdate()
@@ -91,9 +92,9 @@ final class LifecycleManager {
 
     // MARK: - App Open Event Logic
 
-    private func subscribeForLifecycleEvents() {
+    private func subscribeForLifecycleEvents() async {
         #if canImport(UIKit)
-            NotificationCenter.default.addObserver(
+            await NotificationCenter.default.addObserver(
                 forName: UIApplication.didBecomeActiveNotification,
                 object: nil,
                 queue: nil

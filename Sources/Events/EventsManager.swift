@@ -9,7 +9,10 @@ import Foundation
 
 private let log = Log.events
 
-actor EventsManager {
+@EventsManagerActor
+final class EventsManager {
+    static var shared: EventsManager?
+
     private enum Constants {
         static let sendingLimitEvents = 500
     }
@@ -20,15 +23,12 @@ actor EventsManager {
     private var backendSession: Backend.EventsExecutor?
     private var sending: Bool = false
 
-    init(
+    convenience init(
         profileStorage: ProfileIdentifierStorage
     ) {
         self.init(
             profileStorage: profileStorage,
-            eventStorages: [
-                EventCollectionStorage(with: UserDefaults.standard.defaultEventsStorage),
-                EventCollectionStorage(with: UserDefaults.standard.sysLogEventsStorage),
-            ]
+            eventStorages: EventsStorage.all.map { EventCollectionStorage(with: $0) }
         )
     }
 
@@ -90,21 +90,21 @@ actor EventsManager {
             let interval: TaskDuration? =
                 if let error, !((error as? EventsError)?.isInterrupted ?? false) {
                     .seconds(20)
-                } else if await (self?.hasEvents()) ?? false {
+                } else if self?.hasEvents() ?? false {
                     .seconds(1)
                 } else {
                     nil
                 }
 
             guard let interval else {
-                await self?.finishSending()
+                self?.finishSending()
                 return
             }
 
             Task.detached(priority: .utility) { [weak self] in
                 try? await Task.sleep(duration: interval)
                 await self?.finishSending()
-                await self?.needSendEvents()
+                await self?.needSendEvents() // TODO: recursion
             }
         }
     }
@@ -139,6 +139,7 @@ actor EventsManager {
     }
 }
 
+@EventsManagerActor
 private extension [EventCollectionStorage] {
     var hasEvents: Bool { contains { !$0.isEmpty } }
 
