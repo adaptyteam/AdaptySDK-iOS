@@ -73,9 +73,9 @@ extension Adapty {
 
             await Storage.clearAllDataIfDifferent(apiKey: configuration.apiKey)
 
-            Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue //TODO: Refactoring
-            Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled //TODO: Refactoring
-            Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled //TODO: Refactoring
+            Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue // TODO: Refactoring
+            Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled // TODO: Refactoring
+            Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
 
             let environment = await Environment.instance
             let backend = Backend(with: configuration, envorinment: environment)

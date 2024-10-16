@@ -42,12 +42,12 @@ public final class Adapty: Sendable {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             self.receiptManager = StoreKitReceiptManager(session: httpSession)
             self.transactionManager = SK2TransactionManager(session: httpSession)
-            self.productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
+            self.productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession)
             self.sk1QueueManager = nil
         } else {
             self.receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
             self.transactionManager = receiptManager
-            self.productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, storage: UserDefaults.standard, session: httpSession)
+            self.productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession)
             self.sk1QueueManager = nil
         }
 

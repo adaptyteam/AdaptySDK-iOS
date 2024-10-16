@@ -11,16 +11,15 @@ private let log = Log.sk1ProductManager
 
 actor SK1ProductsManager: StoreKitProductsManager {
     private let apiKeyPrefix: String
-    private var cache: ProductVendorIdsCache
+    private let storage = ProductVendorIdsStorage()
     private let session: Backend.MainExecutor
 
     private var products = [String: SK1Product]()
     private let sk1ProductsFetcher = SK1ProductFetcher()
 
-    init(apiKeyPrefix: String, storage: ProductVendorIdsStorage, session: Backend.MainExecutor) {
+    init(apiKeyPrefix: String,  session: Backend.MainExecutor) {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
-        cache = ProductVendorIdsCache(storage: storage)
     }
 
     private var fetchingAllProducts = false
@@ -35,18 +34,18 @@ actor SK1ProductsManager: StoreKitProductsManager {
 
         do {
             let response = try await session.fetchAllProductVendorIds(apiKeyPrefix: apiKeyPrefix)
-            cache.setProductVendorIds(response)
+            await storage.set(productVendorIds: response)
         } catch {
             guard !error.isCancelled else { return }
             Task.detached(priority: .utility) { [weak self] in
                 try? await Task.sleep(duration: .seconds(2))
                 await self?.finishFetchingAllProducts()
-                await self?.fetchAllProducts()
+                await self?.fetchAllProducts() // TODO: Recursion ??
             }
             return
         }
 
-        let allProductVendorIds = Set(cache.allProductVendorIds ?? [])
+        let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
 
         Task.detached(priority: .high) { [weak self] in
             _ = try? await self?.fetchSK1Products(ids: allProductVendorIds)
