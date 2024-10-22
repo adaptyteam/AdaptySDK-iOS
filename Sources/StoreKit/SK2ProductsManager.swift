@@ -12,15 +12,16 @@ private let log = Log.sk2ProductManager
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2ProductsManager: StoreKitProductsManager {
     private let apiKeyPrefix: String
-    private let storage = ProductVendorIdsStorage()
+    private let storage: ProductVendorIdsStorage
     private let session: Backend.MainExecutor
 
     private var products = [String: SK2Product]()
     private let sk2ProductsFetcher = SK2ProductFetcher()
 
-    init(apiKeyPrefix: String, session: Backend.MainExecutor) {
+    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: ProductVendorIdsStorage) {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
+        self.storage = storage
         Task {
             await fetchAllProducts()
         }

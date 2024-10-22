@@ -11,15 +11,16 @@ private let log = Log.sk1ProductManager
 
 actor SK1ProductsManager: StoreKitProductsManager {
     private let apiKeyPrefix: String
-    private let storage = ProductVendorIdsStorage()
+    private let storage: ProductVendorIdsStorage
     private let session: Backend.MainExecutor
 
     private var products = [String: SK1Product]()
     private let sk1ProductsFetcher = SK1ProductFetcher()
 
-    init(apiKeyPrefix: String,  session: Backend.MainExecutor) {
+    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: ProductVendorIdsStorage) {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
+        self.storage = storage
     }
 
     private var fetchingAllProducts = false

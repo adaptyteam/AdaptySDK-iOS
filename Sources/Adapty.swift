@@ -37,15 +37,21 @@ public final class Adapty: Sendable {
         self.httpFallbackSession = backend.createFallbackExecutor()
         self.httpConfigsSession = backend.createConfigsExecutor()
 
+        #if compiler(>=5.10)
+            let productVendorIdsStorage = ProductVendorIdsStorage()
+        #else
+            let productVendorIdsStorage = await ProductVendorIdsStorage()
+        #endif
+
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             self.receiptManager = StoreKitReceiptManager(session: httpSession)
             self.transactionManager = SK2TransactionManager(session: httpSession)
-            self.productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession)
+            self.productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
             self.sk1QueueManager = nil
         } else {
             self.receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
             self.transactionManager = receiptManager
-            self.productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession)
+            self.productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
             self.sk1QueueManager = nil
         }
 
@@ -63,7 +69,12 @@ public final class Adapty: Sendable {
                 SK1TransactionObserver.startObserving(purchaseValidator: self, productsManager: productsManager)
                 self.sk1QueueManager = nil
             } else {
-                self.sk1QueueManager = observerMode ? nil : SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager)
+                #if compiler(>=5.10)
+                    let variationIdStorage = VariationIdStorage()
+                #else
+                    let variationIdStorage = await VariationIdStorage()
+                #endif
+                self.sk1QueueManager = observerMode ? nil : SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager, storage: variationIdStorage)
             }
         }
     }
@@ -98,8 +109,6 @@ public final class Adapty: Sendable {
     ) async throws -> ProfileManager {
         var isFerstLoop = true
 
-
-
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
         while true {
             let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
@@ -124,14 +133,13 @@ public final class Adapty: Sendable {
             else {
                 throw AdaptyError.profileWasChanged()
             }
-            
+
             switch result {
             case let .success(createdProfile):
 
                 if profileId != createdProfile.value.profileId {
                     profileStorage.clearProfile(newProfileId: createdProfile.value.profileId)
                 }
-                
 
                 profileStorage.setSyncedTransactions(false)
                 profileStorage.setProfile(createdProfile)

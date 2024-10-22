@@ -290,13 +290,13 @@ extension SK1QueueManager {
     private static var observer: SK1PaymentTransactionObserver?
 
     @AdaptyActor
-    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager) -> SK1QueueManager? {
+    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager, storage: VariationIdStorage) -> SK1QueueManager? {
         guard observer == nil else { return nil }
 
         let manager = SK1QueueManager(
             purchaseValidator: purchaseValidator,
             productsManager: productsManager,
-            storage: VariationIdStorage()
+            storage: storage
         )
 
         let observer = SK1PaymentTransactionObserver(manager)
