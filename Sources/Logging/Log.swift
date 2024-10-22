@@ -13,7 +13,13 @@ package enum Log {
         package static let shared = InternalActor()
     }
 
-    package nonisolated(unsafe) static var level: Level = .default
+    private final class NonisolatedUnsafe: @unchecked Sendable {
+        var level: Level = .default
+    }
+
+    private static let _nonisolatedUnsafe = NonisolatedUnsafe()
+
+    package static var level: Level { _nonisolatedUnsafe.level }
 
     package static func isLevel(_ level: Level) -> Bool {
         self.level >= level
@@ -24,7 +30,7 @@ package enum Log {
 
     @InternalActor
     static func set(level: Level) async {
-        self.level = level
+        _nonisolatedUnsafe.level = level
     }
 
     @InternalActor
