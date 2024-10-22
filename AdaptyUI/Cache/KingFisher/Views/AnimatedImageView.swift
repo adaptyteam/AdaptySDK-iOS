@@ -579,7 +579,7 @@ extension AnimatedImageView {
         }
 
         /// The index of the current animation frame.
-        internal(set) var currentFrameIndex = 0 {
+        var currentFrameIndex = 0 {
             didSet {
                 previousFrameIndex = oldValue
             }

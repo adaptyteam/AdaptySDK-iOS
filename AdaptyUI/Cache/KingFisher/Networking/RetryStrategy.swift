@@ -56,7 +56,7 @@ class RetryContext: @unchecked Sendable {
     /// If you choose to use ``RetryDecision/retry(userInfo:)`` as the retry decision for
     /// ``RetryStrategy/retry(context:retryHandler:)``, the associated value of ``RetryDecision/retry(userInfo:)`` will
     /// be delivered to you in the next retry.
-    internal(set) var userInfo: Any? {
+    var userInfo: Any? {
         get { propertyQueue.sync { _userInfo } }
         set { propertyQueue.sync { _userInfo = newValue } }
     }
