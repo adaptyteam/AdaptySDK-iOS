@@ -14,8 +14,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let viewModel = MainViewModel()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let adaptyConfigBuilder = Adapty.Configuration
-            .Builder(withAPIKey: AppConstants.adaptyApiKey)
+        let adaptyConfigBuilder = Adapty
+            .ConfigurationBuilder(withAPIKey: AppConstants.adaptyApiKey)
             .with(customerUserId: UserManager.currentUserId)
 
         Adapty.delegate = viewModel
