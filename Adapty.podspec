@@ -22,11 +22,11 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.source           = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
   s.documentation_url = "https://docs.adapty.io"
 
-  s.ios.deployment_target = '12.2'
-  s.osx.deployment_target = '10.14.4'
+  s.ios.deployment_target = '13.0'
+  s.osx.deployment_target = '11.0'
   s.visionos.deployment_target = '1.0'
 
-  s.swift_version = '5.9'
+  s.swift_version = '6.0'
 
   s.source_files = 'Sources/**/*.swift'
   s.resource_bundles = {"Adapty" => ["Sources/PrivacyInfo.xcprivacy"]}
