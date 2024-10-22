@@ -14,7 +14,8 @@ extension MainViewModel {
     var accessLevel: AdaptyProfile.AccessLevel? { profile?.accessLevels[AppConstants.accessLevelId] }
 }
 
-class MainViewModel: NSObject, ObservableObject, AdaptyDelegate {
+final class MainViewModel: NSObject, ObservableObject, AdaptyDelegate {
+    
     override init() {
         super.init()
         
@@ -87,5 +88,9 @@ class MainViewModel: NSObject, ObservableObject, AdaptyDelegate {
     
     func didLoadLatestProfile(_ profile: AdaptyProfile) {
         self.profile = profile
+    }
+    
+    func shouldAddStorePayment(for product: AdaptyDeferredProduct) -> Bool {
+        false
     }
 }
