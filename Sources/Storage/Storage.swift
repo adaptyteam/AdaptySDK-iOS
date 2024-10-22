@@ -9,6 +9,8 @@ import Foundation
 
 private let log = Log.storage
 
+extension UserDefaults: @unchecked Sendable {}
+
 final class Storage {
     private enum Constants {
         static let appKeyHash = "AdaptySDK_Application_Key_Hash"
