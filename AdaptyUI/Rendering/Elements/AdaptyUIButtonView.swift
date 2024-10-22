@@ -27,6 +27,27 @@ struct AdaptyUIButtonView: View {
         self.button = button
     }
 
+    private var currentStateView: AdaptyUI.Element {
+        guard let selectedCondition = button.selectedCondition else {
+            return button.normalState
+        }
+
+        switch selectedCondition {
+        case let .selectedSection(sectionId, sectionIndex):
+            if sectionIndex == sectionsViewModel.selectedIndex(for: sectionId) {
+                return button.selectedState ?? button.normalState
+            } else {
+                return button.normalState
+            }
+        case let .selectedProduct(productId, productsGroupId):
+            if productId == productsViewModel.selectedProductId(by: productsGroupId) {
+                return button.selectedState ?? button.normalState
+            } else {
+                return button.normalState
+            }
+        }
+    }
+
     public var body: some View {
         Button {
             for action in button.actions {
@@ -40,24 +61,7 @@ struct AdaptyUIButtonView: View {
                 )
             }
         } label: {
-            if let selectedCondition = button.selectedCondition, let selectedState = button.selectedState {
-                switch selectedCondition {
-                case let .selectedSection(sectionId, sectionIndex):
-                    if sectionIndex == sectionsViewModel.selectedIndex(for: sectionId) {
-                        AdaptyUIElementView(selectedState)
-                    } else {
-                        AdaptyUIElementView(button.normalState)
-                    }
-                case let .selectedProduct(productId, productsGroupId):
-                    if productId == productsViewModel.selectedProductId(by: productsGroupId) {
-                        AdaptyUIElementView(selectedState)
-                    } else {
-                        AdaptyUIElementView(button.normalState)
-                    }
-                }
-            } else {
-                AdaptyUIElementView(button.normalState)
-            }
+            AdaptyUIElementView(currentStateView)
         }
     }
 }
@@ -99,7 +103,9 @@ extension AdaptyUI.ActionAction {
     ) {
         switch self {
         case let .selectProduct(id, groupId):
-            productsViewModel.selectProduct(id: id, forGroupId: groupId)
+            withAnimation(.linear(duration: 0.0)) {
+                productsViewModel.selectProduct(id: id, forGroupId: groupId)
+            }
         case let .unselectProduct(groupId):
             productsViewModel.unselectProduct(forGroupId: groupId)
         case let .purchaseSelectedProduct(groupId):
@@ -109,9 +115,13 @@ extension AdaptyUI.ActionAction {
         case .restore:
             productsViewModel.restorePurchases()
         case let .switchSection(sectionId, index):
-            sectionsViewModel.updateSelection(for: sectionId, index: index)
+            withAnimation(.linear(duration: 0.0)) {
+                sectionsViewModel.updateSelection(for: sectionId, index: index)
+            }
         case let .openScreen(id):
-            screensViewModel.presentScreen(id: id)
+            withAnimation(.linear(duration: 0.3)) {
+                screensViewModel.presentScreen(id: id)
+            }
         case .closeScreen:
             screensViewModel.dismissScreen(id: screenId)
         case .close:

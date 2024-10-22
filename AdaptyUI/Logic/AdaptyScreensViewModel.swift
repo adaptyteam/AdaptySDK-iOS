@@ -51,23 +51,13 @@ package final class AdaptyScreensViewModel: ObservableObject {
 
     func dismissScreen(id: String) {
         Log.ui.verbose("#\(logId)# dismissScreen \(id)")
-
-        dismissListeners[id]?()
-
-        Task { @MainActor [weak self] in
-            try? await Task.sleep(seconds: 0.3)
-            self?.presentedScreensStack.removeAll(where: { $0.id == id })
-        }
+        presentedScreensStack.removeAll(where: { $0.id == id })
     }
 
-    private var dismissListeners = [String: () -> Void]()
+    func dismissTopScreen() {
+        guard let topScreenId = presentedScreensStack.last?.id else { return }
 
-    func addDismissListener(id: String, listener: @escaping () -> Void) {
-        dismissListeners[id] = listener
-    }
-
-    func removeDismissListener(id: String) {
-        dismissListeners.removeValue(forKey: id)
+        dismissScreen(id: topScreenId)
     }
 }
 

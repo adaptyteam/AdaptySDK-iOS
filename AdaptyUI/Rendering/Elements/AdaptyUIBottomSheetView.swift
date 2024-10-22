@@ -23,38 +23,10 @@ struct AdaptyUIBottomSheetView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Color.black
-                .opacity(presented ? 0.4 : 0.0)
-                .onTapGesture {
-                    withAnimation {
-                        viewModel.dismissScreen(id: bottomSheet.id)
-                    }
-                }
-
-            AdaptyUIElementView(bottomSheet.bottomSheet.content)
-                .withScreenId(bottomSheet.id)
-        }
-        .ignoresSafeArea()
-        .animation(.default.delay(0.3), value: presented)
-        .animation(.snappy.delay(0.1))
-        .transition(
-            .move(edge: .bottom)
-        )
-        .onAppear {
-            withAnimation {
-                presented = true
-            }
-
-            viewModel.addDismissListener(id: bottomSheet.id) {
-                withAnimation {
-                    presented = false
-                }
-            }
-        }
-        .onDisappear {
-            viewModel.removeDismissListener(id: bottomSheet.id)
-        }
+        AdaptyUIElementView(bottomSheet.bottomSheet.content)
+            .withScreenId(bottomSheet.id)
+            .animation(.snappy.delay(0.1))
+            .transition(.move(edge: .bottom))
     }
 }
 
