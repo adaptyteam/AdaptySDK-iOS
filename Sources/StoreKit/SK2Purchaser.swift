@@ -28,18 +28,26 @@ actor SK2Purchaser {
             throw AdaptyError.cantMakePayments()
         }
 
-        return try await makePurchase(sk2Product, product.variationId)
+        let options: Set<Product.PurchaseOption> = Set()
+
+        await storage.setVariationIds(product.variationId, for: sk2Product.id)
+
+        let result = try await makePurchase(sk2Product, options, product.variationId)
+
+        storage.removeVariationIds(for: sk2Product.id)
+
+        return result
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     private func makePurchase(
         _ sk2Product: SK2Product,
+        _ options: Set<Product.PurchaseOption>,
         _ variationId: String?
     ) async throws -> AdaptyPurchaseResult {
         let options: Set<Product.PurchaseOption> = Set()
 
         let stamp = Log.stamp
-        await storage.setVariationIds(variationId, for: sk2Product.id)
 
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .productPurchase,
@@ -53,7 +61,6 @@ actor SK2Purchaser {
         do {
             purchaseResult = try await sk2Product.purchase(options: options)
         } catch {
-            storage.removeVariationIds(for: sk2Product.id)
             await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,
                 stamp: stamp,
@@ -127,8 +134,6 @@ actor SK2Purchaser {
                 transaction: purchasedTransaction,
                 reason: .purchasing
             )
-
-            storage.removeVariationIds(for: sk2Product.id)
 
             await sk2Transaction.finish()
 
