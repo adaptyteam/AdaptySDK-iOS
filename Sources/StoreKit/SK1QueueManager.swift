@@ -49,13 +49,9 @@ actor SK1QueueManager: Sendable {
             payment = {
                 let payment = SKMutablePayment(product: sk1Product)
                 payment.applicationUsername = ""
-
-                payment.paymentDiscount = SKPaymentDiscount(
-                    identifier: offerId,
-                    keyIdentifier: response.keyIdentifier,
-                    nonce: response.nonce,
-                    signature: response.signature,
-                    timestamp: response.timestamp
+                payment.paymentDiscount = SK1PaymentDiscount(
+                    offerId: offerId,
+                    signature: response
                 )
                 return payment
             }()

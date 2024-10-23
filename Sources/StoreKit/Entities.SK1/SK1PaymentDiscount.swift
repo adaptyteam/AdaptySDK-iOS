@@ -15,8 +15,8 @@ extension SK1PaymentDiscount {
             identifier: offerId,
             keyIdentifier: signature.keyIdentifier,
             nonce: signature.nonce,
-            signature: signature.signature,
-            timestamp: signature.timestamp
+            signature: signature.signature.base64EncodedString(),
+            timestamp: signature.timestamp as NSNumber
         )
     }
 }

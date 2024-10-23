@@ -10,8 +10,8 @@ extension AdaptyProductDiscount {
     struct Signature: Sendable, Hashable {
         let keyIdentifier: String
         let nonce: UUID
-        let signature: String
-        let timestamp: NSNumber
+        let signature: Data
+        let timestamp: Int
     }
 }
 
@@ -33,12 +33,11 @@ extension AdaptyProductDiscount.Signature: Decodable {
 
         keyIdentifier = try container.decode(String.self, forKey: .keyIdentifier)
         nonce = try container.decode(UUID.self, forKey: .nonce)
-        signature = try container.decode(String.self, forKey: .signature)
-        guard let timestamp = try Int64(container.decode(String.self, forKey: .timestamp)) else {
+        signature = try container.decode(Data.self, forKey: .signature)
+        
+        guard let timestamp = try Int(container.decode(String.self, forKey: .timestamp)) else {
             throw DecodingError.dataCorruptedError(forKey: .timestamp, in: container, debugDescription: "Wrong format of timestamp.")
         }
-        self.timestamp = NSNumber(value: timestamp)
+        self.timestamp = timestamp
     }
 }
-
-

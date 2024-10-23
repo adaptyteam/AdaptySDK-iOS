@@ -19,7 +19,7 @@ actor SK2Purchaser {
     }
 
     func makePurchase(
-        profileId _: String,
+        profileId: String,
         product: AdaptyPaywallProduct
     ) async throws -> AdaptyPurchaseResult {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
@@ -28,7 +28,28 @@ actor SK2Purchaser {
             throw AdaptyError.cantMakePayments()
         }
 
-        let options: Set<Product.PurchaseOption> = Set()
+        let options: Set<Product.PurchaseOption>
+
+        if let offerId = product.promotionalOfferId {
+            let response = try await purchaseValidator.signSubscriptionOffer(
+                profileId: profileId,
+                vendorProductId: product.vendorProductId,
+                offerId: offerId
+            )
+
+            options = [
+                .promotionalOffer(
+                    offerID: offerId,
+                    keyID: response.keyIdentifier,
+                    nonce: response.nonce,
+                    signature: response.signature,
+                    timestamp: response.timestamp
+                ),
+            ]
+
+        } else {
+            options = []
+        }
 
         await storage.setVariationIds(product.variationId, for: sk2Product.id)
 
@@ -45,8 +66,6 @@ actor SK2Purchaser {
         _ options: Set<Product.PurchaseOption>,
         _ variationId: String?
     ) async throws -> AdaptyPurchaseResult {
-        let options: Set<Product.PurchaseOption> = Set()
-
         let stamp = Log.stamp
 
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
