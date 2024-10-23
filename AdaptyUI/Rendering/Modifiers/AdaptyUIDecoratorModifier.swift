@@ -191,6 +191,7 @@ extension AdaptyUI.ShapeType {
 }
 
 @available(iOS 15.0, *)
+@MainActor
 struct AdaptyUIDecoratorModifier: ViewModifier {
     var decorator: AdaptyUI.Decorator
     var includeBackground: Bool

@@ -32,6 +32,7 @@ extension View {
 }
 
 @available(iOS 15.0, *)
+@MainActor
 struct AdaptyUIImageView: View {
     enum InitializationMode {
         case image(AdaptyUI.Image)

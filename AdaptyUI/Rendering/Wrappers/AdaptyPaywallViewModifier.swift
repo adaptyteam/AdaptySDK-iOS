@@ -11,6 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, *)
+@MainActor
 public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Identifiable {
     @Environment(\.presentationMode) private var presentationMode
 
@@ -183,6 +184,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
 }
 
 @available(iOS 15.0, *)
+@MainActor
 public extension View {
     /// Presents a paywall when a binding to a Boolean value that you
     /// provide is true.

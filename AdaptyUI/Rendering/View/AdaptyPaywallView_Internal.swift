@@ -15,6 +15,7 @@ public struct AdaptyIdentifiablePlaceholder: Identifiable {
 }
 
 @available(iOS 15.0, *)
+@MainActor
 struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable {
     private let showDebugOverlay: Bool
     private let products: [AdaptyPaywallProduct]?
