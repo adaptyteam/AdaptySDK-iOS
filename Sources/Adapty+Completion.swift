@@ -293,10 +293,10 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
-    ///   - completion: A result containing the ``AdaptyPurchasedInfo`` object.
+    ///   - completion: A result containing the ``AdaptyPurchaseResult`` object.
     public nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         withCompletion(completion) {
             try await makePurchase(product: product)
@@ -305,7 +305,7 @@ extension Adapty {
 
     public nonisolated static func makePurchase(
         product: AdaptyDeferredProduct,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         withCompletion(completion) {
             try await makePurchase(product: product)

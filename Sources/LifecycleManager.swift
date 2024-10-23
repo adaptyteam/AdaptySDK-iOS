@@ -29,9 +29,8 @@ final class LifecycleManager {
 
     func initialize() {
         log.info("LifecycleManager initialize")
-        Task {
-            await subscribeForLifecycleEvents()
-        }
+
+        subscribeForLifecycleEvents()
         subscribeForStorefrontUpdate()
         scheduleProfileUpdate()
         scheduleIDFAUpdate()
@@ -92,34 +91,41 @@ final class LifecycleManager {
 
     // MARK: - App Open Event Logic
 
-    private func subscribeForLifecycleEvents() async {
+    private func subscribeForLifecycleEvents() {
         #if canImport(UIKit)
-            await NotificationCenter.default.addObserver(
-                forName: UIApplication.didBecomeActiveNotification,
-                object: nil,
-                queue: nil
-            ) { [weak self] _ in
-                Task { [weak self] in
-                    await self?.handleDidBecomeActiveNotification()
-                }
+            Task {
+                #if compiler(>=5.10)
+                    let didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
+                #else
+                    let didBecomeActiveNotification = await UIApplication.didBecomeActiveNotification
+                #endif
+                NotificationCenter.default.addObserver(
+                    forName: didBecomeActiveNotification,
+                    object: nil,
+                    queue: nil,
+                    using: handleDidBecomeActiveNotification
+                )
             }
         #endif
     }
 
-    private func handleDidBecomeActiveNotification() async {
-        log.verbose("handleDidBecomeActiveNotification")
-        Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
+    @Sendable
+    private nonisolated func handleDidBecomeActiveNotification(_: Notification) {
+        Task { @AdaptyActor in
+            log.verbose("handleDidBecomeActiveNotification")
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
 
-        if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
-            log.verbose("handleDidBecomeActiveNotification SKIP")
-            return
+            if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
+                log.verbose("handleDidBecomeActiveNotification SKIP")
+                return
+            }
+            appOpenedSentAt = Date()
+
+            Adapty.trackEvent(.appOpened)
+            log.verbose("handleDidBecomeActiveNotification track")
+
+            try? await syncProfile()
         }
-        appOpenedSentAt = Date()
-
-        Adapty.trackEvent(.appOpened)
-        log.verbose("handleDidBecomeActiveNotification track")
-
-        try? await syncProfile()
     }
 
     // MARK: - IDFA Update Logic

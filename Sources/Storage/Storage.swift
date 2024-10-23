@@ -9,15 +9,13 @@ import Foundation
 
 private let log = Log.storage
 
-extension UserDefaults: @unchecked Sendable {}
-
 final class Storage {
     private enum Constants {
         static let appKeyHash = "AdaptySDK_Application_Key_Hash"
         static let appInstallationIdentifier = "AdaptySDK_Application_Install_Identifier"
     }
 
-    static let userDefaults = UserDefaults.standard
+    static var userDefaults: UserDefaults { .standard }
 
     @AdaptyActor
     fileprivate static var appInstallationIdentifier: String =
