@@ -55,6 +55,12 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
         case .refreshReceiptFailed: "Refresh receipt failed"
         case .productPurchaseFailed: "Product purchase failed"
         case .requestSKProductsFailed: "Request products form App Store failed"
+        case let .trunsactionUnverified(_, error):
+            if let customError = error as? CustomAdaptyError {
+                "Unverified trunsaction: \(customError.debugDescription)"
+            } else {
+                "Unverified trunsaction"
+            }
         }
     }
 }

@@ -14,7 +14,7 @@ actor SK1QueueManager: Sendable {
     private let productsManager: StoreKitProductsManager
     private let storage: VariationIdStorage
 
-    private var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchasedInfo>]]()
+    private var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchaseResult>]]()
     private var makePurchasesProduct = [String: SK1Product]()
 
     fileprivate init(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager, storage: VariationIdStorage) {
@@ -26,7 +26,7 @@ actor SK1QueueManager: Sendable {
     func makePurchase(
         profileId: String,
         product: AdaptyPaywallProduct
-    ) async throws -> AdaptyPurchasedInfo {
+    ) async throws -> AdaptyPurchaseResult {
         guard SKPaymentQueue.canMakePayments() else {
             throw AdaptyError.cantMakePayments()
         }
@@ -49,13 +49,9 @@ actor SK1QueueManager: Sendable {
             payment = {
                 let payment = SKMutablePayment(product: sk1Product)
                 payment.applicationUsername = ""
-
-                payment.paymentDiscount = SKPaymentDiscount(
-                    identifier: offerId,
-                    keyIdentifier: response.keyIdentifier,
-                    nonce: response.nonce,
-                    signature: response.signature,
-                    timestamp: response.timestamp
+                payment.paymentDiscount = SK1PaymentDiscount(
+                    offerId: offerId,
+                    signature: response
                 )
                 return payment
             }()
@@ -73,7 +69,7 @@ actor SK1QueueManager: Sendable {
 
     func makePurchase(
         product: AdaptyDeferredProduct
-    ) async throws -> AdaptyPurchasedInfo {
+    ) async throws -> AdaptyPurchaseResult {
         try await addPayment(product.payment, for: product.underlying.skProduct)
     }
 
@@ -82,7 +78,7 @@ actor SK1QueueManager: Sendable {
         _ payment: SKPayment,
         for underlying: SK1Product,
         with variationId: String? = nil
-    ) async throws -> AdaptyPurchasedInfo {
+    ) async throws -> AdaptyPurchaseResult {
         try await withCheckedThrowingContinuation { continuation in
             addPayment(payment, for: underlying, with: variationId) { result in
                 continuation.resume(with: result)
@@ -94,7 +90,7 @@ actor SK1QueueManager: Sendable {
         _ payment: SKPayment,
         for underlying: SK1Product,
         with variationId: String? = nil,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchasedInfo>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         let productId = payment.productIdentifier
 
@@ -108,11 +104,7 @@ actor SK1QueueManager: Sendable {
         self.makePurchasesCompletionHandlers[productId] = [completion]
 
         Task {
-            if let variationId {
-                await self.setVariationId(variationId, for: productId)
-            }
-
-            SKPaymentQueue.default().add(payment)
+            await storage.setVariationIds(variationId, for: productId)
 
             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                 methodName: .addPayment,
@@ -120,47 +112,8 @@ actor SK1QueueManager: Sendable {
                     "product_id": productId,
                 ]
             ))
-        }
-    }
 
-    @VariationIdStorage.InternalActor
-    private func setVariationId(_ variationId: String, for productId: String) {
-        if storage.setVariationId(variationId, for: productId) {
-            let params: EventParameters = [
-                "variation_by_product": storage.variationsIds,
-            ]
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "didset_variations_ids",
-                    params: params
-                ))
-            }
-        }
-
-        if storage.setPersistentVariationId(variationId, for: productId) {
-            let params: EventParameters = [
-                "variation_by_product": storage.persistentVariationsIds,
-            ]
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "didset_variations_ids_persistent",
-                    params: params
-                ))
-            }
-        }
-    }
-
-    @VariationIdStorage.InternalActor
-    private func removeVariationId(for productId: String) {
-        guard storage.removeVariationId(for: productId) else { return }
-        let params: EventParameters = [
-            "variation_by_product": storage.variationsIds,
-        ]
-        Task {
-            await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                eventName: "didset_variations_ids",
-                params: params
-            ))
+            SKPaymentQueue.default().add(payment)
         }
     }
 
@@ -206,9 +159,7 @@ actor SK1QueueManager: Sendable {
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
         let productId = sk1Transaction.unfProductID
 
-        let (variationId, persistentVariationId) = await { @VariationIdStorage.InternalActor in
-            (storage.variationsIds[productId], storage.persistentVariationsIds[productId])
-        }()
+        let (variationId, persistentVariationId) = await storage.getVariationIds(for: productId)
 
         let purchasedTransaction: PurchasedTransaction =
             if let sk1Product = makePurchasesProduct[productId] {
@@ -226,7 +177,7 @@ actor SK1QueueManager: Sendable {
                 )
             }
 
-        let result: AdaptyResult<AdaptyPurchasedInfo>
+        let result: AdaptyResult<AdaptyPurchaseResult>
         do {
             let response = try await purchaseValidator.validatePurchase(
                 profileId: nil,
@@ -234,7 +185,7 @@ actor SK1QueueManager: Sendable {
                 reason: .purchasing
             )
 
-            Task { await removeVariationId(for: productId) }
+            storage.removeVariationIds(for: productId)
             makePurchasesProduct.removeValue(forKey: productId)
 
             SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
@@ -246,7 +197,7 @@ actor SK1QueueManager: Sendable {
 
             log.info("finish purchased transaction \(sk1Transaction.underlay)")
 
-            result = .success(AdaptySK1PurchasedInfo(profile: response.value, sk1Transaction: sk1Transaction))
+            result = .success(.success(profile: response.value, transaction: sk1Transaction))
 
         } catch {
             result = .failure(error.asAdaptyError ?? AdaptyError.validatePurchaseFailed(unknownError: error))
@@ -257,18 +208,26 @@ actor SK1QueueManager: Sendable {
 
     private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction) {
         let productId = sk1Transaction.unfProductID
-        Task { await removeVariationId(for: productId) }
+        storage.removeVariationIds(for: productId)
         makePurchasesProduct.removeValue(forKey: productId)
-        let error = StoreKitManagerError.productPurchaseFailed(sk1Transaction.error).asAdaptyError
-        callMakePurchasesCompletionHandlers(productId, .failure(error))
+
+        let result: AdaptyResult<AdaptyPurchaseResult>
+        if (sk1Transaction.error as? SKError)?.isPurchaseCancelled ?? false {
+            result = .success(.userCancelled)
+        } else {
+            let error = StoreKitManagerError.productPurchaseFailed(sk1Transaction.error).asAdaptyError
+            result = .failure(error)
+        }
+        callMakePurchasesCompletionHandlers(productId, result)
     }
 
     private func callMakePurchasesCompletionHandlers(
         _ productId: String,
-        _ result: AdaptyResult<AdaptyPurchasedInfo>
+        _ result: AdaptyResult<AdaptyPurchaseResult>
     ) {
         switch result {
         case let .failure(error):
+
             log.error("Failed to purchase product: \(productId) \(error.localizedDescription)")
         case .success:
             log.info("Successfully purchased product: \(productId).")

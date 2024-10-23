@@ -21,6 +21,7 @@ public final class Adapty: Sendable {
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
     let productsManager: StoreKitProductsManager
+    var sk2Purchaser: SK2Purchaser?
     var sk1QueueManager: SK1QueueManager?
 
     package let observerMode: Bool
@@ -63,6 +64,13 @@ public final class Adapty: Sendable {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             if observerMode {
                 SK2TransactionObserver.startObserving(purchaseValidator: self, productsManager: productsManager)
+            } else {
+                #if compiler(>=5.10)
+                    let variationIdStorage = VariationIdStorage()
+                #else
+                    let variationIdStorage = await VariationIdStorage()
+                #endif
+                self.sk2Purchaser = SK2Purchaser(purchaseValidator: self, productsManager: productsManager, storage: variationIdStorage)
             }
         } else {
             if observerMode {
@@ -74,7 +82,7 @@ public final class Adapty: Sendable {
                 #else
                     let variationIdStorage = await VariationIdStorage()
                 #endif
-                self.sk1QueueManager = observerMode ? nil : SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager, storage: variationIdStorage)
+                self.sk1QueueManager = SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager, storage: variationIdStorage)
             }
         }
     }

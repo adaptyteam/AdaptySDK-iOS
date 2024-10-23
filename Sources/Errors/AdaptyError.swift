@@ -22,7 +22,6 @@ extension AdaptyError {
     }
 
     public enum ErrorCode: Int, Sendable {
-
         case unknown = 0
 
         /// Client is not allowed to make a request, etc.

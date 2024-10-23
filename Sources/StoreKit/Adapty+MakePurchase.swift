@@ -14,9 +14,9 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
-    /// - Returns: The ``AdaptyPurchasedInfo`` object.
+    /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchasedInfo {
+    public nonisolated static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [
@@ -35,7 +35,13 @@ extension Adapty {
                 )
             }
 
-            throw AdaptyError.cantMakePayments()
+            guard let manager = sdk.sk2Purchaser else { throw AdaptyError.cantMakePayments() }
+
+            
+            return try await manager.makePurchase(
+                profileId: sdk.profileStorage.profileId,
+                product: product
+            )
         }
     }
 
@@ -45,9 +51,9 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - product: a ``AdaptyDeferredProduct`` object retrieved from the delegate.
-    /// - Returns: The ``AdaptyPurchasedInfo`` object.
+    /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func makePurchase(product: AdaptyDeferredProduct) async throws -> AdaptyPurchasedInfo {
+    public nonisolated static func makePurchase(product: AdaptyDeferredProduct) async throws -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [

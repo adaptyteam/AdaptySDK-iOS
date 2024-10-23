@@ -206,6 +206,8 @@ enum AppleMethodName: String {
 
     case finishTransaction = "finish_transaction"
     case addPayment = "add_payment"
+    case productPurchase = "product_purchase"
+
 }
 
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {

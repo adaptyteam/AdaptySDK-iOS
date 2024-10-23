@@ -22,29 +22,29 @@ final class VariationIdStorage: Sendable {
     }
 
     private static let userDefaults = Storage.userDefaults
-    
+
     private static var variationsIds: [String: String] = userDefaults
         .dictionary(forKey: Constants.variationsIds) as? [String: String] ?? [:]
     private static var persistentVariationsIds: [String: String] = userDefaults
         .dictionary(forKey: Constants.persistentVariationsIds) as? [String: String] ?? variationsIds
 
-    var variationsIds: [String: String] { Self.variationsIds }
-    var persistentVariationsIds: [String: String] { Self.persistentVariationsIds }
+    fileprivate var variationsIds: [String: String] { Self.variationsIds }
+    fileprivate var persistentVariationsIds: [String: String] { Self.persistentVariationsIds }
 
-    func setPersistentVariationId(_ variationId: String, for productId: String) -> Bool {
+    fileprivate func setPersistentVariationId(_ variationId: String, for productId: String) -> Bool {
         guard variationId != Self.persistentVariationsIds.updateValue(variationId, forKey: productId) else { return false }
         Self.userDefaults.set(Self.persistentVariationsIds, forKey: Constants.persistentVariationsIds)
         return true
     }
 
-    func setVariationId(_ variationId: String, for productId: String) -> Bool {
+    fileprivate func setVariationId(_ variationId: String, for productId: String) -> Bool {
         guard variationId != Self.variationsIds.updateValue(variationId, forKey: productId) else { return false }
         Self.userDefaults.set(Self.variationsIds, forKey: Constants.variationsIds)
         log.debug("Saving variationsIds for purchased product")
         return true
     }
 
-    func removeVariationId(for productId: String) -> Bool {
+    fileprivate func removeVariationId(for productId: String) -> Bool {
         guard Self.variationsIds.removeValue(forKey: productId) != nil else { return false }
         Self.userDefaults.set(Self.variationsIds, forKey: Constants.variationsIds)
         log.debug("Saving variationsIds for purchased product")
@@ -57,5 +57,47 @@ final class VariationIdStorage: Sendable {
         userDefaults.removeObject(forKey: Constants.variationsIds)
         userDefaults.removeObject(forKey: Constants.persistentVariationsIds)
         log.debug("Clear variationsIds for purchased product.")
+    }
+}
+
+extension VariationIdStorage {
+    nonisolated func getVariationIds(for productId: String) async -> (String?, String?) {
+        await (variationsIds[productId], persistentVariationsIds[productId])
+    }
+
+    nonisolated func setVariationIds(_ variationId: String?, for productId: String) async {
+        guard let variationId else { return }
+        Task {
+            if await setVariationId(variationId, for: productId) {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "didset_variations_ids",
+                    params: [
+                        "variation_by_product": variationsIds,
+                    ]
+                ))
+            }
+
+            if await setPersistentVariationId(variationId, for: productId) {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "didset_variations_ids_persistent",
+                    params: [
+                        "variation_by_product": persistentVariationsIds,
+                    ]
+                ))
+            }
+        }
+    }
+
+    nonisolated func removeVariationIds(for productId: String) {
+        Task {
+            guard await removeVariationId(for: productId) else { return }
+
+            await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "didset_variations_ids",
+                params: [
+                    "variation_by_product": variationsIds,
+                ]
+            ))
+        }
     }
 }
