@@ -41,6 +41,6 @@ extension AdaptyPaywall: AdaptyPaywallInterface {
     }
 
     package func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
-        try await Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration)
+        await Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration)
     }
 }

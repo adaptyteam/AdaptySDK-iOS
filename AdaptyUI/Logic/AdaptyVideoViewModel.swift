@@ -101,7 +101,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         let playerItemToObserve: AVPlayerItem?
 
         switch video {
-        case let .url(url, image):
+        case let .url(url, _):
             let playerItem = AVPlayerItem(url: url)
             let queuePlayer = AVQueuePlayer(items: [playerItem])
             queuePlayer.isMuted = true
@@ -115,7 +115,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
             playerItemToObserve = playerItem
 
             queuePlayer.play()
-        case let .resources(string, image):
+        case .resources:
             playerItemToObserve = nil
         }
 

@@ -16,7 +16,10 @@ extension MainViewModel {
     var accessLevel: AdaptyProfile.AccessLevel? { profile?.accessLevels[AppConstants.accessLevelId] }
 }
 
-class MainViewModel: NSObject, ObservableObject, AdaptyDelegate {
+extension MainViewModel: @unchecked Sendable {
+}
+
+final class MainViewModel: NSObject, ObservableObject, AdaptyDelegate {
     override init() {
         super.init()
         
