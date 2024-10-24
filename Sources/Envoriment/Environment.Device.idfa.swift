@@ -5,15 +5,15 @@
 //  Created by Andrey Kyashkin on 19.12.2019.
 //
 
-#if canImport(AdSupport)
+import Foundation
+
+#if !ADAPTY_KIDS_MODE && canImport(AdSupport)
     import AdSupport
 #endif
 
-#if canImport(AppTrackingTransparency)
+#if !ADAPTY_KIDS_MODE && canImport(AppTrackingTransparency)
     import AppTrackingTransparency
 #endif
-
-import Foundation
 
 private let log = Log.default
 
@@ -23,24 +23,29 @@ extension Adapty.Configuration {
 }
 
 extension Environment.Device {
-    @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
-    static var appTrackingTransparencyStatus: ATTrackingManager.AuthorizationStatus {
-        ATTrackingManager.trackingAuthorizationStatus
-    }
-
     enum IdfaRetriavalStatus: Sendable {
         case notAvailable
-
         case notDetermined
-
         case denied
         case allowed
+    }
+
+    static var appTrackingTransparencyStatus: UInt? {
+        #if ADAPTY_KIDS_MODE || !canImport(AppTrackingTransparency)
+            return nil
+        #else
+            if #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) {
+                return ATTrackingManager.trackingAuthorizationStatus.rawValue
+            } else {
+                return nil
+            }
+        #endif
     }
 
     @AdaptyActor
     static var idfaRetriavalStatus: IdfaRetriavalStatus {
         get async {
-            #if !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
+            #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
                 return .notAvailable
             #else
                 guard !Adapty.Configuration.idfaCollectionDisabled else {
@@ -66,7 +71,7 @@ extension Environment.Device {
     @AdaptyActor
     static var idfa: String? {
         get async {
-            #if !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
+            #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
                 return nil
             #else
 
@@ -103,7 +108,7 @@ extension Environment.Device {
     }
 }
 
-#if canImport(AppTrackingTransparency)
+#if !ADAPTY_KIDS_MODE && canImport(AppTrackingTransparency)
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
     private extension ATTrackingManager {
         @MainActor

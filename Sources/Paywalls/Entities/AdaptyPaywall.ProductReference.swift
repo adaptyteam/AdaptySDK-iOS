@@ -8,10 +8,11 @@
 import Foundation
 
 extension AdaptyPaywall {
-    struct ProductReference : Sendable, Hashable{
+    struct ProductReference: Sendable, Hashable {
         let adaptyProductId: String
         let vendorId: String
         let promotionalOfferId: String?
+        let winBackOfferId: String?
     }
 }
 
@@ -21,13 +22,13 @@ extension AdaptyPaywall.ProductReference: CustomStringConvertible {
     }
 }
 
-
 extension AdaptyPaywall.ProductReference: Codable {
     enum CodingKeys: String, CodingKey {
         case vendorId = "vendor_product_id"
         case adaptyProductId = "adapty_product_id"
         case promotionalOfferEligibility = "promotional_offer_eligibility"
         case promotionalOfferId = "promotional_offer_id"
+        case winBackOfferId = "win_back_offer_id"
     }
 
     init(from decoder: Decoder) throws {
@@ -39,6 +40,8 @@ extension AdaptyPaywall.ProductReference: Codable {
         } else {
             promotionalOfferId = nil
         }
+
+        winBackOfferId = try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -46,5 +49,6 @@ extension AdaptyPaywall.ProductReference: Codable {
         try container.encode(vendorId, forKey: .vendorId)
         try container.encode(adaptyProductId, forKey: .adaptyProductId)
         try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
+        try container.encodeIfPresent(winBackOfferId, forKey: .winBackOfferId)
     }
 }

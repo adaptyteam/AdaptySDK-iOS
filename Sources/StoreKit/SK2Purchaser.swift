@@ -29,8 +29,24 @@ actor SK2Purchaser {
         }
 
         let options: Set<Product.PurchaseOption>
+        let winBackOfferPurchaseOption: Product.PurchaseOption? = {
+            #if compiler(<6.0)
+                nil
+            #else
+                if let winBackOffer = sk2Product.unfWinBackOffer(byId: product.winBackOfferId),
+                   #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+                    .winBackOffer(winBackOffer)
+                } else {
+                    nil
+                }
+            #endif
+        }()
 
-        if let offerId = product.promotionalOfferId {
+        if let winBackOfferPurchaseOption {
+            options = [
+                winBackOfferPurchaseOption,
+            ]
+        } else if let offerId = product.promotionalOfferId {
             let response = try await purchaseValidator.signSubscriptionOffer(
                 profileId: profileId,
                 vendorProductId: product.vendorProductId,
@@ -59,6 +75,8 @@ actor SK2Purchaser {
 
         return result
     }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     private func makePurchase(

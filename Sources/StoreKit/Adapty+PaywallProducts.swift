@@ -13,6 +13,7 @@ extension Adapty {
         vendorProductId: String,
         adaptyProductId: String,
         promotionalOfferId: String?,
+        winBackOfferId: String?,
         variationId: String,
         paywallABTestName: String,
         paywallName: String
@@ -26,6 +27,7 @@ extension Adapty {
             adaptyProductId: adaptyProductId,
             underlying: product,
             promotionalOfferId: promotionalOfferId,
+            winBackOfferId: winBackOfferId,
             variationId: variationId,
             paywallABTestName: paywallABTestName,
             paywallName: paywallName

@@ -15,6 +15,8 @@ public struct AdaptyPaywallProduct: Sendable {
     /// An identifier of a promotional offer, provided by Adapty for this specific user.
     public let promotionalOfferId: String?
 
+    public let winBackOfferId: String?
+
     /// User's eligibility for the promotional offers. Check this property before displaying info about promotional offers.
     public var promotionalOfferEligibility: Bool { promotionalOfferId != nil }
 
@@ -31,6 +33,7 @@ public struct AdaptyPaywallProduct: Sendable {
         adaptyProductId: String,
         underlying: AdaptyProduct,
         promotionalOfferId: String?,
+        winBackOfferId: String?,
         variationId: String,
         paywallABTestName: String,
         paywallName: String
@@ -38,11 +41,11 @@ public struct AdaptyPaywallProduct: Sendable {
         self.adaptyProductId = adaptyProductId
         self.underlying = underlying
         self.promotionalOfferId = promotionalOfferId
+        self.winBackOfferId = winBackOfferId
         self.variationId = variationId
         self.paywallABTestName = paywallABTestName
         self.paywallName = paywallName
     }
-    
 }
 
 extension AdaptyPaywallProduct: AdaptyProduct {
@@ -72,6 +75,7 @@ extension AdaptyPaywallProduct: CustomStringConvertible {
     public var description: String {
         "(paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName)"
             + (promotionalOfferId.map { ", promotionalOfferId: \($0)" } ?? "")
+            + (winBackOfferId.map { ", winBackOfferId: \($0)" } ?? "")
             + ", product:\(underlying.description)"
     }
 }
@@ -98,6 +102,7 @@ extension AdaptyPaywallProduct {
             adaptyProductId: productReference.adaptyProductId,
             underlying: underlying,
             promotionalOfferId: productReference.promotionalOfferId,
+            winBackOfferId: productReference.winBackOfferId,
             variationId: paywall.variationId,
             paywallABTestName: paywall.abTestName,
             paywallName: paywall.name
@@ -111,6 +116,7 @@ extension AdaptyPaywallProduct: Encodable {
         case adaptyProductId = "adapty_product_id"
 
         case promotionalOfferId = "promotional_offer_id"
+        case winBackOfferId = "win_back_offer_id"
         case paywallVariationId = "paywall_variation_id"
         case paywallABTestName = "paywall_ab_test_name"
         case paywallName = "paywall_name"
@@ -158,6 +164,9 @@ extension AdaptyPaywallProduct: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(vendorProductId, forKey: .vendorProductId)
         try container.encode(adaptyProductId, forKey: .adaptyProductId)
+
+        try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
+        try container.encodeIfPresent(winBackOfferId, forKey: .winBackOfferId)
 
         try container.encode(variationId, forKey: .paywallVariationId)
         try container.encode(paywallABTestName, forKey: .paywallABTestName)
