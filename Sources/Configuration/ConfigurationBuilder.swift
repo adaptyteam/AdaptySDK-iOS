@@ -127,10 +127,26 @@ extension Adapty.ConfigurationBuilder {
         ipAddressCollectionDisabled = value
         return self
     }
-    
+
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
     public func with(callbackDispatchQueue queue: DispatchQueue?) -> Self {
         callbackDispatchQueue = queue
+        return self
+    }
+
+    public enum ServerCluster {
+        case `default`
+        case eu
+    }
+
+    @discardableResult
+    public func with(serverCluster value: ServerCluster) -> Self {
+        switch value {
+        case .default:
+            backendBaseUrl = Backend.URLs.defaultPublicEnvironment.baseUrl
+        case .eu:
+            backendBaseUrl = Backend.URLs.euPublicEnvironment.baseUrl
+        }
         return self
     }
 

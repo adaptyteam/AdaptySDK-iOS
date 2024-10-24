@@ -13,7 +13,7 @@ extension Adapty {
             observerMode: false,
             idfaCollectionDisabled: false,
             ipAddressCollectionDisabled: false,
-            backend: Backend.URLs.publicEnvironment
+            backend: Backend.URLs.defaultPublicEnvironment
         )
 
         let apiKey: String
