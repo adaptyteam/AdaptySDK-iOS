@@ -94,7 +94,7 @@ final class LifecycleManager {
     private func subscribeForLifecycleEvents() {
         #if canImport(UIKit)
             Task {
-                #if compiler(>=5.10)
+                #if compiler(>=6.0)
                     let didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
                 #else
                     let didBecomeActiveNotification = await UIApplication.didBecomeActiveNotification
