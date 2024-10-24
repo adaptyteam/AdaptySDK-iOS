@@ -36,10 +36,11 @@ public extension AdaptyPaywallControllerDelegate {
         didStartPurchase underlying: AdaptyPaywallProduct
     ) {}
 
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFinishPurchase underlying: AdaptyPaywallProduct,
-                           purchasedInfo: AdaptyPurchasedInfo)
-    {
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFinishPurchase underlying: AdaptyPaywallProduct,
+        purchaseResult: AdaptyPurchaseResult
+    ) {
         controller.dismiss(animated: true)
     }
 
@@ -50,12 +51,15 @@ public extension AdaptyPaywallControllerDelegate {
 
     func paywallControllerDidStartRestore(_ controller: AdaptyPaywallController) {}
 
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFailRenderingWith error: AdaptyError) {}
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailRenderingWith error: AdaptyError
+    ) {}
 
-    func paywallController(_ controller: AdaptyPaywallController,
-                           didFailLoadingProductsWith error: AdaptyError) -> Bool
-    {
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailLoadingProductsWith error: AdaptyError
+    ) -> Bool {
         false
     }
 

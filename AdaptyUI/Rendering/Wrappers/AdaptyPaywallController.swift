@@ -42,7 +42,7 @@ public class AdaptyPaywallController: UIViewController {
         let logId = Log.stamp
 
         Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
-        
+
         self.logId = logId
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
@@ -102,11 +102,13 @@ public class AdaptyPaywallController: UIViewController {
                     guard let self else { return }
                     self.delegate?.paywallController(self, didStartPurchase: underlying)
                 },
-                didFinishPurchase: { [weak self] underlying, purchasedInfo in
+                didFinishPurchase: { [weak self] underlying, purchaseResult in
                     guard let self else { return }
-                    self.delegate?.paywallController(self,
-                                                     didFinishPurchase: underlying,
-                                                     purchasedInfo: purchasedInfo)
+                    self.delegate?.paywallController(
+                        self,
+                        didFinishPurchase: underlying,
+                        purchaseResult: purchaseResult
+                    )
                 },
                 didFailPurchase: { [weak self] underlying, error in
                     guard let self else { return }

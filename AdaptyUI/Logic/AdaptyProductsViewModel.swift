@@ -213,8 +213,11 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
             Task { @MainActor [weak self] in
                 do {
-                    let purchasedInfo = try await Adapty.makePurchase(product: product)
-                    self?.eventsHandler.event_didFinishPurchase(product: product, purchasedInfo: purchasedInfo)
+                    let purchaseResult = try await Adapty.makePurchase(product: product)
+                    self?.eventsHandler.event_didFinishPurchase(
+                        product: product,
+                        purchaseResult: purchaseResult
+                    )
                 } catch {
                     let adaptyError = error.asAdaptyError
 
