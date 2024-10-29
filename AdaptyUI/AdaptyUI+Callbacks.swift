@@ -10,10 +10,6 @@ import Foundation
 
 #if canImport(UIKit) && canImport(_Concurrency) && compiler(>=5.5.2)
 
-public typealias AdaptyErrorCompletion_Swift = @Sendable (Error?) -> Void
-public typealias AdaptyResult_Swift<Success> = Swift.Result<Success, Error>
-public typealias AdaptyResultCompletion_Swift<Success> = @Sendable (AdaptyResult_Swift<Success>) -> Void
-
 @available(iOS 15.0, *)
 public extension AdaptyUI {
     /// Use this method to initialize the AdaptyUI SDK.
@@ -23,15 +19,10 @@ public extension AdaptyUI {
     /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
     static func activate(
         configuration: Configuration = .default,
-        _ completion: AdaptyErrorCompletion_Swift? = nil
+        _ completion: AdaptyErrorCompletion? = nil
     ) {
-        Task {
-            do {
-                try await AdaptyUI.activate(configuration: configuration)
-                completion?(nil)
-            } catch {
-                completion?(error)
-            }
+        withCompletion(completion) {
+            try await AdaptyUI.activate(configuration: configuration)
         }
     }
 
@@ -44,18 +35,13 @@ public extension AdaptyUI {
     static func getViewConfiguration(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = 5.0,
-        _ completion: @escaping AdaptyResultCompletion_Swift<AdaptyUI.LocalizedViewConfiguration>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyUI.LocalizedViewConfiguration>
     ) {
-        Task {
-            do {
-                let result = try await Adapty.getViewConfiguration(
-                    paywall: paywall,
-                    loadTimeout: loadTimeout
-                )
-                completion(.success(result))
-            } catch {
-                completion(.failure(error))
-            }
+        withCompletion(completion) {
+            try await Adapty.getViewConfiguration(
+                paywall: paywall,
+                loadTimeout: loadTimeout
+            )
         }
     }
 }

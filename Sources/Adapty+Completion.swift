@@ -427,7 +427,7 @@ extension Adapty {
     }
 }
 
-private func withCompletion(
+package func withCompletion(
     _ completion: AdaptyErrorCompletion? = nil,
     from operation: @escaping @Sendable () async throws -> Void
 ) {
@@ -452,7 +452,7 @@ private func withCompletion(
     }
 }
 
-private func withCompletion<T: Sendable>(
+package func withCompletion<T: Sendable>(
     _ completion: AdaptyResultCompletion<T>?,
     from operation: @escaping @Sendable () async throws -> T
 ) {
