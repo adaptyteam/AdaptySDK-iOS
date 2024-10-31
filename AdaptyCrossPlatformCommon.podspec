@@ -33,6 +33,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.source_files = 'CrossPlatformCommon/**/*.{h,m,mm,swift}'
 
   s.dependency 'Adapty', s.version.to_s
+  s.dependency 'AdaptyUI', s.version.to_s
 
   s.frameworks = 'StoreKit'
 
