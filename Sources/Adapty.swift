@@ -85,6 +85,8 @@ public final class Adapty: Sendable {
                 self.sk1QueueManager = SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager, storage: variationIdStorage)
             }
         }
+
+        startSyncIPv4OnceIfNeeded()
     }
 
     fileprivate var sharedProfileManager: ProfileManager.Shared?
