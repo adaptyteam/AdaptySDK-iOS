@@ -29,8 +29,8 @@ extension SK1Product {
         )
     }
 
-    func promotionalOffer(byIdentifier identifier: String?) -> AdaptySubscriptionOffer? {
-        guard let identifier, let offer = discounts.first(where: { $0.identifier == identifier })
+    func promotionalOffer(byIdentifier identifier: String) -> AdaptySubscriptionOffer? {
+        guard let offer = discounts.first(where: { $0.identifier == identifier })
         else { return nil }
         return AdaptySubscriptionOffer(
             offerType: .promotional(identifier),

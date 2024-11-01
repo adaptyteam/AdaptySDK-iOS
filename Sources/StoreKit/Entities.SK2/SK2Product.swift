@@ -12,7 +12,6 @@ typealias SK2Product = Product
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2Product {
-
     @inlinable
     var unfCurrencyCode: String? {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
@@ -48,11 +47,11 @@ extension SK2Product {
         return .autoupdatingCurrent
     }
 
-    func unfWinBackOffer(byId id: String?) -> SK2Product.SubscriptionOffer? {
+    func unfWinBackOffer(byId id: String) -> SK2Product.SubscriptionOffer? {
         #if compiler(<6.0)
             return nil
         #else
-            guard let id, #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
+            guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
                 return nil
             }
 
