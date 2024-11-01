@@ -19,7 +19,6 @@ public struct AdaptyIdentifiablePlaceholder: Identifiable {
 struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable {
     private let showDebugOverlay: Bool
     private let products: [AdaptyPaywallProduct]?
-    private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     private let eventsHandler: AdaptyEventsHandler
     
     private let paywallViewModel: AdaptyPaywallViewModel
@@ -38,7 +37,6 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
         logId: String,
         paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]?,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         configuration: AdaptyUI.LocalizedViewConfiguration,
         observerModeResolver: AdaptyObserverModeResolver?,
         tagResolver: AdaptyTagResolver?,
@@ -61,7 +59,6 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
     ) {
         self.showDebugOverlay = showDebugOverlay
         self.products = products
-        self.introductoryOffersEligibilities = introductoryOffersEligibilities
 
         self.showAlertItem = showAlertItem
         self.showAlertBuilder = showAlertBuilder
@@ -94,7 +91,6 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
             eventsHandler: eventsHandler,
             paywallViewModel: paywallViewModel,
             products: products,
-            introductoryOffersEligibilities: introductoryOffersEligibilities,
             observerModeResolver: observerModeResolver
         )
         screensViewModel = AdaptyScreensViewModel(eventsHandler: eventsHandler,
