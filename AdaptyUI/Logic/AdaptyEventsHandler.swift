@@ -18,7 +18,7 @@ package final class AdaptyEventsHandler {
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
     private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
-    private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)?
+    private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
     private let didCancelPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didStartRestore: (() -> Void)?
@@ -48,7 +48,7 @@ package final class AdaptyEventsHandler {
         didPerformAction: @escaping (AdaptyUI.Action) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
-        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,
+        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
         didCancelPurchase: @escaping (AdaptyPaywallProduct) -> Void,
         didStartRestore: @escaping () -> Void,
@@ -94,10 +94,10 @@ package final class AdaptyEventsHandler {
 
     func event_didFinishPurchase(
         product: AdaptyPaywallProduct,
-        purchasedInfo: AdaptyPurchasedInfo
+        purchaseResult: AdaptyPurchaseResult
     ) {
         Log.ui.verbose("#\(logId)# event_didFinishPurchase: \(product.vendorProductId)")
-        didFinishPurchase?(product, purchasedInfo)
+        didFinishPurchase?(product, purchaseResult)
     }
 
     func event_didFailPurchase(

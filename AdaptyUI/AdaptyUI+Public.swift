@@ -88,11 +88,11 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
-    ///   - purchasedInfo: an ``AdaptyPurchasedInfo`` object containing up to date information about successful purchase.
+    ///   - purchaseResult: an ``AdaptyPurchaseResult`` object containing up to date information about successful purchase.
     func paywallController(
         _ controller: AdaptyPaywallController,
         didFinishPurchase product: AdaptyPaywallProduct,
-        purchasedInfo: AdaptyPurchasedInfo
+        purchaseResult: AdaptyPurchaseResult
     )
 
     /// This method is invoked when the purchase process fails.

@@ -59,7 +59,7 @@ private final class AllEventsStorage: Sendable {
     }) { first, _ in first }
 
     static func incrimentEventCount(_ kind: Kind) {
-        let nextValue = eventsCount[kind] ?? 0 + 1
+        let nextValue = (eventsCount[kind] ?? 0) + 1
         userDefaults.set(nextValue, forKey: kind.counterKey)
         eventsCount[kind] = nextValue
         log.debug("Save \(kind.prefix)Event Counter = \(nextValue) success.")

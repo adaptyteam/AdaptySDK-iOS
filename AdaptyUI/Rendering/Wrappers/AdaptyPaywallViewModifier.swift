@@ -31,7 +31,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
     private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
-    private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)?
+    private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: (AdaptyPaywallProduct, AdaptyError) -> Void
     private let didCancelPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didStartRestore: (() -> Void)?
@@ -80,7 +80,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
-        didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)? = nil,
+        didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
         didCancelPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
@@ -227,7 +227,7 @@ public extension View {
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
-        didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void)? = nil,
+        didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
         didCancelPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,

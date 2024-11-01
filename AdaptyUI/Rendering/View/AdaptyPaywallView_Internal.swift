@@ -47,7 +47,7 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
         didPerformAction: @escaping (AdaptyUI.Action) -> Void,
         didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
-        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchasedInfo) -> Void,
+        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
         didCancelPurchase: @escaping (AdaptyPaywallProduct) -> Void,
         didStartRestore: @escaping () -> Void,
