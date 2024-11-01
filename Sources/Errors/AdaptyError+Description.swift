@@ -61,6 +61,10 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
             } else {
                 "Unverified trunsaction"
             }
+        case .unknownIntroEligibility: "unknown intro offer eligibility"
+        case .purchasingNotDeterminedOffer: "purchasing not determined offer"
+        case let .purchasingWinBackOfferFail(_, error):
+            error
         }
     }
 }

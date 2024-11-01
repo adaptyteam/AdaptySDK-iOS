@@ -30,9 +30,4 @@ protocol StoreKitProductsManager: Actor, Sendable {
         id: String,
         fetchPolicy: ProductsFetchPolicy
     ) async throws -> AdaptyProduct
-
-    func fetchProductsInSameOrder(
-        ids: [String],
-        fetchPolicy: ProductsFetchPolicy
-    ) async throws -> [AdaptyProduct]
 }

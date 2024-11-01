@@ -10,7 +10,7 @@ import StoreKit
 typealias SK1PaymentDiscount = SKPaymentDiscount
 
 extension SK1PaymentDiscount {
-    convenience init(offerId: String, signature: AdaptyProductDiscount.Signature) {
+    convenience init(offerId: String, signature: AdaptySubscriptionOffer.Signature) {
         self.init(
             identifier: offerId,
             keyIdentifier: signature.keyIdentifier,

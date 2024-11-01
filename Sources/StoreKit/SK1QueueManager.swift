@@ -39,25 +39,38 @@ actor SK1QueueManager: Sendable {
 
         let payment: SKPayment
 
-        if let offerId = product.promotionalOfferId {
-            let response = try await purchaseValidator.signSubscriptionOffer(
-                profileId: profileId,
-                vendorProductId: product.vendorProductId,
-                offerId: offerId
-            )
+        switch product.subscriptionOffer {
+        case .notDetermined:
+            throw StoreKitManagerError.purchasingNotDeterminedOffer().asAdaptyError
 
-            payment = {
-                let payment = SKMutablePayment(product: sk1Product)
-                payment.applicationUsername = ""
-                payment.paymentDiscount = SK1PaymentDiscount(
-                    offerId: offerId,
-                    signature: response
-                )
-                return payment
-            }()
-
-        } else {
+        case .unavailable:
             payment = SKPayment(product: sk1Product)
+
+        case let .available(offer):
+            switch offer.offerTypeWithIdentifier {
+            case .introductory:
+                payment = SKPayment(product: sk1Product)
+            case .winBack:
+                throw StoreKitManagerError.purchasingWinBackOfferFail("StoreKit1 Does not support winBackOffer purchase")
+            case let .promotional(offerId):
+
+                let response = try await purchaseValidator.signSubscriptionOffer(
+                    profileId: profileId,
+                    vendorProductId: product.vendorProductId,
+                    offerId: offerId
+                )
+
+                payment = {
+                    let payment = SKMutablePayment(product: sk1Product)
+                    payment.applicationUsername = ""
+                    payment.paymentDiscount = SK1PaymentDiscount(
+                        offerId: offerId,
+                        signature: response
+                    )
+
+                    return payment
+                }()
+            }
         }
 
         return try await addPayment(

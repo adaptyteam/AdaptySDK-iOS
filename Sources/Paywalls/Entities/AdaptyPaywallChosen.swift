@@ -46,7 +46,7 @@ extension AdaptyPaywallChosen: Decodable {
         )
 
         func paywall(from decoder: Decoder, index: Int) throws -> AdaptyPaywall {
-            struct Empty: Decodable /* temp */ {}
+            struct Empty: Decodable {}
 
             var array = try decoder.unkeyedContainer()
             while !array.isAtEnd {

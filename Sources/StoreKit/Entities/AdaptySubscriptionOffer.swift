@@ -1,5 +1,5 @@
 //
-//  AdaptyProductDiscount.swift
+//  AdaptySubscriptionOffer.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -7,14 +7,16 @@
 
 import Foundation
 
-public struct AdaptyProductDiscount: Sendable, Hashable {
+public struct AdaptySubscriptionOffer: Sendable, Hashable {
     fileprivate let _price: Price
 
     /// Unique identifier of a discount offer for a product.
-    public let identifier: String?
+    public var identifier: String? { offerTypeWithIdentifier.identifier }
 
-    public let offerType: OfferType
+    public var offerType: OfferType { offerTypeWithIdentifier.asOfferType }
 
+    let offerTypeWithIdentifier: OfferTypeWithIdentifier
+    
     /// An information about period for a product discount.
     public let subscriptionPeriod: AdaptyProductSubscriptionPeriod
 
@@ -38,19 +40,18 @@ public struct AdaptyProductDiscount: Sendable, Hashable {
 
     /// A formatted price of a discount for a user's locale.
     public var localizedPrice: String? { _price.localizedString }
-    
-    init(_price: Price, 
-         identifier: String?,
-         offerType: OfferType,
-         subscriptionPeriod: AdaptyProductSubscriptionPeriod, 
-         numberOfPeriods: Int,
-         paymentMode: PaymentMode,
-         localizedSubscriptionPeriod: String?,
-         localizedNumberOfPeriods: String?
+
+    init(
+        _price: Price,
+        offerTypeWithIdentifier: OfferTypeWithIdentifier,
+        subscriptionPeriod: AdaptyProductSubscriptionPeriod,
+        numberOfPeriods: Int,
+        paymentMode: PaymentMode,
+        localizedSubscriptionPeriod: String?,
+        localizedNumberOfPeriods: String?
     ) {
         self._price = _price
-        self.identifier = identifier
-        self.offerType = offerType
+        self.offerTypeWithIdentifier = offerTypeWithIdentifier
         self.subscriptionPeriod = subscriptionPeriod
         self.numberOfPeriods = numberOfPeriods
         self.paymentMode = paymentMode
@@ -60,12 +61,12 @@ public struct AdaptyProductDiscount: Sendable, Hashable {
 }
 
 extension Price {
-    init(from product: AdaptyProductDiscount) {
+    init(from product: AdaptySubscriptionOffer) {
         self = product._price
     }
 }
 
-extension AdaptyProductDiscount: CustomStringConvertible {
+extension AdaptySubscriptionOffer: CustomStringConvertible {
     public var description: String {
         "(price: \(_price), type: \(offerType)"
             + (identifier.map { ", identifier: \($0)" } ?? "")
@@ -76,7 +77,7 @@ extension AdaptyProductDiscount: CustomStringConvertible {
     }
 }
 
-extension AdaptyProductDiscount: Encodable {
+extension AdaptySubscriptionOffer: Encodable {
     enum CodingKeys: String, CodingKey {
         case price
         case identifier

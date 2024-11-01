@@ -35,10 +35,7 @@ extension AdaptyDeferredProduct: AdaptyProduct {
     public var regionCode: String? { underlying.regionCode }
     public var isFamilyShareable: Bool { underlying.isFamilyShareable }
     public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? { underlying.subscriptionPeriod }
-    public var introductoryDiscount: AdaptyProductDiscount? { underlying.introductoryDiscount }
     public var subscriptionGroupIdentifier: String? { underlying.subscriptionGroupIdentifier }
-    public var discounts: [AdaptyProductDiscount] { underlying.discounts }
-    public func discount(byIdentifier id: String) -> AdaptyProductDiscount? { underlying.discount(byIdentifier: id) }
     public var localizedPrice: String? { underlying.localizedPrice }
     public var localizedSubscriptionPeriod: String? { underlying.localizedSubscriptionPeriod }
 }

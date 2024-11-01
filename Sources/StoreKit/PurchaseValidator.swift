@@ -19,7 +19,7 @@ protocol PurchaseValidator: AnyObject, Sendable {
         profileId: String,
         vendorProductId: String,
         offerId: String
-    ) async throws -> AdaptyProductDiscount.Signature
+    ) async throws -> AdaptySubscriptionOffer.Signature
 }
 
 
@@ -52,7 +52,7 @@ extension Adapty: PurchaseValidator {
         profileId: String,
         vendorProductId: String,
         offerId: String
-    ) async throws -> AdaptyProductDiscount.Signature {
+    ) async throws -> AdaptySubscriptionOffer.Signature {
         do {
             let response = try await httpSession.signSubscriptionOffer(
                 profileId: profileId,

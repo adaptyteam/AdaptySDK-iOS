@@ -11,7 +11,7 @@
 
     @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
     extension SK2Transaction.Offer.PaymentMode {
-        var asPaymentMode: AdaptyProductDiscount.PaymentMode {
+        var asPaymentMode: AdaptySubscriptionOffer.PaymentMode {
             switch self {
             case .payAsYouGo:
                 .payAsYouGo

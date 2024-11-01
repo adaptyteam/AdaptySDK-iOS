@@ -16,7 +16,7 @@ protocol ProductInfoModel {
     var adaptyProductId: String { get }
     var adaptyProduct: AdaptyPaywallProduct? { get }
 
-    var paymentMode: AdaptyProductDiscount.PaymentMode { get }
+    var paymentMode: AdaptySubscriptionOffer.PaymentMode { get }
 
     func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement?
 }
@@ -48,7 +48,7 @@ struct RealProductInfo: ProductInfoModel {
 
     var adaptyProductId: String { underlying.adaptyProductId }
     var adaptyProduct: AdaptyPaywallProduct? { underlying }
-    var paymentMode: AdaptyProductDiscount.PaymentMode {
+    var paymentMode: AdaptySubscriptionOffer.PaymentMode {
         guard let offer = underlying.eligibleDiscount(introEligibility: introEligibility) else { return .unknown}
         return offer.paymentMode
     }

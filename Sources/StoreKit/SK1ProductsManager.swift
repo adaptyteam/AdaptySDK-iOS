@@ -70,12 +70,12 @@ extension SK1ProductsManager {
         )
     }
 
-    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [AdaptyProduct] {
+    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [SK1Product] {
         let products = try await fetchSK1Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in
             products.first { $0.productIdentifier == id }
-        }.map(AdaptySK1Product.init)
+        }
     }
 
     func fetchSK1Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> SK1Product {

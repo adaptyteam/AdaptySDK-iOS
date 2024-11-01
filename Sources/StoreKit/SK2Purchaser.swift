@@ -29,42 +29,47 @@ actor SK2Purchaser {
         }
 
         let options: Set<Product.PurchaseOption>
-        let winBackOfferPurchaseOption: Product.PurchaseOption? = {
-            #if compiler(<6.0)
-                nil
-            #else
-                if let winBackOffer = sk2Product.unfWinBackOffer(byId: product.winBackOfferId),
-                   #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
-                    .winBackOffer(winBackOffer)
-                } else {
-                    nil
-                }
-            #endif
-        }()
 
-        if let winBackOfferPurchaseOption {
-            options = [
-                winBackOfferPurchaseOption,
-            ]
-        } else if let offerId = product.promotionalOfferId {
-            let response = try await purchaseValidator.signSubscriptionOffer(
-                profileId: profileId,
-                vendorProductId: product.vendorProductId,
-                offerId: offerId
-            )
-
-            options = [
-                .promotionalOffer(
-                    offerID: offerId,
-                    keyID: response.keyIdentifier,
-                    nonce: response.nonce,
-                    signature: response.signature,
-                    timestamp: response.timestamp
-                ),
-            ]
-
-        } else {
+        switch product.subscriptionOffer {
+        case .notDetermined:
+            throw StoreKitManagerError.purchasingNotDeterminedOffer().asAdaptyError
+        case .unavailable:
             options = []
+        case let .available(offer):
+            switch offer.offerTypeWithIdentifier {
+            case .introductory:
+                options = []
+
+            case let .winBack(offerId):
+                #if compiler(<6.0)
+                    throw StoreKitManagerError.purchasingWinBackOfferFail("Does not support winBackOffer purchase before iOS 6.0")
+                #else
+                    if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
+                       let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId) {
+                        options = [.winBackOffer(winBackOffer)]
+                    } else {
+                        throw StoreKitManagerError.purchasingWinBackOfferFail("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)")
+                    }
+                #endif
+
+            case let .promotional(offerId):
+
+                let response = try await purchaseValidator.signSubscriptionOffer(
+                    profileId: profileId,
+                    vendorProductId: product.vendorProductId,
+                    offerId: offerId
+                )
+
+                options = [
+                    .promotionalOffer(
+                        offerID: offerId,
+                        keyID: response.keyIdentifier,
+                        nonce: response.nonce,
+                        signature: response.signature,
+                        timestamp: response.timestamp
+                    ),
+                ]
+            }
         }
 
         await storage.setVariationIds(product.variationId, for: sk2Product.id)

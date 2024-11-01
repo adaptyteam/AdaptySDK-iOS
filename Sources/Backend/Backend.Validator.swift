@@ -8,13 +8,13 @@
 import Foundation
 
 extension Backend {
-    private struct ErrorCodesResponse: Decodable /* temp */ {
+    private struct ErrorCodesResponse: Decodable {
         let codes: [Code]?
         enum CodingKeys: String, CodingKey {
             case codes = "errors"
         }
 
-        struct Code: Decodable /* temp */ {
+        struct Code: Decodable {
             enum CodingKeys: String, CodingKey {
                 case value = "code"
             }

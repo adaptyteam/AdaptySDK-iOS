@@ -1,5 +1,5 @@
 //
-//  AdaptyProductDiscount.PaymentMode.swift
+//  AdaptySubscriptionOffer.PaymentMode.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyProductDiscount {
+extension AdaptySubscriptionOffer {
     public enum PaymentMode: UInt, Sendable {
         case payAsYouGo
         case payUpFront
@@ -16,18 +16,7 @@ extension AdaptyProductDiscount {
     }
 }
 
-//extension AdaptyProductDiscount.PaymentMode: CustomStringConvertible {
-//    public var description: String {
-//        switch self {
-//        case .payAsYouGo: "payAsYouGo"
-//        case .payUpFront: "payUpFront"
-//        case .freeTrial: "freeTrial"
-//        case .unknown: "unknown"
-//        }
-//    }
-//}
-
-extension AdaptyProductDiscount.PaymentMode: Encodable {
+extension AdaptySubscriptionOffer.PaymentMode: Encodable {
     private enum CodingValues: String {
         case payAsYouGo = "pay_as_you_go"
         case payUpFront = "pay_up_front"

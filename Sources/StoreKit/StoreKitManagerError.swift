@@ -15,6 +15,9 @@ enum StoreKitManagerError: Error {
     case requestSKProductsFailed(AdaptyError.Source, error: Error)
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
     case trunsactionUnverified(AdaptyError.Source, error: Error?)
+    case unknownIntroEligibility(AdaptyError.Source)
+    case purchasingNotDeterminedOffer(AdaptyError.Source)
+    case purchasingWinBackOfferFail(AdaptyError.Source, error: String)
 }
 
 extension StoreKitManagerError: CustomStringConvertible {
@@ -46,6 +49,12 @@ extension StoreKitManagerError: CustomStringConvertible {
             } else {
                 "StoreKitManagerError.trunsactionUnverified(\(source))"
             }
+        case let .unknownIntroEligibility(source):
+            "StoreKitManagerError.unknownIntroEligibility(\(source))"
+        case let .purchasingNotDeterminedOffer(source):
+            "StoreKitManagerError.purchasingNotDeterminedOffer(\(source))"
+        case let .purchasingWinBackOfferFail(source, error):
+            "StoreKitManagerError.purchasingWinBackOfferFail(\(source), \"\(error)\")"
         }
     }
 }
@@ -59,7 +68,10 @@ extension StoreKitManagerError {
              let .refreshReceiptFailed(src, _),
              let .requestSKProductsFailed(src, _),
              let .interrupted(src),
-             let .trunsactionUnverified(src, _): src
+             let .trunsactionUnverified(src, _),
+             let .unknownIntroEligibility(src),
+             let .purchasingNotDeterminedOffer(src),
+             let .purchasingWinBackOfferFail(src, _): src
         }
     }
 
@@ -158,5 +170,30 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .trunsactionUnverified(AdaptyError.Source(file: file, function: function, line: line), error: error)
+    }
+
+    static func purchasingNotDeterminedOffer(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .purchasingNotDeterminedOffer(AdaptyError.Source(file: file, function: function, line: line))
+    }
+
+    static func purchasingWinBackOfferFail(
+        _ error: String,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .purchasingWinBackOfferFail(AdaptyError.Source(file: file, function: function, line: line), error: error)
+    }
+
+    static func unknownIntroEligibility(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .unknownIntroEligibility(AdaptyError.Source(file: file, function: function, line: line))
     }
 }

@@ -35,45 +35,7 @@ struct AdaptySK2Product: AdaptyProduct {
         skProduct.subscription?.subscriptionPeriod.asAdaptyProductSubscriptionPeriod
     }
 
-    var introductoryDiscount: AdaptyProductDiscount? {
-        guard let offer = skProduct.subscription?.introductoryOffer else { return nil }
-        return AdaptyProductDiscount(
-            offer: offer,
-            currencyCode: skProduct.unfCurrencyCode,
-            priceLocale: skProduct.unfPriceLocale,
-            periodLocale: skProduct.unfPeriodLocale
-        )
-    }
-
     var subscriptionGroupIdentifier: String? { skProduct.subscription?.subscriptionGroupID }
-
-    var discounts: [AdaptyProductDiscount] {
-        guard let offers = skProduct.subscription?.promotionalOffers, !offers.isEmpty else {
-            return []
-        }
-        let code = skProduct.unfCurrencyCode
-        let priceLocale = skProduct.unfPriceLocale
-        let periodLocale = skProduct.unfPeriodLocale
-        return offers.map { offer in
-            AdaptyProductDiscount(
-                offer: offer,
-                currencyCode: code,
-                priceLocale: priceLocale,
-                periodLocale: periodLocale
-            )
-        }
-    }
-
-    func discount(byIdentifier identifier: String) -> AdaptyProductDiscount? {
-        guard let offer = skProduct.subscription?.promotionalOffers.first(where: { $0.id == identifier })
-        else { return nil }
-        return AdaptyProductDiscount(
-            offer: offer,
-            currencyCode: skProduct.unfCurrencyCode,
-            priceLocale: skProduct.unfPriceLocale,
-            periodLocale: skProduct.unfPeriodLocale
-        )
-    }
 
     var localizedPrice: String? { skProduct.displayPrice }
 

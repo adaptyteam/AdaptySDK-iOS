@@ -9,26 +9,57 @@ import StoreKit
 
 extension SK1Product {
     typealias SubscriptionOffer = SKProductDiscount
+
+    var introductoryOfferNotApplicable: Bool {
+        if let period = subscriptionPeriod,
+           period.numberOfUnits > 0,
+           introductoryPrice != nil {
+            false
+        } else {
+            true
+        }
+    }
+
+    var introductoryOffer: AdaptySubscriptionOffer? {
+        guard let offer = introductoryPrice else { return nil }
+        return AdaptySubscriptionOffer(
+            offerType: .introductory,
+            offer: offer,
+            locale: priceLocale
+        )
+    }
+
+    func promotionalOffer(byIdentifier identifier: String?) -> AdaptySubscriptionOffer? {
+        guard let identifier, let offer = discounts.first(where: { $0.identifier == identifier })
+        else { return nil }
+        return AdaptySubscriptionOffer(
+            offerType: .promotional(identifier),
+            offer: offer,
+            locale: priceLocale
+        )
+    }
 }
 
-extension AdaptyProductDiscount {
-    init(discount: SK1Product.SubscriptionOffer, locale: Locale) {
-        let period = discount.subscriptionPeriod.asAdaptyProductSubscriptionPeriod
-
+private extension AdaptySubscriptionOffer {
+    init(
+        offerType: OfferTypeWithIdentifier,
+        offer: SK1Product.SubscriptionOffer,
+        locale: Locale
+    ) {
+        let period = offer.subscriptionPeriod.asAdaptyProductSubscriptionPeriod
         self.init(
             _price: Price(
-                amount: discount.price as Decimal,
+                amount: offer.price as Decimal,
                 currencyCode: locale.unfCurrencyCode,
                 currencySymbol: locale.currencySymbol,
-                localizedString: locale.localized(sk1Price: discount.price)
+                localizedString: locale.localized(sk1Price: offer.price)
             ),
-            identifier: discount.identifier,
-            offerType: discount.type.asOfferType,
+            offerTypeWithIdentifier: offerType,
             subscriptionPeriod: period,
-            numberOfPeriods: discount.numberOfPeriods,
-            paymentMode: discount.paymentMode.asPaymentMode,
+            numberOfPeriods: offer.numberOfPeriods,
+            paymentMode: offer.paymentMode.asPaymentMode,
             localizedSubscriptionPeriod: locale.localized(period: period),
-            localizedNumberOfPeriods: locale.localized(period: period, numberOfPeriods: discount.numberOfPeriods)
+            localizedNumberOfPeriods: locale.localized(period: period, numberOfPeriods: offer.numberOfPeriods)
         )
     }
 }

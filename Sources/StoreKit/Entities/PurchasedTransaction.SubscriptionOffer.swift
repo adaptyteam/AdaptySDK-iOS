@@ -10,7 +10,7 @@ extension PurchasedTransaction {
     struct SubscriptionOffer: Sendable {
         let id: String?
         let period: AdaptyProductSubscriptionPeriod?
-        let paymentMode: AdaptyProductDiscount.PaymentMode
+        let paymentMode: AdaptySubscriptionOffer.PaymentMode
         let offerType: PurchasedTransaction.OfferType
         let price: Decimal?
 
@@ -28,7 +28,7 @@ extension PurchasedTransaction {
         init(
             id: String?,
             period: AdaptyProductSubscriptionPeriod?,
-            paymentMode: AdaptyProductDiscount.PaymentMode,
+            paymentMode: AdaptySubscriptionOffer.PaymentMode,
             offerType: PurchasedTransaction.OfferType,
             price: Decimal?
         ) {

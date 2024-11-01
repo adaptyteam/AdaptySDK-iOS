@@ -35,7 +35,7 @@ extension Adapty {
 private let log = Log.fallbackPaywalls
 
 extension PaywallsStorage {
-    /// 2
+
     func getPaywallWithFallback(byPlacementId placementId: String, profileId: String, locale: AdaptyLocale) -> AdaptyPaywallChosen? {
         let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId).map {
             AdaptyPaywallChosen(value: $0.value, kind: .restore)

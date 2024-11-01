@@ -12,13 +12,7 @@ public struct AdaptyPaywallProduct: Sendable {
 
     let underlying: AdaptyProduct
 
-    /// An identifier of a promotional offer, provided by Adapty for this specific user.
-    public let promotionalOfferId: String?
-
-    public let winBackOfferId: String?
-
-    /// User's eligibility for the promotional offers. Check this property before displaying info about promotional offers.
-    public var promotionalOfferEligibility: Bool { promotionalOfferId != nil }
+    public let subscriptionOffer: AdaptySubscriptionOffer.Available
 
     /// Same as `variationId` property of the parent AdaptyPaywall.
     public let variationId: String
@@ -32,16 +26,14 @@ public struct AdaptyPaywallProduct: Sendable {
     init(
         adaptyProductId: String,
         underlying: AdaptyProduct,
-        promotionalOfferId: String?,
-        winBackOfferId: String?,
+        subscriptionOffer: AdaptySubscriptionOffer.Available,
         variationId: String,
         paywallABTestName: String,
         paywallName: String
     ) {
         self.adaptyProductId = adaptyProductId
         self.underlying = underlying
-        self.promotionalOfferId = promotionalOfferId
-        self.winBackOfferId = winBackOfferId
+        self.subscriptionOffer = subscriptionOffer
         self.variationId = variationId
         self.paywallABTestName = paywallABTestName
         self.paywallName = paywallName
@@ -63,50 +55,42 @@ extension AdaptyPaywallProduct: AdaptyProduct {
     public var regionCode: String? { underlying.regionCode }
     public var isFamilyShareable: Bool { underlying.isFamilyShareable }
     public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? { underlying.subscriptionPeriod }
-    public var introductoryDiscount: AdaptyProductDiscount? { underlying.introductoryDiscount }
     public var subscriptionGroupIdentifier: String? { underlying.subscriptionGroupIdentifier }
-    public var discounts: [AdaptyProductDiscount] { underlying.discounts }
-    public func discount(byIdentifier id: String) -> AdaptyProductDiscount? { underlying.discount(byIdentifier: id) }
     public var localizedPrice: String? { underlying.localizedPrice }
     public var localizedSubscriptionPeriod: String? { underlying.localizedSubscriptionPeriod }
 }
 
 extension AdaptyPaywallProduct: CustomStringConvertible {
     public var description: String {
-        "(paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName)"
-            + (promotionalOfferId.map { ", promotionalOfferId: \($0)" } ?? "")
-            + (winBackOfferId.map { ", winBackOfferId: \($0)" } ?? "")
-            + ", product:\(underlying.description)"
+        "(paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer) , product:\(underlying.description)"
     }
 }
 
-extension AdaptyPaywallProduct {
-    init?(
-        paywall: AdaptyPaywall,
-        underlying: AdaptyProduct
-    ) {
-        let vendorId = underlying.vendorProductId
-        guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
-            return nil
-        }
+extension AdaptySubscriptionOffer {
+    public enum Available: Sendable {
+        case notDetermined
+        case unavailable
+        case available(AdaptySubscriptionOffer)
+    }
+}
 
-        self.init(paywall: paywall, productReference: reference, underlying: underlying)
+extension AdaptySubscriptionOffer.Available: Encodable {
+    enum CodingKeys: String, CodingKey {
+        case determined
+        case offer
     }
 
-    private init(
-        paywall: AdaptyPaywall,
-        productReference: AdaptyPaywall.ProductReference,
-        underlying: AdaptyProduct
-    ) {
-        self.init(
-            adaptyProductId: productReference.adaptyProductId,
-            underlying: underlying,
-            promotionalOfferId: productReference.promotionalOfferId,
-            winBackOfferId: productReference.winBackOfferId,
-            variationId: paywall.variationId,
-            paywallABTestName: paywall.abTestName,
-            paywallName: paywall.name
-        )
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .notDetermined:
+            try container.encode(false, forKey: .determined)
+        case .unavailable:
+            try container.encode(true, forKey: .determined)
+        case let .available(offer):
+            try container.encode(true, forKey: .determined)
+            try container.encode(offer, forKey: .offer)
+        }
     }
 }
 
@@ -115,8 +99,6 @@ extension AdaptyPaywallProduct: Encodable {
         case vendorProductId = "vendor_product_id"
         case adaptyProductId = "adapty_product_id"
 
-        case promotionalOfferId = "promotional_offer_id"
-        case winBackOfferId = "win_back_offer_id"
         case paywallVariationId = "paywall_variation_id"
         case paywallABTestName = "paywall_ab_test_name"
         case paywallName = "paywall_name"
@@ -138,8 +120,8 @@ extension AdaptyPaywallProduct: Encodable {
             case renewalType = "renewal_type"
             case subscriptionPeriod = "subscription_period"
             case localizedSubscriptionPeriod = "localized_subscription_period"
-            case introductoryOfferPhases = "introductory_offer_phases"
-            case promotionalOffer = "promotional_offer"
+            ///            case introductoryOfferPhases = "introductory_offer_phases"
+            case subscriptionOffer = "offer"
         }
 
         func encode(to encoder: Encoder) throws {
@@ -148,15 +130,7 @@ extension AdaptyPaywallProduct: Encodable {
             try container.encode("autorenewable", forKey: .renewalType)
             try container.encodeIfPresent(product.subscriptionPeriod, forKey: .subscriptionPeriod)
             try container.encodeIfPresent(product.localizedSubscriptionPeriod, forKey: .localizedSubscriptionPeriod)
-
-            if let id = product.promotionalOfferId,
-               let discount = product.discount(byIdentifier: id) {
-                try container.encode(discount, forKey: .promotionalOffer)
-            }
-
-            if let discount = product.introductoryDiscount {
-                try container.encode([discount], forKey: .introductoryOfferPhases)
-            }
+            try container.encode(product.subscriptionOffer, forKey: .subscriptionOffer)
         }
     }
 
@@ -164,9 +138,6 @@ extension AdaptyPaywallProduct: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(vendorProductId, forKey: .vendorProductId)
         try container.encode(adaptyProductId, forKey: .adaptyProductId)
-
-        try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
-        try container.encodeIfPresent(winBackOfferId, forKey: .winBackOfferId)
 
         try container.encode(variationId, forKey: .paywallVariationId)
         try container.encode(paywallABTestName, forKey: .paywallABTestName)

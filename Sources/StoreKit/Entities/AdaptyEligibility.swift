@@ -7,20 +7,14 @@
 
 import Foundation
 
-/// Defines offers eligibility state (e.g. introductory offers or promotional offers.)
-public enum AdaptyEligibility: Sendable, Hashable {
-    /// User is not eligible to get any offer, you should't present it in your UI.
+enum AdaptyEligibility: Sendable, Hashable {
     case ineligible
-
-    /// User is eligible for intro offer, it is safe to reflect this info in you UI.
     case eligible
-
-    /// This kind of product is not configured to have an offer.
     case notApplicable
 }
 
 extension AdaptyEligibility: ExpressibleByBooleanLiteral {
-    public init(booleanLiteral value: Bool) {
+    init(booleanLiteral value: Bool) {
         self = value ? .eligible : .ineligible
     }
 }
@@ -32,7 +26,7 @@ extension AdaptyEligibility: Codable {
         case notApplicable = "not_applicable"
     }
 
-    public init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let value = try CodingValues(rawValue: decoder.singleValueContainer().decode(String.self))
         switch value {
         case .some(.ineligible): self = .ineligible
@@ -43,7 +37,7 @@ extension AdaptyEligibility: Codable {
         }
     }
 
-    public var rawStringValue: String {
+    var rawStringValue: String {
         let value: CodingValues =
             switch self {
             case .ineligible: .ineligible
@@ -53,12 +47,12 @@ extension AdaptyEligibility: Codable {
         return value.rawValue
     }
 
-    public func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(rawStringValue)
     }
 }
 
 extension AdaptyEligibility: CustomStringConvertible {
-    public var description: String { rawStringValue }
+    var description: String { rawStringValue }
 }

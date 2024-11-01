@@ -131,7 +131,6 @@ enum MethodName: String {
     case setVariationIdSK1 = "set_variation_id_sk1"
     case setVariationIdSK2 = "set_variation_id_sk2"
     case getPaywallProducts = "get_paywall_products"
-    case getProductsIntroductoryOfferEligibility = "get_products_introductory_offer_eligibility"
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
     case getReceipt = "get_reciept"
     case makePurchase = "make_purchase"
