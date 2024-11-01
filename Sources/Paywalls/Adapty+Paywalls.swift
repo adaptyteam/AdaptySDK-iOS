@@ -58,14 +58,7 @@ extension Adapty {
         _ fetchPolicy: AdaptyPaywall.FetchPolicy,
         _ loadTimeout: TaskDuration
     ) async throws -> AdaptyPaywall {
-        guard let profileId = profileManager?.profileId else {
-            return try await fetchFallbackPaywall(
-                profileStorage.profileId,
-                placementId,
-                locale,
-                httpFallbackSession
-            )
-        }
+        let profileId = profileStorage.profileId
 
         do {
             return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
@@ -101,7 +94,11 @@ extension Adapty {
         _ locale: AdaptyLocale,
         _ fetchPolicy: AdaptyPaywall.FetchPolicy
     ) async throws -> AdaptyPaywall {
-        let manager = try profileManager(with: profileId).orThrows
+        let manager = try await createdProfileManager
+        
+        guard manager.profileId == profileId else {
+            throw AdaptyError.profileWasChanged()
+        }
 
         let fetchTask = Task {
             try await fetchPaywall(
@@ -166,6 +163,7 @@ extension Adapty {
                 throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
             }
 
+            // TODO: get rid of recursion
             return try await fetchPaywall(profileId, placementId, locale)
         }
 
