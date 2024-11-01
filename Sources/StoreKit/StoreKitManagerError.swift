@@ -17,7 +17,8 @@ enum StoreKitManagerError: Error {
     case trunsactionUnverified(AdaptyError.Source, error: Error?)
     case unknownIntroEligibility(AdaptyError.Source)
     case purchasingNotDeterminedOffer(AdaptyError.Source)
-    case purchasingWinBackOfferFail(AdaptyError.Source, error: String)
+    case purchasingWinBackOfferFailed(AdaptyError.Source, error: String)
+    case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
 }
 
 extension StoreKitManagerError: CustomStringConvertible {
@@ -53,8 +54,10 @@ extension StoreKitManagerError: CustomStringConvertible {
             "StoreKitManagerError.unknownIntroEligibility(\(source))"
         case let .purchasingNotDeterminedOffer(source):
             "StoreKitManagerError.purchasingNotDeterminedOffer(\(source))"
-        case let .purchasingWinBackOfferFail(source, error):
-            "StoreKitManagerError.purchasingWinBackOfferFail(\(source), \"\(error)\")"
+        case let .purchasingWinBackOfferFailed(source, error):
+            "StoreKitManagerError.purchasingWinBackOfferFailed(\(source), \"\(error)\")"
+        case let .getSubscriptionInfoStatusFailed(source, error):
+            "StoreKitManagerError.getSubscriptionInfoStatusFailed(\(source), \(error))"
         }
     }
 }
@@ -71,7 +74,8 @@ extension StoreKitManagerError {
              let .trunsactionUnverified(src, _),
              let .unknownIntroEligibility(src),
              let .purchasingNotDeterminedOffer(src),
-             let .purchasingWinBackOfferFail(src, _): src
+             let .purchasingWinBackOfferFailed(src, _),
+             let .getSubscriptionInfoStatusFailed(src, _): src
         }
     }
 
@@ -81,6 +85,7 @@ extension StoreKitManagerError {
              let .productPurchaseFailed(_, error),
              let .trunsactionUnverified(_, error): error
         case let .refreshReceiptFailed(_, error),
+             let .getSubscriptionInfoStatusFailed(_, error),
              let .requestSKProductsFailed(_, error): error
         default: nil
         }
@@ -180,13 +185,13 @@ extension StoreKitManagerError {
         .purchasingNotDeterminedOffer(AdaptyError.Source(file: file, function: function, line: line))
     }
 
-    static func purchasingWinBackOfferFail(
+    static func purchasingWinBackOfferFailed(
         _ error: String,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        .purchasingWinBackOfferFail(AdaptyError.Source(file: file, function: function, line: line), error: error)
+        .purchasingWinBackOfferFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
     static func unknownIntroEligibility(
@@ -195,5 +200,14 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .unknownIntroEligibility(AdaptyError.Source(file: file, function: function, line: line))
+    }
+
+    static func getSubscriptionInfoStatusFailed(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .getSubscriptionInfoStatusFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 }

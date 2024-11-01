@@ -63,8 +63,9 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
             }
         case .unknownIntroEligibility: "unknown intro offer eligibility"
         case .purchasingNotDeterminedOffer: "purchasing not determined offer"
-        case let .purchasingWinBackOfferFail(_, error):
+        case let .purchasingWinBackOfferFailed(_, error):
             error
+        case .getSubscriptionInfoStatusFailed: "get subscription info status failed"
         }
     }
 }

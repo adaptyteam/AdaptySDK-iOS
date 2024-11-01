@@ -127,7 +127,8 @@ extension StoreKitManagerError: CustomAdaptyError {
             }
         case .unknownIntroEligibility: return .invalidOfferPrice
         case .purchasingNotDeterminedOffer: return .productPurchaseFailed
-        case .purchasingWinBackOfferFail: return .invalidOfferIdentifier
+        case .purchasingWinBackOfferFailed: return .invalidOfferIdentifier
+        case .getSubscriptionInfoStatusFailed: return .fetchSubscriptionStatusFailed
         }
     }
 

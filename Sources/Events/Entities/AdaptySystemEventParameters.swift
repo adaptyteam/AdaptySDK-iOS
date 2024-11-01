@@ -207,6 +207,9 @@ enum AppleMethodName: String {
     case addPayment = "add_payment"
     case productPurchase = "product_purchase"
 
+    case subscriptionInfoStatus = "subscription_info_status"
+    case isEligibleForIntroOffer = "is_eligible_for_intro_offer"
+
 }
 
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {

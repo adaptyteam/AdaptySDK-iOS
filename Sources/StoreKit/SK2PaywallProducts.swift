@@ -93,8 +93,27 @@ extension Adapty {
             return (product: tuple.product, reference: tuple.reference, offer: .unavailable, nil)
         }
 
+        let stamp = Log.stamp
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+            methodName: .isEligibleForIntroOffer,
+            stamp: stamp,
+            params: [
+                "product_id": tuple.product.id,
+            ]
+        ))
+
+        let eligible = await subscription.isEligibleForIntroOffer
+
+        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+            methodName: .isEligibleForIntroOffer,
+            stamp: stamp,
+            params: [
+                "is_eligible": eligible,
+            ]
+        ))
+
         offer =
-            if await subscription.isEligibleForIntroOffer {
+            if eligible {
                 .available(introductoryOffer)
             } else {
                 .unavailable
@@ -150,16 +169,48 @@ extension Adapty {
     }
 
     private func eligibleWinBackOfferIds(for subscriptionGroupIdentifier: String) async throws -> [String] {
-        guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else { return [] }
-        let statuses = try await SK2Product.SubscriptionInfo.status(for: subscriptionGroupIdentifier)
+        #if compiler(<6.0)
+            return []
+        #else
+            guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else { return [] }
+            let statuses: [SK2Product.SubscriptionInfo.Status]
+            let stamp = Log.stamp
 
-        let status = statuses.first {
-            guard case let .verified(transaction) = $0.transaction else { return false }
-            guard transaction.ownershipType == .purchased else { return false }
-            return true
-        }
+            do {
+                Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                    methodName: .subscriptionInfoStatus,
+                    stamp: stamp,
+                    params: [
+                        "subscription_group_id": subscriptionGroupIdentifier,
+                    ]
+                ))
 
-        guard case let .verified(renewalInfo) = status?.renewalInfo else { return [] }
-        return renewalInfo.eligibleWinBackOfferIDs
+                statuses = try await SK2Product.SubscriptionInfo.status(for: subscriptionGroupIdentifier)
+
+                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                    methodName: .subscriptionInfoStatus,
+                    stamp: stamp
+                ))
+
+            } catch {
+                log.error(" Error on get SubscriptionInfo.status: \(error.localizedDescription)")
+                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                    methodName: .subscriptionInfoStatus,
+                    stamp: stamp,
+                    error: error.localizedDescription
+                ))
+
+                throw StoreKitManagerError.getSubscriptionInfoStatusFailed(error).asAdaptyError
+            }
+
+            let status = statuses.first {
+                guard case let .verified(transaction) = $0.transaction else { return false }
+                guard transaction.ownershipType == .purchased else { return false }
+                return true
+            }
+
+            guard case let .verified(renewalInfo) = status?.renewalInfo else { return [] }
+            return renewalInfo.eligibleWinBackOfferIDs
+        #endif
     }
 }

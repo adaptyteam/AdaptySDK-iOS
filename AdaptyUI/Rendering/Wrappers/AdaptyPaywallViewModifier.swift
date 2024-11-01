@@ -23,7 +23,6 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     private let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     private let products: [AdaptyPaywallProduct]?
-    private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     private let observerModeResolver: AdaptyObserverModeResolver?
     private let tagResolver: AdaptyTagResolver?
     private let timerResolver: AdaptyTimerResolver?
@@ -73,7 +72,6 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         paywall: AdaptyPaywall,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         products: [AdaptyPaywallProduct]? = nil,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
@@ -108,7 +106,6 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
         self.products = products
-        self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.observerModeResolver = observerModeResolver
         self.tagResolver = tagResolver
         self.timerResolver = timerResolver
@@ -133,7 +130,6 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
             logId: logId,
             paywall: paywall,
             products: products,
-            introductoryOffersEligibilities: introductoryOffersEligibilities,
             configuration: viewConfiguration,
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
@@ -220,7 +216,6 @@ public extension View {
         paywall: AdaptyPaywall,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         products: [AdaptyPaywallProduct]? = nil,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
@@ -245,7 +240,6 @@ public extension View {
                 paywall: paywall,
                 viewConfiguration: viewConfiguration,
                 products: products,
-                introductoryOffersEligibilities: introductoryOffersEligibilities,
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,

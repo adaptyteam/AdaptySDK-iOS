@@ -20,7 +20,6 @@ public class AdaptyPaywallController: UIViewController {
     public let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     let products: [AdaptyPaywallProduct]?
-    let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     let observerModeResolver: AdaptyObserverModeResolver?
     let tagResolver: AdaptyTagResolver?
     let timerResolver: AdaptyTimerResolver?
@@ -31,7 +30,6 @@ public class AdaptyPaywallController: UIViewController {
     init(
         paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]?,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate?,
         observerModeResolver: AdaptyObserverModeResolver?,
@@ -47,7 +45,6 @@ public class AdaptyPaywallController: UIViewController {
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
         self.products = products
-        self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.tagResolver = tagResolver
         self.timerResolver = timerResolver
         self.delegate = delegate
@@ -84,7 +81,6 @@ public class AdaptyPaywallController: UIViewController {
                 logId: logId,
                 paywall: paywall,
                 products: products,
-                introductoryOffersEligibilities: introductoryOffersEligibilities,
                 configuration: viewConfiguration,
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
