@@ -129,42 +129,42 @@ extension Adapty {
         _ placementId: String,
         _ locale: AdaptyLocale
     ) async throws -> AdaptyPaywall {
-        let (segmentId, cached, isTestUser): (String, AdaptyPaywall?, Bool) = try {
-            let manager = try profileManager(with: profileId).orThrows
-            return (
-                manager.profile.value.segmentId,
-                manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
-                manager.profile.value.isTestUser
-            )
-        }()
-
-        do {
-            var response = try await httpSession.fetchPaywallVariations(
-                apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
-                placementId: placementId,
-                locale: locale,
-                segmentId: segmentId,
-                cached: cached,
-                disableServerCache: isTestUser
-            )
-
-            if let manager = tryProfileManagerOrNil(with: profileId) {
-                response = manager.paywallsStorage.savedPaywallChosen(response)
+        
+        while true {
+            let (segmentId, cached, isTestUser): (String, AdaptyPaywall?, Bool) = try {
+                let manager = try profileManager(with: profileId).orThrows
+                return (
+                    manager.profile.value.segmentId,
+                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
+                    manager.profile.value.isTestUser
+                )
+            }()
+            
+            do {
+                var response = try await httpSession.fetchPaywallVariations(
+                    apiKeyPrefix: apiKeyPrefix,
+                    profileId: profileId,
+                    placementId: placementId,
+                    locale: locale,
+                    segmentId: segmentId,
+                    cached: cached,
+                    disableServerCache: isTestUser
+                )
+                
+                if let manager = tryProfileManagerOrNil(with: profileId) {
+                    response = manager.paywallsStorage.savedPaywallChosen(response)
+                }
+                
+                Adapty.trackEventIfNeed(response)
+                return response.value
+                
+            } catch {
+                guard error.wrongProfileSegmentId,
+                      try await updateSegmentId(for: profileId, oldSegmentId: segmentId)
+                else {
+                    throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                }
             }
-
-            Adapty.trackEventIfNeed(response)
-            return response.value
-
-        } catch {
-            guard error.wrongProfileSegmentId,
-                  try await updateSegmentId(for: profileId, oldSegmentId: segmentId)
-            else {
-                throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
-            }
-
-            // TODO: get rid of recursion
-            return try await fetchPaywall(profileId, placementId, locale)
         }
 
         func updateSegmentId(for profileId: String, oldSegmentId: String) async throws -> Bool {
