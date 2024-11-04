@@ -7,9 +7,10 @@
 
 import StoreKit
 
-public protocol AdaptyPaywallProduct: AdaptyProduct {
-    var subscriptionOffer: AdaptySubscriptionOffer.Available { get }
+public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
 
+    var adaptyProductId: String { get }
+    
     /// Same as `variationId` property of the parent AdaptyPaywall.
     var variationId: String { get }
 
@@ -20,18 +21,10 @@ public protocol AdaptyPaywallProduct: AdaptyProduct {
     var paywallName: String { get }
 }
 
-package protocol PaywallProduct : AdaptyPaywallProduct {
-    var adaptyProductId: String { get }
+public protocol AdaptyPaywallProduct: AdaptyPaywallProductWithoutDeterminingOffer {
+    var subscriptionOffer: AdaptySubscriptionOffer? { get }
 }
 
-
-extension AdaptySubscriptionOffer {
-    public enum Available: Sendable {
-        case notDetermined
-        case unavailable
-        case available(AdaptySubscriptionOffer)
-    }
-}
 //
 //extension AdaptySubscriptionOffer.Available: Encodable {
 //    enum CodingKeys: String, CodingKey {

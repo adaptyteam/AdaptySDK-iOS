@@ -42,28 +42,49 @@ extension Adapty {
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
     /// - Returns: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func getPaywallProducts(paywall: AdaptyPaywall, determineOffer: Bool = true) async throws -> [AdaptyPaywallProduct] {
+    public nonisolated static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct] {
         try await withActivatedSDK(
             methodName: .getPaywallProducts,
-            logParams: [
-                "placement_id": paywall.placementId,
-                "determine_offer": determineOffer,
-            ]
+            logParams: ["placement_id": paywall.placementId]
         ) { sdk in
             if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                 if let manager = sdk.productsManager as? SK2ProductsManager {
                     return try await sdk.getSK2PaywallProducts(
                         paywall: paywall,
-                        productsManager: manager,
-                        determineOffer: determineOffer
+                        productsManager: manager
                     )
                 }
             } else {
                 if let manager = sdk.productsManager as? SK1ProductsManager {
                     return try await sdk.getSK1PaywallProducts(
                         paywall: paywall,
-                        productsManager: manager,
-                        determineOffer: determineOffer
+                        productsManager: manager
+                    )
+                }
+            }
+            return []
+        }
+    }
+    
+    
+    
+    public nonisolated static func getPaywallProductsWithoutDeterminingOffer(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+        try await withActivatedSDK(
+            methodName: .getPaywallProductswithoutDeterminingOffer,
+            logParams: ["placement_id": paywall.placementId]
+        ) { sdk in
+            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+                if let manager = sdk.productsManager as? SK2ProductsManager {
+                    return try await sdk.getSK2PaywallProductsWithoutOffers(
+                        paywall: paywall,
+                        productsManager: manager
+                    )
+                }
+            } else {
+                if let manager = sdk.productsManager as? SK1ProductsManager {
+                    return try await sdk.getSK1PaywallProductsWithoutOffers(
+                        paywall: paywall,
+                        productsManager: manager
                     )
                 }
             }

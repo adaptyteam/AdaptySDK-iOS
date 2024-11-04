@@ -10,25 +10,40 @@ import Foundation
 private let log = Log.sk1ProductManager
 
 extension Adapty {
+    func getSK1PaywallProductsWithoutOffers(
+        paywall: AdaptyPaywall,
+        productsManager: SK1ProductsManager
+    ) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+        try await productsManager.fetchSK1ProductsInSameOrder(
+            ids: paywall.vendorProductIds,
+            fetchPolicy: .returnCacheDataElseLoad
+        )
+        .compactMap { sk1Product in
+            let vendorId = sk1Product.productIdentifier
+            guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+                return nil
+            }
+
+            return AdaptySK1PaywallProductWithoutDeterminingOffer(
+                skProduct: sk1Product,
+                adaptyProductId: reference.adaptyProductId,
+                variationId: paywall.variationId,
+                paywallABTestName: paywall.abTestName,
+                paywallName: paywall.name
+            )
+        }
+    }
+
     func getSK1PaywallProducts(
         paywall: AdaptyPaywall,
-        productsManager: SK1ProductsManager,
-        determineOffer: Bool
+        productsManager: SK1ProductsManager
     ) async throws -> [AdaptyPaywallProduct] {
         typealias ProductTuple = (
             product: SK1Product,
             reference: AdaptyPaywall.ProductReference,
-            offer: AdaptySubscriptionOffer.Available
+            offer: AdaptySubscriptionOffer?,
+            determinedOffer: Bool
         )
-
-        func promotionalOffer(_ promotionalOfferId: String?, _ sk1Product: SK1Product) -> AdaptySubscriptionOffer? {
-            guard let promotionalOfferId else { return nil }
-            guard let offer = sk1Product.promotionalOffer(byIdentifier: promotionalOfferId) else {
-                log.warn("no promotional offer found with id:\(promotionalOfferId) in productId:\(sk1Product.productIdentifier)")
-                return nil
-            }
-            return offer
-        }
 
         let sk1Products = try await productsManager.fetchSK1ProductsInSameOrder(
             ids: paywall.vendorProductIds,
@@ -41,29 +56,29 @@ extension Adapty {
                 return nil
             }
 
-            let offer: AdaptySubscriptionOffer.Available =
+            let (offer, determinedOffer): (AdaptySubscriptionOffer?, Bool) =
                 if let promotionalOffer = promotionalOffer(reference.promotionalOfferId, sk1Product) {
-                    .available(promotionalOffer)
+                    (promotionalOffer, true)
                 } else if sk1Product.introductoryOfferNotApplicable {
-                    .unavailable
+                    (nil, true)
                 } else {
-                    .notDetermined
+                    (nil, false)
                 }
 
-            return (product: sk1Product, reference: reference, offer: offer)
+            return (product: sk1Product, reference: reference, offer: offer, determinedOffer: determinedOffer)
         }
 
         let vendorProductIds: [String] = products.compactMap {
-            guard case .notDetermined = $0.offer else { return nil }
+            guard !$0.determinedOffer else { return nil }
             return $0.product.productIdentifier
         }
 
-        if determineOffer, !vendorProductIds.isEmpty {
+        if !vendorProductIds.isEmpty {
             let states = try await getBackendProductStates(vendorProductIds: vendorProductIds)
             products = try products.map {
-                guard case .notDetermined = $0.offer else { return $0 }
+                guard !$0.determinedOffer else { return $0 }
                 guard let introductoryOffer = $0.product.introductoryOffer else {
-                    return (product: $0.product, reference: $0.reference, offer: .unavailable)
+                    return (product: $0.product, reference: $0.reference, offer: nil, determinedOffer: true)
                 }
 
                 let vendorId = $0.product.productIdentifier
@@ -71,20 +86,20 @@ extension Adapty {
                     throw StoreKitManagerError.unknownIntroEligibility().asAdaptyError
                 }
 
-                let offer: AdaptySubscriptionOffer.Available =
+                let offer: AdaptySubscriptionOffer? =
                     if case .eligible = state.introductoryOfferEligibility {
-                        .available(introductoryOffer)
+                        introductoryOffer
                     } else {
-                        .unavailable
+                        nil
                     }
 
-                return (product: $0.product, reference: $0.reference, offer: offer)
+                return (product: $0.product, reference: $0.reference, offer: offer, determinedOffer: true)
             }
         }
 
         return products.map {
             AdaptySK1PaywallProduct(
-                sk1Product: $0.product,
+                skProduct: $0.product,
                 adaptyProductId: $0.reference.adaptyProductId,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
@@ -92,6 +107,15 @@ extension Adapty {
                 paywallName: paywall.name
             )
         }
+    }
+
+    private func promotionalOffer(_ promotionalOfferId: String?, _ sk1Product: SK1Product) -> AdaptySubscriptionOffer? {
+        guard let promotionalOfferId else { return nil }
+        guard let offer = sk1Product.promotionalOffer(byIdentifier: promotionalOfferId) else {
+            log.warn("no promotional offer found with id:\(promotionalOfferId) in productId:\(sk1Product.productIdentifier)")
+            return nil
+        }
+        return offer
     }
 
     private func getBackendProductStates(vendorProductIds: [String]) async throws -> [BackendProductState] {

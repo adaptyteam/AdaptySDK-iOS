@@ -62,7 +62,6 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
                 "Unverified trunsaction"
             }
         case .unknownIntroEligibility: "unknown intro offer eligibility"
-        case .purchasingNotDeterminedOffer: "purchasing not determined offer"
         case let .purchasingWinBackOfferFailed(_, error):
             error
         case .getSubscriptionInfoStatusFailed: "get subscription info status failed"

@@ -11,32 +11,65 @@ private let log = Log.sk2ProductManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Adapty {
-    func getSK2PaywallProducts(
+    func getSK2PaywallProductsWithoutOffers(
         paywall: AdaptyPaywall,
-        productsManager: SK2ProductsManager,
-        determineOffer: Bool
-    ) async throws -> [AdaptyPaywallProduct] {
-        let sk2Products = try await productsManager.fetchSK2ProductsInSameOrder(
+        productsManager: SK2ProductsManager
+    ) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+        try await productsManager.fetchSK2ProductsInSameOrder(
             ids: paywall.vendorProductIds,
             fetchPolicy: .returnCacheDataElseLoad
         )
-
-        var products: [ProductTuple] = sk2Products.compactMap { productTuple(from: paywall, sk2Product: $0) }
-
-        if determineOffer {
-            let eligibleWinBackOfferIds = try await eligibleWinBackOfferIds(for: Set(products.compactMap { $0.subscriptionGroupId }))
-
-            var newProducts = [ProductTuple]()
-            newProducts.reserveCapacity(products.count)
-            for product in products {
-                await newProducts.append(determineOfferFor(product, with: eligibleWinBackOfferIds))
+        .compactMap { sk2Product in
+            let vendorId = sk2Product.id
+            guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+                return nil
             }
-            products = newProducts
+
+            return AdaptySK2PaywallProductWithoutDeterminingOffer(
+                skProduct: sk2Product,
+                adaptyProductId: reference.adaptyProductId,
+                variationId: paywall.variationId,
+                paywallABTestName: paywall.abTestName,
+                paywallName: paywall.name
+            )
+        }
+    }
+
+    func getSK2PaywallProducts(
+        paywall: AdaptyPaywall,
+        productsManager: SK2ProductsManager
+    ) async throws -> [AdaptyPaywallProduct] {
+        let products: [ProductTuple] = try await productsManager.fetchSK2ProductsInSameOrder(
+            ids: paywall.vendorProductIds,
+            fetchPolicy: .returnCacheDataElseLoad
+        )
+        .compactMap { sk2Product in
+            let vendorId = sk2Product.id
+            guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+                return nil
+            }
+
+            let ((offer, determinedOffer), subscriptionGroupId): ((AdaptySubscriptionOffer?, Bool), String?) =
+                if let subscriptionGroupId = sk2Product.subscription?.subscriptionGroupID,
+                winBackOfferExist(with: reference.winBackOfferId, from: sk2Product) {
+                    ((nil, false), subscriptionGroupId)
+                } else {
+                    (subscriptionOfferAvailable(reference, sk2Product), nil)
+                }
+            return (sk2Product, reference, offer, determinedOffer, subscriptionGroupId)
         }
 
-        return products.map {
+        let eligibleWinBackOfferIds = try await eligibleWinBackOfferIds(for: Set(products.compactMap { $0.subscriptionGroupId }))
+
+        var newProducts = [(product: SK2Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?)]()
+        newProducts.reserveCapacity(products.count)
+        for product in products {
+            await newProducts.append(determineOfferFor(product, with: eligibleWinBackOfferIds))
+        }
+
+        return newProducts.map {
             AdaptySK2PaywallProduct(
-                sk2Product: $0.product,
+                skProduct: $0.product,
                 adaptyProductId: $0.reference.adaptyProductId,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
@@ -49,48 +82,50 @@ extension Adapty {
     private typealias ProductTuple = (
         product: SK2Product,
         reference: AdaptyPaywall.ProductReference,
-        offer: AdaptySubscriptionOffer.Available,
+        offer: AdaptySubscriptionOffer?,
+        determinedOffer: Bool,
         subscriptionGroupId: String?
     )
 
-    private func productTuple(from paywall: AdaptyPaywall, sk2Product: SK2Product) -> ProductTuple? {
-        let vendorId = sk2Product.id
-        guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
-            return nil
+    private func subscriptionOfferAvailable(
+        _ reference: AdaptyPaywall.ProductReference,
+        _ sk2Product: SK2Product
+    ) -> (offer: AdaptySubscriptionOffer?, determinedOffer: Bool) {
+        if let promotionalOffer = promotionalOffer(with: reference.promotionalOfferId, from: sk2Product) {
+            (promotionalOffer, true)
+        } else if sk2Product.introductoryOfferNotApplicable {
+            (nil, true)
+        } else {
+            (nil, false)
         }
-
-        let (offer, subscriptionGroupId): (AdaptySubscriptionOffer.Available, String?) =
-            if let subscriptionGroupId = sk2Product.subscription?.subscriptionGroupID,
-            winBackOfferExist(with: reference.winBackOfferId, from: sk2Product) {
-                (.notDetermined, subscriptionGroupId)
-            } else {
-                (subscriptionOfferAvailable(reference, sk2Product), nil)
-            }
-
-        return (product: sk2Product, reference: reference, offer: offer, subscriptionGroupId: subscriptionGroupId)
     }
 
-    private func determineOfferFor(_ tuple: ProductTuple, with eligibleWinBackOfferIds: [String: [String]]) async -> ProductTuple {
-        var offer = tuple.offer
-        guard case .notDetermined = offer else { return tuple }
+    private func determineOfferFor(
+        _ tuple: ProductTuple,
+        with eligibleWinBackOfferIds: [String: [String]]
+    ) async -> (product: SK2Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?) {
+        guard !tuple.determinedOffer else { return (tuple.product, tuple.reference, tuple.offer) }
 
         if let subscriptionGroupId = tuple.subscriptionGroupId,
-           let winBackOfferId = tuple.reference.winBackOfferId {
+           let winBackOfferId = tuple.reference.winBackOfferId
+        {
             if eligibleWinBackOfferIds[subscriptionGroupId]?.contains(winBackOfferId) ?? false,
-               let winBackOffer = winBackOffer(with: winBackOfferId, from: tuple.product) {
-                return (product: tuple.product, reference: tuple.reference, offer: .available(winBackOffer), nil)
+               let winBackOffer = winBackOffer(with: winBackOfferId, from: tuple.product)
+            {
+                return (tuple.product, tuple.reference, winBackOffer)
             }
-            offer = subscriptionOfferAvailable(tuple.reference, tuple.product)
 
-            guard case .notDetermined = offer else {
-                return (product: tuple.product, reference: tuple.reference, offer: offer, nil)
+            let offerAvailable = subscriptionOfferAvailable(tuple.reference, tuple.product)
+
+            if offerAvailable.determinedOffer {
+                return (tuple.product, tuple.reference, offerAvailable.offer)
             }
         }
 
         guard let subscription = tuple.product.subscription,
               let introductoryOffer = tuple.product.introductoryOffer
         else {
-            return (product: tuple.product, reference: tuple.reference, offer: .unavailable, nil)
+            return (tuple.product, tuple.reference, nil)
         }
 
         let stamp = Log.stamp
@@ -112,14 +147,7 @@ extension Adapty {
             ]
         ))
 
-        offer =
-            if eligible {
-                .available(introductoryOffer)
-            } else {
-                .unavailable
-            }
-
-        return (product: tuple.product, reference: tuple.reference, offer: offer, nil)
+        return (tuple.product, tuple.reference, eligible ? introductoryOffer : nil)
     }
 
     private func winBackOffer(with offerId: String?, from sk2Product: SK2Product) -> AdaptySubscriptionOffer? {
@@ -147,16 +175,6 @@ extension Adapty {
             return nil
         }
         return offer
-    }
-
-    private func subscriptionOfferAvailable(_ reference: AdaptyPaywall.ProductReference, _ sk2Product: SK2Product) -> AdaptySubscriptionOffer.Available {
-        if let promotionalOffer = promotionalOffer(with: reference.promotionalOfferId, from: sk2Product) {
-            .available(promotionalOffer)
-        } else if sk2Product.introductoryOfferNotApplicable {
-            .unavailable
-        } else {
-            .notDetermined
-        }
     }
 
     private func eligibleWinBackOfferIds(for subscriptionGroupIdentifiers: Set<String>) async throws -> [String: [String]] {

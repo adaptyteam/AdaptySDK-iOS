@@ -232,11 +232,19 @@ extension Adapty {
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     public nonisolated static func getPaywallProducts(
         paywall: AdaptyPaywall,
-        determineOffer: Bool = true,
         _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
     ) {
         withCompletion(completion) {
-            try await getPaywallProducts(paywall: paywall, determineOffer: determineOffer)
+            try await getPaywallProducts(paywall: paywall)
+        }
+    }
+    
+    public nonisolated static func getPaywallProductsWithoutDeterminingOffer(
+        paywall: AdaptyPaywall,
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProductWithoutDeterminingOffer]>
+    ) {
+        withCompletion(completion) {
+            try await getPaywallProductsWithoutDeterminingOffer(paywall: paywall)
         }
     }
 

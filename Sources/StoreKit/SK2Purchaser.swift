@@ -31,11 +31,9 @@ actor SK2Purchaser {
         let options: Set<Product.PurchaseOption>
 
         switch product.subscriptionOffer {
-        case .notDetermined:
-            throw StoreKitManagerError.purchasingNotDeterminedOffer().asAdaptyError
-        case .unavailable:
+        case .none:
             options = []
-        case let .available(offer):
+        case let .some(offer):
             switch offer.offerTypeWithIdentifier {
             case .introductory:
                 options = []

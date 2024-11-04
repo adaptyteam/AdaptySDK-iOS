@@ -40,13 +40,9 @@ actor SK1QueueManager: Sendable {
         let payment: SKPayment
 
         switch product.subscriptionOffer {
-        case .notDetermined:
-            throw StoreKitManagerError.purchasingNotDeterminedOffer().asAdaptyError
-
-        case .unavailable:
+        case .none:
             payment = SKPayment(product: sk1Product)
-
-        case let .available(offer):
+        case let .some(offer):
             switch offer.offerTypeWithIdentifier {
             case .introductory:
                 payment = SKPayment(product: sk1Product)

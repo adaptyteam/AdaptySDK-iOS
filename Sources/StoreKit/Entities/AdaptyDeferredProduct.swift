@@ -8,8 +8,10 @@
 import StoreKit
 
 public final class AdaptyDeferredProduct: @unchecked Sendable {
-    /// An identifier of a promotional offer, provided by Adapty for this specific user.
-    public var promotionalOfferId: String? { payment.paymentDiscount?.identifier }
+    public var subscriptionOffer: AdaptySubscriptionOffer? {
+        guard let promotionalOfferId = payment.paymentDiscount?.identifier else { return nil }
+        return skProduct.promotionalOffer(byIdentifier: promotionalOfferId)
+    }
 
     let payment: SKPayment
     let skProduct: SK1Product
@@ -21,11 +23,3 @@ public final class AdaptyDeferredProduct: @unchecked Sendable {
 }
 
 extension AdaptyDeferredProduct: AdaptySK1Product {}
-
-extension AdaptyDeferredProduct: CustomStringConvertible {
-    public var description: String {
-        "(vendorProductId: \(vendorProductId)"
-            + (promotionalOfferId.map { ", promotionalOfferId: \($0)" } ?? "")
-            + ", skProduct: \(skProduct))"
-    }
-}
