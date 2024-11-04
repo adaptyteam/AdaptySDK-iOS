@@ -66,7 +66,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///     - product: an ``AdaptyPaywallProduct`` which was selected.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didSelectProduct product: AdaptyPaywallProduct
+        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
     )
 
     /// If user initiates the purchase process, this method will be invoked.

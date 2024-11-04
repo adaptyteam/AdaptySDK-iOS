@@ -43,7 +43,7 @@ struct AdaptyPaywallView_Internal<AlertItem>: View where AlertItem: Identifiable
         timerResolver: AdaptyTimerResolver,
         showDebugOverlay: Bool,
         didPerformAction: @escaping (AdaptyUI.Action) -> Void,
-        didSelectProduct: @escaping (AdaptyPaywallProduct) -> Void,
+        didSelectProduct: @escaping (AdaptyPaywallProductWithoutDeterminingOffer) -> Void,
         didStartPurchase: @escaping (AdaptyPaywallProduct) -> Void,
         didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,

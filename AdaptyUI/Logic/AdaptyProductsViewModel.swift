@@ -11,18 +11,6 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-extension [AdaptyPaywallProduct] {
-    var containsNotDeterminedOffer: Bool {
-        contains(where: {
-            switch $0.subscriptionOffer {
-            case .notDetermined: true
-            default: false
-            }
-        })
-    }
-}
-
-@available(iOS 15.0, *)
 @MainActor
 protocol ProductsInfoProvider {
     func selectedProductInfo(by groupId: String) -> ProductInfoModel?
@@ -52,20 +40,20 @@ package final class AdaptyProductsViewModel: ObservableObject {
     private let paywallViewModel: AdaptyPaywallViewModel
     private let observerModeResolver: AdaptyObserverModeResolver?
 
-    @Published var products: [ProductInfoModel]
+    @Published private var paywallProductsWithoutOffer: [AdaptyPaywallProductWithoutDeterminingOffer]?
+    @Published private var paywallProducts: [AdaptyPaywallProduct]?
+
+    var products: [AdaptyPaywallProductWrapper] {
+        return
+            paywallProducts?.map { .full($0) } ??
+            paywallProductsWithoutOffer?.map { .withoutOffer($0) } ??
+            []
+    }
+
     @Published var selectedProductsIds: [String: String]
     @Published var productsLoadingInProgress: Bool = false
     @Published var purchaseInProgress: Bool = false
     @Published var restoreInProgress: Bool = false
-
-    var adaptyProducts: [AdaptyPaywallProduct]? {
-        didSet {
-            products = Self.generateProductsInfos(
-                paywall: paywallViewModel.paywall,
-                products: adaptyProducts
-            )
-        }
-    }
 
     package init(
         eventsHandler: AdaptyEventsHandler,
@@ -77,34 +65,19 @@ package final class AdaptyProductsViewModel: ObservableObject {
         self.eventsHandler = eventsHandler
         self.paywallViewModel = paywallViewModel
 
-        self.products = Self.generateProductsInfos(
-            paywall: paywallViewModel.paywall,
-            products: products
-        )
-
+        paywallProducts = products
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
 
         self.observerModeResolver = observerModeResolver
     }
 
-    private static func generateProductsInfos(
-        paywall _: AdaptyPaywallInterface,
-        products: [AdaptyPaywallProduct]?
-    ) -> [ProductInfoModel] {
-        guard let products else { return [] }
-
-        return products.map {
-            RealProductInfo(underlying: $0)
-        }
-    }
-
     func loadProductsIfNeeded() {
-        guard !productsLoadingInProgress else { return }
+        guard !productsLoadingInProgress, paywallProducts == nil else { return }
 
-        if let adaptyProducts {
-            loadProducts(determineOffer: adaptyProducts.containsNotDeterminedOffer)
+        if paywallProductsWithoutOffer != nil {
+            loadProducts()
         } else {
-            loadProducts(determineOffer: false)
+            loadProductsWithoutOffers()
         }
     }
 
@@ -115,8 +88,8 @@ package final class AdaptyProductsViewModel: ObservableObject {
     func selectProduct(id: String, forGroupId groupId: String) {
         selectedProductsIds[groupId] = id
 
-        if let selectedProduct = adaptyProducts?.first(where: { $0.adaptyProductId == id }) {
-            eventsHandler.event_didSelectProduct(selectedProduct)
+        if let selectedProduct = products.first(where: { $0.adaptyProductId == id }) {
+            eventsHandler.event_didSelectProduct(selectedProduct.anyProduct)
         }
     }
 
@@ -124,7 +97,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
         selectedProductsIds.removeValue(forKey: groupId)
     }
 
-    private func loadProducts(determineOffer: Bool) {
+    private func loadProductsWithoutOffers() {
         productsLoadingInProgress = true
         let logId = logId
         Log.ui.verbose("#\(logId)# loadProducts begin")
@@ -133,25 +106,8 @@ package final class AdaptyProductsViewModel: ObservableObject {
             guard let self else { return }
 
             do {
-                let adaptyProducts: [AdaptyPaywallProduct]
-                let productsResult = try await self.paywallViewModel.paywall.getPaywallProducts(determineOffer: determineOffer)
-
-                switch productsResult {
-                case .partial(let products, let failedIds):
-                    Log.ui.warn("#\(logId)# loadProducts partial!")
-                    adaptyProducts = products
-                    self.eventsHandler.event_didPartiallyLoadProducts(failedProductIds: failedIds)
-                case .full(let products):
-                    Log.ui.verbose("#\(logId)# loadProducts success")
-                    adaptyProducts = products
-                }
-
-                self.adaptyProducts = adaptyProducts
-                self.productsLoadingInProgress = false
-                
-                if adaptyProducts.containsNotDeterminedOffer {
-                    self.loadProducts(determineOffer: true)
-                }
+                self.paywallProductsWithoutOffer = try await self.paywallViewModel.paywall.getPaywallProductsWithoutDeterminingOffer()
+                self.loadProducts()
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
                 self.productsLoadingInProgress = false
@@ -159,7 +115,45 @@ package final class AdaptyProductsViewModel: ObservableObject {
                 if self.eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) {
                     Task {
                         try await Task.sleep(seconds: 2)
-                        self.loadProducts(determineOffer: determineOffer)
+                        self.loadProductsIfNeeded()
+                    }
+                }
+            }
+        }
+    }
+
+    private func loadProducts() {
+        productsLoadingInProgress = true
+        let logId = logId
+        Log.ui.verbose("#\(logId)# loadProducts begin")
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            do {
+                let paywallProducts: [AdaptyPaywallProduct]
+                let productsResult = try await self.paywallViewModel.paywall.getPaywallProducts()
+
+                switch productsResult {
+                case .partial(let products, let failedIds):
+                    Log.ui.warn("#\(logId)# loadProducts partial!")
+                    paywallProducts = products
+                    self.eventsHandler.event_didPartiallyLoadProducts(failedProductIds: failedIds)
+                case .full(let products):
+                    Log.ui.verbose("#\(logId)# loadProducts success")
+                    paywallProducts = products
+                }
+
+                self.paywallProducts = paywallProducts
+                self.productsLoadingInProgress = false
+            } catch {
+                Log.ui.error("#\(logId)# loadProducts fail: \(error)")
+                self.productsLoadingInProgress = false
+
+                if self.eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) {
+                    Task {
+                        try await Task.sleep(seconds: 2)
+                        self.loadProductsIfNeeded()
                     }
                 }
             }
@@ -174,7 +168,11 @@ package final class AdaptyProductsViewModel: ObservableObject {
     }
 
     func purchaseProduct(id productId: String) {
-        guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
+        guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
+            Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
+            return
+        }
+
         let logId = logId
         if let observerModeResolver {
             observerModeResolver.observerMode(
