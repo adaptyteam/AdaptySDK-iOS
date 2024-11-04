@@ -45,11 +45,6 @@ let package = Package(
             dependencies: ["Adapty", "AdaptyUI"],
             path: "AdaptyUITesting"
         ),
-        .target(
-            name: "AdaptyCrossPlatformCommon",
-            dependencies: ["Adapty"],
-            path: "CrossPlatformCommon"
-        ),
         .testTarget(
             name: "AdaptyTests",
             dependencies: ["Adapty"],

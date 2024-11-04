@@ -8,9 +8,9 @@
 
 import Foundation
 
-enum AdaptyCrossPlatform {}
+public enum AdaptyCrossPlatform {}
 
-extension AdaptyCrossPlatform {
+public extension AdaptyCrossPlatform {
     enum ArgumentName {
         static let value = "value"
         static let id = "id"
@@ -32,7 +32,7 @@ extension AdaptyCrossPlatform {
     }
 }
 
-extension AdaptyCrossPlatform {
+public extension AdaptyCrossPlatform {
     enum MethodName: String {
         case identify
         case logout
@@ -49,6 +49,7 @@ extension AdaptyCrossPlatform {
         case didUpdateProfile = "did_update_profile"
         case notImplemented = "not_implemented"
 
+        case activate
         case setLogLevel = "set_log_level"
         case updateProfile = "update_profile"
         case setFallbackPaywalls = "set_fallback_paywalls"
