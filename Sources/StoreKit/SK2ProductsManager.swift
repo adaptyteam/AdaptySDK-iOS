@@ -69,13 +69,7 @@ private extension Error {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
-    func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> AdaptyProduct {
-        try await AdaptySK2Product(skProduct:
-            fetchSK2Product(id: productId, fetchPolicy: fetchPolicy)
-        )
-    }
-
-    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [SK2Product] {
+    func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [SK2Product] {
         let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in

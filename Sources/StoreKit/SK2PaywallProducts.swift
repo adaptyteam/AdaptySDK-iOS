@@ -16,7 +16,7 @@ extension Adapty {
         productsManager: SK2ProductsManager,
         determineOffer: Bool
     ) async throws -> [AdaptyPaywallProduct] {
-        let sk2Products = try await productsManager.fetchProductsInSameOrder(
+        let sk2Products = try await productsManager.fetchSK2ProductsInSameOrder(
             ids: paywall.vendorProductIds,
             fetchPolicy: .returnCacheDataElseLoad
         )
@@ -35,9 +35,9 @@ extension Adapty {
         }
 
         return products.map {
-            AdaptyPaywallProduct(
+            AdaptySK2PaywallProduct(
+                sk2Product: $0.product,
                 adaptyProductId: $0.reference.adaptyProductId,
-                underlying: AdaptySK2Product(skProduct: $0.product),
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.abTestName,

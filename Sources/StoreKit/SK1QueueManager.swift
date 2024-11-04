@@ -83,7 +83,7 @@ actor SK1QueueManager: Sendable {
     func makePurchase(
         product: AdaptyDeferredProduct
     ) async throws -> AdaptyPurchaseResult {
-        try await addPayment(product.payment, for: product.underlying.skProduct)
+        try await addPayment(product.payment, for: product.skProduct)
     }
 
     @inlinable

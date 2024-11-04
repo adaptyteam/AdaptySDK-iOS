@@ -7,52 +7,48 @@
 
 import StoreKit
 
-struct AdaptySK1Product: AdaptyProduct {
-    let skProduct: SK1Product
+protocol AdaptySK1Product: AdaptyProduct {
+    var skProduct: SK1Product { get }
+}
 
-    var sk1Product: SK1Product? { skProduct }
+extension AdaptySK1Product{
+    public var sk1Product: SK1Product? { skProduct }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    var sk2Product: SK2Product? { nil }
+    public var sk2Product: SK2Product? { nil }
+    
+    public var vendorProductId: String { skProduct.productIdentifier }
 
-    var vendorProductId: String { skProduct.productIdentifier }
+    public var localizedDescription: String { skProduct.localizedDescription }
 
-    var localizedDescription: String { skProduct.localizedDescription }
+    public var localizedTitle: String { skProduct.localizedTitle }
 
-    var localizedTitle: String { skProduct.localizedTitle }
+    public var price: Decimal { skProduct.price as Decimal }
 
-    var price: Decimal { skProduct.price as Decimal }
+    public var currencyCode: String? { skProduct.priceLocale.unfCurrencyCode }
 
-    var currencyCode: String? { skProduct.priceLocale.unfCurrencyCode }
+    public var currencySymbol: String? { skProduct.priceLocale.currencySymbol }
 
-    var currencySymbol: String? { skProduct.priceLocale.currencySymbol }
+    public var regionCode: String? { skProduct.priceLocale.unfRegionCode }
 
-    var regionCode: String? { skProduct.priceLocale.unfRegionCode }
+    public var isFamilyShareable: Bool { skProduct.unfIsFamilyShareable }
 
-    var isFamilyShareable: Bool { skProduct.unfIsFamilyShareable }
-
-    var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
+    public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
         skProduct.subscriptionPeriod?.asAdaptyProductSubscriptionPeriod
     }
     
-    var subscriptionGroupIdentifier: String? { skProduct.subscriptionGroupIdentifier }
+    public var subscriptionGroupIdentifier: String? { skProduct.subscriptionGroupIdentifier }
 
-    var localizedPrice: String? {
+    public var localizedPrice: String? {
         skProduct.priceLocale.localized(sk1Price: skProduct.price)
     }
 
-    var localizedSubscriptionPeriod: String? {
+    public var localizedSubscriptionPeriod: String? {
         guard let period = subscriptionPeriod else { return nil }
         return skProduct.priceLocale.localized(period: period)
     }
-}
-
-extension AdaptySK1Product: CustomStringConvertible {
-    var description: String {
+    
+    public  var description: String {
         "(vendorProductId: \(vendorProductId), skProduct: \(skProduct))"
     }
-}
-
-extension SK1Product {
-    var asAdaptyProduct: AdaptySK1Product { .init(skProduct: self) }
 }

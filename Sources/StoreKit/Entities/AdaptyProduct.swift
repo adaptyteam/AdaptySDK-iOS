@@ -47,15 +47,6 @@ public protocol AdaptyProduct: Sendable, CustomStringConvertible {
 
     /// The identifier of the subscription group to which the subscription belongs. (Will be `nil` for iOS version below 12.0 and macOS version below 10.14).
     var subscriptionGroupIdentifier: String? { get }
-    
-    
-//    /// The object containing introductory price information for the product. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
-//    var introductoryOffer: AdaptySubscriptionOffer? { get }
-//
-//    /// An array of subscription offers available for the auto-renewable subscription. (Will be empty for iOS version below 12.2 and macOS version below 10.14.4).
-//    var discounts: [AdaptySubscriptionOffer] { get }
-//
-//    func discount(byIdentifier: String) -> AdaptySubscriptionOffer?
 
     /// The price's language is determined by the preferred language set on the device.
     var localizedPrice: String? { get }
