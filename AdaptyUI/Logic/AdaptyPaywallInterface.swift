@@ -10,7 +10,7 @@ import Foundation
 
 package enum AdaptyUIGetProductsResult: Sendable {
     case partial(products: [AdaptyPaywallProduct], failedIds: [String])
-    case full(products:[AdaptyPaywallProduct])
+    case full(products: [AdaptyPaywallProduct])
 }
 
 @MainActor
@@ -19,6 +19,7 @@ package protocol AdaptyPaywallInterface {
     var locale: String? { get }
     var vendorProductIds: [String] { get }
 
+    func getPaywallProductsWithoutDeterminingOffer() async throws -> [AdaptyPaywallProductWithoutDeterminingOffer]
     func getPaywallProducts() async throws -> AdaptyUIGetProductsResult
     func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws
 }
@@ -27,9 +28,13 @@ extension AdaptyPaywall: AdaptyPaywallInterface {
     package var id: String? { placementId }
     package var locale: String? { remoteConfig?.locale }
 
+    package func getPaywallProductsWithoutDeterminingOffer() async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+        try await Adapty.getPaywallProductsWithoutDeterminingOffer(paywall: self)
+    }
+
     package func getPaywallProducts() async throws -> AdaptyUIGetProductsResult {
         let products = try await Adapty.getPaywallProducts(paywall: self)
-        
+
         if products.count == vendorProductIds.count {
             return .full(products: products)
         } else {

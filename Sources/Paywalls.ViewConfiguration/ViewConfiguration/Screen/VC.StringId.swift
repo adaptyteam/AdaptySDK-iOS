@@ -30,7 +30,7 @@ extension AdaptyUI.ViewConfiguration.StringId {
             }
         }
 
-        static func calculate(adaptyProductId: String, byPaymentMode mode: AdaptyProductDiscount.PaymentMode, suffix: String?) -> String {
+        static func calculate(adaptyProductId: String, byPaymentMode mode: AdaptySubscriptionOffer.PaymentMode, suffix: String?) -> String {
             let mode = mode.asString ?? "default"
             return if let suffix {
                 "PRODUCT_\(adaptyProductId)_\(mode)_\(suffix)"
@@ -39,7 +39,7 @@ extension AdaptyUI.ViewConfiguration.StringId {
             }
         }
 
-        static func calculate(byPaymentMode mode: AdaptyProductDiscount.PaymentMode, suffix: String?) -> String {
+        static func calculate(byPaymentMode mode: AdaptySubscriptionOffer.PaymentMode, suffix: String?) -> String {
             let mode = mode.asString ?? "default"
             return if let suffix {
                 "PRODUCT_\(mode)_\(suffix)"

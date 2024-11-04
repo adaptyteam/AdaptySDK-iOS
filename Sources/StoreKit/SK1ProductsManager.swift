@@ -64,18 +64,12 @@ private extension Error {
 }
 
 extension SK1ProductsManager {
-    func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> AdaptyProduct {
-        try await AdaptySK1Product(skProduct:
-            fetchSK1Product(id: productId, fetchPolicy: fetchPolicy)
-        )
-    }
-
-    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [AdaptyProduct] {
+    func fetchSK1ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [SK1Product] {
         let products = try await fetchSK1Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in
             products.first { $0.productIdentifier == id }
-        }.map(AdaptySK1Product.init)
+        }
     }
 
     func fetchSK1Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> SK1Product {

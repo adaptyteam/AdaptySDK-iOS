@@ -23,7 +23,7 @@ extension Result where Failure == AdaptyError {
 
 extension Adapty.Configuration {
     @AdaptyActor
-    static var callbackDispatchQueue: DispatchQueue?
+    package static var callbackDispatchQueue: DispatchQueue?
 }
 
 extension Adapty {
@@ -238,52 +238,13 @@ extension Adapty {
             try await getPaywallProducts(paywall: paywall)
         }
     }
-
-    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
-    ///
-    /// - Parameters:
-    ///   - products: The ``AdaptyPaywallProduct`` array, for which information will be retrieved.
-    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-    public nonisolated static func getProductsIntroductoryOfferEligibility(
-        products: [AdaptyPaywallProduct],
-        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
+    
+    public nonisolated static func getPaywallProductsWithoutDeterminingOffer(
+        paywall: AdaptyPaywall,
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProductWithoutDeterminingOffer]>
     ) {
         withCompletion(completion) {
-            try await getProductsIntroductoryOfferEligibility(products: products)
-        }
-    }
-
-    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
-    ///
-    /// - Parameters:
-    ///   - products: The ``AdaptyProduct`` array, for which information will be retrieved.
-    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-    public nonisolated static func getProductsIntroductoryOfferEligibility(
-        products: [any AdaptyProduct],
-        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
-    ) {
-        withCompletion(completion) {
-            try await getProductsIntroductoryOfferEligibility(products: products)
-        }
-    }
-
-    /// Once you have an ``AdaptyPaywallProduct`` array, fetch introductory offers information for this products.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products#products-fetch-policy-and-intro-offer-eligibility-not-applicable-for-android)
-    ///
-    /// - Parameters:
-    ///   - products: The products ids `String` array, for which information will be retrieved
-    ///   - completion: A dictionary where Key is vendorProductId and Value is corresponding ``AdaptyEligibility``.
-    public nonisolated static func getProductsIntroductoryOfferEligibility(
-        vendorProductIds: [String],
-        _ completion: @escaping AdaptyResultCompletion<[String: AdaptyEligibility]>
-    ) {
-        withCompletion(completion) {
-            try await getProductsIntroductoryOfferEligibility(vendorProductIds: vendorProductIds)
+            try await getPaywallProductsWithoutDeterminingOffer(paywall: paywall)
         }
     }
 
@@ -427,7 +388,7 @@ extension Adapty {
     }
 }
 
-package func withCompletion(
+private func withCompletion(
     _ completion: AdaptyErrorCompletion? = nil,
     from operation: @escaping @Sendable () async throws -> Void
 ) {
@@ -452,7 +413,7 @@ package func withCompletion(
     }
 }
 
-package func withCompletion<T: Sendable>(
+private func withCompletion<T: Sendable>(
     _ completion: AdaptyResultCompletion<T>?,
     from operation: @escaping @Sendable () async throws -> T
 ) {

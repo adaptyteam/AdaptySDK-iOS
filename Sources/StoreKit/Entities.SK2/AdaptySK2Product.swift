@@ -8,89 +8,47 @@
 import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptySK2Product: AdaptyProduct {
-    let skProduct: SK2Product
+protocol AdaptySK2Product: AdaptyProduct {
+    var skProduct: SK2Product { get }
+}
 
-    var sk1Product: SK1Product? { nil }
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptySK2Product{
 
-    var sk2Product: SK2Product? { skProduct }
+    public var sk1Product: SK1Product? { nil }
 
-    var vendorProductId: String { skProduct.id }
+    public var sk2Product: SK2Product? { skProduct }
 
-    var localizedDescription: String { skProduct.description }
+    public var vendorProductId: String { skProduct.id }
 
-    var localizedTitle: String { skProduct.displayName }
+    public var localizedDescription: String { skProduct.description }
 
-    var price: Decimal { skProduct.price }
+    public var localizedTitle: String { skProduct.displayName }
 
-    var currencyCode: String? { skProduct.unfCurrencyCode }
+    public var price: Decimal { skProduct.price }
 
-    var currencySymbol: String? { skProduct.unfPriceLocale.currencySymbol }
+    public var currencyCode: String? { skProduct.unfCurrencyCode }
 
-    var regionCode: String? { skProduct.unfPriceLocale.unfRegionCode }
+    public var currencySymbol: String? { skProduct.unfPriceLocale.currencySymbol }
 
-    var isFamilyShareable: Bool { skProduct.isFamilyShareable }
+    public var regionCode: String? { skProduct.unfPriceLocale.unfRegionCode }
 
-    var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
+    public var isFamilyShareable: Bool { skProduct.isFamilyShareable }
+
+    public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
         skProduct.subscription?.subscriptionPeriod.asAdaptyProductSubscriptionPeriod
     }
 
-    var introductoryDiscount: AdaptyProductDiscount? {
-        guard let offer = skProduct.subscription?.introductoryOffer else { return nil }
-        return AdaptyProductDiscount(
-            offer: offer,
-            currencyCode: skProduct.unfCurrencyCode,
-            priceLocale: skProduct.unfPriceLocale,
-            periodLocale: skProduct.unfPeriodLocale
-        )
-    }
+    public var subscriptionGroupIdentifier: String? { skProduct.subscription?.subscriptionGroupID }
 
-    var subscriptionGroupIdentifier: String? { skProduct.subscription?.subscriptionGroupID }
+    public var localizedPrice: String? { skProduct.displayPrice }
 
-    var discounts: [AdaptyProductDiscount] {
-        guard let offers = skProduct.subscription?.promotionalOffers, !offers.isEmpty else {
-            return []
-        }
-        let code = skProduct.unfCurrencyCode
-        let priceLocale = skProduct.unfPriceLocale
-        let periodLocale = skProduct.unfPeriodLocale
-        return offers.map { offer in
-            AdaptyProductDiscount(
-                offer: offer,
-                currencyCode: code,
-                priceLocale: priceLocale,
-                periodLocale: periodLocale
-            )
-        }
-    }
-
-    func discount(byIdentifier identifier: String) -> AdaptyProductDiscount? {
-        guard let offer = skProduct.subscription?.promotionalOffers.first(where: { $0.id == identifier })
-        else { return nil }
-        return AdaptyProductDiscount(
-            offer: offer,
-            currencyCode: skProduct.unfCurrencyCode,
-            priceLocale: skProduct.unfPriceLocale,
-            periodLocale: skProduct.unfPeriodLocale
-        )
-    }
-
-    var localizedPrice: String? { skProduct.displayPrice }
-
-    var localizedSubscriptionPeriod: String? {
+    public var localizedSubscriptionPeriod: String? {
         guard let period = subscriptionPeriod else { return nil }
         return skProduct.unfPeriodLocale.localized(period: period)
     }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptySK2Product: CustomStringConvertible {
-    var description: String {
+    
+    public var description: String {
         "(vendorProductId: \(vendorProductId), skProduct: \(skProduct))"
     }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension SK2Product {
-    var asAdaptyProduct: AdaptySK2Product { .init(skProduct: self) }
 }

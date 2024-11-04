@@ -8,24 +8,57 @@
 import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyProductDiscount {
+extension SK2Product {
+    var introductoryOfferNotApplicable: Bool {
+        subscription?.introductoryOffer == nil
+    }
+
+    var introductoryOffer: AdaptySubscriptionOffer? {
+        guard let offer = subscription?.introductoryOffer else { return nil }
+        return AdaptySubscriptionOffer(
+            offerType: .introductory,
+            offer: offer,
+            product: self
+        )
+    }
+
+    func promotionalOffer(byIdentifier identifier: String) -> AdaptySubscriptionOffer? {
+        guard let offer = subscription?.promotionalOffers.first(where: { $0.id == identifier })
+        else { return nil }
+        return AdaptySubscriptionOffer(
+            offerType: .promotional(identifier),
+            offer: offer,
+            product: self
+        )
+    }
+
+    func winBackOffer(byIdentifier identifier: String) -> AdaptySubscriptionOffer? {
+        guard let offer = unfWinBackOffer(byId: identifier) else { return nil }
+        return AdaptySubscriptionOffer(
+            offerType: .winBack(identifier),
+            offer: offer,
+            product: self
+        )
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+private extension AdaptySubscriptionOffer {
     init(
+        offerType: OfferTypeWithIdentifier,
         offer: SK2Product.SubscriptionOffer,
-        currencyCode: String?,
-        priceLocale: Locale,
-        periodLocale: Locale
+        product: SK2Product
     ) {
         let period = offer.period.asAdaptyProductSubscriptionPeriod
-
+        let periodLocale = product.unfPeriodLocale
         self.init(
             _price: Price(
                 amount: offer.price,
-                currencyCode: currencyCode,
-                currencySymbol: priceLocale.currencySymbol,
+                currencyCode: product.unfCurrencyCode,
+                currencySymbol: product.unfPriceLocale.currencySymbol,
                 localizedString: offer.displayPrice
             ),
-            identifier: offer.id,
-            offerType: offer.type.asOfferType,
+            offerTypeWithIdentifier: offerType,
             subscriptionPeriod: period,
             numberOfPeriods: offer.periodCount,
             paymentMode: offer.paymentMode.asPaymentMode,

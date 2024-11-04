@@ -9,19 +9,7 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, *)
-extension AdaptyPaywallProduct {
-    func eligibleDiscount(introEligibility: AdaptyEligibility) -> AdaptyProductDiscount? {
-        if promotionalOfferEligibility, let promotionalOfferId = promotionalOfferId,
-           let promotionalOffer = discount(byIdentifier: promotionalOfferId)
-        {
-            return promotionalOffer
-        } else if introEligibility == .eligible {
-            return introductoryDiscount
-        } else {
-            return nil
-        }
-    }
-
+extension AdaptyProduct {
     func pricePer(period: AdaptyPeriodUnit) -> String? {
         guard let skProduct = sk2Product else { return nil }
         guard let subscriptionPeriod = subscriptionPeriod else { return nil }

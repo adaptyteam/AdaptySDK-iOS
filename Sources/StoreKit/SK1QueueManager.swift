@@ -39,25 +39,34 @@ actor SK1QueueManager: Sendable {
 
         let payment: SKPayment
 
-        if let offerId = product.promotionalOfferId {
-            let response = try await purchaseValidator.signSubscriptionOffer(
-                profileId: profileId,
-                vendorProductId: product.vendorProductId,
-                offerId: offerId
-            )
-
-            payment = {
-                let payment = SKMutablePayment(product: sk1Product)
-                payment.applicationUsername = ""
-                payment.paymentDiscount = SK1PaymentDiscount(
-                    offerId: offerId,
-                    signature: response
-                )
-                return payment
-            }()
-
-        } else {
+        switch product.subscriptionOffer {
+        case .none:
             payment = SKPayment(product: sk1Product)
+        case let .some(offer):
+            switch offer.offerTypeWithIdentifier {
+            case .introductory:
+                payment = SKPayment(product: sk1Product)
+            case .winBack:
+                throw StoreKitManagerError.purchasingWinBackOfferFailed("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
+            case let .promotional(offerId):
+
+                let response = try await purchaseValidator.signSubscriptionOffer(
+                    profileId: profileId,
+                    vendorProductId: product.vendorProductId,
+                    offerId: offerId
+                )
+
+                payment = {
+                    let payment = SKMutablePayment(product: sk1Product)
+                    payment.applicationUsername = ""
+                    payment.paymentDiscount = SK1PaymentDiscount(
+                        offerId: offerId,
+                        signature: response
+                    )
+
+                    return payment
+                }()
+            }
         }
 
         return try await addPayment(
@@ -70,7 +79,7 @@ actor SK1QueueManager: Sendable {
     func makePurchase(
         product: AdaptyDeferredProduct
     ) async throws -> AdaptyPurchaseResult {
-        try await addPayment(product.payment, for: product.underlying.skProduct)
+        try await addPayment(product.payment, for: product.skProduct)
     }
 
     @inlinable

@@ -66,7 +66,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     ///     - product: an ``AdaptyPaywallProduct`` which was selected.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didSelectProduct product: AdaptyPaywallProduct
+        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
     )
 
     /// If user initiates the purchase process, this method will be invoked.
@@ -253,7 +253,6 @@ public extension AdaptyUI {
     static func paywallController(
         for paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]? = nil,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
@@ -276,7 +275,6 @@ public extension AdaptyUI {
         return AdaptyPaywallController(
             paywall: paywall,
             products: products,
-            introductoryOffersEligibilities: introductoryOffersEligibilities,
             viewConfiguration: viewConfiguration,
             delegate: delegate,
             observerModeResolver: observerModeResolver,

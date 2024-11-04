@@ -12,71 +12,76 @@ import UIKit
 
 @available(iOS 15.0, *)
 protocol ProductInfoModel {
-    var isPlaceholder: Bool { get }
+    var anyProduct: AdaptyPaywallProductWithoutDeterminingOffer { get }
     var adaptyProductId: String { get }
     var adaptyProduct: AdaptyPaywallProduct? { get }
 
-    var paymentMode: AdaptyProductDiscount.PaymentMode { get }
+    var paymentMode: AdaptySubscriptionOffer.PaymentMode { get }
 
     func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement?
 }
 
+enum AdaptyPaywallProductWrapper {
+    case withoutOffer(AdaptyPaywallProductWithoutDeterminingOffer)
+    case full(AdaptyPaywallProduct)
+}
+
 @available(iOS 15.0, *)
-extension AdaptyPaywallProduct {
+extension AdaptyPaywallProductWrapper: ProductInfoModel {
+    var anyProduct: AdaptyPaywallProductWithoutDeterminingOffer {
+        switch self {
+        case .withoutOffer(let v): v
+        case .full(let v): v
+        }
+    }
+
     func isApplicableForTag(_ tag: AdaptyUI.ProductTag) -> Bool {
         switch tag {
         case .title, .price:
             return true
-        case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear,
-             .offerPrice, .offerPeriods, .offerNumberOfPeriods:
-            return subscriptionPeriod != nil
+        case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear:
+            return anyProduct.subscriptionPeriod != nil
+        case .offerPrice, .offerPeriods, .offerNumberOfPeriods:
+            return adaptyProduct?.subscriptionOffer != nil
         }
     }
-}
 
-@available(iOS 15.0, *)
-struct RealProductInfo: ProductInfoModel {
-    var isPlaceholder: Bool { false }
-    
-    let underlying: AdaptyPaywallProduct
-    let introEligibility: AdaptyEligibility
+    var adaptyProductId: String { anyProduct.adaptyProductId }
 
-    init(underlying: AdaptyPaywallProduct, introEligibility: AdaptyEligibility) {
-        self.underlying = underlying
-        self.introEligibility = introEligibility
+    var adaptyProduct: AdaptyPaywallProduct? {
+        switch self {
+        case .withoutOffer: nil
+        case .full(let v): v
+        }
     }
 
-    var adaptyProductId: String { underlying.adaptyProductId }
-    var adaptyProduct: AdaptyPaywallProduct? { underlying }
-    var paymentMode: AdaptyProductDiscount.PaymentMode {
-        guard let offer = underlying.eligibleDiscount(introEligibility: introEligibility) else { return .unknown}
-        return offer.paymentMode
+    var paymentMode: AdaptySubscriptionOffer.PaymentMode {
+        adaptyProduct?.subscriptionOffer?.paymentMode ?? .unknown
     }
 
     func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement? {
-        guard underlying.isApplicableForTag(tag) else { return .notApplicable }
+        guard isApplicableForTag(tag) else { return .notApplicable }
 
         let result: String?
-
         switch tag {
         case .title:
-            result = underlying.localizedTitle
+            result = anyProduct.localizedTitle
         case .price:
-            result = underlying.localizedPrice
+            result = anyProduct.localizedPrice
         case .pricePerDay:
-            result = underlying.pricePer(period: .day)
+            result = anyProduct.pricePer(period: .day)
         case .pricePerWeek:
-            result = underlying.pricePer(period: .week)
+            result = anyProduct.pricePer(period: .week)
         case .pricePerMonth:
-            result = underlying.pricePer(period: .month)
+            result = anyProduct.pricePer(period: .month)
         case .pricePerYear:
-            result = underlying.pricePer(period: .year)
+            result = anyProduct.pricePer(period: .year)
         case .offerPrice:
-            result = underlying.eligibleDiscount(introEligibility: introEligibility)?.localizedPrice
+            result = adaptyProduct?.subscriptionOffer?.localizedPrice
         case .offerPeriods:
-            result = underlying.eligibleDiscount(introEligibility: introEligibility)?.localizedSubscriptionPeriod
+            result = adaptyProduct?.subscriptionOffer?.localizedSubscriptionPeriod
         case .offerNumberOfPeriods:
-            result = underlying.eligibleDiscount(introEligibility: introEligibility)?.localizedNumberOfPeriods
+            result = adaptyProduct?.subscriptionOffer?.localizedNumberOfPeriods
         }
 
         if let result = result {

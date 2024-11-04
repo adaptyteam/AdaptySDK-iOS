@@ -40,79 +40,45 @@ package final class AdaptyProductsViewModel: ObservableObject {
     private let paywallViewModel: AdaptyPaywallViewModel
     private let observerModeResolver: AdaptyObserverModeResolver?
 
-    @Published var products: [ProductInfoModel]
+    @Published private var paywallProductsWithoutOffer: [AdaptyPaywallProductWithoutDeterminingOffer]?
+    @Published private var paywallProducts: [AdaptyPaywallProduct]?
+
+    var products: [AdaptyPaywallProductWrapper] {
+        return
+            paywallProducts?.map { .full($0) } ??
+            paywallProductsWithoutOffer?.map { .withoutOffer($0) } ??
+            []
+    }
+
     @Published var selectedProductsIds: [String: String]
     @Published var productsLoadingInProgress: Bool = false
     @Published var purchaseInProgress: Bool = false
     @Published var restoreInProgress: Bool = false
 
-    var adaptyProducts: [AdaptyPaywallProduct]? {
-        didSet {
-            products = Self.generateProductsInfos(
-                paywall: paywallViewModel.paywall,
-                products: adaptyProducts,
-                eligibilities: introductoryOffersEligibilities
-            )
-        }
-    }
-
-    var introductoryOffersEligibilities: [String: AdaptyEligibility]? {
-        didSet {
-            products = Self.generateProductsInfos(
-                paywall: paywallViewModel.paywall,
-                products: adaptyProducts,
-                eligibilities: introductoryOffersEligibilities
-            )
-        }
-    }
-
     package init(
         eventsHandler: AdaptyEventsHandler,
         paywallViewModel: AdaptyPaywallViewModel,
         products: [AdaptyPaywallProduct]?,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]?,
         observerModeResolver: AdaptyObserverModeResolver?
     ) {
         logId = eventsHandler.logId
         self.eventsHandler = eventsHandler
         self.paywallViewModel = paywallViewModel
 
-        self.introductoryOffersEligibilities = introductoryOffersEligibilities
-        self.products = Self.generateProductsInfos(
-            paywall: paywallViewModel.paywall,
-            products: products,
-            eligibilities: introductoryOffersEligibilities
-        )
-
+        paywallProducts = products
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
 
         self.observerModeResolver = observerModeResolver
     }
 
-    private static func generateProductsInfos(
-        paywall _: AdaptyPaywallInterface,
-        products: [AdaptyPaywallProduct]?,
-        eligibilities: [String: AdaptyEligibility]?
-    ) -> [ProductInfoModel] {
-        guard let products else { return [] }
-
-        return products.map {
-            RealProductInfo(
-                underlying: $0,
-                introEligibility: eligibilities?[$0.vendorProductId] ?? .ineligible
-            )
-        }
-    }
-
     func loadProductsIfNeeded() {
-        guard !productsLoadingInProgress else { return }
+        guard !productsLoadingInProgress, paywallProducts == nil else { return }
 
-        guard let adaptyProducts, introductoryOffersEligibilities == nil else {
+        if paywallProductsWithoutOffer != nil {
             loadProducts()
-            return
+        } else {
+            loadProductsWithoutOffers()
         }
-
-        loadProductsIntroductoryEligibilities(products: adaptyProducts)
     }
 
     func selectedProductId(by groupId: String) -> String? {
@@ -122,13 +88,38 @@ package final class AdaptyProductsViewModel: ObservableObject {
     func selectProduct(id: String, forGroupId groupId: String) {
         selectedProductsIds[groupId] = id
 
-        if let selectedProduct = adaptyProducts?.first(where: { $0.adaptyProductId == id }) {
-            eventsHandler.event_didSelectProduct(selectedProduct)
+        if let selectedProduct = products.first(where: { $0.adaptyProductId == id }) {
+            eventsHandler.event_didSelectProduct(selectedProduct.anyProduct)
         }
     }
 
     func unselectProduct(forGroupId groupId: String) {
         selectedProductsIds.removeValue(forKey: groupId)
+    }
+
+    private func loadProductsWithoutOffers() {
+        productsLoadingInProgress = true
+        let logId = logId
+        Log.ui.verbose("#\(logId)# loadProducts begin")
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            do {
+                self.paywallProductsWithoutOffer = try await self.paywallViewModel.paywall.getPaywallProductsWithoutDeterminingOffer()
+                self.loadProducts()
+            } catch {
+                Log.ui.error("#\(logId)# loadProducts fail: \(error)")
+                self.productsLoadingInProgress = false
+
+                if self.eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) {
+                    Task {
+                        try await Task.sleep(seconds: 2)
+                        self.loadProductsIfNeeded()
+                    }
+                }
+            }
+        }
     }
 
     private func loadProducts() {
@@ -140,22 +131,21 @@ package final class AdaptyProductsViewModel: ObservableObject {
             guard let self else { return }
 
             do {
-                let adaptyProducts: [AdaptyPaywallProduct]
+                let paywallProducts: [AdaptyPaywallProduct]
                 let productsResult = try await self.paywallViewModel.paywall.getPaywallProducts()
 
                 switch productsResult {
                 case .partial(let products, let failedIds):
                     Log.ui.warn("#\(logId)# loadProducts partial!")
-                    adaptyProducts = products
+                    paywallProducts = products
                     self.eventsHandler.event_didPartiallyLoadProducts(failedProductIds: failedIds)
                 case .full(let products):
                     Log.ui.verbose("#\(logId)# loadProducts success")
-                    adaptyProducts = products
+                    paywallProducts = products
                 }
 
-                self.adaptyProducts = adaptyProducts
+                self.paywallProducts = paywallProducts
                 self.productsLoadingInProgress = false
-                self.loadProductsIntroductoryEligibilities(products: adaptyProducts)
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
                 self.productsLoadingInProgress = false
@@ -163,24 +153,9 @@ package final class AdaptyProductsViewModel: ObservableObject {
                 if self.eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) {
                     Task {
                         try await Task.sleep(seconds: 2)
-                        self.loadProducts()
+                        self.loadProductsIfNeeded()
                     }
                 }
-            }
-        }
-    }
-
-    private func loadProductsIntroductoryEligibilities(products: [AdaptyPaywallProduct]) {
-        let logId = logId
-        Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities begin")
-
-        Task { @MainActor [weak self] in
-            do {
-                let eligibilities = try await Adapty.getProductsIntroductoryOfferEligibility(products: products)
-                self?.introductoryOffersEligibilities = eligibilities
-                Log.ui.verbose("#\(logId)# loadProductsIntroductoryEligibilities success: \(eligibilities)")
-            } catch {
-                Log.ui.error("#\(logId)# loadProductsIntroductoryEligibilities fail: \(error)")
             }
         }
     }
@@ -193,7 +168,11 @@ package final class AdaptyProductsViewModel: ObservableObject {
     }
 
     func purchaseProduct(id productId: String) {
-        guard let product = adaptyProducts?.first(where: { $0.adaptyProductId == productId }) else { return }
+        guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
+            Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
+            return
+        }
+
         let logId = logId
         if let observerModeResolver {
             observerModeResolver.observerMode(

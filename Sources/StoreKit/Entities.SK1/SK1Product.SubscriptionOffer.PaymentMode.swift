@@ -8,7 +8,7 @@
 import StoreKit
 
 extension SK1Product.SubscriptionOffer.PaymentMode {
-    var asPaymentMode: AdaptyProductDiscount.PaymentMode {
+    var asPaymentMode: AdaptySubscriptionOffer.PaymentMode {
         switch self {
         case .payAsYouGo:
             .payAsYouGo

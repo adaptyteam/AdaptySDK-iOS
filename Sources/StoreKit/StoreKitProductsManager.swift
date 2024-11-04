@@ -25,14 +25,4 @@ protocol StoreKitProductsManager: Actor, Sendable {
         persistentVariationId: String?,
         sk2Transaction: SK2Transaction
     ) async -> PurchasedTransaction
-
-    func fetchProduct(
-        id: String,
-        fetchPolicy: ProductsFetchPolicy
-    ) async throws -> AdaptyProduct
-
-    func fetchProductsInSameOrder(
-        ids: [String],
-        fetchPolicy: ProductsFetchPolicy
-    ) async throws -> [AdaptyProduct]
 }

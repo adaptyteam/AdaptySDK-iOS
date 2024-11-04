@@ -1,12 +1,12 @@
 //
-//  AdaptyProductDiscount.Signature.swift
+//  AdaptySubscriptionOffer.Signature.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //
 import Foundation
 
-extension AdaptyProductDiscount {
+extension AdaptySubscriptionOffer {
     struct Signature: Sendable, Hashable {
         let keyIdentifier: String
         let nonce: UUID
@@ -15,7 +15,7 @@ extension AdaptyProductDiscount {
     }
 }
 
-extension AdaptyProductDiscount.Signature: Decodable {
+extension AdaptySubscriptionOffer.Signature: Decodable {
     enum CodingKeys: String, CodingKey {
         case keyIdentifier = "key_id"
         case signature

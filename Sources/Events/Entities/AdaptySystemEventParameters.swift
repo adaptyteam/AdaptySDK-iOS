@@ -131,7 +131,7 @@ enum MethodName: String {
     case setVariationIdSK1 = "set_variation_id_sk1"
     case setVariationIdSK2 = "set_variation_id_sk2"
     case getPaywallProducts = "get_paywall_products"
-    case getProductsIntroductoryOfferEligibility = "get_products_introductory_offer_eligibility"
+    case getPaywallProductswithoutDeterminingOffer = "get_paywall_products_without_determining_offer"
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
     case getReceipt = "get_reciept"
     case makePurchase = "make_purchase"
@@ -207,6 +207,9 @@ enum AppleMethodName: String {
     case finishTransaction = "finish_transaction"
     case addPayment = "add_payment"
     case productPurchase = "product_purchase"
+
+    case subscriptionInfoStatus = "subscription_info_status"
+    case isEligibleForIntroOffer = "is_eligible_for_intro_offer"
 
 }
 

@@ -28,7 +28,7 @@ extension AdaptyUI {
         }
 
         package func richText(
-            byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
+            byPaymentMode mode: AdaptySubscriptionOffer.PaymentMode = .unknown
         ) -> RichText {
             localizer.richText(
                 adaptyProductId: adaptyProductId,
@@ -68,7 +68,7 @@ extension AdaptyUI {
 
         package func richText(
             adaptyProductId: String,
-            byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown
+            byPaymentMode mode: AdaptySubscriptionOffer.PaymentMode = .unknown
         ) -> RichText {
             localizer.richText(
                 adaptyProductId: adaptyProductId,
@@ -83,7 +83,7 @@ extension AdaptyUI {
 private extension AdaptyUI.ViewConfiguration.Localizer {
     func richText(
         adaptyProductId: String,
-        byPaymentMode mode: AdaptyProductDiscount.PaymentMode = .unknown,
+        byPaymentMode mode: AdaptySubscriptionOffer.PaymentMode = .unknown,
         suffix: String?,
         defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?
     ) -> AdaptyUI.RichText {

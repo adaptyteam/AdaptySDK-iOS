@@ -24,7 +24,7 @@ extension Error {
         if let error = self as? CustomAdaptyError { return AdaptyError(error) }
         return nil
     }
-    
+
     var unwrapped: Error {
         if let adaptyError = self as? AdaptyError {
             adaptyError.wrapped
@@ -68,7 +68,7 @@ extension HTTPError: CustomAdaptyError {
     }
 }
 
- extension EventsError: CustomAdaptyError {
+extension EventsError: CustomAdaptyError {
     static let errorDomain = AdaptyError.EventsErrorDomain
 
     var errorCode: Int { adaptyErrorCode.rawValue }
@@ -92,7 +92,7 @@ extension HTTPError: CustomAdaptyError {
         case .interrupted: .operationInterrupted
         }
     }
- }
+}
 
 extension StoreKitManagerError: CustomAdaptyError {
     static let errorDomain = AdaptyError.SKManagerErrorDomain
@@ -119,12 +119,15 @@ extension StoreKitManagerError: CustomAdaptyError {
         case .refreshReceiptFailed: return .refreshReceiptFailed
         case .requestSKProductsFailed: return .productRequestFailed
         case .productPurchaseFailed: return .productPurchaseFailed
-        case .trunsactionUnverified( _, let error):
+        case let .trunsactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
                 return customError.adaptyErrorCode
             } else {
                 return .networkFailed
             }
+        case .unknownIntroEligibility: return .invalidOfferPrice
+        case .purchasingWinBackOfferFailed: return .invalidOfferIdentifier
+        case .getSubscriptionInfoStatusFailed: return .fetchSubscriptionStatusFailed
         }
     }
 

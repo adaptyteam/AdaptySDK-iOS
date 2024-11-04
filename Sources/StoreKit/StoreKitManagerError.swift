@@ -15,6 +15,9 @@ enum StoreKitManagerError: Error {
     case requestSKProductsFailed(AdaptyError.Source, error: Error)
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
     case trunsactionUnverified(AdaptyError.Source, error: Error?)
+    case unknownIntroEligibility(AdaptyError.Source)
+    case purchasingWinBackOfferFailed(AdaptyError.Source, error: String)
+    case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
 }
 
 extension StoreKitManagerError: CustomStringConvertible {
@@ -46,6 +49,12 @@ extension StoreKitManagerError: CustomStringConvertible {
             } else {
                 "StoreKitManagerError.trunsactionUnverified(\(source))"
             }
+        case let .unknownIntroEligibility(source):
+            "StoreKitManagerError.unknownIntroEligibility(\(source))"
+        case let .purchasingWinBackOfferFailed(source, error):
+            "StoreKitManagerError.purchasingWinBackOfferFailed(\(source), \"\(error)\")"
+        case let .getSubscriptionInfoStatusFailed(source, error):
+            "StoreKitManagerError.getSubscriptionInfoStatusFailed(\(source), \(error))"
         }
     }
 }
@@ -59,7 +68,10 @@ extension StoreKitManagerError {
              let .refreshReceiptFailed(src, _),
              let .requestSKProductsFailed(src, _),
              let .interrupted(src),
-             let .trunsactionUnverified(src, _): src
+             let .trunsactionUnverified(src, _),
+             let .unknownIntroEligibility(src),
+             let .purchasingWinBackOfferFailed(src, _),
+             let .getSubscriptionInfoStatusFailed(src, _): src
         }
     }
 
@@ -69,6 +81,7 @@ extension StoreKitManagerError {
              let .productPurchaseFailed(_, error),
              let .trunsactionUnverified(_, error): error
         case let .refreshReceiptFailed(_, error),
+             let .getSubscriptionInfoStatusFailed(_, error),
              let .requestSKProductsFailed(_, error): error
         default: nil
         }
@@ -158,5 +171,31 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .trunsactionUnverified(AdaptyError.Source(file: file, function: function, line: line), error: error)
+    }
+
+    static func purchasingWinBackOfferFailed(
+        _ error: String,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .purchasingWinBackOfferFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
+    }
+
+    static func unknownIntroEligibility(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .unknownIntroEligibility(AdaptyError.Source(file: file, function: function, line: line))
+    }
+
+    static func getSubscriptionInfoStatusFailed(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .getSubscriptionInfoStatusFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 }

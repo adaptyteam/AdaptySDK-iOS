@@ -248,7 +248,7 @@ extension Adapty {
         get async throws {
             switch sharedProfileManager {
             case .none:
-                throw AdaptyError.profileWasChanged()
+                throw AdaptyError.notActivated()
             case let .current(manager):
                 return manager
             case let .creating(_, _, task):

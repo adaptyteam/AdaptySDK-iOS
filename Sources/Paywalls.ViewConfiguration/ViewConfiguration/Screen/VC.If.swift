@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyUI.ViewConfiguration {
-    struct If: Decodable /* temp */ {
+    struct If: Decodable {
         let content: AdaptyUI.ViewConfiguration.Element
 
         enum CodingKeys: String, CodingKey {

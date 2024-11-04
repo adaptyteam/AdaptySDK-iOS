@@ -23,13 +23,12 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     private let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
 
     private let products: [AdaptyPaywallProduct]?
-    private let introductoryOffersEligibilities: [String: AdaptyEligibility]?
     private let observerModeResolver: AdaptyObserverModeResolver?
     private let tagResolver: AdaptyTagResolver?
     private let timerResolver: AdaptyTimerResolver?
 
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
-    private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
+    private let didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: (AdaptyPaywallProduct, AdaptyError) -> Void
@@ -73,12 +72,11 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         paywall: AdaptyPaywall,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         products: [AdaptyPaywallProduct]? = nil,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
-        didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
+        didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
@@ -108,7 +106,6 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration
         self.products = products
-        self.introductoryOffersEligibilities = introductoryOffersEligibilities
         self.observerModeResolver = observerModeResolver
         self.tagResolver = tagResolver
         self.timerResolver = timerResolver
@@ -133,7 +130,6 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
             logId: logId,
             paywall: paywall,
             products: products,
-            introductoryOffersEligibilities: introductoryOffersEligibilities,
             configuration: viewConfiguration,
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
@@ -220,12 +216,11 @@ public extension View {
         paywall: AdaptyPaywall,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         products: [AdaptyPaywallProduct]? = nil,
-        introductoryOffersEligibilities: [String: AdaptyEligibility]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
-        didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
+        didSelectProduct: ((AdaptyProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
@@ -245,7 +240,6 @@ public extension View {
                 paywall: paywall,
                 viewConfiguration: viewConfiguration,
                 products: products,
-                introductoryOffersEligibilities: introductoryOffersEligibilities,
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
