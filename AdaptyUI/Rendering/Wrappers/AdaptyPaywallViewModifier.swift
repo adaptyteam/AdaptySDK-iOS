@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Identifiable {
     @Environment(\.presentationMode) private var presentationMode
@@ -179,7 +179,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension View {
     /// Presents a paywall when a binding to a Boolean value that you

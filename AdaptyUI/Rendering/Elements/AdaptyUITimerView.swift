@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI {
     enum TimerTag {
         case TIMER_h
@@ -31,7 +31,7 @@ extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.TimerTag {
     static func createFromString(_ value: String) -> AdaptyUI.TimerTag? {
         switch value {
@@ -121,7 +121,7 @@ extension AdaptyUI.TimerTag {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.RichText {
     var timerUpdatesPerSecond: Int {
         var result = 1
@@ -138,7 +138,7 @@ extension AdaptyUI.RichText {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUITimerView: View, AdaptyTagResolver {
     @Environment(\.adaptyScreenId)

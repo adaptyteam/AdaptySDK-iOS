@@ -10,7 +10,7 @@
 import Adapty
 import UIKit
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 protocol ProductInfoModel {
     var anyProduct: AdaptyPaywallProductWithoutDeterminingOffer { get }
     var adaptyProductId: String { get }
@@ -21,12 +21,13 @@ protocol ProductInfoModel {
     func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement?
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 enum AdaptyPaywallProductWrapper {
     case withoutOffer(AdaptyPaywallProductWithoutDeterminingOffer)
     case full(AdaptyPaywallProduct)
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPaywallProductWrapper: ProductInfoModel {
     var anyProduct: AdaptyPaywallProductWithoutDeterminingOffer {
         switch self {

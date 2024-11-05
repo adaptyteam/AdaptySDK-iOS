@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Transition.Interpolator {
     func swiftuiAnimation(duration: Double) -> Animation {
         switch self {
@@ -22,7 +22,7 @@ extension AdaptyUI.Transition.Interpolator {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Transition {
     var swiftuiAnimation: Animation? {
         switch self {
@@ -36,7 +36,7 @@ extension AdaptyUI.Transition {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUITransitionInModifier: ViewModifier {
     private let transitionIn: AdaptyUI.Transition
 
@@ -59,7 +59,7 @@ struct AdaptyUITransitionInModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func transitionIn(_ transitionIn: [AdaptyUI.Transition]?, visibility: Bool) -> some View {

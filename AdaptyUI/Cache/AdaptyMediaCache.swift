@@ -8,7 +8,7 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI {
     static let imageCache = ImageCache(name: "Adapty")
@@ -72,7 +72,7 @@ extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI {
     @MainActor
     final class ImageUrlPrefetcher: AdaptyUIImageUrlObserver {

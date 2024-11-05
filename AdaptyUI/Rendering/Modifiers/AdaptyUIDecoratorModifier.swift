@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 13.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Mode {
     func of(_ colorScheme: ColorScheme) -> T {
         switch colorScheme {
@@ -21,7 +21,7 @@ extension AdaptyUI.Mode {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension InsettableShape {
     @ViewBuilder
     func fill(background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
@@ -119,7 +119,7 @@ extension InsettableShape {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func clipShape(_ shape: AdaptyUI.ShapeType) -> some View {
@@ -140,7 +140,7 @@ extension View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(_ background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
@@ -190,7 +190,7 @@ extension AdaptyUI.ShapeType {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIDecoratorModifier: ViewModifier {
     var decorator: AdaptyUI.Decorator
@@ -246,7 +246,7 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func decorate(

@@ -9,16 +9,18 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-// TODO: swift 6
 struct AdaptyMockPaywall: AdaptyPaywallInterface {
     var id: String? { nil }
     var locale: String? { nil }
     var vendorProductIds: [String] { [] }
-    
-    func getPaywallProducts() async throws -> [AdaptyPaywallProduct] {
+
+    func getPaywallProductsWithoutDeterminingOffer() async throws -> [any AdaptyPaywallProductWithoutDeterminingOffer] {
         []
     }
 
-    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
+    func getPaywallProducts() async throws -> AdaptyUIGetProductsResult {
+        .full(products: [])
     }
+
+    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {}
 }

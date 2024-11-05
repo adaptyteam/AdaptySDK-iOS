@@ -10,7 +10,7 @@
 import Adapty
 import UIKit
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     struct Configuration: Sendable {
         public static let `default` = Configuration(
@@ -32,7 +32,7 @@ public extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     /// This enum describes user initiated actions.
     enum Action {
@@ -46,7 +46,7 @@ public extension AdaptyUI {
 }
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyPaywallControllerDelegate: NSObject {
     /// If user performs an action process, this method will be invoked.
@@ -175,7 +175,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     )
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public protocol AdaptyObserverModeResolver {
     func observerMode(
         didInitiatePurchase product: AdaptyPaywallProduct,
@@ -184,7 +184,7 @@ public protocol AdaptyObserverModeResolver {
     )
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension AdaptyUI {
     private static var isActivated: Bool = false

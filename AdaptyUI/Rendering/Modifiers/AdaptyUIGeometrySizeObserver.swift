@@ -9,7 +9,7 @@
 
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIGeometrySizePreferenceKey: PreferenceKey {
     static let defaultValue: CGSize = .zero
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
@@ -17,7 +17,7 @@ struct AdaptyUIGeometrySizePreferenceKey: PreferenceKey {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIGeometrySizeObserver: ViewModifier {
     var onChange: (CGSize) -> Void
 
@@ -38,7 +38,7 @@ struct AdaptyUIGeometrySizeObserver: ViewModifier {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     func onGeometrySizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
         modifier(AdaptyUIGeometrySizeObserver(action))

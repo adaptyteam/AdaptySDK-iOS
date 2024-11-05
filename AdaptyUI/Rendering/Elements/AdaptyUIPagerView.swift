@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.VerticalAlignment {
     var swiftUIAlignment: Alignment {
         switch self {
@@ -22,7 +22,7 @@ extension AdaptyUI.VerticalAlignment {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Pager.Length {
     func valueWith(parent: Double, screenSize: Double, safeAreaStart: Double, safeAreaEnd: Double) -> CGFloat {
         switch self {
@@ -32,7 +32,7 @@ extension AdaptyUI.Pager.Length {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.TransitionSlide {
     var swiftUIAnimation: Animation {
         switch interpolator {
@@ -44,7 +44,7 @@ extension AdaptyUI.TransitionSlide {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func dragGesture(condition: Bool,
@@ -63,7 +63,7 @@ extension View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIPagerView: View {
     private static let pageControllTapAnimationDuration = 0.3

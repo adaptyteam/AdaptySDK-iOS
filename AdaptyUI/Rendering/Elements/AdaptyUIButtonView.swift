@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIButtonView: View {
     @Environment(\.adaptyScreenId)
     private var screenId: String
@@ -66,7 +66,7 @@ struct AdaptyUIButtonView: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension [AdaptyUI.ActionAction] {
     func fire(
@@ -90,7 +90,7 @@ extension [AdaptyUI.ActionAction] {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI.ActionAction {
     func fire(
