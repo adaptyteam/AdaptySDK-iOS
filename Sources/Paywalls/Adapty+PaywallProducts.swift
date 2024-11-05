@@ -66,8 +66,6 @@ extension Adapty {
         }
     }
     
-    
-    
     public nonisolated static func getPaywallProductsWithoutDeterminingOffer(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
         try await withActivatedSDK(
             methodName: .getPaywallProductswithoutDeterminingOffer,

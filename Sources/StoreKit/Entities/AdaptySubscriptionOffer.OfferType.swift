@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptySubscriptionOffer {
-    public enum OfferTypeWithIdentifier: Sendable, Hashable {
+    enum OfferTypeWithIdentifier: Sendable, Hashable {
         case introductory
         case promotional(String)
         case winBack(String)
