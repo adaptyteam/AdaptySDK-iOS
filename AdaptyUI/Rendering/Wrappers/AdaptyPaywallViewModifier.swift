@@ -28,7 +28,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
     private let timerResolver: AdaptyTimerResolver?
 
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
-    private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
+    private let didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: (AdaptyPaywallProduct, AdaptyError) -> Void
@@ -76,7 +76,7 @@ public struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
-        didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
+        didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
@@ -220,7 +220,7 @@ public extension View {
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
-        didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
+        didSelectProduct: ((AdaptyProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
