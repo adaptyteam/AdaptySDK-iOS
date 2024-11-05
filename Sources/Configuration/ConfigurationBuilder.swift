@@ -134,13 +134,10 @@ extension Adapty.ConfigurationBuilder {
         return self
     }
 
-    public enum ServerCluster {
-        case `default`
-        case eu
-    }
+
 
     @discardableResult
-    public func with(serverCluster value: ServerCluster) -> Self {
+    public func with(serverCluster value: Adapty.ServerCluster) -> Self {
         switch value {
         case .default:
             backendBaseUrl = Backend.URLs.defaultPublicEnvironment.baseUrl
@@ -184,5 +181,12 @@ extension Adapty.ConfigurationBuilder {
     package func with(crosplatformSDKName name: String, version: String) -> Self {
         crossPlatformSDK = (name: name, version: version)
         return self
+    }
+}
+
+extension Adapty {
+    public enum ServerCluster {
+        case `default`
+        case eu
     }
 }

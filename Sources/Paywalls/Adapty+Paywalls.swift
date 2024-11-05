@@ -10,6 +10,7 @@ import Foundation
 private let log = Log.default
 
 extension Adapty {
+
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
@@ -27,7 +28,7 @@ extension Adapty {
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
+        loadTimeout: TimeInterval = defaultLoadPaywallTimeout
     ) async throws -> AdaptyPaywall {
         let loadTimeout = loadTimeout.allowedLoadPaywallTimeout
         let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale
@@ -226,8 +227,12 @@ extension Adapty {
     }
 }
 
+extension Adapty {
+    public nonisolated static let defaultLoadPaywallTimeout: TimeInterval = TimeInterval.defaultLoadPaywallTimeout
+}
+
 extension TimeInterval {
-    public static let defaultLoadPaywallTimeout: TimeInterval = 5.0
+    static let defaultLoadPaywallTimeout: TimeInterval = 5.0
     static let minimumLoadPaywallTimeout: TimeInterval = 1.0
 
     var allowedLoadPaywallTimeout: TaskDuration {

@@ -34,8 +34,8 @@ let package = Package(
             path: "Sources",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                    .enableExperimentalFeature("StrictConcurrency"),
-                ]
+                .enableExperimentalFeature("StrictConcurrency"),
+            ]
         ),
         .target(
             name: "AdaptyUI",
@@ -50,7 +50,7 @@ let package = Package(
         ),
         .target(
             name: "AdaptyCrossPlatformCommon",
-            dependencies: ["Adapty"],
+            dependencies: ["Adapty", "AdaptyUI"],
             path: "CrossPlatformCommon"
         ),
         .testTarget(
