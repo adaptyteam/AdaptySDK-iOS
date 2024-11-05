@@ -366,11 +366,14 @@ $defs:
     type: string
     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
+  AdaptyConfiguration.ServerCluster: #request
+    type: string
+    enum:
+      - eu
+      - default
+
   AdaptyConfiguration: #request
     type: object
-
-  AdaptyConfiguration.ServerCluster: #request
-    type: enum
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -385,7 +388,7 @@ $defs:
     type: object
 
   AdaptyPaywall.FetchPolicy: #request
-    type: enum
+    type: object
 
   AdaptyPaywall.RemoteConfig:  #request #response
     type: object
@@ -394,7 +397,13 @@ $defs:
     type: object
 
   AdaptySubscriptionPeriod.Unit: #response
-    type: enum
+    type: string
+    enum:
+        - day
+        - week
+        - month
+        - year
+        - unknown
 
   AdaptyProfile: #response
     type: object
@@ -409,7 +418,15 @@ $defs:
     type: object
 
   AdaptyProfile.Gender: #request
-    type: enum
+    type: string
+    enum:
+      - f
+      - m
+      - o
+    description: |
+      * `f` - female
+      * `m` - male
+      * `o` - other
 
   AdaptyProfileParameters: #request
     type: object
@@ -418,15 +435,29 @@ $defs:
     type: object
 
   AdaptySubscriptionOffer.OfferType: #response
-    type: enum
+    type: string
+    enum:
+      - introductory
+      - promotional
+      - winBack
 
   AdaptySubscriptionOffer.PaymentMode: #response
-    type: enum
+    type: string
+    enum:
+      - pay_as_you_go
+      - pay_up_front
+      - free_trial
+      - unknown
 
   AdaptyAttributionSource: #request
-    type: enum
+    type: string
+    enum:
+      - adjust
+      - appsflyer
+      - branch
+      - custom
 
   AdaptyPurchaseResult: #response
-    type: enum
+    type: object
 
 
