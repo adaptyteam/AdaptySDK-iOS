@@ -8,7 +8,7 @@
 import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public struct AdaptySK2PaywallProduct: AdaptySK2Product {
+struct AdaptySK2PaywallProduct: AdaptySK2Product {
     let skProduct: SK2Product
 
     
@@ -34,7 +34,7 @@ public struct AdaptySK2PaywallProduct: AdaptySK2Product {
 extension AdaptySK2PaywallProduct: AdaptyPaywallProduct {}
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product {
+struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product {
     let skProduct: SK2Product
 
     public let adaptyProductId: String

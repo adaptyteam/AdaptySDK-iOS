@@ -21,7 +21,7 @@ extension Result where Failure == AdaptyError {
     }
 }
 
-extension Adapty.Configuration {
+extension AdaptyConfiguration {
     @AdaptyActor
     package static var callbackDispatchQueue: DispatchQueue?
 }
@@ -51,10 +51,10 @@ extension Adapty {
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
-    /// - Parameter builder: `Adapty.ConfigurationBuilder` which allows to configure Adapty SDK
+    /// - Parameter builder: `AdaptyConfiguration.Builder` which allows to configure Adapty SDK
     /// - Parameter completion: Result callback
     public nonisolated static func activate(
-        with builder: Adapty.ConfigurationBuilder,
+        with builder: AdaptyConfiguration.Builder,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let configuration = builder.build()
@@ -67,10 +67,10 @@ extension Adapty {
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
-    /// - Parameter configuration: `Adapty.Configuration` which allows to configure Adapty SDK
+    /// - Parameter configuration: `AdaptyConfiguration` which allows to configure Adapty SDK
     /// - Parameter completion: Result callback
     public nonisolated static func activate(
-        with configuration: Adapty.Configuration,
+        with configuration: AdaptyConfiguration,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) {
@@ -402,11 +402,11 @@ private func withCompletion(
     Task {
         do {
             try await operation()
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(nil)
             }
         } catch {
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error))
             }
         }
@@ -427,11 +427,11 @@ private func withCompletion<T: Sendable>(
     Task {
         do {
             let result = try await operation()
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(.success(result))
             }
         } catch {
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(.failure(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error)))
             }
         }

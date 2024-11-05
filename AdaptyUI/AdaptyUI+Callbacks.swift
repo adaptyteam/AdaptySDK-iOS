@@ -53,11 +53,11 @@ private func withCompletion(
     Task {
         do {
             try await operation()
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion?(nil)
             }
         } catch {
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion?(error.asAdaptyError)
             }
         }
@@ -71,11 +71,11 @@ private func withCompletion<T: Sendable>(
     Task {
         do {
             let result = try await operation()
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(.success(result))
             }
         } catch {
-            await (Adapty.Configuration.callbackDispatchQueue ?? .main).async {
+            await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(.failure(error.asAdaptyError))
             }
         }
