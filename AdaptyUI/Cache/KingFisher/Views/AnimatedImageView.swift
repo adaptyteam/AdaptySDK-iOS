@@ -270,7 +270,7 @@ final class AnimatedImageView: KFCrossPlatformImageView {
         wantsLayer = true
     }
     
-    open override var animates: Bool {
+    override var animates: Bool {
         get {
             if isDisplayLinkInitialized {
                 return !displayLink.isPaused
@@ -300,11 +300,11 @@ final class AnimatedImageView: KFCrossPlatformImageView {
         }
     }
     
-    open override var wantsUpdateLayer: Bool {
+    override var wantsUpdateLayer: Bool {
         return true
     }
     
-    open override func updateLayer() {
+    override func updateLayer() {
         if let frame = animator?.currentFrameImage ?? currentFrame, let layer = layer {
             layer.contents = frame.kf.cgImage
             layer.contentsScale = frame.kf.scale
@@ -332,12 +332,12 @@ final class AnimatedImageView: KFCrossPlatformImageView {
         }
     }
     
-    open override func viewDidMoveToWindow() {
+    override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         didMove()
     }
     
-    open override func viewDidMoveToSuperview() {
+    override func viewDidMoveToSuperview() {
         super.viewDidMoveToSuperview()
         didMove()
     }
