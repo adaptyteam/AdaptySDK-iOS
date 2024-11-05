@@ -28,7 +28,7 @@ public extension AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didSelectProduct underlying: AdaptyPaywallProduct
+        didSelectProduct product: any AdaptyPaywallProductWithoutDeterminingOffer
     ) {}
 
     func paywallController(
