@@ -28,7 +28,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.osx.deployment_target = '11.0'
   s.visionos.deployment_target = '1.0'
 
-  s.swift_version = '6.0'
+  s.swift_version = '5.9'
 
   s.source_files = 'CrossPlatformCommon/**/*.{h,m,mm,swift}'
 
