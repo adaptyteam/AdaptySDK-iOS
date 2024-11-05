@@ -12,7 +12,7 @@ extension SK1Product {
 }
 
 extension SK1Product.SubscriptionPeriod {
-    var asAdaptyProductSubscriptionPeriod: AdaptyProductSubscriptionPeriod {
-         .init(unit: unit.asAdaptyPeriodUnit, numberOfUnits: numberOfUnits)
+    var asAdaptySubscriptionPeriod: AdaptySubscriptionPeriod {
+         .init(unit: unit.asAdaptySubscriptionPeriodUnit, numberOfUnits: numberOfUnits)
     }
 }

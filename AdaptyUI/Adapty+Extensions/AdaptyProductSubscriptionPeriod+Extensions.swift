@@ -1,5 +1,5 @@
 //
-//  AdaptyProductSubscriptionPeriod+Extensions.swift
+//  AdaptySubscriptionPeriod+Extensions.swift
 //
 //
 //  Created by Alexey Goncharov on 2023-01-24.
@@ -8,7 +8,7 @@
 import Adapty
 import Foundation
 
-extension AdaptyProductSubscriptionPeriod {
+extension AdaptySubscriptionPeriod {
     private func numberOfDays() -> Double {
         switch unit {
         case .day: return Double(numberOfUnits)
@@ -49,8 +49,8 @@ extension AdaptyProductSubscriptionPeriod {
         }
     }
 
-    func numberOfPeriods(_ period: AdaptyPeriodUnit) -> Double {
-        switch period {
+    func numberOfPeriods(_ unit: Unit) -> Double {
+        switch unit {
         case .day: return numberOfDays()
         case .week: return numberOfWeeks()
         case .month: return numberOfMonths()

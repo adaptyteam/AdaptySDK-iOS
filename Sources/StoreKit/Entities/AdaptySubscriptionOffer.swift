@@ -18,7 +18,7 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
     let offerTypeWithIdentifier: OfferTypeWithIdentifier
     
     /// An information about period for a product discount.
-    public let subscriptionPeriod: AdaptyProductSubscriptionPeriod
+    public let subscriptionPeriod: AdaptySubscriptionPeriod
 
     /// A number of periods this product discount is available
     public let numberOfPeriods: Int
@@ -44,7 +44,7 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
     init(
         _price: Price,
         offerTypeWithIdentifier: OfferTypeWithIdentifier,
-        subscriptionPeriod: AdaptyProductSubscriptionPeriod,
+        subscriptionPeriod: AdaptySubscriptionPeriod,
         numberOfPeriods: Int,
         paymentMode: PaymentMode,
         localizedSubscriptionPeriod: String?,

@@ -16,7 +16,7 @@ extension Locale {
         return formatter.string(from: price)
     }
 
-    func localized(period: AdaptyProductSubscriptionPeriod, numberOfPeriods: Int = 1) -> String? {
+    func localized(period: AdaptySubscriptionPeriod, numberOfPeriods: Int = 1) -> String? {
         let countUnits = period.numberOfUnits * numberOfPeriods
         switch period.unit {
         case .day:

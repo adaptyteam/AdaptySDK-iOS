@@ -16,7 +16,7 @@ struct AdaptyRecipes_SwiftUIApp: App {
     init() {
         viewModel = MainViewModel()
 
-        let adaptyConfigBuilder = AdaptyConfiguration.
+        let adaptyConfigBuilder = AdaptyConfiguration
             .builder(withAPIKey: AppConstants.adaptyApiKey)
             .with(customerUserId: UserManager.currentUserId)
 

@@ -33,8 +33,8 @@ extension AdaptySK1Product{
 
     public var isFamilyShareable: Bool { skProduct.unfIsFamilyShareable }
 
-    public var subscriptionPeriod: AdaptyProductSubscriptionPeriod? {
-        skProduct.subscriptionPeriod?.asAdaptyProductSubscriptionPeriod
+    public var subscriptionPeriod: AdaptySubscriptionPeriod? {
+        skProduct.subscriptionPeriod?.asAdaptySubscriptionPeriod
     }
     
     public var subscriptionGroupIdentifier: String? { skProduct.subscriptionGroupIdentifier }

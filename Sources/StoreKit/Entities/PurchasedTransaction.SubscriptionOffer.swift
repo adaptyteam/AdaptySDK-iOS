@@ -9,7 +9,7 @@ import Foundation
 extension PurchasedTransaction {
     struct SubscriptionOffer: Sendable {
         let id: String?
-        let period: AdaptyProductSubscriptionPeriod?
+        let period: AdaptySubscriptionPeriod?
         let paymentMode: AdaptySubscriptionOffer.PaymentMode
         let offerType: PurchasedTransaction.OfferType
         let price: Decimal?
@@ -27,7 +27,7 @@ extension PurchasedTransaction {
 
         init(
             id: String?,
-            period: AdaptyProductSubscriptionPeriod?,
+            period: AdaptySubscriptionPeriod?,
             paymentMode: AdaptySubscriptionOffer.PaymentMode,
             offerType: PurchasedTransaction.OfferType,
             price: Decimal?

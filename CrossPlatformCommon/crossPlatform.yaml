@@ -1,82 +1,86 @@
-$schema: 'https://json-schema.org/draft/2020-12/schema'
-$id: 'https://adapty.io/crossPlatform/3.0.0/schema'
-title: 'Cross Platform Format'
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://adapty.io/crossPlatform/3.0.0/schema"
+title: "Cross Platform Format"
 
 $defs:
-###Function###
-
-  ### setDelegate ###
-
   ### getSDKVersion ###
 
-  GetSDKVersion.Request:
+  GetSDKVersion.Request: #request
     type: object
     required: [name]
     properties:
       name: { const: "get_sdk_version" }
 
-  GetSDKVersion.Response:
+  GetSDKVersion.Response: #response
     type: object
-    required: [value]
+    required: [success]
     properties:
-      value: { type: string  }
+      success: { type: string }
 
   ### isActivated ###
 
-  IsActivated.Request:
+  IsActivated.Request: #request
     type: object
     required: [name]
     properties:
       name: { const: "get_is_activated" }
 
-  IsActivated.Response:
+  IsActivated.Response: #response
     type: object
-    required: [value]
+    required: [success]
     properties:
-      value: { type: boolean  }
+      success: { type: boolean }
 
   ### getLogLevel ###
 
-  GetLogLevel.Request:
+  GetLogLevel.Request: #request
     type: object
     required: [name]
     properties:
       name: { const: "get_log_level" }
 
-  GetLogLevel.Response:
+  GetLogLevel.Response: #response
     type: object
-    required: [value]
+    required: [success]
     properties:
-      value: { $ref: "#/$defs/AdaptyLog.Level" }
+      success: { $ref: "#/$defs/AdaptyLog.Level" }
 
   ### setLogLevel ###
 
-  SetLogLevel.Request:
+  SetLogLevel.Request: #request
     type: object
     required: [name, value]
     properties:
       name: { const: "set_log_level" }
       value: { $ref: "#/$defs/AdaptyLog.Level" }
 
-  SetLogLevel.Response:
+  SetLogLevel.Response: #response
     type: object
+    required: [success]
+    properties:
+      success: { const: true }
 
   ### activate ###
-  Activate.Request:
+  Activate.Request: #request
     type: object
     required: [name, configuration]
     properties:
       name: { const: "activate" }
       configuration: { $ref: "#/$defs/AdaptyConfiguration" }
 
-  Activate.Response:
+  Activate.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### getPaywall ###
 
-  GetPaywall.Request:
+  GetPaywall.Request: #request
     type: object
     required: [name, placement_id]
     properties:
@@ -86,310 +90,343 @@ $defs:
       fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
       loadTimeout: { type: number }
 
-  GetPaywall.Response:
+  GetPaywall.Response: #response
     type: object
     oneOf:
-    - required: [error]
-      properties:
-        error: { $ref: "#/$defs/AdaptyError" }
-    - required: [value]
-      properties:
-        value: { $ref: "#/$defs/AdaptyPaywall" }
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPaywall" }
 
   ### getPaywallProducts ###
 
-  GetPaywallProducts.Request:
+  GetPaywallProducts.Request: #request
     type: object
     required: [name, paywall]
     properties:
       name: { const: "get_paywall_products" }
-      paywall: { $ref: "#/$defs/AdaptyPaywall"  }
+      paywall: { $ref: "#/$defs/AdaptyPaywall" }
 
-  GetPaywallProducts.Response:
+  GetPaywallProducts.Response: #response
     type: object
     oneOf:
-    - required: [error]
-      properties:
-        error: { $ref: "#/$defs/AdaptyError" }
-    - required: [value]
-      properties:
-        value: { type: array, items: { $ref: "#/$defs/AdaptyPaywallProduct" } }
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success:
+            { type: array, items: { $ref: "#/$defs/AdaptyPaywallProduct" } }
 
   ### getProfile ###
 
-  GetProfile.Request:
+  GetProfile.Request: #request
     type: object
     required: [name]
     properties:
       name: { const: "get_profile" }
 
-  GetProfile.Response:
+  GetProfile.Response: #response
     type: object
     oneOf:
-    - required: [error]
-      properties:
-        error: { $ref: "#/$defs/AdaptyError" }
-    - required: [value]
-      properties:
-        value: { $ref: "#/$defs/AdaptyProfile" }
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyProfile" }
 
   ### updateProfile ###
 
-  UpdateProfile.Request:
+  UpdateProfile.Request: #request
     type: object
     required: [name, params]
     properties:
       name: { const: "update_profile" }
-      params: {  $ref: "#/$defs/AdaptyProfileParameters"}
+      params: { $ref: "#/$defs/AdaptyProfileParameters" }
 
-  UpdateProfile.Response:
+  UpdateProfile.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### identify ###
 
-  Identify.Request:
+  Identify.Request: #request
     type: object
     required: [name, customer_user_id]
     properties:
       name: { const: "identify" }
       customer_user_id: { type: string }
 
-  Identify.Response:
+  Identify.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### logout ###
 
-  Logout.Request:
+  Logout.Request: #request
     type: object
     required: [name]
     properties:
       name: { const: "logout" }
 
-  Logout.Response:
+  Logout.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### logShowOnboarding ###
 
-  LogShowOnboarding.Request:
+  LogShowOnboarding.Request: #request
     type: object
     required: [name, params]
     properties:
       name: { const: "log_show_onboarding" }
       params: { $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
 
-  LogShowOnboarding.Response:
+  LogShowOnboarding.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### logShowPaywall ###
 
-  LogShowPaywall.Request:
+  LogShowPaywall.Request: #request
     type: object
     required: [name, paywall]
     properties:
       name: { const: "log_show_paywall" }
       paywall: { $ref: "#/$defs/AdaptyPaywall" }
 
-  LogShowPaywall.Response:
+  LogShowPaywall.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### makePurchase ###
 
-  MakePurchase.Request:
+  MakePurchase.Request: #request
     type: object
     required: [name, product]
     properties:
       name: { const: "make_purchase" }
-      product: {  $ref: "#/$defs/AdaptyPaywallProduct" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct" }
 
-  MakePurchase.Response:
+  MakePurchase.Response: #response
     type: object
     oneOf:
-    - required: [error]
-      properties:
-        error: { $ref: "#/$defs/AdaptyError" }
-    - required: [value]
-      properties:
-        value: { $ref: "#/$defs/AdaptyPurchaseResult" }
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
   ### restorePurchases ###
 
-  RestorePurchases.Request:
+  RestorePurchases.Request: #request
     type: object
     required: [name]
     properties:
       name: { const: "restore_purchases" }
 
-  RestorePurchases.Response:
+  RestorePurchases.Response: #response
     type: object
     oneOf:
-    - required: [error]
-      properties:
-        error: { $ref: "#/$defs/AdaptyError" }
-    - required: [value]
-      properties:
-        value: { $ref: "#/$defs/AdaptyProfile" }
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyProfile" }
 
   ### setFallbackPaywalls ###
 
-  SetFallbackPaywalls.Request:
+  SetFallbackPaywalls.Request: #request
     type: object
     required: [name, url]
     properties:
       name: { const: "set_fallback_paywalls" }
       url: { type: string }
 
-  SetFallbackPaywalls.Response:
+  SetFallbackPaywalls.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### setVariationId ###
 
-  SetVariationId.Request:
+  SetVariationId.Request: #request
     type: object
-    required: [name, variation_id, transaction_id ]
+    required: [name, variation_id, transaction_id]
     properties:
       name: { const: "set_variation_id" }
       variation_id: { type: string }
       transaction_id: { type: string }
 
-  SetVariationId.Response:
+  SetVariationId.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### updateAttribution ###
 
-  UpdateAttribution.Request:
+  UpdateAttribution.Request: #request
     type: object
-    required: [name, attribution, source ]
+    required: [name, attribution, source]
     properties:
       name: { const: "update_attribution" }
       attribution: { type: object }
       source: { $ref: "#/$defs/AdaptyAttributionSource" }
       networkUser_id: { type: string }
 
-  UpdateAttribution.Response:
+  UpdateAttribution.Response: #response
     type: object
-    properties:
-      error: { $ref: "#/$defs/AdaptyError" }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### presentCodeRedemptionSheet ###
 
-  PresentCodeRedemptionSheet.Request:
+  PresentCodeRedemptionSheet.Request: #request
     type: object
     required: [name]
     properties:
       name: { const: "present_code_redemption_sheet" }
 
-  PresentCodeRedemptionSheet.Response:
+  PresentCodeRedemptionSheet.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { const: true }
+
+  ### Entities ###
+
+  AdaptyError: #response
+    type: object
+    required: [adapty_code, message]
+    properties:
+      adapty_code: { type: integer }
+      message: { type: string }
+      detail: { type: string }
+      
+  AdaptyLog.Level: #request #response
+    type: string
+    enum:
+      - error
+      - warn
+      - info
+      - verbose
+      - debug
+
+  Date: #response
+    type: string
+    format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+
+  AdaptyConfiguration: #request
     type: object
 
-###Adapty###
-  AdaptyConfiguration: 
-    type: object
-
-  AdaptyConfiguration.ServerCluster:  
+  AdaptyConfiguration.ServerCluster: #request
     type: enum
 
-###PROTOCOLS###
-  AdaptyDelegate:
+  AdaptyPaywallProduct.Response: #response
     type: object
 
-  AdaptyProduct:
+  AdaptyPaywallProduct.Request: #request
     type: object
 
-  AdaptyPaywallProduct:
+  AdaptyOnboardingScreenParameters: #request
     type: object
 
-  CustomAdaptyError:
+  AdaptyPaywall: #request #response
     type: object
 
-###Structures###
-  AdaptyError:
-    type: object
-
-  AdaptyError.Source:
-    type: object
-
-  AdaptyError.ErrorCode:
+  AdaptyPaywall.FetchPolicy: #request
     type: enum
 
-  AdaptyOnboardingScreenParameters:
+  AdaptyPaywall.RemoteConfig:  #request #response
     type: object
 
-  AdaptyPaywall:
+  AdaptySubscriptionPeriod: #response
     type: object
 
-  AdaptyPaywall.FetchPolicy:
+  AdaptySubscriptionPeriod.Unit: #response
     type: enum
 
-  AdaptyPaywall.RemoteConfig:
+  AdaptyProfile: #response
     type: object
 
-  AdaptyProductSubscriptionPeriod:
+  AdaptyProfile.AccessLevel: #response
     type: object
 
-  AdaptyProfile:
+  AdaptyProfile.NonSubscription: #response
     type: object
 
-  AdaptyProfile.AccessLevel:
+  AdaptyProfile.Subscription: #response
     type: object
 
-  AdaptyProfile.NonSubscription:
-    type: object
-
-  AdaptyProfile.Subscription:
-    type: object
-
-  AdaptyProfile.Gender:
+  AdaptyProfile.Gender: #request
     type: enum
 
-  AdaptyProfileParameters:
+  AdaptyProfileParameters: #request
     type: object
 
-  AdaptyProfileParameters.Builder:
+  AdaptySubscriptionOffer: #response
     type: object
 
-  AdaptyStorefront:
-    type: object
-
-  AdaptySubscriptionOffer:
-    type: object
-
-  AdaptySubscriptionOffer.OfferType:
-    type: enum
-  
-  AdaptySubscriptionOffer.PaymentMode:
+  AdaptySubscriptionOffer.OfferType: #response
     type: enum
 
-  AdaptyAttributionSource:
+  AdaptySubscriptionOffer.PaymentMode: #response
     type: enum
 
-  AdaptyPeriodUnit:
+  AdaptyAttributionSource: #request
     type: enum
 
-  AdaptyPurchaseResult:
+  AdaptyPurchaseResult: #response
     type: enum
 
-  AdaptyLog.Level:
-    type: enum
 
-  AdaptyLog.Category:
-    type: object
-
-  AdaptyLog.Record:
-    type: object
-
-  AdaptyLog.Source:
-    type: object
