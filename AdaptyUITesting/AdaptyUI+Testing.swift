@@ -116,7 +116,7 @@ public extension AdaptyUI.LocalizedViewConfiguration {
 }
 #endif
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public struct AdaptyUITestRendererView: View {
     var eventsHandler: AdaptyEventsHandler
     var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
@@ -142,7 +142,6 @@ public struct AdaptyUITestRendererView: View {
             eventsHandler: eventsHandler,
             paywallViewModel: paywallVM,
             products: nil,
-            introductoryOffersEligibilities: nil,
             observerModeResolver: nil
         )
         let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])
@@ -174,7 +173,7 @@ public struct AdaptyUITestRendererView: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension View {
     func withScreenSizeTestingWrapper(_ value: CGSize) -> some View {
         withScreenSize(value)

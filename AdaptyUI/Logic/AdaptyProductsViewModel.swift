@@ -10,14 +10,14 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 protocol ProductsInfoProvider {
     func selectedProductInfo(by groupId: String) -> ProductInfoModel?
     func productInfo(by adaptyId: String) -> ProductInfoModel?
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProductsViewModel: ProductsInfoProvider {
     func selectedProductInfo(by groupId: String) -> ProductInfoModel? {
         guard let selectedProductId = selectedProductId(by: groupId) else { return nil }
@@ -30,7 +30,7 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")

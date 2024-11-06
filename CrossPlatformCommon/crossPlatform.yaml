@@ -1,0 +1,463 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://adapty.io/crossPlatform/3.0.0/schema"
+title: "Cross Platform Format"
+
+$defs:
+  ### getSDKVersion ###
+
+  GetSDKVersion.Request: #request
+    type: object
+    required: [name]
+    properties:
+      name: { const: "get_sdk_version" }
+
+  GetSDKVersion.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { type: string }
+
+  ### isActivated ###
+
+  IsActivated.Request: #request
+    type: object
+    required: [name]
+    properties:
+      name: { const: "get_is_activated" }
+
+  IsActivated.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { type: boolean }
+
+  ### getLogLevel ###
+
+  GetLogLevel.Request: #request
+    type: object
+    required: [name]
+    properties:
+      name: { const: "get_log_level" }
+
+  GetLogLevel.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { $ref: "#/$defs/AdaptyLog.Level" }
+
+  ### setLogLevel ###
+
+  SetLogLevel.Request: #request
+    type: object
+    required: [name, value]
+    properties:
+      name: { const: "set_log_level" }
+      value: { $ref: "#/$defs/AdaptyLog.Level" }
+
+  SetLogLevel.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { const: true }
+
+  ### activate ###
+  Activate.Request: #request
+    type: object
+    required: [name, configuration]
+    properties:
+      name: { const: "activate" }
+      configuration: { $ref: "#/$defs/AdaptyConfiguration" }
+
+  Activate.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### getPaywall ###
+
+  GetPaywall.Request: #request
+    type: object
+    required: [name, placement_id]
+    properties:
+      name: { const: "get_paywall" }
+      placement_id: { type: string }
+      locale: { type: string }
+      fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+      loadTimeout: { type: number }
+
+  GetPaywall.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPaywall" }
+
+  ### getPaywallProducts ###
+
+  GetPaywallProducts.Request: #request
+    type: object
+    required: [name, paywall]
+    properties:
+      name: { const: "get_paywall_products" }
+      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+
+  GetPaywallProducts.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success:
+            { type: array, items: { $ref: "#/$defs/AdaptyPaywallProduct" } }
+
+  ### getProfile ###
+
+  GetProfile.Request: #request
+    type: object
+    required: [name]
+    properties:
+      name: { const: "get_profile" }
+
+  GetProfile.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyProfile" }
+
+  ### updateProfile ###
+
+  UpdateProfile.Request: #request
+    type: object
+    required: [name, params]
+    properties:
+      name: { const: "update_profile" }
+      params: { $ref: "#/$defs/AdaptyProfileParameters" }
+
+  UpdateProfile.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### identify ###
+
+  Identify.Request: #request
+    type: object
+    required: [name, customer_user_id]
+    properties:
+      name: { const: "identify" }
+      customer_user_id: { type: string }
+
+  Identify.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### logout ###
+
+  Logout.Request: #request
+    type: object
+    required: [name]
+    properties:
+      name: { const: "logout" }
+
+  Logout.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### logShowOnboarding ###
+
+  LogShowOnboarding.Request: #request
+    type: object
+    required: [name, params]
+    properties:
+      name: { const: "log_show_onboarding" }
+      params: { $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
+
+  LogShowOnboarding.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### logShowPaywall ###
+
+  LogShowPaywall.Request: #request
+    type: object
+    required: [name, paywall]
+    properties:
+      name: { const: "log_show_paywall" }
+      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+
+  LogShowPaywall.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### makePurchase ###
+
+  MakePurchase.Request: #request
+    type: object
+    required: [name, product]
+    properties:
+      name: { const: "make_purchase" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct" }
+
+  MakePurchase.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPurchaseResult" }
+
+  ### restorePurchases ###
+
+  RestorePurchases.Request: #request
+    type: object
+    required: [name]
+    properties:
+      name: { const: "restore_purchases" }
+
+  RestorePurchases.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyProfile" }
+
+  ### setFallbackPaywalls ###
+
+  SetFallbackPaywalls.Request: #request
+    type: object
+    required: [name, url]
+    properties:
+      name: { const: "set_fallback_paywalls" }
+      url: { type: string }
+
+  SetFallbackPaywalls.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### setVariationId ###
+
+  SetVariationId.Request: #request
+    type: object
+    required: [name, variation_id, transaction_id]
+    properties:
+      name: { const: "set_variation_id" }
+      variation_id: { type: string }
+      transaction_id: { type: string }
+
+  SetVariationId.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### updateAttribution ###
+
+  UpdateAttribution.Request: #request
+    type: object
+    required: [name, attribution, source]
+    properties:
+      name: { const: "update_attribution" }
+      attribution: { type: object }
+      source: { $ref: "#/$defs/AdaptyAttributionSource" }
+      networkUser_id: { type: string }
+
+  UpdateAttribution.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### presentCodeRedemptionSheet ###
+
+  PresentCodeRedemptionSheet.Request: #request
+    type: object
+    required: [name]
+    properties:
+      name: { const: "present_code_redemption_sheet" }
+
+  PresentCodeRedemptionSheet.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { const: true }
+
+  ### Entities ###
+
+  AdaptyError: #response
+    type: object
+    required: [adapty_code, message]
+    properties:
+      adapty_code: { type: integer }
+      message: { type: string }
+      detail: { type: string }
+      
+  AdaptyLog.Level: #request #response
+    type: string
+    enum:
+      - error
+      - warn
+      - info
+      - verbose
+      - debug
+
+  Date: #response
+    type: string
+    format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+
+  AdaptyConfiguration.ServerCluster: #request
+    type: string
+    enum:
+      - eu
+      - default
+
+  AdaptyConfiguration: #request
+    type: object
+
+  AdaptyPaywallProduct.Response: #response
+    type: object
+
+  AdaptyPaywallProduct.Request: #request
+    type: object
+
+  AdaptyOnboardingScreenParameters: #request
+    type: object
+
+  AdaptyPaywall: #request #response
+    type: object
+
+  AdaptyPaywall.FetchPolicy: #request
+    type: object
+
+  AdaptyPaywall.RemoteConfig:  #request #response
+    type: object
+
+  AdaptySubscriptionPeriod: #response
+    type: object
+
+  AdaptySubscriptionPeriod.Unit: #response
+    type: string
+    enum:
+        - day
+        - week
+        - month
+        - year
+        - unknown
+
+  AdaptyProfile: #response
+    type: object
+
+  AdaptyProfile.AccessLevel: #response
+    type: object
+
+  AdaptyProfile.NonSubscription: #response
+    type: object
+
+  AdaptyProfile.Subscription: #response
+    type: object
+
+  AdaptyProfile.Gender: #request
+    type: string
+    enum:
+      - f
+      - m
+      - o
+    description: |
+      * `f` - female
+      * `m` - male
+      * `o` - other
+
+  AdaptyProfileParameters: #request
+    type: object
+
+  AdaptySubscriptionOffer: #response
+    type: object
+
+  AdaptySubscriptionOffer.OfferType: #response
+    type: string
+    enum:
+      - introductory
+      - promotional
+      - winBack
+
+  AdaptySubscriptionOffer.PaymentMode: #response
+    type: string
+    enum:
+      - pay_as_you_go
+      - pay_up_front
+      - free_trial
+      - unknown
+
+  AdaptyAttributionSource: #request
+    type: string
+    enum:
+      - adjust
+      - appsflyer
+      - branch
+      - custom
+
+  AdaptyPurchaseResult: #response
+    type: object
+
+

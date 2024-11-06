@@ -121,7 +121,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
 
             self.init(
                 id: nil,
-                period: sk1ProductOffer.subscriptionPeriod.asAdaptyProductSubscriptionPeriod,
+                period: sk1ProductOffer.subscriptionPeriod.asAdaptySubscriptionPeriod,
                 paymentMode: sk1ProductOffer.paymentMode.asPaymentMode,
                 offerType: .introductory,
                 price: sk1ProductOffer.price.decimalValue
@@ -137,7 +137,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
         if let sk1ProductOffer {
             self.init(
                 id: sk1ProductOffer.identifier,
-                period: sk1ProductOffer.subscriptionPeriod.asAdaptyProductSubscriptionPeriod,
+                period: sk1ProductOffer.subscriptionPeriod.asAdaptySubscriptionPeriod,
                 paymentMode: sk1ProductOffer.paymentMode.asPaymentMode,
                 offerType: .promotional,
                 price: sk1ProductOffer.price.decimalValue
@@ -163,7 +163,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
 
         self.init(
             id: sk2Transaction.unfOfferId,
-            period: sk1ProductOffer?.subscriptionPeriod.asAdaptyProductSubscriptionPeriod,
+            period: sk1ProductOffer?.subscriptionPeriod.asAdaptySubscriptionPeriod,
             paymentMode: sk1ProductOffer?.paymentMode.asPaymentMode ?? .unknown,
             offerType: offerType,
             price: sk1ProductOffer?.price.decimalValue
@@ -187,7 +187,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
 
             self = .init(
                 id: sk2TransactionOffer.id,
-                period: sk1ProductOffer?.subscriptionPeriod.asAdaptyProductSubscriptionPeriod,
+                period: sk1ProductOffer?.subscriptionPeriod.asAdaptySubscriptionPeriod,
                 paymentMode: sk2TransactionOffer.paymentMode?.asPaymentMode ?? .unknown,
                 offerType: offerType,
                 price: sk1ProductOffer?.price.decimalValue

@@ -45,7 +45,7 @@ extension Adapty {
 
     static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
         guard let delegate = Adapty.delegate else { return }
-        let queue = Configuration.callbackDispatchQueue ?? .main
+        let queue = AdaptyConfiguration.callbackDispatchQueue ?? .main
         queue.async {
             call(delegate)
         }

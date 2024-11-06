@@ -9,7 +9,7 @@ import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2Product.SubscriptionPeriod.Unit {
-    var asAdaptyPeriodUnit: AdaptyPeriodUnit {
+    var asAdaptySubscriptionPeriodUnit: AdaptySubscriptionPeriod.Unit {
         switch self {
         case .day: .day
         case .week: .week

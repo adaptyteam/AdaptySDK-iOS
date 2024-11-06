@@ -18,7 +18,7 @@ struct Backend: HTTPCodableConfiguration {
     func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
     func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
 
-    init(with configuration: Adapty.Configuration, envorinment: Environment) {
+    init(with configuration: AdaptyConfiguration, envorinment: Environment) {
         let baseUrls = configuration.backend
         let apiKey = configuration.apiKey
 

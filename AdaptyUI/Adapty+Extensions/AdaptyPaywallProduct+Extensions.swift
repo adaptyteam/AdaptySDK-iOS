@@ -8,9 +8,9 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProduct {
-    func pricePer(period: AdaptyPeriodUnit) -> String? {
+    func pricePer(period: AdaptySubscriptionPeriod.Unit) -> String? {
         guard let skProduct = sk2Product else { return nil }
         guard let subscriptionPeriod = subscriptionPeriod else { return nil }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Adapty.Configuration {
+extension AdaptyConfiguration {
     @AdaptyActor
     static var ipAddressCollectionDisabled = Self.default.ipAddressCollectionDisabled
 }
@@ -21,7 +21,7 @@ extension Adapty {
     private static var syncIPv4Started = false
 
     func startSyncIPv4OnceIfNeeded() {
-        guard !Configuration.ipAddressCollectionDisabled,
+        guard !AdaptyConfiguration.ipAddressCollectionDisabled,
               Environment.Device.ipV4Address == nil,
               !Adapty.syncIPv4Started
         else { return }

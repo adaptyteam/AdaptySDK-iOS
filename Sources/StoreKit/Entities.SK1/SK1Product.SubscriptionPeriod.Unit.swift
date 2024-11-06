@@ -1,5 +1,5 @@
 //
-//  SK1Product.SubscriptionPeriod .Unit.swift
+//  SK1Product.SubscriptionPeriod.Unit.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2024
@@ -12,7 +12,7 @@ extension SK1Product.SubscriptionPeriod {
 }
 
 extension SK1Product.SubscriptionPeriod.Unit {
-    var asAdaptyPeriodUnit: AdaptyPeriodUnit {
+    var asAdaptySubscriptionPeriodUnit: AdaptySubscriptionPeriod.Unit {
         switch self {
         case .day: .day
         case .week: .week

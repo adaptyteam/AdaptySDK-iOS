@@ -23,7 +23,7 @@ extension Adapty {
         customerUserId: String? = nil
     ) async throws {
         try await activate(
-            with: Configuration
+            with: AdaptyConfiguration
                 .builder(withAPIKey: apiKey)
                 .with(customerUserId: customerUserId)
                 .with(observerMode: observerMode)
@@ -35,9 +35,9 @@ extension Adapty {
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
-    /// - Parameter builder: `Adapty.ConfigurationBuilder` which allows to configure Adapty SDK
+    /// - Parameter builder: `AdaptyConfiguration.Builder` which allows to configure Adapty SDK
     public nonisolated static func activate(
-        with builder: Adapty.ConfigurationBuilder
+        with builder: AdaptyConfiguration.Builder
     ) async throws {
         try await activate(with: builder.build())
     }
@@ -46,9 +46,9 @@ extension Adapty {
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
-    /// - Parameter configuration: `Adapty.Configuration` which allows to configure Adapty SDK
+    /// - Parameter configuration: `AdaptyConfiguration` which allows to configure Adapty SDK
     public static func activate(
-        with configuration: Adapty.Configuration
+        with configuration: AdaptyConfiguration
     ) async throws {
         let stamp = Log.stamp
         let logParams: EventParameters? = [
@@ -73,9 +73,9 @@ extension Adapty {
 
             await Storage.clearAllDataIfDifferent(apiKey: configuration.apiKey)
 
-            Configuration.callbackDispatchQueue = configuration.callbackDispatchQueue // TODO: Refactoring
-            Configuration.idfaCollectionDisabled = configuration.idfaCollectionDisabled // TODO: Refactoring
-            Configuration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
+            AdaptyConfiguration.callbackDispatchQueue = configuration.callbackDispatchQueue // TODO: Refactoring
+            AdaptyConfiguration.idfaCollectionDisabled = configuration.idfaCollectionDisabled // TODO: Refactoring
+            AdaptyConfiguration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
 
             let environment = await Environment.instance
             let backend = Backend(with: configuration, envorinment: environment)

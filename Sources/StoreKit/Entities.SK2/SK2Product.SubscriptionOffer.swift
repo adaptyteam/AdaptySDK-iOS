@@ -49,7 +49,7 @@ private extension AdaptySubscriptionOffer {
         offer: SK2Product.SubscriptionOffer,
         product: SK2Product
     ) {
-        let period = offer.period.asAdaptyProductSubscriptionPeriod
+        let period = offer.period.asAdaptySubscriptionPeriod
         let periodLocale = product.unfPeriodLocale
         self.init(
             _price: Price(

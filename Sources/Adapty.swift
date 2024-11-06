@@ -27,7 +27,7 @@ public final class Adapty: Sendable {
     package let observerMode: Bool
 
     init(
-        configuration: Configuration,
+        configuration: AdaptyConfiguration,
         backend: Backend
     ) async {
         self.observerMode = configuration.observerMode

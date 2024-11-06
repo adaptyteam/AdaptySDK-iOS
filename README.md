@@ -108,8 +108,8 @@ import Adapty
 And add the following to `application(_:didFinishLaunchingWithOptions:):`
 ```swift
 let configurationBuilder =
-    Adapty.Configuration
-        .Builder(withAPIKey: "PUBLIC_SDK_KEY")
+    AdaptyConfiguration
+        .builder(withAPIKey: "PUBLIC_SDK_KEY")
         .with(observerMode: false)
         .with(customerUserId: "YOUR_USER_ID")
         .with(idfaCollectionDisabled: false)

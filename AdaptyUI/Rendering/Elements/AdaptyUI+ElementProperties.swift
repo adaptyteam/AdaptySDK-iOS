@@ -10,17 +10,17 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Point {
     var unitPoint: UnitPoint { UnitPoint(x: x, y: y) }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.ColorGradient.Item {
     var gradientStop: Gradient.Stop { Gradient.Stop(color: color.swiftuiColor, location: p) }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func applyingProperties(_ props: AdaptyUI.Element.Properties?, includeBackground: Bool) -> some View {
@@ -30,7 +30,7 @@ extension View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Mode<AdaptyUI.Color> {
     private func resolvedColor(style: UIUserInterfaceStyle) -> AdaptyUI.Color {
         switch style {
@@ -52,7 +52,7 @@ extension AdaptyUI.Mode<AdaptyUI.Color> {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Color {
     var swiftuiColor: SwiftUI.Color {
         SwiftUI.Color(uiColor)

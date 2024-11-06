@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIRangedFrameModifier: ViewModifier {
     typealias Constraints = (min: CGFloat?, max: CGFloat?, shrink: Bool)
 
@@ -83,7 +83,7 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     func rangedFrame(box: AdaptyUI.Box) -> some View {
         modifier(AdaptyUIRangedFrameModifier(box: box))

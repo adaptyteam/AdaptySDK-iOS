@@ -1,5 +1,5 @@
 //
-//  Configuration.Builder.swift
+//  AdaptyConfiguration.Builder.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.04.2024.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension Adapty.Configuration {
-    fileprivate init(with builder: Adapty.ConfigurationBuilder) {
+extension AdaptyConfiguration {
+    fileprivate init(with builder: AdaptyConfiguration.Builder) {
         let apiKey = builder.apiKey
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
@@ -30,13 +30,13 @@ extension Adapty.Configuration {
         )
     }
 
-    public static func builder(withAPIKey apiKey: String) -> Adapty.ConfigurationBuilder {
-        .init(withAPIKey: apiKey)
+    public static func builder(withAPIKey apiKey: String) -> AdaptyConfiguration.Builder {
+        .init(apiKey: apiKey)
     }
 }
 
-extension Adapty {
-    public final class ConfigurationBuilder {
+extension AdaptyConfiguration {
+    public final class Builder {
         public private(set) var apiKey: String
         public private(set) var customerUserId: String?
         public private(set) var observerMode: Bool
@@ -53,21 +53,17 @@ extension Adapty {
 
         package private(set) var crossPlatformSDK: (name: String, version: String)?
 
-        public convenience init(withAPIKey key: String) {
-            self.init(apiKey: key)
-        }
-
         init(
             apiKey: String,
             customerUserId: String? = nil,
-            observerMode: Bool = Configuration.default.observerMode,
-            idfaCollectionDisabled: Bool = Configuration.default.idfaCollectionDisabled,
-            ipAddressCollectionDisabled: Bool = Configuration.default.ipAddressCollectionDisabled,
+            observerMode: Bool = AdaptyConfiguration.default.observerMode,
+            idfaCollectionDisabled: Bool = AdaptyConfiguration.default.idfaCollectionDisabled,
+            ipAddressCollectionDisabled: Bool = AdaptyConfiguration.default.ipAddressCollectionDisabled,
             callbackDispatchQueue: DispatchQueue? = nil,
-            backendBaseUrl: URL = Configuration.default.backend.baseUrl,
-            backendFallbackBaseUrl: URL = Configuration.default.backend.fallbackUrl,
-            backendConfigsBaseUrl: URL = Configuration.default.backend.configsUrl,
-            backendProxy: (host: String, port: Int)? = Configuration.default.backend.proxy,
+            backendBaseUrl: URL = AdaptyConfiguration.default.backend.baseUrl,
+            backendFallbackBaseUrl: URL = AdaptyConfiguration.default.backend.fallbackUrl,
+            backendConfigsBaseUrl: URL = AdaptyConfiguration.default.backend.configsUrl,
+            backendProxy: (host: String, port: Int)? = AdaptyConfiguration.default.backend.proxy,
             logLevel: AdaptyLog.Level? = nil,
             crossPlatformSDK: (name: String, version: String)? = nil
         ) {
@@ -85,14 +81,14 @@ extension Adapty {
             self.crossPlatformSDK = crossPlatformSDK
         }
 
-        /// Call this method to get the ``Adapty.Configuration`` object.
-        public func build() -> Adapty.Configuration {
+        /// Call this method to get the ``AdaptyConfiguration`` object.
+        public func build() -> AdaptyConfiguration {
             .init(with: self)
         }
     }
 }
 
-extension Adapty.ConfigurationBuilder {
+extension AdaptyConfiguration.Builder {
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
     @discardableResult
     public func with(apiKey key: String) -> Self {
@@ -134,13 +130,10 @@ extension Adapty.ConfigurationBuilder {
         return self
     }
 
-    public enum ServerCluster {
-        case `default`
-        case eu
-    }
+
 
     @discardableResult
-    public func with(serverCluster value: ServerCluster) -> Self {
+    public func with(serverCluster value: AdaptyConfiguration.ServerCluster) -> Self {
         switch value {
         case .default:
             backendBaseUrl = Backend.URLs.defaultPublicEnvironment.baseUrl
@@ -186,3 +179,5 @@ extension Adapty.ConfigurationBuilder {
         return self
     }
 }
+
+

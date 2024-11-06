@@ -117,7 +117,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
             if let sk2ProductOffer = sk2Product?.subscriptionOffer(byType: .promotional, withId: discountIdentifier) {
                 self.init(
                     id: discountIdentifier,
-                    period: sk2ProductOffer.period.asAdaptyProductSubscriptionPeriod,
+                    period: sk2ProductOffer.period.asAdaptySubscriptionPeriod,
                     paymentMode: sk2ProductOffer.paymentMode.asPaymentMode,
                     offerType: .promotional,
                     price: sk2ProductOffer.price
@@ -128,7 +128,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
         } else if let offer = sk2Product?.subscription?.introductoryOffer {
             self.init(
                 id: nil,
-                period: offer.period.asAdaptyProductSubscriptionPeriod,
+                period: offer.period.asAdaptySubscriptionPeriod,
                 paymentMode: offer.paymentMode.asPaymentMode,
                 offerType: .introductory,
                 price: offer.price
@@ -149,7 +149,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
         )
         self = .init(
             id: sk2Transaction.unfOfferId,
-            period: (sk2ProductOffer?.period)?.asAdaptyProductSubscriptionPeriod,
+            period: (sk2ProductOffer?.period)?.asAdaptySubscriptionPeriod,
             paymentMode: (sk2ProductOffer?.paymentMode)?.asPaymentMode ?? .unknown,
             offerType: offerType,
             price: sk2ProductOffer?.price
@@ -169,7 +169,7 @@ private extension PurchasedTransaction.SubscriptionOffer {
             )
             self = .init(
                 id: sk2TransactionOffer.id,
-                period: (sk2ProductOffer?.period).map { $0.asAdaptyProductSubscriptionPeriod },
+                period: (sk2ProductOffer?.period).map { $0.asAdaptySubscriptionPeriod },
                 paymentMode: sk2TransactionOffer.paymentMode.map { $0.asPaymentMode } ?? .unknown,
                 offerType: sk2TransactionOffer.type.asPurchasedTransactionOfferType,
                 price: sk2ProductOffer?.price

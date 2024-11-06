@@ -1,5 +1,5 @@
 //
-//  Configuration+Decodable.swift
+//  AdaptyConfiguration.Builder+Decodable.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.04.2024.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Adapty.ConfigurationBuilder: Decodable {
+extension AdaptyConfiguration.Builder: Decodable {
     enum CodingKeys: String, CodingKey {
         case apiKey = "api_key"
         case customerUserId = "customer_user_id"
@@ -30,7 +30,7 @@ extension Adapty.ConfigurationBuilder: Decodable {
     public convenience init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let defaultValue = Adapty.Configuration.default
+        let defaultValue = AdaptyConfiguration.default
 
         let proxy: (host: String, port: Int)? =
             if let host = try container.decodeIfPresent(String.self, forKey: .backendProxyHost),

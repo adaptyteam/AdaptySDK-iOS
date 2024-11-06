@@ -1,5 +1,5 @@
 //
-//  AdaptyPeriodUnit.swift
+//  AdaptySubscriptionPeriod.Unit.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2022.
@@ -7,15 +7,17 @@
 
 import Foundation
 
-public enum AdaptyPeriodUnit: UInt, Sendable, Hashable {
-    case day
-    case week
-    case month
-    case year
-    case unknown
+extension AdaptySubscriptionPeriod {
+    public enum Unit: UInt, Sendable, Hashable {
+        case day
+        case week
+        case month
+        case year
+        case unknown
+    }
 }
 
-extension AdaptyPeriodUnit: CustomStringConvertible {
+extension AdaptySubscriptionPeriod.Unit: CustomStringConvertible {
     public var description: String {
         let value: CodingValues =
             switch self {
@@ -29,7 +31,7 @@ extension AdaptyPeriodUnit: CustomStringConvertible {
     }
 }
 
-extension AdaptyPeriodUnit: Codable {
+extension AdaptySubscriptionPeriod.Unit: Codable {
     fileprivate enum CodingValues: String {
         case day
         case week

@@ -43,7 +43,7 @@ public protocol AdaptyProduct: Sendable, CustomStringConvertible {
     var isFamilyShareable: Bool { get }
 
     /// The period details for products that are subscriptions. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
-    var subscriptionPeriod: AdaptyProductSubscriptionPeriod? { get }
+    var subscriptionPeriod: AdaptySubscriptionPeriod? { get }
 
     /// The identifier of the subscription group to which the subscription belongs. (Will be `nil` for iOS version below 12.0 and macOS version below 10.14).
     var subscriptionGroupIdentifier: String? { get }

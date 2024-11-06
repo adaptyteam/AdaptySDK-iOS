@@ -17,7 +17,7 @@ import Foundation
 
 private let log = Log.default
 
-extension Adapty.Configuration {
+extension AdaptyConfiguration {
     @AdaptyActor
     static var idfaCollectionDisabled = Self.default.idfaCollectionDisabled
 }
@@ -48,7 +48,7 @@ extension Environment.Device {
             #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
                 return .notAvailable
             #else
-                guard !Adapty.Configuration.idfaCollectionDisabled else {
+                guard !AdaptyConfiguration.idfaCollectionDisabled else {
                     return .notAvailable
                 }
 
@@ -75,7 +75,7 @@ extension Environment.Device {
                 return nil
             #else
 
-                guard !Adapty.Configuration.idfaCollectionDisabled else { return nil }
+                guard !AdaptyConfiguration.idfaCollectionDisabled else { return nil }
 
                 if let result = _idfa { return result }
 

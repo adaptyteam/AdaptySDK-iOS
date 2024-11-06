@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.CornerRadius {
     func normalized(width: Double, height: Double) -> AdaptyUI.CornerRadius {
         var normalizedRadii = self
@@ -67,7 +67,7 @@ extension AdaptyUI.CornerRadius {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct UnevenRoundedRectangleFallback: InsettableShape {
     var cornerRadii: AdaptyUI.CornerRadius
     var insetAmount: CGFloat = 0
@@ -137,7 +137,7 @@ struct UnevenRoundedRectangleFallback: InsettableShape {
     }
 }
 
-@available(iOS 16.0, *)
+@available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
 extension AdaptyUI.CornerRadius {
     var systemRadii: RectangleCornerRadii {
         RectangleCornerRadii(

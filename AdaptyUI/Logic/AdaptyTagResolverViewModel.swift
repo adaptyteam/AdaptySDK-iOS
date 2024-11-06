@@ -10,7 +10,7 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI {
     enum ProductTagReplacement {
         case notApplicable
@@ -32,18 +32,18 @@ extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyTagResolver {
     func replacement(for tag: String) -> String?
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Dictionary<String, String>: AdaptyTagResolver {
     public func replacement(for tag: String) -> String? { self[tag] }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyTagResolverViewModel: ObservableObject, AdaptyTagResolver {
     let tagResolver: AdaptyTagResolver?

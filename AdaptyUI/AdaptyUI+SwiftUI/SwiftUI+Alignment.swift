@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Alignment {
     static func from(
         horizontal: HorizontalAlignment,
@@ -31,7 +31,7 @@ extension Alignment {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.HorizontalAlignment {
     func swiftuiValue(with layoutDirection: LayoutDirection) -> SwiftUI.HorizontalAlignment {
         switch self {
@@ -55,7 +55,7 @@ extension AdaptyUI.HorizontalAlignment {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.VerticalAlignment {
     var swiftuiValue: SwiftUI.VerticalAlignment {
         switch self {
@@ -67,7 +67,7 @@ extension AdaptyUI.VerticalAlignment {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Stack {
     func swiftuiValue(with layoutDirection: LayoutDirection) -> Alignment {
         Alignment.from(

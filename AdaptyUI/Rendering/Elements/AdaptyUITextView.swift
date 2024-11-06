@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUITextView: View {
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
@@ -63,7 +63,7 @@ struct AdaptyUITextView: View {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI.RichText {
     func convertToSwiftUIText(
@@ -123,7 +123,7 @@ extension AdaptyUI.RichText {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.ImageData {
     private var uiImage: UIImage? {
         switch self {
@@ -164,7 +164,7 @@ extension UIImage {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI.Text {
     enum ProductInfoContainer {
@@ -195,7 +195,7 @@ extension AdaptyUI.Text {
     }
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AttributedString {
     static func createFrom(
         value: String,
@@ -226,7 +226,7 @@ extension UIFont {
     static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
 }
 
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.RichText.TextAttributes {
     var uiFont: UIFont { font.uiFont(size: size) }
     var uiColor: UIColor? { txtColor.asSolidColor?.uiColor }
