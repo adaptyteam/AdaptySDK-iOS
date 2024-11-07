@@ -7,7 +7,7 @@
 
 import StoreKit
 
-public protocol CustomAdaptyError: CustomStringConvertible, CustomDebugStringConvertible, CustomNSError {
+package protocol CustomAdaptyError: CustomStringConvertible, CustomDebugStringConvertible, CustomNSError {
     var originalError: Error? { get }
     var adaptyErrorCode: AdaptyError.ErrorCode { get }
 }

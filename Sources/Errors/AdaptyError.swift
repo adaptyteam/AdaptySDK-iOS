@@ -119,7 +119,7 @@ public struct AdaptyError: CustomNSError, CustomStringConvertible, CustomDebugSt
     public var errorCode: Int { wrapped.errorCode }
     public var errorUserInfo: [String: Any] { wrapped.errorUserInfo }
 
-    public init(_ wrapped: CustomAdaptyError) {
+    package init(_ wrapped: CustomAdaptyError) {
         self.wrapped = wrapped
     }
 }
