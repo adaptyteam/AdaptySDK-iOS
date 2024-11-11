@@ -1,0 +1,50 @@
+//
+//  Request.MakePurchase.swift
+//  AdaptyPlugin
+//
+//  Created by Aleksei Valiano on 08.11.2024.
+//
+
+import Adapty
+import Foundation
+
+extension Request {
+    struct MakePurchase: AdaptyPluginRequest {
+        static let method = Method.makePurchase
+        let product: AdaptyPaywallProduct
+
+        init(from jsonDictionary: AdaptyJsonDictionary) throws {
+            try self.init(
+                product: jsonDictionary.value(forKey: CodingKeys.product)
+            )
+        }
+
+        init(product: KeyValue) throws {
+            self.product = try paywall.decode(AdaptyPaywallProduct.self)
+        }
+
+        func execute() async throws -> AdaptyJsonData {
+            let result = try await Adapty.makePurchase(product: product)
+            return .success(result)
+        }
+    }
+}
+
+private enum CodingKeys: CodingKey {
+    case product
+}
+
+public extension AdaptyPlugin {
+    @objc static func makePurchase(
+        product: String,
+        _ completion: @escaping AdaptyJsonDataCompletion
+    ) {
+        withCompletion(completion) {
+            await Request.MakePurchase.execute {
+                try Request.MakePurchase(
+                    product: .init(key: CodingKeys.product, value: product)
+                )
+            }
+        }
+    }
+}

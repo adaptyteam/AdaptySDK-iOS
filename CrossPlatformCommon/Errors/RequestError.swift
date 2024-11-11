@@ -10,7 +10,7 @@ enum RequestError: Error {
     case notFoundRequest(Request.Method)
     case notExist(key: String)
     case isNil(key: String)
-    case wrongType(key: String, expected: Any.Type, present: Any.Type)
+    case wrongType(key: String?, expected: Any.Type, present: Any.Type)
 
     var localizedDescription: String {
         switch self {
@@ -21,9 +21,13 @@ enum RequestError: Error {
         case .notExist(key: let key):
             "Key \(key) not exist"
         case .isNil(key: let key):
-            "Key \(key) is nil"
+            "Value by key(\(key)) is nil"
         case .wrongType(key: let key, expected: let expected, present: let present):
-            "Key \(key) has wrong type. Expected \(expected), present \(present)"
+            if let key {
+                "Value by key (\(key)) has wrong type. Expected \(expected), present \(present)"
+            } else {
+                "Value has wrong type. Expected \(expected), present \(present)"
+            }
         }
     }
 }

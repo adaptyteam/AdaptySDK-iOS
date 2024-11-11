@@ -1,5 +1,5 @@
 //
-//  Requests.LogLevel.swift
+//  Request.LogLevel.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 07.11.2024.
@@ -16,9 +16,8 @@ extension Request {
         
         init() {}
 
-        func call() async -> AdaptyJsonData {
-            let result = Adapty.logLevel
-            return AdaptyPluginResult.success(result).asAdaptyJsonData
+        func execute() async throws -> AdaptyJsonData {
+            .success(Adapty.logLevel)
         }
     }
     
@@ -26,13 +25,9 @@ extension Request {
         static let method = Method.setLogLevel
         let value: AdaptyLog.Level
         
-        enum CodingKeys: CodingKey {
-            case value
-        }
-        
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
-                value: jsonDictionary.decode(String.self, forKey: CodingKeys.value)
+                value: jsonDictionary.value(String.self, forKey: CodingKeys.value)
             )
         }
         
@@ -40,19 +35,25 @@ extension Request {
             self.value = AdaptyLog.Level(stringLiteral: value)
         }
         
-        func call() async -> AdaptyJsonData {
+        func execute() async throws -> AdaptyJsonData {
             Adapty.logLevel = value
-            return AdaptyPluginResult.success(true).asAdaptyJsonData
+            return .success()
         }
     }
 }
 
 public extension AdaptyPlugin {
     @objc static func getLogLevel(_ completion: @escaping AdaptyJsonDataCompletion) {
-        Request.GetLogLevel().call(completion)
+        withCompletion(completion) {
+            await Request.GetLogLevel.execute()
+        }
     }
     
     @objc static func setLogLevel(value: String, _ completion: @escaping AdaptyJsonDataCompletion) {
-        Request.SetLogLevel(value: value).call(completion)
+        withCompletion(completion) {
+            await Request.SetLogLevel.execute {
+                Request.SetLogLevel(value: value)
+            }
+        }
     }
 }

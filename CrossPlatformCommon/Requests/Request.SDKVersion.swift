@@ -1,5 +1,5 @@
 //
-//  RequestGetSDKVersion.swift
+//  Request.SDKVersion.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 06.11.2024.
@@ -16,15 +16,16 @@ extension Request {
 
         init() {}
 
-        func call() async -> AdaptyJsonData {
-            let result = Adapty.SDKVersion
-            return AdaptyPluginResult.success(result).asAdaptyJsonData
+        func execute() async throws -> AdaptyJsonData {
+            .success(Adapty.SDKVersion)
         }
     }
 }
 
 public extension AdaptyPlugin {
     @objc static func SDKVersion(_ completion: @escaping AdaptyJsonDataCompletion) {
-        Request.GetSDKVersion().call(completion)
+        withCompletion(completion) {
+            await Request.GetSDKVersion.execute()
+        }
     }
 }

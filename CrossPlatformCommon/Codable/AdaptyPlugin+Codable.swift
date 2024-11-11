@@ -2,7 +2,7 @@
 //  AdaptyPlugin+Codable.swift
 //  AdaptyPlugin
 //
-//  Created by Aleksei Valiano on 06.11.2024.
+//  Created by Aleksei Valiano on 08.11.2024.
 //
 
 import Foundation
@@ -30,7 +30,3 @@ extension AdaptyPlugin {
         return decoder
     }()
 }
-
-
-
-

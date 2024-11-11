@@ -20,54 +20,42 @@ public struct AdaptyPluginError: Error, Encodable {
 }
 
 extension AdaptyPluginError {
-    static func encodingFailed(message: String? = nil, _ error: Error) -> AdaptyPluginError {
-        let message = message ?? "Encoding failed"
-        if let encodableError = error as? Encodable {
-            do {
-                let detail = try AdaptyPlugin.encoder.encode(encodableError).asAdaptyJsonString
-                return encodingFailed(
-                    message: "\(message): \(error.localizedDescription)",
-                    detail: detail
-                )
-            } catch {}
+    static func callFailed(_ error: Error) -> AdaptyPluginError {
+        if let adaptyError = error as? AdaptyError {
+            return adaptyError.asAdaptyPluginError
         }
 
-        return encodingFailed(
-            message: "\(message): \(error.localizedDescription)",
-            detail: "\(message) \(String(describing: error))"
+        return AdaptyPluginError(
+            errorCode: AdaptyError.ErrorCode.unknown.rawValue,
+            message: "Unknown: \(error.localizedDescription)",
+            detail: "AdaptyPluginError.unknown: \(String(describing: error))"
         )
     }
 
-    private static func encodingFailed(message: String, detail: String) -> AdaptyPluginError {
-        .init(
+    static func encodingFailed(message: String? = nil, _ error: Error) -> AdaptyPluginError {
+        let message = message ?? "Encoding failed"
+
+        let detail = (error as? Encodable)
+            .flatMap { try? AdaptyPlugin.encoder.encode($0).asAdaptyJsonString }
+            ?? "\(message) \(String(describing: error))"
+
+        return .init(
             errorCode: AdaptyError.ErrorCode.encodingFailed.rawValue,
-            message: message,
+            message: "\(message): \(error.localizedDescription)",
             detail: "AdaptyPluginError.encodingFailed: \(detail)"
         )
     }
 
     static func decodingFailed(message: String? = nil, _ error: Error) -> AdaptyPluginError {
         let message = message ?? "Decoding failed"
-        if let encodableError = error as? Encodable {
-            do {
-                let detail = try AdaptyPlugin.encoder.encode(encodableError).asAdaptyJsonString
-                return decodingFailed(
-                    message: "\(message): \(error.localizedDescription)",
-                    detail: detail
-                )
-            } catch {}
-        }
 
-        return decodingFailed(
-            message: "\(message): \(error.localizedDescription)",
-            detail: "\(message) \(String(describing: error))"
-        )
-    }
+        let detail = (error as? Encodable)
+            .flatMap { try? AdaptyPlugin.encoder.encode($0).asAdaptyJsonString }
+            ?? "\(message) \(String(describing: error))"
 
-    private static func decodingFailed(message: String, detail: String) -> AdaptyPluginError {
-        .init(
+        return .init(
             errorCode: AdaptyError.ErrorCode.decodingFailed.rawValue,
-            message: message,
+            message: "\(message): \(error.localizedDescription)",
             detail: "AdaptyPluginError.decodingFailed: \(detail)"
         )
     }
