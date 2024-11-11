@@ -14,6 +14,10 @@ extension Request {
 
         let fileURL: URL
 
+        enum CodingKeys: String, CodingKey {
+            case fileURL = "file_url"
+        }
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 fileURL: jsonDictionary.value(forKey: CodingKeys.fileURL)
@@ -31,21 +35,14 @@ extension Request {
     }
 }
 
-private enum CodingKeys: String, CodingKey {
-    case fileURL = "file_url"
-}
-
 public extension AdaptyPlugin {
     @objc static func setFallbackPaywalls(
         fileURL: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.SetFallbackPaywalls.execute {
-                try Request.SetFallbackPaywalls(
-                    fileURL: .init(key: CodingKeys.fileURL, value: fileURL)
-                )
-            }
-        }
+        typealias CodingKeys = Request.SetFallbackPaywalls.CodingKeys
+        execute(with: completion) { try Request.SetFallbackPaywalls(
+            fileURL: .init(key: CodingKeys.fileURL, value: fileURL)
+        ) }
     }
 }

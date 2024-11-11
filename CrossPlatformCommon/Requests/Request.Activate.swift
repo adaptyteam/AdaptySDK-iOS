@@ -14,6 +14,10 @@ extension Request {
 
         let configuration: AdaptyConfiguration
 
+        enum CodingKeys: CodingKey {
+            case configuration
+        }
+
         init(from params: AdaptyJsonDictionary) throws {
             try self.init(
                 configuration: params.value(forKey: CodingKeys.configuration)
@@ -42,21 +46,14 @@ extension Request {
     }
 }
 
-private enum CodingKeys: CodingKey {
-    case configuration
-}
-
 public extension AdaptyPlugin {
     @objc static func activate(
         configuration: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.Activate.execute {
-                try Request.Activate(
-                    configuration: .init(key: CodingKeys.configuration, value: configuration)
-                )
-            }
-        }
+        typealias CodingKeys = Request.Activate.CodingKeys
+        execute(with: completion) { try Request.Activate(
+            configuration: .init(key: CodingKeys.configuration, value: configuration)
+        ) }
     }
 }

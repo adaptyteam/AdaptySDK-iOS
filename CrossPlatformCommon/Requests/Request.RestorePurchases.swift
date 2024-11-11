@@ -27,8 +27,6 @@ public extension AdaptyPlugin {
     @objc static func restorePurchases(
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.RestorePurchases.execute()
-        }
+        execute(with: completion) { Request.RestorePurchases() }
     }
 }

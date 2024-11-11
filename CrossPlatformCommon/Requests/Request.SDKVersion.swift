@@ -24,8 +24,6 @@ extension Request {
 
 public extension AdaptyPlugin {
     @objc static func SDKVersion(_ completion: @escaping AdaptyJsonDataCompletion) {
-        withCompletion(completion) {
-            await Request.GetSDKVersion.execute()
-        }
+        execute(with: completion) { Request.GetSDKVersion() }
     }
 }

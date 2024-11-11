@@ -27,11 +27,11 @@ extension Request {
         
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
-                value: jsonDictionary.value(String.self, forKey: CodingKeys.value)
+                jsonDictionary.value(String.self, forKey: CodingKeys.value)
             )
         }
         
-        init(value: String) {
+        init(_ value: String) {
             self.value = AdaptyLog.Level(stringLiteral: value)
         }
         
@@ -44,16 +44,10 @@ extension Request {
 
 public extension AdaptyPlugin {
     @objc static func getLogLevel(_ completion: @escaping AdaptyJsonDataCompletion) {
-        withCompletion(completion) {
-            await Request.GetLogLevel.execute()
-        }
+        execute(with: completion) { Request.GetLogLevel() }
     }
     
     @objc static func setLogLevel(value: String, _ completion: @escaping AdaptyJsonDataCompletion) {
-        withCompletion(completion) {
-            await Request.SetLogLevel.execute {
-                Request.SetLogLevel(value: value)
-            }
-        }
+        execute(with: completion) { Request.SetLogLevel(value) }
     }
 }

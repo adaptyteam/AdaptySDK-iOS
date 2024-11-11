@@ -13,6 +13,11 @@ extension Request {
         static let method = Method.updateProfile
 
         let params: AdaptyProfileParameters
+
+        enum CodingKeys: CodingKey {
+            case params
+        }
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 params: jsonDictionary.value(forKey: CodingKeys.params)
@@ -30,21 +35,14 @@ extension Request {
     }
 }
 
-private enum CodingKeys: CodingKey {
-    case params
-}
-
 public extension AdaptyPlugin {
     @objc static func updateAttribution(
         params: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.UpdateProfile.execute {
-                try Request.UpdateProfile(
-                    params: .init(key: CodingKeys.params, value: params)
-                )
-            }
-        }
+        typealias CodingKeys = Request.UpdateProfile.CodingKeys
+        execute(with: completion) { try Request.UpdateProfile(
+            params: .init(key: CodingKeys.params, value: params)
+        ) }
     }
 }

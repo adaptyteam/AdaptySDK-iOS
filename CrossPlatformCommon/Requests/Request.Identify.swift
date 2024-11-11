@@ -14,6 +14,10 @@ extension Request {
 
         let customerUserId: String
 
+        enum CodingKeys: String, CodingKey {
+            case customerUserId = "customer_user_id"
+        }
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 customerUserId: jsonDictionary
@@ -32,21 +36,13 @@ extension Request {
     }
 }
 
-private enum CodingKeys: String, CodingKey {
-    case customerUserId = "customer_user_id"
-}
-
 public extension AdaptyPlugin {
     @objc static func identify(
         customerUserId: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.Identify.execute {
-                Request.Identify(
-                    customerUserId: customerUserId
-                )
-            }
-        }
+        execute(with: completion) { Request.Identify(
+            customerUserId: customerUserId
+        ) }
     }
 }

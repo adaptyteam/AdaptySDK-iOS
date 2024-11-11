@@ -17,6 +17,13 @@ extension Request {
         let fetchPolicy: AdaptyPaywall.FetchPolicy?
         let loadTimeout: TimeInterval?
 
+        enum CodingKeys: String, CodingKey {
+            case placementId = "placement_id"
+            case locale
+            case fetchPolicy = "fetch_policy"
+            case loadTimeout = "load_timeout"
+        }
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 placementId: jsonDictionary
@@ -40,22 +47,14 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            let paywall = try await Adapty.getPaywall(
+            try .success(await Adapty.getPaywall(
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy ?? AdaptyPaywall.FetchPolicy.default,
                 loadTimeout: loadTimeout ?? Adapty.defaultLoadPaywallTimeout
-            )
-            return .success(paywall)
+            ))
         }
     }
-}
-
-private enum CodingKeys: String, CodingKey {
-    case placementId = "placement_id"
-    case locale
-    case fetchPolicy = "fetch_policy"
-    case loadTimeout = "load_timeout"
 }
 
 public extension AdaptyPlugin {
@@ -66,15 +65,12 @@ public extension AdaptyPlugin {
         loadTimeout: Double,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.GetPaywall.execute {
-                try Request.GetPaywall(
-                    placementId: placementId,
-                    locale: locale,
-                    fetchPolicy: .init(key: CodingKeys.fetchPolicy, value: fetchPolicy),
-                    loadTimeout: loadTimeout
-                )
-            }
-        }
+        typealias CodingKeys = Request.GetPaywall.CodingKeys
+        execute(with: completion) { try Request.GetPaywall(
+            placementId: placementId,
+            locale: locale,
+            fetchPolicy: .init(key: CodingKeys.fetchPolicy, value: fetchPolicy),
+            loadTimeout: loadTimeout
+        ) }
     }
 }

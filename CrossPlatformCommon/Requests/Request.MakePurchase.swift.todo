@@ -11,40 +11,50 @@ import Foundation
 extension Request {
     struct MakePurchase: AdaptyPluginRequest {
         static let method = Method.makePurchase
-        let product: AdaptyPaywallProduct
+        let product: AdaptyPluginPaywallProduct
 
+        enum CodingKeys: CodingKey {
+            case product
+        }
+        
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 product: jsonDictionary.value(forKey: CodingKeys.product)
             )
         }
 
+        
         init(product: KeyValue) throws {
-            self.product = try paywall.decode(AdaptyPaywallProduct.self)
+            let product = try product.decode(Request.AdaptyPluginPaywallProduct.self)
+            self.product = getPaywallProduct(
         }
 
         func execute() async throws -> AdaptyJsonData {
+            let product = try await Adapty.getPaywallProduct(
+                vendorProductId: product.vendorProductId,
+                adaptyProductId: product.adaptyProductId,
+                promotionalOfferId: product.promotionalOfferId,
+                winBackOfferId: product.winBackOfferId,
+                variationId: product.variationId,
+                paywallABTestName: product.paywallABTestName,
+                paywallName: product.paywallName
+            )
             let result = try await Adapty.makePurchase(product: product)
             return .success(result)
         }
     }
 }
 
-private enum CodingKeys: CodingKey {
-    case product
-}
 
 public extension AdaptyPlugin {
     @objc static func makePurchase(
         product: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.MakePurchase.execute {
-                try Request.MakePurchase(
+        typealias CodingKeys = Request.MakePurchase.CodingKeys
+             execute(with: completion) { try Request.MakePurchase(
                     product: .init(key: CodingKeys.product, value: product)
-                )
-            }
-        }
+                )  }
+        
     }
 }

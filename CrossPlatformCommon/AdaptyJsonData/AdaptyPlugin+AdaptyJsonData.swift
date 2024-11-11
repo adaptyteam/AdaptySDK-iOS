@@ -29,19 +29,17 @@ public extension AdaptyPlugin {
     static func execute(method: String, withJson jsonData: AdaptyJsonData) async -> AdaptyJsonData {
         do {
             let requestType = try Request.requestType(for: method)
-            return await requestType.execute(withJson: jsonData)
+            return await execute(requestType: requestType, withJson: jsonData)
         } catch {
             let error = AdaptyPluginError.decodingFailed(error)
             log.error(error.message)
             return .failure(error)
         }
     }
-}
 
-extension AdaptyPluginRequest {
-    static func execute(withJson jsonData: AdaptyJsonData) async -> AdaptyJsonData {
+    private static func execute<RequestType: AdaptyPluginRequest>(requestType: RequestType.Type, withJson jsonData: AdaptyJsonData) async -> AdaptyJsonData {
         await execute {
-            try jsonData.decode(Self.self)
+            try jsonData.decode(requestType)
         }
     }
 }
