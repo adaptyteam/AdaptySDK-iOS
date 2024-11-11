@@ -49,9 +49,11 @@ enum Request {
         RestorePurchases.method: RestorePurchases.self,
         SetFallbackPaywalls.method: SetFallbackPaywalls.self,
         SetVariationId.method: SetVariationId.self,
-//        UpdateAttribution.method: UpdateAttribution.self,
+        UpdateAttribution.method: UpdateAttribution.self,
         UpdateProfile.method: UpdateProfile.self
     ]
+}
+enum Response {
 }
 
 extension Request {

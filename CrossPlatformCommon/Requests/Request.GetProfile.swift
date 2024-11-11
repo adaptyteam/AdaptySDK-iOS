@@ -17,22 +17,15 @@ extension Request {
         init() {}
 
         func execute() async throws -> AdaptyJsonData {
-            let profile = try await Adapty.getProfile()
-            return .success(profile)
+            try .success(await Adapty.getProfile())
         }
     }
-}
-
-private enum CodingKeys: CodingKey {
-    case paywall
 }
 
 public extension AdaptyPlugin {
     @objc static func getProfile(
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.GetProfile.execute()
-        }
+        execute(with: completion) { Request.GetProfile() }
     }
 }

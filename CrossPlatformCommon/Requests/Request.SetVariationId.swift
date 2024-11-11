@@ -15,6 +15,11 @@ extension Request {
         let variationId: String
         let transactionId: String
 
+        enum CodingKeys: String, CodingKey {
+            case variationId = "variation_id"
+            case transactionId = "transaction_id"
+        }
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 variationId: jsonDictionary.value(String.self, forKey: CodingKeys.variationId),
@@ -34,24 +39,16 @@ extension Request {
     }
 }
 
-private enum CodingKeys: String, CodingKey {
-    case variationId = "variation_id"
-    case transactionId = "transaction_id"
-}
-
 public extension AdaptyPlugin {
     @objc static func setVariationId(
         variationId: String,
         transactionId: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.SetVariationId.execute {
-                Request.SetVariationId(
-                    variationId: variationId,
-                    transactionId: transactionId
-                )
-            }
-        }
+        typealias CodingKeys = Request.SetVariationId.CodingKeys
+        execute(with: completion) { Request.SetVariationId(
+            variationId: variationId,
+            transactionId: transactionId
+        ) }
     }
 }

@@ -24,8 +24,6 @@ extension Request {
 
 public extension AdaptyPlugin {
     @objc static func isActivated(_ completion: @escaping AdaptyJsonDataCompletion) {
-        withCompletion(completion) {
-            await Request.IsActivated.execute()
-        }
+        execute(with: completion) { Request.IsActivated() }
     }
 }

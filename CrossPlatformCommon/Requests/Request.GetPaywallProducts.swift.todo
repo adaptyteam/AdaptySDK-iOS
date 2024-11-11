@@ -14,6 +14,10 @@ extension Request {
 
         let paywall: AdaptyPaywall
 
+        enum CodingKeys: CodingKey {
+            case paywall
+        }
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 paywall: jsonDictionary.value(forKey: CodingKeys.paywall)
@@ -25,14 +29,9 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            let products = try await Adapty.getPaywallProducts(paywall: paywall)
-            return .success(products)
+            try .success(await Adapty.getPaywallProducts(paywall: paywall))
         }
     }
-}
-
-private enum CodingKeys: CodingKey {
-    case paywall
 }
 
 public extension AdaptyPlugin {
@@ -40,12 +39,10 @@ public extension AdaptyPlugin {
         paywall: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.GetPaywallProducts.execute {
-                try Request.GetPaywallProducts(
-                    paywall: .init(key: CodingKeys.paywall, value: paywall)
-                )
-            }
-        }
+        typealias CodingKeys = Request.GetPaywallProducts.CodingKeys
+        execute(with: completion) { try Request.GetPaywallProducts(
+            paywall: .init(key: CodingKeys.paywall, value: paywall)
+
+        ) }
     }
 }

@@ -25,8 +25,6 @@ extension Request {
 
 public extension AdaptyPlugin {
     @objc static func presentCodeRedemptionSheet(_ completion: @escaping AdaptyJsonDataCompletion) {
-        withCompletion(completion) {
-            await Request.PresentCodeRedemptionSheet.execute()
-        }
+        execute(with: completion) { Request.PresentCodeRedemptionSheet() }
     }
 }

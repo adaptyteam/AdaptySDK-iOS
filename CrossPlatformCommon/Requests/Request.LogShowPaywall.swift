@@ -40,12 +40,8 @@ public extension AdaptyPlugin {
         paywall: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.LogShowPaywall.execute {
-                try Request.LogShowPaywall(
-                    paywall: .init(key: CodingKeys.paywall, value: paywall)
-                )
-            }
-        }
+        execute(with: completion) { try Request.LogShowPaywall(
+            paywall: .init(key: CodingKeys.paywall, value: paywall)
+        ) }
     }
 }

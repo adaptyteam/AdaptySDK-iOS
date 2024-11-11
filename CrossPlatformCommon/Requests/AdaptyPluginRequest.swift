@@ -16,13 +16,13 @@ protocol AdaptyPluginRequest: Decodable, Sendable {
     func execute() async throws -> AdaptyJsonData
 }
 
-extension AdaptyPluginRequest {
-    static func execute(instance: () throws -> Self) async -> AdaptyJsonData {
-        let request: Self
+extension AdaptyPlugin {
+    static func execute<Request: AdaptyPluginRequest>(instance: () throws -> Request) async -> AdaptyJsonData {
+        let request: Request
         do {
             request = try instance()
         } catch {
-            let error = AdaptyPluginError.decodingFailed(message: "Request params of method:\(method) is invalid", error)
+            let error = AdaptyPluginError.decodingFailed(message: "Request params of method:\(Request.method) is invalid", error)
             log.error(error.message)
             return .failure(error)
         }

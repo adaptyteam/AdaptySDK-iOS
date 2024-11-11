@@ -13,6 +13,11 @@ extension Request {
         static let method = Method.logShowOnboarding
 
         let params: AdaptyOnboardingScreenParameters
+
+        enum CodingKeys: CodingKey {
+            case params
+        }
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 params: jsonDictionary.value(forKey: CodingKeys.params)
@@ -30,21 +35,14 @@ extension Request {
     }
 }
 
-private enum CodingKeys: CodingKey {
-    case params
-}
-
 public extension AdaptyPlugin {
     @objc static func identify(
         params: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.LogShowOnboarding.execute {
-                try Request.LogShowOnboarding(
-                    params: .init(key: CodingKeys.params, value: params)
-                )
-            }
-        }
+        typealias CodingKeys = Request.LogShowOnboarding.CodingKeys
+        execute(with: completion) { try Request.LogShowOnboarding(
+            params: .init(key: CodingKeys.params, value: params)
+        ) }
     }
 }

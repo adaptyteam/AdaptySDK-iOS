@@ -28,8 +28,6 @@ public extension AdaptyPlugin {
         customerUserId: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        withCompletion(completion) {
-            await Request.Logout.execute()
-        }
+        execute(with: completion) { Request.Logout() }
     }
 }
