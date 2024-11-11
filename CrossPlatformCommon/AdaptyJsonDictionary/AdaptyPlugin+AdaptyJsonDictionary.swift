@@ -11,36 +11,38 @@ import Foundation
 private let log = Log.plugin
 
 public extension AdaptyPlugin {
-    static func request(json jsonDictionary: AdaptyJsonDictionary) async -> AdaptyJsonData {
+    static func execute(withJson jsonDictionary: AdaptyJsonDictionary) async -> AdaptyJsonData {
         do {
-            let method = try jsonDictionary.decode(String.self, forKey: "method")
-            return await request(method: method, json: jsonDictionary)
+            let method = try jsonDictionary.value(String.self, forKey: "method")
+            return await execute(method: method, withJson: jsonDictionary)
         } catch {
             let error = AdaptyPluginError.decodingFailed(message: "Request data is invalid", error)
             log.error(error.message)
-            return AdaptyPluginResult.failure(error).asAdaptyJsonData
+            return .failure(error)
         }
     }
 
-    static func request(method: String, json jsonDictionary: AdaptyJsonDictionary) async -> AdaptyJsonData {
+    static func execute(method: String, withJson jsonDictionary: AdaptyJsonDictionary) async -> AdaptyJsonData {
         do {
             let requestType = try Request.requestType(for: method)
-            return await request(requestType: requestType, json: jsonDictionary)
+            return await requestType.execute(withJson: jsonDictionary)
         } catch {
             let error = AdaptyPluginError.decodingFailed(error)
             log.error(error.message)
-            return AdaptyPluginResult.failure(error).asAdaptyJsonData
+            return .failure(error)
         }
     }
+}
 
-    private static func request(requestType: AdaptyPluginRequest.Type, json jsonDictionary: AdaptyJsonDictionary) async -> AdaptyJsonData {
-        do {
-            let params = try requestType.init(from: jsonDictionary)
-            return await params.call()
-        } catch {
-            let error = AdaptyPluginError.decodingFailed(message: "Request params of method:\(requestType.method) is invalid", error)
-            log.error(error.message)
-            return AdaptyPluginResult.failure(error).asAdaptyJsonData
+extension AdaptyPluginRequest {
+    static func execute(withJson jsonDictionary: AdaptyJsonDictionary) async -> AdaptyJsonData {
+        await execute {
+            try self.init(from: jsonDictionary)
         }
+    }
+    
+    @inlinable
+    static func execute() async -> AdaptyJsonData {
+        await execute(withJson: [:])
     }
 }

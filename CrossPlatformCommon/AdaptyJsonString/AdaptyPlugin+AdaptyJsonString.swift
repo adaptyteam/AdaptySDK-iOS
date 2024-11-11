@@ -5,17 +5,16 @@
 //  Created by Aleksei Valiano on 07.11.2024.
 //
 
-import Adapty
 import Foundation
 
 public extension AdaptyPlugin {
     @inlinable
-    static func request(json jsonString: AdaptyJsonString) async -> AdaptyJsonData {
-        await request(json: jsonString.asAdaptyJsonData)
+    static func execute(withJson jsonString: AdaptyJsonString) async -> AdaptyJsonData {
+        await execute(withJson: jsonString.asAdaptyJsonData)
     }
 
     @inlinable
-    static func request(method: String, json jsonString: AdaptyJsonString) async -> AdaptyJsonData {
-        await request(method: method, json: jsonString.asAdaptyJsonData)
+    static func execute(method: String, withJson jsonString: AdaptyJsonString) async -> AdaptyJsonData {
+        await execute(method: method, withJson: jsonString.asAdaptyJsonData)
     }
 }

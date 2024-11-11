@@ -1,5 +1,5 @@
 //
-//  RequestIsActivated.swift
+//  Request.IsActivated.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 06.11.2024.
@@ -16,15 +16,16 @@ extension Request {
 
         init() {}
 
-        func call() async -> AdaptyJsonData {
-            let result = await Adapty.isActivated
-            return AdaptyPluginResult.success(result).asAdaptyJsonData
+        func execute() async throws -> AdaptyJsonData {
+            .success(await Adapty.isActivated)
         }
     }
 }
 
 public extension AdaptyPlugin {
     @objc static func isActivated(_ completion: @escaping AdaptyJsonDataCompletion) {
-        Request.IsActivated().call(completion)
+        withCompletion(completion) {
+            await Request.IsActivated.execute()
+        }
     }
 }
