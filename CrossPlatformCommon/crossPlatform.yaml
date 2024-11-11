@@ -2,14 +2,15 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://adapty.io/crossPlatform/3.0.0/schema"
 title: "Cross Platform Format"
 
-$defs:
+$recuests:
+
   ### getSDKVersion ###
 
   GetSDKVersion.Request: #request
     type: object
-    required: [name]
+    required: [method]
     properties:
-      name: { const: "get_sdk_version" }
+      method: { const: "get_sdk_version" }
 
   GetSDKVersion.Response: #response
     type: object
@@ -21,9 +22,9 @@ $defs:
 
   IsActivated.Request: #request
     type: object
-    required: [name]
+    required: [method]
     properties:
-      name: { const: "get_is_activated" }
+      method: { const: "is_activated" }
 
   IsActivated.Response: #response
     type: object
@@ -35,9 +36,9 @@ $defs:
 
   GetLogLevel.Request: #request
     type: object
-    required: [name]
+    required: [method]
     properties:
-      name: { const: "get_log_level" }
+      method: { const: "get_log_level" }
 
   GetLogLevel.Response: #response
     type: object
@@ -49,9 +50,9 @@ $defs:
 
   SetLogLevel.Request: #request
     type: object
-    required: [name, value]
+    required: [method, value]
     properties:
-      name: { const: "set_log_level" }
+      method: { const: "set_log_level" }
       value: { $ref: "#/$defs/AdaptyLog.Level" }
 
   SetLogLevel.Response: #response
@@ -63,10 +64,10 @@ $defs:
   ### activate ###
   Activate.Request: #request
     type: object
-    required: [name, configuration]
+    required: [method, configuration]
     properties:
-      name: { const: "activate" }
-      configuration: { $ref: "#/$defs/AdaptyConfiguration" }
+      method: { const: "activate" }
+      configuration: { type: jsonString, $ref: "#/$defs/AdaptyConfiguration" } 
 
   Activate.Response: #response
     type: object
@@ -82,13 +83,13 @@ $defs:
 
   GetPaywall.Request: #request
     type: object
-    required: [name, placement_id]
+    required: [method, placement_id]
     properties:
-      name: { const: "get_paywall" }
+      method: { const: "get_paywall" }
       placement_id: { type: string }
       locale: { type: string }
-      fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
-      loadTimeout: { type: number }
+      fetch_policy: { type: jsonString, $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+      load_timeout: { type: number }
 
   GetPaywall.Response: #response
     type: object
@@ -104,10 +105,10 @@ $defs:
 
   GetPaywallProducts.Request: #request
     type: object
-    required: [name, paywall]
+    required: [method, paywall]
     properties:
-      name: { const: "get_paywall_products" }
-      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+      method: { const: "get_paywall_products" }
+      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
 
   GetPaywallProducts.Response: #response
     type: object
@@ -124,9 +125,9 @@ $defs:
 
   GetProfile.Request: #request
     type: object
-    required: [name]
+    required: [method]
     properties:
-      name: { const: "get_profile" }
+      method: { const: "get_profile" }
 
   GetProfile.Response: #response
     type: object
@@ -142,10 +143,10 @@ $defs:
 
   UpdateProfile.Request: #request
     type: object
-    required: [name, params]
+    required: [method, params]
     properties:
-      name: { const: "update_profile" }
-      params: { $ref: "#/$defs/AdaptyProfileParameters" }
+      method: { const: "update_profile" }
+      params: { type: jsonString, $ref: "#/$defs/AdaptyProfileParameters" }
 
   UpdateProfile.Response: #response
     type: object
@@ -161,9 +162,9 @@ $defs:
 
   Identify.Request: #request
     type: object
-    required: [name, customer_user_id]
+    required: [method, customer_user_id]
     properties:
-      name: { const: "identify" }
+      method: { const: "identify" }
       customer_user_id: { type: string }
 
   Identify.Response: #response
@@ -180,9 +181,9 @@ $defs:
 
   Logout.Request: #request
     type: object
-    required: [name]
+    required: [method]
     properties:
-      name: { const: "logout" }
+      method: { const: "logout" }
 
   Logout.Response: #response
     type: object
@@ -198,10 +199,10 @@ $defs:
 
   LogShowOnboarding.Request: #request
     type: object
-    required: [name, params]
+    required: [method, params]
     properties:
-      name: { const: "log_show_onboarding" }
-      params: { $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
+      method: { const: "log_show_onboarding" }
+      params: { type: jsonString, $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
 
   LogShowOnboarding.Response: #response
     type: object
@@ -217,10 +218,10 @@ $defs:
 
   LogShowPaywall.Request: #request
     type: object
-    required: [name, paywall]
+    required: [method, paywall]
     properties:
-      name: { const: "log_show_paywall" }
-      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+      method: { const: "log_show_paywall" }
+      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
 
   LogShowPaywall.Response: #response
     type: object
@@ -236,10 +237,10 @@ $defs:
 
   MakePurchase.Request: #request
     type: object
-    required: [name, product]
+    required: [method, product]
     properties:
-      name: { const: "make_purchase" }
-      product: { $ref: "#/$defs/AdaptyPaywallProduct" }
+      method: { const: "make_purchase" }
+      product: { type: jsonString, $ref: "#/$defs/AdaptyPaywallProduct.Request" }
 
   MakePurchase.Response: #response
     type: object
@@ -255,9 +256,9 @@ $defs:
 
   RestorePurchases.Request: #request
     type: object
-    required: [name]
+    required: [method]
     properties:
-      name: { const: "restore_purchases" }
+      method: { const: "restore_purchases" }
 
   RestorePurchases.Response: #response
     type: object
@@ -273,10 +274,10 @@ $defs:
 
   SetFallbackPaywalls.Request: #request
     type: object
-    required: [name, url]
+    required: [method, file_url]
     properties:
-      name: { const: "set_fallback_paywalls" }
-      url: { type: string }
+      method: { const: "set_fallback_paywalls" }
+      file_url: { type: string }
 
   SetFallbackPaywalls.Response: #response
     type: object
@@ -292,9 +293,9 @@ $defs:
 
   SetVariationId.Request: #request
     type: object
-    required: [name, variation_id, transaction_id]
+    required: [method, variation_id, transaction_id]
     properties:
-      name: { const: "set_variation_id" }
+      method: { const: "set_variation_id" }
       variation_id: { type: string }
       transaction_id: { type: string }
 
@@ -312,12 +313,12 @@ $defs:
 
   UpdateAttribution.Request: #request
     type: object
-    required: [name, attribution, source]
+    required: [method, attribution, source]
     properties:
-      name: { const: "update_attribution" }
-      attribution: { type: object }
+      method: { const: "update_attribution" }
+      attribution: { type: jsonString }
       source: { $ref: "#/$defs/AdaptyAttributionSource" }
-      networkUser_id: { type: string }
+      network_user_id: { type: string }
 
   UpdateAttribution.Response: #response
     type: object
@@ -333,9 +334,9 @@ $defs:
 
   PresentCodeRedemptionSheet.Request: #request
     type: object
-    required: [name]
+    required: [method]
     properties:
-      name: { const: "present_code_redemption_sheet" }
+      method: { const: "present_code_redemption_sheet" }
 
   PresentCodeRedemptionSheet.Response: #response
     type: object
@@ -343,6 +344,7 @@ $defs:
     properties:
       success: { const: true }
 
+$defs:
   ### Entities ###
 
   AdaptyError: #response
