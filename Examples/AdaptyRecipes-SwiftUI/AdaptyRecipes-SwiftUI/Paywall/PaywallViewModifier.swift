@@ -35,20 +35,18 @@ struct PaywallViewModifier: ViewModifier {
         self.placementId = placementId
     }
 
-    @State private var paywall: AdaptyPaywall?
-    @State private var viewConfig: AdaptyUI.LocalizedViewConfiguration?
+    @State private var paywallConfig: AdaptyUI.PaywallConfiguration?
 
     @State private var alertError: IdentifiableErrorWrapper?
     @State private var alertPaywallError: IdentifiableErrorWrapper?
 
     @ViewBuilder
     func contentOrSheet(content: Content) -> some View {
-        if let paywall, let viewConfig {
+        if let paywallConfig {
             content
                 .paywall(
                     isPresented: isPresented,
-                    paywall: paywall,
-                    viewConfiguration: viewConfig,
+                    paywallConfiguration: paywallConfig,
                     // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
                     // observerModeResolver: ObserverModeResolver(),
                     didFailPurchase: { _, error in
@@ -86,8 +84,7 @@ struct PaywallViewModifier: ViewModifier {
                     let paywall = try await Adapty.getPaywall(placementId: placementId)
                     let viewConfig = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
 
-                    self.paywall = paywall
-                    self.viewConfig = viewConfig
+                    paywallConfig = AdaptyUI.paywallConfiguration(for: paywall, viewConfiguration: viewConfig)
                 } catch {
                     Logger.log(.error, "getPaywallAndConfig: \(error)")
                     alertError = .init(title: "getPaywallAndConfig error!", error: error)

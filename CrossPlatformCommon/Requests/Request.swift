@@ -38,13 +38,13 @@ enum Request {
         SetLogLevel.method: SetLogLevel.self,
         Activate.method: Activate.self,
         GetPaywall.method: GetPaywall.self,
-//        GetPaywallProducts.method: GetPaywallProducts.self,
+        GetPaywallProducts.method: GetPaywallProducts.self,
         GetProfile.method: GetProfile.self,
         Identify.method: Identify.self,
         Logout.method: Logout.self,
         LogShowOnboarding.method: LogShowOnboarding.self,
         LogShowPaywall.method: LogShowPaywall.self,
-//        MakePurchase.method: MakePurchase.self,
+        MakePurchase.method: MakePurchase.self,
         PresentCodeRedemptionSheet.method: PresentCodeRedemptionSheet.self,
         RestorePurchases.method: RestorePurchases.self,
         SetFallbackPaywalls.method: SetFallbackPaywalls.self,
@@ -53,20 +53,20 @@ enum Request {
         UpdateProfile.method: UpdateProfile.self
     ]
 }
-enum Response {
-}
+
+enum Response {}
 
 extension Request {
     static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {
         guard let method = Method(rawValue: method) else {
-            throw RequestError.uncnownMethod(method)
+            throw AdaptyPluginDecodingError.uncnownMethod(method)
         }
         return try requestType(for: method)
     }
 
     private static func requestType(for method: Method) throws -> AdaptyPluginRequest.Type {
         guard let requestType = allRequests[method] else {
-            throw RequestError.notFoundRequest(method)
+            throw AdaptyPluginDecodingError.notFoundRequest(method)
         }
         return requestType
     }

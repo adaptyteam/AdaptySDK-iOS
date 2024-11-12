@@ -13,48 +13,44 @@ extension SK1Product {
     var introductoryOfferNotApplicable: Bool {
         if let period = subscriptionPeriod,
            period.numberOfUnits > 0,
-           introductoryPrice != nil {
+           introductoryPrice != nil
+        {
             false
         } else {
             true
         }
     }
 
-    var introductoryOffer: AdaptySubscriptionOffer? {
-        guard let offer = introductoryPrice else { return nil }
-        return AdaptySubscriptionOffer(
-            offerType: .introductory,
-            offer: offer,
-            locale: priceLocale
-        )
+    private var unfIntroductoryOffer: SK1Product.SubscriptionOffer? {
+        introductoryPrice
     }
 
-    func promotionalOffer(byIdentifier identifier: String) -> AdaptySubscriptionOffer? {
-        guard let offer = discounts.first(where: { $0.identifier == identifier })
-        else { return nil }
-        return AdaptySubscriptionOffer(
-            offerType: .promotional(identifier),
-            offer: offer,
-            locale: priceLocale
-        )
+    private func unfPromotionalOffer(byId identifier: String) -> SK1Product.SubscriptionOffer? {
+        discounts.first(where: { $0.identifier == identifier })
     }
-}
 
-private extension AdaptySubscriptionOffer {
-    init(
-        offerType: OfferTypeWithIdentifier,
-        offer: SK1Product.SubscriptionOffer,
-        locale: Locale
-    ) {
+    func subscriptionOffer(by offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier) -> AdaptySubscriptionOffer? {
+        let offer: SK1Product.SubscriptionOffer? =
+            switch offerTypeWithIdentifier {
+            case .introductory:
+                unfIntroductoryOffer
+            case .promotional(let id):
+                unfPromotionalOffer(byId: id)
+            default:
+                nil
+            }
+        guard let offer else { return nil }
+
+        let locale = priceLocale
         let period = offer.subscriptionPeriod.asAdaptySubscriptionPeriod
-        self.init(
+        return AdaptySubscriptionOffer(
             _price: Price(
                 amount: offer.price as Decimal,
                 currencyCode: locale.unfCurrencyCode,
                 currencySymbol: locale.currencySymbol,
                 localizedString: locale.localized(sk1Price: offer.price)
             ),
-            offerTypeWithIdentifier: offerType,
+            offerTypeWithIdentifier: offerTypeWithIdentifier,
             subscriptionPeriod: period,
             numberOfPeriods: offer.numberOfPeriods,
             paymentMode: offer.paymentMode.asPaymentMode,

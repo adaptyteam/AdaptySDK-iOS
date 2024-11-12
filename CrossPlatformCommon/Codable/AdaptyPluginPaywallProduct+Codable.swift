@@ -1,6 +1,6 @@
 //
 //  AdaptyPluginPaywallProduct+Codable.swift
-//  Adapty
+//  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 11.11.2024.
 //
@@ -12,7 +12,7 @@ extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
         let vendorProductId: String
         let adaptyProductId: String
-        let promotionalOfferId: String?
+        let offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier?
         let variationId: String
         let paywallABTestName: String
         let paywallName: String
@@ -21,7 +21,7 @@ extension Request {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
             adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
-            promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
+            offerTypeWithIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.OfferTypeWithIdentifier.self, forKey: .offerTypeWithIdentifier)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
@@ -32,14 +32,11 @@ extension Request {
 private enum CodingKeys: String, CodingKey {
     case vendorProductId = "vendor_product_id"
     case adaptyProductId = "adapty_product_id"
-
-    case promotionalOfferId = "promotional_offer_id"
     case paywallVariationId = "paywall_variation_id"
     case paywallABTestName = "paywall_ab_test_name"
     case paywallName = "paywall_name"
-
-    case subscriptionDetails = "subscription_details"
-
+    case offerTypeWithIdentifier = "subscription_offer"
+    case subscription
     case localizedDescription = "localized_description"
     case localizedTitle = "localized_title"
     case price
@@ -49,11 +46,69 @@ private enum CodingKeys: String, CodingKey {
 
 extension Response {
     struct AdaptyPluginPaywallProduct: Encodable {
-        let adaptyPaywallProduct: AdaptyPaywallProduct
-        init(_ adaptyPaywallProduct: AdaptyPaywallProduct) throws {
-            self.adaptyPaywallProduct = adaptyPaywallProduct
+        let wrapped: AdaptyPaywallProduct
+
+        init(_ wrapped: AdaptyPaywallProduct) {
+            self.wrapped = wrapped
         }
 
-        func encode(to encoder: any Encoder) throws {}
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(wrapped.vendorProductId, forKey: .vendorProductId)
+            try container.encode(wrapped.adaptyProductId, forKey: .adaptyProductId)
+            try container.encode(wrapped.variationId, forKey: .paywallVariationId)
+            try container.encode(wrapped.paywallABTestName, forKey: .paywallABTestName)
+            try container.encode(wrapped.paywallName, forKey: .paywallName)
+            try container.encode(wrapped.localizedDescription, forKey: .localizedDescription)
+            try container.encode(wrapped.localizedTitle, forKey: .localizedTitle)
+            try container.encode(Price(from: wrapped), forKey: .price)
+            try container.encodeIfPresent(wrapped.regionCode, forKey: .regionCode)
+            try container.encode(wrapped.isFamilyShareable, forKey: .isFamilyShareable)
+            try container.encodeIfPresent(Subscription(product: wrapped), forKey: .subscription)
+        }
+    }
+}
+
+private struct Subscription: Sendable, Encodable {
+    let groupIdentifier: String
+    let period: AdaptySubscriptionPeriod
+    let localizedPeriod: String?
+    let offer: AdaptySubscriptionOffer?
+
+    init?(product: AdaptyPaywallProduct) {
+        guard let groupIdentifier = product.subscriptionGroupIdentifier,
+              let period = product.subscriptionPeriod
+        else { return nil }
+
+        self.groupIdentifier = groupIdentifier
+        self.period = period
+        localizedPeriod = product.localizedSubscriptionPeriod
+        offer = product.subscriptionOffer
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case groupIdentifier = "group_identifier"
+        case period = "period"
+        case localizedPeriod = "localized_period"
+        case offer
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(groupIdentifier, forKey: .groupIdentifier)
+        try container.encode(period, forKey: .period)
+        try container.encodeIfPresent(localizedPeriod, forKey: .localizedPeriod)
+        try container.encode(offer, forKey: .offer)
+    }
+}
+
+extension Price {
+    init(from product: some AdaptyProduct) {
+        self.init(
+            amount: product.price,
+            currencyCode: product.currencyCode,
+            currencySymbol: product.currencySymbol,
+            localizedString: product.localizedPrice
+        )
     }
 }

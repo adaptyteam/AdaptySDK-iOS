@@ -13,52 +13,48 @@ extension SK2Product {
         subscription?.introductoryOffer == nil
     }
 
-    var introductoryOffer: AdaptySubscriptionOffer? {
-        guard let offer = subscription?.introductoryOffer else { return nil }
-        return AdaptySubscriptionOffer(
-            offerType: .introductory,
-            offer: offer,
-            product: self
-        )
+    private var unfIntroductoryOffer: SK2Product.SubscriptionOffer? {
+        subscription?.introductoryOffer
     }
 
-    func promotionalOffer(byIdentifier identifier: String) -> AdaptySubscriptionOffer? {
-        guard let offer = subscription?.promotionalOffers.first(where: { $0.id == identifier })
-        else { return nil }
-        return AdaptySubscriptionOffer(
-            offerType: .promotional(identifier),
-            offer: offer,
-            product: self
-        )
+    private func unfPromotionalOffer(byId identifier: String) -> SK2Product.SubscriptionOffer? {
+        subscription?.promotionalOffers.first(where: { $0.id == identifier })
     }
 
-    func winBackOffer(byIdentifier identifier: String) -> AdaptySubscriptionOffer? {
-        guard let offer = unfWinBackOffer(byId: identifier) else { return nil }
-        return AdaptySubscriptionOffer(
-            offerType: .winBack(identifier),
-            offer: offer,
-            product: self
-        )
-    }
-}
+    func unfWinBackOffer(byId identifier: String) -> SK2Product.SubscriptionOffer? {
+#if compiler(<6.0)
+        return nil
+#else
+        guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
+            return nil
+        }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-private extension AdaptySubscriptionOffer {
-    init(
-        offerType: OfferTypeWithIdentifier,
-        offer: SK2Product.SubscriptionOffer,
-        product: SK2Product
-    ) {
+        return subscription?.winBackOffers.first { $0.id == identifier }
+#endif
+    }
+
+    func subscriptionOffer(by offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier) -> AdaptySubscriptionOffer? {
+        let offer: SK2Product.SubscriptionOffer? =
+            switch offerTypeWithIdentifier {
+            case .introductory:
+                unfIntroductoryOffer
+            case .promotional(let id):
+                unfPromotionalOffer(byId: id)
+            case .winBack(let id):
+                unfWinBackOffer(byId: id)
+            }
+        guard let offer else { return nil }
+
         let period = offer.period.asAdaptySubscriptionPeriod
-        let periodLocale = product.unfPeriodLocale
-        self.init(
+        let periodLocale = unfPeriodLocale
+        return AdaptySubscriptionOffer(
             _price: Price(
                 amount: offer.price,
-                currencyCode: product.unfCurrencyCode,
-                currencySymbol: product.unfPriceLocale.currencySymbol,
+                currencyCode: unfCurrencyCode,
+                currencySymbol: unfPriceLocale.currencySymbol,
                 localizedString: offer.displayPrice
             ),
-            offerTypeWithIdentifier: offerType,
+            offerTypeWithIdentifier: offerTypeWithIdentifier,
             subscriptionPeriod: period,
             numberOfPeriods: offer.periodCount,
             paymentMode: offer.paymentMode.asPaymentMode,

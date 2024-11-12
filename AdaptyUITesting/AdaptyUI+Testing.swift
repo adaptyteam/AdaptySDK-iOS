@@ -118,57 +118,34 @@ public extension AdaptyUI.LocalizedViewConfiguration {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public struct AdaptyUITestRendererView: View {
-    var eventsHandler: AdaptyEventsHandler
-    var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+    let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+    let paywallConfiguration: AdaptyPaywallConfiguration
 
     public init(
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration
     ) {
         self.viewConfiguration = viewConfiguration
-        self.eventsHandler = AdaptyEventsHandler()
+        paywallConfiguration = AdaptyPaywallConfiguration(
+            logId: Log.stamp,
+            paywall: AdaptyMockPaywall(),
+            viewConfiguration: viewConfiguration,
+            products: nil,
+            observerModeResolver: nil,
+            tagResolver: ["TEST_TAG": "Adapty"],
+            timerResolver: nil
+        )
     }
 
     public var body: some View {
-        let actionsVM = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
-        let sectionsVM = AdaptySectionsViewModel(logId: "AdaptyUITesting")
-
-        let paywallVM = AdaptyPaywallViewModel(
-            eventsHandler: eventsHandler,
-            paywall: AdaptyMockPaywall(),
-            viewConfiguration: viewConfiguration
-        )
-
-        let productsVM = AdaptyProductsViewModel(
-            eventsHandler: eventsHandler,
-            paywallViewModel: paywallVM,
-            products: nil,
-            observerModeResolver: nil
-        )
-        let tagResolverVM = AdaptyTagResolverViewModel(tagResolver: ["TEST_TAG": "Adapty"])
-        let screensVM = AdaptyScreensViewModel(
-            eventsHandler: eventsHandler,
-            viewConfiguration: viewConfiguration
-        )
-        let timerVM = AdaptyTimerViewModel(
-            timerResolver: AdaptyUIDefaultTimerResolver(),
-            paywallViewModel: paywallVM,
-            productsViewModel: productsVM,
-            actionsViewModel: actionsVM,
-            sectionsViewModel: sectionsVM,
-            screensViewModel: screensVM
-        )
-
-        let videoVM = AdaptyVideoViewModel(eventsHandler: eventsHandler)
-
         AdaptyUIElementView(viewConfiguration.screen.content)
-            .environmentObject(paywallVM)
-            .environmentObject(actionsVM)
-            .environmentObject(sectionsVM)
-            .environmentObject(productsVM)
-            .environmentObject(tagResolverVM)
-            .environmentObject(timerVM)
-            .environmentObject(screensVM)
-            .environmentObject(videoVM)
+            .environmentObject(paywallConfiguration.paywallViewModel)
+            .environmentObject(paywallConfiguration.actionsViewModel)
+            .environmentObject(paywallConfiguration.sectionsViewModel)
+            .environmentObject(paywallConfiguration.productsViewModel)
+            .environmentObject(paywallConfiguration.tagResolverViewModel)
+            .environmentObject(paywallConfiguration.timerViewModel)
+            .environmentObject(paywallConfiguration.screensViewModel)
+            .environmentObject(paywallConfiguration.videoViewModel)
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }

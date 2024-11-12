@@ -1,11 +1,11 @@
 //
-//  RequestError.swift
+//  AdaptyPluginDecodingError.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 07.11.2024.
 //
 
-enum RequestError: Error {
+enum AdaptyPluginDecodingError: Error {
     case uncnownMethod(String)
     case notFoundRequest(Request.Method)
     case notExist(key: String)

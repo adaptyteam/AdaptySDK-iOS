@@ -10,7 +10,7 @@ import StoreKit
 public final class AdaptyDeferredProduct: @unchecked Sendable {
     public var subscriptionOffer: AdaptySubscriptionOffer? {
         guard let promotionalOfferId = payment.paymentDiscount?.identifier else { return nil }
-        return skProduct.promotionalOffer(byIdentifier: promotionalOfferId)
+        return skProduct.subscriptionOffer(by: .promotional(promotionalOfferId))
     }
 
     let payment: SKPayment

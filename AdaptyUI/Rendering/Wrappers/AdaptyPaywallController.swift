@@ -12,43 +12,30 @@ import SwiftUI
 import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public class AdaptyPaywallController: UIViewController {
+public final class AdaptyPaywallController: UIViewController {
     public let id = UUID()
-    public let logId: String
 
     public let paywall: AdaptyPaywall
-    public let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+    public var viewConfiguration: AdaptyUI.LocalizedViewConfiguration {
+        paywallConfiguration.paywallViewModel.viewConfiguration
+    }
 
-    let products: [AdaptyPaywallProduct]?
-    let observerModeResolver: AdaptyObserverModeResolver?
-    let tagResolver: AdaptyTagResolver?
-    let timerResolver: AdaptyTimerResolver?
+    let paywallConfiguration: AdaptyUI.PaywallConfiguration
     let showDebugOverlay: Bool
 
     public weak var delegate: AdaptyPaywallControllerDelegate?
 
+    private let logId: String = Log.stamp
+
     init(
+        paywallConfiguration: AdaptyUI.PaywallConfiguration,
         paywall: AdaptyPaywall,
-        products: [AdaptyPaywallProduct]?,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate?,
-        observerModeResolver: AdaptyObserverModeResolver?,
-        tagResolver: AdaptyTagResolver?,
-        timerResolver: AdaptyTimerResolver?,
         showDebugOverlay: Bool
     ) {
-        let logId = Log.stamp
-
-        Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
-
-        self.logId = logId
+        self.paywallConfiguration = paywallConfiguration
         self.paywall = paywall
-        self.viewConfiguration = viewConfiguration
-        self.products = products
-        self.tagResolver = tagResolver
-        self.timerResolver = timerResolver
         self.delegate = delegate
-        self.observerModeResolver = observerModeResolver
         self.showDebugOverlay = showDebugOverlay
 
         super.init(nibName: nil, bundle: nil)
@@ -57,7 +44,7 @@ public class AdaptyPaywallController: UIViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -76,70 +63,78 @@ public class AdaptyPaywallController: UIViewController {
 
         view.backgroundColor = .systemBackground
 
+        paywallConfiguration.eventsHandler.didPerformAction = { [weak self] action in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didPerform: action)
+        }
+
+        paywallConfiguration.eventsHandler.didSelectProduct = { [weak self] underlying in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didSelectProduct: underlying)
+        }
+
+        paywallConfiguration.eventsHandler.didStartPurchase = { [weak self] underlying in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didStartPurchase: underlying)
+        }
+
+        paywallConfiguration.eventsHandler.didFinishPurchase = { [weak self] underlying, purchaseResult in
+            guard let self else { return }
+            self.delegate?.paywallController(
+                self,
+                didFinishPurchase: underlying,
+                purchaseResult: purchaseResult
+            )
+        }
+
+        paywallConfiguration.eventsHandler.didFailPurchase = { [weak self] underlying, error in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFailPurchase: underlying, error: error)
+        }
+
+        paywallConfiguration.eventsHandler.didStartRestore = { [weak self] in
+            guard let self else { return }
+            self.delegate?.paywallControllerDidStartRestore(self)
+        }
+
+        paywallConfiguration.eventsHandler.didFinishRestore = { [weak self] profile in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFinishRestoreWith: profile)
+        }
+
+        paywallConfiguration.eventsHandler.didFailRestore = { [weak self] error in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFailRestoreWith: error)
+        }
+
+        paywallConfiguration.eventsHandler.didFailRendering = { [weak self] error in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didFailRenderingWith: error)
+        }
+
+        paywallConfiguration.eventsHandler.didFailLoadingProducts = { [weak self] error in
+            guard let self else { return false }
+            guard let delegate = self.delegate else { return true }
+            return delegate.paywallController(self, didFailLoadingProductsWith: error)
+        }
+
+        paywallConfiguration.eventsHandler.didPartiallyLoadProducts = { [weak self] failedIds in
+            guard let self else { return }
+            self.delegate?.paywallController(self, didPartiallyLoadProducts: failedIds)
+        }
+
         addSubSwiftUIView(
             AdaptyPaywallView_Internal(
-                logId: logId,
-                paywall: paywall,
-                products: products,
-                configuration: viewConfiguration,
-                observerModeResolver: observerModeResolver,
-                tagResolver: tagResolver,
-                timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
-                showDebugOverlay: showDebugOverlay,
-                didPerformAction: { [weak self] action in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didPerform: action)
-                },
-                didSelectProduct: { [weak self] underlying in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didSelectProduct: underlying)
-                },
-                didStartPurchase: { [weak self] underlying in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didStartPurchase: underlying)
-                },
-                didFinishPurchase: { [weak self] underlying, purchaseResult in
-                    guard let self else { return }
-                    self.delegate?.paywallController(
-                        self,
-                        didFinishPurchase: underlying,
-                        purchaseResult: purchaseResult
-                    )
-                },
-                didFailPurchase: { [weak self] underlying, error in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didFailPurchase: underlying, error: error)
-                },
-                didCancelPurchase: { [weak self] underlying in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didCancelPurchase: underlying)
-                },
-                didStartRestore: { [weak self] in
-                    guard let self else { return }
-                    self.delegate?.paywallControllerDidStartRestore(self)
-                },
-                didFinishRestore: { [weak self] profile in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didFinishRestoreWith: profile)
-                },
-                didFailRestore: { [weak self] error in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didFailRestoreWith: error)
-                },
-                didFailRendering: { [weak self] error in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didFailRenderingWith: error)
-                },
-                didFailLoadingProducts: { [weak self] error in
-                    guard let self else { return false }
-                    guard let delegate = self.delegate else { return true }
-                    return delegate.paywallController(self, didFailLoadingProductsWith: error)
-                },
-                didPartiallyLoadProducts: { [weak self] failedIds in
-                    guard let self else { return }
-                    self.delegate?.paywallController(self, didPartiallyLoadProducts: failedIds)
-                }
-            ),
+                showDebugOverlay: showDebugOverlay
+            )
+            .environmentObject(paywallConfiguration.paywallViewModel)
+            .environmentObject(paywallConfiguration.productsViewModel)
+            .environmentObject(paywallConfiguration.actionsViewModel)
+            .environmentObject(paywallConfiguration.sectionsViewModel)
+            .environmentObject(paywallConfiguration.tagResolverViewModel)
+            .environmentObject(paywallConfiguration.timerViewModel)
+            .environmentObject(paywallConfiguration.screensViewModel)
+            .environmentObject(paywallConfiguration.videoViewModel),
             to: view
         )
 
@@ -148,12 +143,18 @@ public class AdaptyPaywallController: UIViewController {
 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
         Log.ui.verbose("#\(logId)# viewDidAppear")
+        
+        paywallConfiguration.paywallViewModel.logShowPaywall()
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+
         Log.ui.verbose("#\(logId)# viewDidDisappear")
+        
+        paywallConfiguration.paywallViewModel.resetLogShowPaywall()
     }
 }
 

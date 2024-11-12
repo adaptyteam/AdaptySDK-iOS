@@ -40,13 +40,13 @@ actor SK2Purchaser {
 
             case let .winBack(offerId):
                 #if compiler(<6.0)
-                throw StoreKitManagerError.purchasingWinBackOfferFailed("Does not support winBackOffer purchase before iOS 6.0").asAdaptyError
+                throw StoreKitManagerError.invalidOffer("Does not support winBackOffer purchase before iOS 6.0").asAdaptyError
                 #else
                     if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
                        let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId) {
                         options = [.winBackOffer(winBackOffer)]
                     } else {
-                        throw StoreKitManagerError.purchasingWinBackOfferFailed("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
+                        throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
                     }
                 #endif
 

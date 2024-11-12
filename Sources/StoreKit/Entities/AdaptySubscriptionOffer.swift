@@ -8,7 +8,7 @@
 import Foundation
 
 public struct AdaptySubscriptionOffer: Sendable, Hashable {
-    fileprivate let _price: Price
+    package let _price: Price
 
     /// Unique identifier of a discount offer for a product.
     public var identifier: String? { offerTypeWithIdentifier.identifier }
@@ -16,7 +16,7 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
     public var offerType: OfferType { offerTypeWithIdentifier.asOfferType }
 
     let offerTypeWithIdentifier: OfferTypeWithIdentifier
-    
+
     /// An information about period for a product discount.
     public let subscriptionPeriod: AdaptySubscriptionPeriod
 
@@ -60,12 +60,6 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
     }
 }
 
-extension Price {
-    init(from product: AdaptySubscriptionOffer) {
-        self = product._price
-    }
-}
-
 extension AdaptySubscriptionOffer: CustomStringConvertible {
     public var description: String {
         "(price: \(_price), type: \(offerType)"
@@ -74,30 +68,5 @@ extension AdaptySubscriptionOffer: CustomStringConvertible {
             + (localizedSubscriptionPeriod.map { ", localizedSubscriptionPeriod: \($0)" } ?? "")
             + (localizedNumberOfPeriods.map { ", localizedNumberOfPeriods: \($0)" } ?? "")
             + ")"
-    }
-}
-
-extension AdaptySubscriptionOffer: Encodable {
-    enum CodingKeys: String, CodingKey {
-        case price
-        case identifier
-        case offerType = "offer_type"
-        case numberOfPeriods = "number_of_periods"
-        case paymentMode = "payment_mode"
-        case subscriptionPeriod = "subscription_period"
-        case localizedSubscriptionPeriod = "localized_subscription_period"
-        case localizedNumberOfPeriods = "localized_number_of_periods"
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(identifier, forKey: .identifier)
-        try container.encode(offerType, forKey: .offerType)
-        try container.encode(_price, forKey: .price)
-        try container.encode(numberOfPeriods, forKey: .numberOfPeriods)
-        try container.encode(paymentMode, forKey: .paymentMode)
-        try container.encode(subscriptionPeriod, forKey: .subscriptionPeriod)
-        try container.encodeIfPresent(localizedSubscriptionPeriod, forKey: .localizedSubscriptionPeriod)
-        try container.encodeIfPresent(localizedNumberOfPeriods, forKey: .localizedNumberOfPeriods)
     }
 }

@@ -201,7 +201,10 @@ package final class AdaptyProductsViewModel: ObservableObject {
                     let adaptyError = error.asAdaptyError
 
                     if adaptyError.adaptyErrorCode == .paymentCancelled {
-                        self?.eventsHandler.event_didCancelPurchase(product: product)
+                        self?.eventsHandler.event_didFinishPurchase(
+                            product: product,
+                            purchaseResult: .userCancelled
+                        )
                     } else {
                         self?.eventsHandler.event_didFailPurchase(product: product, error: adaptyError)
                     }

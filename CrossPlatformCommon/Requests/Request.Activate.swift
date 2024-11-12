@@ -29,6 +29,9 @@ extension Request {
                 self.configuration = configuration
             } else {
                 let builder = try configuration.decode(AdaptyConfiguration.Builder.self)
+                guard builder.crossPlatformSDK != nil else {
+                    throw AdaptyPluginDecodingError.notExist(key: "cross platform sdk version or name not set")
+                }
                 self.configuration = builder.build()
             }
         }
@@ -36,6 +39,9 @@ extension Request {
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let builder = try container.decode(AdaptyConfiguration.Builder.self, forKey: .configuration)
+            guard builder.crossPlatformSDK != nil else {
+                throw AdaptyPluginDecodingError.notExist(key: "cross platform sdk version or name not set")
+            }
             self.configuration = builder.build()
         }
 

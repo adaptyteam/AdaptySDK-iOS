@@ -55,13 +55,4 @@ public protocol AdaptyProduct: Sendable, CustomStringConvertible {
     var localizedSubscriptionPeriod: String? { get }
 }
 
-extension Price {
-    init(from product: some AdaptyProduct) {
-        self.init(
-            amount: product.price,
-            currencyCode: product.currencyCode,
-            currencySymbol: product.currencySymbol,
-            localizedString: product.localizedPrice
-        )
-    }
-}
+

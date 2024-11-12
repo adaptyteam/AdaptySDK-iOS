@@ -34,6 +34,38 @@ extension Adapty {
         }
     }
 
+    func getSK1PaywallProduct(
+        vendorProductId: String,
+        adaptyProductId: String,
+        offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier?,
+        variationId: String,
+        paywallABTestName: String,
+        paywallName: String,
+        productsManager: SK1ProductsManager
+    ) async throws -> AdaptySK1PaywallProduct {
+        let sk1Product = try await productsManager.fetchSK1Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
+
+        let subscriptionOffer: AdaptySubscriptionOffer? =
+            if let offerTypeWithIdentifier {
+                if let offer = sk1Product.subscriptionOffer(by: offerTypeWithIdentifier) {
+                    offer
+                } else {
+                    throw StoreKitManagerError.invalidOffer("StoreKit1 product dont have offer id: `\(offerTypeWithIdentifier.identifier ?? "nil")` with type:\(offerTypeWithIdentifier.asOfferType.rawValue) ").asAdaptyError
+                }
+            } else {
+                nil
+            }
+
+        return AdaptySK1PaywallProduct(
+            skProduct: sk1Product,
+            adaptyProductId: adaptyProductId,
+            subscriptionOffer: subscriptionOffer,
+            variationId: variationId,
+            paywallABTestName: paywallABTestName,
+            paywallName: paywallName
+        )
+    }
+
     func getSK1PaywallProducts(
         paywall: AdaptyPaywall,
         productsManager: SK1ProductsManager
@@ -77,7 +109,7 @@ extension Adapty {
             let states = try await getBackendProductStates(vendorProductIds: vendorProductIds)
             products = try products.map {
                 guard !$0.determinedOffer else { return $0 }
-                guard let introductoryOffer = $0.product.introductoryOffer else {
+                guard let introductoryOffer = $0.product.subscriptionOffer(by: .introductory) else {
                     return (product: $0.product, reference: $0.reference, offer: nil, determinedOffer: true)
                 }
 
@@ -109,10 +141,10 @@ extension Adapty {
         }
     }
 
-    private func promotionalOffer(_ promotionalOfferId: String?, _ sk1Product: SK1Product) -> AdaptySubscriptionOffer? {
-        guard let promotionalOfferId else { return nil }
-        guard let offer = sk1Product.promotionalOffer(byIdentifier: promotionalOfferId) else {
-            log.warn("no promotional offer found with id:\(promotionalOfferId) in productId:\(sk1Product.productIdentifier)")
+    private func promotionalOffer(_ offerId: String?, _ sk1Product: SK1Product) -> AdaptySubscriptionOffer? {
+        guard let offerId else { return nil }
+        guard let offer = sk1Product.subscriptionOffer(by: .promotional(offerId)) else {
+            log.warn("no promotional offer found with id:\(offerId) in productId:\(sk1Product.productIdentifier)")
             return nil
         }
         return offer

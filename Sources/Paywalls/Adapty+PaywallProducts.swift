@@ -64,30 +64,43 @@ public extension Adapty {
         }
     }
 
-//    package nonisolated static func getPaywallProduct(
-//        vendorProductId: String,
-//        adaptyProductId: String,
-//        promotionalOfferId: String?,
-//        winBackOfferId: String?,
-//        variationId: String,
-//        paywallABTestName: String,
-//        paywallName: String
-//    ) async throws -> AdaptyPaywallProduct {
-//        
-//        
-//        let product = try await activatedSDK.productsManager.fetchProduct(
-//            id: vendorProductId,
-//            fetchPolicy: .returnCacheDataElseLoad
-//        )
-//
-//        return AdaptyPaywallProduct(
-//            adaptyProductId: adaptyProductId,
-//            underlying: product,
-//            promotionalOfferId: promotionalOfferId,
-//            winBackOfferId: winBackOfferId,
-//            variationId: variationId,
-//            paywallABTestName: paywallABTestName,
-//            paywallName: paywallName
-//        )
-//    }
+    package nonisolated static func getPaywallProduct(
+        vendorProductId: String,
+        adaptyProductId: String,
+        offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier?,
+        variationId: String,
+        paywallABTestName: String,
+        paywallName: String
+    ) async throws -> AdaptyPaywallProduct {
+        let sdk = try await Adapty.activatedSDK
+
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+            guard let manager = sdk.productsManager as? SK2ProductsManager else {
+                throw AdaptyError.cantMakePayments()
+            }
+            return try await sdk.getSK2PaywallProduct(
+                vendorProductId: vendorProductId,
+                adaptyProductId: adaptyProductId,
+                offerTypeWithIdentifier: offerTypeWithIdentifier,
+                variationId: variationId,
+                paywallABTestName: paywallABTestName,
+                paywallName: paywallName,
+                productsManager: manager
+            )
+
+        } else {
+            guard let manager = sdk.productsManager as? SK1ProductsManager else {
+                throw AdaptyError.cantMakePayments()
+            }
+            return try await sdk.getSK1PaywallProduct(
+                vendorProductId: vendorProductId,
+                adaptyProductId: adaptyProductId,
+                offerTypeWithIdentifier: offerTypeWithIdentifier,
+                variationId: variationId,
+                paywallABTestName: paywallABTestName,
+                paywallName: paywallName,
+                productsManager: manager
+            )
+        }
+    }
 }
