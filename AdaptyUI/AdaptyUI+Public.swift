@@ -257,7 +257,7 @@ public extension AdaptyUI {
             throw err
         }
 
-        let paywallConfiguration = AdaptyPaywallConfiguration(
+        let paywallConfiguration = PaywallConfiguration(
             logId: Log.stamp,
             paywall: paywall,
             viewConfiguration: viewConfiguration,
@@ -291,8 +291,8 @@ public extension AdaptyUI {
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil
-    ) -> AdaptyPaywallConfiguration {
-        AdaptyPaywallConfiguration(
+    ) -> PaywallConfiguration {
+        PaywallConfiguration(
             logId: Log.stamp,
             paywall: paywall,
             viewConfiguration: viewConfiguration,

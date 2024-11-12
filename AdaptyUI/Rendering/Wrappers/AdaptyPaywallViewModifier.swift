@@ -18,14 +18,14 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
     private let isPresented: Binding<Bool>
     private let fullScreen: Bool
 
-    private let paywallConfiguration: AdaptyPaywallConfiguration
+    private let paywallConfiguration: AdaptyUI.PaywallConfiguration
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
 
     init(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyPaywallConfiguration,
+        paywallConfiguration: AdaptyUI.PaywallConfiguration,
         showAlertItem: Binding<AlertItem?>,
         showAlertBuilder: ((AlertItem) -> Alert)?
     ) {
@@ -74,7 +74,7 @@ public extension View {
     ///     - isPresented: A binding to a Boolean value that determines whether
     ///     to present the sheet.
     ///     - fullScreen: determines whether the screen will `.sheet` or `.fullScreenCover` function.
-    ///     - paywallConfiguration: an ``AdaptyPaywallConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.paywallConfiguration(for:products:viewConfiguration:observerModeResolver:tagResolver:timerResolver:)`` method.
+    ///     - paywallConfiguration: an ``AdaptyUI.PaywallConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.paywallConfiguration(for:products:viewConfiguration:observerModeResolver:tagResolver:timerResolver:)`` method.
     ///     - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     ///     - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
     ///     - didPerformAction: If user performs an action, this callback will be invoked. There is a default implementation, e.g. `close` action will dismiss the paywall, `openUrl` action will open the URL.
@@ -93,7 +93,7 @@ public extension View {
     func paywall<AlertItem: Identifiable>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyPaywallConfiguration,
+        paywallConfiguration: AdaptyUI.PaywallConfiguration,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,

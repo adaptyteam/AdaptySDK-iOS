@@ -20,7 +20,7 @@ public final class AdaptyPaywallController: UIViewController {
         paywallConfiguration.paywallViewModel.viewConfiguration
     }
 
-    let paywallConfiguration: AdaptyPaywallConfiguration
+    let paywallConfiguration: AdaptyUI.PaywallConfiguration
     let showDebugOverlay: Bool
 
     public weak var delegate: AdaptyPaywallControllerDelegate?
@@ -28,7 +28,7 @@ public final class AdaptyPaywallController: UIViewController {
     private let logId: String = Log.stamp
 
     init(
-        paywallConfiguration: AdaptyPaywallConfiguration,
+        paywallConfiguration: AdaptyUI.PaywallConfiguration,
         paywall: AdaptyPaywall,
         delegate: AdaptyPaywallControllerDelegate?,
         showDebugOverlay: Bool
