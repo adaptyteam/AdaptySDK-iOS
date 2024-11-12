@@ -47,7 +47,7 @@ actor SK1QueueManager: Sendable {
             case .introductory:
                 payment = SKPayment(product: sk1Product)
             case .winBack:
-                throw StoreKitManagerError.purchasingWinBackOfferFailed("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
+                throw StoreKitManagerError.invalidOffer("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
             case let .promotional(offerId):
 
                 let response = try await purchaseValidator.signSubscriptionOffer(

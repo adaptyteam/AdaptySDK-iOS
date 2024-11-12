@@ -46,16 +46,4 @@ extension SK2Product {
         }
         return .autoupdatingCurrent
     }
-
-    func unfWinBackOffer(byId id: String) -> SK2Product.SubscriptionOffer? {
-        #if compiler(<6.0)
-            return nil
-        #else
-            guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
-                return nil
-            }
-
-            return subscription?.winBackOffers.first { $0.id == id }
-        #endif
-    }
 }

@@ -1,6 +1,6 @@
 //
 //  AdaptyPluginPaywallProduct+Codable.swift
-//  Adapty
+//  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 11.11.2024.
 //
@@ -12,7 +12,7 @@ extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
         let vendorProductId: String
         let adaptyProductId: String
-        let promotionalOfferId: String?
+        let offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier?
         let variationId: String
         let paywallABTestName: String
         let paywallName: String
@@ -21,7 +21,7 @@ extension Request {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
             adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
-            promotionalOfferId = try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
+            offerTypeWithIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.OfferTypeWithIdentifier.self, forKey: .offerTypeWithIdentifier)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
@@ -33,7 +33,10 @@ private enum CodingKeys: String, CodingKey {
     case vendorProductId = "vendor_product_id"
     case adaptyProductId = "adapty_product_id"
 
+    case offerTypeWithIdentifier = "subscription_offer"
+
     case promotionalOfferId = "promotional_offer_id"
+
     case paywallVariationId = "paywall_variation_id"
     case paywallABTestName = "paywall_ab_test_name"
     case paywallName = "paywall_name"

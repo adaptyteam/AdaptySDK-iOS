@@ -44,7 +44,7 @@ enum Request {
         Logout.method: Logout.self,
         LogShowOnboarding.method: LogShowOnboarding.self,
         LogShowPaywall.method: LogShowPaywall.self,
-//        MakePurchase.method: MakePurchase.self,
+        MakePurchase.method: MakePurchase.self,
         PresentCodeRedemptionSheet.method: PresentCodeRedemptionSheet.self,
         RestorePurchases.method: RestorePurchases.self,
         SetFallbackPaywalls.method: SetFallbackPaywalls.self,

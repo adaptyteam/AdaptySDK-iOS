@@ -16,25 +16,22 @@ extension Request {
         enum CodingKeys: CodingKey {
             case product
         }
-        
+
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 product: jsonDictionary.value(forKey: CodingKeys.product)
             )
         }
 
-        
         init(product: KeyValue) throws {
-            let product = try product.decode(Request.AdaptyPluginPaywallProduct.self)
-            self.product = getPaywallProduct(
+            self.product = try product.decode(Request.AdaptyPluginPaywallProduct.self)
         }
 
         func execute() async throws -> AdaptyJsonData {
             let product = try await Adapty.getPaywallProduct(
                 vendorProductId: product.vendorProductId,
                 adaptyProductId: product.adaptyProductId,
-                promotionalOfferId: product.promotionalOfferId,
-                winBackOfferId: product.winBackOfferId,
+                offerTypeWithIdentifier: product.offerTypeWithIdentifier,
                 variationId: product.variationId,
                 paywallABTestName: product.paywallABTestName,
                 paywallName: product.paywallName
@@ -45,16 +42,14 @@ extension Request {
     }
 }
 
-
 public extension AdaptyPlugin {
     @objc static func makePurchase(
         product: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
         typealias CodingKeys = Request.MakePurchase.CodingKeys
-             execute(with: completion) { try Request.MakePurchase(
-                    product: .init(key: CodingKeys.product, value: product)
-                )  }
-        
+        execute(with: completion) { try Request.MakePurchase(
+            product: .init(key: CodingKeys.product, value: product)
+        ) }
     }
 }

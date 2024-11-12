@@ -16,7 +16,7 @@ enum StoreKitManagerError: Error {
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
     case trunsactionUnverified(AdaptyError.Source, error: Error?)
     case unknownIntroEligibility(AdaptyError.Source)
-    case purchasingWinBackOfferFailed(AdaptyError.Source, error: String)
+    case invalidOffer(AdaptyError.Source, error: String)
     case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
 }
 
@@ -51,8 +51,8 @@ extension StoreKitManagerError: CustomStringConvertible {
             }
         case let .unknownIntroEligibility(source):
             "StoreKitManagerError.unknownIntroEligibility(\(source))"
-        case let .purchasingWinBackOfferFailed(source, error):
-            "StoreKitManagerError.purchasingWinBackOfferFailed(\(source), \"\(error)\")"
+        case let .invalidOffer(source, error):
+            "StoreKitManagerError.invalidOffer(\(source), \"\(error)\")"
         case let .getSubscriptionInfoStatusFailed(source, error):
             "StoreKitManagerError.getSubscriptionInfoStatusFailed(\(source), \(error))"
         }
@@ -70,7 +70,7 @@ extension StoreKitManagerError {
              let .interrupted(src),
              let .trunsactionUnverified(src, _),
              let .unknownIntroEligibility(src),
-             let .purchasingWinBackOfferFailed(src, _),
+             let .invalidOffer(src, _),
              let .getSubscriptionInfoStatusFailed(src, _): src
         }
     }
@@ -173,13 +173,13 @@ extension StoreKitManagerError {
         .trunsactionUnverified(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
-    static func purchasingWinBackOfferFailed(
+    static func invalidOffer(
         _ error: String,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        .purchasingWinBackOfferFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
+        .invalidOffer(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
     static func unknownIntroEligibility(
