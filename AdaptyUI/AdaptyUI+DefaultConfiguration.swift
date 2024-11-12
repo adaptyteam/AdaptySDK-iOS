@@ -44,11 +44,6 @@ public extension AdaptyPaywallControllerDelegate {
         controller.dismiss(animated: true)
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
-        didCancelPurchase underlying: AdaptyPaywallProduct
-    ) {}
-
     func paywallControllerDidStartRestore(_ controller: AdaptyPaywallController) {}
 
     func paywallController(

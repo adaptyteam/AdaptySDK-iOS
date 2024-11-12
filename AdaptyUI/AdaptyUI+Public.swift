@@ -106,15 +106,6 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
         error: AdaptyError
     )
 
-    /// This method is invoked when user cancel the purchase manually.
-    /// - Parameters
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
-    ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
-        didCancelPurchase product: AdaptyPaywallProduct
-    )
-
     /// If user initiates the restore process, this method will be invoked.
     ///
     /// - Parameters:
@@ -239,7 +230,7 @@ public extension AdaptyUI {
 
         return try await Adapty.getViewConfiguration(paywall: paywall, loadTimeout: loadTimeout)
     }
-
+    
     /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
     ///
     /// - Parameters:
@@ -266,21 +257,49 @@ public extension AdaptyUI {
             throw err
         }
 
-        if isObserverModeEnabled && observerModeResolver == nil {
-            Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
-        } else if !isObserverModeEnabled && observerModeResolver != nil {
-            Log.ui.warn("You should not pass observerModeResolver if you're using Adapty in Full Mode")
-        }
-
-        return AdaptyPaywallController(
+        let paywallConfiguration = AdaptyPaywallConfiguration(
+            logId: Log.stamp,
             paywall: paywall,
-            products: products,
             viewConfiguration: viewConfiguration,
-            delegate: delegate,
+            products: products,
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
-            timerResolver: timerResolver,
+            timerResolver: timerResolver
+        )
+        
+        return AdaptyPaywallController(
+            paywallConfiguration: paywallConfiguration,
+            paywall: paywall,
+            delegate: delegate,
             showDebugOverlay: showDebugOverlay
+        )
+    }
+    
+    /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
+    ///
+    /// - Parameters:
+    ///   - paywall: an ``AdaptyPaywall`` object, for which you are trying to get a controller.
+    ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
+    ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
+    ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
+    ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
+    /// - Returns: an ``AdaptyPaywallConfiguration`` object.
+    static func paywallConfiguration(
+        for paywall: AdaptyPaywall,
+        products: [AdaptyPaywallProduct]? = nil,
+        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyTagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil
+    ) -> AdaptyPaywallConfiguration {
+        AdaptyPaywallConfiguration(
+            logId: Log.stamp,
+            paywall: paywall,
+            viewConfiguration: viewConfiguration,
+            products: products,
+            observerModeResolver: observerModeResolver,
+            tagResolver: tagResolver,
+            timerResolver: timerResolver
         )
     }
 }
