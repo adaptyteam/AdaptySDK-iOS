@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyConfiguration.Builder: Decodable {
-    enum CodingKeys: String, CodingKey {
+    private enum CodingKeys: String, CodingKey {
         case apiKey = "api_key"
         case customerUserId = "customer_user_id"
         case observerMode = "observer_mode"

@@ -59,14 +59,14 @@ enum Response {}
 extension Request {
     static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {
         guard let method = Method(rawValue: method) else {
-            throw RequestError.uncnownMethod(method)
+            throw AdaptyPluginDecodingError.uncnownMethod(method)
         }
         return try requestType(for: method)
     }
 
     private static func requestType(for method: Method) throws -> AdaptyPluginRequest.Type {
         guard let requestType = allRequests[method] else {
-            throw RequestError.notFoundRequest(method)
+            throw AdaptyPluginDecodingError.notFoundRequest(method)
         }
         return requestType
     }
