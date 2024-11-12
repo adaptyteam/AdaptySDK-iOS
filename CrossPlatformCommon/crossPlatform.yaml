@@ -366,6 +366,10 @@ $defs:
       - verbose
       - debug
 
+  AdaptyLocale:
+    type: string
+    example: "en"
+
   Date: #response
     type: string
     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -387,12 +391,12 @@ $defs:
       ip_address_collection_disabled: { type: boolean, default: false }
       backend_base_url: { type: string }
       backend_fallback_base_url: { type: string }
-      backend_proxy_host: { type: string}
+      backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
       log_level: { $ref: "#/$defs/AdaptyLog.Level" }
-      cross_platform_sdk_name:  { type: string }
+      cross_platform_sdk_name: { type: string }
       cross_platform_sdk_version: { type: string }
-      
+
   AdaptyPaywallProduct.Response: #response
     type: object
 
@@ -404,12 +408,76 @@ $defs:
 
   AdaptyPaywall: #request #response
     type: object
+    required:
+      - developer_id
+      - paywall_id
+      - paywall_name
+      - ab_test_name
+      - variation_id
+      - revision
+      - products
+      - response_created_at
+    properties:
+      developer_id: { type: string }
+      paywall_id: { type: string }
+      paywall_name: { type: string }
+      response_created_at: { type: integer }
+      revision: { type: integer }
+      variation_id: { type: string }
+      ab_test_name: { type: string }
+      remote_config: { $ref: "#/$defs/AdaptyPaywall.RemoteConfig" }
+      paywall_builder: { $ref: "#/$defs/AdaptyPaywall.ViewConfiguration" }
+      products:
+        type: array
+        items: { $ref: "#/$defs/AdaptyPaywall.ProductReference" }
 
   AdaptyPaywall.FetchPolicy: #request
     type: object
+    oneOf:
+      - required: [type]
+        properties:
+          type:
+            type: string
+            enum:
+              - reload_revalidating_cache_data
+              - return_cache_data_else_load
+      - required: [type, max_age]
+        properties:
+          type:
+            type: string
+            const: return_cache_data_if_not_expired_else_load
+          max_age:
+            type: number
+            description: "seconds"
 
   AdaptyPaywall.RemoteConfig: #request #response
     type: object
+    required: [lang, data]
+    properties:
+      lang: { $ref: "#/$defs/AdaptyLocale" }
+      data: { type: string, description: "custom JSON string" }
+
+  AdaptyPaywall.ProductReference: #request #response
+    type: object
+    required:
+      - vendor_product_id
+      - adapty_product_id
+    properties:
+      vendor_product_id: { type: string }
+      adapty_product_id: { type: string }
+      promotional_offer_id: { type: string, description: "iOS Only" }
+      win_back_offer_id: { type: string, description: "iOS Only" }
+      base_plan_id: { type: string, description: "Android Only" }
+      offer_id: { type: string, description: "Android Only" }
+
+  AdaptyPaywall.ViewConfiguration:
+    type: object
+    required:
+      - paywall_builder_id
+      - lang
+    properties:
+      paywall_builder_id: { type: string }
+      lang: { $ref: "#/$defs/AdaptyLocale" }
 
   AdaptySubscriptionPeriod: #response
     type: object
