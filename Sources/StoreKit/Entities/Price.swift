@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct Price: Sendable, Hashable {
-    let amount: Decimal
-    let currencyCode: String?
-    let currencySymbol: String?
-    let localizedString: String?
+package struct Price: Sendable, Hashable {
+    package let amount: Decimal
+    package let currencyCode: String?
+    package let currencySymbol: String?
+    package let localizedString: String?
 }
 
 extension Price: CustomStringConvertible {
@@ -21,22 +21,5 @@ extension Price: CustomStringConvertible {
             + (currencySymbol.map { ", symbol: \($0)" } ?? "")
             + (localizedString.map { ", localized: \($0)" } ?? "")
             + ")"
-    }
-}
-
-extension Price: Encodable {
-    enum CodingKeys: String, CodingKey {
-        case amount
-        case currencyCode = "currency_code"
-        case currencySymbol = "currency_symbol"
-        case localizedString = "localized_string"
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(amount, forKey: .amount)
-        try container.encodeIfPresent(currencyCode, forKey: .currencyCode)
-        try container.encodeIfPresent(currencySymbol, forKey: .currencySymbol)
-        try container.encodeIfPresent(localizedString, forKey: .localizedString)
     }
 }

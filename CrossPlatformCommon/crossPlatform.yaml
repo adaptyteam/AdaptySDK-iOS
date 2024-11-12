@@ -3,7 +3,6 @@ $id: "https://adapty.io/crossPlatform/3.0.0/schema"
 title: "Cross Platform Format"
 
 $recuests:
-
   ### getSDKVersion ###
 
   GetSDKVersion.Request: #request
@@ -67,7 +66,7 @@ $recuests:
     required: [method, configuration]
     properties:
       method: { const: "activate" }
-      configuration: { type: jsonString, $ref: "#/$defs/AdaptyConfiguration" } 
+      configuration: { type: jsonString, $ref: "#/$defs/AdaptyConfiguration" }
 
   Activate.Response: #response
     type: object
@@ -88,7 +87,8 @@ $recuests:
       method: { const: "get_paywall" }
       placement_id: { type: string }
       locale: { type: string }
-      fetch_policy: { type: jsonString, $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+      fetch_policy:
+        { type: jsonString, $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
       load_timeout: { type: number }
 
   GetPaywall.Response: #response
@@ -202,7 +202,8 @@ $recuests:
     required: [method, params]
     properties:
       method: { const: "log_show_onboarding" }
-      params: { type: jsonString, $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
+      params:
+        { type: jsonString, $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
 
   LogShowOnboarding.Response: #response
     type: object
@@ -240,7 +241,8 @@ $recuests:
     required: [method, product]
     properties:
       method: { const: "make_purchase" }
-      product: { type: jsonString, $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      product:
+        { type: jsonString, $ref: "#/$defs/AdaptyPaywallProduct.Request" }
 
   MakePurchase.Response: #response
     type: object
@@ -316,7 +318,7 @@ $recuests:
     required: [method, attribution, source]
     properties:
       method: { const: "update_attribution" }
-      attribution: { type: jsonString }
+      attribution: { type: string }
       source: { $ref: "#/$defs/AdaptyAttributionSource" }
       network_user_id: { type: string }
 
@@ -354,7 +356,7 @@ $defs:
       adapty_code: { type: integer }
       message: { type: string }
       detail: { type: string }
-      
+
   AdaptyLog.Level: #request #response
     type: string
     enum:
@@ -376,7 +378,21 @@ $defs:
 
   AdaptyConfiguration: #request
     type: object
-
+    required: [api_key]
+    properties:
+      api_key: { type: string }
+      customer_user_id: { type: string }
+      observer_mode: { type: boolean, default: false }
+      idfa_collection_disabled: { type: boolean, default: false }
+      ip_address_collection_disabled: { type: boolean, default: false }
+      backend_base_url: { type: string }
+      backend_fallback_base_url: { type: string }
+      backend_proxy_host: { type: string}
+      backend_proxy_port: { type: integer }
+      log_level: { $ref: "#/$defs/AdaptyLog.Level" }
+      cross_platform_sdk_name:  { type: string }
+      cross_platform_sdk_version: { type: string }
+      
   AdaptyPaywallProduct.Response: #response
     type: object
 
@@ -392,7 +408,7 @@ $defs:
   AdaptyPaywall.FetchPolicy: #request
     type: object
 
-  AdaptyPaywall.RemoteConfig:  #request #response
+  AdaptyPaywall.RemoteConfig: #request #response
     type: object
 
   AdaptySubscriptionPeriod: #response
@@ -401,11 +417,11 @@ $defs:
   AdaptySubscriptionPeriod.Unit: #response
     type: string
     enum:
-        - day
-        - week
-        - month
-        - year
-        - unknown
+      - day
+      - week
+      - month
+      - year
+      - unknown
 
   AdaptyProfile: #response
     type: object
@@ -461,5 +477,3 @@ $defs:
 
   AdaptyPurchaseResult: #response
     type: object
-
-

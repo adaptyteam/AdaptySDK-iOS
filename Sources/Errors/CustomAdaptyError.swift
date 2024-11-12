@@ -126,7 +126,7 @@ extension StoreKitManagerError: CustomAdaptyError {
                 return .networkFailed
             }
         case .unknownIntroEligibility: return .invalidOfferPrice
-        case .purchasingWinBackOfferFailed: return .invalidOfferIdentifier
+        case .invalidOffer: return .invalidOfferIdentifier
         case .getSubscriptionInfoStatusFailed: return .fetchSubscriptionStatusFailed
         }
     }

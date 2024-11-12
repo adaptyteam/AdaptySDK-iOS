@@ -7,9 +7,6 @@
 
 import Foundation
 
-
-
-
 extension AdaptyJsonData {
     private enum Result: Encodable {
         case success(Encodable)

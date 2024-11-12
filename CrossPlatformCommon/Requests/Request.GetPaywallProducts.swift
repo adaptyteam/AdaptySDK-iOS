@@ -29,7 +29,8 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try .success(await Adapty.getPaywallProducts(paywall: paywall))
+            let products = try await Adapty.getPaywallProducts(paywall: paywall)
+            return .success(products.map(Response.AdaptyPluginPaywallProduct.init))
         }
     }
 }

@@ -16,8 +16,8 @@ extension AdaptyJsonDictionary {
     func isExist(key: Key) -> Bool { keys.contains(key) }
 
     func value(forKey key: Key) throws -> KeyValue {
-        guard isExist(key: key) else { throw RequestError.notExist(key: key) }
-        guard let value = self[key] else { throw RequestError.isNil(key: key) }
+        guard isExist(key: key) else { throw AdaptyPluginDecodingError.notExist(key: key) }
+        guard let value = self[key] else { throw AdaptyPluginDecodingError.isNil(key: key) }
         return .init(key: key, value: value)
     }
 
@@ -72,7 +72,7 @@ extension KeyValue {
     @usableFromInline
     func cast<T: Sendable>(_ valueType: T.Type) throws -> T {
         guard let result: T = value as? T else {
-            throw RequestError.wrongType(key: key, expected: valueType, present: type(of: value))
+            throw AdaptyPluginDecodingError.wrongType(key: key, expected: valueType, present: type(of: value))
         }
         return result
     }
@@ -80,7 +80,7 @@ extension KeyValue {
     func decode<T: Decodable>(_ valueType: T.Type) throws -> T {
         if let value: T = value as? T { return value }
         guard let jsonData: Data = (value as? Data) ?? (value as? String)?.data(using: .utf8) else {
-            throw RequestError.wrongType(key: key, expected: Data.self, present: type(of: value))
+            throw AdaptyPluginDecodingError.wrongType(key: key, expected: Data.self, present: type(of: value))
         }
         return try jsonData.decode(valueType)
     }

@@ -25,26 +25,7 @@ public protocol AdaptyPaywallProduct: AdaptyPaywallProductWithoutDeterminingOffe
     var subscriptionOffer: AdaptySubscriptionOffer? { get }
 }
 
-//
-//extension AdaptySubscriptionOffer.Available: Encodable {
-//    enum CodingKeys: String, CodingKey {
-//        case determined
-//        case offer
-//    }
-//
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        switch self {
-//        case .notDetermined:
-//            try container.encode(false, forKey: .determined)
-//        case .unavailable:
-//            try container.encode(true, forKey: .determined)
-//        case let .available(offer):
-//            try container.encode(true, forKey: .determined)
-//            try container.encode(offer, forKey: .offer)
-//        }
-//    }
-//}
+
 //
 //extension AdaptyPaywallProduct: Encodable {
 //    enum CodingKeys: String, CodingKey {
