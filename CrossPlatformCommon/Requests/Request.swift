@@ -15,6 +15,7 @@ enum Request {
         case getLogLevel = "get_log_level"
         case setLogLevel = "set_log_level"
         case activate
+        case activateAdaptyUI = "activate_adpty_ui"
         case getPaywall = "get_paywall"
         case getPaywallProducts = "get_paywall_products"
         case getProfile = "get_profile"
@@ -31,31 +32,41 @@ enum Request {
         case updateProfile = "update_profile"
     }
 
-    static let allRequests: [Request.Method: AdaptyPluginRequest.Type] = [
-        GetSDKVersion.method: GetSDKVersion.self,
-        IsActivated.method: IsActivated.self,
-        GetLogLevel.method: GetLogLevel.self,
-        SetLogLevel.method: SetLogLevel.self,
-        Activate.method: Activate.self,
-        GetPaywall.method: GetPaywall.self,
-        GetPaywallProducts.method: GetPaywallProducts.self,
-        GetProfile.method: GetProfile.self,
-        Identify.method: Identify.self,
-        Logout.method: Logout.self,
-        LogShowOnboarding.method: LogShowOnboarding.self,
-        LogShowPaywall.method: LogShowPaywall.self,
-        MakePurchase.method: MakePurchase.self,
-        PresentCodeRedemptionSheet.method: PresentCodeRedemptionSheet.self,
-        RestorePurchases.method: RestorePurchases.self,
-        SetFallbackPaywalls.method: SetFallbackPaywalls.self,
-        SetVariationId.method: SetVariationId.self,
-        UpdateAttribution.method: UpdateAttribution.self,
-        UpdateProfile.method: UpdateProfile.self
-    ]
+    static let allRequests: [Request.Method: AdaptyPluginRequest.Type] = {
+        var allRequests: [AdaptyPluginRequest.Type] = [
+            GetSDKVersion.self,
+            IsActivated.self,
+            GetLogLevel.self,
+            SetLogLevel.self,
+            Activate.self,
+            GetPaywall.self,
+            GetPaywallProducts.self,
+            GetProfile.self,
+            Identify.self,
+            Logout.self,
+            LogShowOnboarding.self,
+            LogShowPaywall.self,
+            MakePurchase.self,
+            PresentCodeRedemptionSheet.self,
+            RestorePurchases.self,
+            SetFallbackPaywalls.self,
+            SetVariationId.self,
+            UpdateAttribution.self,
+            UpdateProfile.self
+        ]
+
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+            let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
+                ActivateAdaptyUI.self
+            ]
+            allRequests.append(contentsOf: adaptyUiRequests)
+        }
+
+        return Dictionary(allRequests.map { ($0.method, $0) }) { _, last in last }
+    }()
 }
 
 enum Response {}
-
 extension Request {
     static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {
         guard let method = Method(rawValue: method) else {
