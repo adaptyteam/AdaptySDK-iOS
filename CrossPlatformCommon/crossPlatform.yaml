@@ -3,6 +3,25 @@ $id: "https://adapty.io/crossPlatform/3.0.0/schema"
 title: "Cross Platform Format"
 
 $recuests:
+
+  ### activate ###
+  Activate.Request: #request
+    type: object
+    required: [method, configuration]
+    properties:
+      method: { const: "activate" }
+      configuration: { type: jsonString, $ref: "#/$defs/AdaptyConfiguration" }
+
+  Activate.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+          
   ### getSDKVersion ###
 
   GetSDKVersion.Request: #request
@@ -60,23 +79,7 @@ $recuests:
     properties:
       success: { const: true }
 
-  ### activate ###
-  Activate.Request: #request
-    type: object
-    required: [method, configuration]
-    properties:
-      method: { const: "activate" }
-      configuration: { type: jsonString, $ref: "#/$defs/AdaptyConfiguration" }
 
-  Activate.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
 
   ### getPaywall ###
 
@@ -119,7 +122,10 @@ $recuests:
       - required: [success]
         properties:
           success:
-            { type: array, items: { $ref: "#/$defs/AdaptyPaywallProduct" } }
+            {
+              type: array,
+              items: { $ref: "#/$defs/AdaptyPaywallProduct.Response" },
+            }
 
   ### getProfile ###
 
@@ -399,9 +405,60 @@ $defs:
 
   AdaptyPaywallProduct.Response: #response
     type: object
+    required:
+      - vendor_product_id
+      - adapty_product_id
+      - paywall_variation_id
+      - paywall_ab_test_name
+      - paywall_name
+      - localized_description
+      - localized_title
+      - is_family_shareable
+      - price
+    properties:
+      vendor_product_id: { type: string }
+      adapty_product_id: { type: string }
+      paywall_variation_id: { type: string }
+      paywall_ab_test_name: { type: string }
+      paywall_name: { type: string }
+      localized_description: { type: string }
+      localized_title: { type: string }
+      is_family_shareable:
+        { type: string, default: false, description: "iOS Only" }
+      region_code: { type: string }
+      price: { $ref: "#/$defs/AdaptyPrice" }
+      subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
+      payload_data: { type: string }
+
+  AdaptyPaywallProduct.Subscription:
+    type: object
+    required:
+      - group_identifier
+      - period
+      # - android_base_plan_id
+    properties:
+      group_identifier: { type: string, description: "iOS Only" }
+      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
+      localized_period: { type: string }
+      offer: { $ref: "#/$defs/AdaptySubscriptionOffer" }
+      # android_offer_id: { type: string, description: "Android Only" }
+      # android_base_plan_id: { type: string, description: "Android Only" }
+      # android_offer_tags:
+      #   type: array
+      #   items: { type: string }
+      #   description: "Android Only"
+      # renewal_type:
+      #   type: string
+      #   enum: [prepaid, autorenewable]
+      #   default: autorenewable
+      # introductory_offer_phases:
+      #   type: array
+
 
   AdaptyPaywallProduct.Request: #request
     type: object
+    properties:
+      payload_data: { type: string }
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -430,6 +487,7 @@ $defs:
       products:
         type: array
         items: { $ref: "#/$defs/AdaptyPaywall.ProductReference" }
+      payload_data: { type: string }
 
   AdaptyPaywall.FetchPolicy: #request
     type: object
