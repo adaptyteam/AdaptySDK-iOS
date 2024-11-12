@@ -83,7 +83,6 @@ $recuests:
           success: { $ref: "#/$defs/AdaptyProfile" }
 
   ### identify ###
-
   Identify.Request: #request
     type: object
     required: [method, customer_user_id]
@@ -102,7 +101,6 @@ $recuests:
           success: { const: true }
 
   ### isActivated ###
-
   IsActivated.Request: #request
     type: object
     required: [method]
@@ -116,7 +114,6 @@ $recuests:
       success: { type: boolean }
 
   ### getLogLevel ###
-
   GetLogLevel.Request: #request
     type: object
     required: [method]
@@ -130,7 +127,6 @@ $recuests:
       success: { $ref: "#/$defs/AdaptyLog.Level" }
 
   ### setLogLevel ###
-
   SetLogLevel.Request: #request
     type: object
     required: [method, value]
@@ -145,7 +141,6 @@ $recuests:
       success: { const: true }
 
   ### logout ###
-
   Logout.Request: #request
     type: object
     required: [method]
@@ -163,7 +158,6 @@ $recuests:
           success: { const: true }
 
   ### logShowOnboarding ###
-
   LogShowOnboarding.Request: #request
     type: object
     required: [method, params]
@@ -183,7 +177,6 @@ $recuests:
           success: { const: true }
 
   ### logShowPaywall ###
-
   LogShowPaywall.Request: #request
     type: object
     required: [method, paywall]
@@ -201,8 +194,7 @@ $recuests:
         properties:
           success: { const: true }
 
-  ### makePurchase ###
-
+  ### makePurchase ### TODO:
   MakePurchase.Request: #request
     type: object
     required: [method, product]
@@ -222,7 +214,6 @@ $recuests:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
   ### presentCodeRedemptionSheet ###
-
   PresentCodeRedemptionSheet.Request: #request
     type: object
     required: [method]
@@ -236,7 +227,6 @@ $recuests:
       success: { const: true }
 
   ### restorePurchases ###
-
   RestorePurchases.Request: #request
     type: object
     required: [method]
@@ -254,7 +244,6 @@ $recuests:
           success: { $ref: "#/$defs/AdaptyProfile" }
 
   ### getSDKVersion ###
-
   GetSDKVersion.Request: #request
     type: object
     required: [method]
@@ -268,7 +257,6 @@ $recuests:
       success: { type: string }
 
   ### setFallbackPaywalls ###
-
   SetFallbackPaywalls.Request: #request
     type: object
     required: [method, file_url]
@@ -287,7 +275,6 @@ $recuests:
           success: { const: true }
 
   ### setVariationId ###
-
   SetVariationId.Request: #request
     type: object
     required: [method, variation_id, transaction_id]
@@ -307,7 +294,6 @@ $recuests:
           success: { const: true }
 
   ### updateAttribution ###
-
   UpdateAttribution.Request: #request
     type: object
     required: [method, attribution, source]
@@ -327,8 +313,7 @@ $recuests:
         properties:
           success: { const: true }
 
-  ### updateProfile ###
-
+  ### updateProfile ### TODO:
   UpdateProfile.Request: #request
     type: object
     required: [method, params]
@@ -452,6 +437,7 @@ $defs:
     type: object
     properties:
       payload_data: { type: string }
+
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -716,3 +702,11 @@ $defs:
 
   AdaptyPurchaseResult: #response
     type: object
+    oneOf:
+      - required: [type]
+        properties:
+          type: { type: string, enum: ["pending", "user_cancelled"] }
+      - required: [type, profile]
+        properties:
+          type: { type: string, const: "success" }
+          profile: { $ref: "#/$defs/AdaptyProfile" }
