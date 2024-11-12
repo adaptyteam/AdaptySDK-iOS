@@ -33,9 +33,9 @@ extension SK2Product {
 #endif
     }
 
-    func subscriptionOffer(by offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier) -> AdaptySubscriptionOffer? {
+    func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
         let offer: SK2Product.SubscriptionOffer? =
-            switch offerTypeWithIdentifier {
+            switch offerIdentifier {
             case .introductory:
                 unfIntroductoryOffer
             case .promotional(let id):
@@ -54,7 +54,7 @@ extension SK2Product {
                 currencySymbol: unfPriceLocale.currencySymbol,
                 localizedString: offer.displayPrice
             ),
-            offerTypeWithIdentifier: offerTypeWithIdentifier,
+            offerIdentifier: offerIdentifier,
             subscriptionPeriod: period,
             numberOfPeriods: offer.periodCount,
             paymentMode: offer.paymentMode.asPaymentMode,

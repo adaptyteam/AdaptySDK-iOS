@@ -11,11 +11,11 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
     package let _price: Price
 
     /// Unique identifier of a discount offer for a product.
-    public var identifier: String? { offerTypeWithIdentifier.identifier }
+    public var identifier: String? { offerIdentifier.identifier }
 
-    public var offerType: OfferType { offerTypeWithIdentifier.asOfferType }
+    public var offerType: OfferType { offerIdentifier.asOfferType }
 
-    let offerTypeWithIdentifier: OfferTypeWithIdentifier
+    let offerIdentifier: Identifier
 
     /// An information about period for a product discount.
     public let subscriptionPeriod: AdaptySubscriptionPeriod
@@ -43,7 +43,7 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
 
     init(
         _price: Price,
-        offerTypeWithIdentifier: OfferTypeWithIdentifier,
+        offerIdentifier: Identifier,
         subscriptionPeriod: AdaptySubscriptionPeriod,
         numberOfPeriods: Int,
         paymentMode: PaymentMode,
@@ -51,7 +51,7 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
         localizedNumberOfPeriods: String?
     ) {
         self._price = _price
-        self.offerTypeWithIdentifier = offerTypeWithIdentifier
+        self.offerIdentifier = offerIdentifier
         self.subscriptionPeriod = subscriptionPeriod
         self.numberOfPeriods = numberOfPeriods
         self.paymentMode = paymentMode

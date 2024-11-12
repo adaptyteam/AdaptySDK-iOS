@@ -43,7 +43,8 @@ $recuests:
         properties:
           success: { $ref: "#/$defs/AdaptyPaywall" }
 
-  ### getPaywallProducts ### TODO:
+  ### getPaywallProducts ###
+  # TODO:
   GetPaywallProducts.Request: #request
     type: object
     required: [method, paywall]
@@ -194,7 +195,7 @@ $recuests:
         properties:
           success: { const: true }
 
-  ### makePurchase ### TODO:
+  ### makePurchase ###
   MakePurchase.Request: #request
     type: object
     required: [method, product]
@@ -313,7 +314,7 @@ $recuests:
         properties:
           success: { const: true }
 
-  ### updateProfile ### TODO:
+  ### updateProfile ###
   UpdateProfile.Request: #request
     type: object
     required: [method, params]
@@ -359,12 +360,6 @@ $defs:
     type: string
     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
-  AdaptyConfiguration.ServerCluster: #request
-    type: string
-    enum:
-      - eu
-      - default
-
   AdaptyConfiguration: #request
     type: object
     required: [api_key]
@@ -409,7 +404,8 @@ $defs:
       subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
       payload_data: { type: string }
 
-  AdaptyPaywallProduct.Subscription:
+  # TODO:
+  AdaptyPaywallProduct.Subscription: #response
     type: object
     required:
       - group_identifier
@@ -435,7 +431,20 @@ $defs:
 
   AdaptyPaywallProduct.Request: #request
     type: object
+    required:
+      - vendor_product_id
+      - adaptyProductId
+      - paywall_variation_id
+      - paywall_ab_test_name
+      - paywall_name
     properties:
+      vendor_product_id: { type: string }
+      adaptyProductId: { type: string }
+      subscription_offer:
+        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+      paywall_variation_id: { type: string }
+      paywall_ab_test_name:  { type: string }
+      paywall_name:  { type: string }
       payload_data: { type: string }
 
 
@@ -523,6 +532,10 @@ $defs:
 
   AdaptySubscriptionPeriod: #response
     type: object
+    required: [unit, number_of_units]
+    properties:
+      unit: { $ref: "#/$defs/AdaptySubscriptionPeriod.Unit" }
+      number_of_units: { type: integer }
 
   AdaptySubscriptionPeriod.Unit: #response
     type: string
@@ -653,7 +666,6 @@ $defs:
     type: object
     additionalProperties:
       oneOf:
-        - type:
         - type: string
           nullable: false
         - type: number
@@ -673,16 +685,42 @@ $defs:
 
   AdaptyProfileParameters: #request
     type: object
+    properties:
+      first_name: { type: string }
+      last_name: { type: string }
+      gender: { $ref: "#/$defs/AdaptyProfile.Gender" }
+      birthday: { type: string, format: "YYYY-MM-dd" }
+      email: { type: string }
+      phone_number: { type: string }
+      facebook_anonymous_id: { type: string }
+      amplitude_user_id: { type: string }
+      amplitude_device_id: { type: string }
+      mixpanel_user_id: { type: string }
+      appmetrica_profile_id: { type: string }
+      appmetrica_device_id: { type: string }
+      att_status: { type: integer, description: "iOS Only" }
+      custom_attributes: { $ref: "#/$defs/AdaptyProfile.CustomAttributes" }
+      analytics_disabled: { type: boolean }
+      one_signal_player_id: { type: string }
+      one_signal_subscription_id: { type: string }
+      pushwoosh_hwid: { type: string }
+      firebase_app_instance_id: { type: string }
+      airbridge_device_id: { type: string }
 
+  # TODO:
   AdaptySubscriptionOffer: #response
     type: object
 
-  AdaptySubscriptionOffer.OfferType: #response
+  AdaptySubscriptionOffer.Identifier: #request #response
     type: string
-    enum:
-      - introductory
-      - promotional
-      - winBack
+    oneOf:
+      - required: [type]
+        properties:
+          type: { type: string, const: "introductory" }
+      - required: [type, id]
+        properties:
+          type: { type: string, enum: ["promotional", "win_back"] }
+          id: { type: string }
 
   AdaptySubscriptionOffer.PaymentMode: #response
     type: string
