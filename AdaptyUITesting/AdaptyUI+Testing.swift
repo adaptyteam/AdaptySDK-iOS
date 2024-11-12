@@ -119,13 +119,13 @@ public extension AdaptyUI.LocalizedViewConfiguration {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public struct AdaptyUITestRendererView: View {
     let viewConfiguration: AdaptyUI.LocalizedViewConfiguration
-    let paywallConfiguration: AdaptyPaywallConfiguration
+    let paywallConfiguration: AdaptyUI.PaywallConfiguration
 
     public init(
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration
     ) {
         self.viewConfiguration = viewConfiguration
-        paywallConfiguration = AdaptyPaywallConfiguration(
+        paywallConfiguration = AdaptyUI.PaywallConfiguration(
             logId: Log.stamp,
             paywall: AdaptyMockPaywall(),
             viewConfiguration: viewConfiguration,

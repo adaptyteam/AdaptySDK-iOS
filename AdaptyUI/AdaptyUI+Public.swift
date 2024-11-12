@@ -5,10 +5,7 @@
 //  Created by Alexey Goncharov on 27.1.23..
 //
 
-#if canImport(UIKit)
-
 import Adapty
-import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
@@ -31,6 +28,10 @@ public extension AdaptyUI {
         }
     }
 }
+
+#if canImport(UIKit)
+
+import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
@@ -230,7 +231,7 @@ public extension AdaptyUI {
 
         return try await Adapty.getViewConfiguration(paywall: paywall, loadTimeout: loadTimeout)
     }
-    
+
     /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
     ///
     /// - Parameters:
@@ -266,7 +267,7 @@ public extension AdaptyUI {
             tagResolver: tagResolver,
             timerResolver: timerResolver
         )
-        
+
         return AdaptyPaywallController(
             paywallConfiguration: paywallConfiguration,
             paywall: paywall,
@@ -274,7 +275,7 @@ public extension AdaptyUI {
             showDebugOverlay: showDebugOverlay
         )
     }
-    
+
     /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
     ///
     /// - Parameters:

@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 12.11.2024.
 //
 
+import Adapty
 import AdaptyUI
 import Foundation
 
