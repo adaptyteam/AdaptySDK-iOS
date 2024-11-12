@@ -43,7 +43,8 @@ $recuests:
         properties:
           success: { $ref: "#/$defs/AdaptyPaywall" }
 
-  ### getPaywallProducts ### TODO:
+  ### getPaywallProducts ###
+  # TODO:
   GetPaywallProducts.Request: #request
     type: object
     required: [method, paywall]
@@ -194,7 +195,8 @@ $recuests:
         properties:
           success: { const: true }
 
-  ### makePurchase ### TODO:
+  ### makePurchase ###
+  # TODO:
   MakePurchase.Request: #request
     type: object
     required: [method, product]
@@ -313,7 +315,7 @@ $recuests:
         properties:
           success: { const: true }
 
-  ### updateProfile ### TODO:
+  ### updateProfile ###
   UpdateProfile.Request: #request
     type: object
     required: [method, params]
@@ -359,12 +361,6 @@ $defs:
     type: string
     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
-  AdaptyConfiguration.ServerCluster: #request
-    type: string
-    enum:
-      - eu
-      - default
-
   AdaptyConfiguration: #request
     type: object
     required: [api_key]
@@ -409,7 +405,8 @@ $defs:
       subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
       payload_data: { type: string }
 
-  AdaptyPaywallProduct.Subscription:
+  # TODO:
+  AdaptyPaywallProduct.Subscription: #response
     type: object
     required:
       - group_identifier
@@ -433,11 +430,11 @@ $defs:
       # introductory_offer_phases:
       #   type: array
 
+  # TODO:
   AdaptyPaywallProduct.Request: #request
     type: object
     properties:
       payload_data: { type: string }
-
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -523,6 +520,10 @@ $defs:
 
   AdaptySubscriptionPeriod: #response
     type: object
+    required: [unit, number_of_units]
+    properties:
+      unit: { $ref: "#/$defs/AdaptySubscriptionPeriod.Unit" }
+      number_of_units: { type: integer }
 
   AdaptySubscriptionPeriod.Unit: #response
     type: string
@@ -653,7 +654,6 @@ $defs:
     type: object
     additionalProperties:
       oneOf:
-        - type:
         - type: string
           nullable: false
         - type: number
@@ -673,7 +673,29 @@ $defs:
 
   AdaptyProfileParameters: #request
     type: object
+    properties:
+      first_name: { type: string }
+      last_name: { type: string }
+      gender: { $ref: "#/$defs/AdaptyProfile.Gender" }
+      birthday: { type: string , format: "YYYY-MM-dd"}
+      email: { type: string }
+      phone_number: { type: string }
+      facebook_anonymous_id: { type: string }
+      amplitude_user_id: { type: string }
+      amplitude_device_id: { type: string }
+      mixpanel_user_id: { type: string }
+      appmetrica_profile_id: { type: string }
+      appmetrica_device_id: { type: string }
+      att_status: { type: integer,  description: "iOS Only" }
+      custom_attributes: { $ref: "#/$defs/AdaptyProfile.CustomAttributes" }
+      analytics_disabled: { type: boolean }
+      one_signal_player_id: { type: string }
+      one_signal_subscription_id: { type: string }
+      pushwoosh_hwid: { type: string }
+      firebase_app_instance_id: { type: string }
+      airbridge_device_id: { type: string }
 
+  # TODO:
   AdaptySubscriptionOffer: #response
     type: object
 
