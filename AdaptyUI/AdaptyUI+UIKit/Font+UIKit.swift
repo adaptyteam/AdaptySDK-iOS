@@ -56,7 +56,7 @@ extension UIFont {
     }
 }
 
-extension AdaptyUICore.Font {
+extension VC.Font {
     static let systemFontReservedName = "adapty_system"
 
     func uiFont(size: Double) -> UIFont {

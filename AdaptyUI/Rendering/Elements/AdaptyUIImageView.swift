@@ -14,7 +14,7 @@ import UIKit
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func aspectRatio(_ aspect: AdaptyUICore.AspectRatio) -> some View {
+    func aspectRatio(_ aspect: VC.AspectRatio) -> some View {
         switch aspect {
         case .fit:
             aspectRatio(contentMode: .fit)
@@ -35,22 +35,22 @@ extension View {
 @MainActor
 struct AdaptyUIImageView: View {
     enum InitializationMode {
-        case image(AdaptyUICore.Image)
-        case raw(AdaptyUICore.ImageData, AdaptyUICore.AspectRatio, AdaptyUICore.Filling?)
+        case image(VC.Image)
+        case raw(VC.ImageData, VC.AspectRatio, VC.Filling?)
     }
 
     private var data: InitializationMode
 
     init(
-        asset: AdaptyUICore.ImageData,
-        aspect: AdaptyUICore.AspectRatio,
-        tint: AdaptyUICore.Filling? = nil
+        asset: VC.ImageData,
+        aspect: VC.AspectRatio,
+        tint: VC.Filling? = nil
     ) {
         data = .raw(asset, aspect, tint)
     }
 
     init(
-        _ image: AdaptyUICore.Image
+        _ image: VC.Image
     ) {
         data = .image(image)
     }
@@ -61,8 +61,8 @@ struct AdaptyUIImageView: View {
     @ViewBuilder
     private func rasterImage(
         _ uiImage: UIImage?,
-        aspect: AdaptyUICore.AspectRatio,
-        tint: AdaptyUICore.Filling?
+        aspect: VC.AspectRatio,
+        tint: VC.Filling?
     ) -> some View {
         if let uiImage {
             if let tint = tint?.asSolidColor?.swiftuiColor {
@@ -84,9 +84,9 @@ struct AdaptyUIImageView: View {
 
     @ViewBuilder
     private func resolvedSchemeBody(
-        asset: AdaptyUICore.ImageData,
-        aspect: AdaptyUICore.AspectRatio,
-        tint: AdaptyUICore.Filling?
+        asset: VC.ImageData,
+        aspect: VC.AspectRatio,
+        tint: VC.Filling?
     ) -> some View {
         switch asset {
         case let .resources(name):

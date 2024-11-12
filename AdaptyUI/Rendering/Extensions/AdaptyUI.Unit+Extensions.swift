@@ -10,7 +10,7 @@
 import Adapty
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-package extension AdaptyUICore.Unit {
+package extension VC.Unit {
     func points(screenSize: Double, safeAreaStart: Double, safeAreaEnd: Double) -> Double {
         switch self {
         case let .point(value): value

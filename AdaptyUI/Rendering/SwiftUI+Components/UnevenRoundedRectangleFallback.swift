@@ -11,8 +11,8 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.CornerRadius {
-    func normalized(width: Double, height: Double) -> AdaptyUICore.CornerRadius {
+extension VC.CornerRadius {
+    func normalized(width: Double, height: Double) -> VC.CornerRadius {
         var normalizedRadii = self
 
         // Normalize the top and bottom radii against the width
@@ -21,7 +21,7 @@ extension AdaptyUICore.CornerRadius {
 
         if topSum > width {
             let scaleFactor = width / topSum
-            normalizedRadii = AdaptyUICore.CornerRadius(
+            normalizedRadii = VC.CornerRadius(
                 topLeading: topLeading * scaleFactor,
                 topTrailing: topTrailing * scaleFactor,
                 bottomTrailing: bottomTrailing,
@@ -31,7 +31,7 @@ extension AdaptyUICore.CornerRadius {
 
         if bottomSum > width {
             let scaleFactor = width / bottomSum
-            normalizedRadii = AdaptyUICore.CornerRadius(
+            normalizedRadii = VC.CornerRadius(
                 topLeading: normalizedRadii.topLeading,
                 topTrailing: normalizedRadii.topTrailing,
                 bottomTrailing: bottomTrailing * scaleFactor,
@@ -45,7 +45,7 @@ extension AdaptyUICore.CornerRadius {
 
         if leftSum > height {
             let scaleFactor = height / leftSum
-            normalizedRadii = AdaptyUICore.CornerRadius(
+            normalizedRadii = VC.CornerRadius(
                 topLeading: normalizedRadii.topLeading * scaleFactor,
                 topTrailing: normalizedRadii.topTrailing,
                 bottomTrailing: normalizedRadii.bottomTrailing,
@@ -55,7 +55,7 @@ extension AdaptyUICore.CornerRadius {
 
         if rightSum > height {
             let scaleFactor = height / rightSum
-            normalizedRadii = AdaptyUICore.CornerRadius(
+            normalizedRadii = VC.CornerRadius(
                 topLeading: normalizedRadii.topLeading,
                 topTrailing: normalizedRadii.topTrailing * scaleFactor,
                 bottomTrailing: normalizedRadii.bottomTrailing * scaleFactor,
@@ -69,7 +69,7 @@ extension AdaptyUICore.CornerRadius {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct UnevenRoundedRectangleFallback: InsettableShape {
-    var cornerRadii: AdaptyUICore.CornerRadius
+    var cornerRadii: VC.CornerRadius
     var insetAmount: CGFloat = 0
 
     func inset(by amount: CGFloat) -> UnevenRoundedRectangleFallback {
@@ -138,7 +138,7 @@ struct UnevenRoundedRectangleFallback: InsettableShape {
 }
 
 @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
-extension AdaptyUICore.CornerRadius {
+extension VC.CornerRadius {
     var systemRadii: RectangleCornerRadii {
         RectangleCornerRadii(
             topLeading: topLeading,

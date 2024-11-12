@@ -35,7 +35,7 @@ public extension AdaptyUI {
     static func getViewConfiguration(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = 5.0,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyUICore.LocalizedViewConfiguration>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyViewConfiguration>
     ) {
         withCompletion(completion) {
             try await Adapty.getViewConfiguration(

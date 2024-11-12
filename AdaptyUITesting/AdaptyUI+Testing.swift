@@ -13,7 +13,7 @@ import Foundation
 import SwiftUI
 
 #if DEBUG
-public extension AdaptyUICore.LocalizedViewConfiguration {
+public extension AdaptyViewConfiguration {
     static func createTest(
         templateId: String = "basic",
         locale: String = "en",
@@ -118,14 +118,14 @@ public extension AdaptyUICore.LocalizedViewConfiguration {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public struct AdaptyUITestRendererView: View {
-    let viewConfiguration: AdaptyUICore.LocalizedViewConfiguration
-    let paywallConfiguration: AdaptyUICore.PaywallConfiguration
+    let viewConfiguration: AdaptyViewConfiguration
+    let paywallConfiguration: AdaptyUI.PaywallConfiguration
 
     public init(
-        viewConfiguration: AdaptyUICore.LocalizedViewConfiguration
+        viewConfiguration: AdaptyViewConfiguration
     ) {
         self.viewConfiguration = viewConfiguration
-        paywallConfiguration = AdaptyUICore.PaywallConfiguration(
+        paywallConfiguration = AdaptyUI.PaywallConfiguration(
             logId: Log.stamp,
             paywall: AdaptyMockPaywall(),
             viewConfiguration: viewConfiguration,

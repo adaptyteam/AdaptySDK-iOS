@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(macOS 10.15, iOS 13.0, *)
-extension AdaptyUICore {
+extension VC {
     enum DebugElement: String {
         case circle
         case circleRed = "circle_red"
@@ -38,7 +38,7 @@ extension AdaptyUICore {
 }
 
 @available(macOS 10.15, iOS 13.0, *)
-extension AdaptyUICore.DebugElement: View {
+extension VC.DebugElement: View {
     var body: some View {
         switch self {
         case .circle, .circleRed, .circleGreen, .circleBlue, .circleYellow: Circle()
@@ -61,7 +61,7 @@ struct AdaptyUIUnknownElementView: View {
 //    }
 
     var body: some View {
-        if let debugElement = AdaptyUICore.DebugElement(rawValue: value) {
+        if let debugElement = VC.DebugElement(rawValue: value) {
             debugElement
         } else {
             Text("Unknown View \(value)")
@@ -70,7 +70,7 @@ struct AdaptyUIUnknownElementView: View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.Element {
+extension VC.Element {
     var testCircle: Self {
         .unknown("circle", nil)
     }
@@ -82,7 +82,7 @@ extension AdaptyUICore.Element {
 
 @available(macOS 10.15, iOS 13.0, *)
 #Preview {
-    AdaptyUIUnknownElementView(value: AdaptyUICore.DebugElement.rectangle.rawValue)
+    AdaptyUIUnknownElementView(value: VC.DebugElement.rectangle.rawValue)
 }
 
 #endif

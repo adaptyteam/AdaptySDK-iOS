@@ -75,7 +75,7 @@ extension AdaptyUI {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI {
     @MainActor
-    final class ImageUrlPrefetcher: AdaptyUIImageUrlObserver {
+    final class ImageUrlPrefetcher: AdaptyImageUrlObserver {
         static let shared = ImageUrlPrefetcher()
 
         private var initialized = false
@@ -85,7 +85,7 @@ extension AdaptyUI {
             guard !initialized else { return }
 
             Log.prefetcher.verbose("initialize")
-            AdaptyUICore.setImageUrlObserver(self)
+            Adapty.setImageUrlObserver(self)
         }
 
         nonisolated func extractedImageUrls(_ urls: Set<URL>) {

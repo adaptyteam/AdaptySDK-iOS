@@ -11,19 +11,19 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.Point {
+extension VC.Point {
     var unitPoint: UnitPoint { UnitPoint(x: x, y: y) }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.ColorGradient.Item {
+extension VC.ColorGradient.Item {
     var gradientStop: Gradient.Stop { Gradient.Stop(color: color.swiftuiColor, location: p) }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func applyingProperties(_ props: AdaptyUICore.Element.Properties?, includeBackground: Bool) -> some View {
+    func applyingProperties(_ props: VC.Element.Properties?, includeBackground: Bool) -> some View {
         decorate(with: props?.decorator, includeBackground: includeBackground)
             .offset(x: props?.offset.x ?? 0.0, y: props?.offset.y ?? 0.0)
             .padding(props?.padding)
@@ -31,8 +31,8 @@ extension View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.Mode<AdaptyUICore.Color> {
-    private func resolvedColor(style: UIUserInterfaceStyle) -> AdaptyUICore.Color {
+extension VC.Mode<VC.Color> {
+    private func resolvedColor(style: UIUserInterfaceStyle) -> VC.Color {
         switch style {
         case .dark:
             return mode(.dark)
@@ -53,7 +53,7 @@ extension AdaptyUICore.Mode<AdaptyUICore.Color> {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.Color {
+extension VC.Color {
     var swiftuiColor: SwiftUI.Color {
         SwiftUI.Color(uiColor)
     }

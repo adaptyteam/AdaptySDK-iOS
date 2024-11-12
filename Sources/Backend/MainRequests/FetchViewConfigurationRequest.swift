@@ -8,7 +8,7 @@
 import Foundation
 
 struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUICore.ViewConfiguration>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyViewSource>
 
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
@@ -23,8 +23,8 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
         headers = HTTPHeaders()
             .setViewConfigurationLocale(locale)
-            .setVisualBuilderVersion(AdaptyUICore.builderVersion)
-            .setVisualBuilderConfigurationFormatVersion(AdaptyUICore.configurationFormatVersion)
+            .setVisualBuilderVersion(AdaptyViewConfiguration.builderVersion)
+            .setVisualBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
@@ -36,8 +36,8 @@ extension Backend.MainExecutor {
         paywallVariationId: String,
         locale: AdaptyLocale,
         disableServerCache: Bool
-    ) async throws -> AdaptyUICore.ViewConfiguration {
-        let md5Hash = "{\"builder_version\":\"\(AdaptyUICore.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
+    ) async throws -> AdaptyViewSource {
+        let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
 
         let request = FetchViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -54,8 +54,8 @@ extension Backend.MainExecutor {
                 "api_prefix": apiKeyPrefix,
                 "variation_id": paywallVariationId,
                 "locale": locale,
-                "builder_version": AdaptyUICore.builderVersion,
-                "builder_config_format_version": AdaptyUICore.configurationFormatVersion,
+                "builder_version": AdaptyViewConfiguration.builderVersion,
+                "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
                 "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]

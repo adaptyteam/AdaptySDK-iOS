@@ -42,7 +42,7 @@ extension Adapty {
         )), for: profileId)
     }
 
-    package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUICore.LocalizedViewConfiguration) {
+    package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyViewConfiguration) {
         trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
     }
 }

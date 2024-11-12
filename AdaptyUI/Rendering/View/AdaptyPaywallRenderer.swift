@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-package extension AdaptyUICore {
+package extension VC {
     enum Template: String {
         case basic
         case flat
@@ -26,7 +26,7 @@ struct AdaptyPaywallRendererView: View {
     @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
 
     @ViewBuilder
-    private func templateResolverView(_ template: AdaptyUICore.Template, screen: AdaptyUICore.Screen) -> some View {
+    private func templateResolverView(_ template: VC.Template, screen: VC.Screen) -> some View {
         switch template {
         case .basic:
             AdaptyUIBasicContainerView(screen: screen)
@@ -40,7 +40,7 @@ struct AdaptyPaywallRendererView: View {
     public var body: some View {
         let viewConfiguration = paywallViewModel.viewConfiguration
 
-        if let template = AdaptyUICore.Template(rawValue: viewConfiguration.templateId) {
+        if let template = VC.Template(rawValue: viewConfiguration.templateId) {
             ZStack {
                 templateResolverView(template, screen: viewConfiguration.screen)
                     .decorate(with: viewConfiguration.screen.background)

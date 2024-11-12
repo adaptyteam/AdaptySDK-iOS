@@ -41,7 +41,7 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequestWithDecodableRe
         self.cached = cached
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyUICore.builderVersion)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
         )
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
@@ -86,8 +86,8 @@ private extension FetchFallbackPaywallVariationsExecutor {
                     "api_prefix": apiKeyPrefix,
                     "placement_id": placementId,
                     "language_code": locale.languageCode,
-                    "builder_version": AdaptyUICore.builderVersion,
-                    "builder_config_format_version": AdaptyUICore.configurationFormatVersion,
+                    "builder_version": AdaptyViewConfiguration.builderVersion,
+                    "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
                     "disable_server_cache": disableServerCache,
                 ]
             )

@@ -24,7 +24,7 @@ package class AdaptyVideoViewModel: ObservableObject {
     @Published var playerManagers = [String: AdaptyUIVideoPlayerManager]()
 
     func getOrCreatePlayerManager(
-        for video: AdaptyUICore.VideoData,
+        for video: VC.VideoData,
         loop: Bool,
         id: String
     ) -> AdaptyUIVideoPlayerManager {
@@ -93,7 +93,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     private var playerStatusObservation: NSKeyValueObservation?
 
     init(
-        video: AdaptyUICore.VideoData,
+        video: VC.VideoData,
         loop: Bool,
         eventsHandler: AdaptyEventsHandler,
         onStateUpdated: @escaping (PlayerState) -> Void

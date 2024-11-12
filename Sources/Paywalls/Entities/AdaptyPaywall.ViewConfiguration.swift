@@ -11,7 +11,7 @@ import Foundation
 extension AdaptyPaywall {
     enum ViewConfiguration: Sendable, Hashable {
         case withoutData(AdaptyLocale, String)
-        case data(AdaptyUICore.ViewConfiguration)
+        case data(AdaptyViewSource)
 
         var hasData: Bool {
             switch self {
@@ -37,14 +37,14 @@ extension AdaptyPaywall {
 }
 
 extension AdaptyPaywall.ViewConfiguration: Codable {
-    typealias CodingKeys = AdaptyUICore.ViewConfiguration.ContainerCodingKeys
+    typealias CodingKeys = AdaptyViewSource.ContainerCodingKeys
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self =
             if container.contains(.container) {
-                try .data(AdaptyUICore.ViewConfiguration(from: decoder))
+                try .data(AdaptyViewSource(from: decoder))
             } else {
                 try .withoutData(
                     container.decode(AdaptyLocale.self, forKey: .responseLocale),

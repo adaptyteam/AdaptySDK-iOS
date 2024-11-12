@@ -15,12 +15,12 @@ struct AdaptyUITextView: View {
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
 
-    private var text: AdaptyUICore.Text
+    private var text: VC.Text
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
-    init(_ text: AdaptyUICore.Text) {
+    init(_ text: VC.Text) {
         self.text = text
     }
 
@@ -65,7 +65,7 @@ struct AdaptyUITextView: View {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-extension AdaptyUICore.RichText {
+extension VC.RichText {
     func convertToSwiftUIText(
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?,
@@ -85,7 +85,7 @@ extension AdaptyUICore.RichText {
 
                 if let customTagResult = tagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
-                } else if let productTag = AdaptyUICore.ProductTag(rawValue: value),
+                } else if let productTag = VC.ProductTag(rawValue: value),
                           let productTagResult = productInfo?.stringByTag(productTag)
                 {
                     switch productTagResult {
@@ -124,7 +124,7 @@ extension AdaptyUICore.RichText {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.ImageData {
+extension VC.ImageData {
     private var uiImage: UIImage? {
         switch self {
         case let .raster(data):
@@ -166,14 +166,14 @@ extension UIImage {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-extension AdaptyUICore.Text {
+extension VC.Text {
     enum ProductInfoContainer {
         case notApplicable
         case notFound
         case found(ProductInfoModel)
     }
 
-    func extract(productsInfoProvider: ProductsInfoProvider) -> (AdaptyUICore.RichText, ProductInfoContainer) {
+    func extract(productsInfoProvider: ProductsInfoProvider) -> (VC.RichText, ProductInfoContainer) {
         switch value {
         case let .text(value):
             return (value, .notApplicable)
@@ -199,7 +199,7 @@ extension AdaptyUICore.Text {
 extension AttributedString {
     static func createFrom(
         value: String,
-        attributes: AdaptyUICore.RichText.TextAttributes?
+        attributes: VC.RichText.TextAttributes?
     ) -> AttributedString {
         var result = AttributedString(value)
 
@@ -227,7 +227,7 @@ extension UIFont {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUICore.RichText.TextAttributes {
+extension VC.RichText.TextAttributes {
     var uiFont: UIFont { font.uiFont(size: size) }
     var uiColor: UIColor? { txtColor.asSolidColor?.uiColor }
     var backgroundUIColor: UIColor? { background?.asSolidColor?.uiColor }

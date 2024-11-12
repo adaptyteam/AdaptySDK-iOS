@@ -15,16 +15,16 @@ import Foundation
 package final class AdaptyScreensViewModel: ObservableObject {
     struct BottomSheet: Identifiable {
         var id: String
-        var bottomSheet: AdaptyUICore.BottomSheet
+        var bottomSheet: VC.BottomSheet
     }
 
     let logId: String
     let eventsHandler: AdaptyEventsHandler
-    let viewConfiguration: AdaptyUICore.LocalizedViewConfiguration
+    let viewConfiguration: AdaptyViewConfiguration
 
     package init(
         eventsHandler: AdaptyEventsHandler,
-        viewConfiguration: AdaptyUICore.LocalizedViewConfiguration
+        viewConfiguration: AdaptyViewConfiguration
     ) {
         self.eventsHandler = eventsHandler
         self.logId = eventsHandler.logId

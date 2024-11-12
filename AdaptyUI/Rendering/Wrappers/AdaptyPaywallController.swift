@@ -16,7 +16,7 @@ public final class AdaptyPaywallController: UIViewController {
     public let id = UUID()
 
     public let paywall: AdaptyPaywall
-    public var viewConfiguration: AdaptyUICore.LocalizedViewConfiguration {
+    public var viewConfiguration: AdaptyViewConfiguration {
         paywallConfiguration.paywallViewModel.viewConfiguration
     }
 

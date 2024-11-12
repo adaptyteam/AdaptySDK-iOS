@@ -226,7 +226,7 @@ public extension AdaptyUI {
     static func getViewConfiguration(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = 5.0
-    ) async throws -> AdaptyUICore.LocalizedViewConfiguration {
+    ) async throws -> AdaptyViewConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
@@ -250,7 +250,7 @@ public extension AdaptyUI {
     static func paywallController(
         for paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]? = nil,
-        viewConfiguration: AdaptyUICore.LocalizedViewConfiguration,
+        viewConfiguration: AdaptyViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
@@ -293,7 +293,7 @@ public extension AdaptyUI {
     static func paywallConfiguration(
         for paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]? = nil,
-        viewConfiguration: AdaptyUICore.LocalizedViewConfiguration,
+        viewConfiguration: AdaptyViewConfiguration,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil
