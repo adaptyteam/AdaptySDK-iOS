@@ -46,20 +46,34 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
             .environmentObject(paywallConfiguration.timerViewModel)
             .environmentObject(paywallConfiguration.screensViewModel)
             .environmentObject(paywallConfiguration.videoViewModel)
+            .onAppear {
+                paywallConfiguration.paywallViewModel.logShowPaywall()
+            }
     }
 
     public func body(content: Content) -> some View {
         if fullScreen {
             content
-                .fullScreenCover(isPresented: isPresented) {
-                    paywallViewBody
-                }
-
+                .fullScreenCover(
+                    isPresented: isPresented,
+                    onDismiss: {
+                        paywallConfiguration.paywallViewModel.resetLogShowPaywall()
+                    },
+                    content: {
+                        paywallViewBody
+                    }
+                )
         } else {
             content
-                .sheet(isPresented: isPresented) {
-                    paywallViewBody
-                }
+                .sheet(
+                    isPresented: isPresented,
+                    onDismiss: {
+                        paywallConfiguration.paywallViewModel.resetLogShowPaywall()
+                    },
+                    content: {
+                        paywallViewBody
+                    }
+                )
         }
     }
 }

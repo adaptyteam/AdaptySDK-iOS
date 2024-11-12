@@ -32,7 +32,12 @@ package final class AdaptyPaywallViewModel: ObservableObject {
         self.viewConfiguration = viewConfiguration
     }
 
+    private var logShowPaywallCalled = false
+    
     func logShowPaywall() {
+        guard !logShowPaywallCalled else { return }
+        logShowPaywallCalled = true
+        
         let logId = logId
         Log.ui.verbose("#\(logId)# logShowPaywall begin")
 
@@ -44,6 +49,11 @@ package final class AdaptyPaywallViewModel: ObservableObject {
                 Log.ui.error("#\(logId)# logShowPaywall fail: \(error)")
             }
         }
+    }
+    
+    func resetLogShowPaywall() {
+        Log.ui.verbose("#\(logId)# resetLogShowPaywall")
+        logShowPaywallCalled = false
     }
 
     func reloadData() {
