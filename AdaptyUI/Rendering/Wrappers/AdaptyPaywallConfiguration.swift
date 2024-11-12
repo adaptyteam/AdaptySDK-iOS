@@ -8,7 +8,6 @@
 #if canImport(UIKit)
 
 import Adapty
-import AdaptyUI
 import SwiftUI
 import UIKit
 
@@ -29,7 +28,7 @@ public final class AdaptyPaywallConfiguration {
 
     package init(
         logId: String,
-        paywall: AdaptyPaywall,
+        paywall: AdaptyPaywallInterface,
         viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
         products: [AdaptyPaywallProduct]?,
         observerModeResolver: AdaptyObserverModeResolver?,
