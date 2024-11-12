@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUI {
+package extension AdaptyUICore {
     enum Background: Sendable {
         static let `default` = Background.filling(.same(.default))
 
@@ -30,7 +30,7 @@ package extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Background: Hashable {
+extension AdaptyUICore.Background: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .filling(value):

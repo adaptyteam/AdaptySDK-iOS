@@ -27,7 +27,7 @@ struct AdaptyUIBasicContainerView: View {
     @State
     private var drawFooterBackground = false
 
-    var screen: AdaptyUI.Screen
+    var screen: AdaptyUICore.Screen
 
     var body: some View {
         GeometryReader { globalProxy in
@@ -76,9 +76,9 @@ struct AdaptyUIBasicContainerView: View {
 
     @ViewBuilder
     func coverView(
-        _ box: AdaptyUI.Box,
-        _ content: AdaptyUI.Element,
-        _ properties: AdaptyUI.Element.Properties?
+        _ box: AdaptyUICore.Box,
+        _ content: AdaptyUICore.Element,
+        _ properties: AdaptyUICore.Element.Properties?
     ) -> some View {
         let height: CGFloat = {
             if let boxHeight = box.height, case let .fixed(unit) = boxHeight {
@@ -124,8 +124,8 @@ struct AdaptyUIBasicContainerView: View {
 
     @ViewBuilder
     func contentView(
-        content: AdaptyUI.Element,
-        coverBox: AdaptyUI.Box,
+        content: AdaptyUICore.Element,
+        coverBox: AdaptyUICore.Box,
         globalProxy: GeometryProxy
     ) -> some View {
         let bottomOverscrollHeight = screenSize.height
@@ -148,7 +148,7 @@ struct AdaptyUIBasicContainerView: View {
 
     @ViewBuilder
     private func footerView(
-        _ element: AdaptyUI.Element,
+        _ element: AdaptyUICore.Element,
         globalProxy: GeometryProxy
     ) -> some View {
         if footerSize.height >= globalProxy.size.height {

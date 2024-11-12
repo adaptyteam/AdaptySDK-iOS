@@ -8,35 +8,35 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     enum Element: Sendable {
         case reference(String)
-        indirect case stack(AdaptyUI.ViewConfiguration.Stack, Properties?)
-        case text(AdaptyUI.ViewConfiguration.Text, Properties?)
-        case image(AdaptyUI.ViewConfiguration.Image, Properties?)
-        case video(AdaptyUI.ViewConfiguration.VideoPlayer, Properties?)
-        indirect case button(AdaptyUI.ViewConfiguration.Button, Properties?)
-        indirect case box(AdaptyUI.ViewConfiguration.Box, Properties?)
-        indirect case row(AdaptyUI.ViewConfiguration.Row, Properties?)
-        indirect case column(AdaptyUI.ViewConfiguration.Column, Properties?)
-        indirect case section(AdaptyUI.ViewConfiguration.Section, Properties?)
-        case toggle(AdaptyUI.ViewConfiguration.Toggle, Properties?)
-        case timer(AdaptyUI.ViewConfiguration.Timer, Properties?)
-        indirect case pager(AdaptyUI.ViewConfiguration.Pager, Properties?)
+        indirect case stack(AdaptyUICore.ViewConfiguration.Stack, Properties?)
+        case text(AdaptyUICore.ViewConfiguration.Text, Properties?)
+        case image(AdaptyUICore.ViewConfiguration.Image, Properties?)
+        case video(AdaptyUICore.ViewConfiguration.VideoPlayer, Properties?)
+        indirect case button(AdaptyUICore.ViewConfiguration.Button, Properties?)
+        indirect case box(AdaptyUICore.ViewConfiguration.Box, Properties?)
+        indirect case row(AdaptyUICore.ViewConfiguration.Row, Properties?)
+        indirect case column(AdaptyUICore.ViewConfiguration.Column, Properties?)
+        indirect case section(AdaptyUICore.ViewConfiguration.Section, Properties?)
+        case toggle(AdaptyUICore.ViewConfiguration.Toggle, Properties?)
+        case timer(AdaptyUICore.ViewConfiguration.Timer, Properties?)
+        indirect case pager(AdaptyUICore.ViewConfiguration.Pager, Properties?)
 
         case unknown(String, Properties?)
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Element {
+extension AdaptyUICore.ViewConfiguration.Element {
     struct Properties: Sendable, Hashable {
         let elementId: String?
-        let decorator: AdaptyUI.ViewConfiguration.Decorator?
-        let padding: AdaptyUI.EdgeInsets
-        let offset: AdaptyUI.Offset
+        let decorator: AdaptyUICore.ViewConfiguration.Decorator?
+        let padding: AdaptyUICore.EdgeInsets
+        let offset: AdaptyUICore.Offset
 
         let visibility: Bool
-        let transitionIn: [AdaptyUI.Transition]
+        let transitionIn: [AdaptyUICore.Transition]
 
         var isZero: Bool {
             elementId == nil
@@ -49,7 +49,7 @@ extension AdaptyUI.ViewConfiguration.Element {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Element: Hashable {
+extension AdaptyUICore.ViewConfiguration.Element: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .reference(value):
@@ -110,8 +110,8 @@ extension AdaptyUI.ViewConfiguration.Element: Hashable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func element(_ from: AdaptyUI.ViewConfiguration.Element) throws -> AdaptyUI.Element {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func element(_ from: AdaptyUICore.ViewConfiguration.Element) throws -> AdaptyUICore.Element {
         switch from {
         case let .reference(id):
             try reference(id)
@@ -144,7 +144,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         }
     }
 
-    private func elementProperties(_ from: AdaptyUI.ViewConfiguration.Element.Properties) throws -> AdaptyUI.Element.Properties? {
+    private func elementProperties(_ from: AdaptyUICore.ViewConfiguration.Element.Properties) throws -> AdaptyUICore.Element.Properties? {
         guard !from.isZero else { return nil }
         return try .init(
             decorator: from.decorator.map(decorator),
@@ -156,7 +156,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Element: Decodable {
+extension AdaptyUICore.ViewConfiguration.Element: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case count
@@ -193,33 +193,33 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
 
         switch contentType {
         case .if:
-            self = try AdaptyUI.ViewConfiguration.If(from: decoder).content
+            self = try AdaptyUICore.ViewConfiguration.If(from: decoder).content
         case .reference:
             self = try .reference(container.decode(String.self, forKey: .elementId))
         case .box:
-            self = try .box(AdaptyUI.ViewConfiguration.Box(from: decoder), propertyOrNil())
+            self = try .box(AdaptyUICore.ViewConfiguration.Box(from: decoder), propertyOrNil())
         case .vStack, .hStack, .zStack:
-            self = try .stack(AdaptyUI.ViewConfiguration.Stack(from: decoder), propertyOrNil())
+            self = try .stack(AdaptyUICore.ViewConfiguration.Stack(from: decoder), propertyOrNil())
         case .button:
-            self = try .button(AdaptyUI.ViewConfiguration.Button(from: decoder), propertyOrNil())
+            self = try .button(AdaptyUICore.ViewConfiguration.Button(from: decoder), propertyOrNil())
         case .text:
-            self = try .text(AdaptyUI.ViewConfiguration.Text(from: decoder), propertyOrNil())
+            self = try .text(AdaptyUICore.ViewConfiguration.Text(from: decoder), propertyOrNil())
         case .image:
-            self = try .image(AdaptyUI.ViewConfiguration.Image(from: decoder), propertyOrNil())
+            self = try .image(AdaptyUICore.ViewConfiguration.Image(from: decoder), propertyOrNil())
         case .video:
-            self = try .video(AdaptyUI.ViewConfiguration.VideoPlayer(from: decoder), propertyOrNil())
+            self = try .video(AdaptyUICore.ViewConfiguration.VideoPlayer(from: decoder), propertyOrNil())
         case .row:
-            self = try .row(AdaptyUI.ViewConfiguration.Row(from: decoder), propertyOrNil())
+            self = try .row(AdaptyUICore.ViewConfiguration.Row(from: decoder), propertyOrNil())
         case .column:
-            self = try .column(AdaptyUI.ViewConfiguration.Column(from: decoder), propertyOrNil())
+            self = try .column(AdaptyUICore.ViewConfiguration.Column(from: decoder), propertyOrNil())
         case .section:
-            self = try .section(AdaptyUI.ViewConfiguration.Section(from: decoder), propertyOrNil())
+            self = try .section(AdaptyUICore.ViewConfiguration.Section(from: decoder), propertyOrNil())
         case .toggle:
-            self = try .toggle(AdaptyUI.ViewConfiguration.Toggle(from: decoder), propertyOrNil())
+            self = try .toggle(AdaptyUICore.ViewConfiguration.Toggle(from: decoder), propertyOrNil())
         case .timer:
-            self = try .timer(AdaptyUI.ViewConfiguration.Timer(from: decoder), propertyOrNil())
+            self = try .timer(AdaptyUICore.ViewConfiguration.Timer(from: decoder), propertyOrNil())
         case .pager:
-            self = try .pager(AdaptyUI.ViewConfiguration.Pager(from: decoder), propertyOrNil())
+            self = try .pager(AdaptyUICore.ViewConfiguration.Pager(from: decoder), propertyOrNil())
         }
 
         func propertyOrNil() -> Properties? {
@@ -229,7 +229,7 @@ extension AdaptyUI.ViewConfiguration.Element: Decodable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
+extension AdaptyUICore.ViewConfiguration.Element.Properties: Decodable {
     enum CodingKeys: String, CodingKey {
         case elementId = "element_id"
         case decorator
@@ -241,20 +241,20 @@ extension AdaptyUI.ViewConfiguration.Element.Properties: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let transitionIn: [AdaptyUI.Transition] =
-            if let array = try? container.decodeIfPresent([AdaptyUI.Transition].self, forKey: .transitionIn) {
+        let transitionIn: [AdaptyUICore.Transition] =
+            if let array = try? container.decodeIfPresent([AdaptyUICore.Transition].self, forKey: .transitionIn) {
                 array
-            } else if let transition = try container.decodeIfPresent(AdaptyUI.Transition.self, forKey: .transitionIn) {
+            } else if let transition = try container.decodeIfPresent(AdaptyUICore.Transition.self, forKey: .transitionIn) {
                 [transition]
             } else {
                 []
             }
         try self.init(
             elementId: container.decodeIfPresent(String.self, forKey: .elementId),
-            decorator: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Decorator.self, forKey: .decorator),
-            padding: container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? AdaptyUI.Element.Properties.defaultPadding,
-            offset: container.decodeIfPresent(AdaptyUI.Offset.self, forKey: .offset) ?? AdaptyUI.Element.Properties.defaultOffset,
-            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? AdaptyUI.Element.Properties.defaultVisibility,
+            decorator: container.decodeIfPresent(AdaptyUICore.ViewConfiguration.Decorator.self, forKey: .decorator),
+            padding: container.decodeIfPresent(AdaptyUICore.EdgeInsets.self, forKey: .padding) ?? AdaptyUICore.Element.Properties.defaultPadding,
+            offset: container.decodeIfPresent(AdaptyUICore.Offset.self, forKey: .offset) ?? AdaptyUICore.Element.Properties.defaultOffset,
+            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? AdaptyUICore.Element.Properties.defaultVisibility,
             transitionIn: transitionIn
         )
     }

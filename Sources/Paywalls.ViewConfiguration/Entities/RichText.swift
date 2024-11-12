@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct RichText: Sendable, Hashable {
         static let empty = RichText(items: [], fallback: nil)
 
@@ -19,11 +19,11 @@ extension AdaptyUI {
         package enum Item: Sendable {
             case text(String, TextAttributes)
             case tag(String, TextAttributes)
-            case image(AdaptyUI.Mode<AdaptyUI.ImageData>?, TextAttributes)
+            case image(AdaptyUICore.Mode<AdaptyUICore.ImageData>?, TextAttributes)
         }
 
         package struct TextAttributes: Sendable, Hashable {
-            package let font: AdaptyUI.Font
+            package let font: AdaptyUICore.Font
             package let size: Double
             package let txtColor: Mode<Filling>
             package let imgTintColor: Mode<Filling>?
@@ -34,7 +34,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.RichText.Item: Hashable {
+extension AdaptyUICore.RichText.Item: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .text(value, attr):
@@ -54,10 +54,10 @@ extension AdaptyUI.RichText.Item: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.RichText {
+    package extension AdaptyUICore.RichText {
         static func create(
-            items: [AdaptyUI.RichText.Item],
-            fallback: [AdaptyUI.RichText.Item]? = nil
+            items: [AdaptyUICore.RichText.Item],
+            fallback: [AdaptyUICore.RichText.Item]? = nil
         ) -> Self {
             .init(
                 items: items,
@@ -66,13 +66,13 @@ extension AdaptyUI.RichText.Item: Hashable {
         }
     }
 
-    package extension AdaptyUI.RichText.TextAttributes {
+    package extension AdaptyUICore.RichText.TextAttributes {
         static func create(
-            font: AdaptyUI.Font,
+            font: AdaptyUICore.Font,
             size: Double? = nil,
-            txtColor: AdaptyUI.Mode<AdaptyUI.Filling>? = nil,
-            imgTintColor: AdaptyUI.Mode<AdaptyUI.Filling>? = nil,
-            background: AdaptyUI.Mode<AdaptyUI.Filling>? = nil,
+            txtColor: AdaptyUICore.Mode<AdaptyUICore.Filling>? = nil,
+            imgTintColor: AdaptyUICore.Mode<AdaptyUICore.Filling>? = nil,
+            background: AdaptyUICore.Mode<AdaptyUICore.Filling>? = nil,
             strike: Bool = false,
             underline: Bool = false
         ) -> Self {

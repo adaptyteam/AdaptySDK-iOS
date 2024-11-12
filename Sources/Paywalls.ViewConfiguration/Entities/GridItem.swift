@@ -8,26 +8,26 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct GridItem: Sendable, Hashable {
         static let defaultHorizontalAlignment: HorizontalAlignment = .center
         static let defaultVerticalAlignment: VerticalAlignment = .center
 
         package let length: Length
-        package let horizontalAlignment: AdaptyUI.HorizontalAlignment
-        package let verticalAlignment: AdaptyUI.VerticalAlignment
-        package let content: AdaptyUI.Element
+        package let horizontalAlignment: AdaptyUICore.HorizontalAlignment
+        package let verticalAlignment: AdaptyUICore.VerticalAlignment
+        package let content: AdaptyUICore.Element
     }
 }
 
-extension AdaptyUI.GridItem {
+extension AdaptyUICore.GridItem {
     package enum Length: Sendable {
-        case fixed(AdaptyUI.Unit)
+        case fixed(AdaptyUICore.Unit)
         case weight(Int)
     }
 }
 
-extension AdaptyUI.GridItem.Length: Hashable {
+extension AdaptyUICore.GridItem.Length: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fixed(value):
@@ -41,12 +41,12 @@ extension AdaptyUI.GridItem.Length: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.GridItem {
+    package extension AdaptyUICore.GridItem {
         static func create(
             length: Length,
-            horizontalAlignment: AdaptyUI.HorizontalAlignment = defaultHorizontalAlignment,
-            verticalAlignment: AdaptyUI.VerticalAlignment = defaultVerticalAlignment,
-            content: AdaptyUI.Element
+            horizontalAlignment: AdaptyUICore.HorizontalAlignment = defaultHorizontalAlignment,
+            verticalAlignment: AdaptyUICore.VerticalAlignment = defaultVerticalAlignment,
+            content: AdaptyUICore.Element
         ) -> Self {
             .init(
                 length: length,

@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     func extractImageUrls(_ locale: AdaptyLocale) -> Set<URL> {
         let assets: [String: Asset] =
             if let localAssets = getLocalization(locale)?.assets {

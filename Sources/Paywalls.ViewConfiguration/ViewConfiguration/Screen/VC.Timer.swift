@@ -7,13 +7,13 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Timer: Sendable, Hashable {
         let id: String
-        let state: AdaptyUI.Timer.State
+        let state: AdaptyUICore.Timer.State
         let format: [Item]
-        let actions: [AdaptyUI.ViewConfiguration.Action]
-        let horizontalAlign: AdaptyUI.HorizontalAlignment
+        let actions: [AdaptyUICore.ViewConfiguration.Action]
+        let horizontalAlign: AdaptyUICore.HorizontalAlignment
         let defaultTextAttributes: TextAttributes?
 
         struct Item: Sendable, Hashable {
@@ -23,8 +23,8 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func timer(_ from: AdaptyUI.ViewConfiguration.Timer) throws -> AdaptyUI.Timer {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func timer(_ from: AdaptyUICore.ViewConfiguration.Timer) throws -> AdaptyUICore.Timer {
         try .init(
             id: from.id,
             state: from.state,
@@ -34,7 +34,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
                     defaultTextAttributes: from.defaultTextAttributes
                 ) else { return nil }
 
-                return AdaptyUI.Timer.Item(
+                return AdaptyUICore.Timer.Item(
                     from: $0.from,
                     value: value
                 )
@@ -45,7 +45,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Timer: Decodable {
+extension AdaptyUICore.ViewConfiguration.Timer: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case duration
@@ -75,9 +75,9 @@ extension AdaptyUI.ViewConfiguration.Timer: Decodable {
         state =
             switch behaviour {
             case BehaviourType.endAtUTC.rawValue:
-                try .endedAt(container.decode(AdaptyUI.ViewConfiguration.DateString.self, forKey: .endTime).utc)
+                try .endedAt(container.decode(AdaptyUICore.ViewConfiguration.DateString.self, forKey: .endTime).utc)
             case BehaviourType.endAtLocalTime.rawValue:
-                try .endedAt(container.decode(AdaptyUI.ViewConfiguration.DateString.self, forKey: .endTime).local)
+                try .endedAt(container.decode(AdaptyUICore.ViewConfiguration.DateString.self, forKey: .endTime).local)
             case .none:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .default)
             case BehaviourType.everyAppear.rawValue:
@@ -100,19 +100,19 @@ extension AdaptyUI.ViewConfiguration.Timer: Decodable {
             }
 
         actions =
-            if let action = try? container.decodeIfPresent(AdaptyUI.ViewConfiguration.Action.self, forKey: .actions) {
+            if let action = try? container.decodeIfPresent(AdaptyUICore.ViewConfiguration.Action.self, forKey: .actions) {
                 [action]
             } else {
-                try container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .actions) ?? []
+                try container.decodeIfPresent([AdaptyUICore.ViewConfiguration.Action].self, forKey: .actions) ?? []
             }
 
-        horizontalAlign = try container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
-        let textAttributes = try AdaptyUI.ViewConfiguration.TextAttributes(from: decoder)
+        horizontalAlign = try container.decodeIfPresent(AdaptyUICore.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
+        let textAttributes = try AdaptyUICore.ViewConfiguration.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes
     }
 }
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct DateString: Decodable {
         let utc: Date
         let local: Date
@@ -154,7 +154,7 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Timer.Item: Decodable {
+extension AdaptyUICore.ViewConfiguration.Timer.Item: Decodable {
     enum CodingKeys: String, CodingKey {
         case from
         case stringId = "string_id"

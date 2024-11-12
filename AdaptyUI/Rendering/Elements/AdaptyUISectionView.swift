@@ -14,9 +14,9 @@ import SwiftUI
 struct AdaptyUISectionView: View {
     @EnvironmentObject var viewModel: AdaptySectionsViewModel
     
-    var section: AdaptyUI.Section
+    var section: AdaptyUICore.Section
 
-    init(_ section: AdaptyUI.Section) {
+    init(_ section: AdaptyUICore.Section) {
         self.section = section
     }
 

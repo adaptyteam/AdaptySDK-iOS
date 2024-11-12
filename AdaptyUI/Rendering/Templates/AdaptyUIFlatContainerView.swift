@@ -18,11 +18,11 @@ struct AdaptyUIFlatContainerView: View {
     @State
     private var drawFooterBackground = false
 
-    var screen: AdaptyUI.Screen
+    var screen: AdaptyUICore.Screen
 
     @ViewBuilder
     private func footerView(
-        _ element: AdaptyUI.Element,
+        _ element: AdaptyUICore.Element,
         globalProxy: GeometryProxy
     ) -> some View {
         if footerSize.height >= globalProxy.size.height {

@@ -8,14 +8,14 @@
 
 import Foundation
 
-extension AdaptyUI.Text {
+extension AdaptyUICore.Text {
     package enum OverflowMode: String {
         case scale
         case unknown
     }
 }
 
-extension AdaptyUI.Text.OverflowMode: Decodable {
+extension AdaptyUICore.Text.OverflowMode: Decodable {
     package init(from decoder: Decoder) throws {
         self =
             switch try decoder.singleValueContainer().decode(String.self) {

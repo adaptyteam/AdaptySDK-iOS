@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum Unit: Sendable {
         case point(Double)
         case screen(Double)
@@ -15,7 +15,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Unit: Hashable {
+extension AdaptyUICore.Unit: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .point(value):
@@ -45,9 +45,9 @@ extension AdaptyUI.Unit: Hashable {
     }
 }
 
-extension AdaptyUI.Unit.SafeArea: Decodable {}
+extension AdaptyUICore.Unit.SafeArea: Decodable {}
 
-extension AdaptyUI.Unit: Decodable {
+extension AdaptyUICore.Unit: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
         case unit

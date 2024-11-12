@@ -7,6 +7,11 @@
 
 import Adapty
 
+/// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
+/// To make full use of this functionality, you need to install an additional library, as well as make additional setups in the Adapty Dashboard.
+/// You can find more information in the corresponding section of [our documentation](https://adapty.io/docs/3.0/adapty-paywall-builder).
+public enum AdaptyUI {}
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     struct Configuration: Sendable {
@@ -221,7 +226,7 @@ public extension AdaptyUI {
     static func getViewConfiguration(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = 5.0
-    ) async throws -> AdaptyUI.LocalizedViewConfiguration {
+    ) async throws -> AdaptyUICore.LocalizedViewConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
@@ -245,7 +250,7 @@ public extension AdaptyUI {
     static func paywallController(
         for paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]? = nil,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
+        viewConfiguration: AdaptyUICore.LocalizedViewConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
@@ -288,7 +293,7 @@ public extension AdaptyUI {
     static func paywallConfiguration(
         for paywall: AdaptyPaywall,
         products: [AdaptyPaywallProduct]? = nil,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
+        viewConfiguration: AdaptyUICore.LocalizedViewConfiguration,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil

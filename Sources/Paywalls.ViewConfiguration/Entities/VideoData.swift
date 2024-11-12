@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum VideoData: Sendable {
         case url(URL, image: ImageData)
         case resources(String, image: ImageData)
@@ -22,7 +22,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.VideoData: Hashable {
+extension AdaptyUICore.VideoData: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .url(url, img):
@@ -35,7 +35,7 @@ extension AdaptyUI.VideoData: Hashable {
     }
 }
 
-extension AdaptyUI.VideoData: Decodable {
+extension AdaptyUICore.VideoData: Decodable {
     static let assetType = "video"
 
     private enum CodingKeys: String, CodingKey {
@@ -48,7 +48,7 @@ extension AdaptyUI.VideoData: Decodable {
 
         self = try .url(
             container.decode(URL.self, forKey: .url),
-            image: container.decode(AdaptyUI.ImageData.self, forKey: .image)
+            image: container.decode(AdaptyUICore.ImageData.self, forKey: .image)
         )
     }
 }

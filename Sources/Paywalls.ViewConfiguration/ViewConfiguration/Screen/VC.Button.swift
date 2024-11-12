@@ -8,17 +8,17 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Button: Sendable, Hashable {
-        let actions: [AdaptyUI.ViewConfiguration.Action]
-        let normalState: AdaptyUI.ViewConfiguration.Element
-        let selectedState: AdaptyUI.ViewConfiguration.Element?
-        let selectedCondition: AdaptyUI.StateCondition?
+        let actions: [AdaptyUICore.ViewConfiguration.Action]
+        let normalState: AdaptyUICore.ViewConfiguration.Element
+        let selectedState: AdaptyUICore.ViewConfiguration.Element?
+        let selectedCondition: AdaptyUICore.StateCondition?
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func button(_ from: AdaptyUI.ViewConfiguration.Button) throws -> AdaptyUI.Button {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func button(_ from: AdaptyUICore.ViewConfiguration.Button) throws -> AdaptyUICore.Button {
         try .init(
             actions: from.actions.map(action),
             normalState: element(from.normalState),
@@ -27,13 +27,13 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 
-    func buttonAction(_ from: AdaptyUI.ActionAction) throws -> AdaptyUI.ActionAction {
+    func buttonAction(_ from: AdaptyUICore.ActionAction) throws -> AdaptyUICore.ActionAction {
         guard case let .openUrl(stringId) = from else { return from }
         return .openUrl(urlIfPresent(stringId))
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Button: Decodable {
+extension AdaptyUICore.ViewConfiguration.Button: Decodable {
     enum CodingKeys: String, CodingKey {
         case actions = "action"
         case normalState = "normal"
@@ -44,16 +44,16 @@ extension AdaptyUI.ViewConfiguration.Button: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let actions =
-            if let action = try? container.decode(AdaptyUI.ViewConfiguration.Action.self, forKey: .actions) {
+            if let action = try? container.decode(AdaptyUICore.ViewConfiguration.Action.self, forKey: .actions) {
                 [action]
             } else {
-                try container.decode([AdaptyUI.ViewConfiguration.Action].self, forKey: .actions)
+                try container.decode([AdaptyUICore.ViewConfiguration.Action].self, forKey: .actions)
             }
         try self.init(
             actions: actions,
-            normalState: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .normalState),
-            selectedState: container.decodeIfPresent(AdaptyUI.ViewConfiguration.Element.self, forKey: .selectedState),
-            selectedCondition: container.decodeIfPresent(AdaptyUI.StateCondition.self, forKey: .selectedCondition)
+            normalState: container.decode(AdaptyUICore.ViewConfiguration.Element.self, forKey: .normalState),
+            selectedState: container.decodeIfPresent(AdaptyUICore.ViewConfiguration.Element.self, forKey: .selectedState),
+            selectedCondition: container.decodeIfPresent(AdaptyUICore.StateCondition.self, forKey: .selectedCondition)
         )
     }
 }

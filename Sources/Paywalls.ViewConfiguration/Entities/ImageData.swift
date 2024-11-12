@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum ImageData: Sendable {
         case raster(Data)
         case url(URL, previewRaster: Data?)
@@ -15,7 +15,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.ImageData: Hashable {
+extension AdaptyUICore.ImageData: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .raster(value):
@@ -32,7 +32,7 @@ extension AdaptyUI.ImageData: Hashable {
     }
 }
 
-extension AdaptyUI.ImageData: Decodable {
+extension AdaptyUICore.ImageData: Decodable {
     static let assetType = "image"
 
     private enum CodingKeys: String, CodingKey {

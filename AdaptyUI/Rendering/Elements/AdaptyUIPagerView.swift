@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.VerticalAlignment {
+extension AdaptyUICore.VerticalAlignment {
     var swiftUIAlignment: Alignment {
         switch self {
         case .top: .top
@@ -23,7 +23,7 @@ extension AdaptyUI.VerticalAlignment {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.Pager.Length {
+extension AdaptyUICore.Pager.Length {
     func valueWith(parent: Double, screenSize: Double, safeAreaStart: Double, safeAreaEnd: Double) -> CGFloat {
         switch self {
         case let .fixed(unit): unit.points(screenSize: screenSize, safeAreaStart: safeAreaStart, safeAreaEnd: safeAreaEnd)
@@ -33,7 +33,7 @@ extension AdaptyUI.Pager.Length {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.TransitionSlide {
+extension AdaptyUICore.TransitionSlide {
     var swiftUIAnimation: Animation {
         switch interpolator {
         case .easeInOut: .easeInOut(duration: duration)
@@ -75,14 +75,14 @@ struct AdaptyUIPagerView: View {
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
 
-    var pager: AdaptyUI.Pager
+    var pager: AdaptyUICore.Pager
 
     @State private var currentPage: Int = 0
     @State private var offset = CGFloat.zero
     @State private var isInteracting = false
     @State private var timer: Timer?
 
-    init(_ pager: AdaptyUI.Pager) {
+    init(_ pager: AdaptyUICore.Pager) {
         self.pager = pager
     }
 
@@ -239,7 +239,7 @@ struct AdaptyUIPagerView: View {
     }
 
     @ViewBuilder
-    private func pageControlView(_ pageControl: AdaptyUI.Pager.PageControl, onDotTap: @escaping (Int) -> Void) -> some View {
+    private func pageControlView(_ pageControl: AdaptyUICore.Pager.PageControl, onDotTap: @escaping (Int) -> Void) -> some View {
         HStack(spacing: pageControl.spacing) {
             ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Button: Sendable, Hashable {
         package let actions: [ActionAction]
         package let normalState: Element
@@ -17,12 +17,12 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Button {
+    package extension AdaptyUICore.Button {
         static func create(
-            actions: [AdaptyUI.ActionAction],
-            normalState: AdaptyUI.Element,
-            selectedState: AdaptyUI.Element? = nil,
-            selectedCondition: AdaptyUI.StateCondition? = nil
+            actions: [AdaptyUICore.ActionAction],
+            normalState: AdaptyUICore.Element,
+            selectedState: AdaptyUICore.Element? = nil,
+            selectedCondition: AdaptyUICore.StateCondition? = nil
         ) -> Self {
             .init(
                 actions: actions,

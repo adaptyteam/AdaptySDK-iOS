@@ -17,14 +17,14 @@ package final class AdaptyPaywallViewModel: ObservableObject {
     let eventsHandler: AdaptyEventsHandler
 
     @Published var paywall: AdaptyPaywallInterface
-    @Published var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+    @Published var viewConfiguration: AdaptyUICore.LocalizedViewConfiguration
 
-    var onViewConfigurationUpdate: ((AdaptyUI.LocalizedViewConfiguration) -> Void)?
+    var onViewConfigurationUpdate: ((AdaptyUICore.LocalizedViewConfiguration) -> Void)?
 
     package init(
         eventsHandler: AdaptyEventsHandler,
         paywall: AdaptyPaywallInterface,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+        viewConfiguration: AdaptyUICore.LocalizedViewConfiguration
     ) {
         self.logId = eventsHandler.logId
         self.eventsHandler = eventsHandler

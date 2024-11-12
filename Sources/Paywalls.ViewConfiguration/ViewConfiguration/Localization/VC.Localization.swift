@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Localization: Sendable, Hashable {
         let id: AdaptyLocale
         let isRightToLeft: Bool?
@@ -21,7 +21,7 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localization: Decodable {
+extension AdaptyUICore.ViewConfiguration.Localization: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case strings
@@ -40,7 +40,7 @@ extension AdaptyUI.ViewConfiguration.Localization: Decodable {
         id = try container.decode(AdaptyLocale.self, forKey: .id)
         isRightToLeft = try container.decodeIfPresent(Bool.self, forKey: .isRightToLeft)
 
-        assets = try (container.decodeIfPresent(AdaptyUI.ViewConfiguration.AssetsContainer.self, forKey: .assets))?.value
+        assets = try (container.decodeIfPresent(AdaptyUICore.ViewConfiguration.AssetsContainer.self, forKey: .assets))?.value
 
         var stringsContainer = try container.nestedUnkeyedContainer(forKey: .strings)
         var strings = [String: Item]()
@@ -50,8 +50,8 @@ extension AdaptyUI.ViewConfiguration.Localization: Decodable {
         while !stringsContainer.isAtEnd {
             let item = try stringsContainer.nestedContainer(keyedBy: ItemCodingKeys.self)
             try strings[item.decode(String.self, forKey: .id)] = try Item(
-                value: item.decode(AdaptyUI.ViewConfiguration.RichText.self, forKey: .value),
-                fallback: item.decodeIfPresent(AdaptyUI.ViewConfiguration.RichText.self, forKey: .fallback)
+                value: item.decode(AdaptyUICore.ViewConfiguration.RichText.self, forKey: .value),
+                fallback: item.decodeIfPresent(AdaptyUICore.ViewConfiguration.RichText.self, forKey: .fallback)
             )
         }
         self.strings = strings.isEmpty ? nil : strings

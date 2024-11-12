@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUI {
+package extension AdaptyUICore {
     struct Color: Sendable, Hashable {
         static let transparent = Color(data: 0x00000000)
         static let white = Color(data: 0xFFFFFFFF)
@@ -24,14 +24,14 @@ package extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Color {
+    package extension AdaptyUICore.Color {
         static func create(data: UInt64) -> Self {
             .init(data: data)
         }
     }
 #endif
 
-extension AdaptyUI.Color: Decodable {
+extension AdaptyUICore.Color: Decodable {
     static let assetType = "color"
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()

@@ -8,7 +8,7 @@
 
 import Foundation
 
-package extension AdaptyUI {
+package extension AdaptyUICore {
     enum Mode<T>: Sendable, Hashable where T: Sendable, T: Hashable {
         case same(T)
         case different(light: T, dark: T)

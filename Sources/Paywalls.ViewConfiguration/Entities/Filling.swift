@@ -7,24 +7,24 @@
 
 import Foundation
 
-package extension AdaptyUI {
+package extension AdaptyUICore {
     enum Filling: Sendable {
         static let `default` = Filling.solidColor(Color.black)
 
-        case solidColor(AdaptyUI.Color)
-        case colorGradient(AdaptyUI.ColorGradient)
+        case solidColor(AdaptyUICore.Color)
+        case colorGradient(AdaptyUICore.ColorGradient)
 
-        package var asSolidColor: AdaptyUI.Color? {
+        package var asSolidColor: AdaptyUICore.Color? {
             switch self {
             case let .solidColor(value): value
             default: nil
             }
         }
 
-        package var asColorGradient: AdaptyUI.ColorGradient {
+        package var asColorGradient: AdaptyUICore.ColorGradient {
             switch self {
             case let .solidColor(value):
-                AdaptyUI.ColorGradient(
+                AdaptyUICore.ColorGradient(
                     kind: .linear,
                     start: .zero,
                     end: .one,
@@ -37,7 +37,7 @@ package extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Filling: Hashable {
+extension AdaptyUICore.Filling: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .solidColor(value):
@@ -50,7 +50,7 @@ extension AdaptyUI.Filling: Hashable {
     }
 }
 
-package extension AdaptyUI.Mode<AdaptyUI.Filling> {
+package extension AdaptyUICore.Mode<AdaptyUICore.Filling> {
     var hasColorGradient: Bool {
         switch self {
         case .same(.solidColor), .different(light: .solidColor, dark: .solidColor):
@@ -60,7 +60,7 @@ package extension AdaptyUI.Mode<AdaptyUI.Filling> {
         }
     }
 
-    var asSolidColor: AdaptyUI.Mode<AdaptyUI.Color>? {
+    var asSolidColor: AdaptyUICore.Mode<AdaptyUICore.Color>? {
         switch self {
         case let .same(.solidColor(value)):
             .same(value)
@@ -71,7 +71,7 @@ package extension AdaptyUI.Mode<AdaptyUI.Filling> {
         }
     }
 
-    var asColorGradient: AdaptyUI.Mode<AdaptyUI.ColorGradient> {
+    var asColorGradient: AdaptyUICore.Mode<AdaptyUICore.ColorGradient> {
         switch self {
         case let .same(value):
             .same(value.asColorGradient)
@@ -81,9 +81,9 @@ package extension AdaptyUI.Mode<AdaptyUI.Filling> {
     }
 }
 
-extension AdaptyUI.Filling: Decodable {
+extension AdaptyUICore.Filling: Decodable {
     static func assetType(_ type: String) -> Bool {
-        type == AdaptyUI.Color.assetType || AdaptyUI.ColorGradient.assetType(type)
+        type == AdaptyUICore.Color.assetType || AdaptyUICore.ColorGradient.assetType(type)
     }
 
     package init(from decoder: Decoder) throws {
@@ -95,10 +95,10 @@ extension AdaptyUI.Filling: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         switch try container.decode(String.self, forKey: .type) {
-        case AdaptyUI.Color.assetType:
-            self = try .solidColor(container.decode(AdaptyUI.Color.self, forKey: .value))
-        case let type where AdaptyUI.ColorGradient.assetType(type):
-            self = try .colorGradient(AdaptyUI.ColorGradient(from: decoder))
+        case AdaptyUICore.Color.assetType:
+            self = try .solidColor(container.decode(AdaptyUICore.Color.self, forKey: .value))
+        case let type where AdaptyUICore.ColorGradient.assetType(type):
+            self = try .colorGradient(AdaptyUICore.ColorGradient(from: decoder))
         default:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.type], debugDescription: "unknown color assset type"))
         }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Screen: Sendable, Hashable  {
         let backgroundAssetId: String?
         let cover: Box?
@@ -19,10 +19,10 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func screen(_ from: AdaptyUI.ViewConfiguration.Screen) throws -> AdaptyUI.Screen {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func screen(_ from: AdaptyUICore.ViewConfiguration.Screen) throws -> AdaptyUICore.Screen {
         try .init(
-            background: from.backgroundAssetId.flatMap { try? background($0) } ?? AdaptyUI.Screen.defaultBackground,
+            background: from.backgroundAssetId.flatMap { try? background($0) } ?? AdaptyUICore.Screen.defaultBackground,
             cover: from.cover.map(box),
             content: element(from.content),
             footer: from.footer.map(element),
@@ -31,14 +31,14 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 
-    func bottomSheet(_ from: AdaptyUI.ViewConfiguration.Screen) throws -> AdaptyUI.BottomSheet {
+    func bottomSheet(_ from: AdaptyUICore.ViewConfiguration.Screen) throws -> AdaptyUICore.BottomSheet {
         try .init(
             content: element(from.content)
         )
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Screen: Decodable {
+extension AdaptyUICore.ViewConfiguration.Screen: Decodable {
     enum CodingKeys: String, CodingKey {
         case backgroundAssetId = "background"
         case cover

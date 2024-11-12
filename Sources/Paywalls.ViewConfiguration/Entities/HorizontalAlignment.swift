@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum HorizontalAlignment: String {
         case leading
         case trailing
@@ -18,4 +18,4 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.HorizontalAlignment: Decodable {}
+extension AdaptyUICore.HorizontalAlignment: Decodable {}

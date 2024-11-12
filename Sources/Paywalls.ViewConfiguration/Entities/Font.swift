@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Font: Sendable, Hashable {
         package static let `default` = Font(
             alias: "adapty_system",
@@ -28,14 +28,14 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Font {
+    package extension AdaptyUICore.Font {
         static func create(
             alias: String = `default`.alias,
             familyName: String = `default`.familyName,
             weight: Int = `default`.weight,
             italic: Bool = `default`.italic,
             defaultSize: Double = `default`.defaultSize,
-            defaultColor: AdaptyUI.Filling = `default`.defaultColor
+            defaultColor: AdaptyUICore.Filling = `default`.defaultColor
         ) -> Self {
             .init(
                 alias: alias,
@@ -49,7 +49,7 @@ extension AdaptyUI {
     }
 #endif
 
-extension AdaptyUI.Font: Decodable {
+extension AdaptyUICore.Font: Decodable {
     static let assetType = "font"
     
     enum CodingKeys: String, CodingKey {
@@ -71,13 +71,13 @@ extension AdaptyUI.Font: Decodable {
         if let v = (try? container.decode([String].self, forKey: .familyName))?.first {
             familyName = v
         } else {
-            familyName = try container.decodeIfPresent(String.self, forKey: .familyName) ?? AdaptyUI.Font.default.familyName
+            familyName = try container.decodeIfPresent(String.self, forKey: .familyName) ?? AdaptyUICore.Font.default.familyName
         }
-        weight = try container.decodeIfPresent(Int.self, forKey: .weight) ?? AdaptyUI.Font.default.weight
-        italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? AdaptyUI.Font.default.italic
+        weight = try container.decodeIfPresent(Int.self, forKey: .weight) ?? AdaptyUICore.Font.default.weight
+        italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? AdaptyUICore.Font.default.italic
 
-        defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? AdaptyUI.Font.default.defaultSize
+        defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? AdaptyUICore.Font.default.defaultSize
 
-        defaultColor = try container.decodeIfPresent(AdaptyUI.Color.self, forKey: .defaultColor).map { .solidColor($0) } ?? AdaptyUI.Font.default.defaultColor
+        defaultColor = try container.decodeIfPresent(AdaptyUICore.Color.self, forKey: .defaultColor).map { .solidColor($0) } ?? AdaptyUICore.Font.default.defaultColor
     }
 }

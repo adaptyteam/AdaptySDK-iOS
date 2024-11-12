@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum VerticalAlignment: String {
         case top
         case center
@@ -16,4 +16,4 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.VerticalAlignment: Decodable {}
+extension AdaptyUICore.VerticalAlignment: Decodable {}

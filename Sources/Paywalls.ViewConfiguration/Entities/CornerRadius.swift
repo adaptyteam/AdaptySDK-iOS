@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct CornerRadius: Sendable, Hashable {
         static let defaultValue: Double = 0.0
         package let topLeading: Double
@@ -25,7 +25,7 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.CornerRadius {
+    package extension AdaptyUICore.CornerRadius {
         static func create(
             same: Double = defaultValue
         ) -> Self {
@@ -48,8 +48,8 @@ extension AdaptyUI {
     }
 #endif
 
-extension AdaptyUI.CornerRadius {
-    package static let zero = AdaptyUI.CornerRadius(same: 0.0)
+extension AdaptyUICore.CornerRadius {
+    package static let zero = AdaptyUICore.CornerRadius(same: 0.0)
     package init(same value: Double) {
         self.init(topLeading: value, topTrailing: value, bottomTrailing: value, bottomLeading: value)
     }
@@ -63,7 +63,7 @@ extension AdaptyUI.CornerRadius {
     }
 }
 
-extension AdaptyUI.CornerRadius: Decodable {
+extension AdaptyUICore.CornerRadius: Decodable {
     enum CodingKeys: String, CodingKey {
         case topLeading = "top_leading"
         case topTrailing = "top_trailing"
@@ -73,7 +73,7 @@ extension AdaptyUI.CornerRadius: Decodable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let defaultValue = AdaptyUI.CornerRadius.defaultValue
+        let defaultValue = AdaptyUICore.CornerRadius.defaultValue
 
         if let value = try? container.decode(Double.self) {
             self.init(same: value)

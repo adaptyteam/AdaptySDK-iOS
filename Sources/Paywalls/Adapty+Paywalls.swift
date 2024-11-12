@@ -47,7 +47,7 @@ extension Adapty {
                 fetchPolicy,
                 loadTimeout
             )
-            AdaptyUI.sendImageUrlsToObserver(paywall)
+            AdaptyUICore.sendImageUrlsToObserver(paywall)
 
             return paywall
         }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct LazyLocalisedProductText: Sendable, Hashable {
         package let adaptyProductId: String
         private let suffix: String?
@@ -80,16 +80,16 @@ extension AdaptyUI {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Localizer {
+private extension AdaptyUICore.ViewConfiguration.Localizer {
     func richText(
         adaptyProductId: String,
         byPaymentMode mode: AdaptySubscriptionOffer.PaymentMode = .unknown,
         suffix: String?,
-        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?
-    ) -> AdaptyUI.RichText {
+        defaultTextAttributes: AdaptyUICore.ViewConfiguration.TextAttributes?
+    ) -> AdaptyUICore.RichText {
         if
             let value = richText(
-                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
+                stringId: AdaptyUICore.ViewConfiguration.StringId.Product.calculate(
                     adaptyProductId: adaptyProductId,
                     byPaymentMode: mode,
                     suffix: suffix
@@ -100,7 +100,7 @@ private extension AdaptyUI.ViewConfiguration.Localizer {
         } else if
             mode != .unknown,
             let value = richText(
-                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
+                stringId: AdaptyUICore.ViewConfiguration.StringId.Product.calculate(
                     adaptyProductId: adaptyProductId,
                     byPaymentMode: .unknown,
                     suffix: suffix
@@ -110,7 +110,7 @@ private extension AdaptyUI.ViewConfiguration.Localizer {
             value
         } else if
             let value = richText(
-                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
+                stringId: AdaptyUICore.ViewConfiguration.StringId.Product.calculate(
                     byPaymentMode: mode,
                     suffix: suffix
                 ),
@@ -120,7 +120,7 @@ private extension AdaptyUI.ViewConfiguration.Localizer {
         } else if
             mode != .unknown,
             let value = richText(
-                stringId: AdaptyUI.ViewConfiguration.StringId.Product.calculate(
+                stringId: AdaptyUICore.ViewConfiguration.StringId.Product.calculate(
                     byPaymentMode: .unknown,
                     suffix: suffix
                 ),

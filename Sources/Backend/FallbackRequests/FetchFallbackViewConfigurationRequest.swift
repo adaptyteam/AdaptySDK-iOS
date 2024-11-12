@@ -8,7 +8,7 @@
 import Foundation
 
 struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUI.ViewConfiguration>
+    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyUICore.ViewConfiguration>
 
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
@@ -17,7 +17,7 @@ struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     init(apiKeyPrefix: String, paywallInstanceIdentity: String, locale: AdaptyLocale, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(AdaptyUI.builderVersion)/\(locale.languageCode)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(AdaptyUICore.builderVersion)/\(locale.languageCode)/fallback.json"
         )
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
@@ -30,7 +30,7 @@ extension Backend.FallbackExecutor {
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
         disableServerCache: Bool
-    ) async throws -> AdaptyUI.ViewConfiguration {
+    ) async throws -> AdaptyUICore.ViewConfiguration {
         let request = FetchFallbackViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
@@ -45,8 +45,8 @@ extension Backend.FallbackExecutor {
                 logParams: [
                     "api_prefix": apiKeyPrefix,
                     "paywall_instance_id": paywallInstanceIdentity,
-                    "builder_version": AdaptyUI.builderVersion,
-                    "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                    "builder_version": AdaptyUICore.builderVersion,
+                    "builder_config_format_version": AdaptyUICore.configurationFormatVersion,
                     "language_code": locale.languageCode,
                     "disable_server_cache": disableServerCache,
                 ]

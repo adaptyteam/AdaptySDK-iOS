@@ -30,7 +30,7 @@ extension AdaptyUI {
         package init(
             logId: String,
             paywall: AdaptyPaywallInterface,
-            viewConfiguration: AdaptyUI.LocalizedViewConfiguration,
+            viewConfiguration: AdaptyUICore.LocalizedViewConfiguration,
             products: [AdaptyPaywallProduct]?,
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyTagResolver?,

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Pager: Sendable, Hashable {
         static let `default` = Pager(
             pageWidth: .default,
@@ -32,10 +32,10 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Pager {
+extension AdaptyUICore.Pager {
     package enum Length: Sendable {
         static let `default` = Length.parent(1)
-        case fixed(AdaptyUI.Unit)
+        case fixed(AdaptyUICore.Unit)
         case parent(Double)
     }
 
@@ -53,8 +53,8 @@ extension AdaptyUI.Pager {
             padding: .init(same: .point(6)),
             dotSize: 6,
             spacing: 6,
-            color: .same(AdaptyUI.Color.white),
-            selectedColor: .same(AdaptyUI.Color.lightGray)
+            color: .same(AdaptyUICore.Color.white),
+            selectedColor: .same(AdaptyUICore.Color.lightGray)
         )
 
         package enum Layout: String {
@@ -63,12 +63,12 @@ extension AdaptyUI.Pager {
         }
 
         package let layout: Layout
-        package let verticalAlignment: AdaptyUI.VerticalAlignment
-        package let padding: AdaptyUI.EdgeInsets
+        package let verticalAlignment: AdaptyUICore.VerticalAlignment
+        package let padding: AdaptyUICore.EdgeInsets
         package let dotSize: Double
         package let spacing: Double
-        package let color: AdaptyUI.Mode<AdaptyUI.Color>
-        package let selectedColor: AdaptyUI.Mode<AdaptyUI.Color>
+        package let color: AdaptyUICore.Mode<AdaptyUICore.Color>
+        package let selectedColor: AdaptyUICore.Mode<AdaptyUICore.Color>
     }
 
     package struct Animation: Sendable, Hashable {
@@ -76,13 +76,13 @@ extension AdaptyUI.Pager {
         static let defaultAfterInteractionDelay: TimeInterval = 3.0
 
         package let startDelay: TimeInterval
-        package let pageTransition: AdaptyUI.TransitionSlide
-        package let repeatTransition: AdaptyUI.TransitionSlide?
+        package let pageTransition: AdaptyUICore.TransitionSlide
+        package let repeatTransition: AdaptyUICore.TransitionSlide?
         package let afterInteractionDelay: TimeInterval
     }
 }
 
-extension AdaptyUI.Pager.Length: Hashable {
+extension AdaptyUICore.Pager.Length: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fixed(value):
@@ -96,13 +96,13 @@ extension AdaptyUI.Pager.Length: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Pager {
+    package extension AdaptyUICore.Pager {
         static func create(
             pageWidth: Length = `default`.pageWidth,
             pageHeight: Length = `default`.pageHeight,
-            pagePadding: AdaptyUI.EdgeInsets = `default`.pagePadding,
+            pagePadding: AdaptyUICore.EdgeInsets = `default`.pagePadding,
             spacing: Double = `default`.spacing,
-            content: [AdaptyUI.Element] = `default`.content,
+            content: [AdaptyUICore.Element] = `default`.content,
             pageControl: PageControl? = `default`.pageControl,
             animation: Animation? = `default`.animation,
             interactionBehaviour: InteractionBehaviour = `default`.interactionBehaviour
@@ -120,15 +120,15 @@ extension AdaptyUI.Pager.Length: Hashable {
         }
     }
 
-    package extension AdaptyUI.Pager.PageControl {
+    package extension AdaptyUICore.Pager.PageControl {
         static func create(
             layout: Layout = `default`.layout,
-            verticalAlignment: AdaptyUI.VerticalAlignment = `default`.verticalAlignment,
-            padding: AdaptyUI.EdgeInsets = `default`.padding,
+            verticalAlignment: AdaptyUICore.VerticalAlignment = `default`.verticalAlignment,
+            padding: AdaptyUICore.EdgeInsets = `default`.padding,
             dotSize: Double = `default`.dotSize,
             spacing: Double = `default`.spacing,
-            color: AdaptyUI.Mode<AdaptyUI.Color> = `default`.color,
-            selectedColor: AdaptyUI.Mode<AdaptyUI.Color> = `default`.selectedColor
+            color: AdaptyUICore.Mode<AdaptyUICore.Color> = `default`.color,
+            selectedColor: AdaptyUICore.Mode<AdaptyUICore.Color> = `default`.selectedColor
         ) -> Self {
             .init(
                 layout: layout,
@@ -142,11 +142,11 @@ extension AdaptyUI.Pager.Length: Hashable {
         }
     }
 
-    package extension AdaptyUI.Pager.Animation {
+    package extension AdaptyUICore.Pager.Animation {
         static func create(
             startDelay: TimeInterval = defaultStartDelay,
-            pageTransition: AdaptyUI.TransitionSlide = .create(),
-            repeatTransition: AdaptyUI.TransitionSlide? = nil,
+            pageTransition: AdaptyUICore.TransitionSlide = .create(),
+            repeatTransition: AdaptyUICore.TransitionSlide? = nil,
             afterInteractionDelay: TimeInterval = defaultAfterInteractionDelay
         ) -> Self {
             .init(
@@ -159,7 +159,7 @@ extension AdaptyUI.Pager.Length: Hashable {
     }
 #endif
 
-extension AdaptyUI.Pager.InteractionBehaviour: Decodable {
+extension AdaptyUICore.Pager.InteractionBehaviour: Decodable {
     package init(from decoder: Decoder) throws {
         self =
             switch try decoder.singleValueContainer().decode(String.self) {
@@ -171,9 +171,9 @@ extension AdaptyUI.Pager.InteractionBehaviour: Decodable {
     }
 }
 
-extension AdaptyUI.Pager.PageControl.Layout: Decodable {}
+extension AdaptyUICore.Pager.PageControl.Layout: Decodable {}
 
-extension AdaptyUI.Pager.Animation: Decodable {
+extension AdaptyUICore.Pager.Animation: Decodable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"
         case pageTransition = "page_transition"
@@ -184,9 +184,9 @@ extension AdaptyUI.Pager.Animation: Decodable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.Pager.Animation.defaultStartDelay
-        pageTransition = try container.decodeIfPresent(AdaptyUI.TransitionSlide.self, forKey: .pageTransition) ?? AdaptyUI.TransitionSlide.default
-        repeatTransition = try container.decodeIfPresent(AdaptyUI.TransitionSlide.self, forKey: .repeatTransition)
-        afterInteractionDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.Pager.Animation.defaultAfterInteractionDelay
+        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUICore.Pager.Animation.defaultStartDelay
+        pageTransition = try container.decodeIfPresent(AdaptyUICore.TransitionSlide.self, forKey: .pageTransition) ?? AdaptyUICore.TransitionSlide.default
+        repeatTransition = try container.decodeIfPresent(AdaptyUICore.TransitionSlide.self, forKey: .repeatTransition)
+        afterInteractionDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUICore.Pager.Animation.defaultAfterInteractionDelay
     }
 }

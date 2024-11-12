@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI.Color {
+extension AdaptyUICore.Color {
     package var asHexString: String { String(format: "#%08x", data) }
 
     package init(hex: String) throws {

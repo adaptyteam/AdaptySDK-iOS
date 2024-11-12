@@ -85,7 +85,7 @@ extension AdaptyUI {
             guard !initialized else { return }
 
             Log.prefetcher.verbose("initialize")
-            AdaptyUI.setImageUrlObserver(self)
+            AdaptyUICore.setImageUrlObserver(self)
         }
 
         nonisolated func extractedImageUrls(_ urls: Set<URL>) {

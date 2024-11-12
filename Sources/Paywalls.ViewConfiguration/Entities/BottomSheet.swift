@@ -7,16 +7,16 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct BottomSheet: Sendable, Hashable {
         package let content: Element
     }
 }
 
 #if DEBUG
-    package extension AdaptyUI.BottomSheet {
+    package extension AdaptyUICore.BottomSheet {
         static func create(
-            content: AdaptyUI.Element
+            content: AdaptyUICore.Element
         ) -> Self {
             .init(
                 content: content

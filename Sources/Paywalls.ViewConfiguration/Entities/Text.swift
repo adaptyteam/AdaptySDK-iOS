@@ -8,9 +8,9 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Text: Sendable, Hashable {
-        static let `default` = AdaptyUI.Text(
+        static let `default` = AdaptyUICore.Text(
             value: .text(.empty),
             horizontalAlign: .leading,
             maxRows: nil,
@@ -30,7 +30,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Text.Value: Hashable {
+extension AdaptyUICore.Text.Value: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .text(value):
@@ -47,12 +47,12 @@ extension AdaptyUI.Text.Value: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Text {
+    package extension AdaptyUICore.Text {
         static func create(
-            text: [AdaptyUI.RichText.Item],
-            horizontalAlign: AdaptyUI.HorizontalAlignment = `default`.horizontalAlign,
+            text: [AdaptyUICore.RichText.Item],
+            horizontalAlign: AdaptyUICore.HorizontalAlignment = `default`.horizontalAlign,
             maxRows: Int? = `default`.maxRows,
-            overflowMode: Set<AdaptyUI.Text.OverflowMode> = `default`.overflowMode
+            overflowMode: Set<AdaptyUICore.Text.OverflowMode> = `default`.overflowMode
         ) -> Self {
             .init(
                 value: .text(.create(items: text)),
@@ -63,10 +63,10 @@ extension AdaptyUI.Text.Value: Hashable {
         }
 
         static func create(
-            text: AdaptyUI.RichText,
-            horizontalAlign: AdaptyUI.HorizontalAlignment = `default`.horizontalAlign,
+            text: AdaptyUICore.RichText,
+            horizontalAlign: AdaptyUICore.HorizontalAlignment = `default`.horizontalAlign,
             maxRows: Int? = `default`.maxRows,
-            overflowMode: Set<AdaptyUI.Text.OverflowMode> = `default`.overflowMode
+            overflowMode: Set<AdaptyUICore.Text.OverflowMode> = `default`.overflowMode
         ) -> Self {
             .init(
                 value: .text(text),
@@ -77,10 +77,10 @@ extension AdaptyUI.Text.Value: Hashable {
         }
 
         static func create(
-            value: AdaptyUI.Text.Value,
-            horizontalAlign: AdaptyUI.HorizontalAlignment = `default`.horizontalAlign,
+            value: AdaptyUICore.Text.Value,
+            horizontalAlign: AdaptyUICore.HorizontalAlignment = `default`.horizontalAlign,
             maxRows: Int? = `default`.maxRows,
-            overflowMode: Set<AdaptyUI.Text.OverflowMode> = `default`.overflowMode
+            overflowMode: Set<AdaptyUICore.Text.OverflowMode> = `default`.overflowMode
         ) -> Self {
             .init(
                 value: value,

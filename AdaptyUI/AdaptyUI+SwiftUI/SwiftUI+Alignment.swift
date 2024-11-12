@@ -32,7 +32,7 @@ extension Alignment {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.HorizontalAlignment {
+extension AdaptyUICore.HorizontalAlignment {
     func swiftuiValue(with layoutDirection: LayoutDirection) -> SwiftUI.HorizontalAlignment {
         switch self {
         case .leading: SwiftUI.HorizontalAlignment.leading
@@ -56,7 +56,7 @@ extension AdaptyUI.HorizontalAlignment {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.VerticalAlignment {
+extension AdaptyUICore.VerticalAlignment {
     var swiftuiValue: SwiftUI.VerticalAlignment {
         switch self {
         case .top: .top
@@ -68,7 +68,7 @@ extension AdaptyUI.VerticalAlignment {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.Stack {
+extension AdaptyUICore.Stack {
     func swiftuiValue(with layoutDirection: LayoutDirection) -> Alignment {
         Alignment.from(
             horizontal: horizontalAlignment.swiftuiValue(with: layoutDirection),

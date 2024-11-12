@@ -55,7 +55,7 @@ package final class AdaptyTimerViewModel: ObservableObject {
         self.screensViewModel = screensViewModel
     }
 
-    private func initializeTimer(_ timer: AdaptyUI.Timer, at: Date) -> Date {
+    private func initializeTimer(_ timer: AdaptyUICore.Timer, at: Date) -> Date {
         switch timer.state {
         case let .endedAt(endAt):
             timers[timer.id] = endAt
@@ -97,7 +97,7 @@ package final class AdaptyTimerViewModel: ObservableObject {
     }
 
     func timeLeft(
-        for timer: AdaptyUI.Timer,
+        for timer: AdaptyUICore.Timer,
         at: Date,
         screenId: String
     ) -> TimeInterval {

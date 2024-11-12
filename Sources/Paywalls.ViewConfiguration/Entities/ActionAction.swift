@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum ActionAction: Sendable {
         case openUrl(String?)
         case restore
@@ -23,7 +23,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.ActionAction: Hashable {
+extension AdaptyUICore.ActionAction: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .openUrl(value):

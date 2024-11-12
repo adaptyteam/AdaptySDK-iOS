@@ -21,10 +21,10 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    var box: AdaptyUI.Box
+    var box: AdaptyUICore.Box
 
     private func constraints(
-        for lenght: AdaptyUI.Box.Length?,
+        for lenght: AdaptyUICore.Box.Length?,
         screenSize: CGFloat,
         safeAreaStart: Double,
         safeAreaEnd: Double
@@ -85,7 +85,7 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
-    func rangedFrame(box: AdaptyUI.Box) -> some View {
+    func rangedFrame(box: AdaptyUICore.Box) -> some View {
         modifier(AdaptyUIRangedFrameModifier(box: box))
     }
 }

@@ -7,16 +7,16 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Point: Sendable, Hashable {
         package let x: Double
         package let y: Double
     }
 }
 
-extension AdaptyUI.Point {
-    package static let zero = AdaptyUI.Point(x: 0.0, y: 0.0)
-    package static let one = AdaptyUI.Point(x: 1.0, y: 1.0)
+extension AdaptyUICore.Point {
+    package static let zero = AdaptyUICore.Point(x: 0.0, y: 0.0)
+    package static let one = AdaptyUICore.Point(x: 1.0, y: 1.0)
 
     package var isZero: Bool {
         x == 0.0 && y == 0.0
@@ -24,7 +24,7 @@ extension AdaptyUI.Point {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Point {
+    package extension AdaptyUICore.Point {
         static func create(
             x: Double = 0.0,
             y: Double = 0.0
@@ -37,7 +37,7 @@ extension AdaptyUI.Point {
     }
 #endif
 
-extension AdaptyUI.Point: Decodable {
+extension AdaptyUICore.Point: Decodable {
     enum CodingKeys: String, CodingKey {
         case x
         case y

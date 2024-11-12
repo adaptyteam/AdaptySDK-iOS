@@ -8,17 +8,17 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct GridItem: Sendable, Hashable {
-        let length: AdaptyUI.GridItem.Length
-        let horizontalAlignment: AdaptyUI.HorizontalAlignment
-        let verticalAlignment: AdaptyUI.VerticalAlignment
-        let content: AdaptyUI.ViewConfiguration.Element
+        let length: AdaptyUICore.GridItem.Length
+        let horizontalAlignment: AdaptyUICore.HorizontalAlignment
+        let verticalAlignment: AdaptyUICore.VerticalAlignment
+        let content: AdaptyUICore.ViewConfiguration.Element
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func gridItem(_ from: AdaptyUI.ViewConfiguration.GridItem) throws -> AdaptyUI.GridItem {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func gridItem(_ from: AdaptyUICore.ViewConfiguration.GridItem) throws -> AdaptyUICore.GridItem {
         try .init(
             length: from.length,
             horizontalAlignment: from.horizontalAlignment,
@@ -28,7 +28,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.GridItem: Decodable {
+extension AdaptyUICore.ViewConfiguration.GridItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case fixed
         case weight
@@ -39,18 +39,18 @@ extension AdaptyUI.ViewConfiguration.GridItem: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let length: AdaptyUI.GridItem.Length =
+        let length: AdaptyUICore.GridItem.Length =
             if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
                 .weight(value)
             } else {
-                try .fixed(container.decode(AdaptyUI.Unit.self, forKey: .fixed))
+                try .fixed(container.decode(AdaptyUICore.Unit.self, forKey: .fixed))
             }
 
         try self.init(
             length: length,
-            horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? AdaptyUI.GridItem.defaultHorizontalAlignment,
-            verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? AdaptyUI.GridItem.defaultVerticalAlignment,
-            content: container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .content)
+            horizontalAlignment: container.decodeIfPresent(AdaptyUICore.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? AdaptyUICore.GridItem.defaultHorizontalAlignment,
+            verticalAlignment: container.decodeIfPresent(AdaptyUICore.VerticalAlignment.self, forKey: .verticalAlignment) ?? AdaptyUICore.GridItem.defaultVerticalAlignment,
+            content: container.decode(AdaptyUICore.ViewConfiguration.Element.self, forKey: .content)
         )
     }
 }

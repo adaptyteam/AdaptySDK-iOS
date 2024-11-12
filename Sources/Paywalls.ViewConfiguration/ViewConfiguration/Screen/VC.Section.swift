@@ -8,16 +8,16 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Section: Sendable, Hashable {
         let id: String
         let index: Int
-        let content: [AdaptyUI.ViewConfiguration.Element]
+        let content: [AdaptyUICore.ViewConfiguration.Element]
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func section(_ from: AdaptyUI.ViewConfiguration.Section) throws -> AdaptyUI.Section {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func section(_ from: AdaptyUICore.ViewConfiguration.Section) throws -> AdaptyUICore.Section {
         try .init(
             id: from.id,
             index: from.index,
@@ -26,7 +26,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Section: Decodable {
+extension AdaptyUICore.ViewConfiguration.Section: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case index
@@ -38,7 +38,7 @@ extension AdaptyUI.ViewConfiguration.Section: Decodable {
         try self.init(
             id: container.decode(String.self, forKey: .id),
             index: container.decodeIfPresent(Int.self, forKey: .index) ?? 0,
-            content: container.decode([AdaptyUI.ViewConfiguration.Element].self, forKey: .content)
+            content: container.decode([AdaptyUICore.ViewConfiguration.Element].self, forKey: .content)
         )
     }
 }

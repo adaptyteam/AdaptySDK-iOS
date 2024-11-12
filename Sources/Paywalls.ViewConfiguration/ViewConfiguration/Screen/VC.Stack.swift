@@ -8,23 +8,23 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Stack: Hashable, Sendable {
-        let type: AdaptyUI.StackType
-        let horizontalAlignment: AdaptyUI.HorizontalAlignment
-        let verticalAlignment: AdaptyUI.VerticalAlignment
+        let type: AdaptyUICore.StackType
+        let horizontalAlignment: AdaptyUICore.HorizontalAlignment
+        let verticalAlignment: AdaptyUICore.VerticalAlignment
         let spacing: Double
         let items: [StackItem]
     }
 
     enum StackItem: Sendable {
         case space(Int)
-        case element(AdaptyUI.ViewConfiguration.Element)
+        case element(AdaptyUICore.ViewConfiguration.Element)
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    private func stackItem(_ from: AdaptyUI.ViewConfiguration.StackItem) throws -> AdaptyUI.StackItem {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    private func stackItem(_ from: AdaptyUICore.ViewConfiguration.StackItem) throws -> AdaptyUICore.StackItem {
         switch from {
         case let .space(value):
             .space(value)
@@ -33,7 +33,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         }
     }
 
-    func stack(_ from: AdaptyUI.ViewConfiguration.Stack) throws -> AdaptyUI.Stack {
+    func stack(_ from: AdaptyUICore.ViewConfiguration.Stack) throws -> AdaptyUICore.Stack {
         try .init(
             type: from.type,
             horizontalAlignment: from.horizontalAlignment,
@@ -44,7 +44,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.StackItem: Hashable {
+extension AdaptyUICore.ViewConfiguration.StackItem: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .space(value):
@@ -57,7 +57,7 @@ extension AdaptyUI.ViewConfiguration.StackItem: Hashable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Stack: Decodable {
+extension AdaptyUICore.ViewConfiguration.Stack: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case horizontalAlignment = "h_align"
@@ -67,19 +67,19 @@ extension AdaptyUI.ViewConfiguration.Stack: Decodable {
     }
 
     init(from decoder: Decoder) throws {
-        let def = AdaptyUI.Stack.default
+        let def = AdaptyUICore.Stack.default
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            type: container.decode(AdaptyUI.StackType.self, forKey: .type),
-            horizontalAlignment: container.decodeIfPresent(AdaptyUI.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
-            verticalAlignment: container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
+            type: container.decode(AdaptyUICore.StackType.self, forKey: .type),
+            horizontalAlignment: container.decodeIfPresent(AdaptyUICore.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
+            verticalAlignment: container.decodeIfPresent(AdaptyUICore.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
-            items: container.decode([AdaptyUI.ViewConfiguration.StackItem].self, forKey: .content)
+            items: container.decode([AdaptyUICore.ViewConfiguration.StackItem].self, forKey: .content)
         )
     }
 }
 
-extension AdaptyUI.ViewConfiguration.StackItem: Decodable {
+extension AdaptyUICore.ViewConfiguration.StackItem: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case count
@@ -94,7 +94,7 @@ extension AdaptyUI.ViewConfiguration.StackItem: Decodable {
         let type = try container.decode(String.self, forKey: .type)
 
         guard let contentType = ContentType(rawValue: type) else {
-            self = try .element(AdaptyUI.ViewConfiguration.Element(from: decoder))
+            self = try .element(AdaptyUICore.ViewConfiguration.Element(from: decoder))
             return
         }
 
@@ -105,4 +105,4 @@ extension AdaptyUI.ViewConfiguration.StackItem: Decodable {
     }
 }
 
-extension AdaptyUI.StackType: Decodable {}
+extension AdaptyUICore.StackType: Decodable {}

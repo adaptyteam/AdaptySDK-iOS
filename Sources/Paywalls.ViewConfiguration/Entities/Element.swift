@@ -7,42 +7,42 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum Element: Sendable {
         case space(Int)
-        indirect case stack(AdaptyUI.Stack, Properties?)
-        case text(AdaptyUI.Text, Properties?)
-        case image(AdaptyUI.Image, Properties?)
-        case video(AdaptyUI.VideoPlayer, Properties?)
-        indirect case button(AdaptyUI.Button, Properties?)
-        indirect case box(AdaptyUI.Box, Properties?)
-        indirect case row(AdaptyUI.Row, Properties?)
-        indirect case column(AdaptyUI.Column, Properties?)
-        indirect case section(AdaptyUI.Section, Properties?)
-        case toggle(AdaptyUI.Toggle, Properties?)
-        case timer(AdaptyUI.Timer, Properties?)
-        indirect case pager(AdaptyUI.Pager, Properties?)
+        indirect case stack(AdaptyUICore.Stack, Properties?)
+        case text(AdaptyUICore.Text, Properties?)
+        case image(AdaptyUICore.Image, Properties?)
+        case video(AdaptyUICore.VideoPlayer, Properties?)
+        indirect case button(AdaptyUICore.Button, Properties?)
+        indirect case box(AdaptyUICore.Box, Properties?)
+        indirect case row(AdaptyUICore.Row, Properties?)
+        indirect case column(AdaptyUICore.Column, Properties?)
+        indirect case section(AdaptyUICore.Section, Properties?)
+        case toggle(AdaptyUICore.Toggle, Properties?)
+        case timer(AdaptyUICore.Timer, Properties?)
+        indirect case pager(AdaptyUICore.Pager, Properties?)
 
         case unknown(String, Properties?)
     }
 }
 
-extension AdaptyUI.Element {
+extension AdaptyUICore.Element {
     package struct Properties: Sendable, Hashable {
-        static let defaultPadding = AdaptyUI.EdgeInsets(same: .point(0))
-        static let defaultOffset = AdaptyUI.Offset.zero
+        static let defaultPadding = AdaptyUICore.EdgeInsets(same: .point(0))
+        static let defaultOffset = AdaptyUICore.Offset.zero
         static let defaultVisibility = false
 
-        package let decorator: AdaptyUI.Decorator?
-        package let padding: AdaptyUI.EdgeInsets
-        package let offset: AdaptyUI.Offset
+        package let decorator: AdaptyUICore.Decorator?
+        package let padding: AdaptyUICore.EdgeInsets
+        package let offset: AdaptyUICore.Offset
 
         package let visibility: Bool
-        package let transitionIn: [AdaptyUI.Transition]
+        package let transitionIn: [AdaptyUICore.Transition]
     }
 }
 
-extension AdaptyUI.Element: Hashable {
+extension AdaptyUICore.Element: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .space(value):
@@ -104,13 +104,13 @@ extension AdaptyUI.Element: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Element.Properties {
+    package extension AdaptyUICore.Element.Properties {
         static func create(
-            decorator: AdaptyUI.Decorator? = nil,
-            padding: AdaptyUI.EdgeInsets = AdaptyUI.Element.Properties.defaultPadding,
-            offset: AdaptyUI.Offset = AdaptyUI.Element.Properties.defaultOffset,
-            visibility: Bool = AdaptyUI.Element.Properties.defaultVisibility,
-            transitionIn: [AdaptyUI.Transition] = []
+            decorator: AdaptyUICore.Decorator? = nil,
+            padding: AdaptyUICore.EdgeInsets = AdaptyUICore.Element.Properties.defaultPadding,
+            offset: AdaptyUICore.Offset = AdaptyUICore.Element.Properties.defaultOffset,
+            visibility: Bool = AdaptyUICore.Element.Properties.defaultVisibility,
+            transitionIn: [AdaptyUICore.Transition] = []
         ) -> Self {
             .init(
                 decorator: decorator,

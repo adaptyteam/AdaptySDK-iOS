@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.HorizontalAlignment {
+extension AdaptyUICore.HorizontalAlignment {
     func textAlignment(with layoutDirection: LayoutDirection) -> TextAlignment {
         switch self {
         case .leading: TextAlignment.leading
@@ -39,7 +39,7 @@ struct AdaptyUIAlignmentModifier: ViewModifier {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    var alignment: AdaptyUI.HorizontalAlignment
+    var alignment: AdaptyUICore.HorizontalAlignment
 
     func body(content: Content) -> some View {
         content
@@ -50,7 +50,7 @@ struct AdaptyUIAlignmentModifier: ViewModifier {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func multilineTextAlignment(_ alignment: AdaptyUI.HorizontalAlignment) -> some View {
+    func multilineTextAlignment(_ alignment: AdaptyUICore.HorizontalAlignment) -> some View {
         modifier(AdaptyUIAlignmentModifier(alignment: alignment))
     }
 }

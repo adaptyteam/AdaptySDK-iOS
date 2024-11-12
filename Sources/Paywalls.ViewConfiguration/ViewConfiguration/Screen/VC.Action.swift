@@ -8,15 +8,15 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     enum Action: Sendable {
         case openUrl(String)
-        case action(AdaptyUI.ActionAction)
+        case action(AdaptyUICore.ActionAction)
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func action(_ from: AdaptyUI.ViewConfiguration.Action) throws -> AdaptyUI.ActionAction {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func action(_ from: AdaptyUICore.ViewConfiguration.Action) throws -> AdaptyUICore.ActionAction {
         switch from {
         case let .openUrl(stringId):
             .openUrl(urlIfPresent(stringId))
@@ -26,7 +26,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Action: Hashable {
+extension AdaptyUICore.ViewConfiguration.Action: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .openUrl(value):
@@ -39,7 +39,7 @@ extension AdaptyUI.ViewConfiguration.Action: Hashable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Action: Decodable {
+extension AdaptyUICore.ViewConfiguration.Action: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case url
@@ -80,16 +80,16 @@ extension AdaptyUI.ViewConfiguration.Action: Decodable {
             self = try .action(.custom(id: container.decode(String.self, forKey: .customId)))
         case .purchaseSelectedProduct:
             self = try .action(.purchaseSelectedProduct(
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUICore.ViewConfiguration.StringId.Product.defaultProductGroupId
             ))
         case .unselectProduct:
             self = try .action(.unselectProduct(
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUICore.ViewConfiguration.StringId.Product.defaultProductGroupId
             ))
         case .selectProductId:
             self = try .action(.selectProduct(
                 id: container.decode(String.self, forKey: .productId),
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUICore.ViewConfiguration.StringId.Product.defaultProductGroupId
             ))
         case .purchaseProductId:
             self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId)))

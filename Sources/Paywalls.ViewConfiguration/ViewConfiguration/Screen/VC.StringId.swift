@@ -8,14 +8,14 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     enum StringId: Sendable {
         case basic(String)
         case product(Product)
     }
 }
 
-extension AdaptyUI.ViewConfiguration.StringId {
+extension AdaptyUICore.ViewConfiguration.StringId {
     struct Product: Sendable, Hashable {
         static let defaultProductGroupId = "group_A"
         let adaptyProductId: String?
@@ -50,7 +50,7 @@ extension AdaptyUI.ViewConfiguration.StringId {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.StringId: Hashable {
+extension AdaptyUICore.ViewConfiguration.StringId: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .basic(value):
@@ -63,7 +63,7 @@ extension AdaptyUI.ViewConfiguration.StringId: Hashable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.StringId: Decodable {
+extension AdaptyUICore.ViewConfiguration.StringId: Decodable {
     init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(String.self) {
             self = .basic(value)
@@ -80,7 +80,7 @@ extension AdaptyUI.ViewConfiguration.StringId: Decodable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.StringId.Product: Decodable {
+extension AdaptyUICore.ViewConfiguration.StringId.Product: Decodable {
     static let typeValue = "product"
     enum CodingKeys: String, CodingKey {
         case type

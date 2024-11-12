@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct TextAttributes: Sendable, Hashable {
         let fontAssetId: String?
         let size: Double?
@@ -43,7 +43,7 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
+extension AdaptyUICore.ViewConfiguration.Localizer {
     func urlIfPresent(_ stringId: String?) -> String? {
         guard let stringId, let item = self.localization?.strings?[stringId] else { return nil }
         return item.value.asString ?? item.fallback?.asString
@@ -51,10 +51,10 @@ extension AdaptyUI.ViewConfiguration.Localizer {
 
     func richText(
         stringId: String,
-        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?
-    ) -> AdaptyUI.RichText? {
+        defaultTextAttributes: AdaptyUICore.ViewConfiguration.TextAttributes?
+    ) -> AdaptyUICore.RichText? {
         guard let item = localization?.strings?[stringId] else { return nil }
-        return AdaptyUI.RichText(
+        return AdaptyUICore.RichText(
             items: item.value.convert(
                 self,
                 defaultTextAttributes: defaultTextAttributes
@@ -67,7 +67,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.RichText {
+private extension AdaptyUICore.ViewConfiguration.RichText {
     var asString: String? {
         items.first.flatMap {
             if case let .text(value, attr) = $0, attr == nil { value } else { nil }
@@ -75,9 +75,9 @@ private extension AdaptyUI.ViewConfiguration.RichText {
     }
 
     func convert(
-        _ localizer: AdaptyUI.ViewConfiguration.Localizer,
-        defaultTextAttributes: AdaptyUI.ViewConfiguration.TextAttributes?
-    ) -> [AdaptyUI.RichText.Item] {
+        _ localizer: AdaptyUICore.ViewConfiguration.Localizer,
+        defaultTextAttributes: AdaptyUICore.ViewConfiguration.TextAttributes?
+    ) -> [AdaptyUICore.RichText.Item] {
         items.compactMap { item in
             switch item {
             case let .text(value, attr):
@@ -93,12 +93,12 @@ private extension AdaptyUI.ViewConfiguration.RichText {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.TextAttributes {
+private extension AdaptyUICore.ViewConfiguration.TextAttributes {
     func add(
-        _ other: AdaptyUI.ViewConfiguration.TextAttributes?
-    ) -> AdaptyUI.ViewConfiguration.TextAttributes {
+        _ other: AdaptyUICore.ViewConfiguration.TextAttributes?
+    ) -> AdaptyUICore.ViewConfiguration.TextAttributes {
         guard let other else { return self }
-        return AdaptyUI.ViewConfiguration.TextAttributes(
+        return AdaptyUICore.ViewConfiguration.TextAttributes(
             fontAssetId: fontAssetId ?? other.fontAssetId,
             size: size ?? other.size,
             txtColorAssetId: txtColorAssetId ?? other.txtColorAssetId,
@@ -110,10 +110,10 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.TextAttributes? {
+private extension AdaptyUICore.ViewConfiguration.TextAttributes? {
     func add(
-        _ other: AdaptyUI.ViewConfiguration.TextAttributes?
-    ) -> AdaptyUI.ViewConfiguration.TextAttributes? {
+        _ other: AdaptyUICore.ViewConfiguration.TextAttributes?
+    ) -> AdaptyUICore.ViewConfiguration.TextAttributes? {
         switch self {
         case .none:
             other
@@ -123,11 +123,11 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
     }
 
     func convert(
-        _ localizer: AdaptyUI.ViewConfiguration.Localizer
-    ) -> AdaptyUI.RichText.TextAttributes {
+        _ localizer: AdaptyUICore.ViewConfiguration.Localizer
+    ) -> AdaptyUICore.RichText.TextAttributes {
         let attr = self
-        let font = (try? attr?.fontAssetId.map(localizer.font)) ?? AdaptyUI.Font.default
-        return AdaptyUI.RichText.TextAttributes(
+        let font = (try? attr?.fontAssetId.map(localizer.font)) ?? AdaptyUICore.Font.default
+        return AdaptyUICore.RichText.TextAttributes(
             font: font,
             size: attr?.size ?? font.defaultSize,
             txtColor: (try? attr?.txtColorAssetId.map(localizer.filling)) ?? .same(font.defaultColor),
@@ -139,7 +139,7 @@ private extension AdaptyUI.ViewConfiguration.TextAttributes? {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.RichText.Item: Hashable {
+extension AdaptyUICore.ViewConfiguration.RichText.Item: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
         case let .text(value, attr):
@@ -160,7 +160,7 @@ extension AdaptyUI.ViewConfiguration.RichText.Item: Hashable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.RichText: Decodable {
+extension AdaptyUICore.ViewConfiguration.RichText: Decodable {
     init(from decoder: Decoder) throws {
         items =
             if let value = try? Item(from: decoder) {
@@ -171,7 +171,7 @@ extension AdaptyUI.ViewConfiguration.RichText: Decodable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.RichText.Item: Decodable {
+extension AdaptyUICore.ViewConfiguration.RichText.Item: Decodable {
     enum CodingKeys: String, CodingKey {
         case text
         case tag
@@ -190,17 +190,17 @@ extension AdaptyUI.ViewConfiguration.RichText.Item: Decodable {
             if container.contains(.text) {
                 try .text(
                     container.decode(String.self, forKey: .text),
-                    container.decodeIfPresent(AdaptyUI.ViewConfiguration.TextAttributes.self, forKey: .attributes)
+                    container.decodeIfPresent(AdaptyUICore.ViewConfiguration.TextAttributes.self, forKey: .attributes)
                 )
             } else if container.contains(.tag) {
                 try .tag(
                     container.decode(String.self, forKey: .tag),
-                    container.decodeIfPresent(AdaptyUI.ViewConfiguration.TextAttributes.self, forKey: .attributes)
+                    container.decodeIfPresent(AdaptyUICore.ViewConfiguration.TextAttributes.self, forKey: .attributes)
                 )
             } else if container.contains(.image) {
                 try .image(
                     container.decode(String.self, forKey: .image),
-                    container.decodeIfPresent(AdaptyUI.ViewConfiguration.TextAttributes.self, forKey: .attributes)
+                    container.decodeIfPresent(AdaptyUICore.ViewConfiguration.TextAttributes.self, forKey: .attributes)
                 )
             } else {
                 .unknown
@@ -208,7 +208,7 @@ extension AdaptyUI.ViewConfiguration.RichText.Item: Decodable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.TextAttributes: Decodable {
+extension AdaptyUICore.ViewConfiguration.TextAttributes: Decodable {
     enum CodingKeys: String, CodingKey {
         case size
         case fontAssetId = "font"

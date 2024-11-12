@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Stack: Sendable, Hashable {
         static let `default` = Stack(
             type: .vertical,
@@ -47,7 +47,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.StackItem: Hashable {
+extension AdaptyUICore.StackItem: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .space(value):
@@ -61,13 +61,13 @@ extension AdaptyUI.StackItem: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Stack {
+    package extension AdaptyUICore.Stack {
         static func create(
-            type: AdaptyUI.StackType = `default`.type,
-            horizontalAlignment: AdaptyUI.HorizontalAlignment = `default`.horizontalAlignment,
-            verticalAlignment: AdaptyUI.VerticalAlignment = `default`.verticalAlignment,
+            type: AdaptyUICore.StackType = `default`.type,
+            horizontalAlignment: AdaptyUICore.HorizontalAlignment = `default`.horizontalAlignment,
+            verticalAlignment: AdaptyUICore.VerticalAlignment = `default`.verticalAlignment,
             spacing: Double = `default`.spacing,
-            content: [AdaptyUI.Element] = []
+            content: [AdaptyUICore.Element] = []
         ) -> Self {
             .init(
                 type: type,
@@ -79,13 +79,13 @@ extension AdaptyUI.StackItem: Hashable {
         }
     }
 
-    package extension AdaptyUI.Stack {
+    package extension AdaptyUICore.Stack {
         static func create(
-            type: AdaptyUI.StackType = `default`.type,
-            horizontalAlignment: AdaptyUI.HorizontalAlignment = `default`.horizontalAlignment,
-            verticalAlignment: AdaptyUI.VerticalAlignment = `default`.verticalAlignment,
+            type: AdaptyUICore.StackType = `default`.type,
+            horizontalAlignment: AdaptyUICore.HorizontalAlignment = `default`.horizontalAlignment,
+            verticalAlignment: AdaptyUICore.VerticalAlignment = `default`.verticalAlignment,
             spacing: Double = `default`.spacing,
-            items: [AdaptyUI.StackItem] = `default`.items
+            items: [AdaptyUICore.StackItem] = `default`.items
         ) -> Self {
             .init(
                 type: type,

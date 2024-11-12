@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct VideoPlayer: Hashable, Sendable {
         static let defaultAspectRatio = AspectRatio.fit
 
@@ -19,10 +19,10 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.VideoPlayer {
+    package extension AdaptyUICore.VideoPlayer {
         static func create(
-            asset: AdaptyUI.Mode<AdaptyUI.VideoData>,
-            aspect: AdaptyUI.AspectRatio = defaultAspectRatio,
+            asset: AdaptyUICore.Mode<AdaptyUICore.VideoData>,
+            aspect: AdaptyUICore.AspectRatio = defaultAspectRatio,
             loop: Bool = true
         ) -> Self {
             .init(

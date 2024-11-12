@@ -8,9 +8,9 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct If: Decodable {
-        let content: AdaptyUI.ViewConfiguration.Element
+        let content: AdaptyUICore.ViewConfiguration.Element
 
         enum CodingKeys: String, CodingKey {
             case platform
@@ -24,10 +24,10 @@ extension AdaptyUI.ViewConfiguration {
             content =
                 if
                     try container.decodeIfPresent(String.self, forKey: .platform).map({ $0 == "ios" }) ?? true,
-                    try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUI.configurationFormatVersion.isSameOrNewerVersion) ?? true {
-                    try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .then)
+                    try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUICore.configurationFormatVersion.isSameOrNewerVersion) ?? true {
+                    try container.decode(AdaptyUICore.ViewConfiguration.Element.self, forKey: .then)
                 } else {
-                    try container.decode(AdaptyUI.ViewConfiguration.Element.self, forKey: .else)
+                    try container.decode(AdaptyUICore.ViewConfiguration.Element.self, forKey: .else)
                 }
         }
     }

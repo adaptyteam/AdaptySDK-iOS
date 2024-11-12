@@ -7,26 +7,26 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct TransitionSlide: Sendable, Hashable {
-        static let `default` = AdaptyUI.TransitionSlide(
+        static let `default` = AdaptyUICore.TransitionSlide(
             startDelay: 0.0,
             duration: 0.3,
-            interpolator: AdaptyUI.Transition.Interpolator.default
+            interpolator: AdaptyUICore.Transition.Interpolator.default
         )
 
         package let startDelay: TimeInterval
         package let duration: TimeInterval
-        package let interpolator: AdaptyUI.Transition.Interpolator
+        package let interpolator: AdaptyUICore.Transition.Interpolator
     }
 }
 
 #if DEBUG
-    package extension AdaptyUI.TransitionSlide {
+    package extension AdaptyUICore.TransitionSlide {
         static func create(
             startDelay: TimeInterval = `default`.startDelay,
             duration: TimeInterval = `default`.duration,
-            interpolator: AdaptyUI.Transition.Interpolator = `default`.interpolator
+            interpolator: AdaptyUICore.Transition.Interpolator = `default`.interpolator
         ) -> Self {
             .init(
                 startDelay: startDelay,
@@ -37,7 +37,7 @@ extension AdaptyUI {
     }
 #endif
 
-extension AdaptyUI.TransitionSlide: Decodable {
+extension AdaptyUICore.TransitionSlide: Decodable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"
         case duration
@@ -47,8 +47,8 @@ extension AdaptyUI.TransitionSlide: Decodable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionSlide.default.startDelay
-        duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionSlide.default.duration
-        interpolator = try (container.decodeIfPresent(AdaptyUI.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyUI.TransitionSlide.default.interpolator
+        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUICore.TransitionSlide.default.startDelay
+        duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUICore.TransitionSlide.default.duration
+        interpolator = try (container.decodeIfPresent(AdaptyUICore.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyUICore.TransitionSlide.default.interpolator
     }
 }

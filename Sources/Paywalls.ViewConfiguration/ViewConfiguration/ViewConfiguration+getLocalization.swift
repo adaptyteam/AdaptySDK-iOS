@@ -8,12 +8,12 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
-    func extractLocale()  throws -> AdaptyUI.LocalizedViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
+    func extractLocale()  throws -> AdaptyUICore.LocalizedViewConfiguration {
         try extractLocale(responseLocale)
     }
 
-    func extractLocale(_ locale: AdaptyLocale) throws -> AdaptyUI.LocalizedViewConfiguration {
+    func extractLocale(_ locale: AdaptyLocale) throws -> AdaptyUICore.LocalizedViewConfiguration {
         try Localizer(source: self, withLocale: locale).localize()
     }
 
@@ -30,7 +30,7 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Localization {
+private extension AdaptyUICore.ViewConfiguration.Localization {
     func addDefault(localization: Self?) -> Self {
         guard let localization else { return self }
 

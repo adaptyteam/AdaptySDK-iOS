@@ -11,7 +11,7 @@ import Adapty
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI {
+extension AdaptyUICore {
     enum ProductTagReplacement {
         case notApplicable
         case value(String)

@@ -8,17 +8,17 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Toggle: Sendable, Hashable {
-        let onActions: [AdaptyUI.ViewConfiguration.Action]
-        let offActions: [AdaptyUI.ViewConfiguration.Action]
-        let onCondition: AdaptyUI.StateCondition
+        let onActions: [AdaptyUICore.ViewConfiguration.Action]
+        let offActions: [AdaptyUICore.ViewConfiguration.Action]
+        let onCondition: AdaptyUICore.StateCondition
         let colorAssetId: String?
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func toggle(_ from: AdaptyUI.ViewConfiguration.Toggle) throws -> AdaptyUI.Toggle {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func toggle(_ from: AdaptyUICore.ViewConfiguration.Toggle) throws -> AdaptyUICore.Toggle {
         try .init(
             onActions: from.onActions.map(action),
             offActions: from.offActions.map(action),
@@ -28,7 +28,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Toggle: Decodable {
+extension AdaptyUICore.ViewConfiguration.Toggle: Decodable {
     enum CodingKeys: String, CodingKey {
         case sectionId = "section_id"
         case onIndex = "on_index"
@@ -58,21 +58,21 @@ extension AdaptyUI.ViewConfiguration.Toggle: Decodable {
         }
 
         let onActions =
-            if let action = try? container.decodeIfPresent(AdaptyUI.ViewConfiguration.Action.self, forKey: .onActions) {
+            if let action = try? container.decodeIfPresent(AdaptyUICore.ViewConfiguration.Action.self, forKey: .onActions) {
                 [action]
             } else {
-                try container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .onActions) ?? []
+                try container.decodeIfPresent([AdaptyUICore.ViewConfiguration.Action].self, forKey: .onActions) ?? []
             }
         let offActions =
-            if let action = try? container.decodeIfPresent(AdaptyUI.ViewConfiguration.Action.self, forKey: .offActions) {
+            if let action = try? container.decodeIfPresent(AdaptyUICore.ViewConfiguration.Action.self, forKey: .offActions) {
                 [action]
             } else {
-                try container.decodeIfPresent([AdaptyUI.ViewConfiguration.Action].self, forKey: .offActions) ?? []
+                try container.decodeIfPresent([AdaptyUICore.ViewConfiguration.Action].self, forKey: .offActions) ?? []
             }
         try self.init(
             onActions: onActions,
             offActions: offActions,
-            onCondition: container.decode(AdaptyUI.StateCondition.self, forKey: .onCondition),
+            onCondition: container.decode(AdaptyUICore.StateCondition.self, forKey: .onCondition),
             colorAssetId: colorAssetId
         )
     }

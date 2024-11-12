@@ -12,7 +12,7 @@ package protocol AdaptyUIImageUrlObserver: Sendable {
     func extractedImageUrls(_: Set<URL>)
 }
 
-extension AdaptyUI {
+extension AdaptyUICore {
     private actor Holder {
         private(set) var imageUrlObserver: AdaptyUIImageUrlObserver?
 
@@ -29,7 +29,7 @@ extension AdaptyUI {
         }
     }
 
-    static func sendImageUrlsToObserver(_ config: AdaptyUI.ViewConfiguration) {
+    static func sendImageUrlsToObserver(_ config: AdaptyUICore.ViewConfiguration) {
         Task {
             guard let observer = await holder.imageUrlObserver else { return }
             let urls = config.extractImageUrls(config.responseLocale)

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Toggle: Sendable, Hashable {
         package let onActions: [ActionAction]
         package let offActions: [ActionAction]
@@ -18,12 +18,12 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Toggle {
+    package extension AdaptyUICore.Toggle {
         static func create(
-            onActions: [AdaptyUI.ActionAction],
-            offActions: [AdaptyUI.ActionAction],
-            onCondition: AdaptyUI.StateCondition,
-            color: AdaptyUI.Mode<AdaptyUI.Color>? = nil
+            onActions: [AdaptyUICore.ActionAction],
+            offActions: [AdaptyUICore.ActionAction],
+            onCondition: AdaptyUICore.StateCondition,
+            color: AdaptyUICore.Mode<AdaptyUICore.Color>? = nil
         ) -> Self {
             .init(
                 onActions: onActions,
@@ -37,7 +37,7 @@ extension AdaptyUI {
             sectionId: String,
             onIndex: Int = 0,
             offIndex: Int = -1,
-            color: AdaptyUI.Mode<AdaptyUI.Color>? = nil
+            color: AdaptyUICore.Mode<AdaptyUICore.Color>? = nil
         ) -> Self {
             .init(
                 onActions: [.switchSection(id: sectionId, index: onIndex)],

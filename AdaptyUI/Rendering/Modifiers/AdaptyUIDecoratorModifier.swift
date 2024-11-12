@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.Mode {
+extension AdaptyUICore.Mode {
     func of(_ colorScheme: ColorScheme) -> T {
         switch colorScheme {
         case .light: mode(.light)
@@ -24,7 +24,7 @@ extension AdaptyUI.Mode {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension InsettableShape {
     @ViewBuilder
-    func fill(background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
+    func fill(background: AdaptyUICore.Background?, colorScheme: ColorScheme) -> some View {
         if let background {
             switch background {
             case .image:
@@ -76,7 +76,7 @@ extension InsettableShape {
     }
 
     @ViewBuilder
-    func stroke(filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
+    func stroke(filling: AdaptyUICore.Filling?, lineWidth: CGFloat) -> some View {
         if let filling {
             switch filling {
             case let .solidColor(color):
@@ -122,7 +122,7 @@ extension InsettableShape {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func clipShape(_ shape: AdaptyUI.ShapeType) -> some View {
+    func clipShape(_ shape: AdaptyUICore.ShapeType) -> some View {
         switch shape {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
@@ -141,9 +141,9 @@ extension View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.ShapeType {
+extension AdaptyUICore.ShapeType {
     @ViewBuilder
-    func swiftUIShapeFill(_ background: AdaptyUI.Background?, colorScheme: ColorScheme) -> some View {
+    func swiftUIShapeFill(_ background: AdaptyUICore.Background?, colorScheme: ColorScheme) -> some View {
         switch self {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
@@ -166,7 +166,7 @@ extension AdaptyUI.ShapeType {
     }
 
     @ViewBuilder
-    func swiftUIShapeStroke(_ filling: AdaptyUI.Filling?, lineWidth: CGFloat) -> some View {
+    func swiftUIShapeStroke(_ filling: AdaptyUICore.Filling?, lineWidth: CGFloat) -> some View {
         switch self {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
@@ -193,14 +193,14 @@ extension AdaptyUI.ShapeType {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIDecoratorModifier: ViewModifier {
-    var decorator: AdaptyUI.Decorator
+    var decorator: AdaptyUICore.Decorator
     var includeBackground: Bool
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
     @ViewBuilder
-    private func bodyWithBackground(content: Content, background: AdaptyUI.Background?) -> some View {
+    private func bodyWithBackground(content: Content, background: AdaptyUICore.Background?) -> some View {
         if let background {
             switch background {
             case let .image(imageData):
@@ -250,7 +250,7 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
 extension View {
     @ViewBuilder
     func decorate(
-        with decorator: AdaptyUI.Decorator?,
+        with decorator: AdaptyUICore.Decorator?,
         includeBackground: Bool
     ) -> some View {
         if let decorator {

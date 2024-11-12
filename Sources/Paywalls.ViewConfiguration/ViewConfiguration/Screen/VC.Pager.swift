@@ -8,24 +8,24 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Pager: Sendable, Hashable {
-        let pageWidth: AdaptyUI.Pager.Length
-        let pageHeight: AdaptyUI.Pager.Length
-        let pagePadding: AdaptyUI.EdgeInsets
+        let pageWidth: AdaptyUICore.Pager.Length
+        let pageHeight: AdaptyUICore.Pager.Length
+        let pagePadding: AdaptyUICore.EdgeInsets
         let spacing: Double
-        let content: [AdaptyUI.ViewConfiguration.Element]
-        let pageControl: AdaptyUI.ViewConfiguration.Pager.PageControl?
-        let animation: AdaptyUI.Pager.Animation?
-        let interactionBehaviour: AdaptyUI.Pager.InteractionBehaviour
+        let content: [AdaptyUICore.ViewConfiguration.Element]
+        let pageControl: AdaptyUICore.ViewConfiguration.Pager.PageControl?
+        let animation: AdaptyUICore.Pager.Animation?
+        let interactionBehaviour: AdaptyUICore.Pager.InteractionBehaviour
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Pager {
+extension AdaptyUICore.ViewConfiguration.Pager {
     struct PageControl: Sendable, Hashable {
-        let layout: AdaptyUI.Pager.PageControl.Layout
-        let verticalAlignment: AdaptyUI.VerticalAlignment
-        let padding: AdaptyUI.EdgeInsets
+        let layout: AdaptyUICore.Pager.PageControl.Layout
+        let verticalAlignment: AdaptyUICore.VerticalAlignment
+        let padding: AdaptyUICore.EdgeInsets
         let dotSize: Double
         let spacing: Double
         let colorAssetId: String?
@@ -33,8 +33,8 @@ extension AdaptyUI.ViewConfiguration.Pager {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func pager(_ from: AdaptyUI.ViewConfiguration.Pager) throws -> AdaptyUI.Pager {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func pager(_ from: AdaptyUICore.ViewConfiguration.Pager) throws -> AdaptyUICore.Pager {
         try .init(
             pageWidth: from.pageWidth,
             pageHeight: from.pageHeight,
@@ -47,20 +47,20 @@ extension AdaptyUI.ViewConfiguration.Localizer {
         )
     }
 
-    private func pageControl(_ from: AdaptyUI.ViewConfiguration.Pager.PageControl) throws -> AdaptyUI.Pager.PageControl {
+    private func pageControl(_ from: AdaptyUICore.ViewConfiguration.Pager.PageControl) throws -> AdaptyUICore.Pager.PageControl {
         .init(
             layout: from.layout,
             verticalAlignment: from.verticalAlignment,
             padding: from.padding,
             dotSize: from.dotSize,
             spacing: from.spacing,
-            color: from.colorAssetId.flatMap { try? color($0) } ?? AdaptyUI.Pager.PageControl.default.color,
-            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? AdaptyUI.Pager.PageControl.default.selectedColor
+            color: from.colorAssetId.flatMap { try? color($0) } ?? AdaptyUICore.Pager.PageControl.default.color,
+            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? AdaptyUICore.Pager.PageControl.default.selectedColor
         )
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Pager: Decodable {
+extension AdaptyUICore.ViewConfiguration.Pager: Decodable {
     enum CodingKeys: String, CodingKey {
         case pageWidth = "page_width"
         case pageHeight = "page_height"
@@ -74,19 +74,19 @@ extension AdaptyUI.ViewConfiguration.Pager: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let def = AdaptyUI.Pager.default
-        pageWidth = try container.decodeIfPresent(AdaptyUI.Pager.Length.self, forKey: .pageWidth) ?? def.pageWidth
-        pageHeight = try container.decodeIfPresent(AdaptyUI.Pager.Length.self, forKey: .pageHeight) ?? def.pageHeight
-        pagePadding = try container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .pagePadding) ?? def.pagePadding
+        let def = AdaptyUICore.Pager.default
+        pageWidth = try container.decodeIfPresent(AdaptyUICore.Pager.Length.self, forKey: .pageWidth) ?? def.pageWidth
+        pageHeight = try container.decodeIfPresent(AdaptyUICore.Pager.Length.self, forKey: .pageHeight) ?? def.pageHeight
+        pagePadding = try container.decodeIfPresent(AdaptyUICore.EdgeInsets.self, forKey: .pagePadding) ?? def.pagePadding
         spacing = try container.decodeIfPresent(Double.self, forKey: .spacing) ?? def.spacing
-        content = try container.decode([AdaptyUI.ViewConfiguration.Element].self, forKey: .content)
-        pageControl = try container.decodeIfPresent(AdaptyUI.ViewConfiguration.Pager.PageControl.self, forKey: .pageControl)
-        animation = try container.decodeIfPresent(AdaptyUI.Pager.Animation.self, forKey: .animation)
-        interactionBehaviour = try container.decodeIfPresent(AdaptyUI.Pager.InteractionBehaviour.self, forKey: .interactionBehaviour) ?? def.interactionBehaviour
+        content = try container.decode([AdaptyUICore.ViewConfiguration.Element].self, forKey: .content)
+        pageControl = try container.decodeIfPresent(AdaptyUICore.ViewConfiguration.Pager.PageControl.self, forKey: .pageControl)
+        animation = try container.decodeIfPresent(AdaptyUICore.Pager.Animation.self, forKey: .animation)
+        interactionBehaviour = try container.decodeIfPresent(AdaptyUICore.Pager.InteractionBehaviour.self, forKey: .interactionBehaviour) ?? def.interactionBehaviour
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Pager.PageControl: Decodable {
+extension AdaptyUICore.ViewConfiguration.Pager.PageControl: Decodable {
     enum CodingKeys: String, CodingKey {
         case layout
         case verticalAlignment = "v_align"
@@ -99,10 +99,10 @@ extension AdaptyUI.ViewConfiguration.Pager.PageControl: Decodable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let def = AdaptyUI.Pager.PageControl.default
-        layout = try container.decodeIfPresent(AdaptyUI.Pager.PageControl.Layout.self, forKey: .layout) ?? def.layout
-        verticalAlignment = try container.decodeIfPresent(AdaptyUI.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment
-        padding = try container.decodeIfPresent(AdaptyUI.EdgeInsets.self, forKey: .padding) ?? def.padding
+        let def = AdaptyUICore.Pager.PageControl.default
+        layout = try container.decodeIfPresent(AdaptyUICore.Pager.PageControl.Layout.self, forKey: .layout) ?? def.layout
+        verticalAlignment = try container.decodeIfPresent(AdaptyUICore.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment
+        padding = try container.decodeIfPresent(AdaptyUICore.EdgeInsets.self, forKey: .padding) ?? def.padding
         dotSize = try container.decodeIfPresent(Double.self, forKey: .dotSize) ?? def.dotSize
         spacing = try container.decodeIfPresent(Double.self, forKey: .spacing) ?? def.spacing
         colorAssetId = try container.decodeIfPresent(String.self, forKey: .colorAssetId)
@@ -110,13 +110,13 @@ extension AdaptyUI.ViewConfiguration.Pager.PageControl: Decodable {
     }
 }
 
-extension AdaptyUI.Pager.Length: Decodable {
+extension AdaptyUICore.Pager.Length: Decodable {
     enum CodingKeys: String, CodingKey {
         case parent
     }
 
     package init(from decoder: Decoder) throws {
-        if let value = try? decoder.singleValueContainer().decode(AdaptyUI.Unit.self) {
+        if let value = try? decoder.singleValueContainer().decode(AdaptyUICore.Unit.self) {
             self = .fixed(value)
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)

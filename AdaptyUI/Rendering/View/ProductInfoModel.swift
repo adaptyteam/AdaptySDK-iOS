@@ -18,7 +18,7 @@ protocol ProductInfoModel {
 
     var paymentMode: AdaptySubscriptionOffer.PaymentMode { get }
 
-    func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement?
+    func stringByTag(_ tag: AdaptyUICore.ProductTag) -> AdaptyUICore.ProductTagReplacement?
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -36,7 +36,7 @@ extension AdaptyPaywallProductWrapper: ProductInfoModel {
         }
     }
 
-    func isApplicableForTag(_ tag: AdaptyUI.ProductTag) -> Bool {
+    func isApplicableForTag(_ tag: AdaptyUICore.ProductTag) -> Bool {
         switch tag {
         case .title, .price:
             return true
@@ -60,7 +60,7 @@ extension AdaptyPaywallProductWrapper: ProductInfoModel {
         adaptyProduct?.subscriptionOffer?.paymentMode ?? .unknown
     }
 
-    func stringByTag(_ tag: AdaptyUI.ProductTag) -> AdaptyUI.ProductTagReplacement? {
+    func stringByTag(_ tag: AdaptyUICore.ProductTag) -> AdaptyUICore.ProductTagReplacement? {
         guard isApplicableForTag(tag) else { return .notApplicable }
 
         let result: String?

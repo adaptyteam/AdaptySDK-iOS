@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Row: Sendable, Hashable {
         package let spacing: Double
         package let items: [GridItem]
@@ -16,10 +16,10 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Row {
+    package extension AdaptyUICore.Row {
         static func create(
             spacing: Double = 0,
-            items: [AdaptyUI.GridItem]
+            items: [AdaptyUICore.GridItem]
         ) -> Self {
             .init(
                 spacing: spacing,

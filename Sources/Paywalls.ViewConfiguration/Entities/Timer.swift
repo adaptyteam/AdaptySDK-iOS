@@ -8,13 +8,13 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Timer: Sendable, Hashable {
         package let id: String
         package let state: State
         package let format: [Item]
         package let actions: [ActionAction]
-        package let horizontalAlign: AdaptyUI.HorizontalAlignment
+        package let horizontalAlign: AdaptyUICore.HorizontalAlignment
 
         package func format(byValue: TimeInterval) -> RichText {
             let index =
@@ -27,7 +27,7 @@ extension AdaptyUI {
             return format[index].value
         }
 
-        init(id: String, state: State, format: [Item], actions: [ActionAction], horizontalAlign: AdaptyUI.HorizontalAlignment) {
+        init(id: String, state: State, format: [Item], actions: [ActionAction], horizontalAlign: AdaptyUICore.HorizontalAlignment) {
             self.id = id
             self.state = state
             self.format = format.sorted(by: { $0.from > $1.from })
@@ -55,7 +55,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.Timer.State: Hashable {
+extension AdaptyUICore.Timer.State: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .endedAt(value):
@@ -70,13 +70,13 @@ extension AdaptyUI.Timer.State: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Timer {
+    package extension AdaptyUICore.Timer {
         static func create(
             id: String = UUID().uuidString,
             endedAt: Date,
-            format: AdaptyUI.RichText,
-            actions: [AdaptyUI.ActionAction] = [],
-            horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
+            format: AdaptyUICore.RichText,
+            actions: [AdaptyUICore.ActionAction] = [],
+            horizontalAlign: AdaptyUICore.HorizontalAlignment = .leading
         ) -> Self {
             .create(
                 id: id,
@@ -91,8 +91,8 @@ extension AdaptyUI.Timer.State: Hashable {
             id: String = UUID().uuidString,
             endedAt: Date,
             format: [Item],
-            actions: [AdaptyUI.ActionAction] = [],
-            horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
+            actions: [AdaptyUICore.ActionAction] = [],
+            horizontalAlign: AdaptyUICore.HorizontalAlignment = .leading
         ) -> Self {
             .init(
                 id: id,
@@ -107,9 +107,9 @@ extension AdaptyUI.Timer.State: Hashable {
             id: String = UUID().uuidString,
             duration: TimeInterval,
             startBehaviour: StartBehaviour = .default,
-            format: AdaptyUI.RichText,
-            actions: [AdaptyUI.ActionAction] = [],
-            horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
+            format: AdaptyUICore.RichText,
+            actions: [AdaptyUICore.ActionAction] = [],
+            horizontalAlign: AdaptyUICore.HorizontalAlignment = .leading
         ) -> Self {
             .create(
                 id: id,
@@ -126,8 +126,8 @@ extension AdaptyUI.Timer.State: Hashable {
             duration: TimeInterval,
             startBehaviour: StartBehaviour = .default,
             format: [Item],
-            actions: [AdaptyUI.ActionAction] = [],
-            horizontalAlign: AdaptyUI.HorizontalAlignment = .leading
+            actions: [AdaptyUICore.ActionAction] = [],
+            horizontalAlign: AdaptyUICore.HorizontalAlignment = .leading
         ) -> Self {
             .init(
                 id: id,
@@ -139,10 +139,10 @@ extension AdaptyUI.Timer.State: Hashable {
         }
     }
 
-    package extension AdaptyUI.Timer.Item {
+    package extension AdaptyUICore.Timer.Item {
         static func create(
             from: TimeInterval,
-            value: AdaptyUI.RichText
+            value: AdaptyUICore.RichText
         ) -> Self {
             .init(
                 from: from,

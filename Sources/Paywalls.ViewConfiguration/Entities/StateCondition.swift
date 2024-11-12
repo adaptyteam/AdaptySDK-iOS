@@ -7,14 +7,14 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum StateCondition: Sendable {
         case selectedSection(id: String, index: Int)
         case selectedProduct(id: String, groupId: String)
     }
 }
 
-extension AdaptyUI.StateCondition: Hashable {
+extension AdaptyUICore.StateCondition: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .selectedSection(id, index):
@@ -29,7 +29,7 @@ extension AdaptyUI.StateCondition: Hashable {
     }
 }
 
-extension AdaptyUI.StateCondition: Decodable {
+extension AdaptyUICore.StateCondition: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case productId = "product_id"
@@ -56,7 +56,7 @@ extension AdaptyUI.StateCondition: Decodable {
         case .selectedProduct:
             self = try .selectedProduct(
                 id: container.decode(String.self, forKey: .productId),
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyUICore.ViewConfiguration.StringId.Product.defaultProductGroupId
             )
         }
     }

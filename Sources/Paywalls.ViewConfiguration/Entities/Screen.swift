@@ -7,11 +7,11 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Screen: Sendable, Hashable {
-        static let defaultBackground: AdaptyUI.Background = .filling(.same(.solidColor(.black)))
+        static let defaultBackground: AdaptyUICore.Background = .filling(.same(.solidColor(.black)))
 
-        package let background: AdaptyUI.Background
+        package let background: AdaptyUICore.Background
         package let cover: Box?
         package let content: Element
         package let footer: Element?
@@ -21,13 +21,13 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Screen {
+    package extension AdaptyUICore.Screen {
         static func create(
-            background: AdaptyUI.Background = AdaptyUI.Screen.defaultBackground,
-            cover: AdaptyUI.Box? = nil,
-            content: AdaptyUI.Element,
-            footer: AdaptyUI.Element? = nil,
-            overlay: AdaptyUI.Element? = nil,
+            background: AdaptyUICore.Background = AdaptyUICore.Screen.defaultBackground,
+            cover: AdaptyUICore.Box? = nil,
+            content: AdaptyUICore.Element,
+            footer: AdaptyUICore.Element? = nil,
+            overlay: AdaptyUICore.Element? = nil,
             selectedAdaptyProductId: String? = nil
         ) -> Self {
             .init(

@@ -9,13 +9,13 @@ import Foundation
 
 #if DEBUG
 
-    package extension AdaptyUI.LocalizedViewConfiguration {
+    package extension AdaptyUICore.LocalizedViewConfiguration {
         static func create(
             templateId: String = "transparent",
             locale: String = "en",
             isRightToLeft: Bool = false,
             images: [String] = [],
-            colors: [String: AdaptyUI.Filling] = [:],
+            colors: [String: AdaptyUICore.Filling] = [:],
             strings: [String: [String]] = [:],
             content: String,
             selectedProducts: [String: String] = [:]
@@ -23,10 +23,10 @@ import Foundation
             let locale = AdaptyLocale(id: locale)
 
             let colors = colors
-                .mapValues { AdaptyUI.ViewConfiguration.Asset.filling($0) }
+                .mapValues { AdaptyUICore.ViewConfiguration.Asset.filling($0) }
 
             let assets = Dictionary(
-                images.map { ($0, AdaptyUI.ViewConfiguration.Asset.image(.resources($0))) }
+                images.map { ($0, AdaptyUICore.ViewConfiguration.Asset.image(.resources($0))) }
             ) { current, _ in current }
                 .merging(colors) { current, _ in current }
 
@@ -34,8 +34,8 @@ import Foundation
             let jsonDecoder = JSONDecoder()
             Backend.configure(jsonDecoder: jsonDecoder)
             let screen =
-                if let element = try? jsonDecoder.decode(AdaptyUI.ViewConfiguration.Element.self, from: data) {
-                    AdaptyUI.ViewConfiguration.Screen(
+                if let element = try? jsonDecoder.decode(AdaptyUICore.ViewConfiguration.Element.self, from: data) {
+                    AdaptyUICore.ViewConfiguration.Screen(
                         backgroundAssetId: "$black",
                         cover: nil,
                         content: element,
@@ -44,10 +44,10 @@ import Foundation
                         selectedAdaptyProductId: nil
                     )
                 } else {
-                    try jsonDecoder.decode(AdaptyUI.ViewConfiguration.Screen.self, from: data)
+                    try jsonDecoder.decode(AdaptyUICore.ViewConfiguration.Screen.self, from: data)
                 }
 
-            return try AdaptyUI.ViewConfiguration(
+            return try AdaptyUICore.ViewConfiguration(
                 id: UUID().uuidString,
                 templateId: templateId,
                 templateRevision: 0,
@@ -71,7 +71,7 @@ import Foundation
                 defaultLocalization: nil,
                 defaultScreen: screen,
                 screens: [:],
-                referencedElemnts: [String: AdaptyUI.ViewConfiguration.Element](screen.referencedElemnts, uniquingKeysWith: { _, _ in
+                referencedElemnts: [String: AdaptyUICore.ViewConfiguration.Element](screen.referencedElemnts, uniquingKeysWith: { _, _ in
                     throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate element_id"))
                 }),
                 selectedProducts: selectedProducts

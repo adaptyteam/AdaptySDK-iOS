@@ -7,6 +7,6 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package typealias Offset = Point
 }

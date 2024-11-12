@@ -8,28 +8,28 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     struct Decorator: Sendable, Hashable {
-        let shapeType: AdaptyUI.ShapeType
+        let shapeType: AdaptyUICore.ShapeType
         let backgroundAssetId: String?
         let borderAssetId: String?
         let borderThickness: Double?
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func decorator(_ from: AdaptyUI.ViewConfiguration.Decorator) throws -> AdaptyUI.Decorator {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func decorator(_ from: AdaptyUICore.ViewConfiguration.Decorator) throws -> AdaptyUICore.Decorator {
         .init(
             shapeType: from.shapeType,
             background: from.backgroundAssetId.flatMap { try? background($0) },
-            border: from.borderAssetId.map { (try? filling($0)) ?? AdaptyUI.Border.default.filling }.map {
-                AdaptyUI.Border(filling: $0, thickness: from.borderThickness ?? AdaptyUI.Border.default.thickness)
+            border: from.borderAssetId.map { (try? filling($0)) ?? AdaptyUICore.Border.default.filling }.map {
+                AdaptyUICore.Border(filling: $0, thickness: from.borderThickness ?? AdaptyUICore.Border.default.thickness)
             }
         )
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
+extension AdaptyUICore.ViewConfiguration.Decorator: Decodable {
     enum CodingKeys: String, CodingKey {
         case backgroundAssetId = "background"
         case rectangleCornerRadius = "rect_corner_radius"
@@ -41,10 +41,10 @@ extension AdaptyUI.ViewConfiguration.Decorator: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         backgroundAssetId = try container.decodeIfPresent(String.self, forKey: .backgroundAssetId)
-        let shape = (try? container.decode(AdaptyUI.ShapeType.self, forKey: .shapeType)) ?? AdaptyUI.Decorator.defaultShapeType
+        let shape = (try? container.decode(AdaptyUICore.ShapeType.self, forKey: .shapeType)) ?? AdaptyUICore.Decorator.defaultShapeType
 
         if case .rectangle = shape,
-           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUI.CornerRadius.self, forKey: .rectangleCornerRadius) {
+           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyUICore.CornerRadius.self, forKey: .rectangleCornerRadius) {
             shapeType = .rectangle(cornerRadius: rectangleCornerRadius)
         } else {
             shapeType = shape

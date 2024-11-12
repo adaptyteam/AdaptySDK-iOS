@@ -22,5 +22,5 @@ struct AdaptyMockPaywall: AdaptyPaywallInterface {
         .full(products: [])
     }
 
-    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {}
+    func logShowPaywall(viewConfiguration: AdaptyUICore.LocalizedViewConfiguration) async throws {}
 }

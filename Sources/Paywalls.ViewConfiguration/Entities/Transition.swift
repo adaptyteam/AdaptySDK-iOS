@@ -7,13 +7,13 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum Transition: Sendable {
         case fade(TransitionFade)
         case unknown(String)
 
         package enum Interpolator: Sendable, Hashable {
-            static let `default`: AdaptyUI.Transition.Interpolator = .easeInOut
+            static let `default`: AdaptyUICore.Transition.Interpolator = .easeInOut
 
             case easeInOut
             case easeIn
@@ -25,15 +25,15 @@ extension AdaptyUI {
     package struct TransitionFade: Sendable, Hashable {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultDuration: TimeInterval = 0.3
-        static let defaultInterpolator = AdaptyUI.Transition.Interpolator.default
+        static let defaultInterpolator = AdaptyUICore.Transition.Interpolator.default
 
         package let startDelay: TimeInterval
         package let duration: TimeInterval
-        package let interpolator: AdaptyUI.Transition.Interpolator
+        package let interpolator: AdaptyUICore.Transition.Interpolator
     }
 }
 
-extension AdaptyUI.Transition: Hashable {
+extension AdaptyUICore.Transition: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fade(value):
@@ -47,11 +47,11 @@ extension AdaptyUI.Transition: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyUI.TransitionFade {
+    package extension AdaptyUICore.TransitionFade {
         static func create(
             startDelay: TimeInterval = defaultStartDelay,
             duration: TimeInterval = defaultDuration,
-            interpolator: AdaptyUI.Transition.Interpolator = defaultInterpolator
+            interpolator: AdaptyUICore.Transition.Interpolator = defaultInterpolator
         ) -> Self {
             .init(
                 startDelay: startDelay,
@@ -62,7 +62,7 @@ extension AdaptyUI.Transition: Hashable {
     }
 #endif
 
-extension AdaptyUI.Transition: Decodable {
+extension AdaptyUICore.Transition: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
     }
@@ -78,12 +78,12 @@ extension AdaptyUI.Transition: Decodable {
         case .none:
             self = .unknown(typeName)
         case .fade:
-            self = try .fade(AdaptyUI.TransitionFade(from: decoder))
+            self = try .fade(AdaptyUICore.TransitionFade(from: decoder))
         }
     }
 }
 
-extension AdaptyUI.Transition.Interpolator: Decodable {
+extension AdaptyUICore.Transition.Interpolator: Decodable {
     enum Values: String {
         case easeInOut = "ease_in_out"
         case easeIn = "ease_in"
@@ -108,7 +108,7 @@ extension AdaptyUI.Transition.Interpolator: Decodable {
     }
 }
 
-extension AdaptyUI.TransitionFade: Decodable {
+extension AdaptyUICore.TransitionFade: Decodable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"
         case duration
@@ -118,8 +118,8 @@ extension AdaptyUI.TransitionFade: Decodable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultStartDelay
-        duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUI.TransitionFade.defaultDuration
-        interpolator = try (container.decodeIfPresent(AdaptyUI.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyUI.TransitionFade.defaultInterpolator
+        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUICore.TransitionFade.defaultStartDelay
+        duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUICore.TransitionFade.defaultDuration
+        interpolator = try (container.decodeIfPresent(AdaptyUICore.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyUICore.TransitionFade.defaultInterpolator
     }
 }

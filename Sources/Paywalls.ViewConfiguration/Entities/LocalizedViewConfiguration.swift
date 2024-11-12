@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     public struct LocalizedViewConfiguration: Sendable, Hashable {
         public let id: String
         public let locale: String
@@ -21,14 +21,14 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.LocalizedViewConfiguration {
+    package extension AdaptyUICore.LocalizedViewConfiguration {
         static func create(
             id: String = UUID().uuidString,
             locale: String = AdaptyLocale.defaultPaywallLocale.id,
             isRightToLeft: Bool = false,
             templateId: String,
-            screen: AdaptyUI.Screen,
-            bottomSheets: [String: AdaptyUI.BottomSheet] = [:],
+            screen: AdaptyUICore.Screen,
+            bottomSheets: [String: AdaptyUICore.BottomSheet] = [:],
             templateRevision: Int64 = 0,
             selectedProducts: [String: String] = [:]
         ) -> Self {
@@ -46,7 +46,7 @@ extension AdaptyUI {
     }
 #endif
 
-extension AdaptyUI.LocalizedViewConfiguration: CustomStringConvertible {
+extension AdaptyUICore.LocalizedViewConfiguration: CustomStringConvertible {
     public var description: String {
         "(id: \(id), templateId: \(templateId), templateRevision: \(templateRevision), locale: \(locale), isRightToLeft: \(isRightToLeft))"
     }

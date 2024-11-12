@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum AspectRatio: String {
         case fit
         case fill
@@ -15,4 +15,4 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.AspectRatio: Decodable {}
+extension AdaptyUICore.AspectRatio: Decodable {}

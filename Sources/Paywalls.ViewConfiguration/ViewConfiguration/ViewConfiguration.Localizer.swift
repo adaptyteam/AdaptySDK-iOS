@@ -7,15 +7,15 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration {
+extension AdaptyUICore.ViewConfiguration {
     final class Localizer: @unchecked Sendable {
         let id = UUID()
         let localization: Localization?
-        let source: AdaptyUI.ViewConfiguration
+        let source: AdaptyUICore.ViewConfiguration
         let locale: AdaptyLocale
         var elementIds = Set<String>()
 
-        init(source: AdaptyUI.ViewConfiguration, withLocale: AdaptyLocale) {
+        init(source: AdaptyUICore.ViewConfiguration, withLocale: AdaptyLocale) {
             self.source = source
             self.localization = source.getLocalization(withLocale)
             self.locale = self.localization?.id ?? withLocale
@@ -23,8 +23,8 @@ extension AdaptyUI.ViewConfiguration {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer: Hashable {
-    static func == (lhs: AdaptyUI.ViewConfiguration.Localizer, rhs: AdaptyUI.ViewConfiguration.Localizer) -> Bool {
+extension AdaptyUICore.ViewConfiguration.Localizer: Hashable {
+    static func == (lhs: AdaptyUICore.ViewConfiguration.Localizer, rhs: AdaptyUICore.ViewConfiguration.Localizer) -> Bool {
         lhs.id == rhs.id
     }
 
@@ -33,8 +33,8 @@ extension AdaptyUI.ViewConfiguration.Localizer: Hashable {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func localize() throws -> AdaptyUI.LocalizedViewConfiguration {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func localize() throws -> AdaptyUICore.LocalizedViewConfiguration {
         elementIds.removeAll()
         return try .init(
             id: source.id,
@@ -49,7 +49,7 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum LocalizerError: Swift.Error {
         case notFoundAsset(String)
         case wrongTypeAsset(String)

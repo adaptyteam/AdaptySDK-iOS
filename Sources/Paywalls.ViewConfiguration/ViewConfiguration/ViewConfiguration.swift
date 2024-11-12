@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     struct ViewConfiguration: Sendable, Hashable {
         let id: String
         let templateId: String
@@ -23,13 +23,13 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.ViewConfiguration: CustomStringConvertible {
+extension AdaptyUICore.ViewConfiguration: CustomStringConvertible {
     var description: String {
         "(id: \(id), templateId: \(templateId), templateRevision: \(templateRevision))"
     }
 }
 
-extension AdaptyUI.ViewConfiguration: Decodable {
+extension AdaptyUICore.ViewConfiguration: Decodable {
     enum ContainerCodingKeys: String, CodingKey {
         case container = "paywall_builder_config"
         case responseLocale = "lang"
@@ -61,7 +61,7 @@ extension AdaptyUI.ViewConfiguration: Decodable {
         if container.contains(.products) {
             let products = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
             if let selected = try? products.decodeIfPresent(String.self, forKey: .selected) {
-                selectedProducts = [AdaptyUI.ViewConfiguration.StringId.Product.defaultProductGroupId: selected]
+                selectedProducts = [AdaptyUICore.ViewConfiguration.StringId.Product.defaultProductGroupId: selected]
             } else {
                 selectedProducts = try products.decode([String: String].self, forKey: .selected)
             }

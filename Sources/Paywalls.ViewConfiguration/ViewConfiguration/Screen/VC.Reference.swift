@@ -8,16 +8,16 @@
 
 import Foundation
 
-extension AdaptyUI.ViewConfiguration.Localizer {
-    func reference(_ id: String) throws -> AdaptyUI.Element {
+extension AdaptyUICore.ViewConfiguration.Localizer {
+    func reference(_ id: String) throws -> AdaptyUICore.Element {
         guard !self.elementIds.contains(id) else {
-            throw AdaptyUI.LocalizerError.referenceCycle(id)
+            throw AdaptyUICore.LocalizerError.referenceCycle(id)
         }
         guard let value = source.referencedElemnts[id] else {
-            throw AdaptyUI.LocalizerError.unknownReference(id)
+            throw AdaptyUICore.LocalizerError.unknownReference(id)
         }
         elementIds.insert(id)
-        let result: AdaptyUI.Element
+        let result: AdaptyUICore.Element
         do {
             result = try element(value)
             elementIds.remove(id)
@@ -29,20 +29,20 @@ extension AdaptyUI.ViewConfiguration.Localizer {
     }
 }
 
-extension AdaptyUI.ViewConfiguration.Screen {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+extension AdaptyUICore.ViewConfiguration.Screen {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         [content, footer, overlay].compactMap { $0 }.flatMap { $0.referencedElemnts }
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Button {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Button {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         [normalState, selectedState].compactMap { $0 }.flatMap { $0.referencedElemnts }
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Element {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Element {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         switch self {
         case .reference: []
         case let .stack(value, properties):
@@ -75,27 +75,27 @@ private extension AdaptyUI.ViewConfiguration.Element {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Element.Properties {
-    func referencedElemnts(_ element: AdaptyUI.ViewConfiguration.Element) -> [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Element.Properties {
+    func referencedElemnts(_ element: AdaptyUICore.ViewConfiguration.Element) -> [(String, AdaptyUICore.ViewConfiguration.Element)] {
         guard let elementId else { return [] }
         return [(elementId, element)]
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Box {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Box {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         content?.referencedElemnts ?? []
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Stack {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Stack {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         items.flatMap { $0.referencedElemnts }
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.StackItem {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.StackItem {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         switch self {
         case .space:
             []
@@ -105,62 +105,62 @@ private extension AdaptyUI.ViewConfiguration.StackItem {
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Section {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Section {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         content.flatMap { $0.referencedElemnts }
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Pager {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Pager {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         content.flatMap { $0.referencedElemnts }
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Row {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Row {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         items.flatMap { $0.referencedElemnts }
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Column {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Column {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         items.flatMap { $0.referencedElemnts }
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.GridItem {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.GridItem {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         content.referencedElemnts
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Text {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Text {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         []
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Image {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Image {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         []
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.VideoPlayer {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.VideoPlayer {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         []
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Toggle {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Toggle {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         []
     }
 }
 
-private extension AdaptyUI.ViewConfiguration.Timer {
-    var referencedElemnts: [(String, AdaptyUI.ViewConfiguration.Element)] {
+private extension AdaptyUICore.ViewConfiguration.Timer {
+    var referencedElemnts: [(String, AdaptyUICore.ViewConfiguration.Element)] {
         []
     }
 }

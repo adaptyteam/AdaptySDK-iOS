@@ -21,9 +21,9 @@ struct AdaptyUIToggleView: View {
     @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
     @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
 
-    private var toggle: AdaptyUI.Toggle
+    private var toggle: AdaptyUICore.Toggle
 
-    init(_ toggle: AdaptyUI.Toggle) {
+    init(_ toggle: AdaptyUICore.Toggle) {
         self.toggle = toggle
     }
 

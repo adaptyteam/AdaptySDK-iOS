@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct Image: Sendable, Hashable {
         static let defaultAspectRatio = AspectRatio.fit
 
@@ -18,11 +18,11 @@ extension AdaptyUI {
 }
 
 #if DEBUG
-    package extension AdaptyUI.Image {
+    package extension AdaptyUICore.Image {
         static func create(
-            asset: AdaptyUI.Mode<AdaptyUI.ImageData>,
-            aspect: AdaptyUI.AspectRatio = defaultAspectRatio,
-            tint: AdaptyUI.Mode<AdaptyUI.Filling>? = nil
+            asset: AdaptyUICore.Mode<AdaptyUICore.ImageData>,
+            aspect: AdaptyUICore.AspectRatio = defaultAspectRatio,
+            tint: AdaptyUICore.Mode<AdaptyUICore.Filling>? = nil
         ) -> Self {
             .init(
                 asset: asset,

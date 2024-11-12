@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package enum ShapeType: Sendable {
         case rectangle(cornerRadius: CornerRadius)
         case circle
@@ -16,7 +16,7 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.ShapeType: Hashable {
+extension AdaptyUICore.ShapeType: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .rectangle(value):
@@ -32,7 +32,7 @@ extension AdaptyUI.ShapeType: Hashable {
     }
 }
 
-extension AdaptyUI.ShapeType: Decodable {
+extension AdaptyUICore.ShapeType: Decodable {
     enum Types: String {
         case circle
         case rectangle = "rect"
@@ -50,7 +50,7 @@ extension AdaptyUI.ShapeType: Decodable {
         case .curveDown:
             self = .curveDown
         case .rectangle:
-            self = .rectangle(cornerRadius: AdaptyUI.CornerRadius.zero)
+            self = .rectangle(cornerRadius: AdaptyUICore.CornerRadius.zero)
         case .circle:
             self = .circle
         }

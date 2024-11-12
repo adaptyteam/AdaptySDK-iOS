@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUI {
+extension AdaptyUICore {
     package struct ColorGradient: Hashable, Sendable {
         package let kind: Kind
         package let start: Point
@@ -16,9 +16,9 @@ extension AdaptyUI {
     }
 }
 
-extension AdaptyUI.ColorGradient {
+extension AdaptyUICore.ColorGradient {
     package struct Item: Hashable, Sendable {
-        package let color: AdaptyUI.Color
+        package let color: AdaptyUICore.Color
         package let p: Double
     }
 
@@ -30,12 +30,12 @@ extension AdaptyUI.ColorGradient {
 }
 
 #if DEBUG
-    package extension AdaptyUI.ColorGradient {
+    package extension AdaptyUICore.ColorGradient {
         static func create(
-            kind: AdaptyUI.ColorGradient.Kind,
-            start: AdaptyUI.Point,
-            end: AdaptyUI.Point,
-            items: [AdaptyUI.ColorGradient.Item]
+            kind: AdaptyUICore.ColorGradient.Kind,
+            start: AdaptyUICore.Point,
+            end: AdaptyUICore.Point,
+            items: [AdaptyUICore.ColorGradient.Item]
         ) -> Self {
             .init(
                 kind: kind,
@@ -46,9 +46,9 @@ extension AdaptyUI.ColorGradient {
         }
     }
 
-    package extension AdaptyUI.ColorGradient.Item {
+    package extension AdaptyUICore.ColorGradient.Item {
         static func create(
-            color: AdaptyUI.Color,
+            color: AdaptyUICore.Color,
             p: Double
         ) -> Self {
             .init(
@@ -59,7 +59,7 @@ extension AdaptyUI.ColorGradient {
     }
 #endif
 
-extension AdaptyUI.ColorGradient: Decodable {
+extension AdaptyUICore.ColorGradient: Decodable {
     static func assetType(_ type: String) -> Bool {
         ContentType(rawValue: type) != nil
     }
@@ -76,12 +76,12 @@ extension AdaptyUI.ColorGradient: Decodable {
         let x1: Double
         let y1: Double
 
-        var start: AdaptyUI.Point {
-            AdaptyUI.Point(x: x0, y: y0)
+        var start: AdaptyUICore.Point {
+            AdaptyUICore.Point(x: x0, y: y0)
         }
 
-        var end: AdaptyUI.Point {
-            AdaptyUI.Point(x: x1, y: y1)
+        var end: AdaptyUICore.Point {
+            AdaptyUICore.Point(x: x1, y: y1)
         }
     }
 
@@ -100,9 +100,9 @@ extension AdaptyUI.ColorGradient: Decodable {
 
         kind =
             switch try container.decode(String.self, forKey: .type) {
-            case AdaptyUI.ColorGradient.ContentType.colorRadialGradient.rawValue:
+            case AdaptyUICore.ColorGradient.ContentType.colorRadialGradient.rawValue:
                 .radial
-            case AdaptyUI.ColorGradient.ContentType.colorConicGradient.rawValue:
+            case AdaptyUICore.ColorGradient.ContentType.colorConicGradient.rawValue:
                 .conic
             default:
                 .linear
@@ -110,7 +110,7 @@ extension AdaptyUI.ColorGradient: Decodable {
     }
 }
 
-extension AdaptyUI.ColorGradient.Item: Decodable {
+extension AdaptyUICore.ColorGradient.Item: Decodable {
     enum CodingKeys: String, CodingKey {
         case color
         case p
@@ -118,7 +118,7 @@ extension AdaptyUI.ColorGradient.Item: Decodable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        color = try container.decode(AdaptyUI.Color.self, forKey: .color)
+        color = try container.decode(AdaptyUICore.Color.self, forKey: .color)
         p = try container.decode(Double.self, forKey: .p)
     }
 }
