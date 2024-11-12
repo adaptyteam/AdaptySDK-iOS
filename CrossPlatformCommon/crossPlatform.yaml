@@ -3,7 +3,6 @@ $id: "https://adapty.io/crossPlatform/3.0.0/schema"
 title: "Cross Platform Format"
 
 $recuests:
-
   ### activate ###
   Activate.Request: #request
     type: object
@@ -21,20 +20,86 @@ $recuests:
       - required: [success]
         properties:
           success: { const: true }
-          
-  ### getSDKVersion ###
 
-  GetSDKVersion.Request: #request
+  ### getPaywall ###
+  GetPaywall.Request: #request
+    type: object
+    required: [method, placement_id]
+    properties:
+      method: { const: "get_paywall" }
+      placement_id: { type: string }
+      locale: { type: string }
+      fetch_policy:
+        { type: jsonString, $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+      load_timeout: { type: number }
+
+  GetPaywall.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPaywall" }
+
+  ### getPaywallProducts ### TODO:
+  GetPaywallProducts.Request: #request
+    type: object
+    required: [method, paywall]
+    properties:
+      method: { const: "get_paywall_products" }
+      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
+
+  GetPaywallProducts.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success:
+            {
+              type: array,
+              items: { $ref: "#/$defs/AdaptyPaywallProduct.Response" },
+            }
+
+  ### getProfile ###
+  GetProfile.Request: #request
     type: object
     required: [method]
     properties:
-      method: { const: "get_sdk_version" }
+      method: { const: "get_profile" }
 
-  GetSDKVersion.Response: #response
+  GetProfile.Response: #response
     type: object
-    required: [success]
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyProfile" }
+
+  ### identify ###
+
+  Identify.Request: #request
+    type: object
+    required: [method, customer_user_id]
     properties:
-      success: { type: string }
+      method: { const: "identify" }
+      customer_user_id: { type: string }
+
+  Identify.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### isActivated ###
 
@@ -78,110 +143,6 @@ $recuests:
     required: [success]
     properties:
       success: { const: true }
-
-
-
-  ### getPaywall ###
-
-  GetPaywall.Request: #request
-    type: object
-    required: [method, placement_id]
-    properties:
-      method: { const: "get_paywall" }
-      placement_id: { type: string }
-      locale: { type: string }
-      fetch_policy:
-        { type: jsonString, $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
-      load_timeout: { type: number }
-
-  GetPaywall.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { $ref: "#/$defs/AdaptyPaywall" }
-
-  ### getPaywallProducts ###
-
-  GetPaywallProducts.Request: #request
-    type: object
-    required: [method, paywall]
-    properties:
-      method: { const: "get_paywall_products" }
-      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
-
-  GetPaywallProducts.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success:
-            {
-              type: array,
-              items: { $ref: "#/$defs/AdaptyPaywallProduct.Response" },
-            }
-
-  ### getProfile ###
-
-  GetProfile.Request: #request
-    type: object
-    required: [method]
-    properties:
-      method: { const: "get_profile" }
-
-  GetProfile.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { $ref: "#/$defs/AdaptyProfile" }
-
-  ### updateProfile ###
-
-  UpdateProfile.Request: #request
-    type: object
-    required: [method, params]
-    properties:
-      method: { const: "update_profile" }
-      params: { type: jsonString, $ref: "#/$defs/AdaptyProfileParameters" }
-
-  UpdateProfile.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
-  ### identify ###
-
-  Identify.Request: #request
-    type: object
-    required: [method, customer_user_id]
-    properties:
-      method: { const: "identify" }
-      customer_user_id: { type: string }
-
-  Identify.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
 
   ### logout ###
 
@@ -260,6 +221,20 @@ $recuests:
         properties:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
+  ### presentCodeRedemptionSheet ###
+
+  PresentCodeRedemptionSheet.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "present_code_redemption_sheet" }
+
+  PresentCodeRedemptionSheet.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { const: true }
+
   ### restorePurchases ###
 
   RestorePurchases.Request: #request
@@ -277,6 +252,20 @@ $recuests:
       - required: [success]
         properties:
           success: { $ref: "#/$defs/AdaptyProfile" }
+
+  ### getSDKVersion ###
+
+  GetSDKVersion.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "get_sdk_version" }
+
+  GetSDKVersion.Response: #response
+    type: object
+    required: [success]
+    properties:
+      success: { type: string }
 
   ### setFallbackPaywalls ###
 
@@ -338,19 +327,24 @@ $recuests:
         properties:
           success: { const: true }
 
-  ### presentCodeRedemptionSheet ###
+  ### updateProfile ###
 
-  PresentCodeRedemptionSheet.Request: #request
+  UpdateProfile.Request: #request
     type: object
-    required: [method]
+    required: [method, params]
     properties:
-      method: { const: "present_code_redemption_sheet" }
+      method: { const: "update_profile" }
+      params: { type: jsonString, $ref: "#/$defs/AdaptyProfileParameters" }
 
-  PresentCodeRedemptionSheet.Response: #response
+  UpdateProfile.Response: #response
     type: object
-    required: [success]
-    properties:
-      success: { const: true }
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
 $defs:
   ### Entities ###
@@ -454,7 +448,6 @@ $defs:
       # introductory_offer_phases:
       #   type: array
 
-
   AdaptyPaywallProduct.Request: #request
     type: object
     properties:
@@ -462,6 +455,11 @@ $defs:
 
   AdaptyOnboardingScreenParameters: #request
     type: object
+    required: [onboarding_screen_order]
+    properties:
+      onboarding_name: { type: string }
+      onboarding_screen_name: { type: string }
+      onboarding_screen_order: { type: integer, minimum: 1 }
 
   AdaptyPaywall: #request #response
     type: object
@@ -551,15 +549,130 @@ $defs:
 
   AdaptyProfile: #response
     type: object
+    required:
+      - profile_id
+      - segment_hash
+      - is_test_user
+      - version
+    properties:
+      profile_id: { type: string }
+      customer_user_id: { type: string }
+      segment_hash: { type: string }
+      custom_attributes: { $ref: "#/$defs/AdaptyProfile.CustomAttributes" }
+      paid_access_levels:
+        type: object
+        additionalProperties: { $ref: "#/$defs/AdaptyProfile.AccessLevel" }
+      subscriptions:
+        type: object
+        additionalProperties: { $ref: "#/$defs/AdaptyProfile.Subscription" }
+      non_subscriptions:
+        type: object
+        additionalProperties:
+          type: array
+          items: { $ref: "#/$defs/AdaptyProfile.NonSubscription" }
+      timestamp: { type: integer }
+      is_test_user: { type: boolean }
 
   AdaptyProfile.AccessLevel: #response
     type: object
+    required:
+      - id
+      - is_active
+      - vendor_product_id
+      - store
+      - activated_at
+      - is_lifetime
+      - will_renew
+      - is_in_grace_period
+      - is_refund
+    properties:
+      id: { type: string }
+      is_active: { type: boolean }
+      vendor_product_id: { type: string }
+      store: { type: string }
+      activated_at: { $ref: "#/$defs/Date" }
+      renewed_at: { $ref: "#/$defs/Date" }
+      expires_at: { $ref: "#/$defs/Date" }
+      is_lifetime: { type: boolean }
+      active_introductory_offer_type: { type: string }
+      active_promotional_offer_type: { type: string }
+      active_promotional_offer_id: { type: string }
+      offer_id: { type: string }
+      will_renew: { type: boolean }
+      is_in_grace_period: { type: boolean }
+      unsubscribed_at: { $ref: "#/$defs/Date" }
+      billing_issue_detected_at: { $ref: "#/$defs/Date" }
+      starts_at: { $ref: "#/$defs/Date" }
+      cancellation_reason: { type: string }
+      is_refund: { type: boolean }
 
   AdaptyProfile.NonSubscription: #response
     type: object
+    required:
+      - purchase_id
+      - store
+      - vendor_product_id
+      - purchased_at
+      - is_sandbox
+      - is_refund
+      - is_consumable
+    properties:
+      purchase_id: { type: string }
+      store: { type: string }
+      vendor_product_id: { type: string }
+      vendor_transaction_id: { type: string }
+      purchased_at: { $ref: "#/$defs/Date" }
+      is_sandbox: { type: boolean }
+      is_refund: { type: boolean }
+      is_consumable: { type: boolean }
 
   AdaptyProfile.Subscription: #response
     type: object
+    required:
+      - store
+      - vendor_product_id
+      - vendor_transaction_id
+      - vendor_original_transaction_id
+      - is_active
+      - is_lifetime
+      - activated_at
+      - is_in_grace_period
+      - is_refund
+      - is_sandbox
+      - will_renew
+    properties:
+      store: { type: string }
+      vendor_product_id: { type: string }
+      vendor_transaction_id: { type: string }
+      vendor_original_transaction_id: { type: string }
+      is_active: { type: boolean }
+      is_lifetime: { type: boolean }
+      activated_at: { $ref: "#/$defs/Date" }
+      renewed_at: { $ref: "#/$defs/Date" }
+      expires_at: { $ref: "#/$defs/Date" }
+      starts_at: { $ref: "#/$defs/Date" }
+      unsubscribed_at: { $ref: "#/$defs/Date" }
+      billing_issue_detected_at: { $ref: "#/$defs/Date" }
+      is_in_grace_period: { type: boolean }
+      is_refund: { type: boolean }
+      is_sandbox: { type: boolean }
+      will_renew: { type: boolean }
+      active_introductory_offer_type: { type: string }
+      active_promotional_offer_type: { type: string }
+      active_promotional_offer_id: { type: string }
+      offer_id: { type: string }
+      cancellation_reason: { type: string }
+
+  AdaptyProfile.CustomAttributes:
+    type: object
+    additionalProperties:
+      oneOf:
+        - type:
+        - type: string
+          nullable: false
+        - type: number
+          format: double
+          nullable: false
 
   AdaptyProfile.Gender: #request
     type: string
