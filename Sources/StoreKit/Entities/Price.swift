@@ -12,6 +12,13 @@ package struct Price: Sendable, Hashable {
     package let currencyCode: String?
     package let currencySymbol: String?
     package let localizedString: String?
+    
+    package init(amount: Decimal, currencyCode: String?, currencySymbol: String?, localizedString: String?) {
+        self.amount = amount
+        self.currencyCode = currencyCode
+        self.currencySymbol = currencySymbol
+        self.localizedString = localizedString
+    }
 }
 
 extension Price: CustomStringConvertible {
