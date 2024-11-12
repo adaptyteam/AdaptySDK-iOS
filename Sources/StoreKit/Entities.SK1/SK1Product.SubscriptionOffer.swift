@@ -29,9 +29,9 @@ extension SK1Product {
         discounts.first(where: { $0.identifier == identifier })
     }
 
-    func subscriptionOffer(by offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier) -> AdaptySubscriptionOffer? {
+    func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
         let offer: SK1Product.SubscriptionOffer? =
-            switch offerTypeWithIdentifier {
+            switch offerIdentifier {
             case .introductory:
                 unfIntroductoryOffer
             case .promotional(let id):
@@ -50,7 +50,7 @@ extension SK1Product {
                 currencySymbol: locale.currencySymbol,
                 localizedString: locale.localized(sk1Price: offer.price)
             ),
-            offerTypeWithIdentifier: offerTypeWithIdentifier,
+            offerIdentifier: offerIdentifier,
             subscriptionPeriod: period,
             numberOfPeriods: offer.numberOfPeriods,
             paymentMode: offer.paymentMode.asPaymentMode,

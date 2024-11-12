@@ -196,7 +196,6 @@ $recuests:
           success: { const: true }
 
   ### makePurchase ###
-  # TODO:
   MakePurchase.Request: #request
     type: object
     required: [method, product]
@@ -430,11 +429,24 @@ $defs:
       # introductory_offer_phases:
       #   type: array
 
-  # TODO:
   AdaptyPaywallProduct.Request: #request
     type: object
+    required:
+      - vendor_product_id
+      - adaptyProductId
+      - paywall_variation_id
+      - paywall_ab_test_name
+      - paywall_name
     properties:
+      vendor_product_id: { type: string }
+      adaptyProductId: { type: string }
+      subscription_offer:
+        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+      paywall_variation_id: { type: string }
+      paywall_ab_test_name:  { type: string }
+      paywall_name:  { type: string }
       payload_data: { type: string }
+
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -677,7 +689,7 @@ $defs:
       first_name: { type: string }
       last_name: { type: string }
       gender: { $ref: "#/$defs/AdaptyProfile.Gender" }
-      birthday: { type: string , format: "YYYY-MM-dd"}
+      birthday: { type: string, format: "YYYY-MM-dd" }
       email: { type: string }
       phone_number: { type: string }
       facebook_anonymous_id: { type: string }
@@ -686,7 +698,7 @@ $defs:
       mixpanel_user_id: { type: string }
       appmetrica_profile_id: { type: string }
       appmetrica_device_id: { type: string }
-      att_status: { type: integer,  description: "iOS Only" }
+      att_status: { type: integer, description: "iOS Only" }
       custom_attributes: { $ref: "#/$defs/AdaptyProfile.CustomAttributes" }
       analytics_disabled: { type: boolean }
       one_signal_player_id: { type: string }
@@ -699,12 +711,16 @@ $defs:
   AdaptySubscriptionOffer: #response
     type: object
 
-  AdaptySubscriptionOffer.OfferType: #response
+  AdaptySubscriptionOffer.Identifier: #request #response
     type: string
-    enum:
-      - introductory
-      - promotional
-      - winBack
+    oneOf:
+      - required: [type]
+        properties:
+          type: { type: string, const: "introductory" }
+      - required: [type, id]
+        properties:
+          type: { type: string, enum: ["promotional", "win_back"] }
+          id: { type: string }
 
   AdaptySubscriptionOffer.PaymentMode: #response
     type: string

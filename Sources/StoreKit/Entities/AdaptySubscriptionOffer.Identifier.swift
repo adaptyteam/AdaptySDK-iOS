@@ -1,5 +1,5 @@
 //
-//  AdaptySubscriptionOffer.OfferType.swift
+//  AdaptySubscriptionOffer.Identifier.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 29.01.2024.
@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptySubscriptionOffer {
-   package enum OfferTypeWithIdentifier: Sendable, Hashable {
+   package enum Identifier: Sendable, Hashable {
         case introductory
         case promotional(String)
         case winBack(String)

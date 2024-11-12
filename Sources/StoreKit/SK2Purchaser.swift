@@ -34,7 +34,7 @@ actor SK2Purchaser {
         case .none:
             options = []
         case let .some(offer):
-            switch offer.offerTypeWithIdentifier {
+            switch offer.offerIdentifier {
             case .introductory:
                 options = []
 

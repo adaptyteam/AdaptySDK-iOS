@@ -31,7 +31,7 @@ extension Request {
             let product = try await Adapty.getPaywallProduct(
                 vendorProductId: product.vendorProductId,
                 adaptyProductId: product.adaptyProductId,
-                offerTypeWithIdentifier: product.offerTypeWithIdentifier,
+                offerIdentifier: product.subscriptionOffer,
                 variationId: product.variationId,
                 paywallABTestName: product.paywallABTestName,
                 paywallName: product.paywallName

@@ -38,7 +38,7 @@ extension Adapty {
     func getSK2PaywallProduct(
         vendorProductId: String,
         adaptyProductId: String,
-        offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier?,
+        offerIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
         paywallABTestName: String,
         paywallName: String,
@@ -47,11 +47,11 @@ extension Adapty {
         let sk2Product = try await productsManager.fetchSK2Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
 
         let subscriptionOffer: AdaptySubscriptionOffer? =
-            if let offerTypeWithIdentifier {
-                if let offer = sk2Product.subscriptionOffer(by: offerTypeWithIdentifier) {
+            if let offerIdentifier {
+                if let offer = sk2Product.subscriptionOffer(by: offerIdentifier) {
                     offer
                 } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit2 product dont have offer id: `\(offerTypeWithIdentifier.identifier ?? "nil")` with type:\(offerTypeWithIdentifier.asOfferType.rawValue) ").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("StoreKit2 product dont have offer id: `\(offerIdentifier.identifier ?? "nil")` with type:\(offerIdentifier.asOfferType.rawValue) ").asAdaptyError
                 }
             } else {
                 nil

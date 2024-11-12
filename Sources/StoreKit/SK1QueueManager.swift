@@ -43,7 +43,7 @@ actor SK1QueueManager: Sendable {
         case .none:
             payment = SKPayment(product: sk1Product)
         case let .some(offer):
-            switch offer.offerTypeWithIdentifier {
+            switch offer.offerIdentifier {
             case .introductory:
                 payment = SKPayment(product: sk1Product)
             case .winBack:

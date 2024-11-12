@@ -12,7 +12,7 @@ extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
         let vendorProductId: String
         let adaptyProductId: String
-        let offerTypeWithIdentifier: AdaptySubscriptionOffer.OfferTypeWithIdentifier?
+        let subscriptionOffer: AdaptySubscriptionOffer.Identifier?
         let variationId: String
         let paywallABTestName: String
         let paywallName: String
@@ -21,7 +21,7 @@ extension Request {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
             adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
-            offerTypeWithIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.OfferTypeWithIdentifier.self, forKey: .offerTypeWithIdentifier)
+            subscriptionOffer = try container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOffer)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
@@ -35,7 +35,7 @@ private enum CodingKeys: String, CodingKey {
     case paywallVariationId = "paywall_variation_id"
     case paywallABTestName = "paywall_ab_test_name"
     case paywallName = "paywall_name"
-    case offerTypeWithIdentifier = "subscription_offer"
+    case subscriptionOffer = "subscription_offer"
     case subscription
     case localizedDescription = "localized_description"
     case localizedTitle = "localized_title"
