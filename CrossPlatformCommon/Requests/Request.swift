@@ -38,7 +38,7 @@ enum Request {
         SetLogLevel.method: SetLogLevel.self,
         Activate.method: Activate.self,
         GetPaywall.method: GetPaywall.self,
-//        GetPaywallProducts.method: GetPaywallProducts.self,
+        GetPaywallProducts.method: GetPaywallProducts.self,
         GetProfile.method: GetProfile.self,
         Identify.method: Identify.self,
         Logout.method: Logout.self,
@@ -53,8 +53,8 @@ enum Request {
         UpdateProfile.method: UpdateProfile.self
     ]
 }
-enum Response {
-}
+
+enum Response {}
 
 extension Request {
     static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {

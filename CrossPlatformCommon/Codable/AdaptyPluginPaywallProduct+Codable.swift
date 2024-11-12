@@ -53,7 +53,8 @@ private enum CodingKeys: String, CodingKey {
 extension Response {
     struct AdaptyPluginPaywallProduct: Encodable {
         let adaptyPaywallProduct: AdaptyPaywallProduct
-        init(_ adaptyPaywallProduct: AdaptyPaywallProduct) throws {
+
+        init(_ adaptyPaywallProduct: AdaptyPaywallProduct) {
             self.adaptyPaywallProduct = adaptyPaywallProduct
         }
 
