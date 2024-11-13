@@ -30,7 +30,9 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await AdaptyUI.Plugin.presentView(viewId: viewId)
+            try await AdaptyUI.Plugin.presentView(
+                viewId: viewId
+            )
             return .success()
         }
     }

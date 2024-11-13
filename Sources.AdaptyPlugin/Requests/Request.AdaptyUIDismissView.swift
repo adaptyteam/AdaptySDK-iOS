@@ -24,17 +24,20 @@ extension Request {
         init(from params: AdaptyJsonDictionary) throws {
             try self.init(
                 viewId: params.value(String.self, forKey: CodingKeys.viewId),
-                destroy: params.value(Bool.self, forKey: CodingKeys.destroy)
+                destroy: params.valueIfPresent(Bool.self, forKey: CodingKeys.destroy)
             )
         }
 
-        init(viewId: String, destroy: Bool) {
+        init(viewId: String, destroy: Bool?) {
             self.viewId = viewId
-            self.destroy = destroy
+            self.destroy = destroy ?? false
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await AdaptyUI.Plugin.dismissView(viewId: viewId, destroy: destroy)
+            try await AdaptyUI.Plugin.dismissView(
+                viewId: viewId,
+                destroy: destroy
+            )
             return .success()
         }
     }

@@ -51,7 +51,7 @@ extension Request {
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy ?? AdaptyPaywall.FetchPolicy.default,
-                loadTimeout: loadTimeout ?? Adapty.defaultLoadPaywallTimeout
+                loadTimeout: loadTimeout
             ))
         }
     }

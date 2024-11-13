@@ -9,24 +9,32 @@ import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyUI.DialogConfiguration {
-    struct Action: Decodable {
-        let title: String?
+    struct Action {
+        package let title: String
+        package init(title: String) {
+            self.title = title
+        }
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyUI {
-    struct DialogConfiguration: Decodable {
+    struct DialogConfiguration {
         package let title: String?
         package let content: String?
         package let defaultAction: AdaptyUI.DialogConfiguration.Action
         package let secondaryAction: AdaptyUI.DialogConfiguration.Action?
 
-        enum CodingKeys: String, CodingKey {
-            case title
-            case content
-            case defaultAction = "default_action"
-            case secondaryAction = "secondary_action"
+        package init(
+            title: String?,
+            content: String?,
+            defaultAction: AdaptyUI.DialogConfiguration.Action,
+            secondaryAction: AdaptyUI.DialogConfiguration.Action?
+        ) {
+            self.title = title
+            self.content = content
+            self.defaultAction = defaultAction
+            self.secondaryAction = secondaryAction
         }
     }
 }

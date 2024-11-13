@@ -9,18 +9,11 @@ import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyUI {
-    struct View: Encodable {
-        let id: String
-        let templateId: String
-        let placementId: String
-        let paywallVariationId: String
-
-        enum CodingKeys: String, CodingKey {
-            case id
-            case templateId = "template_id"
-            case placementId = "placement_id"
-            case paywallVariationId = "paywall_variation_id"
-        }
+    struct View {
+        package let id: String
+        package let templateId: String
+        package let placementId: String
+        package let paywallVariationId: String
     }
 }
 

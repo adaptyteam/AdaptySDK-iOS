@@ -27,7 +27,8 @@ $recuests:
     required: [method, configuration]
     properties:
       method: { const: "adpty_ui_activate" }
-      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+      configuration:
+        { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
 
   AdaptyUIActivate.Response: #response
     type: object
@@ -42,18 +43,20 @@ $recuests:
   ### adaptyUICreateView ###
   AdaptyUICreateView.Request: #request
     type: object
-    required: 
+    required:
       - method
       - paywall
-      - locale
-      - preload_products
     properties:
       method: { const: "adpty_ui_create_view" }
       paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
-      locale: { type: string }
-      preload_products: { type: boolean  }
-      custom_tags: { type: jsonString, $ref: "#/$defs/AdaptyUI.CustomTags" }
-      android_personalized_offers: { type: jsonString, $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
+      load_timeout: { type: number, description: "seconds" }
+      preload_products: { type: boolean, default: false }
+      custom_tags:
+        { type: jsonString, $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
+      custom_timers:
+        { type: jsonString, $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
+      android_personalized_offers:
+        { type: jsonString, $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
 
   AdaptyUICreateView.Response: #response
     type: object
@@ -68,10 +71,11 @@ $recuests:
   ### adaptyUIDismissView ###
   AdaptyUIDismissView.Request: #request
     type: object
-    required: [method, configuration]
+    required: [method, id]
     properties:
       method: { const: "adpty_ui_dismiss_view" }
-      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+      id: { type: string, description: "View Id" }
+      destroy: { type: boolean }
 
   AdaptyUIDismissView.Response: #response
     type: object
@@ -86,10 +90,10 @@ $recuests:
   ### adaptyUIPresentView ###
   AdaptyUIPresentView.Request: #request
     type: object
-    required: [method, configuration]
+    required: [method, id]
     properties:
       method: { const: "adpty_ui_present_view" }
-      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+      id: { type: string, description: "View Id" }
 
   AdaptyUIPresentView.Response: #response
     type: object
@@ -104,10 +108,12 @@ $recuests:
   ### adaptyUIShowDialog ###
   AdaptyUIShowDialog.Request: #request
     type: object
-    required: [method, configuration]
+    required: [method, id, configuration]
     properties:
       method: { const: "adpty_ui_show_dialog" }
-      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+      id: { type: string, description: "View Id" }
+      configuration:
+        { type: jsonString, $ref: "#/$defs/AdaptyUI.DialogConfiguration" }
 
   AdaptyUIShowDialog.Response: #response
     type: object
@@ -536,13 +542,11 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adaptyProductId: { type: string }
-      subscription_offer:
-        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+      subscription_offer: { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
       paywall_variation_id: { type: string }
-      paywall_ab_test_name:  { type: string }
-      paywall_name:  { type: string }
+      paywall_ab_test_name: { type: string }
+      paywall_name: { type: string }
       payload_data: { type: string }
-
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -863,20 +867,40 @@ $defs:
     required:
       - id
       - template_id
-      - paywall_id
+      - placement_id
       - paywall_variation_id
     properties:
       id: { type: string }
       template_id: { type: string }
-      paywall_id: { type: string }
+      placement_id: { type: string }
       paywall_variation_id: { type: string }
 
-  AdaptyUI.CustomTags: #request
+  AdaptyUI.CustomTagsValues: #request
     type: object
     additionalProperties:
       type: string
+
+  AdaptyUI.CustomTimersValues: #request
+    type: object
+    additionalProperties: { $ref: "#/$defs/Date" }
 
   AdaptyUI.AndroidPersonalizedOffers: #request
     type: object
     additionalProperties:
       type: boolean
+
+  AdaptyUI.DialogConfiguration: #request
+    type: object
+    required:
+      - default_action
+    properties:
+      title: { type: string }
+      content: { type: string }
+      default_action: { $ref: "#/$defs/AdaptyUI.DialogConfiguration.Action" }
+      secondary_action: { $ref: "#/$defs/AdaptyUI.DialogConfiguration.Action" }
+
+  AdaptyUI.DialogConfiguration.Action: #request
+    type: object
+    required: [title]
+    properties:
+      title: { type: string }
