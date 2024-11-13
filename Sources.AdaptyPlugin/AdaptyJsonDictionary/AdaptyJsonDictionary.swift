@@ -82,6 +82,7 @@ extension KeyValue {
         guard let jsonData: Data = (value as? Data) ?? (value as? String)?.data(using: .utf8) else {
             throw AdaptyPluginDecodingError.wrongType(key: key, expected: Data.self, present: type(of: value))
         }
+        
         return try jsonData.decode(valueType)
     }
 }

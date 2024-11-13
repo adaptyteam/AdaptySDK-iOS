@@ -25,7 +25,17 @@ extension Request {
         }
 
         init(fileURL: KeyValue) throws {
-            self.fileURL = try fileURL.decode(URL.self)
+            if let url = try? fileURL.cast(URL.self) {
+                self.fileURL = url
+                return
+            }
+
+            if let url = try URL(string: fileURL.cast(String.self)) {
+                self.fileURL = url
+                return
+            }
+
+            throw DecodingError.dataCorrupted(.init(codingPath: [CodingKeys.fileURL], debugDescription: "Is not URL"))
         }
 
         func execute() async throws -> AdaptyJsonData {

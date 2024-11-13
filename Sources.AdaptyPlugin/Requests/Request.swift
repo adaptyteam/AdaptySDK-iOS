@@ -32,9 +32,9 @@ enum Request {
 
         case adaptyUIActivate = "adapty_ui_activate"
         case adaptyUICreateView = "adapty_ui_create_view"
-        case adaptyUIDismissView = "adapty_ui_dismiss_view"
-        case adaptyUIPresentView = "adapty_ui_present_view"
-        case adaptyUIShowDialog = "adapty_ui_show_dialog"
+        case adaptyUIDismissView = "adpty_ui_dismiss_view"
+        case adaptyUIPresentView = "adpty_ui_present_view"
+        case adaptyUIShowDialog = "adpty_ui_show_dialog"
     }
 
     static let allRequests: [Request.Method: AdaptyPluginRequest.Type] = {

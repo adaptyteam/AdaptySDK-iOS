@@ -59,8 +59,21 @@ extension Request {
             }
 
             self.attribution = attribution
-            self.source = try source.decode(AdaptyAttributionSource.self)
             self.networkUserId = networkUserId
+
+            if let source = try? source.cast(AdaptyAttributionSource.self) {
+                self.source = source
+
+            } else {
+                let value = try source.cast(String.self)
+                guard
+                    let source = AdaptyAttributionSource(rawValue: value)
+                else {
+                    throw DecodingError.dataCorrupted(.init(codingPath: [CodingKeys.source], debugDescription: "Has unknown value: \(value) "))
+                }
+
+                self.source = source
+            }
         }
 
         func execute() async throws -> AdaptyJsonData {
