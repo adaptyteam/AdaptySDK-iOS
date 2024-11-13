@@ -48,7 +48,7 @@ let package = Package(
         .target(
             name: "AdaptyPlugin",
             dependencies: ["Adapty", "AdaptyUI"],
-            path: "Sources.AdqptyPlugin"
+            path: "Sources.AdaptyPlugin"
         ),
         .testTarget(
             name: "AdaptyTests",
