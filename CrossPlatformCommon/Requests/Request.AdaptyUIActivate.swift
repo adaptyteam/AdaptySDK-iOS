@@ -1,5 +1,5 @@
 //
-//  Request.ActivateAdaptyUI.swift
+//  Request.AdaptyUIActivate.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 08.11.2024.
@@ -10,8 +10,8 @@ import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
-    struct ActivateAdaptyUI: AdaptyPluginRequest {
-        static let method = Method.activateAdaptyUI
+    struct AdaptyUIActivate: AdaptyPluginRequest {
+        static let method = Method.adaptyUIActivate
 
         let configuration: AdaptyUI.Configuration?
 
@@ -38,12 +38,12 @@ extension Request {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPlugin {
-    @objc static func activateAdaptyUI(
+    @objc static func adaptyUIActivate(
         configuration: String?,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
-        typealias CodingKeys = Request.ActivateAdaptyUI.CodingKeys
-        execute(with: completion) { try Request.ActivateAdaptyUI(
+        typealias CodingKeys = Request.AdaptyUIActivate.CodingKeys
+        execute(with: completion) { try Request.AdaptyUIActivate(
             configuration: configuration.map { KeyValue(key: CodingKeys.configuration, value: $0) }
         ) }
     }

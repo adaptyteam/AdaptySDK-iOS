@@ -21,6 +21,104 @@ $recuests:
         properties:
           success: { const: true }
 
+  ### adaptyUIActivate ###
+  AdaptyUIActivate.Request: #request
+    type: object
+    required: [method, configuration]
+    properties:
+      method: { const: "adpty_ui_activate" }
+      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+
+  AdaptyUIActivate.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### adaptyUICreateView ###
+  AdaptyUICreateView.Request: #request
+    type: object
+    required: 
+      - method
+      - paywall
+      - locale
+      - preload_products
+    properties:
+      method: { const: "adpty_ui_create_view" }
+      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
+      locale: { type: string }
+      preload_products: { type: boolean  }
+      custom_tags: { type: jsonString, $ref: "#/$defs/AdaptyUI.CustomTags" }
+      android_personalized_offers: { type: jsonString, $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
+
+  AdaptyUICreateView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyUI.View" }
+
+  ### adaptyUIDismissView ###
+  AdaptyUIDismissView.Request: #request
+    type: object
+    required: [method, configuration]
+    properties:
+      method: { const: "adpty_ui_dismiss_view" }
+      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+
+  AdaptyUIDismissView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### adaptyUIPresentView ###
+  AdaptyUIPresentView.Request: #request
+    type: object
+    required: [method, configuration]
+    properties:
+      method: { const: "adpty_ui_present_view" }
+      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+
+  AdaptyUIPresentView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### adaptyUIShowDialog ###
+  AdaptyUIShowDialog.Request: #request
+    type: object
+    required: [method, configuration]
+    properties:
+      method: { const: "adpty_ui_show_dialog" }
+      configuration: { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+
+  AdaptyUIShowDialog.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### getPaywall ###
   GetPaywall.Request: #request
     type: object
@@ -44,7 +142,6 @@ $recuests:
           success: { $ref: "#/$defs/AdaptyPaywall" }
 
   ### getPaywallProducts ###
-  # TODO:
   GetPaywallProducts.Request: #request
     type: object
     required: [method, paywall]
@@ -404,7 +501,6 @@ $defs:
       subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
       payload_data: { type: string }
 
-  # TODO:
   AdaptyPaywallProduct.Subscription: #response
     type: object
     required:
@@ -707,7 +803,6 @@ $defs:
       firebase_app_instance_id: { type: string }
       airbridge_device_id: { type: string }
 
-  # TODO:
   AdaptySubscriptionOffer: #response
     type: object
 
@@ -748,3 +843,40 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
+
+  AdaptyUI.Configuration: #request
+    type: object
+    properties:
+      media_cache:
+        type: object
+        required:
+          - memory_storage_total_cost_limit
+          - memory_storage_count_limit
+          - disk_storage_size_limit
+        properties:
+          memory_storage_total_cost_limit: { type: integer }
+          memory_storage_count_limit: { type: integer }
+          disk_storage_size_limit: { type: integer }
+
+  AdaptyUI.View: #response
+    type: object
+    required:
+      - id
+      - template_id
+      - paywall_id
+      - paywall_variation_id
+    properties:
+      id: { type: string }
+      template_id: { type: string }
+      paywall_id: { type: string }
+      paywall_variation_id: { type: string }
+
+  AdaptyUI.CustomTags: #request
+    type: object
+    additionalProperties:
+      type: string
+
+  AdaptyUI.AndroidPersonalizedOffers: #request
+    type: object
+    additionalProperties:
+      type: boolean

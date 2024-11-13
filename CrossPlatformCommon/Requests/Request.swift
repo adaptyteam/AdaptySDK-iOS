@@ -15,7 +15,6 @@ enum Request {
         case getLogLevel = "get_log_level"
         case setLogLevel = "set_log_level"
         case activate
-        case activateAdaptyUI = "activate_adpty_ui"
         case getPaywall = "get_paywall"
         case getPaywallProducts = "get_paywall_products"
         case getProfile = "get_profile"
@@ -30,6 +29,12 @@ enum Request {
         case setVariationId = "set_variation_id"
         case updateAttribution = "update_attribution"
         case updateProfile = "update_profile"
+
+        case adaptyUIActivate = "adpty_ui_activate"
+        case adaptyUICreateView = "adpty_ui_create_view"
+        case adaptyUIDismissView = "adpty_ui_dismiss_view"
+        case adaptyUIPresentView = "adpty_ui_present_view"
+        case adaptyUIShowDialog = "adpty_ui_show_dialog"
     }
 
     static let allRequests: [Request.Method: AdaptyPluginRequest.Type] = {
@@ -57,7 +62,11 @@ enum Request {
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
-                ActivateAdaptyUI.self
+                AdaptyUIActivate.self,
+                AdaptyUICreateView.self,
+                AdaptyUIDismissView.self,
+                AdaptyUIPresentView.self,
+                AdaptyUIShowDialog.self
             ]
             allRequests.append(contentsOf: adaptyUiRequests)
         }
