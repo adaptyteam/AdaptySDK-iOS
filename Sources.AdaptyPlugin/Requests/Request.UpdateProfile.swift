@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct UpdateProfile: AdaptyPluginRequest {
-        static let method = Method.updateProfile
+        static let method = "update_profile"
 
         let params: AdaptyProfileParameters
 

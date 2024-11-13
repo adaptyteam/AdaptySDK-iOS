@@ -24,7 +24,7 @@ public extension AdaptyPlugin {
 
     static func execute(method: String, withJson jsonDictionary: AdaptyJsonDictionary) async -> AdaptyJsonData {
         do {
-            let requestType = try Request.requestType(for: method)
+            let requestType = try await Request.requestType(for: method)
             return await execute(requestType: requestType, withJson: jsonDictionary)
         } catch {
             let error = AdaptyPluginError.decodingFailed(error)

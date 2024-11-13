@@ -11,7 +11,7 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
     struct AdaptyUIShowDialog: AdaptyPluginRequest {
-        static let method = Method.adaptyUIShowDialog
+        static let method = "adapty_ui_show_dialog"
 
         let viewId: String
         let configuration: AdaptyUI.DialogConfiguration

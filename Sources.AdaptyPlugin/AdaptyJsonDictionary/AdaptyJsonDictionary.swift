@@ -12,7 +12,7 @@ private let log = Log.plugin
 
 public typealias AdaptyJsonDictionary = [String: any Sendable]
 
-extension AdaptyJsonDictionary {
+public extension AdaptyJsonDictionary {
     func isExist(key: Key) -> Bool { keys.contains(key) }
 
     func value(forKey key: Key) throws -> KeyValue {
@@ -53,23 +53,22 @@ extension AdaptyJsonDictionary {
     }
 }
 
-struct KeyValue {
-    let key: String
-    let value: any Sendable
+public struct KeyValue {
+    public let key: String
+    public let value: any Sendable
 
-    init(key: String, value: any Sendable) {
+    public init(key: String, value: any Sendable) {
         self.key = key
         self.value = value
     }
 
-    init(key: CodingKey, value: any Sendable) {
+    public init(key: CodingKey, value: any Sendable) {
         self.key = key.stringValue
         self.value = value
     }
 }
 
-extension KeyValue {
-    @usableFromInline
+public extension KeyValue {
     func cast<T: Sendable>(_ valueType: T.Type) throws -> T {
         guard let result: T = value as? T else {
             throw AdaptyPluginDecodingError.wrongType(key: key, expected: valueType, present: type(of: value))
@@ -82,7 +81,7 @@ extension KeyValue {
         guard let jsonData: Data = (value as? Data) ?? (value as? String)?.data(using: .utf8) else {
             throw AdaptyPluginDecodingError.wrongType(key: key, expected: Data.self, present: type(of: value))
         }
-        
+
         return try jsonData.decode(valueType)
     }
 }

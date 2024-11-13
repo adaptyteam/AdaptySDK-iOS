@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct MakePurchase: AdaptyPluginRequest {
-        static let method = Method.makePurchase
+        static let method = "make_purchase"
         let product: AdaptyPluginPaywallProduct
 
         enum CodingKeys: CodingKey {

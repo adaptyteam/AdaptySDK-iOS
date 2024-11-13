@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct IsActivated: AdaptyPluginRequest {
-        static let method = Method.isActivated
+        static let method = "is_activated"
 
         init(from jsonDictionary: AdaptyJsonDictionary) throws {}
 

@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct SetVariationId: AdaptyPluginRequest {
-        static let method = Method.setVariationId
+        static let method = "set_variation_id"
 
         let variationId: String
         let transactionId: String

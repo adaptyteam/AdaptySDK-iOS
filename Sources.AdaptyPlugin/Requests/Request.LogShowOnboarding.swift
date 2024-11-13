@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct LogShowOnboarding: AdaptyPluginRequest {
-        static let method = Method.logShowOnboarding
+        static let method = "log_show_onboarding"
 
         let params: AdaptyOnboardingScreenParameters
 

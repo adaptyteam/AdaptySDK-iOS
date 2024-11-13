@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct GetPaywall: AdaptyPluginRequest {
-        static let method = Method.getPaywall
+        static let method = "get_paywall"
 
         let placementId: String
         let locale: String?

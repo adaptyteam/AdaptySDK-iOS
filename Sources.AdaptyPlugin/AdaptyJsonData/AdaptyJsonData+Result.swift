@@ -37,15 +37,15 @@ extension AdaptyJsonData {
         }
     }
 
-    static func success(_ value: Encodable) -> AdaptyJsonData {
+    public static func success(_ value: Encodable) -> AdaptyJsonData {
         Result.success(value).asAdaptyJsonData
     }
 
-    static func success() -> AdaptyJsonData {
+    public static func success() -> AdaptyJsonData {
         Result.success(true).asAdaptyJsonData
     }
 
-    static func failure(_ error: AdaptyPluginError?) -> AdaptyJsonData {
+    public static func failure(_ error: AdaptyPluginError?) -> AdaptyJsonData {
         guard let error else {
             return .success()
         }

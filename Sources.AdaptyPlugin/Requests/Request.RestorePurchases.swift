@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct RestorePurchases: AdaptyPluginRequest {
-        static let method = Method.restorePurchases
+        static let method = "restore_purchases"
 
         init(from jsonDictionary: AdaptyJsonDictionary) throws {}
 

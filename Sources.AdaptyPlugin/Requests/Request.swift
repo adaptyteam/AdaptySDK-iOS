@@ -5,40 +5,11 @@
 //  Created by Aleksei Valiano on 07.11.2024.
 //
 
-import Adapty
 import Foundation
 
 enum Request {
-    enum Method: String {
-        case getSDKVersion = "get_sdk_version"
-        case isActivated = "is_activated"
-        case getLogLevel = "get_log_level"
-        case setLogLevel = "set_log_level"
-        case activate
-        case getPaywall = "get_paywall"
-        case getPaywallProducts = "get_paywall_products"
-        case getProfile = "get_profile"
-        case identify
-        case logout
-        case logShowOnboarding = "log_show_onboarding"
-        case logShowPaywall = "log_show_paywall"
-        case makePurchase = "make_purchase"
-        case presentCodeRedemptionSheet = "present_code_redemption_sheet"
-        case restorePurchases = "restore_purchases"
-        case setFallbackPaywalls = "set_fallback_paywalls"
-        case setVariationId = "set_variation_id"
-        case updateAttribution = "update_attribution"
-        case updateProfile = "update_profile"
-
-        case adaptyUIActivate = "adapty_ui_activate"
-        case adaptyUICreateView = "adapty_ui_create_view"
-        case adaptyUIDismissView = "adapty_ui_dismiss_view"
-
-        case adaptyUIPresentView = "adapty_ui_present_view"
-        case adaptyUIShowDialog = "adapty_ui_show_dialog"
-    }
-
-    static let allRequests: [Request.Method: AdaptyPluginRequest.Type] = {
+    @MainActor
+    fileprivate static var allRequests: [String: AdaptyPluginRequest.Type] = {
         var allRequests: [AdaptyPluginRequest.Type] = [
             GetSDKVersion.self,
             IsActivated.self,
@@ -74,21 +45,35 @@ enum Request {
 
         return Dictionary(allRequests.map { ($0.method, $0) }) { _, last in last }
     }()
+
+    @MainActor
+    static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {
+        guard let requestType = allRequests[method] else {
+            throw AdaptyPluginDecodingError.unknownMethod(method)
+        }
+        return requestType
+    }
 }
 
 enum Response {}
-extension Request {
-    static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {
-        guard let method = Method(rawValue: method) else {
-            throw AdaptyPluginDecodingError.unknownMethod(method)
+
+public extension AdaptyPlugin {
+    @MainActor
+    static func reqister(requests: [AdaptyPluginRequest.Type]) {
+        for request in requests {
+            Request.allRequests[request.method] = request
         }
-        return try requestType(for: method)
     }
 
-    private static func requestType(for method: Method) throws -> AdaptyPluginRequest.Type {
-        guard let requestType = allRequests[method] else {
-            throw AdaptyPluginDecodingError.notFoundRequest(method)
+    @MainActor
+    static func remove(requests: [String]) {
+        for method in requests {
+            Request.allRequests.removeValue(forKey: method)
         }
-        return requestType
+    }
+
+    @MainActor
+    static var allRequests: [String] {
+        Request.allRequests.keys.map { $0 }
     }
 }

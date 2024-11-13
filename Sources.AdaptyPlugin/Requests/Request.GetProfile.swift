@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct GetProfile: AdaptyPluginRequest {
-        static let method = Method.getProfile
+        static let method = "get_profile"
 
         init(from jsonDictionary: AdaptyJsonDictionary) throws {}
 

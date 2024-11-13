@@ -12,7 +12,7 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
     struct AdaptyUICreateView: AdaptyPluginRequest {
-        static let method = Method.adaptyUICreateView
+        static let method = "adapty_ui_create_view"
 
         let paywall: AdaptyPaywall
         let loadTimeout: TimeInterval?

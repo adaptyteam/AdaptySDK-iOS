@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct Activate: AdaptyPluginRequest {
-        static let method = Method.activate
+        static let method = "activate"
 
         let configuration: AdaptyConfiguration
 
@@ -59,7 +59,7 @@ public extension AdaptyPlugin {
     ) {
         typealias CodingKeys = Request.Activate.CodingKeys
         execute(with: completion) { try Request.Activate(
-            configuration: .init(key: CodingKeys.configuration, value: configuration)
+            configuration: KeyValue(key: CodingKeys.configuration, value: configuration)
         ) }
     }
 }

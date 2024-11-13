@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct UpdateAttribution: AdaptyPluginRequest {
-        static let method = Method.updateAttribution
+        static let method = "update_attribution"
 
         let attribution: [String: any Sendable]
         let source: AdaptyAttributionSource

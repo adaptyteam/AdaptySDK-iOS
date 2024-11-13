@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct PresentCodeRedemptionSheet: AdaptyPluginRequest {
-        static let method = Method.presentCodeRedemptionSheet
+        static let method = "present_code_redemption_sheet"
 
         init(from jsonDictionary: AdaptyJsonDictionary) throws {}
 

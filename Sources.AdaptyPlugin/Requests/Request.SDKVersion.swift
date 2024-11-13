@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct GetSDKVersion: AdaptyPluginRequest {
-        static let method = Method.getSDKVersion
+        static let method = "get_sdk_version"
 
         init(from jsonDictionary: AdaptyJsonDictionary) throws {}
 

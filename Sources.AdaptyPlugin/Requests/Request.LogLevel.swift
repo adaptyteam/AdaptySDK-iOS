@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct GetLogLevel: AdaptyPluginRequest {
-        static let method = Method.getLogLevel
+        static let method = "get_log_level"
         
         init(from jsonDictionary: AdaptyJsonDictionary) throws {}
         
@@ -22,7 +22,7 @@ extension Request {
     }
     
     struct SetLogLevel: AdaptyPluginRequest {
-        static let method = Method.setLogLevel
+        static let method = "set_log_level"
         let value: AdaptyLog.Level
         
         init(from jsonDictionary: AdaptyJsonDictionary) throws {

@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct GetPaywallProducts: AdaptyPluginRequest {
-        static let method = Method.getPaywallProducts
+        static let method = "get_paywall_products"
 
         let paywall: AdaptyPaywall
 

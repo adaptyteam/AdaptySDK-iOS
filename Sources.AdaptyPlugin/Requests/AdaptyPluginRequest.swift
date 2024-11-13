@@ -10,8 +10,8 @@ import Foundation
 
 private let log = Log.plugin
 
-protocol AdaptyPluginRequest: Decodable, Sendable {
-    static var method: Request.Method { get }
+public protocol AdaptyPluginRequest: Decodable, Sendable {
+    static var method: String { get }
     init(from jsonDictionary: AdaptyJsonDictionary) throws
     func execute() async throws -> AdaptyJsonData
 }

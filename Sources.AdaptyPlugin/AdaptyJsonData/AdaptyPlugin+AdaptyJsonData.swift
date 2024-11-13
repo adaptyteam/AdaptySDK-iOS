@@ -15,7 +15,6 @@ public extension AdaptyPlugin {
         struct Body: Decodable {
             let method: String
         }
-
         do {
             let method = try jsonData.decode(Body.self).method
             return await execute(method: method, withJson: jsonData)
@@ -28,7 +27,7 @@ public extension AdaptyPlugin {
 
     static func execute(method: String, withJson jsonData: AdaptyJsonData) async -> AdaptyJsonData {
         do {
-            let requestType = try Request.requestType(for: method)
+            let requestType = try await Request.requestType(for: method)
             return await execute(requestType: requestType, withJson: jsonData)
         } catch {
             let error = AdaptyPluginError.decodingFailed(error)

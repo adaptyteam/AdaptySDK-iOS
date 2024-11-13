@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct SetFallbackPaywalls: AdaptyPluginRequest {
-        static let method = Method.setFallbackPaywalls
+        static let method = "set_fallback_paywalls"
 
         let fileURL: URL
 

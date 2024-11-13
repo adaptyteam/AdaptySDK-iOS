@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct Logout: AdaptyPluginRequest {
-        static let method = Method.logout
+        static let method = "logout"
 
         init(from jsonDictionary: AdaptyJsonDictionary) throws {}
 

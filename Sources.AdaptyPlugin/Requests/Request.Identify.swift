@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct Identify: AdaptyPluginRequest {
-        static let method = Method.identify
+        static let method = "identify"
 
         let customerUserId: String
 
