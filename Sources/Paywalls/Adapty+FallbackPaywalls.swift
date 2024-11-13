@@ -30,6 +30,10 @@ extension Adapty {
             }
         }
     }
+    
+    package nonisolated static func setFallbackPaywalls(data: Data) async throws {
+        // TODO: implement
+    }
 }
 
 private let log = Log.fallbackPaywalls
