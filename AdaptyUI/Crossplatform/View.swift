@@ -26,7 +26,7 @@ package extension AdaptyUI {
 
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyPaywallController {
+package extension AdaptyPaywallController {
     func toView() -> AdaptyUI.View {
         AdaptyUI.View(
             id: id.uuidString,
