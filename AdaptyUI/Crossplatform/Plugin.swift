@@ -43,7 +43,8 @@ package extension AdaptyUI {
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyTagResolver?,
-            timerResolver: AdaptyTimerResolver?
+            timerResolver: AdaptyTimerResolver?,
+            delegate: AdaptyPaywallControllerDelegate
         ) async throws -> AdaptyUI.View {
             let products: [AdaptyPaywallProduct]?
             
@@ -64,7 +65,7 @@ package extension AdaptyUI {
             
             let vc = try AdaptyUI.paywallController(
                 with: configuration,
-                delegate: PluginDelegate.shared
+                delegate: delegate
             )
             
             cachePaywallController(vc, id: vc.id)
