@@ -39,7 +39,7 @@ extension Adapty {
                 fetchPolicy
             )
             
-            AdaptyUI.sendImageUrlsToObserver(paywall)
+            Adapty.sendImageUrlsToObserver(paywall)
             return paywall
         }
     }

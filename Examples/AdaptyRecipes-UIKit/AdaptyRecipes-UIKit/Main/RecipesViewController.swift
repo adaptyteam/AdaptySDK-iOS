@@ -27,13 +27,14 @@ class RecipesViewController: UITableViewController {
     private func presentPaywall() async {
         do {
             let paywall = try await Adapty.getPaywall(placementId: placementId)
-            let viewConfig = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
+            let paywallConfig = try await AdaptyUI.getPaywallConfiguration(
+                forPaywall: paywall
+//              observerModeResolver: self // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
+            )
 
             let vc = try AdaptyUI.paywallController(
-                for: paywall,
-                viewConfiguration: viewConfig,
+                with: paywallConfig,
                 delegate: self
-//                observerModeResolver: self // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
             )
 
             present(vc, animated: true)
@@ -44,8 +45,8 @@ class RecipesViewController: UITableViewController {
 }
 
 // ⚠️ Implement ObserverModeResolver to work in ObserverMode
-//@available(iOS 15.0, *)
-//extension RecipesViewController: AdaptyObserverModeResolver {
+// @available(iOS 15.0, *)
+// extension RecipesViewController: AdaptyObserverModeResolver {
 //    func observerMode(
 //        didInitiatePurchase product: AdaptyPaywallProduct,
 //        onStartPurchase: @escaping () -> Void,
@@ -53,7 +54,7 @@ class RecipesViewController: UITableViewController {
 //    ) {
 //        // handle the purchase
 //    }
-//}
+// }
 
 @available(iOS 15.0, *)
 extension RecipesViewController: AdaptyPaywallControllerDelegate {

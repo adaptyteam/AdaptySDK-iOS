@@ -28,9 +28,9 @@ extension Adapty {
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-        loadTimeout: TimeInterval = defaultLoadPaywallTimeout
+        loadTimeout: TimeInterval? = nil
     ) async throws -> AdaptyPaywall {
-        let loadTimeout = loadTimeout.allowedLoadPaywallTimeout
+        let loadTimeout = (loadTimeout ?? .defaultLoadPaywallTimeout).allowedLoadPaywallTimeout
         let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale
 
         let logParams: EventParameters = [
@@ -47,7 +47,7 @@ extension Adapty {
                 fetchPolicy,
                 loadTimeout
             )
-            AdaptyUI.sendImageUrlsToObserver(paywall)
+            Adapty.sendImageUrlsToObserver(paywall)
 
             return paywall
         }
@@ -225,10 +225,6 @@ extension Adapty {
         Adapty.trackEventIfNeed(result)
         return result.value
     }
-}
-
-extension Adapty {
-    public nonisolated static let defaultLoadPaywallTimeout: TimeInterval = TimeInterval.defaultLoadPaywallTimeout
 }
 
 extension TimeInterval {

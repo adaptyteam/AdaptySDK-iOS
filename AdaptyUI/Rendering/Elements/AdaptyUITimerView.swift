@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI {
+extension VC {
     enum TimerTag {
         case TIMER_h
         case TIMER_hh
@@ -32,8 +32,8 @@ extension AdaptyUI {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.TimerTag {
-    static func createFromString(_ value: String) -> AdaptyUI.TimerTag? {
+extension VC.TimerTag {
+    static func createFromString(_ value: String) -> VC.TimerTag? {
         switch value {
         case "TIMER_h": return .TIMER_h
         case "TIMER_hh": return .TIMER_hh
@@ -122,13 +122,13 @@ extension AdaptyUI.TimerTag {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.RichText {
+extension VC.RichText {
     var timerUpdatesPerSecond: Int {
         var result = 1
 
         for item in items {
             if case let .tag(tagValue, _) = item,
-               let timerTag = AdaptyUI.TimerTag.createFromString(tagValue)
+               let timerTag = VC.TimerTag.createFromString(tagValue)
             {
                 result = max(timerTag.updatesPerSecond, result)
             }
@@ -150,19 +150,19 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
-    private var timer: AdaptyUI.Timer
+    private var timer: VC.Timer
 
-    init(_ timer: AdaptyUI.Timer) {
+    init(_ timer: VC.Timer) {
         self.timer = timer
     }
 
     let startTime: Date = .init()
 
     @State var timeLeft: TimeInterval = 0.0
-    @State var text: AdaptyUI.RichText?
+    @State var text: VC.RichText?
 
     func replacement(for tag: String) -> String? {
-        guard let timerTag = AdaptyUI.TimerTag.createFromString(tag) else {
+        guard let timerTag = VC.TimerTag.createFromString(tag) else {
             return customTagResolverViewModel.replacement(for: tag)
         }
 

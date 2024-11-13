@@ -27,7 +27,7 @@ public struct AdaptyPaywall: Sendable {
 
     public let remoteConfig: AdaptyPaywall.RemoteConfig?
 
-    /// If `true`, it is possible to fetch the view ``AdaptyUI.ViewConfiguration`` object and use it with ``AdaptyUI`` library.
+    /// If `true`, it is possible to fetch the view ``AdaptyViewConfiguration`` object and use it with ``AdaptyUI`` library.
     public var hasViewConfiguration: Bool { viewConfiguration != nil }
 
     let viewConfiguration: ViewConfiguration?

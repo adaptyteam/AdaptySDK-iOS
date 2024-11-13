@@ -19,14 +19,14 @@ struct AdaptyUIColumnView: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private var column: AdaptyUI.Column
+    private var column: VC.Column
 
-    init(_ column: AdaptyUI.Column) {
+    init(_ column: VC.Column) {
         self.column = column
     }
 
     private func calculateTotalWeight(
-        for items: [AdaptyUI.GridItem],
+        for items: [VC.GridItem],
         in _: GeometryProxy
     ) -> (Int, CGFloat) {
         var totalWeight = 0

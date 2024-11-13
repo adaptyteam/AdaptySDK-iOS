@@ -19,7 +19,7 @@ struct AdaptyUIFixedFrameModifier: ViewModifier {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    var box: AdaptyUI.Box
+    var box: VC.Box
 
     func body(content: Content) -> some View {
         let alignment = Alignment.from(
@@ -48,7 +48,7 @@ struct AdaptyUIFixedFrameModifier: ViewModifier {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
-    func fixedFrame(box: AdaptyUI.Box) -> some View {
+    func fixedFrame(box: VC.Box) -> some View {
         modifier(AdaptyUIFixedFrameModifier(box: box))
     }
 }

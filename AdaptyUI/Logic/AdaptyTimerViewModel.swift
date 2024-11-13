@@ -10,18 +10,19 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-public protocol AdaptyTimerResolver {
-    func timerEndAtDate(for timerId: String) -> Date
-}
-
 @MainActor
 package struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
     package init() {}
-    
+
     package func timerEndAtDate(for timerId: String) -> Date {
         Date(timeIntervalSinceNow: 3600.0)
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension [String: Date]: AdaptyTimerResolver {
+    public func timerEndAtDate(for timerId: String) -> Date {
+        self[timerId] ?? Date(timeIntervalSinceNow: 3600.0)
     }
 }
 
@@ -55,7 +56,7 @@ package final class AdaptyTimerViewModel: ObservableObject {
         self.screensViewModel = screensViewModel
     }
 
-    private func initializeTimer(_ timer: AdaptyUI.Timer, at: Date) -> Date {
+    private func initializeTimer(_ timer: VC.Timer, at: Date) -> Date {
         switch timer.state {
         case let .endedAt(endAt):
             timers[timer.id] = endAt
@@ -97,7 +98,7 @@ package final class AdaptyTimerViewModel: ObservableObject {
     }
 
     func timeLeft(
-        for timer: AdaptyUI.Timer,
+        for timer: VC.Timer,
         at: Date,
         screenId: String
     ) -> TimeInterval {

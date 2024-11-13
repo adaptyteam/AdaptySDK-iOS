@@ -15,17 +15,17 @@ package enum AdaptyUIGetProductsResult: Sendable {
 
 @MainActor
 package protocol AdaptyPaywallInterface {
-    var id: String? { get }
+    var placementId: String { get }
+    var variationId: String { get }
     var locale: String? { get }
     var vendorProductIds: [String] { get }
 
     func getPaywallProductsWithoutDeterminingOffer() async throws -> [AdaptyPaywallProductWithoutDeterminingOffer]
     func getPaywallProducts() async throws -> AdaptyUIGetProductsResult
-    func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws
+    func logShowPaywall(viewConfiguration: AdaptyViewConfiguration) async throws
 }
 
 extension AdaptyPaywall: AdaptyPaywallInterface {
-    package var id: String? { placementId }
     package var locale: String? { remoteConfig?.locale }
 
     package func getPaywallProductsWithoutDeterminingOffer() async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
@@ -45,7 +45,7 @@ extension AdaptyPaywall: AdaptyPaywallInterface {
         }
     }
 
-    package func logShowPaywall(viewConfiguration: AdaptyUI.LocalizedViewConfiguration) async throws {
+    package func logShowPaywall(viewConfiguration: AdaptyViewConfiguration) async throws {
         await Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration)
     }
 }

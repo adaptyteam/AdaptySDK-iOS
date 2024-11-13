@@ -15,7 +15,7 @@ struct AdaptyUIButtonView: View {
     @Environment(\.adaptyScreenId)
     private var screenId: String
 
-    private var button: AdaptyUI.Button
+    private var button: VC.Button
 
     @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
@@ -23,11 +23,11 @@ struct AdaptyUIButtonView: View {
     @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
     @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
 
-    init(_ button: AdaptyUI.Button) {
+    init(_ button: VC.Button) {
         self.button = button
     }
 
-    private var currentStateView: AdaptyUI.Element {
+    private var currentStateView: VC.Element {
         guard let selectedCondition = button.selectedCondition else {
             return button.normalState
         }
@@ -68,7 +68,7 @@ struct AdaptyUIButtonView: View {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-extension [AdaptyUI.ActionAction] {
+extension [VC.ActionAction] {
     func fire(
         screenId: String,
         paywallViewModel: AdaptyPaywallViewModel,
@@ -92,7 +92,7 @@ extension [AdaptyUI.ActionAction] {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-extension AdaptyUI.ActionAction {
+extension VC.ActionAction {
     func fire(
         screenId: String,
         paywallViewModel: AdaptyPaywallViewModel,

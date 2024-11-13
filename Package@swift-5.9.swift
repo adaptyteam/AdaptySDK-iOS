@@ -23,8 +23,8 @@ let package = Package(
             targets: ["AdaptyUITesting"]
         ),
         .library(
-            name: "AdaptyCrossPlatformCommon",
-            targets: ["AdaptyCrossPlatformCommon"]
+            name: "AdaptyPlugin",
+            targets: ["AdaptyPlugin"]
         ),
     ],
     targets: [
@@ -49,9 +49,9 @@ let package = Package(
             path: "AdaptyUITesting"
         ),
         .target(
-            name: "AdaptyCrossPlatformCommon",
+            name: "AdaptyPlugin",
             dependencies: ["Adapty", "AdaptyUI"],
-            path: "CrossPlatformCommon"
+            path: "Sources.AdaptyPlugin"
         ),
         .testTarget(
             name: "AdaptyTests",

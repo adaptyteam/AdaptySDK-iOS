@@ -15,9 +15,9 @@ struct AdaptyUIStackView: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private var stack: AdaptyUI.Stack
+    private var stack: VC.Stack
 
-    init(_ stack: AdaptyUI.Stack) {
+    init(_ stack: VC.Stack) {
         self.stack = stack
     }
 

@@ -15,11 +15,6 @@ import UIKit
 public final class AdaptyPaywallController: UIViewController {
     public let id = UUID()
 
-    public let paywall: AdaptyPaywall
-    public var viewConfiguration: AdaptyUI.LocalizedViewConfiguration {
-        paywallConfiguration.paywallViewModel.viewConfiguration
-    }
-
     let paywallConfiguration: AdaptyUI.PaywallConfiguration
     let showDebugOverlay: Bool
 
@@ -29,12 +24,10 @@ public final class AdaptyPaywallController: UIViewController {
 
     init(
         paywallConfiguration: AdaptyUI.PaywallConfiguration,
-        paywall: AdaptyPaywall,
         delegate: AdaptyPaywallControllerDelegate?,
         showDebugOverlay: Bool
     ) {
         self.paywallConfiguration = paywallConfiguration
-        self.paywall = paywall
         self.delegate = delegate
         self.showDebugOverlay = showDebugOverlay
 

@@ -12,13 +12,13 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUITransparentContainerView: View {
-    var screen: AdaptyUI.Screen
+    var screen: VC.Screen
 
     @State var footerSize: CGSize = .zero
 
     @ViewBuilder
     private func scrollableFooterView(
-        _ element: AdaptyUI.Element,
+        _ element: VC.Element,
         globalProxy: GeometryProxy
     ) -> some View {
         let additionalTopPadding = max(0, globalProxy.size.height - footerSize.height + globalProxy.safeAreaInsets.top + globalProxy.safeAreaInsets.bottom)

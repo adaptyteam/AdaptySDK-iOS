@@ -12,7 +12,7 @@ extension Adapty {
     static nonisolated let fallbackFormatVersion = 6
 }
 
-extension AdaptyUI {
-    static nonisolated let configurationFormatVersion = "4.1.0"
+extension AdaptyViewConfiguration {
+    static nonisolated let formatVersion = "4.1.0"
     static nonisolated let builderVersion = "4_1"
 }

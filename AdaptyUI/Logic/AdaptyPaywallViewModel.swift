@@ -17,14 +17,14 @@ package final class AdaptyPaywallViewModel: ObservableObject {
     let eventsHandler: AdaptyEventsHandler
 
     @Published var paywall: AdaptyPaywallInterface
-    @Published var viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+    @Published var viewConfiguration: AdaptyViewConfiguration
 
-    var onViewConfigurationUpdate: ((AdaptyUI.LocalizedViewConfiguration) -> Void)?
+    var onViewConfigurationUpdate: ((AdaptyViewConfiguration) -> Void)?
 
     package init(
         eventsHandler: AdaptyEventsHandler,
         paywall: AdaptyPaywallInterface,
-        viewConfiguration: AdaptyUI.LocalizedViewConfiguration
+        viewConfiguration: AdaptyViewConfiguration
     ) {
         self.logId = eventsHandler.logId
         self.eventsHandler = eventsHandler
@@ -57,13 +57,11 @@ package final class AdaptyPaywallViewModel: ObservableObject {
     }
 
     func reloadData() {
-        guard let placementId = paywall.id else { return }
-
         Task { @MainActor in
             do {
                 Log.ui.verbose("#\(logId)# paywall reloadData begin")
                 
-                let paywall = try await Adapty.getPaywall(placementId: placementId, locale: paywall.locale)
+                let paywall = try await Adapty.getPaywall(placementId: paywall.placementId, locale: paywall.locale)
                 let viewConfiguration = try await Adapty.getViewConfiguration(paywall: paywall)
                 
                 self.paywall = paywall

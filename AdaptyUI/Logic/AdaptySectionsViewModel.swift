@@ -29,7 +29,7 @@ package final class AdaptySectionsViewModel: ObservableObject {
         sectionsStates[sectionId]
     }
 
-    func selectedIndex(for section: AdaptyUI.Section) -> Int {
+    func selectedIndex(for section: VC.Section) -> Int {
         if let stateIndex = sectionsStates[section.id] {
             return stateIndex
         } else {

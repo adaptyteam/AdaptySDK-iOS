@@ -23,8 +23,8 @@ extension View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.Element {
-    var properties: AdaptyUI.Element.Properties? {
+extension VC.Element {
+    var properties: VC.Element.Properties? {
         switch self {
         case .space:
             return nil
@@ -42,13 +42,13 @@ extension AdaptyUI.Element {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIElementWithoutPropertiesView: View {
-    private var element: AdaptyUI.Element
+    private var element: VC.Element
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
     init(
-        _ element: AdaptyUI.Element
+        _ element: VC.Element
     ) {
         self.element = element
     }
@@ -93,7 +93,7 @@ struct AdaptyUIElementWithoutPropertiesView: View {
     }
 
     @ViewBuilder
-    private func elementOrEmpty(_ content: AdaptyUI.Element?) -> some View {
+    private func elementOrEmpty(_ content: VC.Element?) -> some View {
         if let content {
             AdaptyUIElementView(content)
         } else {
@@ -105,12 +105,12 @@ struct AdaptyUIElementWithoutPropertiesView: View {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package struct AdaptyUIElementView: View {
-    private var element: AdaptyUI.Element
+    private var element: VC.Element
     private var additionalPadding: EdgeInsets?
     private var drawDecoratorBackground: Bool
 
     package init(
-        _ element: AdaptyUI.Element,
+        _ element: VC.Element,
         additionalPadding: EdgeInsets? = nil,
         drawDecoratorBackground: Bool = true
     ) {

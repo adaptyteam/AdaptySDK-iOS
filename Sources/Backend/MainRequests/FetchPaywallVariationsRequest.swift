@@ -42,8 +42,8 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
         headers = HTTPHeaders()
             .setPaywallLocale(locale)
             .setBackendProfileId(profileId)
-            .setVisualBuilderVersion(AdaptyUI.builderVersion)
-            .setVisualBuilderConfigurationFormatVersion(AdaptyUI.configurationFormatVersion)
+            .setVisualBuilderVersion(AdaptyViewConfiguration.builderVersion)
+            .setVisualBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
             .setSegmentId(segmentId)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
@@ -94,7 +94,7 @@ extension Backend.MainExecutor {
         cached: AdaptyPaywall?,
         disableServerCache: Bool
     ) async throws -> AdaptyPaywallChosen {
-        let md5Hash = "{\"builder_version\":\"\(AdaptyUI.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
 
         let request = FetchPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -115,8 +115,8 @@ extension Backend.MainExecutor {
                 "placement_id": placementId,
                 "locale": locale,
                 "segment_id": segmentId,
-                "builder_version": AdaptyUI.builderVersion,
-                "builder_config_format_version": AdaptyUI.configurationFormatVersion,
+                "builder_version": AdaptyViewConfiguration.builderVersion,
+                "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
                 "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]

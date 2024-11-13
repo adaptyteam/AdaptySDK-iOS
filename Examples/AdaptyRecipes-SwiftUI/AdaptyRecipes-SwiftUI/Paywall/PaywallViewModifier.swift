@@ -16,7 +16,7 @@ struct IdentifiableErrorWrapper: Identifiable {
 }
 
 // ⚠️ Implement ObserverModeResolver to work in ObserverMode
-//class ObserverModeResolver: AdaptyObserverModeResolver {
+// class ObserverModeResolver: AdaptyObserverModeResolver {
 //    func observerMode(
 //        didInitiatePurchase product: AdaptyPaywallProduct,
 //        onStartPurchase: @escaping () -> Void,
@@ -24,7 +24,7 @@ struct IdentifiableErrorWrapper: Identifiable {
 //    ) {
 //        // handle the purchase
 //    }
-//}
+// }
 
 struct PaywallViewModifier: ViewModifier {
     private var isPresented: Binding<Bool>
@@ -82,9 +82,7 @@ struct PaywallViewModifier: ViewModifier {
             .task {
                 do {
                     let paywall = try await Adapty.getPaywall(placementId: placementId)
-                    let viewConfig = try await AdaptyUI.getViewConfiguration(forPaywall: paywall)
-
-                    paywallConfig = AdaptyUI.paywallConfiguration(for: paywall, viewConfiguration: viewConfig)
+                    paywallConfig = try await AdaptyUI.getPaywallConfiguration(forPaywall: paywall)
                 } catch {
                     Logger.log(.error, "getPaywallAndConfig: \(error)")
                     alertError = .init(title: "getPaywallAndConfig error!", error: error)
