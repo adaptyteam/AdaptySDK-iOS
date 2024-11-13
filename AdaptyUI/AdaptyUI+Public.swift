@@ -15,19 +15,13 @@ public enum AdaptyUI {}
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     struct Configuration: Sendable {
-        public static let `default` = Configuration(
-            mediaCacheConfiguration: .init(
-                memoryStorageTotalCostLimit: 100 * 1024 * 1024, // 100MB
-                memoryStorageCountLimit: .max,
-                diskStorageSizeLimit: 100 * 1024 * 1024 // 100MB
-            )
-        )
+        public static let `default` = Configuration(mediaCacheConfiguration: nil)
 
         /// Represents the Media Cache configuration used in AdaptyUI
-        let mediaCacheConfiguration: MediaCacheConfiguration
+        let mediaCacheConfiguration: MediaCacheConfiguration?
 
         public init(
-            mediaCacheConfiguration: MediaCacheConfiguration
+            mediaCacheConfiguration: MediaCacheConfiguration?
         ) {
             self.mediaCacheConfiguration = mediaCacheConfiguration
         }
@@ -211,7 +205,7 @@ public extension AdaptyUI {
         AdaptyUI.isActivated = true
         AdaptyUI.isObserverModeEnabled = await sdk.observerMode
 
-        AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration)
+        AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration ?? .default)
         ImageUrlPrefetcher.shared.initialize()
 
         Log.ui.info("AdaptyUI activated with \(configuration)")

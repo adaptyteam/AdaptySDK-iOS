@@ -33,6 +33,12 @@ extension AdaptyUI {
             self.memoryStorageCountLimit = memoryStorageCountLimit
             self.diskStorageSizeLimit = diskStorageSizeLimit
         }
+        
+        static let `default`: MediaCacheConfiguration = .init(
+            memoryStorageTotalCostLimit: 100 * 1024 * 1024, // 100MB
+            memoryStorageCountLimit: .max,
+            diskStorageSizeLimit: 100 * 1024 * 1024 // 100MB
+        )
     }
 
     static var currentCacheConfiguration: MediaCacheConfiguration?
