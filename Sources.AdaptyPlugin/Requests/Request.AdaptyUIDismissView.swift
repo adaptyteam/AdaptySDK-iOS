@@ -14,24 +14,27 @@ extension Request {
         static let method = Method.adaptyUIDismissView
 
         let viewId: String
+        let destroy: Bool
 
         enum CodingKeys: String, CodingKey {
             case viewId = "id"
+            case destroy
         }
 
         init(from params: AdaptyJsonDictionary) throws {
             try self.init(
-                viewId: params.value(String.self, forKey: CodingKeys.viewId)
+                viewId: params.value(String.self, forKey: CodingKeys.viewId),
+                destroy: params.value(Bool.self, forKey: CodingKeys.destroy)
             )
         }
 
-        init(viewId: String) {
+        init(viewId: String, destroy: Bool) {
             self.viewId = viewId
+            self.destroy = destroy
         }
 
         func execute() async throws -> AdaptyJsonData {
-            // TODO: implement
-            // use viewId 
+            try await AdaptyUI.Plugin.dismissView(viewId: viewId, destroy: destroy)
             return .success()
         }
     }
@@ -41,11 +44,13 @@ extension Request {
 public extension AdaptyPlugin {
     @objc static func adaptyUIDismissView(
         viewId: String,
+        destroy: Bool,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
         typealias CodingKeys = Request.AdaptyUIDismissView.CodingKeys
         execute(with: completion) { Request.AdaptyUIDismissView(
-            viewId: viewId
+            viewId: viewId,
+            destroy: destroy
         ) }
     }
 }

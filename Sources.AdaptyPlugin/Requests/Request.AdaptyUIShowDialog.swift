@@ -34,9 +34,11 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            // TODO: implement
-            // use viewId , configuration
-            return .success()
+            let selectedIndex = try await AdaptyUI.Plugin.showDialog(
+                viewId: viewId,
+                configuration: configuration
+            )
+            return .success(selectedIndex)
         }
     }
 }
