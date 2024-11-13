@@ -24,4 +24,9 @@ extension AdaptyUI.View: Encodable {
         try container.encode(placementId, forKey: .placementId)
         try container.encode(paywallVariationId, forKey: .paywallVariationId)
     }
+
+    @inlinable
+    public var asAdaptyJsonData: Data {
+        AdaptyPlugin.encoder.encodeOtherwiseEncodedError(self)
+    }
 }

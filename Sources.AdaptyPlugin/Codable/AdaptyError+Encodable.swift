@@ -6,6 +6,7 @@
 //
 
 import Adapty
+import Foundation
 
 extension AdaptyError: Encodable {
     enum CodingKeys: String, CodingKey {
@@ -34,5 +35,10 @@ extension AdaptyError: Encodable {
             message: debugDescription,
             detail: detail
         )
+    }
+
+    @inlinable
+    public var asAdaptyJsonData: Data {
+        AdaptyPlugin.encoder.encodeOtherwiseEncodedError(self)
     }
 }

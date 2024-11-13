@@ -16,17 +16,28 @@ extension AdaptyPlugin {
         return formatter
     }()
 
-    static let encoder: JSONEncoder = {
+   public static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .formatted(dateFormatter)
         encoder.dataEncodingStrategy = .base64
         return encoder
     }()
 
-    static let decoder: JSONDecoder = {
+    public static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(dateFormatter)
         decoder.dataDecodingStrategy = .base64
         return decoder
     }()
+}
+
+public extension JSONEncoder {
+    func encodeOtherwiseEncodedError<T: Encodable>(_ value: T) -> Data {
+        do {
+            return try encode(value)
+        } catch {
+            let error = AdaptyPluginError.encodingFailed(error)
+            return try! encode(error)
+        }
+    }
 }

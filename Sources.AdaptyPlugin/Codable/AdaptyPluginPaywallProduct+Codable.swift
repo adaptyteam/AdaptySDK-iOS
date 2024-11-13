@@ -69,6 +69,14 @@ extension Response {
     }
 }
 
+public extension AdaptyPaywallProduct {
+    var asAdaptyJsonData: Data {
+        AdaptyPlugin.encoder.encodeOtherwiseEncodedError(
+            Response.AdaptyPluginPaywallProduct(self)
+        )
+    }
+}
+
 private struct Subscription: Sendable, Encodable {
     let groupIdentifier: String
     let period: AdaptySubscriptionPeriod
