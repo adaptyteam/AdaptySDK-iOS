@@ -41,13 +41,15 @@ extension Adapty
     
     public typealias CrossplatformDelegateListener = (String, [String: String]) -> Void
     
-    @MainActor
-    public static func initializeCrossplatformDelegate(
+    public nonisolated static func initializeCrossplatformDelegate(
         listener: @escaping CrossplatformDelegateListener
     )
     {
-        Adapty.delegate = PluginDelegate.shared
-        PluginDelegate.shared.delegateListener = listener
+        Task
+        { @MainActor in
+            Adapty.delegate = PluginDelegate.shared
+            PluginDelegate.shared.delegateListener = listener
+        }
     }
     
     @MainActor
@@ -62,14 +64,17 @@ extension Adapty
             arguments: [CrossplatformDelegateArgument: Encodable]
         )
         {
-            do {
+            do
+            {
                 let mappedArgs = try Dictionary(uniqueKeysWithValues: arguments.map
-                                                { key, value in
-                    (key.rawValue, try AdaptyPlugin.encoder.encode(value).asAdaptyJsonString)
+                { key, value in
+                    try (key.rawValue, AdaptyPlugin.encoder.encode(value).asAdaptyJsonString)
                 })
 
                 delegateListener?(method.rawValue, mappedArgs)
-            } catch {
+            }
+            catch
+            {
                 Log.plugin.error("Plugin encoding error: \(error.localizedDescription)")
             }
         }
