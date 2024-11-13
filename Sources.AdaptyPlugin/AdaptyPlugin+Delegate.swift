@@ -62,16 +62,16 @@ extension Adapty
             arguments: [CrossplatformDelegateArgument: Encodable]
         )
         {
-//            do {
-//                let mappedArgs = try Dictionary(uniqueKeysWithValues: arguments.map
-//                                                { key, value in
-//                    (key.rawValue, try encodeModelToString(value))
-//                })
-//
-//                delegateListener?(method.rawValue, mappedArgs)
-//            } catch {
-//                Log.ui.error("Plugin encoding error: \(error.localizedDescription)")
-//            }
+            do {
+                let mappedArgs = try Dictionary(uniqueKeysWithValues: arguments.map
+                                                { key, value in
+                    (key.rawValue, try AdaptyPlugin.encoder.encode(value).asAdaptyJsonString)
+                })
+
+                delegateListener?(method.rawValue, mappedArgs)
+            } catch {
+                Log.plugin.error("Plugin encoding error: \(error.localizedDescription)")
+            }
         }
     }
 }
