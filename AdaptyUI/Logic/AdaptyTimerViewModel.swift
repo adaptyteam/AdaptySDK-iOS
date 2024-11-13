@@ -13,9 +13,16 @@ import SwiftUI
 @MainActor
 package struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
     package init() {}
-    
+
     package func timerEndAtDate(for timerId: String) -> Date {
         Date(timeIntervalSinceNow: 3600.0)
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension [String: Date]: AdaptyTimerResolver {
+    public func timerEndAtDate(for timerId: String) -> Date {
+        self[timerId] ?? Date(timeIntervalSinceNow: 3600.0)
     }
 }
 

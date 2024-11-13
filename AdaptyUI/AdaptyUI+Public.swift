@@ -235,7 +235,7 @@ public extension AdaptyUI {
     /// - Returns: an ``AdaptyPaywallConfiguration`` object.
     static func getPaywallConfiguration(
         forPaywall paywall: AdaptyPaywall,
-        loadTimeout: TimeInterval = 5.0,
+        loadTimeout: TimeInterval,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,

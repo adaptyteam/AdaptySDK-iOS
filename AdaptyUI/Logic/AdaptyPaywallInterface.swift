@@ -15,7 +15,8 @@ package enum AdaptyUIGetProductsResult: Sendable {
 
 @MainActor
 package protocol AdaptyPaywallInterface {
-    var id: String? { get }
+    var placementId: String { get }
+    var variationId: String { get }
     var locale: String? { get }
     var vendorProductIds: [String] { get }
 
@@ -25,7 +26,6 @@ package protocol AdaptyPaywallInterface {
 }
 
 extension AdaptyPaywall: AdaptyPaywallInterface {
-    package var id: String? { placementId }
     package var locale: String? { remoteConfig?.locale }
 
     package func getPaywallProductsWithoutDeterminingOffer() async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {

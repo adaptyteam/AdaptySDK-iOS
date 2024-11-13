@@ -33,7 +33,7 @@ extension AdaptyViewConfiguration {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension Dictionary<String, String>: AdaptyTagResolver {
+extension [String: String]: AdaptyTagResolver {
     public func replacement(for tag: String) -> String? { self[tag] }
 }
 
@@ -41,11 +41,11 @@ extension Dictionary<String, String>: AdaptyTagResolver {
 @MainActor
 package final class AdaptyTagResolverViewModel: ObservableObject, AdaptyTagResolver {
     let tagResolver: AdaptyTagResolver?
-    
+
     package init(tagResolver: AdaptyTagResolver?) {
         self.tagResolver = tagResolver
     }
-    
+
     package func replacement(for tag: String) -> String? {
         tagResolver?.replacement(for: tag)
     }
