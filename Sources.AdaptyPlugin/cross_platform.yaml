@@ -26,7 +26,7 @@ $recuests:
     type: object
     required: [method, configuration]
     properties:
-      method: { const: "adpty_ui_activate" }
+      method: { const: "adapty_ui_activate" }
       configuration:
         { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
 
@@ -47,7 +47,7 @@ $recuests:
       - method
       - paywall
     properties:
-      method: { const: "adpty_ui_create_view" }
+      method: { const: "adapty_ui_create_view" }
       paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
       load_timeout: { type: number, description: "seconds" }
       preload_products: { type: boolean, default: false }
@@ -73,7 +73,7 @@ $recuests:
     type: object
     required: [method, id]
     properties:
-      method: { const: "adpty_ui_dismiss_view" }
+      method: { const: "adapty_ui_dismiss_view" }
       id: { type: string, description: "View Id" }
       destroy: { type: boolean }
 
@@ -92,7 +92,7 @@ $recuests:
     type: object
     required: [method, id]
     properties:
-      method: { const: "adpty_ui_present_view" }
+      method: { const: "adapty_ui_present_view" }
       id: { type: string, description: "View Id" }
 
   AdaptyUIPresentView.Response: #response
@@ -110,7 +110,7 @@ $recuests:
     type: object
     required: [method, id, configuration]
     properties:
-      method: { const: "adpty_ui_show_dialog" }
+      method: { const: "adapty_ui_show_dialog" }
       id: { type: string, description: "View Id" }
       configuration:
         { type: jsonString, $ref: "#/$defs/AdaptyUI.DialogConfiguration" }
@@ -877,8 +877,7 @@ $defs:
 
   AdaptyUI.CustomTagsValues: #request
     type: object
-    additionalProperties:
-      type: string
+    additionalProperties: { type: string }
 
   AdaptyUI.CustomTimersValues: #request
     type: object
@@ -886,13 +885,11 @@ $defs:
 
   AdaptyUI.AndroidPersonalizedOffers: #request
     type: object
-    additionalProperties:
-      type: boolean
+    additionalProperties: { type: boolean }
 
   AdaptyUI.DialogConfiguration: #request
     type: object
-    required:
-      - default_action
+    required: [default_action]
     properties:
       title: { type: string }
       content: { type: string }
