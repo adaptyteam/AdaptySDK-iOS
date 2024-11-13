@@ -17,7 +17,7 @@ extension AdaptyUI.Configuration: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Codingkey.self)
         try self.init(
-            mediaCacheConfiguration: container.decode(AdaptyUI.MediaCacheConfiguration.self, forKey: .mediaCache)
+            mediaCacheConfiguration: container.decodeIfPresent(AdaptyUI.MediaCacheConfiguration.self, forKey: .mediaCache)
         )
     }
 }
