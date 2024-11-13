@@ -48,6 +48,7 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
+            
             // TODO: implement
             // use paywall, locale, preloadProducts, customTags
             let view = AdaptyUI.View(

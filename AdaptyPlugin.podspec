@@ -7,7 +7,7 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'AdaptyCrossPlatformCommon'
+  s.name             = 'AdaptyPlugin'
   s.version          = '3.2.0-SNAPSHOT'
   s.summary          = 'Common files for cross-platform SDKs Adapty'
 
@@ -28,11 +28,12 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.osx.deployment_target = '11.0'
   s.visionos.deployment_target = '1.0'
 
-  s.swift_version = '6.0'
+  s.swift_version = '5.9'
 
-  s.source_files = 'CrossPlatformCommon/**/*.{h,m,mm,swift}'
+  s.source_files = 'Sources.AdaptyPlugin/**/*.{h,m,mm,swift}'
 
   s.dependency 'Adapty', s.version.to_s
+  s.dependency 'AdaptyUI', s.version.to_s
 
   s.frameworks = 'StoreKit'
 

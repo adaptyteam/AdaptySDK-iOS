@@ -13,7 +13,7 @@ extension Request {
     struct AdaptyUIActivate: AdaptyPluginRequest {
         static let method = Method.adaptyUIActivate
 
-        let configuration: AdaptyUI.Configuration?
+        let configuration: AdaptyUI.Configuration
 
         enum CodingKeys: CodingKey {
             case configuration
@@ -21,16 +21,16 @@ extension Request {
 
         init(from params: AdaptyJsonDictionary) throws {
             try self.init(
-                configuration: params.valueIfPresent(forKey: CodingKeys.configuration)
+                configuration: params.value(forKey: CodingKeys.configuration)
             )
         }
 
-        init(configuration: KeyValue?) throws {
-            self.configuration = try configuration?.decode(AdaptyUI.Configuration.self)
+        init(configuration: KeyValue) throws {
+            self.configuration = try configuration.decode(AdaptyUI.Configuration.self)
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await AdaptyUI.activate(configuration: configuration ?? AdaptyUI.Configuration.default)
+            try await AdaptyUI.activate(configuration: configuration)
             return .success()
         }
     }
@@ -39,12 +39,12 @@ extension Request {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPlugin {
     @objc static func adaptyUIActivate(
-        configuration: String?,
+        configuration: String,
         _ completion: @escaping AdaptyJsonDataCompletion
     ) {
         typealias CodingKeys = Request.AdaptyUIActivate.CodingKeys
         execute(with: completion) { try Request.AdaptyUIActivate(
-            configuration: configuration.map { KeyValue(key: CodingKeys.configuration, value: $0) }
+            configuration: KeyValue(key: CodingKeys.configuration, value: configuration)
         ) }
     }
 }

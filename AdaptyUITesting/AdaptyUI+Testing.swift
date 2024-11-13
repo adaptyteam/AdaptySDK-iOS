@@ -13,7 +13,7 @@ import Foundation
 import SwiftUI
 
 #if DEBUG
-public extension AdaptyViewConfiguration {
+package extension AdaptyViewConfiguration {
     static func createTest(
         templateId: String = "basic",
         locale: String = "en",
@@ -116,39 +116,39 @@ public extension AdaptyViewConfiguration {
 }
 #endif
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public struct AdaptyUITestRendererView: View {
-    let viewConfiguration: AdaptyViewConfiguration
-    let paywallConfiguration: AdaptyUI.PaywallConfiguration
-
-    public init(
-        viewConfiguration: AdaptyViewConfiguration
-    ) {
-        self.viewConfiguration = viewConfiguration
-        paywallConfiguration = AdaptyUI.PaywallConfiguration(
-            logId: Log.stamp,
-            paywall: AdaptyMockPaywall(),
-            viewConfiguration: viewConfiguration,
-            products: nil,
-            observerModeResolver: nil,
-            tagResolver: ["TEST_TAG": "Adapty"],
-            timerResolver: nil
-        )
-    }
-
-    public var body: some View {
-        AdaptyUIElementView(viewConfiguration.screen.content)
-            .environmentObject(paywallConfiguration.paywallViewModel)
-            .environmentObject(paywallConfiguration.actionsViewModel)
-            .environmentObject(paywallConfiguration.sectionsViewModel)
-            .environmentObject(paywallConfiguration.productsViewModel)
-            .environmentObject(paywallConfiguration.tagResolverViewModel)
-            .environmentObject(paywallConfiguration.timerViewModel)
-            .environmentObject(paywallConfiguration.screensViewModel)
-            .environmentObject(paywallConfiguration.videoViewModel)
-            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
-    }
-}
+//@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+//public struct AdaptyUITestRendererView: View {
+//    let viewConfiguration: AdaptyViewConfiguration
+//    let paywallConfiguration: AdaptyUI.PaywallConfiguration
+//
+//    public init(
+//        viewConfiguration: AdaptyViewConfiguration
+//    ) {
+//        self.viewConfiguration = viewConfiguration
+//        paywallConfiguration = AdaptyUI.PaywallConfiguration(
+//            logId: Log.stamp,
+//            paywall: AdaptyMockPaywall(),
+//            viewConfiguration: viewConfiguration,
+//            products: nil,
+//            observerModeResolver: nil,
+//            tagResolver: ["TEST_TAG": "Adapty"],
+//            timerResolver: nil
+//        )
+//    }
+//
+//    public var body: some View {
+//        AdaptyUIElementView(viewConfiguration.screen.content)
+//            .environmentObject(paywallConfiguration.paywallViewModel)
+//            .environmentObject(paywallConfiguration.actionsViewModel)
+//            .environmentObject(paywallConfiguration.sectionsViewModel)
+//            .environmentObject(paywallConfiguration.productsViewModel)
+//            .environmentObject(paywallConfiguration.tagResolverViewModel)
+//            .environmentObject(paywallConfiguration.timerViewModel)
+//            .environmentObject(paywallConfiguration.screensViewModel)
+//            .environmentObject(paywallConfiguration.videoViewModel)
+//            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
+//    }
+//}
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension View {
