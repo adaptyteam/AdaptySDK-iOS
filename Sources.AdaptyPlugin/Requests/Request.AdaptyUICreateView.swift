@@ -15,7 +15,7 @@ extension Request {
         static let method = Method.adaptyUICreateView
 
         let paywall: AdaptyPaywall
-        let loadTimeout: TimeInterval
+        let loadTimeout: TimeInterval?
         let preloadProducts: Bool
         let customTags: [String: String]?
         let customTimers: [String: Date]?
@@ -31,8 +31,8 @@ extension Request {
         init(from params: AdaptyJsonDictionary) throws {
             try self.init(
                 paywall: params.value(forKey: CodingKeys.paywall),
-                loadTimeout: params.value(TimeInterval.self, forKey: CodingKeys.loadTimeout),
-                preloadProducts: params.value(Bool.self, forKey: CodingKeys.preloadProducts),
+                loadTimeout: params.valueIfPresent(TimeInterval.self, forKey: CodingKeys.loadTimeout),
+                preloadProducts: params.valueIfPresent(Bool.self, forKey: CodingKeys.preloadProducts),
                 customTags: params.valueIfPresent(forKey: CodingKeys.customTags),
                 customTimers: params.valueIfPresent(forKey: CodingKeys.customTimers)
             )
@@ -40,27 +40,26 @@ extension Request {
 
         init(
             paywall: KeyValue,
-            loadTimeout: TimeInterval,
-            preloadProducts: Bool,
+            loadTimeout: TimeInterval?,
+            preloadProducts: Bool?,
             customTags: KeyValue?,
             customTimers: KeyValue?
         ) throws {
             self.paywall = try paywall.decode(AdaptyPaywall.self)
             self.loadTimeout = loadTimeout
-            self.preloadProducts = preloadProducts
-            self.customTags = try customTags?.decode([String: String].self) ?? [:]
-            self.customTimers = try customTags?.decode([String: Date].self) ?? [:]
+            self.preloadProducts = preloadProducts ?? false
+            self.customTags = try customTags?.decode([String: String].self)
+            self.customTimers = try customTags?.decode([String: Date].self)
         }
 
         func execute() async throws -> AdaptyJsonData {
-            let view = try await AdaptyUI.Plugin.createView(
+            try .success(await AdaptyUI.Plugin.createView(
                 paywall: paywall,
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts,
                 tagResolver: customTags,
-                timerResolver: nil
-            )
-            return .success(view)
+                timerResolver: customTimers
+            ))
         }
     }
 }
@@ -69,7 +68,7 @@ extension Request {
 public extension AdaptyPlugin {
     @objc static func adaptyUICreateView(
         paywall: String,
-        loadTimeout: TimeInterval,
+        loadTimeout: Double,
         preloadProducts: Bool,
         customTags: String?,
         customTimers: String?,

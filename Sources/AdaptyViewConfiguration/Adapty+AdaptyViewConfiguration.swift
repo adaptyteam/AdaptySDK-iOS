@@ -11,9 +11,9 @@ import Foundation
 extension Adapty {
     package nonisolated static func getViewConfiguration(
         paywall: AdaptyPaywall,
-        loadTimeout: TimeInterval = .defaultLoadPaywallTimeout
+        loadTimeout: TimeInterval? = nil
     ) async throws -> AdaptyViewConfiguration {
-        let loadTimeout = loadTimeout.allowedLoadPaywallTimeout
+        let loadTimeout = (loadTimeout ?? .defaultLoadPaywallTimeout).allowedLoadPaywallTimeout
         return try await activatedSDK.getViewConfiguration(
             paywall: paywall,
             loadTimeout: loadTimeout

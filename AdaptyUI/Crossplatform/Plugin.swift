@@ -40,7 +40,7 @@ package extension AdaptyUI {
         
         package static func createView(
             paywall: AdaptyPaywall,
-            loadTimeout: TimeInterval,
+            loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyTagResolver?,
             timerResolver: AdaptyTimerResolver?

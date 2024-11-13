@@ -167,7 +167,7 @@ extension Adapty {
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
-        loadTimeout: TimeInterval = defaultLoadPaywallTimeout,
+        loadTimeout: TimeInterval? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
         withCompletion(completion) {
