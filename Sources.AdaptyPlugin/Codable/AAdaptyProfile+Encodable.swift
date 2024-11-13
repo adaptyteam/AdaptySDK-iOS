@@ -11,6 +11,8 @@ import Foundation
 public extension AdaptyProfile {
     @inlinable
     var asAdaptyJsonData: Data {
-        AdaptyPlugin.encoder.encodeOtherwiseEncodedError(self)
+        get throws {
+            try AdaptyPlugin.encoder.encode(self)
+        }
     }
 }

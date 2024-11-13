@@ -30,14 +30,3 @@ extension AdaptyPlugin {
         return decoder
     }()
 }
-
-public extension JSONEncoder {
-    func encodeOtherwiseEncodedError<T: Encodable>(_ value: T) -> Data {
-        do {
-            return try encode(value)
-        } catch {
-            let error = AdaptyPluginError.encodingFailed(error)
-            return try! encode(error)
-        }
-    }
-}

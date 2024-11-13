@@ -28,7 +28,12 @@ extension AdaptyJsonData {
         }
 
         var asAdaptyJsonData: Data {
-            AdaptyPlugin.encoder.encodeOtherwiseEncodedError(self)
+            do {
+                return try AdaptyPlugin.encoder.encode(self)
+            } catch {
+                let error = AdaptyPluginError.encodingFailed(error)
+                return try! AdaptyPlugin.encoder.encode(error)
+            }
         }
     }
 

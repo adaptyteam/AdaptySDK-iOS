@@ -71,9 +71,11 @@ extension Response {
 
 public extension AdaptyPaywallProduct {
     var asAdaptyJsonData: Data {
-        AdaptyPlugin.encoder.encodeOtherwiseEncodedError(
-            Response.AdaptyPluginPaywallProduct(self)
-        )
+        get throws {
+            try AdaptyPlugin.encoder.encode(
+                Response.AdaptyPluginPaywallProduct(self)
+            )
+        }
     }
 }
 
@@ -96,7 +98,7 @@ private struct Subscription: Sendable, Encodable {
 
     enum CodingKeys: String, CodingKey {
         case groupIdentifier = "group_identifier"
-        case period = "period"
+        case period
         case localizedPeriod = "localized_period"
         case offer
     }

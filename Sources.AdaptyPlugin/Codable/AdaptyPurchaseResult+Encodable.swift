@@ -26,9 +26,11 @@ extension AdaptyPurchaseResult: Encodable {
             try container.encode(profile, forKey: .profile)
         }
     }
-    
+
     @inlinable
     public var asAdaptyJsonData: Data {
-        AdaptyPlugin.encoder.encodeOtherwiseEncodedError(self)
+        get throws {
+            try AdaptyPlugin.encoder.encode(self)
+        }
     }
 }
