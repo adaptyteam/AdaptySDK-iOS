@@ -6,7 +6,7 @@
 //
 
 enum AdaptyPluginDecodingError: Error {
-    case uncnownMethod(String)
+    case unknownMethod(String)
     case notFoundRequest(Request.Method)
     case notExist(key: String)
     case isNil(key: String)
@@ -14,7 +14,7 @@ enum AdaptyPluginDecodingError: Error {
 
     var localizedDescription: String {
         switch self {
-        case .uncnownMethod(let method):
+        case .unknownMethod(let method):
             "Unknown request method: \(method)"
         case .notFoundRequest(let method):
             "Request for method \(method.rawValue) not found"

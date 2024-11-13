@@ -79,7 +79,7 @@ enum Response {}
 extension Request {
     static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {
         guard let method = Method(rawValue: method) else {
-            throw AdaptyPluginDecodingError.uncnownMethod(method)
+            throw AdaptyPluginDecodingError.unknownMethod(method)
         }
         return try requestType(for: method)
     }
