@@ -28,6 +28,18 @@ public extension AdaptyUI {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+public protocol AdaptyTagResolver: Sendable {
+    func replacement(for tag: String) -> String?
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+public protocol AdaptyTimerResolver: Sendable {
+    func timerEndAtDate(for timerId: String) -> Date
+}
+
 #if canImport(UIKit)
 
 import UIKit
@@ -167,7 +179,7 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public protocol AdaptyObserverModeResolver {
+public protocol AdaptyObserverModeResolver: Sendable {
     func observerMode(
         didInitiatePurchase product: AdaptyPaywallProduct,
         onStartPurchase: @escaping () -> Void,
@@ -216,11 +228,19 @@ public extension AdaptyUI {
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exeeds.
-    /// - Returns: The ``AdaptyUI.LocalizedViewConfiguration`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
-    static func getViewConfiguration(
+    ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
+    ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
+    ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
+    ///   - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
+    /// - Returns: an ``AdaptyPaywallConfiguration`` object.
+    static func getPaywallConfiguration(
         forPaywall paywall: AdaptyPaywall,
-        loadTimeout: TimeInterval = 5.0
-    ) async throws -> AdaptyViewConfiguration {
+        loadTimeout: TimeInterval = 5.0,
+        products: [AdaptyPaywallProduct]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyTagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil
+    ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivatedError
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
@@ -228,27 +248,31 @@ public extension AdaptyUI {
             throw err
         }
 
-        return try await Adapty.getViewConfiguration(paywall: paywall, loadTimeout: loadTimeout)
+        let viewConfiguration = try await Adapty.getViewConfiguration(
+            paywall: paywall,
+            loadTimeout: loadTimeout
+        )
+
+        return PaywallConfiguration(
+            logId: Log.stamp,
+            paywall: paywall,
+            viewConfiguration: viewConfiguration,
+            products: products,
+            observerModeResolver: observerModeResolver,
+            tagResolver: tagResolver,
+            timerResolver: timerResolver
+        )
     }
 
     /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
     ///
     /// - Parameters:
-    ///   - paywall: an ``AdaptyPaywall`` object, for which you are trying to get a controller.
-    ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
     ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
     ///   - delegate: the object that implements the ``AdaptyPaywallControllerDelegate`` protocol. Use it to respond to different events happening inside the purchase screen.
-    ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
-    ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     /// - Returns: an ``AdaptyPaywallController`` object, representing the requested paywall screen.
     static func paywallController(
-        for paywall: AdaptyPaywall,
-        products: [AdaptyPaywallProduct]? = nil,
-        viewConfiguration: AdaptyViewConfiguration,
+        with paywallConfiguration: PaywallConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
-        observerModeResolver: AdaptyObserverModeResolver? = nil,
-        tagResolver: AdaptyTagResolver? = nil,
-        timerResolver: AdaptyTimerResolver? = nil,
         showDebugOverlay: Bool = false
     ) throws -> AdaptyPaywallController {
         guard AdaptyUI.isActivated else {
@@ -257,49 +281,10 @@ public extension AdaptyUI {
             throw err
         }
 
-        let paywallConfiguration = PaywallConfiguration(
-            logId: Log.stamp,
-            paywall: paywall,
-            viewConfiguration: viewConfiguration,
-            products: products,
-            observerModeResolver: observerModeResolver,
-            tagResolver: tagResolver,
-            timerResolver: timerResolver
-        )
-
         return AdaptyPaywallController(
             paywallConfiguration: paywallConfiguration,
-            paywall: paywall,
             delegate: delegate,
             showDebugOverlay: showDebugOverlay
-        )
-    }
-
-    /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
-    ///
-    /// - Parameters:
-    ///   - paywall: an ``AdaptyPaywall`` object, for which you are trying to get a controller.
-    ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
-    ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
-    ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
-    ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
-    /// - Returns: an ``AdaptyPaywallConfiguration`` object.
-    static func paywallConfiguration(
-        for paywall: AdaptyPaywall,
-        products: [AdaptyPaywallProduct]? = nil,
-        viewConfiguration: AdaptyViewConfiguration,
-        observerModeResolver: AdaptyObserverModeResolver? = nil,
-        tagResolver: AdaptyTagResolver? = nil,
-        timerResolver: AdaptyTimerResolver? = nil
-    ) -> PaywallConfiguration {
-        PaywallConfiguration(
-            logId: Log.stamp,
-            paywall: paywall,
-            viewConfiguration: viewConfiguration,
-            products: products,
-            observerModeResolver: observerModeResolver,
-            tagResolver: tagResolver,
-            timerResolver: timerResolver
         )
     }
 }

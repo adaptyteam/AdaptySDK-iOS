@@ -32,15 +32,23 @@ public extension AdaptyUI {
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exceeds.
     ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
-    static func getViewConfiguration(
+    static func getPaywallConfiguration(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval = 5.0,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyViewConfiguration>
+        products: [AdaptyPaywallProduct]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyTagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
+        _ completion: @escaping AdaptyResultCompletion<PaywallConfiguration>
     ) {
         withCompletion(completion) {
-            try await Adapty.getViewConfiguration(
-                paywall: paywall,
-                loadTimeout: loadTimeout
+            try await AdaptyUI.getPaywallConfiguration(
+                forPaywall: paywall,
+                loadTimeout: loadTimeout,
+                products: products,
+                observerModeResolver: observerModeResolver,
+                tagResolver: tagResolver,
+                timerResolver: timerResolver
             )
         }
     }
