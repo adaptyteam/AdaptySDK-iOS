@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct AdaptyViewConfiguration: Sendable, Hashable {
-    public let id: String
-    public let locale: String
-    public let isRightToLeft: Bool
+package struct AdaptyViewConfiguration: Sendable, Hashable {
+    package let id: String
+    package let locale: String
+    package let isRightToLeft: Bool
     package let templateId: String
     package let screen: Screen
     package let bottomSheets: [String: BottomSheet]
