@@ -210,7 +210,6 @@ enum AppleMethodName: String {
 
     case subscriptionInfoStatus = "subscription_info_status"
     case isEligibleForIntroOffer = "is_eligible_for_intro_offer"
-
 }
 
 struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {

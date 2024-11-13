@@ -30,16 +30,11 @@ extension Adapty {
             }
         }
     }
-    
-    package nonisolated static func setFallbackPaywalls(data: Data) async throws {
-        // TODO: implement
-    }
 }
 
 private let log = Log.fallbackPaywalls
 
 extension PaywallsStorage {
-
     func getPaywallWithFallback(byPlacementId placementId: String, profileId: String, locale: AdaptyLocale) -> AdaptyPaywallChosen? {
         let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId).map {
             AdaptyPaywallChosen(value: $0.value, kind: .restore)
