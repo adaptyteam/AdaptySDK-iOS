@@ -5,23 +5,25 @@
 //  Created by Aleksey Goncharov on 13.11.2024.
 //
 
-import Foundation
 import Adapty
+import Foundation
 
 package extension AdaptyUI {
     enum PluginError: Error {
         case viewNotFound(String)
         case viewAlreadyPresented(String)
         case viewPresentationError(String)
+        case delegateIsNotRegestired
     }
 }
 
 extension AdaptyUI.PluginError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
-        case let .viewNotFound(viewId): return "AdaptyUIError.viewNotFound(\(viewId))"
-        case let .viewAlreadyPresented(viewId): return "AdaptyUIError.viewAlreadyPresented(\(viewId))"
-        case let .viewPresentationError(viewId): return "AdaptyUIError.viewPresentationError(\(viewId))"
+        case let .viewNotFound(viewId): "AdaptyUIError.viewNotFound(\(viewId))"
+        case let .viewAlreadyPresented(viewId): "AdaptyUIError.viewAlreadyPresented(\(viewId))"
+        case let .viewPresentationError(viewId): "AdaptyUIError.viewPresentationError(\(viewId))"
+        case .delegateIsNotRegestired: "AdaptyUIError.delegateIsNotRegestired"
         }
     }
 }
@@ -36,6 +38,7 @@ extension AdaptyUI.PluginError: CustomAdaptyError {
         case .viewNotFound: return AdaptyError.ErrorCode.wrongParam
         case .viewAlreadyPresented: return AdaptyError.ErrorCode.wrongParam
         case .viewPresentationError: return AdaptyError.ErrorCode.wrongParam
+        case .delegateIsNotRegestired: return AdaptyError.ErrorCode.unknown
         }
     }
 
@@ -54,9 +57,10 @@ extension AdaptyUI.PluginError: CustomAdaptyError {
 
     public var description: String {
         switch self {
-        case let .viewNotFound(viewId): return "AdaptyUIError.viewNotFound(\(viewId))"
-        case let .viewAlreadyPresented(viewId): return "AdaptyUIError.viewAlreadyPresented(\(viewId))"
-        case let .viewPresentationError(viewId): return "AdaptyUIError.viewPresentationError(\(viewId))"
+        case let .viewNotFound(viewId): "AdaptyUIError.viewNotFound(\(viewId))"
+        case let .viewAlreadyPresented(viewId): "AdaptyUIError.viewAlreadyPresented(\(viewId))"
+        case let .viewPresentationError(viewId): "AdaptyUIError.viewPresentationError(\(viewId))"
+        case .delegateIsNotRegestired: "AdaptyUIError.delegateIsNotRegestired"
         }
     }
 }

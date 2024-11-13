@@ -8,9 +8,9 @@
 import Adapty
 import Foundation
 
-public extension AdaptyProfile {
+extension AdaptyProfile: AdaptyJsonDataRepresentable {
     @inlinable
-    var asAdaptyJsonData: Data {
+    public var asAdaptyJsonData: AdaptyJsonData {
         get throws {
             try AdaptyPlugin.encoder.encode(self)
         }

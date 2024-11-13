@@ -19,3 +19,7 @@ public extension AdaptyJsonData {
         try AdaptyPlugin.decoder.decode(valueType, from: self)
     }
 }
+
+public protocol AdaptyJsonDataRepresentable {
+    var asAdaptyJsonData: AdaptyJsonData  { get throws }
+}

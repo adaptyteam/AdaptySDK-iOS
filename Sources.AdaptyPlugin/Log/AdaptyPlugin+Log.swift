@@ -17,5 +17,11 @@ extension Log {
     }
 
     static let plugin = Category(name: "plugin")
+    static let wrapper = Category(name: "wrapper")
 }
 
+public extension AdaptyPlugin {
+    static func logError(_ message: @autoclosure () -> String, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        Log.wrapper.error(message(), file: file, function: function, line: line)
+    }
+}

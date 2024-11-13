@@ -17,18 +17,30 @@ extension AdaptyUI.View: Encodable {
         case paywallVariationId = "paywall_variation_id"
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(templateId, forKey: .templateId)
         try container.encode(placementId, forKey: .placementId)
         try container.encode(paywallVariationId, forKey: .paywallVariationId)
     }
+}
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyUI.View: AdaptyJsonDataRepresentable {
     @inlinable
-    public var asAdaptyJsonData: Data {
+    public var asAdaptyJsonData: AdaptyJsonData {
         get throws {
             try AdaptyPlugin.encoder.encode(self)
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public extension AdaptyPaywallController {
+    var asAdaptyJsonData: AdaptyJsonData {
+        get throws {
+            try toView().asAdaptyJsonData
         }
     }
 }

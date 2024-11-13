@@ -8,9 +8,9 @@
 import Adapty
 import Foundation
 
-public extension AdaptyPaywall {
+extension AdaptyPaywall: AdaptyJsonDataRepresentable {
     @inlinable
-    var asAdaptyJsonData: Data {
+    public var asAdaptyJsonData: Data {
         get throws {
             try AdaptyPlugin.encoder.encode(self)
         }
