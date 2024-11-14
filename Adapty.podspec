@@ -38,6 +38,6 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
   s.osx.weak_frameworks = 'AdSupport', 'AdServices'
 
   s.pod_target_xcconfig = {
-    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk'
+    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk -Xfrontend -enable-experimental-feature -Xfrontend StrictConcurrency'
   }
 end

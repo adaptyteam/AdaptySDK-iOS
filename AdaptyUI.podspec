@@ -36,7 +36,7 @@ AdaptyUI is an extension for AdaptySDK.
   s.ios.framework = 'UIKit'
 
   s.pod_target_xcconfig = {
-    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk'
+    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk -Xfrontend -enable-experimental-feature -Xfrontend StrictConcurrency'
   }
 
 end
