@@ -12,7 +12,7 @@ extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
         let vendorProductId: String
         let adaptyProductId: String
-        let subscriptionOffer: AdaptySubscriptionOffer.Identifier?
+        let subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
         let variationId: String
         let paywallABTestName: String
         let paywallName: String
@@ -21,7 +21,7 @@ extension Request {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
             adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
-            subscriptionOffer = try container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOffer)
+            subscriptionOfferIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOfferIdentifier)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
@@ -35,7 +35,7 @@ private enum CodingKeys: String, CodingKey {
     case paywallVariationId = "paywall_variation_id"
     case paywallABTestName = "paywall_ab_test_name"
     case paywallName = "paywall_name"
-    case subscriptionOffer = "subscription_offer"
+    case subscriptionOfferIdentifier = "subscription_offer_identifier"
     case subscription
     case localizedDescription = "localized_description"
     case localizedTitle = "localized_title"
@@ -61,9 +61,9 @@ extension Response {
             try container.encode(wrapped.paywallName, forKey: .paywallName)
             try container.encode(wrapped.localizedDescription, forKey: .localizedDescription)
             try container.encode(wrapped.localizedTitle, forKey: .localizedTitle)
-            try container.encode(Price(from: wrapped), forKey: .price)
-            try container.encodeIfPresent(wrapped.regionCode, forKey: .regionCode)
             try container.encode(wrapped.isFamilyShareable, forKey: .isFamilyShareable)
+            try container.encodeIfPresent(wrapped.regionCode, forKey: .regionCode)
+            try container.encode(Price(from: wrapped), forKey: .price)
             try container.encodeIfPresent(Subscription(product: wrapped), forKey: .subscription)
         }
     }
@@ -109,16 +109,5 @@ private struct Subscription: Sendable, Encodable {
         try container.encode(period, forKey: .period)
         try container.encodeIfPresent(localizedPeriod, forKey: .localizedPeriod)
         try container.encode(offer, forKey: .offer)
-    }
-}
-
-extension Price {
-    init(from product: some AdaptyProduct) {
-        self.init(
-            amount: product.price,
-            currencyCode: product.currencyCode,
-            currencySymbol: product.currencySymbol,
-            localizedString: product.localizedPrice
-        )
     }
 }

@@ -507,6 +507,15 @@ $defs:
       subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
       payload_data: { type: string }
 
+  AdaptyPrice: #response
+    type: object
+    required: [amount]
+    properties:
+      amount: { type: number }
+      currency_code: { type: string }
+      currency_symbol: { type: string }
+      localized_string: { type: string }
+
   AdaptyPaywallProduct.Subscription: #response
     type: object
     required:
@@ -542,11 +551,29 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adaptyProductId: { type: string }
-      subscription_offer: { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+      subscription_offer_identifier:
+        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
       payload_data: { type: string }
+
+  AdaptySubscriptionOffer: #response
+    type: object
+    required:
+      - offer_identifier
+      - price
+      - number_of_periods
+      - payment_mode
+      - subscription_period
+    properties:
+      offer_identifier: { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+      price: { $ref: "#/$defs/AdaptyPrice" }
+      number_of_periods: { type: integer }
+      payment_mode: { $ref: "#/$defs/AdaptySubscriptionOffer.PaymentMode" }
+      subscription_period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
+      localized_subscription_period: { type: string }
+      localized_number_of_periods: { type: string }
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -806,9 +833,6 @@ $defs:
       pushwoosh_hwid: { type: string }
       firebase_app_instance_id: { type: string }
       airbridge_device_id: { type: string }
-
-  AdaptySubscriptionOffer: #response
-    type: object
 
   AdaptySubscriptionOffer.Identifier: #request #response
     type: string

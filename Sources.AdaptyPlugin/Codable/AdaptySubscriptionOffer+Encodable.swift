@@ -11,8 +11,7 @@ import Foundation
 extension AdaptySubscriptionOffer: Encodable {
     enum CodingKeys: String, CodingKey {
         case price
-        case identifier
-        case offerType = "offer_type"
+        case offerIdentifier = "offer_identifier"
         case numberOfPeriods = "number_of_periods"
         case paymentMode = "payment_mode"
         case subscriptionPeriod = "subscription_period"
@@ -22,9 +21,8 @@ extension AdaptySubscriptionOffer: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(identifier, forKey: .identifier)
-        try container.encode(offerType, forKey: .offerType)
-        try container.encode(_price, forKey: .price)
+        try container.encode(self.offerIdentifier, forKey: .offerIdentifier)
+        try container.encode(Price(from: self), forKey: .price)
         try container.encode(numberOfPeriods, forKey: .numberOfPeriods)
         try container.encode(paymentMode, forKey: .paymentMode)
         try container.encode(subscriptionPeriod, forKey: .subscriptionPeriod)

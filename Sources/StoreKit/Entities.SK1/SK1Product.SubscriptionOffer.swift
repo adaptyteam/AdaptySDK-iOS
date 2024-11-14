@@ -44,12 +44,10 @@ extension SK1Product {
         let locale = priceLocale
         let period = offer.subscriptionPeriod.asAdaptySubscriptionPeriod
         return AdaptySubscriptionOffer(
-            _price: Price(
-                amount: offer.price as Decimal,
-                currencyCode: locale.unfCurrencyCode,
-                currencySymbol: locale.currencySymbol,
-                localizedString: locale.localized(sk1Price: offer.price)
-            ),
+            price: offer.price as Decimal,
+            currencyCode: locale.unfCurrencyCode,
+//            currencySymbol: locale.currencySymbol,
+            localizedPrice: locale.localized(sk1Price: offer.price),
             offerIdentifier: offerIdentifier,
             subscriptionPeriod: period,
             numberOfPeriods: offer.numberOfPeriods,

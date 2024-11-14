@@ -48,12 +48,10 @@ extension SK2Product {
         let period = offer.period.asAdaptySubscriptionPeriod
         let periodLocale = unfPeriodLocale
         return AdaptySubscriptionOffer(
-            _price: Price(
-                amount: offer.price,
-                currencyCode: unfCurrencyCode,
-                currencySymbol: unfPriceLocale.currencySymbol,
-                localizedString: offer.displayPrice
-            ),
+            price: offer.price,
+            currencyCode: unfCurrencyCode,
+//            currencySymbol: unfPriceLocale.currencySymbol,
+            localizedPrice: offer.displayPrice,
             offerIdentifier: offerIdentifier,
             subscriptionPeriod: period,
             numberOfPeriods: offer.periodCount,

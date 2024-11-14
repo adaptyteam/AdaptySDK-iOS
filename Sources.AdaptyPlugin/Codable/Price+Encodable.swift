@@ -8,7 +8,12 @@
 import Adapty
 import Foundation
 
-extension Price: Encodable {
+struct Price: Encodable {
+    let amount: Decimal
+    let currencyCode: String?
+    let currencySymbol: String?
+    let localizedString: String?
+
     enum CodingKeys: String, CodingKey {
         case amount
         case currencyCode = "currency_code"
@@ -16,11 +21,17 @@ extension Price: Encodable {
         case localizedString = "localized_string"
     }
 
-    package func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(amount, forKey: .amount)
-        try container.encodeIfPresent(currencyCode, forKey: .currencyCode)
-        try container.encodeIfPresent(currencySymbol, forKey: .currencySymbol)
-        try container.encodeIfPresent(localizedString, forKey: .localizedString)
+    init(from product: some AdaptyProduct) {
+        self.amount = product.price
+        self.currencyCode = product.currencyCode
+        self.currencySymbol = product.currencySymbol
+        self.localizedString = product.localizedPrice
+    }
+
+    init(from offer: AdaptySubscriptionOffer) {
+        self.amount = offer.price
+        self.currencyCode = offer.currencyCode
+        self.currencySymbol = nil
+        self.localizedString = offer.localizedPrice
     }
 }

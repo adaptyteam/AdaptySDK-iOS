@@ -43,7 +43,6 @@ public extension AdaptyPlugin {
         typealias CodingKeys = Request.GetPaywallProducts.CodingKeys
         execute(with: completion) { try Request.GetPaywallProducts(
             paywall: .init(key: CodingKeys.paywall, value: paywall)
-
         ) }
     }
 }

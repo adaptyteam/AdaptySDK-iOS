@@ -8,14 +8,12 @@
 import Foundation
 
 public struct AdaptySubscriptionOffer: Sendable, Hashable {
-    package let _price: Price
-
     /// Unique identifier of a discount offer for a product.
     public var identifier: String? { offerIdentifier.identifier }
 
     public var offerType: OfferType { offerIdentifier.asOfferType }
 
-    let offerIdentifier: Identifier
+    package let offerIdentifier: Identifier
 
     /// An information about period for a product discount.
     public let subscriptionPeriod: AdaptySubscriptionPeriod
@@ -33,16 +31,18 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
     public let localizedNumberOfPeriods: String?
 
     /// Discount price of a product in a local currency.
-    public var price: Decimal { _price.amount }
+    public let price: Decimal
 
     /// The currency code of the locale used to format the price of the product.
-    public var currencyCode: String? { _price.currencyCode }
+    public let currencyCode: String?
 
     /// A formatted price of a discount for a user's locale.
-    public var localizedPrice: String? { _price.localizedString }
+    public var localizedPrice: String?
 
     init(
-        _price: Price,
+        price: Decimal,
+        currencyCode: String?,
+        localizedPrice: String?,
         offerIdentifier: Identifier,
         subscriptionPeriod: AdaptySubscriptionPeriod,
         numberOfPeriods: Int,
@@ -50,7 +50,9 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
         localizedSubscriptionPeriod: String?,
         localizedNumberOfPeriods: String?
     ) {
-        self._price = _price
+        self.price = price
+        self.currencyCode = currencyCode
+        self.localizedPrice = localizedPrice
         self.offerIdentifier = offerIdentifier
         self.subscriptionPeriod = subscriptionPeriod
         self.numberOfPeriods = numberOfPeriods
@@ -62,7 +64,9 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
 
 extension AdaptySubscriptionOffer: CustomStringConvertible {
     public var description: String {
-        "(price: \(_price), type: \(offerType)"
+        "(price: \(price)"
+            + (localizedPrice.map { ", localizedPrice: \($0)" } ?? "")
+            + ", type: \(offerType)"
             + (identifier.map { ", identifier: \($0)" } ?? "")
             + ", subscriptionPeriod: \(subscriptionPeriod), numberOfPeriods: \(numberOfPeriods), paymentMode: \(paymentMode)"
             + (localizedSubscriptionPeriod.map { ", localizedSubscriptionPeriod: \($0)" } ?? "")

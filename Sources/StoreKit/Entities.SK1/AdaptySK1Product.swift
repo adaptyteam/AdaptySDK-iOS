@@ -11,12 +11,12 @@ protocol AdaptySK1Product: AdaptyProduct {
     var skProduct: SK1Product { get }
 }
 
-extension AdaptySK1Product{
+extension AdaptySK1Product {
     public var sk1Product: SK1Product? { skProduct }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public var sk2Product: SK2Product? { nil }
-    
+
     public var vendorProductId: String { skProduct.productIdentifier }
 
     public var localizedDescription: String { skProduct.localizedDescription }
@@ -36,7 +36,7 @@ extension AdaptySK1Product{
     public var subscriptionPeriod: AdaptySubscriptionPeriod? {
         skProduct.subscriptionPeriod?.asAdaptySubscriptionPeriod
     }
-    
+
     public var subscriptionGroupIdentifier: String? { skProduct.subscriptionGroupIdentifier }
 
     public var localizedPrice: String? {
@@ -47,8 +47,8 @@ extension AdaptySK1Product{
         guard let period = subscriptionPeriod else { return nil }
         return skProduct.priceLocale.localized(period: period)
     }
-    
-    public  var description: String {
+
+    public var description: String {
         "(vendorProductId: \(vendorProductId), skProduct: \(skProduct))"
     }
 }
