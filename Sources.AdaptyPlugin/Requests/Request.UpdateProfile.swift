@@ -18,31 +18,9 @@ extension Request {
             case params
         }
 
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {
-            try self.init(
-                params: jsonDictionary.value(forKey: CodingKeys.params)
-            )
-        }
-
-        init(params: KeyValue) throws {
-            self.params = try params.decode(AdaptyProfileParameters.self)
-        }
-
         func execute() async throws -> AdaptyJsonData {
             try await Adapty.updateProfile(params: params)
             return .success()
         }
-    }
-}
-
-public extension AdaptyPlugin {
-    @objc static func updateAttribution(
-        params: String,
-        _ completion: @escaping AdaptyJsonDataCompletion
-    ) {
-        typealias CodingKeys = Request.UpdateProfile.CodingKeys
-        execute(with: completion) { try Request.UpdateProfile(
-            params: .init(key: CodingKeys.params, value: params)
-        ) }
     }
 }

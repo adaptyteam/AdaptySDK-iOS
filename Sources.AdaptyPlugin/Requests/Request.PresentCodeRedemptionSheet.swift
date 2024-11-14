@@ -12,19 +12,9 @@ extension Request {
     struct PresentCodeRedemptionSheet: AdaptyPluginRequest {
         static let method = "present_code_redemption_sheet"
 
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {}
-
-        init() {}
-
         func execute() async throws -> AdaptyJsonData {
             Adapty.presentCodeRedemptionSheet()
             return .success()
         }
-    }
-}
-
-public extension AdaptyPlugin {
-    @objc static func presentCodeRedemptionSheet(_ completion: @escaping AdaptyJsonDataCompletion) {
-        execute(with: completion) { Request.PresentCodeRedemptionSheet() }
     }
 }

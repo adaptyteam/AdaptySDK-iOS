@@ -12,7 +12,6 @@ private let log = Log.plugin
 
 public protocol AdaptyPluginRequest: Decodable, Sendable {
     static var method: String { get }
-    init(from jsonDictionary: AdaptyJsonDictionary) throws
     func execute() async throws -> AdaptyJsonData
 }
 

@@ -28,30 +28,6 @@ extension Request {
             case customTimers = "custom_timers"
         }
 
-        init(from params: AdaptyJsonDictionary) throws {
-            try self.init(
-                paywall: params.value(forKey: CodingKeys.paywall),
-                loadTimeout: params.valueIfPresent(TimeInterval.self, forKey: CodingKeys.loadTimeout),
-                preloadProducts: params.valueIfPresent(Bool.self, forKey: CodingKeys.preloadProducts),
-                customTags: params.valueIfPresent(forKey: CodingKeys.customTags),
-                customTimers: params.valueIfPresent(forKey: CodingKeys.customTimers)
-            )
-        }
-
-        init(
-            paywall: KeyValue,
-            loadTimeout: TimeInterval?,
-            preloadProducts: Bool?,
-            customTags: KeyValue?,
-            customTimers: KeyValue?
-        ) throws {
-            self.paywall = try paywall.decode(AdaptyPaywall.self)
-            self.loadTimeout = loadTimeout
-            self.preloadProducts = preloadProducts ?? false
-            self.customTags = try customTags?.decode([String: String].self)
-            self.customTimers = try customTags?.decode([String: Date].self)
-        }
-
         func execute() async throws -> AdaptyJsonData {
             try .success(await AdaptyUI.Plugin.createView(
                 paywall: paywall,
@@ -61,26 +37,5 @@ extension Request {
                 timerResolver: customTimers
             ))
         }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public extension AdaptyPlugin {
-    @objc static func adaptyUICreateView(
-        paywall: String,
-        loadTimeout: Double,
-        preloadProducts: Bool,
-        customTags: String?,
-        customTimers: String?,
-        _ completion: @escaping AdaptyJsonDataCompletion
-    ) {
-        typealias CodingKeys = Request.AdaptyUICreateView.CodingKeys
-        execute(with: completion) { try Request.AdaptyUICreateView(
-            paywall: KeyValue(key: CodingKeys.paywall, value: paywall),
-            loadTimeout: loadTimeout,
-            preloadProducts: preloadProducts,
-            customTags: customTags.map { KeyValue(key: CodingKeys.customTags, value: $0) },
-            customTimers: customTimers.map { KeyValue(key: CodingKeys.customTimers, value: $0) }
-        ) }
     }
 }

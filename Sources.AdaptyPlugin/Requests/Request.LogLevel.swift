@@ -12,10 +12,6 @@ extension Request {
     struct GetLogLevel: AdaptyPluginRequest {
         static let method = "get_log_level"
         
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {}
-        
-        init() {}
-
         func execute() async throws -> AdaptyJsonData {
             .success(Adapty.logLevel)
         }
@@ -29,29 +25,9 @@ extension Request {
             case value
         }
         
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {
-            try self.init(
-                jsonDictionary.value(String.self, forKey: CodingKeys.value)
-            )
-        }
-        
-        init(_ value: String) {
-            self.value = AdaptyLog.Level(stringLiteral: value)
-        }
-        
         func execute() async throws -> AdaptyJsonData {
             Adapty.logLevel = value
             return .success()
         }
-    }
-}
-
-public extension AdaptyPlugin {
-    @objc static func getLogLevel(_ completion: @escaping AdaptyJsonDataCompletion) {
-        execute(with: completion) { Request.GetLogLevel() }
-    }
-    
-    @objc static func setLogLevel(value: String, _ completion: @escaping AdaptyJsonDataCompletion) {
-        execute(with: completion) { Request.SetLogLevel(value) }
     }
 }

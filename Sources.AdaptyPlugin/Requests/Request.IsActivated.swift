@@ -12,18 +12,8 @@ extension Request {
     struct IsActivated: AdaptyPluginRequest {
         static let method = "is_activated"
 
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {}
-
-        init() {}
-
         func execute() async throws -> AdaptyJsonData {
             .success(await Adapty.isActivated)
         }
-    }
-}
-
-public extension AdaptyPlugin {
-    @objc static func isActivated(_ completion: @escaping AdaptyJsonDataCompletion) {
-        execute(with: completion) { Request.IsActivated() }
     }
 }

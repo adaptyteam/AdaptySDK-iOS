@@ -18,31 +18,9 @@ extension Request {
             case paywall
         }
 
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {
-            try self.init(
-                paywall: jsonDictionary.value(forKey: CodingKeys.paywall)
-            )
-        }
-
-        init(paywall: KeyValue) throws {
-            self.paywall = try paywall.decode(AdaptyPaywall.self)
-        }
-
         func execute() async throws -> AdaptyJsonData {
             let products = try await Adapty.getPaywallProducts(paywall: paywall)
             return .success(products.map(Response.AdaptyPluginPaywallProduct.init))
         }
-    }
-}
-
-public extension AdaptyPlugin {
-    @objc static func getPaywallProducts(
-        paywall: String,
-        _ completion: @escaping AdaptyJsonDataCompletion
-    ) {
-        typealias CodingKeys = Request.GetPaywallProducts.CodingKeys
-        execute(with: completion) { try Request.GetPaywallProducts(
-            paywall: .init(key: CodingKeys.paywall, value: paywall)
-        ) }
     }
 }

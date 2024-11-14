@@ -40,61 +40,9 @@ extension Request {
             self.networkUserId = try container.decodeIfPresent(String.self, forKey: .networkUserId)
         }
 
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {
-            try self.init(
-                attribution: jsonDictionary.value(String.self, forKey: CodingKeys.attribution),
-                source: jsonDictionary.value(forKey: CodingKeys.source),
-                networkUserId: jsonDictionary.valueIfPresent(String.self, forKey: CodingKeys.networkUserId)
-            )
-        }
-
-        init(attribution: String, source: KeyValue, networkUserId: String?) throws {
-            guard let data = attribution.data(using: .utf8),
-                  let attribution = try JSONSerialization.jsonObject(with: data) as? [String: any Sendable]
-            else {
-                throw DecodingError.dataCorrupted(.init(
-                    codingPath: [CodingKeys.attribution],
-                    debugDescription: "attribution must be a valid JSON string"
-                ))
-            }
-
-            self.attribution = attribution
-            self.networkUserId = networkUserId
-
-            if let source = try? source.cast(AdaptyAttributionSource.self) {
-                self.source = source
-
-            } else {
-                let value = try source.cast(String.self)
-                guard
-                    let source = AdaptyAttributionSource(rawValue: value)
-                else {
-                    throw DecodingError.dataCorrupted(.init(codingPath: [CodingKeys.source], debugDescription: "Has unknown value: \(value) "))
-                }
-
-                self.source = source
-            }
-        }
-
         func execute() async throws -> AdaptyJsonData {
             try await Adapty.updateAttribution(attribution, source: source, networkUserId: networkUserId)
             return .success()
         }
-    }
-}
-
-public extension AdaptyPlugin {
-    @objc static func updateAttribution(
-        attribution: String,
-        source: String,
-        networkUserId: String?,
-        _ completion: @escaping AdaptyJsonDataCompletion
-    ) {
-        typealias CodingKeys = Request.UpdateAttribution.CodingKeys
-        execute(with: completion) { try Request.UpdateAttribution(
-            attribution: attribution,
-            source: .init(key: CodingKeys.source, value: source),
-            networkUserId: networkUserId
-        ) }
     }
 }

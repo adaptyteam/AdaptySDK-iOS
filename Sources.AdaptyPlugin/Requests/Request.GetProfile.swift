@@ -12,20 +12,8 @@ extension Request {
     struct GetProfile: AdaptyPluginRequest {
         static let method = "get_profile"
 
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {}
-
-        init() {}
-
         func execute() async throws -> AdaptyJsonData {
             try .success(await Adapty.getProfile())
         }
-    }
-}
-
-public extension AdaptyPlugin {
-    @objc static func getProfile(
-        _ completion: @escaping AdaptyJsonDataCompletion
-    ) {
-        execute(with: completion) { Request.GetProfile() }
     }
 }

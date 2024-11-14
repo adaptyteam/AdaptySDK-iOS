@@ -14,34 +14,13 @@ extension Request {
 
         let paywall: AdaptyPaywall
 
-        init(from jsonDictionary: AdaptyJsonDictionary) throws {
-            try self.init(
-                paywall: jsonDictionary.value(forKey: CodingKeys.paywall)
-            )
-        }
-
-        init(paywall: KeyValue) throws {
-            self.paywall = try paywall.decode(AdaptyPaywall.self)
+        enum CodingKeys: CodingKey {
+            case paywall
         }
 
         func execute() async throws -> AdaptyJsonData {
             try await Adapty.logShowPaywall(paywall)
             return .success()
         }
-    }
-}
-
-private enum CodingKeys: CodingKey {
-    case paywall
-}
-
-public extension AdaptyPlugin {
-    @objc static func logShowPaywall(
-        paywall: String,
-        _ completion: @escaping AdaptyJsonDataCompletion
-    ) {
-        execute(with: completion) { try Request.LogShowPaywall(
-            paywall: .init(key: CodingKeys.paywall, value: paywall)
-        ) }
     }
 }
