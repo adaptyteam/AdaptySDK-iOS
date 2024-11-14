@@ -70,7 +70,7 @@ extension Response {
 }
 
 public extension AdaptyPaywallProduct {
-    var asAdaptyJsonData: Data {
+    var asAdaptyJsonData: AdaptyJsonData {
         get throws {
             try AdaptyPlugin.encoder.encode(
                 Response.AdaptyPluginPaywallProduct(self)

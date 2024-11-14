@@ -59,7 +59,7 @@ extension Request {
                 preloadProducts: preloadProducts,
                 tagResolver: customTags,
                 timerResolver: customTimers,
-                delegate: Adapty.PluginDelegate.shared
+                delegate: AdaptyPlugin.adaptyUICrossplatformDelegate
             ))
         }
     }

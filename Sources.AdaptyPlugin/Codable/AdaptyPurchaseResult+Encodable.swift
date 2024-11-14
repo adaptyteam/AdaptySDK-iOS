@@ -28,7 +28,7 @@ extension AdaptyPurchaseResult: Encodable {
     }
 
     @inlinable
-    public var asAdaptyJsonData: Data {
+    public var asAdaptyJsonData: AdaptyJsonData {
         get throws {
             try AdaptyPlugin.encoder.encode(self)
         }

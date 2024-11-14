@@ -18,4 +18,3 @@ extension Log {
 
     static let plugin = Category(name: "plugin")
 }
-

@@ -17,7 +17,7 @@ extension AdaptyUI.View: Encodable {
         case paywallVariationId = "paywall_variation_id"
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(templateId, forKey: .templateId)
@@ -26,7 +26,7 @@ extension AdaptyUI.View: Encodable {
     }
 
     @inlinable
-    public var asAdaptyJsonData: Data {
+    public var asAdaptyJsonData: AdaptyJsonData {
         get throws {
             try AdaptyPlugin.encoder.encode(self)
         }

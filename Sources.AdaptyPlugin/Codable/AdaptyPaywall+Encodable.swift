@@ -10,7 +10,7 @@ import Foundation
 
 public extension AdaptyPaywall {
     @inlinable
-    var asAdaptyJsonData: Data {
+    var asAdaptyJsonData: AdaptyJsonData {
         get throws {
             try AdaptyPlugin.encoder.encode(self)
         }
