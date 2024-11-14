@@ -306,6 +306,12 @@ $recuests:
       method: { const: "make_purchase" }
       product:
         { type: jsonString, $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      subscription_update_params: 
+        type: jsonString
+        $ref: "#/$defs/AdaptySubscriptionUpdateParameters" 
+        description: "Android Only"
+      is_offer_personalized:  { type: boolean , description: "Android Only" }
+
 
   MakePurchase.Response: #response
     type: object
@@ -360,13 +366,13 @@ $recuests:
     properties:
       success: { type: string }
 
-  ### setFallbackPaywalls ###
+ ### setFallbackPaywalls ###
   SetFallbackPaywalls.Request: #request
     type: object
-    required: [method, file_url]
+    required: [method, asset_id]
     properties:
       method: { const: "set_fallback_paywalls" }
-      file_url: { type: string }
+      asset_id: { type: string }
 
   SetFallbackPaywalls.Response: #response
     type: object
@@ -377,6 +383,7 @@ $recuests:
       - required: [success]
         properties:
           success: { const: true }
+
 
   ### setVariationId ###
   SetVariationId.Request: #request
@@ -501,7 +508,7 @@ $defs:
       localized_description: { type: string }
       localized_title: { type: string }
       is_family_shareable:
-        { type: string, default: false, description: "iOS Only" }
+        { type: boolean, default: false, description: "iOS Only" }
       region_code: { type: string }
       price: { $ref: "#/$defs/AdaptyPrice" }
       subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" } # rename 3.0.0  from  subscription_details
@@ -527,7 +534,7 @@ $defs:
       group_identifier: { type: string, description: "iOS Only" } # rename 3.0.0 
       period: { $ref: "#/$defs/AdaptySubscriptionPeriod" } # rename 3.0.0 
       localized_period: { type: string } # rename 3.0.0 
-      offer: { $ref: "#/$defs/AdaptySubscriptionOffer" }
+      offer: { $ref: "#/$defs/AdaptySubscriptionOffer" } # new 3.0.0
       # introductory_offer_eligibility #deleted 3.0.0
       # android_offer_id: { type: string, description: "Android Only" }
       # android_base_plan_id: { type: string, description: "Android Only" }
@@ -546,13 +553,13 @@ $defs:
     type: object
     required:
       - vendor_product_id
-      - adaptyProductId
+      - adapty_product_id
       - paywall_variation_id
       - paywall_ab_test_name
       - paywall_name
     properties:
       vendor_product_id: { type: string }
-      adaptyProductId: { type: string }
+      adapty_product_id: { type: string }
       subscription_offer_identifier:
         { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" } # new 3.0.0
       paywall_variation_id: { type: string }
@@ -892,12 +899,10 @@ $defs:
     type: object
     required:
       - id
-      - template_id
       - placement_id
       - paywall_variation_id
     properties:
       id: { type: string }
-      template_id: { type: string }
       placement_id: { type: string }
       paywall_variation_id: { type: string }
 
@@ -927,3 +932,19 @@ $defs:
     required: [title]
     properties:
       title: { type: string }
+
+  AdaptySubscriptionUpdateParameters: #request # Android Only  
+    type: object
+    required: 
+      - old_sub_vendor_product_id
+      - replacement_mode
+    properties:
+      old_sub_vendor_product_id: { type: string }
+      replacement_mode: 
+        type: string
+        enum:
+          - charge_full_price
+          - deferred
+          - without_proration
+          - charge_prorated_price
+          - with_time_proration
