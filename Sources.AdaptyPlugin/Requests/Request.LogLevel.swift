@@ -25,6 +25,10 @@ extension Request {
         static let method = "set_log_level"
         let value: AdaptyLog.Level
         
+        private enum CodingKeys: CodingKey {
+            case value
+        }
+        
         init(from jsonDictionary: AdaptyJsonDictionary) throws {
             try self.init(
                 jsonDictionary.value(String.self, forKey: CodingKeys.value)
