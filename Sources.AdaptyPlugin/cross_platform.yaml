@@ -306,12 +306,11 @@ $recuests:
       method: { const: "make_purchase" }
       product:
         { type: jsonString, $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      subscription_update_params: 
+      subscription_update_params:
         type: jsonString
-        $ref: "#/$defs/AdaptySubscriptionUpdateParameters" 
+        $ref: "#/$defs/AdaptySubscriptionUpdateParameters"
         description: "Android Only"
-      is_offer_personalized:  { type: boolean , description: "Android Only" }
-
+      is_offer_personalized: { type: boolean, description: "Android Only" }
 
   MakePurchase.Response: #response
     type: object
@@ -366,7 +365,7 @@ $recuests:
     properties:
       success: { type: string }
 
- ### setFallbackPaywalls ###
+  ### setFallbackPaywalls ###
   SetFallbackPaywalls.Request: #request
     type: object
     required: [method, asset_id]
@@ -383,7 +382,6 @@ $recuests:
       - required: [success]
         properties:
           success: { const: true }
-
 
   ### setVariationId ###
   SetVariationId.Request: #request
@@ -484,8 +482,8 @@ $defs:
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
       log_level: { $ref: "#/$defs/AdaptyLog.Level" } # new 3.0.0
-      cross_platform_sdk_name: { type: string }      # new 3.0.0
-      cross_platform_sdk_version: { type: string }   # new 3.0.0
+      cross_platform_sdk_name: { type: string } # new 3.0.0
+      cross_platform_sdk_version: { type: string } # new 3.0.0
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -528,26 +526,21 @@ $defs:
     required:
       - group_identifier # iOS Only # new 3.0.0
       - period # rename 3.0.0
-      # - android_base_plan_id
-      # - subscription_phases
+      - renewal_type # Android Only
+      - base_plan_id # Android Only # new 3.0.0
     properties:
-      group_identifier: { type: string, description: "iOS Only" } # rename 3.0.0 
-      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" } # rename 3.0.0 
-      localized_period: { type: string } # rename 3.0.0 
+      group_identifier: { type: string, description: "iOS Only" } # rename 3.0.0
+      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" } # rename 3.0.0
+      localized_period: { type: string } # rename 3.0.0
       offer: { $ref: "#/$defs/AdaptySubscriptionOffer" } # new 3.0.0
-      # introductory_offer_eligibility #deleted 3.0.0
-      # android_offer_id: { type: string, description: "Android Only" }
-      # android_base_plan_id: { type: string, description: "Android Only" }
-      # android_offer_tags:
-      #   type: array
-      #   items: { type: string }
-      #   description: "Android Only"
-      # renewal_type:
-      #   type: string
-      #   enum: [prepaid, autorenewable]
-      #   default: autorenewable
-      # introductory_offer_phases:
-      #   type: array
+      renewal_type: # Android Only
+        type: string
+        enum:
+          - prepaid
+          - autorenewable
+        default: autorenewable
+        description: "Android Only"
+      base_plan_id: { type: string, description: "Android Only" } # Android Only # rename 3.0.0
 
   AdaptyPaywallProduct.Request: #request
     type: object
@@ -560,8 +553,9 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
-      subscription_offer_identifier:
-        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" } # new 3.0.0
+      subscription_offer_identifier: {
+          $ref: "#/$defs/AdaptySubscriptionOffer.Identifier",
+        } # new 3.0.0
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
@@ -571,18 +565,31 @@ $defs:
     type: object
     required:
       - offer_identifier
-      - price
-      - number_of_periods
-      - payment_mode
-      - subscription_period
+      - phases
     properties:
       offer_identifier: { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
-      price: { $ref: "#/$defs/AdaptyPrice" }
-      number_of_periods: { type: integer }
-      payment_mode: { $ref: "#/$defs/AdaptySubscriptionOffer.PaymentMode" }
-      subscription_period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
-      localized_subscription_period: { type: string }
-      localized_number_of_periods: { type: string }
+      phases:
+        type: array
+        items: { $ref: "#/$defs/AdaptySubscriptionOffer.Phase" }
+      offer_tags: # Android Only
+        type: array
+        items: { type: string }
+        description: Android Only
+
+    AdaptySubscriptionOffer.Phase:
+      type: object
+      required:
+        - price
+        - subscription_period
+        - number_of_periods
+        - payment_mode
+      properties:
+        price: { $ref: "#/$defs/AdaptyPrice" }
+        number_of_periods: { type: integer }
+        payment_mode: { $ref: "#/$defs/AdaptySubscriptionOffer.PaymentMode" }
+        subscription_period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
+        localized_subscription_period: { type: string }
+        localized_number_of_periods: { type: string }
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -846,13 +853,16 @@ $defs:
   AdaptySubscriptionOffer.Identifier: #request #response
     type: string
     oneOf:
-      - required: [type]
+      - required:
+          - type
+          - id # Android Only
         properties:
-          type: { type: string, const: "introductory" }
-      - required: [type, id]
-        properties:
-          type: { type: string, enum: ["promotional", "win_back"] }
           id: { type: string }
+          type: { type: string, const: introductory }
+      - required: [id, type]
+        properties:
+          id: { type: string }
+          type: { type: string, enum: [promotional, win_back] }
 
   AdaptySubscriptionOffer.PaymentMode: #response
     type: string
@@ -933,14 +943,14 @@ $defs:
     properties:
       title: { type: string }
 
-  AdaptySubscriptionUpdateParameters: #request # Android Only  
+  AdaptySubscriptionUpdateParameters: #request # Android Only
     type: object
-    required: 
+    required:
       - old_sub_vendor_product_id
       - replacement_mode
     properties:
       old_sub_vendor_product_id: { type: string }
-      replacement_mode: 
+      replacement_mode:
         type: string
         enum:
           - charge_full_price
