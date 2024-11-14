@@ -476,9 +476,9 @@ $defs:
       backend_fallback_base_url: { type: string }
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
-      log_level: { $ref: "#/$defs/AdaptyLog.Level" }
-      cross_platform_sdk_name: { type: string }
-      cross_platform_sdk_version: { type: string }
+      log_level: { $ref: "#/$defs/AdaptyLog.Level" } # new 3.0.0
+      cross_platform_sdk_name: { type: string }      # new 3.0.0
+      cross_platform_sdk_version: { type: string }   # new 3.0.0
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -490,8 +490,8 @@ $defs:
       - paywall_name
       - localized_description
       - localized_title
-      - is_family_shareable
-      - price
+      - is_family_shareable # iOS Only  # new 3.0.0
+      - price # new 3.0.0
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
@@ -504,7 +504,7 @@ $defs:
         { type: string, default: false, description: "iOS Only" }
       region_code: { type: string }
       price: { $ref: "#/$defs/AdaptyPrice" }
-      subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
+      subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" } # rename 3.0.0  from  subscription_details
       payload_data: { type: string }
 
   AdaptyPrice: #response
@@ -519,14 +519,16 @@ $defs:
   AdaptyPaywallProduct.Subscription: #response
     type: object
     required:
-      - group_identifier
-      - period
+      - group_identifier # iOS Only # new 3.0.0
+      - period # rename 3.0.0
       # - android_base_plan_id
+      # - subscription_phases
     properties:
-      group_identifier: { type: string, description: "iOS Only" }
-      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
-      localized_period: { type: string }
+      group_identifier: { type: string, description: "iOS Only" } # rename 3.0.0 
+      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" } # rename 3.0.0 
+      localized_period: { type: string } # rename 3.0.0 
       offer: { $ref: "#/$defs/AdaptySubscriptionOffer" }
+      # introductory_offer_eligibility #deleted 3.0.0
       # android_offer_id: { type: string, description: "Android Only" }
       # android_base_plan_id: { type: string, description: "Android Only" }
       # android_offer_tags:
@@ -552,7 +554,7 @@ $defs:
       vendor_product_id: { type: string }
       adaptyProductId: { type: string }
       subscription_offer_identifier:
-        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" } # new 3.0.0
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
@@ -593,7 +595,7 @@ $defs:
       - variation_id
       - revision
       - products
-      - response_created_at
+      - response_created_at # new 3.0.0
     properties:
       developer_id: { type: string }
       paywall_id: { type: string }
@@ -644,7 +646,7 @@ $defs:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
       promotional_offer_id: { type: string, description: "iOS Only" }
-      win_back_offer_id: { type: string, description: "iOS Only" }
+      win_back_offer_id: { type: string, description: "iOS Only" } # new 3.0.0
       base_plan_id: { type: string, description: "Android Only" }
       offer_id: { type: string, description: "Android Only" }
 
@@ -678,8 +680,8 @@ $defs:
     required:
       - profile_id
       - segment_hash
-      - is_test_user
-      - version
+      - is_test_user # new 3.0.0
+      - timestamp # new 3.0.0
     properties:
       profile_id: { type: string }
       customer_user_id: { type: string }
@@ -696,8 +698,8 @@ $defs:
         additionalProperties:
           type: array
           items: { $ref: "#/$defs/AdaptyProfile.NonSubscription" }
-      timestamp: { type: integer }
-      is_test_user: { type: boolean }
+      timestamp: { type: integer } # new 3.0.0
+      is_test_user: { type: boolean } # new 3.0.0
 
   AdaptyProfile.AccessLevel: #response
     type: object
