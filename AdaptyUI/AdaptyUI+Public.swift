@@ -190,7 +190,7 @@ public protocol AdaptyObserverModeResolver: Sendable {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension AdaptyUI {
-    private static var isActivated: Bool = false
+    internal static var isActivated: Bool = false
     internal static var isObserverModeEnabled: Bool = false
 
     /// Use this method to initialize the AdaptyUI SDK.

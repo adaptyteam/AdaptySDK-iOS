@@ -58,8 +58,7 @@ extension Request {
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts,
                 tagResolver: customTags,
-                timerResolver: customTimers,
-                delegate: AdaptyPlugin.adaptyUICrossplatformDelegate
+                timerResolver: customTimers
             ))
         }
     }

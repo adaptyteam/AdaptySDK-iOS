@@ -43,13 +43,8 @@ package extension AdaptyUI {
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyTagResolver?,
-            timerResolver: AdaptyTimerResolver?,
-            delegate: AdaptyPaywallControllerDelegate?
+            timerResolver: AdaptyTimerResolver?
         ) async throws -> AdaptyUI.View {
-            guard let delegate else {
-                throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
-            }
-            
             let products: [AdaptyPaywallProduct]?
             
             if preloadProducts {
@@ -67,13 +62,8 @@ package extension AdaptyUI {
                 timerResolver: timerResolver
             )
             
-            let vc = try AdaptyUI.paywallController(
-                with: configuration,
-                delegate: delegate
-            )
-            
+            let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
             cachePaywallController(vc, id: vc.id)
-            
             return vc.toView()
         }
 
