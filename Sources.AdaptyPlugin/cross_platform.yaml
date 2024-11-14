@@ -306,10 +306,11 @@ $recuests:
       method: { const: "make_purchase" }
       product:
         { type: jsonString, $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      subscription_update_params:
-        type: jsonString
-        $ref: "#/$defs/AdaptySubscriptionUpdateParameters"
+      subscription_update_params: {
+        type: jsonString,
+        $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
         description: "Android Only"
+      }
       is_offer_personalized: { type: boolean, description: "Android Only" }
 
   MakePurchase.Response: #response
@@ -439,6 +440,86 @@ $recuests:
       - required: [success]
         properties:
           success: { const: true }
+
+$events:
+
+DidUpdateProfile:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "did_update_profile" }
+
+PaywallViewDidPerformAction:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_perform_action" }
+
+PaywallViewDidPerformSystemBackAction:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_perform_system_back_action" }
+
+PaywallViewDidSelectProduct:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_select_product" }
+
+PaywallViewDidStartPurchase:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_start_purchase" }
+
+PaywallViewDidCancelPurchase:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_cancel_purchase" }
+
+PaywallViewDidFinishPurchase:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_finish_purchase" }
+
+PaywallViewDidFailPurchase:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_fail_purchase" }
+
+PaywallViewDidStartRestore:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_start_restore" }
+
+PaywallViewDidFinishRestore:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_finish_restore" }
+
+PaywallViewDidFailRestore:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_fail_restore" }
+
+PaywallViewDidFailRendering:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_fail_rendering" }
+
+PaywallViewDidFailLoadingProducts:
+  type: object
+  required: [id]
+  properties: 
+    id: { const: "paywall_view_did_fail_loading_products" }
 
 $defs:
   ### Entities ###
