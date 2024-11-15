@@ -9,7 +9,7 @@ $recuests:
     required: [method, configuration]
     properties:
       method: { const: "activate" }
-      configuration: { type: jsonString, $ref: "#/$defs/AdaptyConfiguration" }
+      configuration: { $ref: "#/$defs/AdaptyConfiguration" }
 
   Activate.Response: #response
     type: object
@@ -27,8 +27,7 @@ $recuests:
     required: [method, configuration]
     properties:
       method: { const: "adapty_ui_activate" }
-      configuration:
-        { type: jsonString, $ref: "#/$defs/AdaptyUI.Configuration" }
+      configuration: { $ref: "#/$defs/AdaptyUI.Configuration" }
 
   AdaptyUIActivate.Response: #response
     type: object
@@ -48,15 +47,13 @@ $recuests:
       - paywall
     properties:
       method: { const: "adapty_ui_create_view" }
-      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
+      paywall: { $ref: "#/$defs/AdaptyPaywall" }
       load_timeout: { type: number, description: "seconds" }
       preload_products: { type: boolean, default: false }
-      custom_tags:
-        { type: jsonString, $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
-      custom_timers:
-        { type: jsonString, $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
+      custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
+      custom_timers: { $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
       android_personalized_offers:
-        { type: jsonString, $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
+        { $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
 
   AdaptyUICreateView.Response: #response
     type: object
@@ -75,7 +72,7 @@ $recuests:
     properties:
       method: { const: "adapty_ui_dismiss_view" }
       id: { type: string, description: "View Id" }
-      destroy: { type: boolean }
+      destroy: { type: boolean, default: false }
 
   AdaptyUIDismissView.Response: #response
     type: object
@@ -112,8 +109,7 @@ $recuests:
     properties:
       method: { const: "adapty_ui_show_dialog" }
       id: { type: string, description: "View Id" }
-      configuration:
-        { type: jsonString, $ref: "#/$defs/AdaptyUI.DialogConfiguration" }
+      configuration: { $ref: "#/$defs/AdaptyUI.DialogConfiguration" }
 
   AdaptyUIShowDialog.Response: #response
     type: object
@@ -133,8 +129,7 @@ $recuests:
       method: { const: "get_paywall" }
       placement_id: { type: string }
       locale: { type: string }
-      fetch_policy:
-        { type: jsonString, $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+      fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
       load_timeout: { type: number }
 
   GetPaywall.Response: #response
@@ -153,7 +148,7 @@ $recuests:
     required: [method, paywall]
     properties:
       method: { const: "get_paywall_products" }
-      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
+      paywall: { $ref: "#/$defs/AdaptyPaywall" }
 
   GetPaywallProducts.Response: #response
     type: object
@@ -267,8 +262,7 @@ $recuests:
     required: [method, params]
     properties:
       method: { const: "log_show_onboarding" }
-      params:
-        { type: jsonString, $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
+      params: { $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
 
   LogShowOnboarding.Response: #response
     type: object
@@ -286,7 +280,7 @@ $recuests:
     required: [method, paywall]
     properties:
       method: { const: "log_show_paywall" }
-      paywall: { type: jsonString, $ref: "#/$defs/AdaptyPaywall" }
+      paywall: { $ref: "#/$defs/AdaptyPaywall" }
 
   LogShowPaywall.Response: #response
     type: object
@@ -304,13 +298,12 @@ $recuests:
     required: [method, product]
     properties:
       method: { const: "make_purchase" }
-      product:
-        { type: jsonString, $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      subscription_update_params: {
-        type: jsonString,
-        $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
-        description: "Android Only"
-      }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      subscription_update_params:
+        {
+          $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
+          description: "Android Only",
+        }
       is_offer_personalized: { type: boolean, description: "Android Only" }
 
   MakePurchase.Response: #response
@@ -429,7 +422,7 @@ $recuests:
     required: [method, params]
     properties:
       method: { const: "update_profile" }
-      params: { type: jsonString, $ref: "#/$defs/AdaptyProfileParameters" }
+      params: { $ref: "#/$defs/AdaptyProfileParameters" }
 
   UpdateProfile.Response: #response
     type: object
@@ -443,82 +436,83 @@ $recuests:
 
 $events:
 
-DidUpdateProfile:
+DidLoadLatestProfile:
   type: object
-  required: [id]
-  properties: 
-    id: { const: "did_update_profile" }
+  required: [id, profile]
+  properties:
+    id: { const: "did_load_latest_profile" }
+    profile: {}
 
 PaywallViewDidPerformAction:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_perform_action" }
 
-PaywallViewDidPerformSystemBackAction:
+PaywallViewDidPerformSystemBackAction: # Android Only
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_perform_system_back_action" }
 
 PaywallViewDidSelectProduct:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_select_product" }
 
 PaywallViewDidStartPurchase:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_start_purchase" }
 
 PaywallViewDidCancelPurchase:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_cancel_purchase" }
 
 PaywallViewDidFinishPurchase:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_finish_purchase" }
 
 PaywallViewDidFailPurchase:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_fail_purchase" }
 
 PaywallViewDidStartRestore:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_start_restore" }
 
 PaywallViewDidFinishRestore:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_finish_restore" }
 
 PaywallViewDidFailRestore:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_fail_restore" }
 
 PaywallViewDidFailRendering:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_fail_rendering" }
 
 PaywallViewDidFailLoadingProducts:
   type: object
   required: [id]
-  properties: 
+  properties:
     id: { const: "paywall_view_did_fail_loading_products" }
 
 $defs:
@@ -545,7 +539,7 @@ $defs:
     type: string
     example: "en"
 
-  Date: #response
+  Date: #response #request
     type: string
     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
@@ -982,9 +976,10 @@ $defs:
           - memory_storage_count_limit
           - disk_storage_size_limit
         properties:
-          memory_storage_total_cost_limit: { type: integer }
+          memory_storage_total_cost_limit:
+            { type: integer, description: "bytes" }
           memory_storage_count_limit: { type: integer }
-          disk_storage_size_limit: { type: integer }
+          disk_storage_size_limit: { type: integer, description: "bytes" }
 
   AdaptyUI.View: #response
     type: object
