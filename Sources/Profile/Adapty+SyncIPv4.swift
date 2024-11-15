@@ -68,10 +68,6 @@ extension Adapty {
                 } catch {
                     continuation.resume(throwing: error)
                 }
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
             }.resume()
         }
     }
