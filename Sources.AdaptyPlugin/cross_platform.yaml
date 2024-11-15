@@ -2,7 +2,7 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://adapty.io/crossPlatform/3.0.0/schema"
 title: "Cross Platform Format"
 
-$recuests:
+$requests:
   ### activate ###
   Activate.Request: #request
     type: object
@@ -133,6 +133,26 @@ $recuests:
       load_timeout: { type: number }
 
   GetPaywall.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPaywall" }
+
+    ### getPaywall ###
+  GetPaywallForDefaultAudience.Request: #request
+    type: object
+    required: [method, placement_id]
+    properties:
+      method: { const: "get_paywall_for_default_audience" }
+      placement_id: { type: string }
+      locale: { type: string }
+      fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+
+  GetPaywallForDefaultAudience.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -436,84 +456,84 @@ $recuests:
 
 $events:
 
-DidLoadLatestProfile:
-  type: object
-  required: [id, profile]
-  properties:
-    id: { const: "did_load_latest_profile" }
-    profile: {}
+  DidLoadLatestProfile:
+    type: object
+    required: [id, profile]
+    properties:
+      id: { const: "did_load_latest_profile" }
+      profile: {}
 
-PaywallViewDidPerformAction:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_perform_action" }
+  PaywallViewDidPerformAction:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_perform_action" }
 
-PaywallViewDidPerformSystemBackAction: # Android Only
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_perform_system_back_action" }
+  PaywallViewDidPerformSystemBackAction: # Android Only
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_perform_system_back_action" }
 
-PaywallViewDidSelectProduct:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_select_product" }
+  PaywallViewDidSelectProduct:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_select_product" }
 
-PaywallViewDidStartPurchase:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_start_purchase" }
+  PaywallViewDidStartPurchase:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_start_purchase" }
 
-PaywallViewDidCancelPurchase:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_cancel_purchase" }
+  PaywallViewDidCancelPurchase:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_cancel_purchase" }
 
-PaywallViewDidFinishPurchase:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_finish_purchase" }
+  PaywallViewDidFinishPurchase:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_finish_purchase" }
 
-PaywallViewDidFailPurchase:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_fail_purchase" }
+  PaywallViewDidFailPurchase:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_fail_purchase" }
 
-PaywallViewDidStartRestore:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_start_restore" }
+  PaywallViewDidStartRestore:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_start_restore" }
 
-PaywallViewDidFinishRestore:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_finish_restore" }
+  PaywallViewDidFinishRestore:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_finish_restore" }
 
-PaywallViewDidFailRestore:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_fail_restore" }
+  PaywallViewDidFailRestore:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_fail_restore" }
 
-PaywallViewDidFailRendering:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_fail_rendering" }
+  PaywallViewDidFailRendering:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_fail_rendering" }
 
-PaywallViewDidFailLoadingProducts:
-  type: object
-  required: [id]
-  properties:
-    id: { const: "paywall_view_did_fail_loading_products" }
+  PaywallViewDidFailLoadingProducts:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "paywall_view_did_fail_loading_products" }
 
 $defs:
   ### Entities ###

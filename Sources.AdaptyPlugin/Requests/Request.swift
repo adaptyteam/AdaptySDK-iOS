@@ -17,6 +17,7 @@ enum Request {
             SetLogLevel.self,
             Activate.self,
             GetPaywall.self,
+            GetPaywallForDefaultAudience.self,
             GetPaywallProducts.self,
             GetProfile.self,
             Identify.self,
