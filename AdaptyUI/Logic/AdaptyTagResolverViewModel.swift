@@ -5,10 +5,16 @@
 //  Created by Aleksey Goncharov on 27.05.2024.
 //
 
-#if canImport(UIKit)
-
 import Adapty
 import Foundation
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension [String: String]: AdaptyTagResolver {
+    public func replacement(for tag: String) -> String? { self[tag] }
+}
+
+
+#if canImport(UIKit)
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyViewConfiguration {
@@ -32,10 +38,6 @@ extension AdaptyViewConfiguration {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension [String: String]: AdaptyTagResolver {
-    public func replacement(for tag: String) -> String? { self[tag] }
-}
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor

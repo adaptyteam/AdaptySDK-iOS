@@ -27,6 +27,8 @@ extension AdaptyUIError: CustomAdaptyError {
 
     public var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
+        case .platformNotSupported:
+            return AdaptyError.ErrorCode.unknown
         case .adaptyNotActivated, .adaptyUINotActivated:
             return AdaptyError.ErrorCode.notActivated
         case .activateOnce:
@@ -58,6 +60,8 @@ extension AdaptyUIError: CustomAdaptyError {
 
     public var description: String {
         switch self {
+        case .platformNotSupported:
+            "This platfrom is not supported by AdaptyUI SDK"
         case .adaptyNotActivated:
             "You should activate Adapty SDK before using AdaptyUI"
         case .adaptyUINotActivated:

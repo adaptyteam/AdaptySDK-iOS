@@ -6,6 +6,7 @@
 //
 
 import Adapty
+import Foundation
 
 /// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
 /// To make full use of this functionality, you need to install an additional library, as well as make additional setups in the Adapty Dashboard.
@@ -40,10 +41,6 @@ public protocol AdaptyTimerResolver: Sendable {
     func timerEndAtDate(for timerId: String) -> Date
 }
 
-#if canImport(UIKit)
-
-import UIKit
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     /// This enum describes user initiated actions.
@@ -56,6 +53,10 @@ public extension AdaptyUI {
         case custom(id: String)
     }
 }
+
+#if canImport(UIKit)
+
+import UIKit
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -178,6 +179,8 @@ public protocol AdaptyPaywallControllerDelegate: NSObject {
     )
 }
 
+#endif
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public protocol AdaptyObserverModeResolver: Sendable {
     func observerMode(
@@ -199,6 +202,7 @@ public extension AdaptyUI {
     ///
     /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
     static func activate(configuration: AdaptyUI.Configuration = .default) async throws {
+#if canImport(UIKit)
         let sdk: Adapty
         do {
             sdk = try await Adapty.activatedSDK
@@ -221,8 +225,16 @@ public extension AdaptyUI {
         ImageUrlPrefetcher.shared.initialize()
 
         Log.ui.info("AdaptyUI activated with \(configuration)")
+#else
+        throw AdaptyUIError.platformNotSupported
+#endif
     }
+}
 
+#if canImport(UIKit)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+public extension AdaptyUI {
     /// If you are using the [Paywall Builder](https://adapty.io/docs/3.0/adapty-paywall-builder), you can use this method to get a configuration object for your paywall.
     ///
     /// - Parameters:
@@ -288,5 +300,4 @@ public extension AdaptyUI {
         )
     }
 }
-
 #endif

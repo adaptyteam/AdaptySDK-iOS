@@ -5,6 +5,8 @@
 //  Created by Aleksei Valiano on 14.11.2024.
 //
 
+#if canImport(UIKit)
+
 import AdaptyUI
 import Foundation
 
@@ -16,3 +18,5 @@ public extension AdaptyPaywallController {
         }
     }
 }
+
+#endif
