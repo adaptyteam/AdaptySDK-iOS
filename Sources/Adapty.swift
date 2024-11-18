@@ -159,7 +159,7 @@ public final class Adapty: Sendable {
                     profile: createdProfile,
                     sendedEnvironment: meta.sendedEnvironment
                 )
-                self.sharedProfileManager = .current(manager)
+                sharedProfileManager = .current(manager)
                 return manager
 
             case .failure:
@@ -206,7 +206,7 @@ extension Adapty {
         let profileId = profileStorage.profileId
 
         let task = Task { try await createNewProfileOnServer(profileId, customerUserId) }
-        self.sharedProfileManager = .creating(
+        sharedProfileManager = .creating(
             profileId: profileId,
             withCustomerUserId: customerUserId,
             task: task
@@ -252,12 +252,16 @@ extension Adapty {
             case let .current(manager):
                 return manager
             case let .creating(_, _, task):
-                do {
-                    return try await task.value
-                } catch is CancellationError {
-                    throw AdaptyError.profileWasChanged()
-                } catch {
-                    throw error
+                return try await withTaskCancellationHandler {
+                    do {
+                        return try await task.value
+                    } catch is CancellationError {
+                        throw AdaptyError.profileWasChanged()
+                    } catch {
+                        throw error
+                    }
+                } onCancel: {
+                    Log.default.error("Dont cancel createdProfileManager")
                 }
             }
         }
