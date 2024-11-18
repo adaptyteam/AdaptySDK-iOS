@@ -73,7 +73,7 @@ package extension AdaptyUI {
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
             cachePaywallController(vc, id: vc.id)
-            return vc.toView()
+            return vc.toAdaptyUIView()
 #else
             throw AdaptyUIError.platformNotSupported
 #endif
