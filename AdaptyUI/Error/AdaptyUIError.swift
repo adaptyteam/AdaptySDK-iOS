@@ -9,6 +9,8 @@ import Foundation
 import Adapty
 
 public enum AdaptyUIError: Error {
+    case platformNotSupported
+    
     case adaptyNotActivated
     case adaptyUINotActivated
     case activateOnce

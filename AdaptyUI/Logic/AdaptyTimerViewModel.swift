@@ -5,8 +5,6 @@
 //  Created by Aleksey Goncharov on 04.06.2024.
 //
 
-#if canImport(UIKit)
-
 import Adapty
 import SwiftUI
 
@@ -25,6 +23,9 @@ extension [String: Date]: AdaptyTimerResolver {
         self[timerId] ?? Date(timeIntervalSinceNow: 3600.0)
     }
 }
+
+
+#if canImport(UIKit)
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
