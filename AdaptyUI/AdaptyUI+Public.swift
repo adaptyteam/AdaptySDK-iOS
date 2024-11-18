@@ -61,7 +61,7 @@ import UIKit
 /// Implement this protocol to respond to different events happening inside the purchase screen.
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-public protocol AdaptyPaywallControllerDelegate: NSObject {
+public protocol AdaptyPaywallControllerDelegate: AnyObject {
     /// If user performs an action process, this method will be invoked.
     ///
     /// - Parameters:
