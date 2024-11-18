@@ -16,6 +16,7 @@ extension Adapty {
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
     /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
+    @available(visionOS, unavailable)
     public nonisolated static func makePurchase(product: AdaptyPaywallProduct) async throws -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
