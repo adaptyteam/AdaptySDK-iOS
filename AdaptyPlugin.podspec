@@ -26,7 +26,6 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
 
   s.ios.deployment_target = '13.0'
   s.osx.deployment_target = '11.0'
-  s.visionos.deployment_target = '1.0'
 
   s.swift_version = '5.9'
 
