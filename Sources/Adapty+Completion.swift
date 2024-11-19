@@ -23,7 +23,7 @@ public extension Result where Failure == AdaptyError {
 
 package extension AdaptyConfiguration {
     @AdaptyActor
-    package static var callbackDispatchQueue: DispatchQueue?
+    static var callbackDispatchQueue: DispatchQueue?
 }
 
 public extension Adapty {

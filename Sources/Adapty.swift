@@ -252,7 +252,7 @@ extension Adapty {
             case let .current(manager):
                 return manager
             case let .creating(_, _, task):
-                return try await withTaskCancellationHandler {
+                return try await withTaskCancellationWithError(CancellationError()) {
                     do {
                         return try await task.value
                     } catch is CancellationError {
@@ -260,8 +260,6 @@ extension Adapty {
                     } catch {
                         throw error
                     }
-                } onCancel: {
-                    Log.default.error("Dont cancel createdProfileManager")
                 }
             }
         }
