@@ -14,10 +14,12 @@ extension PaywallViewEvent {
     struct WillPurchase: AdaptyPluginEvent {
         let id = "paywall_view_did_start_restore"
         let view: AdaptyUI.View
+        let product: Response.AdaptyPluginPaywallProduct
 
         enum CodingKeys: String, CodingKey {
             case id
             case view
+            case product
         }
     }
 }

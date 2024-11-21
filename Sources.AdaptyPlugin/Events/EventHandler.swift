@@ -23,5 +23,8 @@ public extension AdaptyPlugin {
         let delegate = AdaptyPluginDelegate(eventHandler: eventHandler)
         self.delegate = delegate
         Adapty.delegate = delegate
+        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+            AdaptyUI.universalDelagate = delegate
+        }
     }
 }
