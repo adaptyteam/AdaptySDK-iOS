@@ -36,9 +36,20 @@ public extension AdaptyPlugin {
         }
     }
 
-    private static func execute<RequestType: AdaptyPluginRequest>(requestType: RequestType.Type, withJson jsonData: AdaptyJsonData) async -> AdaptyJsonData {
-        await execute {
-            try jsonData.decode(requestType)
+    private static func execute<Request: AdaptyPluginRequest>(requestType: Request.Type, withJson jsonData: AdaptyJsonData) async -> AdaptyJsonData {
+        let request: Request
+        do {
+            request = try jsonData.decode(requestType)
+        } catch {
+            let error = AdaptyPluginError.decodingFailed(message: "Request params of method:\(Request.method) is invalid", error)
+            log.error(error.message)
+            return .failure(error)
+        }
+
+        do {
+            return try await request.execute()
+        } catch {
+            return .failure(.callFailed(error))
         }
     }
 }

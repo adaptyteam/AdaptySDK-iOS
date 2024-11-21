@@ -17,4 +17,19 @@ public extension AdaptyPlugin {
     static func execute(method: String, withJson jsonString: AdaptyJsonString) async -> AdaptyJsonData {
         await execute(method: method, withJson: jsonString.asAdaptyJsonData)
     }
+
+    @objc static func execute(
+        withJsonString jsonString: AdaptyJsonString,
+        _ completion: @escaping AdaptyJsonDataCompletion
+    ) {
+        execute(withJsonData: jsonString.asAdaptyJsonData, completion)
+    }
+
+    @objc static func execute(
+        method: String,
+        withJsonString jsonString: AdaptyJsonString,
+        _ completion: @escaping AdaptyJsonDataCompletion
+    ) {
+        execute(method: method, withJsonData: jsonString.asAdaptyJsonData, completion)
+    }
 }

@@ -49,7 +49,7 @@ enum Request {
     @MainActor
     static func requestType(for method: String) throws -> AdaptyPluginRequest.Type {
         guard let requestType = allRequests[method] else {
-            throw AdaptyPluginDecodingError.unknownMethod(method)
+            throw AdaptyPluginInternalError.unknownRequest(method)
         }
         return requestType
     }

@@ -67,7 +67,7 @@ package enum Log {
     }
 }
 
-private extension Log.Category {
+package extension Log.Category {
     func write(
         _ message: String,
         withLevel level: Log.Level,

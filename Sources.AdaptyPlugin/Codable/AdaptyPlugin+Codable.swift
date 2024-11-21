@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyPlugin {
+public extension AdaptyPlugin {
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
@@ -16,14 +16,14 @@ extension AdaptyPlugin {
         return formatter
     }()
 
-   public static let encoder: JSONEncoder = {
+    static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .formatted(dateFormatter)
         encoder.dataEncodingStrategy = .base64
         return encoder
     }()
 
-    public static let decoder: JSONDecoder = {
+    static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(dateFormatter)
         decoder.dataDecodingStrategy = .base64
