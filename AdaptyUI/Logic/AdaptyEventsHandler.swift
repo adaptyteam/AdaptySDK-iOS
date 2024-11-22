@@ -13,6 +13,12 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyEventsHandler: ObservableObject {
+    enum PresentationState {
+        case initial
+        case appeared
+        case disappeared
+    }
+
     let logId: String
 
     var didPerformAction: ((AdaptyUI.Action) -> Void)?
@@ -26,7 +32,7 @@ package final class AdaptyEventsHandler: ObservableObject {
     var didFailRendering: ((AdaptyError) -> Void)?
     var didFailLoadingProducts: ((AdaptyError) -> Bool)?
     var didPartiallyLoadProducts: (([String]) -> Void)?
-    
+
     package init(logId: String) {
         self.logId = logId
         self.didPerformAction = nil
@@ -40,6 +46,16 @@ package final class AdaptyEventsHandler: ObservableObject {
         self.didFailRendering = nil
         self.didFailLoadingProducts = nil
         self.didPartiallyLoadProducts = nil
+    }
+
+    @Published var presentationState: PresentationState = .initial
+
+    func viewDidAppear() {
+        presentationState = .appeared
+    }
+
+    func viewDidDisappear() {
+        presentationState = .disappeared
     }
 
     func event_didPerformAction(_ action: AdaptyUI.Action) {

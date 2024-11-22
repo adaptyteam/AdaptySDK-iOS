@@ -38,6 +38,7 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
 
     var paywallViewBody: some View {
         AdaptyPaywallView_Internal(showDebugOverlay: false)
+            .environmentObject(paywallConfiguration.eventsHandler)
             .environmentObject(paywallConfiguration.paywallViewModel)
             .environmentObject(paywallConfiguration.productsViewModel)
             .environmentObject(paywallConfiguration.actionsViewModel)
@@ -47,6 +48,7 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
             .environmentObject(paywallConfiguration.screensViewModel)
             .environmentObject(paywallConfiguration.videoViewModel)
             .onAppear {
+                paywallConfiguration.eventsHandler.viewDidAppear()
                 paywallConfiguration.paywallViewModel.logShowPaywall()
             }
     }
@@ -57,6 +59,7 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
                 .fullScreenCover(
                     isPresented: isPresented,
                     onDismiss: {
+                        paywallConfiguration.eventsHandler.viewDidDisappear()
                         paywallConfiguration.paywallViewModel.resetLogShowPaywall()
                     },
                     content: {
@@ -68,6 +71,7 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
                 .sheet(
                     isPresented: isPresented,
                     onDismiss: {
+                        paywallConfiguration.eventsHandler.viewDidDisappear()
                         paywallConfiguration.paywallViewModel.resetLogShowPaywall()
                     },
                     content: {
