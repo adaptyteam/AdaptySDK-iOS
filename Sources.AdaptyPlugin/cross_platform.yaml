@@ -455,85 +455,93 @@ $requests:
           success: { const: true }
 
 $events:
-
-  DidLoadLatestProfile:
+  Event.DidLoadLatestProfile:
     type: object
     required: [id, profile]
     properties:
       id: { const: "did_load_latest_profile" }
-      profile: {}
+      profile: { $ref: "#/$defs/AdaptyProfile" }
 
-  PaywallViewDidPerformAction:
+  PaywallViewEvent.DidUserAction:
     type: object
-    required: [id]
+    required: [id, view, action]
     properties:
       id: { const: "paywall_view_did_perform_action" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      action: { $ref: "#/$defs/AdaptyUI.UserAction" }
 
-  PaywallViewDidPerformSystemBackAction: # Android Only
+  PaywallViewEvent.DidSelectProduct:
     type: object
-    required: [id]
-    properties:
-      id: { const: "paywall_view_did_perform_system_back_action" }
-
-  PaywallViewDidSelectProduct:
-    type: object
-    required: [id]
+    required: [id, view, product_id]
     properties:
       id: { const: "paywall_view_did_select_product" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      product_id: { type: string }
 
-  PaywallViewDidStartPurchase:
+  PaywallViewEvent.WillPurchase:
     type: object
-    required: [id]
+    required: [id, view, product]
     properties:
       id: { const: "paywall_view_did_start_purchase" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
 
-  PaywallViewDidCancelPurchase:
+  PaywallViewEvent.DidPurchase:
     type: object
-    required: [id]
-    properties:
-      id: { const: "paywall_view_did_cancel_purchase" }
-
-  PaywallViewDidFinishPurchase:
-    type: object
-    required: [id]
+    required: [id, view, product, purchased_result]
     properties:
       id: { const: "paywall_view_did_finish_purchase" }
-
-  PaywallViewDidFailPurchase:
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+      purchased_result: { $ref: "#/$defs/AdaptyPurchaseResult" }
+  
+  PaywallViewEvent.DidFailPurchase:
     type: object
-    required: [id]
+    required: [id, view, product, error]
     properties:
       id: { const: "paywall_view_did_fail_purchase" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+      error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewDidStartRestore:
+  PaywallViewEvent.WillRestorePurchase:
     type: object
-    required: [id]
+    required: [id, view]
     properties:
       id: { const: "paywall_view_did_start_restore" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
 
-  PaywallViewDidFinishRestore:
+  PaywallViewEvent.DidRestorePurchase:
     type: object
-    required: [id]
+    required: [id, view, profile]
     properties:
       id: { const: "paywall_view_did_finish_restore" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      profile: { $ref: "#/$defs/AdaptyProfile" }
 
-  PaywallViewDidFailRestore:
+  PaywallViewEvent.DidFailRestorePurchase:
     type: object
-    required: [id]
+    required: [id, view, error]
     properties:
       id: { const: "paywall_view_did_fail_restore" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewDidFailRendering:
+  PaywallViewEvent.DidFailRendering:
     type: object
-    required: [id]
+    required: [id, view, error]
     properties:
       id: { const: "paywall_view_did_fail_rendering" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewDidFailLoadingProducts:
+  PaywallViewEvent.DidFailLoadingProducts:
     type: object
-    required: [id]
+    required: [id, view, error]
     properties:
       id: { const: "paywall_view_did_fail_loading_products" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      error: { $ref: "#/$defs/AdaptyError" }
 
 $defs:
   ### Entities ###
@@ -784,7 +792,7 @@ $defs:
       - year
       - unknown
 
-  AdaptyProfile: #response
+  AdaptyProfile: #response #event
     type: object
     required:
       - profile_id
@@ -1001,7 +1009,7 @@ $defs:
           memory_storage_count_limit: { type: integer }
           disk_storage_size_limit: { type: integer, description: "bytes" }
 
-  AdaptyUI.View: #response
+  AdaptyUI.View: #response #event
     type: object
     required:
       - id
@@ -1011,6 +1019,17 @@ $defs:
       id: { type: string }
       placement_id: { type: string }
       paywall_variation_id: { type: string }
+
+  AdaptyUI.UserAction: #event
+    type: object
+    oneOf:
+      - required: [type]
+        properties:
+          type: { type: string, const: ["close", "system_back"] }
+      - required: [type, value]
+        properties:
+          type: { type: string, enum: ["open_url", "custom"] }
+          value: { type: string }
 
   AdaptyUI.CustomTagsValues: #request
     type: object

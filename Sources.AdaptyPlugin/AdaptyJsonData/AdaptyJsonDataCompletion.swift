@@ -9,11 +9,26 @@ import Foundation
 
 public typealias AdaptyJsonDataCompletion = @Sendable (AdaptyJsonData) -> Void
 
-extension AdaptyPlugin {
-    static func execute<Request: AdaptyPluginRequest>(with completion: @escaping AdaptyJsonDataCompletion, instance: @escaping @Sendable () throws -> Request) {
+public extension AdaptyPlugin {
+    @objc static func execute(
+        withJsonData jsonData: AdaptyJsonData,
+        _ completion: @escaping AdaptyJsonDataCompletion
+    ) {
         Task {
-            let result = await execute(instance: instance)
+            let result = await execute(withJson: jsonData)
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+    }
 
+    @objc static func execute(
+        method: String,
+        withJsonData jsonData: AdaptyJsonData,
+        _ completion: @escaping AdaptyJsonDataCompletion
+    ) {
+        Task {
+            let result = await execute(method: method, withJson: jsonData)
             DispatchQueue.main.async {
                 completion(result)
             }

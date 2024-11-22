@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyJsonData {
+public extension AdaptyJsonData {
     private enum Result: Encodable {
         case success(Encodable)
         case failure(AdaptyPluginError)
@@ -37,15 +37,15 @@ extension AdaptyJsonData {
         }
     }
 
-    public static func success(_ value: Encodable) -> AdaptyJsonData {
+    static func success(_ value: Encodable) -> AdaptyJsonData {
         Result.success(value).asAdaptyJsonData
     }
 
-    public static func success() -> AdaptyJsonData {
+    static func success() -> AdaptyJsonData {
         Result.success(true).asAdaptyJsonData
     }
 
-    public static func failure(_ error: AdaptyPluginError?) -> AdaptyJsonData {
+    static func failure(_ error: AdaptyPluginError?) -> AdaptyJsonData {
         guard let error else {
             return .success()
         }

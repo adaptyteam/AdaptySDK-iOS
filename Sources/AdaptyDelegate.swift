@@ -18,7 +18,7 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
     /// Return `false` to defer or cancel the transaction.
     ///
     /// If you return `false`, you can continue the transaction later by manually calling the `defermentCompletion`.
-    func shouldAddStorePayment(for product: AdaptyDeferredProduct) -> Bool // TODO: Change documentation
+    func shouldAddStorePayment(for product: AdaptyDeferredProduct) -> Bool
 }
 
 extension AdaptyDelegate {

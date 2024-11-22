@@ -18,17 +18,3 @@ extension Log {
 
     static let plugin = Category(name: "plugin")
 }
-
-public struct PublicCategory {
-    let wrapped: AdaptyLog.Category
-
-    public init(subsystem: String, name: String) {
-        wrapped = AdaptyLog.Category(subsystem: subsystem,
-                                     version: Adapty.SDKVersion,
-                                     name: name)
-    }
-
-    public func error(_ message: @autoclosure () -> String, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        wrapped.error(message(), file: file, function: function, line: line)
-    }
-}
