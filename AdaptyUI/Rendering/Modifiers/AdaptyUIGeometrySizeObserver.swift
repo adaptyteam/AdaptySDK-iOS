@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Aleksey Goncharov on 23.05.2024.
 //
@@ -40,8 +40,17 @@ struct AdaptyUIGeometrySizeObserver: ViewModifier {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
+    @ViewBuilder
     func onGeometrySizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
-        modifier(AdaptyUIGeometrySizeObserver(action))
+        if #available(iOS 18.0, *) {
+            onGeometryChange(
+                for: CGSize.self,
+                of: { $0.frame(in: .global).size },
+                action: { action($1) }
+            )
+        } else {
+            modifier(AdaptyUIGeometrySizeObserver(action))
+        }
     }
 }
 
