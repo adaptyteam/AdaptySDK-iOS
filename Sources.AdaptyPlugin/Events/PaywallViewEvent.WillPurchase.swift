@@ -12,7 +12,7 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension PaywallViewEvent {
     struct WillPurchase: AdaptyPluginEvent {
-        let id = "paywall_view_did_start_restore"
+        let id = "paywall_view_did_start_purchase"
         let view: AdaptyUI.View
         let product: Response.AdaptyPluginPaywallProduct
 
