@@ -15,7 +15,6 @@ enum StoreKitManagerError: Error {
     case requestSKProductsFailed(AdaptyError.Source, error: Error)
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
     case trunsactionUnverified(AdaptyError.Source, error: Error?)
-    case unknownIntroEligibility(AdaptyError.Source)
     case invalidOffer(AdaptyError.Source, error: String)
     case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
 }
@@ -49,8 +48,6 @@ extension StoreKitManagerError: CustomStringConvertible {
             } else {
                 "StoreKitManagerError.trunsactionUnverified(\(source))"
             }
-        case let .unknownIntroEligibility(source):
-            "StoreKitManagerError.unknownIntroEligibility(\(source))"
         case let .invalidOffer(source, error):
             "StoreKitManagerError.invalidOffer(\(source), \"\(error)\")"
         case let .getSubscriptionInfoStatusFailed(source, error):
@@ -69,7 +66,6 @@ extension StoreKitManagerError {
              let .requestSKProductsFailed(src, _),
              let .interrupted(src),
              let .trunsactionUnverified(src, _),
-             let .unknownIntroEligibility(src),
              let .invalidOffer(src, _),
              let .getSubscriptionInfoStatusFailed(src, _): src
         }
@@ -180,14 +176,6 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .invalidOffer(AdaptyError.Source(file: file, function: function, line: line), error: error)
-    }
-
-    static func unknownIntroEligibility(
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        .unknownIntroEligibility(AdaptyError.Source(file: file, function: function, line: line))
     }
 
     static func getSubscriptionInfoStatusFailed(

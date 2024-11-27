@@ -113,7 +113,7 @@ final class ProfileStorage: Sendable {
         userDefaults.removeObject(forKey: Constants.profileKey)
         profile = nil
 
-        BackendProductStatesStorage.clear()
+        BackendIntroductoryOfferEligibilityStorage.clear()
         PaywallsStorage.clear()
     }
 }

@@ -150,6 +150,35 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func updateAttribution(
+        _ attribution: [AnyHashable: Any],
+        source: String,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) async throws {
+        let attributionJson: String
+        do {
+            let data = try JSONSerialization.data(withJSONObject: attribution)
+            attributionJson = String(decoding: data, as: UTF8.self)
+        } catch {
+            completion?(AdaptyError.wrongAttributeData(error))
+            return
+        }
+
+        withCompletion(completion) {
+            try await updateAttribution(attributionJson, source: source)
+        }
+    }
+
+    nonisolated static func setIntegrationIdentifier(
+        key: String,
+        value: String,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await setIntegrationIdentifier(key: key, value: value)
+        }
+    }
+
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)

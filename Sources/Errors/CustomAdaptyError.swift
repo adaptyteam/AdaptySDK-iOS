@@ -125,7 +125,6 @@ extension StoreKitManagerError: CustomAdaptyError {
             } else {
                 return .networkFailed
             }
-        case .unknownIntroEligibility: return .invalidOfferPrice
         case .invalidOffer: return .invalidOfferIdentifier
         case .getSubscriptionInfoStatusFailed: return .fetchSubscriptionStatusFailed
         }

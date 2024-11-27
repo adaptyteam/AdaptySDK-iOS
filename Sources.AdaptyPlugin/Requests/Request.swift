@@ -28,7 +28,8 @@ enum Request {
             PresentCodeRedemptionSheet.self,
             RestorePurchases.self,
             SetVariationId.self,
-            UpdateAttribution.self,
+            UpdateAttributionData.self,
+            SetIntegrationIdentifier.self,
             UpdateProfile.self
         ]
 

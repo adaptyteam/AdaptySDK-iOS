@@ -397,6 +397,28 @@ $requests:
         properties:
           success: { const: true }
 
+  ### setIntegrationIdentifier ###
+  SetIntegrationIdentifier.Request: #request
+    type: object
+    required: [method, attribution, source]
+    properties:
+      method: { const: "set_integration_identifiers" }
+      key_values:
+        type: object
+        additionalProperties:
+          type: string
+          nullable: false
+
+  SetIntegrationIdentifier.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### setVariationId ###
   SetVariationId.Request: #request
     type: object
@@ -416,17 +438,16 @@ $requests:
         properties:
           success: { const: true }
 
-  ### updateAttribution ###
-  UpdateAttribution.Request: #request
+  ### updateAttributionData ###
+  UpdateAttributionData.Request: #request
     type: object
     required: [method, attribution, source]
     properties:
-      method: { const: "update_attribution" }
+      method: { const: "update_attribution_data" }
       attribution: { type: string }
-      source: { $ref: "#/$defs/AdaptyAttributionSource" }
-      network_user_id: { type: string }
+      source: { type: string }
 
-  UpdateAttribution.Response: #response
+  UpdateAttributionData.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -494,7 +515,7 @@ $events:
       view: { $ref: "#/$defs/AdaptyUI.View" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       purchased_result: { $ref: "#/$defs/AdaptyPurchaseResult" }
-  
+
   PaywallViewEvent.DidFailPurchase:
     type: object
     required: [id, view, product, error]
@@ -938,20 +959,9 @@ $defs:
       birthday: { type: string, format: "YYYY-MM-dd" }
       email: { type: string }
       phone_number: { type: string }
-      facebook_anonymous_id: { type: string }
-      amplitude_user_id: { type: string }
-      amplitude_device_id: { type: string }
-      mixpanel_user_id: { type: string }
-      appmetrica_profile_id: { type: string }
-      appmetrica_device_id: { type: string }
       att_status: { type: integer, description: "iOS Only" }
       custom_attributes: { $ref: "#/$defs/AdaptyProfile.CustomAttributes" }
       analytics_disabled: { type: boolean }
-      one_signal_player_id: { type: string }
-      one_signal_subscription_id: { type: string }
-      pushwoosh_hwid: { type: string }
-      firebase_app_instance_id: { type: string }
-      airbridge_device_id: { type: string }
 
   AdaptySubscriptionOffer.Identifier: #request #response
     type: string
@@ -974,14 +984,6 @@ $defs:
       - pay_up_front
       - free_trial
       - unknown
-
-  AdaptyAttributionSource: #request
-    type: string
-    enum:
-      - adjust
-      - appsflyer
-      - branch
-      - custom
 
   AdaptyPurchaseResult: #response
     type: object
@@ -1033,15 +1035,15 @@ $defs:
 
   AdaptyUI.CustomTagsValues: #request
     type: object
-    additionalProperties: { type: string }
+    additionalProperties: { type: string, nullable: false }
 
   AdaptyUI.CustomTimersValues: #request
     type: object
-    additionalProperties: { $ref: "#/$defs/Date" }
+    additionalProperties: { $ref: "#/$defs/Date", nullable: false }
 
   AdaptyUI.AndroidPersonalizedOffers: #request
     type: object
-    additionalProperties: { type: boolean }
+    additionalProperties: { type: boolean, nullable: false }
 
   AdaptyUI.DialogConfiguration: #request
     type: object

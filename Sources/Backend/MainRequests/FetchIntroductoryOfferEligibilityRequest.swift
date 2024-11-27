@@ -7,8 +7,8 @@
 
 import Foundation
 
-private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = [BackendProductState]?
+private struct FetchIntroductoryOfferEligibilityRequest: HTTPRequestWithDecodableResponse {
+    typealias ResponseBody = [BackendIntroductoryOfferEligibilityState]?
     let endpoint = HTTPEndpoint(
         method: .get,
         path: "/sdk/in-apps/products/"
@@ -36,13 +36,13 @@ private struct FetchProductStatesRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendProductState]? {
+extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendIntroductoryOfferEligibilityState]? {
     @inlinable
     static func decodeDataResponse(
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
         requestHeaders: HTTPHeaders
-    ) throws -> HTTPResponse<[BackendProductState]?> {
+    ) throws -> HTTPResponse<[BackendIntroductoryOfferEligibilityState]?> {
         guard !requestHeaders.hasSameBackendResponseHash(response.headers) else {
             return response.replaceBody(nil)
         }
@@ -50,8 +50,8 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendProduct
         let jsonDecoder = JSONDecoder()
         configuration?.configure(jsonDecoder: jsonDecoder)
 
-        let body: [BackendProductState]? = try jsonDecoder.decode(
-            Backend.Response.ValueOfData<[BackendProductState]>.self,
+        let body: [BackendIntroductoryOfferEligibilityState]? = try jsonDecoder.decode(
+            Backend.Response.ValueOfData<[BackendIntroductoryOfferEligibilityState]>.self,
             responseBody: response.body
         ).value
         return response.replaceBody(body)
@@ -59,11 +59,11 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendProduct
 }
 
 extension Backend.MainExecutor {
-    func fetchProductStates(
+    func fetchIntroductoryOfferEligibility(
         profileId: String,
         responseHash: String?
-    ) async throws -> VH<[BackendProductState]?> {
-        let request = FetchProductStatesRequest(
+    ) async throws -> VH<[BackendIntroductoryOfferEligibilityState]?> {
+        let request = FetchIntroductoryOfferEligibilityRequest(
             profileId: profileId,
             responseHash: responseHash
         )

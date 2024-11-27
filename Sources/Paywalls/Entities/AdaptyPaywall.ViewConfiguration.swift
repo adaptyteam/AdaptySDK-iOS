@@ -10,7 +10,7 @@ import Foundation
 
 extension AdaptyPaywall {
     enum ViewConfiguration: Sendable, Hashable {
-        case withoutData(AdaptyLocale, String)
+        case withoutData(AdaptyLocale, adaptyViewSource_id: String)
         case data(AdaptyViewSource)
 
         var hasData: Bool {
@@ -48,7 +48,7 @@ extension AdaptyPaywall.ViewConfiguration: Codable {
             } else {
                 try .withoutData(
                     container.decode(AdaptyLocale.self, forKey: .responseLocale),
-                    container.decode(String.self, forKey: .id)
+                    adaptyViewSource_id: container.decode(String.self, forKey: .id)
                 )
             }
     }

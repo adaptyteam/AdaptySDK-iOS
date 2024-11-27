@@ -106,26 +106,16 @@ extension Adapty {
         }
 
         if !vendorProductIds.isEmpty {
-            let states = try await getBackendProductStates(vendorProductIds: vendorProductIds)
-            products = try products.map {
+            let introductoryOfferEligibility = await getIntroductoryOfferEligibility(vendorProductIds: vendorProductIds)
+            products = products.map {
                 guard !$0.determinedOffer else { return $0 }
-                guard let introductoryOffer = $0.product.subscriptionOffer(by: .introductory) else {
-                    return (product: $0.product, reference: $0.reference, offer: nil, determinedOffer: true)
+                return if let introductoryOffer = $0.product.subscriptionOffer(by: .introductory),
+                          introductoryOfferEligibility.contains($0.product.productIdentifier)
+                {
+                    (product: $0.product, reference: $0.reference, offer: introductoryOffer, determinedOffer: true)
+                } else {
+                    (product: $0.product, reference: $0.reference, offer: nil, determinedOffer: true)
                 }
-
-                let vendorId = $0.product.productIdentifier
-                guard let state = states.first(where: { $0.vendorId == vendorId }) else {
-                    throw StoreKitManagerError.unknownIntroEligibility().asAdaptyError
-                }
-
-                let offer: AdaptySubscriptionOffer? =
-                    if case .eligible = state.introductoryOfferEligibility {
-                        introductoryOffer
-                    } else {
-                        nil
-                    }
-
-                return (product: $0.product, reference: $0.reference, offer: offer, determinedOffer: true)
             }
         }
 
@@ -150,39 +140,48 @@ extension Adapty {
         return offer
     }
 
-    private func getBackendProductStates(vendorProductIds: [String]) async throws -> [BackendProductState] {
-        let profileId = try await createdProfileManager.profileId
+    private func getProfileState() -> (profileId: String, ineligibleProductIds: Set<String>)? {
+        guard let manager = profileManager else { return nil }
+
+        return (
+            manager.profileId,
+            manager.backendIntroductoryOfferEligibilityStorage.getIneligibleProductIds()
+        )
+    }
+
+    private func getIntroductoryOfferEligibility(vendorProductIds: [String]) async -> [String] {
+        guard let profileState = getProfileState() else { return [] }
+        let (profileId, ineligibleProductIds) = profileState
+
+        let vendorProductIds = vendorProductIds.filter { !ineligibleProductIds.contains($0) }
+        guard !vendorProductIds.isEmpty else { return [] }
 
         if !profileStorage.syncedTransactions {
-            try await syncTransactions(for: profileId)
+            do {
+                try await syncTransactions(for: profileId)
+            } catch {
+                return []
+            }
         }
 
-        let response: VH<[BackendProductState]>?
-        let responseError: Error?
-        let responseHash = try profileManager(with: profileId)?.backendProductStatesStorage.productsHash
+        let lastResponse = try? profileManager(with: profileId)?.backendIntroductoryOfferEligibilityStorage.getLastResponse()
         do {
-            response = try await httpSession.fetchProductStates(
-                profileId: profileId,
-                responseHash: responseHash
-            ).flatValue()
-            responseError = nil
+            let response = try
+                await httpSession.fetchIntroductoryOfferEligibility(
+                    profileId: profileId,
+                    responseHash: lastResponse?.hash
+                ).flatValue()
+
+            guard let response else { return lastResponse?.eligibleProductIds ?? [] }
+
+            if let manager = try? profileManager(with: profileId) {
+                return manager.backendIntroductoryOfferEligibilityStorage.save(response)
+            } else {
+                return response.value.filter(\.value).map(\.vendorId)
+            }
+
         } catch {
-            response = nil
-            responseError = error
-        }
-
-        guard let manager = try profileManager(with: profileId) else {
-            throw AdaptyError.profileWasChanged()
-        }
-
-        manager.backendProductStatesStorage.setBackendProductStates(response)
-
-        let value = manager.backendProductStatesStorage.getBackendProductStates(byIds: vendorProductIds)
-
-        if value.isEmpty, let error = responseError {
-            throw error.asAdaptyError ?? AdaptyError.fetchProductStatesFailed(unknownError: error)
-        } else {
-            return value
+            return []
         }
     }
 }

@@ -15,7 +15,7 @@ final class ProfileManager: Sendable {
 
     let storage: ProfileStorage
     let paywallsStorage = PaywallsStorage()
-    let backendProductStatesStorage = BackendProductStatesStorage()
+    let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
 
     @AdaptyActor
     init(

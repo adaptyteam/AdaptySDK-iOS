@@ -6,13 +6,12 @@
 //
 
 import Foundation
-#if canImport(AdServices)
+#if !ADAPTY_KIDS_MODE && canImport(AdServices)
     import AdServices
 
     private let log = Log.default
 
     extension Adapty {
-        
         func updateASATokenIfNeed(for profile: VH<AdaptyProfile>) {
             guard
                 #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),

@@ -39,7 +39,7 @@ extension UserDefaults {
         try set(Storage.encode(value), forKey: key)
     }
 
-    func getJSON<T>(_ type: T.Type, forKey key: String) throws -> T? where T: Decodable {
+    func getJSON<T: Decodable>(_ type: T.Type, forKey key: String) throws -> T? {
         guard let data = data(forKey: key) else { return nil }
         return try Storage.decode(type, from: data)
     }

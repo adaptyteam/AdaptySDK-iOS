@@ -236,6 +236,15 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
+    
+    static func wrongAttributeData(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), error.localizedDescription).asAdaptyError
+    }
 
     static func fetchPaywallFailed(
         unknownError: Error,
