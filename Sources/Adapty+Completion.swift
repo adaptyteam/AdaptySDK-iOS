@@ -137,19 +137,7 @@ public extension Adapty {
     ///
     /// - Parameter attribution: a dictionary containing attribution (conversion) data.
     /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
-    /// - Parameter networkUserId: a string profile's identifier from the attribution service.
     /// - Parameter completion: A result containing an optional error.
-    nonisolated static func updateAttribution(
-        _ attribution: [String: any Sendable],
-        source: AdaptyAttributionSource,
-        networkUserId: String? = nil,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        withCompletion(completion) {
-            try await updateAttribution(attribution, source: source, networkUserId: networkUserId)
-        }
-    }
-
     nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
         source: String,
