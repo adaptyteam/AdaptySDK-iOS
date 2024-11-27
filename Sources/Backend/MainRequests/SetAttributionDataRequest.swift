@@ -14,7 +14,7 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
         path: "/sdk/attribution/profile/set/data"
     )
     let headers: HTTPHeaders
-    let contentType = "application/json"
+    let contentType: String? = "application/json"
     let stamp = Log.stamp
 
     let source: String

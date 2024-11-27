@@ -15,7 +15,7 @@ private struct SetIntegrationIdentifierRequest: HTTPEncodableRequest {
     )
 
     let headers: HTTPHeaders
-    let contentType = "application/json"
+    let contentType: String? = "application/json"
 
     let stamp = Log.stamp
 
