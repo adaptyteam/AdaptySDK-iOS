@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyProfileParameters {
-    public final class Builder {
+public extension AdaptyProfileParameters {
+    final class Builder {
         var parameters: AdaptyProfileParameters
 
         public convenience init() {
@@ -23,27 +23,27 @@ extension AdaptyProfileParameters {
     }
 }
 
-extension AdaptyProfileParameters.Builder {
+public extension AdaptyProfileParameters.Builder {
     @discardableResult
-    public func with(firstName value: String?) -> Self {
+    func with(firstName value: String?) -> Self {
         parameters.firstName = value
         return self
     }
 
     @discardableResult
-    public func with(lastName value: String?) -> Self {
+    func with(lastName value: String?) -> Self {
         parameters.lastName = value
         return self
     }
 
     @discardableResult
-    public func with(gender value: AdaptyProfile.Gender?) -> Self {
+    func with(gender value: AdaptyProfile.Gender?) -> Self {
         parameters.gender = value
         return self
     }
 
     @discardableResult
-    public func with(birthday value: Date?) -> Self {
+    func with(birthday value: Date?) -> Self {
         guard let value else {
             parameters.birthday = nil
             return self
@@ -56,40 +56,40 @@ extension AdaptyProfileParameters.Builder {
     }
 
     @discardableResult
-    public func with(email value: String?) -> Self {
+    func with(email value: String?) -> Self {
         parameters.email = value
         return self
     }
 
     @discardableResult
-    public func with(phoneNumber value: String?) -> Self {
+    func with(phoneNumber value: String?) -> Self {
         parameters.phoneNumber = value
         return self
     }
 }
 
-extension AdaptyProfileParameters.Builder {
-    func with(customAttributes: AdaptyProfile.CustomAttributes?) -> Self {
+public extension AdaptyProfileParameters.Builder {
+    internal func with(customAttributes: AdaptyProfile.CustomAttributes?) -> Self {
         parameters.codableCustomAttributes = customAttributes
         return self
     }
 
     @discardableResult
-    public func withRemoved(customAttributeForKey key: String) throws -> Self {
+    func withRemoved(customAttributeForKey key: String) throws -> Self {
         try with(customAttribute: .none, forKey: key)
     }
 
     @discardableResult
-    public func with(customAttribute value: String, forKey key: String) throws -> Self {
+    func with(customAttribute value: String, forKey key: String) throws -> Self {
         try with(customAttribute: .string(value), forKey: key)
     }
 
     @discardableResult
-    public func with(customAttribute value: Double, forKey key: String) throws -> Self {
+    func with(customAttribute value: Double, forKey key: String) throws -> Self {
         try with(customAttribute: .double(value), forKey: key)
     }
 
-    func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws -> Self {
+    internal func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws -> Self {
         if let error = AdaptyProfile.CustomAttributes.validateKey(key) { throw error }
         if let error = value.validate() { throw error }
         var attributes = parameters.codableCustomAttributes ?? AdaptyProfile.CustomAttributes()
@@ -100,78 +100,10 @@ extension AdaptyProfileParameters.Builder {
     }
 }
 
-extension AdaptyProfileParameters.Builder {
+public extension AdaptyProfileParameters.Builder {
     @discardableResult
-    public func with(analyticsDisabled value: Bool?) -> Self {
+    func with(analyticsDisabled value: Bool?) -> Self {
         parameters.analyticsDisabled = value
-        return self
-    }
-}
-
-extension AdaptyProfileParameters.Builder {
-    @discardableResult
-    public func with(facebookAnonymousId value: String?) -> Self {
-        parameters.facebookAnonymousId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(amplitudeUserId value: String?) -> Self {
-        parameters.amplitudeUserId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(amplitudeDeviceId value: String?) -> Self {
-        parameters.amplitudeDeviceId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(mixpanelUserId value: String?) -> Self {
-        parameters.mixpanelUserId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(appmetricaProfileId value: String?) -> Self {
-        parameters.appmetricaProfileId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(appmetricaDeviceId value: String?) -> Self {
-        parameters.appmetricaDeviceId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(oneSignalPlayerId value: String?) -> Self {
-        parameters.oneSignalPlayerId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(oneSignalSubscriptionId value: String?) -> Self {
-        parameters.oneSignalSubscriptionId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(pushwooshHWID value: String?) -> Self {
-        parameters.pushwooshHWID = value
-        return self
-    }
-
-    @discardableResult
-    public func with(firebaseAppInstanceId value: String?) -> Self {
-        parameters.firebaseAppInstanceId = value
-        return self
-    }
-
-    @discardableResult
-    public func with(airbridgeDeviceId value: String?) -> Self {
-        parameters.airbridgeDeviceId = value
         return self
     }
 }
@@ -179,10 +111,10 @@ extension AdaptyProfileParameters.Builder {
 #if canImport(AppTrackingTransparency)
     import AppTrackingTransparency
 
-    extension AdaptyProfileParameters.Builder {
+    public extension AdaptyProfileParameters.Builder {
         @available(iOS 14, macOS 11.0, visionOS 1.0, *)
         @discardableResult
-        public func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
+        func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
             guard let value else {
                 parameters.appTrackingTransparencyStatus = nil
                 return self
