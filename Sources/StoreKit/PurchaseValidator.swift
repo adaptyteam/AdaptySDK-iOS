@@ -28,6 +28,7 @@ extension Adapty: PurchaseValidator {
         case setVariation
         case observing
         case purchasing
+        case sk2Updates
     }
     
     func validatePurchase(
