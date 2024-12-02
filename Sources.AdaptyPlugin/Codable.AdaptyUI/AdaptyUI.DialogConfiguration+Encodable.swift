@@ -21,7 +21,7 @@ extension AdaptyUI.DialogConfiguration: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             title: container.decodeIfPresent(String.self, forKey: .title),
-            content: container.decodeIfPresent(String.self, forKey: .title),
+            content: container.decodeIfPresent(String.self, forKey: .content),
             defaultAction: container.decode(AdaptyUI.DialogConfiguration.Action.self, forKey: .defaultAction),
             secondaryAction: container.decodeIfPresent(AdaptyUI.DialogConfiguration.Action.self, forKey: .secondaryAction)
         )
