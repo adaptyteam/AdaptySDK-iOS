@@ -105,6 +105,8 @@ struct AdaptyUIElementWithoutPropertiesView: View {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package struct AdaptyUIElementView: View {
+    @EnvironmentObject private var eventsHandler: AdaptyEventsHandler
+    
     private var element: VC.Element
     private var additionalPadding: EdgeInsets?
     private var drawDecoratorBackground: Bool
@@ -121,13 +123,17 @@ package struct AdaptyUIElementView: View {
 
     package var body: some View {
         let properties = element.properties
+        let resolvedVisibility = switch eventsHandler.presentationState {
+        case .initial: properties?.visibility ?? true
+        default: true
+        }
 
         AdaptyUIElementWithoutPropertiesView(element)
             .paddingIfNeeded(additionalPadding)
             .applyingProperties(properties, includeBackground: drawDecoratorBackground)
             .transitionIn(
                 properties?.transitionIn,
-                visibility: properties?.visibility ?? true
+                visibility: resolvedVisibility
             )
             .modifier(DebugOverlayModifier())
     }

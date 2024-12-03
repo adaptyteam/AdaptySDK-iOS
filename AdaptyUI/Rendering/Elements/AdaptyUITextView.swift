@@ -64,14 +64,21 @@ struct AdaptyUITextView: View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyUI {
+    enum RichTextError: Error {
+        case tagReplacementNotFound
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-extension VC.RichText {
-    func convertToSwiftUIText(
+extension Array where Element == AdaptyViewConfiguration.RichText.Item {
+    func convertToSwiftUITextThrowingError(
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?,
         colorScheme: ColorScheme
-    ) -> Text {
-        items.reduce(Text("")) { partialResult, item in
+    ) throws -> Text {
+        try reduce(Text("")) { partialResult, item in
             switch item {
             case let .text(value, attr):
                 return partialResult + Text(
@@ -96,7 +103,7 @@ extension VC.RichText {
                     }
 
                 } else {
-                    tagReplacementResult = ""
+                    throw AdaptyUI.RichTextError.tagReplacementNotFound
                 }
 
                 return partialResult + Text(
@@ -120,6 +127,38 @@ extension VC.RichText {
                 )
             }
         }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+extension VC.RichText {
+    func convertToSwiftUIText(
+        tagResolver: AdaptyTagResolver,
+        productInfo: ProductInfoModel?,
+        colorScheme: ColorScheme
+    ) -> Text {
+        let result: Text
+
+        do {
+            result = try items.convertToSwiftUITextThrowingError(
+                tagResolver: tagResolver,
+                productInfo: productInfo,
+                colorScheme: colorScheme
+            )
+        } catch {
+            if let fallback, let fallbackText = try? fallback.convertToSwiftUITextThrowingError(
+                tagResolver: tagResolver,
+                productInfo: productInfo,
+                colorScheme: colorScheme
+            ) {
+                result = fallbackText
+            } else {
+                result = Text("")
+            }
+        }
+
+        return result
     }
 }
 
