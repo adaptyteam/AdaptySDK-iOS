@@ -39,7 +39,7 @@ extension VC.Transition {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUITransitionInModifier: ViewModifier {
     private let transitionIn: VC.Transition
-
+    
     @State
     private var opacity: Double
 
@@ -52,8 +52,10 @@ struct AdaptyUITransitionInModifier: ViewModifier {
         content
             .opacity(opacity)
             .onAppear {
-                withAnimation(transitionIn.swiftuiAnimation) {
-                    opacity = 1.0
+                if opacity < 1.0 {
+                    withAnimation(transitionIn.swiftuiAnimation) {
+                        opacity = 1.0
+                    }
                 }
             }
     }

@@ -120,6 +120,7 @@ public final class AdaptyPaywallController: UIViewController {
             AdaptyPaywallView_Internal(
                 showDebugOverlay: showDebugOverlay
             )
+            .environmentObject(paywallConfiguration.eventsHandler)
             .environmentObject(paywallConfiguration.paywallViewModel)
             .environmentObject(paywallConfiguration.productsViewModel)
             .environmentObject(paywallConfiguration.actionsViewModel)
@@ -139,6 +140,7 @@ public final class AdaptyPaywallController: UIViewController {
 
         Log.ui.verbose("#\(logId)# viewDidAppear")
         
+        paywallConfiguration.eventsHandler.viewDidAppear()
         paywallConfiguration.paywallViewModel.logShowPaywall()
     }
 
@@ -147,6 +149,7 @@ public final class AdaptyPaywallController: UIViewController {
 
         Log.ui.verbose("#\(logId)# viewDidDisappear")
         
+        paywallConfiguration.eventsHandler.viewDidDisappear()
         paywallConfiguration.paywallViewModel.resetLogShowPaywall()
     }
 }

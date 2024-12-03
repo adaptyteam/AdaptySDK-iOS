@@ -41,31 +41,27 @@ struct AdaptyPaywallRendererView: View {
         let viewConfiguration = paywallViewModel.viewConfiguration
 
         if let template = VC.Template(rawValue: viewConfiguration.templateId) {
-            ZStack {
+            ZStack(alignment: .bottom) {
                 templateResolverView(template, screen: viewConfiguration.screen)
                     .decorate(with: viewConfiguration.screen.background)
+
+                Color.black
+                    .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
+                    .onTapGesture {
+                        screensViewModel.dismissTopScreen()
+                    }
+
+                ForEach(screensViewModel.bottomSheetsViewModels, id: \.id) { vm in
+                    AdaptyUIBottomSheetView()
+                        .environmentObject(vm)
+                }
 
                 if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
                     AdaptyUILoaderView()
                         .transition(.opacity)
                 }
             }
-            .overlay {
-                ZStack(alignment: .bottom) {
-                    Color.black
-                        .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
-                        .onTapGesture {
-                            withAnimation {
-                                screensViewModel.dismissTopScreen()
-                            }
-                        }
-                    
-                    ForEach(screensViewModel.presentedScreensStack) { bottomSheet in
-                        AdaptyUIBottomSheetView(bottomSheet)
-                    }
-                }
-                .ignoresSafeArea()
-            }
+            .ignoresSafeArea()
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
             .onAppear {
                 paywallViewModel.logShowPaywall()
