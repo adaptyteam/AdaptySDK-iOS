@@ -8,11 +8,11 @@
 import Foundation
 
 extension Adapty {
-    public nonisolated static let SDKVersion = "3.2.1-SNAPSHOT"
-    static nonisolated let fallbackFormatVersion = 6
+    public nonisolated static let SDKVersion = "3.2.2-SNAPSHOT"
+    nonisolated static let fallbackFormatVersion = 6
 }
 
 extension AdaptyViewConfiguration {
-    static nonisolated let formatVersion = "4.1.0"
-    static nonisolated let builderVersion = "4_1"
+    nonisolated static let formatVersion = "4.1.0"
+    nonisolated static let builderVersion = "4_1"
 }
