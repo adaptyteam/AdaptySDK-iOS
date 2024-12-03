@@ -20,6 +20,7 @@ private enum CodingKeys: String, CodingKey {
     case success
     case error
     case metrics
+    case headers
 }
 
 typealias EventParameters = [String: (any Sendable & Encodable)?]
@@ -84,6 +85,7 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
     let backendRequestId: String?
     let metrics: HTTPMetrics?
     let error: String?
+    let headers: HTTPHeaders?
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -91,6 +93,7 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         try container.encode(stamp, forKey: .stamp)
         try container.encodeIfPresent(backendRequestId, forKey: .backendRequestId)
         try container.encodeIfPresent(metrics, forKey: .metrics)
+        try container.encodeIfPresent(headers, forKey: .headers)
 
         if let error {
             try container.encode(false, forKey: .success)
@@ -106,6 +109,7 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         self.stamp = requestStamp
         self.backendRequestId = httpError?.headers?.getBackendRequestId()
         self.metrics = httpError?.metrics
+        self.headers = httpError?.headers?.filtred
         self.error = httpError?.description ?? error.localizedDescription
     }
 
@@ -114,7 +118,19 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         self.stamp = requestStamp
         self.backendRequestId = response.headers.getBackendRequestId()
         self.metrics = response.metrics
+        self.headers = response.headers.filtred
         self.error = nil
+    }
+}
+
+private extension HTTPHeaders {
+    private enum Sufix {
+        static let cacheStatus = "cache-status"
+    }
+
+    var filtred: HTTPHeaders? {
+        let filtred = filter { $0.key.lowercased().hasSuffix(Sufix.cacheStatus) }
+        return filtred.isEmpty ? nil : filtred
     }
 }
 
