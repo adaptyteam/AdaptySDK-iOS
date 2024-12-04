@@ -236,7 +236,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "The total number of custom attributes must be no more than 30").asAdaptyError
     }
-    
+
     static func wrongAttributeData(
         _ error: Error,
         file: String = #fileID,
@@ -271,6 +271,15 @@ extension AdaptyError {
         line: UInt = #line
     ) -> Self {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Update Attribution failed", error: unknownError).asAdaptyError
+    }
+
+    static func setIntegrationIdentifierFaild(
+        unknownError: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Set Integration Identifier failed", error: unknownError).asAdaptyError
     }
 
     static func fetchViewConfigurationFailed(
@@ -345,7 +354,6 @@ extension AdaptyError {
         InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sign subscription offer failed", error: unknownError).asAdaptyError
     }
 
-    
     static func convertToAdaptyErrorFailed(
         unknownError: Error,
         file: String = #fileID,

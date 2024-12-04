@@ -11,7 +11,7 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
     typealias ResponseBody = AdaptyProfile?
     let endpoint = HTTPEndpoint(
         method: .post,
-        path: "/sdk/attribution/profile/set/data"
+        path: "/sdk/attribution/profile/set/data/"
     )
     let headers: HTTPHeaders
     let contentType: String? = "application/json"
@@ -19,6 +19,7 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
 
     let source: String
     let attributionJson: String
+    let profileId: String
 
     func decodeDataResponse(
         _ response: HTTPDataResponse,
@@ -38,17 +39,21 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
 
         self.source = source
         self.attributionJson = attributionJson
+        self.profileId = profileId
     }
 
     enum CodingKeys: String, CodingKey {
         case source
         case attributionJson = "attribution_json"
+        case profileId = "profile_id"
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(source, forKey: .source)
         try container.encode(attributionJson, forKey: .attributionJson)
+        try container.encode(profileId, forKey: .profileId)
+
     }
 }
 

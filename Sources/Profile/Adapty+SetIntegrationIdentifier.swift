@@ -41,21 +41,13 @@ extension Adapty {
         profileId: String,
         keyValues: [String: String]
     ) async throws {
-        let oldResponseHash = profileManager?.profile.hash
-
         do {
-            let response = try await httpSession.setIntegrationIdentifier(
+            try await httpSession.setIntegrationIdentifier(
                 profileId: profileId,
-                keyValues: keyValues,
-                responseHash: oldResponseHash
+                keyValues: keyValues
             )
-
-            if let profile = response.flatValue() {
-                profileManager?.saveResponse(profile)
-            }
-
         } catch {
-            throw error.asAdaptyError ?? .updateAttributionFaild(unknownError: error)
+            throw error.asAdaptyError ?? .setIntegrationIdentifierFaild(unknownError: error)
         }
     }
 }

@@ -41,9 +41,8 @@ private struct SetIntegrationIdentifierRequest: HTTPEncodableRequest {
 extension Backend.MainExecutor {
     func setIntegrationIdentifier(
         profileId: String,
-        keyValues: [String: String],
-        responseHash: String?
-    ) async throws -> VH<AdaptyProfile?> {
+        keyValues: [String: String]
+    ) async throws {
         let request = SetIntegrationIdentifierRequest(
             profileId: profileId,
             keyValues: keyValues
@@ -53,7 +52,5 @@ extension Backend.MainExecutor {
             requestName: .setIntegrationIdentifier,
             logParams: keyValues
         )
-
-        return try await fetchProfile(profileId: profileId, responseHash: responseHash)
     }
 }

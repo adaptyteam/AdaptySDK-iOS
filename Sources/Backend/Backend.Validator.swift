@@ -9,9 +9,10 @@ import Foundation
 
 extension Backend {
     private struct ErrorCodesResponse: Decodable {
-        let codes: [Code]?
+        let codes: [String]?
         enum CodingKeys: String, CodingKey {
-            case codes = "errors"
+            case array = "errors"
+            case code = "error_code"
         }
 
         struct Code: Decodable {
@@ -20,6 +21,16 @@ extension Backend {
             }
 
             let value: String?
+        }
+
+        init(from decoder: any Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            if let code = try container.decodeIfPresent(String.self, forKey: .code) {
+                self.codes = [code]
+            } else {
+                let array = try container.decodeIfPresent([Code].self, forKey: .array)
+                self.codes = array.map { $0.compactMap(\.value) }
+            }
         }
     }
 
@@ -42,7 +53,7 @@ extension Backend {
 
         return HTTPError.backend(response, error: BackendError(
             body: String(data: data, encoding: .utf8) ?? "unknown",
-            errorCodes: errorCodes.compactMap(\.value),
+            errorCodes: errorCodes,
             requestId: response.headers.getBackendRequestId()
         ))
     }
