@@ -77,15 +77,21 @@ public final class Adapty: Sendable {
             }
         } else {
             if observerMode {
-                SK1TransactionObserver.startObserving(purchaseValidator: self, productsManager: productsManager)
-                self.sk1QueueManager = nil
+                SK1TransactionObserver.startObserving(
+                    purchaseValidator: self,
+                    productsManager: productsManager
+                )
             } else {
                 #if compiler(>=5.10)
                     let variationIdStorage = VariationIdStorage()
                 #else
                     let variationIdStorage = await VariationIdStorage()
                 #endif
-                self.sk1QueueManager = SK1QueueManager.startObserving(purchaseValidator: self, productsManager: productsManager, storage: variationIdStorage)
+                self.sk1QueueManager = SK1QueueManager.startObserving(
+                    purchaseValidator: self,
+                    productsManager: productsManager,
+                    storage: variationIdStorage
+                )
             }
         }
 

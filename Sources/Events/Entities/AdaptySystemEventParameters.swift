@@ -53,7 +53,6 @@ enum APIRequestName: String {
     case sendASAToken = "set_asa_token"
     case setAttributionData = "set_attribution_data"
     case setIntegrationIdentifier = "set_integration_identifier"
-    case setTransactionVariationId = "set_variation_id"
     case signSubscriptionOffer = "sign_offer"
 
     case fetchEventsConfig = "get_events_blacklist"
@@ -147,8 +146,8 @@ enum MethodName: String {
     case setIntegrationIdentifiers = "set_integration_identifiers"
 
     case setVariationId = "set_variation_id"
-    case setVariationIdSK1 = "set_variation_id_sk1"
-    case setVariationIdSK2 = "set_variation_id_sk2"
+    case reportSK1Transaction = "report_transaction_sk1"
+    case reportSK2Transaction = "report_transaction_sk2"
     case getPaywallProducts = "get_paywall_products"
     case getPaywallProductswithoutDeterminingOffer = "get_paywall_products_without_determining_offer"
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
