@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 protocol PurchaseValidator: AnyObject, Sendable {
     func validatePurchase(
         profileId: String?,
@@ -22,7 +21,6 @@ protocol PurchaseValidator: AnyObject, Sendable {
     ) async throws -> AdaptySubscriptionOffer.Signature
 }
 
-
 extension Adapty: PurchaseValidator {
     enum ValidatePurchaseReason: Sendable, Hashable {
         case setVariation
@@ -30,7 +28,25 @@ extension Adapty: PurchaseValidator {
         case purchasing
         case sk2Updates
     }
-    
+
+    func reportTransaction(
+        profileId: String?,
+        transactionId: String,
+        variationId: String?
+    ) async throws -> VH<AdaptyProfile> {
+        do {
+            let response = try await httpSession.reportTransaction(
+                profileId: profileId ?? profileStorage.profileId,
+                transactionId: transactionId,
+                variationId: variationId
+            )
+            saveResponse(response, syncedTrunsaction: true)
+            return response
+        } catch {
+            throw error.asAdaptyError ?? AdaptyError.reportTransactionIdFailed(unknownError: error)
+        }
+    }
+
     func validatePurchase(
         profileId: String?,
         transaction: PurchasedTransaction,

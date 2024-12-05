@@ -1,5 +1,5 @@
 //
-//  Request.SetVariationId.swift
+//  Request.ReportTransaction.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 08.11.2024.
@@ -9,10 +9,10 @@ import Adapty
 import Foundation
 
 extension Request {
-    struct SetVariationId: AdaptyPluginRequest {
-        static let method = "set_variation_id"
+    struct ReportTransaction: AdaptyPluginRequest {
+        static let method = "report_transaction"
 
-        let variationId: String
+        let variationId: String?
         let transactionId: String
 
         enum CodingKeys: String, CodingKey {
@@ -21,8 +21,8 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await Adapty.setVariationId(variationId, forTransactionId: transactionId)
-            return .success()
+            let profile = try await Adapty.reportTransaction(transactionId, withVariationId: variationId)
+            return .success(profile)
         }
     }
 }

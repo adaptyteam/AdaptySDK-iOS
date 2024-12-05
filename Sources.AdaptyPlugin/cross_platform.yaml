@@ -349,6 +349,25 @@ $requests:
     properties:
       success: { const: true }
 
+  ### reportTransaction ###
+  ReportTransaction.Request: #request
+    type: object
+    required: [method, transaction_id]
+    properties:
+      method: { const: "report_transaction" }
+      variation_id: { type: string }
+      transaction_id: { type: string }
+
+  ReportTransaction.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyProfile" }
+
   ### restorePurchases ###
   RestorePurchases.Request: #request
     type: object
@@ -397,25 +416,6 @@ $requests:
         properties:
           success: { const: true }
 
-  ### setVariationId ###
-  SetVariationId.Request: #request
-    type: object
-    required: [method, variation_id, transaction_id]
-    properties:
-      method: { const: "set_variation_id" }
-      variation_id: { type: string }
-      transaction_id: { type: string }
-
-  SetVariationId.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
   ### updateAttribution ###
   UpdateAttribution.Request: #request
     type: object
@@ -455,7 +455,6 @@ $requests:
           success: { const: true }
 
 $events:
-
   DidLoadLatestProfile:
     type: object
     required: [id, profile]

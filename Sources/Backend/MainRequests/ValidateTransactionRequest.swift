@@ -30,6 +30,8 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     enum CodingKeys: String, CodingKey {
         case profileId = "profile_id"
         case originalTransactionId = "original_transaction_id"
+        case transactionId = "transaction_id"
+        case variationId = "variation_id"
         case requestSource = "request_source"
     }
 
@@ -43,6 +45,13 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
             try attributesObject.encode(profileId, forKey: .profileId)
             try attributesObject.encode(Adapty.ValidatePurchaseReason.restoreRawString, forKey: .requestSource)
             try attributesObject.encode(originalTransactionId, forKey: .originalTransactionId)
+        case let .report(transactionId, variationId):
+            var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+            try attributesObject.encode(profileId, forKey: .profileId)
+            try attributesObject.encode(Adapty.ValidatePurchaseReason.reportRawString, forKey: .requestSource)
+            try attributesObject.encode(transactionId, forKey: .originalTransactionId)
+            try attributesObject.encode(transactionId, forKey: .transactionId)
+            try attributesObject.encodeIfPresent(variationId, forKey: .variationId)
         case let .other(purchasedTransaction, reason):
             try dataObject.encode(purchasedTransaction, forKey: .attributes)
             var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
@@ -52,13 +61,16 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     }
 
     enum RequestSource: Sendable {
-        case restore(String)
+        case restore(originalTransactionId: String)
+        case report(transactionId: String, variationId: String?)
         case other(PurchasedTransaction, reason: Adapty.ValidatePurchaseReason)
     }
 }
 
 private extension Adapty.ValidatePurchaseReason {
     static let restoreRawString = "restore"
+    static let reportRawString = "report_transaction"
+
     var rawString: String {
         switch self {
         case .setVariation: "set_variation"
@@ -76,12 +88,37 @@ extension Backend.MainExecutor {
     ) async throws -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             profileId: profileId,
-            requestSource: .restore(originalTransactionId)
+            requestSource: .restore(originalTransactionId: originalTransactionId)
         )
         let logParams: EventParameters = [
             "original_transaction_id": originalTransactionId,
             "request_source": Adapty.ValidatePurchaseReason.restoreRawString,
         ]
+        let response = try await perform(
+            request,
+            requestName: .validateTransaction,
+            logParams: logParams
+        )
+
+        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
+    }
+
+    func reportTransaction(
+        profileId: String,
+        transactionId: String,
+        variationId: String?
+    ) async throws -> VH<AdaptyProfile> {
+        let request = ValidateTransactionRequest(
+            profileId: profileId,
+            requestSource: .report(transactionId: transactionId, variationId: variationId)
+        )
+
+        let logParams: EventParameters = [
+            "transaction_id": transactionId,
+            "variation_id": variationId,
+            "request_source": Adapty.ValidatePurchaseReason.reportRawString,
+        ]
+
         let response = try await perform(
             request,
             requestName: .validateTransaction,
