@@ -27,16 +27,14 @@ struct AdaptyUIStackView: View {
             VStack(alignment: stack.horizontalAlignment.swiftuiValue(with: layoutDirection),
                    spacing: stack.spacing)
             {
-                ForEach(stack.content, id: \.self) {
-                    AdaptyUIElementView($0)
+                ForEach(0 ..< stack.content.count, id: \.self) {
+                    AdaptyUIElementView(stack.content[$0])
                 }
-                
-                
             }
         case .horizontal:
             HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
-                ForEach(stack.content, id: \.self) {
-                    AdaptyUIElementView($0)
+                ForEach(0 ..< stack.content.count, id: \.self) {
+                    AdaptyUIElementView(stack.content[$0])
                 }
             }
         case .z:
@@ -46,8 +44,8 @@ struct AdaptyUIStackView: View {
                     vertical: stack.verticalAlignment.swiftuiValue
                 )
             ) {
-                ForEach(stack.content, id: \.self) {
-                    AdaptyUIElementView($0)
+                ForEach(0 ..< stack.content.count, id: \.self) {
+                    AdaptyUIElementView(stack.content[$0])
                 }
             }
         }
