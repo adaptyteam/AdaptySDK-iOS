@@ -142,7 +142,7 @@ public extension Adapty {
         _ attribution: [AnyHashable: Any],
         source: String,
         _ completion: AdaptyErrorCompletion? = nil
-    ) async throws {
+    ) {
         let attributionJson: String
         do {
             let data = try JSONSerialization.data(withJSONObject: attribution)
