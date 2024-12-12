@@ -34,7 +34,11 @@ struct FooterVerticalFillerView: View {
             Color.clear
                 .frame(height: height)
                 .preference(key: AdaptyUIGeometryFramePreferenceKey.self, value: proxy.frame(in: .named(CoordinateSpace.adaptyGlobalName)))
-                .onPreferenceChange(AdaptyUIGeometryFramePreferenceKey.self) { onFrameChange($0) }
+                .onPreferenceChange(AdaptyUIGeometryFramePreferenceKey.self) { value in
+                    Task { @MainActor in
+                        onFrameChange(value)
+                    }
+                }
         }
         .frame(height: height)
     }
