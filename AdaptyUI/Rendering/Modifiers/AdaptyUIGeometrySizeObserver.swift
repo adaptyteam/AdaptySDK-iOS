@@ -46,6 +46,7 @@ struct AdaptyUIGeometrySizeObserver: ViewModifier {
 extension View {
     @ViewBuilder
     func onGeometrySizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
+#if compiler(>=6.0)
         if #available(iOS 18.0, *) {
             onGeometryChange(
                 for: CGSize.self,
@@ -55,6 +56,9 @@ extension View {
         } else {
             modifier(AdaptyUIGeometrySizeObserver(action))
         }
+#else
+        modifier(AdaptyUIGeometrySizeObserver(action))
+#endif
     }
 }
 
