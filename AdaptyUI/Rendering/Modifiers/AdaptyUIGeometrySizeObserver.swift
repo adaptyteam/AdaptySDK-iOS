@@ -32,7 +32,11 @@ struct AdaptyUIGeometrySizeObserver: ViewModifier {
                     Color
                         .clear
                         .preference(key: AdaptyUIGeometrySizePreferenceKey.self, value: proxy.size)
-                        .onPreferenceChange(AdaptyUIGeometrySizePreferenceKey.self) { onChange($0) }
+                        .onPreferenceChange(AdaptyUIGeometrySizePreferenceKey.self) { value in
+                            Task { @MainActor in
+                                onChange(value)
+                            }
+                        }
                 }
             }
     }
