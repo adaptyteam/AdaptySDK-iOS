@@ -8,7 +8,7 @@
 import Foundation
 
 extension Adapty {
-    public nonisolated static let SDKVersion = "3.2.2"
+    public nonisolated static let SDKVersion = "3.2.3"
     static nonisolated let fallbackFormatVersion = 6
 }
 
