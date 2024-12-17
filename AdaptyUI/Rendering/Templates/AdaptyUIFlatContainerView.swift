@@ -11,6 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 struct AdaptyUIFlatContainerView: View {
     @State
     private var footerSize: CGSize = .zero
