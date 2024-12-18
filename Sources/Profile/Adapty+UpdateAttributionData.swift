@@ -25,7 +25,7 @@ public extension Adapty {
         } catch {
             throw AdaptyError.wrongAttributeData(error)
         }
-            
+
         try await updateAttribution(
             attributionJson,
             source: source
@@ -39,11 +39,9 @@ public extension Adapty {
         let logParams: EventParameters = [
             "source": source,
         ]
-            
+
         try await withActivatedSDK(methodName: .updateAttributionData, logParams: logParams) { sdk in
-                
             try await sdk.setAttributionData(
-                profileId: sdk.profileStorage.profileId,
                 source: source,
                 attributionJson: attributionJson
             )
@@ -51,11 +49,13 @@ public extension Adapty {
     }
 
     fileprivate func setAttributionData(
-        profileId: String,
         source: String,
         attributionJson: String
     ) async throws {
-        let oldResponseHash = profileManager?.profile.hash
+        let (profileId, oldResponseHash) = try await {
+            let manager = try await createdProfileManager
+            return (manager.profileId, manager.profile.hash)
+        }()
 
         do {
             let response = try await httpSession.setAttributionData(

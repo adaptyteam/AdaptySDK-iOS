@@ -12,16 +12,7 @@ extension Adapty {
         key: String,
         value: String
     ) async throws {
-        let logParams: EventParameters = [
-            key: value,
-        ]
-
-        try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: logParams) { sdk in
-            try await sdk.setIntegrationIdentifier(
-                profileId: sdk.profileStorage.profileId,
-                keyValues: [key: value]
-            )
-        }
+        try await setIntegrationIdentifiers([key: value])
     }
 
     package nonisolated static func setIntegrationIdentifiers(
@@ -31,16 +22,16 @@ extension Adapty {
 
         try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: logParams) { sdk in
             try await sdk.setIntegrationIdentifier(
-                profileId: sdk.profileStorage.profileId,
                 keyValues: keyValues
             )
         }
     }
 
     func setIntegrationIdentifier(
-        profileId: String,
         keyValues: [String: String]
     ) async throws {
+        let profileId = try await createdProfileManager.profileId
+
         do {
             try await httpSession.setIntegrationIdentifier(
                 profileId: profileId,
