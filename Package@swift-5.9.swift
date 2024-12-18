@@ -40,7 +40,10 @@ let package = Package(
             name: "AdaptyUI",
             dependencies: ["Adapty"],
             path: "AdaptyUI",
-            resources: [.copy("PrivacyInfo.xcprivacy")]
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [
+                .enableExperimentalFeature("StrictConcurrency"),
+            ]
         ),
         .target(
             name: "AdaptyUITesting",

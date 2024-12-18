@@ -41,6 +41,7 @@ struct PaywallViewModifier: ViewModifier {
     @State private var alertPaywallError: IdentifiableErrorWrapper?
 
     @ViewBuilder
+    @MainActor
     func contentOrSheet(content: Content) -> some View {
         if let paywallConfig {
             content
