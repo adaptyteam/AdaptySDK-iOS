@@ -185,39 +185,47 @@ public final class Adapty: Sendable {
 
 extension Adapty {
     func identify(toCustomerUserId newCustomerUserId: String) async throws {
+        let profileId: String
         switch sharedProfileManager {
         case .none:
-            break
+            profileId = profileStorage.profileId
         case let .current(manager):
             guard manager.profile.value.customerUserId != newCustomerUserId else {
                 return
             }
-        case let .creating(_, customerUserId, task):
+            profileId = manager.profileId
+        case let .creating(id, customerUserId, task):
             guard customerUserId != newCustomerUserId else {
                 _ = try await task.value
                 return
             }
-
+            profileId = id
             task.cancel()
         }
-        try await logoutAndCreateNewProfileOnServer(customerUserId: newCustomerUserId)
+
+        let task = Task { try await createNewProfileOnServer(profileId, newCustomerUserId) }
+        sharedProfileManager = .creating(
+            profileId: profileId,
+            withCustomerUserId: newCustomerUserId,
+            task: task
+        )
+
+        _ = try await task.value
     }
 
     func logout() async throws {
         if case let .creating(_, _, task) = sharedProfileManager {
             task.cancel()
         }
-        return try await logoutAndCreateNewProfileOnServer()
-    }
 
-    private func logoutAndCreateNewProfileOnServer(customerUserId: String? = nil) async throws {
         profileStorage.clearProfile(newProfileId: nil)
+
         let profileId = profileStorage.profileId
 
-        let task = Task { try await createNewProfileOnServer(profileId, customerUserId) }
+        let task = Task { try await createNewProfileOnServer(profileId, nil) }
         sharedProfileManager = .creating(
             profileId: profileId,
-            withCustomerUserId: customerUserId,
+            withCustomerUserId: nil,
             task: task
         )
 
