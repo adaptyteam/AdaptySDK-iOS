@@ -25,19 +25,19 @@ extension AdaptyConfiguration.Builder: Decodable {
 
         case crossPlatformSDKName = "cross_platform_sdk_name"
         case crossPlatformSDKVersion = "cross_platform_sdk_version"
+        
+        case serverCluster = "server_cluster"
     }
 
     public convenience init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        let defaultValue = AdaptyConfiguration.default
 
         let proxy: (host: String, port: Int)? =
             if let host = try container.decodeIfPresent(String.self, forKey: .backendProxyHost),
             let port = try container.decodeIfPresent(Int.self, forKey: .backendProxyPort) {
                 (host: host, port: port)
             } else {
-                defaultValue.backend.proxy
+                nil
             }
 
         let crossPlatformSDK: (name: String, version: String)? =
@@ -51,20 +51,27 @@ extension AdaptyConfiguration.Builder: Decodable {
         try self.init(
             apiKey: container.decode(String.self, forKey: .apiKey),
             customerUserId: container.decodeIfPresent(String.self, forKey: .customerUserId),
-            observerMode: container.decodeIfPresent(Bool.self, forKey: .observerMode)
-                ?? defaultValue.observerMode,
-            idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled)
-                ?? defaultValue.idfaCollectionDisabled,
-            ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled)
-                ?? defaultValue.ipAddressCollectionDisabled,
-            backendBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendBaseUrl) ?? defaultValue.backend.baseUrl,
-            backendFallbackBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl)
-                ?? defaultValue.backend.fallbackUrl,
-            backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl)
-                ?? defaultValue.backend.configsUrl,
+            observerMode: container.decodeIfPresent(Bool.self, forKey: .observerMode),
+            idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled),
+            ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),
+            callbackDispatchQueue: nil,
+            serverCluster: container.decodeIfPresent(AdaptyConfiguration.ServerCluster.self, forKey: .serverCluster),
+            backendBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendBaseUrl),
+            backendFallbackBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl),
+            backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl),
             backendProxy: proxy,
             logLevel: container.decodeIfPresent(AdaptyLog.Level.self, forKey: .logLevel),
             crossPlatformSDK: crossPlatformSDK
         )
     }
 }
+
+extension AdaptyConfiguration.ServerCluster: Decodable {
+    public init(from decoder: Decoder) throws {
+        self = switch try decoder.singleValueContainer().decode(String.self) {
+            case "eu":  .eu
+            default: .default
+        }
+    }
+}
+

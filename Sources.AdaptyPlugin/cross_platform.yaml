@@ -128,9 +128,9 @@ $requests:
     properties:
       method: { const: "get_paywall" }
       placement_id: { type: string }
-      locale: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
       fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
-      load_timeout: { type: number }
+      load_timeout: { type: number, description: "seconds" }
 
   GetPaywall.Response: #response
     type: object
@@ -149,7 +149,7 @@ $requests:
     properties:
       method: { const: "get_paywall_for_default_audience" }
       placement_id: { type: string }
-      locale: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
       fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
 
   GetPaywallForDefaultAudience.Response: #response
@@ -419,7 +419,7 @@ $requests:
   ### setIntegrationIdentifier ###
   SetIntegrationIdentifier.Request: #request
     type: object
-    required: [method, attribution, source]
+    required: [method, key_values, source]
     properties:
       method: { const: "set_integration_identifiers" }
       key_values:
@@ -601,13 +601,15 @@ $defs:
       observer_mode: { type: boolean, default: false }
       idfa_collection_disabled: { type: boolean, default: false }
       ip_address_collection_disabled: { type: boolean, default: false }
+      server_cluster: { type: string, enum: ["default", "eu"] }
       backend_base_url: { type: string }
       backend_fallback_base_url: { type: string }
+      backend_configs_base_url: { type: string }
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
-      log_level: { $ref: "#/$defs/AdaptyLog.Level" } # new 3.0.0
-      cross_platform_sdk_name: { type: string } # new 3.0.0
-      cross_platform_sdk_version: { type: string } # new 3.0.0
+      log_level: { $ref: "#/$defs/AdaptyLog.Level" }
+      cross_platform_sdk_name: { type: string }
+      cross_platform_sdk_version: { type: string }
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -619,8 +621,8 @@ $defs:
       - paywall_name
       - localized_description
       - localized_title
-      - is_family_shareable # iOS Only  # new 3.0.0
-      - price # new 3.0.0
+      - is_family_shareable # iOS Only
+      - price
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
@@ -633,7 +635,7 @@ $defs:
         { type: boolean, default: false, description: "iOS Only" }
       region_code: { type: string }
       price: { $ref: "#/$defs/AdaptyPrice" }
-      subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" } # rename 3.0.0  from  subscription_details
+      subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
       payload_data: { type: string }
 
   AdaptyPrice: #response
@@ -648,15 +650,15 @@ $defs:
   AdaptyPaywallProduct.Subscription: #response
     type: object
     required:
-      - group_identifier # iOS Only # new 3.0.0
-      - period # rename 3.0.0
+      - group_identifier # iOS Only
+      - period
       - renewal_type # Android Only
-      - base_plan_id # Android Only # new 3.0.0
+      - base_plan_id # Android Only
     properties:
-      group_identifier: { type: string, description: "iOS Only" } # rename 3.0.0
-      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" } # rename 3.0.0
-      localized_period: { type: string } # rename 3.0.0
-      offer: { $ref: "#/$defs/AdaptySubscriptionOffer" } # new 3.0.0
+      group_identifier: { type: string, description: "iOS Only" }
+      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
+      localized_period: { type: string }
+      offer: { $ref: "#/$defs/AdaptySubscriptionOffer" }
       renewal_type: # Android Only
         type: string
         enum:
@@ -664,7 +666,7 @@ $defs:
           - autorenewable
         default: autorenewable
         description: "Android Only"
-      base_plan_id: { type: string, description: "Android Only" } # Android Only # rename 3.0.0
+      base_plan_id: { type: string, description: "Android Only" } # Android Only
 
   AdaptyPaywallProduct.Request: #request
     type: object
@@ -677,9 +679,8 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
-      subscription_offer_identifier: {
-          $ref: "#/$defs/AdaptySubscriptionOffer.Identifier",
-        } # new 3.0.0
+      subscription_offer_identifier:
+        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
@@ -700,20 +701,20 @@ $defs:
         items: { type: string }
         description: Android Only
 
-    AdaptySubscriptionOffer.Phase:
-      type: object
-      required:
-        - price
-        - subscription_period
-        - number_of_periods
-        - payment_mode
-      properties:
-        price: { $ref: "#/$defs/AdaptyPrice" }
-        number_of_periods: { type: integer }
-        payment_mode: { $ref: "#/$defs/AdaptySubscriptionOffer.PaymentMode" }
-        subscription_period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
-        localized_subscription_period: { type: string }
-        localized_number_of_periods: { type: string }
+  AdaptySubscriptionOffer.Phase:
+    type: object
+    required:
+      - price
+      - subscription_period
+      - number_of_periods
+      - payment_mode
+    properties:
+      price: { $ref: "#/$defs/AdaptyPrice" }
+      number_of_periods: { type: integer }
+      payment_mode: { $ref: "#/$defs/AdaptySubscriptionOffer.PaymentMode" }
+      subscription_period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
+      localized_subscription_period: { type: string }
+      localized_number_of_periods: { type: string }
 
   AdaptyOnboardingScreenParameters: #request
     type: object
@@ -733,7 +734,7 @@ $defs:
       - variation_id
       - revision
       - products
-      - response_created_at # new 3.0.0
+      - response_created_at
     properties:
       developer_id: { type: string }
       paywall_id: { type: string }
@@ -784,7 +785,7 @@ $defs:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
       promotional_offer_id: { type: string, description: "iOS Only" }
-      win_back_offer_id: { type: string, description: "iOS Only" } # new 3.0.0
+      win_back_offer_id: { type: string, description: "iOS Only" }
       base_plan_id: { type: string, description: "Android Only" }
       offer_id: { type: string, description: "Android Only" }
 
@@ -818,8 +819,8 @@ $defs:
     required:
       - profile_id
       - segment_hash
-      - is_test_user # new 3.0.0
-      - timestamp # new 3.0.0
+      - is_test_user
+      - timestamp
     properties:
       profile_id: { type: string }
       customer_user_id: { type: string }
@@ -836,8 +837,8 @@ $defs:
         additionalProperties:
           type: array
           items: { $ref: "#/$defs/AdaptyProfile.NonSubscription" }
-      timestamp: { type: integer } # new 3.0.0
-      is_test_user: { type: boolean } # new 3.0.0
+      timestamp: { type: integer }
+      is_test_user: { type: boolean }
 
   AdaptyProfile.AccessLevel: #response
     type: object

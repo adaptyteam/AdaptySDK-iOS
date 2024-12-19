@@ -12,18 +12,27 @@ extension AdaptyConfiguration {
         let apiKey = builder.apiKey
         assert(apiKey.count >= 41 && apiKey.starts(with: "public_live"), "It looks like you have passed the wrong apiKey value to the Adapty SDK.")
 
+        let defaultValue = AdaptyConfiguration.default
+
+        let defaultBackend = switch builder.serverCluster ?? .default {
+        case .eu:
+            Backend.URLs.euPublicEnvironment
+        default:
+            Backend.URLs.defaultPublicEnvironment
+        }
+
         self.init(
             apiKey: apiKey,
             customerUserId: builder.customerUserId,
-            observerMode: builder.observerMode,
-            idfaCollectionDisabled: builder.idfaCollectionDisabled,
-            ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled,
+            observerMode: builder.observerMode ?? defaultValue.observerMode,
+            idfaCollectionDisabled: builder.idfaCollectionDisabled ?? defaultValue.idfaCollectionDisabled,
+            ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled ?? defaultValue.ipAddressCollectionDisabled,
             callbackDispatchQueue: builder.callbackDispatchQueue,
             backend: .init(
-                baseUrl: builder.backendBaseUrl,
-                fallbackUrl: builder.backendFallbackBaseUrl,
-                configsUrl: builder.backendConfigsBaseUrl,
-                proxy: builder.backendProxy
+                baseUrl: builder.backendBaseUrl ?? defaultBackend.baseUrl,
+                fallbackUrl: builder.backendFallbackBaseUrl ?? defaultBackend.fallbackUrl,
+                configsUrl: builder.backendConfigsBaseUrl ?? defaultBackend.configsUrl,
+                proxy: builder.backendProxy ?? defaultBackend.proxy
             ),
             logLevel: builder.logLevel,
             crossPlatformSDK: builder.crossPlatformSDK
@@ -31,22 +40,37 @@ extension AdaptyConfiguration {
     }
 
     public static func builder(withAPIKey apiKey: String) -> AdaptyConfiguration.Builder {
-        .init(apiKey: apiKey)
+        .init(
+            apiKey: apiKey,
+            customerUserId: nil,
+            observerMode: nil,
+            idfaCollectionDisabled: nil,
+            ipAddressCollectionDisabled: nil,
+            callbackDispatchQueue: nil,
+            serverCluster: nil,
+            backendBaseUrl: nil,
+            backendFallbackBaseUrl: nil,
+            backendConfigsBaseUrl: nil,
+            backendProxy: nil,
+            logLevel: nil,
+            crossPlatformSDK: nil
+        )
     }
 }
 
-extension AdaptyConfiguration {
-    public final class Builder {
+public extension AdaptyConfiguration {
+    final class Builder {
         public private(set) var apiKey: String
         public private(set) var customerUserId: String?
-        public private(set) var observerMode: Bool
-        public private(set) var idfaCollectionDisabled: Bool
-        public private(set) var ipAddressCollectionDisabled: Bool
+        public private(set) var observerMode: Bool?
+        public private(set) var idfaCollectionDisabled: Bool?
+        public private(set) var ipAddressCollectionDisabled: Bool?
         public private(set) var callbackDispatchQueue: DispatchQueue?
 
-        public private(set) var backendBaseUrl: URL
-        public private(set) var backendFallbackBaseUrl: URL
-        public private(set) var backendConfigsBaseUrl: URL
+        public private(set) var serverCluster: ServerCluster?
+        public private(set) var backendBaseUrl: URL?
+        public private(set) var backendFallbackBaseUrl: URL?
+        public private(set) var backendConfigsBaseUrl: URL?
         public private(set) var backendProxy: (host: String, port: Int)?
 
         public private(set) var logLevel: AdaptyLog.Level?
@@ -55,17 +79,18 @@ extension AdaptyConfiguration {
 
         init(
             apiKey: String,
-            customerUserId: String? = nil,
-            observerMode: Bool = AdaptyConfiguration.default.observerMode,
-            idfaCollectionDisabled: Bool = AdaptyConfiguration.default.idfaCollectionDisabled,
-            ipAddressCollectionDisabled: Bool = AdaptyConfiguration.default.ipAddressCollectionDisabled,
-            callbackDispatchQueue: DispatchQueue? = nil,
-            backendBaseUrl: URL = AdaptyConfiguration.default.backend.baseUrl,
-            backendFallbackBaseUrl: URL = AdaptyConfiguration.default.backend.fallbackUrl,
-            backendConfigsBaseUrl: URL = AdaptyConfiguration.default.backend.configsUrl,
-            backendProxy: (host: String, port: Int)? = AdaptyConfiguration.default.backend.proxy,
-            logLevel: AdaptyLog.Level? = nil,
-            crossPlatformSDK: (name: String, version: String)? = nil
+            customerUserId: String?,
+            observerMode: Bool?,
+            idfaCollectionDisabled: Bool?,
+            ipAddressCollectionDisabled: Bool?,
+            callbackDispatchQueue: DispatchQueue?,
+            serverCluster: ServerCluster?,
+            backendBaseUrl: URL?,
+            backendFallbackBaseUrl: URL?,
+            backendConfigsBaseUrl: URL?,
+            backendProxy: (host: String, port: Int)?,
+            logLevel: AdaptyLog.Level?,
+            crossPlatformSDK: (name: String, version: String)?
         ) {
             self.apiKey = apiKey
             self.customerUserId = customerUserId
@@ -73,6 +98,7 @@ extension AdaptyConfiguration {
             self.idfaCollectionDisabled = idfaCollectionDisabled
             self.ipAddressCollectionDisabled = ipAddressCollectionDisabled
             self.callbackDispatchQueue = callbackDispatchQueue
+            self.serverCluster = serverCluster ?? .default
             self.backendBaseUrl = backendBaseUrl
             self.backendFallbackBaseUrl = backendFallbackBaseUrl
             self.backendConfigsBaseUrl = backendConfigsBaseUrl
@@ -88,87 +114,81 @@ extension AdaptyConfiguration {
     }
 }
 
-extension AdaptyConfiguration.Builder {
+public extension AdaptyConfiguration.Builder {
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
     @discardableResult
-    public func with(apiKey key: String) -> Self {
+    func with(apiKey key: String) -> Self {
         apiKey = key
         return self
     }
 
     /// - Parameter customerUserId: User identifier in your system
     @discardableResult
-    public func with(customerUserId id: String?) -> Self {
+    func with(customerUserId id: String?) -> Self {
         customerUserId = id
         return self
     }
 
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/docs/observer-vs-full-mode/). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     @discardableResult
-    public func with(observerMode mode: Bool) -> Self {
+    func with(observerMode mode: Bool) -> Self {
         observerMode = mode
         return self
     }
 
     /// - Parameter idfaCollectionDisabled: A boolean value controlling idfa collection logic
     @discardableResult
-    public func with(idfaCollectionDisabled value: Bool) -> Self {
+    func with(idfaCollectionDisabled value: Bool) -> Self {
         idfaCollectionDisabled = value
         return self
     }
 
     /// - Parameter ipAddressCollectionDisabled: A boolean value controlling ip-address collection logic
     @discardableResult
-    public func with(ipAddressCollectionDisabled value: Bool) -> Self {
+    func with(ipAddressCollectionDisabled value: Bool) -> Self {
         ipAddressCollectionDisabled = value
         return self
     }
 
     /// - Parameter dispatchQueue: Specify the Dispatch Queue where callbacks will be executed
-    public func with(callbackDispatchQueue queue: DispatchQueue?) -> Self {
+    @discardableResult
+    func with(callbackDispatchQueue queue: DispatchQueue) -> Self {
         callbackDispatchQueue = queue
         return self
     }
 
-
-
     @discardableResult
-    public func with(serverCluster value: AdaptyConfiguration.ServerCluster) -> Self {
-        switch value {
-        case .default:
-            backendBaseUrl = Backend.URLs.defaultPublicEnvironment.baseUrl
-        case .eu:
-            backendBaseUrl = Backend.URLs.euPublicEnvironment.baseUrl
-        }
+    func with(serverCluster value: AdaptyConfiguration.ServerCluster) -> Self {
+        serverCluster = value
         return self
     }
 
     @discardableResult
-    public func with(backendBaseUrl url: URL) -> Self {
+    func with(backendBaseUrl url: URL) -> Self {
         backendBaseUrl = url
         return self
     }
 
     @discardableResult
-    public func with(backendFallbackBaseUrl url: URL) -> Self {
+    func with(backendFallbackBaseUrl url: URL) -> Self {
         backendFallbackBaseUrl = url
         return self
     }
 
     @discardableResult
-    public func with(backendConfigsBaseUrl url: URL) -> Self {
+    func with(backendConfigsBaseUrl url: URL) -> Self {
         backendConfigsBaseUrl = url
         return self
     }
 
     @discardableResult
-    public func with(proxy host: String, port: Int) -> Self {
+    func with(proxy host: String, port: Int) -> Self {
         backendProxy = (host: host, port: port)
         return self
     }
 
     @discardableResult
-    public func with(loglevel level: AdaptyLog.Level) -> Self {
+    func with(loglevel level: AdaptyLog.Level) -> Self {
         logLevel = level
         return self
     }
@@ -179,5 +199,3 @@ extension AdaptyConfiguration.Builder {
         return self
     }
 }
-
-
