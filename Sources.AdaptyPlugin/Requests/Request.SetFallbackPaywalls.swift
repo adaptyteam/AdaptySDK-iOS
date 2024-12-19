@@ -11,6 +11,27 @@ import Foundation
 extension Request {
     struct SetFallbackPaywalls: AdaptyPluginRequest {
         static let method = "set_fallback_paywalls"
+        let path: String
+
+        private enum CodingKeys: CodingKey {
+            case path
+        }
+
+        func execute() async throws -> AdaptyJsonData {
+            let fileURL = if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
+                URL(filePath: path)
+            } else {
+                URL(fileURLWithPath: path)
+            }
+
+            try await Adapty.setFallbackPaywalls(fileURL: fileURL)
+
+            return .success()
+        }
+    }
+
+    struct SetFallbackPaywallsByAssetId: AdaptyPluginRequest {
+        static let method = SetFallbackPaywalls.method
         let assetId: String
 
         private enum CodingKeys: String, CodingKey {
@@ -44,7 +65,7 @@ extension Request {
 public extension AdaptyPlugin {
     @MainActor
     static func reqister(setFallbackPaywallsRequests: @MainActor @escaping (String) -> URL?) {
-        Request.SetFallbackPaywalls.assetIdToFileURL = setFallbackPaywallsRequests
-        reqister(requests: [Request.SetFallbackPaywalls.self])
+        Request.SetFallbackPaywallsByAssetId.assetIdToFileURL = setFallbackPaywallsRequests
+        reqister(requests: [Request.SetFallbackPaywallsByAssetId.self])
     }
 }

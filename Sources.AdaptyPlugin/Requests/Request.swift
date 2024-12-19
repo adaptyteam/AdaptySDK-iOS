@@ -30,7 +30,8 @@ enum Request {
             UpdateAttributionData.self,
             SetIntegrationIdentifier.self,
             ReportTransaction.self,
-            UpdateProfile.self
+            UpdateProfile.self,
+            SetFallbackPaywalls.self
         ]
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {

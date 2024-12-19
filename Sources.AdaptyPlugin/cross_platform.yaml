@@ -401,10 +401,16 @@ $requests:
   ### setFallbackPaywalls ###
   SetFallbackPaywalls.Request: #request
     type: object
-    required: [method, asset_id]
+    required: [method]
     properties:
       method: { const: "set_fallback_paywalls" }
-      asset_id: { type: string }
+    oneOf:
+      - required: [asset_id]
+        properties:
+          asset_id: { type: string }
+      - required: [path]
+        properties:
+          path: { type: string }
 
   SetFallbackPaywalls.Response: #response
     type: object
