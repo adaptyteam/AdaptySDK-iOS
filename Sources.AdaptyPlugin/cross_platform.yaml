@@ -119,7 +119,7 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { const: true }
+          success: { $ref: "#/$defs/AdaptyUI.DialogActionType" }
 
   ### getPaywall ###
   GetPaywall.Request: #request
@@ -1058,14 +1058,14 @@ $defs:
     properties:
       title: { type: string }
       content: { type: string }
-      default_action: { $ref: "#/$defs/AdaptyUI.DialogConfiguration.Action" }
-      secondary_action: { $ref: "#/$defs/AdaptyUI.DialogConfiguration.Action" }
+      default_action_title: { type: string }
+      secondary_action_title: { type: string }
 
-  AdaptyUI.DialogConfiguration.Action: #request
-    type: object
-    required: [title]
-    properties:
-      title: { type: string }
+  AdaptyUI.DialogActionType:
+    type: string
+    enum:
+      - default
+      - secondary
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
     type: object

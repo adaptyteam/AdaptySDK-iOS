@@ -133,7 +133,7 @@ package extension AdaptyUI {
         package static func showDialog(
             viewId: String,
             configuration: AdaptyUI.DialogConfiguration
-        ) async throws -> Int {
+        ) async throws -> DialogActionType {
 #if canImport(UIKit)
             guard let vc = cachedPaywallController(viewId) else {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
@@ -143,9 +143,9 @@ package extension AdaptyUI {
                 vc.showDialog(
                     configuration,
                     defaultActionHandler: {
-                        continuation.resume(with: .success(0))
+                        continuation.resume(with: .success(.default))
                     }, secondaryActionHandler: {
-                        continuation.resume(with: .success(1))
+                        continuation.resume(with: .success(.secondary))
                     }
                 )
             }
@@ -153,5 +153,10 @@ package extension AdaptyUI {
             throw AdaptyUIError.platformNotSupported
 #endif
         }
+    }
+    
+    enum DialogActionType {
+        case `default`
+        case secondary
     }
 }
