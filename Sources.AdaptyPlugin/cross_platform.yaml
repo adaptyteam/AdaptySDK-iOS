@@ -1064,7 +1064,7 @@ $defs:
   AdaptyUI.DialogActionType:
     type: string
     enum:
-      - default
+      - primary
       - secondary
 
   AdaptySubscriptionUpdateParameters: #request # Android Only

@@ -143,7 +143,7 @@ package extension AdaptyUI {
                 vc.showDialog(
                     configuration,
                     defaultActionHandler: {
-                        continuation.resume(with: .success(.default))
+                        continuation.resume(with: .success(.primary))
                     }, secondaryActionHandler: {
                         continuation.resume(with: .success(.secondary))
                     }
@@ -156,7 +156,7 @@ package extension AdaptyUI {
     }
     
     enum DialogActionType {
-        case `default`
+        case primary
         case secondary
     }
 }

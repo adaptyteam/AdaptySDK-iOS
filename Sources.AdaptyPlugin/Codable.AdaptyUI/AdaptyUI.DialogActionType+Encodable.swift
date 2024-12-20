@@ -19,8 +19,8 @@ extension AdaptyUI.DialogActionType: Encodable {
         var container = encoder.singleValueContainer()
 
         switch self {
-        case .default:
-            try container.encode("default")
+        case .primary:
+            try container.encode("primary")
         case .secondary:
             try container.encode("secondary")
         }
