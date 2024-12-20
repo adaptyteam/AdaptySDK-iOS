@@ -26,6 +26,8 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
     }
 }
 
+#if canImport(UIKit)
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
     func paywallController(
@@ -132,3 +134,5 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
         return true
     }
 }
+
+#endif
