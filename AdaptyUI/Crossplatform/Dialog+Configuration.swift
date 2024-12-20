@@ -28,13 +28,13 @@ package extension AdaptyUI {
         package init(
             title: String?,
             content: String?,
-            defaultAction: AdaptyUI.DialogConfiguration.Action,
-            secondaryAction: AdaptyUI.DialogConfiguration.Action?
+            defaultActionTitle: String,
+            secondaryActionTitle: String?
         ) {
             self.title = title
             self.content = content
-            self.defaultAction = defaultAction
-            self.secondaryAction = secondaryAction
+            self.defaultAction = .init(title: defaultActionTitle)
+            self.secondaryAction = secondaryActionTitle.map(AdaptyUI.DialogConfiguration.Action.init)
         }
     }
 }

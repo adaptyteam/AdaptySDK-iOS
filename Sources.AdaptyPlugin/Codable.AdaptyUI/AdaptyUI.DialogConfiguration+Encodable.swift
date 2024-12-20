@@ -13,8 +13,8 @@ extension AdaptyUI.DialogConfiguration: Decodable {
     enum CodingKeys: String, CodingKey {
         case title
         case content
-        case defaultAction = "default_action"
-        case secondaryAction = "secondary_action"
+        case defaultActionTitle = "default_action_title"
+        case secondaryActionTitle = "secondary_action_title"
     }
 
     package init(from decoder: any Decoder) throws {
@@ -22,22 +22,8 @@ extension AdaptyUI.DialogConfiguration: Decodable {
         try self.init(
             title: container.decodeIfPresent(String.self, forKey: .title),
             content: container.decodeIfPresent(String.self, forKey: .content),
-            defaultAction: container.decode(AdaptyUI.DialogConfiguration.Action.self, forKey: .defaultAction),
-            secondaryAction: container.decodeIfPresent(AdaptyUI.DialogConfiguration.Action.self, forKey: .secondaryAction)
-        )
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyUI.DialogConfiguration.Action: Decodable {
-    enum CodingKeys: CodingKey {
-        case title
-    }
-
-    package init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        try self.init(
-            title: container.decode(String.self, forKey: .title)
+            defaultActionTitle: container.decode(String.self, forKey: .defaultActionTitle),
+            secondaryActionTitle: container.decodeIfPresent(String.self, forKey: .secondaryActionTitle)
         )
     }
 }
