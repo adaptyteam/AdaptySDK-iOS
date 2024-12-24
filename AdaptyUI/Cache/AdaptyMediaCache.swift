@@ -8,13 +8,8 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-extension AdaptyUI {
-    static let imageCache = ImageCache(name: "Adapty")
-    static let imageDownloader = ImageDownloader(name: "Adapty")
-
-    public struct MediaCacheConfiguration: Sendable {
+public extension AdaptyUI {
+    struct MediaCacheConfiguration: Sendable {
         /// Total cost limit of the storage in bytes.
         public var memoryStorageTotalCostLimit: Int
 
@@ -33,13 +28,20 @@ extension AdaptyUI {
             self.memoryStorageCountLimit = memoryStorageCountLimit
             self.diskStorageSizeLimit = diskStorageSizeLimit
         }
-        
+
         static let `default`: MediaCacheConfiguration = .init(
             memoryStorageTotalCostLimit: 100 * 1024 * 1024, // 100MB
             memoryStorageCountLimit: .max,
             diskStorageSizeLimit: 100 * 1024 * 1024 // 100MB
         )
     }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+extension AdaptyUI {
+    static let imageCache = ImageCache(name: "Adapty")
+    static let imageDownloader = ImageDownloader(name: "Adapty")
 
     static var currentCacheConfiguration: MediaCacheConfiguration?
 

@@ -13,7 +13,6 @@ import Foundation
 /// You can find more information in the corresponding section of [our documentation](https://adapty.io/docs/3.0/adapty-paywall-builder).
 public enum AdaptyUI {}
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     struct Configuration: Sendable {
         public static let `default` = Configuration(mediaCacheConfiguration: nil)

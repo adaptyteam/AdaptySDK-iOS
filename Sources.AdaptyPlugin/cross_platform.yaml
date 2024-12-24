@@ -21,24 +21,6 @@ $requests:
         properties:
           success: { const: true }
 
-  ### adaptyUIActivate ###
-  AdaptyUIActivate.Request: #request
-    type: object
-    required: [method, configuration]
-    properties:
-      method: { const: "adapty_ui_activate" }
-      configuration: { $ref: "#/$defs/AdaptyUI.Configuration" }
-
-  AdaptyUIActivate.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
   ### adaptyUICreateView ###
   AdaptyUICreateView.Request: #request
     type: object
@@ -425,7 +407,7 @@ $requests:
   ### setIntegrationIdentifier ###
   SetIntegrationIdentifier.Request: #request
     type: object
-    required: [method, key_values, source]
+    required: [method, key_values]
     properties:
       method: { const: "set_integration_identifiers" }
       key_values:
@@ -616,6 +598,18 @@ $defs:
       log_level: { $ref: "#/$defs/AdaptyLog.Level" }
       cross_platform_sdk_name: { type: string }
       cross_platform_sdk_version: { type: string }
+      activate_ui: { type: boolean, dafault: false }
+      media_cache:
+        type: object
+        required:
+          - memory_storage_total_cost_limit
+          - memory_storage_count_limit
+          - disk_storage_size_limit
+        properties:
+          memory_storage_total_cost_limit:
+            { type: integer, description: "bytes" }
+          memory_storage_count_limit: { type: integer }
+          disk_storage_size_limit: { type: integer, description: "bytes" }
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -1002,21 +996,6 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
-
-  AdaptyUI.Configuration: #request
-    type: object
-    properties:
-      media_cache:
-        type: object
-        required:
-          - memory_storage_total_cost_limit
-          - memory_storage_count_limit
-          - disk_storage_size_limit
-        properties:
-          memory_storage_total_cost_limit:
-            { type: integer, description: "bytes" }
-          memory_storage_count_limit: { type: integer }
-          disk_storage_size_limit: { type: integer, description: "bytes" }
 
   AdaptyUI.View: #response #event
     type: object

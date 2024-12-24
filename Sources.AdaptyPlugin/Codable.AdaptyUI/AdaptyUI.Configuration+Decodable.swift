@@ -8,10 +8,10 @@
 import AdaptyUI
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.Configuration: Decodable {
     private enum Codingkey: String, CodingKey {
         case mediaCache = "media_cache"
+        
     }
 
     public init(from decoder: Decoder) throws {
@@ -22,7 +22,6 @@ extension AdaptyUI.Configuration: Decodable {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.MediaCacheConfiguration: Decodable {
     private enum Codingkey: String, CodingKey {
         case memoryStorageTotalCostLimit = "memory_storage_total_cost_limit"
