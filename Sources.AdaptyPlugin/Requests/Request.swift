@@ -36,7 +36,6 @@ enum Request {
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
-                AdaptyUIActivate.self,
                 AdaptyUICreateView.self,
                 AdaptyUIDismissView.self,
                 AdaptyUIPresentView.self,
