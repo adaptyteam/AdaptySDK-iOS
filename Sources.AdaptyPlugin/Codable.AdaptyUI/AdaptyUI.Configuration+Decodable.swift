@@ -33,9 +33,9 @@ extension AdaptyUI.MediaCacheConfiguration: Decodable {
         let container = try decoder.container(keyedBy: Codingkey.self)
 
         try self.init(
-            memoryStorageTotalCostLimit: container.decode(Int.self, forKey: .memoryStorageTotalCostLimit),
-            memoryStorageCountLimit: container.decode(Int.self, forKey: .memoryStorageCountLimit),
-            diskStorageSizeLimit: container.decode(UInt.self, forKey: .diskStorageSizeLimit)
+            memoryStorageTotalCostLimit: container.decodeIfPresent(Int.self, forKey: .memoryStorageTotalCostLimit) ?? AdaptyUI.MediaCacheConfiguration.default.memoryStorageTotalCostLimit,
+            memoryStorageCountLimit: container.decodeIfPresent(Int.self, forKey: .memoryStorageCountLimit) ?? AdaptyUI.MediaCacheConfiguration.default.memoryStorageCountLimit,
+            diskStorageSizeLimit: container.decodeIfPresent(UInt.self, forKey: .diskStorageSizeLimit) ?? AdaptyUI.MediaCacheConfiguration.default.diskStorageSizeLimit
         )
     }
 }

@@ -601,10 +601,6 @@ $defs:
       activate_ui: { type: boolean, dafault: false }
       media_cache:
         type: object
-        required:
-          - memory_storage_total_cost_limit
-          - memory_storage_count_limit
-          - disk_storage_size_limit
         properties:
           memory_storage_total_cost_limit:
             { type: integer, description: "bytes" }

@@ -29,7 +29,7 @@ public extension AdaptyUI {
             self.diskStorageSizeLimit = diskStorageSizeLimit
         }
 
-        static let `default`: MediaCacheConfiguration = .init(
+        package static let `default`: MediaCacheConfiguration = .init(
             memoryStorageTotalCostLimit: 100 * 1024 * 1024, // 100MB
             memoryStorageCountLimit: .max,
             diskStorageSizeLimit: 100 * 1024 * 1024 // 100MB
