@@ -51,10 +51,10 @@ extension Backend {
             return HTTPResponse.statusCodeValidator(response)
         }
 
-        return HTTPError.backend(response, error: BackendError(
+        return BackendError(
             body: String(data: data, encoding: .utf8) ?? "unknown",
             errorCodes: errorCodes,
             requestId: response.headers.getBackendRequestId()
-        ))
+        )
     }
 }
