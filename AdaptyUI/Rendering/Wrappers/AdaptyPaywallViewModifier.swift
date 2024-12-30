@@ -37,20 +37,24 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
     }
 
     var paywallViewBody: some View {
-        AdaptyPaywallView_Internal(showDebugOverlay: false)
-            .environmentObject(paywallConfiguration.eventsHandler)
-            .environmentObject(paywallConfiguration.paywallViewModel)
-            .environmentObject(paywallConfiguration.productsViewModel)
-            .environmentObject(paywallConfiguration.actionsViewModel)
-            .environmentObject(paywallConfiguration.sectionsViewModel)
-            .environmentObject(paywallConfiguration.tagResolverViewModel)
-            .environmentObject(paywallConfiguration.timerViewModel)
-            .environmentObject(paywallConfiguration.screensViewModel)
-            .environmentObject(paywallConfiguration.videoViewModel)
-            .onAppear {
-                paywallConfiguration.eventsHandler.viewDidAppear()
-                paywallConfiguration.paywallViewModel.logShowPaywall()
-            }
+        AdaptyPaywallView_Internal(
+            showDebugOverlay: false,
+            showAlertItem: showAlertItem,
+            showAlertBuilder: showAlertBuilder
+        )
+        .environmentObject(paywallConfiguration.eventsHandler)
+        .environmentObject(paywallConfiguration.paywallViewModel)
+        .environmentObject(paywallConfiguration.productsViewModel)
+        .environmentObject(paywallConfiguration.actionsViewModel)
+        .environmentObject(paywallConfiguration.sectionsViewModel)
+        .environmentObject(paywallConfiguration.tagResolverViewModel)
+        .environmentObject(paywallConfiguration.timerViewModel)
+        .environmentObject(paywallConfiguration.screensViewModel)
+        .environmentObject(paywallConfiguration.videoViewModel)
+        .onAppear {
+            paywallConfiguration.eventsHandler.viewDidAppear()
+            paywallConfiguration.paywallViewModel.logShowPaywall()
+        }
     }
 
     public func body(content: Content) -> some View {
