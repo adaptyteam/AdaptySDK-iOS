@@ -9,14 +9,14 @@
 import Foundation
 
 extension Storage {
-    private static let encoder: JSONEncoder = {
+    static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
         encoder.dataEncodingStrategy = .base64
         return encoder
     }()
 
-    private static let decoder: JSONDecoder = {
+    static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
         decoder.dataDecodingStrategy = .base64

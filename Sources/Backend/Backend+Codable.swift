@@ -8,22 +8,17 @@
 import Foundation
 
 extension Backend {
-    fileprivate static let isBackendCodableUserInfoKey = CodingUserInfoKey(rawValue: "adapty_backend")!
-    fileprivate static let profileIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_profile_id")!
-
     static func configure(jsonDecoder: JSONDecoder) {
         jsonDecoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
         jsonDecoder.dataDecodingStrategy = .base64
-        jsonDecoder.setIsBackend()
     }
 
     static func configure(jsonEncoder: JSONEncoder) {
         jsonEncoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
         jsonEncoder.dataEncodingStrategy = .base64
-        jsonEncoder.setIsBackend()
     }
 
-    static let inUTCDateFormatter: DateFormatter = {
+    package static let inUTCDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -32,7 +27,7 @@ extension Backend {
         return formatter
     }()
 
-    static let dateFormatter: DateFormatter = {
+    package static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -41,28 +36,48 @@ extension Backend {
     }()
 }
 
+private extension CodingUserInfoKey {
+    static let enableEncodingViewConfiguration = CodingUserInfoKey(rawValue: "adapty_encode_view_configuration")!
+    static let profileId = CodingUserInfoKey(rawValue: "adapty_profile_id")!
+    static let placementId = CodingUserInfoKey(rawValue: "adapty_placement_id")!
+}
+
 extension CodingUserInfoСontainer {
-    fileprivate func setIsBackend() {
-        userInfo[Backend.isBackendCodableUserInfoKey] = true
+    func setProfileId(_ value: String) {
+        userInfo[.profileId] = value
     }
 
-    func setProfileId(_ value: String) {
-        userInfo[Backend.profileIdUserInfoKey] = value
+    func setPlacementId(_ value: String) {
+        userInfo[.placementId] = value
+    }
+
+    package func enableEncodingViewConfiguration() {
+        userInfo[.enableEncodingViewConfiguration] = true
     }
 }
 
 extension [CodingUserInfoKey: Any] {
-    var isBackend: Bool {
-        self[Backend.isBackendCodableUserInfoKey] as? Bool ?? false
+    var enabledEncodingViewConfiguration: Bool {
+        self[.enableEncodingViewConfiguration] as? Bool ?? false
     }
 
     var profileId: String {
         get throws {
-            if let value = self[Backend.profileIdUserInfoKey] as? String {
+            if let value = self[.profileId] as? String {
                 return value
             }
 
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(Backend.profileIdUserInfoKey) parameter"))
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.profileId) parameter"))
+        }
+    }
+
+    var placementId: String {
+        get throws {
+            if let value = self[.placementId] as? String {
+                return value
+            }
+
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placementId) parameter"))
         }
     }
 }

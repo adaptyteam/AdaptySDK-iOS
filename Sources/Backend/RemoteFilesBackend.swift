@@ -1,5 +1,5 @@
 //
-//  FallbackBackend.swift
+//  RemoteFilesBackend.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FallbackBackend: HTTPCodableConfiguration {
+struct RemoteFilesBackend: HTTPCodableConfiguration {
     let baseURL: URL
     let sessionConfiguration: URLSessionConfiguration
 

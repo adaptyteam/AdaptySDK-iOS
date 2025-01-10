@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol CodingUserInfoСontainer: AnyObject {
+package protocol CodingUserInfoСontainer: AnyObject {
     var userInfo: [CodingUserInfoKey: Any] { get set }
 }
 

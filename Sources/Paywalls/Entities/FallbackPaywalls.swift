@@ -123,8 +123,6 @@ extension FallbackPaywalls {
 }
 
 extension FallbackPaywalls {
-    static let placementIdUserInfoKey = CodingUserInfoKey(rawValue: "adapty_placement_id")!
-
     static func decoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         Backend.configure(jsonDecoder: decoder)
@@ -139,19 +137,7 @@ extension FallbackPaywalls {
 
     static func decoder(profileId: String, placementId: String) -> JSONDecoder {
         let decoder = decoder(profileId: profileId)
-        decoder.userInfo[FallbackPaywalls.placementIdUserInfoKey] = placementId
+        decoder.setPlacementId(placementId)
         return decoder
-    }
-}
-
-private extension [CodingUserInfoKey: Any] {
-    var placementId: String {
-        get throws {
-            if let value = self[FallbackPaywalls.placementIdUserInfoKey] as? String {
-                return value
-            }
-
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(FallbackPaywalls.placementIdUserInfoKey) parameter"))
-        }
     }
 }

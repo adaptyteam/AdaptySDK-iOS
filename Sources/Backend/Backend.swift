@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct Backend: HTTPCodableConfiguration {
+package struct Backend: HTTPCodableConfiguration {
     let baseURL: URL
     let sessionConfiguration: URLSessionConfiguration
-    let fallback: FallbackBackend
-    let configs: FallbackBackend
+    let fallback: RemoteFilesBackend
+    let configs: RemoteFilesBackend
 
     let defaultEncodedContentType = "application/vnd.api+json"
 
@@ -39,13 +39,13 @@ struct Backend: HTTPCodableConfiguration {
 
         self.baseURL = baseUrls.baseUrl
 
-        self.fallback = FallbackBackend(
+        self.fallback = RemoteFilesBackend(
             apiKey: apiKey,
             baseURL: baseUrls.fallbackUrl,
             withProxy: baseUrls.proxy
         )
 
-        self.configs = FallbackBackend(
+        self.configs = RemoteFilesBackend(
             apiKey: apiKey,
             baseURL: baseUrls.configsUrl,
             withProxy: baseUrls.proxy
