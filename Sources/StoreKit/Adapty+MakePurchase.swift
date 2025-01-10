@@ -18,8 +18,8 @@ public extension Adapty {
     /// - Throws: An ``AdaptyError`` object
     @available(visionOS, unavailable)
     nonisolated static func makePurchase(
-        product: AdaptyPaywallProduct
-//        confirmIn viewController: UIViewController? = nil
+        product: AdaptyPaywallProduct,
+        confirmIn viewController: UIViewController? = nil
     ) async throws -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
@@ -27,7 +27,7 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
-//                "view_controller_available": viewController != nil,
+                "view_controller_available": viewController != nil,
             ]
         ) { sdk in
 
@@ -45,8 +45,7 @@ public extension Adapty {
             return try await manager.makePurchase(
                 profileId: sdk.profileStorage.profileId,
                 product: product,
-                confirmIn: nil
-//                confirmIn: viewController
+                confirmIn: viewController
             )
         }
     }
