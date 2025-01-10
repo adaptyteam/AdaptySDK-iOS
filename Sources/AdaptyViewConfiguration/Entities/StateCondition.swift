@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package enum StateCondition: Sendable {
+package extension AdaptyViewConfiguration {
+    enum StateCondition: Sendable {
         case selectedSection(id: String, index: Int)
         case selectedProduct(id: String, groupId: String)
     }
@@ -29,7 +29,7 @@ extension AdaptyViewConfiguration.StateCondition: Hashable {
     }
 }
 
-extension AdaptyViewConfiguration.StateCondition: Decodable {
+extension AdaptyViewConfiguration.StateCondition: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case productId = "product_id"
@@ -58,6 +58,22 @@ extension AdaptyViewConfiguration.StateCondition: Decodable {
                 id: container.decode(String.self, forKey: .productId),
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyViewSource.StringId.Product.defaultProductGroupId
             )
+        }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case let .selectedSection(sectionId, index):
+            try container.encode(Types.selectedSection.rawValue, forKey: .type)
+            try container.encode(sectionId, forKey: .sectionId)
+            try container.encode(index, forKey: .index)
+        case let .selectedProduct(productId, groupId):
+            try container.encode(Types.selectedProduct.rawValue, forKey: .type)
+            try container.encode(productId, forKey: .productId)
+            if groupId != AdaptyViewSource.StringId.Product.defaultProductGroupId {
+                try container.encode(groupId, forKey: .groupId)
+            }
         }
     }
 }

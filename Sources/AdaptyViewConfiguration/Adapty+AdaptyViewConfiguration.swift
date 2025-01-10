@@ -30,10 +30,11 @@ extension Adapty {
 
         let viewConfiguration: AdaptyViewSource =
             switch container {
-            case let .data(value):
-                value
-            case let .withoutData(locale, _):
-                if let value = restoreViewConfiguration(locale, paywall) {
+            case let .value(value): value
+            case let .json(locale, _, json):
+                if let value = try? json.map(AdaptyViewSource.init) {
+                    value
+                } else if let value = restoreViewConfiguration(locale, paywall) {
                     value
                 } else {
                     try await fetchViewConfiguration(
@@ -66,10 +67,10 @@ extension Adapty {
             paywall.revision == cached.revision,
             paywall.version == cached.version,
             let cachedViewConfiguration = cached.viewConfiguration,
-            case let .data(data) = cachedViewConfiguration
+            case let .value(value) = cachedViewConfiguration
         else { return nil }
 
-        return data
+        return value
     }
 
     private func fetchViewConfiguration(

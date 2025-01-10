@@ -26,7 +26,7 @@ import Foundation
                 .mapValues { AdaptyViewSource.Asset.filling($0) }
 
             let assets = Dictionary(
-                images.map { ($0, AdaptyViewSource.Asset.image(.resources($0))) }
+                images.map { ($0, AdaptyViewSource.Asset.image(.custom($0))) }
             ) { current, _ in current }
                 .merging(colors) { current, _ in current }
 
@@ -49,6 +49,7 @@ import Foundation
 
             return try AdaptyViewSource(
                 id: UUID().uuidString,
+                formatVersion: AdaptyViewConfiguration.formatVersion,
                 templateId: templateId,
                 templateRevision: 0,
                 assets: assets,

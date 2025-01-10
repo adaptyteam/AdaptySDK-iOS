@@ -81,17 +81,17 @@ package extension AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling> 
     }
 }
 
-extension AdaptyViewConfiguration.Filling: Decodable {
+extension AdaptyViewConfiguration.Filling: Codable {
     static func assetType(_ type: String) -> Bool {
         type == AdaptyViewConfiguration.Color.assetType || AdaptyViewConfiguration.ColorGradient.assetType(type)
     }
 
-    package init(from decoder: Decoder) throws {
-        enum CodingKeys: String, CodingKey {
-            case type
-            case value
-        }
+    private enum CodingKeys: String, CodingKey {
+        case type
+        case value
+    }
 
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         switch try container.decode(String.self, forKey: .type) {
@@ -101,6 +101,17 @@ extension AdaptyViewConfiguration.Filling: Decodable {
             self = try .colorGradient(AdaptyViewConfiguration.ColorGradient(from: decoder))
         default:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.type], debugDescription: "unknown color assset type"))
+        }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        switch self {
+        case let .solidColor(color):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(AdaptyViewConfiguration.Color.assetType, forKey: .type)
+            try container.encode(color, forKey: .value)
+        case let .colorGradient(gradient):
+            try gradient.encode(to: encoder)
         }
     }
 }

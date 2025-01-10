@@ -7,22 +7,22 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package enum Transition: Sendable {
+package extension AdaptyViewConfiguration {
+    enum Transition: Sendable {
         case fade(TransitionFade)
         case unknown(String)
 
-        package enum Interpolator: Sendable, Hashable {
-            static let `default`: AdaptyViewConfiguration.Transition.Interpolator = .easeInOut
+        package enum Interpolator: String {
+            static let `default` = Self.easeInOut
 
-            case easeInOut
-            case easeIn
-            case easeOut
+            case easeInOut = "ease_in_out"
+            case easeIn = "ease_in"
+            case easeOut = "ease_out"
             case linear
         }
     }
 
-    package struct TransitionFade: Sendable, Hashable {
+    struct TransitionFade: Sendable, Hashable {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultDuration: TimeInterval = 0.3
         static let defaultInterpolator = AdaptyViewConfiguration.Transition.Interpolator.default
@@ -62,7 +62,7 @@ extension AdaptyViewConfiguration.Transition: Hashable {
     }
 #endif
 
-extension AdaptyViewConfiguration.Transition: Decodable {
+extension AdaptyViewConfiguration.Transition: Codable {
     enum CodingKeys: String, CodingKey {
         case type
     }
@@ -81,35 +81,23 @@ extension AdaptyViewConfiguration.Transition: Decodable {
             self = try .fade(AdaptyViewConfiguration.TransitionFade(from: decoder))
         }
     }
-}
 
-extension AdaptyViewConfiguration.Transition.Interpolator: Decodable {
-    enum Values: String {
-        case easeInOut = "ease_in_out"
-        case easeIn = "ease_in"
-        case easeOut = "ease_out"
-        case linear
-    }
-
-    package init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        switch try Values(rawValue: container.decode(String.self)) {
-        case .none:
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "unknown value"))
-        case .easeInOut:
-            self = .easeInOut
-        case .easeIn:
-            self = .easeIn
-        case .easeOut:
-            self = .easeOut
-        case .linear:
-            self = .linear
+    package func encode(to encoder: any Encoder) throws {
+        switch self {
+        case let .fade(fade):
+            try fade.encode(to: encoder)
+        case let .unknown(value):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(value, forKey: .type)
         }
     }
 }
 
-extension AdaptyViewConfiguration.TransitionFade: Decodable {
+extension AdaptyViewConfiguration.Transition.Interpolator: Codable {}
+
+extension AdaptyViewConfiguration.TransitionFade: Codable {
     enum CodingKeys: String, CodingKey {
+        case type
         case startDelay = "start_delay"
         case duration
         case interpolator
@@ -121,5 +109,23 @@ extension AdaptyViewConfiguration.TransitionFade: Decodable {
         startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyViewConfiguration.TransitionFade.defaultStartDelay
         duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyViewConfiguration.TransitionFade.defaultDuration
         interpolator = try (container.decodeIfPresent(AdaptyViewConfiguration.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyViewConfiguration.TransitionFade.defaultInterpolator
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode("fade", forKey: .type)
+
+        if startDelay != Self.defaultStartDelay {
+            try container.encode(startDelay * 1000, forKey: .startDelay)
+        }
+
+        if duration != Self.defaultDuration {
+            try container.encode(duration * 1000, forKey: .duration)
+        }
+
+        if interpolator != Self.defaultInterpolator {
+            try container.encode(interpolator, forKey: .interpolator)
+        }
     }
 }

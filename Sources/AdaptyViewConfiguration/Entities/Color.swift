@@ -31,11 +31,17 @@ package extension AdaptyViewConfiguration {
     }
 #endif
 
-extension AdaptyViewConfiguration.Color: Decodable {
+extension AdaptyViewConfiguration.Color: Codable {
     static let assetType = "color"
+
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let hex = try container.decode(String.self)
         try self.init(hex: hex)
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(asHexString)
     }
 }

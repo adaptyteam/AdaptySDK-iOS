@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package enum ShapeType: Sendable {
+package extension AdaptyViewConfiguration {
+    enum ShapeType: Sendable {
         case rectangle(cornerRadius: CornerRadius)
         case circle
         case curveUp
@@ -32,7 +32,7 @@ extension AdaptyViewConfiguration.ShapeType: Hashable {
     }
 }
 
-extension AdaptyViewConfiguration.ShapeType: Decodable {
+extension AdaptyViewConfiguration.ShapeType: Codable {
     enum Types: String {
         case circle
         case rectangle = "rect"
@@ -53,6 +53,20 @@ extension AdaptyViewConfiguration.ShapeType: Decodable {
             self = .rectangle(cornerRadius: AdaptyViewConfiguration.CornerRadius.zero)
         case .circle:
             self = .circle
+        }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .rectangle:
+            try container.encode(Self.Types.rectangle.rawValue)
+        case .circle:
+            try container.encode(Self.Types.circle.rawValue)
+        case .curveUp:
+            try container.encode(Self.Types.curveUp.rawValue)
+        case .curveDown:
+            try container.encode(Self.Types.curveDown.rawValue)
         }
     }
 }

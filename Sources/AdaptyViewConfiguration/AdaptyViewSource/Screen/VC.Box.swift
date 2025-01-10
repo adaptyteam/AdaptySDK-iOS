@@ -30,7 +30,7 @@ extension AdaptyViewSource.Localizer {
     }
 }
 
-extension AdaptyViewSource.Box: Decodable {
+extension AdaptyViewSource.Box: Codable {
     enum CodingKeys: String, CodingKey {
         case width
         case height
@@ -49,9 +49,22 @@ extension AdaptyViewSource.Box: Decodable {
             content: container.decodeIfPresent(AdaptyViewSource.Element.self, forKey: .content)
         )
     }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(width, forKey: .width)
+        try container.encodeIfPresent(height, forKey: .height)
+        if horizontalAlignment != .center {
+            try container.encode(horizontalAlignment, forKey: .horizontalAlignment)
+        }
+        if verticalAlignment != .center {
+            try container.encode(verticalAlignment, forKey: .verticalAlignment)
+        }
+        try container.encodeIfPresent(content, forKey: .content)
+    }
 }
 
-extension AdaptyViewConfiguration.Box.Length: Decodable {
+extension AdaptyViewConfiguration.Box.Length: Codable {
     enum CodingKeys: String, CodingKey {
         case min
         case shrink
@@ -72,6 +85,22 @@ extension AdaptyViewConfiguration.Box.Length: Decodable {
             } else {
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "don't found fill_max:true or min"))
             }
+        }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        switch self {
+        case .fixed(let unit):
+            try unit.encode(to: encoder)
+        case .min(let unit):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(unit, forKey: .min)
+        case .shrink(let unit):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(unit, forKey: .shrink)
+        case .fillMax:
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(true, forKey: .fillMax)
         }
     }
 }

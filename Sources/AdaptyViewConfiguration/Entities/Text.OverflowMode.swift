@@ -8,14 +8,14 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration.Text {
-    package enum OverflowMode: String {
+package extension AdaptyViewConfiguration.Text {
+    enum OverflowMode: String {
         case scale
         case unknown
     }
 }
 
-extension AdaptyViewConfiguration.Text.OverflowMode: Decodable {
+extension AdaptyViewConfiguration.Text.OverflowMode: Codable {
     package init(from decoder: Decoder) throws {
         self =
             switch try decoder.singleValueContainer().decode(String.self) {
@@ -24,5 +24,15 @@ extension AdaptyViewConfiguration.Text.OverflowMode: Decodable {
             default:
                 .unknown
             }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .scale:
+            try container.encode("scale")
+        case .unknown:
+            try container.encode("unknown")
+        }
     }
 }

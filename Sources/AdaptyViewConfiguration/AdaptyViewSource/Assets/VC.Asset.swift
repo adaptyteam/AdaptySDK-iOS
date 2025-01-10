@@ -157,7 +157,7 @@ extension AdaptyViewSource.Asset: Hashable {
     }
 }
 
-extension AdaptyViewSource.Asset: Decodable {
+extension AdaptyViewSource.Asset: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case type
@@ -184,28 +184,63 @@ extension AdaptyViewSource.Asset: Decodable {
             self = .unknown("asset.type: \(type)")
         }
     }
+
+    func encode(to encoder: any Encoder) throws {
+        switch self {
+        case let .filling(value):
+            try value.encode(to: encoder)
+        case let .image(data):
+            try data.encode(to: encoder)
+        case let .video(data):
+            try data.encode(to: encoder)
+        case let .font(data):
+            try data.encode(to: encoder)
+        case .unknown:
+            break
+        }
+    }
 }
 
 extension AdaptyViewSource {
-    struct AssetsContainer: Decodable {
+    struct AssetsContainer: Codable {
         let value: [String: Asset]
 
+        init(value: [String: Asset]) {
+            self.value = value
+        }
+
         init(from decoder: Decoder) throws {
-            struct Item: Decodable {
-                let id: String
-                let value: Asset
-
-                init(from decoder: Decoder) throws {
-                    let container = try decoder.container(keyedBy: Asset.CodingKeys.self)
-                    id = try container.decode(String.self, forKey: .id)
-                    value = try decoder.singleValueContainer().decode(Asset.self)
-                }
-            }
-
             let array = try decoder.singleValueContainer().decode([Item].self)
             value = try [String: Asset](array.map { ($0.id, $0.value) }, uniquingKeysWith: { _, _ in
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate key"))
             })
+        }
+
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(value.map(Item.init))
+        }
+
+        private struct Item: Codable {
+            let id: String
+            let value: Asset
+
+            init(id: String, value: Asset) {
+                self.id = id
+                self.value = value
+            }
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: Asset.CodingKeys.self)
+                id = try container.decode(String.self, forKey: .id)
+                value = try Asset(from: decoder)
+            }
+
+            func encode(to encoder: any Encoder) throws {
+                try value.encode(to: encoder)
+                var container = encoder.container(keyedBy: Asset.CodingKeys.self)
+                try container.encode(id, forKey: .id)
+            }
         }
     }
 }

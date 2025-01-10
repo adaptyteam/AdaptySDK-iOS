@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct CornerRadius: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct CornerRadius: Sendable, Hashable {
         static let defaultValue: Double = 0.0
         package let topLeading: Double
         package let topTrailing: Double
@@ -48,22 +48,22 @@ extension AdaptyViewConfiguration {
     }
 #endif
 
-extension AdaptyViewConfiguration.CornerRadius {
-    package static let zero = AdaptyViewConfiguration.CornerRadius(same: 0.0)
-    package init(same value: Double) {
+package extension AdaptyViewConfiguration.CornerRadius {
+    static let zero = AdaptyViewConfiguration.CornerRadius(same: 0.0)
+    init(same value: Double) {
         self.init(topLeading: value, topTrailing: value, bottomTrailing: value, bottomLeading: value)
     }
 
-    package var isZeroRadius: Bool {
+    var isZeroRadius: Bool {
         topLeading == 0.0 && topTrailing == 0.0 && bottomTrailing == 0.0 && bottomLeading == 0.0
     }
 
-    package var isSameRadius: Bool {
+    var isSameRadius: Bool {
         (topLeading == topTrailing) && (bottomLeading == bottomTrailing) && (topLeading == bottomLeading)
     }
 }
 
-extension AdaptyViewConfiguration.CornerRadius: Decodable {
+extension AdaptyViewConfiguration.CornerRadius: Codable {
     enum CodingKeys: String, CodingKey {
         case topLeading = "top_leading"
         case topTrailing = "top_trailing"
@@ -94,5 +94,13 @@ extension AdaptyViewConfiguration.CornerRadius: Decodable {
                 bottomLeading: container.decodeIfPresent(Double.self, forKey: .bottomLeading) ?? defaultValue
             )
         }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if topLeading != Self.defaultValue { try container.encode(topLeading, forKey: .topLeading) }
+        if topTrailing != Self.defaultValue { try container.encode(topTrailing, forKey: .topTrailing) }
+        if bottomTrailing != Self.defaultValue { try container.encode(bottomTrailing, forKey: .bottomTrailing) }
+        if bottomLeading != Self.defaultValue { try container.encode(bottomLeading, forKey: .bottomLeading) }
     }
 }

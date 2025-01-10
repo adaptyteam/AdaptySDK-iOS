@@ -54,7 +54,7 @@ extension AdaptyViewSource.Localizer {
     }
 }
 
-extension AdaptyViewSource.Text: Decodable {
+extension AdaptyViewSource.Text: Codable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case horizontalAlign = "align"
@@ -75,5 +75,24 @@ extension AdaptyViewSource.Text: Decodable {
             }
         let textAttributes = try AdaptyViewSource.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        if let defaultTextAttributes = defaultTextAttributes, !defaultTextAttributes.isEmpty {
+            try defaultTextAttributes.encode(to: encoder)
+        }
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(stringId, forKey: .stringId)
+        if horizontalAlign != .leading {
+            try container.encode(horizontalAlign, forKey: .horizontalAlign)
+        }
+        try container.encodeIfPresent(maxRows, forKey: .maxRows)
+        if let first = overflowMode.first {
+            if overflowMode.count == 1 {
+                try container.encode(first, forKey: .overflowMode)
+            } else {
+                try container.encode(overflowMode, forKey: .overflowMode)
+            }
+        }
     }
 }

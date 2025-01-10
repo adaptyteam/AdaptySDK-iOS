@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct EdgeInsets: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct EdgeInsets: Sendable, Hashable {
         package static let zero = AdaptyViewConfiguration.EdgeInsets(same: .point(0.0))
         static let defaultValue: AdaptyViewConfiguration.Unit = .point(0.0)
 
@@ -53,7 +53,7 @@ extension AdaptyViewConfiguration.EdgeInsets {
     }
 }
 
-extension AdaptyViewConfiguration.EdgeInsets: Decodable {
+extension AdaptyViewConfiguration.EdgeInsets: Codable {
     enum CodingKeys: String, CodingKey {
         case top
         case leading
@@ -83,5 +83,21 @@ extension AdaptyViewConfiguration.EdgeInsets: Decodable {
                 bottom: container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .bottom) ?? defaultValue
             )
         }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        if case .point(let value) = leading, value == 0 {} else
+        { try container.encode(leading, forKey: .leading) }
+
+        if case .point(let value) = top, value == 0 {} else
+        { try container.encode(leading, forKey: .top) }
+
+        if case .point(let value) = trailing, value == 0 {} else
+        { try container.encode(leading, forKey: .trailing) }
+
+        if case .point(let value) = bottom, value == 0 {} else
+        { try container.encode(leading, forKey: .bottom) }
     }
 }

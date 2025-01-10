@@ -7,18 +7,18 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct Point: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct Point: Sendable, Hashable {
         package let x: Double
         package let y: Double
     }
 }
 
-extension AdaptyViewConfiguration.Point {
-    package static let zero = AdaptyViewConfiguration.Point(x: 0.0, y: 0.0)
-    package static let one = AdaptyViewConfiguration.Point(x: 1.0, y: 1.0)
+package extension AdaptyViewConfiguration.Point {
+    static let zero = AdaptyViewConfiguration.Point(x: 0.0, y: 0.0)
+    static let one = AdaptyViewConfiguration.Point(x: 1.0, y: 1.0)
 
-    package var isZero: Bool {
+    var isZero: Bool {
         x == 0.0 && y == 0.0
     }
 }
@@ -37,7 +37,7 @@ extension AdaptyViewConfiguration.Point {
     }
 #endif
 
-extension AdaptyViewConfiguration.Point: Decodable {
+extension AdaptyViewConfiguration.Point: Codable {
     enum CodingKeys: String, CodingKey {
         case x
         case y
@@ -46,7 +46,7 @@ extension AdaptyViewConfiguration.Point: Decodable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Double.self) {
-            self.init(x: 0.0, y: value)
+            self.init(x: value, y: value)
         } else if let values = try? container.decode([Double].self) {
             switch values.count {
             case 0: self.init(x: 0.0, y: 0.0)
@@ -59,6 +59,15 @@ extension AdaptyViewConfiguration.Point: Decodable {
                 x: container.decodeIfPresent(Double.self, forKey: .x) ?? 0.0,
                 y: container.decodeIfPresent(Double.self, forKey: .y) ?? 0.0
             )
+        }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        if x == y {
+            try container.encode(x)
+        } else {
+            try container.encode([y, x])
         }
     }
 }

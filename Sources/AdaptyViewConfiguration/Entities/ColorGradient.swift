@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct ColorGradient: Hashable, Sendable {
+package extension AdaptyViewConfiguration {
+    struct ColorGradient: Hashable, Sendable {
         package let kind: Kind
         package let start: Point
         package let end: Point
@@ -16,13 +16,13 @@ extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.ColorGradient {
-    package struct Item: Hashable, Sendable {
+package extension AdaptyViewConfiguration.ColorGradient {
+    struct Item: Hashable, Sendable {
         package let color: AdaptyViewConfiguration.Color
         package let p: Double
     }
 
-    package enum Kind {
+    enum Kind {
         case linear
         case conic
         case radial
@@ -59,7 +59,7 @@ extension AdaptyViewConfiguration.ColorGradient {
     }
 #endif
 
-extension AdaptyViewConfiguration.ColorGradient: Decodable {
+extension AdaptyViewConfiguration.ColorGradient: Codable {
     static func assetType(_ type: String) -> Bool {
         ContentType(rawValue: type) != nil
     }
@@ -75,6 +75,13 @@ extension AdaptyViewConfiguration.ColorGradient: Decodable {
         let y0: Double
         let x1: Double
         let y1: Double
+
+        init(start: AdaptyViewConfiguration.Point, end: AdaptyViewConfiguration.Point) {
+            x0 = start.x
+            y0 = start.y
+            x1 = end.x
+            y1 = end.y
+        }
 
         var start: AdaptyViewConfiguration.Point {
             AdaptyViewConfiguration.Point(x: x0, y: y0)
@@ -108,9 +115,24 @@ extension AdaptyViewConfiguration.ColorGradient: Decodable {
                 .linear
             }
     }
+
+    package func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(items, forKey: .items)
+        try container.encode(Points(start: start, end: end), forKey: .points)
+
+        switch kind {
+        case .radial:
+            try container.encode(AdaptyViewConfiguration.ColorGradient.ContentType.colorRadialGradient.rawValue, forKey: .type)
+        case .conic:
+            try container.encode(AdaptyViewConfiguration.ColorGradient.ContentType.colorConicGradient.rawValue, forKey: .type)
+        case .linear:
+            try container.encode(AdaptyViewConfiguration.ColorGradient.ContentType.colorLinearGradient.rawValue, forKey: .type)
+        }
+    }
 }
 
-extension AdaptyViewConfiguration.ColorGradient.Item: Decodable {
+extension AdaptyViewConfiguration.ColorGradient.Item: Codable {
     enum CodingKeys: String, CodingKey {
         case color
         case p
@@ -120,5 +142,11 @@ extension AdaptyViewConfiguration.ColorGradient.Item: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         color = try container.decode(AdaptyViewConfiguration.Color.self, forKey: .color)
         p = try container.decode(Double.self, forKey: .p)
+    }
+
+    package func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(color, forKey: .color)
+        try container.encode(p, forKey: .p)
     }
 }

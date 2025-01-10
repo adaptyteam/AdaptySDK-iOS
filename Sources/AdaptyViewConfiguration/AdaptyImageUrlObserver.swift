@@ -39,7 +39,7 @@ extension Adapty {
     }
 
     private static func sendImageUrlsToObserver(_ config: AdaptyPaywall.ViewConfiguration) {
-        guard case let .data(value) = config else { return }
+        guard case let .value(value) = config else { return }
         sendImageUrlsToObserver(value)
     }
 

@@ -15,4 +15,4 @@ extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.AspectRatio: Decodable {}
+extension AdaptyViewConfiguration.AspectRatio: Codable {}

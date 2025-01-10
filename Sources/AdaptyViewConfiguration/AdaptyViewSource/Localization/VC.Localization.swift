@@ -14,14 +14,14 @@ extension AdaptyViewSource {
         let strings: [String: Item]?
         let assets: [String: Asset]?
 
-        struct Item: Sendable, Hashable  {
+        struct Item: Sendable, Hashable {
             let value: RichText
             let fallback: RichText?
         }
     }
 }
 
-extension AdaptyViewSource.Localization: Decodable {
+extension AdaptyViewSource.Localization: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case strings
@@ -55,5 +55,25 @@ extension AdaptyViewSource.Localization: Decodable {
             )
         }
         self.strings = strings.isEmpty ? nil : strings
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encodeIfPresent(isRightToLeft, forKey: .isRightToLeft)
+
+        if let assets, !assets.isEmpty {
+            try container.encode(AdaptyViewSource.AssetsContainer(value: assets), forKey: .assets)
+        }
+
+        if let strings {
+            for (key, item) in strings {
+                var stringsContainer = container.nestedUnkeyedContainer(forKey: .strings)
+                var itemContainer = stringsContainer.nestedContainer(keyedBy: ItemCodingKeys.self)
+                try itemContainer.encode(key, forKey: .id)
+                try itemContainer.encode(item.value, forKey: .value)
+                try itemContainer.encodeIfPresent(item.fallback, forKey: .fallback)
+            }
+        }
     }
 }

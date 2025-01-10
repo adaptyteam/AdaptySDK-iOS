@@ -156,7 +156,7 @@ extension AdaptyViewSource.Localizer {
     }
 }
 
-extension AdaptyViewSource.Element: Decodable {
+extension AdaptyViewSource.Element: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case count
@@ -226,6 +226,10 @@ extension AdaptyViewSource.Element: Decodable {
             guard let value = try? Properties(from: decoder) else { return nil }
             return value.isZero ? nil : value
         }
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        // TODO: implement
     }
 }
 

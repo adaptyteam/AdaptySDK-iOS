@@ -8,8 +8,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct Pager: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct Pager: Sendable, Hashable {
         static let `default` = Pager(
             pageWidth: .default,
             pageHeight: .default,
@@ -32,21 +32,21 @@ extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.Pager {
-    package enum Length: Sendable {
+package extension AdaptyViewConfiguration.Pager {
+    enum Length: Sendable {
         static let `default` = Length.parent(1)
         case fixed(AdaptyViewConfiguration.Unit)
         case parent(Double)
     }
 
-    package enum InteractionBehaviour: String {
+    enum InteractionBehaviour: String {
         static let `default` = InteractionBehaviour.pauseAnimation
         case none
-        case cancelAnimation
-        case pauseAnimation
+        case cancelAnimation = "cancel_animation"
+        case pauseAnimation = "pause_animation"
     }
 
-    package struct PageControl: Sendable, Hashable {
+    struct PageControl: Sendable, Hashable {
         static let `default`: Self = .init(
             layout: .stacked,
             verticalAlignment: .bottom,
@@ -71,7 +71,7 @@ extension AdaptyViewConfiguration.Pager {
         package let selectedColor: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Color>
     }
 
-    package struct Animation: Sendable, Hashable {
+    struct Animation: Sendable, Hashable {
         static let defaultStartDelay: TimeInterval = 0.0
         static let defaultAfterInteractionDelay: TimeInterval = 3.0
 
@@ -159,21 +159,11 @@ extension AdaptyViewConfiguration.Pager.Length: Hashable {
     }
 #endif
 
-extension AdaptyViewConfiguration.Pager.InteractionBehaviour: Decodable {
-    package init(from decoder: Decoder) throws {
-        self =
-            switch try decoder.singleValueContainer().decode(String.self) {
-            case "none": .none
-            case "cancel_animation": .cancelAnimation
-            case "pause_animation": .pauseAnimation
-            default: .default
-            }
-    }
-}
+extension AdaptyViewConfiguration.Pager.InteractionBehaviour: Codable {}
 
-extension AdaptyViewConfiguration.Pager.PageControl.Layout: Decodable {}
+extension AdaptyViewConfiguration.Pager.PageControl.Layout: Codable {}
 
-extension AdaptyViewConfiguration.Pager.Animation: Decodable {
+extension AdaptyViewConfiguration.Pager.Animation: Codable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"
         case pageTransition = "page_transition"
@@ -188,5 +178,18 @@ extension AdaptyViewConfiguration.Pager.Animation: Decodable {
         pageTransition = try container.decodeIfPresent(AdaptyViewConfiguration.TransitionSlide.self, forKey: .pageTransition) ?? AdaptyViewConfiguration.TransitionSlide.default
         repeatTransition = try container.decodeIfPresent(AdaptyViewConfiguration.TransitionSlide.self, forKey: .repeatTransition)
         afterInteractionDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyViewConfiguration.Pager.Animation.defaultAfterInteractionDelay
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        if startDelay != Self.defaultStartDelay {
+            try container.encode(startDelay * 1000, forKey: .startDelay)
+        }
+        try container.encode(pageTransition, forKey: .pageTransition)
+        try container.encodeIfPresent(repeatTransition, forKey: .repeatTransition)
+        if afterInteractionDelay != Self.defaultAfterInteractionDelay {
+            try container.encode(afterInteractionDelay * 1000, forKey: .afterInteractionDelay)
+        }
     }
 }

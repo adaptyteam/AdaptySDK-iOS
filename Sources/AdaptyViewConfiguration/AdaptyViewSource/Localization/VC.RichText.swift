@@ -24,8 +24,8 @@ extension AdaptyViewSource {
                 && txtColorAssetId == nil
                 && imgTintColorAssetId == nil
                 && backgroundAssetId == nil
-                && strike == nil
-                && underline == nil
+                && (strike ?? false) == false
+                && (underline ?? false) == false
         }
     }
 
@@ -45,7 +45,7 @@ extension AdaptyViewSource {
 
 extension AdaptyViewSource.Localizer {
     func urlIfPresent(_ stringId: String?) -> String? {
-        guard let stringId, let item = self.localization?.strings?[stringId] else { return nil }
+        guard let stringId, let item = localization?.strings?[stringId] else { return nil }
         return item.value.asString ?? item.fallback?.asString
     }
 
@@ -85,7 +85,7 @@ private extension AdaptyViewSource.RichText {
             case let .tag(value, attr):
                 .tag(value, attr.add(defaultTextAttributes).convert(localizer))
             case let .image(assetId, attr):
-                    .image(try? localizer.imageData(assetId), attr.add(defaultTextAttributes).convert(localizer))
+                .image(try? localizer.imageData(assetId), attr.add(defaultTextAttributes).convert(localizer))
             default:
                 nil
             }
@@ -160,7 +160,7 @@ extension AdaptyViewSource.RichText.Item: Hashable {
     }
 }
 
-extension AdaptyViewSource.RichText: Decodable {
+extension AdaptyViewSource.RichText: Codable {
     init(from decoder: Decoder) throws {
         items =
             if let value = try? Item(from: decoder) {
@@ -169,9 +169,20 @@ extension AdaptyViewSource.RichText: Decodable {
                 try [Item](from: decoder)
             }
     }
+
+    func encode(to encoder: any Encoder) throws {
+        let items = items.filter {
+            if case .unknown = $0 { false } else { true }
+        }
+        if items.count == 1 {
+            try items[0].encode(to: encoder)
+        } else {
+            try items.encode(to: encoder)
+        }
+    }
 }
 
-extension AdaptyViewSource.RichText.Item: Decodable {
+extension AdaptyViewSource.RichText.Item: Codable {
     enum CodingKeys: String, CodingKey {
         case text
         case tag
@@ -206,9 +217,37 @@ extension AdaptyViewSource.RichText.Item: Decodable {
                 .unknown
             }
     }
+
+    func encode(to encoder: any Encoder) throws {
+        switch self {
+        case let .text(text, attributes):
+            guard let attributes, !attributes.isEmpty else {
+                var container = encoder.singleValueContainer()
+                try container.encode(text)
+                return
+            }
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(text, forKey: .text)
+            try container.encode(attributes, forKey: .attributes)
+        case let .tag(tag, attributes):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(tag, forKey: .tag)
+            if let attributes, !attributes.isEmpty {
+                try container.encode(attributes, forKey: .attributes)
+            }
+        case let .image(image, attributes):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(image, forKey: .image)
+            if let attributes, !attributes.isEmpty {
+                try container.encode(attributes, forKey: .attributes)
+            }
+        case .unknown:
+            break
+        }
+    }
 }
 
-extension AdaptyViewSource.TextAttributes: Decodable {
+extension AdaptyViewSource.TextAttributes: Codable {
     enum CodingKeys: String, CodingKey {
         case size
         case fontAssetId = "font"

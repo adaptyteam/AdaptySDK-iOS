@@ -16,4 +16,4 @@ extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.VerticalAlignment: Decodable {}
+extension AdaptyViewConfiguration.VerticalAlignment: Codable {}

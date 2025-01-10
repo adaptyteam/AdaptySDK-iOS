@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Screen: Sendable, Hashable  {
+    struct Screen: Sendable, Hashable {
         let backgroundAssetId: String?
         let cover: Box?
         let content: Element
@@ -38,7 +38,7 @@ extension AdaptyViewSource.Localizer {
     }
 }
 
-extension AdaptyViewSource.Screen: Decodable {
+extension AdaptyViewSource.Screen: Codable {
     enum CodingKeys: String, CodingKey {
         case backgroundAssetId = "background"
         case cover

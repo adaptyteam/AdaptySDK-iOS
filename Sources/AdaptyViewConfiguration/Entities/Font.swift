@@ -7,15 +7,16 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct Font: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct Font: Sendable, Hashable {
+        static let defaultFontColor = Color.black
         package static let `default` = Font(
             alias: "adapty_system",
             familyName: "adapty_system",
             weight: 400,
             italic: false,
             defaultSize: 15,
-            defaultColor: .solidColor(.black)
+            defaultColor: .solidColor(defaultFontColor)
         )
 
         package let alias: String
@@ -49,10 +50,11 @@ extension AdaptyViewConfiguration {
     }
 #endif
 
-extension AdaptyViewConfiguration.Font: Decodable {
+extension AdaptyViewConfiguration.Font: Codable {
     static let assetType = "font"
-    
+
     enum CodingKeys: String, CodingKey {
+        case type
         case alias = "value"
         case familyName = "family_name"
         case weight
@@ -79,5 +81,27 @@ extension AdaptyViewConfiguration.Font: Decodable {
         defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? AdaptyViewConfiguration.Font.default.defaultSize
 
         defaultColor = try container.decodeIfPresent(AdaptyViewConfiguration.Color.self, forKey: .defaultColor).map { .solidColor($0) } ?? AdaptyViewConfiguration.Font.default.defaultColor
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(Self.assetType, forKey: .type)
+
+        try container.encode(alias, forKey: .alias)
+        if familyName != AdaptyViewConfiguration.Font.default.familyName {
+            try container.encode(familyName, forKey: .familyName)
+        }
+        if weight != AdaptyViewConfiguration.Font.default.weight {
+            try container.encode(weight, forKey: .weight)
+        }
+        if italic != AdaptyViewConfiguration.Font.default.italic {
+            try container.encode(italic, forKey: .italic)
+        }
+        if defaultSize != AdaptyViewConfiguration.Font.default.defaultSize {
+            try container.encode(defaultSize, forKey: .defaultSize)
+        }
+        if case let .solidColor(color) = defaultColor, AdaptyViewConfiguration.Font.defaultFontColor != color {
+            try container.encode(color, forKey: .defaultColor)
+        }
     }
 }

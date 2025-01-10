@@ -63,7 +63,7 @@ extension AdaptyViewSource.StringId: Hashable {
     }
 }
 
-extension AdaptyViewSource.StringId: Decodable {
+extension AdaptyViewSource.StringId: Codable {
     init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(String.self) {
             self = .basic(value)
@@ -78,9 +78,20 @@ extension AdaptyViewSource.StringId: Decodable {
 
         self = try .product(Product(from: decoder))
     }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        switch self {
+        case let .basic(string):
+            try container.encode(string)
+        case let .product(product):
+            try container.encode(product)
+        }
+    }
 }
 
-extension AdaptyViewSource.StringId.Product: Decodable {
+extension AdaptyViewSource.StringId.Product: Codable {
     static let typeValue = "product"
     enum CodingKeys: String, CodingKey {
         case type
@@ -99,5 +110,13 @@ extension AdaptyViewSource.StringId.Product: Decodable {
         adaptyProductId = try container.decodeIfPresent(String.self, forKey: .adaptyProductId)
         productGroupId = try container.decodeIfPresent(String.self, forKey: .productGroupId)
         suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(Self.typeValue, forKey: .type)
+        try container.encodeIfPresent(productGroupId, forKey: .productGroupId)
+        try container.encodeIfPresent(adaptyProductId, forKey: .adaptyProductId)
+        try container.encodeIfPresent(suffix, forKey: .suffix)
     }
 }

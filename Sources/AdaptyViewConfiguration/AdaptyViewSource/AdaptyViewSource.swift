@@ -9,6 +9,7 @@ import Foundation
 
 struct AdaptyViewSource: Sendable, Hashable {
     let id: String
+    let formatVersion: String
     let templateId: String
     let templateRevision: Int64
     let assets: [String: Asset]
@@ -23,19 +24,20 @@ struct AdaptyViewSource: Sendable, Hashable {
 
 extension AdaptyViewSource: CustomStringConvertible {
     var description: String {
-        "(id: \(id), templateId: \(templateId), templateRevision: \(templateRevision))"
+        "(id: \(id), formatVersion: \(formatVersion), templateId: \(templateId), templateRevision: \(templateRevision))"
     }
 }
 
-extension AdaptyViewSource: Decodable {
+extension AdaptyViewSource: Codable {
     enum ContainerCodingKeys: String, CodingKey {
         case container = "paywall_builder_config"
+        case json
         case responseLocale = "lang"
         case id = "paywall_builder_id"
     }
 
-    enum CodingKeys: String, CodingKey {
-        case format
+    private enum CodingKeys: String, CodingKey {
+        case formatVersion = "format"
         case templateId = "template_id"
         case templateRevision = "template_revision"
         case assets
@@ -55,6 +57,7 @@ extension AdaptyViewSource: Decodable {
 
         templateId = try container.decode(String.self, forKey: .templateId)
         templateRevision = try container.decode(Int64.self, forKey: .templateRevision)
+        formatVersion = try container.decode(String.self, forKey: .formatVersion)
 
         if container.contains(.products) {
             let products = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
@@ -89,5 +92,30 @@ extension AdaptyViewSource: Decodable {
         referencedElemnts = try [String: Element](screens.flatMap { $0.value.referencedElemnts }, uniquingKeysWith: { _, _ in
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate element_id"))
         })
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var superContainer = encoder.container(keyedBy: ContainerCodingKeys.self)
+        try superContainer.encode(id, forKey: .id)
+        try superContainer.encode(responseLocale, forKey: .responseLocale)
+
+        var container = superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
+        try container.encode(templateId, forKey: .templateId)
+        try container.encode(templateRevision, forKey: .templateRevision)
+        try container.encode(formatVersion, forKey: .formatVersion)
+
+        if !selectedProducts.isEmpty {
+            var products = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
+            try products.encode(selectedProducts, forKey: .selected)
+        }
+
+        try container.encode(AssetsContainer(value: assets), forKey: .assets)
+
+        try container.encode(Array(localizations.values), forKey: .localizations)
+        try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalization)
+
+        var screens = screens
+        screens[CodingKeys.defaultScreen.rawValue] = defaultScreen
+        try container.encode(screens, forKey: .screens)
     }
 }
