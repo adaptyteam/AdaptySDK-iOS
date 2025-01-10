@@ -150,8 +150,10 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
         self.loop = loop
 
         switch video {
-        case let .url(_, image), let .resources(_, image):
+        case let .url(_, image):
             self.placeholder = image
+        case let  .custom(_, image):
+            self.placeholder = .custom(image)
         }
     }
 
@@ -189,18 +191,18 @@ extension VC.VideoPlayer {
     private static let url3 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%203.mov?alt=media&token=ba0e2ec6-f81e-424f-84e6-e18617bedfbf")!
 
     static let test1 = VC.VideoPlayer.create(
-        asset: .same(.url(url1, image: .resources("video_preview_0"))),
+        asset: .same(.url(url1, image: .custom("video_preview_0"))),
         aspect: .stretch,
         loop: true
     )
 
     static let test2 = VC.VideoPlayer.create(
-        asset: .same(.url(url2, image: .resources("general-tab-icon"))),
+        asset: .same(.url(url2, image: .custom("general-tab-icon"))),
         aspect: .fit,
         loop: false
     )
     static let test3 = VC.VideoPlayer.create(
-        asset: .same(.url(url3, image: .resources("general-tab-icon"))),
+        asset: .same(.url(url3, image: .custom("general-tab-icon"))),
         aspect: .fill,
         loop: true
     )

@@ -20,20 +20,6 @@ package extension AdaptyViewConfiguration {
             default: nil
             }
         }
-
-        package var asColorGradient: AdaptyViewConfiguration.ColorGradient {
-            switch self {
-            case let .solidColor(value):
-                AdaptyViewConfiguration.ColorGradient(
-                    kind: .linear,
-                    start: .zero,
-                    end: .one,
-                    items: [.init(color: value, p: 0.5)]
-                )
-            case let .colorGradient(value):
-                value
-            }
-        }
     }
 }
 
@@ -68,15 +54,6 @@ package extension AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling> 
             .different(light: light, dark: dark)
         default:
             nil
-        }
-    }
-
-    var asColorGradient: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.ColorGradient> {
-        switch self {
-        case let .same(value):
-            .same(value.asColorGradient)
-        case let .different(light, dark):
-            .different(light: light.asColorGradient, dark: dark.asColorGradient)
         }
     }
 }

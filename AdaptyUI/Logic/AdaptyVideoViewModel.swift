@@ -115,7 +115,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
             playerItemToObserve = playerItem
 
             queuePlayer.play()
-        case .resources:
+        case .custom:
             playerItemToObserve = nil
         }
 

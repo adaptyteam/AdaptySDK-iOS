@@ -89,7 +89,7 @@ struct AdaptyUIImageView: View {
         tint: VC.Filling?
     ) -> some View {
         switch asset {
-        case let .resources(name):
+        case let .custom(name):
             rasterImage(UIImage(named: name), aspect: aspect, tint: tint)
         case let .raster(data):
             rasterImage(UIImage(data: data), aspect: aspect, tint: tint)
