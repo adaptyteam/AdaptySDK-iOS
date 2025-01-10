@@ -28,7 +28,7 @@ actor SK2Purchaser {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *), !isObservingStarted else {
             return nil
         }
-        
+
         Task {
             for await verificationResult in SK2Transaction.updates {
                 switch verificationResult {
@@ -38,10 +38,10 @@ actor SK2Purchaser {
                     continue
                 case let .verified(sk2Transaction):
                     log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
-                                        
+
                     Task.detached {
                         let (variationId, persistentVariationId) = await storage.getVariationIds(for: sk2Transaction.productID)
-                        
+
                         let purchasedTransaction = await productsManager.fillPurchasedTransaction(
                             variationId: variationId,
                             persistentVariationId: persistentVariationId,
@@ -54,14 +54,14 @@ actor SK2Purchaser {
                                 transaction: purchasedTransaction,
                                 reason: .sk2Updates
                             )
-                            
+
                             await sk2Transaction.finish()
-                            
+
                             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                                 methodName: .finishTransaction,
                                 params: sk2Transaction.logParams
                             ))
-                            
+
                             log.info("Updated transaction: \(sk2Transaction) for product: \(sk2Transaction.productID)")
                         } catch {
                             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Transaction.productID)")
@@ -72,7 +72,7 @@ actor SK2Purchaser {
         }
 
         isObservingStarted = true
-        
+
         return SK2Purchaser(
             purchaseValidator: purchaseValidator,
             storage: storage
@@ -81,7 +81,8 @@ actor SK2Purchaser {
 
     func makePurchase(
         profileId: String,
-        product: AdaptyPaywallProduct
+        product: AdaptyPaywallProduct,
+        confirmIn viewController: UIViewController?
     ) async throws -> AdaptyPurchaseResult {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2Product = product.sk2Product
@@ -134,7 +135,7 @@ actor SK2Purchaser {
 
         await storage.setVariationIds(product.variationId, for: sk2Product.id)
 
-        let result = try await makePurchase(sk2Product, options, product.variationId)
+        let result = try await makePurchase(sk2Product, confirmIn: viewController, options, product.variationId)
 
         switch result {
         case .pending:
@@ -150,6 +151,7 @@ actor SK2Purchaser {
     @available(visionOS, unavailable)
     private func makePurchase(
         _ sk2Product: SK2Product,
+        confirmIn viewController: UIViewController?,
         _ options: Set<Product.PurchaseOption>,
         _ variationId: String?
     ) async throws -> AdaptyPurchaseResult {
@@ -165,7 +167,7 @@ actor SK2Purchaser {
 
         let purchaseResult: Product.PurchaseResult
         do {
-            purchaseResult = try await sk2Product.purchase(options: options)
+            purchaseResult = try await sk2Product.unfPurchase(confirmIn: viewController, options: options)
         } catch {
             await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,

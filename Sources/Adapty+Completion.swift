@@ -275,10 +275,14 @@ public extension Adapty {
     @available(visionOS, unavailable)
     nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
+//        confirmIn viewController: UIViewController? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         withCompletion(completion) {
-            try await makePurchase(product: product)
+            try await makePurchase(
+                product: product
+//                confirmIn: viewController
+            )
         }
     }
 

@@ -17,7 +17,7 @@ extension SK2Product {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             return priceFormatStyle.currencyCode
         }
-
+        
         guard let decoded = try? JSONSerialization.jsonObject(with: jsonRepresentation),
               let dict = decoded as? [String: Any],
               let attributes = dict["attributes"] as? [String: Any],
@@ -26,24 +26,36 @@ extension SK2Product {
         else {
             return nil
         }
-
+        
         return code
     }
-
+    
     @inlinable
     var unfPriceLocale: Locale {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             return priceFormatStyle.locale
         }
-
+        
         return .autoupdatingCurrent
     }
-
+    
     @inlinable
     var unfPeriodLocale: Locale {
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             return subscriptionPeriodFormatStyle.locale
         }
         return .autoupdatingCurrent
+    }
+    
+    func unfPurchase(confirmIn viewController: UIViewController?, options: Set<Product.PurchaseOption> = []) async throws -> PurchaseResult {
+#if (os(iOS) || os(tvOS)) && compiler(>=6.0.3)
+        if #available(iOS 18.2, tvOS 18.2, visionOS 2.2, *), let viewController {
+            try await purchase(confirmIn: viewController, options: options)
+        } else {
+            try await purchase(options: options)
+        }
+#else
+        try await purchase(options: options)
+#endif
     }
 }
