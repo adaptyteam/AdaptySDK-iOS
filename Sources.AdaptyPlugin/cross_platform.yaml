@@ -790,9 +790,11 @@ $defs:
     required:
       - paywall_builder_id
       - lang
+      # - json
     properties:
       paywall_builder_id: { type: string }
       lang: { $ref: "#/$defs/AdaptyLocale" }
+      json: { type: string }
 
   AdaptySubscriptionPeriod: #response
     type: object
