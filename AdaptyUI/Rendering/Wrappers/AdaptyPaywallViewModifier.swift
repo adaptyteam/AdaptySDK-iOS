@@ -12,6 +12,96 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
+public struct AdaptyPaywallView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+
+    private let paywallConfiguration: AdaptyUI.PaywallConfiguration
+
+    var didPerformAction: ((AdaptyUI.Action) -> Void)?
+    var didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
+    var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
+    var didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
+    var didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
+    var didStartRestore: (() -> Void)?
+    var didFinishRestore: ((AdaptyProfile) -> Void)?
+    var didFailRestore: ((AdaptyError) -> Void)?
+    var didFailRendering: ((AdaptyError) -> Void)?
+    var didFailLoadingProducts: ((AdaptyError) -> Bool)?
+    var didPartiallyLoadProducts: (([String]) -> Void)?
+
+    public init(
+        paywallConfiguration: AdaptyUI.PaywallConfiguration,
+        didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
+        didSelectProduct: ((AdaptyProduct) -> Void)? = nil,
+        didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
+        didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
+        didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
+        didStartRestore: (() -> Void)? = nil,
+        didFinishRestore: @escaping (AdaptyProfile) -> Void,
+        didFailRestore: @escaping (AdaptyError) -> Void,
+        didFailRendering: @escaping (AdaptyError) -> Void,
+        didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil
+    ) {
+        self.paywallConfiguration = paywallConfiguration
+
+        self.didPerformAction = didPerformAction
+        self.didSelectProduct = didSelectProduct
+        self.didStartPurchase = didStartPurchase
+        self.didFinishPurchase = didFinishPurchase
+        self.didFailPurchase = didFailPurchase
+        self.didStartRestore = didStartRestore
+        self.didFinishRestore = didFinishRestore
+        self.didFailRestore = didFailRestore
+        self.didFailRendering = didFailRendering
+        self.didFailLoadingProducts = didFailLoadingProducts
+    }
+
+    public var body: some View {
+        paywallConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { action in
+            switch action {
+            case .close:
+                presentationMode.wrappedValue.dismiss()
+            case let .openURL(url):
+                UIApplication.shared.open(url, options: [:])
+            case .custom:
+                break
+            }
+        }
+        paywallConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
+        paywallConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
+        paywallConfiguration.eventsHandler.didFinishPurchase = didFinishPurchase ?? { _, res in
+            if !res.isPurchaseCancelled {
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
+        paywallConfiguration.eventsHandler.didFailPurchase = didFailPurchase
+        paywallConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
+        paywallConfiguration.eventsHandler.didFinishRestore = didFinishRestore
+        paywallConfiguration.eventsHandler.didFailRestore = didFailRestore
+        paywallConfiguration.eventsHandler.didFailRendering = didFailRendering
+        paywallConfiguration.eventsHandler.didFailLoadingProducts = didFailLoadingProducts ?? { _ in true }
+
+        return AdaptyPaywallView_Internal(
+            showDebugOverlay: false
+        )
+        .environmentObject(paywallConfiguration.eventsHandler)
+        .environmentObject(paywallConfiguration.paywallViewModel)
+        .environmentObject(paywallConfiguration.productsViewModel)
+        .environmentObject(paywallConfiguration.actionsViewModel)
+        .environmentObject(paywallConfiguration.sectionsViewModel)
+        .environmentObject(paywallConfiguration.tagResolverViewModel)
+        .environmentObject(paywallConfiguration.timerViewModel)
+        .environmentObject(paywallConfiguration.screensViewModel)
+        .environmentObject(paywallConfiguration.videoViewModel)
+        .onAppear {
+            paywallConfiguration.eventsHandler.viewDidAppear()
+            paywallConfiguration.paywallViewModel.logShowPaywall()
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Identifiable {
     @Environment(\.presentationMode) private var presentationMode
 

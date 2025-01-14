@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		744FE9E42C64C9E600E2BCBB /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 744FE9E32C64C9E600E2BCBB /* Adapty */; };
 		744FE9E62C64C9E600E2BCBB /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 744FE9E52C64C9E600E2BCBB /* AdaptyUI */; };
+		745996772D3687900060BD6C /* PaywallNavigationLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745996762D3687900060BD6C /* PaywallNavigationLink.swift */; };
 		74DD6D622C2ED9B100DFBE57 /* AdaptyRecipes_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DD6D612C2ED9B100DFBE57 /* AdaptyRecipes_SwiftUIApp.swift */; };
 		74DD6D662C2ED9B200DFBE57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74DD6D652C2ED9B200DFBE57 /* Assets.xcassets */; };
 		74DD6D6A2C2ED9B200DFBE57 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74DD6D692C2ED9B200DFBE57 /* Preview Assets.xcassets */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		745996762D3687900060BD6C /* PaywallNavigationLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallNavigationLink.swift; sourceTree = "<group>"; };
 		74DD6D5E2C2ED9B100DFBE57 /* AdaptyRecipes-SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AdaptyRecipes-SwiftUI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		74DD6D612C2ED9B100DFBE57 /* AdaptyRecipes_SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptyRecipes_SwiftUIApp.swift; sourceTree = "<group>"; };
 		74DD6D652C2ED9B200DFBE57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 			isa = PBXGroup;
 			children = (
 				74DD6D8F2C2EEED000DFBE57 /* PaywallViewModifier.swift */,
+				745996762D3687900060BD6C /* PaywallNavigationLink.swift */,
 			);
 			path = Paywall;
 			sourceTree = "<group>";
@@ -232,6 +235,7 @@
 				74DD6D622C2ED9B100DFBE57 /* AdaptyRecipes_SwiftUIApp.swift in Sources */,
 				74DD6D7E2C2EE00B00DFBE57 /* CategoryModel.swift in Sources */,
 				74DD6D762C2EDA5C00DFBE57 /* MainView.swift in Sources */,
+				745996772D3687900060BD6C /* PaywallNavigationLink.swift in Sources */,
 				74DD6D892C2EEA2C00DFBE57 /* Logger.swift in Sources */,
 				74DD6D782C2EDC9700DFBE57 /* MainViewModel.swift in Sources */,
 				74DD6D812C2EE06800DFBE57 /* ProfileView.swift in Sources */,

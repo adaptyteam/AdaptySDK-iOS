@@ -27,11 +27,15 @@ struct CategoriesListView: View {
                             self.recipeRow(for: category)
                         }
                     } else {
-                        Button {
-                            self.showPaywall = true
-                        } label: {
+                        PaywallNavigationLink(placementId: AppConstants.placementId) {
                             self.recipeRow(for: category)
                         }
+
+//                        Button {
+//                            self.showPaywall = true
+//                        } label: {
+//                            self.recipeRow(for: category)
+//                        }
                     }
                 }
             }

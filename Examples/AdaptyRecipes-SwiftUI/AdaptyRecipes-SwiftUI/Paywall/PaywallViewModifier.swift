@@ -48,8 +48,6 @@ struct PaywallViewModifier: ViewModifier {
                 .paywall(
                     isPresented: isPresented,
                     paywallConfiguration: paywallConfig,
-                    // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
-                    // observerModeResolver: ObserverModeResolver(),
                     didFailPurchase: { _, error in
                         alertPaywallError = .init(title: "didFailPurchase error!", error: error)
                     },
@@ -83,7 +81,11 @@ struct PaywallViewModifier: ViewModifier {
             .task {
                 do {
                     let paywall = try await Adapty.getPaywall(placementId: placementId)
-                    paywallConfig = try await AdaptyUI.getPaywallConfiguration(forPaywall: paywall)
+                    paywallConfig = try await AdaptyUI.getPaywallConfiguration(
+                        forPaywall: paywall
+                        // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
+                        // observerModeResolver: ObserverModeResolver(),
+                    )
                 } catch {
                     Logger.log(.error, "getPaywallAndConfig: \(error)")
                     alertError = .init(title: "getPaywallAndConfig error!", error: error)
