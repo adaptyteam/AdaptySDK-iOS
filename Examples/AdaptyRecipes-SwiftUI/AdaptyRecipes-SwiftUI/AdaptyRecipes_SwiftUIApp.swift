@@ -24,7 +24,9 @@ struct AdaptyRecipes_SwiftUIApp: App {
         Adapty.logLevel = .verbose
         Adapty.activate(with: adaptyConfigBuilder)
 
+#if canImport(UIKit)
         AdaptyUI.activate()
+#endif
     }
 
     var body: some Scene {

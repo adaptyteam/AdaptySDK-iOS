@@ -26,6 +26,8 @@ struct IdentifiableErrorWrapper: Identifiable {
 //    }
 // }
 
+#if canImport(UIKit)
+
 struct PaywallViewModifier: ViewModifier {
     private var isPresented: Binding<Bool>
     private var placementId: String
@@ -98,14 +100,19 @@ struct PaywallViewModifier: ViewModifier {
             }
     }
 }
+#endif
 
 extension View {
     func paywall(isPresented: Binding<Bool>, placementId: String) -> some View {
+#if canImport(UIKit)
         modifier(
             PaywallViewModifier(
                 isPresented: isPresented,
                 placementId: placementId
             )
         )
+#else
+        self
+#endif
     }
 }

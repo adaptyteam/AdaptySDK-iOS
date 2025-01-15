@@ -105,7 +105,11 @@ struct ProfileView: View {
         Section {
             if let profileId = viewModel.profile?.profileId, !profileId.isEmpty {
                 Button(profileId) {
+#if canImport(UIKit)
                     UIPasteboard.general.string = profileId
+#else
+                    NSPasteboard.general.setString(profileId, forType: .string)
+#endif
                 }
                 .foregroundColor(.black)
             } else {
@@ -200,7 +204,7 @@ struct ProfileView: View {
             } label: {
                 Text("Update")
             }
-            
+
             Button {
                 Task {
                     await viewModel.restorePurchases()
