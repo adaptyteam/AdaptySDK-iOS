@@ -41,6 +41,19 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.videoGravity = videoGravity
 
         DispatchQueue.main.async {
+#if VISION_OS || os(visionOS)
+            playerStatusObservation = playerViewController.player?.observe(
+                \.status,
+                options: [.old, .new],
+                changeHandler: { player, _ in
+                    DispatchQueue.main.async {
+                        if player.status == .readyToPlay {
+                            onReadyForDisplay()
+                        }
+                    }
+                }
+            )
+#else
             playerStatusObservation = playerViewController.observe(
                 \.isReadyForDisplay,
                 options: [.old, .new, .initial, .prior],
@@ -54,6 +67,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
                     }
                 }
             )
+#endif
         }
 
         return playerViewController
@@ -133,8 +147,6 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
     @State
     private var showPlaceholder = true
 
-//    private let id: String = UUID().uuidString
-
     private let video: VC.VideoData
     private let aspect: VC.AspectRatio
     private let loop: Bool
@@ -152,7 +164,7 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
         switch video {
         case let .url(_, image):
             self.placeholder = image
-        case let  .custom(_, image):
+        case let .custom(_, image):
             self.placeholder = .custom(image)
         }
     }

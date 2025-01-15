@@ -59,7 +59,7 @@ extension SK2Product {
         } else {
             try await purchase(options: options)
         }
-#elseif VISION_OS
+#elseif VISION_OS || os(visionOS)
         if let scene = UIApplication.shared.activeScene {
             try await purchase(confirmIn: scene, options: options)
         } else {

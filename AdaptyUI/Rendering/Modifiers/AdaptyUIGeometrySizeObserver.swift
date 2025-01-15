@@ -47,7 +47,7 @@ extension View {
     @ViewBuilder
     func onGeometrySizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
 #if compiler(>=6.0)
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, visionOS 2.0, *) {
             onGeometryChange(
                 for: CGSize.self,
                 of: { $0.frame(in: .global).size },
