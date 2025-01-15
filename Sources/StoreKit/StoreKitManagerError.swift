@@ -14,7 +14,7 @@ enum StoreKitManagerError: Error {
     case refreshReceiptFailed(AdaptyError.Source, error: Error)
     case requestSKProductsFailed(AdaptyError.Source, error: Error)
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
-    case trunsactionUnverified(AdaptyError.Source, error: Error?)
+    case transactionUnverified(AdaptyError.Source, error: Error?)
     case invalidOffer(AdaptyError.Source, error: String)
     case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
 }
@@ -42,11 +42,11 @@ extension StoreKitManagerError: CustomStringConvertible {
             } else {
                 "StoreKitManagerError.productPurchaseFailed(\(source))"
             }
-        case let .trunsactionUnverified(source, error):
+        case let .transactionUnverified(source, error):
             if let error {
-                "StoreKitManagerError.trunsactionUnverified(\(source), \(error))"
+                "StoreKitManagerError.transactionUnverified(\(source), \(error))"
             } else {
-                "StoreKitManagerError.trunsactionUnverified(\(source))"
+                "StoreKitManagerError.transactionUnverified(\(source))"
             }
         case let .invalidOffer(source, error):
             "StoreKitManagerError.invalidOffer(\(source), \"\(error)\")"
@@ -65,7 +65,7 @@ extension StoreKitManagerError {
              let .refreshReceiptFailed(src, _),
              let .requestSKProductsFailed(src, _),
              let .interrupted(src),
-             let .trunsactionUnverified(src, _),
+             let .transactionUnverified(src, _),
              let .invalidOffer(src, _),
              let .getSubscriptionInfoStatusFailed(src, _): src
         }
@@ -75,7 +75,7 @@ extension StoreKitManagerError {
         switch self {
         case let .receiptIsEmpty(_, error),
              let .productPurchaseFailed(_, error),
-             let .trunsactionUnverified(_, error): error
+             let .transactionUnverified(_, error): error
         case let .refreshReceiptFailed(_, error),
              let .getSubscriptionInfoStatusFailed(_, error),
              let .requestSKProductsFailed(_, error): error
@@ -160,13 +160,13 @@ extension StoreKitManagerError {
         .interrupted(AdaptyError.Source(file: file, function: function, line: line))
     }
 
-    static func trunsactionUnverified(
+    static func transactionUnverified(
         _ error: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        .trunsactionUnverified(AdaptyError.Source(file: file, function: function, line: line), error: error)
+        .transactionUnverified(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
     static func invalidOffer(

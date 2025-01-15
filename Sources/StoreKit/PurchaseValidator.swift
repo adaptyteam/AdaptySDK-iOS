@@ -40,7 +40,7 @@ extension Adapty: PurchaseValidator {
                 transactionId: transactionId,
                 variationId: variationId
             )
-            saveResponse(response, syncedTrunsaction: true)
+            saveResponse(response, syncedTransaction: true)
             return response
         } catch {
             throw error.asAdaptyError ?? AdaptyError.reportTransactionIdFailed(unknownError: error)
@@ -58,7 +58,7 @@ extension Adapty: PurchaseValidator {
                 purchasedTransaction: transaction,
                 reason: reason
             )
-            saveResponse(response, syncedTrunsaction: true)
+            saveResponse(response, syncedTransaction: true)
             return response
         } catch {
             throw error.asAdaptyError ?? AdaptyError.validatePurchaseFailed(unknownError: error)

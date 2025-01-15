@@ -119,7 +119,7 @@ extension StoreKitManagerError: CustomAdaptyError {
         case .refreshReceiptFailed: return .refreshReceiptFailed
         case .requestSKProductsFailed: return .productRequestFailed
         case .productPurchaseFailed: return .productPurchaseFailed
-        case let .trunsactionUnverified(_, error):
+        case let .transactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
                 return customError.adaptyErrorCode
             } else {

@@ -192,9 +192,9 @@ actor SK2Purchaser {
                 stamp: stamp,
                 error: error.localizedDescription
             ))
-            log.error("Unverified purchase trunsaction of product: \(sk2Product.id) \(error.localizedDescription)")
+            log.error("Unverified purchase transaction of product: \(sk2Product.id) \(error.localizedDescription)")
             await transaction.finish()
-            throw StoreKitManagerError.trunsactionUnverified(error).asAdaptyError
+            throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
         case .pending:
             await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,
@@ -252,7 +252,7 @@ actor SK2Purchaser {
             return .success(profile: response.value, transaction: sk2Transaction)
         } catch {
             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Product.id)")
-            throw StoreKitManagerError.trunsactionUnverified(error).asAdaptyError
+            throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
         }
     }
 }

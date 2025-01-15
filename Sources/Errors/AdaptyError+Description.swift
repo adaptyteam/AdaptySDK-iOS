@@ -55,11 +55,11 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
         case .refreshReceiptFailed: "Refresh receipt failed"
         case .productPurchaseFailed: "Product purchase failed"
         case .requestSKProductsFailed: "Request products form App Store failed"
-        case let .trunsactionUnverified(_, error):
+        case let .transactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
-                "Unverified trunsaction: \(customError.debugDescription)"
+                "Unverified transaction: \(customError.debugDescription)"
             } else {
-                "Unverified trunsaction"
+                "Unverified transaction"
             }
         case let .invalidOffer(_, error):
             error

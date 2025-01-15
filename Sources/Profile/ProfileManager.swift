@@ -104,8 +104,8 @@ extension Adapty {
         profileManager?.saveResponse(response)
     }
 
-    func saveResponse(_ newProfile: VH<AdaptyProfile>, syncedTrunsaction: Bool = false) {
-        if syncedTrunsaction, profileStorage.profileId == newProfile.value.profileId {
+    func saveResponse(_ newProfile: VH<AdaptyProfile>, syncedTransaction: Bool = false) {
+        if syncedTransaction, profileStorage.profileId == newProfile.value.profileId {
             profileStorage.setSyncedTransactions(true)
         }
         profileManager?.saveResponse(newProfile)
