@@ -81,8 +81,7 @@ actor SK2Purchaser {
 
     func makePurchase(
         profileId: String,
-        product: AdaptyPaywallProduct,
-        confirmIn viewController: UIViewController?
+        product: AdaptyPaywallProduct
     ) async throws -> AdaptyPurchaseResult {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2Product = product.sk2Product
@@ -102,15 +101,15 @@ actor SK2Purchaser {
 
             case let .winBack(offerId):
                 #if compiler(<6.0)
-                throw StoreKitManagerError.invalidOffer("Does not support winBackOffer purchase before iOS 6.0").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("Does not support winBackOffer purchase before iOS 6.0").asAdaptyError
                 #else
-                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                   let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId)
-                {
-                    options = [.winBackOffer(winBackOffer)]
-                } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
-                }
+                    if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
+                       let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId)
+                    {
+                        options = [.winBackOffer(winBackOffer)]
+                    } else {
+                        throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
+                    }
                 #endif
 
             case let .promotional(offerId):
@@ -135,7 +134,7 @@ actor SK2Purchaser {
 
         await storage.setVariationIds(product.variationId, for: sk2Product.id)
 
-        let result = try await makePurchase(sk2Product, confirmIn: viewController, options, product.variationId)
+        let result = try await makePurchase(sk2Product, options, product.variationId)
 
         switch result {
         case .pending:
@@ -148,10 +147,8 @@ actor SK2Purchaser {
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    @available(visionOS, unavailable)
     private func makePurchase(
         _ sk2Product: SK2Product,
-        confirmIn viewController: UIViewController?,
         _ options: Set<Product.PurchaseOption>,
         _ variationId: String?
     ) async throws -> AdaptyPurchaseResult {
@@ -167,7 +164,7 @@ actor SK2Purchaser {
 
         let purchaseResult: Product.PurchaseResult
         do {
-            purchaseResult = try await sk2Product.unfPurchase(confirmIn: viewController, options: options)
+            purchaseResult = try await sk2Product.unfPurchase(options: options)
         } catch {
             await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,

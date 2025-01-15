@@ -272,17 +272,12 @@ public extension Adapty {
     /// - Parameters:
     ///   - product: a ``AdaptyPaywallProduct`` object retrieved from the paywall.
     ///   - completion: A result containing the ``AdaptyPurchaseResult`` object.
-    @available(visionOS, unavailable)
     nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
-        confirmIn viewController: UIViewController? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         withCompletion(completion) {
-            try await makePurchase(
-                product: product,
-                confirmIn: viewController
-            )
+            try await makePurchase(product: product)
         }
     }
 
