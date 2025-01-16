@@ -231,6 +231,7 @@ public extension AdaptyUI {
 }
 
 #if canImport(UIKit)
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension AdaptyUI {
@@ -250,7 +251,9 @@ public extension AdaptyUI {
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
-        timerResolver: AdaptyTimerResolver? = nil
+        timerResolver: AdaptyTimerResolver? = nil,
+        imageResolver: AdaptyImageAssetResolver? = nil,
+        videoResolver: AdaptyVideoAssetResolver? = nil
     ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivatedError
@@ -271,7 +274,9 @@ public extension AdaptyUI {
             products: products,
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
-            timerResolver: timerResolver
+            timerResolver: timerResolver,
+            imageResolver: imageResolver,
+            videoResolver: videoResolver
         )
     }
 

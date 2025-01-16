@@ -57,6 +57,8 @@ struct AdaptyUIImageView: View {
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @EnvironmentObject
+    private var assetViewModel: AdaptyImageAssetViewModel
 
     @ViewBuilder
     private func rasterImage(
@@ -90,9 +92,17 @@ struct AdaptyUIImageView: View {
     ) -> some View {
         switch asset {
         case let .custom(name):
-            rasterImage(UIImage(named: name), aspect: aspect, tint: tint)
+            rasterImage(
+                assetViewModel.assetResolver.image(for: name),
+                aspect: aspect,
+                tint: tint
+            )
         case let .raster(data):
-            rasterImage(UIImage(data: data), aspect: aspect, tint: tint)
+            rasterImage(
+                UIImage(data: data),
+                aspect: aspect,
+                tint: tint
+            )
         case let .url(url, preview):
             KFImage
                 .url(url)
