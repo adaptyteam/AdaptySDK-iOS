@@ -85,6 +85,44 @@ struct AdaptyUIImageView: View {
     }
 
     @ViewBuilder
+    private func resolvedCustomImage(
+        customAsset: AdaptyCustomImageAsset,
+        aspect: VC.AspectRatio,
+        tint: VC.Filling?
+    ) -> some View {
+        switch customAsset {
+        case let .file(url):
+            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                rasterImage(
+                    image,
+                    aspect: aspect,
+                    tint: tint
+                )
+            } else {
+                EmptyView()
+            }
+        case let .remote(url, preview):
+            KFImage
+                .url(url)
+                .resizable()
+                .aspectRatio(aspect)
+                .background {
+                    if let preview {
+                        rasterImage(preview, aspect: aspect, tint: tint)
+                    } else {
+                        EmptyView()
+                    }
+                }
+        case let .image(value):
+            rasterImage(
+                value,
+                aspect: aspect,
+                tint: tint
+            )
+        }
+    }
+
+    @ViewBuilder
     private func resolvedSchemeBody(
         asset: VC.ImageData,
         aspect: VC.AspectRatio,
@@ -92,11 +130,15 @@ struct AdaptyUIImageView: View {
     ) -> some View {
         switch asset {
         case let .custom(name):
-            rasterImage(
-                assetViewModel.assetResolver.image(for: name),
-                aspect: aspect,
-                tint: tint
-            )
+            if let customAsset = assetViewModel.assetResolver.image(for: name) {
+                resolvedCustomImage(
+                    customAsset: customAsset,
+                    aspect: aspect,
+                    tint: tint
+                )
+            } else {
+                EmptyView()
+            }
         case let .raster(data):
             rasterImage(
                 UIImage(data: data),

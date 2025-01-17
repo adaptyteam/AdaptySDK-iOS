@@ -78,7 +78,7 @@ public extension AdaptyUI {
             )
             videoViewModel = AdaptyVideoViewModel(
                 eventsHandler: eventsHandler,
-                assetResolver: videoResolver ?? AdaptyUIDefaultVideoResolver()
+                assetResolver: videoResolver
             )
             assetViewModel = AdaptyImageAssetViewModel(
                 assetResolver: imageResolver ?? AdaptyUIDefaultImageResolver()

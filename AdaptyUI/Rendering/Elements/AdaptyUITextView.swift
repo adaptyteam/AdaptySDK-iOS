@@ -180,7 +180,7 @@ extension VC.ImageData {
         case let .raster(data):
             UIImage(data: data)
         case let .custom(value):
-            assetResolver.image(for: value)
+            assetResolver.uiImage(for: value)
         default:
             nil
         }

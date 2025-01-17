@@ -11,18 +11,46 @@ import Adapty
 import SwiftUI
 import UIKit
 
+public enum AdaptyCustomImageAsset {
+    case file(url: URL)
+    case remote(url: URL, preview: UIImage?)
+    case image(value: UIImage)
+}
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyImageAssetResolver: Sendable {
-    func image(for name: String) -> UIImage?
+    func image(for name: String) -> AdaptyCustomImageAsset?
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+extension AdaptyImageAssetResolver {
+    func uiImage(for name: String) -> UIImage? {
+        guard let asset = image(for: name) else { return nil }
+        
+        switch asset {
+        case let .file(url):
+            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
+                return image
+            } else {
+                return nil
+            }
+        case .remote:
+            return nil
+        case let .image(value):
+            return value
+        }
+    }
 }
 
 @MainActor
 package struct AdaptyUIDefaultImageResolver: AdaptyImageAssetResolver {
     package init() {}
 
-    package func image(for name: String) -> UIImage? {
-        UIImage(named: name)
+    package func image(for name: String) -> AdaptyCustomImageAsset? {
+        guard let image = UIImage(named: name) else { return nil }
+        return .image(value: image)
     }
 }
 
