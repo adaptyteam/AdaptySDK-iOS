@@ -1,7 +1,7 @@
 PODS:
-  - Adapty (3.3.1)
-  - AdaptyUI (3.3.1):
-    - Adapty (= 3.3.1)
+  - Adapty (3.3.2)
+  - AdaptyUI (3.3.2):
+    - Adapty (= 3.3.2)
 
 DEPENDENCIES:
   - Adapty (from `../../`)
@@ -14,9 +14,9 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Adapty: 97d4543c6d5bf10c25601cf0bc92b1d796efea4a
-  AdaptyUI: 6d0dc25413f8d55bbe833aef3492dadfc57b19fa
+  Adapty: 48e152416362d581ded5aace24ae06fad5a9a41a
+  AdaptyUI: 5374a6869b943460fcb4c0b762dafd9873c2573a
 
 PODFILE CHECKSUM: 235cfbef6b933d442daf00c8c0f0ceab2561282d
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
