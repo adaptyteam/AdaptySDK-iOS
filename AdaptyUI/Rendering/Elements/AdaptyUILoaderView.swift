@@ -18,7 +18,7 @@ struct AdaptyUILoaderView: View {
 
             ProgressView()
                 .progressViewStyle(DefaultProgressViewStyle())
-                .tint(Color(UIColor.systemBackground))
+                .tint(.white)
                 .scaleEffect(CGSize(width: 1.5, height: 1.5))
         }
     }
