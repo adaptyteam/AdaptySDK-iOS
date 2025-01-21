@@ -46,28 +46,4 @@ extension SK2Product {
         }
         return .autoupdatingCurrent
     }
-
-    @MainActor // TODO: discuss this
-    func unfPurchase(
-        options: Set<Product.PurchaseOption> = []
-    ) async throws -> PurchaseResult {
-#if canImport(UIKit) && (os(iOS) || os(tvOS)) && compiler(>=6.0.3)
-        if #available(iOS 18.2, tvOS 18.2, visionOS 2.2, *),
-           let viewController = UIApplication.shared.topPresentedController
-        {
-            try await purchase(confirmIn: viewController, options: options)
-        } else {
-            try await purchase(options: options)
-        }
-#elseif VISION_OS || os(visionOS)
-        if let scene = UIApplication.shared.activeScene {
-            try await purchase(confirmIn: scene, options: options)
-        } else {
-            // TODO: check the error
-            throw AdaptyError.cantMakePayments()
-        }
-#else
-        try await purchase(options: options)
-#endif
-    }
 }
