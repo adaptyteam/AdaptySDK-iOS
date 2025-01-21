@@ -41,7 +41,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.videoGravity = videoGravity
 
         DispatchQueue.main.async {
-#if VISION_OS || os(visionOS)
+#if os(visionOS)
             playerStatusObservation = playerViewController.player?.observe(
                 \.status,
                 options: [.old, .new],

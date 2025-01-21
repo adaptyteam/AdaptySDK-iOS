@@ -14,7 +14,7 @@ import SwiftUI
 @MainActor
 extension AdaptyUI {
     static var mainScreenBounds: CGRect {
-#if VISION_OS || os(visionOS)
+#if os(visionOS)
         UIApplication.shared.windows.first?.bounds ?? .zero
 #else
         UIScreen.main.bounds
