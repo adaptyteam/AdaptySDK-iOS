@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.0.0/schema"
+$id: "https://adapty.io/crossPlatform/3.3.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -615,6 +615,7 @@ $defs:
       - paywall_variation_id
       - paywall_ab_test_name
       - paywall_name
+      - audience_name
       - localized_description
       - localized_title
       - is_family_shareable # iOS Only
@@ -625,6 +626,7 @@ $defs:
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
+      audience_name: { type: string }
       localized_description: { type: string }
       localized_title: { type: string }
       is_family_shareable:

@@ -19,6 +19,8 @@ public struct AdaptyPaywall: Sendable {
     /// Parent A/B test name.
     public let abTestName: String
 
+    public let audienceName: String
+
     /// An identifier of a variation, used to attribute purchases to this paywall.
     public let variationId: String
 
@@ -36,13 +38,13 @@ public struct AdaptyPaywall: Sendable {
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
-        
+
     var version: Int64
 }
 
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
-        "(placementId: \(placementId), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), "
+        "(placementId: \(placementId), instanceIdentity: \(instanceIdentity), name: \(name), abTestName: \(abTestName), audienceName: \(audienceName), variationId: \(variationId), revision: \(revision), hasViewConfiguration: \(hasViewConfiguration), "
             + (remoteConfig.map { "remoteConfig: \($0), " } ?? "")
             + "vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
     }
@@ -63,6 +65,7 @@ extension AdaptyPaywall: Codable {
         case version = "response_created_at"
         case viewConfiguration = "paywall_builder"
         case attributes
+        case audienceName = "audience_name"
     }
 
     public init(from decoder: Decoder) throws {
@@ -78,6 +81,7 @@ extension AdaptyPaywall: Codable {
         revision = try container.decode(Int.self, forKey: .revision)
         variationId = try container.decode(String.self, forKey: .variationId)
         abTestName = try container.decode(String.self, forKey: .abTestName)
+        audienceName = try container.decode(String.self, forKey: .audienceName)
         products = try container.decode([ProductReference].self, forKey: .products)
         remoteConfig = try container.decodeIfPresent(RemoteConfig.self, forKey: .remoteConfig)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
@@ -92,6 +96,7 @@ extension AdaptyPaywall: Codable {
         try container.encode(revision, forKey: .revision)
         try container.encode(variationId, forKey: .variationId)
         try container.encode(abTestName, forKey: .abTestName)
+        try container.encode(audienceName, forKey: .audienceName)
         try container.encode(products, forKey: .products)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
         try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
