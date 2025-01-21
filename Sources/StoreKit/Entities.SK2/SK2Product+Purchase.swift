@@ -7,24 +7,25 @@
 
 import StoreKit
 
-#if os(iOS) || os(tvOS) || VISION_OS || targetEnvironment(macCatalyst) || os(watchOS)
+#if canImport(UIKit)
 import UIKit
 #endif
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension SK2Product {
     func unfPurchase(
         options: Set<Product.PurchaseOption> = []
     ) async throws -> PurchaseResult {
-#if VISION_OS
-        if let scene = await UIApplication.shared.activeScene {
+#if os(visionOS)
+        if let scene = UIApplication.shared.activeScene {
             try await purchase(confirmIn: scene, options: options)
         } else {
             throw AdaptyError.cantMakePayments()
         }
 #elseif(os(iOS) || os(tvOS)) && compiler(>=6.0.3)
         if #available(iOS 18.2, tvOS 18.2, *),
-           let viewController = await UIApplication.shared.topPresentedController
+           let viewController = UIApplication.shared.topPresentedController
         {
             try await purchase(confirmIn: viewController, options: options)
         } else {
@@ -36,7 +37,7 @@ extension SK2Product {
     }
 }
 
-#if os(iOS) || os(tvOS) || VISION_OS || targetEnvironment(macCatalyst) || os(watchOS)
+#if canImport(UIKit)
 @MainActor
 private extension UIApplication {
     /// Returns the key `UIWindowScene` for the current application
