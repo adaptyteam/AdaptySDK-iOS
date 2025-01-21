@@ -28,6 +28,7 @@ public extension AdaptyUI {
         package let timerViewModel: AdaptyTimerViewModel
         package let screensViewModel: AdaptyScreensViewModel
         package let videoViewModel: AdaptyVideoViewModel
+        package let assetViewModel: AdaptyImageAssetViewModel
 
         package init(
             logId: String,
@@ -36,7 +37,9 @@ public extension AdaptyUI {
             products: [AdaptyPaywallProduct]?,
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyTagResolver?,
-            timerResolver: AdaptyTimerResolver?
+            timerResolver: AdaptyTimerResolver?,
+            imageResolver: AdaptyImageAssetResolver?,
+            videoResolver: AdaptyVideoAssetResolver?
         ) {
             Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
 
@@ -73,7 +76,13 @@ public extension AdaptyUI {
                 sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )
-            videoViewModel = AdaptyVideoViewModel(eventsHandler: eventsHandler)
+            videoViewModel = AdaptyVideoViewModel(
+                eventsHandler: eventsHandler,
+                assetResolver: videoResolver
+            )
+            assetViewModel = AdaptyImageAssetViewModel(
+                assetResolver: imageResolver ?? AdaptyUIDefaultImageResolver()
+            )
 
             productsViewModel.loadProductsIfNeeded()
         }

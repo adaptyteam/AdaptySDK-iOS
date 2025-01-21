@@ -19,6 +19,8 @@ struct AdaptyUITextView: View {
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @EnvironmentObject
+    private var assetViewModel: AdaptyImageAssetViewModel
 
     init(_ text: VC.Text) {
         self.text = text
@@ -31,6 +33,7 @@ struct AdaptyUITextView: View {
         case .notApplicable:
             richText
                 .convertToSwiftUIText(
+                    assetResolver: assetViewModel.assetResolver,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme
@@ -41,6 +44,7 @@ struct AdaptyUITextView: View {
         case .notFound:
             richText
                 .convertToSwiftUIText(
+                    assetResolver: assetViewModel.assetResolver,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme
@@ -52,6 +56,7 @@ struct AdaptyUITextView: View {
         case let .found(productInfoModel):
             richText
                 .convertToSwiftUIText(
+                    assetResolver: assetViewModel.assetResolver,
                     tagResolver: customTagResolverViewModel,
                     productInfo: productInfoModel,
                     colorScheme: colorScheme
@@ -74,6 +79,7 @@ extension AdaptyUI {
 @MainActor
 extension Array where Element == AdaptyViewConfiguration.RichText.Item {
     func convertToSwiftUITextThrowingError(
+        assetResolver: AdaptyImageAssetResolver,
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?,
         colorScheme: ColorScheme
@@ -114,6 +120,7 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
                 )
             case let .image(value, attr):
                 guard let uiImage = value?.of(colorScheme).textAttachmentImage(
+                    assetResolver: assetResolver,
                     font: attr.uiFont,
                     tint: attr.imgTintColor?.asSolidColor?.uiColor
                 ) else {
@@ -134,6 +141,7 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
 @MainActor
 extension VC.RichText {
     func convertToSwiftUIText(
+        assetResolver: AdaptyImageAssetResolver,
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?,
         colorScheme: ColorScheme
@@ -142,12 +150,14 @@ extension VC.RichText {
 
         do {
             result = try items.convertToSwiftUITextThrowingError(
+                assetResolver: assetResolver,
                 tagResolver: tagResolver,
                 productInfo: productInfo,
                 colorScheme: colorScheme
             )
         } catch {
             if let fallback, let fallbackText = try? fallback.convertToSwiftUITextThrowingError(
+                assetResolver: assetResolver,
                 tagResolver: tagResolver,
                 productInfo: productInfo,
                 colorScheme: colorScheme
@@ -163,20 +173,25 @@ extension VC.RichText {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension VC.ImageData {
-    private var uiImage: UIImage? {
+    private func uiImage(assetResolver: AdaptyImageAssetResolver) -> UIImage? {
         switch self {
         case let .raster(data):
             UIImage(data: data)
         case let .custom(value):
-            UIImage(named: value)
+            assetResolver.uiImage(for: value)
         default:
             nil
         }
     }
 
-    func textAttachmentImage(font: UIFont, tint: UIColor?) -> UIImage? {
-        guard var image = uiImage else { return nil }
+    func textAttachmentImage(
+        assetResolver: AdaptyImageAssetResolver,
+        font: UIFont,
+        tint: UIColor?
+    ) -> UIImage? {
+        guard var image = uiImage(assetResolver: assetResolver) else { return nil }
 
         let size = CGSize(width: image.size.width * font.capHeight / image.size.height,
                           height: font.capHeight)

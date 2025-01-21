@@ -11,13 +11,30 @@ import Adapty
 import AVKit
 import SwiftUI
 
+public enum AdaptyCustomVideoAsset {
+    case file(url: URL, preview: AdaptyCustomImageAsset?)
+    case remote(url: URL, preview: AdaptyCustomImageAsset?)
+    case player(item: AVPlayerItem, player: AVQueuePlayer, preview: AdaptyCustomImageAsset?)
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+public protocol AdaptyVideoAssetResolver: Sendable {
+    func video(for id: String) -> AdaptyCustomVideoAsset?
+}
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package class AdaptyVideoViewModel: ObservableObject {
     let eventsHandler: AdaptyEventsHandler
+    let assetResolver: AdaptyVideoAssetResolver?
 
-    package init(eventsHandler: AdaptyEventsHandler) {
+    package init(
+        eventsHandler: AdaptyEventsHandler,
+        assetResolver: AdaptyVideoAssetResolver?
+    ) {
         self.eventsHandler = eventsHandler
+        self.assetResolver = assetResolver
     }
 
     @Published var playerStates = [String: AdaptyUIVideoPlayerManager.PlayerState]()
@@ -28,14 +45,15 @@ package class AdaptyVideoViewModel: ObservableObject {
         loop: Bool,
         id: String
     ) -> AdaptyUIVideoPlayerManager {
-        if let manager =  playerManagers[id] {
+        if let manager = playerManagers[id] {
             return manager
         }
 
         let manager = AdaptyUIVideoPlayerManager(
             video: video,
             loop: loop,
-            eventsHandler: eventsHandler
+            eventsHandler: eventsHandler,
+            assetResolver: assetResolver
         ) { [weak self] state in
             DispatchQueue.main.async { [weak self] in
                 self?.playerStates[id] = state
@@ -46,7 +64,7 @@ package class AdaptyVideoViewModel: ObservableObject {
             self?.playerManagers[id] = manager
             self?.playerStates[id] = .loading
         }
-        
+
         return manager
     }
 
@@ -70,7 +88,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
             case .invalid: "Invalid"
             case .loading: "Loading"
             case .ready: "Ready"
-            case let .failed(error): "Failed: \(error)"
+            case .failed(let error): "Failed: \(error)"
             }
         }
 
@@ -92,31 +110,57 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     private var playerLooper: AVPlayerLooper?
     private var playerStatusObservation: NSKeyValueObservation?
 
-    init(
+    static func initializePlayerFromAsset(
         video: VC.VideoData,
-        loop: Bool,
-        eventsHandler: AdaptyEventsHandler,
-        onStateUpdated: @escaping (PlayerState) -> Void
-    ) {
-        let playerItemToObserve: AVPlayerItem?
-
+        assetResolver: AdaptyVideoAssetResolver?
+    ) -> (AVPlayerItem, AVQueuePlayer)? {
         switch video {
-        case let .url(url, _):
+        case .url(let url, _):
             let playerItem = AVPlayerItem(url: url)
             let queuePlayer = AVQueuePlayer(items: [playerItem])
             queuePlayer.isMuted = true
 
+            return (playerItem, queuePlayer)
+        case .custom(let videoId, _):
+            if let customAsset = assetResolver?.video(for: videoId) {
+                switch customAsset {
+                case .file(let url, _), .remote(let url, _):
+                    let playerItem = AVPlayerItem(url: url)
+                    let queuePlayer = AVQueuePlayer(items: [playerItem])
+                    queuePlayer.isMuted = true
+
+                    return (playerItem, queuePlayer)
+                case .player(let playerItem, let queuePlayer, _):
+                    return (playerItem, queuePlayer)
+                }
+            } else {
+                return nil
+            }
+        }
+    }
+
+    init(
+        video: VC.VideoData,
+        loop: Bool,
+        eventsHandler: AdaptyEventsHandler,
+        assetResolver: AdaptyVideoAssetResolver?,
+        onStateUpdated: @escaping (PlayerState) -> Void
+    ) {
+        let playerItemToObserve: AVPlayerItem?
+
+        if let (playerItem, queuePlayer) = Self.initializePlayerFromAsset(video: video, assetResolver: assetResolver) {
+            playerItemToObserve = playerItem
+            player = queuePlayer
+            
             if loop {
                 playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
+            } else {
+                playerLooper = nil
             }
-
-            player = queuePlayer
-
-            playerItemToObserve = playerItem
-
-            queuePlayer.play()
-        case .custom:
+        } else {
             playerItemToObserve = nil
+            player = nil
+            playerLooper = nil
         }
 
         self.eventsHandler = eventsHandler
@@ -133,6 +177,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
                 }
             }
         )
+        player?.play()
     }
 
     private func playerStatusDidChange(_ status: AVPlayerItem.Status, item: AVPlayerItem) {
