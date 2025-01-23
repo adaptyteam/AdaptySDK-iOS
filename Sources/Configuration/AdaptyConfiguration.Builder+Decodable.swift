@@ -12,7 +12,7 @@ extension AdaptyConfiguration.Builder: Decodable {
         case apiKey = "api_key"
         case customerUserId = "customer_user_id"
         case observerMode = "observer_mode"
-        case idfaCollectionDisabled = "idfa_collection_disabled"
+        case idfaCollectionDisabled = "apple_idfa_collection_disabled"
         case ipAddressCollectionDisabled = "ip_address_collection_disabled"
 
         case backendBaseUrl = "backend_base_url"
@@ -25,7 +25,7 @@ extension AdaptyConfiguration.Builder: Decodable {
 
         case crossPlatformSDKName = "cross_platform_sdk_name"
         case crossPlatformSDKVersion = "cross_platform_sdk_version"
-        
+
         case serverCluster = "server_cluster"
     }
 
@@ -69,9 +69,8 @@ extension AdaptyConfiguration.Builder: Decodable {
 extension AdaptyConfiguration.ServerCluster: Decodable {
     public init(from decoder: Decoder) throws {
         self = switch try decoder.singleValueContainer().decode(String.self) {
-            case "eu":  .eu
-            default: .default
+        case "eu": .eu
+        default: .default
         }
     }
 }
-
