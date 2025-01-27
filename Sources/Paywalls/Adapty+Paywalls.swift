@@ -96,7 +96,7 @@ extension Adapty {
         _ fetchPolicy: AdaptyPaywall.FetchPolicy
     ) async throws -> AdaptyPaywall {
         let manager = try await createdProfileManager
-        
+
         guard manager.profileId == profileId else {
             throw AdaptyError.profileWasChanged()
         }
@@ -140,7 +140,7 @@ extension Adapty {
                     manager.profile.value.isTestUser
                 )
             }()
-            
+
             do {
                 var response = try await httpSession.fetchPaywallVariations(
                     apiKeyPrefix: apiKeyPrefix,
@@ -151,14 +151,14 @@ extension Adapty {
                     cached: cached,
                     disableServerCache: isTestUser
                 )
-                
+
                 if let manager = tryProfileManagerOrNil(with: profileId) {
                     response = manager.paywallsStorage.savedPaywallChosen(response)
                 }
-                
+
                 Adapty.trackEventIfNeed(response)
                 return response.value
-                
+
             } catch {
                 guard error.wrongProfileSegmentId,
                       try await updateSegmentId(for: profileId, oldSegmentId: segmentId)
@@ -198,7 +198,8 @@ extension Adapty {
                 placementId: placementId,
                 locale: locale,
                 cached: cached,
-                disableServerCache: isTestUser
+                disableServerCache: isTestUser,
+                existFallback: Adapty.fallbackPaywalls?.contains(placementId: placementId) ?? false
             )
 
             if let manager = tryProfileManagerOrNil(with: profileId) {
