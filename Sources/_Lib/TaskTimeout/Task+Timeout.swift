@@ -44,25 +44,3 @@ func withThrowingTimeout<T: Sendable>(
 
     return try result.get()
 }
-
-extension Task where Failure == Error {
-    static func detached(
-        priority: TaskPriority? = nil,
-        timeout: TaskDuration,
-        operation: @escaping @Sendable () async throws -> Success
-    ) -> Task<Success, Failure> {
-        detached(priority: priority) {
-            try await withThrowingTimeout(timeout, operation: operation)
-        }
-    }
-
-    init(
-        priority: TaskPriority? = nil,
-        timeout: TaskDuration,
-        operation: @escaping @Sendable () async throws -> Success
-    ) {
-        self.init(priority: priority) {
-            try await withThrowingTimeout(timeout, operation: operation)
-        }
-    }
-}
