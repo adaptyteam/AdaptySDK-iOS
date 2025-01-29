@@ -119,7 +119,11 @@ extension Adapty {
             if let cached {
                 cached
             } else {
-                try await fetchTask.value
+                try await withTaskCancellationHandler {
+                    try await fetchTask.value
+                } onCancel: {
+                    fetchTask.cancel()
+                }
             }
 
         return paywall
