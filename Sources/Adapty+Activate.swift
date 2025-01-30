@@ -10,13 +10,18 @@ import Foundation
 private let log = Log.default
 
 extension Adapty {
-    /// Use this method to initialize the Adapty SDK.
+    /// Use this method to initialize the Adapty SDK. It is the caller's responsibility to ensure that this method is
+    /// invoked only once. If and only if this requirement is violated, the method throws an appropriate error.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
+    ///
+    /// - Throws: An `AdaptyError` instance indicating a violation of the requirement to invoke this method only once.
+    ///
+    /// - important: This method is not thread-safe.
     public nonisolated static func activate(
         _ apiKey: String,
         observerMode: Bool = false,
@@ -31,22 +36,32 @@ extension Adapty {
         )
     }
 
-    /// Use this method to initialize the Adapty SDK.
+    /// Use this method to initialize the Adapty SDK. It is the caller's responsibility to ensure that this method is
+    /// invoked only once. If and only if this requirement is violated, the method throws an appropriate error.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
     /// - Parameter builder: `AdaptyConfiguration.Builder` which allows to configure Adapty SDK
+    ///
+    /// - Throws: An `AdaptyError` instance indicating a violation of the requirement to invoke this method only once.
+    ///
+    /// - important: This method is not thread-safe.
     public nonisolated static func activate(
         with builder: AdaptyConfiguration.Builder
     ) async throws {
         try await activate(with: builder.build())
     }
 
-    /// Use this method to initialize the Adapty SDK.
+    /// Use this method to initialize the Adapty SDK. It is the caller's responsibility to ensure that this method is
+    /// invoked only once. If and only if this requirement is violated, the method throws an appropriate error.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
     /// - Parameter configuration: `AdaptyConfiguration` which allows to configure Adapty SDK
+    ///
+    /// - Throws: An `AdaptyError` instance indicating a violation of the requirement to invoke this method only once.
+    ///
+    /// - important: This method is not thread-safe.
     public static func activate(
         with configuration: AdaptyConfiguration
     ) async throws {
