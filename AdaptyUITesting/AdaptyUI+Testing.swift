@@ -28,7 +28,7 @@ public extension AdaptyViewConfigurationTestWrapper {
             templateId: templateId,
             locale: locale,
             isRightToLeft: isRightToLeft,
-            images: images,
+            images: [],
             colors: [
                 "$green_figma": .solidColor(.create(data: 0x3EBD78FF)),
                 "$green_figma_cc": .solidColor(.create(data: 0x3EBD78CC)),
