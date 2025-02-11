@@ -31,6 +31,7 @@ extension AdaptyViewConfiguration.Element {
     package struct Properties: Sendable, Hashable {
         static let defaultPadding = AdaptyViewConfiguration.EdgeInsets(same: .point(0))
         static let defaultOffset = AdaptyViewConfiguration.Offset.zero
+        static let defaultPoint = AdaptyViewConfiguration.Point.zero
         static let defaultVisibility = false
 
         package let decorator: AdaptyViewConfiguration.Decorator?
