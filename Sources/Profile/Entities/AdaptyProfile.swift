@@ -14,8 +14,8 @@ public struct AdaptyProfile: Sendable {
     /// An identifier of a user in your system.
     public let customerUserId: String?
 
-    let segmentId: String
-    let isTestUser: Bool
+    package let segmentId: String
+    package let isTestUser: Bool
 
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 

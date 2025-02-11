@@ -11,7 +11,7 @@ import Adapty
 import AVKit
 import SwiftUI
 
-package enum AdaptyCustomVideoAsset {
+public enum AdaptyCustomVideoAsset {
     case file(url: URL, preview: AdaptyCustomImageAsset?)
     case remote(url: URL, preview: AdaptyCustomImageAsset?)
     case player(item: AVPlayerItem, player: AVQueuePlayer, preview: AdaptyCustomImageAsset?)
@@ -19,7 +19,7 @@ package enum AdaptyCustomVideoAsset {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package protocol AdaptyVideoAssetResolver: Sendable {
+public protocol AdaptyVideoAssetResolver: Sendable {
     func video(for id: String) -> AdaptyCustomVideoAsset?
 }
 

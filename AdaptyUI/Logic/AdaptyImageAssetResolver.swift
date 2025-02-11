@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 import UIKit
 
-package enum AdaptyCustomImageAsset {
+public enum AdaptyCustomImageAsset {
     case file(url: URL)
     case remote(url: URL, preview: UIImage?)
     case image(value: UIImage)
@@ -19,7 +19,7 @@ package enum AdaptyCustomImageAsset {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package protocol AdaptyImageAssetResolver: Sendable {
+public protocol AdaptyImageAssetResolver: Sendable {
     func image(for name: String) -> AdaptyCustomImageAsset?
 }
 
