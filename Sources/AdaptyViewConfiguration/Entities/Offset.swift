@@ -15,8 +15,8 @@ package extension AdaptyViewConfiguration {
 }
 
 package extension AdaptyViewConfiguration.Offset {
-    static let zero = AdaptyViewConfiguration.Point(x: 0.0, y: 0.0)
-    static let one = AdaptyViewConfiguration.Point(x: 1.0, y: 1.0)
+    static let zero = AdaptyViewConfiguration.Offset(x: 0.0, y: 0.0)
+    static let one = AdaptyViewConfiguration.Offset(x: 1.0, y: 1.0)
 
     var isZero: Bool {
         x == 0.0 && y == 0.0
