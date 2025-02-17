@@ -10,7 +10,7 @@ import Foundation
 extension AdaptyViewConfiguration.Color {
     package var asHexString: String { String(format: "#%08x", data) }
 
-    package init(hex: String) throws {
+    package init(customId: String?, hex: String) throws {
         guard hex.hasPrefix("#") else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Wrong format of hex color string, don`t found prefix '#'"))
         }
@@ -23,10 +23,10 @@ extension AdaptyViewConfiguration.Color {
         }
 
         if hexColor.count == 8 {
-            self.init(data: hexNumber)
+            self.init(customId: customId, data: hexNumber)
         } else if hexColor.count == 6 {
             hexNumber = (hexNumber << 8) | 0x000000FF
-            self.init(data: hexNumber)
+            self.init(customId: customId, data: hexNumber)
         } else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Wrong format of hex color string, number of hex pairs should be 3 or 4"))
         }

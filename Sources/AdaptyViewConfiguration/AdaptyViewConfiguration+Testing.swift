@@ -26,7 +26,13 @@ import Foundation
                 .mapValues { AdaptyViewSource.Asset.filling($0) }
 
             let assets = Dictionary(
-                images.map { ($0, AdaptyViewSource.Asset.image(.custom($0))) }
+                images.map { ($0, AdaptyViewSource.Asset.image(
+                    .url(
+                        customId: $0,
+                        URL(string: "https://unknown.image.com")!,
+                        previewRaster: nil
+                    )
+                )) }
             ) { current, _ in current }
                 .merging(colors) { current, _ in current }
 

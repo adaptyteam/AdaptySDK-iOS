@@ -114,29 +114,24 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         video: VC.VideoData,
         assetResolver: AdaptyVideoAssetResolver?
     ) -> (AVPlayerItem, AVQueuePlayer)? {
-        switch video {
-        case .url(let url, _):
-            let playerItem = AVPlayerItem(url: url)
-            let queuePlayer = AVQueuePlayer(items: [playerItem])
-            queuePlayer.isMuted = true
+        if let videoId = video.customId, let customAsset = assetResolver?.video(for: videoId) {
+            switch customAsset {
+            case .file(let url, _), .remote(let url, _):
+                let playerItem = AVPlayerItem(url: url)
+                let queuePlayer = AVQueuePlayer(items: [playerItem])
+                queuePlayer.isMuted = true
 
-            return (playerItem, queuePlayer)
-        case .custom(let videoId, _):
-            if let customAsset = assetResolver?.video(for: videoId) {
-                switch customAsset {
-                case .file(let url, _), .remote(let url, _):
-                    let playerItem = AVPlayerItem(url: url)
-                    let queuePlayer = AVQueuePlayer(items: [playerItem])
-                    queuePlayer.isMuted = true
-
-                    return (playerItem, queuePlayer)
-                case .player(let playerItem, let queuePlayer, _):
-                    return (playerItem, queuePlayer)
-                }
-            } else {
-                return nil
+                return (playerItem, queuePlayer)
+            case .player(let playerItem, let queuePlayer, _):
+                return (playerItem, queuePlayer)
             }
         }
+
+        let playerItem = AVPlayerItem(url: video.url)
+        let queuePlayer = AVQueuePlayer(items: [playerItem])
+        queuePlayer.isMuted = true
+
+        return (playerItem, queuePlayer)
     }
 
     init(
@@ -151,7 +146,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         if let (playerItem, queuePlayer) = Self.initializePlayerFromAsset(video: video, assetResolver: assetResolver) {
             playerItemToObserve = playerItem
             player = queuePlayer
-            
+
             if loop {
                 playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
             } else {

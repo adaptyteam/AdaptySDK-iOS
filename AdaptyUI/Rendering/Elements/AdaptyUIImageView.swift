@@ -129,35 +129,41 @@ struct AdaptyUIImageView: View {
         tint: VC.Filling?
     ) -> some View {
         switch asset {
-        case let .custom(name):
-            if let customAsset = assetViewModel.assetResolver.image(for: name) {
+        case let .raster(customId, data):
+            if let customId, let customAsset = assetViewModel.assetResolver.image(for: customId) {
                 resolvedCustomImage(
                     customAsset: customAsset,
                     aspect: aspect,
                     tint: tint
                 )
             } else {
-                EmptyView()
+                rasterImage(
+                    UIImage(data: data),
+                    aspect: aspect,
+                    tint: tint
+                )
             }
-        case let .raster(data):
-            rasterImage(
-                UIImage(data: data),
-                aspect: aspect,
-                tint: tint
-            )
-        case let .url(url, preview):
-            KFImage
-                .url(url)
-                .resizable()
-                .aspectRatio(aspect)
-                .background {
-                    if let preview {
-                        let image = UIImage(data: preview)
-                        rasterImage(image, aspect: aspect, tint: tint)
-                    } else {
-                        EmptyView()
+        case let .url(customId, url, preview):
+            if let customId, let customAsset = assetViewModel.assetResolver.image(for: customId) {
+                resolvedCustomImage(
+                    customAsset: customAsset,
+                    aspect: aspect,
+                    tint: tint
+                )
+            } else {
+                KFImage
+                    .url(url)
+                    .resizable()
+                    .aspectRatio(aspect)
+                    .background {
+                        if let preview {
+                            let image = UIImage(data: preview)
+                            rasterImage(image, aspect: aspect, tint: tint)
+                        } else {
+                            EmptyView()
+                        }
                     }
-                }
+            }
         }
     }
 

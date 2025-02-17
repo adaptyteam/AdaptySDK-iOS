@@ -8,7 +8,8 @@
 import Foundation
 
 package extension AdaptyViewConfiguration {
-    struct ColorGradient: Hashable, Sendable {
+    struct ColorGradient: CustomAsset, Hashable, Sendable {
+        package let customId: String?
         package let kind: Kind
         package let start: Point
         package let end: Point
@@ -32,12 +33,14 @@ package extension AdaptyViewConfiguration.ColorGradient {
 #if DEBUG
     package extension AdaptyViewConfiguration.ColorGradient {
         static func create(
+            customId: String? = nil,
             kind: AdaptyViewConfiguration.ColorGradient.Kind,
             start: AdaptyViewConfiguration.Point,
             end: AdaptyViewConfiguration.Point,
             items: [AdaptyViewConfiguration.ColorGradient.Item]
         ) -> Self {
             .init(
+                customId: customId,
                 kind: kind,
                 start: start,
                 end: end,
@@ -96,6 +99,7 @@ extension AdaptyViewConfiguration.ColorGradient: Codable {
         case points
         case items = "values"
         case type
+        case customId = "custom_id"
     }
 
     package init(from decoder: Decoder) throws {
@@ -105,6 +109,7 @@ extension AdaptyViewConfiguration.ColorGradient: Codable {
         start = points.start
         end = points.end
 
+        customId = try container.decodeIfPresent(String.self, forKey: .customId)
         kind =
             switch try container.decode(String.self, forKey: .type) {
             case AdaptyViewConfiguration.ColorGradient.ContentType.colorRadialGradient.rawValue:
@@ -120,6 +125,8 @@ extension AdaptyViewConfiguration.ColorGradient: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(items, forKey: .items)
         try container.encode(Points(start: start, end: end), forKey: .points)
+
+        try container.encodeIfPresent(customId, forKey: .customId)
 
         switch kind {
         case .radial:

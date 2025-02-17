@@ -8,9 +8,10 @@
 import Foundation
 
 package extension AdaptyViewConfiguration {
-    struct Font: Sendable, Hashable {
+    struct Font: CustomAsset, Sendable, Hashable {
         static let defaultFontColor = Color.black
         package static let `default` = Font(
+            customId: nil,
             alias: "adapty_system",
             familyName: "adapty_system",
             weight: 400,
@@ -18,7 +19,7 @@ package extension AdaptyViewConfiguration {
             defaultSize: 15,
             defaultColor: .solidColor(defaultFontColor)
         )
-
+        package let customId: String?
         package let alias: String
         package let familyName: String
         package let weight: Int
@@ -31,6 +32,7 @@ package extension AdaptyViewConfiguration {
 #if DEBUG
     package extension AdaptyViewConfiguration.Font {
         static func create(
+            customId: String? = `default`.customId,
             alias: String = `default`.alias,
             familyName: String = `default`.familyName,
             weight: Int = `default`.weight,
@@ -39,6 +41,7 @@ package extension AdaptyViewConfiguration {
             defaultColor: AdaptyViewConfiguration.Filling = `default`.defaultColor
         ) -> Self {
             .init(
+                customId: customId,
                 alias: alias,
                 familyName: familyName,
                 weight: weight,
@@ -55,6 +58,7 @@ extension AdaptyViewConfiguration.Font: Codable {
 
     enum CodingKeys: String, CodingKey {
         case type
+        case customId = "custom_id"
         case alias = "value"
         case familyName = "family_name"
         case weight
@@ -65,6 +69,7 @@ extension AdaptyViewConfiguration.Font: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        customId = try container.decodeIfPresent(String.self, forKey: .customId)
         if let v = (try? container.decode([String].self, forKey: .alias))?.first {
             alias = v
         } else {
@@ -87,6 +92,8 @@ extension AdaptyViewConfiguration.Font: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.assetType, forKey: .type)
 
+        try container.encodeIfPresent(customId, forKey: .customId)
+        
         try container.encode(alias, forKey: .alias)
         if familyName != AdaptyViewConfiguration.Font.default.familyName {
             try container.encode(familyName, forKey: .familyName)

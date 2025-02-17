@@ -177,10 +177,12 @@ extension VC.RichText {
 extension VC.ImageData {
     private func uiImage(assetResolver: AdaptyImageAssetResolver) -> UIImage? {
         switch self {
-        case let .raster(data):
-            UIImage(data: data)
-        case let .custom(value):
-            assetResolver.uiImage(for: value)
+        case let .raster(customId, data):
+            if let customId {
+                assetResolver.uiImage(for: customId)
+            } else {
+                UIImage(data: data)
+            }
         default:
             nil
         }
