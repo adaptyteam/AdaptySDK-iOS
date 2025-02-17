@@ -128,7 +128,8 @@ public final class AdaptyPaywallController: UIViewController {
             .environmentObject(paywallConfiguration.tagResolverViewModel)
             .environmentObject(paywallConfiguration.timerViewModel)
             .environmentObject(paywallConfiguration.screensViewModel)
-            .environmentObject(paywallConfiguration.videoViewModel),
+            .environmentObject(paywallConfiguration.videoViewModel)
+            .environmentObject(paywallConfiguration.assetViewModel),
             to: view
         )
 

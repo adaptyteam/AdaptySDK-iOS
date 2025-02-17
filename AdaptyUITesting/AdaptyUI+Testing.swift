@@ -12,20 +12,23 @@ import AdaptyUI
 import Foundation
 import SwiftUI
 
+public struct AdaptyViewConfigurationTestWrapper {
+    var value: AdaptyViewConfiguration
+}
+
 #if DEBUG
-package extension AdaptyViewConfiguration {
+public extension AdaptyViewConfigurationTestWrapper {
     static func createTest(
         templateId: String = "basic",
         locale: String = "en",
         isRightToLeft: Bool = false,
-        images: [String] = [],
         content: String
     ) throws -> Self {
-        try create(
+        let configuration = try AdaptyViewConfiguration.create(
             templateId: templateId,
             locale: locale,
             isRightToLeft: isRightToLeft,
-            images: images,
+            images: [],
             colors: [
                 "$green_figma": .solidColor(.create(data: 0x3EBD78FF)),
                 "$green_figma_cc": .solidColor(.create(data: 0x3EBD78CC)),
@@ -112,43 +115,53 @@ package extension AdaptyViewConfiguration {
             ],
             content: content
         )
+
+        return .init(value: configuration)
     }
 }
 #endif
 
-//@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-//public struct AdaptyUITestRendererView: View {
-//    let viewConfiguration: AdaptyViewConfiguration
-//    let paywallConfiguration: AdaptyUI.PaywallConfiguration
-//
-//    public init(
-//        viewConfiguration: AdaptyViewConfiguration
-//    ) {
-//        self.viewConfiguration = viewConfiguration
-//        paywallConfiguration = AdaptyUI.PaywallConfiguration(
-//            logId: Log.stamp,
-//            paywall: AdaptyMockPaywall(),
-//            viewConfiguration: viewConfiguration,
-//            products: nil,
-//            observerModeResolver: nil,
-//            tagResolver: ["TEST_TAG": "Adapty"],
-//            timerResolver: nil
-//        )
-//    }
-//
-//    public var body: some View {
-//        AdaptyUIElementView(viewConfiguration.screen.content)
-//            .environmentObject(paywallConfiguration.paywallViewModel)
-//            .environmentObject(paywallConfiguration.actionsViewModel)
-//            .environmentObject(paywallConfiguration.sectionsViewModel)
-//            .environmentObject(paywallConfiguration.productsViewModel)
-//            .environmentObject(paywallConfiguration.tagResolverViewModel)
-//            .environmentObject(paywallConfiguration.timerViewModel)
-//            .environmentObject(paywallConfiguration.screensViewModel)
-//            .environmentObject(paywallConfiguration.videoViewModel)
-//            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
-//    }
-//}
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public struct AdaptyUITestRendererView: View {
+    let viewConfiguration: AdaptyViewConfiguration
+    let paywallConfiguration: AdaptyUI.PaywallConfiguration
+
+    public init(
+        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper
+//        ,
+//        imageResolver: AdaptyImageAssetResolver?,
+//        videoResolver: AdaptyVideoAssetResolver?
+    ) {
+        viewConfiguration = viewConfigurationWrapper.value
+
+        paywallConfiguration = AdaptyUI.PaywallConfiguration(
+            logId: Log.stamp,
+            paywall: AdaptyMockPaywall(),
+            viewConfiguration: viewConfiguration,
+            products: nil,
+            observerModeResolver: nil,
+            tagResolver: ["TEST_TAG": "Adapty"],
+            timerResolver: nil,
+            imageResolver: nil, // imageResolver,
+            videoResolver: nil // videoResolver
+        )
+    }
+
+    public var body: some View {
+        AdaptyUIElementView(viewConfiguration.screen.content)
+            .environmentObject(paywallConfiguration.eventsHandler)
+            .environmentObject(paywallConfiguration.paywallViewModel)
+            .environmentObject(paywallConfiguration.actionsViewModel)
+            .environmentObject(paywallConfiguration.sectionsViewModel)
+            .environmentObject(paywallConfiguration.productsViewModel)
+            .environmentObject(paywallConfiguration.tagResolverViewModel)
+            .environmentObject(paywallConfiguration.timerViewModel)
+            .environmentObject(paywallConfiguration.screensViewModel)
+            .environmentObject(paywallConfiguration.videoViewModel)
+            .environmentObject(paywallConfiguration.assetViewModel)
+            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
+    }
+}
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension View {

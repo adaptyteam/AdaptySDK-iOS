@@ -74,6 +74,12 @@ public final class Adapty: Sendable {
                     productsManager: productsManager,
                     storage: variationIdStorage
                 )
+                
+                self.sk1QueueManager = SK1QueueManager.startObserving(
+                    purchaseValidator: self,
+                    productsManager: productsManager,
+                    storage: variationIdStorage
+                )
             }
         } else {
             if observerMode {

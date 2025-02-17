@@ -50,7 +50,7 @@ extension AdaptyViewConfiguration.Point: Codable {
         } else if let values = try? container.decode([Double].self) {
             switch values.count {
             case 0: self.init(x: 0.0, y: 0.0)
-            case 1: self.init(x: 0.0, y: values[0])
+            case 1: self.init(x: values[0], y: values[0])
             default: self.init(x: values[1], y: values[0])
             }
         } else {

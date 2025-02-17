@@ -51,6 +51,7 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
         .environmentObject(paywallConfiguration.timerViewModel)
         .environmentObject(paywallConfiguration.screensViewModel)
         .environmentObject(paywallConfiguration.videoViewModel)
+        .environmentObject(paywallConfiguration.assetViewModel)
         .onAppear {
             paywallConfiguration.eventsHandler.viewDidAppear()
             paywallConfiguration.paywallViewModel.logShowPaywall()
