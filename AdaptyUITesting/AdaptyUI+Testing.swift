@@ -127,9 +127,10 @@ public struct AdaptyUITestRendererView: View {
     let paywallConfiguration: AdaptyUI.PaywallConfiguration
 
     public init(
-        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper,
-        imageResolver: AdaptyImageAssetResolver?,
-        videoResolver: AdaptyVideoAssetResolver?
+        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper
+//        ,
+//        imageResolver: AdaptyImageAssetResolver?,
+//        videoResolver: AdaptyVideoAssetResolver?
     ) {
         viewConfiguration = viewConfigurationWrapper.value
 
@@ -141,8 +142,8 @@ public struct AdaptyUITestRendererView: View {
             observerModeResolver: nil,
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
-            imageResolver: imageResolver,
-            videoResolver: videoResolver
+            imageResolver: nil, // imageResolver,
+            videoResolver: nil // videoResolver
         )
     }
 
