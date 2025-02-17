@@ -27,7 +27,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
             requestHeaders: headers
         )
     }
-    
+
     init(
         profileId: String,
         parameters: AdaptyProfileParameters?,

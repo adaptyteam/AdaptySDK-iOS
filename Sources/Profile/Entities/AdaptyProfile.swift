@@ -31,6 +31,7 @@ public struct AdaptyProfile: Sendable {
     /// The keys are product ids from the store. The values are arrays of information about consumables. Can be null if the customer has no purchases.
     public let nonSubscriptions: [String: [NonSubscription]]
 
+    let crossPlacementState: CrossPlacementState?
     let version: Int64
 }
 
@@ -56,6 +57,7 @@ extension AdaptyProfile: Hashable {
         hasher.combine(accessLevels)
         hasher.combine(subscriptions)
         hasher.combine(nonSubscriptions)
+        hasher.combine(crossPlacementState)
         hasher.combine(version)
     }
 }
@@ -84,6 +86,8 @@ extension AdaptyProfile: Codable {
         case version = "timestamp"
         case isTestUser = "is_test_user"
         case attributes
+
+        case crossPlacementState = "cross_placement_info"
     }
 
     public init(from decoder: Decoder) throws {
@@ -102,6 +106,7 @@ extension AdaptyProfile: Codable {
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
         subscriptions = try container.decodeIfPresent([String: Subscription].self, forKey: .subscriptions) ?? [:]
         nonSubscriptions = try container.decodeIfPresent([String: [NonSubscription]].self, forKey: .nonSubscriptions) ?? [:]
+        crossPlacementState = try container.decodeIfPresent(CrossPlacementState.self, forKey: .crossPlacementState)
     }
 
     public func encode(to encoder: Encoder) throws {

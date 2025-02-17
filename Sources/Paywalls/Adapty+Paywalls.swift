@@ -10,7 +10,6 @@ import Foundation
 private let log = Log.default
 
 extension Adapty {
-
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
@@ -78,9 +77,15 @@ extension Adapty {
                 httpFallbackSession
             )
         } catch {
-            guard let chosen = try profileManager(with: profileId).orThrows
+            let manager = try profileManager(with: profileId).orThrows
+            guard let chosen = manager
                 .paywallsStorage
-                .getPaywallWithFallback(byPlacementId: placementId, profileId: profileId, locale: locale)
+                .getPaywallWithFallback(
+                    byPlacementId: placementId,
+                    withVariationId: manager.storage.crossPlacmentState?.variationId(placementId: placementId),
+                    profileId: profileId,
+                    locale: locale
+                )
             else {
                 throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
             }
@@ -111,7 +116,10 @@ extension Adapty {
 
         let cached = manager
             .paywallsStorage
-            .getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId)?
+            .getPaywallByLocale(locale,
+                                orDefaultLocale: true,
+                                withPlacementId: placementId,
+                                withVariationId: manager.storage.crossPlacmentState?.variationId(placementId: placementId))?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -134,27 +142,44 @@ extension Adapty {
         _ placementId: String,
         _ locale: AdaptyLocale
     ) async throws -> AdaptyPaywall {
-        
         while true {
-            let (segmentId, cached, isTestUser): (String, AdaptyPaywall?, Bool) = try {
+            let (segmentId, cached, isTestUser, crossPlacementEligible, paywallVariationId): (String, AdaptyPaywall?, Bool, Bool, String?) = try {
                 let manager = try profileManager(with: profileId).orThrows
+                let variationId = manager.storage.crossPlacmentState?.variationId(placementId: placementId)
                 return (
                     manager.profile.value.segmentId,
-                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
-                    manager.profile.value.isTestUser
+                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
+                    manager.profile.value.isTestUser,
+                    manager.storage.crossPlacmentState?.eligibleNewTest ?? false,
+                    variationId
                 )
             }()
 
+            let caseWithPaywallVariation = paywallVariationId != nil
+
             do {
-                var response = try await httpSession.fetchPaywallVariations(
-                    apiKeyPrefix: apiKeyPrefix,
-                    profileId: profileId,
-                    placementId: placementId,
-                    locale: locale,
-                    segmentId: segmentId,
-                    cached: cached,
-                    disableServerCache: isTestUser
-                )
+                var response = if let paywallVariationId {
+                    try await httpSession.fetchPaywall(
+                        apiKeyPrefix: apiKeyPrefix,
+                        profileId: profileId,
+                        placementId: placementId,
+                        paywallVariationId: paywallVariationId,
+                        locale: locale,
+                        cached: cached,
+                        disableServerCache: isTestUser
+                    )
+                } else {
+                    try await httpSession.fetchPaywallVariations(
+                        apiKeyPrefix: apiKeyPrefix,
+                        profileId: profileId,
+                        placementId: placementId,
+                        locale: locale,
+                        segmentId: segmentId,
+                        cached: cached,
+                        crossPlacementEligible: crossPlacementEligible,
+                        disableServerCache: isTestUser
+                    )
+                }
 
                 if let manager = tryProfileManagerOrNil(with: profileId) {
                     response = manager.paywallsStorage.savedPaywallChosen(response)
@@ -164,6 +189,12 @@ extension Adapty {
                 return response.value
 
             } catch {
+                guard !caseWithPaywallVariation else {
+                    throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                }
+
+                if error.notFoundVariationId { continue }
+
                 guard error.wrongProfileSegmentId,
                       try await updateSegmentId(for: profileId, oldSegmentId: segmentId)
                 else {
@@ -185,50 +216,64 @@ extension Adapty {
         _ locale: AdaptyLocale,
         _ session: some FetchFallbackPaywallVariationsExecutor
     ) async throws -> AdaptyPaywall {
-        let result: AdaptyPaywallChosen
-
-        do {
-            let (cached, isTestUser): (AdaptyPaywall?, Bool) = {
-                guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
+        while true {
+            let (cached, isTestUser, paywallVariationId): (AdaptyPaywall?, Bool, String?) = {
+                guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false, nil) }
+                let variationId = manager.storage.crossPlacmentState?.variationId(placementId: placementId)
                 return (
-                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId)?.value,
-                    manager.profile.value.isTestUser
+                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
+                    manager.profile.value.isTestUser,
+                    variationId
                 )
             }()
 
-            var response = try await session.fetchFallbackPaywallVariations(
-                apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
-                placementId: placementId,
-                locale: locale,
-                cached: cached,
-                disableServerCache: isTestUser,
-                existFallback: Adapty.fallbackPaywalls?.contains(placementId: placementId) ?? false
-            )
-
-            if let manager = tryProfileManagerOrNil(with: profileId) {
-                response = manager.paywallsStorage.savedPaywallChosen(response)
-            }
-
-            result = response
-
-        } catch {
-            let chosen =
-                if let manager = tryProfileManagerOrNil(with: profileId) {
-                    manager.paywallsStorage.getPaywallWithFallback(byPlacementId: placementId, profileId: profileId, locale: locale)
+            do {
+                var response = if let paywallVariationId {
+                    try await session.fetchFallbackPaywall(
+                        apiKeyPrefix: apiKeyPrefix,
+                        profileId: profileId,
+                        placementId: placementId,
+                        paywallVariationId: paywallVariationId,
+                        locale: locale,
+                        cached: cached,
+                        disableServerCache: isTestUser
+                    )
                 } else {
-                    Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, profileId: profileId)
+                    try await session.fetchFallbackPaywallVariations(
+                        apiKeyPrefix: apiKeyPrefix,
+                        profileId: profileId,
+                        placementId: placementId,
+                        locale: locale,
+                        cached: cached,
+                        disableServerCache: isTestUser
+                    )
                 }
 
-            guard let chosen else {
-                throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                if let manager = tryProfileManagerOrNil(with: profileId) {
+                    response = manager.paywallsStorage.savedPaywallChosen(response)
+                }
+
+                Adapty.trackEventIfNeed(response)
+                return response.value
+
+            } catch {
+                if error.notFoundVariationId { continue }
+
+                let chosen =
+                    if let manager = tryProfileManagerOrNil(with: profileId) {
+                        manager.paywallsStorage.getPaywallWithFallback(byPlacementId: placementId, withVariationId: paywallVariationId, profileId: profileId, locale: locale)
+                    } else {
+                        Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, withVariationId: paywallVariationId, profileId: profileId)
+                    }
+
+                guard let chosen else {
+                    throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                }
+
+                Adapty.trackEventIfNeed(chosen)
+                return chosen.value
             }
-
-            result = chosen
         }
-
-        Adapty.trackEventIfNeed(result)
-        return result.value
     }
 }
 
@@ -255,6 +300,12 @@ private extension Error {
     var wrongProfileSegmentId: Bool {
         let error = unwrapped
         if let httpError = error as? HTTPError { return Backend.wrongProfileSegmentId(httpError) }
+        return false
+    }
+
+    var notFoundVariationId: Bool {
+        let error = unwrapped
+        if let httpError = error as? HTTPError { return Backend.notFoundVariationId(httpError) }
         return false
     }
 }

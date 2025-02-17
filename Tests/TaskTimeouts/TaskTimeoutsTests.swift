@@ -12,69 +12,52 @@ import Foundation
 import Testing
 
 struct TaskTimeoutsTests {
-    @Test
-    func testTask() async {
+    let duration: TaskDuration = .milliseconds(500)
+
+    @Test func testTask() async {
         let start = Date()
-        
-        do {
-            try await withThrowingTimeout(.milliseconds(500)) {
-                try await Task.sleep(nanoseconds: 1_000_000_000)
+        await #expect(throws: TimeoutError.self) {
+            try await withThrowingTimeout(duration) {
+                try await Task.sleep(nanoseconds: 2 * duration.asNanoseconds)
             }
-            
-            #expect(false)
-        } catch {
-            print("error: \(error)")
-            #expect(error is TimeoutError)
-            #expect(Date().timeIntervalSince(start) < 0.75)
         }
+
+        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeIntrval)
     }
-    
-    @Test
-    func testNestedTask() async {
+
+    @Test func testTaskWithotCancelletionHandler() async {
         let start = Date()
-        
-        do {
-            try await withThrowingTimeout(.milliseconds(500)) {
-                let fetchTask = Task {
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
+        await #expect(throws: TimeoutError.self) {
+            try await withThrowingTimeout(duration) {
+                let nestedTask = Task {
+                    try await Task.sleep(nanoseconds: 2 * duration.asNanoseconds)
                 }
 
-                return try await fetchTask.value
+                try await nestedTask.value
             }
-            
-            #expect(false)
-        } catch {
-            print("error: \(error)")
-            #expect(error is TimeoutError)
-            #expect(Date().timeIntervalSince(start) < 0.75)
         }
-    }
 
-    @Test
-    func testNestedTaskFixed() async {
+        #expect(Date().timeIntervalSince(start) > 2 * duration.asTimeIntrval)
+    }
+    
+    @Test func testTaskWithCancelletionHandler() async {
         let start = Date()
-        
-        do {
-            try await withThrowingTimeout(.milliseconds(500)) {
-                // Create the task with the current task's priority
-                let fetchTask = Task {
-                    try await Task.sleep(nanoseconds: 1_000_000_000)
+        await #expect(throws: TimeoutError.self) {
+            try await withThrowingTimeout(duration) {
+                let nestedTask = Task {
+                    try await Task.sleep(nanoseconds: 2 * duration.asNanoseconds)
                 }
                 
                 // Add cleanup to ensure the task is cancelled if timeout occurs
                 try await withTaskCancellationHandler {
-                    try await fetchTask.value
+                    try await nestedTask.value
                 } onCancel: {
-                    fetchTask.cancel()
+                    nestedTask.cancel()
                 }
             }
-            
-            #expect(false)
-        } catch {
-            print("error: \(error)")
-            #expect(error is TimeoutError)
-            #expect(Date().timeIntervalSince(start) < 0.75)
         }
+
+        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeIntrval)
     }
 }
 

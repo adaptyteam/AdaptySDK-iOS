@@ -21,6 +21,8 @@ public struct AdaptyPaywall: Sendable {
 
     public let audienceName: String
 
+    let placementAudienceVersionId: String
+
     /// An identifier of a variation, used to attribute purchases to this paywall.
     public let variationId: String
 
@@ -66,6 +68,7 @@ extension AdaptyPaywall: Codable {
         case viewConfiguration = "paywall_builder"
         case attributes
         case audienceName = "audience_name"
+        case placementAudienceVersionId = "placement_audience_version_id"
     }
 
     public init(from decoder: Decoder) throws {
@@ -85,6 +88,7 @@ extension AdaptyPaywall: Codable {
         products = try container.decode([ProductReference].self, forKey: .products)
         remoteConfig = try container.decodeIfPresent(RemoteConfig.self, forKey: .remoteConfig)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
+        placementAudienceVersionId = try container.decode(String.self, forKey: .placementAudienceVersionId)
     }
 
     public func encode(to encoder: Encoder) throws {

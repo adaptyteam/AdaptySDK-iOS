@@ -1,0 +1,49 @@
+//
+//  CrossPlacementState.swift
+//  AdaptySDK
+//
+//  Created by Aleksei Valiano on 23.01.2025.
+//
+
+import Foundation
+
+struct CrossPlacementState: Sendable, Hashable {
+    let enabled: Bool
+    let variationIdByPlacements: [String: String]
+    let version: Int64
+}
+
+extension CrossPlacementState {
+    var eligibleNewTest: Bool {
+        enabled ? variationIdByPlacements.isEmpty : false
+    }
+
+    func contains(placementId: String) -> Bool {
+        variationIdByPlacements.keys.contains(placementId)
+    }
+
+    func variationId(placementId: String) -> String? {
+        variationIdByPlacements[placementId]
+    }
+}
+
+extension CrossPlacementState: CustomStringConvertible {
+    public var description: String {
+        "(enabled: \(enabled), variationIdByPlacements: \(variationIdByPlacements), version: \(version))"
+    }
+}
+
+extension CrossPlacementState: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case enabled
+        case variationIdByPlacements = "placement_with_variation_map"
+        case version
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled) ?? true
+        variationIdByPlacements = try container.decode([String: String].self, forKey: .variationIdByPlacements)
+        version = try container.decode(Int64.self, forKey: .version)
+    }
+}

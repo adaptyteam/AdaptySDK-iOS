@@ -40,6 +40,7 @@ private extension CodingUserInfoKey {
     static let enableEncodingViewConfiguration = CodingUserInfoKey(rawValue: "adapty_encode_view_configuration")!
     static let profileId = CodingUserInfoKey(rawValue: "adapty_profile_id")!
     static let placementId = CodingUserInfoKey(rawValue: "adapty_placement_id")!
+    static let paywallVariationId = CodingUserInfoKey(rawValue: "adapty_paywall_variation_id")!
 }
 
 extension CodingUserInfoСontainer {
@@ -49,6 +50,10 @@ extension CodingUserInfoСontainer {
 
     func setPlacementId(_ value: String) {
         userInfo[.placementId] = value
+    }
+
+    func setPaywallVariationId(_ value: String) {
+        userInfo[.paywallVariationId] = value
     }
 
     package func enableEncodingViewConfiguration() {
@@ -78,6 +83,16 @@ extension [CodingUserInfoKey: Any] {
             }
 
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placementId) parameter"))
+        }
+    }
+
+    var paywallVariationId: String {
+        get throws {
+            if let value = self[.paywallVariationId] as? String {
+                return value
+            }
+
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.paywallVariationId) parameter"))
         }
     }
 }

@@ -13,6 +13,10 @@ struct BackendError: Error, Hashable, Codable {
     let requestId: String?
 }
 
+enum ResponseDecodingError: Error, Hashable, Codable {
+    case notFoundVariationId
+}
+
 extension BackendError: CustomStringConvertible {
     public var description: String {
         (requestId.map { "requestId: \($0), " } ?? "") + "body: \(body)"
@@ -20,6 +24,15 @@ extension BackendError: CustomStringConvertible {
 }
 
 extension Backend {
+    static func notFoundVariationId(_ error: HTTPError) -> Bool {
+        switch error {
+        case let .decoding(_, _, _, _, _, value):
+            (value as? ResponseDecodingError) == .notFoundVariationId
+        default:
+            false
+        }
+    }
+
     static func wrongProfileSegmentId(_ error: HTTPError) -> Bool {
         backendErrorCodes(error).contains("INCORRECT_SEGMENT_HASH_ERROR")
     }

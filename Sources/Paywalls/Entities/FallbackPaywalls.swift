@@ -34,23 +34,36 @@ struct FallbackPaywalls: Sendable {
         head.placementIds?.contains(id)
     }
 
-    /// 2
-    func getPaywall(byPlacementId id: String, profileId: String) -> AdaptyPaywallChosen? {
-        guard contains(placementId: id) ?? true else { return nil }
-
+    private func drawVariation(byPlacementId id: String, profileId: String) -> AdaptyPaywallVariations.Draw? {
         let decoder = FallbackPaywalls.decoder(profileId: profileId, placementId: id)
-        let chosen: AdaptyPaywallChosen?
+
         do {
-            chosen = try decoder.decode(Body.self, from: Data(contentsOf: fileURL)).chosen
+            return try decoder.decode(FallbackPaywalls.Draw.self, from: Data(contentsOf: fileURL)).draw
         } catch {
             log.error(error.localizedDescription)
-            chosen = nil
+            return nil
+        }
+    }
+
+    /// 2
+    func getPaywall(byPlacementId id: String, withVariationId: String?, profileId: String) -> AdaptyPaywallChosen? {
+        guard contains(placementId: id) ?? true,
+              let variationId = withVariationId ?? drawVariation(byPlacementId: id, profileId: profileId)?.variationId
+        else { return nil }
+
+        let decoder = FallbackPaywalls.decoder(placementId: id, paywallVariationId: variationId)
+        let paywall: AdaptyPaywall?
+        do {
+            paywall = try decoder.decode(FallbackPaywalls.Value.self, from: Data(contentsOf: fileURL)).paywall
+        } catch {
+            log.error(error.localizedDescription)
+            paywall = nil
         }
 
-        return chosen.map {
+        return paywall.map {
             var v = $0
-            v.value.version = version
-            return v
+            v.version = version
+            return AdaptyPaywallChosen.draw(profileId, v) 
         }
     }
 }
@@ -64,7 +77,7 @@ extension FallbackPaywalls {
         case placementIds = "developer_ids"
     }
 
-    struct Head: Sendable, Decodable {
+    private struct Head: Sendable, Decodable {
         let placementIds: Set<String>?
         let version: Int64
         let formatVersion: Int
@@ -98,8 +111,8 @@ extension FallbackPaywalls {
         }
     }
 
-    struct Body: Sendable, Decodable {
-        let chosen: AdaptyPaywallChosen?
+    struct Draw: Sendable, Decodable {
+        let draw: AdaptyPaywallVariations.Draw?
         init(from decoder: Decoder) throws {
             let placementId = try AnyCodingKeys(stringValue: decoder.userInfo.placementId)
             let container = try decoder
@@ -107,22 +120,47 @@ extension FallbackPaywalls {
                 .nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .data)
 
             guard container.contains(placementId) else {
-                chosen = nil
+                draw = nil
                 return
             }
 
             if let string = try? container.decode(String.self, forKey: placementId) {
-                let decoder = try FallbackPaywalls.decoder(profileId: decoder.userInfo.profileId)
                 let data = string.data(using: .utf8) ?? Data()
-                chosen = try decoder.decode(AdaptyPaywallChosen.self, from: data)
+                let decoder = try FallbackPaywalls.decoder(profileId: decoder.userInfo.profileId)
+
+                draw = try decoder.decode(AdaptyPaywallVariations.Draw.self, from: data)
             } else {
-                chosen = try container.decodeIfPresent(AdaptyPaywallChosen.self, forKey: placementId)
+                draw = try container.decodeIfPresent(AdaptyPaywallVariations.Draw.self, forKey: placementId)
+            }
+        }
+    }
+
+    struct Value: Sendable, Decodable {
+        let paywall: AdaptyPaywall?
+        init(from decoder: Decoder) throws {
+            let placementId = try AnyCodingKeys(stringValue: decoder.userInfo.placementId)
+            let container = try decoder
+                .container(keyedBy: CodingKeys.self)
+                .nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .data)
+
+            guard container.contains(placementId) else {
+                paywall = nil
+                return
+            }
+
+            if let string = try? container.decode(String.self, forKey: placementId) {
+                let data = string.data(using: .utf8) ?? Data()
+                let decoder = try FallbackPaywalls.decoder(paywallVariationId: decoder.userInfo.paywallVariationId)
+
+                paywall = try decoder.decode(AdaptyPaywallVariations.Value.self, from: data).paywall
+            } else {
+                paywall = try container.decodeIfPresent(AdaptyPaywallVariations.Value.self, forKey: placementId)?.paywall
             }
         }
     }
 }
 
-extension FallbackPaywalls {
+private extension FallbackPaywalls {
     static func decoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         Backend.configure(jsonDecoder: decoder)
@@ -135,8 +173,20 @@ extension FallbackPaywalls {
         return decoder
     }
 
+    static func decoder(paywallVariationId: String) -> JSONDecoder {
+        let decoder = decoder()
+        decoder.setPaywallVariationId(paywallVariationId)
+        return decoder
+    }
+
     static func decoder(profileId: String, placementId: String) -> JSONDecoder {
         let decoder = decoder(profileId: profileId)
+        decoder.setPlacementId(placementId)
+        return decoder
+    }
+
+    static func decoder(placementId: String, paywallVariationId: String) -> JSONDecoder {
+        let decoder = decoder(paywallVariationId: paywallVariationId)
         decoder.setPlacementId(placementId)
         return decoder
     }

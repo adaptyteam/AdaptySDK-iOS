@@ -54,8 +54,11 @@ final class PaywallsStorage: Sendable {
         }
     }()
 
-    func getPaywallByLocale(_ locale: AdaptyLocale, orDefaultLocale: Bool, withPlacementId placementId: String) -> VH<AdaptyPaywall>? {
+    func getPaywallByLocale(_ locale: AdaptyLocale, orDefaultLocale: Bool, withPlacementId placementId: String, withVariationId: String?) -> VH<AdaptyPaywall>? {
         guard let paywall = Self.paywallByPlacementId[placementId] else { return nil }
+        if let variationId = withVariationId, paywall.value.variationId != variationId {
+            return nil
+        }
         let paywallLocale = paywall.value.localeOrDefault
         return if paywallLocale.equalLanguageCode(locale) {
             paywall
@@ -68,13 +71,15 @@ final class PaywallsStorage: Sendable {
 
     private func getNewerPaywall(than paywall: AdaptyPaywall) -> AdaptyPaywall? {
         guard let cached: AdaptyPaywall = Self.paywallByPlacementId[paywall.placementId]?.value,
-              cached.equalLanguageCode(paywall) else { return nil }
+              cached.equalLanguageCode(paywall),
+              cached.variationId == paywall.variationId
+        else { return nil }
         return paywall.version >= cached.version ? nil : cached
     }
 
     func savedPaywallChosen(_ chosen: AdaptyPaywallChosen) -> AdaptyPaywallChosen {
         let paywall = chosen.value
-        if let newer = getNewerPaywall(than: paywall) { return AdaptyPaywallChosen(value: newer, kind: .restore) }
+        if let newer = getNewerPaywall(than: paywall) { return AdaptyPaywallChosen.restored(newer) }
 
         Self.paywallByPlacementId[paywall.placementId] = VH(paywall, time: Date())
 

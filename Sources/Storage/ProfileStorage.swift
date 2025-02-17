@@ -17,6 +17,7 @@ final class ProfileStorage: Sendable {
         static let externalAnalyticsDisabledKey = "AdaptySDK_External_Analytics_Disabled"
         static let syncedTransactionsKey = "AdaptySDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "AdaptySDK_Apple_Search_Ads_Sync_Date"
+        static let crossPlacementStateKey = "AdaptySDK_Cross_Placement_State"
     }
 
     private static let userDefaults = Storage.userDefaults
@@ -47,6 +48,15 @@ final class ProfileStorage: Sendable {
     private static var externalAnalyticsDisabled: Bool = userDefaults.bool(forKey: Constants.externalAnalyticsDisabledKey)
     private static var syncedTransactions: Bool = userDefaults.bool(forKey: Constants.syncedTransactionsKey)
     private static var appleSearchAdsSyncDate: Date? = userDefaults.object(forKey: Constants.appleSearchAdsSyncDateKey) as? Date
+
+    private static var crossPlacmentState: CrossPlacementState? = {
+        do {
+            return try userDefaults.getJSON(CrossPlacementState.self, forKey: Constants.crossPlacementStateKey)
+        } catch {
+            log.warn(error.localizedDescription)
+            return nil
+        }
+    }()
 
     var profileId: String { Self.profileId }
 
@@ -89,6 +99,18 @@ final class ProfileStorage: Sendable {
         log.debug("set appleSearchAdsSyncDate = \(now).")
     }
 
+    var crossPlacmentState: CrossPlacementState? { Self.crossPlacmentState }
+
+    func setCrossPlacmentState(_ value: CrossPlacementState) {
+        do {
+            try Self.userDefaults.setJSON(value, forKey: Constants.crossPlacementStateKey)
+            Self.crossPlacmentState = crossPlacmentState
+            log.debug("saving crossPlacmentState success.")
+        } catch {
+            log.error("saving crossPlacmentState fail. \(error.localizedDescription)")
+        }
+    }
+
     func clearProfile(newProfileId profileId: String?) {
         Self.clearProfile(newProfileId: profileId)
     }
@@ -112,6 +134,8 @@ final class ProfileStorage: Sendable {
         appleSearchAdsSyncDate = nil
         userDefaults.removeObject(forKey: Constants.profileKey)
         profile = nil
+        userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
+        crossPlacmentState = nil
 
         BackendIntroductoryOfferEligibilityStorage.clear()
         PaywallsStorage.clear()

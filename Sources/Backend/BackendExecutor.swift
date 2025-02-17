@@ -49,4 +49,24 @@ extension BackendExecutor {
             throw error
         }
     }
+
+    @AdaptyActor
+    @inlinable
+    func perform<Body>(
+        _ request: some HTTPRequest,
+        requestName: APIRequestName,
+        logParams: EventParameters? = nil,
+        withDecoder decoder: @escaping HTTPDecoder<Body>
+    ) async throws -> HTTPResponse<Body> {
+        let stamp = request.stamp
+        Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        do {
+            let response: HTTPResponse<Body> = try await session.perform(request, withDecoder: decoder)
+            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
+            return response
+        } catch {
+            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
+            throw error
+        }
+    }
 }

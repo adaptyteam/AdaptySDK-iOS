@@ -7,33 +7,14 @@
 
 import Foundation
 
-private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = AdaptyPaywallChosen
-
+private struct FetchPaywallVariationsRequest: HTTPRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    let profileId: String
-    let cached: AdaptyPaywall?
     let queryItems: QueryItems
 
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeDataResponse(
-            response,
-            withConfiguration: configuration,
-            withProfileId: profileId,
-            withCachedPaywall: cached
-        )
-    }
-
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, cached: AdaptyPaywall?, disableServerCache: Bool) {
-        self.profileId = profileId
-        self.cached = cached
-
+    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, crossPlacementEligible: Bool, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
@@ -44,43 +25,56 @@ private struct FetchPaywallVariationsRequest: HTTPRequestWithDecodableResponse {
             .setBackendProfileId(profileId)
             .setVisualBuilderVersion(AdaptyViewConfiguration.builderVersion)
             .setVisualBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
+            .setCrossPlacementEligibility(crossPlacementEligible)
             .setSegmentId(segmentId)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
-extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyPaywallChosen {
+extension AdaptyPaywallChosen {
     @inlinable
-    static func decodeDataResponse(
+    static func decodeResponse(
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
         withProfileId profileId: String,
-        withCachedPaywall cached: AdaptyPaywall?
-    ) throws -> HTTPResponse<AdaptyPaywallChosen> {
+        withCachedPaywall cached: AdaptyPaywall?,
+        crossPlacementEligible: Bool
+    ) async throws -> HTTPResponse<AdaptyPaywallChosen> {
         let jsonDecoder = JSONDecoder()
         configuration?.configure(jsonDecoder: jsonDecoder)
-        jsonDecoder.setProfileId(profileId)
 
         let version: Int64 = try jsonDecoder.decode(
-            Backend.Response.ValueOfMeta<AdaptyPaywallChosen.Meta>.self,
+            Backend.Response.ValueOfMeta<AdaptyPaywallVariations.Meta>.self,
             responseBody: response.body
         ).meta.version
 
-        let body: AdaptyPaywallChosen =
-            if let cached, cached.version > version {
-                AdaptyPaywallChosen(
-                    value: cached,
-                    kind: .restore
-                )
-            } else {
-                try jsonDecoder.decode(
-                    Backend.Response.ValueOfData<AdaptyPaywallChosen>.self,
-                    responseBody: response.body
-                ).value.replaceAdaptyPaywall(version: version)
-            }
+        if let cached, cached.version > version {
+            return response.replaceBody(AdaptyPaywallChosen.restored(cached))
+        }
 
-        return response.replaceBody(body)
+        let paywallVariationId: String
+        if crossPlacementEligible {
+            paywallVariationId = "not implimented"
+        } else {
+            jsonDecoder.setProfileId(profileId)
+
+            paywallVariationId = try jsonDecoder.decode(
+                Backend.Response.ValueOfData<AdaptyPaywallVariations.Draw>.self,
+                responseBody: response.body
+            ).value.variationId
+        }
+
+        jsonDecoder.setPaywallVariationId(paywallVariationId)
+
+        guard let paywall = try jsonDecoder.decode(
+            Backend.Response.ValueOfData<AdaptyPaywallVariations.Value>.self,
+            responseBody: response.body
+        ).value.paywall else {
+            throw ResponseDecodingError.notFoundVariationId
+        }
+
+        return response.replaceBody(AdaptyPaywallChosen.draw(profileId, paywall))
     }
 }
 
@@ -92,9 +86,10 @@ extension Backend.MainExecutor {
         locale: AdaptyLocale,
         segmentId: String,
         cached: AdaptyPaywall?,
+        crossPlacementEligible: Bool,
         disableServerCache: Bool
     ) async throws -> AdaptyPaywallChosen {
-        let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\(crossPlacementEligible ? "\"cross_placement_eligibility\":true," : "")\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
 
         let request = FetchPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -103,11 +98,13 @@ extension Backend.MainExecutor {
             locale: locale,
             md5Hash: md5Hash,
             segmentId: segmentId,
-            cached: cached,
+            crossPlacementEligible: crossPlacementEligible,
             disableServerCache: disableServerCache
         )
 
-        let response = try await perform(
+        let configuration = session.configuration as? HTTPCodableConfiguration
+
+        let response: HTTPResponse<AdaptyPaywallChosen> = try await perform(
             request,
             requestName: .fetchPaywallVariations,
             logParams: [
@@ -118,9 +115,18 @@ extension Backend.MainExecutor {
                 "builder_version": AdaptyViewConfiguration.builderVersion,
                 "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
                 "md5": md5Hash,
+                "cross_placement_eligibility": crossPlacementEligible,
                 "disable_server_cache": disableServerCache,
             ]
-        )
+        ) { @Sendable response in
+            try await AdaptyPaywallChosen.decodeResponse(
+                response,
+                withConfiguration: configuration,
+                withProfileId: profileId,
+                withCachedPaywall: cached,
+                crossPlacementEligible: crossPlacementEligible
+            )
+        }
 
         return response.body
     }

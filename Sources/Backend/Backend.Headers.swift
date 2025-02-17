@@ -14,6 +14,7 @@ extension Backend.Request {
     fileprivate static let viewConfigurationLocaleHeaderKey = "adapty-paywall-builder-locale"
     fileprivate static let visualBuilderVersionHeaderKey = "adapty-paywall-builder-version"
     fileprivate static let visualBuilderConfigurationFormatVersionHeaderKey = "adapty-paywall-builder-config-format-version"
+    fileprivate static let crossPlacementEligibilityHeaderKey = "adapty-cross-placement-eligibility"
     fileprivate static let segmentIdHeaderKey = "adapty-profile-segment-hash"
 
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
@@ -39,7 +40,7 @@ extension Backend.Request {
             sessionIDHeaderKey: envorinment.sessionIdentifier,
             appInstallIdHeaderKey: envorinment.application.installationIdentifier,
             isObserveModeHeaderKey: configuration.observerMode ? "true" : "false",
-            storeKit2EnabledHeaderKey:  Environment.StoreKit.storeKit2Enabled ? "enabled" : "unavailable",
+            storeKit2EnabledHeaderKey: Environment.StoreKit.storeKit2Enabled ? "enabled" : "unavailable",
         ]
 
         if let ver = envorinment.application.version {
@@ -55,9 +56,9 @@ extension Backend.Request {
     }
 }
 
-extension Backend.Response {
-    fileprivate static let hashHeaderKey = "x-response-hash"
-    fileprivate static let requestIdHeaderKey = "request-id"
+private extension Backend.Response {
+    static let hashHeaderKey = "x-response-hash"
+    static let requestIdHeaderKey = "request-id"
 }
 
 extension HTTPHeaders {
@@ -75,6 +76,10 @@ extension HTTPHeaders {
 
     func setVisualBuilderConfigurationFormatVersion(_ version: String?) -> Self {
         updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderConfigurationFormatVersionHeaderKey)
+    }
+
+    func setCrossPlacementEligibility(_ enabled: Bool) -> Self {
+        updateOrRemoveValue(enabled ? "true" : "false", forKey: Backend.Request.crossPlacementEligibilityHeaderKey)
     }
 
     func setSegmentId(_ id: String?) -> Self {

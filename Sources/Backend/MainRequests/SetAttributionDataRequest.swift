@@ -53,7 +53,6 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
         try container.encode(source, forKey: .source)
         try container.encode(attributionJson, forKey: .attributionJson)
         try container.encode(profileId, forKey: .profileId)
-
     }
 }
 

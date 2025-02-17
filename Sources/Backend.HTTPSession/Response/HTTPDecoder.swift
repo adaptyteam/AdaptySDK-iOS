@@ -7,4 +7,4 @@
 
 import Foundation
 
-typealias HTTPDecoder<Body> = @Sendable (HTTPDataResponse) throws -> HTTPResponse<Body>
+typealias HTTPDecoder<Body> = @Sendable (HTTPDataResponse) async throws -> HTTPResponse<Body>

@@ -21,7 +21,7 @@ private struct FetchIntroductoryOfferEligibilityRequest: HTTPRequestWithDecodabl
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?
     ) throws -> Response {
-        try Self.decodeDataResponse(
+        try Self.decodeResponse(
             response,
             withConfiguration: configuration,
             requestHeaders: headers
@@ -38,7 +38,7 @@ private struct FetchIntroductoryOfferEligibilityRequest: HTTPRequestWithDecodabl
 
 extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendIntroductoryOfferEligibilityState]? {
     @inlinable
-    static func decodeDataResponse(
+    static func decodeResponse(
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
         requestHeaders: HTTPHeaders

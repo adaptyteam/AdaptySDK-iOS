@@ -91,7 +91,7 @@ final class HTTPSession: Sendable {
 
         var bodyResponse: HTTPResponse<Body>
         do {
-            bodyResponse = try decoder(dataResponse)
+            bodyResponse = try await decoder(dataResponse)
 
         } catch {
             let httpError = HTTPError.decoding(dataResponse, error: error)
