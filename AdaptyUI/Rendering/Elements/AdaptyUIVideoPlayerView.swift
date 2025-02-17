@@ -39,6 +39,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.requiresLinearPlayback = true
         playerViewController.player = player
         playerViewController.videoGravity = videoGravity
+        playerViewController.allowsPictureInPicturePlayback = false
 
         DispatchQueue.main.async {
 #if os(visionOS)
