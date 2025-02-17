@@ -12,7 +12,19 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Identifiable {
+public struct AdaptyLoadingPlaceholderView: View {
+    public init() {}
+
+    public var body: some View {
+        ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(UIColor.systemBackground))
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where AlertItem: Identifiable, Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
 
     private let isPresented: Binding<Bool>
@@ -33,6 +45,7 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
     private let didPartiallyLoadProducts: (([String]) -> Void)?
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
+    private let placeholderBuilder: (() -> Placeholder)?
 
     init(
         isPresented: Binding<Bool>,
@@ -50,7 +63,8 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
         didFailLoadingProducts: ((AdaptyError) -> Bool)?,
         didPartiallyLoadProducts: (([String]) -> Void)?,
         showAlertItem: Binding<AlertItem?>,
-        showAlertBuilder: ((AlertItem) -> Alert)?
+        showAlertBuilder: ((AlertItem) -> Alert)?,
+        placeholderBuilder: (() -> Placeholder)?
     ) {
         self.isPresented = isPresented
         self.fullScreen = fullScreen
@@ -68,6 +82,7 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
         self.didPartiallyLoadProducts = didPartiallyLoadProducts
         self.showAlertItem = showAlertItem
         self.showAlertBuilder = showAlertBuilder
+        self.placeholderBuilder = placeholderBuilder
     }
 
     @ViewBuilder
@@ -89,10 +104,10 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
                 showAlertItem: showAlertItem,
                 showAlertBuilder: showAlertBuilder
             )
+        } else if let placeholderBuilder {
+            placeholderBuilder()
         } else {
-            ProgressView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(UIColor.systemBackground))
+            AdaptyLoadingPlaceholderView()
         }
     }
 
@@ -151,7 +166,7 @@ public extension View {
     ///     - didFailLoadingProducts: This method is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
     ///     - showAlertItem:
     ///     - showAlertBuilder:
-    func paywall<AlertItem: Identifiable>(
+    func paywall<Placeholder: View, AlertItem: Identifiable>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
         paywallConfiguration: AdaptyUI.PaywallConfiguration?,
@@ -167,10 +182,11 @@ public extension View {
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
         didPartiallyLoadProducts: (([String]) -> Void)? = nil,
         showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
-        showAlertBuilder: ((AlertItem) -> Alert)? = nil
+        showAlertBuilder: ((AlertItem) -> Alert)? = nil,
+        placeholderBuilder: (() -> Placeholder)? = { AdaptyLoadingPlaceholderView() }
     ) -> some View {
         modifier(
-            AdaptyPaywallViewModifier<AlertItem>(
+            AdaptyPaywallViewModifier<Placeholder, AlertItem>(
                 isPresented: isPresented,
                 fullScreen: fullScreen,
                 paywallConfiguration: paywallConfiguration,
@@ -186,7 +202,8 @@ public extension View {
                 didFailLoadingProducts: didFailLoadingProducts,
                 didPartiallyLoadProducts: didPartiallyLoadProducts,
                 showAlertItem: showAlertItem,
-                showAlertBuilder: showAlertBuilder
+                showAlertBuilder: showAlertBuilder,
+                placeholderBuilder: placeholderBuilder
             )
         )
     }
