@@ -34,18 +34,13 @@ extension InsettableShape {
                 case let .solidColor(color):
                     self.fill(color.swiftuiColor)
                 case let .colorGradient(gradient):
-                    self.fill(
-                        LinearGradient(
-                            stops: gradient.items.map { $0.gradientStop },
-                            startPoint: gradient.start.unitPoint,
-                            endPoint: gradient.end.unitPoint
-                        )
-                    )
                     switch gradient.kind {
                     case .linear:
                         self.fill(
                             LinearGradient(
-                                stops: gradient.items.map { $0.gradientStop },
+                                stops: gradient.items
+                                    .map { $0.gradientStop }
+                                    .sorted(by: { $0.location > $1.location }),
                                 startPoint: gradient.start.unitPoint,
                                 endPoint: gradient.end.unitPoint
                             )
@@ -53,7 +48,11 @@ extension InsettableShape {
                     case .conic:
                         self.fill(
                             AngularGradient(
-                                gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                                gradient: .init(
+                                    stops: gradient.items
+                                        .map { $0.gradientStop }
+                                        .sorted(by: { $0.location > $1.location })
+                                ),
                                 center: .center,
                                 angle: .degrees(360)
                             )
@@ -61,7 +60,11 @@ extension InsettableShape {
                     case .radial:
                         self.fill(
                             RadialGradient(
-                                gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                                gradient: .init(
+                                    stops: gradient.items
+                                        .map { $0.gradientStop }
+                                        .sorted(by: { $0.location > $1.location })
+                                ),
                                 center: .center,
                                 startRadius: 0.0,
                                 endRadius: 1.0
