@@ -16,8 +16,14 @@ extension VC.Point {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension VC.ColorGradient.Item {
-    var gradientStop: Gradient.Stop { Gradient.Stop(color: color.swiftuiColor, location: p) }
+    func gradientStop(_ assetsResolver: AdaptyAssetsResolver) -> Gradient.Stop {
+        Gradient.Stop(
+            color: color.swiftuiColor(assetsResolver),
+            location: p
+        )
+    }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -31,6 +37,7 @@ extension View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension VC.Mode<VC.Color> {
     private func resolvedColor(style: UIUserInterfaceStyle) -> VC.Color {
         switch style {
@@ -41,25 +48,55 @@ extension VC.Mode<VC.Color> {
         }
     }
 
-    var swiftuiColor: SwiftUI.Color {
-        SwiftUI.Color(uiColor)
+    func swiftuiColor(_ assetsResolver: AdaptyAssetsResolver) -> SwiftUI.Color {
+        SwiftUI.Color(uiColor(assetsResolver))
     }
 
-    var uiColor: UIColor {
+    func uiColor(_ assetsResolver: AdaptyAssetsResolver) -> UIColor {
         UIColor {
-            resolvedColor(style: $0.userInterfaceStyle).uiColor
+            resolvedColor(style: $0.userInterfaceStyle).uiColor(assetsResolver)
         }
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension VC.Color {
-    var swiftuiColor: SwiftUI.Color {
-        SwiftUI.Color(uiColor)
+    func swiftuiColor(_ assetsResolver: AdaptyAssetsResolver) -> SwiftUI.Color {
+        guard let customId, let customColor = assetsResolver.color(for: customId) else {
+            return Color(
+                .sRGB,
+                red: red,
+                green: green,
+                blue: blue,
+                opacity: alpha
+            )
+        }
+
+        return switch customColor {
+        case let .uiColor(value):
+            SwiftUI.Color(value)
+        case let .swiftUIColor(value):
+            value
+        }
     }
 
-    var uiColor: UIColor {
-        UIColor(red: red, green: green, blue: blue, alpha: alpha)
+    func uiColor(_ assetsResolver: AdaptyAssetsResolver) -> UIColor {
+        guard let customId, let customColor = assetsResolver.color(for: customId) else {
+            return UIColor(
+                red: red,
+                green: green,
+                blue: blue,
+                alpha: alpha
+            )
+        }
+
+        return switch customColor {
+        case let .uiColor(value):
+            value
+        case let .swiftUIColor(value):
+            UIColor(value)
+        }
     }
 }
 

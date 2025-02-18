@@ -22,10 +22,11 @@ extension VC.Mode {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension AdaptyViewConfiguration.ColorGradient {
-    var stops: [Gradient.Stop] {
+    func stops(_ ar: AdaptyAssetsResolver) -> [Gradient.Stop] {
         let result = items
-            .map { $0.gradientStop }
+            .map { $0.gradientStop(ar) }
             .sorted(by: { $0.location < $1.location })
 
         return result
@@ -33,9 +34,14 @@ extension AdaptyViewConfiguration.ColorGradient {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension InsettableShape {
     @ViewBuilder
-    func fill(background: VC.Background?, colorScheme: ColorScheme) -> some View {
+    func fill(
+        background: VC.Background?,
+        colorScheme: ColorScheme,
+        assetsResolver: AdaptyAssetsResolver
+    ) -> some View {
         if let background {
             switch background {
             case .image:
@@ -43,13 +49,13 @@ extension InsettableShape {
             case let .filling(filling):
                 switch filling.of(colorScheme) {
                 case let .solidColor(color):
-                    self.fill(color.swiftuiColor)
+                    self.fill(color.swiftuiColor(assetsResolver))
                 case let .colorGradient(gradient):
                     switch gradient.kind {
                     case .linear:
                         self.fill(
                             LinearGradient(
-                                stops: gradient.stops,
+                                stops: gradient.stops(assetsResolver),
                                 startPoint: gradient.start.unitPoint,
                                 endPoint: gradient.end.unitPoint
                             )
@@ -58,7 +64,7 @@ extension InsettableShape {
                         self.fill(
                             AngularGradient(
                                 gradient: .init(
-                                    stops: gradient.stops
+                                    stops: gradient.stops(assetsResolver)
                                 ),
                                 center: .center,
                                 angle: .degrees(360)
@@ -68,7 +74,7 @@ extension InsettableShape {
                         self.fill(
                             RadialGradient(
                                 gradient: .init(
-                                    stops: gradient.stops
+                                    stops: gradient.stops(assetsResolver)
                                 ),
                                 center: .center,
                                 startRadius: 0.0,
@@ -84,17 +90,24 @@ extension InsettableShape {
     }
 
     @ViewBuilder
-    func stroke(filling: VC.Filling?, lineWidth: CGFloat) -> some View {
+    func stroke(
+        filling: VC.Filling?,
+        lineWidth: CGFloat,
+        assetsResolver: AdaptyAssetsResolver
+    ) -> some View {
         if let filling {
             switch filling {
             case let .solidColor(color):
-                self.strokeBorder(color.swiftuiColor, lineWidth: lineWidth)
+                self.strokeBorder(
+                    color.swiftuiColor(assetsResolver),
+                    lineWidth: lineWidth
+                )
             case let .colorGradient(gradient):
                 switch gradient.kind {
                 case .linear:
                     self.strokeBorder(
                         LinearGradient(
-                            stops: gradient.items.map { $0.gradientStop },
+                            stops: gradient.items.map { $0.gradientStop(assetsResolver) },
                             startPoint: gradient.start.unitPoint,
                             endPoint: gradient.end.unitPoint
                         ),
@@ -103,7 +116,7 @@ extension InsettableShape {
                 case .conic:
                     self.strokeBorder(
                         AngularGradient(
-                            gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                            gradient: .init(stops: gradient.items.map { $0.gradientStop(assetsResolver) }),
                             center: .center,
                             angle: .degrees(360)
                         ),
@@ -112,7 +125,7 @@ extension InsettableShape {
                 case .radial:
                     self.strokeBorder(
                         RadialGradient(
-                            gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                            gradient: .init(stops: gradient.items.map { $0.gradientStop(assetsResolver) }),
                             center: .center,
                             startRadius: 0.0,
                             endRadius: 1.0
@@ -149,51 +162,100 @@ extension View {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension VC.ShapeType {
     @ViewBuilder
-    func swiftUIShapeFill(_ background: VC.Background?, colorScheme: ColorScheme) -> some View {
+    func swiftUIShapeFill(
+        _ background: VC.Background?,
+        colorScheme: ColorScheme,
+        assetsResolver: AdaptyAssetsResolver
+    ) -> some View {
         switch self {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
-                    .fill(background: background, colorScheme: colorScheme)
+                    .fill(
+                        background: background,
+                        colorScheme: colorScheme,
+                        assetsResolver: assetsResolver
+                    )
             } else {
                 UnevenRoundedRectangleFallback(cornerRadii: radii)
-                    .fill(background: background, colorScheme: colorScheme)
+                    .fill(
+                        background: background,
+                        colorScheme: colorScheme,
+                        assetsResolver: assetsResolver
+                    )
             }
         case .circle:
             Circle()
-                .fill(background: background, colorScheme: colorScheme)
+                .fill(
+                    background: background,
+                    colorScheme: colorScheme,
+                    assetsResolver: assetsResolver
+                )
         case .curveUp:
             CurveUpShape()
-                .fill(background: background, colorScheme: colorScheme)
+                .fill(
+                    background: background,
+                    colorScheme: colorScheme,
+                    assetsResolver: assetsResolver
+                )
         case .curveDown:
             CurveDownShape()
-                .fill(background: background, colorScheme: colorScheme)
+                .fill(
+                    background: background,
+                    colorScheme: colorScheme,
+                    assetsResolver: assetsResolver
+                )
         }
     }
 
     @ViewBuilder
-    func swiftUIShapeStroke(_ filling: VC.Filling?, lineWidth: CGFloat) -> some View {
+    func swiftUIShapeStroke(
+        _ filling: VC.Filling?,
+        lineWidth: CGFloat,
+        assetsResolver: AdaptyAssetsResolver
+    ) -> some View {
         switch self {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
-                    .stroke(filling: filling, lineWidth: lineWidth)
+                    .stroke(
+                        filling: filling,
+                        lineWidth: lineWidth,
+                        assetsResolver: assetsResolver
+                    )
             } else {
                 UnevenRoundedRectangleFallback(cornerRadii: radii)
-                    .stroke(filling: filling, lineWidth: lineWidth)
+                    .stroke(
+                        filling: filling,
+                        lineWidth: lineWidth,
+                        assetsResolver: assetsResolver
+                    )
             }
         case .circle:
             Circle()
-                .stroke(filling: filling, lineWidth: lineWidth)
+                .stroke(
+                    filling: filling,
+                    lineWidth: lineWidth,
+                    assetsResolver: assetsResolver
+                )
         case .curveUp:
             // Since there is no way to implement InsettableShape in a correct way, we make this hack with doubling the lineWidth
             CurveUpShape()
-                .stroke(filling: filling, lineWidth: lineWidth * 2.0)
+                .stroke(
+                    filling: filling,
+                    lineWidth: lineWidth * 2.0,
+                    assetsResolver: assetsResolver
+                )
         case .curveDown:
             CurveDownShape()
-                .stroke(filling: filling, lineWidth: lineWidth * 2.0)
+                .stroke(
+                    filling: filling,
+                    lineWidth: lineWidth * 2.0,
+                    assetsResolver: assetsResolver
+                )
         }
     }
 }
@@ -204,6 +266,8 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
     var decorator: VC.Decorator
     var includeBackground: Bool
 
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
@@ -227,7 +291,11 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
                     .background {
                         if self.includeBackground {
                             self.decorator.shapeType
-                                .swiftUIShapeFill(self.decorator.background, colorScheme: self.colorScheme)
+                                .swiftUIShapeFill(
+                                    self.decorator.background,
+                                    colorScheme: self.colorScheme,
+                                    assetsResolver: assetsViewModel.assetsResolver
+                                )
                         }
                     }
             }
@@ -246,7 +314,8 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
                 self.decorator.shapeType
                     .swiftUIShapeStroke(
                         border.filling.of(self.colorScheme),
-                        lineWidth: border.thickness
+                        lineWidth: border.thickness,
+                        assetsResolver: assetsViewModel.assetsResolver
                     )
             }
         }

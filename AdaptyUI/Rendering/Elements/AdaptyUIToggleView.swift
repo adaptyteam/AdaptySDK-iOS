@@ -20,6 +20,7 @@ struct AdaptyUIToggleView: View {
     @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
     @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
     @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
+    @EnvironmentObject var assetsViewModel: AdaptyAssetsViewModel
 
     private var toggle: VC.Toggle
 
@@ -47,7 +48,7 @@ struct AdaptyUIToggleView: View {
         })) {
             EmptyView()
         }
-        .tint(toggle.color?.swiftuiColor)
+        .tint(toggle.color?.swiftuiColor(assetsViewModel.assetsResolver))
     }
 }
 

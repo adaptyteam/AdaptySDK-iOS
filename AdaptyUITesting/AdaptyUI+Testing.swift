@@ -142,8 +142,7 @@ public struct AdaptyUITestRendererView: View {
             observerModeResolver: nil,
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
-            imageResolver: nil, // imageResolver,
-            videoResolver: nil // videoResolver
+            assetsResolver: nil // imageResolver
         )
     }
 
@@ -157,8 +156,7 @@ public struct AdaptyUITestRendererView: View {
             .environmentObject(paywallConfiguration.tagResolverViewModel)
             .environmentObject(paywallConfiguration.timerViewModel)
             .environmentObject(paywallConfiguration.screensViewModel)
-            .environmentObject(paywallConfiguration.videoViewModel)
-            .environmentObject(paywallConfiguration.assetViewModel)
+            .environmentObject(paywallConfiguration.assetsViewModel)
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }

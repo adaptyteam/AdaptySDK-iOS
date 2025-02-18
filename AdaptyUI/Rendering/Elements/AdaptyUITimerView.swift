@@ -146,7 +146,7 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
 
     @EnvironmentObject var viewModel: AdaptyTimerViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
-    @EnvironmentObject var assetViewModel: AdaptyImageAssetViewModel
+    @EnvironmentObject var assetsViewModel: AdaptyAssetsViewModel
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
@@ -175,7 +175,7 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
         if let text {
             text
                 .convertToSwiftUIText(
-                    assetResolver: assetViewModel.assetResolver,
+                    assetsResolver: assetsViewModel.assetsResolver,
                     tagResolver: self,
                     productInfo: nil,
                     colorScheme: colorScheme

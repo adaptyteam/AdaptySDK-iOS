@@ -58,7 +58,7 @@ struct AdaptyUIImageView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @EnvironmentObject
-    private var assetViewModel: AdaptyImageAssetViewModel
+    private var assetsViewModel: AdaptyAssetsViewModel
 
     @ViewBuilder
     private func rasterImage(
@@ -71,7 +71,7 @@ struct AdaptyUIImageView: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .renderingMode(.template)
-                    .foregroundColor(tint)
+                    .foregroundColor(tint(assetsViewModel.assetsResolver))
                     .aspectRatio(aspect)
 
             } else {
@@ -130,7 +130,7 @@ struct AdaptyUIImageView: View {
     ) -> some View {
         switch asset {
         case let .raster(customId, data):
-            if let customId, let customAsset = assetViewModel.assetResolver.image(for: customId) {
+            if let customId, let customAsset = assetsViewModel.assetsResolver.image(for: customId) {
                 resolvedCustomImage(
                     customAsset: customAsset,
                     aspect: aspect,
@@ -144,7 +144,7 @@ struct AdaptyUIImageView: View {
                 )
             }
         case let .url(customId, url, preview):
-            if let customId, let customAsset = assetViewModel.assetResolver.image(for: customId) {
+            if let customId, let customAsset = assetsViewModel.assetsResolver.image(for: customId) {
                 resolvedCustomImage(
                     customAsset: customAsset,
                     aspect: aspect,
