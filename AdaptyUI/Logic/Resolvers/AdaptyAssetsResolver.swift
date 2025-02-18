@@ -9,8 +9,8 @@
 
 import Adapty
 import AVKit
-import UIKit
 import SwiftUI
+import UIKit
 
 public enum AdaptyCustomImageAsset {
     case file(url: URL)
@@ -29,11 +29,18 @@ public enum AdaptyCustomColorAsset {
     case swiftUIColor(Color)
 }
 
+public enum AdaptyCustomGradientAsset {
+    case linear(gradient: Gradient, startPoint: UnitPoint, endPoint: UnitPoint)
+    case angular(gradient: Gradient, center: UnitPoint, angle: Angle = .zero)
+    case radial(gradient: Gradient, center: UnitPoint, startRadius: CGFloat, endRadius: CGFloat)
+}
+
 @MainActor
 public protocol AdaptyAssetsResolver: Sendable {
     func image(for id: String) -> AdaptyCustomImageAsset?
     func video(for id: String) -> AdaptyCustomVideoAsset?
     func color(for id: String) -> AdaptyCustomColorAsset?
+    func gradient(for id: String) -> AdaptyCustomGradientAsset?
     func font(for id: String, size: Double) -> UIFont?
 }
 
@@ -45,11 +52,11 @@ package struct AdaptyUIDefaultAssetsResolver: AdaptyAssetsResolver {
         guard let image = UIImage(named: id) else { return nil }
         return .image(value: image)
     }
-    
+
     package func video(for id: String) -> AdaptyCustomVideoAsset? {
         nil
     }
-    
+
     package func color(for id: String) -> AdaptyCustomColorAsset? {
         if let color = UIColor(named: id) {
             return .uiColor(color)
@@ -57,7 +64,11 @@ package struct AdaptyUIDefaultAssetsResolver: AdaptyAssetsResolver {
             return nil
         }
     }
-    
+
+    package func gradient(for id: String) -> AdaptyCustomGradientAsset? {
+        nil
+    }
+
     package func font(for id: String, size: Double) -> UIFont? {
         if let font = UIFont(name: id, size: size) {
             return font

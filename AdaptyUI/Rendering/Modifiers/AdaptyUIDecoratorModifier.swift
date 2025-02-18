@@ -24,9 +24,9 @@ extension VC.Mode {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyViewConfiguration.ColorGradient {
-    func stops(_ ar: AdaptyAssetsResolver) -> [Gradient.Stop] {
+    func stops(_ assetsResolver: AdaptyAssetsResolver) -> [Gradient.Stop] {
         let result = items
-            .map { $0.gradientStop(ar) }
+            .map { $0.gradientStop(assetsResolver) }
             .sorted(by: { $0.location < $1.location })
 
         return result
@@ -51,36 +51,51 @@ extension InsettableShape {
                 case let .solidColor(color):
                     self.fill(color.swiftuiColor(assetsResolver))
                 case let .colorGradient(gradient):
-                    switch gradient.kind {
-                    case .linear:
-                        self.fill(
-                            LinearGradient(
-                                stops: gradient.stops(assetsResolver),
-                                startPoint: gradient.start.unitPoint,
-                                endPoint: gradient.end.unitPoint
+                    if let customId = gradient.customId,
+                       let customGradient = assetsResolver.gradient(for: customId)
+                    {
+                        switch customGradient {
+                        case let .linear(gradient, startPoint, endPoint):
+                            self.fill(
+                                LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint)
                             )
-                        )
-                    case .conic:
-                        self.fill(
-                            AngularGradient(
-                                gradient: .init(
-                                    stops: gradient.stops(assetsResolver)
-                                ),
-                                center: .center,
-                                angle: .degrees(360)
+                        case let .angular(gradient, center, angle):
+                            self.fill(
+                                AngularGradient(gradient: gradient, center: center, angle: angle)
                             )
-                        )
-                    case .radial:
-                        self.fill(
-                            RadialGradient(
-                                gradient: .init(
-                                    stops: gradient.stops(assetsResolver)
-                                ),
-                                center: .center,
-                                startRadius: 0.0,
-                                endRadius: 1.0
+                        case let .radial(gradient, center, startRadius, endRadius):
+                            self.fill(
+                                RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius)
                             )
-                        )
+                        }
+                    } else {
+                        switch gradient.kind {
+                        case .linear:
+                            self.fill(
+                                LinearGradient(
+                                    gradient: .init(stops: gradient.stops(assetsResolver)),
+                                    startPoint: gradient.start.unitPoint,
+                                    endPoint: gradient.end.unitPoint
+                                )
+                            )
+                        case .conic:
+                            self.fill(
+                                AngularGradient(
+                                    gradient: .init(stops: gradient.stops(assetsResolver)),
+                                    center: .center,
+                                    angle: .degrees(360)
+                                )
+                            )
+                        case .radial:
+                            self.fill(
+                                RadialGradient(
+                                    gradient: .init(stops: gradient.stops(assetsResolver)),
+                                    center: .center,
+                                    startRadius: 0.0,
+                                    endRadius: 1.0
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -103,35 +118,51 @@ extension InsettableShape {
                     lineWidth: lineWidth
                 )
             case let .colorGradient(gradient):
-                switch gradient.kind {
-                case .linear:
-                    self.strokeBorder(
-                        LinearGradient(
-                            stops: gradient.items.map { $0.gradientStop(assetsResolver) },
-                            startPoint: gradient.start.unitPoint,
-                            endPoint: gradient.end.unitPoint
-                        ),
-                        lineWidth: lineWidth
-                    )
-                case .conic:
-                    self.strokeBorder(
-                        AngularGradient(
-                            gradient: .init(stops: gradient.items.map { $0.gradientStop(assetsResolver) }),
-                            center: .center,
-                            angle: .degrees(360)
-                        ),
-                        lineWidth: lineWidth
-                    )
-                case .radial:
-                    self.strokeBorder(
-                        RadialGradient(
-                            gradient: .init(stops: gradient.items.map { $0.gradientStop(assetsResolver) }),
-                            center: .center,
-                            startRadius: 0.0,
-                            endRadius: 1.0
-                        ),
-                        lineWidth: lineWidth
-                    )
+                if let customId = gradient.customId,
+                   let customGradient = assetsResolver.gradient(for: customId)
+                {
+                    switch customGradient {
+                    case let .linear(gradient, startPoint, endPoint):
+                        self.strokeBorder(
+                            LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint)
+                        )
+                    case let .angular(gradient, center, angle):
+                        self.strokeBorder(
+                            AngularGradient(gradient: gradient, center: center, angle: angle)
+                        )
+                    case let .radial(gradient, center, startRadius, endRadius):
+                        self.strokeBorder(
+                            RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius)
+                        )
+                    }
+                } else {
+                    switch gradient.kind {
+                    case .linear:
+                        self.strokeBorder(
+                            LinearGradient(
+                                gradient: .init(stops: gradient.stops(assetsResolver)),
+                                startPoint: gradient.start.unitPoint,
+                                endPoint: gradient.end.unitPoint
+                            )
+                        )
+                    case .conic:
+                        self.strokeBorder(
+                            AngularGradient(
+                                gradient: .init(stops: gradient.stops(assetsResolver)),
+                                center: .center,
+                                angle: .degrees(360)
+                            )
+                        )
+                    case .radial:
+                        self.strokeBorder(
+                            RadialGradient(
+                                gradient: .init(stops: gradient.stops(assetsResolver)),
+                                center: .center,
+                                startRadius: 0.0,
+                                endRadius: 1.0
+                            )
+                        )
+                    }
                 }
             }
         } else {
@@ -294,7 +325,7 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
                                 .swiftUIShapeFill(
                                     self.decorator.background,
                                     colorScheme: self.colorScheme,
-                                    assetsResolver: assetsViewModel.assetsResolver
+                                    assetsResolver: self.assetsViewModel.assetsResolver
                                 )
                         }
                     }
@@ -315,7 +346,7 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
                     .swiftUIShapeStroke(
                         border.filling.of(self.colorScheme),
                         lineWidth: border.thickness,
-                        assetsResolver: assetsViewModel.assetsResolver
+                        assetsResolver: self.assetsViewModel.assetsResolver
                     )
             }
         }
