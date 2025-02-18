@@ -158,8 +158,10 @@ extension Adapty {
             let caseWithPaywallVariation = paywallVariationId != nil
 
             do {
-                var response = if let paywallVariationId {
-                    try await httpSession.fetchPaywall(
+                var chosen: AdaptyPaywallChosen
+
+                if let paywallVariationId {
+                    chosen = try await httpSession.fetchPaywall(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
@@ -169,24 +171,26 @@ extension Adapty {
                         disableServerCache: isTestUser
                     )
                 } else {
-                    try await httpSession.fetchPaywallVariations(
+                    
+                    chosen = try await httpSession.fetchPaywallVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
                         locale: locale,
                         segmentId: segmentId,
                         cached: cached,
-                        crossPlacementEligible: crossPlacementEligible,
+                        crossPlacementEligible: false, //crossPlacementEligible,
+                        variationIdResolver: nil, //!crossPlacementEligible ? nil : nil,
                         disableServerCache: isTestUser
                     )
                 }
 
                 if let manager = tryProfileManagerOrNil(with: profileId) {
-                    response = manager.paywallsStorage.savedPaywallChosen(response)
+                    chosen = manager.paywallsStorage.savedPaywallChosen(chosen)
                 }
 
-                Adapty.trackEventIfNeed(response)
-                return response.value
+                Adapty.trackEventIfNeed(chosen)
+                return chosen.value
 
             } catch {
                 guard !caseWithPaywallVariation else {
@@ -228,7 +232,7 @@ extension Adapty {
             }()
 
             do {
-                var response = if let paywallVariationId {
+                var chosen = if let paywallVariationId {
                     try await session.fetchFallbackPaywall(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
@@ -245,16 +249,18 @@ extension Adapty {
                         placementId: placementId,
                         locale: locale,
                         cached: cached,
+                        crossPlacementEligible: false,
+                        variationIdResolver: nil,
                         disableServerCache: isTestUser
                     )
                 }
 
                 if let manager = tryProfileManagerOrNil(with: profileId) {
-                    response = manager.paywallsStorage.savedPaywallChosen(response)
+                    chosen = manager.paywallsStorage.savedPaywallChosen(chosen)
                 }
 
-                Adapty.trackEventIfNeed(response)
-                return response.value
+                Adapty.trackEventIfNeed(chosen)
+                return chosen.value
 
             } catch {
                 if error.notFoundVariationId { continue }

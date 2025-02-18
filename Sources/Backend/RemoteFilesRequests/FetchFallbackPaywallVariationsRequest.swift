@@ -34,6 +34,8 @@ protocol FetchFallbackPaywallVariationsExecutor: BackendExecutor {
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
+        crossPlacementEligible: Bool,
+        variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
         disableServerCache: Bool
     ) async throws -> AdaptyPaywallChosen
 
@@ -57,6 +59,8 @@ private extension FetchFallbackPaywallVariationsExecutor {
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
+        crossPlacementEligible: Bool,
+        variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
         disableServerCache: Bool
     ) async throws -> AdaptyPaywallChosen {
         let request = FetchFallbackPaywallVariationsRequest(
@@ -85,8 +89,9 @@ private extension FetchFallbackPaywallVariationsExecutor {
                     response,
                     withConfiguration: configuration,
                     withProfileId: profileId,
+                    withPlacemantId: placementId,
                     withCachedPaywall: cached,
-                    crossPlacementEligible: false
+                    variationIdResolver: variationIdResolver
                 )
             }
 
@@ -106,6 +111,8 @@ private extension FetchFallbackPaywallVariationsExecutor {
                 placementId: placementId,
                 locale: .defaultPaywallLocale,
                 cached: cached,
+                crossPlacementEligible: crossPlacementEligible,
+                variationIdResolver: variationIdResolver,
                 disableServerCache: disableServerCache
             )
         }
@@ -119,6 +126,8 @@ extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
+        crossPlacementEligible: Bool,
+        variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
         disableServerCache: Bool
     ) async throws -> AdaptyPaywallChosen {
         try await performFetchFallbackPaywallVariationsRequest(
@@ -128,6 +137,8 @@ extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
             placementId: placementId,
             locale: locale,
             cached: cached,
+            crossPlacementEligible: crossPlacementEligible,
+            variationIdResolver: variationIdResolver,
             disableServerCache: disableServerCache
         )
     }
@@ -159,6 +170,8 @@ extension Backend.ConfigsExecutor: FetchFallbackPaywallVariationsExecutor {
         placementId: String,
         locale: AdaptyLocale,
         cached: AdaptyPaywall?,
+        crossPlacementEligible: Bool,
+        variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
         disableServerCache: Bool
     ) async throws -> AdaptyPaywallChosen {
         try await performFetchFallbackPaywallVariationsRequest(
@@ -168,6 +181,8 @@ extension Backend.ConfigsExecutor: FetchFallbackPaywallVariationsExecutor {
             placementId: placementId,
             locale: locale,
             cached: cached,
+            crossPlacementEligible: crossPlacementEligible,
+            variationIdResolver: variationIdResolver,
             disableServerCache: disableServerCache
         )
     }
