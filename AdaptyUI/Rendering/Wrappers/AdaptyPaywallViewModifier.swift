@@ -12,49 +12,102 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Identifiable {
+public struct AdaptyLoadingPlaceholderView: View {
+    public init() {}
+
+    public var body: some View {
+        ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(UIColor.systemBackground))
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where AlertItem: Identifiable, Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
 
     private let isPresented: Binding<Bool>
     private let fullScreen: Bool
 
-    private let paywallConfiguration: AdaptyUI.PaywallConfiguration
+    private let paywallConfiguration: AdaptyUI.PaywallConfiguration?
+
+    private let didPerformAction: ((AdaptyUI.Action) -> Void)?
+    private let didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
+    private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
+    private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
+    private let didFailPurchase: (AdaptyPaywallProduct, AdaptyError) -> Void
+    private let didStartRestore: (() -> Void)?
+    private let didFinishRestore: (AdaptyProfile) -> Void
+    private let didFailRestore: (AdaptyError) -> Void
+    private let didFailRendering: (AdaptyError) -> Void
+    private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
+    private let didPartiallyLoadProducts: (([String]) -> Void)?
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
+    private let placeholderBuilder: (() -> Placeholder)?
 
     init(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyUI.PaywallConfiguration,
+        paywallConfiguration: AdaptyUI.PaywallConfiguration?,
+        didPerformAction: ((AdaptyUI.Action) -> Void)?,
+        didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?,
+        didStartPurchase: ((AdaptyPaywallProduct) -> Void)?,
+        didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?,
+        didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
+        didStartRestore: (() -> Void)?,
+        didFinishRestore: @escaping (AdaptyProfile) -> Void,
+        didFailRestore: @escaping (AdaptyError) -> Void,
+        didFailRendering: @escaping (AdaptyError) -> Void,
+        didFailLoadingProducts: ((AdaptyError) -> Bool)?,
+        didPartiallyLoadProducts: (([String]) -> Void)?,
         showAlertItem: Binding<AlertItem?>,
-        showAlertBuilder: ((AlertItem) -> Alert)?
+        showAlertBuilder: ((AlertItem) -> Alert)?,
+        placeholderBuilder: (() -> Placeholder)?
     ) {
         self.isPresented = isPresented
         self.fullScreen = fullScreen
         self.paywallConfiguration = paywallConfiguration
+        self.didPerformAction = didPerformAction
+        self.didSelectProduct = didSelectProduct
+        self.didStartPurchase = didStartPurchase
+        self.didFinishPurchase = didFinishPurchase
+        self.didFailPurchase = didFailPurchase
+        self.didStartRestore = didStartRestore
+        self.didFinishRestore = didFinishRestore
+        self.didFailRestore = didFailRestore
+        self.didFailRendering = didFailRendering
+        self.didFailLoadingProducts = didFailLoadingProducts
+        self.didPartiallyLoadProducts = didPartiallyLoadProducts
         self.showAlertItem = showAlertItem
         self.showAlertBuilder = showAlertBuilder
+        self.placeholderBuilder = placeholderBuilder
     }
 
-    var paywallViewBody: some View {
-        AdaptyPaywallView_Internal(
-            showDebugOverlay: false,
-            showAlertItem: showAlertItem,
-            showAlertBuilder: showAlertBuilder
-        )
-        .environmentObject(paywallConfiguration.eventsHandler)
-        .environmentObject(paywallConfiguration.paywallViewModel)
-        .environmentObject(paywallConfiguration.productsViewModel)
-        .environmentObject(paywallConfiguration.actionsViewModel)
-        .environmentObject(paywallConfiguration.sectionsViewModel)
-        .environmentObject(paywallConfiguration.tagResolverViewModel)
-        .environmentObject(paywallConfiguration.timerViewModel)
-        .environmentObject(paywallConfiguration.screensViewModel)
-        .environmentObject(paywallConfiguration.videoViewModel)
-        .environmentObject(paywallConfiguration.assetViewModel)
-        .onAppear {
-            paywallConfiguration.eventsHandler.viewDidAppear()
-            paywallConfiguration.paywallViewModel.logShowPaywall()
+    @ViewBuilder
+    private var paywallOrProgressView: some View {
+        if let paywallConfiguration {
+            AdaptyPaywallView(
+                paywallConfiguration: paywallConfiguration,
+                didPerformAction: didPerformAction,
+                didSelectProduct: didSelectProduct,
+                didStartPurchase: didStartPurchase,
+                didFinishPurchase: didFinishPurchase,
+                didFailPurchase: didFailPurchase,
+                didStartRestore: didStartRestore,
+                didFinishRestore: didFinishRestore,
+                didFailRestore: didFailRestore,
+                didFailRendering: didFailRendering,
+                didFailLoadingProducts: didFailLoadingProducts,
+                didPartiallyLoadProducts: didPartiallyLoadProducts,
+                showAlertItem: showAlertItem,
+                showAlertBuilder: showAlertBuilder
+            )
+        } else if let placeholderBuilder {
+            placeholderBuilder()
+        } else {
+            AdaptyLoadingPlaceholderView()
         }
     }
 
@@ -64,11 +117,11 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
                 .fullScreenCover(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration.eventsHandler.viewDidDisappear()
-                        paywallConfiguration.paywallViewModel.resetLogShowPaywall()
+                        paywallConfiguration?.eventsHandler.viewDidDisappear()
+                        paywallConfiguration?.paywallViewModel.resetLogShowPaywall()
                     },
                     content: {
-                        paywallViewBody
+                        paywallOrProgressView
                     }
                 )
         } else {
@@ -76,11 +129,11 @@ struct AdaptyPaywallViewModifier<AlertItem>: ViewModifier where AlertItem: Ident
                 .sheet(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration.eventsHandler.viewDidDisappear()
-                        paywallConfiguration.paywallViewModel.resetLogShowPaywall()
+                        paywallConfiguration?.eventsHandler.viewDidDisappear()
+                        paywallConfiguration?.paywallViewModel.resetLogShowPaywall()
                     },
                     content: {
-                        paywallViewBody
+                        paywallOrProgressView
                     }
                 )
         }
@@ -113,10 +166,10 @@ public extension View {
     ///     - didFailLoadingProducts: This method is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
     ///     - showAlertItem:
     ///     - showAlertBuilder:
-    func paywall<AlertItem: Identifiable>(
+    func paywall<Placeholder: View, AlertItem: Identifiable>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyUI.PaywallConfiguration,
+        paywallConfiguration: AdaptyUI.PaywallConfiguration?,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
@@ -127,40 +180,30 @@ public extension View {
         didFailRestore: @escaping (AdaptyError) -> Void,
         didFailRendering: @escaping (AdaptyError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
+        didPartiallyLoadProducts: (([String]) -> Void)? = nil,
         showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
-        showAlertBuilder: ((AlertItem) -> Alert)? = nil
+        showAlertBuilder: ((AlertItem) -> Alert)? = nil,
+        placeholderBuilder: (() -> Placeholder)? = { AdaptyLoadingPlaceholderView() }
     ) -> some View {
-        paywallConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { action in
-            switch action {
-            case .close:
-                isPresented.wrappedValue = false
-            case let .openURL(url):
-                UIApplication.shared.open(url, options: [:])
-            case .custom:
-                break
-            }
-        }
-        paywallConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
-        paywallConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
-        paywallConfiguration.eventsHandler.didFinishPurchase = didFinishPurchase ?? { _, res in
-            if !res.isPurchaseCancelled {
-                isPresented.wrappedValue = false
-            }
-        }
-        paywallConfiguration.eventsHandler.didFailPurchase = didFailPurchase
-        paywallConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
-        paywallConfiguration.eventsHandler.didFinishRestore = didFinishRestore
-        paywallConfiguration.eventsHandler.didFailRestore = didFailRestore
-        paywallConfiguration.eventsHandler.didFailRendering = didFailRendering
-        paywallConfiguration.eventsHandler.didFailLoadingProducts = didFailLoadingProducts ?? { _ in true }
-
-        return modifier(
-            AdaptyPaywallViewModifier<AlertItem>(
+        modifier(
+            AdaptyPaywallViewModifier<Placeholder, AlertItem>(
                 isPresented: isPresented,
                 fullScreen: fullScreen,
                 paywallConfiguration: paywallConfiguration,
+                didPerformAction: didPerformAction,
+                didSelectProduct: didSelectProduct,
+                didStartPurchase: didStartPurchase,
+                didFinishPurchase: didFinishPurchase,
+                didFailPurchase: didFailPurchase,
+                didStartRestore: didStartRestore,
+                didFinishRestore: didFinishRestore,
+                didFailRestore: didFailRestore,
+                didFailRendering: didFailRendering,
+                didFailLoadingProducts: didFailLoadingProducts,
+                didPartiallyLoadProducts: didPartiallyLoadProducts,
                 showAlertItem: showAlertItem,
-                showAlertBuilder: showAlertBuilder
+                showAlertBuilder: showAlertBuilder,
+                placeholderBuilder: placeholderBuilder
             )
         )
     }

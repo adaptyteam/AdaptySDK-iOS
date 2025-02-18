@@ -22,6 +22,17 @@ extension VC.Mode {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyViewConfiguration.ColorGradient {
+    var stops: [Gradient.Stop] {
+        let result = items
+            .map { $0.gradientStop }
+            .sorted(by: { $0.location < $1.location })
+
+        return result
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension InsettableShape {
     @ViewBuilder
     func fill(background: VC.Background?, colorScheme: ColorScheme) -> some View {
@@ -34,18 +45,11 @@ extension InsettableShape {
                 case let .solidColor(color):
                     self.fill(color.swiftuiColor)
                 case let .colorGradient(gradient):
-                    self.fill(
-                        LinearGradient(
-                            stops: gradient.items.map { $0.gradientStop },
-                            startPoint: gradient.start.unitPoint,
-                            endPoint: gradient.end.unitPoint
-                        )
-                    )
                     switch gradient.kind {
                     case .linear:
                         self.fill(
                             LinearGradient(
-                                stops: gradient.items.map { $0.gradientStop },
+                                stops: gradient.stops,
                                 startPoint: gradient.start.unitPoint,
                                 endPoint: gradient.end.unitPoint
                             )
@@ -53,7 +57,9 @@ extension InsettableShape {
                     case .conic:
                         self.fill(
                             AngularGradient(
-                                gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                                gradient: .init(
+                                    stops: gradient.stops
+                                ),
                                 center: .center,
                                 angle: .degrees(360)
                             )
@@ -61,7 +67,9 @@ extension InsettableShape {
                     case .radial:
                         self.fill(
                             RadialGradient(
-                                gradient: .init(stops: gradient.items.map { $0.gradientStop }),
+                                gradient: .init(
+                                    stops: gradient.stops
+                                ),
                                 center: .center,
                                 startRadius: 0.0,
                                 endRadius: 1.0
