@@ -51,6 +51,8 @@ struct FallbackPaywalls: Sendable {
               let variationId = withVariationId ?? drawVariation(byPlacementId: id, profileId: profileId)?.variationId
         else { return nil }
 
+        Log.crossAB.debug("fallbackFile request: placementId = \(id), variationId = \(variationId) \(withVariationId == nil ? "DRAW" : "")")
+
         let decoder = FallbackPaywalls.decoder(placementId: id, paywallVariationId: variationId)
         let paywall: AdaptyPaywall?
         do {

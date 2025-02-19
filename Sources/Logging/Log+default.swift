@@ -14,6 +14,7 @@ extension Log {
         name: "sdk"
     )
 
+    static let crossAB = Log.Category(name: "CrossAB")
     static let events = Log.Category(name: "Events")
     static let storage = Log.Category(name: "Storage")
     static let http = Log.Category(name: "API")

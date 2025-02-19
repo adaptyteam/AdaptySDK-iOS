@@ -91,8 +91,9 @@ extension ProfileManager {
         storage.setProfile(newProfile)
 
         if let state = newProfile.value.crossPlacementState,
-           storage.crossPlacementState?.version ?? 0 <= state.version
+           storage.crossPlacementState?.version ?? 0 < state.version
         {
+            Log.crossAB.debug("updateProfile version = \(state.version), newValue = \(state.variationIdByPlacements), oldValue = \(storage.crossPlacementState?.variationIdByPlacements.description ?? "DISABLED")")
             storage.setCrossPlacementState(state)
         }
 

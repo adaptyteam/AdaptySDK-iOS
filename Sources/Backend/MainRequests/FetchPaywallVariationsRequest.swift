@@ -62,10 +62,14 @@ extension AdaptyPaywallChosen {
             responseBody: response.body
         ).value
 
-        let paywallVariationId = if let variationIdResolver {
-            try await variationIdResolver(placementId, draw)
+        let paywallVariationId: String
+        
+        if let variationIdResolver {
+            paywallVariationId = try await variationIdResolver(placementId, draw)
         } else {
-            draw.variationId
+            Log.crossAB.debug("AB-test placementId = \(placementId), variationId = \(draw.variationId) DRAW")
+
+            paywallVariationId = draw.variationId
         }
 
         jsonDecoder.setPaywallVariationId(paywallVariationId)

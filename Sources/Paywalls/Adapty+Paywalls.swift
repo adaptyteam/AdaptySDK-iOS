@@ -182,38 +182,47 @@ extension Adapty {
                         crossPlacementEligible: true,
                         variationIdResolver: { @AdaptyActor placementId, selectedPaywall in
                             guard let manager = self.tryProfileManagerOrNil(with: selectedPaywall.profileId) else {
+                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), error = PROFILE_WAS_CHANGED")
                                 throw ResponseDecodingError.profileWasChanged
                             }
 
                             guard let crossPlacementState = manager.storage.crossPlacementState else {
                                 // We are prohibited from participating in Cross AB Tests
                                 if selectedPaywall.participatesInCrossPlacementABTest {
+                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
                                     throw ResponseDecodingError.crossPlacementABTestDisabled
                                 } else {
+                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(selectedPaywall.variationId) DRAW")
                                     return selectedPaywall.variationId
                                 }
                             }
 
                             if crossPlacementState.canParticipateInABTest {
                                 if selectedPaywall.participatesInCrossPlacementABTest {
+                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(selectedPaywall.variationId), state = \(selectedPaywall.variationIdByPlacements) DRAW")
                                     manager.storage.setCrossPlacementState(.init(
                                         variationIdByPlacements: selectedPaywall.variationIdByPlacements,
                                         version: crossPlacementState.version
                                     ))
+                                } else {
+                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(selectedPaywall.variationId) DRAW")
                                 }
                                 return selectedPaywall.variationId
                             } else if let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId) {
                                 // We are participating in cross AB test: A
                                 // And the paywall is from cross AB test: A
+                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE -> variationId = \(variationId)")
                                 return variationId
                             } else if !selectedPaywall.participatesInCrossPlacementABTest {
                                 // We are participating in cross AB test: A
                                 // But the paywall is not in any cross AB test
+                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(selectedPaywall.variationId) DRAW")
                                 return selectedPaywall.variationId
                             } else {
                                 // We are participating in cross AB test: A
                                 // But the paywall is from cross AB test: B
                                 //
+                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(selectedPaywall.variationId) DRAW")
                                 return selectedPaywall.variationId
                             }
 

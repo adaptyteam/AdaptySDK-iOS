@@ -35,6 +35,8 @@ extension Adapty {
             return
         }
 
+        Log.crossAB.debug("-> trackEvent variationId = \(chosen.value.variationId)")
+        
         trackEvent(.paywallVariationAssigned(.init(
             paywallVariationId: chosen.value.variationId,
             viewConfigurationId: chosen.value.viewConfiguration?.id,

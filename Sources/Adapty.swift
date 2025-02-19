@@ -169,6 +169,8 @@ public final class Adapty: Sendable {
                 profileStorage.setSyncedTransactions(false)
                 profileStorage.setProfile(createdProfile)
                 if let crossPlacementState = createdProfile.value.crossPlacementState {
+                    Log.crossAB.debug("createProfile version = \(crossPlacementState.version), value = \(crossPlacementState.variationIdByPlacements)")
+
                     profileStorage.setCrossPlacementState(crossPlacementState)
                 }
 
