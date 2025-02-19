@@ -14,6 +14,8 @@ struct BackendError: Error, Hashable, Codable {
 }
 
 enum ResponseDecodingError: Error, Hashable, Codable {
+    case profileWasChanged
+    case crossPlacementABTestDisabled
     case notFoundVariationId
 }
 
@@ -24,10 +26,14 @@ extension BackendError: CustomStringConvertible {
 }
 
 extension Backend {
-    static func notFoundVariationId(_ error: HTTPError) -> Bool {
+    static func responseDecodingError(_ decodingError: Set<ResponseDecodingError>, _ error: HTTPError ) -> Bool {
         switch error {
         case let .decoding(_, _, _, _, _, value):
-            (value as? ResponseDecodingError) == .notFoundVariationId
+            if let value = value as? ResponseDecodingError  {
+                decodingError.contains(value)
+            } else {
+                false
+            }
         default:
             false
         }

@@ -33,7 +33,7 @@ private struct FetchPaywallVariationsRequest: HTTPRequest {
 }
 
 extension AdaptyPaywallChosen {
-    typealias VariationIdResolver = @Sendable (_ placementId: String, AdaptyPaywallVariations.Draw) async -> String
+    typealias VariationIdResolver = @Sendable (_ placementId: String, AdaptyPaywallVariations.Draw) async throws -> String
 
     @inlinable
     static func decodeResponse(
@@ -63,7 +63,7 @@ extension AdaptyPaywallChosen {
         ).value
 
         let paywallVariationId = if let variationIdResolver {
-            await variationIdResolver(placementId, draw)
+            try await variationIdResolver(placementId, draw)
         } else {
             draw.variationId
         }

@@ -49,7 +49,7 @@ final class ProfileStorage: Sendable {
     private static var syncedTransactions: Bool = userDefaults.bool(forKey: Constants.syncedTransactionsKey)
     private static var appleSearchAdsSyncDate: Date? = userDefaults.object(forKey: Constants.appleSearchAdsSyncDateKey) as? Date
 
-    private static var crossPlacmentState: CrossPlacementState? = {
+    private static var crossPlacementState: CrossPlacementState? = {
         do {
             return try userDefaults.getJSON(CrossPlacementState.self, forKey: Constants.crossPlacementStateKey)
         } catch {
@@ -99,15 +99,15 @@ final class ProfileStorage: Sendable {
         log.debug("set appleSearchAdsSyncDate = \(now).")
     }
 
-    var crossPlacmentState: CrossPlacementState? { Self.crossPlacmentState }
+    var crossPlacementState: CrossPlacementState? { Self.crossPlacementState }
 
-    func setCrossPlacmentState(_ value: CrossPlacementState) {
+    func setCrossPlacementState(_ value: CrossPlacementState) {
         do {
             try Self.userDefaults.setJSON(value, forKey: Constants.crossPlacementStateKey)
-            Self.crossPlacmentState = crossPlacmentState
-            log.debug("saving crossPlacmentState success.")
+            Self.crossPlacementState = crossPlacementState
+            log.debug("saving crossPlacementState success.")
         } catch {
-            log.error("saving crossPlacmentState fail. \(error.localizedDescription)")
+            log.error("saving crossPlacementState fail. \(error.localizedDescription)")
         }
     }
 
@@ -135,7 +135,7 @@ final class ProfileStorage: Sendable {
         userDefaults.removeObject(forKey: Constants.profileKey)
         profile = nil
         userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
-        crossPlacmentState = nil
+        crossPlacementState = nil
 
         BackendIntroductoryOfferEligibilityStorage.clear()
         PaywallsStorage.clear()

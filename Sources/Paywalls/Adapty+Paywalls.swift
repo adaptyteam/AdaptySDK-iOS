@@ -82,7 +82,7 @@ extension Adapty {
                 .paywallsStorage
                 .getPaywallWithFallback(
                     byPlacementId: placementId,
-                    withVariationId: manager.storage.crossPlacmentState?.variationId(placementId: placementId),
+                    withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId),
                     profileId: profileId,
                     locale: locale
                 )
@@ -119,7 +119,7 @@ extension Adapty {
             .getPaywallByLocale(locale,
                                 orDefaultLocale: true,
                                 withPlacementId: placementId,
-                                withVariationId: manager.storage.crossPlacmentState?.variationId(placementId: placementId))?
+                                withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId))?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -143,14 +143,15 @@ extension Adapty {
         _ locale: AdaptyLocale
     ) async throws -> AdaptyPaywall {
         while true {
-            let (segmentId, cached, isTestUser, crossPlacementEligible, paywallVariationId): (String, AdaptyPaywall?, Bool, Bool, String?) = try {
+            let (segmentId, cached, isTestUser, crossPlacementState, paywallVariationId) = try {
                 let manager = try profileManager(with: profileId).orThrows
-                let variationId = manager.storage.crossPlacmentState?.variationId(placementId: placementId)
+                let crossPlacementState = manager.storage.crossPlacementState
+                let variationId = crossPlacementState?.variationId(placementId: placementId)
                 return (
                     manager.profile.value.segmentId,
                     manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
                     manager.profile.value.isTestUser,
-                    manager.storage.crossPlacmentState?.eligibleNewTest ?? false,
+                    crossPlacementState,
                     variationId
                 )
             }()
@@ -170,8 +171,7 @@ extension Adapty {
                         cached: cached,
                         disableServerCache: isTestUser
                     )
-                } else {
-                    
+                } else if let crossPlacementState, crossPlacementState.canParticipateInABTest {
                     chosen = try await httpSession.fetchPaywallVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
@@ -179,8 +179,57 @@ extension Adapty {
                         locale: locale,
                         segmentId: segmentId,
                         cached: cached,
-                        crossPlacementEligible: false, //crossPlacementEligible,
-                        variationIdResolver: nil, //!crossPlacementEligible ? nil : nil,
+                        crossPlacementEligible: true,
+                        variationIdResolver: { @AdaptyActor placementId, selectedPaywall in
+                            guard let manager = self.tryProfileManagerOrNil(with: selectedPaywall.profileId) else {
+                                throw ResponseDecodingError.profileWasChanged
+                            }
+
+                            guard let crossPlacementState = manager.storage.crossPlacementState else {
+                                // We are prohibited from participating in Cross AB Tests
+                                if selectedPaywall.participatesInCrossPlacementABTest {
+                                    throw ResponseDecodingError.crossPlacementABTestDisabled
+                                } else {
+                                    return selectedPaywall.variationId
+                                }
+                            }
+
+                            if crossPlacementState.canParticipateInABTest {
+                                if selectedPaywall.participatesInCrossPlacementABTest {
+                                    manager.storage.setCrossPlacementState(.init(
+                                        variationIdByPlacements: selectedPaywall.variationIdByPlacements,
+                                        version: crossPlacementState.version
+                                    ))
+                                }
+                                return selectedPaywall.variationId
+                            } else if let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId) {
+                                // We are participating in cross AB test: A
+                                // And the paywall is from cross AB test: A
+                                return variationId
+                            } else if !selectedPaywall.participatesInCrossPlacementABTest {
+                                // We are participating in cross AB test: A
+                                // But the paywall is not in any cross AB test
+                                return selectedPaywall.variationId
+                            } else {
+                                // We are participating in cross AB test: A
+                                // But the paywall is from cross AB test: B
+                                //
+                                return selectedPaywall.variationId
+                            }
+
+                        },
+                        disableServerCache: isTestUser
+                    )
+                } else {
+                    chosen = try await httpSession.fetchPaywallVariations(
+                        apiKeyPrefix: apiKeyPrefix,
+                        profileId: profileId,
+                        placementId: placementId,
+                        locale: locale,
+                        segmentId: segmentId,
+                        cached: cached,
+                        crossPlacementEligible: false,
+                        variationIdResolver: nil,
                         disableServerCache: isTestUser
                     )
                 }
@@ -193,11 +242,15 @@ extension Adapty {
                 return chosen.value
 
             } catch {
+                if error.responseDecodingError([.profileWasChanged]) {
+                    throw AdaptyError.profileWasChanged()
+                }
+
                 guard !caseWithPaywallVariation else {
                     throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
                 }
 
-                if error.notFoundVariationId { continue }
+                if error.responseDecodingError([.notFoundVariationId, .crossPlacementABTestDisabled]) { continue }
 
                 guard error.wrongProfileSegmentId,
                       try await updateSegmentId(for: profileId, oldSegmentId: segmentId)
@@ -223,7 +276,7 @@ extension Adapty {
         while true {
             let (cached, isTestUser, paywallVariationId): (AdaptyPaywall?, Bool, String?) = {
                 guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false, nil) }
-                let variationId = manager.storage.crossPlacmentState?.variationId(placementId: placementId)
+                let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId)
                 return (
                     manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
                     manager.profile.value.isTestUser,
@@ -263,7 +316,7 @@ extension Adapty {
                 return chosen.value
 
             } catch {
-                if error.notFoundVariationId { continue }
+                if error.responseDecodingError([.notFoundVariationId]) { continue }
 
                 let chosen =
                     if let manager = tryProfileManagerOrNil(with: profileId) {
@@ -309,9 +362,9 @@ private extension Error {
         return false
     }
 
-    var notFoundVariationId: Bool {
+    func responseDecodingError(_ decodingError: Set<ResponseDecodingError>) -> Bool {
         let error = unwrapped
-        if let httpError = error as? HTTPError { return Backend.notFoundVariationId(httpError) }
+        if let httpError = error as? HTTPError { return Backend.responseDecodingError(decodingError, httpError) }
         return false
     }
 }

@@ -169,7 +169,7 @@ public final class Adapty: Sendable {
                 profileStorage.setSyncedTransactions(false)
                 profileStorage.setProfile(createdProfile)
                 if let crossPlacementState = createdProfile.value.crossPlacementState {
-                    profileStorage.setCrossPlacmentState(crossPlacementState)
+                    profileStorage.setCrossPlacementState(crossPlacementState)
                 }
 
                 

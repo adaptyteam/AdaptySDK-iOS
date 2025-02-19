@@ -91,9 +91,9 @@ extension ProfileManager {
         storage.setProfile(newProfile)
 
         if let state = newProfile.value.crossPlacementState,
-           storage.crossPlacmentState?.version ?? 0 <= state.version
+           storage.crossPlacementState?.version ?? 0 <= state.version
         {
-            storage.setCrossPlacmentState(state)
+            storage.setCrossPlacementState(state)
         }
 
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }

@@ -13,6 +13,8 @@ extension AdaptyPaywallVariations {
         let variationId: String
         let placementAudienceVersionId: String
         let variationIdByPlacements: [String: String]
+
+        var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
     }
 }
 
