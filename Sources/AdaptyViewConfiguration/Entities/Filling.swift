@@ -66,6 +66,7 @@ extension AdaptyViewConfiguration.Filling: Codable {
     private enum CodingKeys: String, CodingKey {
         case type
         case value
+        case customId = "custom_id"
     }
 
     package init(from decoder: Decoder) throws {
@@ -73,7 +74,10 @@ extension AdaptyViewConfiguration.Filling: Codable {
 
         switch try container.decode(String.self, forKey: .type) {
         case AdaptyViewConfiguration.Color.assetType:
-            self = try .solidColor(container.decode(AdaptyViewConfiguration.Color.self, forKey: .value))
+            self = try .solidColor(.init(
+                customId: container.decodeIfPresent(String.self, forKey: .customId),
+                data: container.decode(AdaptyViewConfiguration.Color.self, forKey: .value).data
+            ))
         case let type where AdaptyViewConfiguration.ColorGradient.assetType(type):
             self = try .colorGradient(AdaptyViewConfiguration.ColorGradient(from: decoder))
         default:
@@ -86,6 +90,7 @@ extension AdaptyViewConfiguration.Filling: Codable {
         case let .solidColor(color):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(AdaptyViewConfiguration.Color.assetType, forKey: .type)
+            try container.encodeIfPresent(color.customId, forKey: .customId)
             try container.encode(color, forKey: .value)
         case let .colorGradient(gradient):
             try gradient.encode(to: encoder)

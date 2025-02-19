@@ -252,8 +252,7 @@ public extension AdaptyUI {
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
-        imageResolver: AdaptyImageAssetResolver? = nil,
-        videoResolver: AdaptyVideoAssetResolver? = nil
+        assetsResolver: AdaptyAssetsResolver? = nil
     ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivatedError
@@ -275,8 +274,7 @@ public extension AdaptyUI {
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
             timerResolver: timerResolver,
-            imageResolver: imageResolver,
-            videoResolver: videoResolver
+            assetsResolver: assetsResolver
         )
     }
 

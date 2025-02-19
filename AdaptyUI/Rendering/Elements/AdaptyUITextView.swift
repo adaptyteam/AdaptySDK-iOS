@@ -20,7 +20,7 @@ struct AdaptyUITextView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @EnvironmentObject
-    private var assetViewModel: AdaptyImageAssetViewModel
+    private var assetsViewModel: AdaptyAssetsViewModel
 
     init(_ text: VC.Text) {
         self.text = text
@@ -33,7 +33,7 @@ struct AdaptyUITextView: View {
         case .notApplicable:
             richText
                 .convertToSwiftUIText(
-                    assetResolver: assetViewModel.assetResolver,
+                    assetsResolver: assetsViewModel.assetsResolver,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme
@@ -44,7 +44,7 @@ struct AdaptyUITextView: View {
         case .notFound:
             richText
                 .convertToSwiftUIText(
-                    assetResolver: assetViewModel.assetResolver,
+                    assetsResolver: assetsViewModel.assetsResolver,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme
@@ -56,7 +56,7 @@ struct AdaptyUITextView: View {
         case let .found(productInfoModel):
             richText
                 .convertToSwiftUIText(
-                    assetResolver: assetViewModel.assetResolver,
+                    assetsResolver: assetsViewModel.assetsResolver,
                     tagResolver: customTagResolverViewModel,
                     productInfo: productInfoModel,
                     colorScheme: colorScheme
@@ -79,7 +79,7 @@ extension AdaptyUI {
 @MainActor
 extension Array where Element == AdaptyViewConfiguration.RichText.Item {
     func convertToSwiftUITextThrowingError(
-        assetResolver: AdaptyImageAssetResolver,
+        assetsResolver: AdaptyAssetsResolver,
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?,
         colorScheme: ColorScheme
@@ -90,7 +90,8 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: value,
-                        attributes: attr
+                        attributes: attr,
+                        assetsResolver: assetsResolver
                     )
                 )
             case let .tag(value, attr):
@@ -115,14 +116,15 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: tagReplacementResult,
-                        attributes: attr
+                        attributes: attr,
+                        assetsResolver: assetsResolver
                     )
                 )
             case let .image(value, attr):
                 guard let uiImage = value?.of(colorScheme).textAttachmentImage(
-                    assetResolver: assetResolver,
-                    font: attr.uiFont,
-                    tint: attr.imgTintColor?.asSolidColor?.uiColor
+                    assetsResolver: assetsResolver,
+                    font: attr.uiFont(assetsResolver),
+                    tint: attr.imgTintColor?.asSolidColor?.uiColor(assetsResolver)
                 ) else {
                     return partialResult
                 }
@@ -141,7 +143,7 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
 @MainActor
 extension VC.RichText {
     func convertToSwiftUIText(
-        assetResolver: AdaptyImageAssetResolver,
+        assetsResolver: AdaptyAssetsResolver,
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?,
         colorScheme: ColorScheme
@@ -150,14 +152,14 @@ extension VC.RichText {
 
         do {
             result = try items.convertToSwiftUITextThrowingError(
-                assetResolver: assetResolver,
+                assetsResolver: assetsResolver,
                 tagResolver: tagResolver,
                 productInfo: productInfo,
                 colorScheme: colorScheme
             )
         } catch {
             if let fallback, let fallbackText = try? fallback.convertToSwiftUITextThrowingError(
-                assetResolver: assetResolver,
+                assetsResolver: assetsResolver,
                 tagResolver: tagResolver,
                 productInfo: productInfo,
                 colorScheme: colorScheme
@@ -175,23 +177,25 @@ extension VC.RichText {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension VC.ImageData {
-    private func uiImage(assetResolver: AdaptyImageAssetResolver) -> UIImage? {
+    private func uiImage(assetsResolver: AdaptyAssetsResolver) -> UIImage? {
         switch self {
-        case let .raster(data):
-            UIImage(data: data)
-        case let .custom(value):
-            assetResolver.uiImage(for: value)
+        case let .raster(customId, data):
+            if let customId {
+                assetsResolver.uiImage(for: customId)
+            } else {
+                UIImage(data: data)
+            }
         default:
             nil
         }
     }
 
     func textAttachmentImage(
-        assetResolver: AdaptyImageAssetResolver,
+        assetsResolver: AdaptyAssetsResolver,
         font: UIFont,
         tint: UIColor?
     ) -> UIImage? {
-        guard var image = uiImage(assetResolver: assetResolver) else { return nil }
+        guard var image = uiImage(assetsResolver: assetsResolver) else { return nil }
 
         let size = CGSize(width: image.size.width * font.capHeight / image.size.height,
                           height: font.capHeight)
@@ -250,18 +254,20 @@ extension VC.Text {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension AttributedString {
     static func createFrom(
         value: String,
-        attributes: VC.RichText.TextAttributes?
+        attributes: VC.RichText.TextAttributes?,
+        assetsResolver: AdaptyAssetsResolver
     ) -> AttributedString {
         var result = AttributedString(value)
 
-        result.foregroundColor = attributes?.uiColor ?? .darkText
-        result.font = attributes?.uiFont ?? .adaptyDefault
+        result.foregroundColor = attributes?.uiColor(assetsResolver) ?? .darkText
+        result.font = attributes?.uiFont(assetsResolver) ?? .adaptyDefault
 
         if let background = attributes?.background?.asSolidColor {
-            result.backgroundColor = background.swiftuiColor
+            result.backgroundColor = background.swiftuiColor(assetsResolver)
         }
 
         if attributes?.strike ?? false {
@@ -276,15 +282,25 @@ extension AttributedString {
     }
 }
 
+@MainActor
 extension UIFont {
     static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 extension VC.RichText.TextAttributes {
-    var uiFont: UIFont { font.uiFont(size: size) }
-    var uiColor: UIColor? { txtColor.asSolidColor?.uiColor }
-    var backgroundUIColor: UIColor? { background?.asSolidColor?.uiColor }
+    func uiFont(_ assetsResolver: AdaptyAssetsResolver) -> UIFont {
+        font.uiFont(size: size, assetsResolver: assetsResolver)
+    }
+
+    func uiColor(_ assetsResolver: AdaptyAssetsResolver) -> UIColor? {
+        txtColor.asSolidColor?.uiColor(assetsResolver)
+    }
+
+    func backgroundUIColor(_ assetsResolver: AdaptyAssetsResolver) -> UIColor? {
+        background?.asSolidColor?.uiColor(assetsResolver)
+    }
 }
 
 #endif

@@ -58,7 +58,7 @@ struct AdaptyUIImageView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @EnvironmentObject
-    private var assetViewModel: AdaptyImageAssetViewModel
+    private var assetsViewModel: AdaptyAssetsViewModel
 
     @ViewBuilder
     private func rasterImage(
@@ -71,7 +71,7 @@ struct AdaptyUIImageView: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .renderingMode(.template)
-                    .foregroundColor(tint)
+                    .foregroundColor(tint(assetsViewModel.assetsResolver))
                     .aspectRatio(aspect)
 
             } else {
@@ -129,35 +129,41 @@ struct AdaptyUIImageView: View {
         tint: VC.Filling?
     ) -> some View {
         switch asset {
-        case let .custom(name):
-            if let customAsset = assetViewModel.assetResolver.image(for: name) {
+        case let .raster(customId, data):
+            if let customId, let customAsset = assetsViewModel.assetsResolver.image(for: customId) {
                 resolvedCustomImage(
                     customAsset: customAsset,
                     aspect: aspect,
                     tint: tint
                 )
             } else {
-                EmptyView()
+                rasterImage(
+                    UIImage(data: data),
+                    aspect: aspect,
+                    tint: tint
+                )
             }
-        case let .raster(data):
-            rasterImage(
-                UIImage(data: data),
-                aspect: aspect,
-                tint: tint
-            )
-        case let .url(url, preview):
-            KFImage
-                .url(url)
-                .resizable()
-                .aspectRatio(aspect)
-                .background {
-                    if let preview {
-                        let image = UIImage(data: preview)
-                        rasterImage(image, aspect: aspect, tint: tint)
-                    } else {
-                        EmptyView()
+        case let .url(customId, url, preview):
+            if let customId, let customAsset = assetsViewModel.assetsResolver.image(for: customId) {
+                resolvedCustomImage(
+                    customAsset: customAsset,
+                    aspect: aspect,
+                    tint: tint
+                )
+            } else {
+                KFImage
+                    .url(url)
+                    .resizable()
+                    .aspectRatio(aspect)
+                    .background {
+                        if let preview {
+                            let image = UIImage(data: preview)
+                            rasterImage(image, aspect: aspect, tint: tint)
+                        } else {
+                            EmptyView()
+                        }
                     }
-                }
+            }
         }
     }
 

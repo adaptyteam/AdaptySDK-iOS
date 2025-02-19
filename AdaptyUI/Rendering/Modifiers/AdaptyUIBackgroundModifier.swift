@@ -14,6 +14,8 @@ import SwiftUI
 struct AdaptyUIBackgroundModifier: ViewModifier {
     var background: VC.Background?
 
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
@@ -35,7 +37,8 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
                     Rectangle()
                         .fill(
                             background: self.background,
-                            colorScheme: self.colorScheme
+                            colorScheme: self.colorScheme,
+                            assetsResolver: self.assetsViewModel.assetsResolver
                         )
                         .ignoresSafeArea()
                 }

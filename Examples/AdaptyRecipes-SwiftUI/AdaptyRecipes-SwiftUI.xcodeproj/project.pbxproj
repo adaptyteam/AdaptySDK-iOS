@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -22,7 +22,6 @@
 		74DD6D872C2EEA0F00DFBE57 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DD6D862C2EEA0F00DFBE57 /* UserManager.swift */; };
 		74DD6D892C2EEA2C00DFBE57 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DD6D882C2EEA2C00DFBE57 /* Logger.swift */; };
 		74DD6D8C2C2EEA5000DFBE57 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DD6D8B2C2EEA5000DFBE57 /* AppConstants.swift */; };
-		74DD6D902C2EEED100DFBE57 /* PaywallViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74DD6D8F2C2EEED000DFBE57 /* PaywallViewModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,8 +38,11 @@
 		74DD6D862C2EEA0F00DFBE57 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		74DD6D882C2EEA2C00DFBE57 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		74DD6D8B2C2EEA5000DFBE57 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
-		74DD6D8F2C2EEED000DFBE57 /* PaywallViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallViewModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		74CF0E4F2D63B9A6002F6AB9 /* Helpers */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Helpers; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		74DD6D5B2C2ED9B100DFBE57 /* Frameworks */ = {
@@ -82,7 +84,7 @@
 				74DD6D822C2EE10600DFBE57 /* Main */,
 				74DD6D832C2EE10C00DFBE57 /* Profile */,
 				74DD6D7F2C2EE05300DFBE57 /* Categories */,
-				74DD6D842C2EE11200DFBE57 /* Paywall */,
+				74CF0E4F2D63B9A6002F6AB9 /* Helpers */,
 				74DD6D852C2EE74800DFBE57 /* Supporting Files */,
 				74DD6D682C2ED9B200DFBE57 /* Preview Content */,
 			);
@@ -122,14 +124,6 @@
 			path = Profile;
 			sourceTree = "<group>";
 		};
-		74DD6D842C2EE11200DFBE57 /* Paywall */ = {
-			isa = PBXGroup;
-			children = (
-				74DD6D8F2C2EEED000DFBE57 /* PaywallViewModifier.swift */,
-			);
-			path = Paywall;
-			sourceTree = "<group>";
-		};
 		74DD6D852C2EE74800DFBE57 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +157,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				74CF0E4F2D63B9A6002F6AB9 /* Helpers */,
 			);
 			name = "AdaptyRecipes-SwiftUI";
 			packageProductDependencies = (
@@ -228,7 +225,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				74DD6D902C2EEED100DFBE57 /* PaywallViewModifier.swift in Sources */,
 				74DD6D622C2ED9B100DFBE57 /* AdaptyRecipes_SwiftUIApp.swift in Sources */,
 				74DD6D7E2C2EE00B00DFBE57 /* CategoryModel.swift in Sources */,
 				74DD6D762C2EDA5C00DFBE57 /* MainView.swift in Sources */,

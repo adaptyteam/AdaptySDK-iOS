@@ -18,10 +18,10 @@ extension AdaptyViewSource {
 
         return Set(assets.values.compactMap {
             switch $0 {
-            case let .image(.url(url, _)):
-                url
-            case let .video(.url(_, image: .url(imageUrl, previewRaster: _))):
-                imageUrl
+            case let .image(image):
+                image.url
+            case let .video(video):
+                video.image.url
             default:
                 nil
             }

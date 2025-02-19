@@ -146,7 +146,7 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
 
     @EnvironmentObject var viewModel: AdaptyTimerViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
-    @EnvironmentObject var assetViewModel: AdaptyImageAssetViewModel
+    @EnvironmentObject var assetsViewModel: AdaptyAssetsViewModel
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
@@ -175,7 +175,7 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
         if let text {
             text
                 .convertToSwiftUIText(
-                    assetResolver: assetViewModel.assetResolver,
+                    assetsResolver: assetsViewModel.assetsResolver,
                     tagResolver: self,
                     productInfo: nil,
                     colorScheme: colorScheme
@@ -209,11 +209,15 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
     private func startTimer() {
         stopTimer()
 
-        timeCounter = Timer.scheduledTimer(withTimeInterval: 0.001, repeats: true) { _ in
+        let timeInterval = 1.0 / Double(currentTimerUpdatesPerSecond)
+
+        let timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
             Task { @MainActor in
                 updateTime()
             }
         }
+        RunLoop.current.add(timer, forMode: .common)
+        timeCounter = timer
     }
 
     private func stopTimer() {

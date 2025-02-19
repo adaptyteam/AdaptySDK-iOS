@@ -40,7 +40,7 @@ enum CategoryModel: String, CaseIterable, Identifiable {
         }
     }
 
-    var title: String { rawValue   }
+    var title: String { rawValue }
 
     var isPremium: Bool {
         switch self {
@@ -48,6 +48,22 @@ enum CategoryModel: String, CaseIterable, Identifiable {
             return false
         case .gourmetDishes, .desserts, .internationalCuisine, .seafoodSpecials, .pairings, .superfoodRecipes:
             return true
+        }
+    }
+}
+
+extension CategoryModel {
+    enum PresentationStyle: String {
+        case modal
+        case navigation
+    }
+
+    var presentationStyle: PresentationStyle {
+        switch self {
+        case .gourmetDishes, .internationalCuisine, .pairings:
+            return .modal
+        default:
+            return .navigation
         }
     }
 }

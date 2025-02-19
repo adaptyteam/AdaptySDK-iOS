@@ -39,6 +39,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.requiresLinearPlayback = true
         playerViewController.player = player
         playerViewController.videoGravity = videoGravity
+        playerViewController.allowsPictureInPicturePlayback = false
 
         DispatchQueue.main.async {
 #if os(visionOS)
@@ -84,7 +85,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoView: View {
     @EnvironmentObject
-    private var viewModel: AdaptyVideoViewModel
+    private var viewModel: AdaptyAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
@@ -140,7 +141,7 @@ struct AdaptyUIVideoView: View {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoColorSchemeSpecificView: View {
     @EnvironmentObject
-    private var viewModel: AdaptyVideoViewModel
+    private var viewModel: AdaptyAssetsViewModel
     @EnvironmentObject
     private var playerManager: AdaptyUIVideoPlayerManager
 
@@ -160,13 +161,7 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
         self.video = video
         self.aspect = aspect
         self.loop = loop
-
-        switch video {
-        case let .url(_, image):
-            self.placeholder = image
-        case let .custom(_, image):
-            self.placeholder = .custom(image)
-        }
+        self.placeholder = video.image
     }
 
     var body: some View {
@@ -198,23 +193,25 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
 extension VC.VideoPlayer {
     private static let url1 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%201.mp4?alt=media&token=5e7ac250-091e-4bb3-8a99-6ac4f0735b37")!
 
+    private static let imgUrl = URL(string: "http://www.libpng.org/pub/png/img_png/OwlAlpha.png")!
+
     private static let url2 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%202.mp4?alt=media&token=8735a549-d035-432f-b609-fe795bfb4efb")!
 
     private static let url3 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%203.mov?alt=media&token=ba0e2ec6-f81e-424f-84e6-e18617bedfbf")!
 
     static let test1 = VC.VideoPlayer.create(
-        asset: .same(.url(url1, image: .custom("video_preview_0"))),
+        asset: .same(.create(url: url1, image: .create(customId: "video_preview_0", url: imgUrl))),
         aspect: .stretch,
         loop: true
     )
 
     static let test2 = VC.VideoPlayer.create(
-        asset: .same(.url(url2, image: .custom("general-tab-icon"))),
+        asset: .same(.create(url: url2, image: .create(customId: "general-tab-icon", url: imgUrl))),
         aspect: .fit,
         loop: false
     )
     static let test3 = VC.VideoPlayer.create(
-        asset: .same(.url(url3, image: .custom("general-tab-icon"))),
+        asset: .same(.create(url: url3, image: .create(customId: "general-tab-icon", url: imgUrl))),
         aspect: .fill,
         loop: true
     )

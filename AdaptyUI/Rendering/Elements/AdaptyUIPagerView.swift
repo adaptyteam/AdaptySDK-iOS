@@ -68,6 +68,8 @@ extension View {
 struct AdaptyUIPagerView: View {
     private static let pageControllTapAnimationDuration = 0.3
 
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyAssetsViewModel
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
     @Environment(\.adaptyScreenSize)
@@ -241,12 +243,12 @@ struct AdaptyUIPagerView: View {
     @ViewBuilder
     private func pageControlView(_ pageControl: VC.Pager.PageControl, onDotTap: @escaping (Int) -> Void) -> some View {
         HStack(spacing: pageControl.spacing) {
-            ForEach(0 ..< pager.content.count, id: \.self) { idx in
+            ForEach(0 ..< pager.content.count, id: \.self) { @MainActor idx in
                 Circle()
                     .fill(
                         idx == currentPage ?
-                        pageControl.selectedColor.swiftuiColor :
-                            pageControl.color.swiftuiColor
+                        pageControl.selectedColor.swiftuiColor(assetsViewModel.assetsResolver) :
+                            pageControl.color.swiftuiColor(assetsViewModel.assetsResolver)
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)
