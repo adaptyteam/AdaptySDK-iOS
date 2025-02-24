@@ -8,7 +8,6 @@
 import Foundation
 
 extension Adapty {
-
     @EventsManagerActor
     static let eventsManager = EventsManager()
 
@@ -31,16 +30,16 @@ extension Adapty {
     }
 
     static func trackEventIfNeed(_ chosen: AdaptyPaywallChosen) {
-        guard case let .draw(placementAudienceVersionId, profileId) = chosen.kind else {
+        guard case let .draw(paywall, profileId) = chosen else {
             return
         }
 
-        Log.crossAB.debug("-> trackEvent variationId = \(chosen.value.variationId)")
-        
+        Log.crossAB.debug("-> trackEvent variationId = \(paywall.variationId)")
+
         trackEvent(.paywallVariationAssigned(.init(
-            paywallVariationId: chosen.value.variationId,
-            viewConfigurationId: chosen.value.viewConfiguration?.id,
-            placementAudienceVersionId: placementAudienceVersionId
+            paywallVariationId: paywall.variationId,
+            viewConfigurationId: paywall.viewConfiguration?.id,
+            placementAudienceVersionId: paywall.placementAudienceVersionId
         )), for: profileId)
     }
 
@@ -49,7 +48,7 @@ extension Adapty {
     }
 }
 
-extension Adapty {
+public extension Adapty {
     private static func _trackEvent(_ event: Event) async throws {
         do {
             let event = await Event.Unpacked(
@@ -73,7 +72,7 @@ extension Adapty {
     /// - Parameters:
     ///   - paywall: A ``AdaptyPaywall`` object.
     ///  - Throws: An ``AdaptyError`` object
-    public nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
+    nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
         try await withActivatedSDK(methodName: .logShowPaywall) { _ in
             try await _trackEvent(.paywallShowed(.init(paywallVariationId: paywall.variationId, viewConfigurationId: nil)))
         }
@@ -90,7 +89,7 @@ extension Adapty {
     ///   - screenName: Readable name of a particular screen as part of onboarding.
     ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
     /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
+    nonisolated static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
         try await logShowOnboarding(.init(
             name: name,
             screenName: screenName,
@@ -98,7 +97,7 @@ extension Adapty {
         ))
     }
 
-    public nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws {
+    nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws {
         try await withActivatedSDK(methodName: .logShowOnboarding) { _ in
 
             guard params.screenOrder > 0 else {

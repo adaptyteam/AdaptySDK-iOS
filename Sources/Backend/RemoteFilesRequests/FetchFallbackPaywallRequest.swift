@@ -64,7 +64,7 @@ extension FetchFallbackPaywallVariationsExecutor {
                 ]
             )
 
-            return AdaptyPaywallChosen.draw(profileId, response.body)
+            return .draw(response.body, profileId: profileId)
         } catch {
             guard (error as? HTTPError)?.statusCode == 404,
                   !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale)

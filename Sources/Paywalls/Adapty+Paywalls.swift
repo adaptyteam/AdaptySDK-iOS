@@ -90,7 +90,7 @@ extension Adapty {
                 throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
             }
             Adapty.trackEventIfNeed(chosen)
-            return chosen.value
+            return chosen.paywall
         }
     }
 
@@ -180,50 +180,49 @@ extension Adapty {
                         segmentId: segmentId,
                         cached: cached,
                         crossPlacementEligible: true,
-                        variationIdResolver: { @AdaptyActor placementId, selectedPaywall in
-                            guard let manager = self.tryProfileManagerOrNil(with: selectedPaywall.profileId) else {
+                        variationIdResolver: { @AdaptyActor placementId, draw in
+                            guard let manager = self.tryProfileManagerOrNil(with: draw.profileId) else {
                                 Log.crossAB.debug("Cross-AB-test placementId = \(placementId), error = PROFILE_WAS_CHANGED")
                                 throw ResponseDecodingError.profileWasChanged
                             }
 
                             guard let crossPlacementState = manager.storage.crossPlacementState else {
                                 // We are prohibited from participating in Cross AB Tests
-                                if selectedPaywall.participatesInCrossPlacementABTest {
+                                if draw.participatesInCrossPlacementABTest {
                                     Log.crossAB.debug("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
                                     throw ResponseDecodingError.crossPlacementABTestDisabled
                                 } else {
-                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(selectedPaywall.variationId) DRAW")
-                                    return selectedPaywall.variationId
+                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.paywall.variationId) DRAW")
+                                    return draw.paywall.variationId
                                 }
                             }
 
                             if crossPlacementState.canParticipateInABTest {
-                                if selectedPaywall.participatesInCrossPlacementABTest {
-                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(selectedPaywall.variationId), state = \(selectedPaywall.variationIdByPlacements) DRAW")
+                                if draw.participatesInCrossPlacementABTest {
+                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.paywall.variationId), state = \(draw.variationIdByPlacements) DRAW")
                                     manager.storage.setCrossPlacementState(.init(
-                                        variationIdByPlacements: selectedPaywall.variationIdByPlacements,
+                                        variationIdByPlacements: draw.variationIdByPlacements,
                                         version: crossPlacementState.version
                                     ))
                                 } else {
-                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(selectedPaywall.variationId) DRAW")
+                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
                                 }
-                                return selectedPaywall.variationId
+                                return draw.paywall.variationId
                             } else if let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId) {
                                 // We are participating in cross AB test: A
                                 // And the paywall is from cross AB test: A
                                 Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE -> variationId = \(variationId)")
                                 return variationId
-                            } else if !selectedPaywall.participatesInCrossPlacementABTest {
+                            } else if !draw.participatesInCrossPlacementABTest {
                                 // We are participating in cross AB test: A
                                 // But the paywall is not in any cross AB test
-                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(selectedPaywall.variationId) DRAW")
-                                return selectedPaywall.variationId
+                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
+                                return draw.paywall.variationId
                             } else {
                                 // We are participating in cross AB test: A
                                 // But the paywall is from cross AB test: B
-                                //
-                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(selectedPaywall.variationId) DRAW")
-                                return selectedPaywall.variationId
+                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
+                                return draw.paywall.variationId
                             }
 
                         },
@@ -248,7 +247,7 @@ extension Adapty {
                 }
 
                 Adapty.trackEventIfNeed(chosen)
-                return chosen.value
+                return chosen.paywall
 
             } catch {
                 if error.responseDecodingError([.profileWasChanged]) {
@@ -322,7 +321,7 @@ extension Adapty {
                 }
 
                 Adapty.trackEventIfNeed(chosen)
-                return chosen.value
+                return chosen.paywall
 
             } catch {
                 if error.responseDecodingError([.notFoundVariationId]) { continue }
@@ -339,7 +338,7 @@ extension Adapty {
                 }
 
                 Adapty.trackEventIfNeed(chosen)
-                return chosen.value
+                return chosen.paywall
             }
         }
     }

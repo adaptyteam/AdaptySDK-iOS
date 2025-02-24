@@ -76,6 +76,6 @@ extension Backend.MainExecutor {
             ]
         )
 
-        return AdaptyPaywallChosen.draw(profileId, response.body)
+        return .draw(response.body, profileId: profileId)
     }
 }

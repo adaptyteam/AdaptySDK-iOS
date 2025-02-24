@@ -78,8 +78,8 @@ final class PaywallsStorage: Sendable {
     }
 
     func savedPaywallChosen(_ chosen: AdaptyPaywallChosen) -> AdaptyPaywallChosen {
-        let paywall = chosen.value
-        if let newer = getNewerPaywall(than: paywall) { return AdaptyPaywallChosen.restored(newer) }
+        let paywall = chosen.paywall
+        if let newer = getNewerPaywall(than: paywall) { return AdaptyPaywallChosen.restore(newer) }
 
         Self.paywallByPlacementId[paywall.placementId] = VH(paywall, time: Date())
 

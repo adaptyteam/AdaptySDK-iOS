@@ -54,7 +54,7 @@ extension AdaptyPaywallChosen {
         ).meta.version
 
         if let cached, cached.version > version {
-            return response.replaceBody(AdaptyPaywallChosen.restored(cached))
+            return response.replaceBody(AdaptyPaywallChosen.restore(cached))
         }
 
         let draw = try jsonDecoder.decode(
@@ -62,14 +62,13 @@ extension AdaptyPaywallChosen {
             responseBody: response.body
         ).value
 
-        let paywallVariationId: String
-        
-        if let variationIdResolver {
-            paywallVariationId = try await variationIdResolver(placementId, draw)
-        } else {
-            Log.crossAB.debug("AB-test placementId = \(placementId), variationId = \(draw.variationId) DRAW")
-
-            paywallVariationId = draw.variationId
+        guard let paywallVariationId = try await variationIdResolver?(placementId, draw),
+              paywallVariationId != draw.paywall.variationId
+        else {
+            if variationIdResolver == nil {
+                Log.crossAB.debug("AB-test placementId = \(placementId), variationId = \(draw.paywall.variationId) DRAW")
+            }
+            return response.replaceBody(AdaptyPaywallChosen.draw(draw))
         }
 
         jsonDecoder.setPaywallVariationId(paywallVariationId)
@@ -81,7 +80,7 @@ extension AdaptyPaywallChosen {
             throw ResponseDecodingError.notFoundVariationId
         }
 
-        return response.replaceBody(AdaptyPaywallChosen.draw(profileId, paywall))
+        return response.replaceBody(AdaptyPaywallChosen.draw(paywall, profileId: profileId))
     }
 }
 

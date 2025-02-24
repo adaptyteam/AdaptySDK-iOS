@@ -10,12 +10,13 @@ import Foundation
 extension AdaptyPaywallVariations {
     struct Draw: Sendable {
         let profileId: String
-        let variationId: String
-        let placementAudienceVersionId: String
+        let paywall: AdaptyPaywall
         let variationIdByPlacements: [String: String]
-
-        var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
     }
+}
+
+extension AdaptyPaywallVariations.Draw {
+    var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
 }
 
 extension AdaptyPaywallVariations.Draw: Decodable {
@@ -26,22 +27,27 @@ extension AdaptyPaywallVariations.Draw: Decodable {
         }
 
         let profileId = try decoder.userInfo.profileId
+        let paywall: AdaptyPaywall
+        let variationIdByPlacements: [String: String]
 
-        let variation = if items.count == 1 {
-            firstItem
+        if items.count == 1 {
+            paywall = try AdaptyPaywallVariations.paywall(from: decoder, index: 0)
+            variationIdByPlacements = firstItem.variationIdByPlacements
         } else {
-            Self.draw(
+            let index = Self.draw(
                 items: items,
                 placementAudienceVersionId: firstItem.placementAudienceVersionId,
                 profileId: profileId
             )
+
+            paywall = try AdaptyPaywallVariations.paywall(from: decoder, index: index)
+            variationIdByPlacements = items[index].variationIdByPlacements
         }
 
         self.init(
             profileId: profileId,
-            variationId: variation.variationId,
-            placementAudienceVersionId: variation.placementAudienceVersionId,
-            variationIdByPlacements: variation.variationIdByPlacements
+            paywall: paywall,
+            variationIdByPlacements: variationIdByPlacements
         )
     }
 
@@ -49,26 +55,27 @@ extension AdaptyPaywallVariations.Draw: Decodable {
         items: [Variation],
         placementAudienceVersionId: String,
         profileId: String
-    ) -> Variation {
+    ) -> Int {
         let data = Data("\(placementAudienceVersionId)-\(profileId)".md5.suffix(8))
         let value: UInt64 = data.withUnsafeBytes { $0.load(as: UInt64.self).bigEndian }
         var weight = Int(value % 100)
 
         let sortedItems = items
+            .enumerated()
             .sorted(by: { first, second in
-                if first.weight == second.weight {
-                    first.variationId < second.variationId
+                if first.element.weight == second.element.weight {
+                    first.element.variationId < second.element.variationId
                 } else {
-                    first.weight < second.weight
+                    first.element.weight < second.element.weight
                 }
             })
 
         let index = sortedItems.firstIndex { item in
-            weight -= item.weight
+            weight -= item.element.weight
             return weight <= 0
         } ?? (items.count - 1)
 
-        return sortedItems[index]
+        return sortedItems[index].offset
     }
 
     private struct Variation: Sendable, Decodable {
@@ -82,7 +89,6 @@ extension AdaptyPaywallVariations.Draw: Decodable {
             case variationId = "variation_id"
             case weight
             case crossPlacementInfo = "cross_placement_info"
-
             case attributes
         }
 

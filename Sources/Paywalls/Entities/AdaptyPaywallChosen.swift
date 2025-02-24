@@ -7,35 +7,21 @@
 
 import Foundation
 
-struct AdaptyPaywallChosen: Sendable {
-    var value: AdaptyPaywall
-    let kind: Kind
+enum AdaptyPaywallChosen: Sendable {
+    case restore(AdaptyPaywall)
+    case draw(AdaptyPaywall, profileId: String)
+}
 
-    enum Kind: Sendable, Hashable {
-        case restore
-        case draw(placementAudienceVersionId: String, profileId: String)
+extension AdaptyPaywallChosen {
+    static func draw(_ draw: AdaptyPaywallVariations.Draw) -> Self {
+        .draw(draw.paywall, profileId: draw.profileId)
     }
 
-    private init(_ value: AdaptyPaywall, _ kind: Kind) {
-        self.value = value
-        self.kind = kind
-    }
-
-    static func restored(_ paywall: AdaptyPaywall) -> Self {
-        .init(paywall, .restore)
-    }
-
-    static func draw(_ draw: AdaptyPaywallVariations.Draw, _ paywall: AdaptyPaywall) -> Self {
-        .init(paywall, .draw(placementAudienceVersionId: draw.placementAudienceVersionId, profileId: draw.profileId))
-    }
-
-    static func draw(_ profileId: String, _ paywall: AdaptyPaywall) -> Self {
-        .init(paywall, .draw(placementAudienceVersionId: paywall.placementAudienceVersionId, profileId: profileId))
-    }
-
-    func replaceAdaptyPaywall(version: Int64) -> Self {
-        var mutable = self
-        mutable.value.version = version
-        return mutable
+    var paywall: AdaptyPaywall {
+        switch self {
+        case .restore(let paywall),
+             .draw(let paywall, _):
+            paywall
+        }
     }
 }
