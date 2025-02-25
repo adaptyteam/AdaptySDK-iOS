@@ -16,7 +16,7 @@ extension Request {
 
         let paywall: AdaptyPaywall
         let loadTimeout: TimeInterval?
-        let preloadProducts: Bool
+        let preloadProducts: Bool?
         let customTags: [String: String]?
         let customTimers: [String: Date]?
 
@@ -32,7 +32,7 @@ extension Request {
             try .success(await AdaptyUI.Plugin.createView(
                 paywall: paywall,
                 loadTimeout: loadTimeout,
-                preloadProducts: preloadProducts,
+                preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,
                 timerResolver: customTimers
             ))
