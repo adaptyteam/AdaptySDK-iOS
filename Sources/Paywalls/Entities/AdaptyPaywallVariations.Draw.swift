@@ -110,7 +110,9 @@ extension AdaptyPaywallVariations.Draw: Decodable {
             variationId = try container.decode(String.self, forKey: .variationId)
             weight = try container.decode(Int.self, forKey: .weight)
 
-            if container.contains(.crossPlacementInfo) {
+            if container.contains(.crossPlacementInfo),
+               !((try? container.decodeNil(forKey: .crossPlacementInfo)) ?? true)
+            {
                 let crossPlacementInfo = try container.nestedContainer(keyedBy: CrossPlacementCodingKeys.self, forKey: .crossPlacementInfo)
                 variationIdByPlacements = try crossPlacementInfo.decode([String: String].self, forKey: .variationIdByPlacements)
             } else {
