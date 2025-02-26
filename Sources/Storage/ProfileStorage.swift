@@ -104,8 +104,9 @@ final class ProfileStorage: Sendable {
     func setCrossPlacementState(_ value: CrossPlacementState) {
         do {
             try Self.userDefaults.setJSON(value, forKey: Constants.crossPlacementStateKey)
-            Self.crossPlacementState = crossPlacementState
+            Self.crossPlacementState = value
             log.debug("saving crossPlacementState success.")
+            Log.crossAB.debug("saving crossPlacementState success = \(value)")
         } catch {
             log.error("saving crossPlacementState fail. \(error.localizedDescription)")
         }
