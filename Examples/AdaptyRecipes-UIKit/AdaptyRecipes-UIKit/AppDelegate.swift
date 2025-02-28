@@ -14,13 +14,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let viewModel = MainViewModel()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let adaptyConfigBuilder = AdaptyConfiguration
+        let configuration = AdaptyConfiguration
             .builder(withAPIKey: AppConstants.adaptyApiKey)
             .with(customerUserId: UserManager.currentUserId)
+            .build()
 
         Adapty.delegate = viewModel
         Adapty.logLevel = .verbose
-        Adapty.activate(with: adaptyConfigBuilder)
+        Adapty.activate(with: configuration)
 
         if #available(iOS 15.0, *) {
             AdaptyUI.activate()

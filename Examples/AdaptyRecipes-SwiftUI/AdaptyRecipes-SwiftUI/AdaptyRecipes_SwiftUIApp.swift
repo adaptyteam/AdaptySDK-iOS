@@ -16,13 +16,14 @@ struct AdaptyRecipes_SwiftUIApp: App {
     init() {
         viewModel = MainViewModel()
 
-        let adaptyConfigBuilder = AdaptyConfiguration
+        let configuration = AdaptyConfiguration
             .builder(withAPIKey: AppConstants.adaptyApiKey)
             .with(customerUserId: UserManager.currentUserId)
+            .build()
 
         Adapty.delegate = viewModel
         Adapty.logLevel = .verbose
-        Adapty.activate(with: adaptyConfigBuilder)
+        Adapty.activate(with: configuration)
 
 #if canImport(UIKit)
         AdaptyUI.activate()

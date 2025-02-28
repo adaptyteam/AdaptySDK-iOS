@@ -51,22 +51,6 @@ public extension Adapty {
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
-    /// - Parameter builder: `AdaptyConfiguration.Builder` which allows to configure Adapty SDK
-    /// - Parameter completion: Result callback
-    nonisolated static func activate(
-        with builder: AdaptyConfiguration.Builder,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        let configuration = builder.build()
-        withCompletion(completion) {
-            try await activate(with: configuration)
-        }
-    }
-
-    /// Use this method to initialize the Adapty SDK.
-    ///
-    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
-    ///
     /// - Parameter configuration: `AdaptyConfiguration` which allows to configure Adapty SDK
     /// - Parameter completion: Result callback
     nonisolated static func activate(
