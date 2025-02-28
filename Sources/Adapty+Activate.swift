@@ -35,17 +35,6 @@ extension Adapty {
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
-    /// - Parameter builder: `AdaptyConfiguration.Builder` which allows to configure Adapty SDK
-    public nonisolated static func activate(
-        with builder: AdaptyConfiguration.Builder
-    ) async throws {
-        try await activate(with: builder.build())
-    }
-
-    /// Use this method to initialize the Adapty SDK.
-    ///
-    /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
-    ///
     /// - Parameter configuration: `AdaptyConfiguration` which allows to configure Adapty SDK
     public static func activate(
         with configuration: AdaptyConfiguration
