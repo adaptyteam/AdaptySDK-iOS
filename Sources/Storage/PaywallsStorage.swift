@@ -54,7 +54,12 @@ final class PaywallsStorage: Sendable {
         }
     }()
 
-    func getPaywallByLocale(_ locale: AdaptyLocale, orDefaultLocale: Bool, withPlacementId placementId: String, withVariationId: String?) -> VH<AdaptyPaywall>? {
+    func getPaywallByLocale(
+        _ locale: AdaptyLocale,
+        orDefaultLocale: Bool,
+        withPlacementId placementId: String,
+        withVariationId: String?
+    ) -> VH<AdaptyPaywall>? {
         guard let paywall = Self.paywallByPlacementId[placementId] else { return nil }
         if let variationId = withVariationId, paywall.value.variationId != variationId {
             return nil

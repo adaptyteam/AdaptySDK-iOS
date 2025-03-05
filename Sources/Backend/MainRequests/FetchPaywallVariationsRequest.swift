@@ -51,16 +51,18 @@ extension AdaptyPaywallChosen {
         let version: Int64 = try jsonDecoder.decode(
             Backend.Response.ValueOfMeta<AdaptyPaywallVariations.Meta>.self,
             responseBody: response.body
-        ).meta.version
+        ).value.version
 
         if let cached, cached.version > version {
             return response.replaceBody(AdaptyPaywallChosen.restore(cached))
         }
 
-        let draw = try jsonDecoder.decode(
+        var draw = try jsonDecoder.decode(
             Backend.Response.ValueOfData<AdaptyPaywallVariations.Draw>.self,
             responseBody: response.body
         ).value
+
+        draw = draw.replacedPaywallVersion(version)
 
         guard let paywallVariationId = try await variationIdResolver?(placementId, draw),
               paywallVariationId != draw.paywall.variationId
@@ -73,12 +75,14 @@ extension AdaptyPaywallChosen {
 
         jsonDecoder.setPaywallVariationId(paywallVariationId)
 
-        guard let paywall = try jsonDecoder.decode(
+        guard var paywall = try jsonDecoder.decode(
             Backend.Response.ValueOfData<AdaptyPaywallVariations.Value>.self,
             responseBody: response.body
         ).value.paywall else {
             throw ResponseDecodingError.notFoundVariationId
         }
+
+        paywall.version = version
 
         return response.replaceBody(AdaptyPaywallChosen.draw(paywall, profileId: profileId))
     }

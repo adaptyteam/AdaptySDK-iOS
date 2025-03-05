@@ -17,6 +17,16 @@ extension AdaptyPaywallVariations {
 
 extension AdaptyPaywallVariations.Draw {
     var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
+
+    func replacedPaywallVersion(_ version: Int64) -> Self {
+        var paywall = paywall
+        paywall.version = version
+        return .init(
+            profileId: profileId,
+            paywall: paywall,
+            variationIdByPlacements: variationIdByPlacements
+        )
+    }
 }
 
 extension AdaptyPaywallVariations.Draw: Decodable {
