@@ -13,12 +13,11 @@ import SwiftUI
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUIActionsViewModel: ObservableObject {
-    let logId: String
-    let eventsHandler: AdaptyEventsHandler
+    private var logId: String { eventsHandler.logId }
+    private let eventsHandler: AdaptyEventsHandler
 
     package init(eventsHandler: AdaptyEventsHandler) {
         self.eventsHandler = eventsHandler
-        self.logId = eventsHandler.logId
     }
 
     func closeActionOccurred() {

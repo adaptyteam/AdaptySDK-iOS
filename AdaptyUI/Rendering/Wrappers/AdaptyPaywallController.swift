@@ -150,8 +150,7 @@ public final class AdaptyPaywallController: UIViewController {
 
         Log.ui.verbose("#\(logId)# viewDidAppear")
         
-        paywallConfiguration.eventsHandler.viewDidAppear()
-        paywallConfiguration.paywallViewModel.logShowPaywall()
+        paywallConfiguration.reportOnAppear()
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
@@ -159,8 +158,7 @@ public final class AdaptyPaywallController: UIViewController {
 
         Log.ui.verbose("#\(logId)# viewDidDisappear")
         
-        paywallConfiguration.eventsHandler.viewDidDisappear()
-        paywallConfiguration.paywallViewModel.resetLogShowPaywall()
+        paywallConfiguration.reportOnDisappear()
     }
 }
 

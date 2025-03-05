@@ -114,12 +114,10 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         .environmentObject(paywallConfiguration.screensViewModel)
         .environmentObject(paywallConfiguration.assetsViewModel)
         .onAppear {
-            paywallConfiguration.eventsHandler.viewDidAppear()
-            paywallConfiguration.paywallViewModel.logShowPaywall()
+            paywallConfiguration.reportOnAppear()
         }
         .onDisappear {
-            paywallConfiguration.eventsHandler.viewDidDisappear()
-            paywallConfiguration.paywallViewModel.resetLogShowPaywall()
+            paywallConfiguration.reportOnDisappear()
         }
     }
 }

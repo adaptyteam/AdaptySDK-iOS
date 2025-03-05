@@ -13,10 +13,11 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptySectionsViewModel: ObservableObject {
-    let logId: String
+    private var logId: String { eventsHandler.logId }
+    private let eventsHandler: AdaptyEventsHandler
 
-    package init(logId: String) {
-        self.logId = logId
+    package init(eventsHandler: AdaptyEventsHandler) {
+        self.eventsHandler = eventsHandler
     }
 
     @Published var sectionsStates = [String: Int]()
@@ -38,6 +39,11 @@ package final class AdaptySectionsViewModel: ObservableObject {
             }
             return section.index
         }
+    }
+    
+    func resetSectionsState() {
+        Log.ui.verbose("#\(logId)# resetSectionsState")
+        sectionsStates.removeAll()
     }
 }
 

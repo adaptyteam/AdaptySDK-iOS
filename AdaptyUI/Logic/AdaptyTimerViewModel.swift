@@ -30,6 +30,9 @@ extension [String: Date]: AdaptyTimerResolver {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyTimerViewModel: ObservableObject {
+    private var logId: String { eventsHandler.logId }
+    private let eventsHandler: AdaptyEventsHandler
+    
     private static var globalTimers = [String: Date]()
     private var timers = [String: Date]()
 
@@ -42,6 +45,7 @@ package final class AdaptyTimerViewModel: ObservableObject {
     private let screensViewModel: AdaptyScreensViewModel
 
     package init(
+        eventsHandler: AdaptyEventsHandler,
         timerResolver: AdaptyTimerResolver,
         paywallViewModel: AdaptyPaywallViewModel,
         productsViewModel: AdaptyProductsViewModel,
@@ -49,6 +53,7 @@ package final class AdaptyTimerViewModel: ObservableObject {
         sectionsViewModel: AdaptySectionsViewModel,
         screensViewModel: AdaptyScreensViewModel
     ) {
+        self.eventsHandler = eventsHandler
         self.timerResolver = timerResolver
         self.paywallViewModel = paywallViewModel
         self.productsViewModel = productsViewModel
@@ -118,6 +123,11 @@ package final class AdaptyTimerViewModel: ObservableObject {
         }
 
         return timeLeft
+    }
+    
+    func resetTimersState() {
+        Log.ui.verbose("#\(logId)# resetTimersState")
+        timers.removeAll()
     }
 }
 
