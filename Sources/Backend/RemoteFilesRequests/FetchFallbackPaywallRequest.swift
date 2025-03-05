@@ -7,22 +7,36 @@
 
 import Foundation
 
-struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
+private struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = AdaptyPaywall
 
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
     let stamp = Log.stamp
 
-    let timeoutInterval: TimeInterval? = 0.5
+    let timeoutInterval: TimeInterval?
+
+    func decodeDataResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeResponse(response, withConfiguration: configuration)
+    }
 
     init(
         apiKeyPrefix: String,
         placementId: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        timeoutInterval: TimeInterval?
     ) {
+        self.timeoutInterval = if let timeoutInterval {
+            max(0.5, timeoutInterval)
+        } else {
+            nil
+        }
+
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
@@ -32,22 +46,26 @@ struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension FetchFallbackPaywallVariationsExecutor {
-    func performFetchFallbackPaywall(
+extension Backend.FallbackExecutor {
+    func fetchFallbackPaywall(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        timeoutInterval: TimeInterval?
     ) async throws -> AdaptyPaywallChosen {
         let request = FetchFallbackPaywallRequest(
             apiKeyPrefix: apiKeyPrefix,
             placementId: placementId,
             paywallVariationId: paywallVariationId,
             locale: locale,
-            disableServerCache: disableServerCache
+            disableServerCache: disableServerCache,
+            timeoutInterval: timeoutInterval
         )
+
+        let startRequestTime = Date()
 
         do {
             let response = try await perform(
@@ -71,13 +89,15 @@ extension FetchFallbackPaywallVariationsExecutor {
             else {
                 throw error
             }
-            return try await performFetchFallbackPaywall(
+
+            return try await fetchFallbackPaywall(
                 apiKeyPrefix: apiKeyPrefix,
                 profileId: profileId,
                 placementId: placementId,
                 paywallVariationId: paywallVariationId,
                 locale: .defaultPaywallLocale,
-                disableServerCache: disableServerCache
+                disableServerCache: disableServerCache,
+                timeoutInterval: timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
             )
         }
     }
