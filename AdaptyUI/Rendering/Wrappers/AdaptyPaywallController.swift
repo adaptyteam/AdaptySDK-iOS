@@ -56,6 +56,16 @@ public final class AdaptyPaywallController: UIViewController {
 
         view.backgroundColor = .systemBackground
 
+        paywallConfiguration.eventsHandler.didAppear = { [weak self] in
+            guard let self else { return }
+            self.delegate?.paywallControllerDidAppear(self)
+        }
+        
+        paywallConfiguration.eventsHandler.didDisappear = { [weak self] in
+            guard let self else { return }
+            self.delegate?.paywallControllerDidDisappear(self)
+        }
+        
         paywallConfiguration.eventsHandler.didPerformAction = { [weak self] action in
             guard let self else { return }
             self.delegate?.paywallController(self, didPerform: action)
@@ -140,8 +150,7 @@ public final class AdaptyPaywallController: UIViewController {
 
         Log.ui.verbose("#\(logId)# viewDidAppear")
         
-        paywallConfiguration.eventsHandler.viewDidAppear()
-        paywallConfiguration.paywallViewModel.logShowPaywall()
+        paywallConfiguration.reportOnAppear()
     }
 
     override public func viewDidDisappear(_ animated: Bool) {
@@ -149,8 +158,7 @@ public final class AdaptyPaywallController: UIViewController {
 
         Log.ui.verbose("#\(logId)# viewDidDisappear")
         
-        paywallConfiguration.eventsHandler.viewDidDisappear()
-        paywallConfiguration.paywallViewModel.resetLogShowPaywall()
+        paywallConfiguration.reportOnDisappear()
     }
 }
 

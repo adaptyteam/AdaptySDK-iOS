@@ -1,5 +1,5 @@
 //
-//  FetchFallbackPaywallRequest.swift
+//  FetchFallbackPaywallVariationsRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 26.03.2024
@@ -11,14 +11,21 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
     let queryItems: QueryItems
-    let timeoutInterval: TimeInterval? = 0.5
+    let timeoutInterval: TimeInterval?
 
     init(
         apiKeyPrefix: String,
         placementId: String,
         locale: AdaptyLocale,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        timeoutInterval: TimeInterval?
     ) {
+        self.timeoutInterval = if let timeoutInterval {
+            max(0.5, timeoutInterval)
+        } else {
+            nil
+        }
+
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
@@ -27,30 +34,7 @@ private struct FetchFallbackPaywallVariationsRequest: HTTPRequest {
     }
 }
 
-protocol FetchFallbackPaywallVariationsExecutor: BackendExecutor {
-    func fetchFallbackPaywallVariations(
-        apiKeyPrefix: String,
-        profileId: String,
-        placementId: String,
-        locale: AdaptyLocale,
-        cached: AdaptyPaywall?,
-        crossPlacementEligible: Bool,
-        variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
-        disableServerCache: Bool
-    ) async throws -> AdaptyPaywallChosen
-
-    func fetchFallbackPaywall(
-        apiKeyPrefix: String,
-        profileId: String,
-        placementId: String,
-        paywallVariationId: String,
-        locale: AdaptyLocale,
-        cached: AdaptyPaywall?,
-        disableServerCache: Bool
-    ) async throws -> AdaptyPaywallChosen
-}
-
-private extension FetchFallbackPaywallVariationsExecutor {
+private extension BackendExecutor {
     @inline(__always)
     func performFetchFallbackPaywallVariationsRequest(
         requestName: APIRequestName,
@@ -61,14 +45,18 @@ private extension FetchFallbackPaywallVariationsExecutor {
         cached: AdaptyPaywall?,
         crossPlacementEligible: Bool,
         variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        timeoutInterval: TimeInterval?
     ) async throws -> AdaptyPaywallChosen {
         let request = FetchFallbackPaywallVariationsRequest(
             apiKeyPrefix: apiKeyPrefix,
             placementId: placementId,
             locale: locale,
-            disableServerCache: disableServerCache
+            disableServerCache: disableServerCache,
+            timeoutInterval: timeoutInterval
         )
+
+        let startRequestTime = Date()
 
         do {
             let configuration = session.configuration as? HTTPCodableConfiguration
@@ -113,13 +101,14 @@ private extension FetchFallbackPaywallVariationsExecutor {
                 cached: cached,
                 crossPlacementEligible: crossPlacementEligible,
                 variationIdResolver: variationIdResolver,
-                disableServerCache: disableServerCache
+                disableServerCache: disableServerCache,
+                timeoutInterval: timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
             )
         }
     }
 }
 
-extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
+extension Backend.FallbackExecutor {
     func fetchFallbackPaywallVariations(
         apiKeyPrefix: String,
         profileId: String,
@@ -128,7 +117,8 @@ extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
         cached: AdaptyPaywall?,
         crossPlacementEligible: Bool,
         variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        timeoutInterval: TimeInterval?
     ) async throws -> AdaptyPaywallChosen {
         try await performFetchFallbackPaywallVariationsRequest(
             requestName: .fetchFallbackPaywallVariations,
@@ -139,32 +129,14 @@ extension Backend.FallbackExecutor: FetchFallbackPaywallVariationsExecutor {
             cached: cached,
             crossPlacementEligible: crossPlacementEligible,
             variationIdResolver: variationIdResolver,
-            disableServerCache: disableServerCache
-        )
-    }
-
-    func fetchFallbackPaywall(
-        apiKeyPrefix: String,
-        profileId: String,
-        placementId: String,
-        paywallVariationId: String,
-        locale: AdaptyLocale,
-        cached: AdaptyPaywall?,
-        disableServerCache: Bool
-    ) async throws -> AdaptyPaywallChosen {
-        try await performFetchFallbackPaywall(
-            apiKeyPrefix: apiKeyPrefix,
-            profileId: profileId,
-            placementId: placementId,
-            paywallVariationId: paywallVariationId,
-            locale: locale,
-            disableServerCache: disableServerCache
+            disableServerCache: disableServerCache,
+            timeoutInterval: timeoutInterval
         )
     }
 }
 
-extension Backend.ConfigsExecutor: FetchFallbackPaywallVariationsExecutor {
-    func fetchFallbackPaywallVariations(
+extension Backend.ConfigsExecutor {
+    func fetchUntargetedPaywallVariations(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -172,7 +144,8 @@ extension Backend.ConfigsExecutor: FetchFallbackPaywallVariationsExecutor {
         cached: AdaptyPaywall?,
         crossPlacementEligible: Bool,
         variationIdResolver: AdaptyPaywallChosen.VariationIdResolver?,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        timeoutInterval: TimeInterval?
     ) async throws -> AdaptyPaywallChosen {
         try await performFetchFallbackPaywallVariationsRequest(
             requestName: .fetchUntargetedPaywallVariations,
@@ -183,26 +156,8 @@ extension Backend.ConfigsExecutor: FetchFallbackPaywallVariationsExecutor {
             cached: cached,
             crossPlacementEligible: crossPlacementEligible,
             variationIdResolver: variationIdResolver,
-            disableServerCache: disableServerCache
-        )
-    }
-
-    func fetchFallbackPaywall(
-        apiKeyPrefix: String,
-        profileId: String,
-        placementId: String,
-        paywallVariationId: String,
-        locale: AdaptyLocale,
-        cached: AdaptyPaywall?,
-        disableServerCache: Bool
-    ) async throws -> AdaptyPaywallChosen {
-        try await performFetchFallbackPaywall(
-            apiKeyPrefix: apiKeyPrefix,
-            profileId: profileId,
-            placementId: placementId,
-            paywallVariationId: paywallVariationId,
-            locale: locale,
-            disableServerCache: disableServerCache
+            disableServerCache: disableServerCache,
+            timeoutInterval: timeoutInterval
         )
     }
 }

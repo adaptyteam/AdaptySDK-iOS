@@ -35,7 +35,7 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
 package final class AdaptyProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
 
-    let logId: String
+    private var logId: String { eventsHandler.logId }
     private let eventsHandler: AdaptyEventsHandler
     private let paywallViewModel: AdaptyPaywallViewModel
     private let observerModeResolver: AdaptyObserverModeResolver?
@@ -61,7 +61,6 @@ package final class AdaptyProductsViewModel: ObservableObject {
         products: [AdaptyPaywallProduct]?,
         observerModeResolver: AdaptyObserverModeResolver?
     ) {
-        logId = eventsHandler.logId
         self.eventsHandler = eventsHandler
         self.paywallViewModel = paywallViewModel
 
@@ -69,6 +68,11 @@ package final class AdaptyProductsViewModel: ObservableObject {
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
 
         self.observerModeResolver = observerModeResolver
+    }
+    
+    func resetSelectedProducts() {
+        Log.ui.verbose("#\(logId)# resetSelectedProducts")
+        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
     }
 
     func loadProductsIfNeeded() {

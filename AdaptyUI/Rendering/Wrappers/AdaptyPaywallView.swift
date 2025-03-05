@@ -10,7 +10,6 @@
 import Adapty
 import SwiftUI
 
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
@@ -18,6 +17,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
 
     private let paywallConfiguration: AdaptyUI.PaywallConfiguration
 
+    private let didAppear: (() -> Void)?
+    private let didDisappear: (() -> Void)?
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
     private let didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
@@ -34,6 +35,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
 
     public init(
         paywallConfiguration: AdaptyUI.PaywallConfiguration,
+        didAppear: (() -> Void)? = nil,
+        didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
@@ -49,6 +52,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         showAlertBuilder: ((AlertItem) -> Alert)? = nil
     ) {
         self.paywallConfiguration = paywallConfiguration
+        self.didAppear = didAppear
+        self.didDisappear = didDisappear
         self.didPerformAction = didPerformAction
         self.didSelectProduct = didSelectProduct
         self.didStartPurchase = didStartPurchase
@@ -65,6 +70,9 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
     }
 
     public var body: some View {
+        paywallConfiguration.eventsHandler.didAppear = didAppear
+        paywallConfiguration.eventsHandler.didDisappear = didDisappear
+
         paywallConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { action in
             switch action {
             case .close:
@@ -75,6 +83,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
                 break
             }
         }
+
         paywallConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
         paywallConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
         paywallConfiguration.eventsHandler.didFinishPurchase = didFinishPurchase ?? { _, res in
@@ -105,8 +114,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         .environmentObject(paywallConfiguration.screensViewModel)
         .environmentObject(paywallConfiguration.assetsViewModel)
         .onAppear {
-            paywallConfiguration.eventsHandler.viewDidAppear()
-            paywallConfiguration.paywallViewModel.logShowPaywall()
+            paywallConfiguration.reportOnAppear()
         }
     }
 }

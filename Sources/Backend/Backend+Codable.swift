@@ -120,26 +120,18 @@ extension Backend.Response {
     struct ValueOfData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
         let value: Value
 
-        init(_ value: Value) {
-            self.value = value
-        }
-
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
             value = try container.decode(Value.self, forKey: .data)
         }
     }
 
-    struct ValueOfMeta<Meta>: Sendable, Decodable where Meta: Decodable, Meta: Sendable {
-        let meta: Meta
-
-        init(_ meta: Meta) {
-            self.meta = meta
-        }
+    struct ValueOfMeta<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+        let value: Value
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            meta = try container.decode(Meta.self, forKey: .meta)
+            value = try container.decode(Value.self, forKey: .meta)
         }
     }
 }

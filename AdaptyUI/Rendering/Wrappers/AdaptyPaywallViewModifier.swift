@@ -32,6 +32,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
 
     private let paywallConfiguration: AdaptyUI.PaywallConfiguration?
 
+    private let didAppear: (() -> Void)?
+    private let didDisappear: (() -> Void)?
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
     private let didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
@@ -51,6 +53,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
         paywallConfiguration: AdaptyUI.PaywallConfiguration?,
+        didAppear: (() -> Void)? = nil,
+        didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)?,
         didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)?,
@@ -69,6 +73,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
         self.isPresented = isPresented
         self.fullScreen = fullScreen
         self.paywallConfiguration = paywallConfiguration
+        self.didAppear = didAppear
+        self.didDisappear = didDisappear
         self.didPerformAction = didPerformAction
         self.didSelectProduct = didSelectProduct
         self.didStartPurchase = didStartPurchase
@@ -90,6 +96,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
         if let paywallConfiguration {
             AdaptyPaywallView(
                 paywallConfiguration: paywallConfiguration,
+                didAppear: didAppear,
+                didDisappear: didDisappear,
                 didPerformAction: didPerformAction,
                 didSelectProduct: didSelectProduct,
                 didStartPurchase: didStartPurchase,
@@ -117,8 +125,7 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
                 .fullScreenCover(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration?.eventsHandler.viewDidDisappear()
-                        paywallConfiguration?.paywallViewModel.resetLogShowPaywall()
+                        paywallConfiguration?.reportOnDisappear()
                     },
                     content: {
                         paywallOrProgressView
@@ -129,8 +136,7 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
                 .sheet(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration?.eventsHandler.viewDidDisappear()
-                        paywallConfiguration?.paywallViewModel.resetLogShowPaywall()
+                        paywallConfiguration?.reportOnDisappear()
                     },
                     content: {
                         paywallOrProgressView
@@ -153,23 +159,27 @@ public extension View {
     ///     - paywallConfiguration: an ``AdaptyUI.PaywallConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.paywallConfiguration(for:products:viewConfiguration:observerModeResolver:tagResolver:timerResolver:)`` method.
     ///     - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     ///     - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
+    ///     - didAppear: This callback is invoked when the paywall view was presented.
+    ///     - didDisappear: This callback is invoked when the paywall view was dismissed.
     ///     - didPerformAction: If user performs an action, this callback will be invoked. There is a default implementation, e.g. `close` action will dismiss the paywall, `openUrl` action will open the URL.
     ///     - didSelectProduct: If product was selected for purchase (by user or by system), this callback will be invoked.
     ///     - didStartPurchase: If user initiates the purchase process, this callback will be invoked.
-    ///     - didFinishPurchase: This method is invoked when a successful purchase is made.
-    ///     - didFailPurchase: This method is invoked when the purchase process fails.
-    ///     - didStartRestore: If user initiates the restore process, this method will be invoked.
-    ///     - didFinishRestore: This method is invoked when a successful restore is made.
+    ///     - didFinishPurchase: This callback is invoked when a successful purchase is made.
+    ///     - didFailPurchase: This callback is invoked when the purchase process fails.
+    ///     - didStartRestore: If user initiates the restore process, this callback will be invoked.
+    ///     - didFinishRestore: This callback is invoked when a successful restore is made.
     ///     Check if the ``AdaptyProfile`` object contains the desired access level, and if so, the controller can be dismissed.
-    ///     - didFailRestore: This method is invoked when the restore process fails.
-    ///     - didFailRendering: This method will be invoked in case of errors during the screen rendering process.
-    ///     - didFailLoadingProducts: This method is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
+    ///     - didFailRestore: This callback is invoked when the restore process fails.
+    ///     - didFailRendering: This callback will be invoked in case of errors during the screen rendering process.
+    ///     - didFailLoadingProducts: This callback is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
     ///     - showAlertItem:
     ///     - showAlertBuilder:
     func paywall<Placeholder: View, AlertItem: Identifiable>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
         paywallConfiguration: AdaptyUI.PaywallConfiguration?,
+        didAppear: (() -> Void)? = nil,
+        didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
@@ -190,6 +200,8 @@ public extension View {
                 isPresented: isPresented,
                 fullScreen: fullScreen,
                 paywallConfiguration: paywallConfiguration,
+                didAppear: didAppear,
+                didDisappear: didDisappear,
                 didPerformAction: didPerformAction,
                 didSelectProduct: didSelectProduct,
                 didStartPurchase: didStartPurchase,

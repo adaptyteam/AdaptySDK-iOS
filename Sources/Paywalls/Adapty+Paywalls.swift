@@ -61,36 +61,38 @@ extension Adapty {
         let profileId = profileStorage.profileId
 
         do {
-            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
-                try await self.fetchPaywall(
+            let startTaskTime = Date()
+
+            do {
+                return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
+                    try await self.fetchPaywall(
+                        profileId,
+                        placementId,
+                        locale,
+                        fetchPolicy
+                    )
+                }
+            } catch let error where error.canUseFallbackServer {
+                return try await fetchFallbackPaywall(
                     profileId,
                     placementId,
                     locale,
-                    fetchPolicy
+                    loadTimeout.asTimeIntrval + startTaskTime.timeIntervalSinceNow
                 )
             }
-        } catch let error where error.canUseFallbackServer {
-            return try await fetchFallbackPaywall(
+
+        } catch {
+            guard let paywall = getCacheOrFallbackFilePaywall(
                 profileId,
                 placementId,
                 locale,
-                httpFallbackSession
+                withCrossPlacmentABTest: true
             )
-        } catch {
-            let manager = try profileManager(with: profileId).orThrows
-            guard let chosen = manager
-                .paywallsStorage
-                .getPaywallWithFallback(
-                    byPlacementId: placementId,
-                    withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId),
-                    profileId: profileId,
-                    locale: locale
-                )
             else {
                 throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
             }
-            Adapty.trackEventIfNeed(chosen)
-            return chosen.paywall
+
+            return paywall
         }
     }
 
@@ -275,11 +277,39 @@ extension Adapty {
         }
     }
 
-    func fetchFallbackPaywall(
+    func getCacheOrFallbackFilePaywall(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale,
-        _ session: some FetchFallbackPaywallVariationsExecutor
+        withCrossPlacmentABTest: Bool
+    ) -> AdaptyPaywall? {
+        let chosen =
+            if let manager = tryProfileManagerOrNil(with: profileId) {
+                manager.paywallsStorage.getPaywallWithFallback(
+                    byPlacementId: placementId,
+                    withVariationId: withCrossPlacmentABTest ? manager.storage.crossPlacementState?.variationId(placementId: placementId) : nil,
+                    profileId: profileId,
+                    locale: locale
+                )
+            } else {
+                Adapty.fallbackPaywalls?.getPaywall(
+                    byPlacementId: placementId,
+                    withVariationId: nil,
+                    profileId: profileId
+                )
+            }
+
+        guard let chosen else { return nil }
+
+        Adapty.trackEventIfNeed(chosen)
+        return chosen.paywall
+    }
+
+    private func fetchFallbackPaywall(
+        _ profileId: String,
+        _ placementId: String,
+        _ locale: AdaptyLocale,
+        _ timeoutInterval: TimeInterval?
     ) async throws -> AdaptyPaywall {
         while true {
             let (cached, isTestUser, paywallVariationId): (AdaptyPaywall?, Bool, String?) = {
@@ -294,17 +324,17 @@ extension Adapty {
 
             do {
                 var chosen = if let paywallVariationId {
-                    try await session.fetchFallbackPaywall(
+                    try await httpFallbackSession.fetchFallbackPaywall(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
                         paywallVariationId: paywallVariationId,
                         locale: locale,
-                        cached: cached,
-                        disableServerCache: isTestUser
+                        disableServerCache: isTestUser,
+                        timeoutInterval: timeoutInterval
                     )
                 } else {
-                    try await session.fetchFallbackPaywallVariations(
+                    try await httpFallbackSession.fetchFallbackPaywallVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
@@ -312,7 +342,8 @@ extension Adapty {
                         cached: cached,
                         crossPlacementEligible: false,
                         variationIdResolver: nil,
-                        disableServerCache: isTestUser
+                        disableServerCache: isTestUser,
+                        timeoutInterval: timeoutInterval
                     )
                 }
 
@@ -324,21 +355,7 @@ extension Adapty {
                 return chosen.paywall
 
             } catch {
-                if error.responseDecodingError([.notFoundVariationId]) { continue }
-
-                let chosen =
-                    if let manager = tryProfileManagerOrNil(with: profileId) {
-                        manager.paywallsStorage.getPaywallWithFallback(byPlacementId: placementId, withVariationId: paywallVariationId, profileId: profileId, locale: locale)
-                    } else {
-                        Adapty.fallbackPaywalls?.getPaywall(byPlacementId: placementId, withVariationId: paywallVariationId, profileId: profileId)
-                    }
-
-                guard let chosen else {
-                    throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
-                }
-
-                Adapty.trackEventIfNeed(chosen)
-                return chosen.paywall
+                guard error.responseDecodingError([.notFoundVariationId]) else { throw error }
             }
         }
     }

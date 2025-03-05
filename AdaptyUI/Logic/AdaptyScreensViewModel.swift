@@ -27,9 +27,9 @@ package final class AdaptyBottomSheetViewModel: ObservableObject {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyScreensViewModel: ObservableObject {
-    let logId: String
-    let eventsHandler: AdaptyEventsHandler
-    let viewConfiguration: AdaptyViewConfiguration
+    private var logId: String { eventsHandler.logId }
+    private let eventsHandler: AdaptyEventsHandler
+    private let viewConfiguration: AdaptyViewConfiguration
     let bottomSheetsViewModels: [AdaptyBottomSheetViewModel]
 
     @Published var presentedScreensStack = [String]()
@@ -39,7 +39,6 @@ package final class AdaptyScreensViewModel: ObservableObject {
         viewConfiguration: AdaptyViewConfiguration
     ) {
         self.eventsHandler = eventsHandler
-        logId = eventsHandler.logId
         self.viewConfiguration = viewConfiguration
 
         bottomSheetsViewModels = viewConfiguration.bottomSheets.map {
@@ -78,6 +77,12 @@ package final class AdaptyScreensViewModel: ObservableObject {
         guard let topScreenId = presentedScreensStack.last else { return }
 
         dismissScreen(id: topScreenId)
+    }
+
+    func resetScreensStack() {
+        Log.ui.verbose("#\(logId)# resetScreensStack")
+        presentedScreensStack.removeAll()
+        bottomSheetsViewModels.forEach { $0.isPresented = false }
     }
 }
 

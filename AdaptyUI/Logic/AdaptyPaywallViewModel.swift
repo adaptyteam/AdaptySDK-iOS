@@ -13,7 +13,7 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyPaywallViewModel: ObservableObject {
-    let logId: String
+    private var logId: String { eventsHandler.logId }
     let eventsHandler: AdaptyEventsHandler
 
     @Published var paywall: AdaptyPaywallInterface
@@ -26,7 +26,6 @@ package final class AdaptyPaywallViewModel: ObservableObject {
         paywall: AdaptyPaywallInterface,
         viewConfiguration: AdaptyViewConfiguration
     ) {
-        self.logId = eventsHandler.logId
         self.eventsHandler = eventsHandler
         self.paywall = paywall
         self.viewConfiguration = viewConfiguration

@@ -15,6 +15,13 @@ private struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
     let queryItems: QueryItems
     let stamp = Log.stamp
 
+    func decodeDataResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> Response {
+        try Self.decodeResponse(response, withConfiguration: configuration)
+    }
+
     init(
         apiKeyPrefix: String,
         profileId: String,
@@ -36,6 +43,30 @@ private struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
             .setVisualBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
+    }
+}
+
+extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyPaywall {
+    @inlinable
+    static func decodeResponse(
+        _ response: HTTPDataResponse,
+        withConfiguration configuration: HTTPCodableConfiguration?
+    ) throws -> HTTPResponse<AdaptyPaywall> {
+        let jsonDecoder = JSONDecoder()
+        configuration?.configure(jsonDecoder: jsonDecoder)
+
+        let version: Int64 = try jsonDecoder.decode(
+            Backend.Response.ValueOfMeta<AdaptyPaywallVariations.Meta>.self,
+            responseBody: response.body
+        ).value.version
+
+        var body: ResponseBody = try jsonDecoder.decode(
+            Backend.Response.ValueOfData<AdaptyPaywall>.self,
+            responseBody: response.body
+        ).value
+
+        body.version = version
+        return response.replaceBody(body)
     }
 }
 

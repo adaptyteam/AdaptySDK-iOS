@@ -1,5 +1,5 @@
 //
-//  Adapty+UntargetedPaywalls.swift
+//  Adapty+PaywallsForDefaultAudience.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 12.08.2024
@@ -38,7 +38,7 @@ extension Adapty {
                 locale,
                 fetchPolicy
             )
-            
+
             Adapty.sendImageUrlsToObserver(paywall)
             return paywall
         }
@@ -51,14 +51,12 @@ extension Adapty {
     ) async throws -> AdaptyPaywall {
         let manager = profileManager
         let profileId = manager?.profileId ?? profileStorage.profileId
-        let session = httpConfigsSession
 
         let fetchTask = Task {
-            try await fetchFallbackPaywall(
+            try await fetchPaywallForDefaultAudience(
                 profileId,
                 placementId,
-                locale,
-                session
+                locale
             )
         }
 
@@ -76,5 +74,51 @@ extension Adapty {
             }
 
         return paywall
+    }
+
+    private func fetchPaywallForDefaultAudience(
+        _ profileId: String,
+        _ placementId: String,
+        _ locale: AdaptyLocale
+    ) async throws -> AdaptyPaywall {
+        let (cached, isTestUser): (AdaptyPaywall?, Bool) = {
+            guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
+            return (
+                manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
+                manager.profile.value.isTestUser
+            )
+        }()
+
+        do {
+            var chosen = try await httpConfigsSession.fetchUntargetedPaywallVariations(
+                apiKeyPrefix: apiKeyPrefix,
+                profileId: profileId,
+                placementId: placementId,
+                locale: locale,
+                cached: cached,
+                crossPlacementEligible: false,
+                variationIdResolver: nil,
+                disableServerCache: isTestUser,
+                timeoutInterval: nil
+            )
+
+            if let manager = tryProfileManagerOrNil(with: profileId) {
+                chosen = manager.paywallsStorage.savedPaywallChosen(chosen)
+            }
+
+            Adapty.trackEventIfNeed(chosen)
+            return chosen.paywall
+
+        } catch {
+            guard let paywall = getCacheOrFallbackFilePaywall(
+                profileId,
+                placementId,
+                locale,
+                withCrossPlacmentABTest: false
+            ) else {
+                throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+            }
+            return paywall
+        }
     }
 }

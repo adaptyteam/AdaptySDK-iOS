@@ -50,7 +50,7 @@ public extension AdaptyUI {
             eventsHandler = AdaptyEventsHandler(logId: logId)
             tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
             actionsViewModel = AdaptyUIActionsViewModel(eventsHandler: eventsHandler)
-            sectionsViewModel = AdaptySectionsViewModel(logId: logId)
+            sectionsViewModel = AdaptySectionsViewModel(eventsHandler: eventsHandler)
             paywallViewModel = AdaptyPaywallViewModel(
                 eventsHandler: eventsHandler,
                 paywall: paywall,
@@ -67,6 +67,7 @@ public extension AdaptyUI {
                 viewConfiguration: viewConfiguration
             )
             timerViewModel = AdaptyTimerViewModel(
+                eventsHandler: eventsHandler,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
@@ -81,6 +82,20 @@ public extension AdaptyUI {
             )
 
             productsViewModel.loadProductsIfNeeded()
+        }
+
+        func reportOnAppear() {
+            eventsHandler.viewDidAppear()
+            paywallViewModel.logShowPaywall()
+        }
+
+        func reportOnDisappear() {
+            eventsHandler.viewDidDisappear()
+            paywallViewModel.resetLogShowPaywall()
+            productsViewModel.resetSelectedProducts()
+            sectionsViewModel.resetSectionsState()
+            timerViewModel.resetTimersState()
+            screensViewModel.resetScreensStack()
         }
     }
 }
