@@ -61,6 +61,18 @@ import UIKit
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyPaywallControllerDelegate: AnyObject {
+    /// This method is invoked when the paywall view was presented.
+    ///
+    /// - Parameters:
+    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    func paywallControllerDidAppear(_ controller: AdaptyPaywallController)
+    
+    /// This method is invoked when the paywall view was dismissed.
+    ///
+    /// - Parameters:
+    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    func paywallControllerDidDisappear(_ controller: AdaptyPaywallController)
+    
     /// If user performs an action process, this method will be invoked.
     ///
     /// - Parameters:
