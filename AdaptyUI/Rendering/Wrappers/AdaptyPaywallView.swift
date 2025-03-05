@@ -116,9 +116,6 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         .onAppear {
             paywallConfiguration.reportOnAppear()
         }
-        .onDisappear {
-            paywallConfiguration.reportOnDisappear()
-        }
     }
 }
 

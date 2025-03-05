@@ -124,6 +124,9 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
             content
                 .fullScreenCover(
                     isPresented: isPresented,
+                    onDismiss: {
+                        paywallConfiguration?.reportOnDisappear()
+                    },
                     content: {
                         paywallOrProgressView
                     }
@@ -132,6 +135,9 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
             content
                 .sheet(
                     isPresented: isPresented,
+                    onDismiss: {
+                        paywallConfiguration?.reportOnDisappear()
+                    },
                     content: {
                         paywallOrProgressView
                     }

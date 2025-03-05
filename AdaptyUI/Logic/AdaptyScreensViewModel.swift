@@ -78,10 +78,11 @@ package final class AdaptyScreensViewModel: ObservableObject {
 
         dismissScreen(id: topScreenId)
     }
-    
+
     func resetScreensStack() {
         Log.ui.verbose("#\(logId)# resetScreensStack")
         presentedScreensStack.removeAll()
+        bottomSheetsViewModels.forEach { $0.isPresented = false }
     }
 }
 
