@@ -8,7 +8,7 @@
 import Foundation
 
 enum AppConstants {
-    static let adaptyApiKey = "public_live_iNuUlSsN.83zcTTR8D5Y8FI9cGUI6"
+    static let adaptyApiKey = "YOUR_API_KEY"
     static let accessLevelId = "premium"
-    static let placementId = "test_alexey"
+    static let placementId = "YOUR_PLACEMENT_ID"
 }

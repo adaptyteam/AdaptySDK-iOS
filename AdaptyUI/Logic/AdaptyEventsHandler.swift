@@ -21,6 +21,9 @@ package final class AdaptyEventsHandler: ObservableObject {
 
     let logId: String
 
+    var didAppear: (() -> Void)?
+    var didDisappear: (() -> Void)?
+    
     var didPerformAction: ((AdaptyUI.Action) -> Void)?
     var didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
     var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
@@ -51,11 +54,17 @@ package final class AdaptyEventsHandler: ObservableObject {
     @Published var presentationState: PresentationState = .initial
 
     func viewDidAppear() {
+        Log.ui.verbose("#\(logId)# event_didAppear")
+
         presentationState = .appeared
+        didAppear?()
     }
 
     func viewDidDisappear() {
+        Log.ui.verbose("#\(logId)# event_didDisappear")
+
         presentationState = .disappeared
+        didDisappear?()
     }
 
     func event_didPerformAction(_ action: AdaptyUI.Action) {

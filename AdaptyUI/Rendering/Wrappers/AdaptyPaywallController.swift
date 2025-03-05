@@ -56,6 +56,16 @@ public final class AdaptyPaywallController: UIViewController {
 
         view.backgroundColor = .systemBackground
 
+        paywallConfiguration.eventsHandler.didAppear = { [weak self] in
+            guard let self else { return }
+            self.delegate?.paywallControllerDidAppear(self)
+        }
+        
+        paywallConfiguration.eventsHandler.didDisappear = { [weak self] in
+            guard let self else { return }
+            self.delegate?.paywallControllerDidDisappear(self)
+        }
+        
         paywallConfiguration.eventsHandler.didPerformAction = { [weak self] action in
             guard let self else { return }
             self.delegate?.paywallController(self, didPerform: action)
