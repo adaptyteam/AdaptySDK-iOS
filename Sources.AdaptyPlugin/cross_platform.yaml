@@ -471,6 +471,20 @@ $events:
       id: { const: "did_load_latest_profile" }
       profile: { $ref: "#/$defs/AdaptyProfile" }
 
+  PaywallViewEvent.DidAppear:
+    type: object
+    required: [id, view]
+    properties:
+      id: { const: "paywall_view_did_appear" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      
+  PaywallViewEvent.DidDisappear:
+    type: object
+    required: [id, view]
+    properties:
+      id: { const: "paywall_view_did_disappear" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      
   PaywallViewEvent.DidUserAction:
     type: object
     required: [id, view, action]
