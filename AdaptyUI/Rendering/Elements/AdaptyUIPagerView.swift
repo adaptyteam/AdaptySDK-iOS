@@ -40,6 +40,8 @@ extension VC.TransitionSlide {
         case .easeIn: .easeIn(duration: duration)
         case .easeOut: .easeOut(duration: duration)
         case .linear: .linear(duration: duration)
+        case let .cubicBezier(x1, y1, x2, y2):
+            .easeInOut(duration: duration)
         }
     }
 }

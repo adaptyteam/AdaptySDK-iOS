@@ -12,12 +12,12 @@ package extension AdaptyViewConfiguration {
         static let `default` = AdaptyViewConfiguration.TransitionSlide(
             startDelay: 0.0,
             duration: 0.3,
-            interpolator: AdaptyViewConfiguration.Transition.Interpolator.default
+            interpolator: AdaptyViewConfiguration.Animation.Interpolator.default
         )
 
         package let startDelay: TimeInterval
         package let duration: TimeInterval
-        package let interpolator: AdaptyViewConfiguration.Transition.Interpolator
+        package let interpolator: AdaptyViewConfiguration.Animation.Interpolator
     }
 }
 
@@ -26,7 +26,7 @@ package extension AdaptyViewConfiguration {
         static func create(
             startDelay: TimeInterval = `default`.startDelay,
             duration: TimeInterval = `default`.duration,
-            interpolator: AdaptyViewConfiguration.Transition.Interpolator = `default`.interpolator
+            interpolator: AdaptyViewConfiguration.Animation.Interpolator = `default`.interpolator
         ) -> Self {
             .init(
                 startDelay: startDelay,
@@ -50,7 +50,7 @@ extension AdaptyViewConfiguration.TransitionSlide: Codable {
 
         startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyViewConfiguration.TransitionSlide.default.startDelay
         duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyViewConfiguration.TransitionSlide.default.duration
-        interpolator = try (container.decodeIfPresent(AdaptyViewConfiguration.Transition.Interpolator.self, forKey: .interpolator)) ?? AdaptyViewConfiguration.TransitionSlide.default.interpolator
+        interpolator = try (container.decodeIfPresent(AdaptyViewConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? AdaptyViewConfiguration.TransitionSlide.default.interpolator
     }
 
     package func encode(to encoder: any Encoder) throws {

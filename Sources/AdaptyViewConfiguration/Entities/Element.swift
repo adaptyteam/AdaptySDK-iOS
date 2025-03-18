@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package enum Element: Sendable {
+package extension AdaptyViewConfiguration {
+    enum Element: Sendable {
         case space(Int)
         indirect case stack(AdaptyViewConfiguration.Stack, Properties?)
         case text(AdaptyViewConfiguration.Text, Properties?)
@@ -27,18 +27,18 @@ extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.Element {
-    package struct Properties: Sendable, Hashable {
+package extension AdaptyViewConfiguration.Element {
+    struct Properties: Sendable, Hashable {
         static let defaultPadding = AdaptyViewConfiguration.EdgeInsets(same: .point(0))
         static let defaultOffset = AdaptyViewConfiguration.Offset.zero
-        static let defaultVisibility = false
+        static let defaultOpacity: Double = 1
 
         package let decorator: AdaptyViewConfiguration.Decorator?
         package let padding: AdaptyViewConfiguration.EdgeInsets
         package let offset: AdaptyViewConfiguration.Offset
 
-        package let visibility: Bool
-        package let transitionIn: [AdaptyViewConfiguration.Transition]
+        package let opacity: Double
+        package let onAppiar: [AdaptyViewConfiguration.Animation]
     }
 }
 
@@ -109,15 +109,15 @@ extension AdaptyViewConfiguration.Element: Hashable {
             decorator: AdaptyViewConfiguration.Decorator? = nil,
             padding: AdaptyViewConfiguration.EdgeInsets = AdaptyViewConfiguration.Element.Properties.defaultPadding,
             offset: AdaptyViewConfiguration.Offset = AdaptyViewConfiguration.Element.Properties.defaultOffset,
-            visibility: Bool = AdaptyViewConfiguration.Element.Properties.defaultVisibility,
-            transitionIn: [AdaptyViewConfiguration.Transition] = []
+            opacity: Double = AdaptyViewConfiguration.Element.Properties.defaultOpacity,
+            onAppiar: [AdaptyViewConfiguration.Animation] = []
         ) -> Self {
             .init(
                 decorator: decorator,
                 padding: padding,
                 offset: offset,
-                visibility: visibility,
-                transitionIn: transitionIn
+                opacity: opacity,
+                onAppiar: onAppiar
             )
         }
     }

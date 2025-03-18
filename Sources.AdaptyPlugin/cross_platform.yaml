@@ -729,11 +729,11 @@ $defs:
       - developer_id
       - paywall_id
       - paywall_name
-      - ab_test_name
-      - variation_id
-      - revision
-      - products
       - response_created_at
+      - revision
+      - variation_id
+      - ab_test_name
+      - products
     properties:
       developer_id: { type: string }
       paywall_id: { type: string }

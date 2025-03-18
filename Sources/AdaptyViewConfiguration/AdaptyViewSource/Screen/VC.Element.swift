@@ -35,16 +35,16 @@ extension AdaptyViewSource.Element {
         let padding: AdaptyViewConfiguration.EdgeInsets
         let offset: AdaptyViewConfiguration.Offset
 
-        let visibility: Bool
-        let transitionIn: [AdaptyViewConfiguration.Transition]
+        let opacity: Double
+        let onAppiar: [AdaptyViewConfiguration.Animation]
 
         var isZero: Bool {
             elementId == nil
                 && decorator == nil
                 && padding.isZero
                 && offset.isZero
-                && visibility
-                && transitionIn.isEmpty
+                && opacity == 0
+                && onAppiar.isEmpty
         }
     }
 }
@@ -150,8 +150,8 @@ extension AdaptyViewSource.Localizer {
             decorator: from.decorator.map(decorator),
             padding: from.padding,
             offset: from.offset,
-            visibility: from.visibility,
-            transitionIn: from.transitionIn
+            opacity: from.opacity,
+            onAppiar: from.onAppiar
         )
     }
 }
@@ -240,26 +240,43 @@ extension AdaptyViewSource.Element.Properties: Decodable {
         case padding
         case offset
         case visibility
+        case opacity
         case transitionIn = "transition_in"
+        case onAppiar = "on_appiar"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let transitionIn: [AdaptyViewConfiguration.Transition] =
-            if let array = try? container.decodeIfPresent([AdaptyViewConfiguration.Transition].self, forKey: .transitionIn) {
+
+        let onAppiarKey: CodingKeys =
+            if container.contains(.transitionIn) && !container.contains(.onAppiar) {
+                .transitionIn
+            } else {
+                .onAppiar
+            }
+
+        let onAppiar: [AdaptyViewConfiguration.Animation] =
+            if let array = try? container.decodeIfPresent([AdaptyViewConfiguration.Animation].self, forKey: onAppiarKey) {
                 array
-            } else if let transition = try container.decodeIfPresent(AdaptyViewConfiguration.Transition.self, forKey: .transitionIn) {
-                [transition]
+            } else if let animation = try container.decodeIfPresent(AdaptyViewConfiguration.Animation.self, forKey: onAppiarKey) {
+                [animation]
             } else {
                 []
             }
+
+        let opacity = if container.contains(.visibility) && !container.contains(.opacity) {
+            try container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true ? 1.0 : 0.0
+        } else {
+            try container.decodeIfPresent(Double.self, forKey: .opacity) ?? AdaptyViewConfiguration.Element.Properties.defaultOpacity
+        }
+
         try self.init(
             elementId: container.decodeIfPresent(String.self, forKey: .elementId),
             decorator: container.decodeIfPresent(AdaptyViewSource.Decorator.self, forKey: .decorator),
             padding: container.decodeIfPresent(AdaptyViewConfiguration.EdgeInsets.self, forKey: .padding) ?? AdaptyViewConfiguration.Element.Properties.defaultPadding,
             offset: container.decodeIfPresent(AdaptyViewConfiguration.Offset.self, forKey: .offset) ?? AdaptyViewConfiguration.Element.Properties.defaultOffset,
-            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? AdaptyViewConfiguration.Element.Properties.defaultVisibility,
-            transitionIn: transitionIn
+            opacity: opacity,
+            onAppiar: onAppiar
         )
     }
 }

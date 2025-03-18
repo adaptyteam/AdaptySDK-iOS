@@ -1,5 +1,5 @@
 //
-//  AdaptyUITransitionInModifier.swift
+//  AdaptyUIAnimationModifier.swift
 //
 //
 //  Created by Aleksey Goncharov on 17.06.2024.
@@ -11,22 +11,24 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.Transition.Interpolator {
+extension VC.Animation.Interpolator {
     func swiftuiAnimation(duration: Double) -> Animation {
         switch self {
         case .easeInOut: .easeInOut(duration: duration)
         case .easeIn: .easeIn(duration: duration)
         case .easeOut: .easeOut(duration: duration)
         case .linear: .linear(duration: duration)
+        case let .cubicBezier(x1, y1, x2, y2):
+            .easeInOut(duration: duration)
         }
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.Transition {
+extension VC.Animation {
     var swiftuiAnimation: Animation? {
         switch self {
-        case let .fade(params):
+        case let .opacity(params):
             params.interpolator
                 .swiftuiAnimation(duration: params.duration)
                 .delay(params.startDelay)
@@ -37,15 +39,15 @@ extension VC.Transition {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUITransitionInModifier: ViewModifier {
-    private let transitionIn: VC.Transition
-    
+struct AdaptyUIAnimationModifier: ViewModifier {
+    private let animation: VC.Animation
+
     @State
     private var opacity: Double
 
-    init(_ transitionIn: VC.Transition, _ visibility: Bool) {
-        self.transitionIn = transitionIn
-        opacity = visibility ? 1.0 : 0.0
+    init(_ animation: VC.Animation, _ opacity: Double) {
+        self.animation = animation
+        self.opacity = opacity
     }
 
     func body(content: Content) -> some View {
@@ -53,7 +55,7 @@ struct AdaptyUITransitionInModifier: ViewModifier {
             .opacity(opacity)
             .onAppear {
                 if opacity < 1.0 {
-                    withAnimation(transitionIn.swiftuiAnimation) {
+                    withAnimation(animation.swiftuiAnimation) {
                         opacity = 1.0
                     }
                 }
@@ -64,9 +66,9 @@ struct AdaptyUITransitionInModifier: ViewModifier {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func transitionIn(_ transitionIn: [VC.Transition]?, visibility: Bool) -> some View {
-        if let transitionIn = transitionIn?.first {
-            modifier(AdaptyUITransitionInModifier(transitionIn, visibility))
+    func animations(_ animations: [VC.Animation]?, opacity: Double) -> some View {
+        if let animation = animations?.first {
+            modifier(AdaptyUIAnimationModifier(animation, opacity))
         } else {
             self
         }
