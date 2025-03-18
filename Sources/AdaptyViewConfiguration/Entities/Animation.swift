@@ -9,40 +9,47 @@ import Foundation
 
 package extension AdaptyViewConfiguration {
     enum Animation: Sendable {
-        case opacity(Parameters)
-        case offsetX(Parameters)
-        case offsetY(Parameters)
-        case rotation(Parameters)
-        case scale(Parameters)
-        case width(Parameters)
-        case height(Parameters)
+        case opacity(Timeline, DoubleValue)
+        case offsetX(Timeline, UnitValue)
+        case offsetY(Timeline, UnitValue)
+        case rotation(Timeline, DoubleValue)
+        case scale(Timeline, DoubleValue)
+        case width(Timeline, UnitValue)
+        case height(Timeline, UnitValue)
     }
 }
 
 extension AdaptyViewConfiguration.Animation: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
-        case let .opacity(params):
+        case let .opacity(timeline, value):
             hasher.combine(1)
-            hasher.combine(params)
-        case let .offsetX(params):
+            hasher.combine(timeline)
+            hasher.combine(value)
+        case let .offsetX(timeline, value):
             hasher.combine(2)
-            hasher.combine(params)
-        case let .offsetY(params):
+            hasher.combine(timeline)
+            hasher.combine(value)
+        case let .offsetY(timeline, value):
             hasher.combine(3)
-            hasher.combine(params)
-        case let .rotation(params):
+            hasher.combine(timeline)
+            hasher.combine(value)
+        case let .rotation(timeline, value):
             hasher.combine(4)
-            hasher.combine(params)
-        case let .scale(params):
+            hasher.combine(timeline)
+            hasher.combine(value)
+        case let .scale(timeline, value):
             hasher.combine(5)
-            hasher.combine(params)
-        case let .width(params):
+            hasher.combine(timeline)
+            hasher.combine(value)
+        case let .width(timeline, value):
             hasher.combine(6)
-            hasher.combine(params)
-        case let .height(params):
+            hasher.combine(timeline)
+            hasher.combine(value)
+        case let .height(timeline, value):
             hasher.combine(7)
-            hasher.combine(params)
+            hasher.combine(timeline)
+            hasher.combine(value)
         }
     }
 }
@@ -50,6 +57,7 @@ extension AdaptyViewConfiguration.Animation: Hashable {
 extension AdaptyViewConfiguration.Animation: Codable {
     enum CodingKeys: String, CodingKey {
         case type
+        case interpolator
     }
 
     enum Types: String {
@@ -69,20 +77,26 @@ extension AdaptyViewConfiguration.Animation: Codable {
         switch Types(rawValue: typeName) {
         case .none:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Unknown animation type with name \(typeName)'"))
-        case .fade, .opacity:
-            self = try .opacity(AdaptyViewConfiguration.Animation.Parameters(from: decoder))
+        case .fade:
+            self = try .opacity(.init(from: decoder), .init(
+                interpolator: (container.decodeIfPresent(AdaptyViewConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? .default,
+                start: 0.0,
+                end: 1.0
+            ))
+        case .opacity:
+            self = try .opacity(.init(from: decoder), .init(from: decoder))
         case .offsetX:
-            self = try .offsetX(AdaptyViewConfiguration.Animation.Parameters(from: decoder))
+            self = try .offsetX(.init(from: decoder), .init(from: decoder))
         case .offsetY:
-            self = try .offsetY(AdaptyViewConfiguration.Animation.Parameters(from: decoder))
+            self = try .offsetY(.init(from: decoder), .init(from: decoder))
         case .rotation:
-            self = try .rotation(AdaptyViewConfiguration.Animation.Parameters(from: decoder))
+            self = try .rotation(.init(from: decoder), .init(from: decoder))
         case .scale:
-            self = try .scale(AdaptyViewConfiguration.Animation.Parameters(from: decoder))
+            self = try .scale(.init(from: decoder), .init(from: decoder))
         case .width:
-            self = try .width(AdaptyViewConfiguration.Animation.Parameters(from: decoder))
+            self = try .width(.init(from: decoder), .init(from: decoder))
         case .height:
-            self = try .height(AdaptyViewConfiguration.Animation.Parameters(from: decoder))
+            self = try .height(.init(from: decoder), .init(from: decoder))
         }
     }
 
@@ -90,27 +104,34 @@ extension AdaptyViewConfiguration.Animation: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         switch self {
-        case let .opacity(params):
+        case let .opacity(timeline, value):
             try container.encode(Types.opacity.rawValue, forKey: .type)
-            try params.encode(to: encoder)
-        case let .offsetX(params):
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .offsetX(timeline, value):
             try container.encode(Types.offsetX.rawValue, forKey: .type)
-            try params.encode(to: encoder)
-        case let .offsetY(params):
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .offsetY(timeline, value):
             try container.encode(Types.offsetY.rawValue, forKey: .type)
-            try params.encode(to: encoder)
-        case let .rotation(params):
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .rotation(timeline, value):
             try container.encode(Types.rotation.rawValue, forKey: .type)
-            try params.encode(to: encoder)
-        case let .scale(params):
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .scale(timeline, value):
             try container.encode(Types.scale.rawValue, forKey: .type)
-            try params.encode(to: encoder)
-        case let .width(params):
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .width(timeline, value):
             try container.encode(Types.width.rawValue, forKey: .type)
-            try params.encode(to: encoder)
-        case let .height(params):
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .height(timeline, value):
             try container.encode(Types.height.rawValue, forKey: .type)
-            try params.encode(to: encoder)
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
         }
     }
 }

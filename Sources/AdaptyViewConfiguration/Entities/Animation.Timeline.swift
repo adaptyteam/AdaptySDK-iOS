@@ -1,5 +1,5 @@
 //
-//  Animation.Parameters.swift
+//  Animation.Timeline.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 16.01.2024
@@ -8,18 +8,15 @@
 import Foundation
 
 package extension AdaptyViewConfiguration.Animation {
-    struct Parameters: Sendable, Hashable {
-        static let `default` = Parameters(
+    struct Timeline: Sendable, Hashable {
+        static let `default` = Timeline(
             duration: 0.3,
-            interpolator: .default,
             startDelay: 0.0,
             repiatType: nil,
             repiatDelay: 0.0,
             repiatNaxCount: nil
         )
         package let duration: TimeInterval
-        package let interpolator: AdaptyViewConfiguration.Animation.Interpolator
-
         package let startDelay: TimeInterval
         package let repiatType: RepiatType?
         package let repiatDelay: TimeInterval
@@ -33,18 +30,16 @@ package extension AdaptyViewConfiguration.Animation {
 }
 
 #if DEBUG
-package extension AdaptyViewConfiguration.Animation.Parameters {
+package extension AdaptyViewConfiguration.Animation.Timeline {
     static func create(
         startDelay: TimeInterval = Self.default.startDelay,
         duration: TimeInterval = Self.default.duration,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator = Self.default.interpolator,
         repiatType: RepiatType? = Self.default.repiatType,
         repiatDelay: TimeInterval = Self.default.repiatDelay,
         repiatNaxCount: Int? = Self.default.repiatNaxCount
     ) -> Self {
         .init(
             duration: duration,
-            interpolator: interpolator,
             startDelay: startDelay,
             repiatType: repiatType,
             repiatDelay: repiatDelay,
@@ -54,14 +49,13 @@ package extension AdaptyViewConfiguration.Animation.Parameters {
 }
 #endif
 
-extension AdaptyViewConfiguration.Animation.Parameters: Codable {
+extension AdaptyViewConfiguration.Animation.Timeline: Codable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"
         case repiatType = "repiat"
         case repiatDelay = "repiat_delay"
         case repiatNaxCount = "repiat_max_count"
         case duration
-        case interpolator
     }
 
     package init(from decoder: Decoder) throws {
@@ -76,7 +70,6 @@ extension AdaptyViewConfiguration.Animation.Parameters: Codable {
         repiatNaxCount = try container.decodeIfPresent(Int.self, forKey: .repiatNaxCount) ?? defaultValue.repiatNaxCount
 
         duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? defaultValue.duration
-        interpolator = try (container.decodeIfPresent(AdaptyViewConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? defaultValue.interpolator
     }
 
     package func encode(to encoder: any Encoder) throws {
@@ -99,11 +92,7 @@ extension AdaptyViewConfiguration.Animation.Parameters: Codable {
         if duration != defaultValue.duration {
             try container.encode(duration * 1000, forKey: .duration)
         }
-
-        if interpolator != defaultValue.interpolator {
-            try container.encode(interpolator, forKey: .interpolator)
-        }
     }
 }
 
-extension AdaptyViewConfiguration.Animation.Parameters.RepiatType: Codable {}
+extension AdaptyViewConfiguration.Animation.Timeline.RepiatType: Codable {}

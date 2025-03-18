@@ -151,7 +151,7 @@ extension AdaptyViewSource.Localizer {
             padding: from.padding,
             offset: from.offset,
             opacity: from.opacity,
-                        onAppear: from.onAppear
+            onAppear: from.onAppear
         )
     }
 }
