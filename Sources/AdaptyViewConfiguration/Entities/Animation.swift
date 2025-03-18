@@ -12,12 +12,10 @@ package extension AdaptyViewConfiguration {
         case opacity(Parameters)
         case offsetX(Parameters)
         case offsetY(Parameters)
-
         case rotation(Parameters)
         case scale(Parameters)
         case width(Parameters)
         case height(Parameters)
-
     }
 }
 

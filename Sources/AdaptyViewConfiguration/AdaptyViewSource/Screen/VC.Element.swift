@@ -36,7 +36,7 @@ extension AdaptyViewSource.Element {
         let offset: AdaptyViewConfiguration.Offset
 
         let opacity: Double
-        let onAppiar: [AdaptyViewConfiguration.Animation]
+        let onAppear: [AdaptyViewConfiguration.Animation]
 
         var isZero: Bool {
             elementId == nil
@@ -44,7 +44,7 @@ extension AdaptyViewSource.Element {
                 && padding.isZero
                 && offset.isZero
                 && opacity == 0
-                && onAppiar.isEmpty
+                && onAppear.isEmpty
         }
     }
 }
@@ -151,7 +151,7 @@ extension AdaptyViewSource.Localizer {
             padding: from.padding,
             offset: from.offset,
             opacity: from.opacity,
-            onAppiar: from.onAppiar
+                        onAppear: from.onAppear
         )
     }
 }
@@ -242,20 +242,20 @@ extension AdaptyViewSource.Element.Properties: Decodable {
         case visibility
         case opacity
         case transitionIn = "transition_in"
-        case onAppiar = "on_appiar"
+        case onAppear = "on_appear"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let onAppiarKey: CodingKeys =
-            if container.contains(.transitionIn) && !container.contains(.onAppiar) {
+            if container.contains(.transitionIn) && !container.contains(.onAppear) {
                 .transitionIn
             } else {
-                .onAppiar
+                .onAppear
             }
 
-        let onAppiar: [AdaptyViewConfiguration.Animation] =
+        let onAppear: [AdaptyViewConfiguration.Animation] =
             if let array = try? container.decodeIfPresent([AdaptyViewConfiguration.Animation].self, forKey: onAppiarKey) {
                 array
             } else if let animation = try container.decodeIfPresent(AdaptyViewConfiguration.Animation.self, forKey: onAppiarKey) {
@@ -276,7 +276,7 @@ extension AdaptyViewSource.Element.Properties: Decodable {
             padding: container.decodeIfPresent(AdaptyViewConfiguration.EdgeInsets.self, forKey: .padding) ?? AdaptyViewConfiguration.Element.Properties.defaultPadding,
             offset: container.decodeIfPresent(AdaptyViewConfiguration.Offset.self, forKey: .offset) ?? AdaptyViewConfiguration.Element.Properties.defaultOffset,
             opacity: opacity,
-            onAppiar: onAppiar
+            onAppear: onAppear
         )
     }
 }

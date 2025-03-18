@@ -38,7 +38,7 @@ package extension AdaptyViewConfiguration.Element {
         package let offset: AdaptyViewConfiguration.Offset
 
         package let opacity: Double
-        package let onAppiar: [AdaptyViewConfiguration.Animation]
+        package let onAppear: [AdaptyViewConfiguration.Animation]
     }
 }
 
@@ -110,14 +110,14 @@ extension AdaptyViewConfiguration.Element: Hashable {
             padding: AdaptyViewConfiguration.EdgeInsets = AdaptyViewConfiguration.Element.Properties.defaultPadding,
             offset: AdaptyViewConfiguration.Offset = AdaptyViewConfiguration.Element.Properties.defaultOffset,
             opacity: Double = AdaptyViewConfiguration.Element.Properties.defaultOpacity,
-            onAppiar: [AdaptyViewConfiguration.Animation] = []
+            onAppear: [AdaptyViewConfiguration.Animation] = []
         ) -> Self {
             .init(
                 decorator: decorator,
                 padding: padding,
                 offset: offset,
                 opacity: opacity,
-                onAppiar: onAppiar
+                onAppear: onAppear
             )
         }
     }
