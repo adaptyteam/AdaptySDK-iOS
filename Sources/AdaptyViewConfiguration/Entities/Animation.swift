@@ -19,6 +19,7 @@ package extension AdaptyViewConfiguration {
     }
 }
 
+
 extension AdaptyViewConfiguration.Animation: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {

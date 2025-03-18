@@ -222,6 +222,31 @@ extension AdaptyViewSource.Element: Codable {
             self = try .pager(AdaptyViewSource.Pager(from: decoder), propertyOrNil())
         }
 
+        
+//        switch self {
+//        case let .box(box, property):
+//            if case  box.width
+//            property?.onAppear.contains {
+//                
+//            }
+//        case let .button(_, property),
+//            let .text(_, property),
+//            let .image(_, property),
+//            let .stack(_, property),
+//            let .video(_, property),
+//            let .button(_, property),
+//            let .row(_, property),
+//            let .column(_, property),
+//            let .section(_, property),
+//            let .toggle(_, property),
+//            let .timer(_, property),
+//            let .pager(_, property),
+//            let .column(_, property):
+//            
+//            
+//        case .reference, .unknown:
+//        }
+        
         func propertyOrNil() -> Properties? {
             guard let value = try? Properties(from: decoder) else { return nil }
             return value.isZero ? nil : value
@@ -248,20 +273,13 @@ extension AdaptyViewSource.Element.Properties: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let onAppiarKey: CodingKeys =
-            if container.contains(.transitionIn) && !container.contains(.onAppear) {
-                .transitionIn
-            } else {
-                .onAppear
-            }
-
         let onAppear: [AdaptyViewConfiguration.Animation] =
-            if let array = try? container.decodeIfPresent([AdaptyViewConfiguration.Animation].self, forKey: onAppiarKey) {
-                array
-            } else if let animation = try container.decodeIfPresent(AdaptyViewConfiguration.Animation.self, forKey: onAppiarKey) {
-                [animation]
+            if container.contains(.transitionIn) && !container.contains(.onAppear) {
+                if let animation = try container.decodeIfPresent(AdaptyViewConfiguration.Animation.self, forKey: .transitionIn) { [animation] } else { [] }
             } else {
-                []
+                if let array = try? container.decodeIfPresent([AdaptyViewConfiguration.Animation].self, forKey: .onAppear) {
+                    array
+                } else { [] }
             }
 
         let opacity = if container.contains(.visibility) && !container.contains(.opacity) {
