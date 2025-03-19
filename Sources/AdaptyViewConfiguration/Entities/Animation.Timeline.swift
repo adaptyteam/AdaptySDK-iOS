@@ -14,13 +14,13 @@ package extension AdaptyViewConfiguration.Animation {
             startDelay: 0.0,
             repeatType: nil,
             repeatDelay: 0.0,
-            repeatNaxCount: nil
+            repeatMaxCount: nil
         )
         package let duration: TimeInterval
         package let startDelay: TimeInterval
         package let repeatType: RepeatType?
         package let repeatDelay: TimeInterval
-        package let repeatNaxCount: Int?
+        package let repeatMaxCount: Int?
 
         package enum RepeatType: String {
             case restart
@@ -36,14 +36,14 @@ package extension AdaptyViewConfiguration.Animation.Timeline {
         duration: TimeInterval = Self.default.duration,
         repeatType: RepeatType? = Self.default.repeatType,
         repeatDelay: TimeInterval = Self.default.repeatDelay,
-        repeatNaxCount: Int? = Self.default.repeatNaxCount
+        repeatMaxCount: Int? = Self.default.repeatMaxCount
     ) -> Self {
         .init(
             duration: duration,
             startDelay: startDelay,
             repeatType: repeatType,
             repeatDelay: repeatDelay,
-            repeatNaxCount: repeatNaxCount
+            repeatMaxCount: repeatMaxCount
         )
     }
 }
@@ -54,7 +54,7 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
         case startDelay = "start_delay"
         case repeatType = "repeat"
         case repeatDelay = "repeat_delay"
-        case repeatNaxCount = "repeat_max_count"
+        case repeatMaxCount = "repeat_max_count"
         case duration
     }
 
@@ -67,7 +67,7 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
 
         repeatDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .repeatDelay)).map { $0 / 1000.0 } ?? defaultValue.repeatDelay
 
-        repeatNaxCount = try container.decodeIfPresent(Int.self, forKey: .repeatNaxCount) ?? defaultValue.repeatNaxCount
+        repeatMaxCount = try container.decodeIfPresent(Int.self, forKey: .repeatMaxCount) ?? defaultValue.repeatMaxCount
 
         duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? defaultValue.duration
     }
@@ -87,7 +87,7 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
             try container.encode(repeatDelay * 1000, forKey: .repeatDelay)
         }
 
-        try container.encodeIfPresent(repeatNaxCount, forKey: .repeatNaxCount)
+        try container.encodeIfPresent(repeatMaxCount, forKey: .repeatMaxCount)
 
         if duration != defaultValue.duration {
             try container.encode(duration * 1000, forKey: .duration)
