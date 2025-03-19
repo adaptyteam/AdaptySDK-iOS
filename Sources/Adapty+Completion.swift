@@ -459,6 +459,24 @@ public extension Adapty {
             try await logShowOnboarding(params)
         }
     }
+    
+    nonisolated static func updateCollectingRefundDataConsent(
+        _ consent: Bool,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await updateCollectingRefundDataConsent(consent)
+        }
+    }
+    
+    nonisolated static func updateRefundPreference(
+        _ refundPreference: AdaptyRefundPreference,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await updateRefundPreference(refundPreference)
+        }
+    }
 }
 
 private func withCompletion(

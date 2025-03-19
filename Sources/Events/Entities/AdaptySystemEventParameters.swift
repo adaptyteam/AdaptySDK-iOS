@@ -165,6 +165,9 @@ enum MethodName: String {
     case logShowPaywall = "log_show_paywall"
 
     case presentCodeRedemptionSheet = "present_code_redemption_sheet"
+    
+    case updateCollectingRefundDataConsent = "update_collecting_refund_data_consent"
+    case updateRefundPreference = "update_refund_preference"
 }
 
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
