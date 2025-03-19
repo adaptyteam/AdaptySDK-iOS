@@ -29,7 +29,7 @@ final class EventsManager {
     }
 
     func trackEvent(_ unpacked: Event.Unpacked) throws {
-        guard !configuration.blacklist.contains(unpacked.event.name.rawValue) else {
+        guard !configuration.blacklist.contains(unpacked.event.name) else {
             return
         }
 

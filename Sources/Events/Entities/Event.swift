@@ -13,6 +13,8 @@ enum Event: Sendable {
     case paywallShowed(AdaptyPaywallShowedParameters)
     case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)
     case onboardingScreenShowed(AdaptyOnboardingScreenParameters)
+    case сonsentToCollectingRefundData(AdaptyConsentToCollectingDataParameters)
+    case refundPreference(AdaptyRefundPreferenceParameters)
     case system(AdaptySystemEventParameters)
 }
 
@@ -36,6 +38,10 @@ extension Event: Encodable {
         case let .onboardingScreenShowed(value):
             try value.encode(to: encoder)
         case let .paywallVariationAssigned(value):
+            try value.encode(to: encoder)
+        case let .сonsentToCollectingRefundData(value):
+            try value.encode(to: encoder)
+        case let .refundPreference(value):
             try value.encode(to: encoder)
         case let .system(value):
             let data = try Event.encoder.encode(value)
