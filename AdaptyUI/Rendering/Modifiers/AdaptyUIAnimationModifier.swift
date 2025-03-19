@@ -10,65 +10,174 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.Animation.Interpolator {
-    func swiftuiAnimation(duration: Double) -> Animation {
-        switch self {
+extension Animation {
+    static func fromInterpolator(
+        _ interpolator: VC.Animation.Interpolator,
+        duration: TimeInterval
+    ) -> Animation {
+        switch interpolator {
         case .easeInOut: .easeInOut(duration: duration)
         case .easeIn: .easeIn(duration: duration)
         case .easeOut: .easeOut(duration: duration)
         case .linear: .linear(duration: duration)
-        case let .cubicBezier(x1, y1, x2, y2):
-            .easeInOut(duration: duration)
+        case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2)
         }
+    }
+
+    func withTimeline(_ timeline: AdaptyViewConfiguration.Animation.Timeline) -> Animation {
+        guard let type = timeline.repeatType else { return self }
+
+        switch type {
+        case .reverse:
+            if let count = timeline.repeatMaxCount {
+                return delay(timeline.repeatDelay)
+                    .repeatCount(count, autoreverses: true)
+            } else {
+                return delay(timeline.repeatDelay)
+                    .repeatForever(autoreverses: true)
+            }
+        case .restart:
+            if let count = timeline.repeatMaxCount {
+                return delay(timeline.repeatDelay)
+                    .repeatCount(count, autoreverses: false)
+            } else {
+                return delay(timeline.repeatDelay)
+                    .repeatForever(autoreverses: false)
+            }
+        }
+    }
+
+    static func create(
+        timeline: AdaptyViewConfiguration.Animation.Timeline,
+        interpolator: AdaptyViewConfiguration.Animation.Interpolator
+    ) -> Animation {
+        let result: Animation = .fromInterpolator(
+            interpolator,
+            duration: timeline.duration
+        )
+        .withTimeline(timeline)
+        .delay(timeline.startDelay)
+
+        return result
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.Animation {
-    var swiftuiAnimation: Animation? {
-        switch self {
-        case let .opacity(params):
-            params.interpolator
-                .swiftuiAnimation(duration: params.duration)
-                .delay(params.startDelay)
-        case .unknown:
-            nil
-        }
-    }
-}
+struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
+    private let animations: [AdaptyViewConfiguration.Animation]
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUIAnimationModifier: ViewModifier {
-    private let animation: VC.Animation
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
 
-    @State
-    private var opacity: Double
+    @State private var offsetX: CGFloat
+    @State private var offsetY: CGFloat
+    @State private var scaleX: CGFloat
+    @State private var scaleY: CGFloat
+    @State private var rotation: Angle
+    @State private var opacity: Double
 
-    init(_ animation: VC.Animation, _ opacity: Double) {
-        self.animation = animation
-        self.opacity = opacity
+    init(_ properties: VC.Element.Properties) {
+        self.offsetX = properties.offset.x
+        self.offsetY = properties.offset.y
+        self.scaleX = 1.0
+        self.scaleY = 1.0
+        self.rotation = .zero
+        self.opacity = properties.opacity ?? 1.0
+
+        self.animations = properties.onAppear
     }
 
     func body(content: Content) -> some View {
         content
+            .offset(x: offsetX, y: offsetY)
+            .rotationEffect(rotation)
+            .scaleEffect(x: scaleX, y: scaleY, anchor: .center)
             .opacity(opacity)
-            .onAppear {
-                if opacity < 1.0 {
-                    withAnimation(animation.swiftuiAnimation) {
-                        opacity = 1.0
-                    }
+            .onAppear { startAnimations() }
+    }
+
+    private func startAnimations() {
+        for animation in animations {
+            switch animation {
+            case let .opacity(timeline, value):
+                startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) { self.opacity = $0 }
+            case let .offsetX(timeline, value):
+                startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) {
+                    self.offsetX = $0.points(
+                        screenSize: self.screenSize.width,
+                        safeAreaStart: self.safeArea.leading,
+                        safeAreaEnd: self.safeArea.trailing
+                    )
                 }
+            case let .offsetY(timeline, value):
+                startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) {
+                    self.offsetY = $0.points(
+                        screenSize: self.screenSize.width,
+                        safeAreaStart: self.safeArea.leading,
+                        safeAreaEnd: self.safeArea.trailing
+                    )
+                }
+            case let .rotation(timeline, value):
+                startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) { self.rotation = .degrees($0) }
+            case let .scale(timeline, value):
+                startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) {
+                    self.scaleX = $0
+                    self.scaleY = $0
+                }
+            default:
+                break
             }
+        }
+    }
+
+    private func startValueAnimation<Value>(
+        _ timeline: AdaptyViewConfiguration.Animation.Timeline,
+        interpolator: AdaptyViewConfiguration.Animation.Interpolator,
+        from start: Value,
+        to end: Value,
+        updateBlock: (Value) -> Void
+    ) {
+        updateBlock(start)
+
+        withAnimation(.create(timeline: timeline, interpolator: interpolator)) {
+            updateBlock(end)
+        }
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func animations(_ animations: [VC.Animation]?, opacity: Double) -> some View {
-        if let animation = animations?.first {
-            modifier(AdaptyUIAnimationModifier(animation, opacity))
+    func animatableProperties(_ properties: VC.Element.Properties?) -> some View {
+        if let properties {
+            modifier(AdaptyUIAnimatablePropertiesModifier(properties))
         } else {
             self
         }
