@@ -19,7 +19,7 @@ extension Event {
 extension Event.Packed {
     init(from unpacked: Event.Unpacked, counter: Int) throws {
         try self.init(
-            name: unpacked.event.name.rawValue,
+            name: unpacked.event.name,
             id: unpacked.id,
             counter: counter,
             data: Event.encoder.encode(Event.Unpacked_w_counter(orginal: unpacked, counter: counter))
@@ -55,7 +55,7 @@ private extension Event {
             try container.encode(counter, forKey: .counter)
             try container.encode(orginal.environment.system.name, forKey: .sysName)
             try container.encode(orginal.environment.application.installationIdentifier, forKey: .appInstallId)
-            try container.encode(orginal.event.name.rawValue, forKey: .name)
+            try container.encode(orginal.event.name, forKey: .name)
 
             try orginal.event.encode(to: encoder)
         }
