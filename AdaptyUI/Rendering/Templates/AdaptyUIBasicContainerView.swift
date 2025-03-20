@@ -130,7 +130,7 @@ struct AdaptyUIBasicContainerView: View {
     ) -> some View {
         let bottomOverscrollHeight = screenSize.height
         let properties = content.properties
-        let offsetY = properties?.offset.y ?? 0
+        let offsetY = properties?.offset.y ?? .zero
 
         VStack(spacing: 0) {
             AdaptyUIElementWithoutPropertiesView(content)
