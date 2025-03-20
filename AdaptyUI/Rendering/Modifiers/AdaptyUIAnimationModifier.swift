@@ -92,7 +92,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .offset(x: offsetX, y: offsetY)
-            .rotationEffect(rotation)
+            .rotationEffect(rotation, anchor: .center)
             .scaleEffect(x: scaleX, y: scaleY, anchor: .center)
             .opacity(opacity)
             .onAppear { startAnimations() }
@@ -129,9 +129,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     to: value.end
                 ) {
                     self.offsetY = $0.points(
-                        screenSize: self.screenSize.width,
-                        safeAreaStart: self.safeArea.leading,
-                        safeAreaEnd: self.safeArea.trailing
+                        screenSize: self.screenSize.height,
+                        safeAreaStart: self.safeArea.top,
+                        safeAreaEnd: self.safeArea.bottom
                     )
                 }
             case let .rotation(timeline, value):
