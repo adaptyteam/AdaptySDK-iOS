@@ -17,6 +17,7 @@ package extension AdaptyViewConfiguration {
 package extension AdaptyViewConfiguration.Point {
     static let zero = AdaptyViewConfiguration.Point(x: 0.0, y: 0.0)
     static let one = AdaptyViewConfiguration.Point(x: 1.0, y: 1.0)
+    static let center = AdaptyViewConfiguration.Point(x: 0.5, y: 0.5)
 
     var isZero: Bool {
         x == 0.0 && y == 0.0

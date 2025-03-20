@@ -12,13 +12,12 @@ package extension AdaptyViewConfiguration {
         case opacity(Timeline, DoubleValue)
         case offsetX(Timeline, UnitValue)
         case offsetY(Timeline, UnitValue)
-        case rotation(Timeline, DoubleValue)
-        case scale(Timeline, DoubleValue)
+        case rotation(Timeline, PointWithAnchorValue)
+        case scale(Timeline, PointWithAnchorValue)
         case width(Timeline, UnitValue)
         case height(Timeline, UnitValue)
     }
 }
-
 
 extension AdaptyViewConfiguration.Animation: Hashable {
     package func hash(into hasher: inout Hasher) {
