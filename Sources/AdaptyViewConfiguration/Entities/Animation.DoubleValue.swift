@@ -9,7 +9,7 @@ import Foundation
 
 package extension AdaptyViewConfiguration.Animation {
     struct DoubleValue: Sendable, Hashable {
-        package let interpolator: AdaptyViewConfiguration.Animation.Interpolator
+        package let interpolator: Interpolator
         package let start: Double
         package let end: Double
     }

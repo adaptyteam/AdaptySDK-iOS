@@ -88,20 +88,20 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialOffset = properties.offset ?? .zero
         self.animations = properties.onAppear
     }
-    
+
     private var resolvedOffset: CGSize {
         let resolvedX = animatedOffsetX ?? initialOffset.x.points(
-            screenSize: self.screenSize.width,
-            safeAreaStart: self.safeArea.leading,
-            safeAreaEnd: self.safeArea.trailing
+            screenSize: screenSize.width,
+            safeAreaStart: safeArea.leading,
+            safeAreaEnd: safeArea.trailing
         )
-        
+
         let resolvedY = animatedOffsetY ?? initialOffset.y.points(
-            screenSize: self.screenSize.width,
-            safeAreaStart: self.safeArea.leading,
-            safeAreaEnd: self.safeArea.trailing
+            screenSize: screenSize.width,
+            safeAreaStart: safeArea.leading,
+            safeAreaEnd: safeArea.trailing
         )
-        
+
         return CGSize(
             width: resolvedX ?? 0.0,
             height: resolvedY ?? 0.0

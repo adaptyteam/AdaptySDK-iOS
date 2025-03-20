@@ -29,14 +29,14 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Element {
-    struct Properties: Sendable, Hashable {
+    struct Properties: Sendable {
         let elementId: String?
         let decorator: AdaptyViewSource.Decorator?
         let padding: AdaptyViewConfiguration.EdgeInsets
         let offset: AdaptyViewConfiguration.Offset
 
         let opacity: Double
-        let onAppear: [AdaptyViewConfiguration.Animation]
+        let onAppear: [AdaptyViewSource.Animation]
 
         var isZero: Bool {
             elementId == nil
@@ -45,67 +45,6 @@ extension AdaptyViewSource.Element {
                 && offset.isZero
                 && opacity == 0
                 && onAppear.isEmpty
-        }
-    }
-}
-
-extension AdaptyViewSource.Element: Hashable {
-    package func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .reference(value):
-            hasher.combine(1)
-            hasher.combine(value)
-        case let .stack(value, properties):
-            hasher.combine(2)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .text(value, properties):
-            hasher.combine(3)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .image(value, properties):
-            hasher.combine(4)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .video(value, properties):
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .button(value, properties):
-            hasher.combine(5)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .box(value, properties):
-            hasher.combine(6)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .row(value, properties):
-            hasher.combine(7)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .column(value, properties):
-            hasher.combine(8)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .section(value, properties):
-            hasher.combine(9)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .toggle(value, properties):
-            hasher.combine(10)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .timer(value, properties):
-            hasher.combine(11)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .pager(value, properties):
-            hasher.combine(12)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .unknown(value, properties):
-            hasher.combine(13)
-            hasher.combine(value)
-            hasher.combine(properties)
         }
     }
 }
@@ -151,7 +90,7 @@ extension AdaptyViewSource.Localizer {
             padding: from.padding,
             offset: from.offset,
             opacity: from.opacity,
-            onAppear: from.onAppear
+            onAppear: from.onAppear.map(animation)
         )
     }
 }
@@ -221,31 +160,6 @@ extension AdaptyViewSource.Element: Codable {
         case .pager:
             self = try .pager(AdaptyViewSource.Pager(from: decoder), propertyOrNil())
         }
-
-        
-//        switch self {
-//        case let .box(box, property):
-//            if case  box.width
-//            property?.onAppear.contains {
-//                
-//            }
-//        case let .button(_, property),
-//            let .text(_, property),
-//            let .image(_, property),
-//            let .stack(_, property),
-//            let .video(_, property),
-//            let .button(_, property),
-//            let .row(_, property),
-//            let .column(_, property),
-//            let .section(_, property),
-//            let .toggle(_, property),
-//            let .timer(_, property),
-//            let .pager(_, property),
-//            let .column(_, property):
-//            
-//            
-//        case .reference, .unknown:
-//        }
         
         func propertyOrNil() -> Properties? {
             guard let value = try? Properties(from: decoder) else { return nil }
@@ -273,11 +187,11 @@ extension AdaptyViewSource.Element.Properties: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let onAppear: [AdaptyViewConfiguration.Animation] =
+        let onAppear: [AdaptyViewSource.Animation] =
             if container.contains(.transitionIn) && !container.contains(.onAppear) {
-                if let animation = try container.decodeIfPresent(AdaptyViewConfiguration.Animation.self, forKey: .transitionIn) { [animation] } else { [] }
+                if let animation = try container.decodeIfPresent(AdaptyViewSource.Animation.self, forKey: .transitionIn) { [animation] } else { [] }
             } else {
-                if let array = try? container.decodeIfPresent([AdaptyViewConfiguration.Animation].self, forKey: .onAppear) {
+                if let array = try? container.decodeIfPresent([AdaptyViewSource.Animation].self, forKey: .onAppear) {
                     array
                 } else { [] }
             }

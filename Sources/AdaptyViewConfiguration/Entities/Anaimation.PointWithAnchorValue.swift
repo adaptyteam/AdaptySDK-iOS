@@ -9,7 +9,7 @@ import Foundation
 
 package extension AdaptyViewConfiguration.Animation {
     struct PointWithAnchorValue: Sendable, Hashable {
-        package let interpolator: AdaptyViewConfiguration.Animation.Interpolator
+        package let interpolator: Interpolator
         package let start: AdaptyViewConfiguration.Point
         package let end: AdaptyViewConfiguration.Point
         package let anchor: AdaptyViewConfiguration.Point

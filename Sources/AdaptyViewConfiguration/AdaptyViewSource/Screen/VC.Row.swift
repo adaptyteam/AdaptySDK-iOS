@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Row: Sendable, Hashable {
+    struct Row: Sendable {
         let spacing: Double
         let items: [GridItem]
     }

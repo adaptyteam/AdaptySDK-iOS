@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Box: Sendable, Hashable {
+    struct Box: Sendable {
         let width: AdaptyViewConfiguration.Box.Length?
         let height: AdaptyViewConfiguration.Box.Length?
         let horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment

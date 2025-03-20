@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Pager: Sendable, Hashable {
+    struct Pager: Sendable {
         let pageWidth: AdaptyViewConfiguration.Pager.Length
         let pageHeight: AdaptyViewConfiguration.Pager.Length
         let pagePadding: AdaptyViewConfiguration.EdgeInsets
