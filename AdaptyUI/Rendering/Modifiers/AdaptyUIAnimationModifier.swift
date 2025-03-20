@@ -64,6 +64,7 @@ extension Animation {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
+    private let initialOffset: AdaptyViewConfiguration.Offset
     private let animations: [AdaptyViewConfiguration.Animation]
 
     @Environment(\.adaptyScreenSize)
@@ -71,27 +72,45 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
 
-    @State private var offsetX: CGFloat
-    @State private var offsetY: CGFloat
+    @State private var animatedOffsetX: CGFloat?
+    @State private var animatedOffsetY: CGFloat?
     @State private var scaleX: CGFloat
     @State private var scaleY: CGFloat
     @State private var rotation: Angle
     @State private var opacity: Double
 
     init(_ properties: VC.Element.Properties) {
-        self.offsetX = properties.offset.x
-        self.offsetY = properties.offset.y
         self.scaleX = 1.0
         self.scaleY = 1.0
         self.rotation = .zero
         self.opacity = properties.opacity ?? 1.0
 
+        self.initialOffset = properties.offset ?? .zero
         self.animations = properties.onAppear
+    }
+    
+    private var resolvedOffset: CGSize {
+        let resolvedX = animatedOffsetX ?? initialOffset.x.points(
+            screenSize: self.screenSize.width,
+            safeAreaStart: self.safeArea.leading,
+            safeAreaEnd: self.safeArea.trailing
+        )
+        
+        let resolvedY = animatedOffsetY ?? initialOffset.y.points(
+            screenSize: self.screenSize.width,
+            safeAreaStart: self.safeArea.leading,
+            safeAreaEnd: self.safeArea.trailing
+        )
+        
+        return CGSize(
+            width: resolvedX ?? 0.0,
+            height: resolvedY ?? 0.0
+        )
     }
 
     func body(content: Content) -> some View {
         content
-            .offset(x: offsetX, y: offsetY)
+            .offset(resolvedOffset)
             .rotationEffect(rotation, anchor: .center)
             .scaleEffect(x: scaleX, y: scaleY, anchor: .center)
             .opacity(opacity)
@@ -115,7 +134,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     from: value.start,
                     to: value.end
                 ) {
-                    self.offsetX = $0.points(
+                    self.animatedOffsetX = $0.points(
                         screenSize: self.screenSize.width,
                         safeAreaStart: self.safeArea.leading,
                         safeAreaEnd: self.safeArea.trailing
@@ -128,7 +147,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     from: value.start,
                     to: value.end
                 ) {
-                    self.offsetY = $0.points(
+                    self.animatedOffsetY = $0.points(
                         screenSize: self.screenSize.height,
                         safeAreaStart: self.safeArea.top,
                         safeAreaEnd: self.safeArea.bottom
