@@ -167,8 +167,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     from: value.start,
                     to: value.end
                 ) {
-                    self.scaleX = $0
-                    self.scaleY = $0
+                    self.scaleX = $0.x
+                    self.scaleY = $0.y
                 }
             default:
                 break

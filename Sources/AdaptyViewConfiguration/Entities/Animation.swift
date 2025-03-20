@@ -12,7 +12,7 @@ package extension AdaptyViewConfiguration {
         case opacity(Timeline, DoubleValue)
         case offsetX(Timeline, UnitValue)
         case offsetY(Timeline, UnitValue)
-        case rotation(Timeline, PointWithAnchorValue)
+        case rotation(Timeline, DoubleWithAnchorValue)
         case scale(Timeline, PointWithAnchorValue)
         case width(Timeline, UnitValue)
         case height(Timeline, UnitValue)
