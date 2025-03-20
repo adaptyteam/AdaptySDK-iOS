@@ -142,7 +142,9 @@ struct AdaptyUIBasicContainerView: View {
             }
         }
         .padding(.bottom, bottomOverscrollHeight - offsetY)
-        .applyingProperties(properties, includeBackground: true)
+        .decorate(with: properties?.decorator, includeBackground: true)
+        .animatableProperties(properties)
+        .padding(properties?.padding)
         .padding(.bottom, offsetY - bottomOverscrollHeight)
     }
 

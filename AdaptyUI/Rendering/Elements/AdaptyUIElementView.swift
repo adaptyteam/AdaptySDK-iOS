@@ -123,19 +123,12 @@ package struct AdaptyUIElementView: View {
     }
 
     package var body: some View {
-        let properties = element.properties
-        let resolvedOpacity = switch eventsHandler.presentationState {
-        case .initial: properties?.opacity ?? 1.0
-        default: 1.0
-        }
-
         AdaptyUIElementWithoutPropertiesView(element)
             .paddingIfNeeded(additionalPadding)
-            .applyingProperties(properties, includeBackground: drawDecoratorBackground)
-            .animations(
-                properties?.onAppiar,
-                opacity: resolvedOpacity
-            )
+            .decorate(with: element.properties?.decorator,
+                      includeBackground: drawDecoratorBackground)
+            .animatableProperties(element.properties)
+            .padding(element.properties?.padding)
             .modifier(DebugOverlayModifier())
     }
 }

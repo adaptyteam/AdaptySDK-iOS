@@ -28,7 +28,9 @@ public extension AdaptyViewConfigurationTestWrapper {
             templateId: templateId,
             locale: locale,
             isRightToLeft: isRightToLeft,
-            images: [],
+            images: [
+                "star.fill", "beagle", "close", "coast-bg"
+            ],
             colors: [
                 "$green_figma": .solidColor(.create(data: 0x3EBD78FF)),
                 "$green_figma_cc": .solidColor(.create(data: 0x3EBD78CC)),
@@ -127,10 +129,8 @@ public struct AdaptyUITestRendererView: View {
     let paywallConfiguration: AdaptyUI.PaywallConfiguration
 
     public init(
-        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper
-//        ,
-//        imageResolver: AdaptyImageAssetResolver?,
-//        videoResolver: AdaptyVideoAssetResolver?
+        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper,
+        assetsResolver: AdaptyAssetsResolver?
     ) {
         viewConfiguration = viewConfigurationWrapper.value
 
@@ -142,7 +142,7 @@ public struct AdaptyUITestRendererView: View {
             observerModeResolver: nil,
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
-            assetsResolver: nil // imageResolver
+            assetsResolver: assetsResolver
         )
     }
 
