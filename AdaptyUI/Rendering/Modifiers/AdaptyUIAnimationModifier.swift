@@ -74,16 +74,25 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var animatedOffsetX: CGFloat?
     @State private var animatedOffsetY: CGFloat?
+
     @State private var scaleX: CGFloat
     @State private var scaleY: CGFloat
+    @State private var scaleAnchor: UnitPoint
+
     @State private var rotation: Angle
+    @State private var rotationAnchor: UnitPoint
+
     @State private var opacity: Double
 
     init(_ properties: VC.Element.Properties) {
+        self.opacity = properties.opacity ?? 1.0
+
         self.scaleX = 1.0
         self.scaleY = 1.0
+        self.scaleAnchor = .center
+
         self.rotation = .zero
-        self.opacity = properties.opacity ?? 1.0
+        self.rotationAnchor = .center
 
         self.initialOffset = properties.offset ?? .zero
         self.animations = properties.onAppear
@@ -111,8 +120,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .offset(resolvedOffset)
-            .rotationEffect(rotation, anchor: .center)
-            .scaleEffect(x: scaleX, y: scaleY, anchor: .center)
+            .rotationEffect(rotation, anchor: rotationAnchor)
+            .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
             .opacity(opacity)
             .onAppear { startAnimations() }
     }
@@ -154,6 +163,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     )
                 }
             case let .rotation(timeline, value):
+                rotationAnchor = value.anchor.unitPoint
                 startValueAnimation(
                     timeline,
                     interpolator: value.interpolator,
@@ -161,6 +171,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     to: value.end
                 ) { self.rotation = .degrees($0) }
             case let .scale(timeline, value):
+                scaleAnchor = value.anchor.unitPoint
                 startValueAnimation(
                     timeline,
                     interpolator: value.interpolator,
