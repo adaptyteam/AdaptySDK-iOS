@@ -9,25 +9,25 @@ import Foundation
 
 package extension AdaptyViewConfiguration {
     struct Offset: Sendable, Hashable {
-        package let x: Double
-        package let y: Double
+        package let x: Unit
+        package let y: Unit
     }
 }
 
 package extension AdaptyViewConfiguration.Offset {
-    static let zero = AdaptyViewConfiguration.Offset(x: 0.0, y: 0.0)
-    static let one = AdaptyViewConfiguration.Offset(x: 1.0, y: 1.0)
+    static let zero = AdaptyViewConfiguration.Offset(x: .zero, y: .zero)
+    static let one = AdaptyViewConfiguration.Offset(x: .point(1.0), y: .point(1.0))
 
     var isZero: Bool {
-        x == 0.0 && y == 0.0
+        x.isZero && y.isZero
     }
 }
 
 #if DEBUG
     package extension AdaptyViewConfiguration.Offset {
         static func create(
-            x: Double = 0.0,
-            y: Double = 0.0
+            x: AdaptyViewConfiguration.Unit = .zero,
+            y: AdaptyViewConfiguration.Unit = .zero
         ) -> Self {
             .init(
                 x: x,
@@ -45,19 +45,19 @@ extension AdaptyViewConfiguration.Offset: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(Double.self) {
-            self.init(x: 0.0, y: value)
-        } else if let values = try? container.decode([Double].self) {
+        if let value = try? container.decode(AdaptyViewConfiguration.Unit.self) {
+            self.init(x: .zero, y: value)
+        } else if let values = try? container.decode([AdaptyViewConfiguration.Unit].self) {
             switch values.count {
-            case 0: self.init(x: 0.0, y: 0.0)
-            case 1: self.init(x: 0.0, y: values[0])
+            case 0: self.init(x: .zero, y: .zero)
+            case 1: self.init(x: .zero, y: values[0])
             default: self.init(x: values[1], y: values[0])
             }
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             try self.init(
-                x: container.decodeIfPresent(Double.self, forKey: .x) ?? 0.0,
-                y: container.decodeIfPresent(Double.self, forKey: .y) ?? 0.0
+                x: container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .x) ?? .zero,
+                y: container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .y) ?? .zero
             )
         }
     }
