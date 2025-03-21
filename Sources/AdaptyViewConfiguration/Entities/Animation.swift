@@ -10,8 +10,7 @@ import Foundation
 package extension AdaptyViewConfiguration {
     enum Animation: Sendable {
         case opacity(Timeline, DoubleValue)
-        case offsetX(Timeline, UnitValue)
-        case offsetY(Timeline, UnitValue)
+        case offset(Timeline, OffsetValue)
         case rotation(Timeline, DoubleWithAnchorValue)
         case scale(Timeline, PointWithAnchorValue)
         case width(Timeline, UnitValue)
@@ -20,6 +19,8 @@ package extension AdaptyViewConfiguration {
         case border(Timeline, FillingValue)
         case borderThickness(Timeline, DoubleValue)
         case shadow(Timeline, FillingValue)
+        case shadowOffset(Timeline, UnitValue)
+        case shadowBlurRadius(Timeline, DoubleValue)
     }
 }
 
@@ -30,44 +31,48 @@ extension AdaptyViewConfiguration.Animation: Hashable {
             hasher.combine(1)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .offsetX(timeline, value):
+        case let .offset(timeline, value):
             hasher.combine(2)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .offsetY(timeline, value):
+        case let .rotation(timeline, value):
             hasher.combine(3)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .rotation(timeline, value):
+        case let .scale(timeline, value):
             hasher.combine(4)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .scale(timeline, value):
+        case let .width(timeline, value):
             hasher.combine(5)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .width(timeline, value):
+        case let .height(timeline, value):
             hasher.combine(6)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .height(timeline, value):
+        case let .background(timeline, value):
             hasher.combine(7)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .background(timeline, value):
+        case let .border(timeline, value):
             hasher.combine(8)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .border(timeline, value):
+        case let .borderThickness(timeline, value):
             hasher.combine(9)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .borderThickness(timeline, value):
+        case let .shadow(timeline, value):
             hasher.combine(10)
             hasher.combine(timeline)
             hasher.combine(value)
-        case let .shadow(timeline, value):
+        case let .shadowOffset(timeline, value):
             hasher.combine(11)
+            hasher.combine(timeline)
+            hasher.combine(value)
+        case let .shadowBlurRadius(timeline, value):
+            hasher.combine(12)
             hasher.combine(timeline)
             hasher.combine(value)
         }

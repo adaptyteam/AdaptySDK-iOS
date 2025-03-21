@@ -12,12 +12,12 @@ extension AdaptyViewSource {
         typealias Timeline = AdaptyViewConfiguration.Animation.Timeline
         typealias DoubleValue = AdaptyViewConfiguration.Animation.DoubleValue
         typealias UnitValue = AdaptyViewConfiguration.Animation.UnitValue
+        typealias OffsetValue = AdaptyViewConfiguration.Animation.OffsetValue
         typealias DoubleWithAnchorValue = AdaptyViewConfiguration.Animation.DoubleWithAnchorValue
         typealias PointWithAnchorValue = AdaptyViewConfiguration.Animation.PointWithAnchorValue
 
         case opacity(Timeline, DoubleValue)
-        case offsetX(Timeline, UnitValue)
-        case offsetY(Timeline, UnitValue)
+        case offset(Timeline, OffsetValue)
         case rotation(Timeline, DoubleWithAnchorValue)
         case scale(Timeline, PointWithAnchorValue)
         case width(Timeline, UnitValue)
@@ -26,6 +26,8 @@ extension AdaptyViewSource {
         case border(Timeline, AssetIdValue)
         case borderThickness(Timeline, DoubleValue)
         case shadow(Timeline, AssetIdValue)
+        case shadowOffset(Timeline, UnitValue)
+        case shadowBlurRadius(Timeline, DoubleValue)
     }
 }
 
@@ -34,10 +36,8 @@ extension AdaptyViewSource.Localizer {
         switch from {
         case let .opacity(timeline, value):
             .opacity(timeline, value)
-        case let .offsetX(timeline, value):
-            .offsetX(timeline, value)
-        case let .offsetY(timeline, value):
-            .offsetY(timeline, value)
+        case let .offset(timeline, value):
+            .offset(timeline, value)
         case let .rotation(timeline, value):
             .rotation(timeline, value)
         case let .scale(timeline, value):
@@ -54,6 +54,10 @@ extension AdaptyViewSource.Localizer {
             .borderThickness(timeline, value)
         case let .shadow(timeline, value):
             try .shadow(timeline, animationFillingValue(value))
+        case let .shadowOffset(timeline, value):
+            try .shadowOffset(timeline, value)
+        case let .shadowBlurRadius(timeline, value):
+            try .shadowBlurRadius(timeline, value)
         }
     }
 }
@@ -67,8 +71,7 @@ extension AdaptyViewSource.Animation: Codable {
     enum Types: String {
         case fade
         case opacity
-        case offsetX = "offset_x"
-        case offsetY = "offset_y"
+        case offset
         case rotation
         case scale
         case width
@@ -77,6 +80,9 @@ extension AdaptyViewSource.Animation: Codable {
         case border
         case borderThickness = "border_thickness"
         case shadow
+        case shadowOffset = "shadow_offset"
+        case shadowBlurRadius = "shadow_blur_radius"
+
     }
 
     init(from decoder: Decoder) throws {
@@ -93,10 +99,8 @@ extension AdaptyViewSource.Animation: Codable {
             ))
         case .opacity:
             self = try .opacity(.init(from: decoder), .init(from: decoder))
-        case .offsetX:
-            self = try .offsetX(.init(from: decoder), .init(from: decoder))
-        case .offsetY:
-            self = try .offsetY(.init(from: decoder), .init(from: decoder))
+        case .offset:
+            self = try .offset(.init(from: decoder), .init(from: decoder))
         case .rotation:
             self = try .rotation(.init(from: decoder), .init(from: decoder))
         case .scale:
@@ -113,6 +117,10 @@ extension AdaptyViewSource.Animation: Codable {
             self = try .borderThickness(.init(from: decoder), .init(from: decoder))
         case .shadow:
             self = try .shadow(.init(from: decoder), .init(from: decoder))
+        case .shadowOffset:
+            self = try .shadowOffset(.init(from: decoder), .init(from: decoder))
+        case .shadowBlurRadius:
+            self = try .shadowBlurRadius(.init(from: decoder), .init(from: decoder))
         }
     }
 
@@ -124,12 +132,8 @@ extension AdaptyViewSource.Animation: Codable {
             try container.encode(Types.opacity.rawValue, forKey: .type)
             try value.encode(to: encoder)
             try timeline.encode(to: encoder)
-        case let .offsetX(timeline, value):
-            try container.encode(Types.offsetX.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .offsetY(timeline, value):
-            try container.encode(Types.offsetY.rawValue, forKey: .type)
+        case let .offset(timeline, value):
+            try container.encode(Types.offset.rawValue, forKey: .type)
             try value.encode(to: encoder)
             try timeline.encode(to: encoder)
         case let .rotation(timeline, value):
@@ -162,6 +166,14 @@ extension AdaptyViewSource.Animation: Codable {
             try timeline.encode(to: encoder)
         case let .shadow(timeline, value):
             try container.encode(Types.shadow.rawValue, forKey: .type)
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .shadowOffset(timeline, value):
+            try container.encode(Types.shadowOffset.rawValue, forKey: .type)
+            try value.encode(to: encoder)
+            try timeline.encode(to: encoder)
+        case let .shadowBlurRadius(timeline, value):
+            try container.encode(Types.shadowBlurRadius.rawValue, forKey: .type)
             try value.encode(to: encoder)
             try timeline.encode(to: encoder)
         }
