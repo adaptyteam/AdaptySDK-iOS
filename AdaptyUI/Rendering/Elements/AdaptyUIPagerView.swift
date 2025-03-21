@@ -40,8 +40,8 @@ extension VC.TransitionSlide {
         case .easeIn: .easeIn(duration: duration)
         case .easeOut: .easeOut(duration: duration)
         case .linear: .linear(duration: duration)
-        case let .cubicBezier(x1, y1, x2, y2):
-            .easeInOut(duration: duration)
+        case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2, duration: duration)
+        default: .linear(duration: duration)
         }
     }
 }
@@ -249,7 +249,7 @@ struct AdaptyUIPagerView: View {
                 Circle()
                     .fill(
                         idx == currentPage ?
-                        pageControl.selectedColor.swiftuiColor(assetsViewModel.assetsResolver) :
+                            pageControl.selectedColor.swiftuiColor(assetsViewModel.assetsResolver) :
                             pageControl.color.swiftuiColor(assetsViewModel.assetsResolver)
                     )
                     .frame(width: pageControl.dotSize,
