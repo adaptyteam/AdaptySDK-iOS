@@ -134,7 +134,6 @@ extension AdaptyViewConfiguration.Animation.Interpolator: Codable {
             try container.encode(Values.easeInOutBounce.rawValue)
         case let .cubicBezier(x1, x2, x3, x4):
             try container.encode([x1, x2, x3, x4])
-
         }
     }
 }

@@ -10,58 +10,6 @@
 import Adapty
 import SwiftUI
 
-extension Animation {
-    static func fromInterpolator(
-        _ interpolator: VC.Animation.Interpolator,
-        duration: TimeInterval
-    ) -> Animation {
-        switch interpolator {
-        case .easeInOut: .easeInOut(duration: duration)
-        case .easeIn: .easeIn(duration: duration)
-        case .easeOut: .easeOut(duration: duration)
-        case .linear: .linear(duration: duration)
-        case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2)
-        }
-    }
-
-    func withTimeline(_ timeline: AdaptyViewConfiguration.Animation.Timeline) -> Animation {
-        guard let type = timeline.repeatType else { return self }
-
-        switch type {
-        case .reverse:
-            if let count = timeline.repeatMaxCount {
-                return delay(timeline.repeatDelay)
-                    .repeatCount(count, autoreverses: true)
-            } else {
-                return delay(timeline.repeatDelay)
-                    .repeatForever(autoreverses: true)
-            }
-        case .restart:
-            if let count = timeline.repeatMaxCount {
-                return delay(timeline.repeatDelay)
-                    .repeatCount(count, autoreverses: false)
-            } else {
-                return delay(timeline.repeatDelay)
-                    .repeatForever(autoreverses: false)
-            }
-        }
-    }
-
-    static func create(
-        timeline: AdaptyViewConfiguration.Animation.Timeline,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator
-    ) -> Animation {
-        let result: Animation = .fromInterpolator(
-            interpolator,
-            duration: timeline.duration
-        )
-        .withTimeline(timeline)
-        .delay(timeline.startDelay)
-
-        return result
-    }
-}
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private let initialOffset: AdaptyViewConfiguration.Offset
@@ -84,8 +32,17 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var opacity: Double
 
+    @State
+    private var shadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    private var shadowBlurRadius: Double?
+    private var shadowOffset: AdaptyViewConfiguration.Offset?
+
     init(_ properties: VC.Element.Properties) {
         self.opacity = properties.opacity ?? 1.0
+
+        self.shadowFilling = properties.decorator?.shadow?.filling
+        self.shadowBlurRadius = properties.decorator?.shadow?.blurRadius
+        self.shadowOffset = properties.decorator?.shadow?.offset
 
         self.scaleX = 1.0
         self.scaleY = 1.0
@@ -119,6 +76,11 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .shadow(
+                filling: shadowFilling,
+                blurRadius: shadowBlurRadius,
+                offset: shadowOffset
+            )
             .offset(resolvedOffset)
             .rotationEffect(rotation, anchor: rotationAnchor)
             .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
@@ -180,6 +142,16 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                 ) {
                     self.scaleX = $0.x
                     self.scaleY = $0.y
+                }
+            case let .shadow(timeline, value):
+                shadowFilling = value.start
+                startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) {
+                    self.shadowFilling = $0
                 }
             default:
                 break
