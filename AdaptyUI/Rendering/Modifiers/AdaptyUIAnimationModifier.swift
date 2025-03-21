@@ -10,6 +10,7 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Animation {
     static func fromInterpolator(
         _ interpolator: VC.Animation.Interpolator,
@@ -84,8 +85,17 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var opacity: Double
 
+    @State
+    private var shadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    private var shadowBlurRadius: Double?
+    private var shadowOffset: AdaptyViewConfiguration.Offset?
+
     init(_ properties: VC.Element.Properties) {
         self.opacity = properties.opacity ?? 1.0
+
+        self.shadowFilling = properties.decorator?.shadow?.filling
+        self.shadowBlurRadius = properties.decorator?.shadow?.blurRadius
+        self.shadowOffset = properties.decorator?.shadow?.offset
 
         self.scaleX = 1.0
         self.scaleY = 1.0
@@ -119,6 +129,11 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .shadow(
+                filling: shadowFilling,
+                blurRadius: shadowBlurRadius,
+                offset: shadowOffset
+            )
             .offset(resolvedOffset)
             .rotationEffect(rotation, anchor: rotationAnchor)
             .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
@@ -180,6 +195,16 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                 ) {
                     self.scaleX = $0.x
                     self.scaleY = $0.y
+                }
+            case let .shadow(timeline, value):
+                shadowFilling = value.start
+                startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) {
+                    self.shadowFilling = $0
                 }
             default:
                 break
