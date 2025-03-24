@@ -14,22 +14,16 @@ import SwiftUI
 struct AdaptyShadowModifier: ViewModifier {
     private let filling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>
     private let blurRadius: Double
-    private let offset: AdaptyViewConfiguration.Offset
+    private let offset: CGSize
 
     init(
         filling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>,
         blurRadius: Double,
-        offset: AdaptyViewConfiguration.Offset
+        offset: CGSize
     ) {
         self.filling = filling
         self.blurRadius = blurRadius
         self.offset = offset
-    }
-
-    init(shadow: AdaptyViewConfiguration.Shadow) {
-        self.filling = shadow.filling
-        self.blurRadius = shadow.blurRadius
-        self.offset = shadow.offset
     }
 
     @EnvironmentObject
@@ -49,16 +43,8 @@ struct AdaptyShadowModifier: ViewModifier {
                     .asSolidColor?
                     .swiftuiColor(self.assetsViewModel.assetsResolver) ?? .clear,
                 radius: self.blurRadius,
-                x: self.offset.x.points(
-                    screenSize: self.screenSize.width,
-                    safeAreaStart: self.safeArea.leading,
-                    safeAreaEnd: self.safeArea.trailing
-                ),
-                y: self.offset.y.points(
-                    screenSize: self.screenSize.height,
-                    safeAreaStart: self.safeArea.top,
-                    safeAreaEnd: self.safeArea.bottom
-                )
+                x: self.offset.width,
+                y: self.offset.height
             )
     }
 }
@@ -69,7 +55,7 @@ extension View {
     func shadow(
         filling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?,
         blurRadius: Double?,
-        offset: AdaptyViewConfiguration.Offset?
+        offset: CGSize?
     ) -> some View {
         if let filling, let blurRadius, let offset {
             self.modifier(
@@ -78,17 +64,6 @@ extension View {
                     blurRadius: blurRadius,
                     offset: offset
                 )
-            )
-        } else {
-            self
-        }
-    }
-
-    @ViewBuilder
-    func shadow(_ shadow: AdaptyViewConfiguration.Shadow?) -> some View {
-        if let shadow {
-            self.modifier(
-                AdaptyShadowModifier(shadow: shadow)
             )
         } else {
             self
