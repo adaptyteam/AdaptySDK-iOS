@@ -26,7 +26,7 @@ extension AdaptyViewSource {
         case border(Timeline, AssetIdValue)
         case borderThickness(Timeline, DoubleValue)
         case shadow(Timeline, AssetIdValue)
-        case shadowOffset(Timeline, UnitValue)
+        case shadowOffset(Timeline, OffsetValue)
         case shadowBlurRadius(Timeline, DoubleValue)
     }
 }

@@ -19,7 +19,7 @@ package extension AdaptyViewConfiguration {
         case border(Timeline, FillingValue)
         case borderThickness(Timeline, DoubleValue)
         case shadow(Timeline, FillingValue)
-        case shadowOffset(Timeline, UnitValue)
+        case shadowOffset(Timeline, OffsetValue)
         case shadowBlurRadius(Timeline, DoubleValue)
     }
 }
