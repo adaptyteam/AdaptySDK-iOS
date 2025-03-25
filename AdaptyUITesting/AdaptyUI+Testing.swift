@@ -91,6 +91,18 @@ public extension AdaptyViewConfigurationTestWrapper {
                         .create(color: .create(data: 0xF3227AFF), p: 1.0),
                     ]
                 )),
+                "$shimmer_gradient": .colorGradient(.create(
+                    kind: .linear,
+                    start: .create(x: 0.0, y: 1.0),
+                    end: .create(x: 1.0, y: 0.0),
+                    items: [
+                        .create(color: .create(data: 0xFFFFFF00), p: 0.0),
+                        .create(color: .create(data: 0xFFFFFF00), p: 0.35),
+                        .create(color: .create(data: 0xFFFFFFFF), p: 0.5),
+                        .create(color: .create(data: 0xFFFFFF00), p: 0.65),
+                        .create(color: .create(data: 0xFFFFFF00), p: 1.0),
+                    ]
+                )),
             ],
             strings: [
                 "$short": ["Article."],
