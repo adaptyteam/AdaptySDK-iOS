@@ -104,7 +104,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     to: value.end
                 ) {
                     self.animatedOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
-                    self.animatedOffsetY = $0.x.points(.vertical, screenSize, safeArea)
+                    self.animatedOffsetY = $0.y.points(.vertical, screenSize, safeArea)
                 }
             case let .rotation(timeline, value):
                 rotationAnchor = value.anchor.unitPoint
