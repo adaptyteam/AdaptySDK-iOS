@@ -12,7 +12,7 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Animation {
-    @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+    @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *)
     static func fromInterpolator(
         _ interpolator: VC.Animation.Interpolator,
         duration: TimeInterval
@@ -29,20 +29,6 @@ extension Animation {
         case .easeInBounce: .adaptyCustomEaseInBounce(duration: duration)
         case .easeOutBounce: .adaptyCustomEaseOutBounce(duration: duration)
         case .easeInOutBounce: .adaptyCustomEaseInOutBounce(duration: duration)
-        }
-    }
-
-    static func fromInterpolatorFallback(
-        _ interpolator: VC.Animation.Interpolator,
-        duration: TimeInterval
-    ) -> Animation {
-        switch interpolator {
-        case .easeInOut: .easeInOut(duration: duration)
-        case .easeIn: .easeIn(duration: duration)
-        case .easeOut: .easeOut(duration: duration)
-        case .linear: .linear(duration: duration)
-        case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2)
-        default: .linear(duration: duration)
         }
     }
 
@@ -69,26 +55,53 @@ extension Animation {
         }
     }
 
+    @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *)
     static func create(
         timeline: AdaptyViewConfiguration.Animation.Timeline,
         interpolator: AdaptyViewConfiguration.Animation.Interpolator
     ) -> Animation {
-        let result: Animation
-        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
-            result = .fromInterpolator(
-                interpolator,
-                duration: timeline.duration
-            )
-        } else {
-            result = .fromInterpolatorFallback(
-                interpolator,
-                duration: timeline.duration
-            )
+        .fromInterpolator(
+            interpolator,
+            duration: timeline.duration
+        )
+        .withTimeline(timeline)
+        .delay(timeline.startDelay)
+    }
+
+    static func createFallback(
+        timeline: AdaptyViewConfiguration.Animation.Timeline,
+        interpolator: VC.Animation.Interpolator
+    ) -> (Animation, (Double) -> Double) {
+        let animation: Animation = switch interpolator {
+        case .easeInOut: .easeInOut(duration: timeline.duration)
+        case .easeIn: .easeIn(duration: timeline.duration)
+        case .easeOut: .easeOut(duration: timeline.duration)
+        case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2, duration: timeline.duration)
+        default: .linear(duration: timeline.duration)
+            //        case .easeInElastic: .adaptyCustomEaseInElastic(duration: duration)
+            //        case .easeOutElastic: .adaptyCustomEaseOutElastic(duration: duration)
+            //        case .easeInOutElastic: .adaptyCustomEaseInOutElastic(duration: duration)
+            //        case .easeInBounce: .adaptyCustomEaseInBounce(duration: duration)
+            //        case .easeOutBounce: .adaptyCustomEaseOutBounce(duration: duration)
+            //        case .easeInOutBounce: .adaptyCustomEaseInOutBounce(duration: duration)
         }
 
-        return result
-            .withTimeline(timeline)
-            .delay(timeline.startDelay)
+        let functor: (Double) -> Double = switch interpolator {
+        case .easeInElastic: AdaptyUICustomAnimationFunctions.easeInElastic(_:)
+        case .easeOutElastic: AdaptyUICustomAnimationFunctions.easeOutElastic(_:)
+        case .easeInOutElastic: AdaptyUICustomAnimationFunctions.easeInOutElastic(_:)
+        case .easeInBounce: AdaptyUICustomAnimationFunctions.easeInBounce(_:)
+        case .easeOutBounce: AdaptyUICustomAnimationFunctions.easeOutBounce(_:)
+        case .easeInOutBounce: AdaptyUICustomAnimationFunctions.easeInOutBounce(_:)
+        default: { $0 }
+        }
+
+        return (
+            animation
+                .withTimeline(timeline)
+                .delay(timeline.startDelay),
+            functor
+        )
     }
 }
 

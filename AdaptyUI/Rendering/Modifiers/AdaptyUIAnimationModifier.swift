@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *)
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private let animations: [AdaptyViewConfiguration.Animation]
 
@@ -136,15 +136,16 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     self.shadowFilling = $0
                 }
             case let .shadowOffset(timeline, value):
-                // TODO: add support for Y offset
-                animatedShadowOffsetX = value.start.points(.horizontal, screenSize, safeArea)
+                animatedShadowOffsetX = value.start.x.points(.horizontal, screenSize, safeArea)
+                animatedShadowOffsetY = value.start.y.points(.vertical, screenSize, safeArea)
                 startValueAnimation(
                     timeline,
                     interpolator: value.interpolator,
                     from: value.start,
                     to: value.end
                 ) {
-                    self.animatedShadowOffsetX = $0.points(.horizontal, screenSize, safeArea)
+                    self.animatedShadowOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
+                    self.animatedShadowOffsetY = $0.y.points(.vertical, screenSize, safeArea)
                 }
             case let .shadowBlurRadius(timeline, value):
                 shadowBlurRadius = value.start
@@ -182,7 +183,11 @@ extension View {
     @ViewBuilder
     func animatableProperties(_ properties: VC.Element.Properties?) -> some View {
         if let properties {
-            modifier(AdaptyUIAnimatablePropertiesModifier(properties))
+            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
+                modifier(AdaptyUIAnimatablePropertiesModifier(properties))
+            } else {
+                modifier(AdaptyUIAnimatablePropertiesFallbackModifier(properties))
+            }
         } else {
             self
         }

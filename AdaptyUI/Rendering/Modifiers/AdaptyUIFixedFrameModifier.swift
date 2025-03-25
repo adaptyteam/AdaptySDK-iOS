@@ -122,8 +122,12 @@ struct AdaptyUIFixedFrameModifier: ViewModifier {
     ) {
         updateBlock(start)
 
-        withAnimation(.create(timeline: timeline, interpolator: interpolator)) {
-            updateBlock(end)
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
+            withAnimation(.create(timeline: timeline, interpolator: interpolator)) {
+                updateBlock(end)
+            }
+        } else {
+            // TODO: Fallback on earlier versions
         }
     }
 }
