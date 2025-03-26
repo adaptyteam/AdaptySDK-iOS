@@ -1,5 +1,5 @@
 //
-//  AdaptyUIAnimationModifier.swift
+//  AdaptyUIAnimatablePropertiesModifier.swift
 //
 //
 //  Created by Aleksey Goncharov on 17.06.2024.

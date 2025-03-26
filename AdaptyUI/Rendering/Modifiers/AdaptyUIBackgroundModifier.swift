@@ -21,7 +21,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         switch self.background {
-        case .image(let imageData):
+        case let .image(imageData):
             content
                 .background {
                     AdaptyUIImageView(
@@ -31,17 +31,19 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
                     )
                     .ignoresSafeArea()
                 }
-        default:
+        case let .filling(filling):
             content
                 .background {
                     Rectangle()
                         .fill(
-                            background: self.background,
+                            filling,
                             colorScheme: self.colorScheme,
                             assetsResolver: self.assetsViewModel.assetsResolver
                         )
                         .ignoresSafeArea()
                 }
+        case .none:
+            content
         }
     }
 }
@@ -49,7 +51,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func decorate(with background: VC.Background?) -> some View {
+    func staticBackground(_ background: VC.Background?) -> some View {
         if let background {
             modifier(AdaptyUIBackgroundModifier(background: background))
         } else {

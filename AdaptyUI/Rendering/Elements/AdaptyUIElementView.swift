@@ -125,8 +125,11 @@ package struct AdaptyUIElementView: View {
     package var body: some View {
         AdaptyUIElementWithoutPropertiesView(element)
             .paddingIfNeeded(additionalPadding)
-            .decorate(with: element.properties?.decorator,
-                      includeBackground: drawDecoratorBackground)
+            .animatableDecorator(
+                element.properties?.decorator,
+                animations: element.properties?.onAppear,
+                includeBackground: drawDecoratorBackground
+            )
             .animatableProperties(element.properties)
             .padding(element.properties?.padding)
             .modifier(DebugOverlayModifier())

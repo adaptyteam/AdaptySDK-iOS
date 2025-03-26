@@ -38,69 +38,60 @@ extension AdaptyViewConfiguration.ColorGradient {
 extension InsettableShape {
     @ViewBuilder
     func fill(
-        background: VC.Background?,
+        _ filling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>,
         colorScheme: ColorScheme,
         assetsResolver: AdaptyAssetsResolver
     ) -> some View {
-        if let background {
-            switch background {
-            case .image:
-                self
-            case let .filling(filling):
-                switch filling.of(colorScheme) {
-                case let .solidColor(color):
-                    self.fill(color.swiftuiColor(assetsResolver))
-                case let .colorGradient(gradient):
-                    if let customId = gradient.customId,
-                       let customGradient = assetsResolver.gradient(for: customId)
-                    {
-                        switch customGradient {
-                        case let .linear(gradient, startPoint, endPoint):
-                            self.fill(
-                                LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint)
-                            )
-                        case let .angular(gradient, center, angle):
-                            self.fill(
-                                AngularGradient(gradient: gradient, center: center, angle: angle)
-                            )
-                        case let .radial(gradient, center, startRadius, endRadius):
-                            self.fill(
-                                RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius)
-                            )
-                        }
-                    } else {
-                        switch gradient.kind {
-                        case .linear:
-                            self.fill(
-                                LinearGradient(
-                                    gradient: .init(stops: gradient.stops(assetsResolver)),
-                                    startPoint: gradient.start.unitPoint,
-                                    endPoint: gradient.end.unitPoint
-                                )
-                            )
-                        case .conic:
-                            self.fill(
-                                AngularGradient(
-                                    gradient: .init(stops: gradient.stops(assetsResolver)),
-                                    center: .center,
-                                    angle: .degrees(360)
-                                )
-                            )
-                        case .radial:
-                            self.fill(
-                                RadialGradient(
-                                    gradient: .init(stops: gradient.stops(assetsResolver)),
-                                    center: .center,
-                                    startRadius: 0.0,
-                                    endRadius: 1.0
-                                )
-                            )
-                        }
-                    }
+        switch filling.of(colorScheme) {
+        case let .solidColor(color):
+            self.fill(color.swiftuiColor(assetsResolver))
+        case let .colorGradient(gradient):
+            if let customId = gradient.customId,
+               let customGradient = assetsResolver.gradient(for: customId)
+            {
+                switch customGradient {
+                case let .linear(gradient, startPoint, endPoint):
+                    self.fill(
+                        LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint)
+                    )
+                case let .angular(gradient, center, angle):
+                    self.fill(
+                        AngularGradient(gradient: gradient, center: center, angle: angle)
+                    )
+                case let .radial(gradient, center, startRadius, endRadius):
+                    self.fill(
+                        RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius)
+                    )
+                }
+            } else {
+                switch gradient.kind {
+                case .linear:
+                    self.fill(
+                        LinearGradient(
+                            gradient: .init(stops: gradient.stops(assetsResolver)),
+                            startPoint: gradient.start.unitPoint,
+                            endPoint: gradient.end.unitPoint
+                        )
+                    )
+                case .conic:
+                    self.fill(
+                        AngularGradient(
+                            gradient: .init(stops: gradient.stops(assetsResolver)),
+                            center: .center,
+                            angle: .degrees(360)
+                        )
+                    )
+                case .radial:
+                    self.fill(
+                        RadialGradient(
+                            gradient: .init(stops: gradient.stops(assetsResolver)),
+                            center: .center,
+                            startRadius: 0.0,
+                            endRadius: 1.0
+                        )
+                    )
                 }
             }
-        } else {
-            self
         }
     }
 
@@ -197,7 +188,7 @@ extension View {
 extension VC.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(
-        _ background: VC.Background?,
+        _ filling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>,
         colorScheme: ColorScheme,
         assetsResolver: AdaptyAssetsResolver
     ) -> some View {
@@ -206,14 +197,14 @@ extension VC.ShapeType {
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
                     .fill(
-                        background: background,
+                        filling,
                         colorScheme: colorScheme,
                         assetsResolver: assetsResolver
                     )
             } else {
                 UnevenRoundedRectangleFallback(cornerRadii: radii)
                     .fill(
-                        background: background,
+                        filling,
                         colorScheme: colorScheme,
                         assetsResolver: assetsResolver
                     )
@@ -221,21 +212,21 @@ extension VC.ShapeType {
         case .circle:
             Circle()
                 .fill(
-                    background: background,
+                    filling,
                     colorScheme: colorScheme,
                     assetsResolver: assetsResolver
                 )
         case .curveUp:
             CurveUpShape()
                 .fill(
-                    background: background,
+                    filling,
                     colorScheme: colorScheme,
                     assetsResolver: assetsResolver
                 )
         case .curveDown:
             CurveDownShape()
                 .fill(
-                    background: background,
+                    filling,
                     colorScheme: colorScheme,
                     assetsResolver: assetsResolver
                 )
@@ -293,41 +284,80 @@ extension VC.ShapeType {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-struct AdaptyUIDecoratorModifier: ViewModifier {
-    var decorator: VC.Decorator
-    var includeBackground: Bool
+struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
+    private let decorator: VC.Decorator
+    private let includeBackground: Bool
+    private let animations: [AdaptyViewConfiguration.Animation]?
+
+    init(
+        decorator: VC.Decorator,
+        animations: [AdaptyViewConfiguration.Animation]?,
+        includeBackground: Bool
+    ) {
+        self.decorator = decorator
+        self.animations = animations
+        self.includeBackground = includeBackground
+    }
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
+    func body(content: Content) -> some View {
+        self.bodyWithBackground(
+            content: content
+        )
+        .overlay {
+            if let border = decorator.border {
+                self.decorator.shapeType
+                    .swiftUIShapeStroke(
+                        (self.animatedBorderFilling ?? border.filling).of(self.colorScheme),
+                        lineWidth: self.animatedBorderThickness ?? border.thickness,
+                        assetsResolver: self.assetsViewModel.assetsResolver
+                    )
+            }
+        }
+        .clipShape(self.decorator.shapeType)
+        .onAppear {
+            self.startAnimations()
+        }
+    }
+
     @ViewBuilder
-    private func bodyWithBackground(content: Content, background: VC.Background?) -> some View {
-        if let background {
+    private func bodyWithBackground(content: Content) -> some View {
+        if !self.includeBackground {
+            content
+        } else if let animatedBackgroundFilling {
+            content
+                .background {
+                    self.decorator.shapeType
+                        .swiftUIShapeFill(
+                            animatedBackgroundFilling,
+                            colorScheme: self.colorScheme,
+                            assetsResolver: self.assetsViewModel.assetsResolver
+                        )
+                }
+        } else if let background = self.decorator.background {
             switch background {
             case let .image(imageData):
                 content
                     .background {
-                        if self.includeBackground {
-                            AdaptyUIImageView(
-                                asset: imageData.of(self.colorScheme),
-                                aspect: .fill,
-                                tint: nil
-                            )
-                        }
+                        AdaptyUIImageView(
+                            asset: imageData.of(self.colorScheme),
+                            aspect: .fill,
+                            tint: nil
+                        )
                     }
-            default:
+            case let .filling(fillingValue):
                 content
                     .background {
-                        if self.includeBackground {
-                            self.decorator.shapeType
-                                .swiftUIShapeFill(
-                                    self.decorator.background,
-                                    colorScheme: self.colorScheme,
-                                    assetsResolver: self.assetsViewModel.assetsResolver
-                                )
-                        }
+                        self.decorator.shapeType
+                            .swiftUIShapeFill(
+                                fillingValue,
+                                colorScheme: self.colorScheme,
+                                assetsResolver: self.assetsViewModel.assetsResolver
+                            )
                     }
             }
         } else {
@@ -335,36 +365,78 @@ struct AdaptyUIDecoratorModifier: ViewModifier {
         }
     }
 
-    func body(content: Content) -> some View {
-        self.bodyWithBackground(
-            content: content,
-            background: self.decorator.background
-        )
-        .overlay {
-            if let border = decorator.border {
-                self.decorator.shapeType
-                    .swiftUIShapeStroke(
-                        border.filling.of(self.colorScheme),
-                        lineWidth: border.thickness,
-                        assetsResolver: self.assetsViewModel.assetsResolver
-                    )
+    @State private var animatedBackgroundFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    @State private var animatedBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    @State private var animatedBorderThickness: Double?
+
+    private func startAnimations() {
+        guard let animations, !animations.isEmpty else { return }
+
+        for animation in animations {
+            switch animation {
+            case let .background(timeline, value):
+                self.animatedBackgroundFilling = value.start
+                self.startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) { self.animatedBackgroundFilling = $0 }
+            case let .border(timeline, value):
+                self.animatedBorderFilling = value.start
+                self.startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) { self.animatedBorderFilling = $0 }
+            case let .borderThickness(timeline, value):
+                self.animatedBorderThickness = value.start
+                self.startValueAnimation(
+                    timeline,
+                    interpolator: value.interpolator,
+                    from: value.start,
+                    to: value.end
+                ) { self.animatedBorderThickness = $0 }
+            default:
+                break
             }
         }
-        .clipShape(self.decorator.shapeType)
+    }
+
+    private func startValueAnimation<Value>(
+        _ timeline: AdaptyViewConfiguration.Animation.Timeline,
+        interpolator: AdaptyViewConfiguration.Animation.Interpolator,
+        from start: Value,
+        to end: Value,
+        updateBlock: (Value) -> Void
+    ) {
+        updateBlock(start)
+
+        let (animation, _) = Animation.customIgnoringElasticAndBounce(
+            timeline: timeline,
+            interpolator: interpolator
+        )
+
+        withAnimation(animation) {
+            updateBlock(end)
+        }
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func decorate(
-        with decorator: VC.Decorator?,
+    func animatableDecorator(
+        _ decorator: VC.Decorator?,
+        animations: [AdaptyViewConfiguration.Animation]?,
         includeBackground: Bool
     ) -> some View {
         if let decorator {
             modifier(
-                AdaptyUIDecoratorModifier(
+                AdaptyUIAnimatableDecoratorModifier(
                     decorator: decorator,
+                    animations: animations,
                     includeBackground: includeBackground
                 )
             )
