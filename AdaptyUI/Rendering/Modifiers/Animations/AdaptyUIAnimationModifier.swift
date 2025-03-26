@@ -107,6 +107,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     self.animatedOffsetY = $0.y.points(.vertical, screenSize, safeArea)
                 }
             case let .rotation(timeline, value):
+                rotation = .degrees(value.start)
                 rotationAnchor = value.anchor.unitPoint
                 startValueAnimation(
                     timeline,
@@ -115,6 +116,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     to: value.end
                 ) { self.rotation = .degrees($0) }
             case let .scale(timeline, value):
+                scaleX = value.start.x
+                scaleY = value.start.y
                 scaleAnchor = value.anchor.unitPoint
                 startValueAnimation(
                     timeline,
@@ -172,7 +175,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     ) {
         updateBlock(start)
 
-        withAnimation(.create(timeline: timeline, interpolator: interpolator)) {
+        withAnimation(.custom(timeline: timeline, interpolator: interpolator)) {
             updateBlock(end)
         }
     }
@@ -183,11 +186,11 @@ extension View {
     @ViewBuilder
     func animatableProperties(_ properties: VC.Element.Properties?) -> some View {
         if let properties {
-            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
-                modifier(AdaptyUIAnimatablePropertiesModifier(properties))
-            } else {
-                modifier(AdaptyUIAnimatablePropertiesFallbackModifier(properties))
-            }
+//            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
+//                modifier(AdaptyUIAnimatablePropertiesModifier(properties))
+//            } else {
+                modifier(AdaptyUIAnimatablePropertiesModifier_Fallback(properties))
+//            }
         } else {
             self
         }
