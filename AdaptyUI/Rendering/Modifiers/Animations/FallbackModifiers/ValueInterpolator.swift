@@ -1,5 +1,5 @@
 //
-//  AdaptyUIAnimationIterpolator.swift
+//  ValueInterpolator.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 3/26/25.
@@ -11,7 +11,7 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUIValueIterpolator<T>: AnimatableModifier where T: View {
+struct AdaptyUIValueInterpolator<T>: AnimatableModifier where T: View {
     private var progress: Double
     private let functor: (Double) -> Double
     @ViewBuilder private let contentBuilder: (AnyView, Double) -> T
@@ -45,7 +45,7 @@ extension View {
         contentBuilder: @escaping (AnyView, Double) -> T
     ) -> some View {
         modifier(
-            AdaptyUIValueIterpolator<T>(
+            AdaptyUIValueInterpolator<T>(
                 progress: progress,
                 functor: functor,
                 contentBuilder: contentBuilder

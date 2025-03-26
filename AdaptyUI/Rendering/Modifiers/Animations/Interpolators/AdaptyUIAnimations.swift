@@ -30,12 +30,28 @@ extension AdaptyViewConfiguration.Animation.Interpolator {
     }
 
     func animationIgnoringElasticAndBounce(duration: TimeInterval) -> Animation {
-        switch self {
-        case .easeInOut: .easeInOut(duration: duration)
-        case .easeIn: .easeIn(duration: duration)
-        case .easeOut: .easeOut(duration: duration)
-        case .cubicBezier(let x1, let y1, let x2, let y2): .timingCurve(x1, y1, x2, y2, duration: duration)
-        default: .linear(duration: duration)
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
+            switch self {
+            case .easeInOut: .easeInOut(duration: duration)
+            case .easeIn: .easeIn(duration: duration)
+            case .easeOut: .easeOut(duration: duration)
+            case .linear: .linear(duration: duration)
+            case .cubicBezier(let x1, let y1, let x2, let y2): .timingCurve(x1, y1, x2, y2, duration: duration)
+            case .easeInElastic: .adaptyCustomEaseInElastic(duration: duration)
+            case .easeOutElastic: .adaptyCustomEaseOutElastic(duration: duration)
+            case .easeInOutElastic: .adaptyCustomEaseInOutElastic(duration: duration)
+            case .easeInBounce: .adaptyCustomEaseInBounce(duration: duration)
+            case .easeOutBounce: .adaptyCustomEaseOutBounce(duration: duration)
+            case .easeInOutBounce: .adaptyCustomEaseInOutBounce(duration: duration)
+            }
+        } else {
+            switch self {
+            case .easeInOut: .easeInOut(duration: duration)
+            case .easeIn: .easeIn(duration: duration)
+            case .easeOut: .easeOut(duration: duration)
+            case .cubicBezier(let x1, let y1, let x2, let y2): .timingCurve(x1, y1, x2, y2, duration: duration)
+            default: .linear(duration: duration)
+            }
         }
     }
 
@@ -88,7 +104,7 @@ extension Animation {
             .delay(timeline.startDelay)
     }
 
-    static func customFallback(
+    static func customIgnoringElasticAndBounce(
         timeline: AdaptyViewConfiguration.Animation.Timeline,
         interpolator: AdaptyViewConfiguration.Animation.Interpolator
     ) -> (Animation, (Double) -> Double) {
@@ -101,12 +117,12 @@ extension Animation {
         )
     }
 
-    static func customFallback(
+    static func customIgnoringElasticAndBounce(
         animation: AdaptyViewConfiguration.Animation
     ) -> (Animation, (Double) -> Double) {
         let (timeline, interpolator) = animation.getAnimationProperties()
 
-        return Animation.customFallback(
+        return Animation.customIgnoringElasticAndBounce(
             timeline: timeline,
             interpolator: interpolator
         )

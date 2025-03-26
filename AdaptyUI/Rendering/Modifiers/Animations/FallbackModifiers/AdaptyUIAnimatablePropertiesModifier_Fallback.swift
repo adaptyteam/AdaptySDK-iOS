@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  AdaptyUIAnimatablePropertiesModifier_Fallback.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 3/24/25.
@@ -118,7 +118,7 @@ struct AdaptyUIAnimatablePropertiesModifier_Fallback: ViewModifier {
     ) {
         updateBlock(start)
 
-        let (animation, _) = Animation.customFallback(
+        let (animation, _) = Animation.customIgnoringElasticAndBounce(
             timeline: timeline,
             interpolator: interpolator
         )
@@ -137,7 +137,7 @@ struct AdaptyUIAnimatableGeometryFallbackModifier: ViewModifier {
 
     init(animation: AdaptyViewConfiguration.Animation) {
         self.animation = animation
-        (swiftUIanimation, functor) = Animation.customFallback(animation: animation)
+        (swiftUIanimation, functor) = Animation.customIgnoringElasticAndBounce(animation: animation)
     }
 
     @Environment(\.adaptyScreenSize)

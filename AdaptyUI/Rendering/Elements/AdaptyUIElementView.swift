@@ -64,7 +64,7 @@ struct AdaptyUIElementWithoutPropertiesView: View {
             }
         case let .box(box, props):
             elementOrEmpty(box.content)
-                .fixedFrame(box: box, animations: props?.onAppear)
+                .animatableFrame(box: box, animations: props?.onAppear)
                 .rangedFrame(box: box)
         case let .stack(stack, _):
             AdaptyUIStackView(stack)

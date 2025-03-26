@@ -10,8 +10,8 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *)
-struct AdaptyUIFixedFrameModifier: ViewModifier {
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+struct AdaptyUIAnimatableFrameModifier: ViewModifier {
     private let box: VC.Box
     private let animations: [AdaptyViewConfiguration.Animation]?
 
@@ -122,7 +122,12 @@ struct AdaptyUIFixedFrameModifier: ViewModifier {
     ) {
         updateBlock(start)
 
-        withAnimation(.custom(timeline: timeline, interpolator: interpolator)) {
+        let (animation, _) = Animation.customIgnoringElasticAndBounce(
+            timeline: timeline,
+            interpolator: interpolator
+        )
+
+        withAnimation(animation) {
             updateBlock(end)
         }
     }
@@ -131,27 +136,16 @@ struct AdaptyUIFixedFrameModifier: ViewModifier {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func fixedFrame(
+    func animatableFrame(
         box: VC.Box,
         animations: [AdaptyViewConfiguration.Animation]?
     ) -> some View {
-        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
-            modifier(
-                AdaptyUIFixedFrameModifier(
-                    box: box,
-                    animations: animations
-                )
+        modifier(
+            AdaptyUIAnimatableFrameModifier(
+                box: box,
+                animations: animations
             )
-        } else {
-            // TODO: implement fallback modifier
-            self
-//            modifier(
-//                AdaptyUIFixedFrameModifier(
-//                    box: box,
-//                    animations: animations
-//                )
-//            )
-        }
+        )
     }
 }
 
