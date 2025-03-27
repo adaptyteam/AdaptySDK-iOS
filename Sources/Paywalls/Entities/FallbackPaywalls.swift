@@ -51,7 +51,7 @@ struct FallbackPaywalls: Sendable {
             paywall = nil
         }
 
-        Log.crossAB.debug("fallbackFile request: placementId = \(id), variationId = \(withVariationId ?? "nil DRAW") response: variationId = \(paywall == nil ? "nil" : (paywall?.variationId ?? ""))")
+        Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(withVariationId ?? "nil DRAW") response: variationId = \(paywall == nil ? "nil" : (paywall?.variationId ?? ""))")
 
         return paywall.map {
             var v = $0

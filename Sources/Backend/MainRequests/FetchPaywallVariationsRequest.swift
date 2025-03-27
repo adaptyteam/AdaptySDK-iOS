@@ -68,7 +68,7 @@ extension AdaptyPaywallChosen {
               paywallVariationId != draw.paywall.variationId
         else {
             if variationIdResolver == nil {
-                Log.crossAB.debug("AB-test placementId = \(placementId), variationId = \(draw.paywall.variationId) DRAW")
+                Log.crossAB.verbose("AB-test placementId = \(placementId), variationId = \(draw.paywall.variationId) DRAW")
             }
             return response.replaceBody(AdaptyPaywallChosen.draw(draw))
         }
