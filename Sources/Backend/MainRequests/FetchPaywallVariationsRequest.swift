@@ -14,7 +14,16 @@ private struct FetchPaywallVariationsRequest: HTTPRequest {
 
     let queryItems: QueryItems
 
-    init(apiKeyPrefix: String, profileId: String, placementId: String, locale: AdaptyLocale, md5Hash: String, segmentId: String, crossPlacementEligible: Bool, disableServerCache: Bool) {
+    init(
+        apiKeyPrefix: String,
+        profileId: String,
+        placementId: String,
+        locale: AdaptyLocale,
+        md5Hash: String,
+        segmentId: String,
+        crossPlacementEligible: Bool,
+        disableServerCache: Bool
+    ) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
@@ -36,7 +45,7 @@ extension AdaptyPaywallChosen {
     typealias VariationIdResolver = @Sendable (_ placementId: String, AdaptyPaywallVariations.Draw) async throws -> String
 
     @inlinable
-    static func decodeResponse(
+    static func decodePaywallVariationsResponse(
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
         withProfileId profileId: String,
@@ -57,12 +66,10 @@ extension AdaptyPaywallChosen {
             return response.replaceBody(AdaptyPaywallChosen.restore(cached))
         }
 
-        var draw = try jsonDecoder.decode(
+        let draw = try jsonDecoder.decode(
             Backend.Response.ValueOfData<AdaptyPaywallVariations.Draw>.self,
             responseBody: response.body
-        ).value
-
-        draw = draw.replacedPaywallVersion(version)
+        ).value.replacedPaywallVersion(version)
 
         guard let paywallVariationId = try await variationIdResolver?(placementId, draw),
               paywallVariationId != draw.paywall.variationId
@@ -75,16 +82,12 @@ extension AdaptyPaywallChosen {
 
         jsonDecoder.setPaywallVariationId(paywallVariationId)
 
-        guard var paywall = try jsonDecoder.decode(
-            Backend.Response.ValueOfData<AdaptyPaywallVariations.Value>.self,
-            responseBody: response.body
-        ).value.paywall else {
-            throw ResponseDecodingError.notFoundVariationId
-        }
-
-        paywall.version = version
-
-        return response.replaceBody(AdaptyPaywallChosen.draw(paywall, profileId: profileId))
+        return try response.replaceBody(AdaptyPaywallChosen.draw(
+            jsonDecoder.decode(
+                Backend.Response.ValueOfData<AdaptyPaywallVariations.Draw>.self,
+                responseBody: response.body
+            ).value.replacedPaywallVersion(version)
+        ))
     }
 }
 
@@ -130,7 +133,7 @@ extension Backend.MainExecutor {
                 "disable_server_cache": disableServerCache,
             ]
         ) { @Sendable response in
-            try await AdaptyPaywallChosen.decodeResponse(
+            try await AdaptyPaywallChosen.decodePaywallVariationsResponse(
                 response,
                 withConfiguration: configuration,
                 withProfileId: profileId,

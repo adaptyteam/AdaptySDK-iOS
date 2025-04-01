@@ -330,6 +330,7 @@ extension Adapty {
                         placementId: placementId,
                         paywallVariationId: paywallVariationId,
                         locale: locale,
+                        cached: nil,
                         disableServerCache: isTestUser,
                         timeoutInterval: timeoutInterval
                     )

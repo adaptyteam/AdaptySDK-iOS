@@ -30,17 +30,17 @@ extension Adapty {
     }
 
     static func trackEventIfNeed(_ chosen: AdaptyPaywallChosen) {
-        guard case let .draw(paywall, profileId) = chosen else {
+        guard case let .draw(draw) = chosen else {
             return
         }
 
-        Log.crossAB.verbose("-> trackEvent variationId = \(paywall.variationId)")
-
+        Log.crossAB.verbose("-> trackEvent variationId = \(draw.paywall.variationId)")
+        
         trackEvent(.paywallVariationAssigned(.init(
-            paywallVariationId: paywall.variationId,
-            viewConfigurationId: paywall.viewConfiguration?.id,
-            placementAudienceVersionId: paywall.placementAudienceVersionId
-        )), for: profileId)
+            paywallVariationId: draw.paywall.variationId,
+            viewConfigurationId: draw.paywall.viewConfiguration?.id,
+            placementAudienceVersionId: draw.placementAudienceVersionId
+        )), for: draw.profileId)
     }
 
     package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyViewConfiguration) {
