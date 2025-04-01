@@ -445,6 +445,24 @@ $requests:
         properties:
           success: { const: true }
 
+  ### updateCollectingRefundDataConsent ###
+  UpdateCollectingRefundDataConsent.Request: #request
+    type: object
+    required: [method, consent]
+    properties:
+      method: { const: "update_collecting_refund_data_consent" }
+      consent: { type: boolean }
+
+  UpdateCollectingRefundDataConsent.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### updateProfile ###
   UpdateProfile.Request: #request
     type: object
@@ -454,6 +472,24 @@ $requests:
       params: { $ref: "#/$defs/AdaptyProfileParameters" }
 
   UpdateProfile.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### updateRefundPreference ###
+  UpdateRefundPreference.Request: #request
+    type: object
+    required: [method, refund_preference]
+    properties:
+      method: { const: "update_refund_preference" }
+      refund_preference: { $ref: "#/$defs/AdaptyRefundPreference" }
+
+  UpdateRefundPreference.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -1076,3 +1112,10 @@ $defs:
           - without_proration
           - charge_prorated_price
           - with_time_proration
+
+  AdaptyRefundPreference:
+    type: string
+    enum:
+      - no_preference
+      - grant
+      - decline

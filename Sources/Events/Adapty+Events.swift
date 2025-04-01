@@ -109,4 +109,16 @@ public extension Adapty {
             try await _trackEvent(.onboardingScreenShowed(params))
         }
     }
+
+    nonisolated static func updateCollectingRefundDataConsent(_ consent: Bool) async throws {
+        try await withActivatedSDK(methodName: .updateCollectingRefundDataConsent) { _ in
+            try await _trackEvent(.сonsentToCollectingRefundData(.init(consent: consent)))
+        }
+    }
+
+    nonisolated static func updateRefundPreference(_ refundPreference: AdaptyRefundPreference) async throws {
+        try await withActivatedSDK(methodName: .updateRefundPreference) { _ in
+            try await _trackEvent(.refundPreference(.init(refundPreference: refundPreference)))
+        }
+    }
 }
