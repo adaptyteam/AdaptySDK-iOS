@@ -21,6 +21,18 @@ extension UIViewController {
     }
 }
 
+extension UIWindow {
+    fileprivate var topViewController: UIViewController? {
+        var topViewController = rootViewController
+    
+        while let presentedController = topViewController?.presentedViewController {
+            topViewController = presentedController
+        }
+        
+        return topViewController
+    }
+}
+
 #endif
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -87,7 +99,7 @@ package extension AdaptyUI {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
             
-            guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
+            guard let rootVC = UIApplication.shared.windows.first?.topViewController else {
                 throw AdaptyError(AdaptyUI.PluginError.viewPresentationError(viewId))
             }
             
