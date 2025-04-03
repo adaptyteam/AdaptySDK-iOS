@@ -132,7 +132,7 @@ public final class Adapty: Sendable {
         _ profileId: String,
         _ customerUserId: String?
     ) async throws -> ProfileManager {
-        var isFerstLoop = true
+        var isFirstLoop = true
 
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
         var createdProfile: VH<AdaptyProfile>?
@@ -140,8 +140,8 @@ public final class Adapty: Sendable {
             let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
 
             let result = await Task {
-                if isFerstLoop {
-                    isFerstLoop = false
+                if isFirstLoop {
+                    isFirstLoop = false
                 } else {
                     try await Task.sleep(duration: .milliseconds(100))
                 }
