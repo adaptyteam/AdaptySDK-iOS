@@ -40,8 +40,6 @@ extension VC.TransitionSlide {
         case .easeIn: .easeIn(duration: duration)
         case .easeOut: .easeOut(duration: duration)
         case .linear: .linear(duration: duration)
-        case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2, duration: duration)
-        default: .linear(duration: duration)
         }
     }
 }
@@ -81,7 +79,17 @@ struct AdaptyUIPagerView: View {
 
     var pager: VC.Pager
 
-    @State private var currentPage: Int = 0
+    // We had to introduce this additional State variable to workaround weird SwiftUI crash caused animated currentPage change
+    // PageControl now relies on currentPageSelectedIndex variable which is updating outside of withAnimation block
+    @State private var currentPageSelectedIndex: Int = 0
+    @State private var currentPage: Int = 0 {
+        didSet {
+            Task { @MainActor in
+                currentPageSelectedIndex = currentPage
+            }
+        }
+    }
+
     @State private var offset = CGFloat.zero
     @State private var isInteracting = false
     @State private var timer: Timer?
@@ -245,10 +253,10 @@ struct AdaptyUIPagerView: View {
     @ViewBuilder
     private func pageControlView(_ pageControl: VC.Pager.PageControl, onDotTap: @escaping (Int) -> Void) -> some View {
         HStack(spacing: pageControl.spacing) {
-            ForEach(0 ..< pager.content.count, id: \.self) { @MainActor idx in
+            ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()
                     .fill(
-                        idx == currentPage ?
+                        idx == currentPageSelectedIndex ?
                             pageControl.selectedColor.swiftuiColor(assetsViewModel.assetsResolver) :
                             pageControl.color.swiftuiColor(assetsViewModel.assetsResolver)
                     )
