@@ -146,17 +146,18 @@ public final class Adapty: Sendable {
                     try await Task.sleep(duration: .milliseconds(100))
                 }
 
-                let response =
-                    if let createdProfile {
-                        createdProfile
-                    } else {
-                        try await httpSession.createProfile(
-                            profileId: profileId,
-                            customerUserId: customerUserId,
-                            parameters: AdaptyProfileParameters(analyticsDisabled: analyticsDisabled),
-                            environmentMeta: meta
-                        )
-                    }
+                let response: VH<AdaptyProfile>
+                if let createdProfile {
+                    response = createdProfile
+                } else {
+                    response = try await httpSession.createProfile(
+                        profileId: profileId,
+                        customerUserId: customerUserId,
+                        parameters: AdaptyProfileParameters(analyticsDisabled: analyticsDisabled),
+                        environmentMeta: meta
+                    )
+                    createdProfile = response
+                }
 
                 guard profileId != response.value.profileId else {
                     return (response, CrossPlacementState.defaultForNewUser)
