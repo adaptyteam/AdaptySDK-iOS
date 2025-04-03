@@ -83,7 +83,7 @@ final class PaywallsStorage: Sendable {
     }
 
     func savedPaywallChosen(_ chosen: AdaptyPaywallChosen) -> AdaptyPaywallChosen {
-        Log.crossAB.debug("savedPaywallChosen variationId: \(chosen.paywall.variationId), placementId: \(chosen.paywall.placementId), version: \(chosen.paywall.version)")
+        Log.crossAB.verbose("savedPaywallChosen variationId: \(chosen.paywall.variationId), placementId: \(chosen.paywall.placementId), version: \(chosen.paywall.version)")
         
         let paywall = chosen.paywall
         if let newer = getNewerPaywall(than: paywall) { return AdaptyPaywallChosen.restore(newer) }

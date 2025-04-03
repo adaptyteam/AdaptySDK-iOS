@@ -51,7 +51,7 @@ extension View {
             onGeometryChange(
                 for: CGSize.self,
                 of: { $0.frame(in: .global).size },
-                action: { action($1) }
+                action: { _, x in DispatchQueue.main.async { action(x) } }
             )
         } else {
             modifier(AdaptyUIGeometrySizeObserver(action))

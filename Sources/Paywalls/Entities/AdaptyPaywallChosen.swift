@@ -9,19 +9,16 @@ import Foundation
 
 enum AdaptyPaywallChosen: Sendable {
     case restore(AdaptyPaywall)
-    case draw(AdaptyPaywall, profileId: String)
+    case draw(AdaptyPaywallVariations.Draw)
 }
 
 extension AdaptyPaywallChosen {
-    static func draw(_ draw: AdaptyPaywallVariations.Draw) -> Self {
-        .draw(draw.paywall, profileId: draw.profileId)
-    }
-
     var paywall: AdaptyPaywall {
         switch self {
-        case .restore(let paywall),
-             .draw(let paywall, _):
+        case .restore(let paywall):
             paywall
+        case .draw(let draw):
+            draw.paywall
         }
     }
 }

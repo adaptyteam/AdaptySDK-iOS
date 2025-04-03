@@ -30,6 +30,22 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
+    func paywallControllerDidAppear(
+        _ controller: AdaptyPaywallController
+    ) {
+        eventHandler.handle(event: PaywallViewEvent.DidAppear(
+            view: controller.toAdaptyUIView()
+        ))
+    }
+    
+    func paywallControllerDidDisappear(
+        _ controller: AdaptyPaywallController
+    ) {
+        eventHandler.handle(event: PaywallViewEvent.DidDisappear(
+            view: controller.toAdaptyUIView()
+        ))
+    }
+    
     func paywallController(
         _ controller: AdaptyPaywallController,
         didPerform action: AdaptyUI.Action

@@ -73,7 +73,7 @@ private extension BackendExecutor {
                     "disable_server_cache": disableServerCache,
                 ]
             ) { @Sendable response in
-                try await AdaptyPaywallChosen.decodeResponse(
+                try await AdaptyPaywallChosen.decodePaywallVariationsResponse(
                     response,
                     withConfiguration: configuration,
                     withProfileId: profileId,
