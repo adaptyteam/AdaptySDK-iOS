@@ -7,20 +7,11 @@
 
 import Foundation
 
-private struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = AdaptyPaywall
-
+private struct FetchPaywallRequest: HTTPRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
-
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeResponse(response, withConfiguration: configuration)
-    }
 
     init(
         apiKeyPrefix: String,
@@ -46,27 +37,34 @@ private struct FetchPaywallRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyPaywall {
+extension AdaptyPaywallChosen {
     @inlinable
-    static func decodeResponse(
+    static func decodePaywallResponse(
         _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> HTTPResponse<AdaptyPaywall> {
+        withConfiguration configuration: HTTPCodableConfiguration?,
+        withProfileId profileId: String,
+        withPlacemantId placementId: String,
+        withCachedPaywall cached: AdaptyPaywall? 
+    ) async throws -> HTTPResponse<AdaptyPaywallChosen> {
         let jsonDecoder = JSONDecoder()
         configuration?.configure(jsonDecoder: jsonDecoder)
+        jsonDecoder.setProfileId(profileId)
 
         let version: Int64 = try jsonDecoder.decode(
             Backend.Response.ValueOfMeta<AdaptyPaywallVariations.Meta>.self,
             responseBody: response.body
         ).value.version
 
-        var body: ResponseBody = try jsonDecoder.decode(
-            Backend.Response.ValueOfData<AdaptyPaywall>.self,
-            responseBody: response.body
-        ).value
+        if let cached, cached.version > version {
+            return response.replaceBody(AdaptyPaywallChosen.restore(cached))
+        }
 
-        body.version = version
-        return response.replaceBody(body)
+        let draw = try jsonDecoder.decode(
+            Backend.Response.ValueOfData<AdaptyPaywallVariations.Draw>.self,
+            responseBody: response.body
+        ).value.replacedPaywallVersion(version)
+
+        return response.replaceBody(AdaptyPaywallChosen.draw(draw))
     }
 }
 
@@ -92,6 +90,8 @@ extension Backend.MainExecutor {
             disableServerCache: disableServerCache
         )
 
+        let configuration = session.configuration as? HTTPCodableConfiguration
+
         let response = try await perform(
             request,
             requestName: .fetchPaywall,
@@ -105,8 +105,16 @@ extension Backend.MainExecutor {
                 "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]
-        )
+        ) { @Sendable response in
+            try await AdaptyPaywallChosen.decodePaywallResponse(
+                response,
+                withConfiguration: configuration,
+                withProfileId: profileId,
+                withPlacemantId: placementId,
+                withCachedPaywall: cached
+            )
+        }
 
-        return .draw(response.body, profileId: profileId)
+        return response.body
     }
 }

@@ -184,46 +184,46 @@ extension Adapty {
                         crossPlacementEligible: true,
                         variationIdResolver: { @AdaptyActor placementId, draw in
                             guard let manager = self.tryProfileManagerOrNil(with: draw.profileId) else {
-                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), error = PROFILE_WAS_CHANGED")
+                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), error = PROFILE_WAS_CHANGED")
                                 throw ResponseDecodingError.profileWasChanged
                             }
 
                             guard let crossPlacementState = manager.storage.crossPlacementState else {
                                 // We are prohibited from participating in Cross AB Tests
                                 if draw.participatesInCrossPlacementABTest {
-                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
                                     throw ResponseDecodingError.crossPlacementABTestDisabled
                                 } else {
-                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.paywall.variationId) DRAW")
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.paywall.variationId) DRAW")
                                     return draw.paywall.variationId
                                 }
                             }
 
                             if crossPlacementState.canParticipateInABTest {
                                 if draw.participatesInCrossPlacementABTest {
-                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.paywall.variationId), state = \(draw.variationIdByPlacements) DRAW")
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.paywall.variationId), state = \(draw.variationIdByPlacements) DRAW")
                                     manager.storage.setCrossPlacementState(.init(
                                         variationIdByPlacements: draw.variationIdByPlacements,
                                         version: crossPlacementState.version
                                     ))
                                 } else {
-                                    Log.crossAB.debug("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
                                 }
                                 return draw.paywall.variationId
                             } else if let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId) {
                                 // We are participating in cross AB test: A
                                 // And the paywall is from cross AB test: A
-                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE -> variationId = \(variationId)")
+                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE -> variationId = \(variationId)")
                                 return variationId
                             } else if !draw.participatesInCrossPlacementABTest {
                                 // We are participating in cross AB test: A
                                 // But the paywall is not in any cross AB test
-                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
+                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
                                 return draw.paywall.variationId
                             } else {
                                 // We are participating in cross AB test: A
                                 // But the paywall is from cross AB test: B
-                                Log.crossAB.debug("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
+                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
                                 return draw.paywall.variationId
                             }
 
@@ -330,6 +330,7 @@ extension Adapty {
                         placementId: placementId,
                         paywallVariationId: paywallVariationId,
                         locale: locale,
+                        cached: nil,
                         disableServerCache: isTestUser,
                         timeoutInterval: timeoutInterval
                     )

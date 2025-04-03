@@ -35,26 +35,72 @@ extension Adapty {
 private let log = Log.fallbackPaywalls
 
 extension PaywallsStorage {
-    func getPaywallWithFallback(byPlacementId placementId: String, withVariationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPaywallChosen? {
-        let cache = getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: withVariationId).map {
+    private func getPaywall(byPlacementId placementId: String, withVariationId variationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPaywallChosen? {
+        getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: variationId).map {
             AdaptyPaywallChosen.restore($0.value)
         }
+    }
 
-        guard let fallback = Adapty.fallbackPaywalls,
-              fallback.contains(placementId: placementId) ?? true
+    func getPaywallWithFallback(byPlacementId placementId: String, withVariationId variationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPaywallChosen? {
+        let cachedA = variationId == nil ? nil
+            : getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId, locale: locale)
+
+        let cachedB = cachedA != nil ? nil
+            : getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId, locale: locale)
+
+        let cached = cachedA ?? cachedB
+
+        guard let fallbackFile = Adapty.fallbackPaywalls, fallbackFile.contains(placementId: placementId) ?? true
         else {
-            return cache
+            guard let cached else { return nil }
+            Log.crossAB.verbose("return cached paywall (placementId: \(placementId), variationId: \(cached.paywall.variationId), version: \(cached.paywall.version) no-fallback")
+            return cached
         }
 
-        if let cache, cache.paywall.version >= fallback.version {
-            return cache
-        }
+        switch (cachedA, cachedB) {
+        case (.some(let cached), _):
+            if cached.paywall.version < fallbackFile.version,
+               let fallbacked = fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
+            {
+                Log.crossAB.verbose("return from fallback paywall (placementId: \(placementId), variationId: \(fallbacked.paywall.variationId), version: \(fallbacked.paywall.version)) same-variation")
+                return fallbacked
+            } else {
+                Log.crossAB.verbose("return cached paywall (placementId: \(placementId), variationId: \(cached.paywall.variationId), version: \(cached.paywall.version) same-variation")
+                return cached
+            }
 
-        guard let chosen = fallback.getPaywall(byPlacementId: placementId, withVariationId: withVariationId, profileId: profileId)
-        else {
-            return cache
+        case (_, .some(let cached)):
+
+            let fallbackedA = variationId == nil ? nil :
+                fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
+
+            let fallbackedB = (fallbackedA != nil || cached.paywall.version >= fallbackFile.version) ? nil
+                : fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
+
+            if let fallbacked = fallbackedA ?? fallbackedB {
+                Log.crossAB.verbose("return from fallback paywall (placementId: \(placementId), variationId: \(fallbacked.paywall.variationId), version: \(fallbacked.paywall.version))")
+
+                return fallbacked
+            } else {
+                Log.crossAB.verbose("return cached paywall (placementId: \(placementId), variationId: \(cached.paywall.variationId), version: \(cached.paywall.version)")
+                return cached
+            }
+
+        default:
+
+            let fallbacked =
+                if let variationId {
+                    fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
+                        ?? fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
+                } else {
+                    fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
+                }
+
+            guard let fallbacked else { return nil }
+
+            Log.crossAB.verbose("return from fallback paywall (placementId: \(placementId), variationId: \(fallbacked.paywall.variationId), version: \(fallbacked.paywall.version)) no-cache")
+
+            return fallbacked
         }
-        log.verbose("return from fallback paywall (placementId: \(placementId))")
-        return chosen
     }
 }

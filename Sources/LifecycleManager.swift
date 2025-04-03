@@ -89,6 +89,36 @@ final class LifecycleManager {
         }
     }
 
+    private var crossABIsSyncing = false
+
+    private func syncCrossABState() async throws {
+        guard !crossABIsSyncing else { return }
+
+        defer { crossABIsSyncing = false }
+        crossABIsSyncing = true
+        
+        log.verbose("LifecycleManager: syncCrossPlacementState START")
+
+        for attempt in 0 ..< 3 {
+            if attempt > 0 {
+                try await Task.sleep(nanoseconds: 1_000_000)
+            }
+
+            guard let profileManager = Adapty.optionalSDK?.profileManager else {
+                log.verbose("LifecycleManager: syncCrossPlacementState (\(attempt)) SKIP")
+                return
+            }
+
+            do {
+                try await profileManager.syncCrossPlacementState()
+                log.verbose("LifecycleManager: syncCrossPlacementState (\(attempt)) SUCCESS")
+                break
+            } catch {
+                log.verbose("LifecycleManager: syncCrossPlacementState (\(attempt)) ERROR: \(error)")
+            }
+        }
+    }
+
     // MARK: - App Open Event Logic
 
     private func subscribeForLifecycleEvents() {
@@ -124,6 +154,7 @@ final class LifecycleManager {
             Adapty.trackEvent(.appOpened)
             log.verbose("handleDidBecomeActiveNotification track")
 
+            try? await syncCrossABState()
             try? await syncProfile()
         }
     }

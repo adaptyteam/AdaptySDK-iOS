@@ -47,12 +47,13 @@ struct AdaptyUITextView: View {
                     assetsResolver: assetsViewModel.assetsResolver,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
-                    colorScheme: colorScheme
+                    colorScheme: colorScheme,
+                    placeholder: true
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.01 : 1.0)
-                .redactedAsPlaceholder(true)
+                .redacted(reason: .placeholder)
         case let .found(productInfoModel):
             richText
                 .convertToSwiftUIText(
@@ -146,31 +147,44 @@ extension VC.RichText {
         assetsResolver: AdaptyAssetsResolver,
         tagResolver: AdaptyTagResolver,
         productInfo: ProductInfoModel?,
-        colorScheme: ColorScheme
+        colorScheme: ColorScheme,
+        placeholder: Bool = false
     ) -> Text {
-        let result: Text
-
-        do {
-            result = try items.convertToSwiftUITextThrowingError(
-                assetsResolver: assetsResolver,
-                tagResolver: tagResolver,
-                productInfo: productInfo,
-                colorScheme: colorScheme
-            )
-        } catch {
-            if let fallback, let fallbackText = try? fallback.convertToSwiftUITextThrowingError(
-                assetsResolver: assetsResolver,
-                tagResolver: tagResolver,
-                productInfo: productInfo,
-                colorScheme: colorScheme
-            ) {
-                result = fallbackText
-            } else {
-                result = Text("")
+        if placeholder {
+            let reducedString = items.reduce("") { partialResult, item in
+                switch item {
+                case let .text(value, _), let .tag(value, _):
+                    return partialResult + value
+                default:
+                    return partialResult
+                }
             }
-        }
+            return Text(reducedString)
+        } else {
+            let result: Text
 
-        return result
+            do {
+                result = try items.convertToSwiftUITextThrowingError(
+                    assetsResolver: assetsResolver,
+                    tagResolver: tagResolver,
+                    productInfo: productInfo,
+                    colorScheme: colorScheme
+                )
+            } catch {
+                if let fallback, let fallbackText = try? fallback.convertToSwiftUITextThrowingError(
+                    assetsResolver: assetsResolver,
+                    tagResolver: tagResolver,
+                    productInfo: productInfo,
+                    colorScheme: colorScheme
+                ) {
+                    result = fallbackText
+                } else {
+                    result = Text("")
+                }
+            }
+
+            return result
+        }
     }
 }
 

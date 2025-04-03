@@ -7,21 +7,11 @@
 
 import Foundation
 
-private struct FetchFallbackPaywallRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = AdaptyPaywall
-
+private struct FetchFallbackPaywallRequest: HTTPRequest {
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
     let stamp = Log.stamp
-
     let timeoutInterval: TimeInterval?
-
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeResponse(response, withConfiguration: configuration)
-    }
 
     init(
         apiKeyPrefix: String,
@@ -53,6 +43,7 @@ extension Backend.FallbackExecutor {
         placementId: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
+        cached: AdaptyPaywall?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws -> AdaptyPaywallChosen {
@@ -68,6 +59,8 @@ extension Backend.FallbackExecutor {
         let startRequestTime = Date()
 
         do {
+            let configuration = session.configuration as? HTTPCodableConfiguration
+
             let response = try await perform(
                 request,
                 requestName: .fetchFallbackPaywall,
@@ -80,9 +73,17 @@ extension Backend.FallbackExecutor {
                     "language_code": locale.languageCode,
                     "disable_server_cache": disableServerCache,
                 ]
-            )
+            ) { @Sendable response in
+                try await AdaptyPaywallChosen.decodePaywallResponse(
+                    response,
+                    withConfiguration: configuration,
+                    withProfileId: profileId,
+                    withPlacemantId: placementId,
+                    withCachedPaywall: cached
+                )
+            }
 
-            return .draw(response.body, profileId: profileId)
+            return response.body
         } catch {
             guard (error as? HTTPError)?.statusCode == 404,
                   !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale)
@@ -96,6 +97,7 @@ extension Backend.FallbackExecutor {
                 placementId: placementId,
                 paywallVariationId: paywallVariationId,
                 locale: .defaultPaywallLocale,
+                cached: cached,
                 disableServerCache: disableServerCache,
                 timeoutInterval: timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
             )

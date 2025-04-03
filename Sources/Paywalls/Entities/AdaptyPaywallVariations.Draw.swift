@@ -10,7 +10,8 @@ import Foundation
 extension AdaptyPaywallVariations {
     struct Draw: Sendable {
         let profileId: String
-        let paywall: AdaptyPaywall
+        var paywall: AdaptyPaywall
+        let placementAudienceVersionId: String
         let variationIdByPlacements: [String: String]
     }
 }
@@ -18,46 +19,68 @@ extension AdaptyPaywallVariations {
 extension AdaptyPaywallVariations.Draw {
     var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
 
+    private func replacedPaywall(_ paywall: AdaptyPaywall) -> Self {
+        var draw = self
+        draw.paywall = paywall
+        return draw
+    }
+
     func replacedPaywallVersion(_ version: Int64) -> Self {
         var paywall = paywall
         paywall.version = version
-        return .init(
-            profileId: profileId,
-            paywall: paywall,
-            variationIdByPlacements: variationIdByPlacements
-        )
+        return replacedPaywall(paywall)
     }
 }
 
 extension AdaptyPaywallVariations.Draw: Decodable {
     init(from decoder: Decoder) throws {
+        let profileId = try decoder.userInfo.profileId
+
+        if let singleItem = try? Variation(from: decoder) {
+            if let variationId = decoder.userInfo.paywallVariationIdOrNil, singleItem.variationId != variationId {
+                throw ResponseDecodingError.notFoundVariationId
+            }
+
+            try self.init(
+                profileId: profileId,
+                paywall: AdaptyPaywall(from: decoder),
+                placementAudienceVersionId: singleItem.placementAudienceVersionId,
+                variationIdByPlacements: singleItem.variationIdByPlacements
+            )
+            return
+        }
+
         let items = try [Variation](from: decoder)
         guard let firstItem = items.first else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Paywalls collection is empty"))
         }
 
-        let profileId = try decoder.userInfo.profileId
-        let paywall: AdaptyPaywall
-        let variationIdByPlacements: [String: String]
-
-        if items.count == 1 {
-            paywall = try AdaptyPaywallVariations.paywall(from: decoder, index: 0)
-            variationIdByPlacements = firstItem.variationIdByPlacements
+        let index: Int
+        if let variationId = decoder.userInfo.paywallVariationIdOrNil {
+            guard let foundedIndex = items.firstIndex(where: { $0.variationId == variationId }) else {
+                throw ResponseDecodingError.notFoundVariationId
+            }
+            index = foundedIndex
+        } else if items.count == 1 {
+            index = 0
         } else {
-            let index = Self.draw(
+            index = Self.draw(
                 items: items,
                 placementAudienceVersionId: firstItem.placementAudienceVersionId,
                 profileId: profileId
             )
-
-            paywall = try AdaptyPaywallVariations.paywall(from: decoder, index: index)
-            variationIdByPlacements = items[index].variationIdByPlacements
         }
 
-        self.init(
+        guard items.indices.contains(index) else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Paywall with index \(index) not found"))
+        }
+
+        let item = items[index]
+        try self.init(
             profileId: profileId,
-            paywall: paywall,
-            variationIdByPlacements: variationIdByPlacements
+            paywall: AdaptyPaywallVariations.paywall(from: decoder, index: index),
+            placementAudienceVersionId: item.placementAudienceVersionId,
+            variationIdByPlacements: item.variationIdByPlacements
         )
     }
 

@@ -19,8 +19,6 @@ public struct AdaptyPaywall: Sendable {
     /// Parent A/B test name.
     public let abTestName: String
 
-    let placementAudienceVersionId: String
-
     public let audienceName: String
 
     /// An identifier of a variation, used to attribute purchases to this paywall.
@@ -67,7 +65,6 @@ extension AdaptyPaywall: Codable {
         case version = "response_created_at"
         case viewConfiguration = "paywall_builder"
         case attributes
-        case placementAudienceVersionId = "placement_audience_version_id"
         case audienceName = "audience_name"
     }
 
@@ -88,7 +85,6 @@ extension AdaptyPaywall: Codable {
         audienceName = try container.decode(String.self, forKey: .audienceName)
         remoteConfig = try container.decodeIfPresent(RemoteConfig.self, forKey: .remoteConfig)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
-        placementAudienceVersionId = try container.decode(String.self, forKey: .placementAudienceVersionId)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -104,7 +100,6 @@ extension AdaptyPaywall: Codable {
         try container.encode(audienceName, forKey: .audienceName)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
         try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
-        try container.encode(placementAudienceVersionId, forKey: .placementAudienceVersionId)
     }
 }
 

@@ -106,7 +106,7 @@ final class ProfileStorage: Sendable {
             try Self.userDefaults.setJSON(value, forKey: Constants.crossPlacementStateKey)
             Self.crossPlacementState = value
             log.debug("saving crossPlacementState success.")
-            Log.crossAB.debug("saving crossPlacementState success = \(value)")
+            Log.crossAB.verbose("saving crossPlacementState success = \(value)")
         } catch {
             log.error("saving crossPlacementState fail. \(error.localizedDescription)")
         }

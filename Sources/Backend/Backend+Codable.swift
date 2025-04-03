@@ -86,15 +86,11 @@ extension [CodingUserInfoKey: Any] {
         }
     }
 
-    var paywallVariationId: String {
-        get throws {
-            if let value = self[.paywallVariationId] as? String {
-                return value
-            }
-
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.paywallVariationId) parameter"))
-        }
+    var paywallVariationIdOrNil: String? {
+        self[.paywallVariationId] as? String
     }
+
+
 }
 
 extension Backend {
