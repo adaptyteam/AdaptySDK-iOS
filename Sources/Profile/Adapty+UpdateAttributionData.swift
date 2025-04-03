@@ -13,7 +13,7 @@ public extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
     ///
     /// - Parameter attribution: a dictionary containing attribution (conversion) data.
-    /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
+    /// - Parameter source: a source of attribution.
     nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
         source: String

@@ -120,7 +120,7 @@ public extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
     ///
     /// - Parameter attribution: a dictionary containing attribution (conversion) data.
-    /// - Parameter source: a source of attribution. The allowed values are: `.appsflyer`, `.adjust`, `.branch`, `.custom`.
+    /// - Parameter source: a source of attribution.
     /// - Parameter completion: A result containing an optional error.
     nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
@@ -457,6 +457,24 @@ public extension Adapty {
     ) {
         withCompletion(completion) {
             try await logShowOnboarding(params)
+        }
+    }
+    
+    nonisolated static func updateCollectingRefundDataConsent(
+        _ consent: Bool,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await updateCollectingRefundDataConsent(consent)
+        }
+    }
+    
+    nonisolated static func updateRefundPreference(
+        _ refundPreference: AdaptyRefundPreference,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) {
+            try await updateRefundPreference(refundPreference)
         }
     }
 }
