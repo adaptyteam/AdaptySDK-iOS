@@ -8,6 +8,7 @@
 import Foundation
 
 struct CrossPlacementState: Sendable, Hashable {
+    static let defaultForNewUser = CrossPlacementState(variationIdByPlacements: [:], version: 0)
     let variationIdByPlacements: [String: String]
     let version: Int64
 }

@@ -90,13 +90,6 @@ extension ProfileManager {
         profile = newProfile
         storage.setProfile(newProfile)
 
-        if let state = newProfile.value.crossPlacementState,
-           storage.crossPlacementState?.version ?? 0 < state.version
-        {
-            Log.crossAB.verbose("updateProfile version = \(state.version), newValue = \(state.variationIdByPlacements), oldValue = \(storage.crossPlacementState?.variationIdByPlacements.description ?? "DISABLED")")
-            storage.setCrossPlacementState(state)
-        }
-
         Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
     }
 }

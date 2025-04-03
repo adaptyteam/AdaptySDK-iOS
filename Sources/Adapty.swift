@@ -74,7 +74,7 @@ public final class Adapty: Sendable {
                     productsManager: productsManager,
                     storage: variationIdStorage
                 )
-                
+
                 self.sk1QueueManager = SK1QueueManager.startObserving(
                     purchaseValidator: self,
                     productsManager: productsManager,
@@ -135,6 +135,7 @@ public final class Adapty: Sendable {
         var isFerstLoop = true
 
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
+        var createdProfile: VH<AdaptyProfile>?
         while true {
             let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
 
@@ -144,12 +145,27 @@ public final class Adapty: Sendable {
                 } else {
                     try await Task.sleep(duration: .milliseconds(100))
                 }
-                return try await httpSession.createProfile(
-                    profileId: profileId,
-                    customerUserId: customerUserId,
-                    parameters: AdaptyProfileParameters(analyticsDisabled: analyticsDisabled),
-                    environmentMeta: meta
-                )
+
+                let response =
+                    if let createdProfile {
+                        createdProfile
+                    } else {
+                        try await httpSession.createProfile(
+                            profileId: profileId,
+                            customerUserId: customerUserId,
+                            parameters: AdaptyProfileParameters(analyticsDisabled: analyticsDisabled),
+                            environmentMeta: meta
+                        )
+                    }
+
+                guard profileId != response.value.profileId else {
+                    return (response, CrossPlacementState.defaultForNewUser)
+                }
+
+                let newProfileId = response.value.profileId
+                let crossPlacementState = try await httpSession.fetchCrossPlacementState(profileId: newProfileId)
+
+                return (response, crossPlacementState)
             }.result
 
             guard case let .creating(creatingProfileId, creatingCustomerUserId, _) = sharedProfileManager,
@@ -160,7 +176,7 @@ public final class Adapty: Sendable {
             }
 
             switch result {
-            case let .success(createdProfile):
+            case let .success((createdProfile, crossPlacementState)):
 
                 if profileId != createdProfile.value.profileId {
                     profileStorage.clearProfile(newProfileId: createdProfile.value.profileId)
@@ -168,13 +184,11 @@ public final class Adapty: Sendable {
 
                 profileStorage.setSyncedTransactions(false)
                 profileStorage.setProfile(createdProfile)
-                if let crossPlacementState = createdProfile.value.crossPlacementState {
-                    Log.crossAB.verbose("createProfile version = \(crossPlacementState.version), value = \(crossPlacementState.variationIdByPlacements)")
 
-                    profileStorage.setCrossPlacementState(crossPlacementState)
-                }
+                Log.crossAB.verbose("createProfile version = \(crossPlacementState.version), value = \(crossPlacementState.variationIdByPlacements)")
 
-                
+                profileStorage.setCrossPlacementState(crossPlacementState)
+
                 let manager = ProfileManager(
                     storage: profileStorage,
                     profile: createdProfile,
