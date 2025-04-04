@@ -240,7 +240,7 @@ extension AdaptyViewConfiguration.Animation.DoubleWithAnchorValue {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyViewConfiguration.Animation.PointWithAnchorValue {
+extension AdaptyViewConfiguration.Animation.ScaleParameters {
     func current(p: Double) -> CGSize {
         CGSize(
             width: start.x + (end.x - start.x) * p,
