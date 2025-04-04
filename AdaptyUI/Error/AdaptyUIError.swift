@@ -5,16 +5,16 @@
 //  Created by Alexey Goncharov on 2023-01-23.
 //
 
-import Foundation
 import Adapty
+import Foundation
 
 public enum AdaptyUIError: Error {
     case platformNotSupported
-    
+
     case adaptyNotActivated
     case adaptyUINotActivated
     case activateOnce
-    
+
     case encoding(Error)
     case unsupportedTemplate(String)
     case styleNotFound(String)

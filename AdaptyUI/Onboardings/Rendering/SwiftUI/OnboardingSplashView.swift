@@ -9,7 +9,7 @@ import SwiftUI
 
 @MainActor
 struct OnboardingSplashView<Splash: View>: View {
-    private let id: String
+    private let configuration: AdaptyUI.OnboardingConfiguration
 
     private let splashViewBuilder: () -> Splash
     private let onCloseAction: (OnboardingsCloseAction) -> Void
@@ -23,7 +23,7 @@ struct OnboardingSplashView<Splash: View>: View {
     @State private var isLoading = true
 
     init(
-        id: String,
+        configuration: AdaptyUI.OnboardingConfiguration,
         splashViewBuilder: @escaping () -> Splash,
         onCloseAction: @escaping (OnboardingsCloseAction) -> Void,
         onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?,
@@ -32,7 +32,7 @@ struct OnboardingSplashView<Splash: View>: View {
         onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
         onError: @escaping (Error) -> Void
     ) {
-        self.id = id
+        self.configuration = configuration
         self.splashViewBuilder = splashViewBuilder
         self.onCloseAction = onCloseAction
         self.onOpenPaywallAction = onOpenPaywallAction
@@ -88,7 +88,7 @@ struct OnboardingSplashView<Splash: View>: View {
 
     private func loadURL() async {
         do {
-            url = try await Onboardings.activated.configuration.onboardingUrl(onboardingId: id)
+            url = configuration.url
         } catch {
             onError(error)
         }

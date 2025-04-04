@@ -6,8 +6,7 @@
 //
 
 import SwiftUI
-
-private let log = Log.Category(name: "OnboardingView")
+import Adapty
 
 final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
     private let onFinishLoading: (OnboardingsDidFinishLoadingAction) -> Void
@@ -16,7 +15,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
     private let onCustomAction: ((OnboardingsCustomAction) -> Void)?
     private let onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?
     private let onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?
-    private let onError: (OnboardingsError) -> Void
+    private let onError: (AdaptyError) -> Void
 
     init(
         onFinishLoading: @escaping (OnboardingsDidFinishLoadingAction) -> Void,
@@ -25,7 +24,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
         onCustomAction: ((OnboardingsCustomAction) -> Void)?,
         onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?,
         onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
-        onError: @escaping (OnboardingsError) -> Void
+        onError: @escaping (AdaptyError) -> Void
     ) {
         self.onFinishLoading = onFinishLoading
         self.onCloseAction = onCloseAction
@@ -57,7 +56,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
         if let onOpenPaywallAction {
             onOpenPaywallAction(action)
         } else {
-            log.warn("OnboardingView: Not implimented callback 'onOpenPaywallAction'")
+            Log.onboardings.warn("OnboardingView: Not implimented callback 'onOpenPaywallAction'")
         }
     }
 
@@ -68,7 +67,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
         if let onCustomAction {
             onCustomAction(action)
         } else {
-            log.warn("OnboardingView: Not implimented callback 'onCustomAction'")
+            Log.onboardings.warn("OnboardingView: Not implimented callback 'onCustomAction'")
         }
     }
 
@@ -79,7 +78,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
         if let onStateUpdatedAction {
             onStateUpdatedAction(action)
         } else {
-            log.warn("OnboardingView: Not implimented callback 'onStateUpdatedAction'")
+            Log.onboardings.warn("OnboardingView: Not implimented callback 'onStateUpdatedAction'")
         }
     }
 
@@ -92,7 +91,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
 
     func onboardingController(
         _ controller: UIViewController,
-        didFailWithError error: OnboardingsError
+        didFailWithError error: AdaptyError
     ) {
         onError(error)
     }

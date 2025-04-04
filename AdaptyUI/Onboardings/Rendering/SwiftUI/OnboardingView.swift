@@ -5,6 +5,7 @@
 //  Created by Aleksey Goncharov on 09.08.2024.
 //
 
+import Adapty
 import SwiftUI
 
 @MainActor
@@ -21,7 +22,7 @@ struct OnboardingView: UIViewControllerRepresentable {
         onCustomAction: ((OnboardingsCustomAction) -> Void)?,
         onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?,
         onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
-        onError: @escaping (OnboardingsError) -> Void
+        onError: @escaping (AdaptyError) -> Void
     ) {
         self.url = url
         self.onFinishLoading = onFinishLoading

@@ -5,6 +5,7 @@
 //  Created by Aleksey Goncharov on 02.08.2024.
 //
 
+import Adapty
 import UIKit
 import WebKit
 
@@ -43,7 +44,7 @@ public final class OnboardingController: UIViewController {
         delegate?.apply(message: message, from: self)
     }
 
-    private func handleError(_ error: OnboardingsError) {
+    private func handleError(_ error: AdaptyOnboardingsError) {
         delegate?.apply(error: error, from: self)
     }
 

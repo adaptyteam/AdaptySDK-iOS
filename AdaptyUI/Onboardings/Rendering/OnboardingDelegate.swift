@@ -6,9 +6,8 @@
 //
 //
 
+import Adapty
 import UIKit
-
-private let log = Log.Category(name: "OnboardingDelegate")
 
 @MainActor
 public protocol OnboardingDelegate: NSObjectProtocol {
@@ -18,7 +17,7 @@ public protocol OnboardingDelegate: NSObjectProtocol {
     func onboardingController(_ controller: UIViewController, onCustomAction action: OnboardingsCustomAction)
     func onboardingController(_ controller: UIViewController, onStateUpdatedAction action: OnboardingsStateUpdatedAction)
     func onboardingController(_ controller: UIViewController, onAnalyticsEvent event: OnboardingsAnalyticsEvent)
-    func onboardingController(_ controller: UIViewController, didFailWithError error: OnboardingsError)
+    func onboardingController(_ controller: UIViewController, didFailWithError error: AdaptyError)
 }
 
 public protocol OnboardingSplashDelegate: NSObjectProtocol {
@@ -27,23 +26,23 @@ public protocol OnboardingSplashDelegate: NSObjectProtocol {
 
 public extension OnboardingDelegate {
     func onboardingController(_ controller: UIViewController, didFinishLoading action: OnboardingsDidFinishLoadingAction) {
-        log.warn("Not implemented method 'onboardingController(didFinishLoading:)' of OnboardingDelegate ")
+        Log.onboardings.warn("Not implemented method 'onboardingController(didFinishLoading:)' of OnboardingDelegate ")
     }
 
     func onboardingController(_ controller: UIViewController, onPaywallAction action: OnboardingsOpenPaywallAction) {
-        log.warn("Not implemented method 'onboardingController(openPaywallAction:)' of OnboardingDelegate ")
+        Log.onboardings.warn("Not implemented method 'onboardingController(openPaywallAction:)' of OnboardingDelegate ")
     }
 
     func onboardingController(_ controller: UIViewController, onCustomAction action: OnboardingsCustomAction) {
-        log.warn("Not implemented method 'onboardingController(onCustomAction:)' of OnboardingDelegate ")
+        Log.onboardings.warn("Not implemented method 'onboardingController(onCustomAction:)' of OnboardingDelegate ")
     }
 
     func onboardingController(_ controller: UIViewController, onStateUpdatedAction action: OnboardingsStateUpdatedAction) {
-        log.warn("Not implemented method 'onboardingController(onStateUpdatedAction:)' of OnboardingDelegate ")
+        Log.onboardings.warn("Not implemented method 'onboardingController(onStateUpdatedAction:)' of OnboardingDelegate ")
     }
 
     func onboardingController(_ controller: UIViewController, onAnalyticsEvent event: OnboardingsAnalyticsEvent) {
-        log.warn("Not implemented method 'onboardingController(onAnalyticsEvent:)' of OnboardingDelegate ")
+        Log.onboardings.warn("Not implemented method 'onboardingController(onAnalyticsEvent:)' of OnboardingDelegate ")
     }
 }
 
@@ -65,7 +64,7 @@ extension OnboardingDelegate {
         }
     }
 
-    func apply(error: OnboardingsError, from controller: UIViewController) {
-        onboardingController(controller, didFailWithError: error)
+    func apply(error: AdaptyOnboardingsError, from controller: UIViewController) {
+        onboardingController(controller, didFailWithError: error.asAdaptyError)
     }
 }

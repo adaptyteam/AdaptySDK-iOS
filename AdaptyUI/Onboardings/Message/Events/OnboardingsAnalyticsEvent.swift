@@ -6,9 +6,8 @@
 //
 //
 
+import Adapty
 import Foundation
-
-private let log = Log.Category(name: "AnalitycsEvent")
 
 public enum OnboardingsAnalyticsEvent: Sendable, Hashable {
     case unknown(meta: OnboardingsMetaParams, name: String)
@@ -55,7 +54,7 @@ public enum OnboardingsAnalyticsEvent: Sendable, Hashable {
 
         guard let name = Name(rawValue: name) else {
             self = .unknown(meta: meta, name: name)
-            log.warn("Uncnown analitycs event with name: \(name), meta: \(meta.debugDescription)")
+            Log.onboardings.warn("Unknown analitycs event with name: \(name), meta: \(meta.debugDescription)")
             return
         }
 

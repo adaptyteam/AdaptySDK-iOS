@@ -97,6 +97,9 @@ extension AdaptyError {
         case profileWasChanged = 3006
         case unsupportedData = 3007
         case fetchTimeoutError = 3101
+        
+        case webkit = 4000
+        
         case operationInterrupted = 9000
     }
 }

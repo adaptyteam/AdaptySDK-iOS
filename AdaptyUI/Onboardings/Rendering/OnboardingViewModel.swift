@@ -7,18 +7,17 @@
 
 import Foundation
 import WebKit
+import Adapty
 
-private extension Onboardings {
+private extension AdaptyUI {
     static let webViewEventMessageName = "postEvent"
 }
-
-private let log = Log.Category(name: "OnboardingViewModel")
 
 final class OnboardingViewModel: NSObject, ObservableObject {
     let stamp: String
     let url: URL
     var onMessage: ((OnboardingsMessage) -> Void)?
-    var onError: ((OnboardingsError) -> Void)?
+    var onError: ((AdaptyOnboardingsError) -> Void)?
 
     init(stamp: String, url: URL) {
         self.stamp = stamp
@@ -27,10 +26,10 @@ final class OnboardingViewModel: NSObject, ObservableObject {
 
     @MainActor
     func configureWebView(_ webView: WKWebView) {
-        log.verbose("\(stamp) configureWebView \(self.url)")
+        Log.onboardings.verbose("\(stamp) configureWebView \(self.url)")
 
         webView.navigationDelegate = self
-        webView.configuration.userContentController.add(self, name: Onboardings.webViewEventMessageName)
+        webView.configuration.userContentController.add(self, name: AdaptyUI.webViewEventMessageName)
 
         let request = URLRequest(url: url)
         webView.load(request)
@@ -40,28 +39,28 @@ final class OnboardingViewModel: NSObject, ObservableObject {
 extension OnboardingViewModel: WKNavigationDelegate, WKScriptMessageHandler {
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         let url = webView.url?.absoluteString ?? "null"
-        log.verbose("\(stamp) webView didStartProvisionalNavigation url: \(url)")
+        Log.onboardings.verbose("\(stamp) webView didStartProvisionalNavigation url: \(url)")
     }
 
     public func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
         let url = webView.url?.absoluteString ?? "null"
-        log.verbose("\(stamp) webView didFinish navigation url: \(url)")
+        Log.onboardings.verbose("\(stamp) webView didFinish navigation url: \(url)")
     }
 
     public func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
-        log.error("\(stamp) didFail navigation withError \(error)")
-        onError?(.webKit(error: error))
+        Log.onboardings.error("\(stamp) didFail navigation withError \(error)")
+        onError?(AdaptyOnboardingsError.webKit(error: error))
     }
 
     public func userContentController(_: WKUserContentController, didReceive wkMessage: WKScriptMessage) {
         do {
             let message = try OnboardingsMessage(chanel: wkMessage.name, body: wkMessage.body)
-            log.verbose("\(stamp) On message: \(message)")
+            Log.onboardings.verbose("\(stamp) On message: \(message)")
             onMessage?(message)
         } catch let error as OnboardingsUnknownMessageError {
-            log.warn("\(stamp) Unknown message \(error.type.map { "with type \"\($0)\"" } ?? "with name \"\(error.chanel)\""): \(String(describing: wkMessage.body))")
+            Log.onboardings.warn("\(stamp) Unknown message \(error.type.map { "with type \"\($0)\"" } ?? "with name \"\(error.chanel)\""): \(String(describing: wkMessage.body))")
         } catch {
-            log.error("\(stamp) Error on decoding event: \(error)")
+            Log.onboardings.error("\(stamp) Error on decoding event: \(error)")
         }
     }
 }

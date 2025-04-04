@@ -6,9 +6,10 @@
 //
 
 import UIKit
+import Adapty
 
 public final class OnboardingSplashController: UIViewController {
-    private let id: String
+    private let configuration: AdaptyUI.OnboardingConfiguration
 
     private weak var applicationSplashVC: UIViewController?
     private weak var onboardingVC: OnboardingController?
@@ -18,11 +19,11 @@ public final class OnboardingSplashController: UIViewController {
 
     @MainActor
     init(
-        id: String,
+        configuration: AdaptyUI.OnboardingConfiguration,
         delegate: OnboardingDelegate,
         splashDelegate: OnboardingSplashDelegate
     ) {
-        self.id = id
+        self.configuration = configuration
         self.delegate = delegate
         self.splashDelegate = splashDelegate
 
@@ -69,8 +70,8 @@ public final class OnboardingSplashController: UIViewController {
     }
 
     private func layoutOnboarding() async throws -> OnboardingController {
-        let onboardingVC = try await Onboardings.createOnboardingController(
-            id: id,
+        let onboardingVC = try await AdaptyUI.createOnboardingController(
+            configuration: configuration,
             delegate: self
         )
 
@@ -155,7 +156,7 @@ extension OnboardingSplashController: OnboardingDelegate {
         delegate?.onboardingController(controller, onAnalyticsEvent: event)
     }
 
-    public func onboardingController(_ controller: UIViewController, didFailWithError error: OnboardingsError) {
+    public func onboardingController(_ controller: UIViewController, didFailWithError error: AdaptyError) {
         delegate?.onboardingController(controller, didFailWithError: error)
     }
 }
