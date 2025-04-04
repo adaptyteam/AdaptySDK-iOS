@@ -9,18 +9,18 @@ import Foundation
 
 package extension AdaptyViewConfiguration {
     enum Animation: Sendable {
-        case opacity(Timeline, DoubleValue)
-        case offset(Timeline, OffsetValue)
+        case opacity(Timeline, Animation.Range<Double>)
+        case offset(Timeline, Animation.Range<Offset>)
         case rotation(Timeline, DoubleWithAnchorValue)
         case scale(Timeline, PointWithAnchorValue)
-        case width(Timeline, UnitValue)
-        case height(Timeline, UnitValue)
-        case background(Timeline, FillingValue)
-        case border(Timeline, FillingValue)
-        case borderThickness(Timeline, DoubleValue)
-        case shadow(Timeline, FillingValue)
-        case shadowOffset(Timeline, OffsetValue)
-        case shadowBlurRadius(Timeline, DoubleValue)
+        case width(Timeline, Animation.Range<Unit>)
+        case height(Timeline, Animation.Range<Unit>)
+        case background(Timeline, Animation.Range<Mode<Filling>>)
+        case border(Timeline, Animation.Range<Mode<Filling>>)
+        case borderThickness(Timeline, Animation.Range<Double>)
+        case shadow(Timeline, Animation.Range<Mode<Filling>>)
+        case shadowOffset(Timeline, Animation.Range<Offset>)
+        case shadowBlurRadius(Timeline, Animation.Range<Double>)
     }
 }
 

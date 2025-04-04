@@ -9,7 +9,6 @@ import Foundation
 
 package extension AdaptyViewConfiguration.Animation {
     struct PointWithAnchorValue: Sendable, Hashable {
-        package let interpolator: Interpolator
         package let start: AdaptyViewConfiguration.Point
         package let end: AdaptyViewConfiguration.Point
         package let anchor: AdaptyViewConfiguration.Point
@@ -21,11 +20,9 @@ package extension AdaptyViewConfiguration.Animation.PointWithAnchorValue {
     static func create(
         start: AdaptyViewConfiguration.Point,
         end: AdaptyViewConfiguration.Point,
-        anchor: AdaptyViewConfiguration.Point = .center,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator = .default
+        anchor: AdaptyViewConfiguration.Point = .center
     ) -> Self {
         .init(
-            interpolator: interpolator,
             start: start,
             end: end,
             anchor: anchor
@@ -39,7 +36,6 @@ extension AdaptyViewConfiguration.Animation.PointWithAnchorValue: Codable {
         case start
         case end
         case anchor
-        case interpolator
     }
 
     package init(from decoder: Decoder) throws {
@@ -47,7 +43,6 @@ extension AdaptyViewConfiguration.Animation.PointWithAnchorValue: Codable {
         start = try container.decode(AdaptyViewConfiguration.Point.self, forKey: .start)
         end = try container.decode(AdaptyViewConfiguration.Point.self, forKey: .end)
         anchor = try container.decodeIfPresent(AdaptyViewConfiguration.Point.self, forKey: .anchor) ?? .center
-        interpolator = try (container.decodeIfPresent(AdaptyViewConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? .default
     }
 
     package func encode(to encoder: any Encoder) throws {
@@ -56,9 +51,6 @@ extension AdaptyViewConfiguration.Animation.PointWithAnchorValue: Codable {
         try container.encode(end, forKey: .end)
         if anchor != .center {
             try container.encode(anchor, forKey: .anchor)
-        }
-        if interpolator != .default {
-            try container.encode(interpolator, forKey: .interpolator)
         }
     }
 }

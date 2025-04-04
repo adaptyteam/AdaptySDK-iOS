@@ -11,12 +11,14 @@ package extension AdaptyViewConfiguration.Animation {
     struct Timeline: Sendable, Hashable {
         static let `default` = Timeline(
             duration: 0.3,
+            interpolator: .default,
             startDelay: 0.0,
             repeatType: nil,
             repeatDelay: 0.0,
-            repeatMaxCount: nil
+            repeatMaxCount: nil,
         )
         package let duration: TimeInterval
+        package let interpolator: Interpolator
         package let startDelay: TimeInterval
         package let repeatType: RepeatType?
         package let repeatDelay: TimeInterval
@@ -34,12 +36,14 @@ package extension AdaptyViewConfiguration.Animation.Timeline {
     static func create(
         startDelay: TimeInterval = Self.default.startDelay,
         duration: TimeInterval = Self.default.duration,
+        interpolator: AdaptyViewConfiguration.Animation.Interpolator = Self.default.interpolator,
         repeatType: RepeatType? = Self.default.repeatType,
         repeatDelay: TimeInterval = Self.default.repeatDelay,
         repeatMaxCount: Int? = Self.default.repeatMaxCount
     ) -> Self {
         .init(
             duration: duration,
+            interpolator: interpolator,
             startDelay: startDelay,
             repeatType: repeatType,
             repeatDelay: repeatDelay,
@@ -56,6 +60,8 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
         case repeatDelay = "repeat_delay"
         case repeatMaxCount = "repeat_max_count"
         case duration
+        case interpolator
+
     }
 
     package init(from decoder: Decoder) throws {
@@ -70,6 +76,8 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
         repeatMaxCount = try container.decodeIfPresent(Int.self, forKey: .repeatMaxCount) ?? defaultValue.repeatMaxCount
 
         duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? defaultValue.duration
+        interpolator = try (container.decodeIfPresent(AdaptyViewConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? .default
+
     }
 
     package func encode(to encoder: any Encoder) throws {
@@ -91,6 +99,10 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
 
         if duration != defaultValue.duration {
             try container.encode(duration * 1000, forKey: .duration)
+        }
+        
+        if interpolator != defaultValue.interpolator {
+            try container.encode(interpolator, forKey: .interpolator)
         }
     }
 }

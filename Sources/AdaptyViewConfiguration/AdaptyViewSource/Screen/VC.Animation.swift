@@ -8,28 +8,31 @@
 import Foundation
 
 extension AdaptyViewSource {
+    typealias Unit = AdaptyViewConfiguration.Unit
+    typealias Offset  = AdaptyViewConfiguration.Offset
     enum Animation: Sendable {
+        typealias Range = AdaptyViewConfiguration.Animation.Range
         typealias Timeline = AdaptyViewConfiguration.Animation.Timeline
-        typealias DoubleValue = AdaptyViewConfiguration.Animation.DoubleValue
-        typealias UnitValue = AdaptyViewConfiguration.Animation.UnitValue
-        typealias OffsetValue = AdaptyViewConfiguration.Animation.OffsetValue
         typealias DoubleWithAnchorValue = AdaptyViewConfiguration.Animation.DoubleWithAnchorValue
         typealias PointWithAnchorValue = AdaptyViewConfiguration.Animation.PointWithAnchorValue
 
-        case opacity(Timeline, DoubleValue)
-        case offset(Timeline, OffsetValue)
+        case opacity(Timeline, Animation.Range<Double>)
+        case offset(Timeline, Animation.Range<Offset>)
         case rotation(Timeline, DoubleWithAnchorValue)
         case scale(Timeline, PointWithAnchorValue)
-        case width(Timeline, UnitValue)
-        case height(Timeline, UnitValue)
-        case background(Timeline, AssetIdValue)
-        case border(Timeline, AssetIdValue)
-        case borderThickness(Timeline, DoubleValue)
-        case shadow(Timeline, AssetIdValue)
-        case shadowOffset(Timeline, OffsetValue)
-        case shadowBlurRadius(Timeline, DoubleValue)
+        case width(Timeline, Animation.Range<Unit>)
+        case height(Timeline, Animation.Range<Unit>)
+        case background(Timeline, Animation.Range<String>)
+        case border(Timeline, Animation.Range<String>)
+        case borderThickness(Timeline, Animation.Range<Double>)
+        case shadow(Timeline, Animation.Range<String>)
+        case shadowOffset(Timeline, Animation.Range<Offset>)
+        case shadowBlurRadius(Timeline, Animation.Range<Double>)
     }
 }
+
+
+
 
 extension AdaptyViewSource.Localizer {
     func animation(_ from: AdaptyViewSource.Animation) throws -> AdaptyViewConfiguration.Animation {
@@ -55,10 +58,17 @@ extension AdaptyViewSource.Localizer {
         case let .shadow(timeline, value):
             try .shadow(timeline, animationFillingValue(value))
         case let .shadowOffset(timeline, value):
-            try .shadowOffset(timeline, value)
+             .shadowOffset(timeline, value)
         case let .shadowBlurRadius(timeline, value):
-            try .shadowBlurRadius(timeline, value)
+             .shadowBlurRadius(timeline, value)
         }
+    }
+    
+    func animationFillingValue(_ from: AdaptyViewSource.Animation.Range<String>) throws -> AdaptyViewConfiguration.Animation.Range<AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>> {
+        try .init(
+            start: filling(from.start),
+            end: filling(from.end)
+        )
     }
 }
 
@@ -82,7 +92,6 @@ extension AdaptyViewSource.Animation: Codable {
         case shadow
         case shadowOffset = "shadow_offset"
         case shadowBlurRadius = "shadow_blur_radius"
-
     }
 
     init(from decoder: Decoder) throws {
@@ -92,11 +101,7 @@ extension AdaptyViewSource.Animation: Codable {
         case .none:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Unknown animation type with name \(typeName)'"))
         case .fade:
-            self = try .opacity(.init(from: decoder), .init(
-                interpolator: (container.decodeIfPresent(AdaptyViewConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? .default,
-                start: 0.0,
-                end: 1.0
-            ))
+            self = try .opacity(.init(from: decoder), .init(start: 0.0, end: 1.0))
         case .opacity:
             self = try .opacity(.init(from: decoder), .init(from: decoder))
         case .offset:
