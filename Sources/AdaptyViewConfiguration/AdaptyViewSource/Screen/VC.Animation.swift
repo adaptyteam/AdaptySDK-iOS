@@ -67,6 +67,7 @@ extension AdaptyViewSource.Animation: Codable {
         case offset
         case angle
         case anchor
+        case color
     }
 
     enum Types: String {
@@ -110,7 +111,10 @@ extension AdaptyViewSource.Animation: Codable {
         case .box:
             self = try .box(.init(from: decoder), .init(from: decoder))
         case .background:
-            self = try .background(.init(from: decoder), .init(from: decoder))
+            self = try .background(
+                .init(from: decoder),
+                container.decode(AdaptyViewSource.Animation.Range<String>.self, forKey: .color)
+            )
         case .border:
             self = try .border(.init(from: decoder), .init(from: decoder))
         case .shadow:
