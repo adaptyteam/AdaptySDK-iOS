@@ -13,11 +13,33 @@ package extension AdaptyViewConfiguration {
         case offset(Timeline, Animation.Range<Offset>)
         case rotation(Timeline, Animation.RotationParameters)
         case scale(Timeline, ScaleParameters)
-        case box(Timeline,BoxParameters)
+        case box(Timeline, BoxParameters)
         case background(Timeline, Animation.Range<Mode<Filling>>)
         case border(Timeline, BorderParameters)
         case shadow(Timeline, ShadowParameters)
+    }
+}
 
+extension AdaptyViewConfiguration.Animation {
+    var timeline: Timeline {
+        switch self {
+        case let .opacity(timeline, _):
+            timeline
+        case let .offset(timeline, _):
+            timeline
+        case let .rotation(timeline, _):
+            timeline
+        case let .scale(timeline, _):
+            timeline
+        case let .box(timeline, _):
+            timeline
+        case let .background(timeline, _):
+            timeline
+        case let .border(timeline, _):
+            timeline
+        case let .shadow(timeline, _):
+            timeline
+        }
     }
 }
 
