@@ -35,12 +35,7 @@ extension VC.Pager.Length {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.TransitionSlide {
     var swiftUIAnimation: Animation {
-        switch interpolator {
-        case .easeInOut: .easeInOut(duration: duration)
-        case .easeIn: .easeIn(duration: duration)
-        case .easeOut: .easeOut(duration: duration)
-        case .linear: .linear(duration: duration)
-        }
+        interpolator.animationIgnoringElasticAndBounceBefore17(duration: duration)
     }
 }
 

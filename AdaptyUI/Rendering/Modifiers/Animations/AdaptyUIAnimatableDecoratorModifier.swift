@@ -289,6 +289,22 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private let includeBackground: Bool
     private let animations: [AdaptyViewConfiguration.Animation]?
 
+    @State private var animatedBackgroundFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+
+    private var initialBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    private var initialBorderThickness: Double?
+
+    @State private var animatedBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    @State private var animatedBorderThickness: Double?
+
+    private var resolvedBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? {
+        self.animatedBorderFilling ?? self.initialBorderFilling
+    }
+
+    private var resolvedBorderThickness: Double? {
+        self.animatedBorderThickness ?? self.initialBorderThickness
+    }
+
     init(
         decorator: VC.Decorator,
         animations: [AdaptyViewConfiguration.Animation]?,
@@ -297,6 +313,9 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         self.decorator = decorator
         self.animations = animations
         self.includeBackground = includeBackground
+
+        self.initialBorderFilling = decorator.border?.filling
+        self.initialBorderThickness = decorator.border?.thickness
     }
 
     @EnvironmentObject
@@ -312,8 +331,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             if let border = decorator.border {
                 self.decorator.shapeType
                     .swiftUIShapeStroke(
-                        (self.animatedBorderFilling ?? border.filling).of(self.colorScheme),
-                        lineWidth: self.animatedBorderThickness ?? border.thickness,
+                        self.resolvedBorderFilling?.of(self.colorScheme),
+                        lineWidth: self.resolvedBorderThickness ?? 0.0,
                         assetsResolver: self.assetsViewModel.assetsResolver
                     )
             }
@@ -365,10 +384,6 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         }
     }
 
-    @State private var animatedBackgroundFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
-    @State private var animatedBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
-    @State private var animatedBorderThickness: Double?
-
     private func startAnimations() {
         guard let animations, !animations.isEmpty else { return }
 
@@ -377,49 +392,35 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             case let .background(timeline, value):
                 self.animatedBackgroundFilling = value.start
                 self.startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
+                    animation,
                     from: value.start,
                     to: value.end
                 ) { self.animatedBackgroundFilling = $0 }
             case let .border(timeline, value):
-                self.animatedBorderFilling = value.start
-                self.startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) { self.animatedBorderFilling = $0 }
-            case let .borderThickness(timeline, value):
-                self.animatedBorderThickness = value.start
-                self.startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) { self.animatedBorderThickness = $0 }
+                self.animatedBorderThickness = value.thickness?.start
+
+                if let color = value.color {
+                    self.animatedBorderFilling = value.color?.start
+
+                    self.startValueAnimation(
+                        animation,
+                        from: color.start,
+                        to: color.end
+                    ) { self.animatedBorderFilling = $0 }
+                }
+
+                if let thickness = value.thickness {
+                    self.animatedBorderThickness = thickness.start ?? 0.0
+
+                    self.startValueAnimation(
+                        animation,
+                        from: thickness.start,
+                        to: thickness.end
+                    ) { self.animatedBorderThickness = $0 }
+                }
             default:
                 break
             }
-        }
-    }
-
-    private func startValueAnimation<Value>(
-        _ timeline: AdaptyViewConfiguration.Animation.Timeline,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator,
-        from start: Value,
-        to end: Value,
-        updateBlock: (Value) -> Void
-    ) {
-        updateBlock(start)
-
-        let (animation, _) = Animation.customIgnoringElasticAndBounce(
-            timeline: timeline,
-            interpolator: interpolator
-        )
-
-        withAnimation(animation) {
-            updateBlock(end)
         }
     }
 }

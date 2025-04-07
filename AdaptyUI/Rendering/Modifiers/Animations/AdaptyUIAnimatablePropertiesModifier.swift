@@ -14,8 +14,10 @@ import SwiftUI
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private let animations: [AdaptyViewConfiguration.Animation]
 
+    private let initialShadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
     private let initialOffset: AdaptyViewConfiguration.Offset
     private let initialShadowOffset: AdaptyViewConfiguration.Offset
+    private let initialShadowBlurRadius: Double
 
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
@@ -31,14 +33,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var opacity: Double
 
-    @State private var shadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
-    @State private var shadowBlurRadius: Double?
 
     init(_ properties: VC.Element.Properties) {
         self.opacity = properties.opacity ?? 1.0
-
-        self.shadowFilling = properties.decorator?.shadow?.filling
-        self.shadowBlurRadius = properties.decorator?.shadow?.blurRadius
 
         self.scaleX = 1.0
         self.scaleY = 1.0
@@ -48,7 +45,11 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.rotationAnchor = .center
 
         self.initialOffset = properties.offset ?? .zero
+        
+        self.initialShadowFilling = properties.decorator?.shadow?.filling
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
+        self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
+        
         self.animations = properties.onAppear
     }
 
@@ -62,21 +63,30 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         )
     }
 
-    @State private var animatedShadowOffsetX: CGFloat?
-    @State private var animatedShadowOffsetY: CGFloat?
+    @State private var animatedShadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    @State private var animatedShadowBlurRadius: Double?
+    @State private var animatedShadowOffset: CGSize?
 
+    private var resolvedShadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? {
+        animatedShadowFilling ?? initialShadowFilling
+    }
+    
+    private var resolvedShadowBlurRadius: Double {
+        animatedShadowBlurRadius ?? initialShadowBlurRadius
+    }
+    
     private var resolvedShadowOffset: CGSize {
         CGSize(
-            width: animatedShadowOffsetX ?? initialShadowOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
-            height: animatedShadowOffsetY ?? initialShadowOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
+            width: animatedShadowOffset?.width ?? initialShadowOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
+            height: animatedShadowOffset?.height ?? initialShadowOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
         )
     }
-
+    
     func body(content: Content) -> some View {
         content
             .shadow(
-                filling: shadowFilling,
-                blurRadius: shadowBlurRadius,
+                filling: resolvedShadowFilling,
+                blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset
             )
             .offset(resolvedOffset)
@@ -92,14 +102,12 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             case let .opacity(timeline, value):
                 startValueAnimation(
                     timeline,
-                    interpolator: value.interpolator,
                     from: value.start,
                     to: value.end
                 ) { self.opacity = $0 }
             case let .offset(timeline, value):
                 startValueAnimation(
                     timeline,
-                    interpolator: value.interpolator,
                     from: value.start,
                     to: value.end
                 ) {
@@ -107,58 +115,66 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     self.animatedOffsetY = $0.y.points(.vertical, screenSize, safeArea)
                 }
             case let .rotation(timeline, value):
-                rotation = .degrees(value.start)
+                rotation = .degrees(value.angle.start)
                 rotationAnchor = value.anchor.unitPoint
                 startValueAnimation(
                     timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
+                    from: value.angle.start,
+                    to: value.angle.end
                 ) { self.rotation = .degrees($0) }
             case let .scale(timeline, value):
-                scaleX = value.start.x
-                scaleY = value.start.y
+                scaleX = value.scale.start.x
+                scaleY = value.scale.start.y
                 scaleAnchor = value.anchor.unitPoint
                 startValueAnimation(
                     timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
+                    from: value.scale.start,
+                    to: value.scale.end
                 ) {
                     self.scaleX = $0.x
                     self.scaleY = $0.y
                 }
             case let .shadow(timeline, value):
-                shadowFilling = value.start
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.shadowFilling = $0
+                if let colorValue = value.color {
+                    animatedShadowFilling = value.color?.start
+
+                    startValueAnimation(
+                        timeline,
+                        from: colorValue.start,
+                        to: colorValue.end
+                    ) {
+                        self.animatedShadowFilling = $0
+                    }
                 }
-            case let .shadowOffset(timeline, value):
-                animatedShadowOffsetX = value.start.x.points(.horizontal, screenSize, safeArea)
-                animatedShadowOffsetY = value.start.y.points(.vertical, screenSize, safeArea)
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.animatedShadowOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
-                    self.animatedShadowOffsetY = $0.y.points(.vertical, screenSize, safeArea)
+                
+                if let blurValue = value.blurRadius {
+                    animatedShadowBlurRadius = blurValue.start
+                    
+                    startValueAnimation(
+                        timeline,
+                        from: blurValue.start,
+                        to: blurValue.end
+                    ) {
+                        self.animatedShadowBlurRadius = $0
+                    }
                 }
-            case let .shadowBlurRadius(timeline, value):
-                shadowBlurRadius = value.start
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.shadowBlurRadius = $0
+                
+                if let offsetValue = value.offset {
+                    animatedShadowOffset = CGSize(
+                        width: offsetValue.start.x.points(.horizontal, screenSize, safeArea),
+                        height: offsetValue.start.y.points(.vertical, screenSize, safeArea)
+                    )
+
+                    startValueAnimation(
+                        timeline,
+                        from: offsetValue.start,
+                        to: offsetValue.end
+                    ) {
+                        animatedShadowOffset = CGSize(
+                            width: $0.x.points(.horizontal, screenSize, safeArea),
+                            height: $0.y.points(.vertical, screenSize, safeArea)
+                        )
+                    }
                 }
             default:
                 break
@@ -168,14 +184,13 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     private func startValueAnimation<Value>(
         _ timeline: AdaptyViewConfiguration.Animation.Timeline,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator,
         from start: Value,
         to end: Value,
         updateBlock: (Value) -> Void
     ) {
         updateBlock(start)
 
-        withAnimation(.custom(timeline: timeline, interpolator: interpolator)) {
+        withAnimation(.custom(timeline: timeline, interpolator: timeline.interpolator)) {
             updateBlock(end)
         }
     }
@@ -186,11 +201,11 @@ extension View {
     @ViewBuilder
     func animatableProperties(_ properties: VC.Element.Properties?) -> some View {
         if let properties {
-//            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
-//                modifier(AdaptyUIAnimatablePropertiesModifier(properties))
-//            } else {
+            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
+                modifier(AdaptyUIAnimatablePropertiesModifier(properties))
+            } else {
                 modifier(AdaptyUIAnimatablePropertiesModifier_Fallback(properties))
-//            }
+            }
         } else {
             self
         }

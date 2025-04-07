@@ -81,54 +81,33 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
 
         for animation in animations {
             switch animation {
-            case let .width(timeline, value):
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.animatedWidth = $0.points(
-                        screenSize: screenSize.width,
-                        safeAreaStart: safeArea.leading,
-                        safeAreaEnd: safeArea.trailing
-                    )
+            case let .box(_, value):
+                if let widthValue = value.width {
+                    animatedWidth = widthValue.start.points(.horizontal, screenSize, safeArea)
+
+                    startValueAnimation(
+                        animation,
+                        from: widthValue.start,
+                        to: widthValue.end
+                    ) {
+                        self.animatedWidth = $0.points(.horizontal, screenSize, safeArea)
+                    }
                 }
-            case let .height(timeline, value):
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.animatedHeight = $0.points(
-                        screenSize: self.screenSize.height,
-                        safeAreaStart: self.safeArea.top,
-                        safeAreaEnd: self.safeArea.bottom
-                    )
+
+                if let heightValue = value.height {
+                    animatedHeight = heightValue.start.points(.vertical, screenSize, safeArea)
+
+                    startValueAnimation(
+                        animation,
+                        from: heightValue.start,
+                        to: heightValue.end
+                    ) {
+                        self.animatedHeight = $0.points(.vertical, screenSize, safeArea)
+                    }
                 }
             default:
                 break
             }
-        }
-    }
-
-    private func startValueAnimation<Value>(
-        _ timeline: AdaptyViewConfiguration.Animation.Timeline,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator,
-        from start: Value,
-        to end: Value,
-        updateBlock: (Value) -> Void
-    ) {
-        updateBlock(start)
-
-        let (animation, _) = Animation.customIgnoringElasticAndBounce(
-            timeline: timeline,
-            interpolator: interpolator
-        )
-
-        withAnimation(animation) {
-            updateBlock(end)
         }
     }
 }

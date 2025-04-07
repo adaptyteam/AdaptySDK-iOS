@@ -19,7 +19,7 @@ extension AdaptyViewConfiguration.Animation.Interpolator {
         case .easeIn: .easeIn(duration: duration)
         case .easeOut: .easeOut(duration: duration)
         case .linear: .linear(duration: duration)
-        case .cubicBezier(let x1, let y1, let x2, let y2): .timingCurve(x1, y1, x2, y2, duration: duration)
+        case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2, duration: duration)
         case .easeInElastic: .adaptyCustomEaseInElastic(duration: duration)
         case .easeOutElastic: .adaptyCustomEaseOutElastic(duration: duration)
         case .easeInOutElastic: .adaptyCustomEaseInOutElastic(duration: duration)
@@ -29,14 +29,14 @@ extension AdaptyViewConfiguration.Animation.Interpolator {
         }
     }
 
-    func animationIgnoringElasticAndBounce(duration: TimeInterval) -> Animation {
+    func animationIgnoringElasticAndBounceBefore17(duration: TimeInterval) -> Animation {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
             switch self {
             case .easeInOut: .easeInOut(duration: duration)
             case .easeIn: .easeIn(duration: duration)
             case .easeOut: .easeOut(duration: duration)
             case .linear: .linear(duration: duration)
-            case .cubicBezier(let x1, let y1, let x2, let y2): .timingCurve(x1, y1, x2, y2, duration: duration)
+            case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2, duration: duration)
             case .easeInElastic: .adaptyCustomEaseInElastic(duration: duration)
             case .easeOutElastic: .adaptyCustomEaseOutElastic(duration: duration)
             case .easeInOutElastic: .adaptyCustomEaseInOutElastic(duration: duration)
@@ -49,7 +49,7 @@ extension AdaptyViewConfiguration.Animation.Interpolator {
             case .easeInOut: .easeInOut(duration: duration)
             case .easeIn: .easeIn(duration: duration)
             case .easeOut: .easeOut(duration: duration)
-            case .cubicBezier(let x1, let y1, let x2, let y2): .timingCurve(x1, y1, x2, y2, duration: duration)
+            case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2, duration: duration)
             default: .linear(duration: duration)
             }
         }
@@ -104,48 +104,18 @@ extension Animation {
             .delay(timeline.startDelay)
     }
 
-    static func customIgnoringElasticAndBounce(
-        timeline: AdaptyViewConfiguration.Animation.Timeline,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator
-    ) -> (Animation, (Double) -> Double) {
-        (
-            interpolator
-                .animationIgnoringElasticAndBounce(duration: timeline.duration)
-                .withTimeline(timeline)
-                .delay(timeline.startDelay),
-            interpolator.customFunctor()
-        )
-    }
-
-    static func customIgnoringElasticAndBounce(
+    static func customIgnoringElasticAndBounceBefore17(
         animation: AdaptyViewConfiguration.Animation
     ) -> (Animation, (Double) -> Double) {
-        let (timeline, interpolator) = animation.getAnimationProperties()
-
-        return Animation.customIgnoringElasticAndBounce(
-            timeline: timeline,
-            interpolator: interpolator
+        let timeline = animation.timeline
+        
+        return (
+            timeline.interpolator
+                .animationIgnoringElasticAndBounceBefore17(duration: timeline.duration)
+                .withTimeline(timeline)
+                .delay(timeline.startDelay),
+            timeline.interpolator.customFunctor()
         )
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyViewConfiguration.Animation {
-    func getAnimationProperties() -> (Timeline, Interpolator) {
-        switch self {
-        case .opacity(let timeline, let value): (timeline, value.interpolator)
-        case .offset(let timeline, let value): (timeline, value.interpolator)
-        case .rotation(let timeline, let value): (timeline, value.interpolator)
-        case .scale(let timeline, let value): (timeline, value.interpolator)
-        case .width(let timeline, let value): (timeline, value.interpolator)
-        case .height(let timeline, let value): (timeline, value.interpolator)
-        case .background(let timeline, let value): (timeline, value.interpolator)
-        case .border(let timeline, let value): (timeline, value.interpolator)
-        case .borderThickness(let timeline, let value): (timeline, value.interpolator)
-        case .shadow(let timeline, let value): (timeline, value.interpolator)
-        case .shadowOffset(let timeline, let value): (timeline, value.interpolator)
-        case .shadowBlurRadius(let timeline, let value): (timeline, value.interpolator)
-        }
     }
 }
 

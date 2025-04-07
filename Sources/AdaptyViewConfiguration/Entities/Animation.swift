@@ -20,7 +20,7 @@ package extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.Animation {
+package extension AdaptyViewConfiguration.Animation {
     var timeline: Timeline {
         switch self {
         case let .opacity(timeline, _):

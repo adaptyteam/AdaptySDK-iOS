@@ -13,14 +13,17 @@ import SwiftUI
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIAnimatablePropertiesModifier_Fallback: ViewModifier {
     private let animations: [AdaptyViewConfiguration.Animation]
+
+    private let initialShadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
     private let initialShadowOffset: AdaptyViewConfiguration.Offset
+    private let initialShadowBlurRadius: Double
 
     init(_ properties: VC.Element.Properties) {
         animations = properties.onAppear
 
-        shadowFilling = properties.decorator?.shadow?.filling
-        shadowBlurRadius = properties.decorator?.shadow?.blurRadius
+        initialShadowFilling = properties.decorator?.shadow?.filling
         initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
+        initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
     }
 
     @Environment(\.adaptyScreenSize)
@@ -28,16 +31,22 @@ struct AdaptyUIAnimatablePropertiesModifier_Fallback: ViewModifier {
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
 
-    @State private var shadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
-    @State private var shadowBlurRadius: Double?
+    @State private var animatedShadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
+    @State private var animatedShadowBlurRadius: Double?
+    @State private var animatedShadowOffset: CGSize?
 
-    @State private var animatedShadowOffsetX: CGFloat?
-    @State private var animatedShadowOffsetY: CGFloat?
+    private var resolvedShadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? {
+        animatedShadowFilling ?? initialShadowFilling
+    }
+
+    private var resolvedShadowBlurRadius: Double {
+        animatedShadowBlurRadius ?? initialShadowBlurRadius
+    }
 
     private var resolvedShadowOffset: CGSize {
         CGSize(
-            width: animatedShadowOffsetX ?? initialShadowOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
-            height: animatedShadowOffsetY ?? initialShadowOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
+            width: animatedShadowOffset?.width ?? initialShadowOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
+            height: animatedShadowOffset?.height ?? initialShadowOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
         )
     }
 
@@ -61,8 +70,8 @@ struct AdaptyUIAnimatablePropertiesModifier_Fallback: ViewModifier {
 
         return result
             .shadow(
-                filling: shadowFilling,
-                blurRadius: shadowBlurRadius,
+                filling: resolvedShadowFilling,
+                blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset
             )
             .onAppear { startAnimations() }
@@ -71,56 +80,67 @@ struct AdaptyUIAnimatablePropertiesModifier_Fallback: ViewModifier {
     private func startAnimations() {
         for animation in animations {
             switch animation {
-            case .shadow(let timeline, let value):
-                shadowFilling = value.start
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.shadowFilling = $0
+            case .shadow(_, let value):
+                if let colorValue = value.color {
+                    animatedShadowFilling = value.color?.start
+
+                    startValueAnimation(
+                        animation,
+                        from: colorValue.start,
+                        to: colorValue.end
+                    ) {
+                        self.animatedShadowFilling = $0
+                    }
                 }
-            case .shadowOffset(let timeline, let value):
-                animatedShadowOffsetX = value.start.x.points(.horizontal, screenSize, safeArea)
-                animatedShadowOffsetY = value.start.y.points(.vertical, screenSize, safeArea)
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.animatedShadowOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
-                    self.animatedShadowOffsetY = $0.y.points(.vertical, screenSize, safeArea)
+
+                if let blurValue = value.blurRadius {
+                    animatedShadowBlurRadius = blurValue.start
+
+                    startValueAnimation(
+                        animation,
+                        from: blurValue.start,
+                        to: blurValue.end
+                    ) {
+                        self.animatedShadowBlurRadius = $0
+                    }
                 }
-            case .shadowBlurRadius(let timeline, let value):
-                shadowBlurRadius = value.start
-                startValueAnimation(
-                    timeline,
-                    interpolator: value.interpolator,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.shadowBlurRadius = $0
+
+                if let offsetValue = value.offset {
+                    animatedShadowOffset = CGSize(
+                        width: offsetValue.start.x.points(.horizontal, screenSize, safeArea),
+                        height: offsetValue.start.y.points(.vertical, screenSize, safeArea)
+                    )
+
+                    startValueAnimation(
+                        animation,
+                        from: offsetValue.start,
+                        to: offsetValue.end
+                    ) {
+                        animatedShadowOffset = CGSize(
+                            width: $0.x.points(.horizontal, screenSize, safeArea),
+                            height: $0.y.points(.vertical, screenSize, safeArea)
+                        )
+                    }
                 }
             default:
                 break
             }
         }
     }
+}
 
-    private func startValueAnimation<Value>(
-        _ timeline: AdaptyViewConfiguration.Animation.Timeline,
-        interpolator: AdaptyViewConfiguration.Animation.Interpolator,
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension ViewModifier {
+    func startValueAnimation<Value>(
+        _ animation: AdaptyViewConfiguration.Animation,
         from start: Value,
         to end: Value,
         updateBlock: (Value) -> Void
     ) {
         updateBlock(start)
 
-        let (animation, _) = Animation.customIgnoringElasticAndBounce(
-            timeline: timeline,
-            interpolator: interpolator
+        let (animation, _) = Animation.customIgnoringElasticAndBounceBefore17(
+            animation: animation,
         )
 
         withAnimation(animation) {
@@ -137,7 +157,7 @@ struct AdaptyUIAnimatableGeometryFallbackModifier: ViewModifier {
 
     init(animation: AdaptyViewConfiguration.Animation) {
         self.animation = animation
-        (swiftUIanimation, functor) = Animation.customIgnoringElasticAndBounce(animation: animation)
+        (swiftUIanimation, functor) = Animation.customIgnoringElasticAndBounceBefore17(animation: animation)
     }
 
     @Environment(\.adaptyScreenSize)
@@ -202,7 +222,7 @@ struct AdaptyUIAnimatableGeometryFallbackModifier: ViewModifier {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyViewConfiguration.Animation.OffsetValue {
+extension AdaptyViewConfiguration.Animation.Range<AdaptyViewConfiguration.Offset> {
     func current(
         p: Double,
         _ screenSize: CGSize,
@@ -226,16 +246,16 @@ extension AdaptyViewConfiguration.Animation.OffsetValue {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyViewConfiguration.Animation.DoubleValue {
+extension AdaptyViewConfiguration.Animation.Range<Double> {
     func current(p: Double) -> Double {
         start + (end - start) * p
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyViewConfiguration.Animation.DoubleWithAnchorValue {
+extension AdaptyViewConfiguration.Animation.RotationParameters {
     func currentRotation(p: Double) -> Angle {
-        .degrees(start) + (.degrees(end) - .degrees(start)) * p
+        .degrees(angle.start) + (.degrees(angle.end) - .degrees(angle.start)) * p
     }
 }
 
@@ -243,8 +263,8 @@ extension AdaptyViewConfiguration.Animation.DoubleWithAnchorValue {
 extension AdaptyViewConfiguration.Animation.ScaleParameters {
     func current(p: Double) -> CGSize {
         CGSize(
-            width: start.x + (end.x - start.x) * p,
-            height: start.y + (end.y - start.y) * p
+            width: scale.start.x + (scale.end.x - scale.start.x) * p,
+            height: scale.start.y + (scale.end.y - scale.start.y) * p
         )
     }
 }
