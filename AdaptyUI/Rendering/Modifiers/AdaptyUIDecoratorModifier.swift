@@ -52,7 +52,7 @@ extension InsettableShape {
                     self.fill(color.swiftuiColor(assetsResolver))
                 case let .colorGradient(gradient):
                     if let customId = gradient.customId,
-                       let customGradient = assetsResolver.gradient(for: customId)
+                       case let .gradient(customGradient) = assetsResolver.asset(for: customId)
                     {
                         switch customGradient {
                         case let .linear(gradient, startPoint, endPoint):
@@ -119,7 +119,7 @@ extension InsettableShape {
                 )
             case let .colorGradient(gradient):
                 if let customId = gradient.customId,
-                   let customGradient = assetsResolver.gradient(for: customId)
+                   case let .gradient(customGradient) = assetsResolver.asset(for: customId)
                 {
                     switch customGradient {
                     case let .linear(gradient, startPoint, endPoint):
