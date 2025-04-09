@@ -113,7 +113,7 @@ struct AdaptyUIImageView: View {
                         EmptyView()
                     }
                 }
-        case let .image(value):
+        case let .uiImage(value):
             rasterImage(
                 value,
                 aspect: aspect,
@@ -130,7 +130,9 @@ struct AdaptyUIImageView: View {
     ) -> some View {
         switch asset {
         case let .raster(customId, data):
-            if let customId, let customAsset = assetsViewModel.assetsResolver.image(for: customId) {
+            if let customId,
+               case let .image(customAsset) = assetsViewModel.assetsResolver.asset(for: customId)
+            {
                 resolvedCustomImage(
                     customAsset: customAsset,
                     aspect: aspect,
@@ -144,7 +146,9 @@ struct AdaptyUIImageView: View {
                 )
             }
         case let .url(customId, url, preview):
-            if let customId, let customAsset = assetsViewModel.assetsResolver.image(for: customId) {
+            if let customId,
+               case let .image(customAsset) = assetsViewModel.assetsResolver.asset(for: customId)
+            {
                 resolvedCustomImage(
                     customAsset: customAsset,
                     aspect: aspect,

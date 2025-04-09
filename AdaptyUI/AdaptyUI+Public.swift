@@ -66,13 +66,13 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     /// - Parameters:
     ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
     func paywallControllerDidAppear(_ controller: AdaptyPaywallController)
-    
+
     /// This method is invoked when the paywall view was dismissed.
     ///
     /// - Parameters:
     ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
     func paywallControllerDidDisappear(_ controller: AdaptyPaywallController)
-    
+
     /// If user performs an action process, this method will be invoked.
     ///
     /// - Parameters:
@@ -213,31 +213,48 @@ public extension AdaptyUI {
     ///
     /// - Parameter builder: `AdaptyUI.Configuration` which allows to configure AdaptyUI SDK
     static func activate(configuration: AdaptyUI.Configuration = .default) async throws {
+        let stamp = Log.stamp
+        let logParams = [
+            "media_cache": configuration.mediaCacheConfiguration,
+        ]
+
+        Log.ui.verbose("Calling AdaptyUI activate [\(stamp)] with params: \(logParams)")
+
 #if canImport(UIKit)
-        let sdk: Adapty
-        do {
-            sdk = try await Adapty.activatedSDK
-        } catch {
-            let err = AdaptyUIError.adaptyNotActivatedError
-            Log.ui.error("AdaptyUI activate error: \(err)")
-            throw err
+
+        let task = Task<Adapty, Error> { @AdaptyActor in
+            let sdk: Adapty
+
+            do {
+                sdk = try await Adapty.activatedSDK
+            } catch {
+                let err = AdaptyUIError.adaptyNotActivatedError
+                Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(error).")
+                throw err
+            }
+
+            return sdk
         }
+
+        let sdk = try await task.value
 
         guard !AdaptyUI.isActivated else {
             let err = AdaptyUIError.activateOnceError
-            Log.ui.warn("AdaptyUI activate error: \(err)")
-
+            Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(err).")
             throw err
         }
+
         AdaptyUI.isActivated = true
         AdaptyUI.isObserverModeEnabled = await sdk.observerMode
 
         AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration ?? .default)
         ImageUrlPrefetcher.shared.initialize()
 
-        Log.ui.info("AdaptyUI activated with \(configuration)")
+        Log.ui.info("AdaptyUI activated successfully. [\(stamp)]")
 #else
-        throw AdaptyUIError.platformNotSupported
+        let err = AdaptyUIError.platformNotSupported
+        Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(err).")
+        throw err
 #endif
     }
 }
@@ -258,6 +275,38 @@ public extension AdaptyUI {
     ///   - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
     /// - Returns: an ``AdaptyPaywallConfiguration`` object.
     static func getPaywallConfiguration(
+        forPaywall paywall: AdaptyPaywall,
+        loadTimeout: TimeInterval? = nil,
+        products: [AdaptyPaywallProduct]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyTagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil
+    ) async throws -> PaywallConfiguration {
+        guard AdaptyUI.isActivated else {
+            let err = AdaptyUIError.adaptyNotActivatedError
+            Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
+
+            throw err
+        }
+
+        let viewConfiguration = try await Adapty.getViewConfiguration(
+            paywall: paywall,
+            loadTimeout: loadTimeout
+        )
+
+        return PaywallConfiguration(
+            logId: Log.stamp,
+            paywall: paywall,
+            viewConfiguration: viewConfiguration,
+            products: products,
+            observerModeResolver: observerModeResolver,
+            tagResolver: tagResolver,
+            timerResolver: timerResolver,
+            assetsResolver: nil
+        )
+    }
+    
+    package static func getPaywallConfigurationWithAssets(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
