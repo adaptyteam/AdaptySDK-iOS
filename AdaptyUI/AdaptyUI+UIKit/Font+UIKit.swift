@@ -61,8 +61,8 @@ extension VC.Font {
     static let systemFontReservedName = "adapty_system"
 
     func uiFont(size: Double, assetsResolver: AdaptyAssetsResolver) -> UIFont {
-        if let customId, let font = assetsResolver.font(for: customId, size: size) {
-            return font
+        if let customId, case let .font(font) = assetsResolver.asset(for: customId) {
+            return font.withSize(size)
         }
         
         if !alias.isEmpty, let font = UIFont(name: alias, size: size) {

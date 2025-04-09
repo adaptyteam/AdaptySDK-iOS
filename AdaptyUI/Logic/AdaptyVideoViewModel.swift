@@ -11,8 +11,6 @@ import Adapty
 import AVKit
 import SwiftUI
 
-
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
@@ -54,7 +52,9 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         video: VC.VideoData,
         assetsResolver: AdaptyAssetsResolver?
     ) -> (AVPlayerItem, AVQueuePlayer)? {
-        if let videoId = video.customId, let customAsset = assetsResolver?.video(for: videoId) {
+        if let videoId = video.customId,
+           case .video(let customAsset) = assetsResolver?.asset(for: videoId)
+        {
             switch customAsset {
             case .file(let url, _), .remote(let url, _):
                 let playerItem = AVPlayerItem(url: url)

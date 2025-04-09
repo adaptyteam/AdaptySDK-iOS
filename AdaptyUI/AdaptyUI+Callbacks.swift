@@ -39,7 +39,6 @@ public extension AdaptyUI {
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyTagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
-        assetsResolver: AdaptyAssetsResolver? = nil,
         _ completion: @escaping AdaptyResultCompletion<PaywallConfiguration>
     ) {
         withCompletion(completion) {
@@ -50,7 +49,6 @@ public extension AdaptyUI {
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
-                assetsResolver: assetsResolver
             )
         }
     }
