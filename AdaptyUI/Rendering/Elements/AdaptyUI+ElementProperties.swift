@@ -53,7 +53,10 @@ extension VC.Mode<VC.Color> {
 @MainActor
 extension VC.Color {
     func swiftuiColor(_ assetsResolver: AdaptyAssetsResolver) -> SwiftUI.Color {
-        guard let customId, let customColor = assetsResolver.color(for: customId) else {
+        guard
+            let customId,
+            case let .color(customColor) = assetsResolver.asset(for: customId)
+        else {
             return Color(
                 .sRGB,
                 red: red,
@@ -72,7 +75,10 @@ extension VC.Color {
     }
 
     func uiColor(_ assetsResolver: AdaptyAssetsResolver) -> UIColor {
-        guard let customId, let customColor = assetsResolver.color(for: customId) else {
+        guard
+            let customId,
+            case let .color(customColor) = assetsResolver.asset(for: customId)
+        else {
             return UIColor(
                 red: red,
                 green: green,

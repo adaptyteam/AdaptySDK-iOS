@@ -14,7 +14,7 @@ import UIKit
 @MainActor
 extension AdaptyAssetsResolver {
     func uiImage(for name: String) -> UIImage? {
-        guard let asset = image(for: name) else { return nil }
+        guard case let .image(asset) = asset(for: name) else { return nil }
 
         switch asset {
         case let .file(url):
@@ -25,7 +25,7 @@ extension AdaptyAssetsResolver {
             }
         case .remote:
             return nil
-        case let .image(value):
+        case let .uiImage(value):
             return value
         }
     }
