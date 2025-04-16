@@ -50,7 +50,8 @@ extension AdaptyViewConfiguration.Animation.Interpolator {
             case .easeIn: .easeIn(duration: duration)
             case .easeOut: .easeOut(duration: duration)
             case let .cubicBezier(x1, y1, x2, y2): .timingCurve(x1, y1, x2, y2, duration: duration)
-            default: .linear(duration: duration)
+            case .linear: .linear(duration: duration)
+            default: .easeInOut(duration: duration)
             }
         }
     }
