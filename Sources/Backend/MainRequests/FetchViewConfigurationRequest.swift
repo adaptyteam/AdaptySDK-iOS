@@ -8,7 +8,7 @@
 import Foundation
 
 struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyViewSource>
+    typealias ResponseBody = Backend.Response.Data<AdaptyViewSource>
 
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders

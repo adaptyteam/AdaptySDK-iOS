@@ -42,6 +42,10 @@ extension Backend {
     static func wrongProfileSegmentId(_ error: HTTPError) -> Bool {
         backendErrorCodes(error).contains("INCORRECT_SEGMENT_HASH_ERROR")
     }
+    
+    static func wrongPlacementContentType(_ error: HTTPError) -> Bool {
+        backendErrorCodes(error).contains("UNSUPPORTED_PLACEMENT_TYPE_ERROR")
+    }
 
     static func backendErrorCodes(_ error: HTTPError) -> [String] {
         switch error {

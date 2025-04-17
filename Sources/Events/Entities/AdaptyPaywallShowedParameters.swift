@@ -8,13 +8,13 @@
 import Foundation
 
 struct AdaptyPaywallShowedParameters: Sendable {
-    let paywallVariationId: String
+    let variationId: String
     let viewConfigurationId: String?
 }
 
 extension AdaptyPaywallShowedParameters: Codable {
     enum CodingKeys: String, CodingKey {
-        case paywallVariationId = "variation_id"
+        case variationId = "variation_id"
         case viewConfigurationId = "paywall_builder_id"
     }
 }

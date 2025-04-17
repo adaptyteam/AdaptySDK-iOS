@@ -1,5 +1,5 @@
 //
-//  Adapty+PaywallsForDefaultAudience.swift
+//  Adapty+PlacementForDefaultAudience.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 12.08.2024
@@ -22,9 +22,9 @@ extension Adapty {
     public nonisolated static func getPaywallForDefaultAudience(
         placementId: String,
         locale: String? = nil,
-        fetchPolicy: AdaptyPaywall.FetchPolicy = .default
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws -> AdaptyPaywall {
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale
+        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
 
         let logParams: EventParameters = [
             "placement_id": placementId,
@@ -33,7 +33,7 @@ extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getPaywallForDefaultAudience, logParams: logParams) { sdk in
-            let paywall = try await sdk.getPaywallForDefaultAudience(
+            let paywall: AdaptyPaywall = try await sdk.getPlacementForDefaultAudience(
                 placementId,
                 locale,
                 fetchPolicy
@@ -44,53 +44,77 @@ extension Adapty {
         }
     }
 
-    private func getPaywallForDefaultAudience(
+    public nonisolated static func getOnboardingForDefaultAudience(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default
+    ) async throws -> AdaptyOnboarding {
+        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+
+        let logParams: EventParameters = [
+            "placement_id": placementId,
+            "locale": locale,
+            "fetch_policy": fetchPolicy,
+        ]
+
+        return try await withActivatedSDK(methodName: .getOnboardingForDefaultAudience, logParams: logParams) { sdk in
+            let onboarding: AdaptyOnboarding = try await sdk.getPlacementForDefaultAudience(
+                placementId,
+                locale,
+                fetchPolicy
+            )
+
+            return onboarding
+        }
+    }
+
+    private func getPlacementForDefaultAudience<Content: AdaptyPlacementContent>(
         _ placementId: String,
         _ locale: AdaptyLocale,
-        _ fetchPolicy: AdaptyPaywall.FetchPolicy
-    ) async throws -> AdaptyPaywall {
+        _ fetchPolicy: AdaptyPlacementFetchPolicy
+    ) async throws -> Content {
         let manager = profileManager
         let profileId = manager?.profileId ?? profileStorage.profileId
 
-        let fetchTask = Task {
-            try await fetchPaywallForDefaultAudience(
+        let fetchTask = Task<Content, Error> {
+            try await fetchPlacementForDefaultAudience(
                 profileId,
                 placementId,
                 locale
             )
         }
 
-        let cached = manager?
-            .paywallsStorage
-            .getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: nil)?
+        let cached: Content? = manager?
+            .placementStorage
+            .getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: nil)?
             .withFetchPolicy(fetchPolicy)?
             .value
 
-        let paywall =
+        let content =
             if let cached {
                 cached
             } else {
                 try await fetchTask.value
             }
 
-        return paywall
+        return content
     }
 
-    private func fetchPaywallForDefaultAudience(
+    private func fetchPlacementForDefaultAudience<Content: AdaptyPlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale
-    ) async throws -> AdaptyPaywall {
-        let (cached, isTestUser): (AdaptyPaywall?, Bool) = {
+    ) async throws -> Content {
+        let (cached, isTestUser): (Content?, Bool) = {
             guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
             return (
-                manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
+                manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
                 manager.profile.value.isTestUser
             )
         }()
 
         do {
-            var chosen = try await httpConfigsSession.fetchUntargetedPaywallVariations(
+            var chosen: AdaptyPlacementChosen<Content> = try await httpConfigsSession.fetchUntargetedPlacementVariations(
                 apiKeyPrefix: apiKeyPrefix,
                 profileId: profileId,
                 placementId: placementId,
@@ -103,22 +127,22 @@ extension Adapty {
             )
 
             if let manager = tryProfileManagerOrNil(with: profileId) {
-                chosen = manager.paywallsStorage.savedPaywallChosen(chosen)
+                chosen = manager.placementStorage.savedPlacementChosen(chosen)
             }
 
             Adapty.trackEventIfNeed(chosen)
-            return chosen.paywall
+            return chosen.content
 
         } catch {
-            guard let paywall = getCacheOrFallbackFilePaywall(
+            guard let content: Content = getCacheOrFallbackFilePlacement(
                 profileId,
                 placementId,
                 locale,
                 withCrossPlacmentABTest: false
             ) else {
-                throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                throw error.asAdaptyError ?? AdaptyError.fetchPlacementFailed(unknownError: error)
             }
-            return paywall
+            return content
         }
     }
 }

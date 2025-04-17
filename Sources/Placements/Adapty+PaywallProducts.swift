@@ -19,7 +19,7 @@ public extension Adapty {
     nonisolated static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct] {
         try await withActivatedSDK(
             methodName: .getPaywallProducts,
-            logParams: ["placement_id": paywall.placementId]
+            logParams: ["placement_id": paywall.placement.id]
         ) { sdk in
             if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                 if let manager = sdk.productsManager as? SK2ProductsManager {
@@ -43,7 +43,7 @@ public extension Adapty {
     nonisolated static func getPaywallProductsWithoutDeterminingOffer(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
         try await withActivatedSDK(
             methodName: .getPaywallProductswithoutDeterminingOffer,
-            logParams: ["placement_id": paywall.placementId]
+            logParams: ["placement_id": paywall.placement.id]
         ) { sdk in
             if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                 if let manager = sdk.productsManager as? SK2ProductsManager {

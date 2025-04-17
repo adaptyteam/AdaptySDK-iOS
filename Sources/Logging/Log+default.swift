@@ -19,7 +19,7 @@ extension Log {
     static let storage = Log.Category(name: "Storage")
     static let http = Log.Category(name: "API")
 
-    static let fallbackPaywalls = Log.Category(name: "FallbackPaywalls")
+    static let fallbackPlacements = Log.Category(name: "FallbackPlacements")
 
     static let storeFront = Log.Category(name: "SKStorefront")
     static let sk1ProductManager = Log.Category(name: "SK1ProductsManager")

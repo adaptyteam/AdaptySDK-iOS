@@ -8,7 +8,7 @@
 import Foundation
 
 private struct FetchCrossPlacementStateRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<CrossPlacementState>
+    typealias ResponseBody = Backend.Response.Data<CrossPlacementState>
     let endpoint = HTTPEndpoint(
         method: .get,
         path: "/sdk/in-apps/profile/cross-placement-info/"

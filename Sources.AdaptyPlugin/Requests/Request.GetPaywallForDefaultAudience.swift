@@ -14,7 +14,7 @@ extension Request {
 
         let placementId: String
         let locale: String?
-        let fetchPolicy: AdaptyPaywall.FetchPolicy?
+        let fetchPolicy: AdaptyPlacementFetchPolicy?
 
         enum CodingKeys: String, CodingKey {
             case placementId = "placement_id"
@@ -26,7 +26,7 @@ extension Request {
             try .success(await Adapty.getPaywallForDefaultAudience(
                 placementId: placementId,
                 locale: locale,
-                fetchPolicy: fetchPolicy ?? AdaptyPaywall.FetchPolicy.default
+                fetchPolicy: fetchPolicy ?? AdaptyPlacementFetchPolicy.default
             ))
         }
     }

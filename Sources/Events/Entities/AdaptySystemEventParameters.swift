@@ -42,12 +42,18 @@ enum APIRequestName: String {
     case fetchProfile = "get_profile"
     case updateProfile = "update_profile"
     case fetchPaywallVariations = "get_paywall_variations"
+    case fetchOnboardingVariations = "get_onboarding_variations"
     case fetchFallbackPaywallVariations = "get_fallback_paywall_variations"
+    case fetchFallbackOnboardingVariations = "get_fallback_onboarding_variations"
     case fetchUntargetedPaywallVariations = "get_untargeted_paywall_variations"
+    case fetchUntargetedOnboardingVariations = "get_untargeted_onboarding_variations"
+
     case fetchViewConfiguration = "get_paywall_builder"
     case fetchFallbackViewConfiguration = "get_fallback_paywall_builder"
     case fetchCrossPlacementState = "get_cross_placement_state"
+    case fetchOnboarding = "get_onboarding "
     case fetchPaywall = "get_paywall"
+
     case fetchFallbackPaywall = "get_fallback_paywall"
 
     case validateTransaction = "validate_transaction"
@@ -159,14 +165,19 @@ enum MethodName: String {
     case restorePurchases = "restore_purchases"
 
     case getPaywall = "get_paywall"
+    case getOnboarding = "get_onboarding"
+
     case getPaywallForDefaultAudience = "get_untargeted_paywall"
+    case getOnboardingForDefaultAudience = "get_untargeted_onboarding"
+
     case setFallbackPaywalls = "set_fallback_paywalls"
 
     case logShowOnboarding = "log_show_onboarding"
+    case logShowOnboardingScreen = "log_show_onboarding_screen"
     case logShowPaywall = "log_show_paywall"
 
     case presentCodeRedemptionSheet = "present_code_redemption_sheet"
-    
+
     case updateCollectingRefundDataConsent = "update_collecting_refund_data_consent"
     case updateRefundPreference = "update_refund_preference"
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 private struct FetchEventsConfigRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<EventsBackendConfiguration>
+    typealias ResponseBody = Backend.Response.Data<EventsBackendConfiguration>
 
     let endpoint = HTTPEndpoint(
         method: .get,

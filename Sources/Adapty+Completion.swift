@@ -167,7 +167,7 @@ public extension Adapty {
     nonisolated static func getPaywall(
         placementId: String,
         locale: String? = nil,
-        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
@@ -194,7 +194,7 @@ public extension Adapty {
     nonisolated static func getPaywallForDefaultAudience(
         placementId: String,
         locale: String? = nil,
-        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
         withCompletion(completion) {

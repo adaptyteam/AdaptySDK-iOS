@@ -246,13 +246,13 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), error.localizedDescription).asAdaptyError
     }
 
-    static func fetchPaywallFailed(
+    static func fetchPlacementFailed(
         unknownError: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch Profile failed", error: unknownError).asAdaptyError
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch placement failed", error: unknownError).asAdaptyError
     }
 
     static func syncProfileFailed(

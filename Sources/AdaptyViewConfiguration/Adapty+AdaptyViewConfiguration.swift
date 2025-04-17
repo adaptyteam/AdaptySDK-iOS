@@ -13,7 +13,7 @@ extension Adapty {
         paywall: AdaptyPaywall,
         loadTimeout: TimeInterval? = nil
     ) async throws -> AdaptyViewConfiguration {
-        let loadTimeout = (loadTimeout ?? .defaultLoadPaywallTimeout).allowedLoadPaywallTimeout
+        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         return try await activatedSDK.getViewConfiguration(
             paywall: paywall,
             loadTimeout: loadTimeout
@@ -61,10 +61,10 @@ extension Adapty {
 
     private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyViewSource? {
         guard
-            let cached = profileManager?.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placementId, withVariationId: paywall.variationId)?.value,
+            let cached: AdaptyPaywall = profileManager?.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placement.id, withVariationId: paywall.variationId)?.value,
             paywall.instanceIdentity == cached.instanceIdentity,
-            paywall.revision == cached.revision,
-            paywall.version == cached.version,
+            paywall.placement.revision == cached.placement.revision,
+            paywall.placement.version == cached.placement.version,
             let cachedViewConfiguration = cached.viewConfiguration,
             case let .value(value) = cachedViewConfiguration
         else { return nil }

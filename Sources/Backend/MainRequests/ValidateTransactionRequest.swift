@@ -8,7 +8,7 @@
 import Foundation
 
 private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyProfile>
+    typealias ResponseBody = Backend.Response.Data<AdaptyProfile>
 
     let endpoint = HTTPEndpoint(
         method: .post,
@@ -141,8 +141,9 @@ extension Backend.MainExecutor {
             "product_id": purchasedTransaction.vendorProductId,
             "original_transaction_id": purchasedTransaction.originalTransactionId,
             "transaction_id": purchasedTransaction.transactionId,
-            "variation_id": purchasedTransaction.productVariationId,
-            "variation_id_persistent": purchasedTransaction.persistentProductVariationId,
+            "variation_id": purchasedTransaction.paywallVariationId,
+            "variation_id_persistent": purchasedTransaction.persistentPaywallVariationId,
+            "onboarding_variation_id": purchasedTransaction.persistentOnboardingVariationId,
             "promotional_offer_id": purchasedTransaction.subscriptionOffer?.id,
             "environment": purchasedTransaction.environment,
             "request_source": reason.rawString,

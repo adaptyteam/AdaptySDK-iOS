@@ -8,7 +8,7 @@
 import Foundation
 
 private struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<[String]>
+    typealias ResponseBody = Backend.Response.Data<[String]>
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
 

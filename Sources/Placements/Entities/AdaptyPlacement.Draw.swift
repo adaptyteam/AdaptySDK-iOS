@@ -1,0 +1,80 @@
+//
+//  AdaptyPlacement.Draw.swift
+//  AdaptySDK
+//
+//  Created by Aleksei Valiano on 26.03.2024
+//
+
+import Foundation
+
+extension AdaptyPlacement {
+    struct Draw<Content: AdaptyPlacementContent>: Sendable {
+        let profileId: String
+        var content: Content
+        let placementAudienceVersionId: String
+        let variationIdByPlacements: [String: String]
+    }
+}
+
+extension AdaptyPlacement.Draw {
+    var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
+}
+
+extension AdaptyPlacement.Draw: Decodable {
+    init(from decoder: Decoder) throws {
+        let profileId = try decoder.userInfo.profileId
+        let placement = try decoder.userInfo.placement
+
+        let variations = try [AdaptyPlacement.Variation](from: decoder)
+
+        guard !variations.isEmpty else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placements contetnts collection is empty"))
+        }
+
+        let index: Int
+        if let variationId = decoder.userInfo.placementVariationIdOrNil {
+            guard let founded = variations.firstIndex(where: { $0.variationId == variationId }) else {
+                throw ResponseDecodingError.notFoundVariationId
+            }
+            index = founded
+        } else {
+            index = variations.draw(
+                placementAudienceVersionId: placement.placementAudienceVersionId, // TODO: extract from placement
+                profileId: profileId
+            )
+        }
+
+        guard variations.indices.contains(index) else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
+        }
+
+        let variation = variations[index]
+
+        let content = try Self.content(from: decoder, index: index)
+
+        self.init(
+            profileId: profileId,
+            content: content,
+            placementAudienceVersionId: placement.placementAudienceVersionId, // TODO: extract from placement
+            variationIdByPlacements: variation.variationIdByPlacements
+        )
+    }
+
+    private static func content(from decoder: Decoder, index: Int) throws -> Content {
+        var array = try decoder.unkeyedContainer()
+        while !array.isAtEnd {
+            if array.currentIndex == index {
+                if Content.self == AdaptyPaywall.self {
+                    let container = try array.nestedContainer(keyedBy: Backend.CodingKeys.self)
+                    return try container.decode(Content.self, forKey: .attributes)
+                }
+                return try array.decode(Content.self)
+            }
+            _ = try array.decode(PassObject.self)
+        }
+
+        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
+    }
+}
+
+private struct PassObject: Decodable {}

@@ -1,5 +1,5 @@
 //
-//  Adapty+FallbackPaywalls.swift
+//  Adapty+FallbackPlacements.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -8,7 +8,7 @@
 import Foundation
 
 extension Adapty {
-    static var fallbackPaywalls: FallbackPaywalls?
+    static var fallbackPlacements: FallbackPlacements?
 
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///
@@ -24,7 +24,7 @@ extension Adapty {
             methodName: .setFallbackPaywalls
         ) { @AdaptyActor in
             do {
-                Adapty.fallbackPaywalls = try FallbackPaywalls(fileURL: url)
+                Adapty.fallbackPlacements = try FallbackPlacements(fileURL: url)
             } catch {
                 throw error.asAdaptyError ?? .decodingFallbackFailed(unknownError: error)
             }
@@ -32,73 +32,73 @@ extension Adapty {
     }
 }
 
-private let log = Log.fallbackPaywalls
+private let log = Log.fallbackPlacements
 
 extension PaywallsStorage {
-    private func getPaywall(byPlacementId placementId: String, withVariationId variationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPaywallChosen? {
-        getPaywallByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: variationId).map {
-            AdaptyPaywallChosen.restore($0.value)
+    private func getPlacement<Content: AdaptyPlacementContent>(byPlacementId placementId: String, withVariationId variationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPlacementChosen<Content>? {
+        getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: variationId).map {
+            AdaptyPlacementChosen.restore($0.value)
         }
     }
 
-    func getPaywallWithFallback(byPlacementId placementId: String, withVariationId variationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPaywallChosen? {
-        let cachedA = variationId == nil ? nil
-            : getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId, locale: locale)
+    func getPlacementWithFallback<Content: AdaptyPlacementContent>(byPlacementId placementId: String, withVariationId variationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPlacementChosen<Content>? {
+        let cachedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
+            : getPlacement(byPlacementId: placementId, withVariationId: variationId, profileId: profileId, locale: locale)
 
-        let cachedB = cachedA != nil ? nil
-            : getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId, locale: locale)
+        let cachedB: AdaptyPlacementChosen<Content>? = cachedA != nil ? nil
+            : getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId, locale: locale)
 
         let cached = cachedA ?? cachedB
 
-        guard let fallbackFile = Adapty.fallbackPaywalls, fallbackFile.contains(placementId: placementId) ?? true
+        guard let fallbackFile = Adapty.fallbackPlacements, fallbackFile.contains(placementId: placementId) ?? true
         else {
             guard let cached else { return nil }
-            Log.crossAB.verbose("return cached paywall (placementId: \(placementId), variationId: \(cached.paywall.variationId), version: \(cached.paywall.version) no-fallback")
+            Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version) no-fallback")
             return cached
         }
 
         switch (cachedA, cachedB) {
         case (.some(let cached), _):
-            if cached.paywall.version < fallbackFile.version,
-               let fallbacked = fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
+            if cached.content.placement.version < fallbackFile.version,
+               let fallbacked: AdaptyPlacementChosen<Content> = fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
             {
-                Log.crossAB.verbose("return from fallback paywall (placementId: \(placementId), variationId: \(fallbacked.paywall.variationId), version: \(fallbacked.paywall.version)) same-variation")
+                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version)) same-variation")
                 return fallbacked
             } else {
-                Log.crossAB.verbose("return cached paywall (placementId: \(placementId), variationId: \(cached.paywall.variationId), version: \(cached.paywall.version) same-variation")
+                Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version) same-variation")
                 return cached
             }
 
         case (_, .some(let cached)):
 
-            let fallbackedA = variationId == nil ? nil :
-                fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
+            let fallbackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil :
+                fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
 
-            let fallbackedB = (fallbackedA != nil || cached.paywall.version >= fallbackFile.version) ? nil
-                : fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
+            let fallbackedB: AdaptyPlacementChosen<Content>? = (fallbackedA != nil || cached.content.placement.version >= fallbackFile.version) ? nil
+                : fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
 
             if let fallbacked = fallbackedA ?? fallbackedB {
-                Log.crossAB.verbose("return from fallback paywall (placementId: \(placementId), variationId: \(fallbacked.paywall.variationId), version: \(fallbacked.paywall.version))")
+                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version))")
 
                 return fallbacked
             } else {
-                Log.crossAB.verbose("return cached paywall (placementId: \(placementId), variationId: \(cached.paywall.variationId), version: \(cached.paywall.version)")
+                Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version)")
                 return cached
             }
 
         default:
 
-            let fallbacked =
+            let fallbacked: AdaptyPlacementChosen<Content>? =
                 if let variationId {
-                    fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
-                        ?? fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
+                    fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
+                        ?? fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
                 } else {
-                    fallbackFile.getPaywall(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
+                    fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
                 }
 
             guard let fallbacked else { return nil }
 
-            Log.crossAB.verbose("return from fallback paywall (placementId: \(placementId), variationId: \(fallbacked.paywall.variationId), version: \(fallbacked.paywall.version)) no-cache")
+            Log.crossAB.verbose("return from fallback plqcement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version)) no-cache")
 
             return fallbacked
         }

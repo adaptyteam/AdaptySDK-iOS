@@ -8,7 +8,7 @@
 import Foundation
 
 private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyProfile>
+    typealias ResponseBody = Backend.Response.Data<AdaptyProfile>
 
     let endpoint = HTTPEndpoint(
         method: .post,

@@ -28,7 +28,7 @@ extension Adapty {
                 skProduct: sk1Product,
                 adaptyProductId: reference.adaptyProductId,
                 variationId: paywall.variationId,
-                paywallABTestName: paywall.abTestName,
+                paywallABTestName: paywall.placement.abTestName,
                 paywallName: paywall.name
             )
         }
@@ -125,7 +125,7 @@ extension Adapty {
                 adaptyProductId: $0.reference.adaptyProductId,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
-                paywallABTestName: paywall.abTestName,
+                paywallABTestName: paywall.placement.abTestName,
                 paywallName: paywall.name
             )
         }

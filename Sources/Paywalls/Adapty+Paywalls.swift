@@ -26,11 +26,11 @@ extension Adapty {
     public nonisolated static func getPaywall(
         placementId: String,
         locale: String? = nil,
-        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil
     ) async throws -> AdaptyPaywall {
-        let loadTimeout = (loadTimeout ?? .defaultLoadPaywallTimeout).allowedLoadPaywallTimeout
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPaywallLocale
+        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
+        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
 
         let logParams: EventParameters = [
             "placement_id": placementId,
@@ -40,7 +40,7 @@ extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getPaywall, logParams: logParams) { sdk in
-            let paywall = try await sdk.getPaywall(
+            let paywall: AdaptyPaywall = try await sdk.getPlacement(
                 placementId,
                 locale,
                 fetchPolicy,
@@ -52,12 +52,40 @@ extension Adapty {
         }
     }
 
-    private func getPaywall(
+    public nonisolated static func getOnboarding(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
+        loadTimeout: TimeInterval? = nil
+    ) async throws -> AdaptyOnboarding {
+        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
+        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+
+        let logParams: EventParameters = [
+            "placement_id": placementId,
+            "locale": locale,
+            "fetch_policy": fetchPolicy,
+            "load_timeout": loadTimeout.asMilliseconds,
+        ]
+
+        return try await withActivatedSDK(methodName: .getOnboarding, logParams: logParams) { sdk in
+            let onboarding: AdaptyOnboarding = try await sdk.getPlacement(
+                placementId,
+                locale,
+                fetchPolicy,
+                loadTimeout
+            )
+
+            return onboarding
+        }
+    }
+
+    private func getPlacement<Content: AdaptyPlacementContent>(
         _ placementId: String,
         _ locale: AdaptyLocale,
-        _ fetchPolicy: AdaptyPaywall.FetchPolicy,
+        _ fetchPolicy: AdaptyPlacementFetchPolicy,
         _ loadTimeout: TaskDuration
-    ) async throws -> AdaptyPaywall {
+    ) async throws -> Content {
         let profileId = profileStorage.profileId
 
         do {
@@ -65,7 +93,7 @@ extension Adapty {
 
             do {
                 return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
-                    try await self.fetchPaywall(
+                    try await self.fetchPlacement(
                         profileId,
                         placementId,
                         locale,
@@ -73,7 +101,7 @@ extension Adapty {
                     )
                 }
             } catch let error where error.canUseFallbackServer {
-                return try await fetchFallbackPaywall(
+                return try await fetchFallbackPlacement(
                     profileId,
                     placementId,
                     locale,
@@ -82,50 +110,50 @@ extension Adapty {
             }
 
         } catch {
-            guard let paywall = getCacheOrFallbackFilePaywall(
+            guard let content: Content = getCacheOrFallbackFilePlacement(
                 profileId,
                 placementId,
                 locale,
                 withCrossPlacmentABTest: true
             )
             else {
-                throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                throw error.asAdaptyError ?? AdaptyError.fetchPlacementFailed(unknownError: error)
             }
 
-            return paywall
+            return content
         }
     }
 
-    private func fetchPaywall(
+    private func fetchPlacement<Content: AdaptyPlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale,
-        _ fetchPolicy: AdaptyPaywall.FetchPolicy
-    ) async throws -> AdaptyPaywall {
+        _ fetchPolicy: AdaptyPlacementFetchPolicy
+    ) async throws -> Content {
         let manager = try await createdProfileManager
 
         guard manager.profileId == profileId else {
             throw AdaptyError.profileWasChanged()
         }
 
-        let fetchTask = Task {
-            try await fetchPaywall(
+        let fetchTask = Task<Content, Error> {
+            try await fetchPlacement(
                 profileId,
                 placementId,
                 locale
             )
         }
 
-        let cached = manager
-            .paywallsStorage
-            .getPaywallByLocale(locale,
-                                orDefaultLocale: true,
-                                withPlacementId: placementId,
-                                withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId))?
+        let cached: Content? = manager
+            .placementStorage
+            .getPlacementByLocale(locale,
+                                  orDefaultLocale: true,
+                                  withPlacementId: placementId,
+                                  withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId))?
             .withFetchPolicy(fetchPolicy)?
             .value
 
-        let paywall =
+        let content =
             if let cached {
                 cached
             } else {
@@ -136,45 +164,53 @@ extension Adapty {
                 }
             }
 
-        return paywall
+        return content
     }
 
-    private func fetchPaywall(
+    private func fetchPlacement<Content: AdaptyPlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale
-    ) async throws -> AdaptyPaywall {
+    ) async throws -> Content {
         while true {
-            let (segmentId, cached, isTestUser, crossPlacementState, paywallVariationId) = try {
+            let (segmentId, cached, isTestUser, crossPlacementState, variationId) = try {
                 let manager = try profileManager(with: profileId).orThrows
                 let crossPlacementState = manager.storage.crossPlacementState
                 let variationId = crossPlacementState?.variationId(placementId: placementId)
+                let cached: Content? = manager.placementStorage
+                    .getPlacementByLocale(
+                        locale,
+                        orDefaultLocale: false,
+                        withPlacementId: placementId,
+                        withVariationId: variationId
+                    )?
+                    .value
                 return (
                     manager.profile.value.segmentId,
-                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
+                    cached,
                     manager.profile.value.isTestUser,
                     crossPlacementState,
                     variationId
                 )
             }()
 
-            let caseWithPaywallVariation = paywallVariationId != nil
+            let caseWithPaywallVariation = variationId != nil
 
             do {
-                var chosen: AdaptyPaywallChosen
+                var chosen: AdaptyPlacementChosen<Content>
 
-                if let paywallVariationId {
-                    chosen = try await httpSession.fetchPaywall(
+                if let variationId {
+                    chosen = try await httpSession.fetchPlacement(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
-                        paywallVariationId: paywallVariationId,
+                        variationId: variationId,
                         locale: locale,
                         cached: cached,
                         disableServerCache: isTestUser
                     )
                 } else if let crossPlacementState, crossPlacementState.canParticipateInABTest {
-                    chosen = try await httpSession.fetchPaywallVariations(
+                    chosen = try await httpSession.fetchPlacementVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
@@ -194,22 +230,22 @@ extension Adapty {
                                     Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
                                     throw ResponseDecodingError.crossPlacementABTestDisabled
                                 } else {
-                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.paywall.variationId) DRAW")
-                                    return draw.paywall.variationId
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.content.variationId) DRAW")
+                                    return draw.content.variationId
                                 }
                             }
 
                             if crossPlacementState.canParticipateInABTest {
                                 if draw.participatesInCrossPlacementABTest {
-                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.paywall.variationId), state = \(draw.variationIdByPlacements) DRAW")
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.content.variationId), state = \(draw.variationIdByPlacements) DRAW")
                                     manager.storage.setCrossPlacementState(.init(
                                         variationIdByPlacements: draw.variationIdByPlacements,
                                         version: crossPlacementState.version
                                     ))
                                 } else {
-                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(draw.content.variationId) DRAW")
                                 }
-                                return draw.paywall.variationId
+                                return draw.content.variationId
                             } else if let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId) {
                                 // We are participating in cross AB test: A
                                 // And the paywall is from cross AB test: A
@@ -218,20 +254,20 @@ extension Adapty {
                             } else if !draw.participatesInCrossPlacementABTest {
                                 // We are participating in cross AB test: A
                                 // But the paywall is not in any cross AB test
-                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
-                                return draw.paywall.variationId
+                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(draw.content.variationId) DRAW")
+                                return draw.content.variationId
                             } else {
                                 // We are participating in cross AB test: A
                                 // But the paywall is from cross AB test: B
-                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(draw.paywall.variationId) DRAW")
-                                return draw.paywall.variationId
+                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(draw.content.variationId) DRAW")
+                                return draw.content.variationId
                             }
 
                         },
                         disableServerCache: isTestUser
                     )
                 } else {
-                    chosen = try await httpSession.fetchPaywallVariations(
+                    chosen = try await httpSession.fetchPlacementVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
@@ -245,11 +281,11 @@ extension Adapty {
                 }
 
                 if let manager = tryProfileManagerOrNil(with: profileId) {
-                    chosen = manager.paywallsStorage.savedPaywallChosen(chosen)
+                    chosen = manager.placementStorage.savedPlacementChosen(chosen)
                 }
 
                 Adapty.trackEventIfNeed(chosen)
-                return chosen.paywall
+                return chosen.content
 
             } catch {
                 if error.responseDecodingError([.profileWasChanged]) {
@@ -257,7 +293,7 @@ extension Adapty {
                 }
 
                 guard !caseWithPaywallVariation else {
-                    throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                    throw error.asAdaptyError ?? AdaptyError.fetchPlacementFailed(unknownError: error)
                 }
 
                 if error.responseDecodingError([.notFoundVariationId, .crossPlacementABTestDisabled]) { continue }
@@ -265,7 +301,7 @@ extension Adapty {
                 guard error.wrongProfileSegmentId,
                       try await updateSegmentId(for: profileId, oldSegmentId: segmentId)
                 else {
-                    throw error.asAdaptyError ?? AdaptyError.fetchPaywallFailed(unknownError: error)
+                    throw error.asAdaptyError ?? AdaptyError.fetchPlacementFailed(unknownError: error)
                 }
             }
         }
@@ -277,22 +313,22 @@ extension Adapty {
         }
     }
 
-    func getCacheOrFallbackFilePaywall(
+    func getCacheOrFallbackFilePlacement<Content: AdaptyPlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale,
         withCrossPlacmentABTest: Bool
-    ) -> AdaptyPaywall? {
-        let chosen =
+    ) -> Content? {
+        let chosen: AdaptyPlacementChosen<Content>? =
             if let manager = tryProfileManagerOrNil(with: profileId) {
-                manager.paywallsStorage.getPaywallWithFallback(
+                manager.placementStorage.getPlacementWithFallback(
                     byPlacementId: placementId,
                     withVariationId: withCrossPlacmentABTest ? manager.storage.crossPlacementState?.variationId(placementId: placementId) : nil,
                     profileId: profileId,
                     locale: locale
                 )
             } else {
-                Adapty.fallbackPaywalls?.getPaywall(
+                Adapty.fallbackPlacements?.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
                     profileId: profileId
@@ -302,40 +338,40 @@ extension Adapty {
         guard let chosen else { return nil }
 
         Adapty.trackEventIfNeed(chosen)
-        return chosen.paywall
+        return chosen.content
     }
 
-    private func fetchFallbackPaywall(
+    private func fetchFallbackPlacement<Content: AdaptyPlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale,
         _ timeoutInterval: TimeInterval?
-    ) async throws -> AdaptyPaywall {
+    ) async throws -> Content {
         while true {
-            let (cached, isTestUser, paywallVariationId): (AdaptyPaywall?, Bool, String?) = {
+            let (cached, isTestUser, variationId): (Content?, Bool, String?) = {
                 guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false, nil) }
                 let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId)
                 return (
-                    manager.paywallsStorage.getPaywallByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
+                    manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
                     manager.profile.value.isTestUser,
                     variationId
                 )
             }()
 
             do {
-                var chosen = if let paywallVariationId {
-                    try await httpFallbackSession.fetchFallbackPaywall(
+                var chosen: AdaptyPlacementChosen<Content> = if let variationId {
+                    try await httpFallbackSession.fetchFallbackPlacement(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
-                        paywallVariationId: paywallVariationId,
+                        paywallVariationId: variationId,
                         locale: locale,
                         cached: nil,
                         disableServerCache: isTestUser,
                         timeoutInterval: timeoutInterval
                     )
                 } else {
-                    try await httpFallbackSession.fetchFallbackPaywallVariations(
+                    try await httpFallbackSession.fetchFallbackPlacementVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         profileId: profileId,
                         placementId: placementId,
@@ -349,11 +385,11 @@ extension Adapty {
                 }
 
                 if let manager = tryProfileManagerOrNil(with: profileId) {
-                    chosen = manager.paywallsStorage.savedPaywallChosen(chosen)
+                    chosen = manager.placementStorage.savedPlacementChosen(chosen)
                 }
 
                 Adapty.trackEventIfNeed(chosen)
-                return chosen.paywall
+                return chosen.content
 
             } catch {
                 guard error.responseDecodingError([.notFoundVariationId]) else { throw error }
@@ -363,10 +399,10 @@ extension Adapty {
 }
 
 extension TimeInterval {
-    static let defaultLoadPaywallTimeout: TimeInterval = 5.0
+    static let defaultLoadPlacementTimeout: TimeInterval = 5.0
     static let minimumLoadPaywallTimeout: TimeInterval = 1.0
 
-    var allowedLoadPaywallTimeout: TaskDuration {
+    var allowedLoadPlacementTimeout: TaskDuration {
         let minimum: TimeInterval = .minimumLoadPaywallTimeout
         guard self < minimum else { return TaskDuration(self) }
         log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
@@ -385,6 +421,12 @@ private extension Error {
     var wrongProfileSegmentId: Bool {
         let error = unwrapped
         if let httpError = error as? HTTPError { return Backend.wrongProfileSegmentId(httpError) }
+        return false
+    }
+
+    var wrongPlacementContentType: Bool {
+        let error = unwrapped
+        if let httpError = error as? HTTPError { return Backend.wrongPlacementContentType(httpError) }
         return false
     }
 

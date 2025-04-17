@@ -12,16 +12,16 @@ private let log = Log.storage
 private extension AdaptyPaywall {
     var localeOrDefault: AdaptyLocale {
         var remoteConfigLocale = remoteConfig?.adaptyLocale
-        if let locale = remoteConfigLocale, locale.equalLanguageCode(.defaultPaywallLocale) {
+        if let locale = remoteConfigLocale, locale.equalLanguageCode(.defaultPlacementLocale) {
             remoteConfigLocale = nil
         }
         var viewConfigurationLocale = viewConfiguration?.responseLocale
-        if let locale = viewConfigurationLocale, locale.equalLanguageCode(.defaultPaywallLocale) {
+        if let locale = viewConfigurationLocale, locale.equalLanguageCode(.defaultPlacementLocale) {
             viewConfigurationLocale = nil
         }
 
         return switch (remoteConfigLocale, viewConfigurationLocale) {
-        case (.none, .none): .defaultPaywallLocale
+        case (.none, .none): .defaultPlacementLocale
         case let (.some(locale), _),
              let (_, .some(locale)): locale
         }
@@ -54,56 +54,60 @@ final class PaywallsStorage: Sendable {
         }
     }()
 
-    func getPaywallByLocale(
+    func getPlacementByLocale<Content: AdaptyPlacementContent>(
         _ locale: AdaptyLocale,
         orDefaultLocale: Bool,
         withPlacementId placementId: String,
         withVariationId: String?
-    ) -> VH<AdaptyPaywall>? {
-        guard let paywall = Self.paywallByPlacementId[placementId] else { return nil }
-        if let variationId = withVariationId, paywall.value.variationId != variationId {
-            return nil
-        }
-        let paywallLocale = paywall.value.localeOrDefault
-        return if paywallLocale.equalLanguageCode(locale) {
-            paywall
-        } else if orDefaultLocale, paywallLocale.equalLanguageCode(.defaultPaywallLocale) {
-            paywall
-        } else {
-            nil
-        }
+    ) -> VH<Content>?  {
+        return nil
+
+//        guard let paywall = Self.paywallByPlacementId[placementId] else { return nil }
+//        if let variationId = withVariationId, paywall.value.variationId != variationId {
+//            return nil
+//        }
+//        let paywallLocale = paywall.value.localeOrDefault
+//        return if paywallLocale.equalLanguageCode(locale) {
+//            paywall
+//        } else if orDefaultLocale, paywallLocale.equalLanguageCode(.defaultPlacementLocale) {
+//            paywall
+//        } else {
+//            nil
+//        }
     }
 
-    private func getNewerPaywall(than paywall: AdaptyPaywall) -> AdaptyPaywall? {
-        guard let cached: AdaptyPaywall = Self.paywallByPlacementId[paywall.placementId]?.value,
-              cached.equalLanguageCode(paywall),
-              cached.variationId == paywall.variationId
-        else { return nil }
-        return paywall.version >= cached.version ? nil : cached
+    
+    private func getNewerPlacement<Content: AdaptyPlacementContent>(than paywall: Content) -> Content? {
+        return nil
+//        guard let cached: AdaptyPaywall = Self.paywallByPlacementId[paywall.placementId]?.value,
+//              cached.equalLanguageCode(paywall),
+//              cached.variationId == paywall.variationId
+//        else { return nil }
+//        return paywall.version >= cached.version ? nil : cached
     }
 
-    func savedPaywallChosen(_ chosen: AdaptyPaywallChosen) -> AdaptyPaywallChosen {
-        Log.crossAB.verbose("savedPaywallChosen variationId: \(chosen.paywall.variationId), placementId: \(chosen.paywall.placementId), version: \(chosen.paywall.version)")
-        
-        let paywall = chosen.paywall
-        if let newer = getNewerPaywall(than: paywall) { return AdaptyPaywallChosen.restore(newer) }
-
-        Self.paywallByPlacementId[paywall.placementId] = VH(paywall, time: Date())
-
-        let paywalls = Array(Self.paywallByPlacementId.values)
-
-        guard !paywalls.isEmpty else {
-            Self.clear()
-            return chosen
-        }
-
-        do {
-            Self.userDefaults.set(Constants.currentPaywallsStorageVersion, forKey: Constants.paywallsStorageVersionKey)
-            try Self.userDefaults.setJSON(paywalls, forKey: Constants.paywallsStorageKey)
-            log.debug("Saving paywalls success.")
-        } catch {
-            log.error("Saving paywalls fail. \(error.localizedDescription)")
-        }
+    func savedPlacementChosen<Content: AdaptyPlacementContent>(_ chosen: AdaptyPlacementChosen<Content>) -> AdaptyPlacementChosen<Content> {
+//        Log.crossAB.verbose("savedPaywallChosen variationId: \(chosen.paywall.variationId), placementId: \(chosen.paywall.placementId), version: \(chosen.paywall.version)")
+//
+//        let paywall = chosen.paywall
+//        if let newer = getNewerPaywall(than: paywall) { return AdaptyPlacementChosen.restore(newer) }
+//
+//        Self.paywallByPlacementId[paywall.placementId] = VH(paywall, time: Date())
+//
+//        let paywalls = Array(Self.paywallByPlacementId.values)
+//
+//        guard !paywalls.isEmpty else {
+//            Self.clear()
+//            return chosen
+//        }
+//
+//        do {
+//            Self.userDefaults.set(Constants.currentPaywallsStorageVersion, forKey: Constants.paywallsStorageVersionKey)
+//            try Self.userDefaults.setJSON(paywalls, forKey: Constants.paywallsStorageKey)
+//            log.debug("Saving paywalls success.")
+//        } catch {
+//            log.error("Saving paywalls fail. \(error.localizedDescription)")
+//        }
 
         return chosen
     }

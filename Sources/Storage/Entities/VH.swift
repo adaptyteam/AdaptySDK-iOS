@@ -7,11 +7,7 @@
 
 import Foundation
 
-protocol ValueHashable: Sendable {}
-
-extension Optional: ValueHashable where Wrapped: ValueHashable {}
-
-struct VH<Value: ValueHashable>: Sendable {
+struct VH<Value: Sendable>: Sendable {
     let value: Value
     let hash: String?
     let time: Date?

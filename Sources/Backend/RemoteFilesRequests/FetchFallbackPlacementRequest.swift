@@ -1,5 +1,5 @@
 //
-//  FetchFallbackPaywallRequest.swift
+//  FetchFallbackPlacementRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.01.2025.
@@ -7,17 +7,14 @@
 
 import Foundation
 
-private struct FetchFallbackPaywallRequest: HTTPRequest {
+private struct FetchFallbackPlacementRequest: HTTPRequest {
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
     let stamp = Log.stamp
     let timeoutInterval: TimeInterval?
 
     init(
-        apiKeyPrefix: String,
-        placementId: String,
-        paywallVariationId: String,
-        locale: AdaptyLocale,
+        endpoint: HTTPEndpoint,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) {
@@ -27,31 +24,41 @@ private struct FetchFallbackPaywallRequest: HTTPRequest {
             nil
         }
 
-        endpoint = HTTPEndpoint(
-            method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
-        )
-
+        self.endpoint = endpoint
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
 }
 
 extension Backend.FallbackExecutor {
-    func fetchFallbackPaywall(
+    func fetchFallbackPlacement<Content: AdaptyPlacementContent>(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
-        cached: AdaptyPaywall?,
+        cached: Content?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
-    ) async throws -> AdaptyPaywallChosen {
-        let request = FetchFallbackPaywallRequest(
-            apiKeyPrefix: apiKeyPrefix,
-            placementId: placementId,
-            paywallVariationId: paywallVariationId,
-            locale: locale,
+    ) async throws -> AdaptyPlacementChosen<Content> {
+        let endpoint: HTTPEndpoint
+        let requestName: APIRequestName
+
+        if Content.self == AdaptyPaywall.self {
+            endpoint = HTTPEndpoint(
+                method: .get,
+                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
+            )
+            requestName = .fetchFallbackPaywall
+        } else {
+            endpoint = HTTPEndpoint(
+                method: .get,
+                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
+            )
+            requestName = .fetchFallbackPaywall
+        }
+
+        let request = FetchFallbackPlacementRequest(
+            endpoint: endpoint,
             disableServerCache: disableServerCache,
             timeoutInterval: timeoutInterval
         )
@@ -63,7 +70,7 @@ extension Backend.FallbackExecutor {
 
             let response = try await perform(
                 request,
-                requestName: .fetchFallbackPaywall,
+                requestName: requestName,
                 logParams: [
                     "api_prefix": apiKeyPrefix,
                     "placement_id": placementId,
@@ -74,29 +81,28 @@ extension Backend.FallbackExecutor {
                     "disable_server_cache": disableServerCache,
                 ]
             ) { @Sendable response in
-                try await AdaptyPaywallChosen.decodePaywallResponse(
+                try await AdaptyPlacementChosen.decodePlacementResponse(
                     response,
                     withConfiguration: configuration,
                     withProfileId: profileId,
-                    withPlacemantId: placementId,
-                    withCachedPaywall: cached
+                    withCached: cached
                 )
             }
 
             return response.body
         } catch {
             guard (error as? HTTPError)?.statusCode == 404,
-                  !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale)
+                  !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
             else {
                 throw error
             }
 
-            return try await fetchFallbackPaywall(
+            return try await fetchFallbackPlacement(
                 apiKeyPrefix: apiKeyPrefix,
                 profileId: profileId,
                 placementId: placementId,
                 paywallVariationId: paywallVariationId,
-                locale: .defaultPaywallLocale,
+                locale: .defaultPlacementLocale,
                 cached: cached,
                 disableServerCache: disableServerCache,
                 timeoutInterval: timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)

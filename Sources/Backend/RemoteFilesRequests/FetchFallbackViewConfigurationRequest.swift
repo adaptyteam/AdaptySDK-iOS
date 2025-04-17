@@ -8,7 +8,7 @@
 import Foundation
 
 private struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyViewSource>
+    typealias ResponseBody = Backend.Response.Data<AdaptyViewSource>
 
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
@@ -55,14 +55,14 @@ extension Backend.FallbackExecutor {
             return response.body.value
         } catch {
             guard (error as? HTTPError)?.statusCode == 404,
-                  !locale.equalLanguageCode(AdaptyLocale.defaultPaywallLocale)
+                  !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
             else {
                 throw error
             }
             return try await fetchFallbackViewConfiguration(
                 apiKeyPrefix: apiKeyPrefix,
                 paywallInstanceIdentity: paywallInstanceIdentity,
-                locale: .defaultPaywallLocale,
+                locale: .defaultPlacementLocale,
                 disableServerCache: disableServerCache
             )
         }

@@ -8,7 +8,7 @@
 import Foundation
 
 struct AdaptyLocale: Sendable {
-    static let defaultPaywallLocale = AdaptyLocale(id: "en")
+    static let defaultPlacementLocale = AdaptyLocale(id: "en")
 
     let id: String
     var languageCode: String {

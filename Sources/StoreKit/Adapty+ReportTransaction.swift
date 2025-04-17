@@ -56,14 +56,16 @@ public extension Adapty {
             let purchasedTransaction =
                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                     await sdk.productsManager.fillPurchasedTransaction(
-                        variationId: variationId,
-                        persistentVariationId: nil,
+                        paywallVariationId: variationId,
+                        persistentPaywallVariationId: nil,
+                        persistentOnboardingVariationId: nil,
                         sk1Transaction: sk1Transaction
                     )
                 } else {
                     await sdk.productsManager.fillPurchasedTransaction(
-                        variationId: variationId,
-                        persistentVariationId: nil,
+                        paywallVariationId: variationId,
+                        persistentPaywallVariationId: nil,
+                        persistentOnboardingVariationId: nil,
                         sk1Transaction: sk1Transaction
                     )
                 }
@@ -96,8 +98,9 @@ public extension Adapty {
             let profileId = try await sdk.createdProfileManager.profileId
 
             let purchasedTransaction = await sdk.productsManager.fillPurchasedTransaction(
-                variationId: variationId,
-                persistentVariationId: nil,
+                paywallVariationId: variationId,
+                persistentPaywallVariationId: nil,
+                persistentOnboardingVariationId: nil,
                 sk2Transaction: sk2Transaction
             )
 

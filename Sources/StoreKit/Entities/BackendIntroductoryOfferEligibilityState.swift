@@ -19,8 +19,6 @@ extension BackendIntroductoryOfferEligibilityState: CustomStringConvertible {
     }
 }
 
-extension [BackendIntroductoryOfferEligibilityState]: ValueHashable {}
-
 extension BackendIntroductoryOfferEligibilityState: Codable {
     enum CodingKeys: String, CodingKey {
         case vendorId = "vendor_product_id"

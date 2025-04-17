@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywall.FetchPolicy.swift
+//  AdaptyPlacementFetchPolicy.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 12.10.2023
@@ -7,17 +7,15 @@
 
 import Foundation
 
-extension AdaptyPaywall {
-    public enum FetchPolicy: Sendable, Hashable {
-        public static let `default`: Self = .reloadRevalidatingCacheData
-        case reloadRevalidatingCacheData
-        case returnCacheDataElseLoad
-        case returnCacheDataIfNotExpiredElseLoad(maxAge: TimeInterval)
-    }
+public enum AdaptyPlacementFetchPolicy: Sendable, Hashable {
+    public static let `default`: Self = .reloadRevalidatingCacheData
+    case reloadRevalidatingCacheData
+    case returnCacheDataElseLoad
+    case returnCacheDataIfNotExpiredElseLoad(maxAge: TimeInterval)
 }
 
-extension AdaptyPaywall.FetchPolicy {
-    func canReturn(_ data: VH<AdaptyPaywall>) -> Bool {
+extension AdaptyPlacementFetchPolicy {
+    func canReturn<Content:AdaptyPlacementContent>(_ data: VH<Content>) -> Bool {
         switch self {
         case .reloadRevalidatingCacheData: return false
         case .returnCacheDataElseLoad: return true
@@ -30,14 +28,14 @@ extension AdaptyPaywall.FetchPolicy {
     }
 }
 
-extension VH<AdaptyPaywall> {
+extension VH where Value: AdaptyPlacementContent {
     @inlinable
-    func withFetchPolicy(_ fetchPolicy: AdaptyPaywall.FetchPolicy) -> Self? {
+    func withFetchPolicy(_ fetchPolicy: AdaptyPlacementFetchPolicy) -> Self? {
         fetchPolicy.canReturn(self) ? self : nil
     }
 }
 
-extension AdaptyPaywall.FetchPolicy: Codable {
+extension AdaptyPlacementFetchPolicy: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case maxAge = "max_age"

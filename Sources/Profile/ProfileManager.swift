@@ -14,7 +14,7 @@ final class ProfileManager: Sendable {
     var onceSentEnvironment: SendedEnvironment
 
     let storage: ProfileStorage
-    let paywallsStorage = PaywallsStorage()
+    let placementStorage = PaywallsStorage()
     let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
 
     @AdaptyActor
