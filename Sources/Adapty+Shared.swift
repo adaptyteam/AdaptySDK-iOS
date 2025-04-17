@@ -24,6 +24,7 @@ extension Adapty {
 
     static func set(shared sdk: Adapty) { shared = .activated(sdk) }
 
+    @AdaptyActor
     package static var activatedSDK: Adapty {
         get async throws {
             switch shared {
