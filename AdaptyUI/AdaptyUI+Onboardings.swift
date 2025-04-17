@@ -10,7 +10,9 @@ import Foundation
 import SwiftUI
 
 public extension AdaptyUI {
-    struct OnboardingConfiguration: Sendable {
+    struct OnboardingConfiguration: Sendable, Identifiable {
+        public var id: String { url.absoluteString }
+        
         let url = URL(string: "https://public_live_lzjhlp9e.octopusbuilder.com/onboarding-fitness-app-small/")!
     }
 }
@@ -46,7 +48,6 @@ public extension AdaptyUI {
         )
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     @MainActor
     static func swiftuiView<Splash: SwiftUI.View>(
         configuration: OnboardingConfiguration,
