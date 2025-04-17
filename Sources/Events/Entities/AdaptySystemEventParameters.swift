@@ -170,7 +170,7 @@ enum MethodName: String {
     case getPaywallForDefaultAudience = "get_untargeted_paywall"
     case getOnboardingForDefaultAudience = "get_untargeted_onboarding"
 
-    case setFallbackPaywalls = "set_fallback_paywalls"
+    case setFallback = "set_fallback_file"
 
     case logShowOnboarding = "log_show_onboarding"
     case logShowOnboardingScreen = "log_show_onboarding_screen"

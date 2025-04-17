@@ -181,6 +181,23 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func getOnboarding(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
+        loadTimeout: TimeInterval? = nil,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyOnboarding>
+    ) {
+        withCompletion(completion) {
+            try await getOnboarding(
+                placementId: placementId,
+                locale: locale,
+                fetchPolicy: fetchPolicy,
+                loadTimeout: loadTimeout
+            )
+        }
+    }
+
     /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
     ///
     /// - Parameters:
@@ -206,6 +223,21 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func getOnboardingForDefaultAudience(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyOnboarding>
+    ) {
+        withCompletion(completion) {
+            try await getOnboardingForDefaultAudience(
+                placementId: placementId,
+                locale: locale,
+                fetchPolicy: fetchPolicy
+            )
+        }
+    }
+
     /// To set fallback paywalls, use this method. You should pass exactly the same payload you're getting from Adapty backend. You can copy it from Adapty Dashboard.
     ///
     /// Adapty allows you to provide fallback paywalls that will be used when a user opens the app for the first time and there's no internet connection. Or in the rare case when Adapty backend is down and there's no cache on the device.
@@ -215,12 +247,12 @@ public extension Adapty {
     /// - Parameters:
     ///   - fileURL:
     ///   - completion: Result callback.
-    nonisolated static func setFallbackPaywalls(
+    nonisolated static func setFallback(
         fileURL url: URL,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) {
-            try await setFallbackPaywalls(fileURL: url)
+            try await setFallback(fileURL: url)
         }
     }
 
@@ -459,7 +491,7 @@ public extension Adapty {
             try await logShowOnboarding(params)
         }
     }
-    
+
     nonisolated static func updateCollectingRefundDataConsent(
         _ consent: Bool,
         _ completion: AdaptyErrorCompletion? = nil
@@ -468,7 +500,7 @@ public extension Adapty {
             try await updateCollectingRefundDataConsent(consent)
         }
     }
-    
+
     nonisolated static func updateRefundPreference(
         _ refundPreference: AdaptyRefundPreference,
         _ completion: AdaptyErrorCompletion? = nil
