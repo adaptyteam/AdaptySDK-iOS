@@ -1,5 +1,5 @@
 //
-//  OnboardingController.swift
+//  AdaptyOnboardingController.swift
 //
 //
 //  Created by Aleksey Goncharov on 02.08.2024.
@@ -9,16 +9,16 @@ import Adapty
 import UIKit
 import WebKit
 
-public final class OnboardingController: UIViewController {
+public final class AdaptyOnboardingController: UIViewController {
     private let stamp: String
     private let viewModel: OnboardingViewModel
-    weak var delegate: OnboardingDelegate?
+    weak var delegate: AdaptyOnboardingControllerDelegate?
 
     private var webView: WKWebView!
 
     init(
-        url: URL,
-        delegate: OnboardingDelegate
+        configuration: AdaptyUI.OnboardingConfiguration,
+        delegate: AdaptyOnboardingControllerDelegate
     ) {
         let stamp = Log.stamp
 
@@ -26,7 +26,7 @@ public final class OnboardingController: UIViewController {
         self.delegate = delegate
         self.viewModel = OnboardingViewModel(
             stamp: stamp,
-            url: url
+            configuration: configuration
         )
 
         super.init(nibName: nil, bundle: nil)

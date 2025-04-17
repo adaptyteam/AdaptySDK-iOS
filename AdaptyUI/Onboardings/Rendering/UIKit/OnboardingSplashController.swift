@@ -12,20 +12,20 @@ public final class OnboardingSplashController: UIViewController {
     private let configuration: AdaptyUI.OnboardingConfiguration
 
     private weak var applicationSplashVC: UIViewController?
-    private weak var onboardingVC: OnboardingController?
+    private weak var onboardingVC: AdaptyOnboardingController?
 
-    private weak var delegate: OnboardingDelegate?
-    private weak var splashDelegate: OnboardingSplashDelegate?
+    private weak var delegate: AdaptyOnboardingControllerDelegate?
+    private weak var placeholderDelegate: AdaptyOnboardingPlaceholderDelegate?
 
     @MainActor
     init(
         configuration: AdaptyUI.OnboardingConfiguration,
-        delegate: OnboardingDelegate,
-        splashDelegate: OnboardingSplashDelegate
+        delegate: AdaptyOnboardingControllerDelegate,
+        placeholderDelegate: AdaptyOnboardingPlaceholderDelegate
     ) {
         self.configuration = configuration
         self.delegate = delegate
-        self.splashDelegate = splashDelegate
+        self.placeholderDelegate = placeholderDelegate
 
         super.init(nibName: nil, bundle: nil)
     }
@@ -69,7 +69,7 @@ public final class OnboardingSplashController: UIViewController {
         applicationSplashVC?.endAppearanceTransition()
     }
 
-    private func layoutOnboarding() async throws -> OnboardingController {
+    private func layoutOnboarding() async throws -> AdaptyOnboardingController {
         let onboardingVC = try await AdaptyUI.createOnboardingController(
             configuration: configuration,
             delegate: self
@@ -100,8 +100,7 @@ public final class OnboardingSplashController: UIViewController {
     }
 
     private func layoutApplicationSplash() -> UIViewController? {
-        guard let splashDelegate,
-              let childVC = splashDelegate.onboardingsSplashViewController()
+        guard let childVC = placeholderDelegate?.onboardingsControllerPlaceholderController()
         else {
             return nil
         }
@@ -131,32 +130,32 @@ public final class OnboardingSplashController: UIViewController {
     }
 }
 
-extension OnboardingSplashController: OnboardingDelegate {
-    public func onboardingController(_ controller: UIViewController, didFinishLoading action: OnboardingsDidFinishLoadingAction) {
+extension OnboardingSplashController: AdaptyOnboardingControllerDelegate {
+    public func onboardingController(_ controller: AdaptyOnboardingController, didFinishLoading action: OnboardingsDidFinishLoadingAction) {
         removeApplicationSplash()
     }
     
-    public func onboardingController(_ controller: UIViewController, onCloseAction action: OnboardingsCloseAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onCloseAction action: OnboardingsCloseAction) {
         delegate?.onboardingController(controller, onCloseAction: action)
     }
 
-    public func onboardingController(_ controller: UIViewController, onPaywallAction action: OnboardingsOpenPaywallAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onPaywallAction action: OnboardingsOpenPaywallAction) {
         delegate?.onboardingController(controller, onPaywallAction: action)
     }
 
-    public func onboardingController(_ controller: UIViewController, onCustomAction action: OnboardingsCustomAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onCustomAction action: OnboardingsCustomAction) {
         delegate?.onboardingController(controller, onCustomAction: action)
     }
 
-    public func onboardingController(_ controller: UIViewController, onStateUpdatedAction action: OnboardingsStateUpdatedAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onStateUpdatedAction action: OnboardingsStateUpdatedAction) {
         delegate?.onboardingController(controller, onStateUpdatedAction: action)
     }
 
-    public func onboardingController(_ controller: UIViewController, onAnalyticsEvent event: OnboardingsAnalyticsEvent) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: OnboardingsAnalyticsEvent) {
         delegate?.onboardingController(controller, onAnalyticsEvent: event)
     }
 
-    public func onboardingController(_ controller: UIViewController, didFailWithError error: AdaptyError) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyError) {
         delegate?.onboardingController(controller, didFailWithError: error)
     }
 }

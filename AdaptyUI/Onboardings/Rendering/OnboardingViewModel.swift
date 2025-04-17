@@ -5,9 +5,9 @@
 //  Created by Aleksey Goncharov on 05.08.2024.
 //
 
+import Adapty
 import Foundation
 import WebKit
-import Adapty
 
 private extension AdaptyUI {
     static let webViewEventMessageName = "postEvent"
@@ -15,23 +15,23 @@ private extension AdaptyUI {
 
 final class OnboardingViewModel: NSObject, ObservableObject {
     let stamp: String
-    let url: URL
+    let configuration: AdaptyUI.OnboardingConfiguration
     var onMessage: ((OnboardingsMessage) -> Void)?
     var onError: ((AdaptyOnboardingsError) -> Void)?
 
-    init(stamp: String, url: URL) {
+    init(stamp: String, configuration: AdaptyUI.OnboardingConfiguration) {
         self.stamp = stamp
-        self.url = url
+        self.configuration = configuration
     }
 
     @MainActor
     func configureWebView(_ webView: WKWebView) {
-        Log.onboardings.verbose("\(stamp) configureWebView \(self.url)")
+        Log.onboardings.verbose("\(stamp) configureWebView \(configuration.url)")
 
         webView.navigationDelegate = self
         webView.configuration.userContentController.add(self, name: AdaptyUI.webViewEventMessageName)
 
-        let request = URLRequest(url: url)
+        let request = URLRequest(url: configuration.url)
         webView.load(request)
     }
 }

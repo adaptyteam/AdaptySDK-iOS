@@ -1,5 +1,5 @@
 //
-//  OnboardingView.swift
+//  AdaptyOnboardingView_Internal.swift
 //
 //
 //  Created by Aleksey Goncharov on 09.08.2024.
@@ -9,13 +9,13 @@ import Adapty
 import SwiftUI
 
 @MainActor
-struct OnboardingView: UIViewControllerRepresentable {
-    private let delegate: OnboardingDelegate
-    private let url: URL
+struct AdaptyOnboardingView_Internal: UIViewControllerRepresentable {
+    private let delegate: AdaptyOnboardingControllerDelegate
+    private let configuration: AdaptyUI.OnboardingConfiguration
     private let onFinishLoading: (OnboardingsDidFinishLoadingAction) -> Void
 
     init(
-        url: URL,
+        configuration: AdaptyUI.OnboardingConfiguration,
         onFinishLoading: @escaping (OnboardingsDidFinishLoadingAction) -> Void,
         onCloseAction: @escaping (OnboardingsCloseAction) -> Void,
         onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?,
@@ -24,7 +24,7 @@ struct OnboardingView: UIViewControllerRepresentable {
         onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
         onError: @escaping (AdaptyError) -> Void
     ) {
-        self.url = url
+        self.configuration = configuration
         self.onFinishLoading = onFinishLoading
         self.delegate = OnboardingDelegateImpl(
             onFinishLoading: onFinishLoading,
@@ -38,13 +38,13 @@ struct OnboardingView: UIViewControllerRepresentable {
     }
 
     public func makeUIViewController(context: Context) -> some UIViewController {
-        OnboardingController(
-            url: url,
+        AdaptyOnboardingController(
+            configuration: configuration,
             delegate: delegate
         )
     }
 
     public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        (uiViewController as? OnboardingController)?.delegate = delegate
+        (uiViewController as? AdaptyOnboardingController)?.delegate = delegate
     }
 }

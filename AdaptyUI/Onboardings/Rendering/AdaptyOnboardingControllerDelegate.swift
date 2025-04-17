@@ -1,5 +1,5 @@
 //
-//  OnboardingDelegate.swift
+//  AdaptyOnboardingController.swift
 //
 //
 //  Created by Aleksei Valiano on 01.08.2024
@@ -10,21 +10,21 @@ import Adapty
 import UIKit
 
 @MainActor
-public protocol OnboardingDelegate: NSObjectProtocol {
-    func onboardingController(_ controller: UIViewController, didFinishLoading action: OnboardingsDidFinishLoadingAction)
-    func onboardingController(_ controller: UIViewController, onCloseAction action: OnboardingsCloseAction)
-    func onboardingController(_ controller: UIViewController, onPaywallAction action: OnboardingsOpenPaywallAction)
-    func onboardingController(_ controller: UIViewController, onCustomAction action: OnboardingsCustomAction)
-    func onboardingController(_ controller: UIViewController, onStateUpdatedAction action: OnboardingsStateUpdatedAction)
-    func onboardingController(_ controller: UIViewController, onAnalyticsEvent event: OnboardingsAnalyticsEvent)
-    func onboardingController(_ controller: UIViewController, didFailWithError error: AdaptyError)
+public protocol AdaptyOnboardingControllerDelegate: NSObjectProtocol {
+    func onboardingController(_ controller: AdaptyOnboardingController, didFinishLoading action: OnboardingsDidFinishLoadingAction)
+    func onboardingController(_ controller: AdaptyOnboardingController, onCloseAction action: OnboardingsCloseAction)
+    func onboardingController(_ controller: AdaptyOnboardingController, onPaywallAction action: OnboardingsOpenPaywallAction)
+    func onboardingController(_ controller: AdaptyOnboardingController, onCustomAction action: OnboardingsCustomAction)
+    func onboardingController(_ controller: AdaptyOnboardingController, onStateUpdatedAction action: OnboardingsStateUpdatedAction)
+    func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: OnboardingsAnalyticsEvent)
+    func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyError)
 }
 
-public protocol OnboardingSplashDelegate: NSObjectProtocol {
-    func onboardingsSplashViewController() -> UIViewController?
+public protocol AdaptyOnboardingPlaceholderDelegate: NSObjectProtocol {
+    func onboardingsControllerPlaceholderController() -> UIViewController?
 }
 
-public extension OnboardingDelegate {
+public extension AdaptyOnboardingControllerDelegate {
     func onboardingController(_ controller: UIViewController, didFinishLoading action: OnboardingsDidFinishLoadingAction) {
         Log.onboardings.warn("Not implemented method 'onboardingController(didFinishLoading:)' of OnboardingDelegate ")
     }
@@ -46,8 +46,8 @@ public extension OnboardingDelegate {
     }
 }
 
-extension OnboardingDelegate {
-    func apply(message: OnboardingsMessage, from controller: UIViewController) {
+extension AdaptyOnboardingControllerDelegate {
+    func apply(message: OnboardingsMessage, from controller: AdaptyOnboardingController) {
         switch message {
         case let .close(action):
             onboardingController(controller, onCloseAction: action)
@@ -64,7 +64,7 @@ extension OnboardingDelegate {
         }
     }
 
-    func apply(error: AdaptyOnboardingsError, from controller: UIViewController) {
+    func apply(error: AdaptyOnboardingsError, from controller: AdaptyOnboardingController) {
         onboardingController(controller, didFailWithError: error.asAdaptyError)
     }
 }

@@ -6,68 +6,56 @@
 //
 //
 
+import Adapty
 import Foundation
 import SwiftUI
 
 public extension AdaptyUI {
-    struct OnboardingConfiguration: Sendable, Identifiable {
-        public var id: String { url.absoluteString }
-        
-        let url = URL(string: "https://public_live_lzjhlp9e.octopusbuilder.com/onboarding-fitness-app-small/")!
+    struct OnboardingConfiguration: Sendable {
+        public let id: String
+
+        let url: URL
+
+        init(onboarding: AdaptyOnboarding) {
+            id = onboarding.placement.id
+            url = onboarding.viewConfigurationUrl
+        }
+
+        package init(id: String, url: URL) {
+            self.id = id
+            self.url = url
+        }
     }
 }
 
 public extension AdaptyUI {
-    static func createOnboardingConfiguration(id: String) async throws -> OnboardingConfiguration {
-        return OnboardingConfiguration()
+    static func getOnboardingConfiguration(
+        forOnboarding onboarding: AdaptyOnboarding
+    ) -> OnboardingConfiguration {
+        OnboardingConfiguration(onboarding: onboarding)
     }
 
     @MainActor
     static func createOnboardingController(
         configuration: OnboardingConfiguration,
-        delegate: OnboardingDelegate
-    ) async throws -> OnboardingController {
-        let vc = OnboardingController(
-            url: configuration.url,
+        delegate: AdaptyOnboardingControllerDelegate
+    ) -> AdaptyOnboardingController {
+        AdaptyOnboardingController(
+            configuration: configuration,
             delegate: delegate
         )
-
-        return vc
     }
 
     @MainActor
     static func createSplashController(
         configuration: OnboardingConfiguration,
-        delegate: OnboardingDelegate,
-        splashDelegate: OnboardingSplashDelegate
+        delegate: AdaptyOnboardingControllerDelegate,
+        placeholderDelegate: AdaptyOnboardingPlaceholderDelegate
     ) -> OnboardingSplashController {
         OnboardingSplashController(
             configuration: configuration,
             delegate: delegate,
-            splashDelegate: splashDelegate
-        )
-    }
-
-    @MainActor
-    static func swiftuiView<Splash: SwiftUI.View>(
-        configuration: OnboardingConfiguration,
-        splashViewBuilder: @escaping () -> Splash,
-        onCloseAction: @escaping (OnboardingsCloseAction) -> Void,
-        onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)? = nil,
-        onCustomAction: ((OnboardingsCustomAction) -> Void)? = nil,
-        onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)? = nil,
-        onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)? = nil,
-        onError: @escaping (Error) -> Void
-    ) -> some SwiftUI.View {
-        OnboardingSplashView(
-            configuration: configuration,
-            splashViewBuilder: splashViewBuilder,
-            onCloseAction: onCloseAction,
-            onOpenPaywallAction: onOpenPaywallAction,
-            onCustomAction: onCustomAction,
-            onStateUpdatedAction: onStateUpdatedAction,
-            onAnalyticsEvent: onAnalyticsEvent,
-            onError: onError
+            placeholderDelegate: placeholderDelegate
         )
     }
 }

@@ -8,10 +8,10 @@
 import SwiftUI
 
 @MainActor
-struct OnboardingSplashView<Splash: View>: View {
+public struct AdaptyOnboardingView<Placeholder: View>: View {
     private let configuration: AdaptyUI.OnboardingConfiguration
 
-    private let splashViewBuilder: () -> Splash
+    private let placeholderViewBuilder: () -> Placeholder
     private let onCloseAction: (OnboardingsCloseAction) -> Void
     private let onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?
     private let onCustomAction: ((OnboardingsCustomAction) -> Void)?
@@ -19,21 +19,20 @@ struct OnboardingSplashView<Splash: View>: View {
     private let onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?
     private let onError: (Error) -> Void
 
-    @State private var url: URL?
     @State private var isLoading = true
 
-    init(
+    public init(
         configuration: AdaptyUI.OnboardingConfiguration,
-        splashViewBuilder: @escaping () -> Splash,
+        placeholder: @escaping () -> Placeholder,
         onCloseAction: @escaping (OnboardingsCloseAction) -> Void,
-        onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?,
-        onCustomAction: ((OnboardingsCustomAction) -> Void)?,
-        onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?,
-        onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
+        onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)? = nil,
+        onCustomAction: ((OnboardingsCustomAction) -> Void)? = nil,
+        onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)? = nil,
+        onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)? = nil,
         onError: @escaping (Error) -> Void
     ) {
         self.configuration = configuration
-        self.splashViewBuilder = splashViewBuilder
+        self.placeholderViewBuilder = placeholder
         self.onCloseAction = onCloseAction
         self.onOpenPaywallAction = onOpenPaywallAction
         self.onCustomAction = onCustomAction
@@ -45,33 +44,26 @@ struct OnboardingSplashView<Splash: View>: View {
     @ViewBuilder
     private var zstackBody: some View {
         ZStack {
-            if let url {
-                OnboardingView(
-                    url: url,
-                    onFinishLoading: { _ in
-                        withAnimation {
-                            isLoading = false
-                        }
-                    },
-                    onCloseAction: onCloseAction,
-                    onOpenPaywallAction: onOpenPaywallAction,
-                    onCustomAction: onCustomAction,
-                    onStateUpdatedAction: onStateUpdatedAction,
-                    onAnalyticsEvent: onAnalyticsEvent,
-                    onError: onError
-                )
-                .zIndex(0)
-            }
+            AdaptyOnboardingView_Internal(
+                configuration: configuration,
+                onFinishLoading: { _ in
+                    withAnimation {
+                        isLoading = false
+                    }
+                },
+                onCloseAction: onCloseAction,
+                onOpenPaywallAction: onOpenPaywallAction,
+                onCustomAction: onCustomAction,
+                onStateUpdatedAction: onStateUpdatedAction,
+                onAnalyticsEvent: onAnalyticsEvent,
+                onError: onError
+            )
+            .zIndex(0)
 
-            if isLoading || url == nil {
-                splashViewBuilder()
+            if isLoading {
+                placeholderViewBuilder()
                     .transition(.opacity)
                     .zIndex(1)
-            }
-        }
-        .onAppear {
-            Task {
-                await loadURL()
             }
         }
     }
@@ -83,14 +75,6 @@ struct OnboardingSplashView<Splash: View>: View {
         } else {
             zstackBody
                 .edgesIgnoringSafeArea(.all)
-        }
-    }
-
-    private func loadURL() async {
-        do {
-            url = configuration.url
-        } catch {
-            onError(error)
         }
     }
 }

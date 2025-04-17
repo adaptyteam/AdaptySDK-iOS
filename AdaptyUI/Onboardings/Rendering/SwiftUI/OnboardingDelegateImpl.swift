@@ -8,7 +8,7 @@
 import SwiftUI
 import Adapty
 
-final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
+final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate {
     private let onFinishLoading: (OnboardingsDidFinishLoadingAction) -> Void
     private let onCloseAction: (OnboardingsCloseAction) -> Void
     private let onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?
@@ -36,21 +36,21 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
     }
 
     func onboardingController(
-        _ controller: UIViewController,
+        _ controller: AdaptyOnboardingController,
         didFinishLoading action: OnboardingsDidFinishLoadingAction
     ) {
         onFinishLoading(action)
     }
 
     func onboardingController(
-        _ controller: UIViewController,
+        _ controller: AdaptyOnboardingController,
         onCloseAction action: OnboardingsCloseAction
     ) {
         onCloseAction(action)
     }
 
     func onboardingController(
-        _ controller: UIViewController,
+        _ controller: AdaptyOnboardingController,
         onPaywallAction action: OnboardingsOpenPaywallAction
     ) {
         if let onOpenPaywallAction {
@@ -61,7 +61,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
     }
 
     func onboardingController(
-        _ controller: UIViewController,
+        _ controller: AdaptyOnboardingController,
         onCustomAction action: OnboardingsCustomAction
     ) {
         if let onCustomAction {
@@ -72,7 +72,7 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
     }
 
     func onboardingController(
-        _ controller: UIViewController,
+        _ controller: AdaptyOnboardingController,
         onStateUpdatedAction action: OnboardingsStateUpdatedAction
     ) {
         if let onStateUpdatedAction {
@@ -83,14 +83,14 @@ final class OnboardingDelegateImpl: NSObject, OnboardingDelegate {
     }
 
     func onboardingController(
-        _ controller: UIViewController,
+        _ controller: AdaptyOnboardingController,
         onAnalyticsEvent event: OnboardingsAnalyticsEvent
     ) {
         onAnalyticsEvent?(event)
     }
 
     func onboardingController(
-        _ controller: UIViewController,
+        _ controller: AdaptyOnboardingController,
         didFailWithError error: AdaptyError
     ) {
         onError(error)

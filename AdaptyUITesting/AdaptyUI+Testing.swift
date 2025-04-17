@@ -191,4 +191,13 @@ public extension AdaptyUI {
     }
 }
 
+public extension AdaptyUI {
+    static func getOnboardingConfigurationTest() -> OnboardingConfiguration {
+        OnboardingConfiguration(
+            id: "test",
+            url: URL(string: "https://public_live_lzjhlp9e.octopusbuilder.com/onboarding-fitness-app-small/")!
+        )
+    }
+}
+
 #endif
