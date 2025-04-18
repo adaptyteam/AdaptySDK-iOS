@@ -20,7 +20,7 @@ extension AdaptyUI {
         showDebugOverlay: Bool = false
     ) throws -> AdaptyPaywallController {
         guard AdaptyUI.isActivated else {
-            let err = AdaptyUIError.adaptyNotActivatedError
+            let err = AdaptyUIError.adaptyNotActivated
             Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
             throw err
         }

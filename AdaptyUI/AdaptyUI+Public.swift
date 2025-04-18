@@ -166,7 +166,7 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     ///   - error: an ``AdaptyError`` object representing the error.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyError
+        didFailRenderingWith error: AdaptyUIError
     )
 
     /// This method is invoked in case of errors during the products loading process.
@@ -228,7 +228,7 @@ public extension AdaptyUI {
             do {
                 sdk = try await Adapty.activatedSDK
             } catch {
-                let err = AdaptyUIError.adaptyNotActivatedError
+                let err = AdaptyUIError.adaptyNotActivated
                 Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(error).")
                 throw err
             }
@@ -239,7 +239,7 @@ public extension AdaptyUI {
         let sdk = try await task.value
 
         guard !AdaptyUI.isActivated else {
-            let err = AdaptyUIError.activateOnceError
+            let err = AdaptyUIError.activateOnce
             Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(err).")
             throw err
         }
@@ -283,7 +283,7 @@ public extension AdaptyUI {
         timerResolver: AdaptyTimerResolver? = nil
     ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
-            let err = AdaptyUIError.adaptyNotActivatedError
+            let err = AdaptyUIError.adaptyNotActivated
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
 
             throw err
@@ -316,7 +316,7 @@ public extension AdaptyUI {
         assetsResolver: AdaptyAssetsResolver? = nil
     ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
-            let err = AdaptyUIError.adaptyNotActivatedError
+            let err = AdaptyUIError.adaptyNotActivated
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
 
             throw err
@@ -351,7 +351,7 @@ public extension AdaptyUI {
         showDebugOverlay: Bool = false
     ) throws -> AdaptyPaywallController {
         guard AdaptyUI.isActivated else {
-            let err = AdaptyUIError.adaptyNotActivatedError
+            let err = AdaptyUIError.adaptyNotActivated
             Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
             throw err
         }

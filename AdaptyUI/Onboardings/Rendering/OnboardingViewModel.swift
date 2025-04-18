@@ -17,7 +17,7 @@ final class OnboardingViewModel: NSObject, ObservableObject {
     let stamp: String
     let configuration: AdaptyUI.OnboardingConfiguration
     var onMessage: ((OnboardingsMessage) -> Void)?
-    var onError: ((AdaptyOnboardingsError) -> Void)?
+    var onError: ((AdaptyUIError) -> Void)?
 
     init(stamp: String, configuration: AdaptyUI.OnboardingConfiguration) {
         self.stamp = stamp
@@ -49,7 +49,7 @@ extension OnboardingViewModel: WKNavigationDelegate, WKScriptMessageHandler {
 
     public func webView(_: WKWebView, didFail _: WKNavigation!, withError error: Error) {
         Log.onboardings.error("\(stamp) didFail navigation withError \(error)")
-        onError?(AdaptyOnboardingsError.webKit(error: error))
+        onError?(.webKit(error))
     }
 
     public func userContentController(_: WKUserContentController, didReceive wkMessage: WKScriptMessage) {
