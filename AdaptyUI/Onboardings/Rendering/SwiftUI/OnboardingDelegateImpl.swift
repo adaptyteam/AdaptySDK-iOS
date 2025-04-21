@@ -15,7 +15,7 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
     private let onCustomAction: ((OnboardingsCustomAction) -> Void)?
     private let onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?
     private let onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?
-    private let onError: (AdaptyError) -> Void
+    private let onError: (AdaptyUIError) -> Void
 
     init(
         onFinishLoading: @escaping (OnboardingsDidFinishLoadingAction) -> Void,
@@ -24,7 +24,7 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
         onCustomAction: ((OnboardingsCustomAction) -> Void)?,
         onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?,
         onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
-        onError: @escaping (AdaptyError) -> Void
+        onError: @escaping (AdaptyUIError) -> Void
     ) {
         self.onFinishLoading = onFinishLoading
         self.onCloseAction = onCloseAction
@@ -91,7 +91,7 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
 
     func onboardingController(
         _ controller: AdaptyOnboardingController,
-        didFailWithError error: AdaptyError
+        didFailWithError error: AdaptyUIError
     ) {
         onError(error)
     }

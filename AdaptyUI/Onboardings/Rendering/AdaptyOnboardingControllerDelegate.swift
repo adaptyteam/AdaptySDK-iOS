@@ -17,7 +17,7 @@ public protocol AdaptyOnboardingControllerDelegate: NSObjectProtocol {
     func onboardingController(_ controller: AdaptyOnboardingController, onCustomAction action: OnboardingsCustomAction)
     func onboardingController(_ controller: AdaptyOnboardingController, onStateUpdatedAction action: OnboardingsStateUpdatedAction)
     func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: OnboardingsAnalyticsEvent)
-    func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyError)
+    func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyUIError)
 }
 
 public protocol AdaptyOnboardingPlaceholderDelegate: NSObjectProtocol {
@@ -64,7 +64,7 @@ extension AdaptyOnboardingControllerDelegate {
         }
     }
 
-    func apply(error: AdaptyOnboardingsError, from controller: AdaptyOnboardingController) {
-        onboardingController(controller, didFailWithError: error.asAdaptyError)
+    func apply(error: AdaptyUIError, from controller: AdaptyOnboardingController) {
+        onboardingController(controller, didFailWithError: error)
     }
 }

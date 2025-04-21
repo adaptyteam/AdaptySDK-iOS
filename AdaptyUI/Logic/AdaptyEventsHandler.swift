@@ -32,7 +32,7 @@ package final class AdaptyEventsHandler: ObservableObject {
     var didStartRestore: (() -> Void)?
     var didFinishRestore: ((AdaptyProfile) -> Void)?
     var didFailRestore: ((AdaptyError) -> Void)?
-    var didFailRendering: ((AdaptyError) -> Void)?
+    var didFailRendering: ((AdaptyUIError) -> Void)?
     var didFailLoadingProducts: ((AdaptyError) -> Bool)?
     var didPartiallyLoadProducts: (([String]) -> Void)?
 
@@ -115,7 +115,7 @@ package final class AdaptyEventsHandler: ObservableObject {
 
     func event_didFailRendering(with error: AdaptyUIError) {
         Log.ui.error("#\(logId)# event_didFailRendering: \(error)")
-        didFailRendering?(AdaptyError(error))
+        didFailRendering?(error)
     }
 
     func event_didFailLoadingProducts(with error: AdaptyError) -> Bool {

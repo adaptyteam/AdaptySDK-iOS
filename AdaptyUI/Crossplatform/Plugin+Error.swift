@@ -29,7 +29,7 @@ extension AdaptyUI.PluginError: CustomDebugStringConvertible {
 }
 
 extension AdaptyUI.PluginError: CustomAdaptyError {
-    public static let errorDomain = AdaptyError.AdaptyUIErrorDomain
+    public static let errorDomain = AdaptyUIError.AdaptyUIErrorDomain
 
     public var originalError: Error? { nil }
 

@@ -44,7 +44,7 @@ public final class AdaptyOnboardingController: UIViewController {
         delegate?.apply(message: message, from: self)
     }
 
-    private func handleError(_ error: AdaptyOnboardingsError) {
+    private func handleError(_ error: AdaptyUIError) {
         delegate?.apply(error: error, from: self)
     }
 

@@ -155,7 +155,7 @@ extension OnboardingSplashController: AdaptyOnboardingControllerDelegate {
         delegate?.onboardingController(controller, onAnalyticsEvent: event)
     }
 
-    public func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyError) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyUIError) {
         delegate?.onboardingController(controller, didFailWithError: error)
     }
 }

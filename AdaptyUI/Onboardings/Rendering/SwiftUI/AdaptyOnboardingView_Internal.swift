@@ -22,7 +22,7 @@ struct AdaptyOnboardingView_Internal: UIViewControllerRepresentable {
         onCustomAction: ((OnboardingsCustomAction) -> Void)?,
         onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?,
         onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
-        onError: @escaping (AdaptyError) -> Void
+        onError: @escaping (AdaptyUIError) -> Void
     ) {
         self.configuration = configuration
         self.onFinishLoading = onFinishLoading

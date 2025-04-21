@@ -11,11 +11,11 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .unknown(_, description, _): description
-        case .activateOnceError: "You need to be activate Adapty once"
-        case .cantMakePayments: "In-App Purchases are not allowed on this device"
-        case .notActivated: "The Adapty is not activated"
-        case .profileWasChanged: "The user profile was replaced"
-        case .profileCreateFailed: "Unable to create user profile"
+        case .activateOnceError: "Adapty can only be activated once. Please check your initialization code."
+        case .cantMakePayments: "In-App Purchases are not available on this device. Please check your device settings."
+        case .notActivated: "Adapty SDK is not initialized. Please call activate() before using other methods."
+        case .profileWasChanged: "The user profile has been updated while performing the operation. Please try again."
+        case .profileCreateFailed: "Failed to create a new user profile."
         case let .fetchFailed(_, description, _): description
         case let .decodingFailed(_, description, _): description
         case let .wrongParam(_, description): description
@@ -25,12 +25,12 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
 
 extension HTTPError: CustomDebugStringConvertible {
     var debugDescription: String {
-        if isCancelled { return "Request cancelled" }
+        if isCancelled { return "The request was cancelled." }
         switch self {
-        case .perform: return "Perform request failed"
-        case .network: return "Network error"
-        case .decoding: return "Response decoding failed"
-        case .backend: return "Server error"
+        case .perform: return "Failed to execute the request. Please check your internet connection."
+        case .network: return "Network connection error. Please check your internet connection and try again."
+        case .decoding: return "Failed to process the server response. Please try again later or contact support if the issue persists."
+        case .backend: return "Server error. Please try again later or contact support if the issue persists."
         }
     }
 }
@@ -38,10 +38,10 @@ extension HTTPError: CustomDebugStringConvertible {
 extension EventsError: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
-        case .interrupted: "Operation interrupted"
-        case .sending: "Network request failed"
-        case .decoding: "Event decoding failed"
-        case .encoding: "Event encoding failed"
+        case .interrupted: "The operation was interrupted."
+        case .sending: "Failed to send event data."
+        case .decoding: "Failed to process event data."
+        case .encoding: "Failed to prepare event data."
         }
     }
 }
@@ -49,21 +49,21 @@ extension EventsError: CustomDebugStringConvertible {
 extension StoreKitManagerError: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
-        case .interrupted: "Operation interrupted"
-        case .noProductIDsFound: "No In-App Purchase product identifiers were found."
-        case .receiptIsEmpty: "Can't find a valid receipt"
-        case .refreshReceiptFailed: "Refresh receipt failed"
-        case .productPurchaseFailed: "Product purchase failed"
-        case .requestSKProductsFailed: "Request products form App Store failed"
+        case .interrupted: "The purchase operation was interrupted. Please try again."
+        case .noProductIDsFound: "No valid In-App Purchase products were found. Please check your product configuration on the App Store Connect and Adapty Dashboard."
+        case .receiptIsEmpty: "No valid purchase receipt found."
+        case .refreshReceiptFailed: "Failed to refresh the purchase receipt."
+        case .productPurchaseFailed: "The purchase could not be completed."
+        case .requestSKProductsFailed: "Failed to fetch product information from the StoreKit. Please check your internet connection."
         case let .transactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
-                "Unverified transaction: \(customError.debugDescription)"
+                "Transaction verification failed: \(customError.debugDescription)"
             } else {
-                "Unverified transaction"
+                "Transaction verification failed."
             }
         case let .invalidOffer(_, error):
             error
-        case .getSubscriptionInfoStatusFailed: "get subscription info status failed"
+        case .getSubscriptionInfoStatusFailed: "Failed to retrieve subscription information."
         }
     }
 }
