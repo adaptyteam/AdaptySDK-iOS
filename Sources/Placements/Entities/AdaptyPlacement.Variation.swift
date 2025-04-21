@@ -28,11 +28,11 @@ extension AdaptyPlacement {
         }
 
         init(from decoder: Decoder) throws {
-            let rootContainer = try decoder.container(keyedBy: Backend.CodingKeys.self)
+            let superContainer = try decoder.container(keyedBy: Backend.CodingKeys.self)
 
             let container =
-                if rootContainer.contains(.attributes) {
-                    try rootContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+                if superContainer.contains(.attributes) {
+                    try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
                 } else {
                     try decoder.container(keyedBy: CodingKeys.self)
                 }

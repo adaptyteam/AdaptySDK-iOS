@@ -100,7 +100,7 @@ extension [CodingUserInfoKey: Any] {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placement) parameter"))
         }
     }
-    
+
     var placementOrNil: AdaptyPlacement? {
         self[.placement] as? AdaptyPlacement
     }
@@ -142,13 +142,15 @@ extension Backend.Response {
             let value: Value
 
             init(from decoder: Decoder) throws {
-                var container = try decoder.container(keyedBy: Backend.CodingKeys.self)
+                let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
 
-                if container.contains(.attributes) {
-                    container = try container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .attributes)
+                if let dataObject = try? container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data),
+                   dataObject.contains(.attributes)
+                {
+                    value = try dataObject.decode(Value.self, forKey: .attributes)
+                } else {
+                    value = try container.decode(Value.self, forKey: .data)
                 }
-
-                value = try container.decode(Value.self, forKey: .data)
             }
         }
     }
