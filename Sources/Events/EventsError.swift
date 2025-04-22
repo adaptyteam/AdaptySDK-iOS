@@ -40,7 +40,7 @@ extension EventsError {
         }
     }
 
-    var originalError: Error {
+    var originalError: Error? {
         switch self {
         case let .sending(_, error): error
         case let .encoding(_, error),
