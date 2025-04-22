@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension OnboardingsMessage {
+extension AdaptyOnboardingsMessage {
     init(chanel: String, body: Any) throws {
 //        enum ChanelName: String {
 //            case events

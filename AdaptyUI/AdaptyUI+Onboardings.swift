@@ -15,15 +15,19 @@ public extension AdaptyUI {
         public let id: String
 
         let url: URL
+        let variationId: String
 
         init(onboarding: AdaptyOnboarding) {
             id = onboarding.placement.id
             url = onboarding.viewConfiguration.url
+            variationId = onboarding.variationId
         }
 
+        // TODO: remove this method
         package init(id: String, url: URL) {
             self.id = id
             self.url = url
+            self.variationId = "test"
         }
     }
 }

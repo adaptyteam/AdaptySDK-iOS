@@ -1,5 +1,5 @@
 //
-//  OnboardingsStateUpdatedAction.swift
+//  AdaptyOnboardingsStateUpdatedAction.swift
 //
 //
 //  Created by Aleksei Valiano on 01.08.2024
@@ -8,14 +8,14 @@
 
 import Foundation
 
-public struct OnboardingsStateUpdatedAction: Sendable, Hashable {
+public struct AdaptyOnboardingsStateUpdatedAction: Sendable, Hashable {
     public let elementId: String
-    public let meta: OnboardingsMetaParams
+    public let meta: AdaptyOnboardingsMetaParams
     public let params: OnboardingsStateUpdatedParams
 
     init(_ body: BodyDecoder.Dictionary) throws {
         self.elementId = try body["element_id"].asString()
-        self.meta = try OnboardingsMetaParams(body["meta"])
+        self.meta = try AdaptyOnboardingsMetaParams(body["meta"])
 
         enum ValueType: String {
             case select
@@ -44,7 +44,7 @@ public struct OnboardingsStateUpdatedAction: Sendable, Hashable {
     }
 }
 
-extension OnboardingsStateUpdatedAction: CustomDebugStringConvertible {
+extension AdaptyOnboardingsStateUpdatedAction: CustomDebugStringConvertible {
     public var debugDescription: String {
         "{elementId: \(elementId), params: \(params.debugDescription), meta: \(meta.debugDescription)}"
     }

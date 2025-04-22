@@ -1,5 +1,5 @@
 //
-//  OnboardingsMetaParams.swift
+//  AdaptyOnboardingsMetaParams.swift
 //
 //
 //  Created by Aleksei Valiano on 01.08.2024
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct OnboardingsMetaParams: Sendable, Hashable {
+public struct AdaptyOnboardingsMetaParams: Sendable, Hashable {
     public let onboardingId: String
     public let screenClientId: String
     public let screenIndex: Int
@@ -23,7 +23,7 @@ public struct OnboardingsMetaParams: Sendable, Hashable {
     }
 }
 
-extension OnboardingsMetaParams: CustomDebugStringConvertible {
+extension AdaptyOnboardingsMetaParams: CustomDebugStringConvertible {
     public var debugDescription: String {
         "{onboardingId: \(onboardingId), screenClientId: \(screenClientId), screenIndex: \(screenIndex), screensTotal: \(screensTotal)}"
     }

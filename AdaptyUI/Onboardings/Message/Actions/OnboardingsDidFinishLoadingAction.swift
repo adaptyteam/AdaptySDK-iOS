@@ -9,10 +9,10 @@
 import Foundation
 
 public struct OnboardingsDidFinishLoadingAction: Sendable, Hashable {
-    public let meta: OnboardingsMetaParams
+    public let meta: AdaptyOnboardingsMetaParams
 
     init(_ body: BodyDecoder.Dictionary) throws {
-        self.meta = try OnboardingsMetaParams(body["meta"])
+        self.meta = try AdaptyOnboardingsMetaParams(body["meta"])
     }
 }
 

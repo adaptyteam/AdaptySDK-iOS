@@ -17,11 +17,11 @@ struct AdaptyOnboardingView_Internal: UIViewControllerRepresentable {
     init(
         configuration: AdaptyUI.OnboardingConfiguration,
         onFinishLoading: @escaping (OnboardingsDidFinishLoadingAction) -> Void,
-        onCloseAction: @escaping (OnboardingsCloseAction) -> Void,
-        onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?,
-        onCustomAction: ((OnboardingsCustomAction) -> Void)?,
-        onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?,
-        onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
+        onCloseAction: @escaping (AdaptyOnboardingsCloseAction) -> Void,
+        onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)?,
+        onCustomAction: ((AdaptyOnboardingsCustomAction) -> Void)?,
+        onStateUpdatedAction: ((AdaptyOnboardingsStateUpdatedAction) -> Void)?,
+        onAnalyticsEvent: ((AdaptyOnboardingsAnalyticsEvent) -> Void)?,
         onError: @escaping (AdaptyUIError) -> Void
     ) {
         self.configuration = configuration

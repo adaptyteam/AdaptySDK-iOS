@@ -8,16 +8,16 @@
 
 import Foundation
 
-enum OnboardingsMessage: Sendable, Hashable {
-    case analytics(OnboardingsAnalyticsEvent)
-    case stateUpdated(OnboardingsStateUpdatedAction)
-    case openPaywall(OnboardingsOpenPaywallAction)
-    case custom(OnboardingsCustomAction)
-    case close(OnboardingsCloseAction)
+enum AdaptyOnboardingsMessage: Sendable, Hashable {
+    case analytics(AdaptyOnboardingsAnalyticsEvent)
+    case stateUpdated(AdaptyOnboardingsStateUpdatedAction)
+    case openPaywall(AdaptyOnboardingsOpenPaywallAction)
+    case custom(AdaptyOnboardingsCustomAction)
+    case close(AdaptyOnboardingsCloseAction)
     case didFinishLoading(OnboardingsDidFinishLoadingAction)
 }
 
-extension OnboardingsMessage: CustomDebugStringConvertible {
+extension AdaptyOnboardingsMessage: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .analytics(event):
