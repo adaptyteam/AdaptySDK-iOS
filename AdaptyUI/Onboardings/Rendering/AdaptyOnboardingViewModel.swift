@@ -76,7 +76,7 @@ final class AdaptyOnboardingViewModel: ObservableObject {
                     variationId: variationId,
                     screenName: meta.screenClientId,
                     screenOrder: "\(meta.screenIndex)",
-                    isLatestScreen: "\(isLatest)"
+                    isLatestScreen: isLatest
                 )
                 try await Adapty.logShowOnboarding(params)
             default:
