@@ -21,7 +21,7 @@ public struct AdaptyOnboarding: AdaptyPlacementContent {
 
     public var hasViewConfiguration: Bool { true }
 
-    package let viewConfigurationUrl: URL
+    package let viewConfiguration: ViewConfiguration
 
     package let shouldTrackShown: Bool
 }
@@ -40,7 +40,7 @@ extension AdaptyOnboarding: Codable {
         case variationId = "variation_id"
         case name = "onboarding_name"
         case remoteConfig = "remote_config"
-        case viewConfigurationUrl = "onboarding_config_url"
+        case viewConfiguration = "onboarding_builder"
         case shouldTrackShown = "should_track_shown"
     }
 
@@ -51,7 +51,7 @@ extension AdaptyOnboarding: Codable {
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig)
-        viewConfigurationUrl = try container.decode(URL.self, forKey: .viewConfigurationUrl)
+        viewConfiguration = try container.decode(ViewConfiguration.self, forKey: .viewConfiguration)
         shouldTrackShown = try container.decodeIfPresent(Bool.self, forKey: .shouldTrackShown) ?? false
     }
 
@@ -61,7 +61,7 @@ extension AdaptyOnboarding: Codable {
         try container.encode(name, forKey: .name)
         try container.encode(variationId, forKey: .variationId)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
-        try container.encode(viewConfigurationUrl, forKey: .viewConfigurationUrl)
+        try container.encode(viewConfiguration, forKey: .viewConfiguration)
         try container.encode(shouldTrackShown, forKey: .shouldTrackShown)
         try placement.encode(to: encoder)
     }

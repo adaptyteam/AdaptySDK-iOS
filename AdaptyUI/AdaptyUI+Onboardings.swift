@@ -18,7 +18,7 @@ public extension AdaptyUI {
 
         init(onboarding: AdaptyOnboarding) {
             id = onboarding.placement.id
-            url = onboarding.viewConfigurationUrl
+            url = onboarding.viewConfiguration.url
         }
 
         package init(id: String, url: URL) {

@@ -34,7 +34,7 @@ extension Adapty {
 
 private let log = Log.fallbackPlacements
 
-extension PaywallsStorage {
+extension PlacementStorage {
     private func getPlacement<Content: AdaptyPlacementContent>(byPlacementId placementId: String, withVariationId variationId: String?, profileId: String, locale: AdaptyLocale) -> AdaptyPlacementChosen<Content>? {
         getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: variationId).map {
             AdaptyPlacementChosen.restore($0.value)

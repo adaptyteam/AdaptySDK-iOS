@@ -139,7 +139,7 @@ final class ProfileStorage: Sendable {
         crossPlacementState = nil
 
         BackendIntroductoryOfferEligibilityStorage.clear()
-        PaywallsStorage.clear()
+        PlacementStorage.clear()
     }
 }
 
