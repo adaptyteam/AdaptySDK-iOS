@@ -135,23 +135,23 @@ extension OnboardingSplashController: AdaptyOnboardingControllerDelegate {
         removeApplicationSplash()
     }
     
-    public func onboardingController(_ controller: AdaptyOnboardingController, onCloseAction action: OnboardingsCloseAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onCloseAction action: AdaptyOnboardingsCloseAction) {
         delegate?.onboardingController(controller, onCloseAction: action)
     }
 
-    public func onboardingController(_ controller: AdaptyOnboardingController, onPaywallAction action: OnboardingsOpenPaywallAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onPaywallAction action: AdaptyOnboardingsOpenPaywallAction) {
         delegate?.onboardingController(controller, onPaywallAction: action)
     }
 
-    public func onboardingController(_ controller: AdaptyOnboardingController, onCustomAction action: OnboardingsCustomAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onCustomAction action: AdaptyOnboardingsCustomAction) {
         delegate?.onboardingController(controller, onCustomAction: action)
     }
 
-    public func onboardingController(_ controller: AdaptyOnboardingController, onStateUpdatedAction action: OnboardingsStateUpdatedAction) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction) {
         delegate?.onboardingController(controller, onStateUpdatedAction: action)
     }
 
-    public func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: OnboardingsAnalyticsEvent) {
+    public func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent) {
         delegate?.onboardingController(controller, onAnalyticsEvent: event)
     }
 

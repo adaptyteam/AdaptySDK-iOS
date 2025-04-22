@@ -12,11 +12,11 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
     private let configuration: AdaptyUI.OnboardingConfiguration
 
     private let placeholderViewBuilder: () -> Placeholder
-    private let onCloseAction: (OnboardingsCloseAction) -> Void
-    private let onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?
-    private let onCustomAction: ((OnboardingsCustomAction) -> Void)?
-    private let onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?
-    private let onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?
+    private let onCloseAction: (AdaptyOnboardingsCloseAction) -> Void
+    private let onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)?
+    private let onCustomAction: ((AdaptyOnboardingsCustomAction) -> Void)?
+    private let onStateUpdatedAction: ((AdaptyOnboardingsStateUpdatedAction) -> Void)?
+    private let onAnalyticsEvent: ((AdaptyOnboardingsAnalyticsEvent) -> Void)?
     private let onError: (Error) -> Void
 
     @State private var isLoading = true
@@ -24,11 +24,11 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
     public init(
         configuration: AdaptyUI.OnboardingConfiguration,
         placeholder: @escaping () -> Placeholder,
-        onCloseAction: @escaping (OnboardingsCloseAction) -> Void,
-        onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)? = nil,
-        onCustomAction: ((OnboardingsCustomAction) -> Void)? = nil,
-        onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)? = nil,
-        onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)? = nil,
+        onCloseAction: @escaping (AdaptyOnboardingsCloseAction) -> Void,
+        onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)? = nil,
+        onCustomAction: ((AdaptyOnboardingsCustomAction) -> Void)? = nil,
+        onStateUpdatedAction: ((AdaptyOnboardingsStateUpdatedAction) -> Void)? = nil,
+        onAnalyticsEvent: ((AdaptyOnboardingsAnalyticsEvent) -> Void)? = nil,
         onError: @escaping (Error) -> Void
     ) {
         self.configuration = configuration

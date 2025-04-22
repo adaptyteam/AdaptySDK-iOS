@@ -10,20 +10,20 @@ import Adapty
 
 final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate {
     private let onFinishLoading: (OnboardingsDidFinishLoadingAction) -> Void
-    private let onCloseAction: (OnboardingsCloseAction) -> Void
-    private let onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?
-    private let onCustomAction: ((OnboardingsCustomAction) -> Void)?
-    private let onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?
-    private let onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?
+    private let onCloseAction: (AdaptyOnboardingsCloseAction) -> Void
+    private let onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)?
+    private let onCustomAction: ((AdaptyOnboardingsCustomAction) -> Void)?
+    private let onStateUpdatedAction: ((AdaptyOnboardingsStateUpdatedAction) -> Void)?
+    private let onAnalyticsEvent: ((AdaptyOnboardingsAnalyticsEvent) -> Void)?
     private let onError: (AdaptyUIError) -> Void
 
     init(
         onFinishLoading: @escaping (OnboardingsDidFinishLoadingAction) -> Void,
-        onCloseAction: @escaping (OnboardingsCloseAction) -> Void,
-        onOpenPaywallAction: ((OnboardingsOpenPaywallAction) -> Void)?,
-        onCustomAction: ((OnboardingsCustomAction) -> Void)?,
-        onStateUpdatedAction: ((OnboardingsStateUpdatedAction) -> Void)?,
-        onAnalyticsEvent: ((OnboardingsAnalyticsEvent) -> Void)?,
+        onCloseAction: @escaping (AdaptyOnboardingsCloseAction) -> Void,
+        onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)?,
+        onCustomAction: ((AdaptyOnboardingsCustomAction) -> Void)?,
+        onStateUpdatedAction: ((AdaptyOnboardingsStateUpdatedAction) -> Void)?,
+        onAnalyticsEvent: ((AdaptyOnboardingsAnalyticsEvent) -> Void)?,
         onError: @escaping (AdaptyUIError) -> Void
     ) {
         self.onFinishLoading = onFinishLoading
@@ -44,14 +44,14 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
 
     func onboardingController(
         _ controller: AdaptyOnboardingController,
-        onCloseAction action: OnboardingsCloseAction
+        onCloseAction action: AdaptyOnboardingsCloseAction
     ) {
         onCloseAction(action)
     }
 
     func onboardingController(
         _ controller: AdaptyOnboardingController,
-        onPaywallAction action: OnboardingsOpenPaywallAction
+        onPaywallAction action: AdaptyOnboardingsOpenPaywallAction
     ) {
         if let onOpenPaywallAction {
             onOpenPaywallAction(action)
@@ -62,7 +62,7 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
 
     func onboardingController(
         _ controller: AdaptyOnboardingController,
-        onCustomAction action: OnboardingsCustomAction
+        onCustomAction action: AdaptyOnboardingsCustomAction
     ) {
         if let onCustomAction {
             onCustomAction(action)
@@ -73,7 +73,7 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
 
     func onboardingController(
         _ controller: AdaptyOnboardingController,
-        onStateUpdatedAction action: OnboardingsStateUpdatedAction
+        onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction
     ) {
         if let onStateUpdatedAction {
             onStateUpdatedAction(action)
@@ -84,7 +84,7 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
 
     func onboardingController(
         _ controller: AdaptyOnboardingController,
-        onAnalyticsEvent event: OnboardingsAnalyticsEvent
+        onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent
     ) {
         onAnalyticsEvent?(event)
     }

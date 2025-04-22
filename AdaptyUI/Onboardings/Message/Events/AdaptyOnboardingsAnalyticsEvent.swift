@@ -1,5 +1,5 @@
 //
-//  OnboardingsAnalyticsEvent.swift
+//  AdaptyOnboardingsAnalyticsEvent.swift
 //
 //
 //  Created by Aleksei Valiano on 01.08.2024
@@ -9,18 +9,18 @@
 import Adapty
 import Foundation
 
-public enum OnboardingsAnalyticsEvent: Sendable, Hashable {
-    case unknown(meta: OnboardingsMetaParams, name: String)
-    case onboardingStarted(meta: OnboardingsMetaParams)
-    case screenPresented(meta: OnboardingsMetaParams)
-    case screenCompleted(meta: OnboardingsMetaParams, elementId: String?, reply: String?)
-    case secondScreenPresented(meta: OnboardingsMetaParams)
-    case registrationScreenPresented(meta: OnboardingsMetaParams)
-    case productsScreenPresented(meta: OnboardingsMetaParams)
-    case userEmailCollected(meta: OnboardingsMetaParams)
-    case onboardingCompleted(meta: OnboardingsMetaParams)
+public enum AdaptyOnboardingsAnalyticsEvent: Sendable, Hashable {
+    case unknown(meta: AdaptyOnboardingsMetaParams, name: String)
+    case onboardingStarted(meta: AdaptyOnboardingsMetaParams)
+    case screenPresented(meta: AdaptyOnboardingsMetaParams)
+    case screenCompleted(meta: AdaptyOnboardingsMetaParams, elementId: String?, reply: String?)
+    case secondScreenPresented(meta: AdaptyOnboardingsMetaParams)
+    case registrationScreenPresented(meta: AdaptyOnboardingsMetaParams)
+    case productsScreenPresented(meta: AdaptyOnboardingsMetaParams)
+    case userEmailCollected(meta: AdaptyOnboardingsMetaParams)
+    case onboardingCompleted(meta: AdaptyOnboardingsMetaParams)
 
-    public var meta: OnboardingsMetaParams {
+    public var meta: AdaptyOnboardingsMetaParams {
         switch self {
         case let .unknown(meta, _),
              let .onboardingStarted(meta),
@@ -47,7 +47,7 @@ public enum OnboardingsAnalyticsEvent: Sendable, Hashable {
     }
 
     init(_ body: BodyDecoder.Dictionary) throws {
-        let meta = try OnboardingsMetaParams(body["meta"])
+        let meta = try AdaptyOnboardingsMetaParams(body["meta"])
 
         let name = try body["name"].asString()
         let params = try body["params"].asOptionalDictionary()
@@ -83,7 +83,7 @@ public enum OnboardingsAnalyticsEvent: Sendable, Hashable {
     }
 }
 
-extension OnboardingsAnalyticsEvent: CustomDebugStringConvertible {
+extension AdaptyOnboardingsAnalyticsEvent: CustomDebugStringConvertible {
     public var debugDescription: String {
         switch self {
         case let .unknown(meta, name):

@@ -11,7 +11,19 @@ package struct AdaptyOnboardingScreenShowedParameters: Sendable {
     package let variationId: String
     package let screenName: String?
     package let screenOrder: String
-    package let isLastestScreen: String
+    package let isLatestScreen: String
+    
+    package init(
+        variationId: String,
+        screenName: String?,
+        screenOrder: String,
+        isLatestScreen: String
+    ) {
+        self.variationId = variationId
+        self.screenName = screenName
+        self.screenOrder = screenOrder
+        self.isLatestScreen = isLatestScreen
+    }
 }
 
 extension AdaptyOnboardingScreenShowedParameters: Codable {
@@ -19,6 +31,6 @@ extension AdaptyOnboardingScreenShowedParameters: Codable {
         case variationId = "variation_id"
         case screenName = "onboarding_screen_name"
         case screenOrder = "onboarding_screen_order"
-        case isLastestScreen = "onboarding_latest_screen"
+        case isLatestScreen = "onboarding_latest_screen"
     }
 }

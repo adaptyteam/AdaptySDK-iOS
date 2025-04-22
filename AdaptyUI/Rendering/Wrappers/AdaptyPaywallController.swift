@@ -55,7 +55,7 @@ public final class AdaptyPaywallController: UIViewController {
         Log.ui.verbose("#\(logId)# viewDidLoad begin")
 
         view.backgroundColor = .systemBackground
-
+        
         paywallConfiguration.eventsHandler.didAppear = { [weak self] in
             guard let self else { return }
             self.delegate?.paywallControllerDidAppear(self)

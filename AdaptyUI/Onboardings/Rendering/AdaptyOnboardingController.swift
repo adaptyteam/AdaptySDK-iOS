@@ -11,7 +11,7 @@ import WebKit
 
 public final class AdaptyOnboardingController: UIViewController {
     private let stamp: String
-    private let viewModel: OnboardingViewModel
+    private let viewModel: AdaptyOnboardingViewModel
     weak var delegate: AdaptyOnboardingControllerDelegate?
 
     private var webView: WKWebView!
@@ -24,7 +24,7 @@ public final class AdaptyOnboardingController: UIViewController {
 
         self.stamp = stamp
         self.delegate = delegate
-        self.viewModel = OnboardingViewModel(
+        self.viewModel = AdaptyOnboardingViewModel(
             stamp: stamp,
             configuration: configuration
         )
@@ -40,7 +40,7 @@ public final class AdaptyOnboardingController: UIViewController {
         }
     }
 
-    private func handleMessage(_ message: OnboardingsMessage) {
+    private func handleMessage(_ message: AdaptyOnboardingsMessage) {
         delegate?.apply(message: message, from: self)
     }
 
