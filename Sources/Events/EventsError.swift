@@ -9,7 +9,6 @@ enum EventsError: Error {
     case sending(AdaptyError.Source, error: Error)
     case encoding(AdaptyError.Source, error: Error)
     case decoding(AdaptyError.Source, error: Error)
-    case interrupted(AdaptyError.Source)
 }
 
 extension EventsError: CustomStringConvertible {
@@ -21,8 +20,6 @@ extension EventsError: CustomStringConvertible {
             "EventsError.encoding(\(source), \(error))"
         case let .decoding(source, error: error):
             "EventsError.decoding(\(source), \(error))"
-        case let .interrupted(source):
-            "EventsError.interrupted(\(source))"
         }
     }
 }
@@ -32,25 +29,22 @@ extension EventsError {
         switch self {
         case let .sending(src, _),
              let .encoding(src, _),
-             let .decoding(src, _),
-             let .interrupted(src): src
+             let .decoding(src, _): src
         }
     }
 
     var isInterrupted: Bool {
         switch self {
-        case .interrupted: true
         case let .sending(_, error): (error as? HTTPError)?.isCancelled ?? false
         default: false
         }
     }
 
-    var originalError: Error? {
+    var originalError: Error {
         switch self {
         case let .sending(_, error): error
         case let .encoding(_, error),
              let .decoding(_, error): error
-        default: nil
         }
     }
 }
@@ -96,15 +90,5 @@ extension EventsError {
             ),
             error: error
         )
-    }
-
-    static func interrupted(
-        file: String = #fileID, function: String = #function, line: UInt = #line
-    ) -> Self {
-        .interrupted(AdaptyError.Source(
-            file: file,
-            function: function,
-            line: line
-        ))
     }
 }

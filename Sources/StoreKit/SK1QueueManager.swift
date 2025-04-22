@@ -254,7 +254,7 @@ actor SK1QueueManager: Sendable {
         }
     }
 
-    fileprivate func shouldAddStorePaymentOccured(
+    fileprivate func shouldAddStorePaymentOccurred(
         product: SKProduct,
         hasDelegate: Bool,
         result: Bool
@@ -315,7 +315,7 @@ extension SK1QueueManager {
             func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for sk1Product: SKProduct) -> Bool {
                 guard let delegate = Adapty.delegate else {
                     Task {
-                        await wrapped.shouldAddStorePaymentOccured(
+                        await wrapped.shouldAddStorePaymentOccurred(
                             product: sk1Product,
                             hasDelegate: false,
                             result: true
@@ -328,7 +328,7 @@ extension SK1QueueManager {
                 let result = delegate.shouldAddStorePayment(for: deferredProduct)
 
                 Task {
-                    await wrapped.shouldAddStorePaymentOccured(
+                    await wrapped.shouldAddStorePaymentOccurred(
                         product: sk1Product,
                         hasDelegate: true,
                         result: result
