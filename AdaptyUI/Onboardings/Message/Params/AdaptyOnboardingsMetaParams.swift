@@ -19,7 +19,7 @@ public struct AdaptyOnboardingsMetaParams: Sendable, Hashable {
         self.onboardingId = try body["onboarding_id"].asString()
         self.screenClientId = try body["screen_cid"].asString()
         self.screenIndex = try body["screen_index"].asInt()
-        self.screensTotal = try body["total_screens"].asOptionalInt() ?? 0
+        self.screensTotal = try body["total_screens"].asInt()
     }
 }
 
