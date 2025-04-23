@@ -13,6 +13,7 @@ private extension AdaptyUI {
     static let webViewEventMessageName = "postEvent"
 }
 
+@MainActor
 final class AdaptyOnboardingViewModel: ObservableObject {
     let stamp: String
     let configuration: AdaptyUI.OnboardingConfiguration
@@ -47,6 +48,15 @@ final class AdaptyOnboardingViewModel: ObservableObject {
         webView.load(request)
     }
 
+    private var wasAppeared: Bool = false
+    private var wasLoaded: Bool = false
+
+    func viewDidAppear() {
+        wasAppeared = true
+
+        persistOnboardingVariationIdIfNeeded()
+    }
+
     private func handleMessage(_ name: String, _ body: Any) {
         do {
             let message = try AdaptyOnboardingsMessage(chanel: name, body: body)
@@ -55,6 +65,9 @@ final class AdaptyOnboardingViewModel: ObservableObject {
             onMessage?(message)
 
             switch message {
+            case let .didFinishLoading(action):
+                wasLoaded = true
+                persistOnboardingVariationIdIfNeeded()
             case let .analytics(event):
                 handleAnalyticsEvent(event, variationId: configuration.variationId)
             default:
@@ -64,6 +77,18 @@ final class AdaptyOnboardingViewModel: ObservableObject {
             Log.onboardings.warn("\(stamp) Unknown message \(error.type.map { "with type \"\($0)\"" } ?? "with name \"\(error.chanel)\""): \(String(describing: body))")
         } catch {
             Log.onboardings.error("\(stamp) Error on decoding event: \(error)")
+        }
+    }
+
+    private func persistOnboardingVariationIdIfNeeded() {
+        guard configuration.shouldTrackShown, wasAppeared, wasLoaded else { return }
+
+        let variationId = configuration.variationId
+
+        Task { @MainActor in
+            await Adapty.persistOnboardingVariationId(variationId)
+
+            Log.onboardings.verbose("\(stamp) persistOnboardingVariationId")
         }
     }
 
