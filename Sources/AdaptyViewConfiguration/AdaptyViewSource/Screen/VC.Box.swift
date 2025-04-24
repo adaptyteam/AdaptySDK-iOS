@@ -67,6 +67,7 @@ extension AdaptyViewSource.Box: Codable {
 extension AdaptyViewConfiguration.Box.Length: Codable {
     enum CodingKeys: String, CodingKey {
         case min
+        case max
         case shrink
         case fillMax = "fill_max"
     }
@@ -79,25 +80,29 @@ extension AdaptyViewConfiguration.Box.Length: Codable {
             if let value = try container.decodeIfPresent(Bool.self, forKey: .fillMax), value {
                 self = .fillMax
             } else if let value = try container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .min) {
-                self = .min(value)
+                self = try .flexible(min: value, max: container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .max))
             } else if let value = try container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .shrink) {
-                self = .shrink(value)
+                self = try .shrinkable(min: value, max: container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .max))
+            } else if let value = try container.decodeIfPresent(AdaptyViewConfiguration.Unit.self, forKey: .max) {
+                self = .flexible(min: nil, max: value)
             } else {
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "don't found fill_max:true or min"))
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "don't found unknown properties"))
             }
         }
     }
 
     package func encode(to encoder: any Encoder) throws {
         switch self {
-        case .fixed(let unit):
+        case let .fixed(unit):
             try unit.encode(to: encoder)
-        case .min(let unit):
+        case let .flexible(min, max):
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(unit, forKey: .min)
-        case .shrink(let unit):
+            try container.encodeIfPresent(min, forKey: .min)
+            try container.encodeIfPresent(max, forKey: .max)
+        case let .shrinkable(min, max):
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(unit, forKey: .shrink)
+            try container.encode(min, forKey: .shrink)
+            try container.encodeIfPresent(max, forKey: .max)
         case .fillMax:
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(true, forKey: .fillMax)
