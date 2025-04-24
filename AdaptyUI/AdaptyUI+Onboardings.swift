@@ -16,11 +16,13 @@ public extension AdaptyUI {
 
         let url: URL
         let variationId: String
+        let shouldTrackShown: Bool
 
         init(onboarding: AdaptyOnboarding) {
             id = onboarding.placement.id
             url = onboarding.viewConfiguration.url
             variationId = onboarding.variationId
+            shouldTrackShown = onboarding.shouldTrackShown
         }
 
         // TODO: remove this method
@@ -28,6 +30,7 @@ public extension AdaptyUI {
             self.id = id
             self.url = url
             self.variationId = "test"
+            self.shouldTrackShown = true
         }
     }
 }

@@ -180,6 +180,8 @@ enum MethodName: String {
 
     case updateCollectingRefundDataConsent = "update_collecting_refund_data_consent"
     case updateRefundPreference = "update_refund_preference"
+    
+    case persistOnboardingVariationId = "persist_onboarding_variation_id"
 }
 
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {

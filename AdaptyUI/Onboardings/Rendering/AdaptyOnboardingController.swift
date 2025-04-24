@@ -62,6 +62,12 @@ public final class AdaptyOnboardingController: UIViewController {
 
         viewModel.configureWebView(webView)
     }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        viewModel.viewDidAppear()
+    }
 
     private func buildWebView() -> WKWebView {
         let config = WKWebViewConfiguration()
