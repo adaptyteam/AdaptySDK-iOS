@@ -48,7 +48,7 @@ public extension AdaptyUI {
                 products: products,
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
-                timerResolver: timerResolver,
+                timerResolver: timerResolver
             )
         }
     }

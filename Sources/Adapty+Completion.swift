@@ -460,6 +460,13 @@ public extension Adapty {
         }
     }
     
+    /// Call this method to update the current user's refund data consent.
+    ///
+    /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#obtain-user-consent)
+    ///
+    /// - Parameters:
+    ///   - consent: `Bool` value wehter user gave the consent or not.
+    ///   - completion: Result callback.
     nonisolated static func updateCollectingRefundDataConsent(
         _ consent: Bool,
         _ completion: AdaptyErrorCompletion? = nil
@@ -469,6 +476,13 @@ public extension Adapty {
         }
     }
     
+    /// Call this method to set the refund preference individually for current user.
+    ///
+    /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#set-refund-behavior-for-a-specific-user-in-the-dashboard)
+    ///
+    /// - Parameters:
+    ///   - refundPreference: ``AdaptyRefundPreference`` value.
+    ///   - completion: Result callback.
     nonisolated static func updateRefundPreference(
         _ refundPreference: AdaptyRefundPreference,
         _ completion: AdaptyErrorCompletion? = nil
