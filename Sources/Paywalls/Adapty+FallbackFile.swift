@@ -71,16 +71,16 @@ extension PlacementStorage {
 
         case (_, .some(let cached)):
 
-            let fallbackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil :
+            let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil :
                 fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
 
-            let fallbackedB: AdaptyPlacementChosen<Content>? = (fallbackedA != nil || cached.content.placement.version >= fallbackFile.version) ? nil
+            let fallBackedB: AdaptyPlacementChosen<Content>? = (fallBackedA != nil || cached.content.placement.version >= fallbackFile.version) ? nil
                 : fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
 
-            if let fallbacked = fallbackedA ?? fallbackedB {
-                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version))")
+            if let fallBacked = fallBackedA ?? fallBackedB {
+                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallBacked.content.variationId), version: \(fallBacked.content.placement.version))")
 
-                return fallbacked
+                return fallBacked
             } else {
                 Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version)")
                 return cached
@@ -88,7 +88,7 @@ extension PlacementStorage {
 
         default:
 
-            let fallbacked: AdaptyPlacementChosen<Content>? =
+            let fallBacked: AdaptyPlacementChosen<Content>? =
                 if let variationId {
                     fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, profileId: profileId)
                         ?? fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
@@ -96,11 +96,11 @@ extension PlacementStorage {
                     fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId)
                 }
 
-            guard let fallbacked else { return nil }
+            guard let fallBacked else { return nil }
 
-            Log.crossAB.verbose("return from fallback plqcement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version)) no-cache")
+            Log.crossAB.verbose("return from fallback plqcement content (placementId: \(placementId), variationId: \(fallBacked.content.variationId), version: \(fallBacked.content.placement.version)) no-cache")
 
-            return fallbacked
+            return fallBacked
         }
     }
 }

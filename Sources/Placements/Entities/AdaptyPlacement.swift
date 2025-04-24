@@ -15,9 +15,17 @@ public struct AdaptyPlacement: Sendable, Identifiable {
     /// Parent A/B test name.
     public let abTestName: String
 
-    let placementAudienceVersionId: String  // TODO: extract from placement
+    let placementAudienceVersionId: String // TODO: extract from placement
 
-    let version: Int64
+    var version: Int64
+}
+
+extension AdaptyPlacement {
+    func replace(version: Int64) -> Self {
+        var placement = self
+        placement.version = version
+        return placement
+    }
 }
 
 extension AdaptyPlacement: CustomStringConvertible {

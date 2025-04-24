@@ -44,7 +44,7 @@ private extension CodingUserInfoKey {
     static let placement = CodingUserInfoKey(rawValue: "adapty_placement")!
 }
 
-extension CodingUserInfoСontainer {
+extension CodingUserInfoContainer {
     func setProfileId(_ value: String) {
         userInfo[.profileId] = value
     }
@@ -86,7 +86,9 @@ extension [CodingUserInfoKey: Any] {
             if let value = self[.placementId] as? String {
                 return value
             }
-
+            if let value = placementOrNil {
+                return value.id
+            }
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placementId) parameter"))
         }
     }
@@ -134,8 +136,9 @@ extension Backend.Response {
         let value: Value
 
         init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            value = try container.decode(Value.self, forKey: .data)
+            value = try decoder
+                .container(keyedBy: Backend.CodingKeys.self)
+                .decode(Value.self, forKey: .data)
         }
 
         struct OptionalAttributes: Sendable, Decodable {
@@ -159,8 +162,9 @@ extension Backend.Response {
         let value: Value
 
         init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            value = try container.decode(Value.self, forKey: .meta)
+            value = try decoder
+                .container(keyedBy: Backend.CodingKeys.self)
+                .decode(Value.self, forKey: .meta)
         }
     }
 }

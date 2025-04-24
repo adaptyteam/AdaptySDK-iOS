@@ -8,7 +8,7 @@
 
 import Foundation
 
-package protocol CodingUserInfoСontainer: AnyObject {
+package protocol CodingUserInfoContainer: AnyObject {
 #if compiler(>=6.1.0)
     var userInfo: [CodingUserInfoKey: any Sendable] { get set }
 #else
@@ -16,5 +16,5 @@ package protocol CodingUserInfoСontainer: AnyObject {
 #endif
 }
 
-extension JSONDecoder: CodingUserInfoСontainer {}
-extension JSONEncoder: CodingUserInfoСontainer {}
+extension JSONDecoder: CodingUserInfoContainer {}
+extension JSONEncoder: CodingUserInfoContainer {}

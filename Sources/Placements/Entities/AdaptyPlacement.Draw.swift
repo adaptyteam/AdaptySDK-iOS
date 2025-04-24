@@ -28,7 +28,7 @@ extension AdaptyPlacement.Draw: Decodable {
         let variations = try [AdaptyPlacement.Variation](from: decoder)
 
         guard !variations.isEmpty else {
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placements contetnts collection is empty"))
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placements contents collection is empty"))
         }
 
         let index: Int

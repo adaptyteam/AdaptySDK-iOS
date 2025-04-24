@@ -83,7 +83,7 @@ private extension BackendExecutor {
                     response,
                     withConfiguration: configuration,
                     withProfileId: profileId,
-                    withPlacemantId: placementId,
+                    withPlacementId: placementId,
                     withCached: cached,
                     variationIdResolver: variationIdResolver
                 )

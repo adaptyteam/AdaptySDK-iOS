@@ -92,7 +92,7 @@ extension VariationIdStorage {
         Task {
             if await setPaywallVariationId(variationId, for: productId) {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "didset_variations_ids",
+                    eventName: "did_set_variations_ids",
                     params: [
                         "variation_by_product": paywallVariationsIds,
                     ]
@@ -101,7 +101,7 @@ extension VariationIdStorage {
 
             if await setPersistentPaywallVariationId(variationId, for: productId) {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "didset_variations_ids_persistent",
+                    eventName: "did_set_variations_ids_persistent",
                     params: [
                         "variation_by_product": persistentPaywallVariationsIds,
                     ]
@@ -115,7 +115,7 @@ extension VariationIdStorage {
         Task {
             if await setPersistentOnboardingVariationId(variationId) {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "didset_onboarding_variatios_id",
+                    eventName: "did_set_onboarding_variations_id",
                     params: [
                         "onboarding_variation_id": variationId,
                     ]
@@ -129,7 +129,7 @@ extension VariationIdStorage {
             guard await removePaywallVariationId(for: productId) else { return }
 
             await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                eventName: "didset_variations_ids",
+                eventName: "did_set_variations_ids",
                 params: [
                     "variation_by_product": paywallVariationsIds,
                 ]

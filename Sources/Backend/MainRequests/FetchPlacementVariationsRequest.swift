@@ -44,7 +44,7 @@ extension AdaptyPlacementChosen {
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
         withProfileId profileId: String,
-        withPlacemantId placementId: String,
+        withPlacementId placementId: String,
         withCached cached: Content?,
         variationIdResolver: VariationIdResolver?
     ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
@@ -152,7 +152,7 @@ extension Backend.MainExecutor {
                 response,
                 withConfiguration: configuration,
                 withProfileId: profileId,
-                withPlacemantId: placementId,
+                withPlacementId: placementId,
                 withCached: cached,
                 variationIdResolver: variationIdResolver
             )
