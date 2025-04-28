@@ -13,11 +13,11 @@ private let log = Log.storage
 final class PlacementStorage: Sendable {
     private static func getPlacement<Content: AdaptyPlacementContent>(_ placementId: String) -> VH<Content>? {
         if Content.self == AdaptyPaywall.self {
-            PaywallStorage.paywallByPlacementId[placementId] as? VH<Content>
+            return PaywallStorage.paywallByPlacementId[placementId] as? VH<Content>
         } else if Content.self == AdaptyOnboarding.self {
-            OnboardingStorage.onboardingByPlacementId[placementId] as? VH<Content>
+            return OnboardingStorage.onboardingByPlacementId[placementId] as? VH<Content>
         } else {
-            nil
+            return nil
         }
     }
 
