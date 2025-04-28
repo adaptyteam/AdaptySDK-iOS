@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptySubscriptionPeriod {
-    public enum Unit: UInt, Sendable, Hashable {
+public extension AdaptySubscriptionPeriod {
+    enum Unit: UInt, Sendable, Hashable {
         case day
         case week
         case month

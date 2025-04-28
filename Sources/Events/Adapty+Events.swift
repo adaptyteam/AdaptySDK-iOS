@@ -138,7 +138,7 @@ public extension Adapty {
     /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#obtain-user-consent)
     ///
     /// - Parameters:
-    ///   - consent: `Bool` value wehter user gave the consent or not.
+    ///   - consent: `Bool` value whether user gave the consent or not.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func updateCollectingRefundDataConsent(_ consent: Bool) async throws {
         try await withActivatedSDK(methodName: .updateCollectingRefundDataConsent) { _ in

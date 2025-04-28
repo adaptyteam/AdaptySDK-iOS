@@ -37,7 +37,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
             view: controller.toAdaptyUIView()
         ))
     }
-    
+
     func paywallControllerDidDisappear(
         _ controller: AdaptyPaywallController
     ) {
@@ -45,7 +45,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
             view: controller.toAdaptyUIView()
         ))
     }
-    
+
     func paywallController(
         _ controller: AdaptyPaywallController,
         didPerform action: AdaptyUI.Action

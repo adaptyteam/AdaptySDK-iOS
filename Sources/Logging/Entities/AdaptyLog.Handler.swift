@@ -7,10 +7,10 @@
 
 import Foundation
 
-extension Log {
-    package typealias Handler = AdaptyLog.Handler
+package extension Log {
+    typealias Handler = AdaptyLog.Handler
 }
 
-extension AdaptyLog {
-    public typealias Handler = @Sendable (Record) -> Void
+public extension AdaptyLog {
+    typealias Handler = @Sendable (Record) -> Void
 }

@@ -7,12 +7,12 @@
 
 import Foundation
 
-extension Log {
-    package typealias Source = AdaptyLog.Source
+package extension Log {
+    typealias Source = AdaptyLog.Source
 }
 
-extension AdaptyLog {
-    public struct Source: Equatable, Sendable {
+public extension AdaptyLog {
+    struct Source: Equatable, Sendable {
         public let fileName: String
         public let functionName: String
         public let lineNumber: UInt

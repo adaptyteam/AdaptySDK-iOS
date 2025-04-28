@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  Adapty
+//  PaywallViewEvent.DidDisappear.swift
+//  AdaptyPlugin
 //
 //  Created by Alexey Goncharov on 3/13/25.
 //

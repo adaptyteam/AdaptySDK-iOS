@@ -15,7 +15,7 @@ public enum AdaptyPlacementFetchPolicy: Sendable, Hashable {
 }
 
 extension AdaptyPlacementFetchPolicy {
-    func canReturn<Content:AdaptyPlacementContent>(_ data: VH<Content>) -> Bool {
+    func canReturn<Content: AdaptyPlacementContent>(_ data: VH<Content>) -> Bool {
         switch self {
         case .reloadRevalidatingCacheData: return false
         case .returnCacheDataElseLoad: return true

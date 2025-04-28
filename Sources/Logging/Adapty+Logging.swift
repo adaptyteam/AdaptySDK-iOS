@@ -7,9 +7,9 @@
 
 import Foundation
 
-extension Adapty {
+public extension Adapty {
     /// Set to the most appropriate level of logging
-    public nonisolated static var logLevel: AdaptyLog.Level {
+    nonisolated static var logLevel: AdaptyLog.Level {
         get { Log.level }
         set {
             Task {
@@ -22,7 +22,7 @@ extension Adapty {
     /// This will not override the default behavior but will add a new one.
     ///
     /// - Parameter handler: The function will be called for each message with the appropriate `logLevel`
-    public nonisolated static func setLogHandler(_ handler: AdaptyLog.Handler?) { 
+    nonisolated static func setLogHandler(_ handler: AdaptyLog.Handler?) {
         Task {
             await Log.set(handler: handler)
         }

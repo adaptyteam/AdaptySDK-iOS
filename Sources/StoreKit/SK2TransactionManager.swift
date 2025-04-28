@@ -73,7 +73,8 @@ actor SK2TransactionManager: StoreKitTransactionManager {
                 log.verbose("found transaction original-id: \(transaction.originalID), purchase date:\(transaction.purchaseDate)")
 
                 guard let lasted = lastTransaction,
-                      transaction.purchaseDate < lasted.purchaseDate else {
+                      transaction.purchaseDate < lasted.purchaseDate
+                else {
                     lastTransaction = transaction
                     continue
                 }

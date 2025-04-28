@@ -31,7 +31,7 @@ actor HTTPTaskState {
     private var shouldCancel = false
 
     func start(_ task: URLSessionTask) {
-        self.taskIdentifier = task.taskIdentifier
+        taskIdentifier = task.taskIdentifier
         if shouldCancel {
             task.cancel()
         } else {
@@ -41,7 +41,7 @@ actor HTTPTaskState {
     }
 
     func cancel() {
-        if let task = self.task {
+        if let task = task {
             task.cancel()
         } else {
             shouldCancel = true

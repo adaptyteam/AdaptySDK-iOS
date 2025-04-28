@@ -1,15 +1,14 @@
 //
-//  LazyLocalisedProductText.swift
+//  LazyLocalizedProductText.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 02.05.2024
-//
 //
 
 import Foundation
 
 extension AdaptyViewConfiguration {
-    package struct LazyLocalisedProductText: Sendable, Hashable {
+    package struct LazyLocalizedProductText: Sendable, Hashable {
         package let adaptyProductId: String
         private let suffix: String?
         private let localizer: AdaptyViewSource.Localizer
@@ -39,7 +38,7 @@ extension AdaptyViewConfiguration {
         }
     }
 
-    package struct LazyLocalisedUnknownProductText: Sendable, Hashable {
+    package struct LazyLocalizedUnknownProductText: Sendable, Hashable {
         package let productGroupId: String
         private let suffix: String?
         private let localizer: AdaptyViewSource.Localizer

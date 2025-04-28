@@ -31,19 +31,19 @@ extension Backend.Request {
     fileprivate static let crossSDKVersionHeaderKey = "adapty-sdk-crossplatform-version"
     fileprivate static let crossSDKPlatformHeaderKey = "adapty-sdk-crossplatform-name"
 
-    static func globalHeaders(_ configuration: AdaptyConfiguration, _ envorinment: Environment) -> HTTPHeaders {
+    static func globalHeaders(_ configuration: AdaptyConfiguration, _ environment: Environment) -> HTTPHeaders {
         var headers = [
             authorizationHeaderKey: "Api-Key \(configuration.apiKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
-            sdkPlatformHeaderKey: envorinment.system.name,
+            sdkPlatformHeaderKey: environment.system.name,
             sdkStoreHeaderKey: Environment.StoreKit.name,
-            sessionIDHeaderKey: envorinment.sessionIdentifier,
-            appInstallIdHeaderKey: envorinment.application.installationIdentifier,
+            sessionIDHeaderKey: environment.sessionIdentifier,
+            appInstallIdHeaderKey: environment.application.installationIdentifier,
             isObserveModeHeaderKey: configuration.observerMode ? "true" : "false",
             storeKit2EnabledHeaderKey: Environment.StoreKit.storeKit2Enabled ? "enabled" : "unavailable",
         ]
 
-        if let ver = envorinment.application.version {
+        if let ver = environment.application.version {
             headers[appVersionHeaderKey] = ver
         }
 

@@ -7,12 +7,12 @@
 
 import Foundation
 
-extension Log {
-    package typealias Record = AdaptyLog.Record
+package extension Log {
+    typealias Record = AdaptyLog.Record
 }
 
-extension AdaptyLog {
-    public struct Record: Sendable {
+public extension AdaptyLog {
+    struct Record: Sendable {
         public let date: Date
         public let level: Level
         public let message: String

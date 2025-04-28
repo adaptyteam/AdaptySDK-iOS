@@ -22,7 +22,7 @@ final class EventsStorage: Sendable {
     var eventsCount: Int { AllEventsStorage.eventsCount[kind] ?? 0 }
     var events: [Data]? { AllEventsStorage.events[kind] ?? nil }
 
-    func incrimentEventCount() { AllEventsStorage.incrimentEventCount(kind) }
+    func incrementEventCount() { AllEventsStorage.incrementEventCount(kind) }
     func setEvents(_ value: [Data]) { AllEventsStorage.setEvents(value, kind) }
     func clear() { AllEventsStorage.clear(kind) }
 
@@ -58,7 +58,7 @@ private final class AllEventsStorage: Sendable {
         ($0, userDefaults.object(forKey: $0.eventsKey) as? [Data])
     }) { first, _ in first }
 
-    static func incrimentEventCount(_ kind: Kind) {
+    static func incrementEventCount(_ kind: Kind) {
         let nextValue = (eventsCount[kind] ?? 0) + 1
         userDefaults.set(nextValue, forKey: kind.counterKey)
         eventsCount[kind] = nextValue

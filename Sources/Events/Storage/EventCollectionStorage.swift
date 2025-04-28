@@ -47,7 +47,7 @@ final class EventCollectionStorage {
 
     func add(_ event: Event.Unpacked) throws {
         let event = try Event.Packed(from: event, counter: storage.eventsCount)
-        storage.incrimentEventCount()
+        storage.incrementEventCount()
         let old = events.elements.first
         events.append(event, withLimit: Constants.limitEvents)
         if let old, old.id != events.elements.first?.id {

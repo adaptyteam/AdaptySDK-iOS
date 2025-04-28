@@ -78,7 +78,7 @@ extension VariationIdStorage {
     nonisolated func getPaywallVariationIds(for productId: String) async -> (String?, String?) {
         await (paywallVariationsIds[productId], persistentPaywallVariationsIds[productId])
     }
-    
+
     nonisolated func getVariationIds(for productId: String) async -> (String?, String?, String?) {
         await (paywallVariationsIds[productId], persistentPaywallVariationsIds[productId], persistentOnboardingVariationsId)
     }
@@ -86,7 +86,7 @@ extension VariationIdStorage {
     nonisolated func getOnboardingVariationId() async -> String? {
         await persistentOnboardingVariationsId
     }
-    
+
     nonisolated func setPaywallVariationIds(_ variationId: String?, for productId: String) async {
         guard let variationId else { return }
         Task {

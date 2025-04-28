@@ -148,7 +148,7 @@ extension Backend.FallbackExecutor {
 }
 
 extension Backend.ConfigsExecutor {
-    func fetchUntargetedPlacementVariations<Content: AdaptyPlacementContent>(
+    func fetchPlacementVariationsForDefaultAudience<Content: AdaptyPlacementContent>(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -161,9 +161,9 @@ extension Backend.ConfigsExecutor {
     ) async throws -> AdaptyPlacementChosen<Content> {
         let requestName: APIRequestName =
             if Content.self == AdaptyPaywall.self {
-                .fetchUntargetedPaywallVariations
+                .fetchPaywallVariationsForDefaultAudience
             } else {
-                .fetchUntargetedOnboardingVariations
+                .fetchOnboardingVariationsForDefaultAudience
             }
         return try await performFetchFallbackPlacementVariationsRequest(
             requestName: requestName,

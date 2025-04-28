@@ -13,7 +13,7 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI {
-    public static var universalDelagate: AdaptyPaywallControllerDelegate?
+    public static var universalDelegate: AdaptyPaywallControllerDelegate?
 
     package static func paywallControllerWithUniversalDelegate(
         _ paywallConfiguration: PaywallConfiguration,
@@ -25,7 +25,7 @@ extension AdaptyUI {
             throw err
         }
 
-        guard let delegate = AdaptyUI.universalDelagate else {
+        guard let delegate = AdaptyUI.universalDelegate else {
             Log.ui.error("AdaptyUI delegateIsNotRegestired")
             throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
         }

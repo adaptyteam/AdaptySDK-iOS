@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyError {
-    public struct Source: Sendable, Hashable {
+public extension AdaptyError {
+    struct Source: Sendable, Hashable {
         public let version = Adapty.SDKVersion
         public let file: String
         public let function: String

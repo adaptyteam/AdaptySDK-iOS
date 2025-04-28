@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptySubscriptionOffer {
-   package enum Identifier: Sendable, Hashable {
+    package enum Identifier: Sendable, Hashable {
         case introductory
         case promotional(String)
         case winBack(String)
@@ -41,4 +41,3 @@ extension AdaptySubscriptionOffer {
         case winBack
     }
 }
-

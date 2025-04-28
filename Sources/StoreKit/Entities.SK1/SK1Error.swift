@@ -10,7 +10,6 @@ import StoreKit
 typealias SK1Error = SKError
 
 extension SK1Error {
-    
     @inlinable
     var isPurchaseCancelled: Bool {
         (code == .paymentCancelled) || (code == .overlayCancelled)

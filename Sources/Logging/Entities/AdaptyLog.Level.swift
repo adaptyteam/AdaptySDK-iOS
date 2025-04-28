@@ -7,12 +7,12 @@
 
 import Foundation
 
-extension Log {
-    package typealias Level = AdaptyLog.Level
+package extension Log {
+    typealias Level = AdaptyLog.Level
 }
 
-extension AdaptyLog {
-    public enum Level: Int, Sendable {
+public extension AdaptyLog {
+    enum Level: Int, Sendable {
         public static let `default` = Level.info
 
         /// Only errors will be logged

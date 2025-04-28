@@ -114,7 +114,7 @@ extension Adapty {
         }()
 
         do {
-            var chosen: AdaptyPlacementChosen<Content> = try await httpConfigsSession.fetchUntargetedPlacementVariations(
+            var chosen: AdaptyPlacementChosen<Content> = try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
                 apiKeyPrefix: apiKeyPrefix,
                 profileId: profileId,
                 placementId: placementId,

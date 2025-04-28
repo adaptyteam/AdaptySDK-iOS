@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyProfile {
-    public enum Gender: Sendable, Hashable {
+public extension AdaptyProfile {
+    enum Gender: Sendable, Hashable {
         case female
         case male
         case other

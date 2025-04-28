@@ -35,9 +35,9 @@ final class EventsManager {
 
         do {
             if unpacked.event.isLowPriority {
-                try self.eventStorages.last?.add(unpacked)
+                try eventStorages.last?.add(unpacked)
             } else {
-                try self.eventStorages.first?.add(unpacked)
+                try eventStorages.first?.add(unpacked)
             }
         } catch {
             let error = EventsError.encoding(error)
@@ -95,13 +95,13 @@ final class EventsManager {
             )
         }
 
-        let events = self.eventStorages.getEvents(
+        let events = eventStorages.getEvents(
             limit: Constants.sendingLimitEvents,
-            blackList: self.configuration.blacklist
+            blackList: configuration.blacklist
         )
 
         guard !events.elements.isEmpty else {
-            self.eventStorages.subtract(oldIndexes: events.endIndex)
+            eventStorages.subtract(oldIndexes: events.endIndex)
             return
         }
 
@@ -110,7 +110,7 @@ final class EventsManager {
             events: events.elements
         )
 
-        self.eventStorages.subtract(oldIndexes: events.endIndex)
+        eventStorages.subtract(oldIndexes: events.endIndex)
     }
 
     private func finishSending() {
@@ -139,10 +139,9 @@ private extension [EventCollectionStorage] {
     }
 
     func subtract(oldIndexes: [Int?]) {
-        zip(oldIndexes, self)
-            .forEach { optionalIndex, storage in
-                guard let index = optionalIndex else { return }
-                storage.subtract(newStartIndex: index + 1)
-            }
+        for (optionalIndex, storage) in zip(oldIndexes, self) {
+            guard let index = optionalIndex else { continue }
+            storage.subtract(newStartIndex: index + 1)
+        }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  ProfileManager+SendEvironment.swift
+//  ProfileManager+SentEnvironment.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.10.2022.
@@ -8,29 +8,29 @@
 import StoreKit
 
 extension ProfileManager {
-    enum SendedEnvironment: Sendable, Hashable { // TODO: need refactoring
-        case dont
+    enum SentEnvironment: Sendable, Hashable { // TODO: need refactoring
+        case none
         case withIdfa
         case withoutIdfa
     }
 }
 
 extension Environment.Meta {
-    var sendedEnvironment: ProfileManager.SendedEnvironment {
+    var sentEnvironment: ProfileManager.SentEnvironment {
         idfa == nil ? .withoutIdfa : .withIdfa
     }
 }
 
-extension ProfileManager.SendedEnvironment {
+extension ProfileManager.SentEnvironment {
     func needSend(analyticsDisabled: Bool) async -> Bool {
         switch self {
-        case .dont: 
+        case .none:
             return true
-        case .withIdfa: 
+        case .withIdfa:
             return false
         case .withoutIdfa:
             guard !analyticsDisabled else { return false }
-            return await Environment.Device.idfaRetriavalStatus == .allowed
+            return await Environment.Device.idfaRetrievalStatus == .allowed
         }
     }
 

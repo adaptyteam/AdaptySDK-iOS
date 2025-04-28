@@ -7,11 +7,6 @@
 
 import StoreKit
 
-enum ProductsFetchPolicy: Sendable, Hashable {
-    case `default`
-    case returnCacheDataElseLoad
-}
-
 protocol StoreKitProductsManager: Actor, Sendable {
     func fillPurchasedTransaction(
         paywallVariationId: String?,

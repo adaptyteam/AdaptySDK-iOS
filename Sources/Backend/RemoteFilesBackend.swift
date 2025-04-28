@@ -30,4 +30,3 @@ struct RemoteFilesBackend: HTTPCodableConfiguration {
         sessionConfiguration = configuration
     }
 }
-

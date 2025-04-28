@@ -105,7 +105,7 @@ extension Adapty {
                     profileId,
                     placementId,
                     locale,
-                    loadTimeout.asTimeIntrval + startTaskTime.timeIntervalSinceNow
+                    loadTimeout.asTimeInterval + startTaskTime.timeIntervalSinceNow
                 )
             }
 

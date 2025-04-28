@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyProfileParameters {
-    public enum AppTrackingTransparencyStatus: Sendable, Hashable {
+public extension AdaptyProfileParameters {
+    enum AppTrackingTransparencyStatus: Sendable, Hashable {
         case unknown
         case notDetermined
         case restricted

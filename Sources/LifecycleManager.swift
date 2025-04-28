@@ -96,7 +96,7 @@ final class LifecycleManager {
 
         defer { crossABIsSyncing = false }
         crossABIsSyncing = true
-        
+
         log.verbose("LifecycleManager: syncCrossPlacementState START")
 
         for attempt in 0 ..< 3 {
@@ -172,7 +172,7 @@ final class LifecycleManager {
                     return
                 }
 
-                let status = await Environment.Device.idfaRetriavalStatus
+                let status = await Environment.Device.idfaRetrievalStatus
                 log.verbose("idfaUpdateTimer tick, status = \(status)")
 
                 switch status {

@@ -25,7 +25,7 @@ public final class Adapty: Sendable {
     var sk1QueueManager: SK1QueueManager?
 
     package let observerMode: Bool
-    
+
     let variationIdStorage: VariationIdStorage
 
     init(
@@ -39,7 +39,7 @@ public final class Adapty: Sendable {
         self.httpSession = backend.createMainExecutor()
         self.httpFallbackSession = backend.createFallbackExecutor()
         self.httpConfigsSession = backend.createConfigsExecutor()
-        
+
         #if compiler(>=5.10)
             let productVendorIdsStorage = ProductVendorIdsStorage()
             self.variationIdStorage = VariationIdStorage()
@@ -108,7 +108,7 @@ public final class Adapty: Sendable {
             withCustomerUserId: customerUserId
         ) {
             .current(
-                ProfileManager(storage: profileStorage, profile: profile, sendedEnvironment: .dont)
+                ProfileManager(storage: profileStorage, profile: profile, sentEnvironment: .none)
             )
         } else {
             .creating(
@@ -186,7 +186,7 @@ public final class Adapty: Sendable {
                 let manager = ProfileManager(
                     storage: profileStorage,
                     profile: createdProfile,
-                    sendedEnvironment: meta.sendedEnvironment
+                    sentEnvironment: meta.sentEnvironment
                 )
                 sharedProfileManager = .current(manager)
                 return manager

@@ -1,6 +1,6 @@
 //
 //  PaywallViewEvent.DidFailRestorePurchases.swift
-//  Adapty
+//  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 21.11.2024.
 //

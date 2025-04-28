@@ -26,7 +26,7 @@ struct VH<Value: Sendable>: Sendable {
         self.init(value, hash: nil, time: time)
     }
 
-    @inlinable 
+    @inlinable
     func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
         VH<U>(transform(value), hash: hash, time: time)
     }

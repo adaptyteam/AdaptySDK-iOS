@@ -1,5 +1,5 @@
 //
-//  Recuest.GetPaywallForDefaultAudience.swift
+//  Request.GetPaywallForDefaultAudience.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 15.11.2024.
