@@ -7,32 +7,98 @@
 
 import Foundation
 
-private struct FetchPlacementVariationsRequest: HTTPRequest {
+private struct FetchPaywallVariationsRequest: HTTPRequest, BackendAPIRequestParameters {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
+    let queryItems: QueryItems
     let stamp = Log.stamp
 
-    let queryItems: QueryItems
+    let logName = APIRequestName.fetchPaywallVariations
+    let logParams: EventParameters?
 
     init(
-        endpoint: HTTPEndpoint,
+        apiKeyPrefix: String,
         profileId: String,
+        placementId: String,
         locale: AdaptyLocale,
         segmentId: String,
         crossPlacementEligible: Bool,
         disableServerCache: Bool
     ) {
-        self.endpoint = endpoint
+        let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\(crossPlacementEligible ? "\"cross_placement_eligibility\":true," : "")\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
+
+        endpoint = HTTPEndpoint(
+            method: .get,
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
+        )
 
         headers = HTTPHeaders()
             .setPaywallLocale(locale)
             .setBackendProfileId(profileId)
-            .setVisualBuilderVersion(AdaptyViewConfiguration.builderVersion)
-            .setVisualBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
+            .setPaywallBuilderVersion(AdaptyViewConfiguration.builderVersion)
+            .setPaywallBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
             .setCrossPlacementEligibility(crossPlacementEligible)
             .setSegmentId(segmentId)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
+
+        logParams = [
+            "api_prefix": apiKeyPrefix,
+            "placement_id": placementId,
+            "locale": locale,
+            "segment_id": segmentId,
+            "builder_version": AdaptyViewConfiguration.builderVersion,
+            "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
+            "md5": md5Hash,
+            "cross_placement_eligibility": crossPlacementEligible,
+            "disable_server_cache": disableServerCache,
+        ]
+    }
+}
+
+private struct FetchOnboardingVariationsRequest: HTTPRequest, BackendAPIRequestParameters {
+    let endpoint: HTTPEndpoint
+    let headers: HTTPHeaders
+    let queryItems: QueryItems
+    let stamp = Log.stamp
+
+    let logName = APIRequestName.fetchOnboardingVariations
+    let logParams: EventParameters?
+
+    init(
+        apiKeyPrefix: String,
+        profileId: String,
+        placementId: String,
+        locale: AdaptyLocale,
+        segmentId: String,
+        crossPlacementEligible: Bool,
+        disableServerCache: Bool
+    ) {
+        let md5Hash = "{\"cross_placement_eligibility\":\(crossPlacementEligible ? "true" : "false"),\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\"}".md5.hexString
+
+        endpoint = HTTPEndpoint(
+            method: .get,
+            path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(md5Hash)/"
+        )
+
+        headers = HTTPHeaders()
+            .setOnboardingLocale(locale)
+            .setBackendProfileId(profileId)
+            .setOnboardingUIVersion(AdaptyOnboarding.ViewConfiguration.uiVersion)
+            .setCrossPlacementEligibility(crossPlacementEligible)
+            .setSegmentId(segmentId)
+
+        queryItems = QueryItems().setDisableServerCache(disableServerCache)
+
+        logParams = [
+            "api_prefix": apiKeyPrefix,
+            "placement_id": placementId,
+            "locale": locale,
+            "segment_id": segmentId,
+            "md5": md5Hash,
+            "cross_placement_eligibility": crossPlacementEligible,
+            "disable_server_cache": disableServerCache,
+        ]
     }
 }
 
@@ -100,54 +166,33 @@ extension Backend.MainExecutor {
         variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool
     ) async throws -> AdaptyPlacementChosen<Content> {
-        let endpoint: HTTPEndpoint
-        let requestName: APIRequestName
-        let md5Hash: String
+        let request: HTTPRequest & BackendAPIRequestParameters =
+            if Content.self == AdaptyPaywall.self {
+                FetchPaywallVariationsRequest(
+                    apiKeyPrefix: apiKeyPrefix,
+                    profileId: profileId,
+                    placementId: placementId,
+                    locale: locale,
+                    segmentId: segmentId,
+                    crossPlacementEligible: crossPlacementEligible,
+                    disableServerCache: disableServerCache
+                )
 
-        if Content.self == AdaptyPaywall.self {
-            md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\(crossPlacementEligible ? "\"cross_placement_eligibility\":true," : "")\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
-
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
-            )
-            requestName = .fetchPaywallVariations
-        } else {
-            md5Hash = "{\"cross_placement_eligibility\":\(crossPlacementEligible ? "true" : "false"),\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\"}".md5.hexString
-
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(md5Hash)/"
-            )
-            requestName = .fetchOnboardingVariations
-        }
-
-        let request = FetchPlacementVariationsRequest(
-            endpoint: endpoint,
-            profileId: profileId,
-            locale: locale,
-            segmentId: segmentId,
-            crossPlacementEligible: crossPlacementEligible,
-            disableServerCache: disableServerCache
-        )
+            } else {
+                FetchOnboardingVariationsRequest(
+                    apiKeyPrefix: apiKeyPrefix,
+                    profileId: profileId,
+                    placementId: placementId,
+                    locale: locale,
+                    segmentId: segmentId,
+                    crossPlacementEligible: crossPlacementEligible,
+                    disableServerCache: disableServerCache
+                )
+            }
 
         let configuration = session.configuration as? HTTPCodableConfiguration
 
-        let response: HTTPResponse<AdaptyPlacementChosen> = try await perform(
-            request,
-            requestName: requestName,
-            logParams: [
-                "api_prefix": apiKeyPrefix,
-                "placement_id": placementId,
-                "locale": locale,
-                "segment_id": segmentId,
-                "builder_version": AdaptyViewConfiguration.builderVersion,
-                "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
-                "md5": md5Hash,
-                "cross_placement_eligibility": crossPlacementEligible,
-                "disable_server_cache": disableServerCache,
-            ]
-        ) { @Sendable response in
+        let response: HTTPResponse<AdaptyPlacementChosen> = try await perform(request) { @Sendable response in
             try await AdaptyPlacementChosen.decodePlacementVariationsResponse(
                 response,
                 withConfiguration: configuration,

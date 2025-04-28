@@ -11,7 +11,21 @@ protocol BackendExecutor: Sendable {
     var session: HTTPSession { get }
 }
 
+protocol BackendAPIRequestParameters: Sendable {
+    var logName: APIRequestName { get }
+    var stamp: String { get }
+    var logParams: EventParameters? { get }
+}
+
 extension BackendExecutor {
+    @AdaptyActor
+    @inlinable
+    func perform<Request: HTTPRequestWithDecodableResponse & BackendAPIRequestParameters>(
+        _ request: Request
+    ) async throws -> Request.Response {
+        try await perform(request, requestName: request.logName, logParams: request.logParams)
+    }
+
     @AdaptyActor
     @inlinable
     func perform<Request: HTTPRequestWithDecodableResponse>(
@@ -33,6 +47,14 @@ extension BackendExecutor {
 
     @AdaptyActor
     @inlinable
+    func perform<Request: HTTPRequest & BackendAPIRequestParameters>(
+        _ request: Request
+    ) async throws -> HTTPEmptyResponse {
+        try await perform(request, requestName: request.logName, logParams: request.logParams)
+    }
+
+    @AdaptyActor
+    @inlinable
     func perform(
         _ request: some HTTPRequest,
         requestName: APIRequestName,
@@ -48,6 +70,15 @@ extension BackendExecutor {
             Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
             throw error
         }
+    }
+
+    @AdaptyActor
+    @inlinable
+    func perform<Body, Request: HTTPRequest & BackendAPIRequestParameters>(
+        _ request: Request,
+        withDecoder decoder: @escaping HTTPDecoder<Body>
+    ) async throws -> HTTPResponse<Body> {
+        try await perform(request, requestName: request.logName, logParams: request.logParams, withDecoder: decoder)
     }
 
     @AdaptyActor

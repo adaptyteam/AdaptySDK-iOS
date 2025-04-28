@@ -22,9 +22,9 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
         )
 
         headers = HTTPHeaders()
-            .setViewConfigurationLocale(locale)
-            .setVisualBuilderVersion(AdaptyViewConfiguration.builderVersion)
-            .setVisualBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
+            .setPaywallBuilderLocale(locale)
+            .setPaywallBuilderVersion(AdaptyViewConfiguration.builderVersion)
+            .setPaywallBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }

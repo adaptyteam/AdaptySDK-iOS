@@ -11,9 +11,11 @@ extension Backend.Request {
     fileprivate static let authorizationHeaderKey = "Authorization"
     fileprivate static let hashHeaderKey = "adapty-sdk-previous-response-hash"
     fileprivate static let paywallLocaleHeaderKey = "adapty-paywall-locale"
-    fileprivate static let viewConfigurationLocaleHeaderKey = "adapty-paywall-builder-locale"
-    fileprivate static let visualBuilderVersionHeaderKey = "adapty-paywall-builder-version"
-    fileprivate static let visualBuilderConfigurationFormatVersionHeaderKey = "adapty-paywall-builder-config-format-version"
+    fileprivate static let onboardingLocaleHeaderKey = "adapty-onboarding-locale"
+    fileprivate static let paywallBuilderLocaleHeaderKey = "adapty-paywall-builder-locale"
+    fileprivate static let paywallBuilderVersionHeaderKey = "adapty-paywall-builder-version"
+    fileprivate static let paywallBuilderConfigurationFormatVersionHeaderKey = "adapty-paywall-builder-config-format-version"
+    fileprivate static let onboardingUIVersionHeaderKey = "adapty-onboarding-ui-version"
     fileprivate static let crossPlacementEligibilityHeaderKey = "adapty-cross-placement-eligibility"
     fileprivate static let segmentIdHeaderKey = "adapty-profile-segment-hash"
 
@@ -66,16 +68,24 @@ extension HTTPHeaders {
         updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallLocaleHeaderKey)
     }
 
-    func setViewConfigurationLocale(_ locale: AdaptyLocale?) -> Self {
-        updateOrRemoveValue(locale?.id, forKey: Backend.Request.viewConfigurationLocaleHeaderKey)
+    func setOnboardingLocale(_ locale: AdaptyLocale?) -> Self {
+        updateOrRemoveValue(locale?.id, forKey: Backend.Request.onboardingLocaleHeaderKey)
     }
 
-    func setVisualBuilderVersion(_ version: String?) -> Self {
-        updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderVersionHeaderKey)
+    func setPaywallBuilderLocale(_ locale: AdaptyLocale?) -> Self {
+        updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallBuilderLocaleHeaderKey)
     }
 
-    func setVisualBuilderConfigurationFormatVersion(_ version: String?) -> Self {
-        updateOrRemoveValue(version, forKey: Backend.Request.visualBuilderConfigurationFormatVersionHeaderKey)
+    func setPaywallBuilderVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.paywallBuilderVersionHeaderKey)
+    }
+
+    func setPaywallBuilderConfigurationFormatVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.paywallBuilderConfigurationFormatVersionHeaderKey)
+    }
+
+    func setOnboardingUIVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.onboardingUIVersionHeaderKey)
     }
 
     func setCrossPlacementEligibility(_ enabled: Bool) -> Self {
