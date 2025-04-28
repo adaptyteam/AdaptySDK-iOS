@@ -113,7 +113,7 @@ extension Backend.MainExecutor {
             )
             requestName = .fetchPaywallVariations
         } else {
-            md5Hash = "{\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\"}".md5.hexString
+            md5Hash = "{\"cross_placement_eligibility\":\(crossPlacementEligible ? "true" : "false"),\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\"}".md5.hexString
 
             endpoint = HTTPEndpoint(
                 method: .get,
