@@ -45,13 +45,13 @@ enum APIRequestName: String {
     case fetchOnboardingVariations = "get_onboarding_variations"
     case fetchFallbackPaywallVariations = "get_fallback_paywall_variations"
     case fetchFallbackOnboardingVariations = "get_fallback_onboarding_variations"
-    case fetchPaywallVariationsForDefaultAudience = "get_untargeted_paywall_variations"
-    case fetchOnboardingVariationsForDefaultAudience = "get_untargeted_onboarding_variations"
+    case fetchPaywallVariationsForDefaultAudience = "get_paywall_variations_for_default_audience"
+    case fetchOnboardingVariationsForDefaultAudience = "get_onboarding_variations_for_default_audience"
 
     case fetchViewConfiguration = "get_paywall_builder"
     case fetchFallbackViewConfiguration = "get_fallback_paywall_builder"
     case fetchCrossPlacementState = "get_cross_placement_state"
-    case fetchOnboarding = "get_onboarding "
+    case fetchOnboarding = "get_onboarding"
     case fetchPaywall = "get_paywall"
 
     case fetchFallbackPaywall = "get_fallback_paywall"
