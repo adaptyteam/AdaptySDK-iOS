@@ -168,27 +168,4 @@ public extension View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public extension AdaptyUI {
-    static func getPaywallConfigurationTestAssets(
-        forPaywall paywall: AdaptyPaywall,
-        loadTimeout: TimeInterval? = nil,
-        products: [AdaptyPaywallProduct]? = nil,
-        observerModeResolver: AdaptyObserverModeResolver? = nil,
-        tagResolver: AdaptyTagResolver? = nil,
-        timerResolver: AdaptyTimerResolver? = nil,
-        assetsResolver: AdaptyAssetsResolver? = nil
-    ) async throws -> PaywallConfiguration {
-        try await AdaptyUI.getPaywallConfigurationWithAssets(
-            forPaywall: paywall,
-            loadTimeout: loadTimeout,
-            products: products,
-            observerModeResolver: observerModeResolver,
-            tagResolver: tagResolver,
-            timerResolver: timerResolver,
-            assetsResolver: assetsResolver
-        )
-    }
-}
-
 #endif
