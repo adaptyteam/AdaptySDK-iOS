@@ -52,7 +52,7 @@ extension Backend.FallbackExecutor {
         } else {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
+                path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(paywallVariationId)/\(locale.languageCode)/fallback.json"
             )
             requestName = .fetchFallbackPaywall
         }

@@ -52,7 +52,7 @@ private extension BackendExecutor {
             } else {
                 HTTPEndpoint(
                     method: .get,
-                    path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/app_store/\(locale.languageCode.lowercased())/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
+                    path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(locale.languageCode.lowercased())/fallback.json"
                 )
             }
 
