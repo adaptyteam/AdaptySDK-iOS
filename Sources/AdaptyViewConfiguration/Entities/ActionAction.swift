@@ -7,15 +7,15 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package enum ActionAction: Sendable {
+package extension AdaptyViewConfiguration {
+    enum ActionAction: Sendable {
         case openUrl(String?)
         case restore
         case custom(id: String)
         case selectProduct(id: String, groupId: String)
-        case purchaseProduct(id: String)
+        case purchaseProduct(id: String, provider: PaymentServiceProvider)
         case unselectProduct(groupId: String)
-        case purchaseSelectedProduct(groupId: String)
+        case purchaseSelectedProduct(groupId: String, provider: PaymentServiceProvider)
         case close
         case switchSection(id: String, index: Int)
         case openScreen(id: String)
@@ -36,15 +36,17 @@ extension AdaptyViewConfiguration.ActionAction: Hashable {
             hasher.combine(3)
             hasher.combine(id)
             hasher.combine(groupId)
-        case let .purchaseProduct(id):
+        case let .purchaseProduct(id, provider):
             hasher.combine(4)
             hasher.combine(id)
+            hasher.combine(provider)
         case let .unselectProduct(groupId):
             hasher.combine(5)
             hasher.combine(groupId)
-        case let .purchaseSelectedProduct(groupId):
+        case let .purchaseSelectedProduct(groupId, provider):
             hasher.combine(6)
             hasher.combine(groupId)
+            hasher.combine(provider)
         case let .switchSection(id, index):
             hasher.combine(7)
             hasher.combine(id)

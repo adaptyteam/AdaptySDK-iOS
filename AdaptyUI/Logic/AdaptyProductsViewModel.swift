@@ -69,7 +69,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
         self.observerModeResolver = observerModeResolver
     }
-    
+
     func resetSelectedProducts() {
         Log.ui.verbose("#\(logId)# resetSelectedProducts")
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
@@ -166,12 +166,15 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
     // MARK: Actions
 
-    func purchaseSelectedProduct(fromGroupId groupId: String) {
+    func purchaseSelectedProduct(
+        fromGroupId groupId: String,
+        provider: AdaptyViewConfiguration.PaymentServiceProvider
+    ) {
         guard let productId = selectedProductId(by: groupId) else { return }
-        purchaseProduct(id: productId)
+        purchaseProduct(id: productId, provider: provider)
     }
 
-    func purchaseProduct(id productId: String) {
+    func purchaseProduct(id productId: String, provider: AdaptyViewConfiguration.PaymentServiceProvider) {
         guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
             Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
             return
