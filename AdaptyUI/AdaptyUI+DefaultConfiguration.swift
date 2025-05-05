@@ -68,6 +68,17 @@ public extension AdaptyPaywallControllerDelegate {
         _ controller: AdaptyPaywallController,
         didPartiallyLoadProducts failedIds: [String]
     ) {}
+
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        shouldContinueWebPurchase product: AdaptyPaywallProduct
+    ) -> Bool { true }
+
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailWebPurchase product: AdaptyPaywallProduct,
+        error: AdaptyError
+    ) {}
 }
 
 #endif

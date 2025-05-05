@@ -180,6 +180,31 @@ package final class AdaptyProductsViewModel: ObservableObject {
             return
         }
 
+        switch provider {
+        case .storeKit:
+            purchaseProductWithStoreKit(product)
+        case .webPaymentService:
+            purchaseProductInWeb(product)
+        }
+    }
+
+    private func purchaseProductInWeb(_ product: AdaptyPaywallProduct) {
+        guard eventsHandler.event_shouldContinueWebPurchase(product: product) else { return }
+
+        Task { @MainActor [weak self] in
+            do {
+                try await Adapty.makeWebPurchase(product: product)
+            } catch {
+                self?.eventsHandler
+                    .event_didFailWebPurchase(
+                        product: product,
+                        error: error.asAdaptyError
+                    )
+            }
+        }
+    }
+
+    private func purchaseProductWithStoreKit(_ product: AdaptyPaywallProduct) {
         let logId = logId
         if let observerModeResolver {
             observerModeResolver.observerMode(

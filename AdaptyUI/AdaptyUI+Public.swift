@@ -49,7 +49,7 @@ public extension AdaptyUI {
         /// User pressed any button with URL
         case openURL(url: URL)
         /// User pressed any button with custom action (e.g. login)
-        case custom(id: String)
+        case custom(id: String)        
     }
 }
 
@@ -187,6 +187,28 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     func paywallController(
         _ controller: AdaptyPaywallController,
         didPartiallyLoadProducts failedIds: [String]
+    )
+    
+    /// If user initiates the web-purchase process, this method will be invoked.
+    ///
+    /// - Parameters:
+    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
+    /// - Returns: Return `true`, if you want to continue the flow. Return `false`, if you want to interrupt the process.
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        shouldContinueWebPurchase product: AdaptyPaywallProduct
+    ) -> Bool
+    
+    /// This method is invoked when the web-purchase process fails.
+    /// - Parameters:
+    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
+    ///   - error: an ``AdaptyError`` object representing the error.
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFailWebPurchase product: AdaptyPaywallProduct,
+        error: AdaptyError
     )
 }
 
