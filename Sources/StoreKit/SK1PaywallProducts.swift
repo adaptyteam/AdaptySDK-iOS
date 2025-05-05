@@ -20,6 +20,7 @@ extension Adapty {
         )
         .compactMap { sk1Product in
             let vendorId = sk1Product.productIdentifier
+
             guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
                 return nil
             }
@@ -27,9 +28,11 @@ extension Adapty {
             return AdaptySK1PaywallProductWithoutDeterminingOffer(
                 skProduct: sk1Product,
                 adaptyProductId: reference.adaptyProductId,
+                paywallProductIndex: reference.paywallProductIndex,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.abTestName,
-                paywallName: paywall.name
+                paywallName: paywall.name,
+                purchaseUrl: paywall.purchaseUrl
             )
         }
     }
@@ -37,11 +40,13 @@ extension Adapty {
     func getSK1PaywallProduct(
         vendorProductId: String,
         adaptyProductId: String,
+        paywallProductIndex: Int,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
         paywallABTestName: String,
         paywallName: String,
-        productsManager: SK1ProductsManager
+        productsManager: SK1ProductsManager,
+        paywallPurchaseUrl: URL?
     ) async throws -> AdaptySK1PaywallProduct {
         let sk1Product = try await productsManager.fetchSK1Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
 
@@ -59,10 +64,12 @@ extension Adapty {
         return AdaptySK1PaywallProduct(
             skProduct: sk1Product,
             adaptyProductId: adaptyProductId,
+            paywallProductIndex: paywallProductIndex,
             subscriptionOffer: subscriptionOffer,
             variationId: variationId,
             paywallABTestName: paywallABTestName,
-            paywallName: paywallName
+            paywallName: paywallName,
+            purchaseUrl: paywallPurchaseUrl
         )
     }
 
@@ -123,10 +130,12 @@ extension Adapty {
             AdaptySK1PaywallProduct(
                 skProduct: $0.product,
                 adaptyProductId: $0.reference.adaptyProductId,
+                paywallProductIndex: $0.reference.paywallProductIndex,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.abTestName,
-                paywallName: paywall.name
+                paywallName: paywall.name,
+                purchaseUrl: paywall.purchaseUrl
             )
         }
     }

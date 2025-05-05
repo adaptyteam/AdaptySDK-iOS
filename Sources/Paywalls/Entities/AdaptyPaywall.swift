@@ -39,6 +39,7 @@ public struct AdaptyPaywall: Sendable {
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
 
+    var purchaseUrl: URL?
     var version: Int64
 }
 
@@ -66,6 +67,37 @@ extension AdaptyPaywall: Codable {
         case viewConfiguration = "paywall_builder"
         case attributes
         case audienceName = "audience_name"
+        case purchaseUrl = "web_purchase_url"
+    }
+
+    fileprivate func extractedFunc(
+        _ arrayContainer: inout any UnkeyedDecodingContainer,
+    ) throws -> [ProductReference] {
+        var index = 0
+        var products = [ProductReference]()
+
+        while !arrayContainer.isAtEnd {
+            let container = try arrayContainer.nestedContainer(keyedBy: ProductReference.CodingKeys.self)
+
+            let promotionalOfferId: String? =
+                if (try? container.decode(Bool.self, forKey: .promotionalOfferEligibility)) ?? true {
+                    try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
+                } else {
+                    nil
+                }
+            try products.append(
+                ProductReference(
+                    paywallProductIndex: index,
+                    adaptyProductId: container.decode(String.self, forKey: .adaptyProductId),
+                    vendorId: container.decode(String.self, forKey: .vendorId),
+                    promotionalOfferId: promotionalOfferId,
+                    winBackOfferId: container.decodeIfPresent(String.self, forKey: .winBackOfferId)
+                )
+            )
+            index += 1
+        }
+
+        return products
     }
 
     public init(from decoder: Decoder) throws {
@@ -81,10 +113,28 @@ extension AdaptyPaywall: Codable {
         revision = try container.decode(Int.self, forKey: .revision)
         variationId = try container.decode(String.self, forKey: .variationId)
         abTestName = try container.decode(String.self, forKey: .abTestName)
-        products = try container.decode([ProductReference].self, forKey: .products)
+
         audienceName = try container.decode(String.self, forKey: .audienceName)
         remoteConfig = try container.decodeIfPresent(RemoteConfig.self, forKey: .remoteConfig)
+        purchaseUrl = try container.decodeIfPresent(URL.self, forKey: .purchaseUrl)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
+
+        products = try {
+            var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
+            var products = [ProductReference]()
+            var index = 0
+
+            while !arrayContainer.isAtEnd {
+                let product = try ProductReference(
+                    from: arrayContainer.nestedContainer(keyedBy: ProductReference.CodingKeys.self),
+                    index: index
+                )
+                index += 1
+                products.append(product)
+            }
+
+            return products
+        }()
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -99,6 +149,7 @@ extension AdaptyPaywall: Codable {
         try container.encode(products, forKey: .products)
         try container.encode(audienceName, forKey: .audienceName)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
+        try container.encodeIfPresent(purchaseUrl, forKey: .purchaseUrl)
         try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
     }
 }

@@ -265,6 +265,15 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func makeWebPurchase(
+        product: AdaptyPaywallProduct,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
+    ) {
+        withCompletion(completion) {
+            try await makeWebPurchase(product: product)
+        }
+    }
+
     nonisolated static func makePurchase(
         product: AdaptyDeferredProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
@@ -459,7 +468,7 @@ public extension Adapty {
             try await logShowOnboarding(params)
         }
     }
-    
+
     /// Call this method to update the current user's refund data consent.
     ///
     /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#obtain-user-consent)
@@ -475,7 +484,7 @@ public extension Adapty {
             try await updateCollectingRefundDataConsent(consent)
         }
     }
-    
+
     /// Call this method to set the refund preference individually for current user.
     ///
     /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#set-refund-behavior-for-a-specific-user-in-the-dashboard)

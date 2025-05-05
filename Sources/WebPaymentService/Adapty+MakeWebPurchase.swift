@@ -11,7 +11,12 @@ public extension Adapty {
     nonisolated static func makeWebPurchase(
         product: AdaptyPaywallProduct
     ) async throws -> AdaptyPurchaseResult {
-        try await withActivatedSDK(
+        
+//        guard let purchaseUrl = (product as? WebPurchasable)?.purchaseUrl else {
+//            throw
+//        }
+        
+        return try await withActivatedSDK(
             methodName: .makeWebPurchase,
             logParams: [
                 "paywall_name": product.paywallName,

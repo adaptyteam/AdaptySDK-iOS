@@ -318,6 +318,16 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
+  MakeWebPurchase.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPurchaseResult" }
+
   ### presentCodeRedemptionSheet ###
   PresentCodeRedemptionSheet.Request: #request
     type: object
@@ -663,6 +673,7 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - paywall_product_index
       - paywall_variation_id
       - paywall_ab_test_name
       - paywall_name
@@ -674,9 +685,11 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      paywall_product_index: { type: integer }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
+      web_purchase_url: { type: string }
       audience_name: { type: string }
       localized_description: { type: string }
       localized_title: { type: string }
@@ -722,17 +735,20 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - paywall_product_index
       - paywall_variation_id
       - paywall_ab_test_name
       - paywall_name
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      paywall_product_index: { type: integer }
       subscription_offer_identifier:
         { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
+      web_purchase_url: { type: string }
       payload_data: { type: string }
 
   AdaptySubscriptionOffer: #response
@@ -797,6 +813,7 @@ $defs:
       products:
         type: array
         items: { $ref: "#/$defs/AdaptyPaywall.ProductReference" }
+      web_purchase_url: { type: string }
       payload_data: { type: string }
 
   AdaptyPaywall.FetchPolicy: #request

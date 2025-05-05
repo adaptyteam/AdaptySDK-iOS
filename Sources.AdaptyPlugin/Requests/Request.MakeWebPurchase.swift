@@ -1,16 +1,16 @@
 //
-//  Request.MakePurchase.swift
+//  Request.MakeWebPurchase.swift
 //  AdaptyPlugin
 //
-//  Created by Aleksei Valiano on 08.11.2024.
+//  Created by Aleksei Valiano on 03.05.2025.
 //
 
 import Adapty
 import Foundation
 
 extension Request {
-    struct MakePurchase: AdaptyPluginRequest {
-        static let method = "make_purchase"
+    struct MakeWebPurchase: AdaptyPluginRequest {
+        static let method = "make_web_purchase"
         let product: AdaptyPluginPaywallProduct
 
         enum CodingKeys: CodingKey {
@@ -28,7 +28,7 @@ extension Request {
                 paywallName: product.paywallName,
                 paywallPurchaseUrl: product.paywallPurchaseURL
             )
-            let result = try await Adapty.makePurchase(product: product)
+            let result = try await Adapty.makeWebPurchase(product: product)
             return .success(result)
         }
     }
