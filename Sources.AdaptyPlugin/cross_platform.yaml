@@ -701,7 +701,6 @@ $defs:
       - paywall_variation_id
       - paywall_ab_test_name
       - paywall_name
-      - audience_name
       - localized_description
       - localized_title
       - is_family_shareable # iOS Only
@@ -714,7 +713,6 @@ $defs:
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
       web_purchase_url: { type: string }
-      audience_name: { type: string }
       localized_description: { type: string }
       localized_title: { type: string }
       is_family_shareable:
@@ -820,6 +818,7 @@ $defs:
       - paywall_id
       - paywall_name
       - ab_test_name
+      - audience_name
       - variation_id
       - revision
       - products
@@ -832,6 +831,7 @@ $defs:
       revision: { type: integer }
       variation_id: { type: string }
       ab_test_name: { type: string }
+      audience_name: { type: string }
       remote_config: { $ref: "#/$defs/AdaptyPaywall.RemoteConfig" }
       paywall_builder: { $ref: "#/$defs/AdaptyPaywall.ViewConfiguration" }
       products:
