@@ -157,6 +157,7 @@ enum MethodName: String {
     case getReceipt = "get_reciept"
     case makePurchase = "make_purchase"
     case makeWebPurchase = "make_web_purchase"
+    case createWebPurchaseUrl = "create_web_purchase_url"
 
     case restorePurchases = "restore_purchases"
 

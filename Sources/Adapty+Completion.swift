@@ -274,6 +274,15 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func createWebPurchaseUrl(
+        product: AdaptyPaywallProduct,
+        _ completion: @escaping AdaptyResultCompletion<URL>
+    ) {
+        withCompletion(completion) {
+            try await createWebPurchaseUrl(product: product)
+        }
+    }
+
     nonisolated static func makePurchase(
         product: AdaptyDeferredProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>

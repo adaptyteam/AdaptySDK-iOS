@@ -9,11 +9,6 @@ import Adapty
 import Foundation
 
 extension AdaptySubscriptionOffer.OfferType: Codable {
-    enum CodingValues: String, Codable {
-        case introductory
-        case promotional
-        case winBack = "win_back"
-    }
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -29,17 +24,7 @@ extension AdaptySubscriptionOffer.OfferType: Codable {
     }
 
     public func encode(to encoder: any Encoder) throws {
-        let value: CodingValues =
-            switch self {
-            case .introductory:
-                .introductory
-            case .promotional:
-                .promotional
-            case .winBack:
-                .winBack
-            }
-
         var container = encoder.singleValueContainer()
-        try container.encode(value)
+        try container.encode(encodedValue)
     }
 }

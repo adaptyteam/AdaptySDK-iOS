@@ -379,4 +379,31 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "AdaptyPaywall.viewConfiguration is nil").asAdaptyError
     }
+
+    static func productWithoutPurchaseUrl(
+        adaptyProductId: String,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Current method is not available for the product:\(adaptyProductId)").asAdaptyError
+    }
+
+    static func failedDecodingPurchaseUrl(
+        url: URL,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Failed decoding purchaseUrl:\(url)", error: URLError(.badURL)).asAdaptyError
+    }
+
+    static func failedOpeningPurchaseUrl(
+        _ url: URL,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Failed opening purchaseUrl:\(url)").asAdaptyError
+    }
 }

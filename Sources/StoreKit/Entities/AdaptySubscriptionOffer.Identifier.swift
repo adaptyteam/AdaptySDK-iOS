@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptySubscriptionOffer {
-   package enum Identifier: Sendable, Hashable {
+    package enum Identifier: Sendable, Hashable {
         case introductory
         case promotional(String)
         case winBack(String)
@@ -42,3 +42,24 @@ extension AdaptySubscriptionOffer {
     }
 }
 
+package extension AdaptySubscriptionOffer.OfferType {
+    enum CodingValues: String, Codable {
+        case introductory
+        case promotional
+        case winBack = "win_back"
+    }
+
+    var encodedValue: String {
+        let value: CodingValues =
+            switch self {
+            case .introductory:
+                .introductory
+            case .promotional:
+                .promotional
+            case .winBack:
+                .winBack
+            }
+
+        return value.rawValue
+    }
+}
