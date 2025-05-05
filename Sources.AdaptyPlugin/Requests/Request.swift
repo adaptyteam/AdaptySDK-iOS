@@ -26,6 +26,7 @@ enum Request {
             LogShowPaywall.self,
             MakePurchase.self,
             MakeWebPurchase.self,
+            CreateWebPurchaseUrl.self,
             PresentCodeRedemptionSheet.self,
             RestorePurchases.self,
             UpdateAttributionData.self,

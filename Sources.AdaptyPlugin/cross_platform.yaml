@@ -318,6 +318,13 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
+  MakeWebPurchase.Request: #request
+    type: object
+    required: [method, product]
+    properties:
+      method: { const: "make_web_purchase" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+
   MakeWebPurchase.Response: #response
     type: object
     oneOf:
@@ -327,6 +334,23 @@ $requests:
       - required: [success]
         properties:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
+
+  CreateWebPurchaseUrl.Request: #request
+    type: object
+    required: [method, product]
+    properties:
+      method: { const: "create_web_purchase_url" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+
+  CreateWebPurchaseUrl.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { type: string }
 
   ### presentCodeRedemptionSheet ###
   PresentCodeRedemptionSheet.Request: #request
