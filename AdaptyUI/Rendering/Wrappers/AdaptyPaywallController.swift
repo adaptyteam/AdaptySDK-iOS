@@ -126,19 +126,19 @@ public final class AdaptyPaywallController: UIViewController {
             self.delegate?.paywallController(self, didPartiallyLoadProducts: failedIds)
         }
 
-        paywallConfiguration.eventsHandler.shouldContinueWebPurchase = { [weak self] product in
+        paywallConfiguration.eventsHandler.shouldContinueWebPaymentNavigation = { [weak self] product in
             guard let self, let delegate else { return true }
-            return delegate.paywallController(self, shouldContinueWebPurchase: product)
+            return delegate.paywallController(self, shouldContinueWebPaymentNavigation: product)
         }
 
-        paywallConfiguration.eventsHandler.didFailWebPurchase = {
+        paywallConfiguration.eventsHandler.didFailWebPaymentNavigation = {
             [weak self] product, error in
             guard let self else { return }
 
             self.delegate?
                 .paywallController(
                     self,
-                    didFailWebPurchase: product,
+                    didFailWebPaymentNavigation: product,
                     error: error
                 )
         }

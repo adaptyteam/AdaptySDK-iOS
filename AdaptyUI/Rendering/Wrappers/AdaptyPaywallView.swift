@@ -24,8 +24,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
-    private let shouldContinueWebPurchase: ((AdaptyPaywallProduct) -> Bool)?
-    private let didFailWebPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
+    private let shouldContinueWebPaymentNavigation: ((AdaptyPaywallProduct?) -> Bool)?
+    private let didFailWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError) -> Void)?
     private let didStartRestore: (() -> Void)?
     private let didFinishRestore: ((AdaptyProfile) -> Void)?
     private let didFailRestore: ((AdaptyError) -> Void)?
@@ -44,8 +44,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
-        shouldContinueWebPurchase: ((AdaptyPaywallProduct) -> Bool)? = nil,
-        didFailWebPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)? = nil,
+        shouldContinueWebPaymentNavigation: ((AdaptyPaywallProduct?) -> Bool)? = nil,
+        didFailWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
@@ -63,8 +63,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         self.didStartPurchase = didStartPurchase
         self.didFinishPurchase = didFinishPurchase
         self.didFailPurchase = didFailPurchase
-        self.shouldContinueWebPurchase = shouldContinueWebPurchase
-        self.didFailWebPurchase = didFailWebPurchase
+        self.shouldContinueWebPaymentNavigation = shouldContinueWebPaymentNavigation
+        self.didFailWebPaymentNavigation = didFailWebPaymentNavigation
         self.didStartRestore = didStartRestore
         self.didFinishRestore = didFinishRestore
         self.didFailRestore = didFailRestore
@@ -105,7 +105,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         paywallConfiguration.eventsHandler.didFailLoadingProducts = didFailLoadingProducts ?? { _ in true }
         paywallConfiguration.eventsHandler.didPartiallyLoadProducts = didPartiallyLoadProducts
 
-        paywallConfiguration.eventsHandler.shouldContinueWebPurchase = shouldContinueWebPurchase ?? { _ in true }
+        paywallConfiguration.eventsHandler.shouldContinueWebPaymentNavigation = shouldContinueWebPaymentNavigation ?? { _ in true }
 
         return AdaptyPaywallView_Internal(
             showDebugOverlay: false,

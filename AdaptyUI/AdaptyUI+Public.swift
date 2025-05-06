@@ -197,7 +197,7 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     /// - Returns: Return `true`, if you want to continue the flow. Return `false`, if you want to interrupt the process.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        shouldContinueWebPurchase product: AdaptyPaywallProduct
+        shouldContinueWebPaymentNavigation product: AdaptyPaywallProduct?
     ) -> Bool
     
     /// This method is invoked when the web-purchase process fails.
@@ -207,7 +207,7 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     ///   - error: an ``AdaptyError`` object representing the error.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailWebPurchase product: AdaptyPaywallProduct,
+        didFailWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError
     )
 }

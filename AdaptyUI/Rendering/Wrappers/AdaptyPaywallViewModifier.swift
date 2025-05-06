@@ -39,8 +39,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: (AdaptyPaywallProduct, AdaptyError) -> Void
-    private let shouldContinueWebPurchase: ((AdaptyPaywallProduct) -> Bool)?
-    private let didFailWebPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
+    private let shouldContinueWebPaymentNavigation: ((AdaptyPaywallProduct?) -> Bool)?
+    private let didFailWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError) -> Void)?
     private let didStartRestore: (() -> Void)?
     private let didFinishRestore: (AdaptyProfile) -> Void
     private let didFailRestore: (AdaptyError) -> Void
@@ -62,8 +62,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)?,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
-        shouldContinueWebPurchase: ((AdaptyPaywallProduct) -> Bool)? = nil,
-        didFailWebPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)? = nil,
+        shouldContinueWebPaymentNavigation: ((AdaptyPaywallProduct?) -> Bool)? = nil,
+        didFailWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError) -> Void)? = nil,
         didStartRestore: (() -> Void)?,
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
@@ -84,8 +84,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
         self.didStartPurchase = didStartPurchase
         self.didFinishPurchase = didFinishPurchase
         self.didFailPurchase = didFailPurchase
-        self.shouldContinueWebPurchase = shouldContinueWebPurchase
-        self.didFailWebPurchase = didFailWebPurchase
+        self.shouldContinueWebPaymentNavigation = shouldContinueWebPaymentNavigation
+        self.didFailWebPaymentNavigation = didFailWebPaymentNavigation
         self.didStartRestore = didStartRestore
         self.didFinishRestore = didFinishRestore
         self.didFailRestore = didFailRestore
@@ -109,8 +109,8 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
                 didStartPurchase: didStartPurchase,
                 didFinishPurchase: didFinishPurchase,
                 didFailPurchase: didFailPurchase,
-                shouldContinueWebPurchase: shouldContinueWebPurchase,
-                didFailWebPurchase: didFailWebPurchase,
+                shouldContinueWebPaymentNavigation: shouldContinueWebPaymentNavigation,
+                didFailWebPaymentNavigation: didFailWebPaymentNavigation,
                 didStartRestore: didStartRestore,
                 didFinishRestore: didFinishRestore,
                 didFailRestore: didFailRestore,
@@ -193,8 +193,8 @@ public extension View {
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
-        shouldContinueWebPurchase: ((AdaptyPaywallProduct) -> Bool)? = nil,
-        didFailWebPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)? = nil,
+        shouldContinueWebPaymentNavigation: ((AdaptyPaywallProduct?) -> Bool)? = nil,
+        didFailWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
@@ -217,8 +217,8 @@ public extension View {
                 didStartPurchase: didStartPurchase,
                 didFinishPurchase: didFinishPurchase,
                 didFailPurchase: didFailPurchase,
-                shouldContinueWebPurchase: shouldContinueWebPurchase,
-                didFailWebPurchase: didFailWebPurchase,
+                shouldContinueWebPaymentNavigation: shouldContinueWebPaymentNavigation,
+                didFailWebPaymentNavigation: didFailWebPaymentNavigation,
                 didStartRestore: didStartRestore,
                 didFinishRestore: didFinishRestore,
                 didFailRestore: didFailRestore,
