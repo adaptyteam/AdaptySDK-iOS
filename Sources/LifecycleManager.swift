@@ -71,6 +71,18 @@ final class LifecycleManager {
         }
     }
 
+    private func setLastStartAcceleratedSyncProfileDateIfSDKActivated() {
+        Adapty.optionalSDK?.profileStorage.setLastStartAcceleratedSyncProfileDate()
+    }
+
+    private func getLastStartAcceleratedSyncProfileDate() -> Date {
+        Adapty.optionalSDK?.profileStorage.lastStartAcceleratedSyncProfileDate ?? Date(timeIntervalSince1970: 0)
+    }
+
+    private func getLastOpenedWebPaywallDate() -> Date {
+        Adapty.optionalSDK?.profileStorage.lastOpenedWebPaywallDate ?? Date(timeIntervalSince1970: 0)
+    }
+
     private func syncProfile() async throws {
         guard !profileIsSyncing else { return }
 
@@ -96,7 +108,7 @@ final class LifecycleManager {
 
         defer { crossABIsSyncing = false }
         crossABIsSyncing = true
-        
+
         log.verbose("LifecycleManager: syncCrossPlacementState START")
 
         for attempt in 0 ..< 3 {

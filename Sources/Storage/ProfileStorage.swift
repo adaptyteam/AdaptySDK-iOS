@@ -118,7 +118,7 @@ final class ProfileStorage: Sendable {
         }
     }
 
-    var lastOpenedWebPaywallDate: Date { Self.lastOpenedWebPaywallDate ?? Date(timeIntervalSince1970: 0) }
+    var lastOpenedWebPaywallDate: Date? { Self.lastOpenedWebPaywallDate  }
 
     func setLastOpenedWebPaywallDate() {
         let now = Date()
@@ -127,7 +127,7 @@ final class ProfileStorage: Sendable {
         log.debug("set lastOpenedWebPaywallDate = \(now).")
     }
 
-    var lastStartAcceleratedSyncProfileDate: Date { Self.lastStartAcceleratedSyncProfileDate ?? Date(timeIntervalSince1970: 0) }
+    var lastStartAcceleratedSyncProfileDate: Date? { Self.lastStartAcceleratedSyncProfileDate  }
 
     func setLastStartAcceleratedSyncProfileDate() {
         let now = Date()
