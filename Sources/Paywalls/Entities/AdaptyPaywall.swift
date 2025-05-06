@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyPaywall: Sendable {
+public struct AdaptyPaywall: Sendable, WebPaywallURLProviding {
     /// An identifier of a placement, configured in Adapty Dashboard.
     public let placementId: String
 
@@ -39,7 +39,7 @@ public struct AdaptyPaywall: Sendable {
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
 
-    var purchaseUrl: URL?
+    package var webPaywallBaseUrl: URL?
     var version: Int64
 }
 
@@ -67,7 +67,7 @@ extension AdaptyPaywall: Codable {
         case viewConfiguration = "paywall_builder"
         case attributes
         case audienceName = "audience_name"
-        case purchaseUrl = "web_purchase_url"
+        case webPaywallBaseUrl = "web_purchase_url"
     }
 
     fileprivate func extractedFunc(
@@ -116,7 +116,7 @@ extension AdaptyPaywall: Codable {
 
         audienceName = try container.decode(String.self, forKey: .audienceName)
         remoteConfig = try container.decodeIfPresent(RemoteConfig.self, forKey: .remoteConfig)
-        purchaseUrl = try container.decodeIfPresent(URL.self, forKey: .purchaseUrl)
+        webPaywallBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallBaseUrl)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
 
         products = try {
@@ -149,7 +149,7 @@ extension AdaptyPaywall: Codable {
         try container.encode(products, forKey: .products)
         try container.encode(audienceName, forKey: .audienceName)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
-        try container.encodeIfPresent(purchaseUrl, forKey: .purchaseUrl)
+        try container.encodeIfPresent(webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
         try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
     }
 }

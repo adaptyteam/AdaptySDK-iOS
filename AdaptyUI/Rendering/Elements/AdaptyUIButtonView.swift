@@ -112,6 +112,8 @@ extension VC.ActionAction {
             productsViewModel.purchaseSelectedProduct(fromGroupId: groupId, provider: provider)
         case let .purchaseProduct(productId, provider):
             productsViewModel.purchaseProduct(id: productId, provider: provider)
+        case .openWebPaywall:
+            break
         case .restore:
             productsViewModel.restorePurchases()
         case let .switchSection(sectionId, index):

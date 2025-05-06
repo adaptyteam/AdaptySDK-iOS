@@ -8,7 +8,7 @@
 import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptySK2PaywallProduct: AdaptySK2Product, WebPurchasable {
+struct AdaptySK2PaywallProduct: AdaptySK2Product, WebPaywallURLProviding {
     let skProduct: SK2Product
 
     public let adaptyProductId: String
@@ -26,7 +26,7 @@ struct AdaptySK2PaywallProduct: AdaptySK2Product, WebPurchasable {
     /// Same as `name` property of the parent AdaptyPaywall.
     public let paywallName: String
 
-    let purchaseUrl: URL?
+    let webPaywallBaseUrl: URL?
 
     public var description: String {
         "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
@@ -37,7 +37,7 @@ struct AdaptySK2PaywallProduct: AdaptySK2Product, WebPurchasable {
 extension AdaptySK2PaywallProduct: AdaptyPaywallProduct {}
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, WebPurchasable {
+struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, WebPaywallURLProviding {
     let skProduct: SK2Product
 
     public let adaptyProductId: String
@@ -53,7 +53,7 @@ struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, WebPurc
     /// Same as `name` property of the parent AdaptyPaywall.
     public let paywallName: String
 
-    let purchaseUrl: URL?
+    let webPaywallBaseUrl: URL?
 
     public var description: String {
         "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"

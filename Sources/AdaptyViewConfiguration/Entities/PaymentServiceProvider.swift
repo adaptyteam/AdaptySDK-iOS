@@ -10,6 +10,6 @@ import Foundation
 package extension AdaptyViewConfiguration {
     enum PaymentServiceProvider: Hashable, Sendable {
         case storeKit
-        case webPaymentService
+        case openWebPaywall
     }
 }

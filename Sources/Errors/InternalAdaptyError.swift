@@ -380,6 +380,15 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "AdaptyPaywall.viewConfiguration is nil").asAdaptyError
     }
 
+    static func paywallWithoutPurchaseUrl(
+        paywall: AdaptyPaywall,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Current method is not available for the paywall (placementId: \(paywall.placementId), name: \(paywall.name), variationId: \(paywall.variationId))").asAdaptyError
+    }
+    
     static func productWithoutPurchaseUrl(
         adaptyProductId: String,
         file: String = #fileID,
@@ -389,21 +398,21 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Current method is not available for the product:\(adaptyProductId)").asAdaptyError
     }
 
-    static func failedDecodingPurchaseUrl(
+    static func failedDecodingWebPaywallUrl(
         url: URL,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Failed decoding purchaseUrl:\(url)", error: URLError(.badURL)).asAdaptyError
+        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Failed decoding web paywall url:\(url)", error: URLError(.badURL)).asAdaptyError
     }
 
-    static func failedOpeningPurchaseUrl(
+    static func failedOpeningWebPaywallUrl(
         _ url: URL,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Failed opening purchaseUrl:\(url)").asAdaptyError
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Failed opening web paywall url: \(url)").asAdaptyError
     }
 }

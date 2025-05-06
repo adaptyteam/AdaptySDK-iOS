@@ -183,7 +183,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
         switch provider {
         case .storeKit:
             purchaseProductWithStoreKit(product)
-        case .webPaymentService:
+        case .openWebPaywall:
             purchaseProductInWeb(product)
         }
     }
@@ -193,7 +193,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
         Task { @MainActor [weak self] in
             do {
-                try await Adapty.makeWebPurchase(product: product)
+                try await Adapty.openWebPaywall(for: product)
             } catch {
                 self?.eventsHandler
                     .event_didFailWebPurchase(

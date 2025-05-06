@@ -318,14 +318,20 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
-  MakeWebPurchase.Request: #request
+  OpenWebPaywall.Request: #request
     type: object
-    required: [method, product]
+    required: [method ]
     properties:
-      method: { const: "make_web_purchase" }
-      product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      method: { const: "open_web_paywall" }
+    oneOf:
+      - required: [product]
+        properties:
+          product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      - required: [paywall]
+        properties:
+          paywall: { $ref: "#/$defs/AdaptyPaywall" }
 
-  MakeWebPurchase.Response: #response
+  OpenWebPaywall.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -333,14 +339,20 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { $ref: "#/$defs/AdaptyPurchaseResult" }
+          success: { const: true }
 
-  CreateWebPurchaseUrl.Request: #request
+  CreateWebPaywallUrl.Request: #request
     type: object
-    required: [method, product]
+    required: [method ]
     properties:
-      method: { const: "create_web_purchase_url" }
-      product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      method: { const: "create_web_paywall_url" }
+    oneOf:
+      - required: [product]
+        properties:
+          product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      - required: [paywall]
+        properties:
+          paywall: { $ref: "#/$defs/AdaptyPaywall" }
 
   CreateWebPurchaseUrl.Response: #response
     type: object

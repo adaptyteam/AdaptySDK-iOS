@@ -20,6 +20,7 @@ package extension AdaptyViewConfiguration {
         case switchSection(id: String, index: Int)
         case openScreen(id: String)
         case closeScreen
+        case openWebPaywall
     }
 }
 
@@ -60,6 +61,8 @@ extension AdaptyViewConfiguration.ActionAction: Hashable {
             hasher.combine(10)
         case .closeScreen:
             hasher.combine(11)
+        case .openWebPaywall:
+            hasher.combine(12)
         }
     }
 }

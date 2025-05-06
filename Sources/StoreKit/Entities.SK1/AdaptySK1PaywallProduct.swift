@@ -7,7 +7,7 @@
 
 import StoreKit
 
-struct AdaptySK1PaywallProduct: AdaptySK1Product, WebPurchasable {
+struct AdaptySK1PaywallProduct: AdaptySK1Product, WebPaywallURLProviding {
     let skProduct: SK1Product
 
     public let adaptyProductId: String
@@ -25,7 +25,7 @@ struct AdaptySK1PaywallProduct: AdaptySK1Product, WebPurchasable {
     /// Same as `name` property of the parent AdaptyPaywall.
     public let paywallName: String
 
-    let purchaseUrl: URL?
+    let webPaywallBaseUrl: URL?
 
     public var description: String {
         "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
@@ -34,7 +34,7 @@ struct AdaptySK1PaywallProduct: AdaptySK1Product, WebPurchasable {
 
 extension AdaptySK1PaywallProduct: AdaptyPaywallProduct {}
 
-struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, WebPurchasable {
+struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, WebPaywallURLProviding {
     let skProduct: SK1Product
 
     public let adaptyProductId: String
@@ -50,7 +50,7 @@ struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, WebPurc
     /// Same as `name` property of the parent AdaptyPaywall.
     public let paywallName: String
 
-    let purchaseUrl: URL?
+    let webPaywallBaseUrl: URL?
 
     public var description: String {
         "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"

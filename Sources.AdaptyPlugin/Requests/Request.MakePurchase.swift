@@ -26,7 +26,7 @@ extension Request {
                 variationId: product.variationId,
                 paywallABTestName: product.paywallABTestName,
                 paywallName: product.paywallName,
-                paywallPurchaseUrl: product.paywallPurchaseURL
+                webPaywallBaseUrl: product.webPaywallBaseUrl
             )
             let result = try await Adapty.makePurchase(product: product)
             return .success(result)

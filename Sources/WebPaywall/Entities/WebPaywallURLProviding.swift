@@ -7,6 +7,7 @@
 
 import Foundation
 
-package protocol WebPurchasable {
-    var purchaseUrl: URL? { get }
+package protocol WebPaywallURLProviding {
+    var webPaywallBaseUrl: URL? { get }
+    
 }

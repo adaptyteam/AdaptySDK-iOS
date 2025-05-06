@@ -17,7 +17,7 @@ extension Request {
         let variationId: String
         let paywallABTestName: String
         let paywallName: String
-        let paywallPurchaseURL: URL?
+        let webPaywallBaseUrl: URL?
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -28,7 +28,7 @@ extension Request {
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
-            paywallPurchaseURL = try container.decodeIfPresent(URL.self, forKey: .paywallPurchaseURL)
+            webPaywallBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallBaseUrl)
         }
     }
 }
@@ -40,7 +40,7 @@ private enum CodingKeys: String, CodingKey {
     case paywallVariationId = "paywall_variation_id"
     case paywallABTestName = "paywall_ab_test_name"
     case paywallName = "paywall_name"
-    case paywallPurchaseURL = "web_purchase_url"
+    case webPaywallBaseUrl = "web_purchase_url"
     case subscriptionOfferIdentifier = "subscription_offer_identifier"
     case subscription
     case localizedDescription = "localized_description"
@@ -66,7 +66,7 @@ extension Response {
             try container.encode(wrapped.variationId, forKey: .paywallVariationId)
             try container.encode(wrapped.paywallABTestName, forKey: .paywallABTestName)
             try container.encode(wrapped.paywallName, forKey: .paywallName)
-            try container.encodeIfPresent((wrapped as? WebPurchasable)?.purchaseUrl, forKey: .paywallPurchaseURL)
+            try container.encodeIfPresent((wrapped as? WebPaywallURLProviding)?.webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
             try container.encode(wrapped.localizedDescription, forKey: .localizedDescription)
             try container.encode(wrapped.localizedTitle, forKey: .localizedTitle)
             try container.encode(wrapped.isFamilyShareable, forKey: .isFamilyShareable)

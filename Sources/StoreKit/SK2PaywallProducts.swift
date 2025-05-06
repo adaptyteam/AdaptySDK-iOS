@@ -32,7 +32,7 @@ extension Adapty {
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.abTestName,
                 paywallName: paywall.name,
-                purchaseUrl: paywall.purchaseUrl
+                webPaywallBaseUrl: paywall.webPaywallBaseUrl
             )
         }
     }
@@ -45,7 +45,7 @@ extension Adapty {
         variationId: String,
         paywallABTestName: String,
         paywallName: String,
-        paywallPurchaseUrl: URL?,
+        webPaywallBaseUrl: URL?,
         productsManager: SK2ProductsManager
     ) async throws -> AdaptySK2PaywallProduct {
         let sk2Product = try await productsManager.fetchSK2Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
@@ -69,7 +69,7 @@ extension Adapty {
             variationId: variationId,
             paywallABTestName: paywallABTestName,
             paywallName: paywallName,
-            purchaseUrl: paywallPurchaseUrl
+            webPaywallBaseUrl: webPaywallBaseUrl
         )
     }
 
@@ -114,7 +114,7 @@ extension Adapty {
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.abTestName,
                 paywallName: paywall.name,
-                purchaseUrl: paywall.purchaseUrl
+                webPaywallBaseUrl: paywall.webPaywallBaseUrl
             )
         }
     }

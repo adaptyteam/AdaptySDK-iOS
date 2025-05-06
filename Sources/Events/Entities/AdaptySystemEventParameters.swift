@@ -156,8 +156,8 @@ enum MethodName: String {
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
     case getReceipt = "get_reciept"
     case makePurchase = "make_purchase"
-    case makeWebPurchase = "make_web_purchase"
-    case createWebPurchaseUrl = "create_web_purchase_url"
+    case openWebPaywall = "open_web_paywall"
+    case createWebPaywallUrl = "create_web_paywall_url"
 
     case restorePurchases = "restore_purchases"
 

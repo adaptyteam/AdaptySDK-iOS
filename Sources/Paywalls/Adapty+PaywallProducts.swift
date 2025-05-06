@@ -72,7 +72,7 @@ public extension Adapty {
         variationId: String,
         paywallABTestName: String,
         paywallName: String,
-        paywallPurchaseUrl: URL?
+        webPaywallBaseUrl: URL?
     ) async throws -> AdaptyPaywallProduct {
         let sdk = try await Adapty.activatedSDK
 
@@ -88,7 +88,7 @@ public extension Adapty {
                 variationId: variationId,
                 paywallABTestName: paywallABTestName,
                 paywallName: paywallName,
-                paywallPurchaseUrl: paywallPurchaseUrl,
+                webPaywallBaseUrl: webPaywallBaseUrl,
                 productsManager: manager
             )
 
@@ -105,7 +105,7 @@ public extension Adapty {
                 paywallABTestName: paywallABTestName,
                 paywallName: paywallName,
                 productsManager: manager,
-                paywallPurchaseUrl: paywallPurchaseUrl
+                webPaywallBaseUrl: webPaywallBaseUrl
             )
         }
     }
