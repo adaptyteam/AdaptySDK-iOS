@@ -61,6 +61,17 @@ final class LifecycleManager {
                 do {
                     try await self?.syncProfile()
                     updateInterval = Self.profileUpdateInterval
+
+                    if let storage = Adapty.optionalSDK?.profileStorage {
+                        let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate ?? Date(timeIntervalSince1970: 0)
+                        let lastOpenedWebPaywallAt = storage.lastOpenedWebPaywallDate ?? Date(timeIntervalSince1970: 0)
+
+                        let now = Date()
+
+                        // TODO:
+
+                        // storage.setLastStartAcceleratedSyncProfileDate()
+                    }
                 } catch {
                     log.warn("LifecycleManager: syncProfile Error: \(error)")
                     updateInterval = Self.profileUpdateShortInterval
@@ -69,18 +80,6 @@ final class LifecycleManager {
                 try await Task.sleep(seconds: updateInterval)
             }
         }
-    }
-
-    private func setLastStartAcceleratedSyncProfileDateIfSDKActivated() {
-        Adapty.optionalSDK?.profileStorage.setLastStartAcceleratedSyncProfileDate()
-    }
-
-    private func getLastStartAcceleratedSyncProfileDate() -> Date {
-        Adapty.optionalSDK?.profileStorage.lastStartAcceleratedSyncProfileDate ?? Date(timeIntervalSince1970: 0)
-    }
-
-    private func getLastOpenedWebPaywallDate() -> Date {
-        Adapty.optionalSDK?.profileStorage.lastOpenedWebPaywallDate ?? Date(timeIntervalSince1970: 0)
     }
 
     private func syncProfile() async throws {
