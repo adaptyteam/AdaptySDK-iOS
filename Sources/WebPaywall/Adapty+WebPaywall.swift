@@ -26,10 +26,7 @@ public extension Adapty {
                 "paywall_product_index": product.paywallProductIndex
             ]
         ) { sdk in
-            let url = try sdk.createWebPaywallUrl(for: product)
-            guard await url.open() else {
-                throw AdaptyError.failedOpeningWebPaywallUrl(url)
-            }
+            try await sdk.openWebPaywall(for: product)
         }
     }
 
@@ -62,10 +59,7 @@ public extension Adapty {
                 "web_purchase_url": paywall.webPaywallBaseUrl
             ]
         ) { sdk in
-            let url = try sdk.createWebPaywallUrl(for: paywall)
-            guard await url.open() else {
-                throw AdaptyError.failedOpeningWebPaywallUrl(url)
-            }
+            try await sdk.openWebPaywall(for: paywall)
         }
     }
 
@@ -82,6 +76,26 @@ public extension Adapty {
         ) { sdk in
             try sdk.createWebPaywallUrl(for: paywall)
         }
+    }
+
+    private func openWebPaywall(
+        for product: AdaptyPaywallProduct
+    ) async throws {
+        let url = try createWebPaywallUrl(for: product)
+        guard await url.open() else {
+            throw AdaptyError.failedOpeningWebPaywallUrl(url)
+        }
+        profileStorage.setLastOpenedWebPaywallDate()
+    }
+
+    private func openWebPaywall(
+        for paywall: AdaptyPaywall
+    ) async throws {
+        let url = try createWebPaywallUrl(for: paywall)
+        guard await url.open() else {
+            throw AdaptyError.failedOpeningWebPaywallUrl(url)
+        }
+        profileStorage.setLastOpenedWebPaywallDate()
     }
 
     private func createWebPaywallUrl(
