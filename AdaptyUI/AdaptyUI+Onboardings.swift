@@ -12,25 +12,16 @@ import SwiftUI
 
 public extension AdaptyUI {
     struct OnboardingConfiguration: Sendable {
-        public let id: String
+        private let onboarding: AdaptyOnboarding
 
-        let url: URL
-        let variationId: String
-        let shouldTrackShown: Bool
+        public var id: String { onboarding.placement.id }
+
+        var url: URL { onboarding.viewConfiguration.url }
+        var variationId: String { onboarding.variationId }
+        var shouldTrackShown: Bool { onboarding.shouldTrackShown }
 
         init(onboarding: AdaptyOnboarding) {
-            id = onboarding.placement.id
-            url = onboarding.viewConfiguration.url
-            variationId = onboarding.variationId
-            shouldTrackShown = onboarding.shouldTrackShown
-        }
-
-        // TODO: remove this method
-        package init(id: String, url: URL) {
-            self.id = id
-            self.url = url
-            self.variationId = "test"
-            self.shouldTrackShown = true
+            self.onboarding = onboarding
         }
     }
 }
