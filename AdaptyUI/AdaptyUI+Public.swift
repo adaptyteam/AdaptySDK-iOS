@@ -189,7 +189,7 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
         didPartiallyLoadProducts failedIds: [String]
     )
     
-    /// This method is invoked when the web-purchase process fails.
+    /// This method is invoked when the web payment navigation is finished.
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
