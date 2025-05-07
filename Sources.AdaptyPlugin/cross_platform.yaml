@@ -695,7 +695,7 @@ $defs:
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
       ip_address_collection_disabled: { type: boolean, default: false }
-      server_cluster: { type: string, enum: ["default", "eu"] }
+      server_cluster: { type: string, enum: ["default", "eu", "cn"] }
       backend_base_url: { type: string }
       backend_fallback_base_url: { type: string }
       backend_configs_base_url: { type: string }
