@@ -652,7 +652,7 @@ $events:
     type: object
     required: [id, view]
     properties:
-      id: { const: "did_finish_web_payment_navigation" }
+      id: { const: "paywall_view_did_finish_web_payment_navigation" }
       view: { $ref: "#/$defs/AdaptyUI.View" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
