@@ -37,7 +37,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
             view: controller.toAdaptyUIView()
         ))
     }
-    
+
     func paywallControllerDidDisappear(
         _ controller: AdaptyPaywallController
     ) {
@@ -45,7 +45,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
             view: controller.toAdaptyUIView()
         ))
     }
-    
+
     func paywallController(
         _ controller: AdaptyPaywallController,
         didPerform action: AdaptyUI.Action
@@ -148,6 +148,18 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
         ))
 
         return true
+    }
+
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
+        error: AdaptyError?
+    ) {
+        eventHandler.handle(event: PaywallViewEvent.DidFinishWebPaymentNavigation(
+            view: controller.toAdaptyUIView(),
+            product: product.map(Response.AdaptyPluginPaywallProduct.init),
+            error: error
+        ))
     }
 }
 

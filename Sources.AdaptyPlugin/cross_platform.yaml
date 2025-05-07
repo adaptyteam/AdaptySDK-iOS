@@ -647,6 +647,15 @@ $events:
       id: { const: "paywall_view_did_fail_loading_products" }
       view: { $ref: "#/$defs/AdaptyUI.View" }
       error: { $ref: "#/$defs/AdaptyError" }
+      
+  PaywallViewEvent.DidFinishWebPaymentNavigation:
+    type: object
+    required: [id, view]
+    properties:
+      id: { const: "did_finish_web_payment_navigation" }
+      view: { $ref: "#/$defs/AdaptyUI.View" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+      error: { $ref: "#/$defs/AdaptyError" }
 
 $defs:
   ### Entities ###

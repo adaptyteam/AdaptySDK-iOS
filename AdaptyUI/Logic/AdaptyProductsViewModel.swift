@@ -189,31 +189,38 @@ package final class AdaptyProductsViewModel: ObservableObject {
     }
 
     private func purchaseProductInWeb(_ product: AdaptyPaywallProduct) {
-        guard eventsHandler.event_shouldContinueWebPaymentNavigation(product: product) else { return }
-
         Task { @MainActor [weak self] in
             do {
                 try await Adapty.openWebPaywall(for: product)
+                self?.eventsHandler
+                    .event_didFinishWebPaymentNavigation(
+                        product: product,
+                        error: nil
+                    )
             } catch {
                 self?.eventsHandler
-                    .event_didFailWebPaymentNavigation(
+                    .event_didFinishWebPaymentNavigation(
                         product: product,
                         error: error.asAdaptyError
                     )
             }
         }
     }
-    
+
     func openWebPaywall(_ product: AdaptyPaywallProduct) {
-        guard eventsHandler.event_shouldContinueWebPaymentNavigation(product: nil) else { return }
         guard let paywall = paywallViewModel.paywall as? AdaptyPaywall else { return }
-                
+
         Task { @MainActor [weak self] in
             do {
                 try await Adapty.openWebPaywall(for: paywall)
+                self?.eventsHandler
+                    .event_didFinishWebPaymentNavigation(
+                        product: nil,
+                        error: nil
+                    )
             } catch {
                 self?.eventsHandler
-                    .event_didFailWebPaymentNavigation(
+                    .event_didFinishWebPaymentNavigation(
                         product: nil,
                         error: error.asAdaptyError
                     )

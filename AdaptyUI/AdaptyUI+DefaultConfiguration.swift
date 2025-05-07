@@ -71,13 +71,8 @@ public extension AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        shouldContinueWebPaymentNavigation product: AdaptyPaywallProduct?
-    ) -> Bool { true }
-
-    func paywallController(
-        _ controller: AdaptyPaywallController,
-        didFailWebPaymentNavigation product: AdaptyPaywallProduct?,
-        error: AdaptyError
+        didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
+        error: AdaptyError?
     ) {}
 }
 

@@ -29,8 +29,7 @@ package final class AdaptyEventsHandler: ObservableObject {
     var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     var didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     var didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
-    var shouldContinueWebPaymentNavigation: ((AdaptyPaywallProduct?) -> Bool)?
-    var didFailWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError) -> Void)?
+    var didFinishWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError?) -> Void)?
     var didStartRestore: (() -> Void)?
     var didFinishRestore: ((AdaptyProfile) -> Void)?
     var didFailRestore: ((AdaptyError) -> Void)?
@@ -45,8 +44,7 @@ package final class AdaptyEventsHandler: ObservableObject {
         self.didStartPurchase = nil
         self.didFinishPurchase = nil
         self.didFailPurchase = nil
-        self.shouldContinueWebPaymentNavigation = nil
-        self.didFailWebPaymentNavigation = nil
+        self.didFinishWebPaymentNavigation = nil
         self.didStartRestore = nil
         self.didFinishRestore = nil
         self.didFailRestore = nil
@@ -94,20 +92,12 @@ package final class AdaptyEventsHandler: ObservableObject {
         didFinishPurchase?(product, purchaseResult)
     }
 
-    func event_shouldContinueWebPaymentNavigation(product: AdaptyPaywallProduct?) -> Bool {
-        let result = shouldContinueWebPaymentNavigation?(product) ?? true
-
-        Log.ui.verbose("#\(logId)# event_shouldContinueWebPaymentNavigation: \(result)")
-
-        return result
-    }
-
-    func event_didFailWebPaymentNavigation(
+    func event_didFinishWebPaymentNavigation(
         product: AdaptyPaywallProduct?,
-        error: AdaptyError
+        error: AdaptyError?
     ) {
-        Log.ui.verbose("#\(logId)# event_didFailPurchase: \(product?.vendorProductId ?? "null"), \(error)")
-        didFailWebPaymentNavigation?(product, error)
+        Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null"), error: \(error)")
+        didFinishWebPaymentNavigation?(product, error)
     }
 
     func event_didFailPurchase(

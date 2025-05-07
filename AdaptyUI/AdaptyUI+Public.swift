@@ -189,17 +189,6 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
         didPartiallyLoadProducts failedIds: [String]
     )
     
-    /// If user initiates the web-purchase process, this method will be invoked.
-    ///
-    /// - Parameters:
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
-    ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
-    /// - Returns: Return `true`, if you want to continue the flow. Return `false`, if you want to interrupt the process.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
-        shouldContinueWebPaymentNavigation product: AdaptyPaywallProduct?
-    ) -> Bool
-    
     /// This method is invoked when the web-purchase process fails.
     /// - Parameters:
     ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
@@ -207,8 +196,8 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     ///   - error: an ``AdaptyError`` object representing the error.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailWebPaymentNavigation product: AdaptyPaywallProduct?,
-        error: AdaptyError
+        didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
+        error: AdaptyError?
     )
 }
 
