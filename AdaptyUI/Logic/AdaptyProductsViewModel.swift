@@ -69,7 +69,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
         self.observerModeResolver = observerModeResolver
     }
-    
+
     func resetSelectedProducts() {
         Log.ui.verbose("#\(logId)# resetSelectedProducts")
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
@@ -166,17 +166,69 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
     // MARK: Actions
 
-    func purchaseSelectedProduct(fromGroupId groupId: String) {
+    func purchaseSelectedProduct(
+        fromGroupId groupId: String,
+        provider: AdaptyViewConfiguration.PaymentServiceProvider
+    ) {
         guard let productId = selectedProductId(by: groupId) else { return }
-        purchaseProduct(id: productId)
+        purchaseProduct(id: productId, provider: provider)
     }
 
-    func purchaseProduct(id productId: String) {
+    func purchaseProduct(id productId: String, provider: AdaptyViewConfiguration.PaymentServiceProvider) {
         guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
             Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
             return
         }
 
+        switch provider {
+        case .storeKit:
+            purchaseProductWithStoreKit(product)
+        case .openWebPaywall:
+            purchaseProductInWeb(product)
+        }
+    }
+
+    private func purchaseProductInWeb(_ product: AdaptyPaywallProduct) {
+        Task { @MainActor [weak self] in
+            do {
+                try await Adapty.openWebPaywall(for: product)
+                self?.eventsHandler
+                    .event_didFinishWebPaymentNavigation(
+                        product: product,
+                        error: nil
+                    )
+            } catch {
+                self?.eventsHandler
+                    .event_didFinishWebPaymentNavigation(
+                        product: product,
+                        error: error.asAdaptyError
+                    )
+            }
+        }
+    }
+
+    func openWebPaywall(_ product: AdaptyPaywallProduct) {
+        guard let paywall = paywallViewModel.paywall as? AdaptyPaywall else { return }
+
+        Task { @MainActor [weak self] in
+            do {
+                try await Adapty.openWebPaywall(for: paywall)
+                self?.eventsHandler
+                    .event_didFinishWebPaymentNavigation(
+                        product: nil,
+                        error: nil
+                    )
+            } catch {
+                self?.eventsHandler
+                    .event_didFinishWebPaymentNavigation(
+                        product: nil,
+                        error: error.asAdaptyError
+                    )
+            }
+        }
+    }
+
+    private func purchaseProductWithStoreKit(_ product: AdaptyPaywallProduct) {
         let logId = logId
         if let observerModeResolver {
             observerModeResolver.observerMode(

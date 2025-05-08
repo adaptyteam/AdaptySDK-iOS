@@ -39,6 +39,8 @@ public protocol AdaptyProduct: Sendable, CustomStringConvertible {
     /// The region code of the locale used to format the price of the product.
     var regionCode: String? { get }
 
+    var priceLocale: Locale { get }
+    
     /// A Boolean value that indicates whether the product is available for family sharing in App Store Connect. (Will be `false` for iOS version below 14.0 and macOS version below 11.0).
     var isFamilyShareable: Bool { get }
 

@@ -24,7 +24,7 @@ extension AdaptySubscriptionOffer.PaymentMode: Encodable {
         case unknown
     }
 
-    var asString: String? {
+    var encodedValue: String? {
         let value: CodingValues? =
             switch self {
             case .payAsYouGo: .payAsYouGo
@@ -38,6 +38,6 @@ extension AdaptySubscriptionOffer.PaymentMode: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(asString ?? CodingValues.unknown.rawValue)
+        try container.encode(encodedValue ?? CodingValues.unknown.rawValue)
     }
 }

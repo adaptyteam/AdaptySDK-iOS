@@ -265,6 +265,42 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func openWebPaywall(
+        for product: AdaptyPaywallProduct,
+        _ completion: AdaptyErrorCompletion?
+    ) {
+        withCompletion(completion) {
+            try await openWebPaywall(for: product)
+        }
+    }
+
+    nonisolated static func openWebPaywall(
+        for paywall: AdaptyPaywall,
+        _ completion: AdaptyErrorCompletion?
+    ) {
+        withCompletion(completion) {
+            try await openWebPaywall(for: paywall)
+        }
+    }
+
+    nonisolated static func createWebPaywallUrl(
+        for product: AdaptyPaywallProduct,
+        _ completion: @escaping AdaptyResultCompletion<URL>
+    ) {
+        withCompletion(completion) {
+            try await createWebPaywallUrl(for: product)
+        }
+    }
+
+    nonisolated static func createWebPaywallUrl(
+        for paywall: AdaptyPaywall,
+        _ completion: @escaping AdaptyResultCompletion<URL>
+    ) {
+        withCompletion(completion) {
+            try await createWebPaywallUrl(for: paywall)
+        }
+    }
+
     nonisolated static func makePurchase(
         product: AdaptyDeferredProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
@@ -459,7 +495,7 @@ public extension Adapty {
             try await logShowOnboarding(params)
         }
     }
-    
+
     /// Call this method to update the current user's refund data consent.
     ///
     /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#obtain-user-consent)
@@ -475,7 +511,7 @@ public extension Adapty {
             try await updateCollectingRefundDataConsent(consent)
         }
     }
-    
+
     /// Call this method to set the refund preference individually for current user.
     ///
     /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#set-refund-behavior-for-a-specific-user-in-the-dashboard)

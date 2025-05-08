@@ -67,10 +67,12 @@ public extension Adapty {
     package nonisolated static func getPaywallProduct(
         vendorProductId: String,
         adaptyProductId: String,
+        paywallProductIndex: Int,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
         paywallABTestName: String,
-        paywallName: String
+        paywallName: String,
+        webPaywallBaseUrl: URL?
     ) async throws -> AdaptyPaywallProduct {
         let sdk = try await Adapty.activatedSDK
 
@@ -81,10 +83,12 @@ public extension Adapty {
             return try await sdk.getSK2PaywallProduct(
                 vendorProductId: vendorProductId,
                 adaptyProductId: adaptyProductId,
+                paywallProductIndex: paywallProductIndex,
                 subscriptionOfferIdentifier: subscriptionOfferIdentifier,
                 variationId: variationId,
                 paywallABTestName: paywallABTestName,
                 paywallName: paywallName,
+                webPaywallBaseUrl: webPaywallBaseUrl,
                 productsManager: manager
             )
 
@@ -95,11 +99,13 @@ public extension Adapty {
             return try await sdk.getSK1PaywallProduct(
                 vendorProductId: vendorProductId,
                 adaptyProductId: adaptyProductId,
+                paywallProductIndex: paywallProductIndex,
                 subscriptionOfferIdentifier: subscriptionOfferIdentifier,
                 variationId: variationId,
                 paywallABTestName: paywallABTestName,
                 paywallName: paywallName,
-                productsManager: manager
+                productsManager: manager,
+                webPaywallBaseUrl: webPaywallBaseUrl
             )
         }
     }

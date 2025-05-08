@@ -26,6 +26,8 @@ extension AdaptySK2Product {
 
     public var price: Decimal { skProduct.price }
 
+    public var priceLocale: Locale { skProduct.unfPriceLocale }
+
     public var currencyCode: String? { skProduct.unfCurrencyCode }
 
     public var currencySymbol: String? { skProduct.unfPriceLocale.currencySymbol }

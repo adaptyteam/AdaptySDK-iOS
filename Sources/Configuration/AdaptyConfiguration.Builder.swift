@@ -17,6 +17,8 @@ extension AdaptyConfiguration {
         let defaultBackend = switch builder.serverCluster ?? .default {
         case .eu:
             Backend.URLs.euPublicEnvironment
+        case .cn:
+            Backend.URLs.cnPublicEnvironment
         default:
             Backend.URLs.defaultPublicEnvironment
         }

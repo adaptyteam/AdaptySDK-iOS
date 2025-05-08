@@ -14,5 +14,5 @@ extension Adapty {
 
 extension AdaptyViewConfiguration {
     nonisolated static let formatVersion = "4.2.0"
-    nonisolated static let builderVersion = "4_1"
+    nonisolated static let builderVersion = "4_2"
 }

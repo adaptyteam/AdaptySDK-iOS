@@ -21,10 +21,12 @@ extension Request {
             let product = try await Adapty.getPaywallProduct(
                 vendorProductId: product.vendorProductId,
                 adaptyProductId: product.adaptyProductId,
+                paywallProductIndex: product.paywallProductIndex,
                 subscriptionOfferIdentifier: product.subscriptionOfferIdentifier,
                 variationId: product.variationId,
                 paywallABTestName: product.paywallABTestName,
-                paywallName: product.paywallName
+                paywallName: product.paywallName,
+                webPaywallBaseUrl: product.webPaywallBaseUrl
             )
             let result = try await Adapty.makePurchase(product: product)
             return .success(result)
