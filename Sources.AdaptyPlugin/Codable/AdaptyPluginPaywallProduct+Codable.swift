@@ -12,19 +12,23 @@ extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
         let vendorProductId: String
         let adaptyProductId: String
+        let paywallProductIndex: Int
         let subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
         let variationId: String
         let paywallABTestName: String
         let paywallName: String
+        let webPaywallBaseUrl: URL?
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
             adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
+            paywallProductIndex = try container.decode(Int.self, forKey: .paywallProductIndex)
             subscriptionOfferIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOfferIdentifier)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
+            webPaywallBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallBaseUrl)
         }
     }
 }
@@ -32,9 +36,11 @@ extension Request {
 private enum CodingKeys: String, CodingKey {
     case vendorProductId = "vendor_product_id"
     case adaptyProductId = "adapty_product_id"
+    case paywallProductIndex = "paywall_product_index"
     case paywallVariationId = "paywall_variation_id"
     case paywallABTestName = "paywall_ab_test_name"
     case paywallName = "paywall_name"
+    case webPaywallBaseUrl = "web_purchase_url"
     case subscriptionOfferIdentifier = "subscription_offer_identifier"
     case subscription
     case localizedDescription = "localized_description"
@@ -56,9 +62,11 @@ extension Response {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(wrapped.vendorProductId, forKey: .vendorProductId)
             try container.encode(wrapped.adaptyProductId, forKey: .adaptyProductId)
+            try container.encode(wrapped.paywallProductIndex, forKey: .paywallProductIndex)
             try container.encode(wrapped.variationId, forKey: .paywallVariationId)
             try container.encode(wrapped.paywallABTestName, forKey: .paywallABTestName)
             try container.encode(wrapped.paywallName, forKey: .paywallName)
+            try container.encodeIfPresent((wrapped as? WebPaywallURLProviding)?.webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
             try container.encode(wrapped.localizedDescription, forKey: .localizedDescription)
             try container.encode(wrapped.localizedTitle, forKey: .localizedTitle)
             try container.encode(wrapped.isFamilyShareable, forKey: .isFamilyShareable)

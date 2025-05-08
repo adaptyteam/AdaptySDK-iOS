@@ -49,7 +49,7 @@ public extension AdaptyUI {
         /// User pressed any button with URL
         case openURL(url: URL)
         /// User pressed any button with custom action (e.g. login)
-        case custom(id: String)
+        case custom(id: String)        
     }
 }
 
@@ -188,6 +188,17 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
         _ controller: AdaptyPaywallController,
         didPartiallyLoadProducts failedIds: [String]
     )
+    
+    /// This method is invoked when the web payment navigation is finished.
+    /// - Parameters:
+    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
+    ///   - error: an ``AdaptyError`` object representing the error.
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
+        error: AdaptyError?
+    )
 }
 
 #endif
@@ -275,38 +286,6 @@ public extension AdaptyUI {
     ///   - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
     /// - Returns: an ``AdaptyPaywallConfiguration`` object.
     static func getPaywallConfiguration(
-        forPaywall paywall: AdaptyPaywall,
-        loadTimeout: TimeInterval? = nil,
-        products: [AdaptyPaywallProduct]? = nil,
-        observerModeResolver: AdaptyObserverModeResolver? = nil,
-        tagResolver: AdaptyTagResolver? = nil,
-        timerResolver: AdaptyTimerResolver? = nil
-    ) async throws -> PaywallConfiguration {
-        guard AdaptyUI.isActivated else {
-            let err = AdaptyUIError.adaptyNotActivatedError
-            Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
-
-            throw err
-        }
-
-        let viewConfiguration = try await Adapty.getViewConfiguration(
-            paywall: paywall,
-            loadTimeout: loadTimeout
-        )
-
-        return PaywallConfiguration(
-            logId: Log.stamp,
-            paywall: paywall,
-            viewConfiguration: viewConfiguration,
-            products: products,
-            observerModeResolver: observerModeResolver,
-            tagResolver: tagResolver,
-            timerResolver: timerResolver,
-            assetsResolver: nil
-        )
-    }
-    
-    package static func getPaywallConfigurationWithAssets(
         forPaywall paywall: AdaptyPaywall,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,

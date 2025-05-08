@@ -22,20 +22,17 @@ struct AdaptyUITransparentContainerView: View {
         _ element: VC.Element,
         globalProxy: GeometryProxy
     ) -> some View {
-        let additionalTopPadding = max(0, globalProxy.size.height - footerSize.height + globalProxy.safeAreaInsets.top + globalProxy.safeAreaInsets.bottom)
+        let additionalTopPadding = globalProxy.size.height
+            - footerSize.height
+            + globalProxy.safeAreaInsets.top
+            + globalProxy.safeAreaInsets.bottom
 
         ScrollViewReader { scrollProxy in
             ScrollView {
-                if additionalTopPadding > 0.0 {
-                    AdaptyUIElementView(element)
-                        .id("content")
-                        .onGeometrySizeChange { footerSize = $0 }
-                        .padding(.top, additionalTopPadding)
-                } else {
-                    AdaptyUIElementView(element)
-                        .id("content")
-                        .onGeometrySizeChange { footerSize = $0 }
-                }
+                AdaptyUIElementView(element)
+                    .id("content")
+                    .onGeometrySizeChange { footerSize = $0 }
+                    .padding(.top, additionalTopPadding > 0.0 ? additionalTopPadding : nil)
             }
             .scrollIndicatorsHidden_compatible()
             .onAppear {

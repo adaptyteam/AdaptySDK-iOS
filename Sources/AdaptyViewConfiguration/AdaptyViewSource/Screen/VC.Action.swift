@@ -62,6 +62,9 @@ extension AdaptyViewSource.Action: Decodable {
         case selectProductId = "select_product"
         case purchaseProductId = "purchase_product"
         case purchaseSelectedProduct = "purchase_selected_product"
+        case webPurchaseProductId = "web_purchase_product"
+        case webPurchaseSelectedProduct = "web_purchase_selected_product"
+        case openWebPaywall = "web_purchase_paywall"
         case unselectProduct = "unselect_product"
     }
 
@@ -78,9 +81,17 @@ extension AdaptyViewSource.Action: Decodable {
             self = .action(.close)
         case .custom:
             self = try .action(.custom(id: container.decode(String.self, forKey: .customId)))
+        case .openWebPaywall:
+            self = .action(.openWebPaywall)
         case .purchaseSelectedProduct:
             self = try .action(.purchaseSelectedProduct(
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyViewSource.StringId.Product.defaultProductGroupId
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyViewSource.StringId.Product.defaultProductGroupId,
+                provider: .storeKit
+            ))
+        case .webPurchaseSelectedProduct:
+            self = try .action(.purchaseSelectedProduct(
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyViewSource.StringId.Product.defaultProductGroupId,
+                provider: .openWebPaywall
             ))
         case .unselectProduct:
             self = try .action(.unselectProduct(
@@ -92,7 +103,9 @@ extension AdaptyViewSource.Action: Decodable {
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? AdaptyViewSource.StringId.Product.defaultProductGroupId
             ))
         case .purchaseProductId:
-            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId)))
+            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId), provider: .storeKit))
+        case .webPurchaseProductId:
+            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId), provider: .openWebPaywall))
         case .switchSection:
             self = try .action(.switchSection(id: container.decode(String.self, forKey: .sectionId), index: container.decode(Int.self, forKey: .index)))
         case .openScreen:

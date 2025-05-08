@@ -19,6 +19,11 @@ final class LifecycleManager {
     private static let appOpenedSendInterval: TimeInterval = 60.0
     private static let profileUpdateInterval: TimeInterval = 60.0
     private static let profileUpdateShortInterval: TimeInterval = 10.0
+
+    private static let profileUpdateAcceleratedInterval: TimeInterval = 3.0
+    private static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: TimeInterval = 60.0 * 20.0
+    private static let profileUpdateAcceleratedDuration: TimeInterval = 60.0 * 5.0
+    
     private static let idfaStatusCheckDuration: TimeInterval = 600.0
     private static let idfaStatusCheckInterval: TimeInterval = 5.0
 
@@ -48,6 +53,29 @@ final class LifecycleManager {
 
     private var profileIsSyncing = false
 
+    private static func calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: TimeInterval) -> TimeInterval {
+        guard let storage = Adapty.optionalSDK?.profileStorage else { return defaultValue }
+
+        let now = Date()
+
+        guard let lastOpenedWebPaywallAt = storage.lastOpenedWebPaywallDate,
+              now.timeIntervalSince(lastOpenedWebPaywallAt) < profileUpdateAcceleratedMaxCooldownAfterOpenWeb
+        else {
+            return defaultValue
+        }
+
+        if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate {
+            if now.timeIntervalSince(lastOpenedWebPaywallAt) < profileUpdateAcceleratedDuration {
+                return profileUpdateAcceleratedInterval
+            } else {
+                return defaultValue
+            }
+        } else {
+            storage.setLastStartAcceleratedSyncProfileDate()
+            return profileUpdateAcceleratedInterval
+        }
+    }
+
     private func scheduleProfileUpdate() {
         log.verbose("LifecycleManager: scheduleProfileUpdate")
 
@@ -56,16 +84,17 @@ final class LifecycleManager {
             try await Task.sleep(seconds: Self.profileUpdateInterval)
 
             while true {
-                let updateInterval: TimeInterval
+                let defaultUpdateInterval: TimeInterval
 
                 do {
                     try await self?.syncProfile()
-                    updateInterval = Self.profileUpdateInterval
+                    defaultUpdateInterval = Self.profileUpdateInterval
                 } catch {
                     log.warn("LifecycleManager: syncProfile Error: \(error)")
-                    updateInterval = Self.profileUpdateShortInterval
+                    defaultUpdateInterval = Self.profileUpdateShortInterval
                 }
-
+                
+                let updateInterval = Self.calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: defaultUpdateInterval)
                 try await Task.sleep(seconds: updateInterval)
             }
         }
@@ -96,7 +125,7 @@ final class LifecycleManager {
 
         defer { crossABIsSyncing = false }
         crossABIsSyncing = true
-        
+
         log.verbose("LifecycleManager: syncCrossPlacementState START")
 
         for attempt in 0 ..< 3 {

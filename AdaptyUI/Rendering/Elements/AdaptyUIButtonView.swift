@@ -108,10 +108,12 @@ extension VC.ActionAction {
             }
         case let .unselectProduct(groupId):
             productsViewModel.unselectProduct(forGroupId: groupId)
-        case let .purchaseSelectedProduct(groupId):
-            productsViewModel.purchaseSelectedProduct(fromGroupId: groupId)
-        case let .purchaseProduct(productId):
-            productsViewModel.purchaseProduct(id: productId)
+        case let .purchaseSelectedProduct(groupId, provider):
+            productsViewModel.purchaseSelectedProduct(fromGroupId: groupId, provider: provider)
+        case let .purchaseProduct(productId, provider):
+            productsViewModel.purchaseProduct(id: productId, provider: provider)
+        case .openWebPaywall:
+            break
         case .restore:
             productsViewModel.restorePurchases()
         case let .switchSection(sectionId, index):

@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct Box: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct Box: Sendable, Hashable {
         static let defaultHorizontalAlignment: HorizontalAlignment = .center
         static let defaultVerticalAlignment: VerticalAlignment = .center
 
@@ -20,11 +20,11 @@ extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.Box {
-    package enum Length: Sendable {
+package extension AdaptyViewConfiguration.Box {
+    enum Length: Sendable {
         case fixed(AdaptyViewConfiguration.Unit)
-        case min(AdaptyViewConfiguration.Unit)
-        case shrink(AdaptyViewConfiguration.Unit)
+        case flexible(min: AdaptyViewConfiguration.Unit?, max: AdaptyViewConfiguration.Unit?)
+        case shrinkable(min: AdaptyViewConfiguration.Unit, max: AdaptyViewConfiguration.Unit?)
         case fillMax
     }
 }
@@ -35,12 +35,14 @@ extension AdaptyViewConfiguration.Box.Length: Hashable {
         case let .fixed(value):
             hasher.combine(1)
             hasher.combine(value)
-        case let .min(value):
+        case let .flexible(min, max):
             hasher.combine(2)
-            hasher.combine(value)
-        case let .shrink(value):
+            hasher.combine(min)
+            hasher.combine(max)
+        case let .shrinkable(min, max):
             hasher.combine(3)
-            hasher.combine(value)
+            hasher.combine(min)
+            hasher.combine(max)
         case .fillMax:
             hasher.combine(4)
         }

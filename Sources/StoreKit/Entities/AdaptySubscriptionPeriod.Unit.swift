@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptySubscriptionPeriod {
-    public enum Unit: UInt, Sendable, Hashable {
+public extension AdaptySubscriptionPeriod {
+    enum Unit: UInt, Sendable, Hashable {
         case day
         case week
         case month
@@ -18,17 +18,7 @@ extension AdaptySubscriptionPeriod {
 }
 
 extension AdaptySubscriptionPeriod.Unit: CustomStringConvertible {
-    public var description: String {
-        let value: CodingValues =
-            switch self {
-            case .day: .day
-            case .week: .week
-            case .month: .month
-            case .year: .year
-            case .unknown: .unknown
-            }
-        return value.rawValue
-    }
+    public var description: String { encodedValue }
 }
 
 extension AdaptySubscriptionPeriod.Unit: Codable {
@@ -53,6 +43,11 @@ extension AdaptySubscriptionPeriod.Unit: Codable {
     }
 
     public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(encodedValue)
+    }
+
+    var encodedValue: String {
         let value: CodingValues =
             switch self {
             case .day: .day
@@ -61,7 +56,7 @@ extension AdaptySubscriptionPeriod.Unit: Codable {
             case .year: .year
             case .unknown: .unknown
             }
-        var container = encoder.singleValueContainer()
-        try container.encode(value.rawValue)
+
+        return value.rawValue
     }
 }

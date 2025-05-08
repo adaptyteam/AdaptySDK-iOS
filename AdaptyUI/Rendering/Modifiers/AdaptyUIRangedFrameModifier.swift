@@ -10,9 +10,13 @@
 import Adapty
 import SwiftUI
 
+extension Double {
+    var cgFloatValue: CGFloat { CGFloat(self) }
+}
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIRangedFrameModifier: ViewModifier {
-    typealias Constraints = (min: CGFloat?, max: CGFloat?, shrink: Bool)
+    typealias Constraints = (min: Double?, max: Double?, shrink: Bool)
 
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
@@ -30,8 +34,34 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
         safeAreaEnd: Double
     ) -> Constraints {
         switch lenght {
-        case let .min(unit): (min: unit.points(screenSize: screenSize, safeAreaStart: safeAreaStart, safeAreaEnd: safeAreaEnd), max: nil, false)
-        case let .shrink(unit): (min: unit.points(screenSize: screenSize, safeAreaStart: safeAreaStart, safeAreaEnd: safeAreaEnd), max: nil, true)
+        case let .flexible(min, max):
+            (
+                min: min?.points(
+                    screenSize: screenSize,
+                    safeAreaStart: safeAreaStart,
+                    safeAreaEnd: safeAreaEnd
+                ),
+                max: max?.points(
+                    screenSize: screenSize,
+                    safeAreaStart: safeAreaStart,
+                    safeAreaEnd: safeAreaEnd
+                ),
+                false
+            )
+        case let .shrinkable(min, max):
+            (
+                min: min.points(
+                    screenSize: screenSize,
+                    safeAreaStart: safeAreaStart,
+                    safeAreaEnd: safeAreaEnd
+                ),
+                max: max?.points(
+                    screenSize: screenSize,
+                    safeAreaStart: safeAreaStart,
+                    safeAreaEnd: safeAreaEnd
+                ),
+                true
+            )
         case .fillMax: (min: nil, max: .infinity, false)
         default: (min: nil, max: nil, false)
         }
@@ -41,14 +71,14 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
         let wConstraints = self.constraints(
             for: self.box.width,
             screenSize: self.screenSize.width,
-            safeAreaStart: safeArea.leading,
-            safeAreaEnd: safeArea.trailing
+            safeAreaStart: self.safeArea.leading,
+            safeAreaEnd: self.safeArea.trailing
         )
         let hConstraints = self.constraints(
             for: self.box.height,
             screenSize: self.screenSize.height,
-            safeAreaStart: safeArea.top,
-            safeAreaEnd: safeArea.bottom
+            safeAreaStart: self.safeArea.top,
+            safeAreaEnd: self.safeArea.bottom
         )
 
         if wConstraints.min == nil && wConstraints.max == nil && wConstraints.shrink == false &&
@@ -66,10 +96,10 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
         } else {
             content
                 .frame(
-                    minWidth: wConstraints.min,
-                    maxWidth: wConstraints.max,
-                    minHeight: hConstraints.min,
-                    maxHeight: hConstraints.max,
+                    minWidth: wConstraints.min?.cgFloatValue,
+                    maxWidth: wConstraints.max?.cgFloatValue,
+                    minHeight: hConstraints.min?.cgFloatValue,
+                    maxHeight: hConstraints.max?.cgFloatValue,
                     alignment: .from(
                         horizontal: self.box.horizontalAlignment.swiftuiValue(with: self.layoutDirection),
                         vertical: self.box.verticalAlignment.swiftuiValue
