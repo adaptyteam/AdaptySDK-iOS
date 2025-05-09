@@ -71,7 +71,7 @@ extension AdaptyPaywall: Codable {
     }
 
     fileprivate func extractedFunc(
-        _ arrayContainer: inout any UnkeyedDecodingContainer,
+        _ arrayContainer: inout any UnkeyedDecodingContainer
     ) throws -> [ProductReference] {
         var index = 0
         var products = [ProductReference]()
