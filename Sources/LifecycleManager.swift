@@ -32,12 +32,14 @@ final class LifecycleManager {
     private var appOpenedSentAt: Date?
     private var newStorefrontCountryAvailable: String?
 
+    private var profileUpdateRegularTask: Task<Void, Error>?
+
     func initialize() {
         log.info("LifecycleManager initialize")
 
         subscribeForLifecycleEvents()
         subscribeForStorefrontUpdate()
-        scheduleProfileUpdate()
+        profileUpdateRegularTask = scheduleProfileUpdate(skipFirstSleep: false)
         scheduleIDFAUpdate()
     }
 
@@ -53,54 +55,71 @@ final class LifecycleManager {
 
     private var profileIsSyncing = false
 
-    private static func calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: TimeInterval) -> TimeInterval {
+    private static func calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: TimeInterval, logStamp stamp: String) -> TimeInterval {
         guard let storage = Adapty.optionalSDK?.profileStorage else { return defaultValue }
 
         let now = Date()
 
-        guard let lastOpenedWebPaywallAt = storage.lastOpenedWebPaywallDate,
-              now.timeIntervalSince(lastOpenedWebPaywallAt) < profileUpdateAcceleratedMaxCooldownAfterOpenWeb
-        else {
+        guard let lastOpenedWebPaywallAt = storage.lastOpenedWebPaywallDate else {
+            log.debug("LifecycleManager: \(stamp) calculateInterval: NO WEB PAYWALL")
             return defaultValue
         }
 
-        if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate {
-            if now.timeIntervalSince(lastOpenedWebPaywallAt) < profileUpdateAcceleratedDuration {
+        if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate, lastStartAcceleratedSyncAt > lastOpenedWebPaywallAt {
+            let timeLeft = now.timeIntervalSince(lastStartAcceleratedSyncAt)
+
+            if timeLeft < profileUpdateAcceleratedDuration {
+                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) < \(profileUpdateAcceleratedDuration) (last start)")
                 return profileUpdateAcceleratedInterval
             } else {
+                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) >= \(profileUpdateAcceleratedDuration) (last start)")
                 return defaultValue
             }
         } else {
+            let timeLeftFromLastOpenedWebPaywall = now.timeIntervalSince(lastOpenedWebPaywallAt)
+
+            guard timeLeftFromLastOpenedWebPaywall < profileUpdateAcceleratedMaxCooldownAfterOpenWeb else {
+                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywall) >= \(profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown)")
+                return defaultValue
+            }
+
+            log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywall) < \(profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown) -> STORE TIME")
+
             storage.setLastStartAcceleratedSyncProfileDate()
             return profileUpdateAcceleratedInterval
         }
     }
 
-    private func scheduleProfileUpdate() {
-        log.verbose("LifecycleManager: scheduleProfileUpdate")
+    private func scheduleProfileUpdate(skipFirstSleep: Bool) -> Task<Void, Error> {
+        let stamp = Log.stamp
 
-        Task { @AdaptyActor [weak self] in
+        log.verbose("LifecycleManager: \(stamp) scheduleProfileUpdate")
 
-            try await Task.sleep(seconds: Self.profileUpdateInterval)
+        return Task { @AdaptyActor [weak self] in
+
+            if !skipFirstSleep {
+                try await Task.sleep(seconds: Self.profileUpdateInterval)
+            }
 
             while true {
                 let defaultUpdateInterval: TimeInterval
 
                 do {
-                    try await self?.syncProfile()
+                    try await self?.syncProfile(logStamp: stamp)
                     defaultUpdateInterval = Self.profileUpdateInterval
                 } catch {
-                    log.warn("LifecycleManager: syncProfile Error: \(error)")
+                    log.warn("LifecycleManager: \(stamp) syncProfile Error: \(error)")
                     defaultUpdateInterval = Self.profileUpdateShortInterval
                 }
-                
-                let updateInterval = Self.calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: defaultUpdateInterval)
+
+                let updateInterval = Self.calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: defaultUpdateInterval, logStamp: stamp)
+                log.debug("LifecycleManager: \(stamp) update after: \(updateInterval) sec.")
                 try await Task.sleep(seconds: updateInterval)
             }
         }
     }
 
-    private func syncProfile() async throws {
+    private func syncProfile(logStamp stamp: String) async throws {
         guard !profileIsSyncing else { return }
 
         defer { profileIsSyncing = false }
@@ -109,11 +128,11 @@ final class LifecycleManager {
         if let storeCountry = newStorefrontCountryAvailable {
             let params = AdaptyProfileParameters(storeCountry: storeCountry)
 
-            log.verbose("LifecycleManager: syncProfile with storeCountry = \(storeCountry)")
+            log.verbose("LifecycleManager: \(stamp) syncProfile with storeCountry = \(storeCountry)")
             try await Adapty.updateProfile(params: params)
             newStorefrontCountryAvailable = nil
         } else {
-            log.verbose("LifecycleManager: syncProfile")
+            log.verbose("LifecycleManager: \(stamp) syncProfile")
             _ = try await Adapty.getProfile()
         }
     }
@@ -174,6 +193,9 @@ final class LifecycleManager {
             log.verbose("handleDidBecomeActiveNotification")
             Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "app_become_active"))
 
+            profileUpdateRegularTask?.cancel()
+            self.profileUpdateRegularTask = self.scheduleProfileUpdate(skipFirstSleep: true)
+
             if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
                 log.verbose("handleDidBecomeActiveNotification SKIP")
                 return
@@ -184,7 +206,6 @@ final class LifecycleManager {
             log.verbose("handleDidBecomeActiveNotification track")
 
             try? await syncCrossABState()
-            try? await syncProfile()
         }
     }
 

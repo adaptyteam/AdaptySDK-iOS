@@ -12,6 +12,17 @@ import SwiftUI
 import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public extension AdaptyPaywallController {
+    var paywallPlacementId: String {
+        paywallConfiguration.paywallViewModel.paywall.placementId
+    }
+
+    var paywallVariationId: String {
+        paywallConfiguration.paywallViewModel.paywall.variationId
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public final class AdaptyPaywallController: UIViewController {
     public let id = UUID()
 
