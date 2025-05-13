@@ -41,3 +41,25 @@ extension AdaptySubscriptionOffer {
         case winBack
     }
 }
+
+package extension AdaptySubscriptionOffer.OfferType {
+    enum CodingValues: String, Codable {
+        case introductory
+        case promotional
+        case winBack = "win_back"
+    }
+
+    var encodedValue: String {
+        let value: CodingValues =
+            switch self {
+            case .introductory:
+                .introductory
+            case .promotional:
+                .promotional
+            case .winBack:
+                .winBack
+            }
+
+        return value.rawValue
+    }
+}

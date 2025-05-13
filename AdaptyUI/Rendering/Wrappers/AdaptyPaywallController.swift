@@ -60,12 +60,12 @@ public final class AdaptyPaywallController: UIViewController {
             guard let self else { return }
             self.delegate?.paywallControllerDidAppear(self)
         }
-        
+
         paywallConfiguration.eventsHandler.didDisappear = { [weak self] in
             guard let self else { return }
             self.delegate?.paywallControllerDidDisappear(self)
         }
-        
+
         paywallConfiguration.eventsHandler.didPerformAction = { [weak self] action in
             guard let self else { return }
             self.delegate?.paywallController(self, didPerform: action)
@@ -126,6 +126,16 @@ public final class AdaptyPaywallController: UIViewController {
             self.delegate?.paywallController(self, didPartiallyLoadProducts: failedIds)
         }
 
+        paywallConfiguration.eventsHandler.didFinishWebPaymentNavigation = { [weak self] product, error in
+            guard let self else { return }
+
+            self.delegate?.paywallController(
+                self,
+                didFinishWebPaymentNavigation: product,
+                error: error
+            )
+        }
+
         addSubSwiftUIView(
             AdaptyPaywallView_Internal(
                 showDebugOverlay: showDebugOverlay
@@ -149,7 +159,7 @@ public final class AdaptyPaywallController: UIViewController {
         super.viewDidAppear(animated)
 
         Log.ui.verbose("#\(logId)# viewDidAppear")
-        
+
         paywallConfiguration.reportOnAppear()
     }
 
@@ -157,7 +167,7 @@ public final class AdaptyPaywallController: UIViewController {
         super.viewDidDisappear(animated)
 
         Log.ui.verbose("#\(logId)# viewDidDisappear")
-        
+
         paywallConfiguration.reportOnDisappear()
     }
 }

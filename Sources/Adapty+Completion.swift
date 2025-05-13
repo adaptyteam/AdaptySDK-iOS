@@ -297,6 +297,42 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func openWebPaywall(
+        for product: AdaptyPaywallProduct,
+        _ completion: AdaptyErrorCompletion?
+    ) {
+        withCompletion(completion) {
+            try await openWebPaywall(for: product)
+        }
+    }
+
+    nonisolated static func openWebPaywall(
+        for paywall: AdaptyPaywall,
+        _ completion: AdaptyErrorCompletion?
+    ) {
+        withCompletion(completion) {
+            try await openWebPaywall(for: paywall)
+        }
+    }
+
+    nonisolated static func createWebPaywallUrl(
+        for product: AdaptyPaywallProduct,
+        _ completion: @escaping AdaptyResultCompletion<URL>
+    ) {
+        withCompletion(completion) {
+            try await createWebPaywallUrl(for: product)
+        }
+    }
+
+    nonisolated static func createWebPaywallUrl(
+        for paywall: AdaptyPaywall,
+        _ completion: @escaping AdaptyResultCompletion<URL>
+    ) {
+        withCompletion(completion) {
+            try await createWebPaywallUrl(for: paywall)
+        }
+    }
+
     nonisolated static func makePurchase(
         product: AdaptyDeferredProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>

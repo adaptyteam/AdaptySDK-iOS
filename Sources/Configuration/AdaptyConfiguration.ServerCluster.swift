@@ -9,5 +9,6 @@ public extension AdaptyConfiguration {
     enum ServerCluster {
         case `default`
         case eu
+        case cn
     }
 }

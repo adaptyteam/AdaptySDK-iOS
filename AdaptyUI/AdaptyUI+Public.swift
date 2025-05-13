@@ -188,6 +188,17 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
         _ controller: AdaptyPaywallController,
         didPartiallyLoadProducts failedIds: [String]
     )
+
+    /// This method is invoked when the web payment navigation is finished.
+    /// - Parameters:
+    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
+    ///   - error: an ``AdaptyError`` object representing the error.
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
+        error: AdaptyError?
+    )
 }
 
 #endif

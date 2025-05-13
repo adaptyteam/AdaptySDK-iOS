@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyPaywall: AdaptyPlacementContent {
+public struct AdaptyPaywall: AdaptyPlacementContent, WebPaywallURLProviding {
     public let placement: AdaptyPlacement
 
     public let instanceIdentity: String
@@ -26,6 +26,8 @@ public struct AdaptyPaywall: AdaptyPlacementContent {
     let viewConfiguration: ViewConfiguration?
 
     let products: [ProductReference]
+
+    package var webPaywallBaseUrl: URL?
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
@@ -46,6 +48,7 @@ extension AdaptyPaywall: Codable {
         case name = "paywall_name"
         case remoteConfig = "remote_config"
         case viewConfiguration = "paywall_builder"
+        case webPaywallBaseUrl = "web_purchase_url"
         case products
     }
 
@@ -57,8 +60,26 @@ extension AdaptyPaywall: Codable {
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig)
-        products = try container.decode([ProductReference].self, forKey: .products)
+        webPaywallBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallBaseUrl)
+//        products = try container.decode([ProductReference].self, forKey: .products)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
+        
+        products = try {
+            var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
+            var products = [ProductReference]()
+            var index = 0
+
+            while !arrayContainer.isAtEnd {
+                let product = try ProductReference(
+                    from: arrayContainer.nestedContainer(keyedBy: ProductReference.CodingKeys.self),
+                    index: index
+                )
+                index += 1
+                products.append(product)
+            }
+
+            return products
+        }()
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -68,6 +89,7 @@ extension AdaptyPaywall: Codable {
         try container.encode(variationId, forKey: .variationId)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
         try container.encode(products, forKey: .products)
+        try container.encodeIfPresent(webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
         try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
         try placement.encode(to: encoder)
     }

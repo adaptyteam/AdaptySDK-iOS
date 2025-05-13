@@ -28,9 +28,11 @@ extension Adapty {
             return AdaptySK2PaywallProductWithoutDeterminingOffer(
                 skProduct: sk2Product,
                 adaptyProductId: reference.adaptyProductId,
+                paywallProductIndex: reference.paywallProductIndex,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.placement.abTestName,
-                paywallName: paywall.name
+                paywallName: paywall.name,
+                webPaywallBaseUrl: paywall.webPaywallBaseUrl
             )
         }
     }
@@ -38,10 +40,12 @@ extension Adapty {
     func getSK2PaywallProduct(
         vendorProductId: String,
         adaptyProductId: String,
+        paywallProductIndex: Int,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
         paywallABTestName: String,
         paywallName: String,
+        webPaywallBaseUrl: URL?,
         productsManager: SK2ProductsManager
     ) async throws -> AdaptySK2PaywallProduct {
         let sk2Product = try await productsManager.fetchSK2Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
@@ -60,10 +64,12 @@ extension Adapty {
         return AdaptySK2PaywallProduct(
             skProduct: sk2Product,
             adaptyProductId: adaptyProductId,
+            paywallProductIndex: paywallProductIndex,
             subscriptionOffer: subscriptionOffer,
             variationId: variationId,
             paywallABTestName: paywallABTestName,
-            paywallName: paywallName
+            paywallName: paywallName,
+            webPaywallBaseUrl: webPaywallBaseUrl
         )
     }
 
@@ -103,10 +109,12 @@ extension Adapty {
             AdaptySK2PaywallProduct(
                 skProduct: $0.product,
                 adaptyProductId: $0.reference.adaptyProductId,
+                paywallProductIndex: $0.reference.paywallProductIndex,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.placement.abTestName,
-                paywallName: paywall.name
+                paywallName: paywall.name,
+                webPaywallBaseUrl: paywall.webPaywallBaseUrl
             )
         }
     }

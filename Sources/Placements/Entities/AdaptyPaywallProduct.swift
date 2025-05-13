@@ -10,6 +10,8 @@ import StoreKit
 public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
     var adaptyProductId: String { get }
 
+    var paywallProductIndex: Int { get }
+
     /// Same as `variationId` property of the parent AdaptyPaywall.
     var variationId: String { get }
 

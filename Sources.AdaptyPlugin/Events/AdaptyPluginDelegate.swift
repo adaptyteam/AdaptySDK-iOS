@@ -30,6 +30,7 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
+
     func paywallControllerDidAppear(
         _ controller: AdaptyPaywallController
     ) {
@@ -127,7 +128,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
             error: error
         ))
     }
-
+    
     func paywallController(
         _ controller: AdaptyPaywallController,
         didFailRenderingWith error: AdaptyError
@@ -148,6 +149,18 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
         ))
 
         return true
+    }
+
+    func paywallController(
+        _ controller: AdaptyPaywallController,
+        didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
+        error: AdaptyError?
+    ) {
+        eventHandler.handle(event: PaywallViewEvent.DidFinishWebPaymentNavigation(
+            view: controller.toAdaptyUIView(),
+            product: product.map(Response.AdaptyPluginPaywallProduct.init),
+            error: error
+        ))
     }
 }
 

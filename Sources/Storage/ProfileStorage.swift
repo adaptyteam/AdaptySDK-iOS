@@ -18,6 +18,8 @@ final class ProfileStorage: Sendable {
         static let syncedTransactionsKey = "AdaptySDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "AdaptySDK_Apple_Search_Ads_Sync_Date"
         static let crossPlacementStateKey = "AdaptySDK_Cross_Placement_State"
+        static let lastOpenedWebPaywallKey = "AdaptySDK_Last_Opened_Web_Paywall"
+        static let lastStartAcceleratedSyncProfileKey = "AdaptySDK_Last_Start_Accelerated_Sync_Profile"
     }
 
     private static let userDefaults = Storage.userDefaults
@@ -48,6 +50,10 @@ final class ProfileStorage: Sendable {
     private static var externalAnalyticsDisabled: Bool = userDefaults.bool(forKey: Constants.externalAnalyticsDisabledKey)
     private static var syncedTransactions: Bool = userDefaults.bool(forKey: Constants.syncedTransactionsKey)
     private static var appleSearchAdsSyncDate: Date? = userDefaults.object(forKey: Constants.appleSearchAdsSyncDateKey) as? Date
+
+    private static var lastOpenedWebPaywallDate: Date? = userDefaults.object(forKey: Constants.lastOpenedWebPaywallKey) as? Date
+
+    private static var lastStartAcceleratedSyncProfileDate: Date? = userDefaults.object(forKey: Constants.lastStartAcceleratedSyncProfileKey) as? Date
 
     private static var crossPlacementState: CrossPlacementState? = {
         do {
@@ -112,6 +118,24 @@ final class ProfileStorage: Sendable {
         }
     }
 
+    var lastOpenedWebPaywallDate: Date? { Self.lastOpenedWebPaywallDate  }
+
+    func setLastOpenedWebPaywallDate() {
+        let now = Date()
+        Self.lastOpenedWebPaywallDate = now
+        Self.userDefaults.set(now, forKey: Constants.lastOpenedWebPaywallKey)
+        log.debug("set lastOpenedWebPaywallDate = \(now).")
+    }
+
+    var lastStartAcceleratedSyncProfileDate: Date? { Self.lastStartAcceleratedSyncProfileDate  }
+
+    func setLastStartAcceleratedSyncProfileDate() {
+        let now = Date()
+        Self.lastOpenedWebPaywallDate = now
+        Self.userDefaults.set(now, forKey: Constants.lastStartAcceleratedSyncProfileKey)
+        log.debug("set lastOpenedWebPaywallDate = \(now).")
+    }
+
     func clearProfile(newProfileId profileId: String?) {
         Self.clearProfile(newProfileId: profileId)
     }
@@ -137,6 +161,10 @@ final class ProfileStorage: Sendable {
         profile = nil
         userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
         crossPlacementState = nil
+        userDefaults.removeObject(forKey: Constants.lastOpenedWebPaywallKey)
+        lastOpenedWebPaywallDate = nil
+        userDefaults.removeObject(forKey: Constants.lastStartAcceleratedSyncProfileKey)
+        lastStartAcceleratedSyncProfileDate = nil
 
         BackendIntroductoryOfferEligibilityStorage.clear()
         PlacementStorage.clear()
