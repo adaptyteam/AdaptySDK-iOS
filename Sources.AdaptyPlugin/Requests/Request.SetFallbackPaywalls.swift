@@ -24,7 +24,7 @@ extension Request {
                 URL(fileURLWithPath: path)
             }
 
-            try await Adapty.setFallbackPaywalls(fileURL: fileURL)
+            try await Adapty.setFallback(fileURL: fileURL)
 
             return .success()
         }
@@ -52,7 +52,7 @@ extension Request {
                 throw AdaptyPluginInternalError.notExist("Asset \(assetId) not found")
             }
 
-            try await Adapty.setFallbackPaywalls(fileURL: url)
+            try await Adapty.setFallback(fileURL: url)
 
             return .success()
         }

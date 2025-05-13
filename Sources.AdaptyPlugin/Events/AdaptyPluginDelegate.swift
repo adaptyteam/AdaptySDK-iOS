@@ -131,7 +131,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
     
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyError
+        didFailRenderingWith error: AdaptyUIError
     ) {
         eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
             view: controller.toAdaptyUIView(),
@@ -143,7 +143,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
         _ controller: AdaptyPaywallController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool {
-        eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
+        eventHandler.handle(event: PaywallViewEvent.DidFailLoadingProducts(
             view: controller.toAdaptyUIView(),
             error: error
         ))
