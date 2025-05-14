@@ -13,7 +13,7 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI {
-    public static var universalDelegate: AdaptyPaywallControllerDelegate?
+    public static var universalDelegate: (AdaptyPaywallControllerDelegate & AdaptyOnboardingControllerDelegate)?
 
     package static func paywallControllerWithUniversalDelegate(
         _ paywallConfiguration: PaywallConfiguration,
@@ -34,6 +34,30 @@ extension AdaptyUI {
             paywallConfiguration: paywallConfiguration,
             delegate: delegate,
             showDebugOverlay: showDebugOverlay
+        )
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+extension AdaptyUI {
+    package static func onboardingControllerWithUniversalDelegate(
+        _ onboardingConfiguration: OnboardingConfiguration
+    ) throws -> AdaptyOnboardingController {
+        guard AdaptyUI.isActivated else {
+            let err = AdaptyUIError.adaptyNotActivated
+            Log.ui.error("AdaptyUI onboardingConfiguration(for:) error: \(err)")
+            throw err
+        }
+
+        guard let delegate = AdaptyUI.universalDelegate else {
+            Log.ui.error("AdaptyUI delegateIsNotRegestired")
+            throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
+        }
+
+        return AdaptyOnboardingController(
+            configuration: onboardingConfiguration,
+            delegate: delegate
         )
     }
 }

@@ -13,7 +13,7 @@ import Foundation
 extension PaywallViewEvent {
     struct DidRestorePurchases: AdaptyPluginEvent {
         let id = "paywall_view_did_finish_restore"
-        let view: AdaptyUI.View
+        let view: AdaptyUI.PaywallView
         let profile: AdaptyProfile
 
         enum CodingKeys: CodingKey {

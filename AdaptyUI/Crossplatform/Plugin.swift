@@ -21,8 +21,8 @@ extension UIViewController {
     }
 }
 
-extension UIWindow {
-    fileprivate var topViewController: UIViewController? {
+fileprivate extension UIWindow {
+    var topViewController: UIViewController? {
         var topViewController = rootViewController
     
         while let presentedController = topViewController?.presentedViewController {
@@ -58,13 +58,13 @@ package extension AdaptyUI {
         }
 #endif
         
-        package static func createView(
+        package static func createPaywallView(
             paywall: AdaptyPaywall,
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyTagResolver?,
             timerResolver: AdaptyTimerResolver?
-        ) async throws -> AdaptyUI.View {
+        ) async throws -> AdaptyUI.PaywallView {
 #if canImport(UIKit)
             let products: [AdaptyPaywallProduct]?
             
@@ -170,5 +170,25 @@ package extension AdaptyUI {
     enum DialogActionType {
         case primary
         case secondary
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+package extension AdaptyUI.Plugin {
+    static func createOnboardingView(
+        onboarding: AdaptyOnboarding
+    ) async throws -> AdaptyUI.OnboardingView {
+#if canImport(UIKit)
+        let configuration = AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
+        let vc = try AdaptyUI.onboardingControllerWithUniversalDelegate(
+            configuration
+        )
+            
+        //        cachePaywallController(vc, id: vc.id)
+        return vc.toAdaptyUIView()
+#else
+        throw AdaptyUIError.platformNotSupported
+#endif
     }
 }

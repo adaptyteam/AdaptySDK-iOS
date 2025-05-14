@@ -12,7 +12,7 @@ import SwiftUI
 
 public extension AdaptyUI {
     struct OnboardingConfiguration: Sendable {
-        private let onboarding: AdaptyOnboarding
+        let onboarding: AdaptyOnboarding
 
         public var id: String { onboarding.placement.id }
 
