@@ -18,6 +18,8 @@ enum Request {
             Activate.self,
             GetPaywall.self,
             GetPaywallForDefaultAudience.self,
+            GetOnboarding.self,
+            GetOnboardingForDefaultAudience.self,
             GetPaywallProducts.self,
             GetProfile.self,
             Identify.self,
@@ -33,7 +35,7 @@ enum Request {
             SetIntegrationIdentifier.self,
             ReportTransaction.self,
             UpdateProfile.self,
-            SetFallbackPaywalls.self,
+            SetFallback.self,
             UpdateCollectingRefundDataConsent.self,
             UpdateRefundPreference.self
         ]
@@ -64,7 +66,7 @@ enum Response {}
 
 public extension AdaptyPlugin {
     @MainActor
-    static func reqister(requests: [AdaptyPluginRequest.Type]) {
+    static func register(requests: [AdaptyPluginRequest.Type]) {
         for request in requests {
             Request.allRequests[request.method] = request
         }

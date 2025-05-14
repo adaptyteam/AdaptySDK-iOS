@@ -1,5 +1,5 @@
 //
-//  Request.SetFallbackPaywalls.swift
+//  Request.SetFallback.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 19.11.2024.
@@ -9,7 +9,7 @@ import Adapty
 import Foundation
 
 extension Request {
-    struct SetFallbackPaywalls: AdaptyPluginRequest {
+    struct SetFallback: AdaptyPluginRequest {
         static let method = "set_fallback_paywalls"
         let path: String
 
@@ -30,8 +30,8 @@ extension Request {
         }
     }
 
-    struct SetFallbackPaywallsByAssetId: AdaptyPluginRequest {
-        static let method = SetFallbackPaywalls.method
+    struct SetFallbackByAssetId: AdaptyPluginRequest {
+        static let method = SetFallback.method
         let assetId: String
 
         private enum CodingKeys: String, CodingKey {
@@ -45,7 +45,7 @@ extension Request {
         @MainActor
         func executeInMainActor() async throws -> AdaptyJsonData {
             guard let assetIdToFileURL = Self.assetIdToFileURL else {
-                throw AdaptyPluginInternalError.unknownRequest(SetFallbackPaywalls.method)
+                throw AdaptyPluginInternalError.unknownRequest(SetFallback.method)
             }
 
             guard let url = assetIdToFileURL(assetId) else {
@@ -64,8 +64,8 @@ extension Request {
 
 public extension AdaptyPlugin {
     @MainActor
-    static func reqister(setFallbackPaywallsRequests: @MainActor @escaping (String) -> URL?) {
-        Request.SetFallbackPaywallsByAssetId.assetIdToFileURL = setFallbackPaywallsRequests
-        reqister(requests: [Request.SetFallbackPaywallsByAssetId.self])
+    static func register(setFallbackRequests: @MainActor @escaping (String) -> URL?) {
+        Request.SetFallbackByAssetId.assetIdToFileURL = setFallbackRequests
+        register(requests: [Request.SetFallbackByAssetId.self])
     }
 }

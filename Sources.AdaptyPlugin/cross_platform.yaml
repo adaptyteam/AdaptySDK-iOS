@@ -103,6 +103,47 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyUI.DialogActionType" }
 
+  ### getOnboarding ###
+  GetOnboarding.Request: #request
+    type: object
+    required: [method, placement_id]
+    properties:
+      method: { const: "get_onboarding" }
+      placement_id: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
+      fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
+      load_timeout: { type: number, description: "seconds" }
+
+  GetOnboarding.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyOnboarding" }
+
+  ### getOnboardingForDefaultAudience ###
+  GetOnboardingForDefaultAudience.Request: #request
+    type: object
+    required: [method, placement_id]
+    properties:
+      method: { const: "get_onboarding_for_default_audience" }
+      placement_id: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
+      fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
+
+  GetOnboardingForDefaultAudience.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyOnboarding" }
+
   ### getPaywall ###
   GetPaywall.Request: #request
     type: object
@@ -124,7 +165,7 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyPaywall" }
 
-    ### getPaywall ###
+    ### getPaywallForDefaultAudience ###
   GetPaywallForDefaultAudience.Request: #request
     type: object
     required: [method, placement_id]
@@ -426,8 +467,8 @@ $requests:
     properties:
       success: { type: string }
 
-  ### setFallbackPaywalls ###
-  SetFallbackPaywalls.Request: #request
+  ### setFallback ###
+  SetFallback.Request: #request
     type: object
     required: [method]
     properties:
@@ -440,7 +481,7 @@ $requests:
         properties:
           path: { type: string }
 
-  SetFallbackPaywalls.Response: #response
+  SetFallback.Response: #response
     type: object
     oneOf:
       - required: [error]
