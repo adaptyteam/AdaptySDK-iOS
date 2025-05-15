@@ -10,6 +10,9 @@ import UIKit
 import WebKit
 
 public final class AdaptyOnboardingController: UIViewController {
+    var id: UUID { UUID() } // TODO: implement
+    var onboarding: AdaptyOnboarding { viewModel.configuration.onboarding } // TODO: maybe public
+    
     private let stamp: String
     private let viewModel: AdaptyOnboardingViewModel
     weak var delegate: AdaptyOnboardingControllerDelegate?

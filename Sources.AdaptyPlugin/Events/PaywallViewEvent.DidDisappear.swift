@@ -13,7 +13,7 @@ import Foundation
 extension PaywallViewEvent {
     struct DidDisappear: AdaptyPluginEvent {
         let id = "paywall_view_did_disappear"
-        let view: AdaptyUI.View
+        let view: AdaptyUI.PaywallView
 
         enum CodingKeys: String, CodingKey {
             case id

@@ -10,7 +10,7 @@ import Adapty
 import UIKit
 
 @MainActor
-public protocol AdaptyOnboardingControllerDelegate: NSObjectProtocol {
+public protocol AdaptyOnboardingControllerDelegate: AnyObject {
     func onboardingController(_ controller: AdaptyOnboardingController, didFinishLoading action: OnboardingsDidFinishLoadingAction)
     func onboardingController(_ controller: AdaptyOnboardingController, onCloseAction action: AdaptyOnboardingsCloseAction)
     func onboardingController(_ controller: AdaptyOnboardingController, onPaywallAction action: AdaptyOnboardingsOpenPaywallAction)
