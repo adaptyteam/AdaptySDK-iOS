@@ -24,6 +24,7 @@ extension AdaptyPlacement.Draw: Decodable {
     init(from decoder: Decoder) throws {
         let profileId = try decoder.userInfo.profileId
         let placement = try decoder.userInfo.placement
+        let placementAudienceVersionId = placement.audienceVersionId
 
         let variations = try [AdaptyPlacement.Variation](from: decoder)
 
@@ -39,7 +40,7 @@ extension AdaptyPlacement.Draw: Decodable {
             index = founded
         } else {
             index = variations.draw(
-                placementAudienceVersionId: placement.placementAudienceVersionId, // TODO: extract from placement
+                placementAudienceVersionId: placementAudienceVersionId,
                 profileId: profileId
             )
         }
@@ -55,7 +56,7 @@ extension AdaptyPlacement.Draw: Decodable {
         self.init(
             profileId: profileId,
             content: content,
-            placementAudienceVersionId: placement.placementAudienceVersionId, // TODO: extract from placement
+            placementAudienceVersionId: placementAudienceVersionId,
             variationIdByPlacements: variation.variationIdByPlacements
         )
     }

@@ -61,7 +61,6 @@ extension AdaptyPaywall: Codable {
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig)
         webPaywallBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallBaseUrl)
-//        products = try container.decode([ProductReference].self, forKey: .products)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
         
         products = try {

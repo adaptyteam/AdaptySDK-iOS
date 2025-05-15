@@ -129,7 +129,7 @@ extension AdaptyPlacementChosen {
         let draw = AdaptyPlacement.Draw<Content>(
             profileId: profileId,
             content: content,
-            placementAudienceVersionId: placement.placementAudienceVersionId, // TODO: extract from placement
+            placementAudienceVersionId: placement.audienceVersionId,
             variationIdByPlacements: variation.variationIdByPlacements
         )
 
