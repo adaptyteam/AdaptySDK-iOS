@@ -881,15 +881,19 @@ $defs:
       - onboarding_name
       - variation_id
       - onboarding_config_url
-      - should_track_shown
+      - onboarding_builder
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       onboarding_id: { type: string }
       onboarding_name: { type: string }
       variation_id: { type: string }
       remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
-      onboarding_config_url: { type: string }
-      should_track_shown: { type: boolean }
+      onboarding_builder: 
+        type: object
+        required: [lang,config_url]
+        properties:
+          lang: { type: string }
+          config_url: { type: string }
       payload_data: { type: string }
       
   AdaptyPaywall: #request #response
@@ -921,13 +925,15 @@ $defs:
         - revision
         - ab_test_name
         - response_created_at
+        - placement_audience_version_id
       properties:
         developer_id: { type: string }
         audience_name: { type: string }
         revision: { type: integer }
         ab_test_name: { type: string }
         response_created_at: { type: integer }
-
+        is_tracking_purchases: { type: bool , default: false}
+        placement_audience_version_id: { type: string }
 
     AdaptyPlacementFetchPolicy: #request
       type: object

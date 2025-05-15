@@ -17,6 +17,8 @@ public struct AdaptyPlacement: Sendable, Identifiable {
 
     let placementAudienceVersionId: String // TODO: extract from placement
 
+    let shouldTrackOnboardingShown: Bool
+
     var version: Int64
 }
 
@@ -42,7 +44,7 @@ extension AdaptyPlacement: Codable {
         case revision
         case abTestName = "ab_test_name"
         case placementAudienceVersionId = "placement_audience_version_id"
-
+        case shouldTrackOnboardingShown = "is_tracking_purchases"
         case version = "response_created_at"
     }
 
@@ -55,6 +57,7 @@ extension AdaptyPlacement: Codable {
         revision = try placement.decode(Int.self, forKey: .revision)
         abTestName = try placement.decode(String.self, forKey: .abTestName)
         placementAudienceVersionId = try placement.decode(String.self, forKey: .placementAudienceVersionId)
+        shouldTrackOnboardingShown = try placement.decodeIfPresent(Bool.self, forKey: .shouldTrackOnboardingShown) ?? false
         version = try container.decode(Int64.self, forKey: .version)
     }
 
@@ -67,6 +70,9 @@ extension AdaptyPlacement: Codable {
         try placement.encode(revision, forKey: .revision)
         try placement.encode(abTestName, forKey: .abTestName)
         try placement.encode(placementAudienceVersionId, forKey: .placementAudienceVersionId)
+        if shouldTrackOnboardingShown {
+            try placement.encode(shouldTrackOnboardingShown, forKey: .shouldTrackOnboardingShown)
+        }
         try container.encode(version, forKey: .version)
     }
 }

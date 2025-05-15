@@ -23,7 +23,7 @@ public struct AdaptyOnboarding: AdaptyPlacementContent {
 
     package let viewConfiguration: ViewConfiguration
 
-    package let shouldTrackShown: Bool
+    package var shouldTrackShown: Bool { placement.shouldTrackOnboardingShown }
 }
 
 extension AdaptyOnboarding: CustomStringConvertible {
@@ -41,7 +41,6 @@ extension AdaptyOnboarding: Codable {
         case name = "onboarding_name"
         case remoteConfig = "remote_config"
         case viewConfiguration = "onboarding_builder"
-        case shouldTrackShown = "should_track_shown"
     }
 
     public init(from decoder: Decoder) throws {
@@ -52,7 +51,6 @@ extension AdaptyOnboarding: Codable {
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig)
         viewConfiguration = try container.decode(ViewConfiguration.self, forKey: .viewConfiguration)
-        shouldTrackShown = try container.decodeIfPresent(Bool.self, forKey: .shouldTrackShown) ?? false
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -62,7 +60,6 @@ extension AdaptyOnboarding: Codable {
         try container.encode(variationId, forKey: .variationId)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
         try container.encode(viewConfiguration, forKey: .viewConfiguration)
-        try container.encode(shouldTrackShown, forKey: .shouldTrackShown)
         try placement.encode(to: encoder)
     }
 }
