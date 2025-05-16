@@ -10,7 +10,7 @@ import UIKit
 import WebKit
 
 public final class AdaptyOnboardingController: UIViewController {
-    var id: UUID { UUID() } // TODO: implement
+    public let id = UUID()
     var onboarding: AdaptyOnboarding { viewModel.configuration.onboarding } // TODO: maybe public
     
     private let stamp: String

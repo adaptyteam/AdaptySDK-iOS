@@ -56,6 +56,22 @@ package extension AdaptyUI {
             guard let uuid = UUID(uuidString: id) else { return nil }
             return paywallControllers[uuid]
         }
+        
+        private static var onboardingControllers = [UUID: AdaptyOnboardingController]()
+        
+        private static func cacheOnboardingController(_ controller: AdaptyOnboardingController, id: UUID) {
+            onboardingControllers[id] = controller
+        }
+        
+        private static func deleteCachedOnboardingController(_ id: String) {
+            guard let uuid = UUID(uuidString: id) else { return }
+            onboardingControllers.removeValue(forKey: uuid)
+        }
+        
+        private static func cachedOnboardingController(_ id: String) -> AdaptyOnboardingController? {
+            guard let uuid = UUID(uuidString: id) else { return nil }
+            return onboardingControllers[uuid]
+        }
 #endif
         
         package static func createPaywallView(
@@ -91,7 +107,7 @@ package extension AdaptyUI {
 #endif
         }
 
-        package static func presentView(
+        package static func presentPaywallView(
             viewId: String
         ) async throws {
 #if canImport(UIKit)
@@ -120,7 +136,7 @@ package extension AdaptyUI {
 #endif
         }
         
-        package static func dismissView(
+        package static func dismissPaywallView(
             viewId: String,
             destroy: Bool
         ) async throws {
@@ -185,10 +201,78 @@ package extension AdaptyUI.Plugin {
             configuration
         )
             
-        //        cachePaywallController(vc, id: vc.id)
+        cacheOnboardingController(vc, id: vc.id)
         return vc.toAdaptyUIView()
 #else
         throw AdaptyUIError.platformNotSupported
 #endif
+    }
+    
+    static func presentOnboardingView(
+        viewId: String
+    ) async throws {
+#if canImport(UIKit)
+        guard let vc = cachedOnboardingController(viewId) else {
+            throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
+        }
+        
+        guard let rootVC = UIApplication.shared.windows.first?.topViewController else {
+            throw AdaptyError(AdaptyUI.PluginError.viewPresentationError(viewId))
+        }
+        
+        guard !rootVC.isOrContainsAdaptyController else {
+            throw AdaptyError(AdaptyUI.PluginError.viewAlreadyPresented(viewId))
+        }
+        
+        vc.modalPresentationCapturesStatusBarAppearance = true
+//        vc.modalPresentationStyle = .overFullScreen
+        vc.modalPresentationStyle = .formSheet  // TODO: add param
+        
+        await withCheckedContinuation { continuation in
+            rootVC.present(vc, animated: true) {
+                continuation.resume()
+            }
+        }
+#else
+        throw AdaptyUIError.platformNotSupported
+#endif
+    }
+    
+    static func dismissOnboardingView(
+        viewId: String,
+        destroy: Bool
+    ) async throws {
+#if canImport(UIKit)
+        guard let vc = cachedOnboardingController(viewId) else {
+            throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
+        }
+
+        await withCheckedContinuation { continuation in
+            vc.dismiss(animated: true) {
+                if destroy {
+                    deleteCachedOnboardingController(viewId)
+                }
+                continuation.resume()
+            }
+        }
+#else
+        throw AdaptyUIError.platformNotSupported
+#endif
+    }
+}
+
+// TODO: Remove
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+package extension AdaptyUI.Plugin {
+    static func createOnboardingViewForTest(
+        placementId: String
+    ) async throws -> AdaptyUI.OnboardingView {
+        let onboarding = try await Adapty.getOnboarding(
+            placementId: placementId
+        )
+        return try await AdaptyUI.Plugin.createOnboardingView(
+            onboarding: onboarding
+        )
     }
 }
