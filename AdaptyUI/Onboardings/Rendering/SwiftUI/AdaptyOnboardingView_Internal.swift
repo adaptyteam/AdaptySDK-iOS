@@ -9,8 +9,10 @@ import Adapty
 import SwiftUI
 
 @MainActor
-struct AdaptyOnboardingView_Internal: UIViewControllerRepresentable {
-    private let delegate: AdaptyOnboardingControllerDelegate
+struct AdaptyOnboardingView_Internal: UIViewRepresentable {
+    typealias UIViewType = AdaptyOnboardingUIView
+
+    private let delegate: AdaptyOnboardingViewDelegate
     private let configuration: AdaptyUI.OnboardingConfiguration
     private let onFinishLoading: (OnboardingsDidFinishLoadingAction) -> Void
 
@@ -37,14 +39,16 @@ struct AdaptyOnboardingView_Internal: UIViewControllerRepresentable {
         )
     }
 
-    public func makeUIViewController(context: Context) -> some UIViewController {
-        AdaptyOnboardingController(
-            configuration: configuration,
-            delegate: delegate
-        )
+    func makeUIView(context: Context) -> AdaptyOnboardingUIView {
+        let onboardingView = AdaptyOnboardingUIView(configuration: configuration)
+        
+        onboardingView.configure(delegate: delegate)
+        onboardingView.layoutWebViewAndPlaceholder()
+        
+        return onboardingView
     }
 
-    public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
-        (uiViewController as? AdaptyOnboardingController)?.delegate = delegate
+    func updateUIView(_ uiView: AdaptyOnboardingUIView, context: Context) {
+        uiView.delegate = delegate
     }
 }

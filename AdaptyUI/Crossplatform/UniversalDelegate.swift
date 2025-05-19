@@ -57,7 +57,8 @@ extension AdaptyUI {
 
         return AdaptyOnboardingController(
             configuration: onboardingConfiguration,
-            delegate: delegate
+            delegate: delegate,
+            statusBarStyle: .lightContent
         )
     }
 }

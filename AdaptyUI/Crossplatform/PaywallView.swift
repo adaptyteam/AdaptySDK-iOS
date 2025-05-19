@@ -41,7 +41,7 @@ public extension AdaptyPaywallController {
 public extension AdaptyOnboardingController {
     func toAdaptyUIView() -> AdaptyUI.OnboardingView {
         AdaptyUI.OnboardingView(
-            id: id.uuidString,
+            id: id,
             placementId: onboarding.placement.id,
             variationId: onboarding.variationId
         )

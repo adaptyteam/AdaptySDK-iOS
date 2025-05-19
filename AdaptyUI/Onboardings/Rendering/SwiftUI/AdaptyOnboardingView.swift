@@ -12,6 +12,7 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
     private let configuration: AdaptyUI.OnboardingConfiguration
 
     private let placeholderViewBuilder: () -> Placeholder
+    private let onFinishLoading: ((OnboardingsDidFinishLoadingAction) -> Void)?
     private let onCloseAction: (AdaptyOnboardingsCloseAction) -> Void
     private let onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)?
     private let onCustomAction: ((AdaptyOnboardingsCustomAction) -> Void)?
@@ -24,6 +25,7 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
     public init(
         configuration: AdaptyUI.OnboardingConfiguration,
         placeholder: @escaping () -> Placeholder,
+        onFinishLoading: ((OnboardingsDidFinishLoadingAction) -> Void)? = nil,
         onCloseAction: @escaping (AdaptyOnboardingsCloseAction) -> Void,
         onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)? = nil,
         onCustomAction: ((AdaptyOnboardingsCustomAction) -> Void)? = nil,
@@ -33,6 +35,7 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
     ) {
         self.configuration = configuration
         self.placeholderViewBuilder = placeholder
+        self.onFinishLoading = onFinishLoading
         self.onCloseAction = onCloseAction
         self.onOpenPaywallAction = onOpenPaywallAction
         self.onCustomAction = onCustomAction
@@ -46,7 +49,9 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
         ZStack {
             AdaptyOnboardingView_Internal(
                 configuration: configuration,
-                onFinishLoading: { _ in
+                onFinishLoading: { action in
+                    onFinishLoading?(action)
+
                     withAnimation {
                         isLoading = false
                     }
@@ -59,6 +64,12 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
                 onError: onError
             )
             .zIndex(0)
+            .onAppear {
+                configuration.viewModel.viewDidAppear()
+            }
+            .onDisappear {
+                configuration.viewModel.viewDidDisappear()
+            }
 
             if isLoading {
                 placeholderViewBuilder()

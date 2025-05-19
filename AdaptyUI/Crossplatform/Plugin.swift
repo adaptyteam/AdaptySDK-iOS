@@ -41,36 +41,32 @@ package extension AdaptyUI {
     class Plugin {
 #if canImport(UIKit)
         
-        private static var paywallControllers = [UUID: AdaptyPaywallController]()
+        private static var paywallControllers = [String: AdaptyPaywallController]()
         
-        private static func cachePaywallController(_ controller: AdaptyPaywallController, id: UUID) {
+        private static func cachePaywallController(_ controller: AdaptyPaywallController, id: String) {
             paywallControllers[id] = controller
         }
         
         private static func deleteCachedPaywallController(_ id: String) {
-            guard let uuid = UUID(uuidString: id) else { return }
-            paywallControllers.removeValue(forKey: uuid)
+            paywallControllers.removeValue(forKey: id)
         }
         
         private static func cachedPaywallController(_ id: String) -> AdaptyPaywallController? {
-            guard let uuid = UUID(uuidString: id) else { return nil }
-            return paywallControllers[uuid]
+            paywallControllers[id]
         }
         
-        private static var onboardingControllers = [UUID: AdaptyOnboardingController]()
+        private static var onboardingControllers = [String: AdaptyOnboardingController]()
         
-        private static func cacheOnboardingController(_ controller: AdaptyOnboardingController, id: UUID) {
+        private static func cacheOnboardingController(_ controller: AdaptyOnboardingController, id: String) {
             onboardingControllers[id] = controller
         }
         
         private static func deleteCachedOnboardingController(_ id: String) {
-            guard let uuid = UUID(uuidString: id) else { return }
-            onboardingControllers.removeValue(forKey: uuid)
+            onboardingControllers.removeValue(forKey: id)
         }
         
         private static func cachedOnboardingController(_ id: String) -> AdaptyOnboardingController? {
-            guard let uuid = UUID(uuidString: id) else { return nil }
-            return onboardingControllers[uuid]
+            onboardingControllers[id]
         }
 #endif
         
@@ -100,7 +96,7 @@ package extension AdaptyUI {
             )
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
-            cachePaywallController(vc, id: vc.id)
+            cachePaywallController(vc, id: vc.id.uuidString)
             return vc.toAdaptyUIView()
 #else
             throw AdaptyUIError.platformNotSupported

@@ -5,10 +5,10 @@
 //  Created by Aleksey Goncharov on 06.08.2024.
 //
 
-import SwiftUI
 import Adapty
+import SwiftUI
 
-final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate {
+final class OnboardingDelegateImpl: AdaptyOnboardingViewDelegate {
     private let onFinishLoading: (OnboardingsDidFinishLoadingAction) -> Void
     private let onCloseAction: (AdaptyOnboardingsCloseAction) -> Void
     private let onOpenPaywallAction: ((AdaptyOnboardingsOpenPaywallAction) -> Void)?
@@ -35,22 +35,22 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
         self.onError = onError
     }
 
-    func onboardingController(
-        _ controller: AdaptyOnboardingController,
+    func onboardingView(
+        _ view: AdaptyOnboardingUIView,
         didFinishLoading action: OnboardingsDidFinishLoadingAction
     ) {
         onFinishLoading(action)
     }
 
-    func onboardingController(
-        _ controller: AdaptyOnboardingController,
+    func onboardingView(
+        _ view: AdaptyOnboardingUIView,
         onCloseAction action: AdaptyOnboardingsCloseAction
     ) {
         onCloseAction(action)
     }
 
-    func onboardingController(
-        _ controller: AdaptyOnboardingController,
+    func onboardingView(
+        _ view: AdaptyOnboardingUIView,
         onPaywallAction action: AdaptyOnboardingsOpenPaywallAction
     ) {
         if let onOpenPaywallAction {
@@ -60,8 +60,8 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
         }
     }
 
-    func onboardingController(
-        _ controller: AdaptyOnboardingController,
+    func onboardingView(
+        _ view: AdaptyOnboardingUIView,
         onCustomAction action: AdaptyOnboardingsCustomAction
     ) {
         if let onCustomAction {
@@ -71,8 +71,8 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
         }
     }
 
-    func onboardingController(
-        _ controller: AdaptyOnboardingController,
+    func onboardingView(
+        _ view: AdaptyOnboardingUIView,
         onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction
     ) {
         if let onStateUpdatedAction {
@@ -82,17 +82,23 @@ final class OnboardingDelegateImpl: NSObject, AdaptyOnboardingControllerDelegate
         }
     }
 
-    func onboardingController(
-        _ controller: AdaptyOnboardingController,
+    func onboardingView(
+        _ view: AdaptyOnboardingUIView,
         onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent
     ) {
         onAnalyticsEvent?(event)
     }
 
-    func onboardingController(
-        _ controller: AdaptyOnboardingController,
+    func onboardingView(
+        _ view: AdaptyOnboardingUIView,
         didFailWithError error: AdaptyUIError
     ) {
         onError(error)
+    }
+
+    func onboardingsViewLoadingPlaceholder(
+        _ view: AdaptyOnboardingUIView
+    ) -> UIView? {
+        nil
     }
 }

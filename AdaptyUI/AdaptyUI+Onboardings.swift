@@ -6,54 +6,54 @@
 //
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import Foundation
 import SwiftUI
 
 public extension AdaptyUI {
-    struct OnboardingConfiguration: Sendable {
-        let onboarding: AdaptyOnboarding
+    @MainActor
+    final class OnboardingConfiguration {
+        let viewModel: AdaptyOnboardingViewModel
 
-        public var id: String { onboarding.placement.id }
+        init(
+            logId: String,
+            onboarding: AdaptyOnboarding
+        ) {
+            Log.ui.verbose("#\(logId)# init onboarding: \(onboarding.placement.id)")
 
-        var url: URL { onboarding.viewConfiguration.url }
-        var variationId: String { onboarding.variationId }
-        var shouldTrackShown: Bool { onboarding.shouldTrackShown }
-
-        init(onboarding: AdaptyOnboarding) {
-            self.onboarding = onboarding
+            self.viewModel = AdaptyOnboardingViewModel(
+                logId: logId,
+                onboarding: onboarding
+            )
         }
     }
 }
 
+@MainActor
 public extension AdaptyUI {
     static func getOnboardingConfiguration(
         forOnboarding onboarding: AdaptyOnboarding
     ) -> OnboardingConfiguration {
-        OnboardingConfiguration(onboarding: onboarding)
+        OnboardingConfiguration(
+            logId: Log.stamp,
+            onboarding: onboarding
+        )
     }
 
     @MainActor
     static func createOnboardingController(
         configuration: OnboardingConfiguration,
-        delegate: AdaptyOnboardingControllerDelegate
+        delegate: AdaptyOnboardingControllerDelegate,
+        statusBarStyle: UIStatusBarStyle = .lightContent
     ) -> AdaptyOnboardingController {
         AdaptyOnboardingController(
             configuration: configuration,
-            delegate: delegate
-        )
-    }
-
-    @MainActor
-    static func createSplashController(
-        configuration: OnboardingConfiguration,
-        delegate: AdaptyOnboardingControllerDelegate,
-        placeholderDelegate: AdaptyOnboardingPlaceholderDelegate
-    ) -> OnboardingSplashController {
-        OnboardingSplashController(
-            configuration: configuration,
             delegate: delegate,
-            placeholderDelegate: placeholderDelegate
+            statusBarStyle: statusBarStyle
         )
     }
 }
+
+#endif
