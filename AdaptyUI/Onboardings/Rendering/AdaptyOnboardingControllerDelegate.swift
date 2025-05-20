@@ -11,6 +11,7 @@
 import Adapty
 import UIKit
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package protocol AdaptyOnboardingViewDelegate: AnyObject {
     func onboardingView(
@@ -53,6 +54,7 @@ package protocol AdaptyOnboardingViewDelegate: AnyObject {
     ) -> UIView?
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyOnboardingViewDelegate {
     func apply(message: AdaptyOnboardingsMessage, from view: AdaptyOnboardingUIView) {
         switch message {
@@ -76,6 +78,7 @@ extension AdaptyOnboardingViewDelegate {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyOnboardingControllerDelegate: AnyObject {
     func onboardingController(
@@ -118,12 +121,20 @@ public protocol AdaptyOnboardingControllerDelegate: AnyObject {
     ) -> UIView?
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyOnboardingControllerDelegate {
     func onboardingController(
         _ controller: UIViewController,
         didFinishLoading action: OnboardingsDidFinishLoadingAction
     ) {
         Log.onboardings.warn("Not implemented method 'onboardingController(didFinishLoading:)' of OnboardingDelegate ")
+    }
+    
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onCloseAction action: AdaptyOnboardingsCloseAction
+    ) {
+        controller.dismiss(animated: true)
     }
 
     func onboardingController(
@@ -161,6 +172,7 @@ public extension AdaptyOnboardingControllerDelegate {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyOnboardingControllerDelegate {
     func apply(message: AdaptyOnboardingsMessage, from controller: AdaptyOnboardingController) {
         switch message {

@@ -8,6 +8,7 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 final class OnboardingDelegateImpl: AdaptyOnboardingViewDelegate {
     private let onFinishLoading: (OnboardingsDidFinishLoadingAction) -> Void
     private let onCloseAction: (AdaptyOnboardingsCloseAction) -> Void
