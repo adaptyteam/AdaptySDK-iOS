@@ -34,6 +34,7 @@ $requests:
       preload_products: { type: boolean, default: false }
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
       custom_timers: { $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
+      custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" } 
       android_personalized_offers:
         { $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
 
@@ -1110,6 +1111,15 @@ $defs:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
 
+  AdaptyUI.CustomAssets: 
+    type: array
+    items:
+      oneOf:
+        - $ref: "#/$assets/Color"
+        - $ref: "#/$assets/ColorGradient"
+        - $ref: "#/$assets/Image"
+        - $ref: "#/$assets/Video" 
+
   AdaptyUI.View: #response #event
     type: object
     required:
@@ -1181,3 +1191,75 @@ $defs:
       - no_preference
       - grant
       - decline
+
+$assets:
+  Color: 
+    type: object
+    required: [id, type, value]
+    properties:
+      id: { type: string }
+      type: { const: color }
+      value: { $ref: "#/$assets/Color.Hex" }
+
+  Color.Hex: 
+    type: string
+    pattern: "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"
+    description: RRGGBB or RRGGBBAA
+
+  ColorGradient: 
+    type: object
+    required: [id, type, values, points]
+    properties:
+      id: { type: string  }
+      type:
+        type: string
+        enum:
+          - linear-gradient
+      values:
+        type: array
+        items:
+          type: object
+          required: [color, p]
+          properties:
+            color: { $ref: "#/$assets/Color.Hex" }
+            p: { type: number }
+      points:
+        type: object
+        required: [x0, y0, x1, y1]
+        properties:
+          x0: { type: number }
+          y0: { type: number }
+          x1: { type: number }
+          y1: { type: number }
+
+  Image:
+    type: object
+    required: [id, type] 
+    properties:
+      id: { type: string }
+      type: { const: image }
+    oneOf:
+      - required: [value]
+        properties:
+          value: { type: string, contentEncoding: base64 }
+      - required: [asset_id]
+        properties:
+          asset_id: { type: string }
+      - required: [path]
+        properties:
+          path: { type: string }
+
+  Video: 
+    type: object
+    required: [id, type]
+    properties:
+      id: { type: string }
+      type: { const: video }
+    oneOf:
+      - required: [asset_id]
+        properties:
+          asset_id: { type: string }
+      - required: [path]
+        properties:
+          path: { type: string }
+
