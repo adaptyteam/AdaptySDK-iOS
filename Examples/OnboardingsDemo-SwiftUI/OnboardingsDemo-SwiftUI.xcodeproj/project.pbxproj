@@ -12,6 +12,10 @@
 		7483795A2C6A514800216CA0 /* ApplicationMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748379592C6A514800216CA0 /* ApplicationMainView.swift */; };
 		74A956A02DDBBC08003A1C56 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 74A9569F2DDBBC08003A1C56 /* Adapty */; };
 		74A956A22DDBBC08003A1C56 /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 74A956A12DDBBC08003A1C56 /* AdaptyUI */; };
+		74A956A52DDCBE61003A1C56 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 74A956A42DDCBE61003A1C56 /* Adapty */; };
+		74A956A72DDCBE61003A1C56 /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 74A956A62DDCBE61003A1C56 /* AdaptyUI */; };
+		74A956AA2DDCBE74003A1C56 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 74A956A92DDCBE74003A1C56 /* Adapty */; };
+		74A956AC2DDCBE74003A1C56 /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 74A956AB2DDCBE74003A1C56 /* AdaptyUI */; };
 		74E1B3E22C64FB350090EDEA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74E1B3D82C64FB350090EDEA /* Preview Assets.xcassets */; };
 		74E1B3E32C64FB350090EDEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74E1B3DA2C64FB350090EDEA /* Assets.xcassets */; };
 		74E1B3E42C64FB350090EDEA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74E1B3DB2C64FB350090EDEA /* LaunchScreen.storyboard */; };
@@ -39,8 +43,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74A956AA2DDCBE74003A1C56 /* Adapty in Frameworks */,
 				74A956A22DDBBC08003A1C56 /* AdaptyUI in Frameworks */,
+				74A956A72DDCBE61003A1C56 /* AdaptyUI in Frameworks */,
+				74A956AC2DDCBE74003A1C56 /* AdaptyUI in Frameworks */,
 				74A956A02DDBBC08003A1C56 /* Adapty in Frameworks */,
+				74A956A52DDCBE61003A1C56 /* Adapty in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +139,10 @@
 			packageProductDependencies = (
 				74A9569F2DDBBC08003A1C56 /* Adapty */,
 				74A956A12DDBBC08003A1C56 /* AdaptyUI */,
+				74A956A42DDCBE61003A1C56 /* Adapty */,
+				74A956A62DDCBE61003A1C56 /* AdaptyUI */,
+				74A956A92DDCBE74003A1C56 /* Adapty */,
+				74A956AB2DDCBE74003A1C56 /* AdaptyUI */,
 			);
 			productName = "OctoflowsDemo-SwiftUI";
 			productReference = 74152F522C615575007F4EFF /* OnboardingsDemo-SwiftUI.app */;
@@ -161,7 +173,7 @@
 			);
 			mainGroup = 74152F492C615575007F4EFF;
 			packageReferences = (
-				74A9569E2DDBBC08003A1C56 /* XCLocalSwiftPackageReference "../../../ios-sdk" */,
+				74A956A82DDCBE74003A1C56 /* XCLocalSwiftPackageReference "../../" */,
 			);
 			productRefGroup = 74152F532C615575007F4EFF /* Products */;
 			projectDirPath = "";
@@ -420,9 +432,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		74A9569E2DDBBC08003A1C56 /* XCLocalSwiftPackageReference "../../../ios-sdk" */ = {
+		74A956A82DDCBE74003A1C56 /* XCLocalSwiftPackageReference "../../" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../ios-sdk";
+			relativePath = "../../";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -432,6 +444,22 @@
 			productName = Adapty;
 		};
 		74A956A12DDBBC08003A1C56 /* AdaptyUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AdaptyUI;
+		};
+		74A956A42DDCBE61003A1C56 /* Adapty */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Adapty;
+		};
+		74A956A62DDCBE61003A1C56 /* AdaptyUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AdaptyUI;
+		};
+		74A956A92DDCBE74003A1C56 /* Adapty */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Adapty;
+		};
+		74A956AB2DDCBE74003A1C56 /* AdaptyUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AdaptyUI;
 		};
