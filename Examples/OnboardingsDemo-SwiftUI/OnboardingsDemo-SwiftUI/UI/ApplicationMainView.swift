@@ -66,7 +66,7 @@ struct ApplicationMainView: View {
         }
         .paywall(
             isPresented: $paywallPresented,
-            fullScreen: false,
+            fullScreen: true,
             paywallConfiguration: paywallConfig,
             didFailPurchase: { _, _ in },
             didFinishRestore: { _ in },

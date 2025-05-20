@@ -55,7 +55,7 @@ final class ViewModel: ObservableObject {
         Task { @MainActor in
             do {
                 let onboarding = try await Adapty.getOnboarding(placementId: "YOUR_ONBOARDING_ID")
-                self.onboardingConfiguration = AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
+                self.onboardingConfiguration = try AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
             } catch {
                 onError?(error)
             }
