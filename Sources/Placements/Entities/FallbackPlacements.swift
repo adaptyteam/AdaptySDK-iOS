@@ -131,7 +131,7 @@ private extension FallbackPlacements {
         if let variationId { jsonDecoder.setPlacementVariationId(variationId) }
 
         return try jsonDecoder.decode(
-            Backend.Response.Data<AdaptyPlacement.Draw<Content>>.Placement.Data.OptionalAttributes.self,
+            Backend.Response.Data<AdaptyPlacement.Draw<Content>>.Placement.Data.self,
             from: data
         ).value
     }
@@ -154,7 +154,7 @@ private extension FallbackPlacements {
         if let variationId { jsonDecoder.setPlacementVariationId(variationId) }
 
         return try jsonDecoder.decode(
-            Backend.Response.Data<AdaptyPlacement.Draw<Content>>.OptionalAttributes.self,
+            Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
             from: data
         ).value
     }
@@ -194,24 +194,12 @@ private extension Backend.Response.Data {
             return try data.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: placementId)
         }
 
-        enum Data {
-            struct OptionalAttributes: Sendable, Decodable {
-                let value: Value?
+        struct Data: Sendable, Decodable {
+            let value: Value?
 
-                init(from decoder: Decoder) throws {
-                    guard let container = try placement(from: decoder) else {
-                        value = nil
-                        return
-                    }
-
-                    if let dataObject = try? container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data),
-                       dataObject.contains(.attributes)
-                    {
-                        value = try dataObject.decode(Value.self, forKey: .attributes)
-                    } else {
-                        value = try container.decode(Value.self, forKey: .data)
-                    }
-                }
+            init(from decoder: Decoder) throws {
+                value = try placement(from: decoder)?
+                    .decode(Value.self, forKey: .data)
             }
         }
 

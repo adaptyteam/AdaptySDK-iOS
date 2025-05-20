@@ -58,7 +58,7 @@ extension AdaptyPlacement: Codable {
         abTestName = try placement.decode(String.self, forKey: .abTestName)
         audienceVersionId = try placement.decode(String.self, forKey: .audienceVersionId)
         shouldTrackOnboardingShown = try placement.decodeIfPresent(Bool.self, forKey: .shouldTrackOnboardingShown) ?? false
-        version = try container.decode(Int64.self, forKey: .version)
+        version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
     }
 
     public func encode(to encoder: Encoder) throws {
