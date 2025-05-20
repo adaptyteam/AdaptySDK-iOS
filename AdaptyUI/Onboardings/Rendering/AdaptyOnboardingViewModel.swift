@@ -60,21 +60,17 @@ final class AdaptyOnboardingViewModel: ObservableObject {
     func viewDidAppear() {
         Log.ui.verbose("VM #\(logId)# viewDidAppear")
 
+        if !wasAppeared {
+            let request = URLRequest(url: onboarding.viewConfiguration.url)
+            webView?.load(request)
+        }
+        
         wasAppeared = true
-
         persistOnboardingVariationIdIfNeeded()
-
-        let request = URLRequest(url: onboarding.viewConfiguration.url)
-        webView?.load(request)
     }
 
     func viewDidDisappear() {
         Log.ui.verbose("VM #\(logId)# viewDidDisappear")
-
-        wasAppeared = false
-        persistWasCalled = false
-
-        webView?.stopLoading()
     }
 
     private func handleMessage(_ name: String, _ body: Any) {
