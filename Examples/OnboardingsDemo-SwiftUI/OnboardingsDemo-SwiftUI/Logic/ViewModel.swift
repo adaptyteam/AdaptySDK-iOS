@@ -41,8 +41,7 @@ final class ViewModel: ObservableObject {
                 Adapty.logLevel = .verbose
                 
                 let configBuilder = AdaptyConfiguration
-                    .builder(withAPIKey: "public_live_GB5pFlIf.MUfgda5fbexiioCWJqvN")
-                    .with(backendBaseUrl: URL(string: "https://app-dev.k8s.adapty.io/api/v1")!)
+                    .builder(withAPIKey: "YOUR_API_KEY")
 
                 try await Adapty.activate(with: configBuilder.build())
                 try await AdaptyUI.activate()
@@ -55,7 +54,7 @@ final class ViewModel: ObservableObject {
     func loadOnboardingConfiguration() {
         Task { @MainActor in
             do {
-                let onboarding = try await Adapty.getOnboarding(placementId: "evg")
+                let onboarding = try await Adapty.getOnboarding(placementId: "YOUR_ONBOARDING_ID")
                 self.onboardingConfiguration = AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
             } catch {
                 onError?(error)
