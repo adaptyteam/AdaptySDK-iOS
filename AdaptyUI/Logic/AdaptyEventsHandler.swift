@@ -96,7 +96,11 @@ package final class AdaptyEventsHandler: ObservableObject {
         product: AdaptyPaywallProduct?,
         error: AdaptyError?
     ) {
-        Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null"), error: \(error)")
+        if let error {
+            Log.ui.error("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null"), error: \(error)")
+        } else {
+            Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null")")
+        }
         didFinishWebPaymentNavigation?(product, error)
     }
 

@@ -85,7 +85,7 @@ final class AdaptyOnboardingViewModel: ObservableObject {
             onMessage?(message)
 
             switch message {
-            case let .didFinishLoading(action):
+            case .didFinishLoading:
                 wasLoaded = true
                 persistOnboardingVariationIdIfNeeded()
             case let .analytics(event):

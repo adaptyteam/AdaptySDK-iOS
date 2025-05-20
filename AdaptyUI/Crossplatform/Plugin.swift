@@ -192,7 +192,7 @@ package extension AdaptyUI.Plugin {
         onboarding: AdaptyOnboarding
     ) async throws -> AdaptyUI.OnboardingView {
 #if canImport(UIKit)
-        let configuration = AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
+        let configuration = try AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
         let vc = try AdaptyUI.onboardingControllerWithUniversalDelegate(
             configuration
         )

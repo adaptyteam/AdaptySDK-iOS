@@ -37,21 +37,34 @@ public extension AdaptyUI {
 public extension AdaptyUI {
     static func getOnboardingConfiguration(
         forOnboarding onboarding: AdaptyOnboarding
-    ) -> OnboardingConfiguration {
-        OnboardingConfiguration(
+    ) throws -> OnboardingConfiguration {
+        guard AdaptyUI.isActivated else {
+            let err = AdaptyUIError.adaptyNotActivated
+            Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
+
+            throw err
+        }
+        
+        return OnboardingConfiguration(
             logId: Log.stamp,
             onboarding: onboarding
         )
     }
 
     @MainActor
-    static func createOnboardingController(
-        configuration: OnboardingConfiguration,
+    static func onboardingController(
+        with onboardingConfiguration: OnboardingConfiguration,
         delegate: AdaptyOnboardingControllerDelegate,
         statusBarStyle: UIStatusBarStyle = .lightContent
-    ) -> AdaptyOnboardingController {
-        AdaptyOnboardingController(
-            configuration: configuration,
+    ) throws -> AdaptyOnboardingController {
+        guard AdaptyUI.isActivated else {
+            let err = AdaptyUIError.adaptyNotActivated
+            Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
+            throw err
+        }
+        
+        return AdaptyOnboardingController(
+            configuration: onboardingConfiguration,
             delegate: delegate,
             statusBarStyle: statusBarStyle
         )
