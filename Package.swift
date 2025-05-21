@@ -54,7 +54,10 @@ let package = Package(
             name: "AdaptyTests",
             dependencies: ["Adapty"],
             path: "Tests",
-            resources: [.process("Placements/fallback.json")]
+            resources: [
+                .process("Placements/fallback.json"),
+                .process("Placements/fallback_large.json"),
+            ]
         ),
     ]
 )
