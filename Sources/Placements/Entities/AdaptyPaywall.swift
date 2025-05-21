@@ -53,9 +53,18 @@ extension AdaptyPaywall: Codable {
     }
 
     public init(from decoder: Decoder) throws {
+
         placement = try decoder.userInfo.placementOrNil ?? AdaptyPlacement(from: decoder)
 
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let superContainer = try decoder.container(keyedBy: Backend.CodingKeys.self)
+        
+        let container =
+            if superContainer.contains(.attributes) {
+                try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+            } else {
+                try decoder.container(keyedBy: CodingKeys.self)
+            }
+        
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)

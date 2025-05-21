@@ -117,12 +117,12 @@ extension AdaptyPlacementChosen {
         jsonDecoder.setPlacement(placement)
 
         let variation = try jsonDecoder.decode(
-            Backend.Response.Data<AdaptyPlacement.Variation>.OptionalAttributes.self,
+            Backend.Response.Data<AdaptyPlacement.Variation>.self,
             responseBody: response.body
         ).value
 
         let content = try jsonDecoder.decode(
-            Backend.Response.Data<Content>.OptionalAttributes.self,
+            Backend.Response.Data<Content>.self,
             responseBody: response.body
         ).value
 

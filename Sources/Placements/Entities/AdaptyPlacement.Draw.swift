@@ -65,10 +65,7 @@ extension AdaptyPlacement.Draw: Decodable {
         var array = try decoder.unkeyedContainer()
         while !array.isAtEnd {
             if array.currentIndex == index {
-                if Content.self == AdaptyPaywall.self {
-                    let container = try array.nestedContainer(keyedBy: Backend.CodingKeys.self)
-                    return try container.decode(Content.self, forKey: .attributes)
-                }
+                
                 return try array.decode(Content.self)
             }
             _ = try array.decode(PassObject.self)

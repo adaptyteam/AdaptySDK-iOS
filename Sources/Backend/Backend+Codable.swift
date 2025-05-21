@@ -140,22 +140,6 @@ extension Backend.Response {
                 .container(keyedBy: Backend.CodingKeys.self)
                 .decode(Value.self, forKey: .data)
         }
-
-        struct OptionalAttributes: Sendable, Decodable {
-            let value: Value
-
-            init(from decoder: Decoder) throws {
-                let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-
-                if let dataObject = try? container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data),
-                   dataObject.contains(.attributes)
-                {
-                    value = try dataObject.decode(Value.self, forKey: .attributes)
-                } else {
-                    value = try container.decode(Value.self, forKey: .data)
-                }
-            }
-        }
     }
 
     struct Meta<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
