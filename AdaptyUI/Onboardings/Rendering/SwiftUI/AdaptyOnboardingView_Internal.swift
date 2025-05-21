@@ -5,6 +5,8 @@
 //  Created by Aleksey Goncharov on 09.08.2024.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import SwiftUI
 
@@ -53,3 +55,5 @@ struct AdaptyOnboardingView_Internal: UIViewRepresentable {
         uiView.delegate = delegate
     }
 }
+
+#endif

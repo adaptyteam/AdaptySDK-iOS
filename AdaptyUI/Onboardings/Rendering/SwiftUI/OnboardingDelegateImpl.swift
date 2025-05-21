@@ -5,6 +5,8 @@
 //  Created by Aleksey Goncharov on 06.08.2024.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import SwiftUI
 
@@ -103,3 +105,5 @@ final class OnboardingDelegateImpl: AdaptyOnboardingViewDelegate {
         nil
     }
 }
+
+#endif

@@ -48,7 +48,7 @@ struct FallbackPlacements: Sendable {
                 version: version
             )
         } catch {
-            log.error(error.localizedDescription)
+            log.error(String(describing: error))
             draw = nil
         }
 
