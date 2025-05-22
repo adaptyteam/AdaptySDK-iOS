@@ -16,6 +16,8 @@ final class AdaptyPluginDelegate {
     init(eventHandler: EventHandler) {
         self.eventHandler = eventHandler
     }
+
+    var onboardingPlatformViewIdsAssociation: [String: String] = [:]
 }
 
 extension AdaptyPluginDelegate: AdaptyDelegate {

@@ -222,7 +222,7 @@ package extension AdaptyUI.Plugin {
         
         vc.modalPresentationCapturesStatusBarAppearance = true
 //        vc.modalPresentationStyle = .overFullScreen
-        vc.modalPresentationStyle = .formSheet  // TODO: add param
+        vc.modalPresentationStyle = .formSheet // TODO: add param
         
         await withCheckedContinuation { continuation in
             rootVC.present(vc, animated: true) {
@@ -270,5 +270,26 @@ package extension AdaptyUI.Plugin {
         return try await AdaptyUI.Plugin.createOnboardingView(
             onboarding: onboarding
         )
+    }
+}
+
+// TODO: Move this to Plugin
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+public extension AdaptyUI {
+    static func createOnboardingUIView(
+        onboarding: AdaptyOnboarding
+    ) throws -> (UIView, String) {
+        let config = try AdaptyUI.getOnboardingConfiguration(
+            forOnboarding: onboarding
+        )
+        
+        let view = AdaptyOnboardingUIView(
+            configuration: config
+        )
+        
+//        view.delegate = AdaptyUI.universalDelegate
+                
+        return (view, view.uid.uuidString)
     }
 }
