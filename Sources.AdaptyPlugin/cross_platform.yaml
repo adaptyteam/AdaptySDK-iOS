@@ -918,42 +918,42 @@ $defs:
       web_purchase_url: { type: string }
       payload_data: { type: string }
 
-    AdaptyPlacement: #request #response
-      type: object
-      required:
-        - developer_id
-        - audience_name
-        - revision
-        - ab_test_name
-        - response_created_at
-        - placement_audience_version_id
-      properties:
-        developer_id: { type: string }
-        audience_name: { type: string }
-        revision: { type: integer }
-        ab_test_name: { type: string }
-        response_created_at: { type: integer }
-        is_tracking_purchases: { type: bool , default: false}
-        placement_audience_version_id: { type: string }
+  AdaptyPlacement: #request #response
+    type: object
+    required:
+      - developer_id
+      - audience_name
+      - revision
+      - ab_test_name
+      - response_created_at
+      - placement_audience_version_id
+    properties:
+      developer_id: { type: string }
+      audience_name: { type: string }
+      revision: { type: integer }
+      ab_test_name: { type: string }
+      response_created_at: { type: integer }
+      is_tracking_purchases: { type: bool , default: false}
+      placement_audience_version_id: { type: string }
 
-    AdaptyPlacementFetchPolicy: #request
-      type: object
-      oneOf:
-        - required: [type]
-          properties:
-            type:
-              type: string
-              enum:
-                - reload_revalidating_cache_data
-                - return_cache_data_else_load
-        - required: [type, max_age]
-          properties:
-            type:
-              type: string
-              const: return_cache_data_if_not_expired_else_load
-            max_age:
-              type: number
-              description: "seconds"
+  AdaptyPlacementFetchPolicy: #request
+    type: object
+    oneOf:
+      - required: [type]
+        properties:
+          type:
+            type: string
+            enum:
+              - reload_revalidating_cache_data
+              - return_cache_data_else_load
+      - required: [type, max_age]
+        properties:
+          type:
+            type: string
+            const: return_cache_data_if_not_expired_else_load
+          max_age:
+            type: number
+            description: "seconds"
 
   AdaptyRemoteConfig: #request #response
     type: object
