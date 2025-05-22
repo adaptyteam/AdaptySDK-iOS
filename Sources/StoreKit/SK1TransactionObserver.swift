@@ -38,8 +38,9 @@ actor SK1TransactionObserver: Sendable {
 
             Task.detached {
                 let transaction = await self.productsManager.fillPurchasedTransaction(
-                    variationId: nil,
-                    persistentVariationId: nil,
+                    paywallVariationId: nil,
+                    persistentPaywallVariationId: nil,
+                    persistentOnboardingVariationId: nil,
                     sk1Transaction: sk1Transaction
                 )
 

@@ -22,7 +22,7 @@ extension Event.Packed {
             name: unpacked.event.name,
             id: unpacked.id,
             counter: counter,
-            data: Event.encoder.encode(Event.Unpacked_w_counter(orginal: unpacked, counter: counter))
+            data: Event.encoder.encode(Event.Unpacked_w_counter(original: unpacked, counter: counter))
         )
     }
 }
@@ -43,21 +43,21 @@ extension Event {
 
 private extension Event {
     struct Unpacked_w_counter: Encodable {
-        let orginal: Unpacked
+        let original: Unpacked
         let counter: Int
 
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: Event.CodingKeys.self)
-            try container.encode(orginal.id, forKey: .id)
-            try container.encode(orginal.profileId, forKey: .profileId)
-            try container.encode(orginal.environment.sessionIdentifier, forKey: .sessionId)
-            try container.encode(orginal.createdAt, forKey: .createdAt)
+            try container.encode(original.id, forKey: .id)
+            try container.encode(original.profileId, forKey: .profileId)
+            try container.encode(original.environment.sessionIdentifier, forKey: .sessionId)
+            try container.encode(original.createdAt, forKey: .createdAt)
             try container.encode(counter, forKey: .counter)
-            try container.encode(orginal.environment.system.name, forKey: .sysName)
-            try container.encode(orginal.environment.application.installationIdentifier, forKey: .appInstallId)
-            try container.encode(orginal.event.name, forKey: .name)
+            try container.encode(original.environment.system.name, forKey: .sysName)
+            try container.encode(original.environment.application.installationIdentifier, forKey: .appInstallId)
+            try container.encode(original.event.name, forKey: .name)
 
-            try orginal.event.encode(to: encoder)
+            try original.event.encode(to: encoder)
         }
     }
 }

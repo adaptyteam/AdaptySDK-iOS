@@ -130,7 +130,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyError
+        didFailRenderingWith error: AdaptyUIError
     ) {
         eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
             view: controller.toAdaptyUIView(),
@@ -142,7 +142,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
         _ controller: AdaptyPaywallController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool {
-        eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
+        eventHandler.handle(event: PaywallViewEvent.DidFailLoadingProducts(
             view: controller.toAdaptyUIView(),
             error: error
         ))
@@ -161,6 +161,23 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
             error: error
         ))
     }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
+    func onboardingController(_ controller: AdaptyOnboardingController, didFinishLoading action: OnboardingsDidFinishLoadingAction) {}
+
+    func onboardingController(_ controller: AdaptyOnboardingController, onCloseAction action: AdaptyOnboardingsCloseAction) {}
+
+    func onboardingController(_ controller: AdaptyOnboardingController, onPaywallAction action: AdaptyOnboardingsOpenPaywallAction) {}
+
+    func onboardingController(_ controller: AdaptyOnboardingController, onCustomAction action: AdaptyOnboardingsCustomAction) {}
+
+    func onboardingController(_ controller: AdaptyOnboardingController, onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction) {}
+
+    func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent) {}
+
+    func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyUIError) {}
 }
 
 #endif

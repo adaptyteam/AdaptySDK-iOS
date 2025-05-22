@@ -40,11 +40,12 @@ actor SK2Purchaser {
                     log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
 
                     Task.detached {
-                        let (variationId, persistentVariationId) = await storage.getVariationIds(for: sk2Transaction.productID)
+                        let (paywallVariationId, persistentPaywallVariationId) = await storage.getPaywallVariationIds(for: sk2Transaction.productID)
 
                         let purchasedTransaction = await productsManager.fillPurchasedTransaction(
-                            variationId: variationId,
-                            persistentVariationId: persistentVariationId,
+                            paywallVariationId: paywallVariationId,
+                            persistentPaywallVariationId: persistentPaywallVariationId,
+                            persistentOnboardingVariationId: nil,
                             sk2Transaction: sk2Transaction
                         )
 
@@ -132,15 +133,16 @@ actor SK2Purchaser {
             }
         }
 
-        await storage.setVariationIds(product.variationId, for: sk2Product.id)
+        await storage.setPaywallVariationIds(product.variationId, for: sk2Product.id)
+        let persistentOnboardingVariationId = await storage.getOnboardingVariationId()
 
-        let result = try await makePurchase(sk2Product, options, product.variationId)
+        let result = try await makePurchase(sk2Product, options, product.variationId, persistentOnboardingVariationId)
 
         switch result {
         case .pending:
             break
         default:
-            storage.removeVariationIds(for: sk2Product.id)
+            storage.removePaywallVariationIds(for: sk2Product.id)
         }
 
         return result
@@ -150,7 +152,8 @@ actor SK2Purchaser {
     private func makePurchase(
         _ sk2Product: SK2Product,
         _ options: Set<Product.PurchaseOption>,
-        _ variationId: String?
+        _ paywallVariationId: String?,
+        _ persistentOnboardingVariationId: String?
     ) async throws -> AdaptyPurchaseResult {
         let stamp = Log.stamp
 
@@ -229,8 +232,9 @@ actor SK2Purchaser {
 
         let purchasedTransaction = PurchasedTransaction(
             sk2Product: sk2Product,
-            variationId: variationId,
-            persistentVariationId: variationId,
+            paywallVariationId: paywallVariationId,
+            persistentPaywallVariationId: paywallVariationId,
+            persistentOnboardingVariationId: persistentOnboardingVariationId,
             sk2Transaction: sk2Transaction
         )
 

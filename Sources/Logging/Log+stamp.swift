@@ -8,10 +8,10 @@
 
 import Foundation
 
-extension Log {
+package extension Log {
     fileprivate static let stampChars = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
-    package static var stamp: String {
+    static var stamp: String {
         var result = ""
         for _ in 0 ..< 6 {
             result.append(Log.stampChars[Int(arc4random_uniform(62))])
@@ -19,13 +19,13 @@ extension Log {
         return result
     }
 
-    package static func stamp(parent: String) -> String {
+    static func stamp(parent: String) -> String {
         "\(parent)/\(stamp)"
     }
 }
 
-extension Hashable {
-    package var stamp: String {
+package extension Hashable {
+    var stamp: String {
         let hashValue = self.hashValue
         var value = hashValue >= 0 ? hashValue : -hashValue
         var result = ""

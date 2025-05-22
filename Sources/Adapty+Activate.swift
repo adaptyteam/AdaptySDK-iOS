@@ -9,7 +9,7 @@ import Foundation
 
 private let log = Log.default
 
-extension Adapty {
+public extension Adapty {
     /// Use this method to initialize the Adapty SDK.
     ///
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
@@ -17,7 +17,7 @@ extension Adapty {
     /// - Parameter apiKey: You can find it in your app settings in [Adapty Dashboard](https://app.adapty.io/) *App settings* > *General*.
     /// - Parameter observerMode: A boolean value controlling [Observer mode](https://docs.adapty.io/v2.0.0/docs/observer-vs-full-mode). Turn it on if you handle purchases and subscription status yourself and use Adapty for sending subscription events and analytics
     /// - Parameter customerUserId: User identifier in your system
-    public nonisolated static func activate(
+    nonisolated static func activate(
         _ apiKey: String,
         observerMode: Bool = false,
         customerUserId: String? = nil
@@ -36,7 +36,7 @@ extension Adapty {
     /// Call this method in the `application(_:didFinishLaunchingWithOptions:)`.
     ///
     /// - Parameter configuration: `AdaptyConfiguration` which allows to configure Adapty SDK
-    public static func activate(
+    static func activate(
         with configuration: AdaptyConfiguration
     ) async throws {
         let stamp = Log.stamp
@@ -67,7 +67,7 @@ extension Adapty {
             AdaptyConfiguration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
 
             let environment = await Environment.instance
-            let backend = Backend(with: configuration, envorinment: environment)
+            let backend = Backend(with: configuration, environment: environment)
 
             Task {
                 await eventsManager.set(backend: backend)

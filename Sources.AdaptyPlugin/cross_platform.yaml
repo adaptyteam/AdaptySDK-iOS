@@ -104,6 +104,47 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyUI.DialogActionType" }
 
+  ### getOnboarding ###
+  GetOnboarding.Request: #request
+    type: object
+    required: [method, placement_id]
+    properties:
+      method: { const: "get_onboarding" }
+      placement_id: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
+      fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
+      load_timeout: { type: number, description: "seconds" }
+
+  GetOnboarding.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyOnboarding" }
+
+  ### getOnboardingForDefaultAudience ###
+  GetOnboardingForDefaultAudience.Request: #request
+    type: object
+    required: [method, placement_id]
+    properties:
+      method: { const: "get_onboarding_for_default_audience" }
+      placement_id: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
+      fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
+
+  GetOnboardingForDefaultAudience.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyOnboarding" }
+
   ### getPaywall ###
   GetPaywall.Request: #request
     type: object
@@ -112,7 +153,7 @@ $requests:
       method: { const: "get_paywall" }
       placement_id: { type: string }
       locale: { $ref: "#/$defs/AdaptyLocale" }
-      fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+      fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
       load_timeout: { type: number, description: "seconds" }
 
   GetPaywall.Response: #response
@@ -125,7 +166,7 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyPaywall" }
 
-    ### getPaywall ###
+    ### getPaywallForDefaultAudience ###
   GetPaywallForDefaultAudience.Request: #request
     type: object
     required: [method, placement_id]
@@ -133,7 +174,7 @@ $requests:
       method: { const: "get_paywall_for_default_audience" }
       placement_id: { type: string }
       locale: { $ref: "#/$defs/AdaptyLocale" }
-      fetch_policy: { $ref: "#/$defs/AdaptyPaywall.FetchPolicy" }
+      fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
 
   GetPaywallForDefaultAudience.Response: #response
     type: object
@@ -427,8 +468,8 @@ $requests:
     properties:
       success: { type: string }
 
-  ### setFallbackPaywalls ###
-  SetFallbackPaywalls.Request: #request
+  ### setFallback ###
+  SetFallback.Request: #request
     type: object
     required: [method]
     properties:
@@ -441,7 +482,7 @@ $requests:
         properties:
           path: { type: string }
 
-  SetFallbackPaywalls.Response: #response
+  SetFallback.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -833,28 +874,43 @@ $defs:
       onboarding_screen_name: { type: string }
       onboarding_screen_order: { type: integer, minimum: 1 }
 
+  AdaptyOnboarding: #request #response
+    type: object
+    required:
+      - placement
+      - onboarding_id
+      - onboarding_name
+      - variation_id
+      - onboarding_config_url
+      - onboarding_builder
+    properties:
+      placement: { $ref: "#/$defs/AdaptyPlacement" }
+      onboarding_id: { type: string }
+      onboarding_name: { type: string }
+      variation_id: { type: string }
+      remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
+      onboarding_builder: 
+        type: object
+        required: [lang,config_url]
+        properties:
+          lang: { type: string }
+          config_url: { type: string }
+      payload_data: { type: string }
+      
   AdaptyPaywall: #request #response
     type: object
     required:
-      - developer_id
+      - placement
       - paywall_id
       - paywall_name
-      - ab_test_name
-      - audience_name
       - variation_id
-      - revision
       - products
-      - response_created_at
     properties:
-      developer_id: { type: string }
+      placement: { $ref: "#/$defs/AdaptyPlacement" }
       paywall_id: { type: string }
       paywall_name: { type: string }
-      response_created_at: { type: integer }
-      revision: { type: integer }
       variation_id: { type: string }
-      ab_test_name: { type: string }
-      audience_name: { type: string }
-      remote_config: { $ref: "#/$defs/AdaptyPaywall.RemoteConfig" }
+      remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
       paywall_builder: { $ref: "#/$defs/AdaptyPaywall.ViewConfiguration" }
       products:
         type: array
@@ -862,26 +918,44 @@ $defs:
       web_purchase_url: { type: string }
       payload_data: { type: string }
 
-  AdaptyPaywall.FetchPolicy: #request
-    type: object
-    oneOf:
-      - required: [type]
-        properties:
-          type:
-            type: string
-            enum:
-              - reload_revalidating_cache_data
-              - return_cache_data_else_load
-      - required: [type, max_age]
-        properties:
-          type:
-            type: string
-            const: return_cache_data_if_not_expired_else_load
-          max_age:
-            type: number
-            description: "seconds"
+    AdaptyPlacement: #request #response
+      type: object
+      required:
+        - developer_id
+        - audience_name
+        - revision
+        - ab_test_name
+        - response_created_at
+        - placement_audience_version_id
+      properties:
+        developer_id: { type: string }
+        audience_name: { type: string }
+        revision: { type: integer }
+        ab_test_name: { type: string }
+        response_created_at: { type: integer }
+        is_tracking_purchases: { type: bool , default: false}
+        placement_audience_version_id: { type: string }
 
-  AdaptyPaywall.RemoteConfig: #request #response
+    AdaptyPlacementFetchPolicy: #request
+      type: object
+      oneOf:
+        - required: [type]
+          properties:
+            type:
+              type: string
+              enum:
+                - reload_revalidating_cache_data
+                - return_cache_data_else_load
+        - required: [type, max_age]
+          properties:
+            type:
+              type: string
+              const: return_cache_data_if_not_expired_else_load
+            max_age:
+              type: number
+              description: "seconds"
+
+  AdaptyRemoteConfig: #request #response
     type: object
     required: [lang, data]
     properties:

@@ -1,6 +1,6 @@
 //
 //  PaywallViewEvent.DidAppear.swift
-//  Adapty
+//  AdaptyPlugin
 //
 //  Created by Alexey Goncharov on 3/13/25.
 //
@@ -13,7 +13,7 @@ import Foundation
 extension PaywallViewEvent {
     struct DidAppear: AdaptyPluginEvent {
         let id = "paywall_view_did_appear"
-        let view: AdaptyUI.View
+        let view: AdaptyUI.PaywallView
 
         enum CodingKeys: String, CodingKey {
             case id

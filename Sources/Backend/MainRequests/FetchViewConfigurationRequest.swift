@@ -8,7 +8,7 @@
 import Foundation
 
 struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.ValueOfData<AdaptyViewSource>
+    typealias ResponseBody = Backend.Response.Data<AdaptyViewSource>
 
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
@@ -22,9 +22,9 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
         )
 
         headers = HTTPHeaders()
-            .setViewConfigurationLocale(locale)
-            .setVisualBuilderVersion(AdaptyViewConfiguration.builderVersion)
-            .setVisualBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
+            .setPaywallBuilderLocale(locale)
+            .setPaywallBuilderVersion(AdaptyViewConfiguration.builderVersion)
+            .setPaywallBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }

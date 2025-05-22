@@ -18,13 +18,13 @@ func withThrowingTimeout<T: Sendable>(
     if timeout < .never {
         guard timeout > .now else {
             task.cancel()
-            throw TimeoutError(timeout.asTimeIntrval)
+            throw TimeoutError(timeout.asTimeInterval)
         }
 
         timeoutTask = Task {
             defer { task.cancel() }
             try await Task.sleep(duration: timeout)
-            throw TimeoutError(timeout.asTimeIntrval)
+            throw TimeoutError(timeout.asTimeInterval)
         }
     }
 

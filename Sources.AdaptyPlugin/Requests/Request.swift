@@ -18,6 +18,8 @@ enum Request {
             Activate.self,
             GetPaywall.self,
             GetPaywallForDefaultAudience.self,
+            GetOnboarding.self,
+            GetOnboardingForDefaultAudience.self,
             GetPaywallProducts.self,
             GetProfile.self,
             Identify.self,
@@ -33,17 +35,23 @@ enum Request {
             SetIntegrationIdentifier.self,
             ReportTransaction.self,
             UpdateProfile.self,
-            SetFallbackPaywalls.self,
+            SetFallback.self,
             UpdateCollectingRefundDataConsent.self,
-            UpdateRefundPreference.self
+            UpdateRefundPreference.self,
         ]
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
-                AdaptyUICreateView.self,
-                AdaptyUIDismissView.self,
-                AdaptyUIPresentView.self,
-                AdaptyUIShowDialog.self
+                AdaptyUICreatePaywallView.self,
+                AdaptyUIDismissPaywallView.self,
+                AdaptyUIPresentPaywallView.self,
+
+                AdaptyUICreateOnboardingViewForTest.self, // TODO: Remove
+                AdaptyUICreateOnboardingView.self,
+                AdaptyUIDismissOnboardingView.self,
+                AdaptyUIPresentOnboardingView.self,
+
+                AdaptyUIShowDialog.self,
             ]
             allRequests.append(contentsOf: adaptyUiRequests)
         }
@@ -64,7 +72,7 @@ enum Response {}
 
 public extension AdaptyPlugin {
     @MainActor
-    static func reqister(requests: [AdaptyPluginRequest.Type]) {
+    static func register(requests: [AdaptyPluginRequest.Type]) {
         for request in requests {
             Request.allRequests[request.method] = request
         }

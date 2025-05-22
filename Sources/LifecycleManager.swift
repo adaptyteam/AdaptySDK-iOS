@@ -222,7 +222,7 @@ final class LifecycleManager {
                     return
                 }
 
-                let status = await Environment.Device.idfaRetriavalStatus
+                let status = await Environment.Device.idfaRetrievalStatus
                 log.verbose("idfaUpdateTimer tick, status = \(status)")
 
                 switch status {

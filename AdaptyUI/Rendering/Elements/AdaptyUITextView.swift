@@ -125,7 +125,7 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
                 guard let uiImage = value?.of(colorScheme).textAttachmentImage(
                     assetsResolver: assetsResolver,
                     font: attr.uiFont(assetsResolver),
-                    tint: attr.imgTintColor?.asSolidColor?.uiColor(assetsResolver)
+                    tint: attr.imageTintColor?.asSolidColor?.uiColor(assetsResolver)
                 ) else {
                     return partialResult
                 }

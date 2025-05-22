@@ -9,9 +9,9 @@ import StoreKit
 
 private let log = Log.default
 
-extension Adapty {
+public extension Adapty {
     /// Call this method to have StoreKit present a sheet enabling the user to redeem codes provided by your app.
-    public nonisolated static func presentCodeRedemptionSheet() {
+    nonisolated static func presentCodeRedemptionSheet() {
         Task.detached {
             let stamp = Log.stamp
             let name = MethodName.presentCodeRedemptionSheet

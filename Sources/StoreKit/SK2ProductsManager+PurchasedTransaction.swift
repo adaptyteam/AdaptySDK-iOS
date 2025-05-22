@@ -12,8 +12,9 @@ private let log = Log.sk2ProductManager
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
     func fillPurchasedTransaction(
-        variationId: String?,
-        persistentVariationId: String?,
+        paywallVariationId: String?,
+        persistentPaywallVariationId: String?,
+        persistentOnboardingVariationId: String?,
         sk1Transaction: SK1TransactionWithIdentifier
     ) async -> PurchasedTransaction {
         await .init(
@@ -21,15 +22,17 @@ extension SK2ProductsManager {
                 id: sk1Transaction.unfProductID,
                 fetchPolicy: .returnCacheDataElseLoad
             ),
-            variationId: variationId,
-            persistentVariationId: persistentVariationId,
+            paywallVariationId: paywallVariationId,
+            persistentPaywallVariationId: persistentPaywallVariationId,
+            persistentOnboardingVariationId: persistentOnboardingVariationId,
             sk1Transaction: sk1Transaction
         )
     }
 
     func fillPurchasedTransaction(
-        variationId: String?,
-        persistentVariationId: String?,
+        paywallVariationId: String?,
+        persistentPaywallVariationId: String?,
+        persistentOnboardingVariationId: String?,
         sk2Transaction: SK2Transaction
     ) async -> PurchasedTransaction {
         await .init(
@@ -37,8 +40,9 @@ extension SK2ProductsManager {
                 id: sk2Transaction.unfProductID,
                 fetchPolicy: .returnCacheDataElseLoad
             ),
-            variationId: variationId,
-            persistentVariationId: persistentVariationId,
+            paywallVariationId: paywallVariationId,
+            persistentPaywallVariationId: persistentPaywallVariationId,
+            persistentOnboardingVariationId: persistentOnboardingVariationId,
             sk2Transaction: sk2Transaction
         )
     }
@@ -48,8 +52,9 @@ extension SK2ProductsManager {
 extension PurchasedTransaction {
     fileprivate init(
         sk2Product: SK2Product?,
-        variationId: String?,
-        persistentVariationId: String?,
+        paywallVariationId: String?,
+        persistentPaywallVariationId: String?,
+        persistentOnboardingVariationId: String?,
         sk1Transaction: SK1TransactionWithIdentifier
     ) {
         let offer = PurchasedTransaction.SubscriptionOffer(
@@ -61,8 +66,9 @@ extension PurchasedTransaction {
             transactionId: sk1Transaction.unfIdentifier,
             originalTransactionId: sk1Transaction.unfOriginalIdentifier,
             vendorProductId: sk1Transaction.unfProductID,
-            productVariationId: variationId,
-            persistentProductVariationId: persistentVariationId,
+            paywallVariationId: paywallVariationId,
+            persistentPaywallVariationId: persistentPaywallVariationId,
+            persistentOnboardingVariationId: persistentOnboardingVariationId,
             price: sk2Product?.price,
             priceLocale: sk2Product?.priceFormatStyle.locale.unfCurrencyCode,
             storeCountry: sk2Product?.priceFormatStyle.locale.unfRegionCode,
@@ -73,8 +79,9 @@ extension PurchasedTransaction {
 
     init(
         sk2Product: SK2Product?,
-        variationId: String?,
-        persistentVariationId: String?,
+        paywallVariationId: String?,
+        persistentPaywallVariationId: String?,
+        persistentOnboardingVariationId: String?,
         sk2Transaction: SK2Transaction
     ) {
         let offer: PurchasedTransaction.SubscriptionOffer? = {
@@ -96,8 +103,9 @@ extension PurchasedTransaction {
             transactionId: sk2Transaction.unfIdentifier,
             originalTransactionId: sk2Transaction.unfOriginalIdentifier,
             vendorProductId: sk2Transaction.unfProductID,
-            productVariationId: variationId,
-            persistentProductVariationId: persistentVariationId,
+            paywallVariationId: paywallVariationId,
+            persistentPaywallVariationId: persistentPaywallVariationId,
+            persistentOnboardingVariationId: persistentOnboardingVariationId,
             price: sk2Product?.price,
             priceLocale: sk2Product?.priceFormatStyle.locale.unfCurrencyCode,
             storeCountry: sk2Product?.priceFormatStyle.locale.unfRegionCode,

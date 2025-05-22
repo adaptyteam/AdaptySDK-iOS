@@ -11,28 +11,28 @@ import Foundation
 final class ProfileManager: Sendable {
     nonisolated let profileId: String
     var profile: VH<AdaptyProfile>
-    var onceSentEnvironment: SendedEnvironment
+    var onceSentEnvironment: SentEnvironment
 
     let storage: ProfileStorage
-    let paywallsStorage = PaywallsStorage()
+    let placementStorage = PlacementStorage()
     let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
 
     @AdaptyActor
     init(
         storage: ProfileStorage,
         profile: VH<AdaptyProfile>,
-        sendedEnvironment: SendedEnvironment
+        sentEnvironment: SentEnvironment
     ) {
         let profileId = profile.value.profileId
         self.profileId = profileId
         self.profile = profile
-        self.onceSentEnvironment = sendedEnvironment
+        self.onceSentEnvironment = sentEnvironment
         self.storage = storage
 
         Task { [weak self] in
             Adapty.optionalSDK?.updateASATokenIfNeed(for: profile)
 
-            if sendedEnvironment == .dont {
+            if sentEnvironment == .none {
                 _ = await self?.getProfile()
             } else {
                 self?.syncTransactionsIfNeed(for: profileId)
@@ -44,7 +44,7 @@ final class ProfileManager: Sendable {
 }
 
 extension ProfileManager {
-    nonisolated func syncTransactionsIfNeed(for profileId: String) { // TODO: extruct this code from ProfileManager
+    nonisolated func syncTransactionsIfNeed(for profileId: String) { // TODO: extract this code from ProfileManager
         Task { @AdaptyActor [weak self] in
             guard let sdk = Adapty.optionalSDK,
                   let self,
@@ -124,7 +124,7 @@ private extension Adapty {
 
             if let manager = try profileManager(with: old.value.profileId) {
                 if let meta {
-                    manager.onceSentEnvironment = meta.sendedEnvironment
+                    manager.onceSentEnvironment = meta.sentEnvironment
                 }
                 manager.saveResponse(response.flatValue())
             }

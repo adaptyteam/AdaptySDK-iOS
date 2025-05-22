@@ -26,6 +26,8 @@ public final class Adapty: Sendable {
 
     package let observerMode: Bool
 
+    let variationIdStorage: VariationIdStorage
+
     init(
         configuration: AdaptyConfiguration,
         backend: Backend
@@ -40,8 +42,10 @@ public final class Adapty: Sendable {
 
         #if compiler(>=5.10)
             let productVendorIdsStorage = ProductVendorIdsStorage()
+            self.variationIdStorage = VariationIdStorage()
         #else
             let productVendorIdsStorage = await ProductVendorIdsStorage()
+            self.variationIdStorage = await VariationIdStorage()
         #endif
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
@@ -63,12 +67,6 @@ public final class Adapty: Sendable {
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             if !observerMode {
-                #if compiler(>=5.10)
-                    let variationIdStorage = VariationIdStorage()
-                #else
-                    let variationIdStorage = await VariationIdStorage()
-                #endif
-
                 self.sk2Purchaser = SK2Purchaser.startObserving(
                     purchaseValidator: self,
                     productsManager: productsManager,
@@ -88,11 +86,6 @@ public final class Adapty: Sendable {
                     productsManager: productsManager
                 )
             } else {
-                #if compiler(>=5.10)
-                    let variationIdStorage = VariationIdStorage()
-                #else
-                    let variationIdStorage = await VariationIdStorage()
-                #endif
                 self.sk1QueueManager = SK1QueueManager.startObserving(
                     purchaseValidator: self,
                     productsManager: productsManager,
@@ -115,7 +108,7 @@ public final class Adapty: Sendable {
             withCustomerUserId: customerUserId
         ) {
             .current(
-                ProfileManager(storage: profileStorage, profile: profile, sendedEnvironment: .dont)
+                ProfileManager(storage: profileStorage, profile: profile, sentEnvironment: .none)
             )
         } else {
             .creating(
@@ -193,7 +186,7 @@ public final class Adapty: Sendable {
                 let manager = ProfileManager(
                     storage: profileStorage,
                     profile: createdProfile,
-                    sendedEnvironment: meta.sendedEnvironment
+                    sentEnvironment: meta.sentEnvironment
                 )
                 sharedProfileManager = .current(manager)
                 return manager

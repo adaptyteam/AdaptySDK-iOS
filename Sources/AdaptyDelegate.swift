@@ -21,8 +21,8 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
     func shouldAddStorePayment(for product: AdaptyDeferredProduct) -> Bool
 }
 
-extension AdaptyDelegate {
-    public func shouldAddStorePayment(for _: AdaptyDeferredProduct) -> Bool { true }
+public extension AdaptyDelegate {
+    func shouldAddStorePayment(for _: AdaptyDeferredProduct) -> Bool { true }
 }
 
 extension Adapty {

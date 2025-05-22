@@ -4,6 +4,7 @@
 //
 //  Created by Aleksei Valiano on 24.09.2022.
 //
+
 import Foundation
 
 extension AdaptySubscriptionOffer {
@@ -34,7 +35,7 @@ extension AdaptySubscriptionOffer.Signature: Decodable {
         keyIdentifier = try container.decode(String.self, forKey: .keyIdentifier)
         nonce = try container.decode(UUID.self, forKey: .nonce)
         signature = try container.decode(Data.self, forKey: .signature)
-        
+
         guard let timestamp = try Int(container.decode(String.self, forKey: .timestamp)) else {
             throw DecodingError.dataCorruptedError(forKey: .timestamp, in: container, debugDescription: "Wrong format of timestamp.")
         }

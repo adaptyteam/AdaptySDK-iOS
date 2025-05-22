@@ -28,7 +28,7 @@ extension AdaptyLog.Level: ExpressibleByStringLiteral {
             }
     }
 
-     var stringLiteral: String {
+    var stringLiteral: String {
         let value: CodingValues =
             switch self {
             case .error: .error

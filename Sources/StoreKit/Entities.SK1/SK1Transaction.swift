@@ -55,11 +55,10 @@ struct SK1TransactionWithIdentifier: Sendable {
 
     @inlinable
     var unfOfferId: String? { underlay.unfOfferId }
-    
+
     @inlinable
     var logParams: EventParameters { underlay.logParams }
 }
-
 
 private extension SKPaymentTransactionState {
     var stringValue: String {

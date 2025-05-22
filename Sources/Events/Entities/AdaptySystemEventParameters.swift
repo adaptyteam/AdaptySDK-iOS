@@ -42,12 +42,18 @@ enum APIRequestName: String {
     case fetchProfile = "get_profile"
     case updateProfile = "update_profile"
     case fetchPaywallVariations = "get_paywall_variations"
+    case fetchOnboardingVariations = "get_onboarding_variations"
     case fetchFallbackPaywallVariations = "get_fallback_paywall_variations"
-    case fetchUntargetedPaywallVariations = "get_untargeted_paywall_variations"
+    case fetchFallbackOnboardingVariations = "get_fallback_onboarding_variations"
+    case fetchPaywallVariationsForDefaultAudience = "get_paywall_variations_for_default_audience"
+    case fetchOnboardingVariationsForDefaultAudience = "get_onboarding_variations_for_default_audience"
+
     case fetchViewConfiguration = "get_paywall_builder"
     case fetchFallbackViewConfiguration = "get_fallback_paywall_builder"
     case fetchCrossPlacementState = "get_cross_placement_state"
+    case fetchOnboarding = "get_onboarding"
     case fetchPaywall = "get_paywall"
+
     case fetchFallbackPaywall = "get_fallback_paywall"
 
     case validateTransaction = "validate_transaction"
@@ -112,7 +118,7 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         self.stamp = requestStamp
         self.backendRequestId = httpError?.headers?.getBackendRequestId()
         self.metrics = httpError?.metrics
-        self.headers = httpError?.headers?.filtred
+        self.headers = httpError?.headers?.filtered
         self.error = httpError?.description ?? error.localizedDescription
     }
 
@@ -121,19 +127,19 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
         self.stamp = requestStamp
         self.backendRequestId = response.headers.getBackendRequestId()
         self.metrics = response.metrics
-        self.headers = response.headers.filtred
+        self.headers = response.headers.filtered
         self.error = nil
     }
 }
 
 private extension HTTPHeaders {
-    private enum Sufix {
+    private enum Suffix {
         static let cacheStatus = "cache-status"
     }
 
-    var filtred: HTTPHeaders? {
-        let filtred = filter { $0.key.lowercased().hasSuffix(Sufix.cacheStatus) }
-        return filtred.isEmpty ? nil : filtred
+    var filtered: HTTPHeaders? {
+        let filtered = filter { $0.key.lowercased().hasSuffix(Suffix.cacheStatus) }
+        return filtered.isEmpty ? nil : filtered
     }
 }
 
@@ -152,9 +158,9 @@ enum MethodName: String {
     case reportSK1Transaction = "report_transaction_sk1"
     case reportSK2Transaction = "report_transaction_sk2"
     case getPaywallProducts = "get_paywall_products"
-    case getPaywallProductswithoutDeterminingOffer = "get_paywall_products_without_determining_offer"
+    case getPaywallProductsWithoutDeterminingOffer = "get_paywall_products_without_determining_offer"
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
-    case getReceipt = "get_reciept"
+    case getReceipt = "get_receipt"
     case makePurchase = "make_purchase"
     case openWebPaywall = "open_web_paywall"
     case createWebPaywallUrl = "create_web_paywall_url"
@@ -162,16 +168,23 @@ enum MethodName: String {
     case restorePurchases = "restore_purchases"
 
     case getPaywall = "get_paywall"
-    case getPaywallForDefaultAudience = "get_untargeted_paywall"
-    case setFallbackPaywalls = "set_fallback_paywalls"
+    case getOnboarding = "get_onboarding"
+
+    case getPaywallForDefaultAudience = "get_paywall_for_default_audience"
+    case getOnboardingForDefaultAudience = "get_onboarding_for_default_audience"
+
+    case setFallback = "set_fallback_file"
 
     case logShowOnboarding = "log_show_onboarding"
+    case logShowOnboardingScreen = "log_show_onboarding_screen"
     case logShowPaywall = "log_show_paywall"
 
     case presentCodeRedemptionSheet = "present_code_redemption_sheet"
-    
+
     case updateCollectingRefundDataConsent = "update_collecting_refund_data_consent"
     case updateRefundPreference = "update_refund_preference"
+
+    case persistOnboardingVariationId = "persist_onboarding_variation_id"
 }
 
 struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {

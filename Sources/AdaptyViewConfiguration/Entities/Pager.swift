@@ -4,7 +4,6 @@
 //
 //  Created by Aleksei Valiano on 30.05.2024
 //
-//
 
 import Foundation
 
@@ -18,7 +17,7 @@ package extension AdaptyViewConfiguration {
             content: [],
             pageControl: nil,
             animation: nil,
-            interactionBehaviour: .default
+            interactionBehavior: .default
         )
 
         package let pageWidth: Length
@@ -28,7 +27,7 @@ package extension AdaptyViewConfiguration {
         package let content: [Element]
         package let pageControl: PageControl?
         package let animation: Animation?
-        package let interactionBehaviour: InteractionBehaviour
+        package let interactionBehavior: InteractionBehavior
     }
 }
 
@@ -39,8 +38,8 @@ package extension AdaptyViewConfiguration.Pager {
         case parent(Double)
     }
 
-    enum InteractionBehaviour: String {
-        static let `default` = InteractionBehaviour.pauseAnimation
+    enum InteractionBehavior: String {
+        static let `default` = InteractionBehavior.pauseAnimation
         case none
         case cancelAnimation = "cancel_animation"
         case pauseAnimation = "pause_animation"
@@ -105,7 +104,7 @@ extension AdaptyViewConfiguration.Pager.Length: Hashable {
             content: [AdaptyViewConfiguration.Element] = `default`.content,
             pageControl: PageControl? = `default`.pageControl,
             animation: Animation? = `default`.animation,
-            interactionBehaviour: InteractionBehaviour = `default`.interactionBehaviour
+            interactionBehaviour: InteractionBehavior = `default`.interactionBehavior
         ) -> Self {
             .init(
                 pageWidth: pageWidth,
@@ -115,7 +114,7 @@ extension AdaptyViewConfiguration.Pager.Length: Hashable {
                 content: content,
                 pageControl: pageControl,
                 animation: animation,
-                interactionBehaviour: interactionBehaviour
+                interactionBehavior: interactionBehaviour
             )
         }
     }
@@ -159,7 +158,7 @@ extension AdaptyViewConfiguration.Pager.Length: Hashable {
     }
 #endif
 
-extension AdaptyViewConfiguration.Pager.InteractionBehaviour: Codable {}
+extension AdaptyViewConfiguration.Pager.InteractionBehavior: Codable {}
 
 extension AdaptyViewConfiguration.Pager.PageControl.Layout: Codable {}
 

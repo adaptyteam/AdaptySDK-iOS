@@ -11,7 +11,6 @@ import Foundation
 extension AdaptyUI.Configuration: Decodable {
     private enum Codingkey: String, CodingKey {
         case mediaCache = "media_cache"
-        
     }
 
     public init(from decoder: Decoder) throws {

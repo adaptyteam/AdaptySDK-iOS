@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyProfile {
-    public struct AccessLevel: Sendable, Hashable {
+public extension AdaptyProfile {
+    struct AccessLevel: Sendable, Hashable {
         /// Unique identifier of the access level configured by you in Adapty Dashboard.
         public let id: String
 

@@ -167,12 +167,29 @@ public extension Adapty {
     nonisolated static func getPaywall(
         placementId: String,
         locale: String? = nil,
-        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
         withCompletion(completion) {
             try await getPaywall(
+                placementId: placementId,
+                locale: locale,
+                fetchPolicy: fetchPolicy,
+                loadTimeout: loadTimeout
+            )
+        }
+    }
+
+    nonisolated static func getOnboarding(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
+        loadTimeout: TimeInterval? = nil,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyOnboarding>
+    ) {
+        withCompletion(completion) {
+            try await getOnboarding(
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,
@@ -194,11 +211,26 @@ public extension Adapty {
     nonisolated static func getPaywallForDefaultAudience(
         placementId: String,
         locale: String? = nil,
-        fetchPolicy: AdaptyPaywall.FetchPolicy = .default,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
         withCompletion(completion) {
             try await getPaywallForDefaultAudience(
+                placementId: placementId,
+                locale: locale,
+                fetchPolicy: fetchPolicy
+            )
+        }
+    }
+
+    nonisolated static func getOnboardingForDefaultAudience(
+        placementId: String,
+        locale: String? = nil,
+        fetchPolicy: AdaptyPlacementFetchPolicy = .default,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyOnboarding>
+    ) {
+        withCompletion(completion) {
+            try await getOnboardingForDefaultAudience(
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy
@@ -215,12 +247,12 @@ public extension Adapty {
     /// - Parameters:
     ///   - fileURL:
     ///   - completion: Result callback.
-    nonisolated static func setFallbackPaywalls(
+    nonisolated static func setFallback(
         fileURL url: URL,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) {
-            try await setFallbackPaywalls(fileURL: url)
+            try await setFallback(fileURL: url)
         }
     }
 

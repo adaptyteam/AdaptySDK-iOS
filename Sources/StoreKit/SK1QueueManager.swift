@@ -113,7 +113,7 @@ actor SK1QueueManager: Sendable {
         makePurchasesCompletionHandlers[productId] = [completion]
 
         Task {
-            await storage.setVariationIds(variationId, for: productId)
+            await storage.setPaywallVariationIds(variationId, for: productId)
 
             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                 methodName: .addPayment,
@@ -168,20 +168,22 @@ actor SK1QueueManager: Sendable {
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
         let productId = sk1Transaction.unfProductID
 
-        let (variationId, persistentVariationId) = await storage.getVariationIds(for: productId)
+        let (paywallVariationId, persistentPaywallVariationId, persistentOnboardingVariationId) = await storage.getVariationIds(for: productId)
 
         let purchasedTransaction: PurchasedTransaction =
             if let sk1Product = makePurchasesProduct[productId] {
                 PurchasedTransaction(
                     sk1Product: sk1Product,
-                    variationId: variationId,
-                    persistentVariationId: persistentVariationId,
+                    paywallVariationId: paywallVariationId,
+                    persistentPaywallVariationId: persistentPaywallVariationId,
+                    persistentOnboardingVariationId: persistentOnboardingVariationId,
                     sk1Transaction: sk1Transaction
                 )
             } else {
                 await productsManager.fillPurchasedTransaction(
-                    variationId: variationId,
-                    persistentVariationId: persistentVariationId,
+                    paywallVariationId: paywallVariationId,
+                    persistentPaywallVariationId: persistentPaywallVariationId,
+                    persistentOnboardingVariationId: persistentOnboardingVariationId,
                     sk1Transaction: sk1Transaction
                 )
             }
@@ -194,7 +196,7 @@ actor SK1QueueManager: Sendable {
                 reason: .purchasing
             )
 
-            storage.removeVariationIds(for: productId)
+            storage.removePaywallVariationIds(for: productId)
             makePurchasesProduct.removeValue(forKey: productId)
 
             SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
@@ -217,7 +219,7 @@ actor SK1QueueManager: Sendable {
 
     private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction) {
         let productId = sk1Transaction.unfProductID
-        storage.removeVariationIds(for: productId)
+        storage.removePaywallVariationIds(for: productId)
         makePurchasesProduct.removeValue(forKey: productId)
 
         let result: AdaptyResult<AdaptyPurchaseResult>
@@ -252,7 +254,7 @@ actor SK1QueueManager: Sendable {
         }
     }
 
-    fileprivate func shouldAddStorePaymentOccured(
+    fileprivate func shouldAddStorePaymentOccurred(
         product: SKProduct,
         hasDelegate: Bool,
         result: Bool
@@ -313,7 +315,7 @@ extension SK1QueueManager {
             func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for sk1Product: SKProduct) -> Bool {
                 guard let delegate = Adapty.delegate else {
                     Task {
-                        await wrapped.shouldAddStorePaymentOccured(
+                        await wrapped.shouldAddStorePaymentOccurred(
                             product: sk1Product,
                             hasDelegate: false,
                             result: true
@@ -326,7 +328,7 @@ extension SK1QueueManager {
                 let result = delegate.shouldAddStorePayment(for: deferredProduct)
 
                 Task {
-                    await wrapped.shouldAddStorePaymentOccured(
+                    await wrapped.shouldAddStorePaymentOccurred(
                         product: sk1Product,
                         hasDelegate: true,
                         result: result

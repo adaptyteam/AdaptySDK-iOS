@@ -13,7 +13,7 @@ import Foundation
 extension PaywallViewEvent {
     struct WillPurchase: AdaptyPluginEvent {
         let id = "paywall_view_did_start_purchase"
-        let view: AdaptyUI.View
+        let view: AdaptyUI.PaywallView
         let product: Response.AdaptyPluginPaywallProduct
 
         enum CodingKeys: String, CodingKey {

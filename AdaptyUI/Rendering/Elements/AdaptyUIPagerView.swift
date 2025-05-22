@@ -142,7 +142,7 @@ struct AdaptyUIPagerView: View {
     private func handlePageControlTap(index: Int) {
         let shouldScheduleAutoscroll: Bool
 
-        switch pager.interactionBehaviour {
+        switch pager.interactionBehavior {
         case .none:
             shouldScheduleAutoscroll = false
             return
@@ -227,7 +227,7 @@ struct AdaptyUIPagerView: View {
             }
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
             .dragGesture(
-                condition: pager.interactionBehaviour != .none,
+                condition: pager.interactionBehavior != .none,
                 onChanged: { value in
                     offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
                     isInteracting = true
@@ -241,7 +241,7 @@ struct AdaptyUIPagerView: View {
                         offset = 0
                         isInteracting = false
 
-                        if pager.interactionBehaviour == .pauseAnimation {
+                        if pager.interactionBehavior == .pauseAnimation {
                             scheduleAutoScroll()
                         }
                     }

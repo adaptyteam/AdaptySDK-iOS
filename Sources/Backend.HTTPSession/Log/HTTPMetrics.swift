@@ -37,7 +37,7 @@ struct HTTPMetrics: Sendable, Hashable {
         let connect: UInt64
         let sent: UInt64
         let wait: UInt64
-        let recived: UInt64
+        let received: UInt64
 
         let bytesSent: Int64
         let bytesReceived: Int64
@@ -54,7 +54,7 @@ struct HTTPMetrics: Sendable, Hashable {
             connect = toMillisecond(metrics.connectStartDate, metrics.requestStartDate) ?? 0
             sent = toMillisecond(metrics.requestStartDate, metrics.requestEndDate) ?? 0
             wait = toMillisecond(metrics.requestEndDate, metrics.responseStartDate) ?? 0
-            recived = toMillisecond(metrics.responseStartDate, metrics.responseEndDate) ?? 0
+            received = toMillisecond(metrics.responseStartDate, metrics.responseEndDate) ?? 0
 
             bytesSent = metrics.countOfRequestBodyBytesSent + metrics.countOfRequestHeaderBytesSent
             bytesReceived = metrics.countOfResponseBodyBytesReceived + metrics.countOfResponseHeaderBytesReceived
@@ -71,10 +71,10 @@ struct HTTPMetrics: Sendable, Hashable {
 
 extension HTTPMetrics {
     init(_ metrics: URLSessionTaskMetrics) {
-        self.taskInterval = metrics.taskInterval
-        self.redirectCount = metrics.redirectCount
-        self.transactions = metrics.transactionMetrics.map(Transaction.init)
-        self.decoding = 0
+        taskInterval = metrics.taskInterval
+        redirectCount = metrics.redirectCount
+        transactions = metrics.transactionMetrics.map(Transaction.init)
+        decoding = 0
     }
 }
 
@@ -111,7 +111,7 @@ extension HTTPMetrics.Transaction: Encodable {
         case connect
         case sent
         case wait
-        case recived
+        case received
     }
 
     private enum BytesCodingKeys: String, CodingKey {
@@ -128,7 +128,7 @@ extension HTTPMetrics.Transaction: Encodable {
         if connect > 0 { try container.encode(connect, forKey: .connect) }
         if sent > 0 { try container.encode(sent, forKey: .sent) }
         if wait > 0 { try container.encode(wait, forKey: .wait) }
-        if recived > 0 { try container.encode(recived, forKey: .recived) }
+        if received > 0 { try container.encode(received, forKey: .received) }
 
         if bytesSent > 0 || bytesReceived > 0 {
             var container = container.nestedContainer(keyedBy: BytesCodingKeys.self, forKey: .bytes)
@@ -162,7 +162,7 @@ extension HTTPMetrics.Transaction: CustomDebugStringConvertible {
         case .cache:
             "(local cache: \(milliseconds(total))):[\(bytes(bytesReceived))]"
         default:
-            "(q: \(milliseconds(queue)), c: \(milliseconds(dns + connect)), u: \(milliseconds(sent)), w: \(milliseconds(wait)), d: \(milliseconds(recived))):[u: \(bytes(bytesSent)), d: \(bytes(bytesReceived))]"
+            "(q: \(milliseconds(queue)), c: \(milliseconds(dns + connect)), u: \(milliseconds(sent)), w: \(milliseconds(wait)), d: \(milliseconds(received))):[u: \(bytes(bytesSent)), d: \(bytes(bytesReceived))]"
         }
 
         func milliseconds(_ i: UInt64) -> String {

@@ -78,7 +78,7 @@ import Foundation
                 defaultLocalization: nil,
                 defaultScreen: screen,
                 screens: [:],
-                referencedElemnts: [String: AdaptyViewSource.Element](screen.referencedElemnts, uniquingKeysWith: { _, _ in
+                referencedElements: [String: AdaptyViewSource.Element](screen.referencedElements, uniquingKeysWith: { _, _ in
                     throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate element_id"))
                 }),
                 selectedProducts: selectedProducts

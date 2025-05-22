@@ -4,6 +4,7 @@
 //
 //  Created by Aleksei Valiano on 08.09.2022.
 //
+
 import Foundation
 
 extension PurchasedTransaction {

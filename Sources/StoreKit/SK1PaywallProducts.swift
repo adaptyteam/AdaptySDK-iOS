@@ -30,7 +30,7 @@ extension Adapty {
                 adaptyProductId: reference.adaptyProductId,
                 paywallProductIndex: reference.paywallProductIndex,
                 variationId: paywall.variationId,
-                paywallABTestName: paywall.abTestName,
+                paywallABTestName: paywall.placement.abTestName,
                 paywallName: paywall.name,
                 webPaywallBaseUrl: paywall.webPaywallBaseUrl
             )
@@ -55,7 +55,7 @@ extension Adapty {
                 if let offer = sk1Product.subscriptionOffer(by: subscriptionOfferIdentifier) {
                     offer
                 } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit1 product dont have offer id: `\(subscriptionOfferIdentifier.identifier ?? "nil")` with type:\(subscriptionOfferIdentifier.asOfferType.rawValue) ").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("StoreKit1 product don't have offer id: `\(subscriptionOfferIdentifier.identifier ?? "nil")` with type:\(subscriptionOfferIdentifier.asOfferType.rawValue) ").asAdaptyError
                 }
             } else {
                 nil
@@ -133,7 +133,7 @@ extension Adapty {
                 paywallProductIndex: $0.reference.paywallProductIndex,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
-                paywallABTestName: paywall.abTestName,
+                paywallABTestName: paywall.placement.abTestName,
                 paywallName: paywall.name,
                 webPaywallBaseUrl: paywall.webPaywallBaseUrl
             )

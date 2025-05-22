@@ -21,7 +21,7 @@ extension CrossPlacementState {
     func contains(placementId: String) -> Bool {
         variationIdByPlacements.keys.contains(placementId)
     }
-    
+
     func variationId(placementId: String) -> String? {
         variationIdByPlacements[placementId]
     }

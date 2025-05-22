@@ -49,14 +49,14 @@ extension AdaptyViewSource.Timer: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case duration
-        case behaviour
+        case behavior
         case format
         case endTime = "end_time"
         case actions = "action"
         case horizontalAlign = "align"
     }
 
-    enum BehaviourType: String, Codable {
+    enum BehaviorType: String, Codable {
         case everyAppear = "start_at_every_appear"
         case firstAppear = "start_at_first_appear"
         case firstAppearPersisted = "start_at_first_appear_persisted"
@@ -70,26 +70,26 @@ extension AdaptyViewSource.Timer: Decodable {
 
         id = try container.decode(String.self, forKey: .id)
 
-        let behaviour = try container.decodeIfPresent(String.self, forKey: .behaviour)
+        let behavior = try container.decodeIfPresent(String.self, forKey: .behavior)
 
         state =
-            switch behaviour {
-            case BehaviourType.endAtUTC.rawValue:
+            switch behavior {
+            case BehaviorType.endAtUTC.rawValue:
                 try .endedAt(container.decode(AdaptyViewSource.DateString.self, forKey: .endTime).utc)
-            case BehaviourType.endAtLocalTime.rawValue:
+            case BehaviorType.endAtLocalTime.rawValue:
                 try .endedAt(container.decode(AdaptyViewSource.DateString.self, forKey: .endTime).local)
             case .none:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .default)
-            case BehaviourType.everyAppear.rawValue:
+            case BehaviorType.everyAppear.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .everyAppear)
-            case BehaviourType.firstAppear.rawValue:
+            case BehaviorType.firstAppear.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .firstAppear)
-            case BehaviourType.firstAppearPersisted.rawValue:
+            case BehaviorType.firstAppearPersisted.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .firstAppearPersisted)
-            case BehaviourType.custom.rawValue:
+            case BehaviorType.custom.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .custom)
             default:
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.behaviour], debugDescription: "unknown value '\(behaviour ?? "null")'"))
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.behavior], debugDescription: "unknown value '\(behavior ?? "null")'"))
             }
 
         format =

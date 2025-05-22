@@ -15,7 +15,6 @@ enum InternalAdaptyError: Error {
     case notActivated(AdaptyError.Source)
 
     case profileWasChanged(AdaptyError.Source)
-    case profileCreateFailed(AdaptyError.Source, error: HTTPError)
     case fetchFailed(AdaptyError.Source, String, error: Error)
     case decodingFailed(AdaptyError.Source, String, error: Error)
 
@@ -35,8 +34,6 @@ extension InternalAdaptyError: CustomStringConvertible {
             "AdaptyError.notActivated(\(source))"
         case let .profileWasChanged(source):
             "AdaptyError.profileWasChanged(\(source))"
-        case let .profileCreateFailed(source, error):
-            "AdaptyError.profileCreateFailed(\(source), \(error))"
         case let .fetchFailed(source, description, error):
             "AdaptyError.fetchFailed(\(source), \(description), \(error))"
         case let .decodingFailed(source, description, error):
@@ -55,7 +52,6 @@ extension InternalAdaptyError {
              let .cantMakePayments(src),
              let .notActivated(src),
              let .profileWasChanged(src),
-             let .profileCreateFailed(src, _),
              let .fetchFailed(src, _, _),
              let .decodingFailed(src, _, _),
              let .wrongParam(src, _):
@@ -65,8 +61,6 @@ extension InternalAdaptyError {
 
     var originalError: Error? {
         switch self {
-        case let .profileCreateFailed(_, error):
-            error
         case let .unknown(_, _, error),
              let .decodingFailed(_, _, error),
              let .fetchFailed(_, _, error):
@@ -87,7 +81,6 @@ extension InternalAdaptyError: CustomNSError {
         case .cantMakePayments: .cantMakePayments
         case .notActivated: .notActivated
         case .profileWasChanged: .profileWasChanged
-        case let .profileCreateFailed(_, error): error.adaptyErrorCode
         case .fetchFailed: .networkFailed
         case .decodingFailed: .decodingFailed
         case .wrongParam: .wrongParam
@@ -124,22 +117,6 @@ extension AdaptyError {
 
     static func profileWasChanged(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         InternalAdaptyError.profileWasChanged(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
-    }
-
-    static func profileCreateFailed(
-        _ error: HTTPError, file: String = #fileID, function: String = #function, line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.profileCreateFailed(AdaptyError.Source(file: file, function: function, line: line), error: error).asAdaptyError
-    }
-
-    var isProfileCreateFailed: Bool {
-        guard let error = wrapped as? InternalAdaptyError else { return false }
-        switch error {
-        case .profileCreateFailed:
-            return true
-        default:
-            return false
-        }
     }
 
     static func decodingFallback(
@@ -246,13 +223,13 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), error.localizedDescription).asAdaptyError
     }
 
-    static func fetchPaywallFailed(
+    static func fetchPlacementFailed(
         unknownError: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch Profile failed", error: unknownError).asAdaptyError
+        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch placement failed", error: unknownError).asAdaptyError
     }
 
     static func syncProfileFailed(
@@ -386,7 +363,7 @@ extension AdaptyError {
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Current method is not available for the paywall (placementId: \(paywall.placementId), name: \(paywall.name), variationId: \(paywall.variationId))").asAdaptyError
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Current method is not available for the paywall (placementId: \(paywall.placement.id), name: \(paywall.name), variationId: \(paywall.variationId))").asAdaptyError
     }
     
     static func productWithoutPurchaseUrl(

@@ -14,7 +14,7 @@ extension Request {
 
         let placementId: String
         let locale: String?
-        let fetchPolicy: AdaptyPaywall.FetchPolicy?
+        let fetchPolicy: AdaptyPlacementFetchPolicy?
         let loadTimeout: TimeInterval?
 
         enum CodingKeys: String, CodingKey {
@@ -28,7 +28,7 @@ extension Request {
             try .success(await Adapty.getPaywall(
                 placementId: placementId,
                 locale: locale,
-                fetchPolicy: fetchPolicy ?? AdaptyPaywall.FetchPolicy.default,
+                fetchPolicy: fetchPolicy ?? AdaptyPlacementFetchPolicy.default,
                 loadTimeout: loadTimeout
             ))
         }

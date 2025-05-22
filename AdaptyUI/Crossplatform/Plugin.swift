@@ -21,8 +21,8 @@ extension UIViewController {
     }
 }
 
-extension UIWindow {
-    fileprivate var topViewController: UIViewController? {
+fileprivate extension UIWindow {
+    var topViewController: UIViewController? {
         var topViewController = rootViewController
     
         while let presentedController = topViewController?.presentedViewController {
@@ -41,30 +41,42 @@ package extension AdaptyUI {
     class Plugin {
 #if canImport(UIKit)
         
-        private static var paywallControllers = [UUID: AdaptyPaywallController]()
+        private static var paywallControllers = [String: AdaptyPaywallController]()
         
-        private static func cachePaywallController(_ controller: AdaptyPaywallController, id: UUID) {
+        private static func cachePaywallController(_ controller: AdaptyPaywallController, id: String) {
             paywallControllers[id] = controller
         }
         
         private static func deleteCachedPaywallController(_ id: String) {
-            guard let uuid = UUID(uuidString: id) else { return }
-            paywallControllers.removeValue(forKey: uuid)
+            paywallControllers.removeValue(forKey: id)
         }
         
         private static func cachedPaywallController(_ id: String) -> AdaptyPaywallController? {
-            guard let uuid = UUID(uuidString: id) else { return nil }
-            return paywallControllers[uuid]
+            paywallControllers[id]
+        }
+        
+        private static var onboardingControllers = [String: AdaptyOnboardingController]()
+        
+        private static func cacheOnboardingController(_ controller: AdaptyOnboardingController, id: String) {
+            onboardingControllers[id] = controller
+        }
+        
+        private static func deleteCachedOnboardingController(_ id: String) {
+            onboardingControllers.removeValue(forKey: id)
+        }
+        
+        private static func cachedOnboardingController(_ id: String) -> AdaptyOnboardingController? {
+            onboardingControllers[id]
         }
 #endif
         
-        package static func createView(
+        package static func createPaywallView(
             paywall: AdaptyPaywall,
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyTagResolver?,
             timerResolver: AdaptyTimerResolver?
-        ) async throws -> AdaptyUI.View {
+        ) async throws -> AdaptyUI.PaywallView {
 #if canImport(UIKit)
             let products: [AdaptyPaywallProduct]?
             
@@ -84,14 +96,14 @@ package extension AdaptyUI {
             )
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
-            cachePaywallController(vc, id: vc.id)
+            cachePaywallController(vc, id: vc.id.uuidString)
             return vc.toAdaptyUIView()
 #else
             throw AdaptyUIError.platformNotSupported
 #endif
         }
 
-        package static func presentView(
+        package static func presentPaywallView(
             viewId: String
         ) async throws {
 #if canImport(UIKit)
@@ -120,7 +132,7 @@ package extension AdaptyUI {
 #endif
         }
         
-        package static func dismissView(
+        package static func dismissPaywallView(
             viewId: String,
             destroy: Bool
         ) async throws {
@@ -170,5 +182,93 @@ package extension AdaptyUI {
     enum DialogActionType {
         case primary
         case secondary
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+package extension AdaptyUI.Plugin {
+    static func createOnboardingView(
+        onboarding: AdaptyOnboarding
+    ) async throws -> AdaptyUI.OnboardingView {
+#if canImport(UIKit)
+        let configuration = try AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
+        let vc = try AdaptyUI.onboardingControllerWithUniversalDelegate(
+            configuration
+        )
+            
+        cacheOnboardingController(vc, id: vc.id)
+        return vc.toAdaptyUIView()
+#else
+        throw AdaptyUIError.platformNotSupported
+#endif
+    }
+    
+    static func presentOnboardingView(
+        viewId: String
+    ) async throws {
+#if canImport(UIKit)
+        guard let vc = cachedOnboardingController(viewId) else {
+            throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
+        }
+        
+        guard let rootVC = UIApplication.shared.windows.first?.topViewController else {
+            throw AdaptyError(AdaptyUI.PluginError.viewPresentationError(viewId))
+        }
+        
+        guard !rootVC.isOrContainsAdaptyController else {
+            throw AdaptyError(AdaptyUI.PluginError.viewAlreadyPresented(viewId))
+        }
+        
+        vc.modalPresentationCapturesStatusBarAppearance = true
+//        vc.modalPresentationStyle = .overFullScreen
+        vc.modalPresentationStyle = .formSheet  // TODO: add param
+        
+        await withCheckedContinuation { continuation in
+            rootVC.present(vc, animated: true) {
+                continuation.resume()
+            }
+        }
+#else
+        throw AdaptyUIError.platformNotSupported
+#endif
+    }
+    
+    static func dismissOnboardingView(
+        viewId: String,
+        destroy: Bool
+    ) async throws {
+#if canImport(UIKit)
+        guard let vc = cachedOnboardingController(viewId) else {
+            throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
+        }
+
+        await withCheckedContinuation { continuation in
+            vc.dismiss(animated: true) {
+                if destroy {
+                    deleteCachedOnboardingController(viewId)
+                }
+                continuation.resume()
+            }
+        }
+#else
+        throw AdaptyUIError.platformNotSupported
+#endif
+    }
+}
+
+// TODO: Remove
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+package extension AdaptyUI.Plugin {
+    static func createOnboardingViewForTest(
+        placementId: String
+    ) async throws -> AdaptyUI.OnboardingView {
+        let onboarding = try await Adapty.getOnboarding(
+            placementId: placementId
+        )
+        return try await AdaptyUI.Plugin.createOnboardingView(
+            onboarding: onboarding
+        )
     }
 }

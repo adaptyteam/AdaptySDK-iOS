@@ -14,7 +14,7 @@ extension Event {
         let profileId: String
         let environment: Environment
         let createdAt: Date
-        
+
         init(
             id: String = UUID().uuidString.lowercased(),
             event: Event,

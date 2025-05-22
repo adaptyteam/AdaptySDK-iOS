@@ -17,85 +17,121 @@ final class VariationIdStorage: Sendable {
     }
 
     private enum Constants {
-        static let variationsIds = "AdaptySDK_Cached_Variations_Ids"
-        static let persistentVariationsIds = "AdaptySDK_Variations_Ids"
+        static let paywallVariationsIds = "AdaptySDK_Cached_Variations_Ids"
+        static let persistentPaywallVariationsIds = "AdaptySDK_Variations_Ids"
+        static let persistentOnboardingVariationsId = "AdaptySDK_Onboarding_Variation_Id"
     }
 
     private static let userDefaults = Storage.userDefaults
 
-    private static var variationsIds: [String: String] = userDefaults
-        .dictionary(forKey: Constants.variationsIds) as? [String: String] ?? [:]
-    private static var persistentVariationsIds: [String: String] = userDefaults
-        .dictionary(forKey: Constants.persistentVariationsIds) as? [String: String] ?? variationsIds
+    private static var paywallVariationsIds: [String: String] = userDefaults
+        .dictionary(forKey: Constants.paywallVariationsIds) as? [String: String] ?? [:]
+    private static var persistentPaywallVariationsIds: [String: String] = userDefaults
+        .dictionary(forKey: Constants.persistentPaywallVariationsIds) as? [String: String] ?? paywallVariationsIds
+    private static var persistentOnboardingVariationsId: String? = userDefaults.string(forKey: Constants.persistentOnboardingVariationsId)
 
-    fileprivate var variationsIds: [String: String] { Self.variationsIds }
-    fileprivate var persistentVariationsIds: [String: String] { Self.persistentVariationsIds }
+    fileprivate var paywallVariationsIds: [String: String] { Self.paywallVariationsIds }
+    fileprivate var persistentPaywallVariationsIds: [String: String] { Self.persistentPaywallVariationsIds }
+    fileprivate var persistentOnboardingVariationsId: String? { Self.persistentOnboardingVariationsId }
 
-    fileprivate func setPersistentVariationId(_ variationId: String, for productId: String) -> Bool {
-        guard variationId != Self.persistentVariationsIds.updateValue(variationId, forKey: productId) else { return false }
-        Self.userDefaults.set(Self.persistentVariationsIds, forKey: Constants.persistentVariationsIds)
+    fileprivate func setPersistentOnboardingVariationId(_ variationId: String) -> Bool {
+        guard variationId != Self.persistentOnboardingVariationsId else { return false }
+        Self.persistentOnboardingVariationsId = variationId
+        Self.userDefaults.set(Self.persistentOnboardingVariationsId, forKey: Constants.persistentOnboardingVariationsId)
         return true
     }
 
-    fileprivate func setVariationId(_ variationId: String, for productId: String) -> Bool {
-        guard variationId != Self.variationsIds.updateValue(variationId, forKey: productId) else { return false }
-        Self.userDefaults.set(Self.variationsIds, forKey: Constants.variationsIds)
-        log.debug("Saving variationsIds for purchased product")
+    fileprivate func setPersistentPaywallVariationId(_ variationId: String, for productId: String) -> Bool {
+        guard variationId != Self.persistentPaywallVariationsIds.updateValue(variationId, forKey: productId) else { return false }
+        Self.userDefaults.set(Self.persistentPaywallVariationsIds, forKey: Constants.persistentPaywallVariationsIds)
         return true
     }
 
-    fileprivate func removeVariationId(for productId: String) -> Bool {
-        guard Self.variationsIds.removeValue(forKey: productId) != nil else { return false }
-        Self.userDefaults.set(Self.variationsIds, forKey: Constants.variationsIds)
-        log.debug("Saving variationsIds for purchased product")
+    fileprivate func setPaywallVariationId(_ variationId: String, for productId: String) -> Bool {
+        guard variationId != Self.paywallVariationsIds.updateValue(variationId, forKey: productId) else { return false }
+        Self.userDefaults.set(Self.paywallVariationsIds, forKey: Constants.paywallVariationsIds)
+        log.debug("Saving variationsIds for paywall")
+        return true
+    }
+
+    fileprivate func removePaywallVariationId(for productId: String) -> Bool {
+        guard Self.paywallVariationsIds.removeValue(forKey: productId) != nil else { return false }
+        Self.userDefaults.set(Self.paywallVariationsIds, forKey: Constants.paywallVariationsIds)
+        log.debug("Saving variationsIds for paywall")
         return true
     }
 
     static func clear() {
-        variationsIds = [:]
-        persistentVariationsIds = [:]
-        userDefaults.removeObject(forKey: Constants.variationsIds)
-        userDefaults.removeObject(forKey: Constants.persistentVariationsIds)
-        log.debug("Clear variationsIds for purchased product.")
+        paywallVariationsIds = [:]
+        persistentPaywallVariationsIds = [:]
+        persistentOnboardingVariationsId = nil
+
+        userDefaults.removeObject(forKey: Constants.paywallVariationsIds)
+        userDefaults.removeObject(forKey: Constants.persistentPaywallVariationsIds)
+        userDefaults.removeObject(forKey: Constants.persistentOnboardingVariationsId)
+
+        log.debug("Clear variationsIds for paywalls and onboarding.")
     }
 }
 
 extension VariationIdStorage {
-    nonisolated func getVariationIds(for productId: String) async -> (String?, String?) {
-        await (variationsIds[productId], persistentVariationsIds[productId])
+    nonisolated func getPaywallVariationIds(for productId: String) async -> (String?, String?) {
+        await (paywallVariationsIds[productId], persistentPaywallVariationsIds[productId])
     }
 
-    nonisolated func setVariationIds(_ variationId: String?, for productId: String) async {
+    nonisolated func getVariationIds(for productId: String) async -> (String?, String?, String?) {
+        await (paywallVariationsIds[productId], persistentPaywallVariationsIds[productId], persistentOnboardingVariationsId)
+    }
+
+    nonisolated func getOnboardingVariationId() async -> String? {
+        await persistentOnboardingVariationsId
+    }
+
+    nonisolated func setPaywallVariationIds(_ variationId: String?, for productId: String) async {
         guard let variationId else { return }
         Task {
-            if await setVariationId(variationId, for: productId) {
+            if await setPaywallVariationId(variationId, for: productId) {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "didset_variations_ids",
+                    eventName: "did_set_variations_ids",
                     params: [
-                        "variation_by_product": variationsIds,
+                        "variation_by_product": paywallVariationsIds,
                     ]
                 ))
             }
 
-            if await setPersistentVariationId(variationId, for: productId) {
+            if await setPersistentPaywallVariationId(variationId, for: productId) {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "didset_variations_ids_persistent",
+                    eventName: "did_set_variations_ids_persistent",
                     params: [
-                        "variation_by_product": persistentVariationsIds,
+                        "variation_by_product": persistentPaywallVariationsIds,
                     ]
                 ))
             }
         }
     }
 
-    nonisolated func removeVariationIds(for productId: String) {
+    nonisolated func setOnboardingVariationId(_ variationId: String?) async {
+        guard let variationId else { return }
         Task {
-            guard await removeVariationId(for: productId) else { return }
+            if await setPersistentOnboardingVariationId(variationId) {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_set_onboarding_variations_id",
+                    params: [
+                        "onboarding_variation_id": variationId,
+                    ]
+                ))
+            }
+        }
+    }
+
+    nonisolated func removePaywallVariationIds(for productId: String) {
+        Task {
+            guard await removePaywallVariationId(for: productId) else { return }
 
             await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                eventName: "didset_variations_ids",
+                eventName: "did_set_variations_ids",
                 params: [
-                    "variation_by_product": variationsIds,
+                    "variation_by_product": paywallVariationsIds,
                 ]
             ))
         }

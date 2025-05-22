@@ -33,7 +33,7 @@ public struct AdaptyProfileParameters: Sendable, Hashable {
     init(ipV4Address: String) {
         self.ipV4Address = ipV4Address
     }
-    
+
     init(analyticsDisabled: Bool) {
         self.analyticsDisabled = analyticsDisabled
     }
@@ -43,9 +43,9 @@ public struct AdaptyProfileParameters: Sendable, Hashable {
     }
 }
 
-extension AdaptyProfileParameters {
-    public static let empty: AdaptyProfileParameters = .init()
-    public func builder() -> Builder { Builder(self) }
+public extension AdaptyProfileParameters {
+    static let empty: AdaptyProfileParameters = .init()
+    func builder() -> Builder { Builder(self) }
 }
 
 extension AdaptyProfileParameters: Codable {
@@ -56,7 +56,7 @@ extension AdaptyProfileParameters: Codable {
         case birthday
         case email
         case phoneNumber = "phone_number"
-        
+
         case storeCountry = "store_country"
         case ipV4Address = "ip_v4_address"
 

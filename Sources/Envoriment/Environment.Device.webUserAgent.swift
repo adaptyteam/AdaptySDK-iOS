@@ -1,9 +1,8 @@
 //
 //  Environment+WebKit.swift
-//
+//  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2024
-//
 //
 
 import Foundation

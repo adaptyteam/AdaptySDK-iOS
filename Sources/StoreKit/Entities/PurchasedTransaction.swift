@@ -4,14 +4,16 @@
 //
 //  Created by Aleksei Valiano on 08.09.2022.
 //
+
 import Foundation
 
 struct PurchasedTransaction: Sendable {
     let transactionId: String
     let originalTransactionId: String
     let vendorProductId: String
-    let productVariationId: String?
-    let persistentProductVariationId: String?
+    let paywallVariationId: String?
+    let persistentPaywallVariationId: String?
+    let persistentOnboardingVariationId: String?
     let price: Decimal?
     let priceLocale: String?
     let storeCountry: String?
@@ -24,8 +26,9 @@ extension PurchasedTransaction: Encodable {
         case transactionId = "transaction_id"
         case originalTransactionId = "original_transaction_id"
         case vendorProductId = "vendor_product_id"
-        case productVariationId = "variation_id"
-        case persistentProductVariationId = "variation_id_persistent"
+        case paywallVariationId = "variation_id"
+        case persistentPaywallVariationId = "variation_id_persistent"
+        case persistentOnboardingVariationId = "onboarding_variation_id"
         case originalPrice = "original_price"
         case discountPrice = "discount_price"
         case priceLocale = "price_locale"
@@ -40,8 +43,9 @@ extension PurchasedTransaction: Encodable {
         try container.encode(transactionId, forKey: .transactionId)
         try container.encode(originalTransactionId, forKey: .originalTransactionId)
         try container.encode(vendorProductId, forKey: .vendorProductId)
-        try container.encodeIfPresent(productVariationId, forKey: .productVariationId)
-        try container.encodeIfPresent(persistentProductVariationId, forKey: .persistentProductVariationId)
+        try container.encodeIfPresent(paywallVariationId, forKey: .paywallVariationId)
+        try container.encodeIfPresent(persistentPaywallVariationId, forKey: .persistentPaywallVariationId)
+        try container.encodeIfPresent(persistentOnboardingVariationId, forKey: .persistentOnboardingVariationId)
         try container.encodeIfPresent(price, forKey: .originalPrice)
         try container.encodeIfPresent(subscriptionOffer?.price, forKey: .discountPrice)
         try container.encodeIfPresent(priceLocale, forKey: .priceLocale)

@@ -40,20 +40,25 @@ private extension CodingUserInfoKey {
     static let enableEncodingViewConfiguration = CodingUserInfoKey(rawValue: "adapty_encode_view_configuration")!
     static let profileId = CodingUserInfoKey(rawValue: "adapty_profile_id")!
     static let placementId = CodingUserInfoKey(rawValue: "adapty_placement_id")!
-    static let paywallVariationId = CodingUserInfoKey(rawValue: "adapty_paywall_variation_id")!
+    static let placementVariationId = CodingUserInfoKey(rawValue: "adapty_placement_variation_id")!
+    static let placement = CodingUserInfoKey(rawValue: "adapty_placement")!
 }
 
-extension CodingUserInfoСontainer {
+extension CodingUserInfoContainer {
     func setProfileId(_ value: String) {
         userInfo[.profileId] = value
+    }
+
+    func setPlacement(_ value: AdaptyPlacement) {
+        userInfo[.placement] = value
     }
 
     func setPlacementId(_ value: String) {
         userInfo[.placementId] = value
     }
 
-    func setPaywallVariationId(_ value: String) {
-        userInfo[.paywallVariationId] = value
+    func setPlacementVariationId(_ value: String) {
+        userInfo[.placementVariationId] = value
     }
 
     package func enableEncodingViewConfiguration() {
@@ -81,16 +86,30 @@ extension [CodingUserInfoKey: Any] {
             if let value = self[.placementId] as? String {
                 return value
             }
-
+            if let value = placementOrNil {
+                return value.id
+            }
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placementId) parameter"))
         }
     }
 
-    var paywallVariationIdOrNil: String? {
-        self[.paywallVariationId] as? String
+    var placement: AdaptyPlacement {
+        get throws {
+            if let value = placementOrNil {
+                return value
+            }
+
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placement) parameter"))
+        }
     }
 
+    var placementOrNil: AdaptyPlacement? {
+        self[.placement] as? AdaptyPlacement
+    }
 
+    var placementVariationIdOrNil: String? {
+        self[.placementVariationId] as? String
+    }
 }
 
 extension Backend {
@@ -113,21 +132,23 @@ extension Encoder {
 }
 
 extension Backend.Response {
-    struct ValueOfData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct Data<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
         let value: Value
 
         init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            value = try container.decode(Value.self, forKey: .data)
+            value = try decoder
+                .container(keyedBy: Backend.CodingKeys.self)
+                .decode(Value.self, forKey: .data)
         }
     }
 
-    struct ValueOfMeta<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct Meta<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
         let value: Value
 
         init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: Backend.CodingKeys.self)
-            value = try container.decode(Value.self, forKey: .meta)
+            value = try decoder
+                .container(keyedBy: Backend.CodingKeys.self)
+                .decode(Value.self, forKey: .meta)
         }
     }
 }

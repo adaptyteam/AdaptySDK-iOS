@@ -18,7 +18,7 @@ struct AdaptyViewSource: Sendable, Hashable {
     let defaultLocalization: Localization?
     let defaultScreen: Screen
     let screens: [String: Screen]
-    let referencedElemnts: [String: Element]
+    let referencedElements: [String: Element]
     let selectedProducts: [String: String]
 }
 
@@ -89,7 +89,7 @@ extension AdaptyViewSource: Codable {
         }
         self.defaultScreen = defaultScreen
         self.screens = screens.filter { $0.key != CodingKeys.defaultScreen.rawValue }
-        referencedElemnts = try [String: Element](screens.flatMap { $0.value.referencedElemnts }, uniquingKeysWith: { _, _ in
+        referencedElements = try [String: Element](screens.flatMap { $0.value.referencedElements }, uniquingKeysWith: { _, _ in
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate element_id"))
         })
     }
