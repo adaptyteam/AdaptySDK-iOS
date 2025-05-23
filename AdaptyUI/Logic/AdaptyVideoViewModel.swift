@@ -48,53 +48,19 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     private var playerLooper: AVPlayerLooper?
     private var playerStatusObservation: NSKeyValueObservation?
 
-    static func initializePlayerFromAsset(
-        video: VC.VideoData,
-        assetsResolver: AdaptyAssetsResolver?
-    ) -> (AVPlayerItem, AVQueuePlayer)? {
-        if let videoId = video.customId,
-           case .video(let customAsset) = assetsResolver?.asset(for: videoId)
-        {
-            switch customAsset {
-            case .file(let url, _), .remote(let url, _):
-                let playerItem = AVPlayerItem(url: url)
-                let queuePlayer = AVQueuePlayer(items: [playerItem])
-                queuePlayer.isMuted = true
-
-                return (playerItem, queuePlayer)
-            case .player(let playerItem, let queuePlayer, _):
-                return (playerItem, queuePlayer)
-            }
-        }
-
-        let playerItem = AVPlayerItem(url: video.url)
-        let queuePlayer = AVQueuePlayer(items: [playerItem])
-        queuePlayer.isMuted = true
-
-        return (playerItem, queuePlayer)
-    }
-
     init(
         video: VC.VideoData,
         loop: Bool,
         eventsHandler: AdaptyEventsHandler,
-        assetsResolver: AdaptyAssetsResolver?,
+        assetsResolver: AdaptyAssetsResolver,
         onStateUpdated: @escaping (PlayerState) -> Void
     ) {
-        let playerItemToObserve: AVPlayerItem?
-
-        if let (playerItem, queuePlayer) = Self.initializePlayerFromAsset(video: video, assetsResolver: assetsResolver) {
-            playerItemToObserve = playerItem
-            player = queuePlayer
-
-            if loop {
-                playerLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
-            } else {
-                playerLooper = nil
-            }
+        let video = video.resolve(with: assetsResolver)
+        player = video.player
+        // preview image : video.image
+        if loop {
+            playerLooper = AVPlayerLooper(player: video.player, templateItem: video.item)
         } else {
-            playerItemToObserve = nil
-            player = nil
             playerLooper = nil
         }
 
@@ -103,7 +69,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
 
         super.init()
 
-        playerStatusObservation = playerItemToObserve?.observe(
+        playerStatusObservation = video.item.observe(
             \.status,
             options: [.old, .new, .initial, .prior],
             changeHandler: { [weak self] item, _ in

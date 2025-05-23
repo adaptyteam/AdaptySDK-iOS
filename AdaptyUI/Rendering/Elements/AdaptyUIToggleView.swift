@@ -48,7 +48,7 @@ struct AdaptyUIToggleView: View {
         })) {
             EmptyView()
         }
-        .tint(toggle.color?.swiftuiColor(assetsViewModel.assetsResolver))
+        .tint(toggle.color?.resolve(with: assetsViewModel.assetsResolver))
     }
 }
 

@@ -43,7 +43,6 @@ public enum AdaptyCustomAsset: Sendable {
     case font(UIFont)
 }
 
-@MainActor
 public protocol AdaptyAssetsResolver: Sendable {
     func asset(for id: String) -> AdaptyCustomAsset?
 }
@@ -52,10 +51,9 @@ extension [String: AdaptyCustomAsset]: AdaptyAssetsResolver {
     public func asset(for id: String) -> AdaptyCustomAsset? { self[id] }
 }
 
-@MainActor
 package struct AdaptyUIDefaultAssetsResolver: AdaptyAssetsResolver {
     package init() {}
-    
+
     package func asset(for id: String) -> AdaptyCustomAsset? {
         guard let uiImage = UIImage(named: id) else { return nil }
         return .image(.uiImage(value: uiImage))

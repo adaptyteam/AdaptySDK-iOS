@@ -56,27 +56,22 @@ extension UIFont {
     }
 }
 
-@MainActor
-extension VC.Font {
-    static let systemFontReservedName = "adapty_system"
+extension UIFont {
+    private static let systemFontReservedName = "adapty_system"
 
-    func uiFont(size: Double, assetsResolver: AdaptyAssetsResolver) -> UIFont {
-        if let customId, case let .font(font) = assetsResolver.asset(for: customId) {
-            return font.withSize(size)
-        }
-        
-        if !alias.isEmpty, let font = UIFont(name: alias, size: size) {
+    static func create(_ font: VC.Font, withSize size: Double) -> UIFont {
+        if !font.alias.isEmpty, let font = UIFont(name: font.alias, size: size) {
             return font
         }
 
-        if familyName == Self.systemFontReservedName {
-            return .systemFont(ofSize: size, weight: .fromInteger(weight), italic: italic)
+        if font.familyName == systemFontReservedName {
+            return .systemFont(ofSize: size, weight: .fromInteger(font.weight), italic: font.italic)
         }
 
         return .customFont(ofSize: size,
-                           name: familyName,
-                           weight: weight,
-                           italic: italic)
+                           name: font.familyName,
+                           weight: font.weight,
+                           italic: font.italic)
     }
 }
 
@@ -85,7 +80,8 @@ extension UIFont {
         let font = UIFont.systemFont(ofSize: fontSize, weight: weight)
 
         guard italic,
-              let italicDescriptor = font.fontDescriptor.withItalicSymbolicTraits(weight: weight) else {
+              let italicDescriptor = font.fontDescriptor.withItalicSymbolicTraits(weight: weight)
+        else {
             return font
         }
 

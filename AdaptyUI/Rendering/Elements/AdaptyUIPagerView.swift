@@ -257,8 +257,8 @@ struct AdaptyUIPagerView: View {
                 Circle()
                     .fill(
                         idx == currentPageSelectedIndex ?
-                            pageControl.selectedColor.swiftuiColor(assetsViewModel.assetsResolver) :
-                            pageControl.color.swiftuiColor(assetsViewModel.assetsResolver)
+                            pageControl.selectedColor.resolve(with: assetsViewModel.assetsResolver) :
+                            pageControl.color.resolve(with: assetsViewModel.assetsResolver)
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)
