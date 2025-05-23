@@ -13,7 +13,7 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.VideoData {
-    package struct Resolved {
+    struct Resolved {
         let player: AVQueuePlayer
         let item: AVPlayerItem
         let image: VC.ImageData.Resolved?
@@ -41,7 +41,7 @@ extension VC.VideoData {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.ImageData {
-    package enum Resolved {
+    enum Resolved {
         case image(UIImage?)
         case remote(URL, preview: UIImage?)
     }
@@ -65,7 +65,7 @@ extension VC.ImageData {
 }
 
 extension VC.Font {
-    package typealias Resolved = UIFont
+    typealias Resolved = UIFont
 
     func resolve(with resolver: AdaptyAssetsResolver, withSize size: Double) -> Resolved {
         guard let customId,
@@ -81,7 +81,7 @@ extension VC.Font {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Filling {
-    package enum Resolved {
+    enum Resolved {
         case solidColor(VC.Color.Resolved)
         case colorGradient(VC.ColorGradient.Resolved)
     }
@@ -122,7 +122,7 @@ extension VC.Filling {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.ColorGradient {
-    package typealias Resolved = AdaptyCustomGradientAsset
+    typealias Resolved = AdaptyCustomGradientAsset
 
     fileprivate var resolved: Resolved {
         switch kind {
@@ -152,11 +152,15 @@ extension VC.ColorGradient {
 
         return result
     }
+
+    package var asCustomAsset: AdaptyCustomAsset {
+        .gradient(resolved)
+    }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Color {
-    package typealias Resolved = SwiftUI.Color
+    typealias Resolved = SwiftUI.Color
 
     func resolve(with resolver: AdaptyAssetsResolver) -> Resolved {
         guard let customId,
@@ -167,6 +171,10 @@ extension VC.Color {
 
     fileprivate var resolved: Resolved {
         SwiftUI.Color(.sRGB, red: red, green: green, blue: blue, opacity: alpha)
+    }
+
+    package var asCustomAsset: AdaptyCustomAsset {
+        .color(.swiftUIColor(resolved))
     }
 }
 

@@ -75,7 +75,8 @@ package extension AdaptyUI {
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyTagResolver?,
-            timerResolver: AdaptyTimerResolver?
+            timerResolver: AdaptyTimerResolver?,
+            assetsResolver: AdaptyAssetsResolver?
         ) async throws -> AdaptyUI.PaywallView {
 #if canImport(UIKit)
             let products: [AdaptyPaywallProduct]?
@@ -92,7 +93,8 @@ package extension AdaptyUI {
                 products: products,
                 observerModeResolver: nil,
                 tagResolver: tagResolver,
-                timerResolver: timerResolver
+                timerResolver: timerResolver,
+                assetsResolver: assetsResolver
             )
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
@@ -222,7 +224,7 @@ package extension AdaptyUI.Plugin {
         
         vc.modalPresentationCapturesStatusBarAppearance = true
 //        vc.modalPresentationStyle = .overFullScreen
-        vc.modalPresentationStyle = .formSheet  // TODO: add param
+        vc.modalPresentationStyle = .formSheet // TODO: add param
         
         await withCheckedContinuation { continuation in
             rootVC.present(vc, animated: true) {
