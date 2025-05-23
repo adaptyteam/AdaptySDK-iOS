@@ -79,56 +79,56 @@ public final class AdaptyOnboardingController: UIViewController {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyOnboardingController: AdaptyOnboardingViewDelegate {
-    package func onboardingView(
+    public func onboardingView(
         _ view: AdaptyOnboardingUIView,
         didFinishLoading action: OnboardingsDidFinishLoadingAction
     ) {
         delegate?.onboardingController(self, didFinishLoading: action)
     }
 
-    package func onboardingView(
+    public func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onCloseAction action: AdaptyOnboardingsCloseAction
     ) {
         delegate?.onboardingController(self, onCloseAction: action)
     }
 
-    package func onboardingView(
+    public func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onPaywallAction action: AdaptyOnboardingsOpenPaywallAction
     ) {
         delegate?.onboardingController(self, onPaywallAction: action)
     }
 
-    package func onboardingView(
+    public func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onCustomAction action: AdaptyOnboardingsCustomAction
     ) {
         delegate?.onboardingController(self, onCustomAction: action)
     }
 
-    package func onboardingView(
+    public func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction
     ) {
         delegate?.onboardingController(self, onStateUpdatedAction: action)
     }
 
-    package func onboardingView(
+    public func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent
     ) {
         delegate?.onboardingController(self, onAnalyticsEvent: event)
     }
 
-    package func onboardingView(
+    public func onboardingView(
         _ view: AdaptyOnboardingUIView,
         didFailWithError error: AdaptyUIError
     ) {
         delegate?.onboardingController(self, didFailWithError: error)
     }
 
-    package func onboardingsViewLoadingPlaceholder(
+    public func onboardingsViewLoadingPlaceholder(
         _ view: AdaptyOnboardingUIView
     ) -> UIView? {
         delegate?.onboardingsControllerLoadingPlaceholder(self)

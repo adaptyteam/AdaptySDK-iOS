@@ -280,16 +280,23 @@ public extension AdaptyUI {
     static func createOnboardingUIView(
         onboarding: AdaptyOnboarding
     ) throws -> (UIView, String) {
+        guard let uuniversalDelegate = AdaptyUI.universalDelegate else {
+            throw AdaptyUIError.adaptyUINotActivated
+        }
+        
         let config = try AdaptyUI.getOnboardingConfiguration(
             forOnboarding: onboarding
         )
         
-        let view = AdaptyOnboardingUIView(
+        let onboardingView = AdaptyOnboardingUIView(
             configuration: config
         )
         
-//        view.delegate = AdaptyUI.universalDelegate
-                
-        return (view, view.uid.uuidString)
+        onboardingView.configure(delegate: uuniversalDelegate)
+        onboardingView.layoutWebViewAndPlaceholder()
+        
+        onboardingView.configuration.viewModel.viewDidAppear()
+                        
+        return (onboardingView, onboardingView.uid.uuidString)
     }
 }

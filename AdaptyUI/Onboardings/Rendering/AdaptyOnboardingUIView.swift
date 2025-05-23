@@ -25,7 +25,7 @@ extension WKWebView {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-package final class AdaptyOnboardingUIView: UIView {
+public final class AdaptyOnboardingUIView: UIView {
     let uid = UUID()
     let configuration: AdaptyUI.OnboardingConfiguration
 
