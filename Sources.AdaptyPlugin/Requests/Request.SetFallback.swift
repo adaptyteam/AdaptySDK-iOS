@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct SetFallback: AdaptyPluginRequest {
-        static let method = "set_fallback_paywalls"
+        static let method = "set_fallback"
         let path: String
 
         private enum CodingKeys: CodingKey {

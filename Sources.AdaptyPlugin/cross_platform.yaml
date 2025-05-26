@@ -21,24 +21,24 @@ $requests:
         properties:
           success: { const: true }
 
-  ### adaptyUICreateView ###
-  AdaptyUICreateView.Request: #request
+  ### createPaywallView ###
+  AdaptyUICreatePaywallView.Request: #request
     type: object
     required:
       - method
       - paywall
     properties:
-      method: { const: "adapty_ui_create_view" }
+      method: { const: "adapty_ui_create_paywall_view" }
       paywall: { $ref: "#/$defs/AdaptyPaywall" }
       load_timeout: { type: number, description: "seconds" }
       preload_products: { type: boolean, default: false }
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
       custom_timers: { $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
-      custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" } 
+      custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" }
       android_personalized_offers:
         { $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
 
-  AdaptyUICreateView.Response: #response
+  AdaptyUICreatePaywallView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -46,18 +46,57 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { $ref: "#/$defs/AdaptyUI.View" }
+          success: { $ref: "#/$defs/AdaptyUI.PaywallView" }
 
-  ### adaptyUIDismissView ###
-  AdaptyUIDismissView.Request: #request
+  ### createOnboardingViewForTest ###
+  AdaptyUICreateOnboardingViewForTest.Request: #request
+    type: object
+    required:
+      - method
+      - placement_id
+    properties:
+      method: { const: "adapty_ui_create_onboarding_view_for_test" }
+      placement_id: { type: string }
+
+  AdaptyUICreateOnboardingViewForTest.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+
+  ### createOnboardingView ###
+  AdaptyUICreateOnboardingView.Request: #request
+    type: object
+    required:
+      - method
+      - onboarding
+    properties:
+      method: { const: "adapty_ui_create_onboarding_view" }
+
+  AdaptyUICreateOnboardingView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+
+  ### dismissOnboardingView ###
+  AdaptyUIDismissOnboardingView.Request: #request
     type: object
     required: [method, id]
     properties:
-      method: { const: "adapty_ui_dismiss_view" }
+      method: { const: "adapty_ui_dismiss_onboarding_view" }
       id: { type: string, description: "View Id" }
       destroy: { type: boolean, default: false }
 
-  AdaptyUIDismissView.Response: #response
+  AdaptyUIDismissOnboardingView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -67,15 +106,52 @@ $requests:
         properties:
           success: { const: true }
 
-  ### adaptyUIPresentView ###
-  AdaptyUIPresentView.Request: #request
+  ### dismissPaywallView ###
+  AdaptyUIDismissPaywallView.Request: #request
     type: object
     required: [method, id]
     properties:
-      method: { const: "adapty_ui_present_view" }
+      method: { const: "adapty_ui_dismiss_paywall_view" }
+      id: { type: string, description: "View Id" }
+      destroy: { type: boolean, default: false }
+
+  AdaptyUIDismissPaywallView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### presentOnboardingView ###
+  AdaptyUIPresentOnboardingView.Request: #request
+    type: object
+    required: [method, id]
+    properties:
+      method: { const: "adapty_ui_present_onboarding_view" }
       id: { type: string, description: "View Id" }
 
-  AdaptyUIPresentView.Response: #response
+  AdaptyUIPresentOnboardingView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### presentPaywallView ###
+  AdaptyUIPresentPaywallView.Request: #request
+    type: object
+    required: [method, id]
+    properties:
+      method: { const: "adapty_ui_present_paywall_view" }
+      id: { type: string, description: "View Id" }
+
+  AdaptyUIPresentPaywallView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -362,7 +438,7 @@ $requests:
 
   OpenWebPaywall.Request: #request
     type: object
-    required: [method ]
+    required: [method]
     properties:
       method: { const: "open_web_paywall" }
     oneOf:
@@ -385,7 +461,7 @@ $requests:
 
   CreateWebPaywallUrl.Request: #request
     type: object
-    required: [method ]
+    required: [method]
     properties:
       method: { const: "create_web_paywall_url" }
     oneOf:
@@ -473,7 +549,7 @@ $requests:
     type: object
     required: [method]
     properties:
-      method: { const: "set_fallback_paywalls" }
+      method: { const: "set_fallback" }
     oneOf:
       - required: [asset_id]
         properties:
@@ -600,21 +676,21 @@ $events:
     required: [id, view]
     properties:
       id: { const: "paywall_view_did_appear" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
-      
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+
   PaywallViewEvent.DidDisappear:
     type: object
     required: [id, view]
     properties:
       id: { const: "paywall_view_did_disappear" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
-      
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+
   PaywallViewEvent.DidUserAction:
     type: object
     required: [id, view, action]
     properties:
       id: { const: "paywall_view_did_perform_action" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       action: { $ref: "#/$defs/AdaptyUI.UserAction" }
 
   PaywallViewEvent.DidSelectProduct:
@@ -622,7 +698,7 @@ $events:
     required: [id, view, product_id]
     properties:
       id: { const: "paywall_view_did_select_product" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product_id: { type: string }
 
   PaywallViewEvent.WillPurchase:
@@ -630,7 +706,7 @@ $events:
     required: [id, view, product]
     properties:
       id: { const: "paywall_view_did_start_purchase" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
 
   PaywallViewEvent.DidPurchase:
@@ -638,7 +714,7 @@ $events:
     required: [id, view, product, purchased_result]
     properties:
       id: { const: "paywall_view_did_finish_purchase" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       purchased_result: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
@@ -647,7 +723,7 @@ $events:
     required: [id, view, product, error]
     properties:
       id: { const: "paywall_view_did_fail_purchase" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
 
@@ -656,14 +732,14 @@ $events:
     required: [id, view]
     properties:
       id: { const: "paywall_view_did_start_restore" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
 
   PaywallViewEvent.DidRestorePurchase:
     type: object
     required: [id, view, profile]
     properties:
       id: { const: "paywall_view_did_finish_restore" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       profile: { $ref: "#/$defs/AdaptyProfile" }
 
   PaywallViewEvent.DidFailRestorePurchase:
@@ -671,7 +747,7 @@ $events:
     required: [id, view, error]
     properties:
       id: { const: "paywall_view_did_fail_restore" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
   PaywallViewEvent.DidFailRendering:
@@ -679,7 +755,7 @@ $events:
     required: [id, view, error]
     properties:
       id: { const: "paywall_view_did_fail_rendering" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
   PaywallViewEvent.DidFailLoadingProducts:
@@ -687,15 +763,15 @@ $events:
     required: [id, view, error]
     properties:
       id: { const: "paywall_view_did_fail_loading_products" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
-      
+
   PaywallViewEvent.DidFinishWebPaymentNavigation:
     type: object
     required: [id, view]
     properties:
       id: { const: "paywall_view_did_finish_web_payment_navigation" }
-      view: { $ref: "#/$defs/AdaptyUI.View" }
+      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
 
@@ -889,14 +965,14 @@ $defs:
       onboarding_name: { type: string }
       variation_id: { type: string }
       remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
-      onboarding_builder: 
+      onboarding_builder:
         type: object
-        required: [lang,config_url]
+        required: [lang, config_url]
         properties:
           lang: { type: string }
           config_url: { type: string }
       payload_data: { type: string }
-      
+
   AdaptyPaywall: #request #response
     type: object
     required:
@@ -933,7 +1009,7 @@ $defs:
       revision: { type: integer }
       ab_test_name: { type: string }
       response_created_at: { type: integer }
-      is_tracking_purchases: { type: bool , default: false}
+      is_tracking_purchases: { type: bool, default: false }
       placement_audience_version_id: { type: string }
 
   AdaptyPlacementFetchPolicy: #request
@@ -1185,25 +1261,38 @@ $defs:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
 
-  AdaptyUI.CustomAssets: 
+  AdaptyUI.CustomAssets:
     type: array
     items:
       oneOf:
         - $ref: "#/$assets/Color"
         - $ref: "#/$assets/ColorGradient"
         - $ref: "#/$assets/Image"
-        - $ref: "#/$assets/Video" 
+        - $ref: "#/$assets/Video"
 
-  AdaptyUI.View: #response #event
+  AdaptyUI.PaywallView: #response #event
+    type: object
+    required:
+      - id
+      - template_id
+      - placement_id
+      - variation_id
+    properties:
+      id: { type: string }
+      template_id: { type: string }
+      placement_id: { type: string }
+      variation_id: { type: string }
+
+  AdaptyUI.OnboardingView: #response #event
     type: object
     required:
       - id
       - placement_id
-      - paywall_variation_id
+      - variation_id
     properties:
       id: { type: string }
       placement_id: { type: string }
-      paywall_variation_id: { type: string }
+      variation_id: { type: string }
 
   AdaptyUI.UserAction: #event
     type: object
@@ -1267,7 +1356,7 @@ $defs:
       - decline
 
 $assets:
-  Color: 
+  Color:
     type: object
     required: [id, type, value]
     properties:
@@ -1275,16 +1364,16 @@ $assets:
       type: { const: color }
       value: { $ref: "#/$assets/Color.Hex" }
 
-  Color.Hex: 
+  Color.Hex:
     type: string
     pattern: "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"
     description: RRGGBB or RRGGBBAA
 
-  ColorGradient: 
+  ColorGradient:
     type: object
     required: [id, type, values, points]
     properties:
-      id: { type: string  }
+      id: { type: string }
       type:
         type: string
         enum:
@@ -1308,7 +1397,7 @@ $assets:
 
   Image:
     type: object
-    required: [id, type] 
+    required: [id, type]
     properties:
       id: { type: string }
       type: { const: image }
@@ -1323,7 +1412,7 @@ $assets:
         properties:
           path: { type: string }
 
-  Video: 
+  Video:
     type: object
     required: [id, type]
     properties:
@@ -1336,4 +1425,3 @@ $assets:
       - required: [path]
         properties:
           path: { type: string }
-

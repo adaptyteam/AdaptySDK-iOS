@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Request.AdaptyUIDismissOnboardingView.swift
 //  AdaptyPlugin
 //
 //  Created by Alexey Goncharov on 5/16/25.

@@ -64,10 +64,10 @@ struct AdaptyUIImageView: View {
     private func rasterImage(
         _ uiImage: UIImage?,
         aspect: VC.AspectRatio,
-        tint: VC.Filling?
+        tint: VC.Color.Resolved?
     ) -> some View {
         if let uiImage {
-            if let tint = tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver) {
+            if let tint = tint {
                 Image(uiImage: uiImage)
                     .resizable()
                     .renderingMode(.template)
@@ -86,11 +86,11 @@ struct AdaptyUIImageView: View {
 
     @ViewBuilder
     private func resolvedSchemeBody(
-        asset: VC.ImageData,
+        asset: VC.ImageData.Resolved,
         aspect: VC.AspectRatio,
-        tint: VC.Filling?
+        tint: VC.Color.Resolved?
     ) -> some View {
-        switch asset.resolve(with: assetsViewModel.assetsResolver) {
+        switch asset {
         case let .image(image):
             rasterImage(image, aspect: aspect, tint: tint)
         case let .remote(url, preview):
@@ -112,12 +112,16 @@ struct AdaptyUIImageView: View {
         switch data {
         case let .image(image):
             resolvedSchemeBody(
-                asset: image.asset.usedColorScheme(colorScheme),
+                asset: image.asset.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme),
                 aspect: image.aspect,
-                tint: image.tint?.usedColorScheme(colorScheme)
+                tint: image.tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
             )
         case let .raw(asset, aspect, tint):
-            resolvedSchemeBody(asset: asset, aspect: aspect, tint: tint)
+            resolvedSchemeBody(
+                asset: asset.resolve(with: assetsViewModel.assetsResolver),
+                aspect: aspect,
+                tint: tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver)
+            )
         }
     }
 }
