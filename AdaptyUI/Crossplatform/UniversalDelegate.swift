@@ -13,7 +13,7 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI {
-    public static var universalDelegate: (AdaptyPaywallControllerDelegate & AdaptyOnboardingControllerDelegate & AdaptyOnboardingViewDelegate)?
+    public static var universalDelegate: (AdaptyPaywallControllerDelegate & AdaptyOnboardingControllerDelegate)?
 
     package static func paywallControllerWithUniversalDelegate(
         _ paywallConfiguration: PaywallConfiguration,

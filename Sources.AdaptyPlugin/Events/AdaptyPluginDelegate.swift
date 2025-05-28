@@ -16,8 +16,6 @@ final class AdaptyPluginDelegate {
     init(eventHandler: EventHandler) {
         self.eventHandler = eventHandler
     }
-
-    var onboardingPlatformViewIdsAssociation: [String: String] = [:]
 }
 
 extension AdaptyPluginDelegate: AdaptyDelegate {
@@ -29,6 +27,8 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
 }
 
 #if canImport(UIKit)
+
+import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
@@ -180,54 +180,9 @@ extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
     func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent) {}
 
     func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyUIError) {}
-}
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyPluginDelegate: AdaptyOnboardingViewDelegate {
-    public func onboardingView(
-        _ view: AdaptyOnboardingUIView,
-        didFinishLoading action: OnboardingsDidFinishLoadingAction
-    ) {
-    }
-
-    public func onboardingView(
-        _ view: AdaptyOnboardingUIView,
-        onCloseAction action: AdaptyOnboardingsCloseAction
-    ) {
-    }
-
-    public func onboardingView(
-        _ view: AdaptyOnboardingUIView,
-        onPaywallAction action: AdaptyOnboardingsOpenPaywallAction
-    ) {
-    }
-
-    public func onboardingView(
-        _ view: AdaptyOnboardingUIView,
-        onCustomAction action: AdaptyOnboardingsCustomAction
-    ) {
-    }
-
-    public func onboardingView(
-        _ view: AdaptyOnboardingUIView,
-        onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction
-    ) {
-    }
-
-    public func onboardingView(
-        _ view: AdaptyOnboardingUIView,
-        onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent
-    ) {
-    }
-
-    public func onboardingView(
-        _ view: AdaptyOnboardingUIView,
-        didFailWithError error: AdaptyUIError
-    ) {
-    }
-
-    public func onboardingsViewLoadingPlaceholder(
-        _ view: AdaptyOnboardingUIView
+    func onboardingsControllerLoadingPlaceholder(
+        _ controller: AdaptyOnboardingController
     ) -> UIView? {
         nil
     }

@@ -274,31 +274,3 @@ package extension AdaptyUI.Plugin {
         )
     }
 }
-
-// TODO: Move this to Plugin
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-public extension AdaptyUI {
-    static func createOnboardingUIView(
-        onboarding: AdaptyOnboarding
-    ) throws -> (UIView, String) {
-        guard let uuniversalDelegate = AdaptyUI.universalDelegate else {
-            throw AdaptyUIError.adaptyUINotActivated
-        }
-        
-        let config = try AdaptyUI.getOnboardingConfiguration(
-            forOnboarding: onboarding
-        )
-        
-        let onboardingView = AdaptyOnboardingUIView(
-            configuration: config
-        )
-        
-        onboardingView.configure(delegate: uuniversalDelegate)
-        onboardingView.layoutWebViewAndPlaceholder()
-        
-        onboardingView.configuration.viewModel.viewDidAppear()
-                        
-        return (onboardingView, onboardingView.uid.uuidString)
-    }
-}

@@ -30,12 +30,4 @@ public extension AdaptyPlugin {
         }
 #endif
     }
-    
-    @MainActor
-    static func addOnboardingViewAssociation(
-        crossplatformViewId: String,
-        nativeViewId: String
-    ) {
-        delegate?.onboardingPlatformViewIdsAssociation[nativeViewId] = crossplatformViewId
-    }
 }

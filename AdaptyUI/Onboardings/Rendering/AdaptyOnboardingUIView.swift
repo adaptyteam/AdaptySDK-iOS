@@ -25,8 +25,8 @@ extension WKWebView {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public final class AdaptyOnboardingUIView: UIView {
-    let uid = UUID()
+package final class AdaptyOnboardingUIView: UIView {
+    let id: String
     let configuration: AdaptyUI.OnboardingConfiguration
 
     private var viewModel: AdaptyOnboardingViewModel { configuration.viewModel }
@@ -36,7 +36,11 @@ public final class AdaptyOnboardingUIView: UIView {
 
     weak var delegate: AdaptyOnboardingViewDelegate?
 
-    init(configuration: AdaptyUI.OnboardingConfiguration) {
+    package init(
+        configuration: AdaptyUI.OnboardingConfiguration,
+        id: String = UUID().uuidString
+    ) {
+        self.id = id
         self.configuration = configuration
         self.logId = configuration.viewModel.logId
 
@@ -73,7 +77,7 @@ public final class AdaptyOnboardingUIView: UIView {
         delegate?.apply(error: error, from: self)
     }
 
-    func configure(delegate: AdaptyOnboardingViewDelegate) {
+    package func configure(delegate: AdaptyOnboardingViewDelegate) {
         Log.ui.verbose("V #\(logId)# configure")
 
         self.delegate = delegate
@@ -82,9 +86,9 @@ public final class AdaptyOnboardingUIView: UIView {
 
     private var placeholderView: UIView?
 
-    func layout(in parentView: UIView) {
+    package func layout(in parentView: UIView) {
         Log.ui.verbose("V #\(logId)# layout(in:)")
-        
+
         translatesAutoresizingMaskIntoConstraints = false
 
         parentView.addSubview(self)
@@ -97,9 +101,9 @@ public final class AdaptyOnboardingUIView: UIView {
         ])
     }
 
-    func layoutWebViewAndPlaceholder() {
+    package func layoutWebViewAndPlaceholder() {
         Log.ui.verbose("V #\(logId)# layoutWebView")
-        
+
         webView.translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(webView)
@@ -113,7 +117,7 @@ public final class AdaptyOnboardingUIView: UIView {
 
         if let placeholderView = delegate?.onboardingsViewLoadingPlaceholder(self) {
             placeholderView.translatesAutoresizingMaskIntoConstraints = false
-            
+
             addSubview(placeholderView)
 
             addConstraints([
