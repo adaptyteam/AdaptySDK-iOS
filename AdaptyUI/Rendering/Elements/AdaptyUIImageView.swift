@@ -64,14 +64,14 @@ struct AdaptyUIImageView: View {
     private func rasterImage(
         _ uiImage: UIImage?,
         aspect: VC.AspectRatio,
-        tint: VC.Filling?
+        tint: VC.Color.Resolved?
     ) -> some View {
         if let uiImage {
-            if let tint = tint?.asSolidColor?.swiftuiColor {
+            if let tint = tint {
                 Image(uiImage: uiImage)
                     .resizable()
                     .renderingMode(.template)
-                    .foregroundColor(tint(assetsViewModel.assetsResolver))
+                    .foregroundColor(tint)
                     .aspectRatio(aspect)
 
             } else {
@@ -85,22 +85,14 @@ struct AdaptyUIImageView: View {
     }
 
     @ViewBuilder
-    private func resolvedCustomImage(
-        customAsset: AdaptyCustomImageAsset,
+    private func resolvedSchemeBody(
+        asset: VC.ImageData.Resolved,
         aspect: VC.AspectRatio,
-        tint: VC.Filling?
+        tint: VC.Color.Resolved?
     ) -> some View {
-        switch customAsset {
-        case let .file(url):
-            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                rasterImage(
-                    image,
-                    aspect: aspect,
-                    tint: tint
-                )
-            } else {
-                EmptyView()
-            }
+        switch asset {
+        case let .image(image):
+            rasterImage(image, aspect: aspect, tint: tint)
         case let .remote(url, preview):
             KFImage
                 .url(url)
@@ -113,61 +105,6 @@ struct AdaptyUIImageView: View {
                         EmptyView()
                     }
                 }
-        case let .uiImage(value):
-            rasterImage(
-                value,
-                aspect: aspect,
-                tint: tint
-            )
-        }
-    }
-
-    @ViewBuilder
-    private func resolvedSchemeBody(
-        asset: VC.ImageData,
-        aspect: VC.AspectRatio,
-        tint: VC.Filling?
-    ) -> some View {
-        switch asset {
-        case let .raster(customId, data):
-            if let customId,
-               case let .image(customAsset) = assetsViewModel.assetsResolver.asset(for: customId)
-            {
-                resolvedCustomImage(
-                    customAsset: customAsset,
-                    aspect: aspect,
-                    tint: tint
-                )
-            } else {
-                rasterImage(
-                    UIImage(data: data),
-                    aspect: aspect,
-                    tint: tint
-                )
-            }
-        case let .url(customId, url, preview):
-            if let customId,
-               case let .image(customAsset) = assetsViewModel.assetsResolver.asset(for: customId)
-            {
-                resolvedCustomImage(
-                    customAsset: customAsset,
-                    aspect: aspect,
-                    tint: tint
-                )
-            } else {
-                KFImage
-                    .url(url)
-                    .resizable()
-                    .aspectRatio(aspect)
-                    .background {
-                        if let preview {
-                            let image = UIImage(data: preview)
-                            rasterImage(image, aspect: aspect, tint: tint)
-                        } else {
-                            EmptyView()
-                        }
-                    }
-            }
         }
     }
 
@@ -175,12 +112,16 @@ struct AdaptyUIImageView: View {
         switch data {
         case let .image(image):
             resolvedSchemeBody(
-                asset: image.asset.of(colorScheme),
+                asset: image.asset.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme),
                 aspect: image.aspect,
-                tint: image.tint?.of(colorScheme)
+                tint: image.tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
             )
         case let .raw(asset, aspect, tint):
-            resolvedSchemeBody(asset: asset, aspect: aspect, tint: tint)
+            resolvedSchemeBody(
+                asset: asset.resolve(with: assetsViewModel.assetsResolver),
+                aspect: aspect,
+                tint: tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver)
+            )
         }
     }
 }

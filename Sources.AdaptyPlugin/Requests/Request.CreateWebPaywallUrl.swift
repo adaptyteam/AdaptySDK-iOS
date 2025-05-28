@@ -1,5 +1,5 @@
 //
-//  Requests.CreateWebPaywallUrl.swift
+//  Request.CreateWebPaywallUrl.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 05.05.2025.
