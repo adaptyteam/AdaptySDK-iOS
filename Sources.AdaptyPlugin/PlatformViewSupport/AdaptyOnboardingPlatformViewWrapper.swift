@@ -14,7 +14,7 @@ public final class AdaptyOnboardingPlatformViewWrapper: UIView {
     private let eventHandler: EventHandler
     private let onboardingView: AdaptyOnboardingUIView
 
-    package init(
+    public init(
         viewId: String,
         eventHandler: EventHandler,
         configuration: AdaptyUI.OnboardingConfiguration
