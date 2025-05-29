@@ -775,6 +775,120 @@ $events:
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
 
+  OnboardingViewEvent.DidFailWithError:
+    type: object
+    required: [id, view, error]
+    properties:
+      id: { const: "onboarding_did_fail_with_error" }
+      view: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+      error: { $ref: "#/$defs/AdaptyError" }
+
+  OnboardingViewEvent.OnAnalyticsEvent:
+    type: object
+    required: [id, view, meta, event]
+    properties:
+      id: { const: "onboarding_on_analytics_action" }
+      view: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+      meta: { $ref: "#/$defs/AdaptyUI.OnboardingMeta" }
+      event:
+        type: object
+        required: [name]
+        properties:
+          name:
+            oneOf:
+              - type: string
+                description: any value for unknown event
+              - enum:
+                  - onboarding_started
+                  - screen_presented
+                  - screen_completed
+                  - second_screen_presented
+                  - registration_screen_presented
+                  - products_screen_presented
+                  - user_email_collected
+                  - onboarding_completed
+          element_id: { type: string }
+          reply: { type: string }
+
+  OnboardingViewEvent.DidFinishLoading:
+    type: object
+    required: [id, view, meta]
+    properties:
+      id: { const: "onboarding_did_finish_loading" }
+      view: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+      meta: { $ref: "#/$defs/AdaptyUI.OnboardingMeta" }
+
+  OnboardingViewEvent.OnCloseAction:
+    type: object
+    required: [id, view, meta, action_id]
+    properties:
+      id: { const: "onboarding_on_close_action" }
+      view: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+      meta: { $ref: "#/$defs/AdaptyUI.OnboardingMeta" }
+      action_id: { type: string }
+
+  OnboardingViewEvent.OnCustomAction:
+    type: object
+    required: [id, view, meta, action_id]
+    properties:
+      id: { const: "onboarding_on_custom_action" }
+      view: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+      meta: { $ref: "#/$defs/AdaptyUI.OnboardingMeta" }
+      action_id: { type: string }
+
+  OnboardingViewEvent.OnPaywallAction:
+    type: object
+    required: [id, view, meta, action_id]
+    properties:
+      id: { const: "onboarding_on_paywall_action" }
+      view: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+      meta: { $ref: "#/$defs/AdaptyUI.OnboardingMeta" }
+      action_id: { type: string }
+
+  OnboardingViewEvent.OnStateUpdatedAction:
+    type: object
+    required: [id, view, meta, action]
+    properties:
+      id: { const: "onboarding_on_state_updated_action" }
+      view: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
+      meta: { $ref: "#/$defs/AdaptyUI.OnboardingMeta" }
+      action:
+        type: object
+        required: [element_id, element_type, value]
+        oneOf:
+          - properties:
+              element_id: { type: string }
+              element_type: { const: select }
+              value: { $ref: "#/$defs/AdaptyUI.OnboardingsStateParams" }
+          - properties:
+              element_id: { type: string }
+              element_type: { const: multi_select }
+              value:
+                type: array
+                items: { $ref: "#/$defs/AdaptyUI.OnboardingsStateParams" }
+          - properties:
+              element_id: { type: string }
+              element_type: { const: input }
+              value:
+                type: object
+                required: [type, value]
+                oneOf:
+                  - properties:
+                      type: { enum: [text, email] }
+                      value: { type: string }
+                  - properties:
+                      type: { const: number }
+                      value: { type: number }
+          - properties:
+              element_id: { type: string }
+              element_type: { const: date_picker }
+              value:
+                type: object
+                properties:
+                  day: { type: integer }
+                  month: { type: integer }
+                  year: { type: integer }
+
 $defs:
   ### Entities ###
 
@@ -957,7 +1071,6 @@ $defs:
       - onboarding_id
       - onboarding_name
       - variation_id
-      - onboarding_config_url
       - onboarding_builder
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
@@ -1274,12 +1387,10 @@ $defs:
     type: object
     required:
       - id
-      - template_id
       - placement_id
       - variation_id
     properties:
       id: { type: string }
-      template_id: { type: string }
       placement_id: { type: string }
       variation_id: { type: string }
 
@@ -1354,6 +1465,23 @@ $defs:
       - no_preference
       - grant
       - decline
+
+  AdaptyUI.OnboardingMeta: #event
+    type: object
+    required: [onboarding_id, screen_cid, screen_index, total_screens]
+    properties:
+      onboarding_id: { type: string }
+      screen_cid: { type: string }
+      screen_index: { type: integer }
+      total_screens: { type: integer }
+
+  AdaptyUI.OnboardingsStateParams: #event
+    type: object
+    required: [id, value, label]
+    properties:
+      id: { type: string }
+      value: { type: string }
+      label: { type: string }
 
 $assets:
   Color:

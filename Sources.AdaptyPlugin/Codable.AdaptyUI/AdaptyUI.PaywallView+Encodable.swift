@@ -12,7 +12,6 @@ import Foundation
 extension AdaptyUI.PaywallView: Encodable {
     enum CodingKeys: String, CodingKey {
         case id
-        case templateId = "template_id"
         case placementId = "placement_id"
         case variationId = "variation_id"
     }
@@ -20,7 +19,6 @@ extension AdaptyUI.PaywallView: Encodable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
-        try container.encode(templateId, forKey: .templateId)
         try container.encode(placementId, forKey: .placementId)
         try container.encode(variationId, forKey: .variationId)
     }
