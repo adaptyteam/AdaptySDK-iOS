@@ -1072,6 +1072,7 @@ $defs:
       - onboarding_name
       - variation_id
       - onboarding_builder
+      - response_created_at
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       onboarding_id: { type: string }
@@ -1085,6 +1086,8 @@ $defs:
           lang: { type: string }
           config_url: { type: string }
       payload_data: { type: string }
+      response_created_at: { type: integer }
+
 
   AdaptyPaywall: #request #response
     type: object
@@ -1094,6 +1097,7 @@ $defs:
       - paywall_name
       - variation_id
       - products
+      - response_created_at
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       paywall_id: { type: string }
@@ -1106,6 +1110,8 @@ $defs:
         items: { $ref: "#/$defs/AdaptyPaywall.ProductReference" }
       web_purchase_url: { type: string }
       payload_data: { type: string }
+      response_created_at: { type: integer }
+
 
   AdaptyPlacement: #request #response
     type: object
@@ -1114,14 +1120,12 @@ $defs:
       - audience_name
       - revision
       - ab_test_name
-      - response_created_at
       - placement_audience_version_id
     properties:
       developer_id: { type: string }
       audience_name: { type: string }
       revision: { type: integer }
       ab_test_name: { type: string }
-      response_created_at: { type: integer }
       is_tracking_purchases: { type: bool, default: false }
       placement_audience_version_id: { type: string }
 
