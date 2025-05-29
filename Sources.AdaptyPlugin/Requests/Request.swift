@@ -46,7 +46,6 @@ enum Request {
                 AdaptyUIDismissPaywallView.self,
                 AdaptyUIPresentPaywallView.self,
 
-                AdaptyUICreateOnboardingViewForTest.self, // TODO: Remove
                 AdaptyUICreateOnboardingView.self,
                 AdaptyUIDismissOnboardingView.self,
                 AdaptyUIPresentOnboardingView.self,
