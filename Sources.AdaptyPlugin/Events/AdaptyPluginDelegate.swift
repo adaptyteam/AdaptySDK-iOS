@@ -167,19 +167,89 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
-    func onboardingController(_ controller: AdaptyOnboardingController, didFinishLoading action: OnboardingsDidFinishLoadingAction) {}
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        didFinishLoading action: OnboardingsDidFinishLoadingAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.DidFinishLoading(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
-    func onboardingController(_ controller: AdaptyOnboardingController, onCloseAction action: AdaptyOnboardingsCloseAction) {}
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onCloseAction action: AdaptyOnboardingsCloseAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnCloseAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
-    func onboardingController(_ controller: AdaptyOnboardingController, onPaywallAction action: AdaptyOnboardingsOpenPaywallAction) {}
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onPaywallAction action: AdaptyOnboardingsOpenPaywallAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnPaywallAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
-    func onboardingController(_ controller: AdaptyOnboardingController, onCustomAction action: AdaptyOnboardingsCustomAction) {}
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onCustomAction action: AdaptyOnboardingsCustomAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnCustomAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
-    func onboardingController(_ controller: AdaptyOnboardingController, onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction) {}
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnStateUpdatedAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
-    func onboardingController(_ controller: AdaptyOnboardingController, onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent) {}
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnAnalyticsAction(
+                view: controller.toAdaptyUIView(),
+                event: event
+            )
+        )
+    }
 
-    func onboardingController(_ controller: AdaptyOnboardingController, didFailWithError error: AdaptyUIError) {}
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        didFailWithError error: AdaptyUIError
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.DidFailWithError(
+                view: controller.toAdaptyUIView(),
+                error: error
+            )
+        )
+    }
 
     func onboardingsControllerLoadingPlaceholder(
         _ controller: AdaptyOnboardingController

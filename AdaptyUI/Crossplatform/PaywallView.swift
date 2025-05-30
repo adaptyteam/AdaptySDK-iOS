@@ -15,7 +15,7 @@ public extension AdaptyUI {
         package let placementId: String
         package let variationId: String
     }
-    
+
     struct OnboardingView: Sendable {
         package let id: String
         package let placementId: String
@@ -39,6 +39,17 @@ public extension AdaptyPaywallController {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyOnboardingController {
+    func toAdaptyUIView() -> AdaptyUI.OnboardingView {
+        AdaptyUI.OnboardingView(
+            id: id,
+            placementId: onboarding.placement.id,
+            variationId: onboarding.variationId
+        )
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+package extension AdaptyOnboardingUIView {
     func toAdaptyUIView() -> AdaptyUI.OnboardingView {
         AdaptyUI.OnboardingView(
             id: id,

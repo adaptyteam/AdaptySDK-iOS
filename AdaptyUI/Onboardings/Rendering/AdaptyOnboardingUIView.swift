@@ -28,6 +28,7 @@ extension WKWebView {
 package final class AdaptyOnboardingUIView: UIView {
     let id: String
     let configuration: AdaptyUI.OnboardingConfiguration
+    var onboarding: AdaptyOnboarding { configuration.viewModel.onboarding }
 
     private var viewModel: AdaptyOnboardingViewModel { configuration.viewModel }
     private let logId: String

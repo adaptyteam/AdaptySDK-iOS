@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 5/28/25.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import AdaptyUI
 import UIKit
@@ -27,7 +29,7 @@ public final class AdaptyOnboardingPlatformViewWrapper: UIView {
         )
 
         super.init(frame: .zero)
-        
+
         layout()
     }
 
@@ -50,39 +52,90 @@ extension AdaptyOnboardingPlatformViewWrapper: AdaptyOnboardingViewDelegate {
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,
         didFinishLoading action: OnboardingsDidFinishLoadingAction
-    ) {}
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.DidFinishLoading(
+                view: view.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onCloseAction action: AdaptyOnboardingsCloseAction
-    ) {}
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnCloseAction(
+                view: view.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onPaywallAction action: AdaptyOnboardingsOpenPaywallAction
-    ) {}
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnPaywallAction(
+                view: view.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onCustomAction action: AdaptyOnboardingsCustomAction
-    ) {}
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnCustomAction(
+                view: view.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction
-    ) {}
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnStateUpdatedAction(
+                view: view.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
 
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,
         onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent
-    ) {}
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnAnalyticsAction(
+                view: view.toAdaptyUIView(),
+                event: event
+            )
+        )
+    }
 
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,
         didFailWithError error: AdaptyUIError
-    ) {}
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.DidFailWithError(
+                view: view.toAdaptyUIView(),
+                error: error
+            )
+        )
+    }
 
     package func onboardingsViewLoadingPlaceholder(
         _ view: AdaptyOnboardingUIView
     ) -> UIView? { nil }
 }
+
+#endif
