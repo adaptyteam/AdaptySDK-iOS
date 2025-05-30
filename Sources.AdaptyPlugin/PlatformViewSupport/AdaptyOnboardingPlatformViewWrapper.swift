@@ -37,11 +37,10 @@ public final class AdaptyOnboardingPlatformViewWrapper: UIView {
     }
 
     private func layout() {
-//        Log.ui.verbose("VC #\(logId)# layout begin")
-
         onboardingView.configure(delegate: self)
         onboardingView.layout(in: self)
         onboardingView.layoutWebViewAndPlaceholder()
+        onboardingView.callViewDidAppear()
     }
 }
 

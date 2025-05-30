@@ -130,6 +130,10 @@ package final class AdaptyOnboardingUIView: UIView {
             self.placeholderView = placeholderView
         }
     }
+    
+    package func callViewDidAppear() {
+        viewModel.viewDidAppear()
+    }
 }
 
 #endif
