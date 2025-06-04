@@ -92,7 +92,8 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
                     AttributedString.createFrom(
                         value: value,
                         attributes: attr,
-                        assetsResolver: assetsResolver
+                        assetsResolver: assetsResolver,
+                        colorScheme: colorScheme
                     )
                 )
             case let .tag(value, attr):
@@ -118,13 +119,17 @@ extension Array where Element == AdaptyViewConfiguration.RichText.Item {
                     AttributedString.createFrom(
                         value: tagReplacementResult,
                         attributes: attr,
-                        assetsResolver: assetsResolver
+                        assetsResolver: assetsResolver,
+                        colorScheme: colorScheme
                     )
                 )
             case let .image(value, attr):
                 guard let uiImage = value?.resolve(with: assetsResolver, colorScheme: colorScheme).textAttachmentImage(
                     font: attr.uiFont(assetsResolver),
-                    tint: attr.imageTintColor?.asSolidColor?.resolve(with: assetsResolver)
+                    tint: attr.imageTintColor?.asSolidColor?.resolve(
+                        with: assetsResolver,
+                        colorScheme: colorScheme
+                    ).uiColor
                 ) else {
                     return partialResult
                 }
@@ -266,15 +271,23 @@ extension AttributedString {
     static func createFrom(
         value: String,
         attributes: VC.RichText.TextAttributes?,
-        assetsResolver: AdaptyAssetsResolver
+        assetsResolver: AdaptyAssetsResolver,
+        colorScheme: ColorScheme
     ) -> AttributedString {
         var result = AttributedString(value)
-
-        result.foregroundColor = attributes?.uiColor(assetsResolver) ?? .darkText
+        
+        result.foregroundColor = attributes?.txtColor.asSolidColor?.resolve(
+            with: assetsResolver,
+            colorScheme: colorScheme
+        ).uiColor ?? .darkText
+        
         result.font = attributes?.uiFont(assetsResolver) ?? .adaptyDefault
 
         if let background = attributes?.background?.asSolidColor {
-            result.backgroundColor = background.resolve(with: assetsResolver)
+            result.backgroundColor = background.resolve(
+                with: assetsResolver,
+                colorScheme: colorScheme
+            )
         }
 
         if attributes?.strike ?? false {
@@ -299,14 +312,6 @@ extension UIFont {
 extension VC.RichText.TextAttributes {
     func uiFont(_ assetsResolver: AdaptyAssetsResolver) -> UIFont {
         font.resolve(with: assetsResolver, withSize: size)
-    }
-
-    func uiColor(_ assetsResolver: AdaptyAssetsResolver) -> UIColor? {
-        txtColor.asSolidColor?.resolve(with: assetsResolver)
-    }
-
-    func backgroundUIColor(_ assetsResolver: AdaptyAssetsResolver) -> UIColor? {
-        background?.asSolidColor?.resolve(with: assetsResolver)
     }
 }
 

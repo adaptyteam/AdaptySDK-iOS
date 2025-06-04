@@ -53,27 +53,6 @@ extension VC.Mode<VC.Color> {
     func resolve(with resolver: AdaptyAssetsResolver, colorScheme: ColorScheme) -> SwiftUI.Color {
         usedColorScheme(colorScheme).resolve(with: resolver)
     }
-
-//    @available(*, deprecated, message: "Use `resolve(with:, colorScheme:)` instead.")
-    func resolve(with resolver: AdaptyAssetsResolver) -> UIColor {
-        UIColor {
-            let colorScheme: ColorScheme =
-                switch $0.userInterfaceStyle {
-                case .dark: .dark
-                default: .light
-                }
-
-            let swiftColor: SwiftUI.Color = usedColorScheme(colorScheme).resolve(with: resolver)
-
-            return UIColor(swiftColor)
-        }
-    }
-
-//    @available(*, deprecated, message: "Use `resolve(with:, colorScheme:)` instead.")
-    func resolve(with resolver: AdaptyAssetsResolver) -> SwiftUI.Color {
-        let uiColor: UIColor = resolve(with: resolver)
-        return SwiftUI.Color(uiColor)
-    }
 }
 
 #endif
