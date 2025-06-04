@@ -7,4 +7,7 @@
 
 import Foundation
 
-
+enum ProductsFetchPolicy: Sendable, Hashable {
+    case `default`
+    case returnCacheDataElseLoad
+}

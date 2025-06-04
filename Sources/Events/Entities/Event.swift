@@ -4,7 +4,6 @@
 //
 //  Created by Aleksei Valiano on 14.09.2024
 //
-//
 
 import Foundation
 
@@ -12,7 +11,9 @@ enum Event: Sendable {
     case appOpened
     case paywallShowed(AdaptyPaywallShowedParameters)
     case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)
-    case onboardingScreenShowed(AdaptyOnboardingScreenParameters)
+    case onboardingVariationAssigned(AdaptyOnboardingVariationAssignedParameters)
+    case onboardingScreenShowed(AdaptyOnboardingScreenShowedParameters)
+    case legacyOnboardingScreenShowed(AdaptyOnboardingScreenParameters)
     case сonsentToCollectingRefundData(AdaptyConsentToCollectingDataParameters)
     case refundPreference(AdaptyRefundPreferenceParameters)
     case system(AdaptySystemEventParameters)
@@ -35,9 +36,13 @@ extension Event: Encodable {
             break
         case let .paywallShowed(value):
             try value.encode(to: encoder)
-        case let .onboardingScreenShowed(value):
+        case let .legacyOnboardingScreenShowed(value):
             try value.encode(to: encoder)
         case let .paywallVariationAssigned(value):
+            try value.encode(to: encoder)
+        case let .onboardingVariationAssigned(value):
+            try value.encode(to: encoder)
+        case let .onboardingScreenShowed(value):
             try value.encode(to: encoder)
         case let .сonsentToCollectingRefundData(value):
             try value.encode(to: encoder)

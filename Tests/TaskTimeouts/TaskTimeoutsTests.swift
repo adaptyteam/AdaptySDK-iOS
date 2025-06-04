@@ -1,6 +1,6 @@
 //
 //  TaskTimeoutsTests.swift
-//  Adapty
+//  AdaptyTests
 //
 //  Created by Alexey Goncharov on 1/28/25.
 //
@@ -22,10 +22,10 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeIntrval)
+        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
     }
 
-    @Test func testTaskWithotCancelletionHandler() async {
+    @Test func testTaskWithoutCancellationHandler() async {
         let start = Date()
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
@@ -37,17 +37,17 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) > 2 * duration.asTimeIntrval)
+        #expect(Date().timeIntervalSince(start) > 2 * duration.asTimeInterval)
     }
-    
-    @Test func testTaskWithCancelletionHandler() async {
+
+    @Test func testTaskWithCancellationHandler() async {
         let start = Date()
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
                 let nestedTask = Task {
                     try await Task.sleep(nanoseconds: 2 * duration.asNanoseconds)
                 }
-                
+
                 // Add cleanup to ensure the task is cancelled if timeout occurs
                 try await withTaskCancellationHandler {
                     try await nestedTask.value
@@ -57,7 +57,7 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeIntrval)
+        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
     }
 }
 

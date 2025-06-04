@@ -51,7 +51,7 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendIntrodu
         configuration?.configure(jsonDecoder: jsonDecoder)
 
         let body: [BackendIntroductoryOfferEligibilityState]? = try jsonDecoder.decode(
-            Backend.Response.ValueOfData<[BackendIntroductoryOfferEligibilityState]>.self,
+            Backend.Response.Data<[BackendIntroductoryOfferEligibilityState]>.self,
             responseBody: response.body
         ).value
         return response.replaceBody(body)

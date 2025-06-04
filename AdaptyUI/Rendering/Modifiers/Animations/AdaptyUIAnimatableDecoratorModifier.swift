@@ -11,29 +11,6 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.Mode {
-    func of(_ colorScheme: ColorScheme) -> T {
-        switch colorScheme {
-        case .light: mode(.light)
-        case .dark: mode(.dark)
-        @unknown default: mode(.light)
-        }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-extension AdaptyViewConfiguration.ColorGradient {
-    func stops(_ assetsResolver: AdaptyAssetsResolver) -> [Gradient.Stop] {
-        let result = items
-            .map { $0.gradientStop(assetsResolver) }
-            .sorted(by: { $0.location < $1.location })
-
-        return result
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension InsettableShape {
     @ViewBuilder
@@ -42,55 +19,36 @@ extension InsettableShape {
         colorScheme: ColorScheme,
         assetsResolver: AdaptyAssetsResolver
     ) -> some View {
-        switch filling.of(colorScheme) {
+        switch filling.resolve(with: assetsResolver, colorScheme: colorScheme) {
         case let .solidColor(color):
-            self.fill(color.swiftuiColor(assetsResolver))
+            self.fill(color)
         case let .colorGradient(gradient):
-            if let customId = gradient.customId,
-               case let .gradient(customGradient) = assetsResolver.asset(for: customId)
-            {
-                switch customGradient {
-                case let .linear(gradient, startPoint, endPoint):
-                    self.fill(
-                        LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint)
+            switch gradient {
+            case let .linear(gradient, start, stop):
+                self.fill(
+                    LinearGradient(
+                        gradient: gradient,
+                        startPoint: start,
+                        endPoint: stop
                     )
-                case let .angular(gradient, center, angle):
-                    self.fill(
-                        AngularGradient(gradient: gradient, center: center, angle: angle)
+                )
+            case let .angular(gradient, center, angle):
+                self.fill(
+                    AngularGradient(
+                        gradient: gradient,
+                        center: center,
+                        angle: angle
                     )
-                case let .radial(gradient, center, startRadius, endRadius):
-                    self.fill(
-                        RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius)
+                )
+            case let .radial(gradient, center, startRadius, endRadius):
+                self.fill(
+                    RadialGradient(
+                        gradient: gradient,
+                        center: center,
+                        startRadius: startRadius,
+                        endRadius: endRadius
                     )
-                }
-            } else {
-                switch gradient.kind {
-                case .linear:
-                    self.fill(
-                        LinearGradient(
-                            gradient: .init(stops: gradient.stops(assetsResolver)),
-                            startPoint: gradient.start.unitPoint,
-                            endPoint: gradient.end.unitPoint
-                        )
-                    )
-                case .conic:
-                    self.fill(
-                        AngularGradient(
-                            gradient: .init(stops: gradient.stops(assetsResolver)),
-                            center: .center,
-                            angle: .degrees(360)
-                        )
-                    )
-                case .radial:
-                    self.fill(
-                        RadialGradient(
-                            gradient: .init(stops: gradient.stops(assetsResolver)),
-                            center: .center,
-                            startRadius: 0.0,
-                            endRadius: 1.0
-                        )
-                    )
-                }
+                )
             }
         }
     }
@@ -102,59 +60,15 @@ extension InsettableShape {
         assetsResolver: AdaptyAssetsResolver
     ) -> some View {
         if let filling {
-            switch filling {
+            switch filling.resolve(with: assetsResolver) {
             case let .solidColor(color):
-                self.strokeBorder(
-                    color.swiftuiColor(assetsResolver),
-                    lineWidth: lineWidth
-                )
-            case let .colorGradient(gradient):
-                if let customId = gradient.customId,
-                   case let .gradient(customGradient) = assetsResolver.asset(for: customId)
-                {
-                    switch customGradient {
-                    case let .linear(gradient, startPoint, endPoint):
-                        self.strokeBorder(
-                            LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint)
-                        )
-                    case let .angular(gradient, center, angle):
-                        self.strokeBorder(
-                            AngularGradient(gradient: gradient, center: center, angle: angle)
-                        )
-                    case let .radial(gradient, center, startRadius, endRadius):
-                        self.strokeBorder(
-                            RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius)
-                        )
-                    }
-                } else {
-                    switch gradient.kind {
-                    case .linear:
-                        self.strokeBorder(
-                            LinearGradient(
-                                gradient: .init(stops: gradient.stops(assetsResolver)),
-                                startPoint: gradient.start.unitPoint,
-                                endPoint: gradient.end.unitPoint
-                            )
-                        )
-                    case .conic:
-                        self.strokeBorder(
-                            AngularGradient(
-                                gradient: .init(stops: gradient.stops(assetsResolver)),
-                                center: .center,
-                                angle: .degrees(360)
-                            )
-                        )
-                    case .radial:
-                        self.strokeBorder(
-                            RadialGradient(
-                                gradient: .init(stops: gradient.stops(assetsResolver)),
-                                center: .center,
-                                startRadius: 0.0,
-                                endRadius: 1.0
-                            )
-                        )
-                    }
-                }
+                self.strokeBorder(color, lineWidth: lineWidth)
+            case let .colorGradient(.linear(gradient, startPoint, endPoint)):
+                self.strokeBorder(LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint))
+            case let .colorGradient(.angular(gradient, center, angle)):
+                self.strokeBorder(AngularGradient(gradient: gradient, center: center, angle: angle))
+            case let .colorGradient(.radial(gradient, center, startRadius, endRadius)):
+                self.strokeBorder(RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius))
             }
         } else {
             self
@@ -297,8 +211,12 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     @State private var animatedBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
     @State private var animatedBorderThickness: Double?
 
-    private var resolvedBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? {
-        self.animatedBorderFilling ?? self.initialBorderFilling
+    private var resolvedBorderFilling: AdaptyViewConfiguration.Filling.Resolved? {
+        (self.animatedBorderFilling ?? self.initialBorderFilling)?
+            .resolve(
+                with: self.assetsViewModel.assetsResolver,
+                colorScheme: self.colorScheme
+            )
     }
 
     private var resolvedBorderThickness: Double? {
@@ -331,8 +249,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             if let border = decorator.border {
                 self.decorator.shapeType
                     .swiftUIShapeStroke(
-                        self.resolvedBorderFilling?.of(self.colorScheme),
-                        lineWidth: self.resolvedBorderThickness ?? 0.0,
+                        border.filling.usedColorScheme(self.colorScheme),
+                        lineWidth: border.thickness,
                         assetsResolver: self.assetsViewModel.assetsResolver
                     )
             }
@@ -363,7 +281,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                 content
                     .background {
                         AdaptyUIImageView(
-                            asset: imageData.of(self.colorScheme),
+                            asset: imageData.usedColorScheme(self.colorScheme),
                             aspect: .fill,
                             tint: nil
                         )
@@ -410,7 +328,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                 }
 
                 if let thickness = value.thickness {
-                    self.animatedBorderThickness = thickness.start ?? 0.0
+                    self.animatedBorderThickness = thickness.start
 
                     self.startValueAnimation(
                         animation,

@@ -33,7 +33,7 @@ package final class AdaptyEventsHandler: ObservableObject {
     var didStartRestore: (() -> Void)?
     var didFinishRestore: ((AdaptyProfile) -> Void)?
     var didFailRestore: ((AdaptyError) -> Void)?
-    var didFailRendering: ((AdaptyError) -> Void)?
+    var didFailRendering: ((AdaptyUIError) -> Void)?
     var didFailLoadingProducts: ((AdaptyError) -> Bool)?
     var didPartiallyLoadProducts: (([String]) -> Void)?
 
@@ -96,7 +96,11 @@ package final class AdaptyEventsHandler: ObservableObject {
         product: AdaptyPaywallProduct?,
         error: AdaptyError?
     ) {
-        Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null"), error: \(error)")
+        if let error {
+            Log.ui.error("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null"), error: \(error)")
+        } else {
+            Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null")")
+        }
         didFinishWebPaymentNavigation?(product, error)
     }
 
@@ -125,7 +129,7 @@ package final class AdaptyEventsHandler: ObservableObject {
 
     func event_didFailRendering(with error: AdaptyUIError) {
         Log.ui.error("#\(logId)# event_didFailRendering: \(error)")
-        didFailRendering?(AdaptyError(error))
+        didFailRendering?(error)
     }
 
     func event_didFailLoadingProducts(with error: AdaptyError) -> Bool {

@@ -4,7 +4,6 @@
 //
 //  Created by Aleksei Valiano on 28.03.2024
 //
-//
 
 import Foundation
 
@@ -17,7 +16,7 @@ extension AdaptyViewSource {
         let content: [AdaptyViewSource.Element]
         let pageControl: AdaptyViewSource.Pager.PageControl?
         let animation: AdaptyViewConfiguration.Pager.Animation?
-        let interactionBehaviour: AdaptyViewConfiguration.Pager.InteractionBehaviour
+        let interactionBehavior: AdaptyViewConfiguration.Pager.InteractionBehavior
     }
 }
 
@@ -43,7 +42,7 @@ extension AdaptyViewSource.Localizer {
             content: from.content.map(element),
             pageControl: from.pageControl.map(pageControl),
             animation: from.animation,
-            interactionBehaviour: from.interactionBehaviour
+            interactionBehavior: from.interactionBehavior
         )
     }
 
@@ -69,7 +68,7 @@ extension AdaptyViewSource.Pager: Decodable {
         case content
         case pageControl = "page_control"
         case animation
-        case interactionBehaviour = "interaction"
+        case interactionBehavior = "interaction"
     }
 
     init(from decoder: Decoder) throws {
@@ -82,7 +81,7 @@ extension AdaptyViewSource.Pager: Decodable {
         content = try container.decode([AdaptyViewSource.Element].self, forKey: .content)
         pageControl = try container.decodeIfPresent(AdaptyViewSource.Pager.PageControl.self, forKey: .pageControl)
         animation = try container.decodeIfPresent(AdaptyViewConfiguration.Pager.Animation.self, forKey: .animation)
-        interactionBehaviour = try container.decodeIfPresent(AdaptyViewConfiguration.Pager.InteractionBehaviour.self, forKey: .interactionBehaviour) ?? def.interactionBehaviour
+        interactionBehavior = try container.decodeIfPresent(AdaptyViewConfiguration.Pager.InteractionBehavior.self, forKey: .interactionBehavior) ?? def.interactionBehavior
     }
 }
 

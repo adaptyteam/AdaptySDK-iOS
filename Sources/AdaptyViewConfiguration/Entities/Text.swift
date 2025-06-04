@@ -4,7 +4,6 @@
 //
 //  Created by Aleksei Valiano on 01.05.2024
 //
-//
 
 import Foundation
 
@@ -24,8 +23,8 @@ extension AdaptyViewConfiguration {
 
         package enum Value: Sendable {
             case text(RichText)
-            case productText(LazyLocalisedProductText)
-            case selectedProductText(LazyLocalisedUnknownProductText)
+            case productText(LazyLocalizedProductText)
+            case selectedProductText(LazyLocalizedUnknownProductText)
         }
     }
 }

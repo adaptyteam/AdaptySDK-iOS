@@ -8,20 +8,20 @@
 import Foundation
 import StoreKit
 
-extension AdaptyError {
-    public static let AdaptyErrorDomain = "AdaptyErrorDomain"
-    public static let HTTPErrorDomain = "AdaptyHTTPErrorDomain"
-    public static let EventsErrorDomain = "AdaptyEventsErrorDomain"
-    public static let SKManagerErrorDomain = "AdaptySKManagerErrorDomain"
+public extension AdaptyError {
+    static let AdaptyErrorDomain = "AdaptyErrorDomain"
+    static let HTTPErrorDomain = "AdaptyHTTPErrorDomain"
+    static let EventsErrorDomain = "AdaptyEventsErrorDomain"
+    static let SKManagerErrorDomain = "AdaptySKManagerErrorDomain"
 
-    public enum UserInfoKey {
+    enum UserInfoKey {
         public static let description = NSDebugDescriptionErrorKey
         public static let source = "AdaptySourceErrorKey"
         public static let endpoint = "AdaptyHTTPEndpointErrorKey"
         public static let statusCode = "AdaptyHTTPStatusCodeErrorKey"
     }
 
-    public enum ErrorCode: Int, Sendable {
+    enum ErrorCode: Int, Sendable {
         case unknown = 0
 
         /// Client is not allowed to make a request, etc.
@@ -97,6 +97,7 @@ extension AdaptyError {
         case profileWasChanged = 3006
         case unsupportedData = 3007
         case fetchTimeoutError = 3101
+
         case operationInterrupted = 9000
     }
 }

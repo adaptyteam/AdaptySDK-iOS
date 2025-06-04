@@ -4,12 +4,11 @@
 //
 //  Created by Aleksei Valiano on 01.05.2024
 //
-//
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct Timer: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct Timer: Sendable, Hashable {
         package let id: String
         package let state: State
         package let format: [Item]
@@ -37,11 +36,11 @@ extension AdaptyViewConfiguration {
 
         package enum State: Sendable {
             case endedAt(Date)
-            case duration(TimeInterval, start: StartBehaviour)
+            case duration(TimeInterval, start: StartBehavior)
         }
 
-        package enum StartBehaviour: Sendable, Hashable {
-            static let `default` = StartBehaviour.firstAppear
+        package enum StartBehavior: Sendable, Hashable {
+            static let `default` = StartBehavior.firstAppear
             case everyAppear
             case firstAppear
             case firstAppearPersisted
@@ -106,7 +105,7 @@ extension AdaptyViewConfiguration.Timer.State: Hashable {
         static func create(
             id: String = UUID().uuidString,
             duration: TimeInterval,
-            startBehaviour: StartBehaviour = .default,
+            startBehavior: StartBehavior = .default,
             format: AdaptyViewConfiguration.RichText,
             actions: [AdaptyViewConfiguration.ActionAction] = [],
             horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
@@ -114,7 +113,7 @@ extension AdaptyViewConfiguration.Timer.State: Hashable {
             .create(
                 id: id,
                 duration: duration,
-                startBehaviour: startBehaviour,
+                startBehavior: startBehavior,
                 format: [.init(from: 0, value: format)],
                 actions: actions,
                 horizontalAlign: horizontalAlign
@@ -124,14 +123,14 @@ extension AdaptyViewConfiguration.Timer.State: Hashable {
         static func create(
             id: String = UUID().uuidString,
             duration: TimeInterval,
-            startBehaviour: StartBehaviour = .default,
+            startBehavior: StartBehavior = .default,
             format: [Item],
             actions: [AdaptyViewConfiguration.ActionAction] = [],
             horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
         ) -> Self {
             .init(
                 id: id,
-                state: .duration(duration, start: startBehaviour),
+                state: .duration(duration, start: startBehavior),
                 format: format,
                 actions: actions,
                 horizontalAlign: horizontalAlign

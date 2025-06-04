@@ -1,5 +1,5 @@
 //
-//    AdaptyProfile.Subscription.swift
+//  AdaptyProfile.Subscription.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -7,9 +7,9 @@
 
 import Foundation
 
-extension AdaptyProfile {
+public extension AdaptyProfile {
     /// Information about the user's subscription.
-    public struct Subscription: Sendable, Hashable {
+    struct Subscription: Sendable, Hashable {
         /// A store of the purchase.
         ///
         /// Possible values:

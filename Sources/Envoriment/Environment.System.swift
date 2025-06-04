@@ -19,7 +19,6 @@ extension Environment {
 
         static var locale: AdaptyLocale { AdaptyLocale(id: Locale.preferredLanguages.first ?? Locale.current.identifier) }
 
-        
         @AdaptyActor
         private static var _version: String?
 
@@ -57,7 +56,5 @@ extension Environment {
                 return result
             }
         }
-
-  
     }
 }

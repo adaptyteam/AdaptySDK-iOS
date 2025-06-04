@@ -65,7 +65,7 @@ private extension AdaptyViewSource.Asset {
 }
 
 extension AdaptyViewSource.Localizer {
-    private enum AssetIdentifySufix: String {
+    private enum AssetIdentifySuffix: String {
         case darkMode = "@dark"
     }
 
@@ -77,7 +77,7 @@ extension AdaptyViewSource.Localizer {
     }
 
     private func assetOrNil(_ assetId: String, darkMode mode: Bool) throws -> AdaptyViewSource.Asset? {
-        let assetId = mode ? assetId + AssetIdentifySufix.darkMode.rawValue : assetId
+        let assetId = mode ? assetId + AssetIdentifySuffix.darkMode.rawValue : assetId
         return localization?.assets?[assetId] ?? source.assets[assetId]
     }
 

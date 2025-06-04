@@ -51,7 +51,7 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyProfile? 
         configuration?.configure(jsonDecoder: jsonDecoder)
 
         let body: ResponseBody = try jsonDecoder.decode(
-            Backend.Response.ValueOfData<AdaptyProfile>.self,
+            Backend.Response.Data<AdaptyProfile>.self,
             responseBody: response.body
         ).value
 

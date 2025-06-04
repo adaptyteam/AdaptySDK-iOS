@@ -28,14 +28,14 @@ extension StoreKitManagerError: CustomStringConvertible {
             "StoreKitManagerError.noProductIDsFound(\(source))"
         case let .receiptIsEmpty(source, error):
             if let error {
-                "StoreKitManagerError.receiptIsEmpty(\(source), \(error)"
+                "StoreKitManagerError.receiptIsEmpty(\(source), \(error))"
             } else {
                 "StoreKitManagerError.receiptIsEmpty(\(source))"
             }
         case let .refreshReceiptFailed(source, error):
-            "StoreKitManagerError.refreshReceiptFailed(\(source), \(error)"
+            "StoreKitManagerError.refreshReceiptFailed(\(source), \(error))"
         case let .requestSKProductsFailed(source, error):
-            "StoreKitManagerError.requestSK1ProductsFailed(\(source), \(error)"
+            "StoreKitManagerError.requestSKProductsFailed(\(source), \(error))"
         case let .productPurchaseFailed(source, error):
             if let error {
                 "StoreKitManagerError.productPurchaseFailed(\(source), \(error))"

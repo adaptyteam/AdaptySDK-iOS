@@ -87,7 +87,7 @@ final class HTTPSession: Sendable {
             throw httpError
         }
 
-        let startDercoderTime = DispatchTime.now()
+        let startDecodeTime = DispatchTime.now()
 
         var bodyResponse: HTTPResponse<Body>
         do {
@@ -99,8 +99,8 @@ final class HTTPSession: Sendable {
             errorHandler?.call(httpError)
             throw httpError
         }
-        let endDercoderTime = DispatchTime.now()
-        bodyResponse = bodyResponse.replaceDecodingTime(start: startDercoderTime, end: endDercoderTime)
+        let endDecodeTime = DispatchTime.now()
+        bodyResponse = bodyResponse.replaceDecodingTime(start: startDecodeTime, end: endDecodeTime)
         Log.response(dataResponse.replaceMetrics(bodyResponse.metrics), request: urlRequest, stamp: stamp)
         return bodyResponse
     }

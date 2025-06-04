@@ -28,6 +28,19 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
 
 #if canImport(UIKit)
 
+import UIKit
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyPlugin {
+    static func instantiateOnboardingPlaceholderView() -> UIView? {
+        Bundle.main.loadNibNamed(
+            "AdaptyOnboardingPlaceholderView",
+            owner: nil,
+            options: nil
+        )?.first as? UIView
+    }
+}
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
     func paywallControllerDidAppear(
@@ -130,7 +143,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyError
+        didFailRenderingWith error: AdaptyUIError
     ) {
         eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
             view: controller.toAdaptyUIView(),
@@ -142,7 +155,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
         _ controller: AdaptyPaywallController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool {
-        eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
+        eventHandler.handle(event: PaywallViewEvent.DidFailLoadingProducts(
             view: controller.toAdaptyUIView(),
             error: error
         ))
@@ -160,6 +173,99 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
             product: product.map(Response.AdaptyPluginPaywallProduct.init),
             error: error
         ))
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        didFinishLoading action: OnboardingsDidFinishLoadingAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.DidFinishLoading(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
+
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onCloseAction action: AdaptyOnboardingsCloseAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnCloseAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
+
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onPaywallAction action: AdaptyOnboardingsOpenPaywallAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnPaywallAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
+
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onCustomAction action: AdaptyOnboardingsCustomAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnCustomAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
+
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onStateUpdatedAction action: AdaptyOnboardingsStateUpdatedAction
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnStateUpdatedAction(
+                view: controller.toAdaptyUIView(),
+                action: action
+            )
+        )
+    }
+
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        onAnalyticsEvent event: AdaptyOnboardingsAnalyticsEvent
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.OnAnalyticsAction(
+                view: controller.toAdaptyUIView(),
+                event: event
+            )
+        )
+    }
+
+    func onboardingController(
+        _ controller: AdaptyOnboardingController,
+        didFailWithError error: AdaptyUIError
+    ) {
+        eventHandler.handle(
+            event: OnboardingViewEvent.DidFailWithError(
+                view: controller.toAdaptyUIView(),
+                error: error
+            )
+        )
+    }
+
+    func onboardingsControllerLoadingPlaceholder(
+        _ controller: AdaptyOnboardingController
+    ) -> UIView? {
+        AdaptyPlugin.instantiateOnboardingPlaceholderView() ?? AdaptyOnboardingPlacehoderView()
     }
 }
 

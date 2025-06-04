@@ -14,6 +14,8 @@ import SwiftUI
 struct AdaptyUIToggleView: View {
     @Environment(\.adaptyScreenId)
     private var screenId: String
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
 
     @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
     @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
@@ -48,7 +50,12 @@ struct AdaptyUIToggleView: View {
         })) {
             EmptyView()
         }
-        .tint(toggle.color?.swiftuiColor(assetsViewModel.assetsResolver))
+        .tint(
+            toggle.color?.resolve(
+                with: assetsViewModel.assetsResolver,
+                colorScheme: colorScheme
+            )
+        )
     }
 }
 

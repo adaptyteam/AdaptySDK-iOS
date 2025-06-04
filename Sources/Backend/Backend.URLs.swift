@@ -15,7 +15,7 @@ extension Backend {
             configsUrl: URL(string: "https://configs-cdn.adapty.io/api/v1")!,
             proxy: nil
         )
-        
+
         static let euPublicEnvironment = URLs(
             baseUrl: URL(string: "https://api-eu.adapty.io/api/v1")!,
             fallbackUrl: URL(string: "https://fallback.adapty.io/api/v1")!,

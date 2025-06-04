@@ -167,7 +167,7 @@ final class ProfileStorage: Sendable {
         lastStartAcceleratedSyncProfileDate = nil
 
         BackendIntroductoryOfferEligibilityStorage.clear()
-        PaywallsStorage.clear()
+        PlacementStorage.clear()
     }
 }
 

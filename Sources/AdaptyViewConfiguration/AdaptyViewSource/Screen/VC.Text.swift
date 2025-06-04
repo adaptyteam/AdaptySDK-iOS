@@ -29,14 +29,14 @@ extension AdaptyViewSource.Localizer {
 
             case let .product(info):
                 if let adaptyProductId = info.adaptyProductId {
-                    .productText(AdaptyViewConfiguration.LazyLocalisedProductText(
+                    .productText(AdaptyViewConfiguration.LazyLocalizedProductText(
                         adaptyProductId: adaptyProductId,
                         suffix: info.suffix,
                         localizer: self,
                         defaultTextAttributes: textBlock.defaultTextAttributes
                     ))
                 } else {
-                    .selectedProductText(AdaptyViewConfiguration.LazyLocalisedUnknownProductText(
+                    .selectedProductText(AdaptyViewConfiguration.LazyLocalizedUnknownProductText(
                         productGroupId: info.productGroupId ?? AdaptyViewSource.StringId.Product.defaultProductGroupId,
                         suffix: info.suffix,
                         localizer: self,

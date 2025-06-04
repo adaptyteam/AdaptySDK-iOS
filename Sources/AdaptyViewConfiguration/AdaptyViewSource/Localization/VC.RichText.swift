@@ -13,7 +13,7 @@ extension AdaptyViewSource {
         let fontAssetId: String?
         let size: Double?
         let txtColorAssetId: String?
-        let imgTintColorAssetId: String?
+        let imageTintColorAssetId: String?
         let backgroundAssetId: String?
         let strike: Bool?
         let underline: Bool?
@@ -22,7 +22,7 @@ extension AdaptyViewSource {
             fontAssetId == nil
                 && size == nil
                 && txtColorAssetId == nil
-                && imgTintColorAssetId == nil
+                && imageTintColorAssetId == nil
                 && backgroundAssetId == nil
                 && (strike ?? false) == false
                 && (underline ?? false) == false
@@ -70,7 +70,7 @@ extension AdaptyViewSource.Localizer {
 private extension AdaptyViewSource.RichText {
     var asString: String? {
         items.first.flatMap {
-            if case let .text(value, attr) = $0, attr == nil { value } else { nil }
+            if case let .text(value, attributes) = $0, attributes == nil { value } else { nil }
         }
     }
 
@@ -80,12 +80,12 @@ private extension AdaptyViewSource.RichText {
     ) -> [AdaptyViewConfiguration.RichText.Item] {
         items.compactMap { item in
             switch item {
-            case let .text(value, attr):
-                .text(value, attr.add(defaultTextAttributes).convert(localizer))
-            case let .tag(value, attr):
-                .tag(value, attr.add(defaultTextAttributes).convert(localizer))
-            case let .image(assetId, attr):
-                .image(try? localizer.imageData(assetId), attr.add(defaultTextAttributes).convert(localizer))
+            case let .text(value, attributes):
+                .text(value, attributes.add(defaultTextAttributes).convert(localizer))
+            case let .tag(value, attributes):
+                .tag(value, attributes.add(defaultTextAttributes).convert(localizer))
+            case let .image(assetId, attributes):
+                .image(try? localizer.imageData(assetId), attributes.add(defaultTextAttributes).convert(localizer))
             default:
                 nil
             }
@@ -102,7 +102,7 @@ private extension AdaptyViewSource.TextAttributes {
             fontAssetId: fontAssetId ?? other.fontAssetId,
             size: size ?? other.size,
             txtColorAssetId: txtColorAssetId ?? other.txtColorAssetId,
-            imgTintColorAssetId: imgTintColorAssetId ?? other.imgTintColorAssetId,
+            imageTintColorAssetId: imageTintColorAssetId ?? other.imageTintColorAssetId,
             backgroundAssetId: backgroundAssetId ?? other.backgroundAssetId,
             strike: strike ?? other.strike,
             underline: underline ?? other.underline
@@ -125,16 +125,16 @@ private extension AdaptyViewSource.TextAttributes? {
     func convert(
         _ localizer: AdaptyViewSource.Localizer
     ) -> AdaptyViewConfiguration.RichText.TextAttributes {
-        let attr = self
-        let font = (try? attr?.fontAssetId.map(localizer.font)) ?? AdaptyViewConfiguration.Font.default
+        let attributes = self
+        let font = (try? attributes?.fontAssetId.map(localizer.font)) ?? AdaptyViewConfiguration.Font.default
         return AdaptyViewConfiguration.RichText.TextAttributes(
             font: font,
-            size: attr?.size ?? font.defaultSize,
-            txtColor: (try? attr?.txtColorAssetId.map(localizer.filling)) ?? .same(font.defaultColor),
-            imgTintColor: try? attr?.imgTintColorAssetId.map(localizer.filling),
-            background: try? attr?.backgroundAssetId.map(localizer.filling),
-            strike: attr?.strike ?? false,
-            underline: attr?.underline ?? false
+            size: attributes?.size ?? font.defaultSize,
+            txtColor: (try? attributes?.txtColorAssetId.map(localizer.filling)) ?? .same(font.defaultColor),
+            imageTintColor: try? attributes?.imageTintColorAssetId.map(localizer.filling),
+            background: try? attributes?.backgroundAssetId.map(localizer.filling),
+            strike: attributes?.strike ?? false,
+            underline: attributes?.underline ?? false
         )
     }
 }
@@ -142,18 +142,18 @@ private extension AdaptyViewSource.TextAttributes? {
 extension AdaptyViewSource.RichText.Item: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
-        case let .text(value, attr):
+        case let .text(value, attributes):
             hasher.combine(1)
             hasher.combine(value)
-            hasher.combine(attr)
-        case let .tag(value, attr):
+            hasher.combine(attributes)
+        case let .tag(value, attributes):
             hasher.combine(2)
             hasher.combine(value)
-            hasher.combine(attr)
-        case let .image(value, attr):
+            hasher.combine(attributes)
+        case let .image(value, attributes):
             hasher.combine(3)
             hasher.combine(value)
-            hasher.combine(attr)
+            hasher.combine(attributes)
         case .unknown:
             hasher.combine(4)
         }
@@ -252,7 +252,7 @@ extension AdaptyViewSource.TextAttributes: Codable {
         case size
         case fontAssetId = "font"
         case txtColorAssetId = "color"
-        case imgTintColorAssetId = "tint"
+        case imageTintColorAssetId = "tint"
         case backgroundAssetId = "background"
         case strike
         case underline

@@ -7,11 +7,7 @@
 
 import Foundation
 
-protocol ValueHashable: Sendable {}
-
-extension Optional: ValueHashable where Wrapped: ValueHashable {}
-
-struct VH<Value: ValueHashable>: Sendable {
+struct VH<Value: Sendable>: Sendable {
     let value: Value
     let hash: String?
     let time: Date?
@@ -30,7 +26,7 @@ struct VH<Value: ValueHashable>: Sendable {
         self.init(value, hash: nil, time: time)
     }
 
-    @inlinable 
+    @inlinable
     func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
         VH<U>(transform(value), hash: hash, time: time)
     }

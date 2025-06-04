@@ -12,27 +12,6 @@ import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-extension AdaptyAssetsResolver {
-    func uiImage(for name: String) -> UIImage? {
-        guard case let .image(asset) = asset(for: name) else { return nil }
-
-        switch asset {
-        case let .file(url):
-            if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
-                return image
-            } else {
-                return nil
-            }
-        case .remote:
-            return nil
-        case let .uiImage(value):
-            return value
-        }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
 package class AdaptyAssetsViewModel: ObservableObject {
     let eventsHandler: AdaptyEventsHandler
     let assetsResolver: AdaptyAssetsResolver

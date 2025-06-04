@@ -1,5 +1,5 @@
 //
-//    AdaptyProfile.NonSubscription.swift
+//  AdaptyProfile.NonSubscription.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyProfile {
-    public struct NonSubscription: Sendable, Hashable {
+public extension AdaptyProfile {
+    struct NonSubscription: Sendable, Hashable {
         /// An identifier of the purchase in Adapty. You can use it to ensure that you've already processed this purchase (for example tracking one time products).
         public let purchaseId: String
 

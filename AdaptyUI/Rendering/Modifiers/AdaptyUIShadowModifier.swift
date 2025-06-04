@@ -39,9 +39,11 @@ struct AdaptyShadowModifier: ViewModifier {
         content
             .shadow(
                 color: self.filling
-                    .of(self.colorScheme)
                     .asSolidColor?
-                    .swiftuiColor(self.assetsViewModel.assetsResolver) ?? .clear,
+                    .resolve(
+                        with: assetsViewModel.assetsResolver,
+                        colorScheme: colorScheme
+                    ) ?? .clear,
                 radius: self.blurRadius,
                 x: self.offset.width,
                 y: self.offset.height

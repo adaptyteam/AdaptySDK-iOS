@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptySubscriptionOffer {
-    public enum PaymentMode: UInt, Sendable {
+public extension AdaptySubscriptionOffer {
+    enum PaymentMode: UInt, Sendable {
         case payAsYouGo
         case payUpFront
         case freeTrial

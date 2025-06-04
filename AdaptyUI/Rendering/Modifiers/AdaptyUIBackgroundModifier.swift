@@ -25,7 +25,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
             content
                 .background {
                     AdaptyUIImageView(
-                        asset: imageData.of(self.colorScheme),
+                        asset: imageData.usedColorScheme(self.colorScheme),
                         aspect: .fill,
                         tint: nil
                     )

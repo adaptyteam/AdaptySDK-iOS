@@ -89,7 +89,6 @@ extension EventsError: CustomAdaptyError {
         case .sending: .networkFailed
         case .encoding: .encodingFailed
         case .decoding: .decodingFailed
-        case .interrupted: .operationInterrupted
         }
     }
 }

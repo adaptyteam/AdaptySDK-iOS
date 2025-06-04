@@ -26,10 +26,10 @@ extension BackendError: CustomStringConvertible {
 }
 
 extension Backend {
-    static func responseDecodingError(_ decodingError: Set<ResponseDecodingError>, _ error: HTTPError ) -> Bool {
+    static func responseDecodingError(_ decodingError: Set<ResponseDecodingError>, _ error: HTTPError) -> Bool {
         switch error {
         case let .decoding(_, _, _, _, _, value):
-            if let value = value as? ResponseDecodingError  {
+            if let value = value as? ResponseDecodingError {
                 decodingError.contains(value)
             } else {
                 false
@@ -41,6 +41,10 @@ extension Backend {
 
     static func wrongProfileSegmentId(_ error: HTTPError) -> Bool {
         backendErrorCodes(error).contains("INCORRECT_SEGMENT_HASH_ERROR")
+    }
+
+    static func wrongPlacementContentType(_ error: HTTPError) -> Bool {
+        backendErrorCodes(error).contains("UNSUPPORTED_PLACEMENT_TYPE_ERROR")
     }
 
     static func backendErrorCodes(_ error: HTTPError) -> [String] {

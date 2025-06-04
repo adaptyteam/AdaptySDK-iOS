@@ -23,7 +23,7 @@ extension AdaptyConfiguration {
 }
 
 extension Environment.Device {
-    enum IdfaRetriavalStatus: Sendable {
+    enum IdfaRetrievalStatus: Sendable {
         case notAvailable
         case notDetermined
         case denied
@@ -43,7 +43,7 @@ extension Environment.Device {
     }
 
     @AdaptyActor
-    static var idfaRetriavalStatus: IdfaRetriavalStatus {
+    static var idfaRetrievalStatus: IdfaRetrievalStatus {
         get async {
             #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
                 return .notAvailable
@@ -112,7 +112,7 @@ extension Environment.Device {
     @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
     private extension ATTrackingManager {
         @MainActor
-        static var canTakeIdfa: Environment.Device.IdfaRetriavalStatus {
+        static var canTakeIdfa: Environment.Device.IdfaRetrievalStatus {
             switch ATTrackingManager.trackingAuthorizationStatus {
             case .notDetermined: return .notDetermined
             case .restricted, .denied: return .denied

@@ -1,6 +1,6 @@
 //
 //  PaywallViewEvent.DidFailRestorePurchases.swift
-//  Adapty
+//  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 21.11.2024.
 //
@@ -13,7 +13,7 @@ import Foundation
 extension PaywallViewEvent {
     struct DidFailRestorePurchases: AdaptyPluginEvent {
         let id = "paywall_view_did_fail_restore"
-        let view: AdaptyUI.View
+        let view: AdaptyUI.PaywallView
         let error: AdaptyError
 
         enum CodingKeys: CodingKey {

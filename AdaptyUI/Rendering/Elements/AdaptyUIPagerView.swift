@@ -71,6 +71,8 @@ struct AdaptyUIPagerView: View {
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
 
     var pager: VC.Pager
 
@@ -137,7 +139,7 @@ struct AdaptyUIPagerView: View {
     private func handlePageControlTap(index: Int) {
         let shouldScheduleAutoscroll: Bool
 
-        switch pager.interactionBehaviour {
+        switch pager.interactionBehavior {
         case .none:
             shouldScheduleAutoscroll = false
             return
@@ -222,7 +224,7 @@ struct AdaptyUIPagerView: View {
             }
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
             .dragGesture(
-                condition: pager.interactionBehaviour != .none,
+                condition: pager.interactionBehavior != .none,
                 onChanged: { value in
                     offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
                     isInteracting = true
@@ -236,7 +238,7 @@ struct AdaptyUIPagerView: View {
                         offset = 0
                         isInteracting = false
 
-                        if pager.interactionBehaviour == .pauseAnimation {
+                        if pager.interactionBehavior == .pauseAnimation {
                             scheduleAutoScroll()
                         }
                     }
@@ -252,8 +254,8 @@ struct AdaptyUIPagerView: View {
                 Circle()
                     .fill(
                         idx == currentPageSelectedIndex ?
-                            pageControl.selectedColor.swiftuiColor(assetsViewModel.assetsResolver) :
-                            pageControl.color.swiftuiColor(assetsViewModel.assetsResolver)
+                            pageControl.selectedColor.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme) :
+                            pageControl.color.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)

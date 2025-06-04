@@ -14,7 +14,7 @@ struct AdaptySK2PaywallProduct: AdaptySK2Product, WebPaywallURLProviding {
     public let adaptyProductId: String
 
     public let paywallProductIndex: Int
-    
+
     public let subscriptionOffer: AdaptySubscriptionOffer?
 
     /// Same as `variationId` property of the parent AdaptyPaywall.

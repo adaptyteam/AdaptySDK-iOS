@@ -54,7 +54,8 @@ public enum AdaptyPurchaseResult: Sendable {
     /// A transaction object, which represents the payment.
     public var sk1Transaction: SKPaymentTransaction? {
         guard case let .success(_, transaction) = self,
-              let sk1Transaction = transaction as? SK1Transaction else {
+              let sk1Transaction = transaction as? SK1Transaction
+        else {
             return nil
         }
         return sk1Transaction
@@ -64,7 +65,8 @@ public enum AdaptyPurchaseResult: Sendable {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public var sk2Transaction: Transaction? {
         guard case let .success(_, transaction) = self,
-              let sk2Transaction = transaction as? SK2Transaction else {
+              let sk2Transaction = transaction as? SK2Transaction
+        else {
             return nil
         }
         return sk2Transaction

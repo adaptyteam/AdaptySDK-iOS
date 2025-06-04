@@ -23,7 +23,7 @@ enum TaskDuration: Comparable, Sendable {
     }
 
     @inlinable
-    var asTimeIntrval: TimeInterval {
+    var asTimeInterval: TimeInterval {
         switch self {
         case .never:
             Double.nan

@@ -13,6 +13,7 @@ extension Log {
     }
 
     static let ui = Category(name: "ui")
+    static let onboardings = Category(name: "onboardings")
     static let cache = Category(name: "AdaptyMediaCache")
     static let prefetcher = Category(name: "ImageUrlPrefetcher")
 }

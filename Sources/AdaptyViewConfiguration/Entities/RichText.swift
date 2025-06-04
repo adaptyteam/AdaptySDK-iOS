@@ -26,7 +26,7 @@ extension AdaptyViewConfiguration {
             package let font: AdaptyViewConfiguration.Font
             package let size: Double
             package let txtColor: Mode<Filling>
-            package let imgTintColor: Mode<Filling>?
+            package let imageTintColor: Mode<Filling>?
             package let background: Mode<Filling>?
             package let strike: Bool
             package let underline: Bool
@@ -37,18 +37,18 @@ extension AdaptyViewConfiguration {
 extension AdaptyViewConfiguration.RichText.Item: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
-        case let .text(value, attr):
+        case let .text(value, attributes):
             hasher.combine(1)
             hasher.combine(value)
-            hasher.combine(attr)
-        case let .tag(value, attr):
+            hasher.combine(attributes)
+        case let .tag(value, attributes):
             hasher.combine(2)
             hasher.combine(value)
-            hasher.combine(attr)
-        case let .image(value, attr):
+            hasher.combine(attributes)
+        case let .image(value, attributes):
             hasher.combine(3)
             hasher.combine(value)
-            hasher.combine(attr)
+            hasher.combine(attributes)
         }
     }
 }
@@ -80,7 +80,7 @@ extension AdaptyViewConfiguration.RichText.Item: Hashable {
                 font: font,
                 size: size ?? font.defaultSize,
                 txtColor: txtColor ?? .same(font.defaultColor),
-                imgTintColor: imgTintColor,
+                imageTintColor: imgTintColor,
                 background: background,
                 strike: strike,
                 underline: underline

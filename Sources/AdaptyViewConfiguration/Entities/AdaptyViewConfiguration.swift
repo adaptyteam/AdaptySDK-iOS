@@ -22,7 +22,7 @@ package struct AdaptyViewConfiguration: Sendable, Hashable {
     package extension AdaptyViewConfiguration {
         static func create(
             id: String = UUID().uuidString,
-            locale: String = AdaptyLocale.defaultPaywallLocale.id,
+            locale: String = AdaptyLocale.defaultPlacementLocale.id,
             isRightToLeft: Bool = false,
             templateId: String,
             screen: AdaptyViewConfiguration.Screen,

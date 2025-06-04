@@ -39,7 +39,6 @@ final class BackendIntroductoryOfferEligibilityStorage: Sendable {
     }
 
     func save(_ response: VH<[BackendIntroductoryOfferEligibilityState]>) -> [String] {
-
         var ineligibleProductIds = [String]()
         var eligibleProductIds = [String]()
 
