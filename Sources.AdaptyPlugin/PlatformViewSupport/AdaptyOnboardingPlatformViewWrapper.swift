@@ -135,7 +135,9 @@ extension AdaptyOnboardingPlatformViewWrapper: AdaptyOnboardingViewDelegate {
 
     package func onboardingsViewLoadingPlaceholder(
         _ view: AdaptyOnboardingUIView
-    ) -> UIView? { nil }
+    ) -> UIView? {
+        AdaptyPlugin.instantiateOnboardingPlaceholderView() ?? AdaptyOnboardingPlacehoderView()
+    }
 }
 
 #endif

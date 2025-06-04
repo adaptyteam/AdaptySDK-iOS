@@ -31,6 +31,17 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
 import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyPlugin {
+    static func instantiateOnboardingPlaceholderView() -> UIView? {
+        Bundle.main.loadNibNamed(
+            "AdaptyOnboardingPlaceholderView",
+            owner: nil,
+            options: nil
+        )?.first as? UIView
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
     func paywallControllerDidAppear(
         _ controller: AdaptyPaywallController
@@ -254,7 +265,7 @@ extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
     func onboardingsControllerLoadingPlaceholder(
         _ controller: AdaptyOnboardingController
     ) -> UIView? {
-        nil
+        AdaptyPlugin.instantiateOnboardingPlaceholderView() ?? AdaptyOnboardingPlacehoderView()
     }
 }
 
