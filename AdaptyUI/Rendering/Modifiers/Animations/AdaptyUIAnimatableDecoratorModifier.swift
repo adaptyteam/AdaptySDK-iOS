@@ -55,12 +55,12 @@ extension InsettableShape {
 
     @ViewBuilder
     func stroke(
-        filling: VC.Filling?,
+        filling: VC.Filling.Resolved?,
         lineWidth: CGFloat,
         assetsResolver: AdaptyAssetsResolver
     ) -> some View {
         if let filling {
-            switch filling.resolve(with: assetsResolver) {
+            switch filling {
             case let .solidColor(color):
                 self.strokeBorder(color, lineWidth: lineWidth)
             case let .colorGradient(.linear(gradient, startPoint, endPoint)):
@@ -149,7 +149,7 @@ extension VC.ShapeType {
 
     @ViewBuilder
     func swiftUIShapeStroke(
-        _ filling: VC.Filling?,
+        _ filling: VC.Filling.Resolved?,
         lineWidth: CGFloat,
         assetsResolver: AdaptyAssetsResolver
     ) -> some View {
@@ -246,11 +246,11 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             content: content
         )
         .overlay {
-            if let border = decorator.border {
+            if let borderFilling = resolvedBorderFilling, let borderThickness = resolvedBorderThickness {
                 self.decorator.shapeType
                     .swiftUIShapeStroke(
-                        border.filling.usedColorScheme(self.colorScheme),
-                        lineWidth: border.thickness,
+                        borderFilling,
+                        lineWidth: borderThickness,
                         assetsResolver: self.assetsViewModel.assetsResolver
                     )
             }
