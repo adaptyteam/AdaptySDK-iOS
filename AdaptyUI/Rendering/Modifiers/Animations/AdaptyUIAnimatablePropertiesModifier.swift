@@ -32,7 +32,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     @State private var rotationAnchor: UnitPoint
 
     @State private var opacity: Double
-
+    
+    @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
     init(_ properties: VC.Element.Properties) {
         self.opacity = properties.opacity ?? 1.0
@@ -45,11 +46,11 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.rotationAnchor = .center
 
         self.initialOffset = properties.offset ?? .zero
-        
+
         self.initialShadowFilling = properties.decorator?.shadow?.filling
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
         self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
-        
+
         self.animations = properties.onAppear
     }
 
@@ -70,18 +71,18 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var resolvedShadowFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? {
         animatedShadowFilling ?? initialShadowFilling
     }
-    
+
     private var resolvedShadowBlurRadius: Double {
         animatedShadowBlurRadius ?? initialShadowBlurRadius
     }
-    
+
     private var resolvedShadowOffset: CGSize {
         CGSize(
             width: animatedShadowOffset?.width ?? initialShadowOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
             height: animatedShadowOffset?.height ?? initialShadowOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
         )
     }
-    
+
     func body(content: Content) -> some View {
         content
             .shadow(
@@ -94,9 +95,16 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
             .opacity(opacity)
             .onAppear { startAnimations() }
+            .onDisappear {
+                animationTokens.forEach { $0.invalidate() }
+                animationTokens.removeAll()
+            }
     }
 
+
     private func startAnimations() {
+        var tokens = Set<AdaptyUIAnimationToken>()
+
         for animation in animations {
             switch animation {
             case let .opacity(timeline, value):
@@ -106,14 +114,16 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     to: value.end
                 ) { self.opacity = $0 }
             case let .offset(timeline, value):
-                startValueAnimation(
-                    timeline,
-                    from: value.start,
-                    to: value.end
-                ) {
-                    self.animatedOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
-                    self.animatedOffsetY = $0.y.points(.vertical, screenSize, safeArea)
-                }
+                tokens.insert(
+                    timeline.animate(
+                        from: value.start,
+                        to: value.end,
+                        updateBlock: {
+                            self.animatedOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
+                            self.animatedOffsetY = $0.y.points(.vertical, screenSize, safeArea)
+                        }
+                    )
+                )
             case let .rotation(timeline, value):
                 rotation = .degrees(value.angle.start)
                 rotationAnchor = value.anchor.unitPoint
@@ -146,10 +156,10 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         self.animatedShadowFilling = $0
                     }
                 }
-                
+
                 if let blurValue = value.blurRadius {
                     animatedShadowBlurRadius = blurValue.start
-                    
+
                     startValueAnimation(
                         timeline,
                         from: blurValue.start,
@@ -158,7 +168,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         self.animatedShadowBlurRadius = $0
                     }
                 }
-                
+
                 if let offsetValue = value.offset {
                     animatedShadowOffset = CGSize(
                         width: offsetValue.start.x.points(.horizontal, screenSize, safeArea),
@@ -180,8 +190,11 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                 break
             }
         }
+
+        animationTokens = tokens
     }
 
+    @available(*, deprecated, renamed: "remove", message: "remove")
     private func startValueAnimation<Value>(
         _ timeline: AdaptyViewConfiguration.Animation.Timeline,
         from start: Value,
