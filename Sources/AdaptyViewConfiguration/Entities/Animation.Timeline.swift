@@ -16,7 +16,7 @@ package extension AdaptyViewConfiguration.Animation {
             loop: nil,
             loopDelay: 0.0,
             pingPongDelay: 0.0,
-            repeatMaxCount: nil,
+            loopCount: nil,
         )
         package let duration: TimeInterval
         package let interpolator: Interpolator
@@ -24,7 +24,7 @@ package extension AdaptyViewConfiguration.Animation {
         package let loop: Loop?
         package let loopDelay: TimeInterval
         package let pingPongDelay: TimeInterval
-        package let repeatMaxCount: Int?
+        package let loopCount: Int?
 
         package enum Loop: String {
             case normal
@@ -42,7 +42,7 @@ package extension AdaptyViewConfiguration.Animation.Timeline {
         loop: Loop? = Self.default.loop,
         loopDelay: TimeInterval = Self.default.loopDelay,
         pingPongDelay: TimeInterval = Self.default.pingPongDelay,
-        repeatMaxCount: Int? = Self.default.repeatMaxCount
+        loopCount: Int? = Self.default.loopCount
     ) -> Self {
         .init(
             duration: duration,
@@ -51,7 +51,7 @@ package extension AdaptyViewConfiguration.Animation.Timeline {
             loop: loop,
             loopDelay: loopDelay,
             pingPongDelay: pingPongDelay,
-            repeatMaxCount: repeatMaxCount
+            loopCount: loopCount
         )
     }
 }
@@ -63,7 +63,7 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
         case loop
         case loopDelay = "loop_delay"
         case pingPongDelay = "ping_pong_delay"
-        case repeatMaxCount = "repeat_max_count"
+        case loopCount = "loop_count"
         case duration
         case interpolator
     }
@@ -79,7 +79,7 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
 
         pingPongDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .pingPongDelay)).map { $0 / 1000.0 } ?? defaultValue.pingPongDelay
 
-        repeatMaxCount = try container.decodeIfPresent(Int.self, forKey: .repeatMaxCount) ?? defaultValue.repeatMaxCount
+        loopCount = try container.decodeIfPresent(Int.self, forKey: .loopCount) ?? defaultValue.loopCount
 
         duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? defaultValue.duration
         interpolator = try (container.decodeIfPresent(AdaptyViewConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? .default
@@ -104,7 +104,7 @@ extension AdaptyViewConfiguration.Animation.Timeline: Codable {
             try container.encode(pingPongDelay * 1000, forKey: .pingPongDelay)
         }
 
-        try container.encodeIfPresent(repeatMaxCount, forKey: .repeatMaxCount)
+        try container.encodeIfPresent(loopCount, forKey: .loopCount)
 
         if duration != defaultValue.duration {
             try container.encode(duration * 1000, forKey: .duration)
