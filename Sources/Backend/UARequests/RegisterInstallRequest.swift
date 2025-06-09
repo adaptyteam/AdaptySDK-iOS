@@ -38,11 +38,15 @@ extension Backend.UAExecutor {
         return Double.random(in: 0 ... max)
     }
 
-    func reqisterInstall(
+    func registerInstall(
         profileId: String,
-        info: Environment.InstallInfo,
         maxRetries: Int = 5
     ) async throws {
+        let includedAnalyticIds = true
+        guard let info = await Environment.InstallInfo(includedAnalyticIds: includedAnalyticIds) else {
+            return
+        }
+
         let request = RegisterInstallRequest(
             profileId: profileId,
             info: info
@@ -50,7 +54,7 @@ extension Backend.UAExecutor {
         var lastError: Error?
         for attempt in 0 ..< maxRetries {
             do {
-                let _: HTTPEmptyResponse = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retry": maxRetries] : nil)
+                let _: HTTPEmptyResponse = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil)
                 return
             } catch {
                 lastError = error

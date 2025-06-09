@@ -83,6 +83,12 @@ public extension Adapty {
 
             set(shared: sdk)
 
+            Task { @AdaptyActor in
+                try await sdk.httpUASession.registerInstall(
+                    profileId: sdk.profileStorage.profileId
+                )
+            }
+
             LifecycleManager.shared.initialize()
             return sdk
         }
