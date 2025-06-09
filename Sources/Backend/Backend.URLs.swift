@@ -13,6 +13,7 @@ extension Backend {
             baseUrl: URL(string: "https://api.adapty.io/api/v1")!,
             fallbackUrl: URL(string: "https://fallback.adapty.io/api/v1")!,
             configsUrl: URL(string: "https://configs-cdn.adapty.io/api/v1")!,
+            uaUrl: URL(string: "https://app-ua-dev.k8s.adapty.io/api/v1")!,
             proxy: nil
         )
 
@@ -20,6 +21,7 @@ extension Backend {
             baseUrl: URL(string: "https://api-eu.adapty.io/api/v1")!,
             fallbackUrl: URL(string: "https://fallback.adapty.io/api/v1")!,
             configsUrl: URL(string: "https://configs-cdn.adapty.io/api/v1")!,
+            uaUrl: URL(string: "https://app-ua-dev.k8s.adapty.io/api/v1")!,
             proxy: nil
         )
 
@@ -27,12 +29,14 @@ extension Backend {
             baseUrl: URL(string: "https://api-cn.adapty.io/api/v1")!,
             fallbackUrl: URL(string: "https://fallback.adapty.io/api/v1")!,
             configsUrl: URL(string: "https://configs-cdn.adapty.io/api/v1")!,
+            uaUrl: URL(string: "https://app-ua-dev.k8s.adapty.io/api/v1")!,
             proxy: nil
         )
 
         let baseUrl: URL
         let fallbackUrl: URL
         let configsUrl: URL
+        let uaUrl: URL
         let proxy: (host: String, port: Int)?
     }
 }

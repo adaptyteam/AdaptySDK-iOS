@@ -13,24 +13,27 @@ final class Storage {
     private enum Constants {
         static let appKeyHash = "AdaptySDK_Application_Key_Hash"
         static let appInstallationIdentifier = "AdaptySDK_Application_Install_Identifier"
+        static let appInstallationTime = "AdaptySDK_Application_Install_Time"
     }
 
     static var userDefaults: UserDefaults { .standard }
 
     @AdaptyActor
-    fileprivate static var appInstallationIdentifier: String =
+    fileprivate static let appInstallation: (identifier: String, time: Date?) =
         if let identifier = userDefaults.string(forKey: Constants.appInstallationIdentifier) {
-            identifier
+            (identifier, userDefaults.object(forKey: Constants.appInstallationTime) as? Date)
         } else {
             createAppInstallationIdentifier()
         }
 
     @AdaptyActor
-    private static func createAppInstallationIdentifier() -> String {
+    private static func createAppInstallationIdentifier() -> (identifier: String, time: Date) {
         let identifier = UUID().uuidString.lowercased()
-        log.debug("appInstallationIdentifier = \(identifier)")
+        let time = Date()
+        log.debug("appInstallationIdentifier = \(identifier), time = \(time)")
         userDefaults.set(identifier, forKey: Constants.appInstallationIdentifier)
-        return identifier
+        userDefaults.set(time, forKey: Constants.appInstallationTime)
+        return (identifier, time)
     }
 
     @discardableResult
@@ -57,5 +60,8 @@ final class Storage {
 
 extension Environment.Application {
     @AdaptyActor
-    static let installationIdentifier = Storage.appInstallationIdentifier
+    static let installationIdentifier = Storage.appInstallation.identifier
+
+    @AdaptyActor
+    static let installationTime: Date? = Storage.appInstallation.time
 }

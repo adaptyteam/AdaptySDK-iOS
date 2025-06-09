@@ -931,6 +931,7 @@ $defs:
       backend_base_url: { type: string }
       backend_fallback_base_url: { type: string }
       backend_configs_base_url: { type: string }
+      backend_ua_base_url: { type: string }
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
       log_level: { $ref: "#/$defs/AdaptyLog.Level" }

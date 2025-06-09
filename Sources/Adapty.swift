@@ -17,6 +17,7 @@ public final class Adapty: Sendable {
     let httpSession: Backend.MainExecutor
     let httpFallbackSession: Backend.FallbackExecutor
     let httpConfigsSession: Backend.ConfigsExecutor
+    let httpUASession: Backend.UAExecutor
 
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
@@ -39,6 +40,7 @@ public final class Adapty: Sendable {
         self.httpSession = backend.createMainExecutor()
         self.httpFallbackSession = backend.createFallbackExecutor()
         self.httpConfigsSession = backend.createConfigsExecutor()
+        self.httpUASession = backend.createUAExecutor()
 
         #if compiler(>=5.10)
             let productVendorIdsStorage = ProductVendorIdsStorage()
@@ -171,7 +173,6 @@ public final class Adapty: Sendable {
 
             switch result {
             case let .success((createdProfile, crossPlacementState)):
-
                 if profileId != createdProfile.value.profileId {
                     profileStorage.clearProfile(newProfileId: createdProfile.value.profileId)
                 }

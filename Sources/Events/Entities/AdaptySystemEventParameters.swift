@@ -67,6 +67,8 @@ enum APIRequestName: String {
     case fetchEventsConfig = "get_events_blacklist"
 
     case fetchAllProductVendorIds = "get_products_ids"
+    
+    case reqisterInstall = "reqister_install"
 }
 
 struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {
