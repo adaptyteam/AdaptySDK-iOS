@@ -86,7 +86,7 @@ public extension Adapty { // TODO: delete
         try await sdk.httpUASession.registerInstall(
             profileId: sdk.profileStorage.profileId,
             installInfo: await Environment.InstallInfo(installTime: installTime, includedAnalyticIds: true),
-            maxRetries: 0
+            maxRetries: 1
         )
     }
 }
