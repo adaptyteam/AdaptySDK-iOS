@@ -80,7 +80,7 @@ extension Backend.UAExecutor {
     }
 }
 
-package extension Adapty {
+public extension Adapty { // TODO: delete
     nonisolated static func debugSendRegisterInstallRequest(installTime: Date = Date()) async throws {
         let sdk = try await activatedSDK
         try await sdk.httpUASession.registerInstall(
