@@ -10,35 +10,38 @@
 import Adapty
 import SwiftUI
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyViewConfiguration.Animation.Timeline {
     @MainActor
     func animate<Value>(
-        //        timeline: AdaptyViewConfiguration.Animation.Timeline,
         from start: Value,
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        switch repeatType {
-        case .reverse: // animate back
-            AdaptyUIPropertyAnimator.animateWithReverseLoop(
+        switch loop {
+        case .normal: // reset value and repeat
+            AdaptyUIPropertyAnimator.animateBasicLoop(
+                token: nil,
                 timeline: self,
                 startDelay: startDelay,
-                repeatMaxCount: repeatMaxCount,
+                loopCount: loopCount,
                 from: start,
                 to: end,
                 updateBlock: updateBlock
             )
-        case .restart: // reset value and repeat
-            AdaptyUIPropertyAnimator.animateWithRestart(
+        case .pingPong: // animate back and repeat
+            AdaptyUIPropertyAnimator.animatePingPongLoop(
+                token: nil,
                 timeline: self,
                 startDelay: startDelay,
-                repeatMaxCount: repeatMaxCount,
+                loopCount: loopCount,
                 from: start,
                 to: end,
                 updateBlock: updateBlock
             )
         default: // no repeat
             AdaptyUIPropertyAnimator.animateOnce(
+                token: nil,
                 timeline: self,
                 startDelay: startDelay,
                 from: start,
@@ -46,6 +49,40 @@ extension AdaptyViewConfiguration.Animation.Timeline {
                 updateBlock: updateBlock
             )
         }
+    }
+
+    @MainActor
+    @discardableResult
+    func withAsyncAnimation(
+        token: AdaptyUIAnimationToken? = nil,
+        delay: TimeInterval,
+        onBeforeAnimation: (() -> Void)?,
+        body: @escaping () -> Void,
+        completion: @escaping (AdaptyUIAnimationToken) -> Void
+    ) -> AdaptyUIAnimationToken {
+        let token = token ?? .create()
+        let animation = interpolator.createAnimation(duration: duration)
+
+        Task { @MainActor in
+            try await Task.sleep(seconds: delay)
+
+            guard token.isActive else {
+                completion(token)
+                return
+            }
+
+            onBeforeAnimation?()
+
+            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+                try withAnimation(animation, body, completion: { completion(token) })
+            } else {
+                try withAnimation(animation, body)
+                try await Task.sleep(seconds: duration)
+                completion(token)
+            }
+        }
+        
+        return token
     }
 }
 
@@ -70,50 +107,91 @@ extension AdaptyUIAnimationToken {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 enum AdaptyUIPropertyAnimator {
-    static func animateWithReverseLoop<Value>(
-        token: AdaptyUIAnimationToken? = nil,
+    static func animatePingPongLoop<Value>(
+        token: AdaptyUIAnimationToken?,
         timeline: AdaptyViewConfiguration.Animation.Timeline,
         startDelay: TimeInterval,
-        repeatMaxCount: Int?,
+        loopCount: Int?,
         from start: Value,
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let token = token ?? .create()
         let duration = timeline.duration
-        let repeatDelay = timeline.repeatDelay
+        let loopDelay = timeline.loopDelay
+        let pingPongDelay = timeline.pingPongDelay
 
-        let animation: Animation = .linear(duration: duration) // TODO: implement interpolator
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
-            guard token.isActive else { return }
-
-            updateBlock(start)
-
-            withAnimation(animation) {
-                updateBlock(end)
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + duration + repeatDelay) {
+        return timeline.withAsyncAnimation(
+            token: token,
+            delay: startDelay,
+            onBeforeAnimation: { updateBlock(start) },
+            body: { updateBlock(end) },
+            completion: { token in
                 guard token.isActive else { return }
 
-                withAnimation(animation) {
-                    updateBlock(start)
-                }
+                timeline.withAsyncAnimation(
+                    token: token,
+                    delay: pingPongDelay,
+                    onBeforeAnimation: nil,
+                    body: { updateBlock(start) },
+                    completion: { token in
+                        let loopLeftCount = (loopCount ?? .max) - 1
 
-                let repeatMaxCount = repeatMaxCount ?? .max
+                        if loopLeftCount > 0 {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + loopDelay) {
+                                guard token.isActive else { return }
 
-                if repeatMaxCount > 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + duration + repeatDelay) {
+                                animatePingPongLoop(
+                                    token: token,
+                                    timeline: timeline,
+                                    startDelay: 0.0,
+                                    loopCount: loopLeftCount,
+                                    from: start,
+                                    to: end,
+                                    updateBlock: updateBlock
+                                )
+                            }
+                        } else {
+                            token.invalidate()
+                        }
+                    }
+                )
+            }
+        )
+    }
+
+    static func animateBasicLoop<Value>(
+        token: AdaptyUIAnimationToken?,
+        timeline: AdaptyViewConfiguration.Animation.Timeline,
+        startDelay: TimeInterval,
+        loopCount: Int?,
+        from start: Value,
+        to end: Value,
+        updateBlock: @escaping (Value) -> Void
+    ) -> AdaptyUIAnimationToken {
+        let duration = timeline.duration
+
+        return timeline.withAsyncAnimation(
+            token: token,
+            delay: startDelay,
+            onBeforeAnimation: { updateBlock(start) },
+            body: { updateBlock(end) },
+            completion: { token in
+                guard token.isActive else { return }
+
+                let loopLeftCount = (loopCount ?? .max) - 1
+
+                if loopLeftCount > 0 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + timeline.loopDelay) {
                         guard token.isActive else { return }
 
-                        animateWithReverseLoop(
+                        animateBasicLoop(
                             token: token,
                             timeline: timeline,
                             startDelay: 0.0,
-                            repeatMaxCount: repeatMaxCount - 1,
+                            loopCount: loopLeftCount,
                             from: start,
                             to: end,
                             updateBlock: updateBlock
@@ -123,87 +201,24 @@ enum AdaptyUIPropertyAnimator {
                     token.invalidate()
                 }
             }
-        }
-
-        return token
-    }
-
-    static func animateWithRestart<Value>(
-        token: AdaptyUIAnimationToken? = nil,
-        timeline: AdaptyViewConfiguration.Animation.Timeline,
-        startDelay: TimeInterval,
-        repeatMaxCount: Int?,
-        from start: Value,
-        to end: Value,
-        updateBlock: @escaping (Value) -> Void
-    ) -> AdaptyUIAnimationToken {
-        let token = token ?? .create()
-        let duration = timeline.duration
-        let repeatDelay = timeline.repeatDelay
-
-        let animation: Animation = .linear(duration: duration) // TODO: implement interpolator
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
-            guard token.isActive else { return }
-
-            updateBlock(start)
-
-            withAnimation(animation) {
-                updateBlock(end)
-            }
-
-            let repeatLeftCount = (repeatMaxCount ?? .max) - 1
-
-            if repeatLeftCount > 0 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + duration + repeatDelay) {
-                    guard token.isActive else { return }
-
-                    animateWithRestart(
-                        token: token,
-                        timeline: timeline,
-                        startDelay: 0.0,
-                        repeatMaxCount: repeatLeftCount,
-                        from: start,
-                        to: end,
-                        updateBlock: updateBlock
-                    )
-                }
-            } else {
-                token.invalidate()
-            }
-        }
-
-        return token
+        )
     }
 
     static func animateOnce<Value>(
-        token: AdaptyUIAnimationToken? = nil,
+        token: AdaptyUIAnimationToken?,
         timeline: AdaptyViewConfiguration.Animation.Timeline,
         startDelay: TimeInterval,
         from start: Value,
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let token = token ?? .create()
-        let duration = timeline.duration
-
-        let animation: Animation = .linear(duration: duration) // TODO: implement interpolator
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
-            guard token.isActive else { return }
-
-            updateBlock(start)
-
-            withAnimation(animation) {
-                updateBlock(end)
-            }
-
-//            DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-            token.invalidate()
-//            }
-        }
-
-        return token
+        timeline.withAsyncAnimation(
+            token: nil,
+            delay: startDelay,
+            onBeforeAnimation: { updateBlock(start) },
+            body: { updateBlock(end) },
+            completion: { $0.invalidate() }
+        )
     }
 }
 

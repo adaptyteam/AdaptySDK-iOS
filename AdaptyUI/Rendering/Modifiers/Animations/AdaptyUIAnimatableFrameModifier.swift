@@ -25,6 +25,8 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
+    @State private var animationTokens = Set<AdaptyUIAnimationToken>()
+
     init(
         box: VC.Box,
         animations: [AdaptyViewConfiguration.Animation]?
@@ -71,44 +73,61 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
                     alignment: alignment
                 )
                 .onAppear { startAnimations() }
+                .onDisappear {
+                    animationTokens.forEach { $0.invalidate() }
+                    animationTokens.removeAll()
+                }
         } else {
-            content.onAppear { startAnimations() }
+            content
+                .onAppear { startAnimations() }
+                .onDisappear {
+                    animationTokens.forEach { $0.invalidate() }
+                    animationTokens.removeAll()
+                }
         }
     }
 
     private func startAnimations() {
         guard let animations, !animations.isEmpty else { return }
 
+        var tokens = Set<AdaptyUIAnimationToken>()
+
         for animation in animations {
             switch animation {
-            case let .box(_, value):
+            case let .box(timeline, value):
                 if let widthValue = value.width {
                     animatedWidth = widthValue.start.points(.horizontal, screenSize, safeArea)
 
-                    startValueAnimation(
-                        animation,
-                        from: widthValue.start,
-                        to: widthValue.end
-                    ) {
-                        self.animatedWidth = $0.points(.horizontal, screenSize, safeArea)
-                    }
+                    tokens.insert(
+                        timeline.animate(
+                            from: widthValue.start,
+                            to: widthValue.end,
+                            updateBlock: {
+                                self.animatedWidth = $0.points(.horizontal, screenSize, safeArea)
+                            }
+                        )
+                    )
                 }
 
                 if let heightValue = value.height {
                     animatedHeight = heightValue.start.points(.vertical, screenSize, safeArea)
 
-                    startValueAnimation(
-                        animation,
-                        from: heightValue.start,
-                        to: heightValue.end
-                    ) {
-                        self.animatedHeight = $0.points(.vertical, screenSize, safeArea)
-                    }
+                    tokens.insert(
+                        timeline.animate(
+                            from: heightValue.start,
+                            to: heightValue.end,
+                            updateBlock: {
+                                self.animatedHeight = $0.points(.vertical, screenSize, safeArea)
+                            }
+                        )
+                    )
                 }
             default:
                 break
             }
         }
+
+        animationTokens = tokens
     }
 }
 

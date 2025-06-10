@@ -10,7 +10,7 @@
 import Adapty
 import SwiftUI
 
-@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private let animations: [AdaptyViewConfiguration.Animation]
 
@@ -32,7 +32,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     @State private var rotationAnchor: UnitPoint
 
     @State private var opacity: Double
-    
+
     @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
     init(_ properties: VC.Element.Properties) {
@@ -101,18 +101,21 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             }
     }
 
-
     private func startAnimations() {
         var tokens = Set<AdaptyUIAnimationToken>()
 
         for animation in animations {
             switch animation {
             case let .opacity(timeline, value):
-                startValueAnimation(
-                    timeline,
-                    from: value.start,
-                    to: value.end
-                ) { self.opacity = $0 }
+                tokens.insert(
+                    timeline.animate(
+                        from: value.start,
+                        to: value.end,
+                        updateBlock: {
+                            self.opacity = $0
+                        }
+                    )
+                )
             case let .offset(timeline, value):
                 tokens.insert(
                     timeline.animate(
@@ -127,46 +130,57 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             case let .rotation(timeline, value):
                 rotation = .degrees(value.angle.start)
                 rotationAnchor = value.anchor.unitPoint
-                startValueAnimation(
-                    timeline,
-                    from: value.angle.start,
-                    to: value.angle.end
-                ) { self.rotation = .degrees($0) }
+                tokens.insert(
+                    timeline.animate(
+                        from: value.angle.start,
+                        to: value.angle.end,
+                        updateBlock: {
+                            self.rotation = .degrees($0)
+                        }
+                    )
+                )
             case let .scale(timeline, value):
                 scaleX = value.scale.start.x
                 scaleY = value.scale.start.y
                 scaleAnchor = value.anchor.unitPoint
-                startValueAnimation(
-                    timeline,
-                    from: value.scale.start,
-                    to: value.scale.end
-                ) {
-                    self.scaleX = $0.x
-                    self.scaleY = $0.y
-                }
+
+                tokens.insert(
+                    timeline.animate(
+                        from: value.scale.start,
+                        to: value.scale.end,
+                        updateBlock: {
+                            self.scaleX = $0.x
+                            self.scaleY = $0.y
+                        }
+                    )
+                )
             case let .shadow(timeline, value):
                 if let colorValue = value.color {
                     animatedShadowFilling = value.color?.start
 
-                    startValueAnimation(
-                        timeline,
-                        from: colorValue.start,
-                        to: colorValue.end
-                    ) {
-                        self.animatedShadowFilling = $0
-                    }
+                    tokens.insert(
+                        timeline.animate(
+                            from: colorValue.start,
+                            to: colorValue.end,
+                            updateBlock: {
+                                self.animatedShadowFilling = $0
+                            }
+                        )
+                    )
                 }
 
                 if let blurValue = value.blurRadius {
                     animatedShadowBlurRadius = blurValue.start
 
-                    startValueAnimation(
-                        timeline,
-                        from: blurValue.start,
-                        to: blurValue.end
-                    ) {
-                        self.animatedShadowBlurRadius = $0
-                    }
+                    tokens.insert(
+                        timeline.animate(
+                            from: blurValue.start,
+                            to: blurValue.end,
+                            updateBlock: {
+                                self.animatedShadowBlurRadius = $0
+                            }
+                        )
+                    )
                 }
 
                 if let offsetValue = value.offset {
@@ -175,16 +189,18 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         height: offsetValue.start.y.points(.vertical, screenSize, safeArea)
                     )
 
-                    startValueAnimation(
-                        timeline,
-                        from: offsetValue.start,
-                        to: offsetValue.end
-                    ) {
-                        animatedShadowOffset = CGSize(
-                            width: $0.x.points(.horizontal, screenSize, safeArea),
-                            height: $0.y.points(.vertical, screenSize, safeArea)
+                    tokens.insert(
+                        timeline.animate(
+                            from: offsetValue.start,
+                            to: offsetValue.end,
+                            updateBlock: {
+                                animatedShadowOffset = CGSize(
+                                    width: $0.x.points(.horizontal, screenSize, safeArea),
+                                    height: $0.y.points(.vertical, screenSize, safeArea)
+                                )
+                            }
                         )
-                    }
+                    )
                 }
             default:
                 break
@@ -193,20 +209,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         animationTokens = tokens
     }
-
-    @available(*, deprecated, renamed: "remove", message: "remove")
-    private func startValueAnimation<Value>(
-        _ timeline: AdaptyViewConfiguration.Animation.Timeline,
-        from start: Value,
-        to end: Value,
-        updateBlock: (Value) -> Void
-    ) {
-        updateBlock(start)
-
-        withAnimation(.custom(timeline: timeline, interpolator: timeline.interpolator)) {
-            updateBlock(end)
-        }
-    }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -214,11 +216,7 @@ extension View {
     @ViewBuilder
     func animatableProperties(_ properties: VC.Element.Properties?) -> some View {
         if let properties {
-            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
-                modifier(AdaptyUIAnimatablePropertiesModifier(properties))
-            } else {
-                modifier(AdaptyUIAnimatablePropertiesModifier_Fallback(properties))
-            }
+            modifier(AdaptyUIAnimatablePropertiesModifier(properties))
         } else {
             self
         }

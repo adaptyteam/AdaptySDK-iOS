@@ -211,6 +211,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     @State private var animatedBorderFilling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>?
     @State private var animatedBorderThickness: Double?
 
+    @State private var animationTokens = Set<AdaptyUIAnimationToken>()
+
     private var resolvedBorderFilling: AdaptyViewConfiguration.Filling.Resolved? {
         (self.animatedBorderFilling ?? self.initialBorderFilling)?
             .resolve(
@@ -259,6 +261,10 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         .onAppear {
             self.startAnimations()
         }
+        .onDisappear {
+            self.animationTokens.forEach { $0.invalidate() }
+            self.animationTokens.removeAll()
+        }
     }
 
     @ViewBuilder
@@ -305,41 +311,52 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private func startAnimations() {
         guard let animations, !animations.isEmpty else { return }
 
+        var tokens = Set<AdaptyUIAnimationToken>()
+
         for animation in animations {
             switch animation {
             case let .background(timeline, value):
                 self.animatedBackgroundFilling = value.start
-                self.startValueAnimation(
-                    animation,
-                    from: value.start,
-                    to: value.end
-                ) { self.animatedBackgroundFilling = $0 }
+
+                tokens.insert(
+                    timeline.animate(
+                        from: value.start,
+                        to: value.end,
+                        updateBlock: { self.animatedBackgroundFilling = $0 }
+                    )
+                )
             case let .border(timeline, value):
                 self.animatedBorderThickness = value.thickness?.start
 
                 if let color = value.color {
                     self.animatedBorderFilling = value.color?.start
 
-                    self.startValueAnimation(
-                        animation,
-                        from: color.start,
-                        to: color.end
-                    ) { self.animatedBorderFilling = $0 }
+                    tokens.insert(
+                        timeline.animate(
+                            from: color.start,
+                            to: color.end,
+                            updateBlock: { self.animatedBorderFilling = $0 }
+                        )
+                    )
                 }
 
                 if let thickness = value.thickness {
                     self.animatedBorderThickness = thickness.start
 
-                    self.startValueAnimation(
-                        animation,
-                        from: thickness.start,
-                        to: thickness.end
-                    ) { self.animatedBorderThickness = $0 }
+                    tokens.insert(
+                        timeline.animate(
+                            from: thickness.start,
+                            to: thickness.end,
+                            updateBlock: { self.animatedBorderThickness = $0 }
+                        )
+                    )
                 }
             default:
                 break
             }
         }
+
+        self.animationTokens = tokens
     }
 }
 
