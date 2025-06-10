@@ -16,15 +16,15 @@ private struct RegisterInstallRequest: HTTPEncodableRequest {
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    let info: Environment.InstallInfo
+    let installInfo: Environment.InstallInfo
 
-    init(profileId: String, info: Environment.InstallInfo) {
+    init(profileId: String, installInfo: Environment.InstallInfo) {
         headers = HTTPHeaders().setBackendProfileId(profileId)
-        self.info = info
+        self.installInfo = installInfo
     }
 
     func encode(to encoder: any Encoder) throws {
-        try info.encode(to: encoder)
+        try installInfo.encode(to: encoder)
     }
 }
 
@@ -40,16 +40,12 @@ extension Backend.UAExecutor {
 
     func registerInstall(
         profileId: String,
+        installInfo: Environment.InstallInfo,
         maxRetries: Int = 5
     ) async throws {
-        let includedAnalyticIds = true
-        guard let info = await Environment.InstallInfo(includedAnalyticIds: includedAnalyticIds) else {
-            return
-        }
-
         let request = RegisterInstallRequest(
             profileId: profileId,
-            info: info
+            installInfo: installInfo
         )
         var lastError: Error?
         for attempt in 0 ..< maxRetries {
@@ -69,5 +65,28 @@ extension Backend.UAExecutor {
         if let lastError {
             throw lastError
         }
+    }
+
+    func registerInstall(
+        profileId: String,
+        includedAnalyticIds: Bool,
+        maxRetries: Int = 5
+    ) async throws {
+        guard let installInfo = await Environment.InstallInfo(includedAnalyticIds: includedAnalyticIds) else {
+            return
+        }
+
+        try await registerInstall(profileId: profileId, installInfo: installInfo)
+    }
+}
+
+package extension Adapty {
+    nonisolated static func debugSendRegisterInstallRequest(installTime: Date = Date()) async throws {
+        let sdk = try await activatedSDK
+        try await sdk.httpUASession.registerInstall(
+            profileId: sdk.profileStorage.profileId,
+            installInfo: await Environment.InstallInfo(installTime: installTime, includedAnalyticIds: true),
+            maxRetries: 0
+        )
     }
 }

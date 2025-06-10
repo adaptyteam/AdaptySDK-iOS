@@ -85,7 +85,8 @@ public extension Adapty {
 
             Task { @AdaptyActor in
                 try await sdk.httpUASession.registerInstall(
-                    profileId: sdk.profileStorage.profileId
+                    profileId: sdk.profileStorage.profileId,
+                    includedAnalyticIds: true
                 )
             }
 
