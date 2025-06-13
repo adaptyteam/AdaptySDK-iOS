@@ -18,7 +18,7 @@ actor SK2Purchaser {
         self.storage = storage
     }
 
-    private static var isObservingStarted = false
+    nonisolated(unsafe) private static var isObservingStarted = false
 
     static func startObserving(
         purchaseValidator: PurchaseValidator,
