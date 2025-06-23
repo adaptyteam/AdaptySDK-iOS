@@ -10,6 +10,7 @@ import StoreKit
 private let log = Log.sk2TransactionManager
 
 actor SK2Purchaser {
+    
     private let purchaseValidator: PurchaseValidator
     private let storage: VariationIdStorage
 
@@ -18,8 +19,10 @@ actor SK2Purchaser {
         self.storage = storage
     }
 
+    @AdaptyActor
     private static var isObservingStarted = false
 
+    @AdaptyActor
     static func startObserving(
         purchaseValidator: PurchaseValidator,
         productsManager: StoreKitProductsManager,
