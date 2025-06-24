@@ -8,20 +8,18 @@
 import Foundation
 
 extension Environment {
-    struct InstallInfo: Sendable, Encodable {
+    struct InstallInfo: Sendable, Hashable, Encodable {
         let bundleId: String?
         let idfv: String?
         let idfa: String?
         let osName: String
         let osVersion: String
         let deviceModel: String
-        let screenWidth: Int?
-        let screenHeight: Int?
-        let screenScale: Double?
+        let screen: Device.ScreenInfo?
         let timezone: String
         let locale: AdaptyLocale
-        let ipV4Address: String?
         let installTime: Date
+        let appLaunchCount: Int
         
         enum CodingKeys: String, CodingKey {
             case bundleId = "bundle_id"
@@ -37,18 +35,28 @@ extension Environment {
             case timezone
             case time = "client_time"
             case locale
-            case ipV4Address = "ip_client"
             case installTime = "install_time"
         }
         
         @AdaptyActor
         init?(includedAnalyticIds: Bool) async {
-            guard let installTime = Application.installationTime else { return nil }
-            await self.init(installTime: installTime, includedAnalyticIds: includedAnalyticIds)
+            guard
+                let installTime = Application.installationTime,
+                let appLaunchCount = Application.appLaunchCount
+            else { return nil }
+            await self.init(
+                installTime: installTime,
+                appLaunchCount: appLaunchCount,
+                includedAnalyticIds: includedAnalyticIds
+            )
         }
         
         @AdaptyActor
-        init(installTime: Date, includedAnalyticIds: Bool) async {
+        init(
+            installTime: Date,
+            appLaunchCount: Int,
+            includedAnalyticIds: Bool
+        ) async {
             self.bundleId = Application.bundleIdentifier
             if includedAnalyticIds {
                 self.idfv = await Device.idfv
@@ -60,38 +68,31 @@ extension Environment {
             self.osName = await System.name
             self.osVersion = await System.version
             self.deviceModel = Device.model
-            if let scrren = await Device.mainScreenInfo {
-                self.screenWidth = scrren.width
-                self.screenHeight = scrren.height
-                self.screenScale = scrren.scale
-            } else {
-                self.screenWidth = nil
-                self.screenHeight = nil
-                self.screenScale = nil
-            }
+            self.screen = await Device.mainScreenInfo
             self.timezone = System.timezone
             self.locale = System.locale
-            self.ipV4Address = Device.ipV4Address
             self.installTime = installTime
+            self.appLaunchCount = appLaunchCount
         }
         
         func encode(to encoder: any Encoder) throws {
-            var container: KeyedEncodingContainer<Environment.InstallInfo.CodingKeys> = encoder.container(keyedBy: Environment.InstallInfo.CodingKeys.self)
-            try container.encodeIfPresent(self.bundleId, forKey: Environment.InstallInfo.CodingKeys.bundleId)
-            try container.encodeIfPresent(self.idfv, forKey: Environment.InstallInfo.CodingKeys.idfv)
-            try container.encodeIfPresent(self.idfa, forKey: Environment.InstallInfo.CodingKeys.idfa)
-            try container.encode(self.osName, forKey: Environment.InstallInfo.CodingKeys.osName)
-            try container.encode(self.osVersion, forKey: Environment.InstallInfo.CodingKeys.osVersion)
-            try container.encode("apple", forKey: Environment.InstallInfo.CodingKeys.deviceBrand)
-            try container.encode(self.deviceModel, forKey: Environment.InstallInfo.CodingKeys.deviceModel)
-            try container.encodeIfPresent(self.screenWidth, forKey: Environment.InstallInfo.CodingKeys.screenWidth)
-            try container.encodeIfPresent(self.screenHeight, forKey: Environment.InstallInfo.CodingKeys.screenHeight)
-            try container.encodeIfPresent(self.screenScale, forKey: Environment.InstallInfo.CodingKeys.screenScale)
-            try container.encode(self.timezone, forKey: Environment.InstallInfo.CodingKeys.timezone)
-            try container.encode(Int(Date().timeIntervalSince1970), forKey: Environment.InstallInfo.CodingKeys.time)
-            try container.encode(self.locale.normalizedIdentifier, forKey: Environment.InstallInfo.CodingKeys.locale)
-            try container.encodeIfPresent(self.ipV4Address, forKey: Environment.InstallInfo.CodingKeys.ipV4Address)
-            try container.encode(Int(self.installTime.timeIntervalSince1970), forKey: Environment.InstallInfo.CodingKeys.installTime)
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encodeIfPresent(bundleId, forKey: .bundleId)
+            try container.encodeIfPresent(idfv, forKey: .idfv)
+            try container.encodeIfPresent(idfa, forKey: .idfa)
+            try container.encode(osName, forKey: .osName)
+            try container.encode(osVersion, forKey: .osVersion)
+            try container.encode("apple", forKey: .deviceBrand)
+            try container.encode(deviceModel, forKey: .deviceModel)
+            if let screen = screen {
+                try container.encode(screen.width, forKey: .screenWidth)
+                try container.encode(screen.height, forKey: .screenHeight)
+                try container.encode(screen.scale, forKey: .screenScale)
+            }
+            try container.encode(timezone, forKey: .timezone)
+            try container.encode(Int(Date().timeIntervalSince1970), forKey: .time)
+            try container.encode(locale.normalizedIdentifier, forKey: .locale)
+            try container.encode(Int(installTime.timeIntervalSince1970), forKey: .installTime)
         }
     }
 }

@@ -7,7 +7,9 @@
 
 import Foundation
 
-private struct RegisterInstallRequest: HTTPEncodableRequest {
+private struct RegisterInstallRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
+    typealias ResponseBody = Backend.Response.OptionalData<RegistrationInstallResponse>
+
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/attribution/install"
@@ -42,51 +44,24 @@ extension Backend.UAExecutor {
         profileId: String,
         installInfo: Environment.InstallInfo,
         maxRetries: Int = 5
-    ) async throws {
+    ) async throws -> RegistrationInstallResponse? {
         let request = RegisterInstallRequest(
             profileId: profileId,
             installInfo: installInfo
         )
-        var lastError: Error?
-        for attempt in 0 ..< maxRetries {
+        var attempt = 0
+        repeat {
             do {
-                let _: HTTPEmptyResponse = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil)
-                return
+                let response = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil)
+                return response.body.value
             } catch {
-                lastError = error
+                guard attempt < maxRetries else { throw error }
                 guard let httpError = error as? HTTPError,
-                      Backend.canRetryRequest(httpError)
+                      UABackend.canRetryRequest(httpError)
                 else { throw error }
+                attempt += 1
                 try await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
-                continue
             }
-        }
-
-        if let lastError {
-            throw lastError
-        }
-    }
-
-    func registerInstall(
-        profileId: String,
-        includedAnalyticIds: Bool,
-        maxRetries: Int = 5
-    ) async throws {
-        guard let installInfo = await Environment.InstallInfo(includedAnalyticIds: includedAnalyticIds) else {
-            return
-        }
-
-        try await registerInstall(profileId: profileId, installInfo: installInfo)
-    }
-}
-
-public extension Adapty { // TODO: delete
-    nonisolated static func debugSendRegisterInstallRequest(installTime: Date = Date()) async throws {
-        let sdk = try await activatedSDK
-        try await sdk.httpUASession.registerInstall(
-            profileId: sdk.profileStorage.profileId,
-            installInfo: await Environment.InstallInfo(installTime: installTime, includedAnalyticIds: true),
-            maxRetries: 1
-        )
+        } while true
     }
 }

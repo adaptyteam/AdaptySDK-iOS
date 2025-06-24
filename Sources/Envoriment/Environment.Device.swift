@@ -48,7 +48,11 @@ extension Environment {
             #endif
         }()
 
-        typealias ScreenInfo = (width: Int, height: Int, scale: Double)
+        struct ScreenInfo: Sendable, Hashable {
+            let width: Int
+            let height: Int
+            let scale: Double
+        }
 
         @AdaptyActor
         private static var _mainScreenInfo: ScreenInfo?
@@ -62,7 +66,7 @@ extension Environment {
                     #if canImport(UIKit)
                         let mainScreen = UIScreen.main
                         let nativeBounds = mainScreen.nativeBounds
-                        return (
+                        return ScreenInfo(
                             width: Int(nativeBounds.width),
                             height: Int(nativeBounds.height),
                             scale: Double(mainScreen.scale)
@@ -71,7 +75,7 @@ extension Environment {
                         guard let mainScreen = NSScreen.main else { return nil }
                         let frameInPoints = mainScreen.frame
                         let scale = mainScreen.backingScaleFactor
-                        return (
+                        return ScreenInfo(
                             width: Int(frameInPoints.width * scale),
                             height: Int(frameInPoints.height * scale),
                             scale: Double(scale)

@@ -14,7 +14,7 @@ extension Backend {
 
     func createUAExecutor() -> UAExecutor {
         UAExecutor(
-            session: HTTPSession(configuration: ua)
+            session: HTTPSession(configuration: ua, responseValidator: validator)
         )
     }
 }

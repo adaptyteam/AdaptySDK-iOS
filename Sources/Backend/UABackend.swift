@@ -34,3 +34,24 @@ struct UABackend: HTTPCodableConfiguration {
         self.baseURL = configuration.backend.uaUrl
     }
 }
+
+extension UABackend {
+    static func canRetryRequest(_ error: HTTPError) -> Bool {
+        switch error {
+        case .perform:
+            false
+        case let .network(_, _, _, error: error):
+            (error as NSError).isNetworkConnectionError
+        case let .decoding(_, _, statusCode, _, _, _),
+             let .backend(_, _, statusCode, _, _, _):
+            switch statusCode {
+            case 429, 499, 500 ... 599:
+                true
+            case 400 ... 499:
+                false
+            default:
+                true
+            }
+        }
+    }
+}

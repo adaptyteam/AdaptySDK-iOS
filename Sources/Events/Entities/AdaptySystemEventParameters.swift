@@ -167,6 +167,7 @@ enum MethodName: String {
     case openWebPaywall = "open_web_paywall"
     case createWebPaywallUrl = "create_web_paywall_url"
 
+    case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
 
     case getPaywall = "get_paywall"
