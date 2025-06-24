@@ -22,4 +22,8 @@ public extension Adapty {
     nonisolated static func debugSendRegisterInstallRequest(installTime: Date = Date()) async throws {
         try await UserAcquisitionManager.shared?.debugSendRegisterInstallRequest(sdk: await activatedSDK, installTime: installTime)
     }
+
+    internal func startRegisterInstallTaskIfNeeded(maxRetries: Int = 10) -> Bool {
+        UserAcquisitionManager.shared?.startRegisterInstallTaskIfNeeded(maxRetries: maxRetries) ?? false
+    }
 }

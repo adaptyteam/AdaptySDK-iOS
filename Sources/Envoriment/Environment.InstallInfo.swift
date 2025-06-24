@@ -20,7 +20,7 @@ extension Environment {
         let locale: AdaptyLocale
         let installTime: Date
         let appLaunchCount: Int
-        
+
         enum CodingKeys: String, CodingKey {
             case bundleId = "bundle_id"
             case idfv
@@ -37,20 +37,7 @@ extension Environment {
             case locale
             case installTime = "install_time"
         }
-        
-        @AdaptyActor
-        init?(includedAnalyticIds: Bool) async {
-            guard
-                let installTime = Application.installationTime,
-                let appLaunchCount = Application.appLaunchCount
-            else { return nil }
-            await self.init(
-                installTime: installTime,
-                appLaunchCount: appLaunchCount,
-                includedAnalyticIds: includedAnalyticIds
-            )
-        }
-        
+
         @AdaptyActor
         init(
             installTime: Date,
@@ -74,7 +61,7 @@ extension Environment {
             self.installTime = installTime
             self.appLaunchCount = appLaunchCount
         }
-        
+
         func encode(to encoder: any Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encodeIfPresent(bundleId, forKey: .bundleId)
