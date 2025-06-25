@@ -23,7 +23,7 @@ final class LifecycleManager {
     private static let profileUpdateAcceleratedInterval: TimeInterval = 3.0
     private static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: TimeInterval = 60.0 * 20.0
     private static let profileUpdateAcceleratedDuration: TimeInterval = 60.0 * 5.0
-    
+
     private static let idfaStatusCheckDuration: TimeInterval = 600.0
     private static let idfaStatusCheckInterval: TimeInterval = 5.0
 
@@ -41,6 +41,8 @@ final class LifecycleManager {
         subscribeForStorefrontUpdate()
         profileUpdateRegularTask = scheduleProfileUpdate(skipFirstSleep: false)
         scheduleIDFAUpdate()
+
+        Adapty.startRegisterInstallTaskIfNeeded()
     }
 
     private func subscribeForStorefrontUpdate() {

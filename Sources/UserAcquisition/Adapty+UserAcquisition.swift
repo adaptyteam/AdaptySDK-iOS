@@ -23,7 +23,7 @@ public extension Adapty {
         try await UserAcquisitionManager.shared?.debugSendRegisterInstallRequest(sdk: await activatedSDK, installTime: installTime)
     }
 
-    internal func startRegisterInstallTaskIfNeeded()  {
+    internal static func startRegisterInstallTaskIfNeeded()  {
         _ = UserAcquisitionManager.shared?.startRegisterInstallTaskIfNeeded()
     }
 }
