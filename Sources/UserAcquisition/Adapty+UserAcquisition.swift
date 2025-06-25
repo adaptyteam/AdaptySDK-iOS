@@ -18,11 +18,6 @@ public extension Adapty {
         }
     }
 
-    // TODO: delete
-    nonisolated static func debugSendRegisterInstallRequest(installTime: Date = Date()) async throws {
-        try await UserAcquisitionManager.shared?.debugSendRegisterInstallRequest(sdk: await activatedSDK, installTime: installTime)
-    }
-
     internal func startRegisterInstallTaskIfNeeded()  {
         _ = UserAcquisitionManager.shared?.startRegisterInstallTaskIfNeeded()
     }

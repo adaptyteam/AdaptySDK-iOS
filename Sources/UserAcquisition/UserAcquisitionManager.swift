@@ -101,19 +101,6 @@ final class UserAcquisitionManager: Sendable {
             appLaunchCount: appLaunchCount
         ))
     }
-
-    // TODO: delete
-    func debugSendRegisterInstallRequest(sdk: Adapty, installTime: Date) async throws {
-        _ = try await executor.registerInstall(
-            profileId: sdk.profileStorage.profileId,
-            installInfo: await Environment.InstallInfo(
-                installTime: installTime,
-                appLaunchCount: Environment.Application.appLaunchCount ?? 1,
-                includedAnalyticIds: true
-            ),
-            maxRetries: 1
-        )
-    }
 }
 
 @AdaptyActor
