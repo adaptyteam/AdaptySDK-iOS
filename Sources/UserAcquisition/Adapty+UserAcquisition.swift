@@ -18,7 +18,7 @@ public extension Adapty {
         }
     }
 
-    internal func startRegisterInstallTaskIfNeeded()  {
+    internal static func startRegisterInstallTaskIfNeeded() {
         _ = UserAcquisitionManager.shared?.startRegisterInstallTaskIfNeeded()
     }
 }
