@@ -22,13 +22,13 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
 
     func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails)
 
-    func onInstallationDetailsFail(error: Error)
+    func onInstallationDetailsFail(error: AdaptyError)
 }
 
 public extension AdaptyDelegate {
     func shouldAddStorePayment(for _: AdaptyDeferredProduct) -> Bool { true }
     func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails) {}
-    func onInstallationDetailsFail(error: Error) {}
+    func onInstallationDetailsFail(error: AdaptyError) {}
 }
 
 extension Adapty {

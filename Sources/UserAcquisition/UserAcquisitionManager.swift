@@ -79,7 +79,7 @@ final class UserAcquisitionManager: Sendable {
                 if let httpError = error as? HTTPError, httpError.isCancelled {
                     return
                 }
-                Adapty.callDelegate { $0.onInstallationDetailsFail(error: error.asAdaptyError ?? error) }
+                Adapty.callDelegate { $0.onInstallationDetailsFail(error: error.asAdaptyError ?? AdaptyError.fetchInstallationDetailsFailed(unknownError: error)) }
             }
         }
         return true

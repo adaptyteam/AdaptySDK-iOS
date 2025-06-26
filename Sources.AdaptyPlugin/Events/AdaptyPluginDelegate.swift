@@ -24,6 +24,18 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
             profile: profile
         ))
     }
+
+    func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails) {
+        eventHandler.handle(event: Event.OnInstallationDetailsSuccess(
+            details: details
+        ))
+    }
+
+    func onInstallationDetailsFail(error: AdaptyError) {
+        eventHandler.handle(event: Event.OnInstallationDetailsFail(
+            error: error
+        ))
+    }
 }
 
 #if canImport(UIKit)
