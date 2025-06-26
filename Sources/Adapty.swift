@@ -67,7 +67,7 @@ public final class Adapty: Sendable {
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             if !observerMode {
-                self.sk2Purchaser = SK2Purchaser.startObserving(
+                self.sk2Purchaser = await SK2Purchaser.safeStartObserving(
                     purchaseValidator: self,
                     productsManager: productsManager,
                     storage: variationIdStorage

@@ -18,9 +18,9 @@ actor SK2Purchaser {
         self.storage = storage
     }
 
-    private static var isObservingStarted = false
+    @MainActor private static var isObservingStarted = false
 
-    static func startObserving(
+    @MainActor static func startObserving(
         purchaseValidator: PurchaseValidator,
         productsManager: StoreKitProductsManager,
         storage: VariationIdStorage
@@ -257,6 +257,29 @@ actor SK2Purchaser {
         } catch {
             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Product.id)")
             throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
+        }
+    }
+}
+
+//MARK: - SafeStartObserving Extension
+
+extension SK2Purchaser {
+    
+    /// A convenience wrapper for calling `startObserving` safely from any concurrency context.
+    /// Ensures the call is executed on the main actor to avoid concurrency violations.
+    /// Use this instead of calling `startObserving` directly when outside the main actor.
+    
+    static func safeStartObserving(
+        purchaseValidator: PurchaseValidator,
+        productsManager: StoreKitProductsManager,
+        storage: VariationIdStorage
+    ) async -> SK2Purchaser? {
+        await MainActor.run {
+            return SK2Purchaser.startObserving(
+                purchaseValidator: purchaseValidator,
+                productsManager: productsManager,
+                storage: storage
+            )
         }
     }
 }
