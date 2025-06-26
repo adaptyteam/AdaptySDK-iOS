@@ -156,31 +156,11 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                 )
             case let .shadow(timeline, value):
                 if let colorValue = value.color {
-                    animatedShadowFilling = value.color?.start
-
-                    tokens.insert(
-                        timeline.animate(
-                            from: colorValue.start,
-                            to: colorValue.end,
-                            updateBlock: {
-                                self.animatedShadowFilling = $0
-                            }
-                        )
-                    )
+                    animatedShadowFilling = colorValue.start
                 }
 
                 if let blurValue = value.blurRadius {
                     animatedShadowBlurRadius = blurValue.start
-
-                    tokens.insert(
-                        timeline.animate(
-                            from: blurValue.start,
-                            to: blurValue.end,
-                            updateBlock: {
-                                self.animatedShadowBlurRadius = $0
-                            }
-                        )
-                    )
                 }
 
                 if let offsetValue = value.offset {
@@ -188,20 +168,30 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         width: offsetValue.start.x.points(.horizontal, screenSize, safeArea),
                         height: offsetValue.start.y.points(.vertical, screenSize, safeArea)
                     )
+                }
 
-                    tokens.insert(
-                        timeline.animate(
-                            from: offsetValue.start,
-                            to: offsetValue.end,
-                            updateBlock: {
+                tokens.insert(
+                    timeline.animate(
+                        from: (value.color?.start, value.blurRadius?.start, value.offset?.start),
+                        to: (value.color?.end, value.blurRadius?.end, value.offset?.end),
+                        updateBlock: { value in
+                            if let colorValue = value.0 {
+                                animatedShadowFilling = colorValue
+                            }
+
+                            if let blurValue = value.1 {
+                                animatedShadowBlurRadius = blurValue
+                            }
+
+                            if let offsetValue = value.2 {
                                 animatedShadowOffset = CGSize(
-                                    width: $0.x.points(.horizontal, screenSize, safeArea),
-                                    height: $0.y.points(.vertical, screenSize, safeArea)
+                                    width: offsetValue.x.points(.horizontal, screenSize, safeArea),
+                                    height: offsetValue.y.points(.vertical, screenSize, safeArea)
                                 )
                             }
-                        )
+                        }
                     )
-                }
+                )
             default:
                 break
             }
