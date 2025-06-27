@@ -41,8 +41,6 @@ final class LifecycleManager {
         subscribeForStorefrontUpdate()
         profileUpdateRegularTask = scheduleProfileUpdate(skipFirstSleep: false)
         scheduleIDFAUpdate()
-
-        Adapty.startRegisterInstallTaskIfNeeded()
     }
 
     private func subscribeForStorefrontUpdate() {
@@ -197,6 +195,8 @@ final class LifecycleManager {
 
             profileUpdateRegularTask?.cancel()
             self.profileUpdateRegularTask = self.scheduleProfileUpdate(skipFirstSleep: true)
+            
+            Adapty.startRegisterInstallTaskIfNeeded()
 
             if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
                 log.verbose("handleDidBecomeActiveNotification SKIP")
