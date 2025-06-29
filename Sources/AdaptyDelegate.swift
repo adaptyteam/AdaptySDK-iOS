@@ -26,22 +26,8 @@ public extension AdaptyDelegate {
 }
 
 extension Adapty {
-    #if compiler(>=5.10)
-        /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
-        public nonisolated(unsafe) static var delegate: AdaptyDelegate?
-    #else
-        /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
-        public nonisolated static var delegate: AdaptyDelegate? {
-            get { _nonisolatedUnsafe.delegate }
-            set { _nonisolatedUnsafe.delegate = newValue }
-        }
-
-        private final class NonisolatedUnsafe: @unchecked Sendable {
-            weak var delegate: AdaptyDelegate?
-        }
-
-        private nonisolated static let _nonisolatedUnsafe = NonisolatedUnsafe()
-    #endif
+    /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
+    public nonisolated(unsafe) static var delegate: AdaptyDelegate?
 
     static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
         guard let delegate = Adapty.delegate else { return }

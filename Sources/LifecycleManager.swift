@@ -23,7 +23,7 @@ final class LifecycleManager {
     private static let profileUpdateAcceleratedInterval: TimeInterval = 3.0
     private static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: TimeInterval = 60.0 * 20.0
     private static let profileUpdateAcceleratedDuration: TimeInterval = 60.0 * 5.0
-    
+
     private static let idfaStatusCheckDuration: TimeInterval = 600.0
     private static let idfaStatusCheckInterval: TimeInterval = 5.0
 
@@ -96,7 +96,6 @@ final class LifecycleManager {
         log.verbose("LifecycleManager: \(stamp) scheduleProfileUpdate")
 
         return Task { @AdaptyActor [weak self] in
-
             if !skipFirstSleep {
                 try await Task.sleep(seconds: Self.profileUpdateInterval)
             }
@@ -172,11 +171,7 @@ final class LifecycleManager {
     private func subscribeForLifecycleEvents() {
         #if canImport(UIKit)
             Task {
-                #if compiler(>=6.0)
-                    let didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
-                #else
-                    let didBecomeActiveNotification = await UIApplication.didBecomeActiveNotification
-                #endif
+                let didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
                 NotificationCenter.default.addObserver(
                     forName: didBecomeActiveNotification,
                     object: nil,

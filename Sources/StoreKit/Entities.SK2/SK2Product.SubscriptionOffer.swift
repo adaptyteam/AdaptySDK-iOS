@@ -22,15 +22,11 @@ extension SK2Product {
     }
 
     func unfWinBackOffer(byId identifier: String) -> SK2Product.SubscriptionOffer? {
-#if compiler(<6.0)
-        return nil
-#else
         guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
             return nil
         }
 
         return subscription?.winBackOffers.first { $0.id == identifier }
-#endif
     }
 
     func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {

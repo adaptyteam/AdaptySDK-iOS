@@ -8,10 +8,6 @@
 import Foundation
 import os.log
 
-#if compiler(<6.0)
-    extension OSLog: @unchecked Sendable {}
-#endif
-
 extension Log {
     @InternalActor
     private static var loggers = [Category: OSLog]()

@@ -227,48 +227,44 @@ extension Adapty {
     }
 
     private func eligibleWinBackOfferIds(for subscriptionGroupIdentifier: String) async throws -> [String] {
-        #if compiler(<6.0)
-            return []
-        #else
-            guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else { return [] }
-            let statuses: [SK2Product.SubscriptionInfo.Status]
-            let stamp = Log.stamp
+        guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else { return [] }
+        let statuses: [SK2Product.SubscriptionInfo.Status]
+        let stamp = Log.stamp
 
-            do {
-                Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                    methodName: .subscriptionInfoStatus,
-                    stamp: stamp,
-                    params: [
-                        "subscription_group_id": subscriptionGroupIdentifier,
-                    ]
-                ))
+        do {
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                methodName: .subscriptionInfoStatus,
+                stamp: stamp,
+                params: [
+                    "subscription_group_id": subscriptionGroupIdentifier,
+                ]
+            ))
 
-                statuses = try await SK2Product.SubscriptionInfo.status(for: subscriptionGroupIdentifier)
+            statuses = try await SK2Product.SubscriptionInfo.status(for: subscriptionGroupIdentifier)
 
-                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
-                    methodName: .subscriptionInfoStatus,
-                    stamp: stamp
-                ))
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                methodName: .subscriptionInfoStatus,
+                stamp: stamp
+            ))
 
-            } catch {
-                log.error(" Error on get SubscriptionInfo.status: \(error.localizedDescription)")
-                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
-                    methodName: .subscriptionInfoStatus,
-                    stamp: stamp,
-                    error: error.localizedDescription
-                ))
+        } catch {
+            log.error(" Error on get SubscriptionInfo.status: \(error.localizedDescription)")
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                methodName: .subscriptionInfoStatus,
+                stamp: stamp,
+                error: error.localizedDescription
+            ))
 
-                throw StoreKitManagerError.getSubscriptionInfoStatusFailed(error).asAdaptyError
-            }
+            throw StoreKitManagerError.getSubscriptionInfoStatusFailed(error).asAdaptyError
+        }
 
-            let status = statuses.first {
-                guard case let .verified(transaction) = $0.transaction else { return false }
-                guard transaction.ownershipType == .purchased else { return false }
-                return true
-            }
+        let status = statuses.first {
+            guard case let .verified(transaction) = $0.transaction else { return false }
+            guard transaction.ownershipType == .purchased else { return false }
+            return true
+        }
 
-            guard case let .verified(renewalInfo) = status?.renewalInfo else { return [] }
-            return renewalInfo.eligibleWinBackOfferIDs
-        #endif
+        guard case let .verified(renewalInfo) = status?.renewalInfo else { return [] }
+        return renewalInfo.eligibleWinBackOfferIDs
     }
 }
