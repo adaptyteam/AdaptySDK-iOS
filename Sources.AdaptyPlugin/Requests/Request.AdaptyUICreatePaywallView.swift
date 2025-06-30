@@ -5,6 +5,8 @@
 //  Created by Aleksei Valiano on 13.11.2024.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import AdaptyUI
 import Foundation
@@ -92,3 +94,5 @@ public extension AdaptyPlugin {
         Request.AdaptyUICreatePaywallView.assetIdToFileURL = createPaywallView
     }
 }
+
+#endif
