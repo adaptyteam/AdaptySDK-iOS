@@ -31,7 +31,7 @@ private struct FetchFallbackPlacementVariationsRequest: HTTPRequest {
 
 private extension BackendExecutor {
     @inline(__always)
-    func performFetchFallbackPlacementVariationsRequest<Content: AdaptyPlacementContent>(
+    func performFetchFallbackPlacementVariationsRequest<Content: PlacementContent>(
         requestName: APIRequestName,
         apiKeyPrefix: String,
         profileId: String,
@@ -42,6 +42,34 @@ private extension BackendExecutor {
         variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
+    ) async throws -> AdaptyPlacementChosen<Content> {
+        try await _performFetchFallbackPlacementVariationsRequest(
+            requestName,
+            apiKeyPrefix,
+            profileId,
+            placementId,
+            locale: locale,
+            locale,
+            cached,
+            crossPlacementEligible,
+            variationIdResolver,
+            disableServerCache,
+            timeoutInterval
+        )
+    }
+
+    private func _performFetchFallbackPlacementVariationsRequest<Content: PlacementContent>(
+        _ requestName: APIRequestName,
+        _ apiKeyPrefix: String,
+        _ profileId: String,
+        _ placementId: String,
+        locale: AdaptyLocale,
+        _ requestLocale: AdaptyLocale,
+        _ cached: Content?,
+        _ crossPlacementEligible: Bool,
+        _ variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
+        _ disableServerCache: Bool,
+        _ timeoutInterval: TimeInterval?
     ) async throws -> AdaptyPlacementChosen<Content> {
         let endpoint =
             if Content.self == AdaptyPaywall.self {
@@ -74,6 +102,7 @@ private extension BackendExecutor {
                     "api_prefix": apiKeyPrefix,
                     "placement_id": placementId,
                     "language_code": locale.languageCode,
+                    "request_locale": requestLocale.id,
                     "builder_version": AdaptyViewConfiguration.builderVersion,
                     "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
                     "disable_server_cache": disableServerCache,
@@ -84,6 +113,7 @@ private extension BackendExecutor {
                     withConfiguration: configuration,
                     withProfileId: profileId,
                     withPlacementId: placementId,
+                    withRequestLocale: requestLocale,
                     withCached: cached,
                     variationIdResolver: variationIdResolver
                 )
@@ -98,24 +128,25 @@ private extension BackendExecutor {
                 throw error
             }
 
-            return try await performFetchFallbackPlacementVariationsRequest(
-                requestName: requestName,
-                apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
-                placementId: placementId,
+            return try await _performFetchFallbackPlacementVariationsRequest(
+                requestName,
+                apiKeyPrefix,
+                profileId,
+                placementId,
                 locale: .defaultPlacementLocale,
-                cached: cached,
-                crossPlacementEligible: crossPlacementEligible,
-                variationIdResolver: variationIdResolver,
-                disableServerCache: disableServerCache,
-                timeoutInterval: timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
+                requestLocale,
+                cached,
+                crossPlacementEligible,
+                variationIdResolver,
+                disableServerCache,
+                timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
             )
         }
     }
 }
 
 extension Backend.FallbackExecutor {
-    func fetchFallbackPlacementVariations<Content: AdaptyPlacementContent>(
+    func fetchFallbackPlacementVariations<Content: PlacementContent>(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -148,7 +179,7 @@ extension Backend.FallbackExecutor {
 }
 
 extension Backend.ConfigsExecutor {
-    func fetchPlacementVariationsForDefaultAudience<Content: AdaptyPlacementContent>(
+    func fetchPlacementVariationsForDefaultAudience<Content: PlacementContent>(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,

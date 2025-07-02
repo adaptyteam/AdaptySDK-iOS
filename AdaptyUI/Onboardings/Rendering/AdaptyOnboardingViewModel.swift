@@ -61,10 +61,11 @@ final class AdaptyOnboardingViewModel: ObservableObject {
         Log.ui.verbose("VM #\(logId)# viewDidAppear")
 
         if !wasAppeared {
-            let request = URLRequest(url: onboarding.viewConfiguration.url)
+            var request = URLRequest(url: onboarding.viewConfiguration.url)
+            request.setValue(onboarding.requestLocaleIdentifier, forHTTPHeaderField: "Accept-Language")
             webView?.load(request)
         }
-        
+
         wasAppeared = true
         persistOnboardingVariationIdIfNeeded()
     }

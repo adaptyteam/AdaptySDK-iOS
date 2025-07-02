@@ -34,7 +34,12 @@ struct FallbackPlacements: Sendable {
         head.placementIds?.contains(id)
     }
 
-    func getPlacement<Content: AdaptyPlacementContent>(byPlacementId id: String, withVariationId: String?, profileId: String) -> AdaptyPlacementChosen<Content>? {
+    func getPlacement<Content: PlacementContent>(
+        byPlacementId id: String,
+        withVariationId: String?,
+        profileId: String,
+        requestLocale: AdaptyLocale
+    ) -> AdaptyPlacementChosen<Content>? {
         guard contains(placementId: id) ?? true else { return nil }
 
         let draw: AdaptyPlacement.Draw<Content>?
@@ -45,6 +50,7 @@ struct FallbackPlacements: Sendable {
                 withProfileId: profileId,
                 withPlacementId: id,
                 withVariationId: withVariationId,
+                withRequestLocale: requestLocale,
                 version: version
             )
         } catch {
@@ -99,36 +105,41 @@ private extension FallbackPlacements {
         }
     }
 
-    static func decodePlacementVariation<Content: AdaptyPlacementContent>(
+    static func decodePlacementVariation<Content: PlacementContent>(
         _ data: Data,
         withProfileId profileId: String,
         withPlacementId placementId: String,
         withVariationId variationId: String?,
+        withRequestLocale requestLocale: AdaptyLocale,
         version: Int64
     ) throws -> AdaptyPlacement.Draw<Content>? {
         let jsonDecoder = FallbackPlacements.decoder()
-        jsonDecoder.setPlacementId(placementId)
+        jsonDecoder.userInfo.setPlacementId(placementId)
+        jsonDecoder.userInfo.setProfileId(profileId)
+        jsonDecoder.userInfo.setRequestLocale(requestLocale)
+
+        if let variationId {
+            jsonDecoder.userInfo.setPlacementVariationId(variationId)
+        }
 
         if let string = try? jsonDecoder.decode(Backend.Response.Data<String>.Placement.self, from: data).value {
             let draw: AdaptyPlacement.Draw<Content> = try decodePlacementVariation(
+                jsonDecoder,
                 string.data(using: .utf8) ?? Data(),
-                withProfileId: profileId,
-                withVariationId: variationId,
                 version: version
             )
             return draw
         }
 
-        let placement = try jsonDecoder.decode(
-            Backend.Response.Data<AdaptyPlacement>.Placement.Meta.self,
-            from: data
-        ).value?.replace(version: version)
+        guard let placement = try jsonDecoder
+            .decode(
+                Backend.Response.Data<AdaptyPlacement>.Placement.Meta.self,
+                from: data
+            )
+            .value?.replace(version: version)
+        else { return nil }
 
-        guard let placement else { return nil }
-
-        jsonDecoder.setPlacement(placement)
-        jsonDecoder.setProfileId(profileId)
-        if let variationId { jsonDecoder.setPlacementVariationId(variationId) }
+        jsonDecoder.userInfo.setPlacement(placement)
 
         return try jsonDecoder.decode(
             Backend.Response.Data<AdaptyPlacement.Draw<Content>>.Placement.Data.self,
@@ -136,22 +147,17 @@ private extension FallbackPlacements {
         ).value
     }
 
-    private static func decodePlacementVariation<Content: AdaptyPlacementContent>(
+    private static func decodePlacementVariation<Content: PlacementContent>(
+        _ jsonDecoder: JSONDecoder,
         _ data: Data,
-        withProfileId profileId: String,
-        withVariationId variationId: String?,
         version: Int64
     ) throws -> AdaptyPlacement.Draw<Content> {
-        let jsonDecoder = FallbackPlacements.decoder()
-
         let placement = try jsonDecoder.decode(
             Backend.Response.Meta<AdaptyPlacement>.self,
             from: data
         ).value.replace(version: version)
 
-        jsonDecoder.setPlacement(placement)
-        jsonDecoder.setProfileId(profileId)
-        if let variationId { jsonDecoder.setPlacementVariationId(variationId) }
+        jsonDecoder.userInfo.setPlacement(placement)
 
         return try jsonDecoder.decode(
             Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,

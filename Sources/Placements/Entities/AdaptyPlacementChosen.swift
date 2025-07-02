@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AdaptyPlacementChosen<Content: AdaptyPlacementContent>: Sendable {
+enum AdaptyPlacementChosen<Content: PlacementContent>: Sendable {
     case restore(Content)
     case draw(AdaptyPlacement.Draw<Content>)
 }

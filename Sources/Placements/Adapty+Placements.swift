@@ -80,7 +80,7 @@ extension Adapty {
         }
     }
 
-    private func getPlacement<Content: AdaptyPlacementContent>(
+    private func getPlacement<Content: PlacementContent>(
         _ placementId: String,
         _ locale: AdaptyLocale,
         _ fetchPolicy: AdaptyPlacementFetchPolicy,
@@ -124,7 +124,7 @@ extension Adapty {
         }
     }
 
-    private func fetchPlacement<Content: AdaptyPlacementContent>(
+    private func fetchPlacement<Content: PlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale,
@@ -167,7 +167,7 @@ extension Adapty {
         return content
     }
 
-    private func fetchPlacement<Content: AdaptyPlacementContent>(
+    private func fetchPlacement<Content: PlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale
@@ -313,27 +313,28 @@ extension Adapty {
         }
     }
 
-    func getCacheOrFallbackFilePlacement<Content: AdaptyPlacementContent>(
+    func getCacheOrFallbackFilePlacement<Content: PlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale,
         withCrossPlacmentABTest: Bool
     ) -> Content? {
-        let chosen: AdaptyPlacementChosen<Content>? =
-            if let manager = tryProfileManagerOrNil(with: profileId) {
-                manager.placementStorage.getPlacementWithFallback(
-                    byPlacementId: placementId,
-                    withVariationId: withCrossPlacmentABTest ? manager.storage.crossPlacementState?.variationId(placementId: placementId) : nil,
-                    profileId: profileId,
-                    locale: locale
-                )
-            } else {
-                Adapty.fallbackPlacements?.getPlacement(
-                    byPlacementId: placementId,
-                    withVariationId: nil,
-                    profileId: profileId
-                )
-            }
+        let chosen: AdaptyPlacementChosen<Content>?
+        if let manager = tryProfileManagerOrNil(with: profileId) {
+            chosen = manager.placementStorage.getPlacementWithFallback(
+                byPlacementId: placementId,
+                withVariationId: withCrossPlacmentABTest ? manager.storage.crossPlacementState?.variationId(placementId: placementId) : nil,
+                profileId: profileId,
+                locale: locale
+            )
+        } else {
+            chosen = Adapty.fallbackPlacements?.getPlacement(
+                byPlacementId: placementId,
+                withVariationId: nil,
+                profileId: profileId,
+                requestLocale: locale
+            )
+        }
 
         guard let chosen else { return nil }
 
@@ -341,7 +342,7 @@ extension Adapty {
         return chosen.content
     }
 
-    private func fetchFallbackPlacement<Content: AdaptyPlacementContent>(
+    private func fetchFallbackPlacement<Content: PlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale,

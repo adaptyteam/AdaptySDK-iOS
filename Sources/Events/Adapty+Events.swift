@@ -29,7 +29,7 @@ extension Adapty {
         trackEvent(.system(params))
     }
 
-    static func trackEventIfNeed<Content: AdaptyPlacementContent>(_ chosen: AdaptyPlacementChosen<Content>) {
+    static func trackEventIfNeed<Content: PlacementContent>(_ chosen: AdaptyPlacementChosen<Content>) {
         guard case let .draw(draw) = chosen else {
             return
         }

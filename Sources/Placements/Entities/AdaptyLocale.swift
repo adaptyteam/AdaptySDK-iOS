@@ -15,6 +15,10 @@ struct AdaptyLocale: Sendable {
         String(id.prefix { !["-", "_"].contains($0) })
     }
 
+    var normalizedIdentifier: String {
+        id.replacingOccurrences(of: "_", with: "-")
+    }
+
     init(id: String) {
         self.id = id
     }

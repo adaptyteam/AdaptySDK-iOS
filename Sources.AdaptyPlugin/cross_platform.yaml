@@ -1073,6 +1073,7 @@ $defs:
       - variation_id
       - onboarding_builder
       - response_created_at
+      - request_locale
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       onboarding_id: { type: string }
@@ -1081,12 +1082,12 @@ $defs:
       remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
       onboarding_builder:
         type: object
-        required: [lang, config_url]
+        required: [config_url]
         properties:
-          lang: { type: string }
           config_url: { type: string }
       payload_data: { type: string }
       response_created_at: { type: integer }
+      request_locale: { $ref: "#/$defs/AdaptyLocale" }
 
 
   AdaptyPaywall: #request #response

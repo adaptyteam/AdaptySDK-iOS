@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyPaywall: AdaptyPlacementContent, WebPaywallURLProviding {
+public struct AdaptyPaywall: PlacementContent, WebPaywallURLProviding {
     public let placement: AdaptyPlacement
 
     public let instanceIdentity: String
@@ -31,6 +31,8 @@ public struct AdaptyPaywall: AdaptyPlacementContent, WebPaywallURLProviding {
 
     /// Array of related products ids.
     public var vendorProductIds: [String] { products.map { $0.vendorId } }
+
+    var requestLocale: AdaptyLocale
 }
 
 extension AdaptyPaywall: CustomStringConvertible {
@@ -50,28 +52,28 @@ extension AdaptyPaywall: Codable {
         case viewConfiguration = "paywall_builder"
         case webPaywallBaseUrl = "web_purchase_url"
         case products
+        case requestLocale = "request_locale"
     }
 
     public init(from decoder: Decoder) throws {
-
         placement = try decoder.userInfo.placementOrNil ?? AdaptyPlacement(from: decoder)
 
         let superContainer = try decoder.container(keyedBy: Backend.CodingKeys.self)
-        
+
         let container =
             if superContainer.contains(.attributes) {
                 try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
             } else {
                 try decoder.container(keyedBy: CodingKeys.self)
             }
-        
+
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig)
         webPaywallBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallBaseUrl)
         viewConfiguration = try container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration)
-        
+
         products = try {
             var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
             var products = [ProductReference]()
@@ -88,6 +90,8 @@ extension AdaptyPaywall: Codable {
 
             return products
         }()
+        
+        requestLocale = try decoder.userInfo.requestLocaleOrNil ?? container.decode(AdaptyLocale.self, forKey: .requestLocale)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -99,14 +103,9 @@ extension AdaptyPaywall: Codable {
         try container.encode(products, forKey: .products)
         try container.encodeIfPresent(webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
         try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
+        try container.encode(requestLocale, forKey: .requestLocale)
         try placement.encode(to: encoder)
     }
 }
 
-extension Sequence<VH<AdaptyPaywall>> {
-    var asPaywallByPlacementId: [String: VH<AdaptyPaywall>] {
-        Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
-            first.value.placement.version > second.value.placement.version ? first : second
-        })
-    }
-}
+
