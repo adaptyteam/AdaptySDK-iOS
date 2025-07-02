@@ -690,14 +690,14 @@ $events:
 
   Event.OnInstallationDetailsSuccess:
     type: object
-    required: [id, profile]
+    required: [id, details]
     properties:
       id: { const: "on_installation_details_success" }
       details: { $ref: "#/$defs/AdaptyInstallationDetails" }
 
   Event.OnInstallationDetailsFail:
     type: object
-    required: [id, profile]
+    required: [id, error]
     properties:
       id: { const: "on_installation_details_fail" }
       error: { $ref: "#/$defs/AdaptyError" }
