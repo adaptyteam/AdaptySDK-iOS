@@ -399,12 +399,7 @@ $requests:
     properties:
       method: { const: "make_purchase" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      subscription_update_params:
-        {
-          $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
-          description: "Android Only",
-        }
-      is_offer_personalized: { type: boolean, description: "Android Only" }
+      parameters:  { $ref: "#/$defs/AdaptyPurchaseParameters" }
 
   MakePurchase.Response: #response
     type: object
@@ -1426,6 +1421,18 @@ $defs:
     enum:
       - primary
       - secondary
+
+  AdaptyPurchaseParameters:  #request
+    type: object
+    properties:
+      subscription_update_params:
+        {
+          $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
+          description: "Android Only",
+        }
+      is_offer_personalized: { type: boolean, description: "Android Only" }
+      obfuscated_account_id: { type: string, description: "Android Only" }
+      obfuscated_profile_id: { type: string, description: "Android Only" }
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
     type: object
