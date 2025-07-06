@@ -36,7 +36,7 @@ final class Storage {
     @discardableResult
     @AdaptyActor
     static func clearAllDataIfDifferent(apiKey: String) async -> Bool {
-        let hash = apiKey.sha256()
+        let hash = apiKey.sha256.hexString
 
         guard let value = userDefaults.string(forKey: Constants.appKeyHash) else {
             userDefaults.set(hash, forKey: Constants.appKeyHash)

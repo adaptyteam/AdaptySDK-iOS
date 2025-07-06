@@ -8,7 +8,7 @@
 import StoreKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptySK2PaywallProduct: AdaptySK2Product, WebPaywallURLProviding {
+struct AdaptySK2PaywallProduct: AdaptySK2Product, AdaptyPaywallProduct, WebPaywallURLProviding {
     let skProduct: SK2Product
 
     public let adaptyProductId: String
@@ -33,11 +33,9 @@ struct AdaptySK2PaywallProduct: AdaptySK2Product, WebPaywallURLProviding {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptySK2PaywallProduct: AdaptyPaywallProduct {}
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, WebPaywallURLProviding {
+struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, AdaptyPaywallProductWithoutDeterminingOffer, WebPaywallURLProviding {
     let skProduct: SK2Product
 
     public let adaptyProductId: String
@@ -60,5 +58,4 @@ struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, WebPayw
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptyPaywallProductWithoutDeterminingOffer {}
+
