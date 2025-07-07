@@ -12,7 +12,7 @@ package extension AdaptyViewConfiguration {
         package let id: String
         package let state: State
         package let format: [Item]
-        package let actions: [ActionAction]
+        package let actions: [Action]
         package let horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment
 
         package func format(byValue: TimeInterval) -> RichText {
@@ -26,7 +26,7 @@ package extension AdaptyViewConfiguration {
             return format[index].value
         }
 
-        init(id: String, state: State, format: [Item], actions: [ActionAction], horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment) {
+        init(id: String, state: State, format: [Item], actions: [Action], horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment) {
             self.id = id
             self.state = state
             self.format = format.sorted(by: { $0.from > $1.from })
@@ -74,7 +74,7 @@ package extension AdaptyViewConfiguration.Timer {
         id: String = UUID().uuidString,
         endedAt: Date,
         format: AdaptyViewConfiguration.RichText,
-        actions: [AdaptyViewConfiguration.ActionAction] = [],
+        actions: [AdaptyViewConfiguration.Action] = [],
         horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
     ) -> Self {
         .create(
@@ -90,7 +90,7 @@ package extension AdaptyViewConfiguration.Timer {
         id: String = UUID().uuidString,
         endedAt: Date,
         format: [Item],
-        actions: [AdaptyViewConfiguration.ActionAction] = [],
+        actions: [AdaptyViewConfiguration.Action] = [],
         horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
     ) -> Self {
         .init(
@@ -107,7 +107,7 @@ package extension AdaptyViewConfiguration.Timer {
         duration: TimeInterval,
         startBehavior: StartBehavior = .default,
         format: AdaptyViewConfiguration.RichText,
-        actions: [AdaptyViewConfiguration.ActionAction] = [],
+        actions: [AdaptyViewConfiguration.Action] = [],
         horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
     ) -> Self {
         .create(
@@ -125,7 +125,7 @@ package extension AdaptyViewConfiguration.Timer {
         duration: TimeInterval,
         startBehavior: StartBehavior = .default,
         format: [Item],
-        actions: [AdaptyViewConfiguration.ActionAction] = [],
+        actions: [AdaptyViewConfiguration.Action] = [],
         horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
     ) -> Self {
         .init(

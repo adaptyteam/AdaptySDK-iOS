@@ -7,10 +7,10 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct Toggle: Sendable, Hashable {
-        package let onActions: [ActionAction]
-        package let offActions: [ActionAction]
+package extension AdaptyViewConfiguration {
+    struct Toggle: Sendable, Hashable {
+        package let onActions: [Action]
+        package let offActions: [Action]
         package let onCondition: StateCondition
         package let color: Mode<Color>?
     }
@@ -19,8 +19,8 @@ extension AdaptyViewConfiguration {
 #if DEBUG
 package extension AdaptyViewConfiguration.Toggle {
     static func create(
-        onActions: [AdaptyViewConfiguration.ActionAction],
-        offActions: [AdaptyViewConfiguration.ActionAction],
+        onActions: [AdaptyViewConfiguration.Action],
+        offActions: [AdaptyViewConfiguration.Action],
         onCondition: AdaptyViewConfiguration.StateCondition,
         color: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Color>? = nil
     ) -> Self {
