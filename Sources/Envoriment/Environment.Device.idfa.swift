@@ -1,5 +1,5 @@
 //
-//  Environment.idfa.swift
+//  Environment.Device.idfa.swift
 //  AdaptySDK
 //
 //  Created by Andrey Kyashkin on 19.12.2019.
@@ -8,11 +8,11 @@
 import Foundation
 
 #if !ADAPTY_KIDS_MODE && canImport(AdSupport)
-    import AdSupport
+import AdSupport
 #endif
 
 #if !ADAPTY_KIDS_MODE && canImport(AppTrackingTransparency)
-    import AppTrackingTransparency
+import AppTrackingTransparency
 #endif
 
 private let log = Log.default
@@ -32,13 +32,13 @@ extension Environment.Device {
 
     static var appTrackingTransparencyStatus: UInt? {
         #if ADAPTY_KIDS_MODE || !canImport(AppTrackingTransparency)
-            return nil
+        return nil
         #else
-            if #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) {
-                return ATTrackingManager.trackingAuthorizationStatus.rawValue
-            } else {
-                return nil
-            }
+        if #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) {
+            return ATTrackingManager.trackingAuthorizationStatus.rawValue
+        } else {
+            return nil
+        }
         #endif
     }
 
@@ -46,21 +46,21 @@ extension Environment.Device {
     static var idfaRetrievalStatus: IdfaRetrievalStatus {
         get async {
             #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
-                return .notAvailable
+            return .notAvailable
             #else
-                guard !AdaptyConfiguration.idfaCollectionDisabled else {
-                    return .notAvailable
-                }
+            guard !AdaptyConfiguration.idfaCollectionDisabled else {
+                return .notAvailable
+            }
 
-                guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
-                    return .allowed
-                }
+            guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
+                return .allowed
+            }
 
-                #if !canImport(AppTrackingTransparency)
-                    return .notAvailable
-                #else
-                    return await ATTrackingManager.canTakeIdfa
-                #endif
+            #if !canImport(AppTrackingTransparency)
+            return .notAvailable
+            #else
+            return await ATTrackingManager.canTakeIdfa
+            #endif
             #endif
         }
     }
@@ -72,36 +72,36 @@ extension Environment.Device {
     static var idfa: String? {
         get async {
             #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
-                return nil
+            return nil
             #else
 
-                guard !AdaptyConfiguration.idfaCollectionDisabled else { return nil }
+            guard !AdaptyConfiguration.idfaCollectionDisabled else { return nil }
 
-                if let result = _idfa { return result }
+            if let result = _idfa { return result }
 
-                // Get and return IDFA
+            // Get and return IDFA
 
-                let result: String? = await MainActor.run {
-                    guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
-                        return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-                    }
-
-                    #if canImport(AppTrackingTransparency)
-                        return switch ATTrackingManager.trackingAuthorizationStatus {
-                        case .authorized:
-                            ASIdentifierManager.shared().advertisingIdentifier.uuidString
-                        default:
-                            String?.none
-                        }
-                    #else
-                        return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-                    #endif
+            let result: String? = await MainActor.run {
+                guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
+                    return ASIdentifierManager.shared().advertisingIdentifier.uuidString
                 }
 
-                if let result {
-                    _idfa = result
+                #if canImport(AppTrackingTransparency)
+                return switch ATTrackingManager.trackingAuthorizationStatus {
+                case .authorized:
+                    ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                default:
+                    String?.none
                 }
-                return result
+                #else
+                return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+                #endif
+            }
+
+            if let result {
+                _idfa = result
+            }
+            return result
 
             #endif
         }
@@ -109,16 +109,16 @@ extension Environment.Device {
 }
 
 #if !ADAPTY_KIDS_MODE && canImport(AppTrackingTransparency)
-    @available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
-    private extension ATTrackingManager {
-        @MainActor
-        static var canTakeIdfa: Environment.Device.IdfaRetrievalStatus {
-            switch ATTrackingManager.trackingAuthorizationStatus {
-            case .notDetermined: return .notDetermined
-            case .restricted, .denied: return .denied
-            case .authorized: return .allowed
-            @unknown default: return .notDetermined
-            }
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
+private extension ATTrackingManager {
+    @MainActor
+    static var canTakeIdfa: Environment.Device.IdfaRetrievalStatus {
+        switch ATTrackingManager.trackingAuthorizationStatus {
+        case .notDetermined: return .notDetermined
+        case .restricted, .denied: return .denied
+        case .authorized: return .allowed
+        @unknown default: return .notDetermined
         }
     }
+}
 #endif

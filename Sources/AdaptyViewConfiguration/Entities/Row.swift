@@ -15,15 +15,15 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Row {
-        static func create(
-            spacing: Double = 0,
-            items: [AdaptyViewConfiguration.GridItem]
-        ) -> Self {
-            .init(
-                spacing: spacing,
-                items: items
-            )
-        }
+package extension AdaptyViewConfiguration.Row {
+    static func create(
+        spacing: Double = 0,
+        items: [AdaptyViewConfiguration.GridItem]
+    ) -> Self {
+        .init(
+            spacing: spacing,
+            items: items
+        )
     }
+}
 #endif

@@ -1,5 +1,5 @@
 //
-//  Adapty+withActivatedSDK.swift
+//  Adapty+Shared.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 22.09.2024

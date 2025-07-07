@@ -104,21 +104,21 @@ extension AdaptyViewConfiguration.Element: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Element.Properties {
-        static func create(
-            decorator: AdaptyViewConfiguration.Decorator? = nil,
-            padding: AdaptyViewConfiguration.EdgeInsets = AdaptyViewConfiguration.Element.Properties.defaultPadding,
-            offset: AdaptyViewConfiguration.Offset = AdaptyViewConfiguration.Element.Properties.defaultOffset,
-            visibility: Bool = AdaptyViewConfiguration.Element.Properties.defaultVisibility,
-            transitionIn: [AdaptyViewConfiguration.Transition] = []
-        ) -> Self {
-            .init(
-                decorator: decorator,
-                padding: padding,
-                offset: offset,
-                visibility: visibility,
-                transitionIn: transitionIn
-            )
-        }
+package extension AdaptyViewConfiguration.Element.Properties {
+    static func create(
+        decorator: AdaptyViewConfiguration.Decorator? = nil,
+        padding: AdaptyViewConfiguration.EdgeInsets = AdaptyViewConfiguration.Element.Properties.defaultPadding,
+        offset: AdaptyViewConfiguration.Offset = AdaptyViewConfiguration.Element.Properties.defaultOffset,
+        visibility: Bool = AdaptyViewConfiguration.Element.Properties.defaultVisibility,
+        transitionIn: [AdaptyViewConfiguration.Transition] = []
+    ) -> Self {
+        .init(
+            decorator: decorator,
+            padding: padding,
+            offset: offset,
+            visibility: visibility,
+            transitionIn: transitionIn
+        )
     }
+}
 #endif

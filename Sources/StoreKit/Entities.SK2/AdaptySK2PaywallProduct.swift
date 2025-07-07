@@ -33,7 +33,6 @@ struct AdaptySK2PaywallProduct: AdaptySK2Product, AdaptyPaywallProduct, WebPaywa
     }
 }
 
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, AdaptyPaywallProductWithoutDeterminingOffer, WebPaywallURLProviding {
     let skProduct: SK2Product
@@ -57,5 +56,3 @@ struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, AdaptyP
         "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
     }
 }
-
-

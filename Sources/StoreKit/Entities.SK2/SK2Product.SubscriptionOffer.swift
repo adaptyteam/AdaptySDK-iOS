@@ -34,9 +34,9 @@ extension SK2Product {
             switch offerIdentifier {
             case .introductory:
                 unfIntroductoryOffer
-            case .promotional(let id):
+            case let .promotional(id):
                 unfPromotionalOffer(byId: id)
-            case .winBack(let id):
+            case let .winBack(id):
                 unfWinBackOffer(byId: id)
             }
         guard let offer else { return nil }

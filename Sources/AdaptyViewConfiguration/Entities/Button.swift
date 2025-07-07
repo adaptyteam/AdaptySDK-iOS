@@ -17,19 +17,19 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Button {
-        static func create(
-            actions: [AdaptyViewConfiguration.ActionAction],
-            normalState: AdaptyViewConfiguration.Element,
-            selectedState: AdaptyViewConfiguration.Element? = nil,
-            selectedCondition: AdaptyViewConfiguration.StateCondition? = nil
-        ) -> Self {
-            .init(
-                actions: actions,
-                normalState: normalState,
-                selectedState: selectedState,
-                selectedCondition: selectedCondition
-            )
-        }
+package extension AdaptyViewConfiguration.Button {
+    static func create(
+        actions: [AdaptyViewConfiguration.ActionAction],
+        normalState: AdaptyViewConfiguration.Element,
+        selectedState: AdaptyViewConfiguration.Element? = nil,
+        selectedCondition: AdaptyViewConfiguration.StateCondition? = nil
+    ) -> Self {
+        .init(
+            actions: actions,
+            normalState: normalState,
+            selectedState: selectedState,
+            selectedCondition: selectedCondition
+        )
     }
+}
 #endif

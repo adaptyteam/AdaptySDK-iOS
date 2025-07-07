@@ -30,27 +30,27 @@ package extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Font {
-        static func create(
-            customId: String? = `default`.customId,
-            alias: String = `default`.alias,
-            familyName: String = `default`.familyName,
-            weight: Int = `default`.weight,
-            italic: Bool = `default`.italic,
-            defaultSize: Double = `default`.defaultSize,
-            defaultColor: AdaptyViewConfiguration.Filling = `default`.defaultColor
-        ) -> Self {
-            .init(
-                customId: customId,
-                alias: alias,
-                familyName: familyName,
-                weight: weight,
-                italic: italic,
-                defaultSize: defaultSize,
-                defaultColor: defaultColor
-            )
-        }
+package extension AdaptyViewConfiguration.Font {
+    static func create(
+        customId: String? = `default`.customId,
+        alias: String = `default`.alias,
+        familyName: String = `default`.familyName,
+        weight: Int = `default`.weight,
+        italic: Bool = `default`.italic,
+        defaultSize: Double = `default`.defaultSize,
+        defaultColor: AdaptyViewConfiguration.Filling = `default`.defaultColor
+    ) -> Self {
+        .init(
+            customId: customId,
+            alias: alias,
+            familyName: familyName,
+            weight: weight,
+            italic: italic,
+            defaultSize: defaultSize,
+            defaultColor: defaultColor
+        )
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.Font: Codable {
@@ -93,7 +93,7 @@ extension AdaptyViewConfiguration.Font: Codable {
         try container.encode(Self.assetType, forKey: .type)
 
         try container.encodeIfPresent(customId, forKey: .customId)
-        
+
         try container.encode(alias, forKey: .alias)
         if familyName != AdaptyViewConfiguration.Font.default.familyName {
             try container.encode(familyName, forKey: .familyName)

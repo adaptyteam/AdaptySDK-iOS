@@ -20,7 +20,6 @@ extension URLSession {
             try await withCheckedThrowingContinuation { continuation in
                 Task {
                     let task = self.dataTask(with: request) { data, response, error in
-
                         Task {
                             let metrics = await taskState.metrics
 

@@ -58,7 +58,6 @@ final class EventsManager {
         sending = true
 
         Task(priority: .utility) { [weak self] in
-
             var error: Error?
             do {
                 try await self?.sendEvents(backendSession)
@@ -126,7 +125,6 @@ private extension [EventCollectionStorage] {
         var limit = limit
         let initResult = (elements: [Data](), endIndex: [Int?]())
         return reduce(initResult) { result, storage in
-
             guard limit > 0,
                   let (elements, endIndex) = storage.getEvents(limit: limit, blackList: blackList)
             else {

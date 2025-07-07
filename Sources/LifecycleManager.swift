@@ -9,7 +9,7 @@ import Foundation
 import StoreKit
 
 #if canImport(UIKit)
-    import UIKit
+import UIKit
 #endif
 
 private let log = Log.Category(name: "LifecycleManager")
@@ -170,15 +170,15 @@ final class LifecycleManager {
 
     private func subscribeForLifecycleEvents() {
         #if canImport(UIKit)
-            Task {
-                let didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
-                NotificationCenter.default.addObserver(
-                    forName: didBecomeActiveNotification,
-                    object: nil,
-                    queue: nil,
-                    using: handleDidBecomeActiveNotification
-                )
-            }
+        Task {
+            let didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
+            NotificationCenter.default.addObserver(
+                forName: didBecomeActiveNotification,
+                object: nil,
+                queue: nil,
+                using: handleDidBecomeActiveNotification
+            )
+        }
         #endif
     }
 

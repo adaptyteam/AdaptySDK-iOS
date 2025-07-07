@@ -1,5 +1,5 @@
 //
-//  Locale+Storekit.swift
+//  Locale+StoreKit.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.02.2024

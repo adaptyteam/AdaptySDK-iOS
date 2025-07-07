@@ -31,35 +31,35 @@ package extension AdaptyViewConfiguration.ColorGradient {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.ColorGradient {
-        static func create(
-            customId: String? = nil,
-            kind: AdaptyViewConfiguration.ColorGradient.Kind,
-            start: AdaptyViewConfiguration.Point,
-            end: AdaptyViewConfiguration.Point,
-            items: [AdaptyViewConfiguration.ColorGradient.Item]
-        ) -> Self {
-            .init(
-                customId: customId,
-                kind: kind,
-                start: start,
-                end: end,
-                items: items
-            )
-        }
+package extension AdaptyViewConfiguration.ColorGradient {
+    static func create(
+        customId: String? = nil,
+        kind: AdaptyViewConfiguration.ColorGradient.Kind,
+        start: AdaptyViewConfiguration.Point,
+        end: AdaptyViewConfiguration.Point,
+        items: [AdaptyViewConfiguration.ColorGradient.Item]
+    ) -> Self {
+        .init(
+            customId: customId,
+            kind: kind,
+            start: start,
+            end: end,
+            items: items
+        )
     }
+}
 
-    package extension AdaptyViewConfiguration.ColorGradient.Item {
-        static func create(
-            color: AdaptyViewConfiguration.Color,
-            p: Double
-        ) -> Self {
-            .init(
-                color: color,
-                p: p
-            )
-        }
+package extension AdaptyViewConfiguration.ColorGradient.Item {
+    static func create(
+        color: AdaptyViewConfiguration.Color,
+        p: Double
+    ) -> Self {
+        .init(
+            color: color,
+            p: p
+        )
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.ColorGradient: Codable {

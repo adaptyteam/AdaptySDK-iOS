@@ -95,67 +95,67 @@ extension AdaptyViewConfiguration.Pager.Length: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Pager {
-        static func create(
-            pageWidth: Length = `default`.pageWidth,
-            pageHeight: Length = `default`.pageHeight,
-            pagePadding: AdaptyViewConfiguration.EdgeInsets = `default`.pagePadding,
-            spacing: Double = `default`.spacing,
-            content: [AdaptyViewConfiguration.Element] = `default`.content,
-            pageControl: PageControl? = `default`.pageControl,
-            animation: Animation? = `default`.animation,
-            interactionBehaviour: InteractionBehavior = `default`.interactionBehavior
-        ) -> Self {
-            .init(
-                pageWidth: pageWidth,
-                pageHeight: pageHeight,
-                pagePadding: pagePadding,
-                spacing: spacing,
-                content: content,
-                pageControl: pageControl,
-                animation: animation,
-                interactionBehavior: interactionBehaviour
-            )
-        }
+package extension AdaptyViewConfiguration.Pager {
+    static func create(
+        pageWidth: Length = `default`.pageWidth,
+        pageHeight: Length = `default`.pageHeight,
+        pagePadding: AdaptyViewConfiguration.EdgeInsets = `default`.pagePadding,
+        spacing: Double = `default`.spacing,
+        content: [AdaptyViewConfiguration.Element] = `default`.content,
+        pageControl: PageControl? = `default`.pageControl,
+        animation: Animation? = `default`.animation,
+        interactionBehaviour: InteractionBehavior = `default`.interactionBehavior
+    ) -> Self {
+        .init(
+            pageWidth: pageWidth,
+            pageHeight: pageHeight,
+            pagePadding: pagePadding,
+            spacing: spacing,
+            content: content,
+            pageControl: pageControl,
+            animation: animation,
+            interactionBehavior: interactionBehaviour
+        )
     }
+}
 
-    package extension AdaptyViewConfiguration.Pager.PageControl {
-        static func create(
-            layout: Layout = `default`.layout,
-            verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = `default`.verticalAlignment,
-            padding: AdaptyViewConfiguration.EdgeInsets = `default`.padding,
-            dotSize: Double = `default`.dotSize,
-            spacing: Double = `default`.spacing,
-            color: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Color> = `default`.color,
-            selectedColor: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Color> = `default`.selectedColor
-        ) -> Self {
-            .init(
-                layout: layout,
-                verticalAlignment: verticalAlignment,
-                padding: padding,
-                dotSize: dotSize,
-                spacing: spacing,
-                color: color,
-                selectedColor: selectedColor
-            )
-        }
+package extension AdaptyViewConfiguration.Pager.PageControl {
+    static func create(
+        layout: Layout = `default`.layout,
+        verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = `default`.verticalAlignment,
+        padding: AdaptyViewConfiguration.EdgeInsets = `default`.padding,
+        dotSize: Double = `default`.dotSize,
+        spacing: Double = `default`.spacing,
+        color: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Color> = `default`.color,
+        selectedColor: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Color> = `default`.selectedColor
+    ) -> Self {
+        .init(
+            layout: layout,
+            verticalAlignment: verticalAlignment,
+            padding: padding,
+            dotSize: dotSize,
+            spacing: spacing,
+            color: color,
+            selectedColor: selectedColor
+        )
     }
+}
 
-    package extension AdaptyViewConfiguration.Pager.Animation {
-        static func create(
-            startDelay: TimeInterval = defaultStartDelay,
-            pageTransition: AdaptyViewConfiguration.TransitionSlide = .create(),
-            repeatTransition: AdaptyViewConfiguration.TransitionSlide? = nil,
-            afterInteractionDelay: TimeInterval = defaultAfterInteractionDelay
-        ) -> Self {
-            .init(
-                startDelay: startDelay,
-                pageTransition: pageTransition,
-                repeatTransition: repeatTransition,
-                afterInteractionDelay: afterInteractionDelay
-            )
-        }
+package extension AdaptyViewConfiguration.Pager.Animation {
+    static func create(
+        startDelay: TimeInterval = defaultStartDelay,
+        pageTransition: AdaptyViewConfiguration.TransitionSlide = .create(),
+        repeatTransition: AdaptyViewConfiguration.TransitionSlide? = nil,
+        afterInteractionDelay: TimeInterval = defaultAfterInteractionDelay
+    ) -> Self {
+        .init(
+            startDelay: startDelay,
+            pageTransition: pageTransition,
+            repeatTransition: repeatTransition,
+            afterInteractionDelay: afterInteractionDelay
+        )
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.Pager.InteractionBehavior: Codable {}

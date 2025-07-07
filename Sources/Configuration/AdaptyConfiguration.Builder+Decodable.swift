@@ -68,10 +68,11 @@ extension AdaptyConfiguration.Builder: Decodable {
 
 extension AdaptyConfiguration.ServerCluster: Decodable {
     public init(from decoder: Decoder) throws {
-        self = switch try decoder.singleValueContainer().decode(String.self) {
-        case "eu": .eu
-        case "cn": .cn
-        default: .default
-        }
+        self =
+            switch try decoder.singleValueContainer().decode(String.self) {
+            case "eu": .eu
+            case "cn": .cn
+            default: .default
+            }
     }
 }

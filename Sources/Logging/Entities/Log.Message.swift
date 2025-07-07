@@ -1,5 +1,5 @@
 //
-//  Log.Massage.swift
+//  Log.Message.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 22.08.2024

@@ -19,17 +19,17 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.VideoPlayer {
-        static func create(
-            asset: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.VideoData>,
-            aspect: AdaptyViewConfiguration.AspectRatio = defaultAspectRatio,
-            loop: Bool = true
-        ) -> Self {
-            .init(
-                asset: asset,
-                aspect: aspect,
-                loop: loop
-            )
-        }
+package extension AdaptyViewConfiguration.VideoPlayer {
+    static func create(
+        asset: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.VideoData>,
+        aspect: AdaptyViewConfiguration.AspectRatio = defaultAspectRatio,
+        loop: Bool = true
+    ) -> Self {
+        .init(
+            asset: asset,
+            aspect: aspect,
+            loop: loop
+        )
     }
+}
 #endif

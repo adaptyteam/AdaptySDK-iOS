@@ -1,5 +1,5 @@
 //
-//  SK@PaywallProducts.swift
+//  SK2PaywallProducts.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.05.2023
@@ -147,11 +147,9 @@ extension Adapty {
         guard !tuple.determinedOffer else { return (tuple.product, tuple.reference, tuple.offer) }
 
         if let subscriptionGroupId = tuple.subscriptionGroupId,
-           let winBackOfferId = tuple.reference.winBackOfferId
-        {
+           let winBackOfferId = tuple.reference.winBackOfferId {
             if eligibleWinBackOfferIds[subscriptionGroupId]?.contains(winBackOfferId) ?? false,
-               let winBackOffer = winBackOffer(with: winBackOfferId, from: tuple.product)
-            {
+               let winBackOffer = winBackOffer(with: winBackOfferId, from: tuple.product) {
                 return (tuple.product, tuple.reference, winBackOffer)
             }
 

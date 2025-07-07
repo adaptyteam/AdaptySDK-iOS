@@ -25,27 +25,27 @@ package extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.CornerRadius {
-        static func create(
-            same: Double = defaultValue
-        ) -> Self {
-            create(topLeading: same, topTrailing: same, bottomTrailing: same, bottomLeading: same)
-        }
-
-        static func create(
-            topLeading: Double = defaultValue,
-            topTrailing: Double = defaultValue,
-            bottomTrailing: Double = defaultValue,
-            bottomLeading: Double = defaultValue
-        ) -> Self {
-            .init(
-                topLeading: topLeading,
-                topTrailing: topTrailing,
-                bottomTrailing: bottomTrailing,
-                bottomLeading: bottomLeading
-            )
-        }
+package extension AdaptyViewConfiguration.CornerRadius {
+    static func create(
+        same: Double = defaultValue
+    ) -> Self {
+        create(topLeading: same, topTrailing: same, bottomTrailing: same, bottomLeading: same)
     }
+
+    static func create(
+        topLeading: Double = defaultValue,
+        topTrailing: Double = defaultValue,
+        bottomTrailing: Double = defaultValue,
+        bottomLeading: Double = defaultValue
+    ) -> Self {
+        .init(
+            topLeading: topLeading,
+            topTrailing: topTrailing,
+            bottomTrailing: bottomTrailing,
+            bottomLeading: bottomLeading
+        )
+    }
+}
 #endif
 
 package extension AdaptyViewConfiguration.CornerRadius {
