@@ -32,7 +32,7 @@ extension BackendExecutor {
         _ request: Request,
         requestName: APIRequestName,
         logParams: EventParameters? = nil
-    ) async throws -> Request.Response {
+    ) async throws(HTTPError) -> Request.Response {
         let stamp = request.stamp
         Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
         do {

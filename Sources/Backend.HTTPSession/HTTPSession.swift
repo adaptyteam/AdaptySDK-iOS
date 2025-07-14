@@ -47,7 +47,7 @@ final class HTTPSession: Sendable {
     func perform<Body>(
         _ request: some HTTPRequest,
         withDecoder decoder: @escaping HTTPDecoder<Body>
-    ) async throws -> HTTPResponse<Body> {
+    ) async throws(HTTPError) -> HTTPResponse<Body> {
         let state = _state
         let stamp = request.stamp
         let errorHandler = _errorHandler
