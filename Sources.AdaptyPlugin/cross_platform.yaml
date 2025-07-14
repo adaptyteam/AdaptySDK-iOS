@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.3.3/schema"
+$id: "https://adapty.io/crossPlatform/3.10.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -35,8 +35,8 @@ $requests:
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
       custom_timers: { $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
       custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" }
-      android_personalized_offers:
-        { $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
+      product_purchase_parameters:
+        { $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters" }
 
   AdaptyUICreatePaywallView.Response: #response
     type: object
@@ -1407,6 +1407,13 @@ $defs:
     type: object
     additionalProperties: { type: boolean, nullable: false }
 
+  AdaptyUI.ProductPurchaseParameters:  #request
+    type: object
+    additionalProperties: { 
+      $ref: "#/$defs/AdaptyPurchaseParameters", 
+      nullable: false 
+    }
+
   AdaptyUI.DialogConfiguration: #request
     type: object
     required: [default_action]
@@ -1422,7 +1429,7 @@ $defs:
       - primary
       - secondary
 
-  AdaptyPurchaseParameters:  #request
+   AdaptyPurchaseParameters:  #request
     type: object
     properties:
       subscription_update_params:
