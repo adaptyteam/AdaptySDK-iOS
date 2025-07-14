@@ -47,19 +47,19 @@ extension AdaptyViewConfiguration.Transition: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.TransitionFade {
-        static func create(
-            startDelay: TimeInterval = defaultStartDelay,
-            duration: TimeInterval = defaultDuration,
-            interpolator: AdaptyViewConfiguration.Transition.Interpolator = defaultInterpolator
-        ) -> Self {
-            .init(
-                startDelay: startDelay,
-                duration: duration,
-                interpolator: interpolator
-            )
-        }
+package extension AdaptyViewConfiguration.TransitionFade {
+    static func create(
+        startDelay: TimeInterval = defaultStartDelay,
+        duration: TimeInterval = defaultDuration,
+        interpolator: AdaptyViewConfiguration.Transition.Interpolator = defaultInterpolator
+    ) -> Self {
+        .init(
+            startDelay: startDelay,
+            duration: duration,
+            interpolator: interpolator
+        )
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.Transition: Codable {

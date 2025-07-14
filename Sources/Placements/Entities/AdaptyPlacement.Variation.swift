@@ -41,8 +41,7 @@ extension AdaptyPlacement {
             weight = try container.decode(Int.self, forKey: .weight)
 
             if container.contains(.crossPlacementInfo),
-               !((try? container.decodeNil(forKey: .crossPlacementInfo)) ?? true)
-            {
+               !((try? container.decodeNil(forKey: .crossPlacementInfo)) ?? true) {
                 let crossPlacementInfo = try container.nestedContainer(keyedBy: CrossPlacementCodingKeys.self, forKey: .crossPlacementInfo)
                 variationIdByPlacements = try crossPlacementInfo.decode([String: String].self, forKey: .variationIdByPlacements)
             } else {

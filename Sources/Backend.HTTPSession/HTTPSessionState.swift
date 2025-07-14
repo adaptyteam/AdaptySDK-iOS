@@ -41,7 +41,7 @@ actor HTTPTaskState {
     }
 
     func cancel() {
-        if let task = task {
+        if let task {
             task.cancel()
         } else {
             shouldCancel = true

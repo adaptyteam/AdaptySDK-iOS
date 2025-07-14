@@ -17,17 +17,17 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Decorator {
-        static func create(
-            shapeType: AdaptyViewConfiguration.ShapeType = defaultShapeType,
-            background: AdaptyViewConfiguration.Background? = nil,
-            border: AdaptyViewConfiguration.Border? = nil
-        ) -> Self {
-            .init(
-                shapeType: shapeType,
-                background: background,
-                border: border
-            )
-        }
+package extension AdaptyViewConfiguration.Decorator {
+    static func create(
+        shapeType: AdaptyViewConfiguration.ShapeType = defaultShapeType,
+        background: AdaptyViewConfiguration.Background? = nil,
+        border: AdaptyViewConfiguration.Border? = nil
+    ) -> Self {
+        .init(
+            shapeType: shapeType,
+            background: background,
+            border: border
+        )
     }
+}
 #endif

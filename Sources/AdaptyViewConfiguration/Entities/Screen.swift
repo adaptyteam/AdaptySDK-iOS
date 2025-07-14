@@ -21,23 +21,23 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Screen {
-        static func create(
-            background: AdaptyViewConfiguration.Background = AdaptyViewConfiguration.Screen.defaultBackground,
-            cover: AdaptyViewConfiguration.Box? = nil,
-            content: AdaptyViewConfiguration.Element,
-            footer: AdaptyViewConfiguration.Element? = nil,
-            overlay: AdaptyViewConfiguration.Element? = nil,
-            selectedAdaptyProductId: String? = nil
-        ) -> Self {
-            .init(
-                background: background,
-                cover: cover,
-                content: content,
-                footer: footer,
-                overlay: overlay,
-                selectedAdaptyProductId: selectedAdaptyProductId
-            )
-        }
+package extension AdaptyViewConfiguration.Screen {
+    static func create(
+        background: AdaptyViewConfiguration.Background = AdaptyViewConfiguration.Screen.defaultBackground,
+        cover: AdaptyViewConfiguration.Box? = nil,
+        content: AdaptyViewConfiguration.Element,
+        footer: AdaptyViewConfiguration.Element? = nil,
+        overlay: AdaptyViewConfiguration.Element? = nil,
+        selectedAdaptyProductId: String? = nil
+    ) -> Self {
+        .init(
+            background: background,
+            cover: cover,
+            content: content,
+            footer: footer,
+            overlay: overlay,
+            selectedAdaptyProductId: selectedAdaptyProductId
+        )
     }
+}
 #endif

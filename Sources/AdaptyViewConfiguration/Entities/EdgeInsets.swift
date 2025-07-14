@@ -20,27 +20,27 @@ package extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.EdgeInsets {
-        static func create(
-            same: AdaptyViewConfiguration.Unit = defaultValue
-        ) -> Self {
-            .init(same: same)
-        }
-
-        static func create(
-            leading: AdaptyViewConfiguration.Unit = defaultValue,
-            top: AdaptyViewConfiguration.Unit = defaultValue,
-            trailing: AdaptyViewConfiguration.Unit = defaultValue,
-            bottom: AdaptyViewConfiguration.Unit = defaultValue
-        ) -> Self {
-            .init(
-                leading: leading,
-                top: top,
-                trailing: trailing,
-                bottom: bottom
-            )
-        }
+package extension AdaptyViewConfiguration.EdgeInsets {
+    static func create(
+        same: AdaptyViewConfiguration.Unit = defaultValue
+    ) -> Self {
+        .init(same: same)
     }
+
+    static func create(
+        leading: AdaptyViewConfiguration.Unit = defaultValue,
+        top: AdaptyViewConfiguration.Unit = defaultValue,
+        trailing: AdaptyViewConfiguration.Unit = defaultValue,
+        bottom: AdaptyViewConfiguration.Unit = defaultValue
+    ) -> Self {
+        .init(
+            leading: leading,
+            top: top,
+            trailing: trailing,
+            bottom: bottom
+        )
+    }
+}
 #endif
 
 extension AdaptyViewConfiguration.EdgeInsets {
@@ -88,16 +88,16 @@ extension AdaptyViewConfiguration.EdgeInsets: Codable {
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if case .point(let value) = leading, value == 0 {} else
+        if case let .point(value) = leading, value == 0 {} else
         { try container.encode(leading, forKey: .leading) }
 
-        if case .point(let value) = top, value == 0 {} else
+        if case let .point(value) = top, value == 0 {} else
         { try container.encode(leading, forKey: .top) }
 
-        if case .point(let value) = trailing, value == 0 {} else
+        if case let .point(value) = trailing, value == 0 {} else
         { try container.encode(leading, forKey: .trailing) }
 
-        if case .point(let value) = bottom, value == 0 {} else
+        if case let .point(value) = bottom, value == 0 {} else
         { try container.encode(leading, forKey: .bottom) }
     }
 }

@@ -14,14 +14,15 @@ extension AdaptyConfiguration {
 
         let defaultValue = AdaptyConfiguration.default
 
-        let defaultBackend = switch builder.serverCluster ?? .default {
-        case .eu:
-            Backend.URLs.euPublicEnvironment
-        case .cn:
-            Backend.URLs.cnPublicEnvironment
-        default:
-            Backend.URLs.defaultPublicEnvironment
-        }
+        let defaultBackend =
+            switch builder.serverCluster ?? .default {
+            case .eu:
+                Backend.URLs.euPublicEnvironment
+            case .cn:
+                Backend.URLs.cnPublicEnvironment
+            default:
+                Backend.URLs.defaultPublicEnvironment
+            }
 
         self.init(
             apiKey: apiKey,

@@ -1,5 +1,5 @@
 //
-//  Environment+WebKit.swift
+//  Environment.Device.webUserAgent.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2024
@@ -8,7 +8,7 @@
 import Foundation
 
 #if canImport(WebKit)
-    import WebKit
+import WebKit
 #endif
 
 private let log = Log.default
@@ -25,9 +25,9 @@ extension Environment.Device {
             }
 
             #if canImport(WebKit)
-                let result = await WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
+            let result = await WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
             #else
-                let result = String?.none
+            let result = String?.none
             #endif
 
             _userAgent = .some(result)

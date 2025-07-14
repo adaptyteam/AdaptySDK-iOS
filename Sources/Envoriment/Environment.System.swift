@@ -8,7 +8,7 @@
 import Foundation
 
 #if canImport(UIKit)
-    import UIKit
+import UIKit
 #endif
 
 private let log = Log.default
@@ -28,9 +28,9 @@ extension Environment {
                 if let result = _version { return result }
 
                 #if os(macOS) || targetEnvironment(macCatalyst)
-                    let result = await MainActor.run { ProcessInfo().operatingSystemVersionString }
+                let result = await MainActor.run { ProcessInfo().operatingSystemVersionString }
                 #else
-                    let result = await UIDevice.current.systemVersion
+                let result = await UIDevice.current.systemVersion
                 #endif
 
                 _version = result
@@ -47,9 +47,9 @@ extension Environment {
                 if let result = _name { return result }
 
                 #if os(macOS) || targetEnvironment(macCatalyst)
-                    let result = "macOS"
+                let result = "macOS"
                 #else
-                    let result = await UIDevice.current.systemName
+                let result = await UIDevice.current.systemName
                 #endif
 
                 _name = result

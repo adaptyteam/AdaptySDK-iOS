@@ -50,21 +50,21 @@ extension AdaptyViewConfiguration.Box.Length: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Box {
-        static func create(
-            width: Length? = nil,
-            height: Length? = nil,
-            horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = defaultHorizontalAlignment,
-            verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = defaultVerticalAlignment,
-            content: AdaptyViewConfiguration.Element? = nil
-        ) -> Self {
-            .init(
-                width: width,
-                height: height,
-                horizontalAlignment: horizontalAlignment,
-                verticalAlignment: verticalAlignment,
-                content: content
-            )
-        }
+package extension AdaptyViewConfiguration.Box {
+    static func create(
+        width: Length? = nil,
+        height: Length? = nil,
+        horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = defaultHorizontalAlignment,
+        verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = defaultVerticalAlignment,
+        content: AdaptyViewConfiguration.Element? = nil
+    ) -> Self {
+        .init(
+            width: width,
+            height: height,
+            horizontalAlignment: horizontalAlignment,
+            verticalAlignment: verticalAlignment,
+            content: content
+        )
     }
+}
 #endif

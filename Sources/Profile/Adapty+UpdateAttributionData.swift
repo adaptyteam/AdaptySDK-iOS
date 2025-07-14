@@ -1,5 +1,5 @@
 //
-//  Adapty+UpdateAttribution.swift
+//  Adapty+UpdateAttributionData.swift
 //  AdaptySDK
 //
 //  Created by Andrey Kyashkin on 28.10.2019.
@@ -48,7 +48,7 @@ public extension Adapty {
         }
     }
 
-    fileprivate func setAttributionData(
+    private func setAttributionData(
         source: String,
         attributionJson: String
     ) async throws {

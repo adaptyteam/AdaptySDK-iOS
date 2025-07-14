@@ -57,7 +57,6 @@ extension Adapty {
 
     private static func fetchIPv4() async throws -> String {
         try await withCheckedThrowingContinuation { continuation in
-
             URLSession.shared.dataTask(with: URL(string: "https://api.ipify.org?format=json")!) { data, _, error in
                 do {
                     if let error { throw error }

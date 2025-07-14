@@ -14,13 +14,13 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.BottomSheet {
-        static func create(
-            content: AdaptyViewConfiguration.Element
-        ) -> Self {
-            .init(
-                content: content
-            )
-        }
+package extension AdaptyViewConfiguration.BottomSheet {
+    static func create(
+        content: AdaptyViewConfiguration.Element
+    ) -> Self {
+        .init(
+            content: content
+        )
     }
+}
 #endif
