@@ -77,7 +77,7 @@ extension Adapty {
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
         loadTimeout: TaskDuration
-    ) async throws -> AdaptyViewSource {
+    ) async throws(AdaptyError) -> AdaptyViewSource {
         let httpSession = httpSession
         let apiKeyPrefix = apiKeyPrefix
         let isTestUser = profileManager?.profile.value.isTestUser ?? false
@@ -100,7 +100,7 @@ extension Adapty {
             throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
         }
 
-        do {
+        do throws(HTTPError) {
             return try await httpFallbackSession.fetchFallbackViewConfiguration(
                 apiKeyPrefix: apiKeyPrefix,
                 paywallInstanceIdentity: paywallInstanceIdentity,
@@ -108,7 +108,7 @@ extension Adapty {
                 disableServerCache: isTestUser
             )
         } catch {
-            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 }

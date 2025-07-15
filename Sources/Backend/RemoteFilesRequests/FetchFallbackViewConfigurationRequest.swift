@@ -30,7 +30,7 @@ extension Backend.FallbackExecutor {
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
         disableServerCache: Bool
-    ) async throws -> AdaptyViewSource {
+    ) async throws(HTTPError) -> AdaptyViewSource {
         let request = FetchFallbackViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
@@ -54,7 +54,7 @@ extension Backend.FallbackExecutor {
 
             return response.body.value
         } catch {
-            guard (error as? HTTPError)?.statusCode == 404,
+            guard error.statusCode == 404,
                   !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
             else {
                 throw error

@@ -23,7 +23,7 @@ private struct FetchAllProductVendorIdsRequest: HTTPRequestWithDecodableResponse
 extension Backend.MainExecutor {
     func fetchAllProductVendorIds(
         apiKeyPrefix: String
-    ) async throws -> [String] {
+    ) async throws(HTTPError) -> [String] {
         let request = FetchAllProductVendorIdsRequest(
             apiKeyPrefix: apiKeyPrefix
         )

@@ -46,7 +46,7 @@ extension AdaptyViewSource.Localizer {
         )
     }
 
-    private func pageControl(_ from: AdaptyViewSource.Pager.PageControl) throws -> AdaptyViewConfiguration.Pager.PageControl {
+    private func pageControl(_ from: AdaptyViewSource.Pager.PageControl) -> AdaptyViewConfiguration.Pager.PageControl {
         .init(
             layout: from.layout,
             verticalAlignment: from.verticalAlignment,

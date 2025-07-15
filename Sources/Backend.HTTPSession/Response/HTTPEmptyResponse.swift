@@ -17,7 +17,7 @@ extension HTTPResponse {
 }
 
 extension HTTPSession {
-    func perform(_ request: some HTTPRequest) async throws -> HTTPEmptyResponse {
+    func perform(_ request: some HTTPRequest) async throws(HTTPError) -> HTTPEmptyResponse {
         try await perform(request) { @Sendable response in
             response.asHTTPEmptyResponse
         }

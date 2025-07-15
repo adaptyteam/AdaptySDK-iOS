@@ -55,7 +55,7 @@ extension ProfileManager {
         }
     }
 
-    func updateProfile(params: AdaptyProfileParameters) async throws -> AdaptyProfile {
+    func updateProfile(params: AdaptyProfileParameters) async throws(AdaptyError) -> AdaptyProfile {
         try await syncProfile(params: params)
     }
 
@@ -64,7 +64,7 @@ extension ProfileManager {
         return await (try? syncProfile(params: nil)) ?? profile.value
     }
 
-    private func syncProfile(params: AdaptyProfileParameters?) async throws -> AdaptyProfile {
+    private func syncProfile(params: AdaptyProfileParameters?) async throws(AdaptyError) -> AdaptyProfile {
         if let analyticsDisabled = params?.analyticsDisabled {
             storage.setExternalAnalyticsDisabled(analyticsDisabled)
         }
@@ -95,7 +95,7 @@ extension ProfileManager {
 }
 
 extension Adapty {
-    func syncTransactions(for profileId: String) async throws {
+    func syncTransactions(for profileId: String) async throws(AdaptyError) {
         let response = try await transactionManager.syncTransactions(for: profileId)
 
         if profileStorage.profileId == profileId {
@@ -113,24 +113,25 @@ extension Adapty {
 }
 
 private extension Adapty {
-    func syncProfile(profile old: VH<AdaptyProfile>, params: AdaptyProfileParameters?, environmentMeta meta: Environment.Meta?) async throws -> AdaptyProfile {
-        do {
-            let response = try await httpSession.syncProfile(
+    func syncProfile(profile old: VH<AdaptyProfile>, params: AdaptyProfileParameters?, environmentMeta meta: Environment.Meta?) async throws(AdaptyError) -> AdaptyProfile {
+        let response: VH<AdaptyProfile?>
+        do throws(HTTPError) {
+            response = try await httpSession.syncProfile(
                 profileId: old.value.profileId,
                 parameters: params,
                 environmentMeta: meta,
                 responseHash: old.hash
             )
-
-            if let manager = try profileManager(with: old.value.profileId) {
-                if let meta {
-                    manager.onceSentEnvironment = meta.sentEnvironment
-                }
-                manager.saveResponse(response.flatValue())
-            }
-            return response.value ?? old.value
         } catch {
-            throw error.asAdaptyError ?? .syncProfileFailed(unknownError: error)
+            throw error.asAdaptyError
         }
+
+        if let manager = try profileManager(with: old.value.profileId) {
+            if let meta {
+                manager.onceSentEnvironment = meta.sentEnvironment
+            }
+            manager.saveResponse(response.flatValue())
+        }
+        return response.value ?? old.value
     }
 }

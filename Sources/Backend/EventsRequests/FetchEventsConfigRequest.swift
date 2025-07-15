@@ -25,7 +25,7 @@ private struct FetchEventsConfigRequest: HTTPRequestWithDecodableResponse {
 extension Backend.EventsExecutor {
     func fetchEventsConfig(
         profileId: String
-    ) async throws -> EventsBackendConfiguration {
+    ) async throws(EventsError) -> EventsBackendConfiguration {
         do {
             let request = FetchEventsConfigRequest(
                 profileId: profileId

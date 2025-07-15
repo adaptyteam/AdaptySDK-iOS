@@ -15,7 +15,7 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Localizer {
-    func action(_ from: AdaptyViewSource.Action) throws -> AdaptyViewConfiguration.Action {
+    func action(_ from: AdaptyViewSource.Action) -> AdaptyViewConfiguration.Action {
         switch from {
         case let .openUrl(stringId):
             .openUrl(urlIfPresent(stringId))

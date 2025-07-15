@@ -12,7 +12,7 @@ private let log = Log.skReceiptManager
 actor StoreKitReceiptManager {
     private let session: Backend.MainExecutor
     private let refresher = ReceiptRefresher()
-    private var syncing: (task: Task<VH<AdaptyProfile>?, any Error>, profileId: String)?
+    private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, profileId: String)?
 
     init(session: Backend.MainExecutor, refreshIfEmpty: Bool = false) {
         self.session = session
@@ -24,7 +24,7 @@ actor StoreKitReceiptManager {
         }
     }
 
-    func getReceipt() async throws -> Data {
+    func getReceipt() async throws(AdaptyError) -> Data {
         do {
             return try bundleReceipt()
         } catch {
@@ -33,12 +33,12 @@ actor StoreKitReceiptManager {
         }
     }
 
-    private func bundleReceipt() throws -> Data {
+    private func bundleReceipt() throws(AdaptyError) -> Data {
         let stamp = Log.stamp
         Task {
             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getReceipt, stamp: stamp))
         }
-        do {
+        do throws(AdaptyError) {
             guard let url = Bundle.main.appStoreReceiptURL else {
                 log.error("Receipt URL is nil.")
                 throw StoreKitManagerError.receiptIsEmpty().asAdaptyError
@@ -73,29 +73,35 @@ actor StoreKitReceiptManager {
 }
 
 extension StoreKitReceiptManager: StoreKitTransactionManager {
-    func syncTransactions(for profileId: String) async throws -> VH<AdaptyProfile>? {
-        let task: Task<VH<AdaptyProfile>?, any Error>
+    func syncTransactions(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
+        let task: AdaptyResultTask<VH<AdaptyProfile>?>
         if let syncing, syncing.profileId == profileId {
             task = syncing.task
         } else {
-            task = Task<VH<AdaptyProfile>?, any Error> {
-                try await syncReceipt(for: profileId)
+            task = Task {
+                do throws(AdaptyError) {
+                    let value = try await syncReceipt(for: profileId)
+                    return .success(value)
+                } catch {
+                    return .failure(error)
+                }
             }
             syncing = (task, profileId)
         }
-        return try await task.value
+        return try await task.value.get()
     }
 
-    private func syncReceipt(for profileId: String) async throws -> VH<AdaptyProfile>? {
+    private func syncReceipt(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
         defer { syncing = nil }
 
-        do {
+        let receipt = try await getReceipt()
+        do throws(HTTPError) {
             return try await session.validateReceipt(
                 profileId: profileId,
-                receipt: getReceipt()
+                receipt: receipt
             )
         } catch {
-            throw error.asAdaptyError ?? AdaptyError.syncRecieptFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 }
@@ -104,8 +110,8 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
     private let queue = DispatchQueue(label: "Adapty.SDK.ReceiptRefresher")
     private var refreshCompletionHandlers: [AdaptyErrorCompletion]?
 
-    func refresh() async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+    func refresh() async throws(AdaptyError) {
+        try await withCheckedThrowingContinuation_ { continuation in
             refresh { error in
                 if let error {
                     continuation.resume(throwing: error)

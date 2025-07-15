@@ -145,7 +145,7 @@ extension AdaptyViewSource.Localizer {
 
     private func elementProperties(_ from: AdaptyViewSource.Element.Properties) throws -> AdaptyViewConfiguration.Element.Properties? {
         guard !from.isZero else { return nil }
-        return try .init(
+        return .init(
             decorator: from.decorator.map(decorator),
             padding: from.padding,
             offset: from.offset,

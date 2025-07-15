@@ -28,7 +28,7 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil
-    ) async throws -> AdaptyPaywall {
+    ) async throws(AdaptyError) -> AdaptyPaywall {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
 
@@ -39,7 +39,7 @@ extension Adapty {
             "load_timeout": loadTimeout.asMilliseconds,
         ]
 
-        return try await withActivatedSDK(methodName: .getPaywall, logParams: logParams) { sdk in
+        return try await withActivatedSDK(methodName: .getPaywall, logParams: logParams) { sdk throws(AdaptyError) in
             let paywall: AdaptyPaywall = try await sdk.getPlacement(
                 placementId,
                 locale,
@@ -57,7 +57,7 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil
-    ) async throws -> AdaptyOnboarding {
+    ) async throws(AdaptyError) -> AdaptyOnboarding {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
 
@@ -68,7 +68,7 @@ extension Adapty {
             "load_timeout": loadTimeout.asMilliseconds,
         ]
 
-        return try await withActivatedSDK(methodName: .getOnboarding, logParams: logParams) { sdk in
+        return try await withActivatedSDK(methodName: .getOnboarding, logParams: logParams) { sdk throws(AdaptyError) in
             let onboarding: AdaptyOnboarding = try await sdk.getPlacement(
                 placementId,
                 locale,
@@ -85,7 +85,7 @@ extension Adapty {
         _ locale: AdaptyLocale,
         _ fetchPolicy: AdaptyPlacementFetchPolicy,
         _ loadTimeout: TaskDuration
-    ) async throws -> Content {
+    ) async throws(AdaptyError) -> Content {
         let profileId = profileStorage.profileId
 
         do {
@@ -129,19 +129,24 @@ extension Adapty {
         _ placementId: String,
         _ locale: AdaptyLocale,
         _ fetchPolicy: AdaptyPlacementFetchPolicy
-    ) async throws -> Content {
+    ) async throws(AdaptyError) -> Content {
         let manager = try await createdProfileManager
 
         guard manager.profileId == profileId else {
             throw AdaptyError.profileWasChanged()
         }
 
-        let fetchTask = Task<Content, Error> {
-            try await fetchPlacement(
-                profileId,
-                placementId,
-                locale
-            )
+        let fetchTask: AdaptyResultTask<Content> = Task {
+            do throws(AdaptyError) {
+                let value: Content = try await self.fetchPlacement(
+                    profileId,
+                    placementId,
+                    locale
+                )
+                return .success(value)
+            } catch {
+                return .failure(error)
+            }
         }
 
         let cached: Content? = manager
@@ -155,27 +160,26 @@ extension Adapty {
             .withFetchPolicy(fetchPolicy)?
             .value
 
-        let content =
-            if let cached {
-                cached
-            } else {
-                try await withTaskCancellationHandler {
-                    try await fetchTask.value
-                } onCancel: {
-                    fetchTask.cancel()
-                }
+        if let cached {
+            return cached
+        } else {
+            let result = await withTaskCancellationHandler {
+                await fetchTask.value
+            } onCancel: {
+                fetchTask.cancel()
             }
 
-        return content
+            return try result.get()
+        }
     }
 
     private func fetchPlacement<Content: AdaptyPlacementContent>(
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale
-    ) async throws -> Content {
+    ) async throws(AdaptyError) -> Content {
         while true {
-            let (segmentId, cached, isTestUser, crossPlacementState, variationId) = try {
+            let (segmentId, cached, isTestUser, crossPlacementState, variationId) = try { () throws(AdaptyError) in
                 let manager = try profileManager(with: profileId).orThrows
                 let crossPlacementState = manager.storage.crossPlacementState
                 let variationId = crossPlacementState?.variationId(placementId: placementId)
@@ -198,7 +202,7 @@ extension Adapty {
 
             let caseWithPaywallVariation = variationId != nil
 
-            do {
+            do throws(HTTPError) {
                 var chosen: AdaptyPlacementChosen<Content> =
                     if let variationId {
                         try await httpSession.fetchPlacement(
@@ -294,20 +298,20 @@ extension Adapty {
                 }
 
                 guard !caseWithPaywallVariation else {
-                    throw error.asAdaptyError ?? AdaptyError.fetchPlacementFailed(unknownError: error)
+                    throw error.asAdaptyError
                 }
 
                 if error.responseDecodingError([.notFoundVariationId, .crossPlacementABTestDisabled]) { continue }
 
-                guard error.wrongProfileSegmentId,
+                guard Backend.wrongProfileSegmentId(error),
                       try await updateSegmentId(for: profileId, oldSegmentId: segmentId)
                 else {
-                    throw error.asAdaptyError ?? AdaptyError.fetchPlacementFailed(unknownError: error)
+                    throw error.asAdaptyError
                 }
             }
         }
 
-        func updateSegmentId(for profileId: String, oldSegmentId: String) async throws -> Bool {
+        func updateSegmentId(for profileId: String, oldSegmentId: String) async throws(AdaptyError) -> Bool {
             let manager = try profileManager(with: profileId).orThrows
             guard manager.profile.value.segmentId == oldSegmentId else { return true }
             return await manager.getProfile().segmentId != oldSegmentId
@@ -347,7 +351,7 @@ extension Adapty {
         _ placementId: String,
         _ locale: AdaptyLocale,
         _ timeoutInterval: TimeInterval?
-    ) async throws -> Content {
+    ) async throws(AdaptyError) -> Content {
         while true {
             let (cached, isTestUser, variationId): (Content?, Bool, String?) = {
                 guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false, nil) }
@@ -359,7 +363,7 @@ extension Adapty {
                 )
             }()
 
-            do {
+            do throws(HTTPError) {
                 var chosen: AdaptyPlacementChosen<Content> =
                     if let variationId {
                         try await httpFallbackSession.fetchFallbackPlacement(
@@ -394,7 +398,7 @@ extension Adapty {
                 return chosen.content
 
             } catch {
-                guard error.responseDecodingError([.notFoundVariationId]) else { throw error }
+                guard error.responseDecodingError([.notFoundVariationId]) else { throw error.asAdaptyError }
             }
         }
     }
@@ -419,22 +423,14 @@ private extension Error {
         if let httpError = error as? HTTPError { return Backend.canUseFallbackServer(httpError) }
         return false
     }
+}
 
-    var wrongProfileSegmentId: Bool {
-        let error = unwrapped
-        if let httpError = error as? HTTPError { return Backend.wrongProfileSegmentId(httpError) }
-        return false
-    }
-
-    var wrongPlacementContentType: Bool {
-        let error = unwrapped
-        if let httpError = error as? HTTPError { return Backend.wrongPlacementContentType(httpError) }
-        return false
-    }
-
+private extension HTTPError {
     func responseDecodingError(_ decodingError: Set<ResponseDecodingError>) -> Bool {
-        let error = unwrapped
-        if let httpError = error as? HTTPError { return Backend.responseDecodingError(decodingError, httpError) }
-        return false
+        guard case let .decoding(_, _, _, _, _, value) = self,
+              let value = value as? ResponseDecodingError
+        else { return false }
+
+        return decodingError.contains(value)
     }
 }

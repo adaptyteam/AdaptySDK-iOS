@@ -6,16 +6,18 @@
 //
 
 extension Adapty {
-    func syncCrossPlacementState(profileId: String) async throws {
-        let state = try await httpSession.fetchCrossPlacementState(
-            profileId: profileId
-        )
-
+    func syncCrossPlacementState(profileId: String) async throws(AdaptyError) {
+        let state: CrossPlacementState
+        do throws(HTTPError) {
+            state = try await httpSession.fetchCrossPlacementState(profileId: profileId)
+        } catch {
+            throw error.asAdaptyError
+        }
         try saveCrossPlacementState(state, forProfileId: profileId)
     }
 
     @AdaptyActor
-    private func saveCrossPlacementState(_ newState: CrossPlacementState, forProfileId profileId: String) throws {
+    private func saveCrossPlacementState(_ newState: CrossPlacementState, forProfileId profileId: String) throws(AdaptyError) {
         guard let manager = try profileManager(with: profileId) else {
             throw AdaptyError.profileWasChanged()
         }
@@ -31,7 +33,7 @@ extension Adapty {
 }
 
 extension ProfileManager {
-    func syncCrossPlacementState() async throws {
+    func syncCrossPlacementState() async throws(AdaptyError) {
         try await Adapty.activatedSDK.syncCrossPlacementState(profileId: profileId)
     }
 }

@@ -8,5 +8,5 @@
 import StoreKit
 
 protocol StoreKitTransactionManager: Actor, Sendable {
-    func syncTransactions(for profileId: String) async throws -> VH<AdaptyProfile>?
+    func syncTransactions(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>?
 }

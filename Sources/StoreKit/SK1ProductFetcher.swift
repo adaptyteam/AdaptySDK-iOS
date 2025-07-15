@@ -12,8 +12,8 @@ private let log = Log.sk1ProductManager
 actor SK1ProductFetcher {
     private let fetcher = _SK1ProductFetcher()
 
-    func fetchProducts(ids productIds: Set<String>, retryCount: Int = 3) async throws -> [SK1Product] {
-        try await withCheckedThrowingContinuation { continuation in
+    func fetchProducts(ids productIds: Set<String>, retryCount: Int = 3) async throws(AdaptyError) -> [SK1Product] {
+        try await withCheckedThrowingContinuation_ { continuation in
             fetcher.fetchProducts(productIdentifiers: productIds, retryCount: retryCount) { result in
                 continuation.resume(with: result)
             }

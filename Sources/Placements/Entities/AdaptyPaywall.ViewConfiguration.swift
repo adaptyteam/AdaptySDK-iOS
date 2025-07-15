@@ -32,7 +32,7 @@ extension AdaptyPaywall.ViewConfiguration {
 }
 
 extension AdaptyViewSource {
-    init(data: Data) throws {
+    init(data: Data) throws(AdaptyError) {
         do {
             self = try Storage.decoder.decode(AdaptyViewSource.self, from: data)
         } catch {

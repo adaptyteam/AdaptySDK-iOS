@@ -62,7 +62,7 @@ extension Backend.MainExecutor {
     func fetchIntroductoryOfferEligibility(
         profileId: String,
         responseHash: String?
-    ) async throws -> VH<[BackendIntroductoryOfferEligibilityState]?> {
+    ) async throws(HTTPError) -> VH<[BackendIntroductoryOfferEligibilityState]?> {
         let request = FetchIntroductoryOfferEligibilityRequest(
             profileId: profileId,
             responseHash: responseHash

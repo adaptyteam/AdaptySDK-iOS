@@ -24,8 +24,8 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Localizer {
-    func timer(_ from: AdaptyViewSource.Timer) throws -> AdaptyViewConfiguration.Timer {
-        try .init(
+    func timer(_ from: AdaptyViewSource.Timer) -> AdaptyViewConfiguration.Timer {
+        .init(
             id: from.id,
             state: from.state,
             format: from.format.compactMap {

@@ -11,6 +11,7 @@ public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
 
 public typealias AdaptyErrorCompletion = @Sendable (AdaptyError?) -> Void
 public typealias AdaptyResultCompletion<Success> = @Sendable (AdaptyResult<Success>) -> Void
+package typealias AdaptyResultTask<Success> = Task<AdaptyResult<Success>, Never>
 
 public extension Result where Failure == AdaptyError {
     var error: AdaptyError? {
@@ -42,7 +43,7 @@ public extension Adapty {
         customerUserId: String? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await activate(apiKey, observerMode: observerMode, customerUserId: customerUserId)
         }
     }
@@ -57,7 +58,7 @@ public extension Adapty {
         with configuration: AdaptyConfiguration,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await activate(with: configuration)
         }
     }
@@ -73,7 +74,7 @@ public extension Adapty {
         _ customerUserId: String,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await identify(customerUserId)
         }
     }
@@ -83,7 +84,7 @@ public extension Adapty {
     nonisolated static func logout(
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await logout()
         }
     }
@@ -96,7 +97,7 @@ public extension Adapty {
     nonisolated static func getProfile(
         _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getProfile()
         }
     }
@@ -110,7 +111,7 @@ public extension Adapty {
         params: AdaptyProfileParameters,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await updateProfile(params: params)
         }
     }
@@ -136,7 +137,7 @@ public extension Adapty {
             return
         }
 
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await updateAttribution(attributionJson, source: source)
         }
     }
@@ -146,7 +147,7 @@ public extension Adapty {
         value: String,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await setIntegrationIdentifier(key: key, value: value)
         }
     }
@@ -171,7 +172,7 @@ public extension Adapty {
         loadTimeout: TimeInterval? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getPaywall(
                 placementId: placementId,
                 locale: locale,
@@ -188,7 +189,7 @@ public extension Adapty {
         loadTimeout: TimeInterval? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyOnboarding>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getOnboarding(
                 placementId: placementId,
                 locale: locale,
@@ -214,7 +215,7 @@ public extension Adapty {
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getPaywallForDefaultAudience(
                 placementId: placementId,
                 locale: locale,
@@ -229,7 +230,7 @@ public extension Adapty {
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         _ completion: @escaping AdaptyResultCompletion<AdaptyOnboarding>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getOnboardingForDefaultAudience(
                 placementId: placementId,
                 locale: locale,
@@ -251,7 +252,7 @@ public extension Adapty {
         fileURL url: URL,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await setFallback(fileURL: url)
         }
     }
@@ -267,7 +268,7 @@ public extension Adapty {
         paywall: AdaptyPaywall,
         _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getPaywallProducts(paywall: paywall)
         }
     }
@@ -276,7 +277,7 @@ public extension Adapty {
         paywall: AdaptyPaywall,
         _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProductWithoutDeterminingOffer]>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getPaywallProductsWithoutDeterminingOffer(paywall: paywall)
         }
     }
@@ -292,7 +293,7 @@ public extension Adapty {
         product: AdaptyPaywallProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await makePurchase(product: product)
         }
     }
@@ -301,7 +302,7 @@ public extension Adapty {
         for product: AdaptyPaywallProduct,
         _ completion: AdaptyErrorCompletion?
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await openWebPaywall(for: product)
         }
     }
@@ -310,7 +311,7 @@ public extension Adapty {
         for paywall: AdaptyPaywall,
         _ completion: AdaptyErrorCompletion?
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await openWebPaywall(for: paywall)
         }
     }
@@ -319,7 +320,7 @@ public extension Adapty {
         for product: AdaptyPaywallProduct,
         _ completion: @escaping AdaptyResultCompletion<URL>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await createWebPaywallUrl(for: product)
         }
     }
@@ -328,7 +329,7 @@ public extension Adapty {
         for paywall: AdaptyPaywall,
         _ completion: @escaping AdaptyResultCompletion<URL>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await createWebPaywallUrl(for: paywall)
         }
     }
@@ -337,7 +338,7 @@ public extension Adapty {
         product: AdaptyDeferredProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await makePurchase(product: product)
         }
     }
@@ -351,7 +352,7 @@ public extension Adapty {
     nonisolated static func getReceipt(
         _ completion: @escaping AdaptyResultCompletion<Data>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getReceipt()
         }
     }
@@ -364,7 +365,7 @@ public extension Adapty {
     nonisolated static func restorePurchases(
         _ completion: @escaping AdaptyResultCompletion<AdaptyProfile>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await restorePurchases()
         }
     }
@@ -381,7 +382,7 @@ public extension Adapty {
     nonisolated static func setVariationId(
         _ variationId: String,
         forPurchasedTransaction sk1Transaction: SKPaymentTransaction
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await reportTransaction(sk1Transaction, withVariationId: variationId)
     }
 
@@ -398,7 +399,7 @@ public extension Adapty {
     nonisolated static func setVariationId(
         _ variationId: String,
         forPurchasedTransaction sk2Transaction: Transaction
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await reportTransaction(sk2Transaction, withVariationId: variationId)
     }
 
@@ -416,7 +417,7 @@ public extension Adapty {
         forPurchasedTransaction transaction: SKPaymentTransaction,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await reportTransaction(transaction, withVariationId: variationId)
         }
     }
@@ -436,7 +437,7 @@ public extension Adapty {
         forPurchasedTransaction transaction: Transaction,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await reportTransaction(transaction, withVariationId: variationId)
         }
     }
@@ -454,7 +455,7 @@ public extension Adapty {
         withVariationId variationId: String? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await reportTransaction(transaction, withVariationId: variationId)
         }
     }
@@ -473,7 +474,7 @@ public extension Adapty {
         withVariationId variationId: String? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await reportTransaction(transaction, withVariationId: variationId)
         }
     }
@@ -492,7 +493,7 @@ public extension Adapty {
         _ paywall: AdaptyPaywall,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await logShowPaywall(paywall)
         }
     }
@@ -514,7 +515,7 @@ public extension Adapty {
         screenOrder: UInt,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await logShowOnboarding(name: name, screenName: screenName, screenOrder: screenOrder)
         }
     }
@@ -523,7 +524,7 @@ public extension Adapty {
         _ params: AdaptyOnboardingScreenParameters,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await logShowOnboarding(params)
         }
     }
@@ -539,7 +540,7 @@ public extension Adapty {
         _ consent: Bool,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await updateCollectingRefundDataConsent(consent)
         }
     }
@@ -555,7 +556,7 @@ public extension Adapty {
         _ refundPreference: AdaptyRefundPreference,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await updateRefundPreference(refundPreference)
         }
     }
@@ -563,7 +564,7 @@ public extension Adapty {
 
 private func withCompletion(
     _ completion: AdaptyErrorCompletion? = nil,
-    from operation: @escaping @Sendable () async throws -> Void
+    from operation: @escaping @Sendable () async throws(AdaptyError) -> Void
 ) {
     guard let completion else {
         Task {
@@ -573,14 +574,14 @@ private func withCompletion(
     }
 
     Task {
-        do {
+        do throws(AdaptyError) {
             try await operation()
             await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(nil)
             }
         } catch {
             await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
-                completion(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error))
+                completion(error)
             }
         }
     }
@@ -588,7 +589,7 @@ private func withCompletion(
 
 private func withCompletion<T: Sendable>(
     _ completion: AdaptyResultCompletion<T>?,
-    from operation: @escaping @Sendable () async throws -> T
+    from operation: @escaping @Sendable () async throws(AdaptyError) -> T
 ) {
     guard let completion else {
         Task {
@@ -598,14 +599,14 @@ private func withCompletion<T: Sendable>(
     }
 
     Task {
-        do {
+        do throws(AdaptyError) {
             let result = try await operation()
             await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
                 completion(.success(result))
             }
         } catch {
             await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
-                completion(.failure(error.asAdaptyError ?? .convertToAdaptyErrorFailed(unknownError: error)))
+                completion(.failure(error))
             }
         }
     }

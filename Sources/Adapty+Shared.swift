@@ -26,7 +26,7 @@ extension Adapty {
 
     @AdaptyActor
     package static var activatedSDK: Adapty {
-        get async throws {
+        get async throws(AdaptyError) {
             switch shared {
             case let .some(.activated(sdk)):
                 return sdk
@@ -50,8 +50,8 @@ extension Adapty {
         methodName: MethodName,
         logParams: EventParameters? = nil,
         function: StaticString = #function,
-        operation: @AdaptyActor @Sendable @escaping (Adapty) async throws -> T
-    ) async throws -> T {
+        operation: @AdaptyActor @Sendable @escaping (Adapty) async throws(AdaptyError) -> T
+    ) async throws(AdaptyError) -> T {
         let stamp = Log.stamp
 
         Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))
@@ -73,8 +73,8 @@ extension Adapty {
         methodName: MethodName,
         logParams: EventParameters? = nil,
         function: StaticString = #function,
-        operation: @AdaptyActor @Sendable @escaping () async throws -> T
-    ) async throws -> T {
+        operation: @AdaptyActor @Sendable @escaping () async throws(AdaptyError) -> T
+    ) async throws(AdaptyError) -> T {
         let stamp = Log.stamp
 
         Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))

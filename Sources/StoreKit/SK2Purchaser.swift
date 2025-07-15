@@ -85,7 +85,7 @@ actor SK2Purchaser {
     func makePurchase(
         profileId: String,
         product: AdaptyPaywallProduct
-    ) async throws -> AdaptyPurchaseResult {
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2Product = product.sk2Product
         else {
@@ -150,7 +150,7 @@ actor SK2Purchaser {
         _ options: Set<Product.PurchaseOption>,
         _ paywallVariationId: String?,
         _ persistentOnboardingVariationId: String?
-    ) async throws -> AdaptyPurchaseResult {
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         let stamp = Log.stamp
 
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(

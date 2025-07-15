@@ -119,7 +119,7 @@ public final class Adapty: Sendable {
     private func createNewProfileOnServer(
         _ profileId: String,
         _ customerUserId: String?
-    ) async throws -> ProfileManager {
+    ) async throws(AdaptyError) -> ProfileManager {
         var isFirstLoop = true
 
         let analyticsDisabled = profileStorage.externalAnalyticsDisabled
@@ -198,7 +198,7 @@ public final class Adapty: Sendable {
 }
 
 extension Adapty {
-    func identify(toCustomerUserId newCustomerUserId: String) async throws {
+    func identify(toCustomerUserId newCustomerUserId: String) async throws(AdaptyError) {
         let profileId: String
         switch sharedProfileManager {
         case .none:
@@ -210,7 +210,7 @@ extension Adapty {
             profileId = manager.profileId
         case let .creating(id, customerUserId, task):
             guard customerUserId != newCustomerUserId else {
-                _ = try await task.value
+                _ = try await task.profileManager
                 return
             }
             profileId = id
@@ -224,10 +224,10 @@ extension Adapty {
             task: task
         )
 
-        _ = try await task.value
+        _ = try await task.profileManager
     }
 
-    func logout() async throws {
+    func logout() async throws(AdaptyError) {
         if case let .creating(_, _, task) = sharedProfileManager {
             task.cancel()
         }
@@ -242,8 +242,7 @@ extension Adapty {
             withCustomerUserId: nil,
             task: task
         )
-
-        _ = try await task.value
+        _ = try await task.profileManager
     }
 }
 
@@ -251,6 +250,21 @@ private extension ProfileManager {
     enum Shared {
         case current(ProfileManager)
         case creating(profileId: String, withCustomerUserId: String?, task: Task<ProfileManager, Error>)
+    }
+}
+
+private extension Task where Success == ProfileManager {
+    var profileManager: ProfileManager {
+        get async throws(AdaptyError) {
+            do {
+                return try await value
+            } catch {
+                if let adaptyError = error as? AdaptyError {
+                    throw adaptyError
+                }
+                throw AdaptyError.profileWasChanged()
+            }
+        }
     }
 }
 
@@ -263,7 +277,7 @@ extension Adapty {
         }
     }
 
-    func profileManager(with profileId: String) throws -> ProfileManager? {
+    func profileManager(with profileId: String) throws(AdaptyError) -> ProfileManager? {
         guard let manager = profileManager else { return nil }
         guard profileId == manager.profileId else { throw AdaptyError.profileWasChanged() }
         return manager
@@ -276,21 +290,22 @@ extension Adapty {
     }
 
     var createdProfileManager: ProfileManager {
-        get async throws {
+        get async throws(AdaptyError) {
             switch sharedProfileManager {
             case .none:
                 throw AdaptyError.notActivated()
             case let .current(manager):
                 return manager
             case let .creating(_, _, task):
-                return try await withTaskCancellationWithError(CancellationError()) {
-                    do {
-                        return try await task.value
-                    } catch is CancellationError {
-                        throw AdaptyError.profileWasChanged()
-                    } catch {
-                        throw error
+                do {
+                    return try await withTaskCancellationWithError(CancellationError()) {
+                        try await task.profileManager
                     }
+                } catch {
+                    if let adaptyError = error as? AdaptyError {
+                        throw adaptyError
+                    }
+                    throw AdaptyError.profileWasChanged()
                 }
             }
         }
@@ -299,7 +314,7 @@ extension Adapty {
 
 extension ProfileManager? {
     var orThrows: ProfileManager {
-        get throws {
+        get throws(AdaptyError) {
             switch self {
             case .none:
                 throw AdaptyError.profileWasChanged()

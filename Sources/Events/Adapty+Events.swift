@@ -66,8 +66,8 @@ extension Adapty {
 }
 
 public extension Adapty {
-    private static func _trackEvent(_ event: Event) async throws {
-        do {
+    private static func _trackEvent(_ event: Event) async throws(AdaptyError) {
+        do throws(EventsError) {
             let event = await Event.Unpacked(
                 event: event,
                 profileId: ProfileStorage.profileId,
@@ -75,7 +75,7 @@ public extension Adapty {
             )
             try await eventsManager.trackEvent(event)
         } catch {
-            throw error.asAdaptyError ?? .trackEventFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 
@@ -89,8 +89,8 @@ public extension Adapty {
     /// - Parameters:
     ///   - paywall: A ``AdaptyPaywall`` object.
     ///  - Throws: An ``AdaptyError`` object
-    nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) async throws {
-        try await withActivatedSDK(methodName: .logShowPaywall) { _ in
+    nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) async throws(AdaptyError) {
+        try await withActivatedSDK(methodName: .logShowPaywall) { _ throws(AdaptyError) in
             try await _trackEvent(.paywallShowed(.init(variationId: paywall.variationId, viewConfigurationId: nil)))
         }
     }
@@ -106,7 +106,7 @@ public extension Adapty {
     ///   - screenName: Readable name of a particular screen as part of onboarding.
     ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws {
+    nonisolated static func logShowOnboarding(name: String?, screenName: String?, screenOrder: UInt) async throws(AdaptyError) {
         try await logShowOnboarding(.init(
             name: name,
             screenName: screenName,
@@ -114,8 +114,8 @@ public extension Adapty {
         ))
     }
 
-    nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws {
-        try await withActivatedSDK(methodName: .logShowOnboarding) { _ in
+    nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws(AdaptyError) {
+        try await withActivatedSDK(methodName: .logShowOnboarding) { _ throws(AdaptyError) in
             guard params.screenOrder > 0 else {
                 let error = AdaptyError.wrongParamOnboardingScreenOrder()
                 Log.default.error(error.debugDescription)
@@ -126,8 +126,8 @@ public extension Adapty {
         }
     }
 
-    package nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenShowedParameters) async throws {
-        try await withActivatedSDK(methodName: .logShowOnboardingScreen) { _ in
+    package nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenShowedParameters) async throws(AdaptyError) {
+        try await withActivatedSDK(methodName: .logShowOnboardingScreen) { _ throws(AdaptyError) in
             try await _trackEvent(.onboardingScreenShowed(params))
         }
     }
@@ -139,8 +139,8 @@ public extension Adapty {
     /// - Parameters:
     ///   - consent: `Bool` value whether user gave the consent or not.
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func updateCollectingRefundDataConsent(_ consent: Bool) async throws {
-        try await withActivatedSDK(methodName: .updateCollectingRefundDataConsent) { _ in
+    nonisolated static func updateCollectingRefundDataConsent(_ consent: Bool) async throws(AdaptyError) {
+        try await withActivatedSDK(methodName: .updateCollectingRefundDataConsent) { _ throws(AdaptyError) in
             try await _trackEvent(.сonsentToCollectingRefundData(.init(consent: consent)))
         }
     }
@@ -152,8 +152,8 @@ public extension Adapty {
     /// - Parameters:
     ///   - refundPreference: ``AdaptyRefundPreference`` value.
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func updateRefundPreference(_ refundPreference: AdaptyRefundPreference) async throws {
-        try await withActivatedSDK(methodName: .updateRefundPreference) { _ in
+    nonisolated static func updateRefundPreference(_ refundPreference: AdaptyRefundPreference) async throws(AdaptyError) {
+        try await withActivatedSDK(methodName: .updateRefundPreference) { _ throws(AdaptyError) in
             try await _trackEvent(.refundPreference(.init(refundPreference: refundPreference)))
         }
     }

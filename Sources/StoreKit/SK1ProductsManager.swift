@@ -64,7 +64,7 @@ private extension Error {
 }
 
 extension SK1ProductsManager {
-    func fetchSK1ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [SK1Product] {
+    func fetchSK1ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [SK1Product] {
         let products = try await fetchSK1Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in
@@ -72,8 +72,8 @@ extension SK1ProductsManager {
         }
     }
 
-    func fetchSK1Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws -> SK1Product {
-        do {
+    func fetchSK1Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> SK1Product {
+        do throws(AdaptyError) {
             let products = try await fetchSK1Products(ids: Set([productId]), fetchPolicy: fetchPolicy)
 
             guard let product = products.first else {
@@ -88,7 +88,8 @@ extension SK1ProductsManager {
     }
 
     func fetchSK1Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
-        async throws -> [SK1Product] {
+        async throws(AdaptyError) -> [SK1Product]
+    {
         guard !productIds.isEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
