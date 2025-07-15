@@ -89,9 +89,15 @@ final class EventsManager {
 
     private func sendEvents(_ session: Backend.EventsExecutor) async throws(EventsError) {
         if configuration.isExpired {
-            configuration = try await session.fetchEventsConfig(
-                profileId: ProfileStorage.profileId
-            )
+            do throws(HTTPError) {
+                configuration = try await session.fetchEventsConfig(
+                    profileId: ProfileStorage.profileId
+                )
+            } catch .backend, .decoding {
+                configuration = .init(blacklist: Event.defaultBlackList, expiration: Date() + 24*60*60)
+            } catch {
+                throw EventsError.sending(error)
+            }
         }
 
         let events = eventStorages.getEvents(
