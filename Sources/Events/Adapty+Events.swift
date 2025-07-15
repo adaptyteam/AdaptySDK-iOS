@@ -67,7 +67,7 @@ extension Adapty {
 
 public extension Adapty {
     private static func _trackEvent(_ event: Event) async throws(AdaptyError) {
-        do throws(EventsError) {
+        do {
             let event = await Event.Unpacked(
                 event: event,
                 profileId: ProfileStorage.profileId,

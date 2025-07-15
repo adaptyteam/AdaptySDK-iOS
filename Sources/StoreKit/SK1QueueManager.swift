@@ -188,7 +188,7 @@ actor SK1QueueManager: Sendable {
             }
 
         let result: AdaptyResult<AdaptyPurchaseResult>
-        do throws(AdaptyError) {
+        do {
             let response = try await purchaseValidator.validatePurchase(
                 profileId: nil,
                 transaction: purchasedTransaction,

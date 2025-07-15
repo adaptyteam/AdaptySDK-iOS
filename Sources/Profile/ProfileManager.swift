@@ -115,7 +115,7 @@ extension Adapty {
 private extension Adapty {
     func syncProfile(profile old: VH<AdaptyProfile>, params: AdaptyProfileParameters?, environmentMeta meta: Environment.Meta?) async throws(AdaptyError) -> AdaptyProfile {
         let response: VH<AdaptyProfile?>
-        do throws(HTTPError) {
+        do {
             response = try await httpSession.syncProfile(
                 profileId: old.value.profileId,
                 parameters: params,

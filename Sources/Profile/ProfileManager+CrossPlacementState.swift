@@ -8,7 +8,7 @@
 extension Adapty {
     func syncCrossPlacementState(profileId: String) async throws(AdaptyError) {
         let state: CrossPlacementState
-        do throws(HTTPError) {
+        do {
             state = try await httpSession.fetchCrossPlacementState(profileId: profileId)
         } catch {
             throw error.asAdaptyError

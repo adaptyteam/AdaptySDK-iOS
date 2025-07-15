@@ -114,7 +114,7 @@ extension Adapty {
             )
         }()
 
-        do throws(HTTPError) {
+        do {
             var chosen: AdaptyPlacementChosen<Content> = try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
                 apiKeyPrefix: apiKeyPrefix,
                 profileId: profileId,

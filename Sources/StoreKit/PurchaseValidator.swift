@@ -34,7 +34,7 @@ extension Adapty: PurchaseValidator {
         transactionId: String,
         variationId: String?
     ) async throws(AdaptyError) -> VH<AdaptyProfile> {
-        do throws(HTTPError) {
+        do {
             let response = try await httpSession.reportTransaction(
                 profileId: profileId ?? profileStorage.profileId,
                 transactionId: transactionId,
@@ -52,7 +52,7 @@ extension Adapty: PurchaseValidator {
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> VH<AdaptyProfile> {
-        do throws(HTTPError) {
+        do {
             let response = try await httpSession.validateTransaction(
                 profileId: profileId ?? profileStorage.profileId,
                 purchasedTransaction: transaction,
@@ -70,7 +70,7 @@ extension Adapty: PurchaseValidator {
         vendorProductId: String,
         offerId: String
     ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature {
-        do throws(HTTPError) {
+        do {
             let response = try await httpSession.signSubscriptionOffer(
                 profileId: profileId,
                 vendorProductId: vendorProductId,

@@ -32,7 +32,7 @@ extension Adapty {
     ) async throws(AdaptyError) {
         let profileId = try await createdProfileManager.profileId
 
-        do throws(HTTPError) {
+        do {
             try await httpSession.setIntegrationIdentifier(
                 profileId: profileId,
                 keyValues: keyValues

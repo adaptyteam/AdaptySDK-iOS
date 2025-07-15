@@ -202,7 +202,7 @@ extension Adapty {
 
             let caseWithPaywallVariation = variationId != nil
 
-            do throws(HTTPError) {
+            do {
                 var chosen: AdaptyPlacementChosen<Content> =
                     if let variationId {
                         try await httpSession.fetchPlacement(
@@ -363,7 +363,7 @@ extension Adapty {
                 )
             }()
 
-            do throws(HTTPError) {
+            do {
                 var chosen: AdaptyPlacementChosen<Content> =
                     if let variationId {
                         try await httpFallbackSession.fetchFallbackPlacement(

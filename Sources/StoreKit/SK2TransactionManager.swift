@@ -52,7 +52,7 @@ actor SK2TransactionManager: StoreKitTransactionManager {
             return nil
         }
 
-        do throws(HTTPError) {
+        do {
             return try await session.syncTransaction(
                 profileId: profileId,
                 originalTransactionId: lastTransaction.unfOriginalIdentifier

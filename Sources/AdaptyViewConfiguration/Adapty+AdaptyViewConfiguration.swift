@@ -100,7 +100,7 @@ extension Adapty {
             throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
         }
 
-        do throws(HTTPError) {
+        do {
             return try await httpFallbackSession.fetchFallbackViewConfiguration(
                 apiKeyPrefix: apiKeyPrefix,
                 paywallInstanceIdentity: paywallInstanceIdentity,

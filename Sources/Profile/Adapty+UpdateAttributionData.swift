@@ -57,7 +57,7 @@ public extension Adapty {
             return (manager.profileId, manager.profile.hash)
         }()
 
-        do throws(HTTPError) {
+        do {
             let response = try await httpSession.setAttributionData(
                 profileId: profileId,
                 source: source,

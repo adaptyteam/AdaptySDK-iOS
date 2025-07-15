@@ -95,7 +95,7 @@ extension StoreKitReceiptManager: StoreKitTransactionManager {
         defer { syncing = nil }
 
         let receipt = try await getReceipt()
-        do throws(HTTPError) {
+        do {
             return try await session.validateReceipt(
                 profileId: profileId,
                 receipt: receipt

@@ -89,7 +89,7 @@ final class EventsManager {
 
     private func sendEvents(_ session: Backend.EventsExecutor) async throws(EventsError) {
         if configuration.isExpired {
-            do throws(HTTPError) {
+            do {
                 configuration = try await session.fetchEventsConfig(
                     profileId: ProfileStorage.profileId
                 )
