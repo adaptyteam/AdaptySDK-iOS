@@ -1409,6 +1409,7 @@ $defs:
 
   AdaptyUI.ProductPurchaseParameters:  #request
     type: object
+    propertyNames: { description: "key is adapty_product_id" }
     additionalProperties: { 
       $ref: "#/$defs/AdaptyPurchaseParameters", 
       nullable: false 
