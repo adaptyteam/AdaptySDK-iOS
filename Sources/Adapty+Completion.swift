@@ -155,7 +155,7 @@ public extension Adapty {
     nonisolated static func getCurrentInstallationStatus(
         _ completion: @escaping AdaptyResultCompletion<AdaptyInstallationStatus>
     ) {
-        withCompletion(completion) {
+        withCompletion(completion) { () async throws(AdaptyError) in
             try await getCurrentInstallationStatus()
         }
     }
