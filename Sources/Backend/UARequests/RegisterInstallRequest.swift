@@ -48,7 +48,7 @@ extension Backend.UAExecutor {
         profileId: String,
         installInfo: Environment.InstallInfo,
         maxRetries: Int = 5
-    ) async throws -> RegistrationInstallResponse? {
+    ) async throws(HTTPError) -> RegistrationInstallResponse? {
         let request = RegisterInstallRequest(
             profileId: profileId,
             installInfo: installInfo
@@ -63,8 +63,9 @@ extension Backend.UAExecutor {
                       UABackend.canRetryRequest(error)
                 else { throw error }
                 attempt += 1
-                try await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
+                try? await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
             }
+
         } while true
     }
 }
