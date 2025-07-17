@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    func extractLocale()  throws -> AdaptyViewConfiguration {
+    func extractLocale() throws -> AdaptyViewConfiguration {
         try extractLocale(responseLocale)
     }
 

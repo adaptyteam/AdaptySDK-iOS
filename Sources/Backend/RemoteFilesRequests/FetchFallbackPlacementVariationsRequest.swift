@@ -18,11 +18,12 @@ private struct FetchFallbackPlacementVariationsRequest: HTTPRequest {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) {
-        self.timeoutInterval = if let timeoutInterval {
-            max(0.5, timeoutInterval)
-        } else {
-            nil
-        }
+        self.timeoutInterval =
+            if let timeoutInterval {
+                max(0.5, timeoutInterval)
+            } else {
+                nil
+            }
 
         self.endpoint = endpoint
         queryItems = QueryItems().setDisableServerCache(disableServerCache)

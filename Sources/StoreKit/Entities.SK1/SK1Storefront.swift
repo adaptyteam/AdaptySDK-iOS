@@ -30,22 +30,22 @@ extension AdaptyStorefront {
         static var updates: AsyncStream<AdaptyStorefront> {
             AsyncStream<AdaptyStorefront> { continuation in
                 #if os(visionOS)
-                    continuation.finish()
+                continuation.finish()
                 #else
-                    Task<Void, Never> {
-                        NotificationCenter.default.addObserver(
-                            forName: Notification.Name.SKStorefrontCountryCodeDidChange,
-                            object: nil,
-                            queue: nil
-                        ) { _ in
-                            if let storefront = SKPaymentQueue.default().storefront {
-                                log.verbose("Notifications SKStorefrontCountryCodeDidChange: value is \(storefront)")
-                                continuation.yield(storefront.asAdaptyStorefront)
-                            } else {
-                                log.warn("Notifications SKStorefrontCountryCodeDidChange: value is nil")
-                            }
+                Task<Void, Never> {
+                    NotificationCenter.default.addObserver(
+                        forName: Notification.Name.SKStorefrontCountryCodeDidChange,
+                        object: nil,
+                        queue: nil
+                    ) { _ in
+                        if let storefront = SKPaymentQueue.default().storefront {
+                            log.verbose("Notifications SKStorefrontCountryCodeDidChange: value is \(storefront)")
+                            continuation.yield(storefront.asAdaptyStorefront)
+                        } else {
+                            log.warn("Notifications SKStorefrontCountryCodeDidChange: value is nil")
                         }
                     }
+                }
                 #endif
             }
         }

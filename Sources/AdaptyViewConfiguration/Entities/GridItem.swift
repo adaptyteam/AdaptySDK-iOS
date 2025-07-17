@@ -40,19 +40,19 @@ extension AdaptyViewConfiguration.GridItem.Length: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.GridItem {
-        static func create(
-            length: Length,
-            horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = defaultHorizontalAlignment,
-            verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = defaultVerticalAlignment,
-            content: AdaptyViewConfiguration.Element
-        ) -> Self {
-            .init(
-                length: length,
-                horizontalAlignment: horizontalAlignment,
-                verticalAlignment: verticalAlignment,
-                content: content
-            )
-        }
+package extension AdaptyViewConfiguration.GridItem {
+    static func create(
+        length: Length,
+        horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = defaultHorizontalAlignment,
+        verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = defaultVerticalAlignment,
+        content: AdaptyViewConfiguration.Element
+    ) -> Self {
+        .init(
+            length: length,
+            horizontalAlignment: horizontalAlignment,
+            verticalAlignment: verticalAlignment,
+            content: content
+        )
     }
+}
 #endif

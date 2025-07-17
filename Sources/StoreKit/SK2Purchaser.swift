@@ -10,7 +10,6 @@ import StoreKit
 private let log = Log.sk2TransactionManager
 
 actor SK2Purchaser {
-    
     private let purchaseValidator: PurchaseValidator
     private let storage: VariationIdStorage
 
@@ -104,20 +103,14 @@ actor SK2Purchaser {
                 options = []
 
             case let .winBack(offerId):
-                #if compiler(<6.0)
-                    throw StoreKitManagerError.invalidOffer("Does not support winBackOffer purchase before iOS 6.0").asAdaptyError
-                #else
-                    if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                       let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId)
-                    {
-                        options = [.winBackOffer(winBackOffer)]
-                    } else {
-                        throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
-                    }
-                #endif
+                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
+                   let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId) {
+                    options = [.winBackOffer(winBackOffer)]
+                } else {
+                    throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
+                }
 
             case let .promotional(offerId):
-
                 let response = try await purchaseValidator.signSubscriptionOffer(
                     profileId: profileId,
                     vendorProductId: product.vendorProductId,

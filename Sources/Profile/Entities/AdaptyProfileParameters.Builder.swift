@@ -109,18 +109,18 @@ public extension AdaptyProfileParameters.Builder {
 }
 
 #if canImport(AppTrackingTransparency)
-    import AppTrackingTransparency
+import AppTrackingTransparency
 
-    public extension AdaptyProfileParameters.Builder {
-        @available(iOS 14, macOS 11.0, visionOS 1.0, *)
-        @discardableResult
-        func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
-            guard let value else {
-                parameters.appTrackingTransparencyStatus = nil
-                return self
-            }
-            parameters.appTrackingTransparencyStatus = AdaptyProfileParameters.AppTrackingTransparencyStatus(from: Int(value.rawValue))
+public extension AdaptyProfileParameters.Builder {
+    @available(iOS 14, macOS 11.0, visionOS 1.0, *)
+    @discardableResult
+    func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
+        guard let value else {
+            parameters.appTrackingTransparencyStatus = nil
             return self
         }
+        parameters.appTrackingTransparencyStatus = AdaptyProfileParameters.AppTrackingTransparencyStatus(from: Int(value.rawValue))
+        return self
     }
+}
 #endif

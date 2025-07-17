@@ -49,8 +49,7 @@ extension URLRequest {
         if let session, session.httpShouldSetCookies {
             if
                 let cookieStorage = session.httpCookieStorage,
-                let cookies = cookieStorage.cookies(for: url), !cookies.isEmpty
-            {
+                let cookies = cookieStorage.cookies(for: url), !cookies.isEmpty {
                 let allCookies = cookies.map { "\($0.name)=\($0.value)" }.joined(separator: ";")
 
                 cookieString = String(format: CurlParameters.cookies, allCookies)

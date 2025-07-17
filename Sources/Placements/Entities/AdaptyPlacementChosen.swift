@@ -15,9 +15,9 @@ enum AdaptyPlacementChosen<Content: PlacementContent>: Sendable {
 extension AdaptyPlacementChosen {
     var content: Content {
         switch self {
-        case .restore(let content):
+        case let .restore(content):
             content
-        case .draw(let draw):
+        case let .draw(draw):
             draw.content
         }
     }

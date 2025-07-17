@@ -29,7 +29,7 @@ extension Adapty {
         trackEvent(.system(params))
     }
 
-    static func trackEventIfNeed<Content: PlacementContent>(_ chosen: AdaptyPlacementChosen<Content>) {
+    static func trackEventIfNeed(_ chosen: AdaptyPlacementChosen<some PlacementContent>) {
         guard case let .draw(draw) = chosen else {
             return
         }
@@ -116,7 +116,6 @@ public extension Adapty {
 
     nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws {
         try await withActivatedSDK(methodName: .logShowOnboarding) { _ in
-
             guard params.screenOrder > 0 else {
                 let error = AdaptyError.wrongParamOnboardingScreenOrder()
                 Log.default.error(error.debugDescription)

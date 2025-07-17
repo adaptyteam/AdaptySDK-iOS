@@ -16,7 +16,6 @@ public extension Adapty {
             "variation_id": variationId,
             "transaction_id": transactionId,
         ]) { sdk in
-
             let profileId = sdk.profileStorage.profileId
             let response = try await sdk.reportTransaction(
                 profileId: profileId,
@@ -43,7 +42,6 @@ public extension Adapty {
             "variation_id": variationId,
             "transaction_id": sk1Transaction.transactionIdentifier,
         ]) { sdk in
-
             guard sk1Transaction.transactionState == .purchased || sk1Transaction.transactionState == .restored,
                   let id = sk1Transaction.transactionIdentifier
             else {

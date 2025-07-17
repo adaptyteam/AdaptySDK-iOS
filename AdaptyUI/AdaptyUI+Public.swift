@@ -295,7 +295,7 @@ public extension AdaptyUI {
         assetsResolver: AdaptyAssetsResolver? = nil
     ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
-            let err = AdaptyUIError.adaptyNotActivated
+            let err = AdaptyUIError.adaptyUINotActivated
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
 
             throw err
@@ -330,7 +330,7 @@ public extension AdaptyUI {
         showDebugOverlay: Bool = false
     ) throws -> AdaptyPaywallController {
         guard AdaptyUI.isActivated else {
-            let err = AdaptyUIError.adaptyNotActivated
+            let err = AdaptyUIError.adaptyUINotActivated
             Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
             throw err
         }

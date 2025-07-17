@@ -22,19 +22,19 @@ package extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.TransitionSlide {
-        static func create(
-            startDelay: TimeInterval = `default`.startDelay,
-            duration: TimeInterval = `default`.duration,
-            interpolator: AdaptyViewConfiguration.Transition.Interpolator = `default`.interpolator
-        ) -> Self {
-            .init(
-                startDelay: startDelay,
-                duration: duration,
-                interpolator: interpolator
-            )
-        }
+package extension AdaptyViewConfiguration.TransitionSlide {
+    static func create(
+        startDelay: TimeInterval = `default`.startDelay,
+        duration: TimeInterval = `default`.duration,
+        interpolator: AdaptyViewConfiguration.Transition.Interpolator = `default`.interpolator
+    ) -> Self {
+        .init(
+            startDelay: startDelay,
+            duration: duration,
+            interpolator: interpolator
+        )
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.TransitionSlide: Codable {

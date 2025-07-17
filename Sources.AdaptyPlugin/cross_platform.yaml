@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.3.3/schema"
+$id: "https://adapty.io/crossPlatform/3.10.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -35,8 +35,8 @@ $requests:
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
       custom_timers: { $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
       custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" }
-      android_personalized_offers:
-        { $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
+      product_purchase_parameters:
+        { $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters" }
 
   AdaptyUICreatePaywallView.Response: #response
     type: object
@@ -47,26 +47,6 @@ $requests:
       - required: [success]
         properties:
           success: { $ref: "#/$defs/AdaptyUI.PaywallView" }
-
-  ### createOnboardingViewForTest ###
-  AdaptyUICreateOnboardingViewForTest.Request: #request
-    type: object
-    required:
-      - method
-      - placement_id
-    properties:
-      method: { const: "adapty_ui_create_onboarding_view_for_test" }
-      placement_id: { type: string }
-
-  AdaptyUICreateOnboardingViewForTest.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
 
   ### createOnboardingView ###
   AdaptyUICreateOnboardingView.Request: #request
@@ -419,12 +399,7 @@ $requests:
     properties:
       method: { const: "make_purchase" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      subscription_update_params:
-        {
-          $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
-          description: "Android Only",
-        }
-      is_offer_personalized: { type: boolean, description: "Android Only" }
+      parameters:  { $ref: "#/$defs/AdaptyPurchaseParameters" }
 
   MakePurchase.Response: #response
     type: object
@@ -481,6 +456,23 @@ $requests:
       - required: [success]
         properties:
           success: { type: string }
+
+  ### getCurrentInstallationStatus ###
+  GetCurrentInstallationStatus.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "get_current_installation_status" }
+
+  GetCurrentInstallationStatus.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyInstallationStatus" }
 
   ### presentCodeRedemptionSheet ###
   PresentCodeRedemptionSheet.Request: #request
@@ -670,6 +662,20 @@ $events:
     properties:
       id: { const: "did_load_latest_profile" }
       profile: { $ref: "#/$defs/AdaptyProfile" }
+
+  Event.OnInstallationDetailsSuccess:
+    type: object
+    required: [id, details]
+    properties:
+      id: { const: "on_installation_details_success" }
+      details: { $ref: "#/$defs/AdaptyInstallationDetails" }
+
+  Event.OnInstallationDetailsFail:
+    type: object
+    required: [id, error]
+    properties:
+      id: { const: "on_installation_details_fail" }
+      error: { $ref: "#/$defs/AdaptyError" }
 
   PaywallViewEvent.DidAppear:
     type: object
@@ -931,6 +937,7 @@ $defs:
       backend_base_url: { type: string }
       backend_fallback_base_url: { type: string }
       backend_configs_base_url: { type: string }
+      backend_ua_base_url: { type: string }
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
       log_level: { $ref: "#/$defs/AdaptyLog.Level" }
@@ -1381,6 +1388,26 @@ $defs:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
 
+  AdaptyInstallationStatus: #response #event
+    type: object
+    oneOf:
+      - required: [status]
+        properties:
+          status: { type: string, enum: ["not_available", "not_determined"] }
+      - required: [status, details]
+        properties:
+          status: { type: string, const: "determined" }
+          details: { $ref: "#/$defs/AdaptyInstallationDetails" }
+
+  AdaptyInstallationDetails: #response #event
+    type: object
+    required: [ install_time, app_launch_count]
+    properties:
+      install_id:  { type: string }
+      install_time: { $ref: "#/$defs/Date", nullable: false }
+      app_launch_count: { type: integer, nullable: false }
+      payload:  { type: string }
+
   AdaptyUI.CustomAssets:
     type: array
     items:
@@ -1435,6 +1462,14 @@ $defs:
     type: object
     additionalProperties: { type: boolean, nullable: false }
 
+  AdaptyUI.ProductPurchaseParameters:  #request
+    type: object
+    propertyNames: { description: "key is adapty_product_id" }
+    additionalProperties: { 
+      $ref: "#/$defs/AdaptyPurchaseParameters", 
+      nullable: false 
+    }
+
   AdaptyUI.DialogConfiguration: #request
     type: object
     required: [default_action]
@@ -1449,6 +1484,18 @@ $defs:
     enum:
       - primary
       - secondary
+
+   AdaptyPurchaseParameters:  #request
+    type: object
+    properties:
+      subscription_update_params:
+        {
+          $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
+          description: "Android Only",
+        }
+      is_offer_personalized: { type: boolean, description: "Android Only" }
+      obfuscated_account_id: { type: string, description: "Android Only" }
+      obfuscated_profile_id: { type: string, description: "Android Only" }
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
     type: object

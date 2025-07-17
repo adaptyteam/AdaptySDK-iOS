@@ -12,7 +12,7 @@ package extension AdaptyViewConfiguration {
         package let id: String
         package let state: State
         package let format: [Item]
-        package let actions: [ActionAction]
+        package let actions: [Action]
         package let horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment
 
         package func format(byValue: TimeInterval) -> RichText {
@@ -26,7 +26,7 @@ package extension AdaptyViewConfiguration {
             return format[index].value
         }
 
-        init(id: String, state: State, format: [Item], actions: [ActionAction], horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment) {
+        init(id: String, state: State, format: [Item], actions: [Action], horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment) {
             self.id = id
             self.state = state
             self.format = format.sorted(by: { $0.from > $1.from })
@@ -69,84 +69,84 @@ extension AdaptyViewConfiguration.Timer.State: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Timer {
-        static func create(
-            id: String = UUID().uuidString,
-            endedAt: Date,
-            format: AdaptyViewConfiguration.RichText,
-            actions: [AdaptyViewConfiguration.ActionAction] = [],
-            horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
-        ) -> Self {
-            .create(
-                id: id,
-                endedAt: endedAt,
-                format: [.init(from: 0, value: format)],
-                actions: actions,
-                horizontalAlign: horizontalAlign
-            )
-        }
-
-        static func create(
-            id: String = UUID().uuidString,
-            endedAt: Date,
-            format: [Item],
-            actions: [AdaptyViewConfiguration.ActionAction] = [],
-            horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
-        ) -> Self {
-            .init(
-                id: id,
-                state: .endedAt(endedAt),
-                format: format,
-                actions: actions,
-                horizontalAlign: horizontalAlign
-            )
-        }
-
-        static func create(
-            id: String = UUID().uuidString,
-            duration: TimeInterval,
-            startBehavior: StartBehavior = .default,
-            format: AdaptyViewConfiguration.RichText,
-            actions: [AdaptyViewConfiguration.ActionAction] = [],
-            horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
-        ) -> Self {
-            .create(
-                id: id,
-                duration: duration,
-                startBehavior: startBehavior,
-                format: [.init(from: 0, value: format)],
-                actions: actions,
-                horizontalAlign: horizontalAlign
-            )
-        }
-
-        static func create(
-            id: String = UUID().uuidString,
-            duration: TimeInterval,
-            startBehavior: StartBehavior = .default,
-            format: [Item],
-            actions: [AdaptyViewConfiguration.ActionAction] = [],
-            horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
-        ) -> Self {
-            .init(
-                id: id,
-                state: .duration(duration, start: startBehavior),
-                format: format,
-                actions: actions,
-                horizontalAlign: horizontalAlign
-            )
-        }
+package extension AdaptyViewConfiguration.Timer {
+    static func create(
+        id: String = UUID().uuidString,
+        endedAt: Date,
+        format: AdaptyViewConfiguration.RichText,
+        actions: [AdaptyViewConfiguration.Action] = [],
+        horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
+    ) -> Self {
+        .create(
+            id: id,
+            endedAt: endedAt,
+            format: [.init(from: 0, value: format)],
+            actions: actions,
+            horizontalAlign: horizontalAlign
+        )
     }
 
-    package extension AdaptyViewConfiguration.Timer.Item {
-        static func create(
-            from: TimeInterval,
-            value: AdaptyViewConfiguration.RichText
-        ) -> Self {
-            .init(
-                from: from,
-                value: value
-            )
-        }
+    static func create(
+        id: String = UUID().uuidString,
+        endedAt: Date,
+        format: [Item],
+        actions: [AdaptyViewConfiguration.Action] = [],
+        horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
+    ) -> Self {
+        .init(
+            id: id,
+            state: .endedAt(endedAt),
+            format: format,
+            actions: actions,
+            horizontalAlign: horizontalAlign
+        )
     }
+
+    static func create(
+        id: String = UUID().uuidString,
+        duration: TimeInterval,
+        startBehavior: StartBehavior = .default,
+        format: AdaptyViewConfiguration.RichText,
+        actions: [AdaptyViewConfiguration.Action] = [],
+        horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
+    ) -> Self {
+        .create(
+            id: id,
+            duration: duration,
+            startBehavior: startBehavior,
+            format: [.init(from: 0, value: format)],
+            actions: actions,
+            horizontalAlign: horizontalAlign
+        )
+    }
+
+    static func create(
+        id: String = UUID().uuidString,
+        duration: TimeInterval,
+        startBehavior: StartBehavior = .default,
+        format: [Item],
+        actions: [AdaptyViewConfiguration.Action] = [],
+        horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = .leading
+    ) -> Self {
+        .init(
+            id: id,
+            state: .duration(duration, start: startBehavior),
+            format: format,
+            actions: actions,
+            horizontalAlign: horizontalAlign
+        )
+    }
+}
+
+package extension AdaptyViewConfiguration.Timer.Item {
+    static func create(
+        from: TimeInterval,
+        value: AdaptyViewConfiguration.RichText
+    ) -> Self {
+        .init(
+            from: from,
+            value: value
+        )
+    }
+}
 #endif

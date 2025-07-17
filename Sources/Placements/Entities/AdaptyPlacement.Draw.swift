@@ -65,7 +65,6 @@ extension AdaptyPlacement.Draw: Decodable {
         var array = try decoder.unkeyedContainer()
         while !array.isAtEnd {
             if array.currentIndex == index {
-                
                 return try array.decode(Content.self)
             }
             _ = try array.decode(PassObject.self)

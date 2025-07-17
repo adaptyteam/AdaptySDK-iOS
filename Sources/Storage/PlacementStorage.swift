@@ -21,7 +21,7 @@ final class PlacementStorage: Sendable {
         }
     }
 
-    private static func setPlacement<Content: PlacementContent>(_ content: Content) {
+    private static func setPlacement(_ content: some PlacementContent) {
         if let paywall = content as? AdaptyPaywall {
             PaywallStorage.setPaywall(paywall)
         } else if let onboarding = content as? AdaptyOnboarding {

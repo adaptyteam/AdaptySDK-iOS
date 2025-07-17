@@ -85,14 +85,12 @@ extension PurchasedTransaction {
         sk2Transaction: SK2Transaction
     ) {
         let offer: PurchasedTransaction.SubscriptionOffer? = {
-            #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
-                if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-                    return .init(
-                        sk2TransactionOffer: sk2Transaction.offer,
-                        sk1Product: sk1Product
-                    )
-                }
-            #endif
+            if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+                return .init(
+                    sk2TransactionOffer: sk2Transaction.offer,
+                    sk1Product: sk1Product
+                )
+            }
             return .init(
                 sk2Transaction: sk2Transaction,
                 sk1Product: sk1Product
@@ -178,30 +176,28 @@ private extension PurchasedTransaction.SubscriptionOffer {
         )
     }
 
-    #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
-        @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
-        init?(
-            sk2TransactionOffer: SK2Transaction.Offer?,
-            sk1Product: SK1Product?
-        ) {
-            guard let sk2TransactionOffer else { return nil }
+    @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
+    init?(
+        sk2TransactionOffer: SK2Transaction.Offer?,
+        sk1Product: SK1Product?
+    ) {
+        guard let sk2TransactionOffer else { return nil }
 
-            let offerType = sk2TransactionOffer.type.asPurchasedTransactionOfferType
+        let offerType = sk2TransactionOffer.type.asPurchasedTransactionOfferType
 
-            let sk1ProductOffer = sk1Product?.subscriptionOffer(
-                byType: offerType,
-                withId: sk2TransactionOffer.id
-            )
+        let sk1ProductOffer = sk1Product?.subscriptionOffer(
+            byType: offerType,
+            withId: sk2TransactionOffer.id
+        )
 
-            self = .init(
-                id: sk2TransactionOffer.id,
-                period: sk1ProductOffer?.subscriptionPeriod.asAdaptySubscriptionPeriod,
-                paymentMode: sk2TransactionOffer.paymentMode?.asPaymentMode ?? .unknown,
-                offerType: offerType,
-                price: sk1ProductOffer?.price.decimalValue
-            )
-        }
-    #endif
+        self = .init(
+            id: sk2TransactionOffer.id,
+            period: sk1ProductOffer?.subscriptionPeriod.asAdaptySubscriptionPeriod,
+            paymentMode: sk2TransactionOffer.paymentMode?.asPaymentMode ?? .unknown,
+            offerType: offerType,
+            price: sk1ProductOffer?.price.decimalValue
+        )
+    }
 }
 
 private extension SK1Product {

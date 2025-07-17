@@ -1,5 +1,5 @@
 //
-//  Adapty+MakeWebPurchase.swift
+//  Adapty+WebPaywall.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.06.2025
@@ -23,7 +23,7 @@ public extension Adapty {
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
                 "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
-                "paywall_product_index": product.paywallProductIndex
+                "paywall_product_index": product.paywallProductIndex,
             ]
         ) { sdk in
             try await sdk.openWebPaywall(for: product)
@@ -41,7 +41,7 @@ public extension Adapty {
                 "product_id": product.vendorProductId,
                 "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
                 "paywall_product_index": product.paywallProductIndex,
-                "product_locale": product.localizedPrice
+                "product_locale": product.localizedPrice,
             ]
         ) { sdk in
             try sdk.createWebPaywallUrl(for: product)
@@ -56,7 +56,7 @@ public extension Adapty {
             logParams: [
                 "paywall_name": paywall.name,
                 "variation_id": paywall.variationId,
-                "web_purchase_url": paywall.webPaywallBaseUrl
+                "web_purchase_url": paywall.webPaywallBaseUrl,
             ]
         ) { sdk in
             try await sdk.openWebPaywall(for: paywall)
@@ -71,7 +71,7 @@ public extension Adapty {
             logParams: [
                 "paywall_name": paywall.name,
                 "variation_id": paywall.variationId,
-                "web_purchase_url": paywall.webPaywallBaseUrl
+                "web_purchase_url": paywall.webPaywallBaseUrl,
             ]
         ) { sdk in
             try sdk.createWebPaywallUrl(for: paywall)
@@ -107,7 +107,7 @@ public extension Adapty {
 
         let parameters = [
             "adapty_profile_id": profileStorage.profileId,
-            "adapty_variation_id": paywall.variationId
+            "adapty_variation_id": paywall.variationId,
         ]
 
         return try webPaywallBaseUrl.appendOrOverwriteQueryParameters(parameters)
@@ -125,7 +125,7 @@ public extension Adapty {
             "adapty_variation_id": product.variationId,
             "adapty_product_id": product.adaptyProductId,
             "adapty_chosen_product_idx": String(product.paywallProductIndex),
-            "adapty_product_locale": product.priceLocale.identifier
+            "adapty_product_locale": product.priceLocale.identifier,
         ]
 
         if let offer = product.subscriptionOffer {
@@ -143,11 +143,11 @@ public extension Adapty {
 private extension URL {
     @MainActor
     func open() async -> Bool {
-#if os(iOS)
+        #if os(iOS)
         await UIApplication.shared.open(self, options: [:])
-#elseif os(macOS)
+        #elseif os(macOS)
         NSWorkspace.shared.open(self)
-#endif
+        #endif
     }
 
     func appendOrOverwriteQueryParameters(

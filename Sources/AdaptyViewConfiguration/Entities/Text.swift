@@ -46,47 +46,47 @@ extension AdaptyViewConfiguration.Text.Value: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Text {
-        static func create(
-            text: [AdaptyViewConfiguration.RichText.Item],
-            horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlign,
-            maxRows: Int? = `default`.maxRows,
-            overflowMode: Set<AdaptyViewConfiguration.Text.OverflowMode> = `default`.overflowMode
-        ) -> Self {
-            .init(
-                value: .text(.create(items: text)),
-                horizontalAlign: horizontalAlign,
-                maxRows: maxRows,
-                overflowMode: overflowMode
-            )
-        }
-
-        static func create(
-            text: AdaptyViewConfiguration.RichText,
-            horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlign,
-            maxRows: Int? = `default`.maxRows,
-            overflowMode: Set<AdaptyViewConfiguration.Text.OverflowMode> = `default`.overflowMode
-        ) -> Self {
-            .init(
-                value: .text(text),
-                horizontalAlign: horizontalAlign,
-                maxRows: maxRows,
-                overflowMode: overflowMode
-            )
-        }
-
-        static func create(
-            value: AdaptyViewConfiguration.Text.Value,
-            horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlign,
-            maxRows: Int? = `default`.maxRows,
-            overflowMode: Set<AdaptyViewConfiguration.Text.OverflowMode> = `default`.overflowMode
-        ) -> Self {
-            .init(
-                value: value,
-                horizontalAlign: horizontalAlign,
-                maxRows: maxRows,
-                overflowMode: overflowMode
-            )
-        }
+package extension AdaptyViewConfiguration.Text {
+    static func create(
+        text: [AdaptyViewConfiguration.RichText.Item],
+        horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlign,
+        maxRows: Int? = `default`.maxRows,
+        overflowMode: Set<AdaptyViewConfiguration.Text.OverflowMode> = `default`.overflowMode
+    ) -> Self {
+        .init(
+            value: .text(.create(items: text)),
+            horizontalAlign: horizontalAlign,
+            maxRows: maxRows,
+            overflowMode: overflowMode
+        )
     }
+
+    static func create(
+        text: AdaptyViewConfiguration.RichText,
+        horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlign,
+        maxRows: Int? = `default`.maxRows,
+        overflowMode: Set<AdaptyViewConfiguration.Text.OverflowMode> = `default`.overflowMode
+    ) -> Self {
+        .init(
+            value: .text(text),
+            horizontalAlign: horizontalAlign,
+            maxRows: maxRows,
+            overflowMode: overflowMode
+        )
+    }
+
+    static func create(
+        value: AdaptyViewConfiguration.Text.Value,
+        horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlign,
+        maxRows: Int? = `default`.maxRows,
+        overflowMode: Set<AdaptyViewConfiguration.Text.OverflowMode> = `default`.overflowMode
+    ) -> Self {
+        .init(
+            value: value,
+            horizontalAlign: horizontalAlign,
+            maxRows: maxRows,
+            overflowMode: overflowMode
+        )
+    }
+}
 #endif

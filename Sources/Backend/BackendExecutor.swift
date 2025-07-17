@@ -32,7 +32,7 @@ extension BackendExecutor {
         _ request: Request,
         requestName: APIRequestName,
         logParams: EventParameters? = nil
-    ) async throws -> Request.Response {
+    ) async throws(HTTPError) -> Request.Response {
         let stamp = request.stamp
         Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
         do {
@@ -47,8 +47,8 @@ extension BackendExecutor {
 
     @AdaptyActor
     @inlinable
-    func perform<Request: HTTPRequest & BackendAPIRequestParameters>(
-        _ request: Request
+    func perform(
+        _ request: some HTTPRequest & BackendAPIRequestParameters
     ) async throws -> HTTPEmptyResponse {
         try await perform(request, requestName: request.logName, logParams: request.logParams)
     }
@@ -74,8 +74,8 @@ extension BackendExecutor {
 
     @AdaptyActor
     @inlinable
-    func perform<Body, Request: HTTPRequest & BackendAPIRequestParameters>(
-        _ request: Request,
+    func perform<Body>(
+        _ request: some HTTPRequest & BackendAPIRequestParameters,
         withDecoder decoder: @escaping HTTPDecoder<Body>
     ) async throws -> HTTPResponse<Body> {
         try await perform(request, requestName: request.logName, logParams: request.logParams, withDecoder: decoder)

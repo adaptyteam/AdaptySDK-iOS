@@ -44,8 +44,9 @@ extension AdaptyViewSource.StringId {
 
         static func calculate(
             byPaymentMode mode: AdaptySubscriptionOffer.PaymentMode,
-            suffix: String?)
-        -> String {
+            suffix: String?
+        )
+            -> String {
             let mode = mode.encodedValue ?? "default"
             return if let suffix {
                 "PRODUCT_\(mode)_\(suffix)"
