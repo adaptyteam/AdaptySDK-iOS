@@ -59,9 +59,8 @@ extension Backend.UAExecutor {
                 let response = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil)
                 return response.body.value
             } catch {
-                guard attempt < maxRetries else { throw error }
-                guard let httpError = error as? HTTPError,
-                      UABackend.canRetryRequest(httpError)
+                guard attempt < maxRetries,
+                      UABackend.canRetryRequest(error)
                 else { throw error }
                 attempt += 1
                 try await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
