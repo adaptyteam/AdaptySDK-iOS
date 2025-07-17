@@ -94,6 +94,8 @@ extension Adapty {
                 loadTimeout
             )
         } catch {
+            if error.isProfileWasChanged { throw error }
+
             let profileId = profileStorage.profileId
 
             guard let content: Content = getCacheOrFallbackFilePlacement(
@@ -122,7 +124,10 @@ extension Adapty {
         do {
             return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
                 let manager = try await self.createdProfileManager
-                profileId = manager.profileId
+                if profileId != manager.profileId {
+                    log.verbose("fetchPlacementOrFallbackPlacement: profileId changed from \(profileId) to \(manager.profileId)")
+                    profileId = manager.profileId
+                }
                 return try await self.fetchPlacement(
                     placementId,
                     locale,
@@ -441,9 +446,9 @@ private extension Error {
         return false
     }
 
-    var wrongPlacementContentType: Bool {
-        let error = unwrapped
-        if let httpError = error as? HTTPError { return Backend.wrongPlacementContentType(httpError) }
+    var isProfileWasChanged: Bool {
+        let error = unwrapped as? InternalAdaptyError
+        if let error, case .profileWasChanged = error { return true }
         return false
     }
 
