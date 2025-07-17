@@ -49,7 +49,7 @@ extension AdaptyViewSource.Timer: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case duration
-        case behavior
+        case behavior = "behaviour"
         case format
         case endTime = "end_time"
         case actions = "action"
