@@ -152,6 +152,14 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func getCurrentInstallationStatus(
+        _ completion: @escaping AdaptyResultCompletion<AdaptyInstallationStatus>
+    ) {
+        withCompletion(completion) {
+            try await getCurrentInstallationStatus()
+        }
+    }
+
     /// Adapty allows you remotely configure the products that will be displayed in your app. This way you don't have to hardcode the products and can dynamically change offers or run A/B tests without app releases.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
