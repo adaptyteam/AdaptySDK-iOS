@@ -37,7 +37,11 @@ extension Backend.UAExecutor {
         maxDelay: TimeInterval = 30.0
     ) -> TimeInterval {
         let max = min(base * pow(2.0, Double(attempt)), maxDelay)
-        return Double.random(in: 0 ... max)
+        if max > 500 {
+            return Double.random(in: 500 ... max)
+        } else {
+            return 500
+        }
     }
 
     func registerInstall(
