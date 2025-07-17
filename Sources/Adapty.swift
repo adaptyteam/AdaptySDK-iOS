@@ -1,5 +1,5 @@
 //
-//  Adapty+OLD.swift
+//  Adapty.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.09.2022.
@@ -40,13 +40,8 @@ public final class Adapty: Sendable {
         self.httpFallbackSession = backend.createFallbackExecutor()
         self.httpConfigsSession = backend.createConfigsExecutor()
 
-        #if compiler(>=5.10)
-            let productVendorIdsStorage = ProductVendorIdsStorage()
-            self.variationIdStorage = VariationIdStorage()
-        #else
-            let productVendorIdsStorage = await ProductVendorIdsStorage()
-            self.variationIdStorage = await VariationIdStorage()
-        #endif
+        let productVendorIdsStorage = ProductVendorIdsStorage()
+        self.variationIdStorage = VariationIdStorage()
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             self.receiptManager = StoreKitReceiptManager(session: httpSession)

@@ -16,11 +16,11 @@ package extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.VideoData {
-        static func create(customId: String? = nil, url: URL, image: AdaptyViewConfiguration.ImageData) -> Self {
-            .init(customId: customId, url: url, image: image)
-        }
+package extension AdaptyViewConfiguration.VideoData {
+    static func create(customId: String? = nil, url: URL, image: AdaptyViewConfiguration.ImageData) -> Self {
+        .init(customId: customId, url: url, image: image)
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.VideoData: Hashable {}

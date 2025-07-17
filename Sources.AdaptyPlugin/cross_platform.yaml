@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.8.0/schema"
+$id: "https://adapty.io/crossPlatform/3.10.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -35,8 +35,8 @@ $requests:
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
       custom_timers: { $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
       custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" }
-      android_personalized_offers:
-        { $ref: "#/$defs/AdaptyUI.AndroidPersonalizedOffers" }
+      product_purchase_parameters:
+        { $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters" }
 
   AdaptyUICreatePaywallView.Response: #response
     type: object
@@ -47,26 +47,6 @@ $requests:
       - required: [success]
         properties:
           success: { $ref: "#/$defs/AdaptyUI.PaywallView" }
-
-  ### createOnboardingViewForTest ###
-  AdaptyUICreateOnboardingViewForTest.Request: #request
-    type: object
-    required:
-      - method
-      - placement_id
-    properties:
-      method: { const: "adapty_ui_create_onboarding_view_for_test" }
-      placement_id: { type: string }
-
-  AdaptyUICreateOnboardingViewForTest.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { $ref: "#/$defs/AdaptyUI.OnboardingView" }
 
   ### createOnboardingView ###
   AdaptyUICreateOnboardingView.Request: #request
@@ -419,12 +399,7 @@ $requests:
     properties:
       method: { const: "make_purchase" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      subscription_update_params:
-        {
-          $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
-          description: "Android Only",
-        }
-      is_offer_personalized: { type: boolean, description: "Android Only" }
+      parameters:  { $ref: "#/$defs/AdaptyPurchaseParameters" }
 
   MakePurchase.Response: #response
     type: object
@@ -1115,7 +1090,7 @@ $defs:
         type: object
         required: [lang, config_url]
         properties:
-          lang: { type: string }
+          lang: { $ref: "#/$defs/AdaptyLocale" }
           config_url: { type: string }
       payload_data: { type: string }
       response_created_at: { type: integer }
@@ -1484,6 +1459,14 @@ $defs:
     type: object
     additionalProperties: { type: boolean, nullable: false }
 
+  AdaptyUI.ProductPurchaseParameters:  #request
+    type: object
+    propertyNames: { description: "key is adapty_product_id" }
+    additionalProperties: { 
+      $ref: "#/$defs/AdaptyPurchaseParameters", 
+      nullable: false 
+    }
+
   AdaptyUI.DialogConfiguration: #request
     type: object
     required: [default_action]
@@ -1498,6 +1481,18 @@ $defs:
     enum:
       - primary
       - secondary
+
+   AdaptyPurchaseParameters:  #request
+    type: object
+    properties:
+      subscription_update_params:
+        {
+          $ref: "#/$defs/AdaptySubscriptionUpdateParameters",
+          description: "Android Only",
+        }
+      is_offer_personalized: { type: boolean, description: "Android Only" }
+      obfuscated_account_id: { type: string, description: "Android Only" }
+      obfuscated_profile_id: { type: string, description: "Android Only" }
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
     type: object

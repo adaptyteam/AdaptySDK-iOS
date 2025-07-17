@@ -13,8 +13,7 @@ extension SK1Product {
     var introductoryOfferNotApplicable: Bool {
         if let period = subscriptionPeriod,
            period.numberOfUnits > 0,
-           introductoryPrice != nil
-        {
+           introductoryPrice != nil {
             false
         } else {
             true
@@ -34,7 +33,7 @@ extension SK1Product {
             switch offerIdentifier {
             case .introductory:
                 unfIntroductoryOffer
-            case .promotional(let id):
+            case let .promotional(id):
                 unfPromotionalOffer(byId: id)
             default:
                 nil

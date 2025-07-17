@@ -70,6 +70,7 @@ package extension AdaptyUI {
         }
 #endif
         
+#if canImport(UIKit)
         package static func createPaywallView(
             paywall: AdaptyPaywall,
             loadTimeout: TimeInterval?,
@@ -78,7 +79,7 @@ package extension AdaptyUI {
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyAssetsResolver?
         ) async throws -> AdaptyUI.PaywallView {
-#if canImport(UIKit)
+
             let products: [AdaptyPaywallProduct]?
             
             if preloadProducts {
@@ -100,10 +101,8 @@ package extension AdaptyUI {
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
             cachePaywallController(vc, id: vc.id.uuidString)
             return vc.toAdaptyUIView()
-#else
-            throw AdaptyUIError.platformNotSupported
-#endif
         }
+#endif
 
         package static func presentPaywallView(
             viewId: String

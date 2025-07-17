@@ -24,17 +24,17 @@ package extension AdaptyViewConfiguration.Offset {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Offset {
-        static func create(
-            x: Double = 0.0,
-            y: Double = 0.0
-        ) -> Self {
-            .init(
-                x: x,
-                y: y
-            )
-        }
+package extension AdaptyViewConfiguration.Offset {
+    static func create(
+        x: Double = 0.0,
+        y: Double = 0.0
+    ) -> Self {
+        .init(
+            x: x,
+            y: y
+        )
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.Offset: Codable {

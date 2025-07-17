@@ -25,11 +25,11 @@ package extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Color {
-        static func create(customId: String? = nil, data: UInt64) -> Self {
-            .init(customId: customId, data: data)
-        }
+package extension AdaptyViewConfiguration.Color {
+    static func create(customId: String? = nil, data: UInt64) -> Self {
+        .init(customId: customId, data: data)
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.Color: Codable {

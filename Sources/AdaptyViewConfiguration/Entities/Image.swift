@@ -18,17 +18,17 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Image {
-        static func create(
-            asset: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.ImageData>,
-            aspect: AdaptyViewConfiguration.AspectRatio = defaultAspectRatio,
-            tint: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil
-        ) -> Self {
-            .init(
-                asset: asset,
-                aspect: aspect,
-                tint: tint
-            )
-        }
+package extension AdaptyViewConfiguration.Image {
+    static func create(
+        asset: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.ImageData>,
+        aspect: AdaptyViewConfiguration.AspectRatio = defaultAspectRatio,
+        tint: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil
+    ) -> Self {
+        .init(
+            asset: asset,
+            aspect: aspect,
+            tint: tint
+        )
     }
+}
 #endif

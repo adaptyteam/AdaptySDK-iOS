@@ -9,9 +9,9 @@ import Foundation
 
 package protocol CodingUserInfoContainer: AnyObject {
     #if compiler(>=6.1.0)
-        var userInfo: [CodingUserInfoKey: any Sendable] { get set }
+    var userInfo: [CodingUserInfoKey: any Sendable] { get set }
     #else
-        var userInfo: [CodingUserInfoKey: Any] { get set }
+    var userInfo: [CodingUserInfoKey: Any] { get set }
     #endif
 }
 

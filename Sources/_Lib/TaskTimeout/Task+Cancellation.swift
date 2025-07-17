@@ -15,7 +15,6 @@ func withTaskCancellationWithError<T: Sendable>(
     let once = OncePerformer()
     return try await withTaskCancellationHandler { @PerformerActor in
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<T, Error>) in
-
             guard !Task.isCancelled else {
                 continuation.resume(throwing: onCancelError)
                 return

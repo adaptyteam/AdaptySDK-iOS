@@ -8,6 +8,7 @@
 import Foundation
 
 extension Event {
+    static var defaultBlackList: Set<String> { Set([Name.system.rawValue]) }
     private enum Name: String, Sendable, Hashable {
         case appOpened = "app_opened"
         case paywallShowed = "paywall_showed"

@@ -85,14 +85,12 @@ extension PurchasedTransaction {
         sk2Transaction: SK2Transaction
     ) {
         let offer: PurchasedTransaction.SubscriptionOffer? = {
-            #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
-                if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-                    return .init(
-                        sk2TransactionOffer: sk2Transaction.offer,
-                        sk2Product: sk2Product
-                    )
-                }
-            #endif
+            if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+                return .init(
+                    sk2TransactionOffer: sk2Transaction.offer,
+                    sk2Product: sk2Product
+                )
+            }
             return .init(
                 sk2Transaction: sk2Transaction,
                 sk2Product: sk2Product
@@ -164,26 +162,24 @@ private extension PurchasedTransaction.SubscriptionOffer {
         )
     }
 
-    #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
-        @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
-        init?(
-            sk2TransactionOffer: SK2Transaction.Offer?,
-            sk2Product: SK2Product?
-        ) {
-            guard let sk2TransactionOffer else { return nil }
-            let sk2ProductOffer = sk2Product?.subscriptionOffer(
-                byType: sk2TransactionOffer.type.asPurchasedTransactionOfferType,
-                withId: sk2TransactionOffer.id
-            )
-            self = .init(
-                id: sk2TransactionOffer.id,
-                period: (sk2ProductOffer?.period).map { $0.asAdaptySubscriptionPeriod },
-                paymentMode: sk2TransactionOffer.paymentMode.map { $0.asPaymentMode } ?? .unknown,
-                offerType: sk2TransactionOffer.type.asPurchasedTransactionOfferType,
-                price: sk2ProductOffer?.price
-            )
-        }
-    #endif
+    @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
+    init?(
+        sk2TransactionOffer: SK2Transaction.Offer?,
+        sk2Product: SK2Product?
+    ) {
+        guard let sk2TransactionOffer else { return nil }
+        let sk2ProductOffer = sk2Product?.subscriptionOffer(
+            byType: sk2TransactionOffer.type.asPurchasedTransactionOfferType,
+            withId: sk2TransactionOffer.id
+        )
+        self = .init(
+            id: sk2TransactionOffer.id,
+            period: (sk2ProductOffer?.period).map { $0.asAdaptySubscriptionPeriod },
+            paymentMode: sk2TransactionOffer.paymentMode.map { $0.asPaymentMode } ?? .unknown,
+            offerType: sk2TransactionOffer.type.asPurchasedTransactionOfferType,
+            price: sk2ProductOffer?.price
+        )
+    }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -204,11 +200,9 @@ private extension SK2Product {
         case .code:
             return nil
         case .winBack:
-            #if compiler(>=6)
-                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *), let offerId {
-                    return subscription.winBackOffers.first { $0.id == offerId }
-                }
-            #endif
+            if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *), let offerId {
+                return subscription.winBackOffers.first { $0.id == offerId }
+            }
         default:
             return nil
         }

@@ -8,7 +8,7 @@
 import Foundation
 
 package extension AdaptyViewConfiguration {
-    enum ActionAction: Sendable {
+    enum Action: Sendable {
         case openUrl(String?)
         case restore
         case custom(id: String)
@@ -24,7 +24,7 @@ package extension AdaptyViewConfiguration {
     }
 }
 
-extension AdaptyViewConfiguration.ActionAction: Hashable {
+extension AdaptyViewConfiguration.Action: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .openUrl(value):

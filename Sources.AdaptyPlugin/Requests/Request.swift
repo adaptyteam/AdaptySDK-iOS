@@ -41,6 +41,7 @@ enum Request {
             GetCurrentInstallationStatus.self
         ]
 
+#if canImport(UIKit)
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
                 AdaptyUICreatePaywallView.self,
@@ -55,6 +56,7 @@ enum Request {
             ]
             allRequests.append(contentsOf: adaptyUiRequests)
         }
+#endif
 
         return Dictionary(allRequests.map { ($0.method, $0) }) { _, last in last }
     }()

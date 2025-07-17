@@ -49,7 +49,6 @@ actor SK1QueueManager: Sendable {
             case .winBack:
                 throw StoreKitManagerError.invalidOffer("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
             case let .promotional(offerId):
-
                 let response = try await purchaseValidator.signSubscriptionOffer(
                     profileId: profileId,
                     vendorProductId: product.vendorProductId,
@@ -238,7 +237,6 @@ actor SK1QueueManager: Sendable {
     ) {
         switch result {
         case let .failure(error):
-
             log.error("Failed to purchase product: \(productId) \(error.localizedDescription)")
         case .success:
             log.info("Successfully purchased product: \(productId).")
@@ -312,31 +310,31 @@ extension SK1QueueManager {
         }
 
         #if !os(watchOS)
-            func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for sk1Product: SKProduct) -> Bool {
-                guard let delegate = Adapty.delegate else {
-                    Task {
-                        await wrapped.shouldAddStorePaymentOccurred(
-                            product: sk1Product,
-                            hasDelegate: false,
-                            result: true
-                        )
-                    }
-                    return true
-                }
-
-                let deferredProduct = AdaptyDeferredProduct(sk1Product: sk1Product, payment: payment)
-                let result = delegate.shouldAddStorePayment(for: deferredProduct)
-
+        func paymentQueue(_: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for sk1Product: SKProduct) -> Bool {
+            guard let delegate = Adapty.delegate else {
                 Task {
                     await wrapped.shouldAddStorePaymentOccurred(
                         product: sk1Product,
-                        hasDelegate: true,
-                        result: result
+                        hasDelegate: false,
+                        result: true
                     )
                 }
-
-                return result
+                return true
             }
+
+            let deferredProduct = AdaptyDeferredProduct(sk1Product: sk1Product, payment: payment)
+            let result = delegate.shouldAddStorePayment(for: deferredProduct)
+
+            Task {
+                await wrapped.shouldAddStorePaymentOccurred(
+                    product: sk1Product,
+                    hasDelegate: true,
+                    result: result
+                )
+            }
+
+            return result
+        }
         #endif
     }
 }

@@ -24,17 +24,17 @@ package extension AdaptyViewConfiguration.Point {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Point {
-        static func create(
-            x: Double = 0.0,
-            y: Double = 0.0
-        ) -> Self {
-            .init(
-                x: x,
-                y: y
-            )
-        }
+package extension AdaptyViewConfiguration.Point {
+    static func create(
+        x: Double = 0.0,
+        y: Double = 0.0
+    ) -> Self {
+        .init(
+            x: x,
+            y: y
+        )
     }
+}
 #endif
 
 extension AdaptyViewConfiguration.Point: Codable {

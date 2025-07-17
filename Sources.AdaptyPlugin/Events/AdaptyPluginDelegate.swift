@@ -44,9 +44,13 @@ import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPlugin {
+    static let xibName = "AdaptyOnboardingPlaceholderView"
+    
     static func instantiateOnboardingPlaceholderView() -> UIView? {
-        Bundle.main.loadNibNamed(
-            "AdaptyOnboardingPlaceholderView",
+        guard Bundle.main.path(forResource: xibName, ofType: "nib") != nil else { return nil }
+        
+        return Bundle.main.loadNibNamed(
+            xibName,
             owner: nil,
             options: nil
         )?.first as? UIView

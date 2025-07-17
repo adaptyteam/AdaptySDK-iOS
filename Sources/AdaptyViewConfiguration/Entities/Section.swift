@@ -16,17 +16,17 @@ extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Section {
-        static func create(
-            id: String = UUID().uuidString,
-            index: Int = 0,
-            content: [AdaptyViewConfiguration.Element]
-        ) -> Self {
-            .init(
-                id: id,
-                index: index,
-                content: content
-            )
-        }
+package extension AdaptyViewConfiguration.Section {
+    static func create(
+        id: String = UUID().uuidString,
+        index: Int = 0,
+        content: [AdaptyViewConfiguration.Element]
+    ) -> Self {
+        .init(
+            id: id,
+            index: index,
+            content: content
+        )
     }
+}
 #endif

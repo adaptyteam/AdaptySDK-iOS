@@ -7,7 +7,7 @@
 
 import StoreKit
 
-struct AdaptySK1PaywallProduct: AdaptySK1Product, WebPaywallURLProviding {
+struct AdaptySK1PaywallProduct: AdaptySK1Product, AdaptyPaywallProduct, WebPaywallURLProviding {
     let skProduct: SK1Product
 
     public let adaptyProductId: String
@@ -32,9 +32,7 @@ struct AdaptySK1PaywallProduct: AdaptySK1Product, WebPaywallURLProviding {
     }
 }
 
-extension AdaptySK1PaywallProduct: AdaptyPaywallProduct {}
-
-struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, WebPaywallURLProviding {
+struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, AdaptyPaywallProductWithoutDeterminingOffer, WebPaywallURLProviding {
     let skProduct: SK1Product
 
     public let adaptyProductId: String
@@ -56,5 +54,3 @@ struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, WebPayw
         "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
     }
 }
-
-extension AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptyPaywallProductWithoutDeterminingOffer {}

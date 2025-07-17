@@ -118,7 +118,6 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
 
     func refresh(_ completion: @escaping AdaptyErrorCompletion) {
         queue.async { [weak self] in
-
             guard let self else {
                 completion(StoreKitManagerError.interrupted().asAdaptyError)
                 return
@@ -152,7 +151,6 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
         }
 
         queue.async { [weak self] in
-
             guard let self else { return }
 
             guard let handlers = self.refreshCompletionHandlers, !handlers.isEmpty else {

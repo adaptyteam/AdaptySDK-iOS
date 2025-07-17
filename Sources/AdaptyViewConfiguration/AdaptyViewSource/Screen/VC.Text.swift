@@ -78,7 +78,7 @@ extension AdaptyViewSource.Text: Codable {
     }
 
     func encode(to encoder: any Encoder) throws {
-        if let defaultTextAttributes = defaultTextAttributes, !defaultTextAttributes.isEmpty {
+        if let defaultTextAttributes, !defaultTextAttributes.isEmpty {
             try defaultTextAttributes.encode(to: encoder)
         }
         var container = encoder.container(keyedBy: CodingKeys.self)

@@ -16,35 +16,35 @@ import Foundation
 extension Environment {
     enum Device {
         #if targetEnvironment(simulator)
-            static let isSimulator = true
+        static let isSimulator = true
         #else
-            static let isSimulator = false
+        static let isSimulator = false
         #endif
 
         static let model: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)
-                let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+            let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
 
-                var modelIdentifier: String?
-                if let modelData = IORegistryEntryCreateCFProperty(service, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data {
-                    modelIdentifier = String(data: modelData, encoding: .utf8)?.trimmingCharacters(in: .controlCharacters)
-                }
-                IOObjectRelease(service)
+            var modelIdentifier: String?
+            if let modelData = IORegistryEntryCreateCFProperty(service, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data {
+                modelIdentifier = String(data: modelData, encoding: .utf8)?.trimmingCharacters(in: .controlCharacters)
+            }
+            IOObjectRelease(service)
 
-                if modelIdentifier?.isEmpty ?? false {
-                    modelIdentifier = nil
-                }
+            if modelIdentifier?.isEmpty ?? false {
+                modelIdentifier = nil
+            }
 
-                return modelIdentifier ?? "unknown device"
+            return modelIdentifier ?? "unknown device"
 
             #else
-                var systemInfo = utsname()
-                uname(&systemInfo)
-                let machineMirror = Mirror(reflecting: systemInfo.machine)
-                return machineMirror.children.reduce("") { identifier, element in
-                    guard let value = element.value as? Int8, value != 0 else { return identifier }
-                    return identifier + String(UnicodeScalar(UInt8(value)))
-                }
+            var systemInfo = utsname()
+            uname(&systemInfo)
+            let machineMirror = Mirror(reflecting: systemInfo.machine)
+            return machineMirror.children.reduce("") { identifier, element in
+                guard let value = element.value as? Int8, value != 0 else { return identifier }
+                return identifier + String(UnicodeScalar(UInt8(value)))
+            }
             #endif
         }()
 

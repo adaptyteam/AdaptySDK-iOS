@@ -54,8 +54,7 @@ extension HTTPRequest {
 
             if let contentType = dataRequest.contentType
                 ?? (configuration as? HTTPCodableConfiguration)?.defaultEncodedContentType,
-                request.value(forHTTPHeaderField: HeaderKey.contentType)?.isEmpty ?? true
-            {
+                request.value(forHTTPHeaderField: HeaderKey.contentType)?.isEmpty ?? true {
                 request.setValue(contentType, forHTTPHeaderField: HeaderKey.contentType)
             }
         }
