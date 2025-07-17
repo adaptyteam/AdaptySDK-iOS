@@ -1,5 +1,5 @@
 //
-//  Adapty+Paywalls.swift
+//  Adapty+Placements.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.11.2023
@@ -146,10 +146,12 @@ extension Adapty {
 
         let cached: Content? = manager
             .placementStorage
-            .getPlacementByLocale(locale,
-                                  orDefaultLocale: true,
-                                  withPlacementId: placementId,
-                                  withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId))?
+            .getPlacementByLocale(
+                locale,
+                orDefaultLocale: true,
+                withPlacementId: placementId,
+                withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId)
+            )?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -197,88 +199,87 @@ extension Adapty {
             let caseWithPaywallVariation = variationId != nil
 
             do {
-                var chosen: AdaptyPlacementChosen<Content>
+                var chosen: AdaptyPlacementChosen<Content> =
+                    if let variationId {
+                        try await httpSession.fetchPlacement(
+                            apiKeyPrefix: apiKeyPrefix,
+                            profileId: profileId,
+                            placementId: placementId,
+                            variationId: variationId,
+                            locale: locale,
+                            cached: cached,
+                            disableServerCache: isTestUser
+                        )
+                    } else if let crossPlacementState, crossPlacementState.canParticipateInABTest {
+                        try await httpSession.fetchPlacementVariations(
+                            apiKeyPrefix: apiKeyPrefix,
+                            profileId: profileId,
+                            placementId: placementId,
+                            locale: locale,
+                            segmentId: segmentId,
+                            cached: cached,
+                            crossPlacementEligible: true,
+                            variationIdResolver: { @AdaptyActor placementId, draw in
+                                guard let manager = self.tryProfileManagerOrNil(with: draw.profileId) else {
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), error = PROFILE_WAS_CHANGED")
+                                    throw ResponseDecodingError.profileWasChanged
+                                }
 
-                if let variationId {
-                    chosen = try await httpSession.fetchPlacement(
-                        apiKeyPrefix: apiKeyPrefix,
-                        profileId: profileId,
-                        placementId: placementId,
-                        variationId: variationId,
-                        locale: locale,
-                        cached: cached,
-                        disableServerCache: isTestUser
-                    )
-                } else if let crossPlacementState, crossPlacementState.canParticipateInABTest {
-                    chosen = try await httpSession.fetchPlacementVariations(
-                        apiKeyPrefix: apiKeyPrefix,
-                        profileId: profileId,
-                        placementId: placementId,
-                        locale: locale,
-                        segmentId: segmentId,
-                        cached: cached,
-                        crossPlacementEligible: true,
-                        variationIdResolver: { @AdaptyActor placementId, draw in
-                            guard let manager = self.tryProfileManagerOrNil(with: draw.profileId) else {
-                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), error = PROFILE_WAS_CHANGED")
-                                throw ResponseDecodingError.profileWasChanged
-                            }
+                                guard let crossPlacementState = manager.storage.crossPlacementState else {
+                                    // We are prohibited from participating in Cross AB Tests
+                                    if draw.participatesInCrossPlacementABTest {
+                                        Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
+                                        throw ResponseDecodingError.crossPlacementABTestDisabled
+                                    } else {
+                                        Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.content.variationId) DRAW")
+                                        return draw.content.variationId
+                                    }
+                                }
 
-                            guard let crossPlacementState = manager.storage.crossPlacementState else {
-                                // We are prohibited from participating in Cross AB Tests
-                                if draw.participatesInCrossPlacementABTest {
-                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
-                                    throw ResponseDecodingError.crossPlacementABTestDisabled
+                                if crossPlacementState.canParticipateInABTest {
+                                    if draw.participatesInCrossPlacementABTest {
+                                        Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.content.variationId), state = \(draw.variationIdByPlacements) DRAW")
+                                        manager.storage.setCrossPlacementState(.init(
+                                            variationIdByPlacements: draw.variationIdByPlacements,
+                                            version: crossPlacementState.version
+                                        ))
+                                    } else {
+                                        Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(draw.content.variationId) DRAW")
+                                    }
+                                    return draw.content.variationId
+                                } else if let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId) {
+                                    // We are participating in cross AB test: A
+                                    // And the paywall is from cross AB test: A
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE -> variationId = \(variationId)")
+                                    return variationId
+                                } else if !draw.participatesInCrossPlacementABTest {
+                                    // We are participating in cross AB test: A
+                                    // But the paywall is not in any cross AB test
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(draw.content.variationId) DRAW")
+                                    return draw.content.variationId
                                 } else {
-                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.content.variationId) DRAW")
+                                    // We are participating in cross AB test: A
+                                    // But the paywall is from cross AB test: B
+                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(draw.content.variationId) DRAW")
                                     return draw.content.variationId
                                 }
-                            }
 
-                            if crossPlacementState.canParticipateInABTest {
-                                if draw.participatesInCrossPlacementABTest {
-                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.content.variationId), state = \(draw.variationIdByPlacements) DRAW")
-                                    manager.storage.setCrossPlacementState(.init(
-                                        variationIdByPlacements: draw.variationIdByPlacements,
-                                        version: crossPlacementState.version
-                                    ))
-                                } else {
-                                    Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN-NO-CROSS -> variationId = \(draw.content.variationId) DRAW")
-                                }
-                                return draw.content.variationId
-                            } else if let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId) {
-                                // We are participating in cross AB test: A
-                                // And the paywall is from cross AB test: A
-                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE -> variationId = \(variationId)")
-                                return variationId
-                            } else if !draw.participatesInCrossPlacementABTest {
-                                // We are participating in cross AB test: A
-                                // But the paywall is not in any cross AB test
-                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-NO-CROSS -> variationId = \(draw.content.variationId) DRAW")
-                                return draw.content.variationId
-                            } else {
-                                // We are participating in cross AB test: A
-                                // But the paywall is from cross AB test: B
-                                Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), CONTINUE-OTHER-CROSS -> variationId = \(draw.content.variationId) DRAW")
-                                return draw.content.variationId
-                            }
-
-                        },
-                        disableServerCache: isTestUser
-                    )
-                } else {
-                    chosen = try await httpSession.fetchPlacementVariations(
-                        apiKeyPrefix: apiKeyPrefix,
-                        profileId: profileId,
-                        placementId: placementId,
-                        locale: locale,
-                        segmentId: segmentId,
-                        cached: cached,
-                        crossPlacementEligible: false,
-                        variationIdResolver: nil,
-                        disableServerCache: isTestUser
-                    )
-                }
+                            },
+                            disableServerCache: isTestUser
+                        )
+                    } else {
+                        try await httpSession.fetchPlacementVariations(
+                            apiKeyPrefix: apiKeyPrefix,
+                            profileId: profileId,
+                            placementId: placementId,
+                            locale: locale,
+                            segmentId: segmentId,
+                            cached: cached,
+                            crossPlacementEligible: false,
+                            variationIdResolver: nil,
+                            disableServerCache: isTestUser
+                        )
+                    }
 
                 if let manager = tryProfileManagerOrNil(with: profileId) {
                     chosen = manager.placementStorage.savedPlacementChosen(chosen)
@@ -359,30 +360,31 @@ extension Adapty {
             }()
 
             do {
-                var chosen: AdaptyPlacementChosen<Content> = if let variationId {
-                    try await httpFallbackSession.fetchFallbackPlacement(
-                        apiKeyPrefix: apiKeyPrefix,
-                        profileId: profileId,
-                        placementId: placementId,
-                        paywallVariationId: variationId,
-                        locale: locale,
-                        cached: nil,
-                        disableServerCache: isTestUser,
-                        timeoutInterval: timeoutInterval
-                    )
-                } else {
-                    try await httpFallbackSession.fetchFallbackPlacementVariations(
-                        apiKeyPrefix: apiKeyPrefix,
-                        profileId: profileId,
-                        placementId: placementId,
-                        locale: locale,
-                        cached: cached,
-                        crossPlacementEligible: false,
-                        variationIdResolver: nil,
-                        disableServerCache: isTestUser,
-                        timeoutInterval: timeoutInterval
-                    )
-                }
+                var chosen: AdaptyPlacementChosen<Content> =
+                    if let variationId {
+                        try await httpFallbackSession.fetchFallbackPlacement(
+                            apiKeyPrefix: apiKeyPrefix,
+                            profileId: profileId,
+                            placementId: placementId,
+                            paywallVariationId: variationId,
+                            locale: locale,
+                            cached: nil,
+                            disableServerCache: isTestUser,
+                            timeoutInterval: timeoutInterval
+                        )
+                    } else {
+                        try await httpFallbackSession.fetchFallbackPlacementVariations(
+                            apiKeyPrefix: apiKeyPrefix,
+                            profileId: profileId,
+                            placementId: placementId,
+                            locale: locale,
+                            cached: cached,
+                            crossPlacementEligible: false,
+                            variationIdResolver: nil,
+                            disableServerCache: isTestUser,
+                            timeoutInterval: timeoutInterval
+                        )
+                    }
 
                 if let manager = tryProfileManagerOrNil(with: profileId) {
                     chosen = manager.placementStorage.savedPlacementChosen(chosen)

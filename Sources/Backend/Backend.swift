@@ -12,6 +12,7 @@ package struct Backend: HTTPCodableConfiguration {
     let sessionConfiguration: URLSessionConfiguration
     let fallback: RemoteFilesBackend
     let configs: RemoteFilesBackend
+    let ua: UABackend
 
     let defaultEncodedContentType = "application/vnd.api+json"
 
@@ -23,7 +24,7 @@ package struct Backend: HTTPCodableConfiguration {
         let apiKey = configuration.apiKey
 
         let sessionConfiguration = URLSessionConfiguration.ephemeral
-        sessionConfiguration.httpAdditionalHeaders = Request.globalHeaders(configuration, environment)
+        sessionConfiguration.httpAdditionalHeaders = Request.globalHeadersWithStoreKit(configuration, environment)
         sessionConfiguration.timeoutIntervalForRequest = 30
         sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
 
@@ -50,6 +51,8 @@ package struct Backend: HTTPCodableConfiguration {
             baseURL: baseUrls.configsUrl,
             withProxy: baseUrls.proxy
         )
+
+        self.ua = UABackend(with: configuration, environment: environment)
     }
 }
 

@@ -5,6 +5,8 @@
 //  Created by Aleksei Valiano on 20.05.2025.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import AdaptyUI
 import UIKit
@@ -90,3 +92,5 @@ private extension String {
         }
     }
 }
+
+#endif

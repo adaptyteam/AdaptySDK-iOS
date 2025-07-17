@@ -54,37 +54,37 @@ extension AdaptyViewConfiguration.RichText.Item: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.RichText {
-        static func create(
-            items: [AdaptyViewConfiguration.RichText.Item],
-            fallback: [AdaptyViewConfiguration.RichText.Item]? = nil
-        ) -> Self {
-            .init(
-                items: items,
-                fallback: fallback
-            )
-        }
+package extension AdaptyViewConfiguration.RichText {
+    static func create(
+        items: [AdaptyViewConfiguration.RichText.Item],
+        fallback: [AdaptyViewConfiguration.RichText.Item]? = nil
+    ) -> Self {
+        .init(
+            items: items,
+            fallback: fallback
+        )
     }
+}
 
-    package extension AdaptyViewConfiguration.RichText.TextAttributes {
-        static func create(
-            font: AdaptyViewConfiguration.Font,
-            size: Double? = nil,
-            txtColor: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil,
-            imgTintColor: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil,
-            background: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil,
-            strike: Bool = false,
-            underline: Bool = false
-        ) -> Self {
-            .init(
-                font: font,
-                size: size ?? font.defaultSize,
-                txtColor: txtColor ?? .same(font.defaultColor),
-                imageTintColor: imgTintColor,
-                background: background,
-                strike: strike,
-                underline: underline
-            )
-        }
+package extension AdaptyViewConfiguration.RichText.TextAttributes {
+    static func create(
+        font: AdaptyViewConfiguration.Font,
+        size: Double? = nil,
+        txtColor: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil,
+        imgTintColor: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil,
+        background: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>? = nil,
+        strike: Bool = false,
+        underline: Bool = false
+    ) -> Self {
+        .init(
+            font: font,
+            size: size ?? font.defaultSize,
+            txtColor: txtColor ?? .same(font.defaultColor),
+            imageTintColor: imgTintColor,
+            background: background,
+            strike: strike,
+            underline: underline
+        )
     }
+}
 #endif

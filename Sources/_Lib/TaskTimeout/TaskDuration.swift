@@ -32,7 +32,7 @@ enum TaskDuration: Comparable, Sendable {
         case let .nanoseconds(nanoseconds):
             Double(nanoseconds) / 1_000_000_000
         case let .milliseconds(milliseconds):
-            Double(milliseconds) / 1_000
+            Double(milliseconds) / 1000
         case let .seconds(seconds):
             Double(seconds)
         case let .minutes(minutes):
@@ -54,14 +54,14 @@ enum TaskDuration: Comparable, Sendable {
         case let .milliseconds(milliseconds):
             milliseconds
         case let .seconds(seconds):
-            seconds * 1_000
+            seconds * 1000
         case let .minutes(minutes):
-            minutes * 60 * 1_000
+            minutes * 60 * 1000
         case let .hours(hours):
-            hours * 60 * 60 * 1_000
+            hours * 60 * 60 * 1000
         }
     }
-    
+
     @inlinable
     var asNanoseconds: UInt64 {
         switch self {

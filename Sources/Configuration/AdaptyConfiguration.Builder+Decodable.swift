@@ -18,6 +18,7 @@ extension AdaptyConfiguration.Builder: Decodable {
         case backendBaseUrl = "backend_base_url"
         case backendFallbackBaseUrl = "backend_fallback_base_url"
         case backendConfigsBaseUrl = "backend_configs_base_url"
+        case backendUABaseUrl = "backend_ua_base_url"
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
 
@@ -59,6 +60,7 @@ extension AdaptyConfiguration.Builder: Decodable {
             backendBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendBaseUrl),
             backendFallbackBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl),
             backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl),
+            backendUABaseUrl: container.decodeIfPresent(URL.self, forKey: .backendUABaseUrl),
             backendProxy: proxy,
             logLevel: container.decodeIfPresent(AdaptyLog.Level.self, forKey: .logLevel),
             crossPlatformSDK: crossPlatformSDK
@@ -68,10 +70,11 @@ extension AdaptyConfiguration.Builder: Decodable {
 
 extension AdaptyConfiguration.ServerCluster: Decodable {
     public init(from decoder: Decoder) throws {
-        self = switch try decoder.singleValueContainer().decode(String.self) {
-        case "eu": .eu
-        case "cn": .cn
-        default: .default
-        }
+        self =
+            switch try decoder.singleValueContainer().decode(String.self) {
+            case "eu": .eu
+            case "cn": .cn
+            default: .default
+            }
     }
 }

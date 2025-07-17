@@ -166,7 +166,7 @@ extension AdaptyViewSource.Element: Codable {
         }
     }
 
-    func encode(to encoder: any Encoder) throws {
+    func encode(to _: any Encoder) throws {
         // TODO: implement
     }
 }

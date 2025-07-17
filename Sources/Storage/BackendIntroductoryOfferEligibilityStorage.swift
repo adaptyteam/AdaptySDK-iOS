@@ -27,7 +27,7 @@ final class BackendIntroductoryOfferEligibilityStorage: Sendable {
 
     func getIneligibleProductIds() -> Set<String> { Self.ineligibleProductIds }
 
-    private func setIneligibleProductIds<S: Sequence>(_ ids: S) where S.Element == String {
+    private func setIneligibleProductIds(_ ids: some Sequence<String>) {
         let old = Self.ineligibleProductIds
         let union = old.union(ids)
 

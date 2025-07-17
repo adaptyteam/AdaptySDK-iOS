@@ -122,15 +122,6 @@ extension Backend {
     }
 }
 
-extension Encoder {
-    func backendContainer<Key: CodingKey>(type: String, keyedBy: Key.Type) throws -> KeyedEncodingContainer<Key> {
-        var container = container(keyedBy: Backend.CodingKeys.self)
-        var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
-        try dataObject.encode(type, forKey: .type)
-        return dataObject.nestedContainer(keyedBy: Key.self, forKey: .attributes)
-    }
-}
-
 extension Backend.Response {
     struct Data<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
         let value: Value
@@ -139,6 +130,18 @@ extension Backend.Response {
             value = try decoder
                 .container(keyedBy: Backend.CodingKeys.self)
                 .decode(Value.self, forKey: .data)
+        }
+        
+        
+    }
+    
+    struct OptionalData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+        let value: Value?
+
+        init(from decoder: Decoder) throws {
+            value = try decoder
+                .container(keyedBy: Backend.CodingKeys.self)
+                .decodeIfPresent(Value.self, forKey: .data)
         }
     }
 

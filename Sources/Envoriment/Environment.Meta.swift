@@ -50,8 +50,6 @@ extension Environment {
             case timezone
             case idfa
             case idfv
-            case screenWidth = "screen_width"
-            case screenHeight = "screen_height"
         }
 
         func encode(to encoder: Encoder) throws {
@@ -61,7 +59,7 @@ extension Environment {
             try container.encodeIfPresent(environment.application.build, forKey: .appBuild)
             try container.encodeIfPresent(environment.application.version, forKey: .appVersion)
             try container.encodeIfPresent(webUserAgent, forKey: .webUserAgent)
-            try container.encode(Device.name, forKey: .device)
+            try container.encode(Device.model, forKey: .device)
             try container.encode(environment.system.version, forKey: .sysVersion)
             try container.encode(environment.system.name, forKey: .sysName)
             try container.encodeIfPresent(locale, forKey: .locale)

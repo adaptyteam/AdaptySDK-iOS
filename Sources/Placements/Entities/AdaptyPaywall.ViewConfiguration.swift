@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywall+ViewConfiguration.swift.swift
+//  AdaptyPaywall.ViewConfiguration.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 10.04.2024

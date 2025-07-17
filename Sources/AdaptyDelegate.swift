@@ -19,29 +19,21 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
     ///
     /// If you return `false`, you can continue the transaction later by manually calling the `defermentCompletion`.
     func shouldAddStorePayment(for product: AdaptyDeferredProduct) -> Bool
+
+    func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails)
+
+    func onInstallationDetailsFail(error: AdaptyError)
 }
 
 public extension AdaptyDelegate {
     func shouldAddStorePayment(for _: AdaptyDeferredProduct) -> Bool { true }
+    func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails) {}
+    func onInstallationDetailsFail(error: AdaptyError) {}
 }
 
 extension Adapty {
-    #if compiler(>=5.10)
-        /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
-        public nonisolated(unsafe) static var delegate: AdaptyDelegate?
-    #else
-        /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
-        public nonisolated static var delegate: AdaptyDelegate? {
-            get { _nonisolatedUnsafe.delegate }
-            set { _nonisolatedUnsafe.delegate = newValue }
-        }
-
-        private final class NonisolatedUnsafe: @unchecked Sendable {
-            weak var delegate: AdaptyDelegate?
-        }
-
-        private nonisolated static let _nonisolatedUnsafe = NonisolatedUnsafe()
-    #endif
+    /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
+    public nonisolated(unsafe) static var delegate: AdaptyDelegate?
 
     static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
         guard let delegate = Adapty.delegate else { return }

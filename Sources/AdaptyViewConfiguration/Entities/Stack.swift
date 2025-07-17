@@ -61,39 +61,39 @@ extension AdaptyViewConfiguration.StackItem: Hashable {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Stack {
-        static func create(
-            type: AdaptyViewConfiguration.StackType = `default`.type,
-            horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlignment,
-            verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = `default`.verticalAlignment,
-            spacing: Double = `default`.spacing,
-            content: [AdaptyViewConfiguration.Element] = []
-        ) -> Self {
-            .init(
-                type: type,
-                horizontalAlignment: horizontalAlignment,
-                verticalAlignment: verticalAlignment,
-                spacing: spacing,
-                items: content.map { .element($0) }
-            )
-        }
+package extension AdaptyViewConfiguration.Stack {
+    static func create(
+        type: AdaptyViewConfiguration.StackType = `default`.type,
+        horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlignment,
+        verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = `default`.verticalAlignment,
+        spacing: Double = `default`.spacing,
+        content: [AdaptyViewConfiguration.Element] = []
+    ) -> Self {
+        .init(
+            type: type,
+            horizontalAlignment: horizontalAlignment,
+            verticalAlignment: verticalAlignment,
+            spacing: spacing,
+            items: content.map { .element($0) }
+        )
     }
+}
 
-    package extension AdaptyViewConfiguration.Stack {
-        static func create(
-            type: AdaptyViewConfiguration.StackType = `default`.type,
-            horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlignment,
-            verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = `default`.verticalAlignment,
-            spacing: Double = `default`.spacing,
-            items: [AdaptyViewConfiguration.StackItem] = `default`.items
-        ) -> Self {
-            .init(
-                type: type,
-                horizontalAlignment: horizontalAlignment,
-                verticalAlignment: verticalAlignment,
-                spacing: spacing,
-                items: items
-            )
-        }
+package extension AdaptyViewConfiguration.Stack {
+    static func create(
+        type: AdaptyViewConfiguration.StackType = `default`.type,
+        horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment = `default`.horizontalAlignment,
+        verticalAlignment: AdaptyViewConfiguration.VerticalAlignment = `default`.verticalAlignment,
+        spacing: Double = `default`.spacing,
+        items: [AdaptyViewConfiguration.StackItem] = `default`.items
+    ) -> Self {
+        .init(
+            type: type,
+            horizontalAlignment: horizontalAlignment,
+            verticalAlignment: verticalAlignment,
+            spacing: spacing,
+            items: items
+        )
     }
+}
 #endif

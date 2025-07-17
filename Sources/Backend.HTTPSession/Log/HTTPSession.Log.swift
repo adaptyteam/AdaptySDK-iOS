@@ -1,5 +1,5 @@
 //
-//  HTTPSession.Logger.swift
+//  HTTPSession.Log.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.09.2022.
@@ -57,7 +57,7 @@ private extension HTTPDataResponse {
         let headers = self.headers.map { "\($0): \($1)" }.joined(separator: "\" -H \"")
 
         return """
-        
+
         ----------RESPONSE START----------
         HTTP \(statusCode)\(headers.isEmpty ? "" : " -H \"\(headers)\"")
         \(body.asLogString)

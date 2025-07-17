@@ -20,12 +20,12 @@ package extension AdaptyViewConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyViewConfiguration.Border {
-        static func create(
-            filling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling> = `default`.filling,
-            thickness: Double = `default`.thickness
-        ) -> Self {
-            .init(filling: filling, thickness: thickness)
-        }
+package extension AdaptyViewConfiguration.Border {
+    static func create(
+        filling: AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling> = `default`.filling,
+        thickness: Double = `default`.thickness
+    ) -> Self {
+        .init(filling: filling, thickness: thickness)
     }
+}
 #endif

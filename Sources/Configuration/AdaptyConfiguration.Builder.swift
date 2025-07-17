@@ -14,14 +14,15 @@ extension AdaptyConfiguration {
 
         let defaultValue = AdaptyConfiguration.default
 
-        let defaultBackend = switch builder.serverCluster ?? .default {
-        case .eu:
-            Backend.URLs.euPublicEnvironment
-        case .cn:
-            Backend.URLs.cnPublicEnvironment
-        default:
-            Backend.URLs.defaultPublicEnvironment
-        }
+        let defaultBackend =
+            switch builder.serverCluster ?? .default {
+            case .eu:
+                Backend.URLs.euPublicEnvironment
+            case .cn:
+                Backend.URLs.cnPublicEnvironment
+            default:
+                Backend.URLs.defaultPublicEnvironment
+            }
 
         self.init(
             apiKey: apiKey,
@@ -34,6 +35,7 @@ extension AdaptyConfiguration {
                 baseUrl: builder.backendBaseUrl ?? defaultBackend.baseUrl,
                 fallbackUrl: builder.backendFallbackBaseUrl ?? defaultBackend.fallbackUrl,
                 configsUrl: builder.backendConfigsBaseUrl ?? defaultBackend.configsUrl,
+                uaUrl: builder.backendUABaseUrl ?? defaultBackend.uaUrl,
                 proxy: builder.backendProxy ?? defaultBackend.proxy
             ),
             logLevel: builder.logLevel,
@@ -53,6 +55,7 @@ extension AdaptyConfiguration {
             backendBaseUrl: nil,
             backendFallbackBaseUrl: nil,
             backendConfigsBaseUrl: nil,
+            backendUABaseUrl: nil,
             backendProxy: nil,
             logLevel: nil,
             crossPlatformSDK: nil
@@ -73,6 +76,7 @@ public extension AdaptyConfiguration {
         public private(set) var backendBaseUrl: URL?
         public private(set) var backendFallbackBaseUrl: URL?
         public private(set) var backendConfigsBaseUrl: URL?
+        public private(set) var backendUABaseUrl: URL?
         public private(set) var backendProxy: (host: String, port: Int)?
 
         public private(set) var logLevel: AdaptyLog.Level?
@@ -90,6 +94,7 @@ public extension AdaptyConfiguration {
             backendBaseUrl: URL?,
             backendFallbackBaseUrl: URL?,
             backendConfigsBaseUrl: URL?,
+            backendUABaseUrl: URL?,
             backendProxy: (host: String, port: Int)?,
             logLevel: AdaptyLog.Level?,
             crossPlatformSDK: (name: String, version: String)?
@@ -104,6 +109,7 @@ public extension AdaptyConfiguration {
             self.backendBaseUrl = backendBaseUrl
             self.backendFallbackBaseUrl = backendFallbackBaseUrl
             self.backendConfigsBaseUrl = backendConfigsBaseUrl
+            self.backendUABaseUrl = backendUABaseUrl
             self.backendProxy = backendProxy
             self.logLevel = logLevel
             self.crossPlatformSDK = crossPlatformSDK
@@ -180,6 +186,12 @@ public extension AdaptyConfiguration.Builder {
     @discardableResult
     func with(backendConfigsBaseUrl url: URL) -> Self {
         backendConfigsBaseUrl = url
+        return self
+    }
+
+    @discardableResult
+    func with(backendUABaseUrl url: URL) -> Self {
+        backendUABaseUrl = url
         return self
     }
 

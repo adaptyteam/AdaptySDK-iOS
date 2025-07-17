@@ -31,29 +31,25 @@ extension SK2Transaction {
     }
 
     var unfOfferType: SK2Transaction.OfferType? {
-        #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
-            if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-                return offer?.type
-            }
-        #endif
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            return offer?.type
+        }
         return offerType
     }
 
     var unfOfferId: String? {
-        #if compiler(>=5.9.2) && (!os(visionOS) || compiler(>=5.10))
-            if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-                return offer?.id
-            }
-        #endif
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            return offer?.id
+        }
         return offerID
     }
 
     var unfEnvironment: String {
         #if !os(visionOS)
-            guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
-                let environment = environmentStringRepresentation
-                return environment.isEmpty ? "storekit2" : environment.lowercased()
-            }
+        guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
+            let environment = environmentStringRepresentation
+            return environment.isEmpty ? "storekit2" : environment.lowercased()
+        }
         #endif
 
         switch environment {

@@ -58,7 +58,6 @@ final class EventsManager {
         sending = true
 
         Task(priority: .utility) { [weak self] in
-
             var error: Error?
             do {
                 try await self?.sendEvents(backendSession)
@@ -90,9 +89,15 @@ final class EventsManager {
 
     private func sendEvents(_ session: Backend.EventsExecutor) async throws {
         if configuration.isExpired {
-            configuration = try await session.fetchEventsConfig(
-                profileId: ProfileStorage.profileId
-            )
+            do throws(HTTPError) {
+                configuration = try await session.fetchEventsConfig(
+                    profileId: ProfileStorage.profileId
+                )
+            } catch .backend, .decoding {
+                configuration = .init(blacklist: Event.defaultBlackList, expiration: Date() + 24*60*60)
+            } catch {
+                throw EventsError.sending(error)
+            }
         }
 
         let events = eventStorages.getEvents(
@@ -126,7 +131,6 @@ private extension [EventCollectionStorage] {
         var limit = limit
         let initResult = (elements: [Data](), endIndex: [Int?]())
         return reduce(initResult) { result, storage in
-
             guard limit > 0,
                   let (elements, endIndex) = storage.getEvents(limit: limit, blackList: blackList)
             else {
