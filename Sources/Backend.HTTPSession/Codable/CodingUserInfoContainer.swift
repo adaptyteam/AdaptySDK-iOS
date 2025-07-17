@@ -8,9 +8,9 @@
 import Foundation
 
 #if compiler(>=6.1.0)
-    package typealias CodingUserInfo = [CodingUserInfoKey: any Sendable]
+package typealias CodingUserInfo = [CodingUserInfoKey: any Sendable]
 #else
-    package typealias CodingUserInfo = [CodingUserInfoKey: Any]
+package typealias CodingUserInfo = [CodingUserInfoKey: Any]
 #endif
 
 package protocol CodingUserInfoContainer: AnyObject {

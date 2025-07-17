@@ -89,7 +89,7 @@ extension Adapty {
             .getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: nil)?
             .withFetchPolicy(fetchPolicy)?
             .value
-        
+
         let content =
             if let cached {
                 cached

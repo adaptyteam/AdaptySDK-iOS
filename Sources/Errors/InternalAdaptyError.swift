@@ -392,8 +392,7 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Failed opening web paywall url: \(url)").asAdaptyError
     }
-    
-    
+
     static func fetchInstallationDetailsFailed(
         unknownError: Error,
         file: String = #fileID,

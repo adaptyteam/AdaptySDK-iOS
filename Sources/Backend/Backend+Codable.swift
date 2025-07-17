@@ -140,10 +140,8 @@ extension Backend.Response {
                 .container(keyedBy: Backend.CodingKeys.self)
                 .decode(Value.self, forKey: .data)
         }
-        
-        
     }
-    
+
     struct OptionalData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
         let value: Value?
 

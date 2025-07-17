@@ -321,21 +321,21 @@ extension Adapty {
         withCrossPlacmentABTest: Bool
     ) -> Content? {
         let chosen: AdaptyPlacementChosen<Content>?
-        if let manager = tryProfileManagerOrNil(with: profileId) {
+            if let manager = tryProfileManagerOrNil(with: profileId) {
             chosen = manager.placementStorage.getPlacementWithFallback(
-                byPlacementId: placementId,
-                withVariationId: withCrossPlacmentABTest ? manager.storage.crossPlacementState?.variationId(placementId: placementId) : nil,
-                profileId: profileId,
-                locale: locale
-            )
-        } else {
+                    byPlacementId: placementId,
+                    withVariationId: withCrossPlacmentABTest ? manager.storage.crossPlacementState?.variationId(placementId: placementId) : nil,
+                    profileId: profileId,
+                    locale: locale
+                )
+            } else {
             chosen = Adapty.fallbackPlacements?.getPlacement(
-                byPlacementId: placementId,
-                withVariationId: nil,
-                profileId: profileId,
-                requestLocale: locale
-            )
-        }
+                    byPlacementId: placementId,
+                    withVariationId: nil,
+                    profileId: profileId,
+                    requestLocale: locale
+                )
+            }
 
         guard let chosen else { return nil }
 

@@ -90,7 +90,7 @@ extension AdaptyPaywall: Codable {
 
             return products
         }()
-        
+
         requestLocale = try decoder.userInfo.requestLocaleOrNil ?? container.decode(AdaptyLocale.self, forKey: .requestLocale)
     }
 
@@ -107,5 +107,3 @@ extension AdaptyPaywall: Codable {
         try placement.encode(to: encoder)
     }
 }
-
-
