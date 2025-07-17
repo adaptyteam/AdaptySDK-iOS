@@ -14,7 +14,6 @@ struct BackendError: Error, Hashable, Codable {
 }
 
 enum ResponseDecodingError: Error, Hashable, Codable {
-    case profileWasChanged
     case crossPlacementABTestDisabled
     case notFoundVariationId
 }
