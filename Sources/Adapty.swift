@@ -297,6 +297,15 @@ extension Adapty {
             case let .current(manager):
                 return manager
             case let .creating(_, _, task):
+//                return try await withTaskCancellationWithError(CancellationError()) {
+//                    do {
+//                        return try await task.value
+//                    } catch is CancellationError {
+//                        throw AdaptyError.profileWasChanged()
+//                    } catch {
+//                        throw error
+//                    }
+//                }
                 do {
                     return try await withTaskCancellationWithError(CancellationError()) {
                         try await task.profileManager
