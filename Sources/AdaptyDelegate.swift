@@ -19,10 +19,16 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
     ///
     /// If you return `false`, you can continue the transaction later by manually calling the `defermentCompletion`.
     func shouldAddStorePayment(for product: AdaptyDeferredProduct) -> Bool
+
+    func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails)
+
+    func onInstallationDetailsFail(error: AdaptyError)
 }
 
 public extension AdaptyDelegate {
     func shouldAddStorePayment(for _: AdaptyDeferredProduct) -> Bool { true }
+    func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails) {}
+    func onInstallationDetailsFail(error: AdaptyError) {}
 }
 
 extension Adapty {

@@ -131,6 +131,18 @@ extension Backend.Response {
                 .container(keyedBy: Backend.CodingKeys.self)
                 .decode(Value.self, forKey: .data)
         }
+        
+        
+    }
+    
+    struct OptionalData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+        let value: Value?
+
+        init(from decoder: Decoder) throws {
+            value = try decoder
+                .container(keyedBy: Backend.CodingKeys.self)
+                .decodeIfPresent(Value.self, forKey: .data)
+        }
     }
 
     struct Meta<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {

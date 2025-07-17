@@ -99,7 +99,7 @@ extension HTTPError {
 }
 
 extension Error {
-    var isCancellationError: Bool {
+    fileprivate var isCancellationError: Bool {
         if self is CancellationError { return true }
         if (self as? URLError)?.code == .cancelled { return true }
         return (self as NSError).isCancellationError
@@ -109,7 +109,7 @@ extension Error {
         (self as NSError).isNetworkConnectionError
     }
 
-    var isTimedOutError: Bool {
+    fileprivate var isTimedOutError: Bool {
         (self as NSError).isTimedOutError
     }
 }

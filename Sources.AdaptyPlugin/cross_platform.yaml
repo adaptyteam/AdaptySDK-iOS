@@ -457,6 +457,23 @@ $requests:
         properties:
           success: { type: string }
 
+  ### getCurrentInstallationStatus ###
+  GetCurrentInstallationStatus.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "get_current_installation_status" }
+
+  GetCurrentInstallationStatus.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyInstallationStatus" }
+
   ### presentCodeRedemptionSheet ###
   PresentCodeRedemptionSheet.Request: #request
     type: object
@@ -645,6 +662,20 @@ $events:
     properties:
       id: { const: "did_load_latest_profile" }
       profile: { $ref: "#/$defs/AdaptyProfile" }
+
+  Event.OnInstallationDetailsSuccess:
+    type: object
+    required: [id, details]
+    properties:
+      id: { const: "on_installation_details_success" }
+      details: { $ref: "#/$defs/AdaptyInstallationDetails" }
+
+  Event.OnInstallationDetailsFail:
+    type: object
+    required: [id, error]
+    properties:
+      id: { const: "on_installation_details_fail" }
+      error: { $ref: "#/$defs/AdaptyError" }
 
   PaywallViewEvent.DidAppear:
     type: object
@@ -906,6 +937,7 @@ $defs:
       backend_base_url: { type: string }
       backend_fallback_base_url: { type: string }
       backend_configs_base_url: { type: string }
+      backend_ua_base_url: { type: string }
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
       log_level: { $ref: "#/$defs/AdaptyLog.Level" }
@@ -1352,6 +1384,26 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
+
+  AdaptyInstallationStatus: #response #event
+    type: object
+    oneOf:
+      - required: [status]
+        properties:
+          status: { type: string, enum: ["not_available", "not_determined"] }
+      - required: [status, details]
+        properties:
+          status: { type: string, const: "determined" }
+          details: { $ref: "#/$defs/AdaptyInstallationDetails" }
+
+  AdaptyInstallationDetails: #response #event
+    type: object
+    required: [ install_time, app_launch_count]
+    properties:
+      install_id:  { type: string }
+      install_time: { $ref: "#/$defs/Date", nullable: false }
+      app_launch_count: { type: integer, nullable: false }
+      payload:  { type: string }
 
   AdaptyUI.CustomAssets:
     type: array

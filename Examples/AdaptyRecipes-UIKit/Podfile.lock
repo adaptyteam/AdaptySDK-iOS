@@ -1,7 +1,7 @@
 PODS:
-  - Adapty (3.8.2)
-  - AdaptyUI (3.8.2):
-    - Adapty (= 3.8.2)
+  - Adapty (3.10.0-SNAPSHOT)
+  - AdaptyUI (3.10.0-SNAPSHOT):
+    - Adapty (= 3.10.0-SNAPSHOT)
 
 DEPENDENCIES:
   - Adapty (from `../../`)

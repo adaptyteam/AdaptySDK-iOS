@@ -38,6 +38,7 @@ enum Request {
             SetFallback.self,
             UpdateCollectingRefundDataConsent.self,
             UpdateRefundPreference.self,
+            GetCurrentInstallationStatus.self
         ]
 
 #if canImport(UIKit)

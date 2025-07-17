@@ -67,6 +67,8 @@ enum APIRequestName: String {
     case fetchEventsConfig = "get_events_blacklist"
 
     case fetchAllProductVendorIds = "get_products_ids"
+    
+    case reqisterInstall = "reqister_install"
 }
 
 struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {
@@ -165,6 +167,7 @@ enum MethodName: String {
     case openWebPaywall = "open_web_paywall"
     case createWebPaywallUrl = "create_web_paywall_url"
 
+    case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
 
     case getPaywall = "get_paywall"

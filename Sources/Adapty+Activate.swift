@@ -83,6 +83,8 @@ public extension Adapty {
 
             set(shared: sdk)
 
+            UserAcquisitionManager.activate(sdk)
+
             LifecycleManager.shared.initialize()
             return sdk
         }
