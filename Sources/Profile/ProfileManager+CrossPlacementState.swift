@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 02.04.2025.
 //
 
-extension Adapty {
+private extension Adapty {
     func syncCrossPlacementState(profileId: String) async throws(AdaptyError) {
         let state: CrossPlacementState
         do {

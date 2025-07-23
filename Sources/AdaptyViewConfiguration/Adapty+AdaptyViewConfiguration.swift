@@ -91,13 +91,14 @@ extension Adapty {
                     disableServerCache: isTestUser
                 )
             }
-        } catch is TimeoutError {
         } catch let error as HTTPError {
             guard Backend.canUseFallbackServer(error) else {
                 throw error.asAdaptyError
             }
         } catch {
-            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
+            guard error is TimeoutError else {
+                throw AdaptyError.unknown(error)
+            }
         }
 
         do {

@@ -55,14 +55,6 @@ actor SK1ProductsManager: StoreKitProductsManager {
     }
 }
 
-private extension Error {
-    var isCancelled: Bool {
-        let error = unwrapped
-        if let httpError = error as? HTTPError { return httpError.isCancelled }
-        return false
-    }
-}
-
 extension SK1ProductsManager {
     func fetchSK1ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [SK1Product] {
         let products = try await fetchSK1Products(ids: Set(productIds), fetchPolicy: fetchPolicy)

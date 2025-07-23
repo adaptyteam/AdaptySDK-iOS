@@ -205,24 +205,6 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), error.localizedDescription).asAdaptyError
     }
 
-    static func fetchPlacementFailed(
-        unknownError: Error, //
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch placement failed", error: unknownError).asAdaptyError
-    }
-
-    static func fetchViewConfigurationFailed(
-        unknownError: Error, //
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch ViewConfiguration failed", error: unknownError).asAdaptyError
-    }
-
     static func isNoViewConfigurationInPaywall(
         file: String = #fileID,
         function: String = #function,
@@ -265,5 +247,14 @@ extension AdaptyError {
         line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Failed opening web paywall url: \(url)").asAdaptyError
+    }
+
+    static func unknown(
+        _ error: Error,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.unknown(AdaptyError.Source(file: file, function: function, line: line), "Unexpected error", error: error).asAdaptyError
     }
 }

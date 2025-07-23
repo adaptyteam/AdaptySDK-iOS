@@ -59,14 +59,6 @@ actor SK2ProductsManager: StoreKitProductsManager {
     }
 }
 
-private extension Error {
-    var isCancelled: Bool {
-        let error = unwrapped
-        if let httpError = error as? HTTPError { return httpError.isCancelled }
-        return false
-    }
-}
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
     func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [SK2Product] {

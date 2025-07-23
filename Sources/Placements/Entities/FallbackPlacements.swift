@@ -24,7 +24,7 @@ struct FallbackPlacements: Sendable {
         do {
             head = try decoder.decode(Head.self, from: Data(contentsOf: url))
         } catch {
-            throw error.asAdaptyError ?? AdaptyError.decodingFallback(error)
+            throw AdaptyError.decodingFallback(error)
         }
         fileURL = url
     }
