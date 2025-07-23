@@ -13,7 +13,7 @@ extension Adapty {
     func getSK1PaywallProductsWithoutOffers(
         paywall: AdaptyPaywall,
         productsManager: SK1ProductsManager
-    ) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+    ) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
         try await productsManager.fetchSK1ProductsInSameOrder(
             ids: paywall.vendorProductIds,
             fetchPolicy: .returnCacheDataElseLoad
@@ -47,7 +47,7 @@ extension Adapty {
         paywallName: String,
         productsManager: SK1ProductsManager,
         webPaywallBaseUrl: URL?
-    ) async throws -> AdaptySK1PaywallProduct {
+    ) async throws(AdaptyError) -> AdaptySK1PaywallProduct {
         let sk1Product = try await productsManager.fetchSK1Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
 
         let subscriptionOffer: AdaptySubscriptionOffer? =
@@ -76,7 +76,7 @@ extension Adapty {
     func getSK1PaywallProducts(
         paywall: AdaptyPaywall,
         productsManager: SK1ProductsManager
-    ) async throws -> [AdaptyPaywallProduct] {
+    ) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
         typealias ProductTuple = (
             product: SK1Product,
             reference: AdaptyPaywall.ProductReference,

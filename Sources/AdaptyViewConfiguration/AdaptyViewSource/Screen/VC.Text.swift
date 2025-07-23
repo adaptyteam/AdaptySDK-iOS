@@ -18,7 +18,7 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Localizer {
-    func text(_ textBlock: AdaptyViewSource.Text) throws -> AdaptyViewConfiguration.Text {
+    func text(_ textBlock: AdaptyViewSource.Text) -> AdaptyViewConfiguration.Text {
         let value: AdaptyViewConfiguration.Text.Value =
             switch textBlock.stringId {
             case let .basic(stringId):

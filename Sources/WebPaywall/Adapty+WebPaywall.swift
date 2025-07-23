@@ -15,7 +15,7 @@ import AppKit
 public extension Adapty {
     nonisolated static func openWebPaywall(
         for product: AdaptyPaywallProduct
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await withActivatedSDK(
             methodName: .openWebPaywall,
             logParams: [
@@ -25,14 +25,14 @@ public extension Adapty {
                 "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
                 "paywall_product_index": product.paywallProductIndex,
             ]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             try await sdk.openWebPaywall(for: product)
         }
     }
 
     nonisolated static func createWebPaywallUrl(
         for product: AdaptyPaywallProduct
-    ) async throws -> URL {
+    ) async throws(AdaptyError) -> URL {
         try await withActivatedSDK(
             methodName: .createWebPaywallUrl,
             logParams: [
@@ -43,14 +43,14 @@ public extension Adapty {
                 "paywall_product_index": product.paywallProductIndex,
                 "product_locale": product.localizedPrice,
             ]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             try sdk.createWebPaywallUrl(for: product)
         }
     }
 
     nonisolated static func openWebPaywall(
         for paywall: AdaptyPaywall
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await withActivatedSDK(
             methodName: .openWebPaywall,
             logParams: [
@@ -58,14 +58,14 @@ public extension Adapty {
                 "variation_id": paywall.variationId,
                 "web_purchase_url": paywall.webPaywallBaseUrl,
             ]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             try await sdk.openWebPaywall(for: paywall)
         }
     }
 
     nonisolated static func createWebPaywallUrl(
         for paywall: AdaptyPaywall
-    ) async throws -> URL {
+    ) async throws(AdaptyError) -> URL {
         try await withActivatedSDK(
             methodName: .createWebPaywallUrl,
             logParams: [
@@ -73,14 +73,14 @@ public extension Adapty {
                 "variation_id": paywall.variationId,
                 "web_purchase_url": paywall.webPaywallBaseUrl,
             ]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             try sdk.createWebPaywallUrl(for: paywall)
         }
     }
 
     private func openWebPaywall(
         for product: AdaptyPaywallProduct
-    ) async throws {
+    ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: product)
         guard await url.open() else {
             throw AdaptyError.failedOpeningWebPaywallUrl(url)
@@ -90,7 +90,7 @@ public extension Adapty {
 
     private func openWebPaywall(
         for paywall: AdaptyPaywall
-    ) async throws {
+    ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: paywall)
         guard await url.open() else {
             throw AdaptyError.failedOpeningWebPaywallUrl(url)
@@ -100,7 +100,7 @@ public extension Adapty {
 
     private func createWebPaywallUrl(
         for paywall: AdaptyPaywall
-    ) throws -> URL {
+    ) throws(AdaptyError) -> URL {
         guard let webPaywallBaseUrl = paywall.webPaywallBaseUrl else {
             throw AdaptyError.paywallWithoutPurchaseUrl(paywall: paywall)
         }
@@ -115,7 +115,7 @@ public extension Adapty {
 
     private func createWebPaywallUrl(
         for product: AdaptyPaywallProduct
-    ) throws -> URL {
+    ) throws(AdaptyError) -> URL {
         guard let webPaywallBaseUrl = (product as? WebPaywallURLProviding)?.webPaywallBaseUrl else {
             throw AdaptyError.productWithoutPurchaseUrl(adaptyProductId: product.adaptyProductId)
         }
@@ -152,7 +152,7 @@ private extension URL {
 
     func appendOrOverwriteQueryParameters(
         _ parameters: [String: String]
-    ) throws -> URL {
+    ) throws(AdaptyError) -> URL {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
             throw AdaptyError.failedDecodingWebPaywallUrl(url: self)
         }

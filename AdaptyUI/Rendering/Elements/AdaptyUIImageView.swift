@@ -40,7 +40,7 @@ struct AdaptyUIImageView: View {
     }
 
     private var data: InitializationMode
-
+    
     init(
         asset: VC.ImageData,
         aspect: VC.AspectRatio,
@@ -96,15 +96,22 @@ struct AdaptyUIImageView: View {
         case let .remote(url, preview):
             KFImage
                 .url(url)
+                .targetCache(AdaptyUI.imageCache)
+                .onSuccess { res in
+                    Log.ui.verbose("IMG load success, cache: \(res.cacheType), url: \(url)")
+                }
+                .onFailure { error in
+                    Log.ui.verbose("IMG load error, \(error), url: \(url)")
+                }
                 .resizable()
-                .aspectRatio(aspect)
-                .background {
+                .placeholder {
                     if let preview {
                         rasterImage(preview, aspect: aspect, tint: tint)
                     } else {
                         EmptyView()
                     }
                 }
+                .aspectRatio(aspect)
         }
     }
 

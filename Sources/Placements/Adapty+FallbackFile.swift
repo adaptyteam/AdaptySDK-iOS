@@ -19,15 +19,11 @@ extension Adapty {
     /// - Parameters:
     ///   - fileURL:
     /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func setFallback(fileURL url: URL) async throws {
+    public nonisolated static func setFallback(fileURL url: URL) async throws(AdaptyError) {
         try await withoutSDK(
             methodName: .setFallback
-        ) { @AdaptyActor in
-            do {
-                Adapty.fallbackPlacements = try FallbackPlacements(fileURL: url)
-            } catch {
-                throw error.asAdaptyError ?? .decodingFallbackFailed(unknownError: error)
-            }
+        ) { @AdaptyActor () throws(AdaptyError) in
+            Adapty.fallbackPlacements = try FallbackPlacements(fileURL: url)
         }
     }
 }

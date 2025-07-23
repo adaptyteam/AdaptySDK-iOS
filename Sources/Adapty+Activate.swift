@@ -21,7 +21,7 @@ public extension Adapty {
         _ apiKey: String,
         observerMode: Bool = false,
         customerUserId: String? = nil
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await activate(
             with: AdaptyConfiguration
                 .builder(withAPIKey: apiKey)
@@ -38,7 +38,7 @@ public extension Adapty {
     /// - Parameter configuration: `AdaptyConfiguration` which allows to configure Adapty SDK
     static func activate(
         with configuration: AdaptyConfiguration
-    ) async throws {
+    ) async throws(AdaptyError) {
         let stamp = Log.stamp
         let logParams: EventParameters? = [
             "observer_mode": configuration.observerMode,

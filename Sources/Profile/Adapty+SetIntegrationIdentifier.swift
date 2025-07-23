@@ -11,16 +11,16 @@ extension Adapty {
     public nonisolated static func setIntegrationIdentifier(
         key: String,
         value: String
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await setIntegrationIdentifiers([key: value])
     }
 
     package nonisolated static func setIntegrationIdentifiers(
         _ keyValues: [String: String]
-    ) async throws {
+    ) async throws(AdaptyError) {
         let logParams: EventParameters = keyValues
 
-        try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: logParams) { sdk in
+        try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: logParams) { sdk throws(AdaptyError) in
             try await sdk.setIntegrationIdentifier(
                 keyValues: keyValues
             )
@@ -29,7 +29,7 @@ extension Adapty {
 
     func setIntegrationIdentifier(
         keyValues: [String: String]
-    ) async throws {
+    ) async throws(AdaptyError) {
         let profileId = try await createdProfileManager.profileId
 
         do {
@@ -38,7 +38,7 @@ extension Adapty {
                 keyValues: keyValues
             )
         } catch {
-            throw error.asAdaptyError ?? .setIntegrationIdentifierFaild(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 }

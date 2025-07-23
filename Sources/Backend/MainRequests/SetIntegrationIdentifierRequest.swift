@@ -42,7 +42,7 @@ extension Backend.MainExecutor {
     func setIntegrationIdentifier(
         profileId: String,
         keyValues: [String: String]
-    ) async throws {
+    ) async throws(HTTPError) {
         let request = SetIntegrationIdentifierRequest(
             profileId: profileId,
             keyValues: keyValues

@@ -17,8 +17,8 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Localizer {
-    func toggle(_ from: AdaptyViewSource.Toggle) throws -> AdaptyViewConfiguration.Toggle {
-        try .init(
+    func toggle(_ from: AdaptyViewSource.Toggle) -> AdaptyViewConfiguration.Toggle {
+        .init(
             onActions: from.onActions.map(action),
             offActions: from.offActions.map(action),
             onCondition: from.onCondition,

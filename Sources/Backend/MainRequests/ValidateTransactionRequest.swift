@@ -85,7 +85,7 @@ extension Backend.MainExecutor {
     func syncTransaction(
         profileId: String,
         originalTransactionId: String
-    ) async throws -> VH<AdaptyProfile> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             profileId: profileId,
             requestSource: .restore(originalTransactionId: originalTransactionId)
@@ -107,7 +107,7 @@ extension Backend.MainExecutor {
         profileId: String,
         transactionId: String,
         variationId: String?
-    ) async throws -> VH<AdaptyProfile> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             profileId: profileId,
             requestSource: .report(transactionId: transactionId, variationId: variationId)
@@ -132,7 +132,7 @@ extension Backend.MainExecutor {
         profileId: String,
         purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
-    ) async throws -> VH<AdaptyProfile> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             profileId: profileId,
             requestSource: .other(purchasedTransaction, reason: reason)

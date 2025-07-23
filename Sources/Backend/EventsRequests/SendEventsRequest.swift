@@ -52,7 +52,7 @@ extension Backend.EventsExecutor {
     func sendEvents(
         profileId: String,
         events: [Data]
-    ) async throws {
+    ) async throws(EventsError) {
         do {
             let _: HTTPEmptyResponse = try await session.perform(SendEventsRequest(
                 profileId: profileId,

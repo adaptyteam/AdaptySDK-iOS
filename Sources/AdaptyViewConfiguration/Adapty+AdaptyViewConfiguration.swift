@@ -77,7 +77,7 @@ extension Adapty {
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
         loadTimeout: TaskDuration
-    ) async throws -> AdaptyViewSource {
+    ) async throws(AdaptyError) -> AdaptyViewSource {
         let httpSession = httpSession
         let apiKeyPrefix = apiKeyPrefix
         let isTestUser = profileManager?.profile.value.isTestUser ?? false
@@ -91,13 +91,14 @@ extension Adapty {
                     disableServerCache: isTestUser
                 )
             }
-        } catch is TimeoutError {
         } catch let error as HTTPError {
             guard Backend.canUseFallbackServer(error) else {
                 throw error.asAdaptyError
             }
         } catch {
-            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
+            guard error is TimeoutError else {
+                throw AdaptyError.unknown(error)
+            }
         }
 
         do {
@@ -108,7 +109,7 @@ extension Adapty {
                 disableServerCache: isTestUser
             )
         } catch {
-            throw error.asAdaptyError ?? .fetchViewConfigurationFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 }

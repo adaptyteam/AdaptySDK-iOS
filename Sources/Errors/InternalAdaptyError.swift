@@ -147,15 +147,6 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), text).asAdaptyError
     }
 
-    static func decodingSetVariationIdParams(
-        _ error: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding SetVariationIdParams failed", error: error).asAdaptyError
-    }
-
     static func decodingViewConfiguration(
         _ error: Error,
         file: String = #fileID,
@@ -163,15 +154,6 @@ extension AdaptyError {
         line: UInt = #line
     ) -> Self {
         InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding ViewConfiguration failed", error: error).asAdaptyError
-    }
-
-    static func decodingPaywallProduct(
-        _ error: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding AdaptyPaywallProduct failed", error: error).asAdaptyError
     }
 
     static func wrongParamPurchasedTransaction(
@@ -223,132 +205,6 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), error.localizedDescription).asAdaptyError
     }
 
-    static func fetchPlacementFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch placement failed", error: unknownError).asAdaptyError
-    }
-
-    static func syncProfileFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Sync Profile failed", error: unknownError).asAdaptyError
-    }
-
-    static func updateAttributionFaild(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Update Attribution failed", error: unknownError).asAdaptyError
-    }
-
-    static func setIntegrationIdentifierFaild(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Set Integration Identifier failed", error: unknownError).asAdaptyError
-    }
-
-    static func fetchViewConfigurationFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "Fetch ViewConfiguration failed", error: unknownError).asAdaptyError
-    }
-
-    static func trackEventFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        EventsError.encoding(unknownError, file: file, function: function, line: line).asAdaptyError
-    }
-
-    static func decodingFallbackFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        decodingFallback(unknownError, file: file, function: function, line: line)
-    }
-
-    static func syncLastTransactionFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sync last transaction  failed", error: unknownError).asAdaptyError
-    }
-
-    static func syncRecieptFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sync last transaction  failed", error: unknownError).asAdaptyError
-    }
-
-    static func reportTransactionIdFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "report transaction failed", error: unknownError).asAdaptyError
-    }
-
-    static func validatePurchaseFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "validate purchase failed", error: unknownError).asAdaptyError
-    }
-
-    static func signSubscriptionOfferFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "sign subscription offer failed", error: unknownError).asAdaptyError
-    }
-
-    static func convertToAdaptyErrorFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.unknown(AdaptyError.Source(file: file, function: function, line: line), "Convert to AdaptyError failed", error: unknownError).asAdaptyError
-    }
-
-    static func fetchProductStatesFailed(
-        unknownError: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        InternalAdaptyError.unknown(AdaptyError.Source(file: file, function: function, line: line), "fetch product states failed", error: unknownError).asAdaptyError
-    }
-
     static func isNoViewConfigurationInPaywall(
         file: String = #fileID,
         function: String = #function,
@@ -392,14 +248,13 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Failed opening web paywall url: \(url)").asAdaptyError
     }
-    
-    
-    static func fetchInstallationDetailsFailed(
-        unknownError: Error,
+
+    static func unknown(
+        _ error: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.fetchFailed(AdaptyError.Source(file: file, function: function, line: line), "fetch installation details failed", error: unknownError).asAdaptyError
+        InternalAdaptyError.unknown(AdaptyError.Source(file: file, function: function, line: line), "Unexpected error", error: error).asAdaptyError
     }
 }

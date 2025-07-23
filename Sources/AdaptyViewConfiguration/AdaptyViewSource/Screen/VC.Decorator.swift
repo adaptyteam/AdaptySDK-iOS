@@ -18,7 +18,7 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Localizer {
-    func decorator(_ from: AdaptyViewSource.Decorator) throws -> AdaptyViewConfiguration.Decorator {
+    func decorator(_ from: AdaptyViewSource.Decorator) -> AdaptyViewConfiguration.Decorator {
         .init(
             shapeType: from.shapeType,
             background: from.backgroundAssetId.flatMap { try? background($0) },

@@ -25,7 +25,7 @@ private struct FetchCrossPlacementStateRequest: HTTPRequestWithDecodableResponse
 extension Backend.MainExecutor {
     func fetchCrossPlacementState(
         profileId: String
-    ) async throws -> CrossPlacementState {
+    ) async throws(HTTPError) -> CrossPlacementState {
         let request = FetchCrossPlacementStateRequest(
             profileId: profileId
         )

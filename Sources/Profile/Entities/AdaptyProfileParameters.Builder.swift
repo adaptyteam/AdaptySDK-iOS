@@ -89,7 +89,7 @@ public extension AdaptyProfileParameters.Builder {
         try with(customAttribute: .double(value), forKey: key)
     }
 
-    internal func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws -> Self {
+    internal func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws(AdaptyError) -> Self {
         if let error = AdaptyProfile.CustomAttributes.validateKey(key) { throw error }
         if let error = value.validate() { throw error }
         var attributes = parameters.codableCustomAttributes ?? AdaptyProfile.CustomAttributes()

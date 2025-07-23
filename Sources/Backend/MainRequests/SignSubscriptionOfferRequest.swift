@@ -33,7 +33,7 @@ extension Backend.MainExecutor {
         profileId: String,
         vendorProductId: String,
         offerId: String
-    ) async throws -> AdaptySubscriptionOffer.Signature {
+    ) async throws(HTTPError) -> AdaptySubscriptionOffer.Signature {
         let request = SignSubscriptionOfferRequest(
             vendorProductId: vendorProductId,
             offerId: offerId,

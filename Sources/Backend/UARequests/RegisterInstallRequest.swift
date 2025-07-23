@@ -36,19 +36,15 @@ extension Backend.UAExecutor {
         base: TimeInterval = 1.0,
         maxDelay: TimeInterval = 30.0
     ) -> TimeInterval {
-        let max = min(base * pow(2.0, Double(attempt)), maxDelay)
-        if max > 500 {
-            return Double.random(in: 500 ... max)
-        } else {
-            return 500
-        }
+        let delay = Double.random(in: 0 ... min(base * pow(2.0, Double(attempt)), maxDelay))
+        return max(0.5, delay)
     }
 
     func registerInstall(
         profileId: String,
         installInfo: Environment.InstallInfo,
         maxRetries: Int = 5
-    ) async throws -> RegistrationInstallResponse? {
+    ) async throws(HTTPError) -> RegistrationInstallResponse? {
         let request = RegisterInstallRequest(
             profileId: profileId,
             installInfo: installInfo
@@ -63,8 +59,9 @@ extension Backend.UAExecutor {
                       UABackend.canRetryRequest(error)
                 else { throw error }
                 attempt += 1
-                try await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
+                try? await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
             }
+
         } while true
     }
 }

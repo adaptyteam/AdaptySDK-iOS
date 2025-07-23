@@ -11,11 +11,11 @@ public extension Adapty {
     package nonisolated static func reportTransaction(
         _ transactionId: String,
         withVariationId variationId: String?
-    ) async throws -> AdaptyProfile {
+    ) async throws(AdaptyError) -> AdaptyProfile {
         try await withActivatedSDK(methodName: .setVariationId, logParams: [
             "variation_id": variationId,
             "transaction_id": transactionId,
-        ]) { sdk in
+        ]) { sdk throws(AdaptyError) in
             let profileId = sdk.profileStorage.profileId
             let response = try await sdk.reportTransaction(
                 profileId: profileId,
@@ -37,11 +37,11 @@ public extension Adapty {
     nonisolated static func reportTransaction(
         _ sk1Transaction: SKPaymentTransaction,
         withVariationId variationId: String? = nil
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await withActivatedSDK(methodName: .reportSK1Transaction, logParams: [
             "variation_id": variationId,
             "transaction_id": sk1Transaction.transactionIdentifier,
-        ]) { sdk in
+        ]) { sdk throws(AdaptyError) in
             guard sk1Transaction.transactionState == .purchased || sk1Transaction.transactionState == .restored,
                   let id = sk1Transaction.transactionIdentifier
             else {
@@ -88,11 +88,11 @@ public extension Adapty {
     nonisolated static func reportTransaction(
         _ sk2Transaction: Transaction,
         withVariationId variationId: String? = nil
-    ) async throws {
+    ) async throws(AdaptyError) {
         try await withActivatedSDK(methodName: .reportSK2Transaction, logParams: [
             "variation_id": variationId,
             "transaction_id": sk2Transaction.unfIdentifier,
-        ]) { sdk in
+        ]) { sdk throws(AdaptyError) in
             let profileId = try await sdk.createdProfileManager.profileId
 
             let purchasedTransaction = await sdk.productsManager.fillPurchasedTransaction(

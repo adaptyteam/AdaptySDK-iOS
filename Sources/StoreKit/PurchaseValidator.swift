@@ -12,13 +12,13 @@ protocol PurchaseValidator: AnyObject, Sendable {
         profileId: String?,
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
-    ) async throws -> VH<AdaptyProfile>
+    ) async throws(AdaptyError) -> VH<AdaptyProfile>
 
     func signSubscriptionOffer(
         profileId: String,
         vendorProductId: String,
         offerId: String
-    ) async throws -> AdaptySubscriptionOffer.Signature
+    ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature
 }
 
 extension Adapty: PurchaseValidator {
@@ -33,7 +33,7 @@ extension Adapty: PurchaseValidator {
         profileId: String?,
         transactionId: String,
         variationId: String?
-    ) async throws -> VH<AdaptyProfile> {
+    ) async throws(AdaptyError) -> VH<AdaptyProfile> {
         do {
             let response = try await httpSession.reportTransaction(
                 profileId: profileId ?? profileStorage.profileId,
@@ -43,7 +43,7 @@ extension Adapty: PurchaseValidator {
             saveResponse(response, syncedTransaction: true)
             return response
         } catch {
-            throw error.asAdaptyError ?? AdaptyError.reportTransactionIdFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 
@@ -51,7 +51,7 @@ extension Adapty: PurchaseValidator {
         profileId: String?,
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
-    ) async throws -> VH<AdaptyProfile> {
+    ) async throws(AdaptyError) -> VH<AdaptyProfile> {
         do {
             let response = try await httpSession.validateTransaction(
                 profileId: profileId ?? profileStorage.profileId,
@@ -61,7 +61,7 @@ extension Adapty: PurchaseValidator {
             saveResponse(response, syncedTransaction: true)
             return response
         } catch {
-            throw error.asAdaptyError ?? AdaptyError.validatePurchaseFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 
@@ -69,7 +69,7 @@ extension Adapty: PurchaseValidator {
         profileId: String,
         vendorProductId: String,
         offerId: String
-    ) async throws -> AdaptySubscriptionOffer.Signature {
+    ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature {
         do {
             let response = try await httpSession.signSubscriptionOffer(
                 profileId: profileId,
@@ -78,7 +78,7 @@ extension Adapty: PurchaseValidator {
             )
             return response
         } catch {
-            throw error.asAdaptyError ?? AdaptyError.signSubscriptionOfferFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 }
