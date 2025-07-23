@@ -84,7 +84,7 @@ extension AdaptyViewSource.Localizer {
 
     private func elementProperties(_ from: AdaptyViewSource.Element.Properties) throws -> AdaptyViewConfiguration.Element.Properties? {
         guard !from.isZero else { return nil }
-        return .init(
+        return try .init(
             decorator: from.decorator.map(decorator),
             padding: from.padding,
             offset: from.offset,
@@ -159,7 +159,7 @@ extension AdaptyViewSource.Element: Codable {
         case .pager:
             self = try .pager(AdaptyViewSource.Pager(from: decoder), propertyOrNil())
         }
-        
+
         func propertyOrNil() -> Properties? {
             guard let value = try? Properties(from: decoder) else { return nil }
             return value.isZero ? nil : value
