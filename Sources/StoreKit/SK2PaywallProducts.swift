@@ -14,7 +14,7 @@ extension Adapty {
     func getSK2PaywallProductsWithoutOffers(
         paywall: AdaptyPaywall,
         productsManager: SK2ProductsManager
-    ) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+    ) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
         try await productsManager.fetchSK2ProductsInSameOrder(
             ids: paywall.vendorProductIds,
             fetchPolicy: .returnCacheDataElseLoad
@@ -47,7 +47,7 @@ extension Adapty {
         paywallName: String,
         webPaywallBaseUrl: URL?,
         productsManager: SK2ProductsManager
-    ) async throws -> AdaptySK2PaywallProduct {
+    ) async throws(AdaptyError) -> AdaptySK2PaywallProduct {
         let sk2Product = try await productsManager.fetchSK2Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
 
         let subscriptionOffer: AdaptySubscriptionOffer? =
@@ -76,7 +76,7 @@ extension Adapty {
     func getSK2PaywallProducts(
         paywall: AdaptyPaywall,
         productsManager: SK2ProductsManager
-    ) async throws -> [AdaptyPaywallProduct] {
+    ) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
         let products: [ProductTuple] = try await productsManager.fetchSK2ProductsInSameOrder(
             ids: paywall.vendorProductIds,
             fetchPolicy: .returnCacheDataElseLoad
@@ -215,7 +215,7 @@ extension Adapty {
         return offer
     }
 
-    private func eligibleWinBackOfferIds(for subscriptionGroupIdentifiers: Set<String>) async throws -> [String: [String]] {
+    private func eligibleWinBackOfferIds(for subscriptionGroupIdentifiers: Set<String>) async throws(AdaptyError) -> [String: [String]] {
         var result = [String: [String]]()
         result.reserveCapacity(subscriptionGroupIdentifiers.count)
         for subscriptionGroupIdentifier in subscriptionGroupIdentifiers {
@@ -224,7 +224,7 @@ extension Adapty {
         return result
     }
 
-    private func eligibleWinBackOfferIds(for subscriptionGroupIdentifier: String) async throws -> [String] {
+    private func eligibleWinBackOfferIds(for subscriptionGroupIdentifier: String) async throws(AdaptyError) -> [String] {
         guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else { return [] }
         let statuses: [SK2Product.SubscriptionInfo.Status]
         let stamp = Log.stamp

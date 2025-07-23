@@ -23,7 +23,7 @@ extension Adapty {
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
-    ) async throws -> AdaptyPaywall {
+    ) async throws(AdaptyError) -> AdaptyPaywall {
         let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
 
         let logParams: EventParameters = [
@@ -32,7 +32,7 @@ extension Adapty {
             "fetch_policy": fetchPolicy,
         ]
 
-        return try await withActivatedSDK(methodName: .getPaywallForDefaultAudience, logParams: logParams) { sdk in
+        return try await withActivatedSDK(methodName: .getPaywallForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
             let paywall: AdaptyPaywall = try await sdk.getPlacementForDefaultAudience(
                 placementId,
                 locale,
@@ -48,7 +48,7 @@ extension Adapty {
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
-    ) async throws -> AdaptyOnboarding {
+    ) async throws(AdaptyError) -> AdaptyOnboarding {
         let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
 
         let logParams: EventParameters = [
@@ -57,7 +57,7 @@ extension Adapty {
             "fetch_policy": fetchPolicy,
         ]
 
-        return try await withActivatedSDK(methodName: .getOnboardingForDefaultAudience, logParams: logParams) { sdk in
+        return try await withActivatedSDK(methodName: .getOnboardingForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
             let onboarding: AdaptyOnboarding = try await sdk.getPlacementForDefaultAudience(
                 placementId,
                 locale,
@@ -72,16 +72,17 @@ extension Adapty {
         _ placementId: String,
         _ locale: AdaptyLocale,
         _ fetchPolicy: AdaptyPlacementFetchPolicy
-    ) async throws -> Content {
+    ) async throws(AdaptyError) -> Content {
         let manager = profileManager
         let profileId = manager?.profileId ?? profileStorage.profileId
 
-        let fetchTask = Task<Content, Error> {
-            try await fetchPlacementForDefaultAudience(
+        let fetchTask = Task.withResult { () async throws(AdaptyError) -> Content in
+            let content: Content = try await self.fetchPlacementForDefaultAudience(
                 profileId,
                 placementId,
                 locale
             )
+            return content
         }
 
         let cached: Content? = manager?
@@ -94,7 +95,7 @@ extension Adapty {
             if let cached {
                 cached
             } else {
-                try await fetchTask.value
+                try await fetchTask.value.get()
             }
 
         return content
@@ -104,7 +105,7 @@ extension Adapty {
         _ profileId: String,
         _ placementId: String,
         _ locale: AdaptyLocale
-    ) async throws -> Content {
+    ) async throws(AdaptyError) -> Content {
         let (cached, isTestUser): (Content?, Bool) = {
             guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
             return (
@@ -140,7 +141,7 @@ extension Adapty {
                 locale,
                 withCrossPlacmentABTest: false
             ) else {
-                throw error.asAdaptyError ?? AdaptyError.fetchPlacementFailed(unknownError: error)
+                throw error.asAdaptyError
             }
             return content
         }

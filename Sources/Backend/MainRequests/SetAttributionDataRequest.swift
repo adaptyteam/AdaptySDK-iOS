@@ -62,7 +62,7 @@ extension Backend.MainExecutor {
         source: String,
         attributionJson: String,
         responseHash: String?
-    ) async throws -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
         let request = SetAttributionDataRequest(
             profileId: profileId,
             source: source,

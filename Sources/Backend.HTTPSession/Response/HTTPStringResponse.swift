@@ -16,7 +16,7 @@ extension HTTPDataResponse {
 }
 
 extension HTTPSession {
-    func perform(_ request: some HTTPRequest) async throws -> HTTPStringResponse {
+    func perform(_ request: some HTTPRequest) async throws(HTTPError) -> HTTPStringResponse {
         try await perform(request) { @Sendable response in
             response.asHTTPStringResponse
         }

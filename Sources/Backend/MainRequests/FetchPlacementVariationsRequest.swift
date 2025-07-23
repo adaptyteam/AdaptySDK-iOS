@@ -167,7 +167,7 @@ extension Backend.MainExecutor {
         crossPlacementEligible: Bool,
         variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool
-    ) async throws -> AdaptyPlacementChosen<Content> {
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let request: HTTPRequest & BackendAPIRequestParameters =
             if Content.self == AdaptyPaywall.self {
                 FetchPaywallVariationsRequest(

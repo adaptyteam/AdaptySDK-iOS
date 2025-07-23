@@ -148,7 +148,7 @@ extension Backend.MainExecutor {
         locale: AdaptyLocale,
         cached: Content?,
         disableServerCache: Bool
-    ) async throws -> AdaptyPlacementChosen<Content> {
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let request: HTTPRequest & BackendAPIRequestParameters =
             if Content.self == AdaptyPaywall.self {
                 FetchPaywallRequest(

@@ -46,7 +46,7 @@ extension Backend.MainExecutor {
     func validateReceipt(
         profileId: String,
         receipt: Data
-    ) async throws -> VH<AdaptyProfile> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateReceiptRequest(profileId: profileId, receipt: receipt)
 
         let response = try await perform(

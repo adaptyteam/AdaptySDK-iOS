@@ -59,17 +59,9 @@ actor SK2ProductsManager: StoreKitProductsManager {
     }
 }
 
-private extension Error {
-    var isCancelled: Bool {
-        let error = unwrapped
-        if let httpError = error as? HTTPError { return httpError.isCancelled }
-        return false
-    }
-}
-
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
-    func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws -> [SK2Product] {
+    func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [SK2Product] {
         let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in
@@ -77,8 +69,8 @@ extension SK2ProductsManager {
         }
     }
 
-    func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws -> SK2Product {
-        do {
+    func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws(AdaptyError) -> SK2Product {
+        do throws(AdaptyError) {
             let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
 
             guard let product = products.first else {
@@ -93,7 +85,8 @@ extension SK2ProductsManager {
     }
 
     func fetchSK2Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
-        async throws -> [SK2Product] {
+        async throws(AdaptyError) -> [SK2Product]
+    {
         guard !productIds.isEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }

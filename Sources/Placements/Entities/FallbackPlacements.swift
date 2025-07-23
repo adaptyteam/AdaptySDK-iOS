@@ -15,15 +15,14 @@ struct FallbackPlacements: Sendable {
     var formatVersion: Int { head.formatVersion }
     var version: Int64 { head.version }
 
-    init(fileURL url: URL) throws {
+    init(fileURL url: URL) throws(AdaptyError) {
         guard url.isFileURL else {
             throw AdaptyError.isNotFileUrl()
         }
         let decoder = FallbackPlacements.decoder()
+       
         do {
             head = try decoder.decode(Head.self, from: Data(contentsOf: url))
-        } catch let error as AdaptyError {
-            throw error
         } catch {
             throw AdaptyError.decodingFallback(error)
         }

@@ -30,7 +30,7 @@ extension Backend.FallbackExecutor {
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
         disableServerCache: Bool
-    ) async throws -> AdaptyViewSource {
+    ) async throws(HTTPError) -> AdaptyViewSource {
         let request = FetchFallbackViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,

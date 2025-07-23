@@ -17,7 +17,7 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Localizer {
-    func decorator(_ from: AdaptyViewSource.Decorator) throws -> AdaptyViewConfiguration.Decorator {
+    func decorator(_ from: AdaptyViewSource.Decorator) -> AdaptyViewConfiguration.Decorator {
         .init(
             shapeType: from.shapeType,
             background: from.backgroundAssetId.flatMap { try? background($0) },
@@ -43,7 +43,8 @@ extension AdaptyViewSource.Decorator: Decodable {
         let shape = (try? container.decode(AdaptyViewConfiguration.ShapeType.self, forKey: .shapeType)) ?? AdaptyViewConfiguration.Decorator.defaultShapeType
 
         if case .rectangle = shape,
-           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyViewConfiguration.CornerRadius.self, forKey: .rectangleCornerRadius) {
+           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyViewConfiguration.CornerRadius.self, forKey: .rectangleCornerRadius)
+        {
             shapeType = .rectangle(cornerRadius: rectangleCornerRadius)
         } else {
             shapeType = shape

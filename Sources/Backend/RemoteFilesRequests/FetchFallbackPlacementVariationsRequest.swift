@@ -43,7 +43,7 @@ private extension BackendExecutor {
         variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
-    ) async throws -> AdaptyPlacementChosen<Content> {
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         try await _performFetchFallbackPlacementVariationsRequest(
             requestName,
             apiKeyPrefix,
@@ -71,7 +71,7 @@ private extension BackendExecutor {
         _ variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         _ disableServerCache: Bool,
         _ timeoutInterval: TimeInterval?
-    ) async throws -> AdaptyPlacementChosen<Content> {
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let endpoint =
             if Content.self == AdaptyPaywall.self {
                 HTTPEndpoint(
@@ -123,7 +123,7 @@ private extension BackendExecutor {
             return response.body
 
         } catch {
-            guard (error as? HTTPError)?.statusCode == 404,
+            guard error.statusCode == 404,
                   !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
             else {
                 throw error
@@ -157,7 +157,7 @@ extension Backend.FallbackExecutor {
         variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
-    ) async throws -> AdaptyPlacementChosen<Content> {
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let requestName: APIRequestName =
             if Content.self == AdaptyPaywall.self {
                 .fetchFallbackPaywallVariations
@@ -190,7 +190,7 @@ extension Backend.ConfigsExecutor {
         variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
-    ) async throws -> AdaptyPlacementChosen<Content> {
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let requestName: APIRequestName =
             if Content.self == AdaptyPaywall.self {
                 .fetchPaywallVariationsForDefaultAudience

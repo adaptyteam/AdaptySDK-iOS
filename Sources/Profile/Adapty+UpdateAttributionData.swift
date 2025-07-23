@@ -17,7 +17,7 @@ public extension Adapty {
     nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
         source: String
-    ) async throws {
+    ) async throws(AdaptyError) {
         let attributionJson: String
         do {
             let data = try JSONSerialization.data(withJSONObject: attribution)
@@ -35,12 +35,12 @@ public extension Adapty {
     nonisolated static func updateAttribution(
         _ attributionJson: String,
         source: String
-    ) async throws {
+    ) async throws(AdaptyError) {
         let logParams: EventParameters = [
             "source": source,
         ]
 
-        try await withActivatedSDK(methodName: .updateAttributionData, logParams: logParams) { sdk in
+        try await withActivatedSDK(methodName: .updateAttributionData, logParams: logParams) { sdk throws(AdaptyError) in
             try await sdk.setAttributionData(
                 source: source,
                 attributionJson: attributionJson
@@ -51,8 +51,8 @@ public extension Adapty {
     private func setAttributionData(
         source: String,
         attributionJson: String
-    ) async throws {
-        let (profileId, oldResponseHash) = try await {
+    ) async throws(AdaptyError) {
+        let (profileId, oldResponseHash) = try await { () async throws(AdaptyError) in
             let manager = try await createdProfileManager
             return (manager.profileId, manager.profile.hash)
         }()
@@ -70,7 +70,7 @@ public extension Adapty {
             }
 
         } catch {
-            throw error.asAdaptyError ?? .updateAttributionFaild(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 }
