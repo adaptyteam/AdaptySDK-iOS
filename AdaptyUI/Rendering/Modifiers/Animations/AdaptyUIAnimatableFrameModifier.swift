@@ -11,6 +11,18 @@ import Adapty
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+typealias FrameAnimationValue = (
+    width: AdaptyViewConfiguration.Unit?,
+    height: AdaptyViewConfiguration.Unit?
+)
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+typealias FrameAnimationRange = (
+    start: FrameAnimationValue,
+    end: FrameAnimationValue
+)
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIAnimatableFrameModifier: ViewModifier {
     private let box: VC.Box
     private let animations: [AdaptyViewConfiguration.Animation]?
@@ -40,13 +52,13 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
         let resolvedHeight: CGFloat?
 
         switch (box.width, box.height) {
-        case let (.fixed(w), .fixed(h)):
+        case (.fixed(let w), .fixed(let h)):
             resolvedWidth = animatedWidth ?? w.points(screenSize: screenSize.width, safeAreaStart: safeArea.leading, safeAreaEnd: safeArea.trailing)
             resolvedHeight = animatedHeight ?? h.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
-        case let (.fixed(w), _):
+        case (.fixed(let w), _):
             resolvedWidth = animatedWidth ?? w.points(screenSize: screenSize.width, safeAreaStart: safeArea.leading, safeAreaEnd: safeArea.trailing)
             resolvedHeight = animatedHeight
-        case let (_, .fixed(h)):
+        case (_, .fixed(let h)):
             resolvedWidth = animatedWidth
             resolvedHeight = animatedHeight ?? h.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
         default:
@@ -94,34 +106,55 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
 
         for animation in animations {
             switch animation {
-            case let .box(timeline, value):
-                if let widthValue = value.width {
-                    animatedWidth = widthValue.start.points(.horizontal, screenSize, safeArea)
+            case .box(let timeline, let value):
+                let frameAnimationRange: FrameAnimationRange?
 
-                    tokens.insert(
-                        timeline.animate(
-                            from: widthValue.start,
-                            to: widthValue.end,
-                            updateBlock: {
-                                self.animatedWidth = $0.points(.horizontal, screenSize, safeArea)
-                            }
-                        )
+                switch (value.width, value.height) {
+                case (.some(let w), .some(let h)):
+                    frameAnimationRange = (
+                        start: (width: w.start, height: h.start),
+                        end: (width: w.end, height: h.end)
                     )
+                case (.none, .some(let h)):
+                    frameAnimationRange = (
+                        start: (width: nil, height: h.start),
+                        end: (width: nil, height: h.end)
+                    )
+                case (.some(let w), .none):
+                    frameAnimationRange = (
+                        start: (width: w.start, height: nil),
+                        end: (width: w.end, height: nil)
+                    )
+                case (.none, .none):
+                    frameAnimationRange = nil
                 }
 
-                if let heightValue = value.height {
-                    animatedHeight = heightValue.start.points(.vertical, screenSize, safeArea)
+                guard let range = frameAnimationRange else { break }
 
-                    tokens.insert(
-                        timeline.animate(
-                            from: heightValue.start,
-                            to: heightValue.end,
-                            updateBlock: {
-                                self.animatedHeight = $0.points(.vertical, screenSize, safeArea)
-                            }
-                        )
-                    )
+                if let startWidth = range.start.width {
+                    animatedWidth = startWidth.points(.horizontal, screenSize, safeArea)
                 }
+
+                if let startHeight = range.start.height {
+                    animatedWidth = startHeight.points(.horizontal, screenSize, safeArea)
+                }
+
+                tokens.insert(
+                    timeline.animate(
+                        from: range.start,
+                        to: range.end,
+                        updateBlock: { v in
+                            if let currentWidth = v.width {
+                                animatedWidth = currentWidth.points(.horizontal, screenSize, safeArea)
+                            }
+
+                            if let currentHeight = v.height {
+                                animatedHeight = currentHeight.points(.horizontal, screenSize, safeArea)
+                            }
+                        }
+                    )
+                )
+
             default:
                 break
             }
