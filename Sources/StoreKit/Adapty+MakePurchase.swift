@@ -17,7 +17,8 @@ public extension Adapty {
     /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func makePurchase(
-        product: AdaptyPaywallProduct
+        product: AdaptyPaywallProduct,
+        parameters: AdaptyPurchaseParameters? = nil
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
@@ -25,6 +26,7 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
+                "app_account_token": parameters?.appAccountToken,
             ]
         ) { sdk throws(AdaptyError) in
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
@@ -40,7 +42,8 @@ public extension Adapty {
 
             return try await manager.makePurchase(
                 profileId: sdk.profileStorage.profileId,
-                product: product
+                product: product,
+                parameters: parameters
             )
         }
     }
@@ -53,7 +56,9 @@ public extension Adapty {
     ///   - product: a ``AdaptyDeferredProduct`` object retrieved from the delegate.
     /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func makePurchase(product: AdaptyDeferredProduct) async throws(AdaptyError) -> AdaptyPurchaseResult {
+    nonisolated static func makePurchase(
+        product: AdaptyDeferredProduct
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [

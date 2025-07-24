@@ -22,6 +22,7 @@ extension Request {
         let customTags: [String: String]?
         let customTimers: [String: Date]?
         let customAssets: [AdaptyCustomAsset.Identifiable]?
+        let productPurchaseParameters: [String: AdaptyPurchaseParameters]?
 
         enum CodingKeys: String, CodingKey {
             case paywall
@@ -30,6 +31,7 @@ extension Request {
             case customTags = "custom_tags"
             case customTimers = "custom_timers"
             case customAssets = "custom_assets"
+            case productPurchaseParameters = "product_purchase_parameters"
         }
 
         func execute() async throws -> AdaptyJsonData {
@@ -44,7 +46,8 @@ extension Request {
                 preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,
                 timerResolver: customTimers,
-                assetsResolver: assetsResolver()
+                assetsResolver: assetsResolver(),
+                productPurchaseParameters: productPurchaseParameters
             ))
         }
 
@@ -60,10 +63,8 @@ extension Request {
                 case .asset(let value):
                     assetsResolver[asset.id] = value
                 case .imageFlutterAssetId(let assetId):
-
                     assetsResolver[asset.id] = try .image(.file(url: url(assetId)))
                 case .videoFlutterAssetId(let assetId):
-
                     assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil))
                 }
             }
