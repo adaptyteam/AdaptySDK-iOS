@@ -57,8 +57,13 @@ final class OnboardingManager: NSObject {
     private func activateAdapty() {
         Task {
             do {
+                Adapty.logLevel = .info
+
+                #error("Change this constant with your own API key, then remove this line.")
+                let apiKey = "YOUR_API_KEY"
+
                 let configBuilder = AdaptyConfiguration
-                    .builder(withAPIKey: "YOUR_API_KEY")
+                    .builder(withAPIKey: apiKey)
 
                 try await Adapty.activate(with: configBuilder.build())
                 try await AdaptyUI.activate()

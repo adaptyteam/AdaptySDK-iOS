@@ -84,7 +84,8 @@ actor SK2Purchaser {
 
     func makePurchase(
         profileId: String,
-        product: AdaptyPaywallProduct
+        product: AdaptyPaywallProduct,
+        parameters: AdaptyPurchaseParameters?
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2Product = product.sk2Product
@@ -92,21 +93,25 @@ actor SK2Purchaser {
             throw AdaptyError.cantMakePayments()
         }
 
-        let options: Set<Product.PurchaseOption>
+        var options = Set<Product.PurchaseOption>()
+
+        if let uuid = parameters?.appAccountToken {
+            options.insert(.appAccountToken(uuid))
+        }
 
         switch product.subscriptionOffer {
         case .none:
-            options = []
+            break
         case let .some(offer):
             switch offer.offerIdentifier {
             case .introductory:
-                options = []
+                break
 
             case let .winBack(offerId):
                 if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
                    let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId)
                 {
-                    options = [.winBackOffer(winBackOffer)]
+                    options.insert(.winBackOffer(winBackOffer))
                 } else {
                     throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
                 }
@@ -118,15 +123,15 @@ actor SK2Purchaser {
                     offerId: offerId
                 )
 
-                options = [
+                options.insert(
                     .promotionalOffer(
                         offerID: offerId,
                         keyID: response.keyIdentifier,
                         nonce: response.nonce,
                         signature: response.signature,
                         timestamp: response.timestamp
-                    ),
-                ]
+                    )
+                )
             }
         }
 

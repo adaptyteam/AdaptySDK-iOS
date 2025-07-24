@@ -299,10 +299,11 @@ public extension Adapty {
     ///   - completion: A result containing the ``AdaptyPurchaseResult`` object.
     nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
+        parameters: AdaptyPurchaseParameters? = nil,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await makePurchase(product: product)
+            try await makePurchase(product: product, parameters: parameters)
         }
     }
 

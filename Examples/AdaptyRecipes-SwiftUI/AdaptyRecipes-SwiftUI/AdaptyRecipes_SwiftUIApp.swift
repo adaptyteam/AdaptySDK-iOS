@@ -22,7 +22,7 @@ struct AdaptyRecipes_SwiftUIApp: App {
             .build()
 
         Adapty.delegate = viewModel
-        Adapty.logLevel = .verbose
+        Adapty.logLevel = .info
         Adapty.activate(with: configuration)
 
 #if canImport(UIKit)
