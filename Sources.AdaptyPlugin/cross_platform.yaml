@@ -1167,9 +1167,13 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - access_level_id
+      - product_type
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       promotional_offer_id: { type: string, description: "iOS Only" }
       win_back_offer_id: { type: string, description: "iOS Only" }
       base_plan_id: { type: string, description: "Android Only" }
