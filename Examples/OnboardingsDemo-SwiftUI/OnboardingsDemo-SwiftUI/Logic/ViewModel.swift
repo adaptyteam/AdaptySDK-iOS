@@ -38,10 +38,13 @@ final class ViewModel: ObservableObject {
     func activateAdapty() {
         Task {
             do {
-                Adapty.logLevel = .verbose
-                
+                Adapty.logLevel = .info
+
+                #error("Change this constant with your own API key, then remove this line.")
+                let apiKey = "YOUR_API_KEY"
+
                 let configBuilder = AdaptyConfiguration
-                    .builder(withAPIKey: "YOUR_API_KEY")
+                    .builder(withAPIKey: apiKey)
 
                 try await Adapty.activate(with: configBuilder.build())
                 try await AdaptyUI.activate()
