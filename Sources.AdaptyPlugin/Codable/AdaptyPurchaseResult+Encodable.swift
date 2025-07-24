@@ -12,6 +12,7 @@ extension AdaptyPurchaseResult: Encodable {
     private enum CodingKeys: String, CodingKey {
         case resultType = "type"
         case profile
+        case jwsTransaction = "jws_transaction"
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -24,6 +25,9 @@ extension AdaptyPurchaseResult: Encodable {
         case .success(let profile, _):
             try container.encode("success", forKey: .resultType)
             try container.encode(profile, forKey: .profile)
+            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+                try container.encodeIfPresent(jwsTransaction, forKey: .jwsTransaction)
+            }
         }
     }
 

@@ -1384,6 +1384,7 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
+          jws_transaction: { type: string }
 
   AdaptyInstallationStatus: #response #event
     type: object
