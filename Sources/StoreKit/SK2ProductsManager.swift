@@ -91,10 +91,6 @@ extension SK2ProductsManager {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 
-        guard !productIds.isEmpty else {
-            throw StoreKitManagerError.noProductIDsFound().asAdaptyError
-        }
-
         if fetchPolicy == .returnCacheDataElseLoad {
             let products = productIds.compactMap { self.products[$0] }
             if products.count == productIds.count {
