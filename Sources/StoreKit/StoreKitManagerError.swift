@@ -17,6 +17,7 @@ enum StoreKitManagerError: Error {
     case transactionUnverified(AdaptyError.Source, error: Error?)
     case invalidOffer(AdaptyError.Source, error: String)
     case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
+    case paymentPendingError(AdaptyError.Source)
 }
 
 extension StoreKitManagerError: CustomStringConvertible {
@@ -52,6 +53,8 @@ extension StoreKitManagerError: CustomStringConvertible {
             "StoreKitManagerError.invalidOffer(\(source), \"\(error)\")"
         case let .getSubscriptionInfoStatusFailed(source, error):
             "StoreKitManagerError.getSubscriptionInfoStatusFailed(\(source), \(error))"
+        case let .paymentPendingError(source):
+            "StoreKitManagerError.paymentPendingError(\(source))"
         }
     }
 }
@@ -67,7 +70,8 @@ extension StoreKitManagerError {
              let .interrupted(src),
              let .transactionUnverified(src, _),
              let .invalidOffer(src, _),
-             let .getSubscriptionInfoStatusFailed(src, _): src
+             let .getSubscriptionInfoStatusFailed(src, _),
+             let .paymentPendingError(src): src
         }
     }
 
@@ -105,6 +109,14 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .productPurchaseFailed(AdaptyError.Source(file: file, function: function, line: line), transactionError: error)
+    }
+    
+    static func paymentPendingError(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .paymentPendingError(AdaptyError.Source(file: file, function: function, line: line))
     }
 
     static func receiptIsEmpty(
