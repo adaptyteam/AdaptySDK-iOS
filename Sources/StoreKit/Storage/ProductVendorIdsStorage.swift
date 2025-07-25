@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @ProductVendorIdsStorage.InternalActor
-final class ProductVendorIdsStorage: Sendable {
+final class ProductVendorIdsStorage {
     @globalActor
     actor InternalActor {
         package static let shared = InternalActor()

@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class UserAcquisitionStorage: Sendable {
+final class UserAcquisitionStorage {
     private enum Constants {
         static let version = "AdaptySDK_User_Acquisition_Version"
         static let registrationInstallSaved = "AdaptySDK_User_Acquisition_saved"

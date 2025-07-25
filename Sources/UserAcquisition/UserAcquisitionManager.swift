@@ -8,7 +8,7 @@
 import Foundation
 
 @AdaptyActor
-final class UserAcquisitionManager: Sendable {
+final class UserAcquisitionManager {
     private let storage: UserAcquisitionStorage
     private let executor: Backend.UAExecutor
     private let installTime: Date

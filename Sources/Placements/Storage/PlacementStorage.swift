@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class PlacementStorage: Sendable {
+final class PlacementStorage {
     private static func getPlacement<Content: AdaptyPlacementContent>(_ placementId: String) -> VH<Content>? {
         if Content.self == AdaptyPaywall.self {
             return PaywallStorage.paywallByPlacementId[placementId] as? VH<Content>

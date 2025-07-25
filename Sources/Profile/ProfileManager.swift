@@ -8,7 +8,7 @@
 import Foundation
 
 @AdaptyActor
-final class ProfileManager: Sendable {
+final class ProfileManager {
     nonisolated let profileId: String
     var profile: VH<AdaptyProfile>
     var onceSentEnvironment: SentEnvironment

@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class PaywallStorage: Sendable {
+final class PaywallStorage {
     private enum Constants {
         static let paywallStorageKey = "AdaptySDK_Cached_Purchase_Containers"
         static let paywallStorageVersionKey = "AdaptySDK_Cached_Purchase_Containers_Version"

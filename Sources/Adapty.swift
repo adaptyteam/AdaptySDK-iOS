@@ -8,7 +8,7 @@
 import Foundation
 
 @AdaptyActor
-public final class Adapty: Sendable {
+public final class Adapty {
     let profileStorage: ProfileStorage
 
     let apiKeyPrefix: String

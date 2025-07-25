@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class OnboardingStorage: Sendable {
+final class OnboardingStorage {
     private enum Constants {
         static let onboardingStorageKey = "AdaptySDK_Cached_Onboarding"
         static let onboardingStorageVersionKey = "AdaptySDK_Cached_Onboarding_Version"
