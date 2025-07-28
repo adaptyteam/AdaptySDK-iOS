@@ -15,6 +15,9 @@ public extension Adapty {
     /// - Parameters:
     ///   - customerUserId: User identifier in your system.
     nonisolated static func identify(_ customerUserId: String) async throws(AdaptyError) {
+        let customerUserId = customerUserId.trimmed
+        // TODO: throw error if customerUserId isEmpty
+        
         try await withActivatedSDK(methodName: .identify, logParams: ["customerUserId": customerUserId]) { sdk throws(AdaptyError) in
             try await sdk.identify(toCustomerUserId: customerUserId)
         }

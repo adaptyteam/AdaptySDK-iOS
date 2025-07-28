@@ -30,7 +30,8 @@ extension Log {
 
     static func responseError(_ error: HTTPError, request: URLRequest, stamp: String, response: HTTPDataResponse?) {
         if case let .network(_, _, _, error: originalError) = error,
-           originalError.isNetworkConnectionError {
+           originalError.isNetworkConnectionError
+        {
             log.verbose("NO CONNECTION <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)] -- \(error)\(error.metrics?.debugDescription ?? "")")
         } else if error.isCancelled {
             log.verbose("CANCELED <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)]\(error.metrics?.debugDescription ?? "")")
@@ -68,7 +69,7 @@ private extension HTTPDataResponse {
 
 private extension Data? {
     var asLogString: String {
-        guard let data = self, let str = String(data: data, encoding: .utf8), !str.isEmpty else { return "" }
+        guard let data = self, let str = String(data: data, encoding: .utf8).nonEmptyOrNil else { return "" }
         return " -d '\(str)'"
     }
 }

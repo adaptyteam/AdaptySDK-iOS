@@ -90,7 +90,7 @@ actor SK2Purchaser {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2Product = product.sk2Product
         else {
-            throw AdaptyError.cantMakePayments()
+            throw .cantMakePayments()
         }
 
         var options = Set<Product.PurchaseOption>()

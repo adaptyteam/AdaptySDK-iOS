@@ -32,7 +32,7 @@ extension Adapty {
         Task {
             guard let observer = await holder.imageUrlObserver else { return }
             let urls = config.extractImageUrls(config.responseLocale)
-            guard !urls.isEmpty else { return }
+            guard urls.isNotEmpty else { return }
             observer.extractedImageUrls(urls)
         }
     }

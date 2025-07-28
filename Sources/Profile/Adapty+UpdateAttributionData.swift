@@ -23,7 +23,7 @@ public extension Adapty {
             let data = try JSONSerialization.data(withJSONObject: attribution)
             attributionJson = String(decoding: data, as: UTF8.self)
         } catch {
-            throw AdaptyError.wrongAttributeData(error)
+            throw .wrongAttributeData(error)
         }
 
         try await updateAttribution(
@@ -36,6 +36,9 @@ public extension Adapty {
         _ attributionJson: String,
         source: String
     ) async throws(AdaptyError) {
+        let source = source.trimmed
+        // TODO: throw error if source isEmpty
+
         let logParams: EventParameters = [
             "source": source,
         ]

@@ -34,7 +34,7 @@ final class OnboardingStorage {
     static func setOnboarding(_ onboarding: AdaptyOnboarding) {
         onboardingByPlacementId[onboarding.placement.id] = VH(onboarding, time: Date())
         let array = Array(onboardingByPlacementId.values)
-        guard !array.isEmpty else {
+        guard array.isNotEmpty else {
             userDefaults.removeObject(forKey: Constants.onboardingStorageKey)
             return
         }

@@ -92,7 +92,7 @@ extension HTTPMetrics: Encodable {
         if redirectCount > 0 {
             try container.encode(redirectCount, forKey: .redirect)
         }
-        if !transactions.isEmpty {
+        if transactions.isNotEmpty {
             try container.encode(transactions, forKey: .transactions)
         }
         if decoding > 0 {
@@ -144,7 +144,7 @@ extension HTTPMetrics: CustomDebugStringConvertible {
         if redirectCount > 0 {
             result += "\tredirects: \(redirectCount)"
         }
-        if !transactions.isEmpty {
+        if transactions.isNotEmpty {
             result += "\t\t " + transactions.map { $0.debugDescription }.joined(separator: ", ")
         }
         if decoding > 1 {

@@ -30,7 +30,7 @@ public extension Adapty {
             ]
         ) { sdk throws(AdaptyError) in
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
-                guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
+                guard let manager = sdk.sk1QueueManager else { throw .cantMakePayments() }
 
                 return try await manager.makePurchase(
                     profileId: sdk.profileStorage.profileId,
@@ -38,7 +38,7 @@ public extension Adapty {
                 )
             }
 
-            guard let manager = sdk.sk2Purchaser else { throw AdaptyError.cantMakePayments() }
+            guard let manager = sdk.sk2Purchaser else { throw .cantMakePayments() }
 
             return try await manager.makePurchase(
                 profileId: sdk.profileStorage.profileId,
@@ -65,7 +65,7 @@ public extension Adapty {
                 "product_id": product.vendorProductId,
             ]
         ) { sdk throws(AdaptyError) in
-            guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
+            guard let manager = sdk.sk1QueueManager else { throw .cantMakePayments() }
             return try await manager.makePurchase(product: product)
         }
     }
@@ -85,7 +85,7 @@ public extension Adapty {
 
             let manager = try await sdk.createdProfileManager
             if manager.profileId != profileId {
-                throw AdaptyError.profileWasChanged()
+                throw .profileWasChanged()
             }
 
             return await manager.getProfile()

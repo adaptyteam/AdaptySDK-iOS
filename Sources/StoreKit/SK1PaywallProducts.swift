@@ -112,12 +112,13 @@ extension Adapty {
             return $0.product.productIdentifier
         }
 
-        if !vendorProductIds.isEmpty {
+        if vendorProductIds.isNotEmpty {
             let introductoryOfferEligibility = await getIntroductoryOfferEligibility(vendorProductIds: vendorProductIds)
             products = products.map {
                 guard !$0.determinedOffer else { return $0 }
                 return if let introductoryOffer = $0.product.subscriptionOffer(by: .introductory),
-                          introductoryOfferEligibility.contains($0.product.productIdentifier) {
+                          introductoryOfferEligibility.contains($0.product.productIdentifier)
+                {
                     (product: $0.product, reference: $0.reference, offer: introductoryOffer, determinedOffer: true)
                 } else {
                     (product: $0.product, reference: $0.reference, offer: nil, determinedOffer: true)
@@ -162,7 +163,7 @@ extension Adapty {
         let (profileId, ineligibleProductIds) = profileState
 
         let vendorProductIds = vendorProductIds.filter { !ineligibleProductIds.contains($0) }
-        guard !vendorProductIds.isEmpty else { return [] }
+        guard vendorProductIds.isNotEmpty else { return [] }
 
         if !profileStorage.syncedTransactions {
             do {

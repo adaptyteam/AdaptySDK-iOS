@@ -24,8 +24,10 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws(AdaptyError) -> AdaptyPaywall {
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
-
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let placementId = placementId.trimmed
+        // TODO: throw error if placementId isEmpty
+        
         let logParams: EventParameters = [
             "placement_id": placementId,
             "locale": locale,
@@ -49,8 +51,10 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws(AdaptyError) -> AdaptyOnboarding {
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
-
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let placementId = placementId.trimmed
+        // TODO: throw error if placementId isEmpty
+        
         let logParams: EventParameters = [
             "placement_id": placementId,
             "locale": locale,

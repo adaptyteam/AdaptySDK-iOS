@@ -21,7 +21,7 @@ final class Storage {
 
     @AdaptyActor
     fileprivate static let appInstallation: (identifier: String, time: Date?, appLaunchCount: Int?) =
-        if let identifier = userDefaults.string(forKey: Constants.appInstallationIdentifier), !identifier.isEmpty {
+    if let identifier = userDefaults.string(forKey: Constants.appInstallationIdentifier).nonEmptyOrNil {
             continueSession(installIdentifier: identifier)
         } else {
             createAppInstallation()

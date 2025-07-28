@@ -16,7 +16,7 @@ public extension AdaptyProfileParameters {
         }
 
         init(_ values: AdaptyProfileParameters) {
-            parameters = values
+            self.parameters = values
         }
 
         public func build() -> AdaptyProfileParameters { parameters }
@@ -26,13 +26,13 @@ public extension AdaptyProfileParameters {
 public extension AdaptyProfileParameters.Builder {
     @discardableResult
     func with(firstName value: String?) -> Self {
-        parameters.firstName = value
+        parameters.firstName = value.trimmed.nonEmptyOrNil
         return self
     }
 
     @discardableResult
     func with(lastName value: String?) -> Self {
-        parameters.lastName = value
+        parameters.lastName = value.trimmed.nonEmptyOrNil
         return self
     }
 
@@ -57,54 +57,72 @@ public extension AdaptyProfileParameters.Builder {
 
     @discardableResult
     func with(email value: String?) -> Self {
-        parameters.email = value
+        parameters.email = value.trimmed.nonEmptyOrNil
         return self
     }
 
     @discardableResult
     func with(phoneNumber value: String?) -> Self {
-        parameters.phoneNumber = value
-        return self
-    }
-}
-
-public extension AdaptyProfileParameters.Builder {
-    internal func with(customAttributes: AdaptyProfile.CustomAttributes?) -> Self {
-        parameters.codableCustomAttributes = customAttributes
+        parameters.phoneNumber = value.trimmed.nonEmptyOrNil
         return self
     }
 
     @discardableResult
-    func withRemoved(customAttributeForKey key: String) throws -> Self {
+    func with(analyticsDisabled value: Bool?) -> Self {
+        parameters.analyticsDisabled = value
+        return self
+    }
+
+    @discardableResult
+    func withRemoved(customAttributeForKey key: String) throws(AdaptyError) -> Self {
         try with(customAttribute: .none, forKey: key)
     }
 
     @discardableResult
-    func with(customAttribute value: String, forKey key: String) throws -> Self {
-        try with(customAttribute: .string(value), forKey: key)
+    func with(customAttribute value: String, forKey key: String) throws(AdaptyError) -> Self {
+        guard let value = value.trimmed.nonEmptyOrNil else {
+            return try with(customAttribute: .none, forKey: key)
+        }
+        return try with(customAttribute: .string(value), forKey: key)
     }
 
     @discardableResult
-    func with(customAttribute value: Double, forKey key: String) throws -> Self {
+    func with(customAttribute value: Double, forKey key: String) throws(AdaptyError) -> Self {
         try with(customAttribute: .double(value), forKey: key)
     }
 
-    internal func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws(AdaptyError) -> Self {
-        if let error = AdaptyProfile.CustomAttributes.validateKey(key) { throw error }
-        if let error = value.validate() { throw error }
+    private func with(customAttribute value: AdaptyProfile.CustomAttributeValue, forKey key: String) throws(AdaptyError) -> Self {
+        let key = key.trimmed
+        try AdaptyProfile.CustomAttributes.validateKey(key)
+        try value.validateLenght()
         var attributes = parameters.codableCustomAttributes ?? AdaptyProfile.CustomAttributes()
         attributes.updateValue(value, forKey: key)
-        if let error = attributes.validate() { throw error }
+        try attributes.validateCount()
         parameters.codableCustomAttributes = attributes
         return self
     }
 }
 
-public extension AdaptyProfileParameters.Builder {
-    @discardableResult
-    func with(analyticsDisabled value: Bool?) -> Self {
-        parameters.analyticsDisabled = value
-        return self
+extension AdaptyProfileParameters.Builder: Decodable {
+    public convenience init(from decoder: any Decoder) throws {
+        var parameters = AdaptyProfileParameters()
+        let container = try decoder.container(keyedBy: AdaptyProfileParameters.CodingKeys.self)
+
+        parameters.firstName = try container.decodeIfPresent(String.self, forKey: .firstName).trimmed.nonEmptyOrNil
+        parameters.lastName = try container.decodeIfPresent(String.self, forKey: .lastName).trimmed.nonEmptyOrNil
+        parameters.gender = try container.decodeIfPresent(AdaptyProfile.Gender.self, forKey: .gender)
+        parameters.birthday = try container.decodeIfPresent(String.self, forKey: .birthday).trimmed.nonEmptyOrNil
+        parameters.email = try container.decodeIfPresent(String.self, forKey: .email).trimmed.nonEmptyOrNil
+        parameters.phoneNumber = try container.decodeIfPresent(String.self, forKey: .phoneNumber).trimmed.nonEmptyOrNil
+        parameters.appTrackingTransparencyStatus = try container.decodeIfPresent(AdaptyProfileParameters.AppTrackingTransparencyStatus.self, forKey: .appTrackingTransparencyStatus)
+        parameters.analyticsDisabled = try container.decodeIfPresent(Bool.self, forKey: .analyticsDisabled)
+
+        if let customAttributes = try container.decodeIfPresent(AdaptyProfile.CustomAttributes.self, forKey: .codableCustomAttributes) {
+            try customAttributes.validateCount()
+            parameters.codableCustomAttributes = customAttributes
+        }
+
+        self.init(parameters)
     }
 }
 

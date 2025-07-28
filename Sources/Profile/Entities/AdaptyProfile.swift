@@ -110,13 +110,13 @@ extension AdaptyProfile: Codable {
         try container.encode(isTestUser, forKey: .isTestUser)
         try container.encode(version, forKey: .version)
         try container.encodeIfPresent(codableCustomAttributes, forKey: .customAttributes)
-        if !accessLevels.isEmpty {
+        if accessLevels.isNotEmpty {
             try container.encode(accessLevels, forKey: .accessLevels)
         }
-        if !subscriptions.isEmpty {
+        if subscriptions.isNotEmpty {
             try container.encode(subscriptions, forKey: .subscriptions)
         }
-        if !nonSubscriptions.isEmpty {
+        if nonSubscriptions.isNotEmpty {
             try container.encode(nonSubscriptions, forKey: .nonSubscriptions)
         }
     }

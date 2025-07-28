@@ -108,7 +108,7 @@ extension AdaptyViewSource.Timer: Decodable {
 
         horizontalAlign = try container.decodeIfPresent(AdaptyViewConfiguration.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         let textAttributes = try AdaptyViewSource.TextAttributes(from: decoder)
-        defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes
+        defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 }
 

@@ -36,7 +36,7 @@ extension Backend {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             if let code = try container.decodeIfPresent(String.self, forKey: .code) {
                 self.codes = [code]
-            } else if let details = try container.decodeIfPresent([Detail].self, forKey: .details), !details.isEmpty {
+            } else if let details = try container.decodeIfPresent([Detail].self, forKey: .details).nonEmptyOrNil {
                 self.codes = details.map(\.value)
             } else {
                 let array = try container.decodeIfPresent([Code].self, forKey: .array)
@@ -56,8 +56,8 @@ extension Backend {
 
     @Sendable
     func validator(_ response: HTTPDataResponse) -> Error? {
-        guard let data = response.body, !data.isEmpty,
-              let errorCodes = try? errorCodesResponse(from: data, withConfiguration: self).codes, !errorCodes.isEmpty
+        guard let data = response.body.nonEmptyOrNil,
+              let errorCodes = try? errorCodesResponse(from: data, withConfiguration: self).codes.nonEmptyOrNil
         else {
             return HTTPResponse.statusCodeValidator(response)
         }

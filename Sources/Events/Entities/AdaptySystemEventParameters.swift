@@ -141,7 +141,7 @@ private extension HTTPHeaders {
 
     var filtered: HTTPHeaders? {
         let filtered = filter { $0.key.lowercased().hasSuffix(Suffix.cacheStatus) }
-        return filtered.isEmpty ? nil : filtered
+        return filtered.nonEmptyOrNil
     }
 }
 

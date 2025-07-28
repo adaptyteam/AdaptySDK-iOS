@@ -105,7 +105,7 @@ final class EventsManager {
             blackList: configuration.blacklist
         )
 
-        guard !events.elements.isEmpty else {
+        guard events.elements.isNotEmpty else {
             eventStorages.subtract(oldIndexes: events.endIndex)
             return
         }
@@ -125,7 +125,7 @@ final class EventsManager {
 
 @EventsManagerActor
 private extension [EventCollectionStorage] {
-    var hasEvents: Bool { contains { !$0.isEmpty } }
+    var hasEvents: Bool { contains { $0.isNotEmpty } }
 
     func getEvents(limit: Int, blackList: Set<String>) -> (elements: [Data], endIndex: [Int?]) {
         var limit = limit

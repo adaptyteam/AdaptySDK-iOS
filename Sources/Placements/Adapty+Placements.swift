@@ -30,7 +30,9 @@ extension Adapty {
         loadTimeout: TimeInterval? = nil
     ) async throws(AdaptyError) -> AdaptyPaywall {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let placementId = placementId.trimmed
+        // TODO: throw error if placementId isEmpty
 
         let logParams: EventParameters = [
             "placement_id": placementId,
@@ -59,7 +61,9 @@ extension Adapty {
         loadTimeout: TimeInterval? = nil
     ) async throws(AdaptyError) -> AdaptyOnboarding {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let placementId = placementId.trimmed
+        // TODO: throw error if placementId isEmpty
 
         let logParams: EventParameters = [
             "placement_id": placementId,
@@ -138,7 +142,7 @@ extension Adapty {
         } catch let error as AdaptyError {
             guard error.canUseFallbackServer else { throw error }
         } catch {
-            guard error is TimeoutError else { throw AdaptyError.unknown(error)}
+            guard error is TimeoutError else { throw .unknown(error) }
         }
 
         return try await fetchFallbackPlacement(

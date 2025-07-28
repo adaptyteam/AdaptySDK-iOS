@@ -24,7 +24,7 @@ extension AdaptyPlacement {
         }
 
         var isCrossPlacementTest: Bool {
-            !variationIdByPlacements.isEmpty
+            variationIdByPlacements.isNotEmpty
         }
 
         init(from decoder: Decoder) throws {

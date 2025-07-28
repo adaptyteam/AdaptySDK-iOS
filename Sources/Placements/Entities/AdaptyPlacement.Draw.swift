@@ -17,7 +17,7 @@ extension AdaptyPlacement {
 }
 
 extension AdaptyPlacement.Draw {
-    var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
+    var participatesInCrossPlacementABTest: Bool { variationIdByPlacements.isNotEmpty }
 }
 
 extension AdaptyPlacement.Draw: Decodable {
@@ -28,7 +28,7 @@ extension AdaptyPlacement.Draw: Decodable {
 
         let variations = try [AdaptyPlacement.Variation](from: decoder)
 
-        guard !variations.isEmpty else {
+        guard variations.isNotEmpty else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placements contents collection is empty"))
         }
 

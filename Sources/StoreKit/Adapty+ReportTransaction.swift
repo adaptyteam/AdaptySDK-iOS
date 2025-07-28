@@ -12,7 +12,11 @@ public extension Adapty {
         _ transactionId: String,
         withVariationId variationId: String?
     ) async throws(AdaptyError) -> AdaptyProfile {
-        try await withActivatedSDK(methodName: .setVariationId, logParams: [
+        let variationId = variationId.trimmed.nonEmptyOrNil
+        let transactionId = transactionId.trimmed
+        // TODO: throw error if transactionId isEmpty
+
+        return try await withActivatedSDK(methodName: .setVariationId, logParams: [
             "variation_id": variationId,
             "transaction_id": transactionId,
         ]) { sdk throws(AdaptyError) in
@@ -38,6 +42,7 @@ public extension Adapty {
         _ transaction: StoreKit.SKPaymentTransaction,
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
+        let variationId = variationId.trimmed.nonEmptyOrNil
         try await withActivatedSDK(methodName: .reportSK1Transaction, logParams: [
             "variation_id": variationId,
             "transaction_id": transaction.transactionIdentifier,
@@ -45,7 +50,7 @@ public extension Adapty {
             guard transaction.transactionState == .purchased || transaction.transactionState == .restored,
                   let id = transaction.transactionIdentifier
             else {
-                throw AdaptyError.wrongParamPurchasedTransaction()
+                throw .wrongParamPurchasedTransaction()
             }
 
             let sk1Transaction = SK1TransactionWithIdentifier(transaction, id: id)
@@ -89,6 +94,7 @@ public extension Adapty {
         _ transaction: StoreKit.Transaction,
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
+        let variationId = variationId.trimmed.nonEmptyOrNil
         try await withActivatedSDK(methodName: .reportSK2Transaction, logParams: [
             "variation_id": variationId,
             "transaction_id": transaction.unfIdentifier,

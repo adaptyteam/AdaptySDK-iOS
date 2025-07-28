@@ -159,7 +159,7 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
         queue.async { [weak self] in
             guard let self else { return }
 
-            guard let handlers = self.refreshCompletionHandlers, !handlers.isEmpty else {
+            guard let handlers = self.refreshCompletionHandlers.nonEmptyOrNil else {
                 log.error("Not found refreshCompletionHandlers")
                 return
             }

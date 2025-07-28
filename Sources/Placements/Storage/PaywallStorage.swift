@@ -34,7 +34,7 @@ final class PaywallStorage {
     static func setPaywall(_ paywall: AdaptyPaywall) {
         paywallByPlacementId[paywall.placement.id] = VH(paywall, time: Date())
         let array = Array(paywallByPlacementId.values)
-        guard !array.isEmpty else {
+        guard array.isNotEmpty else {
             userDefaults.removeObject(forKey: Constants.paywallStorageKey)
             return
         }

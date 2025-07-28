@@ -48,7 +48,7 @@ public extension AdaptyProfileParameters {
     func builder() -> Builder { Builder(self) }
 }
 
-extension AdaptyProfileParameters: Codable {
+extension AdaptyProfileParameters: Encodable {
     enum CodingKeys: String, CodingKey {
         case firstName = "first_name"
         case lastName = "last_name"

@@ -161,7 +161,7 @@ public final class Adapty {
                   profileId == creatingProfileId,
                   customerUserId == creatingCustomerUserId
             else {
-                throw AdaptyError.profileWasChanged()
+                throw .profileWasChanged()
             }
 
             switch result {
@@ -228,6 +228,8 @@ extension Adapty {
     }
 
     func logout() async throws(AdaptyError) {
+        // TODO: throw error if current customerUserId is nil
+
         if case let .creating(_, _, task) = sharedProfileManager {
             task.cancel()
         }
@@ -262,7 +264,7 @@ private extension Task where Success == ProfileManager {
                 if let adaptyError = error as? AdaptyError {
                     throw adaptyError
                 }
-                throw AdaptyError.profileWasChanged()
+                throw .profileWasChanged()
             }
         }
     }
@@ -279,7 +281,7 @@ extension Adapty {
 
     func profileManager(with profileId: String) throws(AdaptyError) -> ProfileManager? {
         guard let manager = profileManager else { return nil }
-        guard profileId == manager.profileId else { throw AdaptyError.profileWasChanged() }
+        guard profileId == manager.profileId else { throw .profileWasChanged() }
         return manager
     }
 
@@ -293,7 +295,7 @@ extension Adapty {
         get async throws(AdaptyError) {
             switch sharedProfileManager {
             case .none:
-                throw AdaptyError.notActivated()
+                throw .notActivated()
             case let .current(manager):
                 return manager
             case let .creating(_, _, task):
@@ -305,7 +307,7 @@ extension Adapty {
                     if let adaptyError = error as? AdaptyError {
                         throw adaptyError
                     }
-                    throw AdaptyError.profileWasChanged()
+                    throw .profileWasChanged()
                 }
             }
         }
@@ -317,7 +319,7 @@ extension ProfileManager? {
         get throws(AdaptyError) {
             switch self {
             case .none:
-                throw AdaptyError.profileWasChanged()
+                throw .profileWasChanged()
             case let .some(value):
                 value
             }

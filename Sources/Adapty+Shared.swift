@@ -33,7 +33,7 @@ extension Adapty {
             case let .some(.activating(task)):
                 return await task.value
             default:
-                throw AdaptyError.notActivated()
+                throw .notActivated()
             }
         }
     }

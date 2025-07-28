@@ -18,7 +18,10 @@ final class EventCollectionStorage {
     private let storage: EventsStorage
     private var events: EventCollection<Event.Packed>
 
+    @inlinable
     var isEmpty: Bool { events.isEmpty }
+    @inlinable
+    var isNotEmpty: Bool { !isEmpty }
 
     init(with storage: EventsStorage) {
         self.storage = storage
@@ -28,7 +31,7 @@ final class EventCollectionStorage {
     }
 
     func getEvents(limit: Int, blackList: Set<String>) -> (elements: [Data], endIndex: Int)? {
-        guard limit > 0, !events.isEmpty else { return nil }
+        guard limit > 0, events.isNotEmpty else { return nil }
         var elements = [Data]()
         var count = 0
 

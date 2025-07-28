@@ -27,12 +27,10 @@ actor SK1QueueManager: Sendable {
         profileId: String,
         product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        guard SKPaymentQueue.canMakePayments() else {
-            throw AdaptyError.cantMakePayments()
-        }
-
-        guard let sk1Product = product.sk1Product else {
-            throw AdaptyError.cantMakePayments()
+        guard SKPaymentQueue.canMakePayments(),
+              let sk1Product = product.sk1Product
+        else {
+            throw .cantMakePayments()
         }
 
         let variationId = product.variationId

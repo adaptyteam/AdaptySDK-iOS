@@ -133,7 +133,7 @@ public extension Adapty {
             let data = try JSONSerialization.data(withJSONObject: attribution)
             attributionJson = String(decoding: data, as: UTF8.self)
         } catch {
-            completion?(AdaptyError.wrongAttributeData(error))
+            completion?(.wrongAttributeData(error))
             return
         }
 

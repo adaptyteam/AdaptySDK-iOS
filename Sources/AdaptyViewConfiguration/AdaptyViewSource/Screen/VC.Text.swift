@@ -74,11 +74,11 @@ extension AdaptyViewSource.Text: Codable {
                 try Set(container.decodeIfPresent([AdaptyViewConfiguration.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
             }
         let textAttributes = try AdaptyViewSource.TextAttributes(from: decoder)
-        defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes
+        defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 
     func encode(to encoder: any Encoder) throws {
-        if let defaultTextAttributes, !defaultTextAttributes.isEmpty {
+        if let defaultTextAttributes = defaultTextAttributes.nonEmptyOrNil {
             try defaultTextAttributes.encode(to: encoder)
         }
         var container = encoder.container(keyedBy: CodingKeys.self)

@@ -25,8 +25,8 @@ extension AdaptyConfiguration {
             }
 
         self.init(
-            apiKey: apiKey,
-            customerUserId: builder.customerUserId,
+            apiKey: apiKey.trimmed,
+            customerUserId: builder.customerUserId.trimmed.nonEmptyOrNil,
             observerMode: builder.observerMode ?? defaultValue.observerMode,
             idfaCollectionDisabled: builder.idfaCollectionDisabled ?? defaultValue.idfaCollectionDisabled,
             ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled ?? defaultValue.ipAddressCollectionDisabled,
@@ -39,13 +39,15 @@ extension AdaptyConfiguration {
                 proxy: builder.backendProxy ?? defaultBackend.proxy
             ),
             logLevel: builder.logLevel,
-            crossPlatformSDK: builder.crossPlatformSDK
+            crossPlatformSDK: builder.crossPlatformSDK.map {
+                (name: $0.name.trimmed, version: $0.version.trimmed)
+            }
         )
     }
 
     public static func builder(withAPIKey apiKey: String) -> AdaptyConfiguration.Builder {
         .init(
-            apiKey: apiKey,
+            apiKey: apiKey.trimmed,
             customerUserId: nil,
             observerMode: nil,
             idfaCollectionDisabled: nil,
@@ -197,7 +199,7 @@ public extension AdaptyConfiguration.Builder {
 
     @discardableResult
     func with(proxy host: String, port: Int) -> Self {
-        backendProxy = (host: host, port: port)
+        backendProxy = (host: host.trimmed, port: port)
         return self
     }
 

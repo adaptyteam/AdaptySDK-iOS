@@ -19,7 +19,7 @@ private extension Adapty {
     @AdaptyActor
     private func saveCrossPlacementState(_ newState: CrossPlacementState, forProfileId profileId: String) throws(AdaptyError) {
         guard let manager = try profileManager(with: profileId) else {
-            throw AdaptyError.profileWasChanged()
+            throw .profileWasChanged()
         }
 
         let storage = manager.storage

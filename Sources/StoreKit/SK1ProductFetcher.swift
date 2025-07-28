@@ -84,7 +84,7 @@ extension _SK1ProductFetcher: SKProductsRequestDelegate {
             }
 
             guard let self else { return }
-            if !response.invalidProductIdentifiers.isEmpty {
+            if response.invalidProductIdentifiers.isNotEmpty {
                 log.warn("InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
             }
 

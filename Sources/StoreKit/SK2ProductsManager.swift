@@ -87,7 +87,7 @@ extension SK2ProductsManager {
     func fetchSK2Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
         async throws(AdaptyError) -> [SK2Product]
     {
-        guard !productIds.isEmpty else {
+        guard productIds.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 
@@ -100,7 +100,7 @@ extension SK2ProductsManager {
 
         let products = try await sk2ProductsFetcher.fetchProducts(ids: productIds, retryCount: retryCount)
 
-        guard !products.isEmpty else {
+        guard products.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 

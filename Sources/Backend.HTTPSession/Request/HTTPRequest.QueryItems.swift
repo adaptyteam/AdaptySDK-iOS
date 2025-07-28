@@ -22,7 +22,7 @@ extension URLQueryItem {
     }
 
     init(name: String, values: [some CustomStringConvertible]?) {
-        guard let array = values, !array.isEmpty else {
+        guard let array = values.nonEmptyOrNil else {
             self.init(name: name, value: nil)
             return
         }
@@ -34,10 +34,6 @@ extension URLQueryItem {
 extension [HTTPRequest.QueryItems.Element] {
     func notNil() -> Self {
         filter { $0.value != nil }
-    }
-
-    func emptyToNil() -> Self? {
-        isEmpty ? nil : self
     }
 
     init(key: String, array: [some CustomStringConvertible]?) {

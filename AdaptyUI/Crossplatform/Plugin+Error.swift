@@ -35,10 +35,10 @@ extension AdaptyUI.PluginError: CustomAdaptyError {
 
     public var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
-        case .viewNotFound: return AdaptyError.ErrorCode.wrongParam
-        case .viewAlreadyPresented: return AdaptyError.ErrorCode.wrongParam
-        case .viewPresentationError: return AdaptyError.ErrorCode.wrongParam
-        case .delegateIsNotRegestired: return AdaptyError.ErrorCode.unknown
+        case .viewNotFound: .wrongParam
+        case .viewAlreadyPresented: .wrongParam
+        case .viewPresentationError: .wrongParam
+        case .delegateIsNotRegestired: .unknown
         }
     }
 

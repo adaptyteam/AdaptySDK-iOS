@@ -83,7 +83,7 @@ public extension Adapty {
     ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: product)
         guard await url.open() else {
-            throw AdaptyError.failedOpeningWebPaywallUrl(url)
+            throw .failedOpeningWebPaywallUrl(url)
         }
         profileStorage.setLastOpenedWebPaywallDate()
     }
@@ -93,7 +93,7 @@ public extension Adapty {
     ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: paywall)
         guard await url.open() else {
-            throw AdaptyError.failedOpeningWebPaywallUrl(url)
+            throw .failedOpeningWebPaywallUrl(url)
         }
         profileStorage.setLastOpenedWebPaywallDate()
     }
@@ -102,7 +102,7 @@ public extension Adapty {
         for paywall: AdaptyPaywall
     ) throws(AdaptyError) -> URL {
         guard let webPaywallBaseUrl = paywall.webPaywallBaseUrl else {
-            throw AdaptyError.paywallWithoutPurchaseUrl(paywall: paywall)
+            throw .paywallWithoutPurchaseUrl(paywall: paywall)
         }
 
         let parameters = [
@@ -117,7 +117,7 @@ public extension Adapty {
         for product: AdaptyPaywallProduct
     ) throws(AdaptyError) -> URL {
         guard let webPaywallBaseUrl = (product as? WebPaywallURLProviding)?.webPaywallBaseUrl else {
-            throw AdaptyError.productWithoutPurchaseUrl(adaptyProductId: product.adaptyProductId)
+            throw .productWithoutPurchaseUrl(adaptyProductId: product.adaptyProductId)
         }
 
         var parameters = [
@@ -154,7 +154,7 @@ private extension URL {
         _ parameters: [String: String]
     ) throws(AdaptyError) -> URL {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
-            throw AdaptyError.failedDecodingWebPaywallUrl(url: self)
+            throw .failedDecodingWebPaywallUrl(url: self)
         }
 
         var existingParams = components.queryItems?.reduce(into: [String: String]()) {
@@ -168,7 +168,7 @@ private extension URL {
         components.queryItems = existingParams.map { URLQueryItem(name: $0.key, value: $0.value) }
 
         guard let url = components.url else {
-            throw AdaptyError.failedDecodingWebPaywallUrl(url: self)
+            throw .failedDecodingWebPaywallUrl(url: self)
         }
         return url
     }

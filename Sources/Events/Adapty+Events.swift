@@ -116,12 +116,6 @@ public extension Adapty {
 
     nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws(AdaptyError) {
         try await withActivatedSDK(methodName: .logShowOnboarding) { _ throws(AdaptyError) in
-            guard params.screenOrder > 0 else {
-                let error = AdaptyError.wrongParamOnboardingScreenOrder()
-                Log.default.error(error.debugDescription)
-                throw error
-            }
-
             try await _trackEvent(.legacyOnboardingScreenShowed(params))
         }
     }

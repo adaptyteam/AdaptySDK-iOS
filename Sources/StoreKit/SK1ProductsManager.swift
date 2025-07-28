@@ -82,11 +82,11 @@ extension SK1ProductsManager {
     func fetchSK1Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
         async throws(AdaptyError) -> [SK1Product]
     {
-        guard !productIds.isEmpty else {
+        guard productIds.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 
-        guard !productIds.isEmpty else {
+        guard productIds.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 
@@ -99,7 +99,7 @@ extension SK1ProductsManager {
 
         let products = try await sk1ProductsFetcher.fetchProducts(ids: productIds, retryCount: retryCount)
 
-        guard !products.isEmpty else {
+        guard products.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 

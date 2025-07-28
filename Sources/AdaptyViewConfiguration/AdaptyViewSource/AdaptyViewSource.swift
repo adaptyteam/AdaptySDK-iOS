@@ -104,7 +104,7 @@ extension AdaptyViewSource: Codable {
         try container.encode(templateRevision, forKey: .templateRevision)
         try container.encode(formatVersion, forKey: .formatVersion)
 
-        if !selectedProducts.isEmpty {
+        if selectedProducts.isNotEmpty {
             var products = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
             try products.encode(selectedProducts, forKey: .selected)
         }
