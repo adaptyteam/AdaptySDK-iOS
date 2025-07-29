@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             .build()
 
         Adapty.delegate = viewModel
-        Adapty.logLevel = .verbose
+        Adapty.logLevel = .info
         Adapty.activate(with: configuration)
 
         if #available(iOS 15.0, *) {
