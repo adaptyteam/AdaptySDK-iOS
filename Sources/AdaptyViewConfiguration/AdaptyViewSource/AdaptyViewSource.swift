@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AdaptyViewSource: Sendable, Hashable {
+struct AdaptyViewSource: Sendable {
     let id: String
     let formatVersion: String
     let templateId: String

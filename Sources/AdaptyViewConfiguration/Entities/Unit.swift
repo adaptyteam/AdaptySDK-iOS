@@ -9,6 +9,7 @@ import Foundation
 
 package extension AdaptyViewConfiguration {
     enum Unit: Sendable {
+        package static let zero = Unit.point(0.0)
         case point(Double)
         case screen(Double)
         case safeArea(SafeArea)

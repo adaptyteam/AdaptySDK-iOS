@@ -50,7 +50,7 @@ extension AdaptyViewConfiguration.ShapeType: Codable {
         case .curveDown:
             self = .curveDown
         case .rectangle:
-            self = .rectangle(cornerRadius: AdaptyViewConfiguration.CornerRadius.zero)
+            self =  .rectangle(cornerRadius: AdaptyViewConfiguration.CornerRadius.zero)
         case .circle:
             self = .circle
         }

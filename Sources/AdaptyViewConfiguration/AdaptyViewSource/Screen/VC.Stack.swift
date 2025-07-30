@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Stack: Hashable, Sendable {
+    struct Stack: Sendable {
         let type: AdaptyViewConfiguration.StackType
         let horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment
         let verticalAlignment: AdaptyViewConfiguration.VerticalAlignment
@@ -42,20 +42,6 @@ extension AdaptyViewSource.Localizer {
         )
     }
 }
-
-extension AdaptyViewSource.StackItem: Hashable {
-    func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .space(value):
-            hasher.combine(1)
-            hasher.combine(value)
-        case let .element(value):
-            hasher.combine(2)
-            hasher.combine(value)
-        }
-    }
-}
-
 extension AdaptyViewSource.Stack: Decodable {
     enum CodingKeys: String, CodingKey {
         case type

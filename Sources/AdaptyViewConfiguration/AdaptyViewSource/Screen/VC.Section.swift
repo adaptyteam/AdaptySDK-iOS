@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Section: Sendable, Hashable {
+    struct Section: Sendable {
         let id: String
         let index: Int
         let content: [AdaptyViewSource.Element]

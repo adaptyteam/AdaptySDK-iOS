@@ -1,0 +1,884 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://adapty.io/ui/4_2_0/schema"
+title: "AdaptyUI Configuration"
+type: object
+required: [format, template_id, template_revision, styles]
+properties:
+  format:
+    type: string
+    const: "4.2.0-SNAPSHOT"
+  template_id:
+    title: "Visual template id"
+    type: string
+  template_revision:
+    title: "Visual template version"
+    type: integer
+    minimum: 0
+  products:
+    type: object
+    required: [selected]
+    properties:
+      selected:
+        oneOf:
+          - type: string
+            description: "Adapty product id, selected in group_A"
+          - type: object
+            additionalProperties: { type: string }
+            description: "key is group id, value is Adapty product id"
+  assets:
+    title: "Default assets"
+    $ref: "#/$defs/Assets"
+  localizations:
+    $ref: "#/$defs/Localizations"
+  default_localization:
+    title: "Default localizations locale identifier"
+    $ref: "#/$defs/Localizations.Identifier"
+  styles:
+    $ref: "#/$defs/UI"
+
+$defs:
+  ###### Common Types ######
+
+  VerticalAlignment:
+    type: string
+    enum:
+      - top
+      - center
+      - bottom
+      - justified
+
+  HorizontalAlignment:
+    type: string
+    enum:
+      - leading
+      - trailing
+      - left
+      - center
+      - right
+      - justified
+
+  AspectRatio:
+    type: string
+    enum:
+      - fit
+      - fill
+      - stretch
+
+  CornerRadius:
+    title: "Corner radius"
+    anyOf:
+      - type: number
+        description: "Same radius for all corners"
+      - type: array
+        items: { type: number }
+        description: "[top_leading,top_trailing,bottom_trailing,bottom_leading], default: 0"
+      - type: object
+        properties:
+          top_leading:
+            { type: number, default: 0, title: "Top leading corner radius" }
+          top_trailing:
+            { type: number, default: 0, title: "Top trailing corner radius" }
+          bottom_trailing:
+            { type: number, default: 0, title: "Bottom trailing corner radius" }
+          bottom_leading:
+            { type: number, default: 0, title: "Bottom leading corner radius" }
+
+  EdgeInsets:
+    title: "Edge Insets"
+    anyOf:
+      - $ref: "#/$defs/Unit"
+      - type: array
+        items: { $ref: "#/$defs/Unit" }
+        description: "[], default 0;  [allEdges]; [verticalEdges,horizontalEdges]; [left,top,right,bottom], default 0"
+      - type: object
+        properties:
+          top: { $ref: "#/$defs/Unit", default: 0 }
+          leading: { $ref: "#/$defs/Unit", default: 0 }
+          bottom: { $ref: "#/$defs/Unit", default: 0 }
+          trailing: { $ref: "#/$defs/Unit", default: 0 }
+
+  Point:
+    title: Point
+    anyOf:
+      - type: number
+        description: "x and y same value"
+      - type: array
+        items: { type: number }
+        description: "[y,x], default 0"
+      - type: object
+        properties:
+          y: { type: number, default: 0 }
+          x: { type: number, default: 0 }
+
+  Offset:
+    title: Offset
+    anyOf:
+      - type: { $ref: "#/$defs/Unit" } # from v4.3.0
+        description: "y value, x = 0 "
+      - type: array
+        items: { $ref: "#/$defs/Unit" } # from v4.3.0
+        description: "[y] or [y,x], default 0"
+      - type: object
+        properties:
+          y: { { $ref: "#/$defs/Unit" }, default: 0 } # from v4.3.0
+          x: { { $ref: "#/$defs/Unit" }, default: 0 } # from v4.3.0
+
+  Unit:
+    title: Unit
+    anyOf:
+      - type: number
+        description: "Value in points"
+      - type: object
+        required: [point]
+        properties:
+          point: { type: number, title: "Value in points" }
+        additionalProperties: false
+      - type: object
+        required: [screen]
+        properties:
+          screen: { type: number, title: "Value in parts of the screen" }
+        additionalProperties: false
+      - type: object
+        required: [safe_area]
+        properties:
+          safe_area: { type: string, enum: [start, end] }
+        additionalProperties: false
+      - type: object
+        required: [value]
+        properties:
+          value: { type: number }
+          unit: { type: string, enum: [point, screen], default: point }
+
+  Transition:
+    type: object
+    required: [type]
+    anyOf:
+      - $ref: "#/$defs/Transition.Fade"
+
+  Transition.Interpolator:
+    type: string
+    enum:
+      - ease_in_out
+      - ease_in
+      - ease_out
+      - linear
+    default: ease_in_out
+
+  Transition.Fade:
+    type: object
+    required: [type]
+    properties:
+      type: { const: fade }
+      start_delay: { type: number, default: 0 }
+      duration: { type: number, default: 300 }
+      interpolator: { $ref: "#/$defs/Transition.Interpolator" }
+
+  Transition.Slide:
+    type: object
+    required: [type]
+    properties:
+      type: { const: slide }
+      start_delay: { type: number, default: 0 }
+      duration: { type: number, default: 300 }
+      interpolator: { $ref: "#/$defs/Transition.Interpolator" }
+
+  ###### UI Components ######
+
+  UI:
+    title: "Screen by key"
+    type: object
+    required: [default]
+    properties:
+      default: { $ref: "#/$defs/UI.Screen" }
+    additionalProperties: { $ref: "#/$defs/UI.SimpleScreen" }
+
+  UI.SimpleScreen:
+    type: object
+    required: [content]
+    properties:
+      content: { $ref: "#/$defs/UI.Element" }
+
+  UI.Screen:
+    type: object
+    required: [background, content]
+    properties:
+      background:
+        {
+          type: string,
+          title: "Background image|color[-gradient] asset identifier",
+        }
+      cover: { $ref: "#/$defs/UI.Box" }
+      content: { $ref: "#/$defs/UI.Element" }
+      footer: { $ref: "#/$defs/UI.Element" }
+      overlay: { $ref: "#/$defs/UI.Element" }
+
+  UI.Box:
+    type: object
+    required: [type]
+    properties:
+      type: { type: string, const: box }
+      height: { $ref: "#/$defs/UI.Box.Length" }
+      width: { $ref: "#/$defs/UI.Box.Length" }
+      h_align: { $ref: "#/$defs/HorizontalAlignment", default: center }
+      v_align: { $ref: "#/$defs/VerticalAlignment", default: center }
+      content: { $ref: "#/$defs/UI.Element" }
+
+  UI.Box.Length:
+    anyOf:
+      - $ref: "#/$defs/Unit"
+        description: "Fixed length"
+      - type: object
+        required: [fill_max]
+        additionalProperties: false
+        properties:
+          fill_max: { type: boolean, const: true }
+      - type: object
+        required: [min]
+        additionalProperties: false
+        properties:
+          min: { $ref: "#/$defs/Unit" }
+      - type: object
+        required: [shrink]
+        additionalProperties: false
+        properties:
+          shrink: { $ref: "#/$defs/Unit" }
+
+  UI.Element:
+    type: object
+    required: [type]
+    oneOf:
+      - { $ref: "#/$defs/UI.Reference" }
+      - { $ref: "#/$defs/UI.If.Them.Else" }
+      - allOf:
+          - oneOf:
+              - { $ref: "#/$defs/UI.Image" }
+              - { $ref: "#/$defs/UI.Video" } # from v4.1.0
+              - { $ref: "#/$defs/UI.Text" }
+              - { $ref: "#/$defs/UI.Toggle" }
+              - { $ref: "#/$defs/UI.Button" }
+              - { $ref: "#/$defs/UI.Stack" }
+              - { $ref: "#/$defs/UI.Box" }
+              - { $ref: "#/$defs/UI.Section" }
+              - { $ref: "#/$defs/UI.Row" }
+              - { $ref: "#/$defs/UI.Column" }
+              - { $ref: "#/$defs/UI.Timer" }
+              - { $ref: "#/$defs/UI.Pager" }
+          - properties:
+              element_id: { type: string }
+              decorator: { $ref: "#/$defs/UI.Element.Decorator" }
+              padding: { $ref: "#/$defs/EdgeInsets", default: 0 }
+              offset: { $ref: "#/$defs/Offset", default: 0 }
+          - oneOf: # from v4.3.0
+              - properties:
+                  visibility: { type: boolean, default: true, deprecated: true }
+              - properties:
+                  opacity: { type: number, default: 1 }
+          - oneOf: # from v4.3.0
+              - properties:
+                  transition_in:
+                    deprecated: true
+                    anyOf:
+                      - type: array
+                        items: { $ref: "#/$defs/Transition" }
+                        minItems: 1
+                      - $ref: "#/$defs/Transition"
+              - properties:
+                  on_appiar:
+                    anyOf:
+                      - type: array
+                        items: { $ref: "#/$defs/Transition" }
+                        minItems: 1
+                      - $ref: "#/$defs/Transition"
+
+  UI.Element.Decorator:
+    title: "Decorator for any element"
+    type: object
+    properties:
+      background:
+        {
+          type: string,
+          title: "Background image or color[-gradient] asset identifier",
+        }
+      type: { $ref: "#/$defs/UI.Element.Decorator.ShapeType", default: rect }
+      border:
+        { type: string, title: "Border color[-gradient] asset identifier" }
+      shadow: {} # from v4.3.0
+    dependentSchemas:
+      border:
+        properties:
+          thickness: { type: number, default: 1 }
+    if:
+      properties:
+        type: { const: rect }
+    then:
+      properties:
+        rect_corner_radius: { $ref: "#/$defs/CornerRadius", default: 0 }
+
+  UI.Element.Decorator.ShapeType:
+    title: "Shape type"
+    type: string
+    enum:
+      - circle
+      - rect
+      - curve_up
+      - curve_down
+
+  UI.Element.Decorator.Shadow: # from v4.3.0
+    title: "Shadow"
+    type: object
+    required: [color]
+    properties:
+      color: { type: string, title: "Color asset identifier" }
+      blur_radius: { type: number, default: 0 }
+      offset: { $ref: "#/$defs/Offset", default: [0, 0] }
+
+  UI.Image:
+    type: object
+    required: [type, asset_id]
+    properties:
+      type: { const: "image" }
+      asset_id: { type: string, title: "Image asset identifier" }
+      aspect:
+        { $ref: "#/$defs/AspectRatio", default: fit, title: "Aspect ratio" }
+      tint:
+        { type: string, title: "Image tint color[-gradient] asset identifier" }
+
+  UI.Video: # from v4.1.0
+    type: object
+    required: [type, asset_id]
+    properties:
+      type: { const: "video" }
+      asset_id: { type: string, title: "Video asset identifier" }
+      aspect:
+        { $ref: "#/$defs/AspectRatio", default: fit, title: "Aspect ratio" }
+      loop: { type: boolean, default: true }
+
+  UI.Text:
+    type: object
+    allOf:
+      - required: [type, string_id]
+        properties:
+          type: { const: "text" }
+          string_id: { $ref: "#/$defs/Localizations.String.Id" }
+          align: { $ref: "#/$defs/HorizontalAlignment", default: left }
+          max_rows: { type: integer, minimum: 1 }
+          on_overflow:
+            anyOf:
+              - $ref: "#/$defs/UI.Text.OverflowMode"
+              - type: array
+                items: { $ref: "#/$defs/UI.Text.OverflowMode" }
+                uniqueItems: true
+      - $ref: "#/$defs/RichText.Attributes"
+
+  UI.Text.OverflowMode:
+    type: string
+    enum:
+      - scale
+
+  UI.Toggle:
+    type: object
+    required: [type]
+    properties:
+      type: { const: toggle }
+      color: { type: string, title: "Text color[-gradient] Asset identifier" }
+    oneOf:
+      - required: [section_id]
+        properties:
+          section_id: { type: string }
+          on_index: { type: integer, default: 0 }
+          off_index: { type: integer, default: -1 }
+      - required: [on_condition]
+        properties:
+          on_condition: { $ref: "#/$defs/UI.Condition" }
+          on_action:
+            oneOf:
+              - $ref: "#/$defs/UI.Action"
+              - type: array
+                items: { $ref: "#/$defs/UI.Action" }
+          off_action:
+            oneOf:
+              - $ref: "#/$defs/UI.Action"
+              - type: array
+                items: { $ref: "#/$defs/UI.Action" }
+
+  UI.Button:
+    type: object
+    required: [type, action, normal]
+    properties:
+      type: { const: button }
+      action:
+        oneOf:
+          - $ref: "#/$defs/UI.Action"
+          - type: array
+            items: { $ref: "#/$defs/UI.Action" }
+      normal: { $ref: "#/$defs/UI.Element" }
+      selected: { $ref: "#/$defs/UI.Element" }
+      selected_condition: { $ref: "#/$defs/UI.Condition" }
+
+  UI.Condition:
+    type: object
+    oneOf:
+      - required: [type, section_id, index]
+        properties:
+          type: { const: selected_section }
+          section_id: { type: string }
+          index: { type: integer }
+      - required: [type, product_id]
+        properties:
+          type: { const: selected_product }
+          product_id: { type: string }
+          group_id: { type: string, default: group_A }
+
+  UI.Action:
+    type: object
+    required: [type]
+    anyOf:
+      - required: [type, url]
+        properties:
+          type: { const: open_url }
+          url: { type: string }
+      - required: [type, custom_id]
+        properties:
+          type: { const: custom }
+          custom_id: { title: "Custom action identifier", type: string }
+      - required: [type, product_id]
+        properties:
+          type: { const: purchase_product }
+          product_id: { title: "Adapty product identifier", type: string }
+      - required: [type, product_id]
+        properties:
+          type: { const: select_product }
+          product_id: { title: "Adapty product identifier", type: string }
+          group_id: { default: "group_A", type: string }
+      - required: [type]
+        properties:
+          type: { const: unselect_product }
+          group_id: { default: "group_A", type: string }
+      - required: [type]
+        properties:
+          type: { const: purchase_selected_product }
+          group_id: { default: "group_A", type: string }
+      - required: [type, screen_id]
+        properties:
+          type: { const: open_screen }
+          screen_id: { title: "Screen identifier", type: string }
+      - required: [type, section_id, index]
+        properties:
+          type: { const: switch }
+          section_id: { title: "Section identifier", type: string }
+          index: { type: integer }
+      - required: [type]
+        properties:
+          type: { type: string, enum: [restore, close, close_screen] }
+
+  UI.Stack:
+    title: "Stack of elements"
+    type: object
+    required: [type, content]
+    properties:
+      type:
+        type: string
+        enum:
+          - v_stack
+          - h_stack
+          - z_stack
+      h_align: { $ref: "#/$defs/HorizontalAlignment", default: center }
+      v_align: { $ref: "#/$defs/VerticalAlignment", default: center }
+      spacing: { type: number, default: 0 }
+      content:
+        title: "Child elements"
+        type: array
+        minItems: 1
+        items:
+          anyOf:
+            - $ref: "#/$defs/UI.Stack.Space"
+            - $ref: "#/$defs/UI.Element"
+
+  UI.Stack.Space:
+    title: "Space in stack"
+    type: object
+    properties:
+      type: { const: space }
+      count: { type: integer, default: 1, minimum: 1 }
+
+  UI.Section:
+    type: object
+    required: [type, id, content]
+    properties:
+      type: { const: section }
+      id: { type: string }
+      index: { type: integer, default: 0 }
+      content:
+        type: array
+        minItems: 1
+        items: { $ref: "#/$defs/UI.Element" }
+
+  UI.Row:
+    title: "Row of items"
+    type: object
+    required: [type, items]
+    properties:
+      type: { const: row }
+      spacing: { type: number, default: 0 }
+      items:
+        type: array
+        minItems: 1
+        items: { $ref: "#/$defs/UI.GridItem" }
+
+  UI.Column:
+    title: "Column of items"
+    type: object
+    required: [type, items]
+    properties:
+      type: { const: row }
+      spacing: { type: number, default: 0 }
+      items:
+        type: array
+        minItems: 1
+        items: { $ref: "#/$defs/UI.GridItem" }
+
+  UI.GridItem:
+    type: object
+    required: [content]
+    allOf:
+      - oneOf:
+          - required: [fixed]
+            properties:
+              fixed: { $ref: "#/$defs/Unit" }
+          - required: [weight]
+            properties:
+              fixed: { type: integer }
+      - properties:
+          h_align: { $ref: "#/$defs/HorizontalAlignment", default: center }
+          v_align: { $ref: "#/$defs/VerticalAlignment", default: center }
+          content: { $ref: "#/$defs/UI.Element" }
+
+  UI.Timer:
+    type: object
+    allOf:
+      - required: [type, id, format]
+        properties:
+          type: { const: timer }
+          id: { type: string }
+          format:
+            oneOf:
+              - type: string
+              - type: array
+                minItems: 1
+                items:
+                  type: object
+                  required: [from, string_id]
+                  properties:
+                    from: { type: number }
+                    string_id: { type: string }
+          align: { $ref: "#/$defs/HorizontalAlignment", default: left }
+          action:
+            oneOf:
+              - $ref: "#/$defs/UI.Action"
+              - type: array
+                items: { $ref: "#/$defs/UI.Action" }
+      - oneOf:
+          - required: [end_time, behaviour]
+            properties:
+              end_time:
+                type: string
+                pattern: "^[0-9]{4}-((0[1-9])|(1[012]))-(([0-2][1-9])|(3[01])) (([01][0-9])|(2[0123])):([0-5][0-9]):([0-5][0-9])$"
+              behaviour:
+                type: string
+                enum:
+                  - end_at_utc_time
+                  - end_at_local_time
+          - required: [duration, behaviour]
+            properties:
+              duration: { type: number, description: seconds }
+              behaviour:
+                type: string
+                enum:
+                  - start_at_every_appear
+                  - start_at_first_appear
+                  - start_at_first_appear_persisted
+                  - custom
+      - ref: "#/$defs/RichText.Attributes"
+
+  UI.Pager:
+    type: object
+    required: [type, items]
+    properties:
+      type: { const: pager }
+      page_width: { $ref: "#/$defs/UI.Pager.Length", default: { parent: 1 } }
+      page_height: { $ref: "#/$defs/UI.Pager.Length", default: { parent: 1 } }
+      spacing: { type: number, default: 0 }
+      content:
+        type: array
+        minItems: 1
+        items: { $ref: "#/$defs/UI.Element" }
+      page_control:
+        type: object
+        properties:
+          layout: { type: string, enum: [overlaid, stacked] }
+          v_align: { $ref: "#/$defs/VerticalAlignment", default: bottom }
+          padding: { $ref: "#/$defs/EdgeInsets", default: 6 }
+          dot_size: { type: number, default: 6 }
+          spacing: { type: number, default: 6 }
+          color:
+            { type: string, title: "Text color[-gradient] Asset identifier" }
+          selected_color:
+            { type: string, title: "Text color[-gradient] Asset identifier" }
+      animation:
+        type: object
+        properties:
+          start_delay: { type: number, default: 0 }
+          page_transition:
+            { $ref: "#/$defs/Transition.Slide", default: { type: slide } }
+          repeat_transition: { $ref: "#/$defs/Transition.Slide" }
+          after_interaction_delay: { type: number, default: 3000 }
+      interaction:
+        type: string
+        enum:
+          - none
+          - cancel_animation
+          - pause_animation
+
+  UI.Pager.Length:
+    anyOf:
+      - $ref: "#/$defs/Unit"
+        description: "Fixed length"
+      - type: object
+        required: [parent]
+        additionalProperties: false
+        properties:
+          parent: { type: number }
+
+  UI.Reference:
+    type: object
+    required: [type, element_id]
+    properties:
+      type: { const: reference }
+      element_id: { type: string }
+
+  UI.If.Them.Else:
+    type: object
+    required: [type, then, else]
+    properties:
+      type: { const: if }
+      platform: { type: string, enum: [ios, android] }
+      version:
+        { type: string, pattern: "^[0-9]+(.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
+      then: { $ref: "#/$defs/UI.Element" }
+      else: { $ref: "#/$defs/UI.Element" }
+
+  ###### Rich Text ######
+
+  RichText:
+    anyOf:
+      - $ref: "#/$defs/RichText.Item"
+      - type: array
+        items: { $ref: "#/$defs/RichText.Item" }
+
+  RichText.Item:
+    anyOf:
+      - $ref: "#/$defs/RichText.Text"
+      - $ref: "#/$defs/RichText.Tag"
+      - $ref: "#/$defs/RichText.Image"
+
+  RichText.Text:
+    anyOf:
+      - type: string
+        title: Text
+      - type: object
+        required: [text]
+        properties:
+          text: { title: Text, type: string }
+          attributes: { $ref: "#/$defs/RichText.Attributes" }
+        additionalProperties: false
+
+  RichText.Attributes:
+    type: object
+    properties:
+      font: { type: string, title: "Font Asset identifier" }
+      size: { type: number, title: "Font size" }
+      strike: { type: boolean }
+      underline: { type: boolean }
+      color: { type: string, title: "Text color[-gradient] Asset identifier" }
+      background:
+        { type: string, title: "Background color[-gradient] Asset identifier" }
+      tint:
+        { type: string, title: "Image tint color[-gradient] Asset identifier" }
+
+  RichText.Tag:
+    type: object
+    required: [tag]
+    properties:
+      tag: { type: string, title: "Tag value" }
+      attributes: { $ref: "#/$defs/RichText.Attributes" }
+    additionalProperties: false
+
+  RichText.Image:
+    type: object
+    required: [image]
+    properties:
+      image: { type: string, title: "Image asset identifier" }
+      attributes: { $ref: "#/$defs/RichText.Attributes" }
+    additionalProperties: false
+
+  ###### Localizations ######
+
+  Localizations:
+    title: "All localizations"
+    type: array
+    items:
+      title: "Localization by locale identifier"
+      type: object
+      required: [id]
+      properties:
+        id: { $ref: "#/$defs/Localizations.Identifier" }
+        is_right_to_left: { type: boolean, default: false }
+        strings: { $ref: "#/$defs/Localizations.Strings" }
+        assets: { $ref: "#/$defs/Assets" }
+
+  Localizations.Identifier:
+    type: string
+    pattern: "^[a-z]{2,4}([_-][A-Z][a-z]{3})?([_-]([A-Z]{2,3}|[0-9]{3}))?$"
+    examples:
+      - en-Latn-US
+      - ru-Cyrl-RU
+
+  Localizations.Strings:
+    type: array
+    items:
+      type: object
+      required: [id, value]
+      properties:
+        id: { type: string, title: "Localized string identifier" }
+        value: { $ref: "#/$defs/RichText" }
+        fallback: { $ref: "#/$defs/RichText" }
+
+  Localizations.String.Id:
+    title: "Localization string identifier"
+    anyOf:
+      - type: string
+      - type: object
+        properties:
+          type: { const: product }
+          id: { type: string, title: "Adapty product identifier" }
+          group_id: { type: string, default: "group_A" }
+          suffix: { type: string }
+
+  ###### Assets ######
+
+  Assets:
+    type: array
+    items:
+      anyOf:
+        - $ref: "#/$defs/Assets.Color"
+        - $ref: "#/$defs/Assets.ColorGradient"
+        - $ref: "#/$defs/Assets.Font"
+        - $ref: "#/$defs/Assets.Image"
+        - $ref: "#/$defs/Assets.Video" # from v4.1.0
+
+  Assets.Font:
+    type: object
+    required: [id, type, value]
+    properties:
+      id: { type: string, title: "Asset identifier" }
+      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
+      type: { const: font }
+      value:
+        title: "font alias for ios only"
+        anyOf:
+          - type: string
+          - type: array
+            items: { type: string }
+            minItems: 1
+      resources:
+        title: "resource name for android only"
+        type: array
+        items: { type: string }
+      family_name:
+        anyOf:
+          - { type: string, default: adapty_system }
+          - type: array
+            items: { type: string }
+            minItems: 1
+      weight: { type: integer, minimum: 0, default: 400 }
+      italic: { type: boolean, default: false }
+      size: { type: number, default: 15 }
+      color: { $ref: "#/$defs/Assets.Color.Hex", default: "#000000FF" }
+
+  Assets.Color:
+    title: "Color asset"
+    type: object
+    required: [id, type, value]
+    properties:
+      id: { type: string, title: "Asset identifier" }
+      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
+      type: { const: color }
+      value: { $ref: "#/$defs/Assets.Color.Hex" }
+
+  Assets.Color.Hex:
+    type: string
+    pattern: "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"
+
+  Assets.ColorGradient:
+    title: "Color gradient asset"
+    type: object
+    required: [id, type, values, points]
+    properties:
+      id: { type: string, title: "Asset identifier" }
+      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
+      type:
+        type: string
+        enum:
+          - linear-gradient
+          - radial-gradient
+          - conic-gradient
+      values:
+        type: array
+        items:
+          type: object
+          required: [color, p]
+          properties:
+            color: { $ref: "#/$defs/Assets.Color.Hex" }
+            p: { type: number }
+      points:
+        type: object
+        required: [x0, y0, x1, y1]
+        properties:
+          x0: { type: number }
+          y0: { type: number }
+          x1: { type: number }
+          y1: { type: number }
+
+  Assets.Image:
+    title: "Image asset"
+    type: object
+    allOf:
+      - required: [id, type]
+        properties:
+          id: { type: string, title: "Asset identifier" }
+          custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
+          type: { const: image }
+      - { $ref: "#/$defs/Data.Image" }
+
+  Assets.Video: # from v4.1.0
+    title: "Video asset"
+    type: object
+    required: [id, type, url, image]
+    properties:
+      id: { type: string, title: "Asset identifier" }
+      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
+      type: { const: video }
+      url: { type: string }
+      image: { $ref: "#/$defs/Data.Image" }
+
+  Data.Image:
+    title: "Image data"
+    type: object
+    anyOf:
+      - required: [value]
+        properties:
+          value: { type: string, contentEncoding: base64 }
+      - required: [url, preview_value]
+        properties:
+          url: { type: string }
+          preview_value: { type: string, contentEncoding: base64 }

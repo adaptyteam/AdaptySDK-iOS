@@ -84,8 +84,9 @@ actor SK2Purchaser {
 
     func makePurchase(
         profileId: String,
+        customerUserId: String?,
         product: AdaptyPaywallProduct,
-        parameters: AdaptyPurchaseParameters?
+        parameters: AdaptyPurchaseParameters
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2Product = product.sk2Product
@@ -95,7 +96,7 @@ actor SK2Purchaser {
 
         var options = Set<Product.PurchaseOption>()
 
-        if let uuid = parameters?.appAccountToken {
+        if let uuid = parameters.appAccountToken.asUUID(customerUserId: customerUserId) {
             options.insert(.appAccountToken(uuid))
         }
 
