@@ -30,7 +30,7 @@ extension Request {
                 paywallName: product.paywallName,
                 webPaywallBaseUrl: product.webPaywallBaseUrl
             )
-            let result = try await Adapty.makePurchase(product: product, parameters: parameters)
+            let result = try await Adapty.makePurchase(product: product, parameters: parameters ?? .default)
             return .success(result)
         }
     }

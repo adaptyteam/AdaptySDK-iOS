@@ -18,7 +18,7 @@ public extension Adapty {
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
-        parameters: AdaptyPurchaseParameters? = nil
+        parameters: AdaptyPurchaseParameters = .default
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
@@ -26,7 +26,7 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
-                "app_account_token": parameters?.appAccountToken,
+                "app_account_token": parameters.appAccountToken.description,
             ]
         ) { sdk throws(AdaptyError) in
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
@@ -40,8 +40,20 @@ public extension Adapty {
 
             guard let manager = sdk.sk2Purchaser else { throw AdaptyError.cantMakePayments() }
 
+            let profileId: String
+            let customerUserId: String?
+
+            if let profile = sdk.profileManager?.profile.value {
+                profileId = profile.profileId
+                customerUserId = profile.customerUserId
+            } else {
+                profileId = sdk.profileStorage.profileId
+                customerUserId = nil
+            }
+
             return try await manager.makePurchase(
-                profileId: sdk.profileStorage.profileId,
+                profileId: profileId,
+                customerUserId: customerUserId,
                 product: product,
                 parameters: parameters
             )
