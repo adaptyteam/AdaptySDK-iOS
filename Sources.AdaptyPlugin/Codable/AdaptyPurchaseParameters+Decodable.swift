@@ -24,13 +24,11 @@ extension AdaptyPurchaseParameters: Decodable {
 extension AdaptyPurchaseParameters.AppAccountTokenValue: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
-        case uuid
     }
 
     enum Values: String, Decodable {
         case none
         case customerUserId = "customer_user_id"
-        case other
     }
 
     public init(from decoder: any Decoder) throws {
@@ -40,8 +38,6 @@ extension AdaptyPurchaseParameters.AppAccountTokenValue: Decodable {
                 self = .none
             case .customerUserId:
                 self = .customerUserId
-            case .other:
-                self = try .other(container.decode(UUID.self, forKey: .uuid))
         }
     }
 }
