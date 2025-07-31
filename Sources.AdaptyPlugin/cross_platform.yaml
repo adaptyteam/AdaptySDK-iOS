@@ -1505,8 +1505,7 @@ $defs:
         type: object
         required: value 
         properties: 
-          value: { enum: [ "none", "customer_user_id", "other" ] }
-          uuid:  { $ref: "#/$defs/UUID" }
+          value: { enum: [ "none", "customer_user_id" ] }
       
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
