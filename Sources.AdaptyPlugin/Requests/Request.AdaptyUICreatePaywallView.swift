@@ -22,7 +22,6 @@ extension Request {
         let customTags: [String: String]?
         let customTimers: [String: Date]?
         let customAssets: [AdaptyCustomAsset.Identifiable]?
-        let productPurchaseParameters: [String: AdaptyPurchaseParameters]?
 
         enum CodingKeys: String, CodingKey {
             case paywall
@@ -31,7 +30,6 @@ extension Request {
             case customTags = "custom_tags"
             case customTimers = "custom_timers"
             case customAssets = "custom_assets"
-            case productPurchaseParameters = "product_purchase_parameters"
         }
 
         func execute() async throws -> AdaptyJsonData {
@@ -46,8 +44,7 @@ extension Request {
                 preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,
                 timerResolver: customTimers,
-                assetsResolver: assetsResolver(),
-                productPurchaseParameters: productPurchaseParameters
+                assetsResolver: assetsResolver()
             ))
         }
 

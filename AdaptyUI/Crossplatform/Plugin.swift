@@ -77,8 +77,7 @@ package extension AdaptyUI {
             preloadProducts: Bool,
             tagResolver: AdaptyTagResolver?,
             timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyAssetsResolver?,
-            productPurchaseParameters: [String: AdaptyPurchaseParameters]? // TODO: [vendor_product_id: AdaptyPurchaseParameters]
+            assetsResolver: AdaptyAssetsResolver?
         ) async throws -> AdaptyUI.PaywallView {
             let products: [AdaptyPaywallProduct]?
             

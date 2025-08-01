@@ -1501,11 +1501,6 @@ $defs:
       is_offer_personalized: { type: boolean, description: "Android Only" }
       obfuscated_account_id: { type: string, description: "Android Only" }
       obfuscated_profile_id: { type: string, description: "Android Only" }
-      app_account_token: 
-        type: object
-        required: value 
-        properties: 
-          value: { enum: [ "none", "customer_user_id" ] }
       
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
