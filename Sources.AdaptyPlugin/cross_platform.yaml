@@ -919,6 +919,13 @@ $defs:
     type: string
     example: "en"
 
+  UUID:
+    type: string
+    format: uuid
+    pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    description: "UUID в формате RFC 4122"
+    example: "123e4567-e89b-12d3-a456-426614174000"
+
   Date: #response #request
     type: string
     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -1384,6 +1391,7 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
+          jws_transaction: { type: string }
 
   AdaptyInstallationStatus: #response #event
     type: object
@@ -1493,6 +1501,7 @@ $defs:
       is_offer_personalized: { type: boolean, description: "Android Only" }
       obfuscated_account_id: { type: string, description: "Android Only" }
       obfuscated_profile_id: { type: string, description: "Android Only" }
+      
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
     type: object

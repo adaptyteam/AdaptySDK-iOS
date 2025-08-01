@@ -8,6 +8,7 @@
 #if canImport(UIKit)
 
 import Adapty
+import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension VC.Unit {
@@ -20,6 +21,32 @@ package extension VC.Unit {
             case .start: safeAreaStart
             case .end: safeAreaEnd
             }
+        }
+    }
+
+    enum Direction {
+        case horizontal
+        case vertical
+    }
+
+    func points(
+        _ direction: Direction,
+        _ screenSize: CGSize,
+        _ safeArea: EdgeInsets
+    ) -> Double {
+        switch direction {
+        case .horizontal:
+            points(
+                screenSize: screenSize.width,
+                safeAreaStart: safeArea.leading,
+                safeAreaEnd: safeArea.trailing
+            )
+        case .vertical:
+            points(
+                screenSize: screenSize.height,
+                safeAreaStart: safeArea.top,
+                safeAreaEnd: safeArea.bottom
+            )
         }
     }
 }

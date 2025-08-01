@@ -26,7 +26,7 @@ actor SK1QueueManager: Sendable {
     func makePurchase(
         profileId: String,
         product: AdaptyPaywallProduct
-    ) async throws -> AdaptyPurchaseResult {
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard SKPaymentQueue.canMakePayments() else {
             throw AdaptyError.cantMakePayments()
         }
@@ -77,7 +77,7 @@ actor SK1QueueManager: Sendable {
 
     func makePurchase(
         product: AdaptyDeferredProduct
-    ) async throws -> AdaptyPurchaseResult {
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await addPayment(product.payment, for: product.skProduct)
     }
 
@@ -86,8 +86,8 @@ actor SK1QueueManager: Sendable {
         _ payment: SKPayment,
         for underlying: SK1Product,
         with variationId: String? = nil
-    ) async throws -> AdaptyPurchaseResult {
-        try await withCheckedThrowingContinuation { continuation in
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
+        try await withCheckedThrowingContinuation_ { continuation in
             addPayment(payment, for: underlying, with: variationId) { result in
                 continuation.resume(with: result)
             }
@@ -210,7 +210,7 @@ actor SK1QueueManager: Sendable {
             result = .success(.success(profile: response.value, transaction: sk1Transaction))
 
         } catch {
-            result = .failure(error.asAdaptyError ?? AdaptyError.validatePurchaseFailed(unknownError: error))
+            result = .failure(error)
         }
 
         callMakePurchasesCompletionHandlers(productId, result)

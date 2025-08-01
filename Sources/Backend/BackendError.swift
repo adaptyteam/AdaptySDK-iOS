@@ -14,7 +14,6 @@ struct BackendError: Error, Hashable, Codable {
 }
 
 enum ResponseDecodingError: Error, Hashable, Codable {
-    case profileWasChanged
     case crossPlacementABTestDisabled
     case notFoundVariationId
 }
@@ -26,18 +25,6 @@ extension BackendError: CustomStringConvertible {
 }
 
 extension Backend {
-    static func responseDecodingError(_ decodingError: Set<ResponseDecodingError>, _ error: HTTPError) -> Bool {
-        switch error {
-        case let .decoding(_, _, _, _, _, value):
-            if let value = value as? ResponseDecodingError {
-                decodingError.contains(value)
-            } else {
-                false
-            }
-        default:
-            false
-        }
-    }
 
     static func wrongProfileSegmentId(_ error: HTTPError) -> Bool {
         backendErrorCodes(error).contains("INCORRECT_SEGMENT_HASH_ERROR")

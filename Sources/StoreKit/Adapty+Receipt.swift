@@ -14,8 +14,8 @@ public extension Adapty {
     ///
     /// - Returns: The receipt `Data`.
     /// - Throws: An ``AdaptyError`` object.
-    nonisolated static func getReceipt() async throws -> Data {
-        try await withActivatedSDK(methodName: .getReceipt) { sdk in
+    nonisolated static func getReceipt() async throws(AdaptyError) -> Data {
+        try await withActivatedSDK(methodName: .getReceipt) { sdk async throws(AdaptyError) in
             try await sdk.receiptManager.getReceipt()
         }
     }

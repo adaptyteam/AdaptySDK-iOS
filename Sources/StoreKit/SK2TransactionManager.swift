@@ -14,26 +14,31 @@ actor SK2TransactionManager: StoreKitTransactionManager {
     private let session: Backend.MainExecutor
 
     private var lastTransactionCached: SK2Transaction?
-    private var syncing: (task: Task<VH<AdaptyProfile>?, any Error>, profileId: String)?
+    private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, profileId: String)?
 
     init(session: Backend.MainExecutor) {
         self.session = session
     }
 
-    func syncTransactions(for profileId: String) async throws -> VH<AdaptyProfile>? {
-        let task: Task<VH<AdaptyProfile>?, any Error>
+    func syncTransactions(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
+        let task: AdaptyResultTask<VH<AdaptyProfile>?>
         if let syncing, syncing.profileId == profileId {
             task = syncing.task
         } else {
-            task = Task<VH<AdaptyProfile>?, any Error> {
-                try await syncLastTransaction(for: profileId)
+            task = Task {
+                do throws(AdaptyError) {
+                    let value = try await syncLastTransaction(for: profileId)
+                    return .success(value)
+                } catch {
+                    return .failure(error)
+                }
             }
             syncing = (task, profileId)
         }
-        return try await task.value
+        return try await task.value.get()
     }
 
-    private func syncLastTransaction(for profileId: String) async throws -> VH<AdaptyProfile>? {
+    private func syncLastTransaction(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
         defer { syncing = nil }
 
         let lastTransaction: SK2Transaction
@@ -53,7 +58,7 @@ actor SK2TransactionManager: StoreKitTransactionManager {
                 originalTransactionId: lastTransaction.unfOriginalIdentifier
             )
         } catch {
-            throw error.asAdaptyError ?? AdaptyError.syncLastTransactionFailed(unknownError: error)
+            throw error.asAdaptyError
         }
     }
 

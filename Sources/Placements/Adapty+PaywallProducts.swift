@@ -16,11 +16,11 @@ public extension Adapty {
     ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
     /// - Returns: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func getPaywallProducts(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProduct] {
+    nonisolated static func getPaywallProducts(paywall: AdaptyPaywall) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
         try await withActivatedSDK(
             methodName: .getPaywallProducts,
             logParams: ["placement_id": paywall.placement.id]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                 if let manager = sdk.productsManager as? SK2ProductsManager {
                     return try await sdk.getSK2PaywallProducts(
@@ -40,11 +40,11 @@ public extension Adapty {
         }
     }
 
-    nonisolated static func getPaywallProductsWithoutDeterminingOffer(paywall: AdaptyPaywall) async throws -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+    nonisolated static func getPaywallProductsWithoutDeterminingOffer(paywall: AdaptyPaywall) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
         try await withActivatedSDK(
             methodName: .getPaywallProductsWithoutDeterminingOffer,
             logParams: ["placement_id": paywall.placement.id]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
                 if let manager = sdk.productsManager as? SK2ProductsManager {
                     return try await sdk.getSK2PaywallProductsWithoutOffers(
@@ -73,7 +73,7 @@ public extension Adapty {
         paywallABTestName: String,
         paywallName: String,
         webPaywallBaseUrl: URL?
-    ) async throws -> AdaptyPaywallProduct {
+    ) async throws(AdaptyError) -> AdaptyPaywallProduct {
         let sdk = try await Adapty.activatedSDK
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {

@@ -198,7 +198,7 @@ extension VC.ImageData.Resolved {
         switch self {
         case let .image(image):
             image
-        case .remote(_, preview: _): // TODO: нужно реализовать !!!
+        case .remote(_, preview: _): // TODO: implement this
             nil
         }
     }

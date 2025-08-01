@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyPaywall {
-    enum ViewConfiguration: Sendable, Hashable {
+    enum ViewConfiguration: Sendable {
         case value(AdaptyViewSource)
         case json(AdaptyLocale, id: String, json: Data?)
     }
@@ -32,7 +32,7 @@ extension AdaptyPaywall.ViewConfiguration {
 }
 
 extension AdaptyViewSource {
-    init(data: Data) throws {
+    init(data: Data) throws(AdaptyError) {
         do {
             self = try Storage.decoder.decode(AdaptyViewSource.self, from: data)
         } catch {

@@ -18,7 +18,7 @@ public extension Adapty {
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func makePurchase(
         product: AdaptyPaywallProduct
-    ) async throws -> AdaptyPurchaseResult {
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [
@@ -26,7 +26,7 @@ public extension Adapty {
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
             ]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
                 guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
 
@@ -38,8 +38,20 @@ public extension Adapty {
 
             guard let manager = sdk.sk2Purchaser else { throw AdaptyError.cantMakePayments() }
 
+            let profileId: String
+            let customerUserId: String?
+
+            if let profile = sdk.profileManager?.profile.value {
+                profileId = profile.profileId
+                customerUserId = profile.customerUserId
+            } else {
+                profileId = sdk.profileStorage.profileId
+                customerUserId = nil
+            }
+
             return try await manager.makePurchase(
-                profileId: sdk.profileStorage.profileId,
+                profileId: profileId,
+                customerUserId: customerUserId,
                 product: product
             )
         }
@@ -53,13 +65,15 @@ public extension Adapty {
     ///   - product: a ``AdaptyDeferredProduct`` object retrieved from the delegate.
     /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func makePurchase(product: AdaptyDeferredProduct) async throws -> AdaptyPurchaseResult {
+    nonisolated static func makePurchase(
+        product: AdaptyDeferredProduct
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [
                 "product_id": product.vendorProductId,
             ]
-        ) { sdk in
+        ) { sdk throws(AdaptyError) in
             guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
             return try await manager.makePurchase(product: product)
         }
@@ -71,8 +85,8 @@ public extension Adapty {
     ///
     /// - Returns: The ``AdaptyProfile`` object. This model contains info about access levels, subscriptions, and non-subscription purchases. Generally, you have to check only access level status to determine whether the user has premium access to the app.
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func restorePurchases() async throws -> AdaptyProfile {
-        try await withActivatedSDK(methodName: .restorePurchases) { sdk in
+    nonisolated static func restorePurchases() async throws(AdaptyError) -> AdaptyProfile {
+        try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(AdaptyError) in
             let profileId = sdk.profileStorage.profileId
             if let response = try await sdk.transactionManager.syncTransactions(for: profileId) {
                 return response.value

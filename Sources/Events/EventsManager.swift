@@ -28,7 +28,7 @@ final class EventsManager {
         needSendEvents()
     }
 
-    func trackEvent(_ unpacked: Event.Unpacked) throws {
+    func trackEvent(_ unpacked: Event.Unpacked) throws(EventsError) {
         guard !configuration.blacklist.contains(unpacked.event.name) else {
             return
         }
@@ -87,9 +87,9 @@ final class EventsManager {
         }
     }
 
-    private func sendEvents(_ session: Backend.EventsExecutor) async throws {
+    private func sendEvents(_ session: Backend.EventsExecutor) async throws(EventsError) {
         if configuration.isExpired {
-            do throws(HTTPError) {
+            do {
                 configuration = try await session.fetchEventsConfig(
                     profileId: ProfileStorage.profileId
                 )

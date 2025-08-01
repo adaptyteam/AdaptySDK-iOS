@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct GridItem: Sendable, Hashable {
+    struct GridItem: Sendable {
         let length: AdaptyViewConfiguration.GridItem.Length
         let horizontalAlignment: AdaptyViewConfiguration.HorizontalAlignment
         let verticalAlignment: AdaptyViewConfiguration.VerticalAlignment

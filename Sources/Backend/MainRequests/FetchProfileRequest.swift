@@ -63,7 +63,7 @@ extension Backend.MainExecutor {
     func fetchProfile(
         profileId: String,
         responseHash: String?
-    ) async throws -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
         let request = FetchProfileRequest(
             profileId: profileId,
             responseHash: responseHash

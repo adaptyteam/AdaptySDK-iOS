@@ -18,22 +18,6 @@ extension CustomAdaptyError {
     }
 }
 
-extension Error {
-    var asAdaptyError: AdaptyError? {
-        if let error = self as? AdaptyError { return error }
-        if let error = self as? CustomAdaptyError { return AdaptyError(error) }
-        return nil
-    }
-
-    var unwrapped: Error {
-        if let adaptyError = self as? AdaptyError {
-            adaptyError.wrapped
-        } else {
-            self
-        }
-    }
-}
-
 extension InternalAdaptyError: CustomAdaptyError {}
 
 extension HTTPError: CustomAdaptyError {

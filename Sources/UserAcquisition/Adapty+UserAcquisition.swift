@@ -8,7 +8,7 @@
 import Foundation
 
 public extension Adapty {
-    nonisolated static func getCurrentInstallationStatus() async throws -> AdaptyInstallationStatus {
+    nonisolated static func getCurrentInstallationStatus() async throws(AdaptyError) -> AdaptyInstallationStatus {
         try await withActivatedSDK(
             methodName: .getCurrentInstallationStatus
         ) { _ in

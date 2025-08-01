@@ -7,12 +7,13 @@
 
 import Foundation
 
-extension AdaptyViewConfiguration {
-    package struct Decorator: Sendable, Hashable {
+package extension AdaptyViewConfiguration {
+    struct Decorator: Sendable, Hashable {
         static let defaultShapeType: ShapeType = .rectangle(cornerRadius: CornerRadius.zero)
         package let shapeType: ShapeType
         package let background: Background?
         package let border: Border?
+        package let shadow: Shadow?
     }
 }
 
@@ -21,12 +22,14 @@ package extension AdaptyViewConfiguration.Decorator {
     static func create(
         shapeType: AdaptyViewConfiguration.ShapeType = defaultShapeType,
         background: AdaptyViewConfiguration.Background? = nil,
-        border: AdaptyViewConfiguration.Border? = nil
+        border: AdaptyViewConfiguration.Border? = nil,
+        shadow: AdaptyViewConfiguration.Shadow? = nil
     ) -> Self {
         .init(
             shapeType: shapeType,
             background: background,
-            border: border
+            border: border,
+            shadow: shadow
         )
     }
 }

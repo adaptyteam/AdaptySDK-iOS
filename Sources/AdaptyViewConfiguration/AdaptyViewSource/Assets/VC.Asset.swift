@@ -70,13 +70,13 @@ extension AdaptyViewSource.Localizer {
     }
 
     private func asset(_ assetId: String, darkMode mode: Bool = false) throws -> AdaptyViewSource.Asset {
-        guard let value = try assetOrNil(assetId, darkMode: mode) else {
+        guard let value = assetOrNil(assetId, darkMode: mode) else {
             throw AdaptyViewLocalizerError.notFoundAsset(assetId)
         }
         return value
     }
 
-    private func assetOrNil(_ assetId: String, darkMode mode: Bool) throws -> AdaptyViewSource.Asset? {
+    private func assetOrNil(_ assetId: String, darkMode mode: Bool) -> AdaptyViewSource.Asset? {
         let assetId = mode ? assetId + AssetIdentifySuffix.darkMode.rawValue : assetId
         return localization?.assets?[assetId] ?? source.assets[assetId]
     }

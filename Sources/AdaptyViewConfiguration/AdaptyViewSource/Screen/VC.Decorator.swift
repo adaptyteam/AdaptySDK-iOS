@@ -13,17 +13,19 @@ extension AdaptyViewSource {
         let backgroundAssetId: String?
         let borderAssetId: String?
         let borderThickness: Double?
+        let shadow: Shadow?
     }
 }
 
 extension AdaptyViewSource.Localizer {
-    func decorator(_ from: AdaptyViewSource.Decorator) throws -> AdaptyViewConfiguration.Decorator {
+    func decorator(_ from: AdaptyViewSource.Decorator) -> AdaptyViewConfiguration.Decorator {
         .init(
             shapeType: from.shapeType,
             background: from.backgroundAssetId.flatMap { try? background($0) },
             border: from.borderAssetId.map { (try? filling($0)) ?? AdaptyViewConfiguration.Border.default.filling }.map {
                 AdaptyViewConfiguration.Border(filling: $0, thickness: from.borderThickness ?? AdaptyViewConfiguration.Border.default.thickness)
-            }
+            },
+            shadow: from.shadow.flatMap { try? shadow($0) }
         )
     }
 }
@@ -35,6 +37,7 @@ extension AdaptyViewSource.Decorator: Decodable {
         case borderAssetId = "border"
         case borderThickness = "thickness"
         case shapeType = "type"
+        case shadow
     }
 
     init(from decoder: Decoder) throws {
@@ -43,7 +46,8 @@ extension AdaptyViewSource.Decorator: Decodable {
         let shape = (try? container.decode(AdaptyViewConfiguration.ShapeType.self, forKey: .shapeType)) ?? AdaptyViewConfiguration.Decorator.defaultShapeType
 
         if case .rectangle = shape,
-           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyViewConfiguration.CornerRadius.self, forKey: .rectangleCornerRadius) {
+           let rectangleCornerRadius = try container.decodeIfPresent(AdaptyViewConfiguration.CornerRadius.self, forKey: .rectangleCornerRadius)
+        {
             shapeType = .rectangle(cornerRadius: rectangleCornerRadius)
         } else {
             shapeType = shape
@@ -56,5 +60,7 @@ extension AdaptyViewSource.Decorator: Decodable {
             borderAssetId = nil
             borderThickness = nil
         }
+
+        shadow = try container.decodeIfPresent(AdaptyViewSource.Shadow.self, forKey: .shadow)
     }
 }

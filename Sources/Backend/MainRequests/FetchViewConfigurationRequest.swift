@@ -36,7 +36,7 @@ extension Backend.MainExecutor {
         paywallVariationId: String,
         locale: AdaptyLocale,
         disableServerCache: Bool
-    ) async throws -> AdaptyViewSource {
+    ) async throws(HTTPError) -> AdaptyViewSource {
         let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
 
         let request = FetchViewConfigurationRequest(

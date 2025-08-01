@@ -40,7 +40,7 @@ extension Backend.FallbackExecutor {
         cached: Content?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
-    ) async throws -> AdaptyPlacementChosen<Content> {
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let endpoint: HTTPEndpoint
         let requestName: APIRequestName
 
@@ -92,7 +92,7 @@ extension Backend.FallbackExecutor {
 
             return response.body
         } catch {
-            guard (error as? HTTPError)?.statusCode == 404,
+            guard error.statusCode == 404,
                   !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
             else {
                 throw error

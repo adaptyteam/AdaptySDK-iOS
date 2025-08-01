@@ -28,83 +28,22 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyViewSource.Element {
-    struct Properties: Sendable, Hashable {
+    struct Properties: Sendable {
         let elementId: String?
         let decorator: AdaptyViewSource.Decorator?
         let padding: AdaptyViewConfiguration.EdgeInsets
         let offset: AdaptyViewConfiguration.Offset
 
-        let visibility: Bool
-        let transitionIn: [AdaptyViewConfiguration.Transition]
+        let opacity: Double
+        let onAppear: [AdaptyViewSource.Animation]
 
         var isZero: Bool {
             elementId == nil
                 && decorator == nil
                 && padding.isZero
                 && offset.isZero
-                && visibility
-                && transitionIn.isEmpty
-        }
-    }
-}
-
-extension AdaptyViewSource.Element: Hashable {
-    package func hash(into hasher: inout Hasher) {
-        switch self {
-        case let .reference(value):
-            hasher.combine(1)
-            hasher.combine(value)
-        case let .stack(value, properties):
-            hasher.combine(2)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .text(value, properties):
-            hasher.combine(3)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .image(value, properties):
-            hasher.combine(4)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .video(value, properties):
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .button(value, properties):
-            hasher.combine(5)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .box(value, properties):
-            hasher.combine(6)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .row(value, properties):
-            hasher.combine(7)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .column(value, properties):
-            hasher.combine(8)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .section(value, properties):
-            hasher.combine(9)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .toggle(value, properties):
-            hasher.combine(10)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .timer(value, properties):
-            hasher.combine(11)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .pager(value, properties):
-            hasher.combine(12)
-            hasher.combine(value)
-            hasher.combine(properties)
-        case let .unknown(value, properties):
-            hasher.combine(13)
-            hasher.combine(value)
-            hasher.combine(properties)
+                && opacity == 0
+                && onAppear.isEmpty
         }
     }
 }
@@ -149,8 +88,8 @@ extension AdaptyViewSource.Localizer {
             decorator: from.decorator.map(decorator),
             padding: from.padding,
             offset: from.offset,
-            visibility: from.visibility,
-            transitionIn: from.transitionIn
+            opacity: from.opacity,
+            onAppear: from.onAppear.map(animation)
         )
     }
 }
@@ -239,26 +178,36 @@ extension AdaptyViewSource.Element.Properties: Decodable {
         case padding
         case offset
         case visibility
+        case opacity
         case transitionIn = "transition_in"
+        case onAppear = "on_appear"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let transitionIn: [AdaptyViewConfiguration.Transition] =
-            if let array = try? container.decodeIfPresent([AdaptyViewConfiguration.Transition].self, forKey: .transitionIn) {
-                array
-            } else if let transition = try container.decodeIfPresent(AdaptyViewConfiguration.Transition.self, forKey: .transitionIn) {
-                [transition]
+
+        let onAppear: [AdaptyViewSource.Animation] =
+            if container.contains(.transitionIn) && !container.contains(.onAppear) {
+                if let animation = try container.decodeIfPresent(AdaptyViewSource.Animation.self, forKey: .transitionIn) { [animation] } else { [] }
             } else {
-                []
+                if let array = try? container.decodeIfPresent([AdaptyViewSource.Animation].self, forKey: .onAppear) {
+                    array
+                } else { [] }
             }
+
+        let opacity = if container.contains(.visibility) && !container.contains(.opacity) {
+            try container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true ? 1.0 : 0.0
+        } else {
+            try container.decodeIfPresent(Double.self, forKey: .opacity) ?? AdaptyViewConfiguration.Element.Properties.defaultOpacity
+        }
+
         try self.init(
             elementId: container.decodeIfPresent(String.self, forKey: .elementId),
             decorator: container.decodeIfPresent(AdaptyViewSource.Decorator.self, forKey: .decorator),
             padding: container.decodeIfPresent(AdaptyViewConfiguration.EdgeInsets.self, forKey: .padding) ?? AdaptyViewConfiguration.Element.Properties.defaultPadding,
             offset: container.decodeIfPresent(AdaptyViewConfiguration.Offset.self, forKey: .offset) ?? AdaptyViewConfiguration.Element.Properties.defaultOffset,
-            visibility: container.decodeIfPresent(Bool.self, forKey: .visibility) ?? AdaptyViewConfiguration.Element.Properties.defaultVisibility,
-            transitionIn: transitionIn
+            opacity: opacity,
+            onAppear: onAppear
         )
     }
 }

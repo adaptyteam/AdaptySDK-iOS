@@ -60,7 +60,7 @@ final class UserAcquisitionManager: Sendable {
                 includedAnalyticIds: true
             )
 
-            do {
+            do throws(HTTPError) {
                 let response = try await executor.registerInstall(
                     profileId: sdk.profileStorage.profileId,
                     installInfo: installInfo,
@@ -76,10 +76,8 @@ final class UserAcquisitionManager: Sendable {
                 Adapty.callDelegate { $0.onInstallationDetailsSuccess(details) }
 
             } catch {
-                if let httpError = error as? HTTPError, httpError.isCancelled {
-                    return
-                }
-                Adapty.callDelegate { $0.onInstallationDetailsFail(error: error.asAdaptyError ?? AdaptyError.fetchInstallationDetailsFailed(unknownError: error)) }
+                guard !error.isCancelled else { return }
+                Adapty.callDelegate { $0.onInstallationDetailsFail(error: error.asAdaptyError) }
             }
         }
         return true

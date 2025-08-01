@@ -87,7 +87,7 @@ extension Backend.MainExecutor {
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
         responseHash: String?
-    ) async throws -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
         if parameters == nil, environmentMeta == nil {
             try await fetchProfile(
                 profileId: profileId,
@@ -108,7 +108,7 @@ extension Backend.MainExecutor {
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
         responseHash: String?
-    ) async throws -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
         let request = UpdateProfileRequest(
             profileId: profileId,
             parameters: parameters,

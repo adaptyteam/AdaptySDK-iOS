@@ -13,7 +13,7 @@ func withTaskCancellationWithError<T: Sendable>(
 ) async throws -> T {
     let task = TaskReference()
     let once = OncePerformer()
-    return try await withTaskCancellationHandler { @PerformerActor in
+    return try await withTaskCancellationHandler(operation: { @PerformerActor in
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<T, Error>) in
             guard !Task.isCancelled else {
                 continuation.resume(throwing: onCancelError)
@@ -37,11 +37,11 @@ func withTaskCancellationWithError<T: Sendable>(
 
             task.set(_task)
         }
-    } onCancel: {
+    }, onCancel: {
         Task { @PerformerActor in
             task.cancel()
         }
-    }
+    })
 }
 
 @globalActor

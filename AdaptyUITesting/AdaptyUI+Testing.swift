@@ -28,7 +28,9 @@ public extension AdaptyViewConfigurationTestWrapper {
             templateId: templateId,
             locale: locale,
             isRightToLeft: isRightToLeft,
-            images: [],
+            images: [
+                "star.fill", "beagle", "close", "coast-bg"
+            ],
             colors: [
                 "$green_figma": .solidColor(.create(data: 0x3EBD78FF)),
                 "$green_figma_cc": .solidColor(.create(data: 0x3EBD78CC)),
@@ -89,6 +91,18 @@ public extension AdaptyViewConfigurationTestWrapper {
                         .create(color: .create(data: 0xF3227AFF), p: 1.0),
                     ]
                 )),
+                "$shimmer_gradient": .colorGradient(.create(
+                    kind: .linear,
+                    start: .create(x: 0.0, y: 1.0),
+                    end: .create(x: 1.0, y: 0.0),
+                    items: [
+                        .create(color: .create(data: 0xFFFFFF00), p: 0.0),
+                        .create(color: .create(data: 0xFFFFFF00), p: 0.35),
+                        .create(color: .create(data: 0xFFFFFFFF), p: 0.5),
+                        .create(color: .create(data: 0xFFFFFF00), p: 0.65),
+                        .create(color: .create(data: 0xFFFFFF00), p: 1.0),
+                    ]
+                )),
             ],
             strings: [
                 "$short": ["Article."],
@@ -127,10 +141,8 @@ public struct AdaptyUITestRendererView: View {
     let paywallConfiguration: AdaptyUI.PaywallConfiguration
 
     public init(
-        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper
-//        ,
-//        imageResolver: AdaptyImageAssetResolver?,
-//        videoResolver: AdaptyVideoAssetResolver?
+        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper,
+        assetsResolver: AdaptyAssetsResolver?
     ) {
         viewConfiguration = viewConfigurationWrapper.value
 
@@ -142,7 +154,7 @@ public struct AdaptyUITestRendererView: View {
             observerModeResolver: nil,
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
-            assetsResolver: nil // imageResolver
+            assetsResolver: assetsResolver
         )
     }
 

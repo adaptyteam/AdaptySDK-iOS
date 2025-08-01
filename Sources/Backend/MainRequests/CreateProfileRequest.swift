@@ -77,7 +77,7 @@ extension Backend.MainExecutor {
         customerUserId: String?,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta
-    ) async throws -> VH<AdaptyProfile> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = CreateProfileRequest(
             profileId: profileId,
             customerUserId: customerUserId,

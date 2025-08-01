@@ -84,28 +84,30 @@ actor SK2Purchaser {
 
     func makePurchase(
         profileId: String,
+        customerUserId: String?,
         product: AdaptyPaywallProduct
-    ) async throws -> AdaptyPurchaseResult {
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
               let sk2Product = product.sk2Product
         else {
             throw AdaptyError.cantMakePayments()
         }
 
-        let options: Set<Product.PurchaseOption>
+        var options = Set<Product.PurchaseOption>()
 
         switch product.subscriptionOffer {
         case .none:
-            options = []
+            break
         case let .some(offer):
             switch offer.offerIdentifier {
             case .introductory:
-                options = []
+                break
 
             case let .winBack(offerId):
                 if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                   let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId) {
-                    options = [.winBackOffer(winBackOffer)]
+                   let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId)
+                {
+                    options.insert(.winBackOffer(winBackOffer))
                 } else {
                     throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
                 }
@@ -117,15 +119,15 @@ actor SK2Purchaser {
                     offerId: offerId
                 )
 
-                options = [
+                options.insert(
                     .promotionalOffer(
                         offerID: offerId,
                         keyID: response.keyIdentifier,
                         nonce: response.nonce,
                         signature: response.signature,
                         timestamp: response.timestamp
-                    ),
-                ]
+                    )
+                )
             }
         }
 
@@ -150,7 +152,7 @@ actor SK2Purchaser {
         _ options: Set<Product.PurchaseOption>,
         _ paywallVariationId: String?,
         _ persistentOnboardingVariationId: String?
-    ) async throws -> AdaptyPurchaseResult {
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         let stamp = Log.stamp
 
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
@@ -174,26 +176,29 @@ actor SK2Purchaser {
             throw StoreKitManagerError.productPurchaseFailed(error).asAdaptyError
         }
 
-        let sk2Transaction: SK2Transaction
+        let sk2SignedTransaction: SK2SignedTransaction
         switch purchaseResult {
-        case let .success(.verified(transaction)):
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
-                methodName: .productPurchase,
-                stamp: stamp,
-                params: [
-                    "verified": true,
-                ]
-            ))
-            sk2Transaction = transaction
-        case let .success(.unverified(transaction, error)):
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
-                methodName: .productPurchase,
-                stamp: stamp,
-                error: error.localizedDescription
-            ))
-            log.error("Unverified purchase transaction of product: \(sk2Product.id) \(error.localizedDescription)")
-            await transaction.finish()
-            throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
+        case let .success(verificationResult):
+            switch verificationResult {
+            case .verified:
+                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                    methodName: .productPurchase,
+                    stamp: stamp,
+                    params: [
+                        "verified": true,
+                    ]
+                ))
+                sk2SignedTransaction = verificationResult
+            case let .unverified(transaction, error):
+                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                    methodName: .productPurchase,
+                    stamp: stamp,
+                    error: error.localizedDescription
+                ))
+                log.error("Unverified purchase transaction of product: \(sk2Product.id) \(error.localizedDescription)")
+                await transaction.finish()
+                throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
+            }
         case .pending:
             await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,
@@ -226,6 +231,8 @@ actor SK2Purchaser {
             throw StoreKitManagerError.productPurchaseFailed(nil).asAdaptyError
         }
 
+        let sk2Transaction = sk2SignedTransaction.unsafePayloadValue
+
         let purchasedTransaction = PurchasedTransaction(
             sk2Product: sk2Product,
             paywallVariationId: paywallVariationId,
@@ -249,7 +256,7 @@ actor SK2Purchaser {
             ))
 
             log.info("Successfully purchased product: \(sk2Product.id) with transaction: \(sk2Transaction)")
-            return .success(profile: response.value, transaction: sk2Transaction)
+            return .success(profile: response.value, transaction: sk2SignedTransaction)
         } catch {
             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Product.id)")
             throw StoreKitManagerError.transactionUnverified(error).asAdaptyError

@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Pager: Sendable, Hashable {
+    struct Pager: Sendable {
         let pageWidth: AdaptyViewConfiguration.Pager.Length
         let pageHeight: AdaptyViewConfiguration.Pager.Length
         let pagePadding: AdaptyViewConfiguration.EdgeInsets
@@ -46,7 +46,7 @@ extension AdaptyViewSource.Localizer {
         )
     }
 
-    private func pageControl(_ from: AdaptyViewSource.Pager.PageControl) throws -> AdaptyViewConfiguration.Pager.PageControl {
+    private func pageControl(_ from: AdaptyViewSource.Pager.PageControl) -> AdaptyViewConfiguration.Pager.PageControl {
         .init(
             layout: from.layout,
             verticalAlignment: from.verticalAlignment,
