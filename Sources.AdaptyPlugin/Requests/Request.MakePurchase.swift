@@ -12,11 +12,9 @@ extension Request {
     struct MakePurchase: AdaptyPluginRequest {
         static let method = "make_purchase"
         let product: AdaptyPluginPaywallProduct
-        let parameters: AdaptyPurchaseParameters?
 
         enum CodingKeys: CodingKey {
             case product
-            case parameters
         }
 
         func execute() async throws -> AdaptyJsonData {
@@ -30,7 +28,7 @@ extension Request {
                 paywallName: product.paywallName,
                 webPaywallBaseUrl: product.webPaywallBaseUrl
             )
-            let result = try await Adapty.makePurchase(product: product, parameters: parameters ?? .default)
+            let result = try await Adapty.makePurchase(product: product)
             return .success(result)
         }
     }
