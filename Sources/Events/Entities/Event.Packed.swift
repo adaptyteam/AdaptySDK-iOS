@@ -49,7 +49,7 @@ private extension Event {
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: Event.CodingKeys.self)
             try container.encode(original.id, forKey: .id)
-            try container.encode(original.profileId, forKey: .profileId)
+            try container.encode(original.userId.profileId, forKey: .profileId)
             try container.encode(original.environment.sessionIdentifier, forKey: .sessionId)
             try container.encode(original.createdAt, forKey: .createdAt)
             try container.encode(counter, forKey: .counter)

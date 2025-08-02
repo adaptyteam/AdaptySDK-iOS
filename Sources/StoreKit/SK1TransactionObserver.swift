@@ -45,7 +45,7 @@ actor SK1TransactionObserver: Sendable {
                 )
 
                 _ = try await self.purchaseValidator.validatePurchase(
-                    profileId: nil,
+                    userId: nil,
                     transaction: transaction,
                     reason: .observing
                 )

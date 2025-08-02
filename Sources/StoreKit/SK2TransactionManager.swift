@@ -14,31 +14,31 @@ actor SK2TransactionManager: StoreKitTransactionManager {
     private let session: Backend.MainExecutor
 
     private var lastTransactionCached: SK2Transaction?
-    private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, profileId: String)?
+    private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, userId: AdaptyUserId)?
 
     init(session: Backend.MainExecutor) {
         self.session = session
     }
 
-    func syncTransactions(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
+    func syncTransactions(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
         let task: AdaptyResultTask<VH<AdaptyProfile>?>
-        if let syncing, syncing.profileId == profileId {
+        if let syncing, userId.isEqualProfileId(syncing.userId) {
             task = syncing.task
         } else {
             task = Task {
                 do throws(AdaptyError) {
-                    let value = try await syncLastTransaction(for: profileId)
+                    let value = try await syncLastTransaction(for: userId)
                     return .success(value)
                 } catch {
                     return .failure(error)
                 }
             }
-            syncing = (task, profileId)
+            syncing = (task, userId)
         }
         return try await task.value.get()
     }
 
-    private func syncLastTransaction(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
+    private func syncLastTransaction(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
         defer { syncing = nil }
 
         let lastTransaction: SK2Transaction
@@ -54,7 +54,7 @@ actor SK2TransactionManager: StoreKitTransactionManager {
 
         do {
             return try await session.syncTransaction(
-                profileId: profileId,
+                userId: userId,
                 originalTransactionId: lastTransaction.unfOriginalIdentifier
             )
         } catch {

@@ -19,7 +19,7 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
 
     let source: String
     let attributionJson: String
-    let profileId: String
+    let userId: AdaptyUserId
 
     func decodeDataResponse(
         _ response: HTTPDataResponse,
@@ -32,14 +32,14 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
         )
     }
 
-    init(profileId: String, source: String, attributionJson: String, responseHash: String?) {
+    init(userId: AdaptyUserId, source: String, attributionJson: String, responseHash: String?) {
         headers = HTTPHeaders()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setBackendResponseHash(responseHash)
 
         self.source = source
         self.attributionJson = attributionJson
-        self.profileId = profileId
+        self.userId = userId
     }
 
     enum CodingKeys: String, CodingKey {
@@ -52,19 +52,19 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(source, forKey: .source)
         try container.encode(attributionJson, forKey: .attributionJson)
-        try container.encode(profileId, forKey: .profileId)
+        try container.encode(userId.profileId, forKey: .profileId)
     }
 }
 
 extension Backend.MainExecutor {
     func setAttributionData(
-        profileId: String,
+        userId: AdaptyUserId,
         source: String,
         attributionJson: String,
         responseHash: String?
     ) async throws(HTTPError) -> VH<AdaptyProfile?> {
         let request = SetAttributionDataRequest(
-            profileId: profileId,
+            userId: userId,
             source: source,
             attributionJson: attributionJson,
             responseHash: responseHash

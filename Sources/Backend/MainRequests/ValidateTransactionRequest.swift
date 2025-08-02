@@ -18,12 +18,14 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    let profileId: String
+    let userId: AdaptyUserId
     let requestSource: RequestSource
 
-    init(profileId: String, requestSource: RequestSource) {
-        headers = HTTPHeaders().setBackendProfileId(profileId)
-        self.profileId = profileId
+    init(userId: AdaptyUserId, requestSource: RequestSource) {
+        headers = HTTPHeaders()
+            .setUserProfileId(userId)
+
+        self.userId = userId
         self.requestSource = requestSource
     }
 
@@ -42,12 +44,12 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         switch requestSource {
         case let .restore(originalTransactionId):
             var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-            try attributesObject.encode(profileId, forKey: .profileId)
+            try attributesObject.encode(userId.profileId, forKey: .profileId)
             try attributesObject.encode(Adapty.ValidatePurchaseReason.restoreRawString, forKey: .requestSource)
             try attributesObject.encode(originalTransactionId, forKey: .originalTransactionId)
         case let .report(transactionId, variationId):
             var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-            try attributesObject.encode(profileId, forKey: .profileId)
+            try attributesObject.encode(userId.profileId, forKey: .profileId)
             try attributesObject.encode(Adapty.ValidatePurchaseReason.reportRawString, forKey: .requestSource)
             try attributesObject.encode(transactionId, forKey: .originalTransactionId)
             try attributesObject.encode(transactionId, forKey: .transactionId)
@@ -55,7 +57,7 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         case let .other(purchasedTransaction, reason):
             try dataObject.encode(purchasedTransaction, forKey: .attributes)
             var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-            try attributesObject.encode(profileId, forKey: .profileId)
+            try attributesObject.encode(userId.profileId, forKey: .profileId)
             try attributesObject.encode(reason.rawString, forKey: .requestSource)
         }
     }
@@ -83,11 +85,11 @@ private extension Adapty.ValidatePurchaseReason {
 
 extension Backend.MainExecutor {
     func syncTransaction(
-        profileId: String,
+        userId: AdaptyUserId,
         originalTransactionId: String
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
-            profileId: profileId,
+            userId: userId,
             requestSource: .restore(originalTransactionId: originalTransactionId)
         )
         let logParams: EventParameters = [
@@ -104,12 +106,12 @@ extension Backend.MainExecutor {
     }
 
     func reportTransaction(
-        profileId: String,
+        userId: AdaptyUserId,
         transactionId: String,
         variationId: String?
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
-            profileId: profileId,
+            userId: userId,
             requestSource: .report(transactionId: transactionId, variationId: variationId)
         )
 
@@ -129,12 +131,12 @@ extension Backend.MainExecutor {
     }
 
     func validateTransaction(
-        profileId: String,
+        userId: AdaptyUserId,
         purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
-            profileId: profileId,
+            userId: userId,
             requestSource: .other(purchasedTransaction, reason: reason)
         )
         let logParams: EventParameters = [

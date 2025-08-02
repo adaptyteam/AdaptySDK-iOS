@@ -19,32 +19,32 @@ private struct SetIntegrationIdentifierRequest: HTTPEncodableRequest {
 
     let stamp = Log.stamp
 
-    let profileId: String
+    let userId: AdaptyUserId
     let keyValues: [String: String]
 
-    init(profileId: String, keyValues: [String: String]) {
+    init(userId: AdaptyUserId, keyValues: [String: String]) {
         headers = HTTPHeaders()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
 
-        self.profileId = profileId
+        self.userId = userId
         self.keyValues = keyValues
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: Backend.CodingKeys.self)
         var keyValues = keyValues
-        keyValues["profile_id"] = profileId
+        keyValues["profile_id"] = userId.profileId
         try container.encode(keyValues, forKey: .data)
     }
 }
 
 extension Backend.MainExecutor {
     func setIntegrationIdentifier(
-        profileId: String,
+        userId: AdaptyUserId,
         keyValues: [String: String]
     ) async throws(HTTPError) {
         let request = SetIntegrationIdentifierRequest(
-            profileId: profileId,
+            userId: userId,
             keyValues: keyValues
         )
         let _: HTTPEmptyResponse = try await perform(

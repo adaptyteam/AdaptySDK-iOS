@@ -12,7 +12,7 @@ private let log = Log.skReceiptManager
 actor StoreKitReceiptManager {
     private let session: Backend.MainExecutor
     private let refresher = ReceiptRefresher()
-    private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, profileId: String)?
+    private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, userId: AdaptyUserId)?
 
     init(session: Backend.MainExecutor, refreshIfEmpty: Bool = false) {
         self.session = session
@@ -73,31 +73,31 @@ actor StoreKitReceiptManager {
 }
 
 extension StoreKitReceiptManager: StoreKitTransactionManager {
-    func syncTransactions(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
+    func syncTransactions(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
         let task: AdaptyResultTask<VH<AdaptyProfile>?>
-        if let syncing, syncing.profileId == profileId {
+        if let syncing, userId.isEqualProfileId(syncing.userId) {
             task = syncing.task
         } else {
             task = Task {
                 do throws(AdaptyError) {
-                    let value = try await syncReceipt(for: profileId)
+                    let value = try await syncReceipt(for: userId)
                     return .success(value)
                 } catch {
                     return .failure(error)
                 }
             }
-            syncing = (task, profileId)
+            syncing = (task, userId)
         }
         return try await task.value.get()
     }
 
-    private func syncReceipt(for profileId: String) async throws(AdaptyError) -> VH<AdaptyProfile>? {
+    private func syncReceipt(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
         defer { syncing = nil }
 
         let receipt = try await getReceipt()
         do {
             return try await session.validateReceipt(
-                profileId: profileId,
+                userId: userId,
                 receipt: receipt
             )
         } catch {

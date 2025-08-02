@@ -67,7 +67,7 @@ extension AdaptyOnboarding: Codable {
 extension Sequence<VH<AdaptyOnboarding>> {
     var asOnboardingByPlacementId: [String: VH<AdaptyOnboarding>] {
         Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
-            first.value.placement.version > second.value.placement.version ? first : second
+            first.value.placement.isNewerThan(second.value.placement) ? first : second
         })
     }
 }

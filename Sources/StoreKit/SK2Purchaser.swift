@@ -53,7 +53,7 @@ actor SK2Purchaser {
 
                         do {
                             _ = try await purchaseValidator.validatePurchase(
-                                profileId: nil,
+                                userId: nil,
                                 transaction: purchasedTransaction,
                                 reason: .sk2Updates
                             )
@@ -83,8 +83,7 @@ actor SK2Purchaser {
     }
 
     func makePurchase(
-        profileId: String,
-        customerUserId: String?,
+        userId: AdaptyUserId,
         product: AdaptyPaywallProduct,
         parameters: AdaptyPurchaseParameters
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
@@ -96,7 +95,7 @@ actor SK2Purchaser {
 
         var options = Set<Product.PurchaseOption>()
 
-        if let uuid = parameters.appAccountToken.asUUID(customerUserId: customerUserId) {
+        if let uuid = parameters.appAccountToken.asUUID(userId: userId) {
             options.insert(.appAccountToken(uuid))
         }
 
@@ -119,7 +118,7 @@ actor SK2Purchaser {
 
             case let .promotional(offerId):
                 let response = try await purchaseValidator.signSubscriptionOffer(
-                    profileId: profileId,
+                    userId: userId,
                     vendorProductId: product.vendorProductId,
                     offerId: offerId
                 )
@@ -248,7 +247,7 @@ actor SK2Purchaser {
 
         do {
             let response = try await purchaseValidator.validatePurchase(
-                profileId: nil,
+                userId: nil,
                 transaction: purchasedTransaction,
                 reason: .purchasing
             )

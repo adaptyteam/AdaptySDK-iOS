@@ -11,13 +11,13 @@ extension Adapty {
     @EventsManagerActor
     static let eventsManager = EventsManager()
 
-    static func trackEvent(_ event: Event, for profileId: String? = nil) {
+    static func trackEvent(_ event: Event, for userId: AdaptyUserId? = nil) {
         let now = Date()
-        let profileId = profileId ?? ProfileStorage.profileId
+        let userId = userId ?? ProfileStorage.userId
         Task.detached(priority: .utility) {
             let event = await Event.Unpacked(
                 event: event,
-                profileId: profileId,
+                userId: userId,
                 environment: Environment.instance,
                 createdAt: now
             )
@@ -57,7 +57,7 @@ extension Adapty {
             return
         }
 
-        trackEvent(event, for: draw.profileId)
+        trackEvent(event, for: draw.userId)
     }
 
     package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyViewConfiguration) {
@@ -70,7 +70,7 @@ public extension Adapty {
         do {
             let event = await Event.Unpacked(
                 event: event,
-                profileId: ProfileStorage.profileId,
+                userId: ProfileStorage.userId,
                 environment: Environment.instance
             )
             try await eventsManager.trackEvent(event)

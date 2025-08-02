@@ -91,7 +91,7 @@ final class EventsManager {
         if configuration.isExpired {
             do {
                 configuration = try await session.fetchEventsConfig(
-                    profileId: ProfileStorage.profileId
+                    userId: ProfileStorage.userId
                 )
             } catch .backend, .decoding {
                 configuration = .init(blacklist: Event.defaultBlackList, expiration: Date() + 24*60*60)
@@ -111,7 +111,7 @@ final class EventsManager {
         }
 
         try await session.sendEvents(
-            profileId: ProfileStorage.profileId,
+            userId: ProfileStorage.userId,
             events: events.elements
         )
 

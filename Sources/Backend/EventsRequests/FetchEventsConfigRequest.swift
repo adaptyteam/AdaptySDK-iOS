@@ -17,17 +17,17 @@ private struct FetchEventsConfigRequest: HTTPRequestWithDecodableResponse {
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    init(profileId: String) {
-        headers = HTTPHeaders().setBackendProfileId(profileId)
+    init(userId: AdaptyUserId) {
+        headers = HTTPHeaders().setUserProfileId(userId)
     }
 }
 
 extension Backend.EventsExecutor {
     func fetchEventsConfig(
-        profileId: String
+        userId: AdaptyUserId
     ) async throws(HTTPError) -> EventsBackendConfiguration {
         let request = FetchEventsConfigRequest(
-            profileId: profileId
+            userId: userId
         )
 
         let response = try await perform(

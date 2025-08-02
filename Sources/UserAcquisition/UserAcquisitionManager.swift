@@ -62,7 +62,7 @@ final class UserAcquisitionManager {
 
             do throws(HTTPError) {
                 let response = try await executor.registerInstall(
-                    profileId: sdk.profileStorage.profileId,
+                    userId: sdk.profileStorage.userId,
                     installInfo: installInfo,
                     maxRetries: maxRetries
                 )

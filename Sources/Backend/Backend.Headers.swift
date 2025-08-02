@@ -105,8 +105,8 @@ extension HTTPHeaders {
         updateOrRemoveValue(hash, forKey: Backend.Request.hashHeaderKey)
     }
 
-    func setBackendProfileId(_ profileId: String?) -> Self {
-        updateOrRemoveValue(profileId, forKey: Backend.Request.profileIdHeaderKey)
+    func setUserProfileId(_ userId: AdaptyUserId?) -> Self {
+        updateOrRemoveValue(userId?.profileId, forKey: Backend.Request.profileIdHeaderKey)
     }
 
     private func updateOrRemoveValue(_ value: String?, forKey key: String) -> Self {

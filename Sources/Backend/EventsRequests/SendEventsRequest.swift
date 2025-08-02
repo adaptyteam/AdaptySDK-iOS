@@ -17,8 +17,8 @@ struct SendEventsRequest: HTTPDataRequest {
 
     let events: [Data]
 
-    init(profileId: String, events: [Data]) {
-        headers = HTTPHeaders().setBackendProfileId(profileId)
+    init(userId: AdaptyUserId, events: [Data]) {
+        headers = HTTPHeaders().setUserProfileId(userId)
         self.events = events
     }
 
@@ -50,12 +50,12 @@ struct SendEventsRequest: HTTPDataRequest {
 
 extension Backend.EventsExecutor {
     func sendEvents(
-        profileId: String,
+        userId: AdaptyUserId,
         events: [Data]
     ) async throws(EventsError) {
         do {
             let _: HTTPEmptyResponse = try await session.perform(SendEventsRequest(
-                profileId: profileId,
+                userId: userId,
                 events: events
             ))
         } catch {

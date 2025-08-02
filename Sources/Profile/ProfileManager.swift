@@ -9,7 +9,7 @@ import Foundation
 
 @AdaptyActor
 final class ProfileManager {
-    nonisolated let profileId: String
+    var userId: AdaptyUserId { profile.value.userId }
     var profile: VH<AdaptyProfile>
     var onceSentEnvironment: SentEnvironment
 
@@ -23,8 +23,7 @@ final class ProfileManager {
         profile: VH<AdaptyProfile>,
         sentEnvironment: SentEnvironment
     ) {
-        let profileId = profile.value.profileId
-        self.profileId = profileId
+        let userId = profile.value.userId
         self.profile = profile
         self.onceSentEnvironment = sentEnvironment
         self.storage = storage
@@ -35,7 +34,7 @@ final class ProfileManager {
             if sentEnvironment == .none {
                 _ = await self?.getProfile()
             } else {
-                self?.syncTransactionsIfNeed(for: profileId)
+                self?.syncTransactionsIfNeed(for: userId)
             }
 
             Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
@@ -44,14 +43,14 @@ final class ProfileManager {
 }
 
 extension ProfileManager {
-    nonisolated func syncTransactionsIfNeed(for profileId: String) { // TODO: extract this code from ProfileManager
+    nonisolated func syncTransactionsIfNeed(for userId: AdaptyUserId) { // TODO: extract this code from ProfileManager
         Task { @AdaptyActor [weak self] in
             guard let sdk = Adapty.optionalSDK,
                   let self,
                   !self.storage.syncedTransactions
             else { return }
 
-            try? await sdk.syncTransactions(for: profileId)
+            try? await sdk.syncTransactions(for: userId)
         }
     }
 
@@ -60,7 +59,7 @@ extension ProfileManager {
     }
 
     func getProfile() async -> AdaptyProfile {
-        syncTransactionsIfNeed(for: profileId)
+        syncTransactionsIfNeed(for: userId)
         return await (try? syncProfile(params: nil)) ?? profile.value
     }
 
@@ -82,9 +81,9 @@ extension ProfileManager {
 
     func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
         guard let newProfile,
-              profile.value.profileId == newProfile.value.profileId,
-              !profile.hash.nonOptionalIsEqual(newProfile.hash),
-              profile.value.version <= newProfile.value.version
+              newProfile.isEqualProfileId(profile),
+              !newProfile.hash.nonOptionalIsEqual(profile.hash),
+              newProfile.value.isNewerOrEqualVersion(profile.value)
         else { return }
 
         profile = newProfile
@@ -95,17 +94,17 @@ extension ProfileManager {
 }
 
 extension Adapty {
-    func syncTransactions(for profileId: String) async throws(AdaptyError) {
-        let response = try await transactionManager.syncTransactions(for: profileId)
+    func syncTransactions(for userId: AdaptyUserId) async throws(AdaptyError) {
+        let response = try await transactionManager.syncTransactions(for: userId)
 
-        if profileStorage.profileId == profileId {
+        if profileStorage.isEqualProfileId(userId) {
             profileStorage.setSyncedTransactions(true)
         }
         profileManager?.saveResponse(response)
     }
 
     func saveResponse(_ newProfile: VH<AdaptyProfile>, syncedTransaction: Bool = false) {
-        if syncedTransaction, profileStorage.profileId == newProfile.value.profileId {
+        if syncedTransaction, newProfile.isEqualProfileId(profileStorage) {
             profileStorage.setSyncedTransactions(true)
         }
         profileManager?.saveResponse(newProfile)
@@ -117,7 +116,7 @@ private extension Adapty {
         let response: VH<AdaptyProfile?>
         do {
             response = try await httpSession.syncProfile(
-                profileId: old.value.profileId,
+                userId: old.value.userId,
                 parameters: params,
                 environmentMeta: meta,
                 responseHash: old.hash
@@ -126,7 +125,7 @@ private extension Adapty {
             throw error.asAdaptyError
         }
 
-        if let manager = try profileManager(with: old.value.profileId) {
+        if let manager = try profileManager(withProfileId: old.value.userId) {
             if let meta {
                 manager.onceSentEnvironment = meta.sentEnvironment
             }

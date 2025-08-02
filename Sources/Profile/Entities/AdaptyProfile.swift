@@ -8,11 +8,13 @@
 import Foundation
 
 public struct AdaptyProfile: Sendable {
+    let userId: AdaptyUserId
+
     /// An identifier of a user in Adapty.
-    public let profileId: String
+    public var profileId: String { userId.profileId }
 
     /// An identifier of a user in your system.
-    public let customerUserId: String?
+    public var customerUserId: String? { userId.customerId }
 
     package let segmentId: String
     package let isTestUser: Bool
@@ -34,10 +36,15 @@ public struct AdaptyProfile: Sendable {
     let version: Int64
 }
 
+extension AdaptyProfile {
+    func isNewerOrEqualVersion(_ other: AdaptyProfile) -> Bool {
+        version >= other.version
+    }
+}
+
 extension AdaptyProfile: Hashable {
     public static func == (lhs: AdaptyProfile, rhs: AdaptyProfile) -> Bool {
-        lhs.profileId == rhs.profileId
-            && lhs.customerUserId == rhs.customerUserId
+        lhs.userId == rhs.userId
             && lhs.segmentId == rhs.segmentId
             && lhs.isTestUser == rhs.isTestUser
             && lhs.codableCustomAttributes == rhs.codableCustomAttributes
@@ -48,8 +55,7 @@ extension AdaptyProfile: Hashable {
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(profileId)
-        hasher.combine(customerUserId)
+        hasher.combine(userId)
         hasher.combine(segmentId)
         hasher.combine(isTestUser)
         hasher.combine(codableCustomAttributes)
@@ -62,8 +68,7 @@ extension AdaptyProfile: Hashable {
 
 extension AdaptyProfile: CustomStringConvertible {
     public var description: String {
-        "(profileId: \(profileId), "
-            + (customerUserId.map { "customerUserId: \($0), " } ?? "")
+        "(id: \(userId), "
             + "segmentId: \(segmentId), isTestuser: \(isTestUser), "
             + (codableCustomAttributes == nil ? "" : "customAttributes: \(customAttributes), ")
             + "accessLevels: \(accessLevels), subscriptions: \(subscriptions), nonSubscriptions: \(nonSubscriptions))"
@@ -90,8 +95,10 @@ extension AdaptyProfile: Codable {
             container = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
         }
 
-        profileId = try container.decode(String.self, forKey: .profileId)
-        customerUserId = try container.decodeIfPresent(String.self, forKey: .customerUserId)
+        userId = try .init(
+            profileId: container.decode(String.self, forKey: .profileId),
+            customerId: container.decodeIfPresent(String.self, forKey: .customerUserId)
+        )
         segmentId = try container.decode(String.self, forKey: .segmentId)
         isTestUser = try container.decodeIfPresent(Bool.self, forKey: .isTestUser) ?? false
         version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
@@ -104,8 +111,8 @@ extension AdaptyProfile: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(profileId, forKey: .profileId)
-        try container.encodeIfPresent(customerUserId, forKey: .customerUserId)
+        try container.encode(userId.profileId, forKey: .profileId)
+        try container.encodeIfPresent(userId.customerId, forKey: .customerUserId)
         try container.encode(segmentId, forKey: .segmentId)
         try container.encode(isTestUser, forKey: .isTestUser)
         try container.encode(version, forKey: .version)

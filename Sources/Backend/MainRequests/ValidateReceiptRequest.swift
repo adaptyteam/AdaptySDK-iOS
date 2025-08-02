@@ -17,12 +17,14 @@ private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDeco
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    let profileId: String
+    let userId: AdaptyUserId
     let receipt: Data
 
-    init(profileId: String, receipt: Data) {
-        headers = HTTPHeaders().setBackendProfileId(profileId)
-        self.profileId = profileId
+    init(userId: AdaptyUserId, receipt: Data) {
+        headers = HTTPHeaders()
+            .setUserProfileId(userId)
+
+        self.userId = userId
         self.receipt = receipt
     }
 
@@ -37,17 +39,20 @@ private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDeco
         try dataObject.encode("adapty_inapps_apple_receipt_validation_result", forKey: .type)
 
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-        try attributesObject.encode(profileId, forKey: .profileId)
+        try attributesObject.encode(userId.profileId, forKey: .profileId)
         try attributesObject.encode(receipt, forKey: .receipt)
     }
 }
 
 extension Backend.MainExecutor {
     func validateReceipt(
-        profileId: String,
+        userId: AdaptyUserId,
         receipt: Data
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
-        let request = ValidateReceiptRequest(profileId: profileId, receipt: receipt)
+        let request = ValidateReceiptRequest(
+            userId: userId,
+            receipt: receipt
+        )
 
         let response = try await perform(
             request,

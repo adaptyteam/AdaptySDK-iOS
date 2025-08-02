@@ -18,7 +18,7 @@ private struct FetchPaywallVariationsRequest: HTTPRequest, BackendAPIRequestPara
 
     init(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale,
         segmentId: String,
@@ -34,7 +34,7 @@ private struct FetchPaywallVariationsRequest: HTTPRequest, BackendAPIRequestPara
 
         headers = HTTPHeaders()
             .setPaywallLocale(locale)
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setPaywallBuilderVersion(AdaptyViewConfiguration.builderVersion)
             .setPaywallBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
             .setCrossPlacementEligibility(crossPlacementEligible)
@@ -67,7 +67,7 @@ private struct FetchOnboardingVariationsRequest: HTTPRequest, BackendAPIRequestP
 
     init(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale,
         segmentId: String,
@@ -83,12 +83,13 @@ private struct FetchOnboardingVariationsRequest: HTTPRequest, BackendAPIRequestP
 
         headers = HTTPHeaders()
             .setOnboardingLocale(locale)
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setOnboardingUIVersion(AdaptyOnboarding.ViewConfiguration.uiVersion)
             .setCrossPlacementEligibility(crossPlacementEligible)
             .setSegmentId(segmentId)
 
-        queryItems = QueryItems().setDisableServerCache(disableServerCache)
+        queryItems = QueryItems()
+            .setDisableServerCache(disableServerCache)
 
         logParams = [
             "api_prefix": apiKeyPrefix,
@@ -109,7 +110,7 @@ extension AdaptyPlacementChosen {
     static func decodePlacementVariationsResponse(
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
-        withProfileId profileId: String,
+        withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
         withCached cached: Content?,
         variationIdResolver: VariationIdResolver?
@@ -122,12 +123,12 @@ extension AdaptyPlacementChosen {
             responseBody: response.body
         ).value
 
-        if let cached, cached.placement.version > placement.version {
+        if let cached, cached.placement.isNewerThan(placement) {
             return response.replaceBody(AdaptyPlacementChosen.restore(cached))
         }
 
         jsonDecoder.setPlacement(placement)
-        jsonDecoder.setProfileId(profileId)
+        jsonDecoder.setUserId(userId)
 
         let draw = try jsonDecoder.decode(
             Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
@@ -157,7 +158,7 @@ extension AdaptyPlacementChosen {
 extension Backend.MainExecutor {
     func fetchPlacementVariations<Content: AdaptyPlacementContent>(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale,
         segmentId: String,
@@ -170,7 +171,7 @@ extension Backend.MainExecutor {
             if Content.self == AdaptyPaywall.self {
                 FetchPaywallVariationsRequest(
                     apiKeyPrefix: apiKeyPrefix,
-                    profileId: profileId,
+                    userId: userId,
                     placementId: placementId,
                     locale: locale,
                     segmentId: segmentId,
@@ -181,7 +182,7 @@ extension Backend.MainExecutor {
             } else {
                 FetchOnboardingVariationsRequest(
                     apiKeyPrefix: apiKeyPrefix,
-                    profileId: profileId,
+                    userId: userId,
                     placementId: placementId,
                     locale: locale,
                     segmentId: segmentId,
@@ -196,7 +197,7 @@ extension Backend.MainExecutor {
             try await AdaptyPlacementChosen.decodePlacementVariationsResponse(
                 response,
                 withConfiguration: configuration,
-                withProfileId: profileId,
+                withUserId: userId,
                 withPlacementId: placementId,
                 withCached: cached,
                 variationIdResolver: variationIdResolver

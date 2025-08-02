@@ -15,11 +15,11 @@ private extension Backend.Request {
 }
 
 extension [HTTPRequest.QueryItems.Element] {
-    func setBackendProfileId(_ profileId: String?) -> Self {
+    func setUserProfileId(_ userId: AdaptyUserId?) -> Self {
         var queryItems = filter { $0.name != Backend.Request.profileIdQueryItemName }
 
-        if let profileId {
-            queryItems.append(URLQueryItem(name: Backend.Request.profileIdQueryItemName, value: profileId))
+        if let userId {
+            queryItems.append(URLQueryItem(name: Backend.Request.profileIdQueryItemName, value: userId.profileId))
         }
         return queryItems
     }

@@ -105,7 +105,7 @@ extension AdaptyPaywall: Codable {
 extension Sequence<VH<AdaptyPaywall>> {
     var asPaywallByPlacementId: [String: VH<AdaptyPaywall>] {
         Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
-            first.value.placement.version > second.value.placement.version ? first : second
+            first.value.placement.isNewerThan(second.value.placement) ? first : second
         })
     }
 }

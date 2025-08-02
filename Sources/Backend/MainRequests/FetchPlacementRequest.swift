@@ -18,7 +18,7 @@ private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
 
     init(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         variationId: String,
         locale: AdaptyLocale,
@@ -33,7 +33,7 @@ private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
 
         headers = HTTPHeaders()
             .setPaywallLocale(locale)
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setPaywallBuilderVersion(AdaptyViewConfiguration.builderVersion)
             .setPaywallBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
 
@@ -63,7 +63,7 @@ private struct FetchOnboardingRequest: HTTPRequest, BackendAPIRequestParameters 
 
     init(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         variationId: String,
         locale: AdaptyLocale,
@@ -78,7 +78,7 @@ private struct FetchOnboardingRequest: HTTPRequest, BackendAPIRequestParameters 
 
         headers = HTTPHeaders()
             .setOnboardingLocale(locale)
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setOnboardingUIVersion(AdaptyOnboarding.ViewConfiguration.uiVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
@@ -99,7 +99,7 @@ extension AdaptyPlacementChosen {
     static func decodePlacementResponse(
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
-        withProfileId profileId: String,
+        withUserId userId: AdaptyUserId,
         withCached cached: Content?
     ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
         let jsonDecoder = JSONDecoder()
@@ -110,7 +110,7 @@ extension AdaptyPlacementChosen {
             responseBody: response.body
         ).value
 
-        if let cached, cached.placement.version > placement.version {
+        if let cached, cached.placement.isNewerThan(placement) {
             return response.replaceBody(AdaptyPlacementChosen.restore(cached))
         }
 
@@ -127,7 +127,7 @@ extension AdaptyPlacementChosen {
         ).value
 
         let draw = AdaptyPlacement.Draw<Content>(
-            profileId: profileId,
+            userId: userId,
             content: content,
             placementAudienceVersionId: placement.audienceVersionId,
             variationIdByPlacements: variation.variationIdByPlacements
@@ -140,7 +140,7 @@ extension AdaptyPlacementChosen {
 extension Backend.MainExecutor {
     func fetchPlacement<Content: AdaptyPlacementContent>(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         variationId: String,
         locale: AdaptyLocale,
@@ -151,7 +151,7 @@ extension Backend.MainExecutor {
             if Content.self == AdaptyPaywall.self {
                 FetchPaywallRequest(
                     apiKeyPrefix: apiKeyPrefix,
-                    profileId: profileId,
+                    userId: userId,
                     placementId: placementId,
                     variationId: variationId,
                     locale: locale,
@@ -161,7 +161,7 @@ extension Backend.MainExecutor {
             } else {
                 FetchOnboardingRequest(
                     apiKeyPrefix: apiKeyPrefix,
-                    profileId: profileId,
+                    userId: userId,
                     placementId: placementId,
                     variationId: variationId,
                     locale: locale,
@@ -175,7 +175,7 @@ extension Backend.MainExecutor {
             try await AdaptyPlacementChosen.decodePlacementResponse(
                 response,
                 withConfiguration: configuration,
-                withProfileId: profileId,
+                withUserId: userId,
                 withCached: cached
             )
         }

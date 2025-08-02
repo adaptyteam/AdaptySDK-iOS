@@ -65,7 +65,7 @@ final class Storage {
 
         if value == hash { return false }
 
-        ProfileStorage.clearProfile(newProfileId: nil)
+        ProfileStorage.clearProfile()
         await EventsStorage.clearAll()
         await ProductVendorIdsStorage.clear()
         await VariationIdStorage.clear()

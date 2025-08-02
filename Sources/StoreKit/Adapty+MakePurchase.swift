@@ -33,27 +33,15 @@ public extension Adapty {
                 guard let manager = sdk.sk1QueueManager else { throw .cantMakePayments() }
 
                 return try await manager.makePurchase(
-                    profileId: sdk.profileStorage.profileId,
+                    userId: sdk.profileStorage.userId,
                     product: product
                 )
             }
 
             guard let manager = sdk.sk2Purchaser else { throw .cantMakePayments() }
 
-            let profileId: String
-            let customerUserId: String?
-
-            if let profile = sdk.profileManager?.profile.value {
-                profileId = profile.profileId
-                customerUserId = profile.customerUserId
-            } else {
-                profileId = sdk.profileStorage.profileId
-                customerUserId = nil
-            }
-
             return try await manager.makePurchase(
-                profileId: profileId,
-                customerUserId: customerUserId,
+                userId: sdk.profileStorage.userId,
                 product: product,
                 parameters: parameters
             )
@@ -90,13 +78,13 @@ public extension Adapty {
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func restorePurchases() async throws(AdaptyError) -> AdaptyProfile {
         try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(AdaptyError) in
-            let profileId = sdk.profileStorage.profileId
-            if let response = try await sdk.transactionManager.syncTransactions(for: profileId) {
+            let userId = sdk.profileStorage.userId
+            if let response = try await sdk.transactionManager.syncTransactions(for: userId) {
                 return response.value
             }
 
             let manager = try await sdk.createdProfileManager
-            if manager.profileId != profileId {
+            if manager.storage.isNotEqualProfileId(userId) {
                 throw .profileWasChanged()
             }
 

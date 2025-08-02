@@ -55,14 +55,14 @@ public extension Adapty {
         source: String,
         attributionJson: String
     ) async throws(AdaptyError) {
-        let (profileId, oldResponseHash) = try await { () async throws(AdaptyError) in
+        let (userId, oldResponseHash) = try await { () async throws(AdaptyError) in
             let manager = try await createdProfileManager
-            return (manager.profileId, manager.profile.hash)
+            return (manager.userId, manager.profile.hash)
         }()
 
         do {
             let response = try await httpSession.setAttributionData(
-                profileId: profileId,
+                userId: userId,
                 source: source,
                 attributionJson: attributionJson,
                 responseHash: oldResponseHash

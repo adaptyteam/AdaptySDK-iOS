@@ -24,7 +24,7 @@ actor SK1QueueManager: Sendable {
     }
 
     func makePurchase(
-        profileId: String,
+        userId: AdaptyUserId,
         product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard SKPaymentQueue.canMakePayments(),
@@ -48,7 +48,7 @@ actor SK1QueueManager: Sendable {
                 throw StoreKitManagerError.invalidOffer("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
             case let .promotional(offerId):
                 let response = try await purchaseValidator.signSubscriptionOffer(
-                    profileId: profileId,
+                    userId: userId,
                     vendorProductId: product.vendorProductId,
                     offerId: offerId
                 )
@@ -188,7 +188,7 @@ actor SK1QueueManager: Sendable {
         let result: AdaptyResult<AdaptyPurchaseResult>
         do {
             let response = try await purchaseValidator.validatePurchase(
-                profileId: nil,
+                userId: nil,
                 transaction: purchasedTransaction,
                 reason: .purchasing
             )

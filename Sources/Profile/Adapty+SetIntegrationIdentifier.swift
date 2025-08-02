@@ -32,11 +32,11 @@ extension Adapty {
     func setIntegrationIdentifier(
         keyValues: [String: String]
     ) async throws(AdaptyError) {
-        let profileId = try await createdProfileManager.profileId
+        let userId = try await createdProfileManager.userId
 
         do {
             try await httpSession.setIntegrationIdentifier(
-                profileId: profileId,
+                userId: userId,
                 keyValues: keyValues
             )
         } catch {

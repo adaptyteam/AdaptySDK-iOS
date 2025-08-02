@@ -57,7 +57,7 @@ final class PlacementStorage {
               cached.equalLanguageCode(content),
               cached.variationId == content.variationId
         else { return nil }
-        return content.placement.version >= cached.placement.version ? nil : cached
+        return cached.placement.isNewerThan(content.placement) ? cached : nil
     }
 
     func savedPlacementChosen<Content: AdaptyPlacementContent>(_ chosen: AdaptyPlacementChosen<Content>) -> AdaptyPlacementChosen<Content> {

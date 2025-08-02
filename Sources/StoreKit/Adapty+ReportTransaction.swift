@@ -20,9 +20,9 @@ public extension Adapty {
             "variation_id": variationId,
             "transaction_id": transactionId,
         ]) { sdk throws(AdaptyError) in
-            let profileId = sdk.profileStorage.profileId
+            let userId = sdk.profileStorage.userId
             let response = try await sdk.reportTransaction(
-                profileId: profileId,
+                userId: userId,
                 transactionId: transactionId,
                 variationId: variationId
             )
@@ -54,7 +54,7 @@ public extension Adapty {
             }
 
             let sk1Transaction = SK1TransactionWithIdentifier(transaction, id: id)
-            let profileId = try await sdk.createdProfileManager.profileId
+            let userId = try await sdk.createdProfileManager.userId
 
             let purchasedTransaction =
                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
@@ -74,7 +74,7 @@ public extension Adapty {
                 }
 
             _ = try await sdk.validatePurchase(
-                profileId: profileId,
+                userId: userId,
                 transaction: purchasedTransaction,
                 reason: .setVariation
             )
@@ -99,7 +99,7 @@ public extension Adapty {
             "variation_id": variationId,
             "transaction_id": transaction.unfIdentifier,
         ]) { sdk throws(AdaptyError) in
-            let profileId = try await sdk.createdProfileManager.profileId
+            let userId = try await sdk.createdProfileManager.userId
 
             let purchasedTransaction = await sdk.productsManager.fillPurchasedTransaction(
                 paywallVariationId: variationId,
@@ -109,7 +109,7 @@ public extension Adapty {
             )
 
             _ = try await sdk.validatePurchase(
-                profileId: profileId,
+                userId: userId,
                 transaction: purchasedTransaction,
                 reason: .setVariation
             )

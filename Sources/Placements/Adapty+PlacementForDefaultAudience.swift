@@ -27,7 +27,7 @@ extension Adapty {
         let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
-        
+
         let logParams: EventParameters = [
             "placement_id": placementId,
             "locale": locale,
@@ -54,7 +54,7 @@ extension Adapty {
         let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
-        
+
         let logParams: EventParameters = [
             "placement_id": placementId,
             "locale": locale,
@@ -78,11 +78,11 @@ extension Adapty {
         _ fetchPolicy: AdaptyPlacementFetchPolicy
     ) async throws(AdaptyError) -> Content {
         let manager = profileManager
-        let profileId = manager?.profileId ?? profileStorage.profileId
+        let userId = manager?.userId ?? profileStorage.userId
 
         let fetchTask = Task.withResult { () async throws(AdaptyError) -> Content in
             let content: Content = try await self.fetchPlacementForDefaultAudience(
-                profileId,
+                userId,
                 placementId,
                 locale
             )
@@ -106,12 +106,12 @@ extension Adapty {
     }
 
     private func fetchPlacementForDefaultAudience<Content: AdaptyPlacementContent>(
-        _ profileId: String,
+        _ userId: AdaptyUserId,
         _ placementId: String,
         _ locale: AdaptyLocale
     ) async throws(AdaptyError) -> Content {
         let (cached, isTestUser): (Content?, Bool) = {
-            guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
+            guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
             return (
                 manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
                 manager.profile.value.isTestUser
@@ -121,7 +121,7 @@ extension Adapty {
         do {
             var chosen: AdaptyPlacementChosen<Content> = try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
                 apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
+                userId: userId,
                 placementId: placementId,
                 locale: locale,
                 cached: cached,
@@ -131,7 +131,7 @@ extension Adapty {
                 timeoutInterval: nil
             )
 
-            if let manager = tryProfileManagerOrNil(with: profileId) {
+            if let manager = try? profileManager(withProfileId: userId) {
                 chosen = manager.placementStorage.savedPlacementChosen(chosen)
             }
 
@@ -140,7 +140,7 @@ extension Adapty {
 
         } catch {
             guard let content: Content = getCacheOrFallbackFilePlacement(
-                profileId,
+                userId,
                 placementId,
                 locale,
                 withCrossPlacmentABTest: false

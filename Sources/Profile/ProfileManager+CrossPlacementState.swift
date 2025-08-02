@@ -6,34 +6,34 @@
 //
 
 private extension Adapty {
-    func syncCrossPlacementState(profileId: String) async throws(AdaptyError) {
+    func syncCrossPlacementState(userId: AdaptyUserId) async throws(AdaptyError) {
         let state: CrossPlacementState
+
         do {
-            state = try await httpSession.fetchCrossPlacementState(profileId: profileId)
+            state = try await httpSession.fetchCrossPlacementState(userId: userId)
         } catch {
             throw error.asAdaptyError
         }
-        try saveCrossPlacementState(state, forProfileId: profileId)
-    }
 
-    @AdaptyActor
-    private func saveCrossPlacementState(_ newState: CrossPlacementState, forProfileId profileId: String) throws(AdaptyError) {
-        guard let manager = try profileManager(with: profileId) else {
+        guard let manager = try profileManager(withProfileId: userId) else {
             throw .profileWasChanged()
         }
-
-        let storage = manager.storage
-        let oldState = storage.crossPlacementState
-        guard (oldState?.version ?? 0) < newState.version else { return }
-
-        Log.crossAB.verbose("updateProfile version = \(newState.version), newValue = \(newState.variationIdByPlacements), oldValue = \(oldState?.variationIdByPlacements.description ?? "DISABLED")")
-
-        storage.setCrossPlacementState(newState)
+        manager.saveCrossPlacementState(state)
     }
 }
 
 extension ProfileManager {
     func syncCrossPlacementState() async throws(AdaptyError) {
-        try await Adapty.activatedSDK.syncCrossPlacementState(profileId: profileId)
+        try await Adapty.activatedSDK.syncCrossPlacementState(userId: userId)
+    }
+
+    func saveCrossPlacementState(_ newState: CrossPlacementState) {
+        let oldState = storage.crossPlacementState
+
+        guard newState.isNewerThan(oldState) else { return }
+
+        Log.crossAB.verbose("updateProfile version = \(newState.version), newValue = \(newState.variationIdByPlacements), oldValue = \(oldState?.variationIdByPlacements.description ?? "DISABLED")")
+
+        storage.setCrossPlacementState(newState)
     }
 }

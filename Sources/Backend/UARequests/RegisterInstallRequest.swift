@@ -20,8 +20,10 @@ private struct RegisterInstallRequest: HTTPEncodableRequest, HTTPRequestWithDeco
 
     let installInfo: Environment.InstallInfo
 
-    init(profileId: String, installInfo: Environment.InstallInfo) {
-        headers = HTTPHeaders().setBackendProfileId(profileId)
+    init(userId: AdaptyUserId, installInfo: Environment.InstallInfo) {
+        headers = HTTPHeaders()
+            .setUserProfileId(userId)
+
         self.installInfo = installInfo
     }
 
@@ -41,12 +43,12 @@ extension Backend.UAExecutor {
     }
 
     func registerInstall(
-        profileId: String,
+        userId: AdaptyUserId,
         installInfo: Environment.InstallInfo,
         maxRetries: Int = 5
     ) async throws(HTTPError) -> RegistrationInstallResponse? {
         let request = RegisterInstallRequest(
-            profileId: profileId,
+            userId: userId,
             installInfo: installInfo
         )
         var attempt = 0

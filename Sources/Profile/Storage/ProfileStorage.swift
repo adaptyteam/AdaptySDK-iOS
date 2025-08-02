@@ -24,18 +24,24 @@ final class ProfileStorage {
 
     private static let userDefaults = Storage.userDefaults
 
-    static var profileId: String =
-        if let identifier = userDefaults.string(forKey: Constants.profileIdKey) {
-            identifier
+    static var userId: AdaptyUserId =
+        if let profileId = userDefaults.string(forKey: Constants.profileIdKey) {
+            AdaptyUserId(
+                profileId: profileId,
+                customerId: profile?.value.customerUserId
+            )
         } else {
-            createProfileId()
+            createAnonymousUserId()
         }
 
-    private static func createProfileId() -> String {
+    private static func createAnonymousUserId() -> AdaptyUserId {
         let identifier = UUID().uuidString.lowercased()
-        log.debug("create profileId = \(identifier)")
         userDefaults.set(identifier, forKey: Constants.profileIdKey)
-        return identifier
+        log.debug("create anonymous profile (profileId: \(identifier))")
+        return AdaptyUserId(
+            profileId: identifier,
+            customerId: nil
+        )
     }
 
     private static var profile: VH<AdaptyProfile>? = {
@@ -64,19 +70,9 @@ final class ProfileStorage {
         }
     }()
 
-    var profileId: String { Self.profileId }
+    var userId: AdaptyUserId { Self.userId }
 
     func getProfile() -> VH<AdaptyProfile>? { Self.profile }
-
-    func setProfile(_ profile: VH<AdaptyProfile>) {
-        do {
-            try Self.userDefaults.setJSON(profile, forKey: Constants.profileKey)
-            Self.profile = profile
-            log.debug("saving profile success.")
-        } catch {
-            log.error("saving profile fail. \(error.localizedDescription)")
-        }
-    }
 
     var externalAnalyticsDisabled: Bool { Self.externalAnalyticsDisabled }
 
@@ -136,19 +132,34 @@ final class ProfileStorage {
         log.debug("set setLastStartAcceleratedSyncProfileDate = \(now).")
     }
 
-    func clearProfile(newProfileId profileId: String?) {
-        Self.clearProfile(newProfileId: profileId)
+    func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
+        Self.clearProfile(newProfile: newProfile)
     }
 
-    @AdaptyActor
-    static func clearProfile(newProfileId profileId: String?) {
-        log.debug("Clear profile")
-        if let profileId {
-            userDefaults.set(profileId, forKey: Constants.profileIdKey)
-            Self.profileId = profileId
-            log.debug("set profileId = \(profileId)")
+    func setProfile(_ newProfile: VH<AdaptyProfile>) {
+        Self.setProfile(newProfile)
+    }
+
+    static func setProfile(_ newProfile: VH<AdaptyProfile>) {
+        profile = newProfile
+        do {
+            try userDefaults.setJSON(newProfile, forKey: Constants.profileKey)
+            log.debug("saving profile success.")
+        } catch {
+            log.error("saving profile fail. \(error.localizedDescription)")
+        }
+    }
+
+    static func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
+        log.verbose("Clear profile")
+        if let newProfile {
+            userId = newProfile.userId
+            userDefaults.set(userId.profileId, forKey: Constants.profileIdKey)
+            log.verbose("set profile \(userId) ")
+            setProfile(newProfile)
         } else {
-            Self.profileId = createProfileId()
+            userId = createAnonymousUserId()
+            profile = nil
         }
 
         userDefaults.removeObject(forKey: Constants.externalAnalyticsDisabledKey)
@@ -158,7 +169,6 @@ final class ProfileStorage {
         userDefaults.removeObject(forKey: Constants.appleSearchAdsSyncDateKey)
         appleSearchAdsSyncDate = nil
         userDefaults.removeObject(forKey: Constants.profileKey)
-        profile = nil
         userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
         crossPlacementState = nil
         userDefaults.removeObject(forKey: Constants.lastOpenedWebPaywallKey)
@@ -172,9 +182,9 @@ final class ProfileStorage {
 }
 
 extension ProfileStorage {
-    func getProfile(profileId: String, withCustomerUserId customerUserId: String?) -> VH<AdaptyProfile>? {
+    func getProfile(with customerUserId: String?) -> VH<AdaptyProfile>? {
         guard let profile = getProfile(),
-              profile.value.profileId == profileId
+              profile.isEqualProfileId(userId)
         else { return nil }
 
         guard let customerUserId else { return profile }

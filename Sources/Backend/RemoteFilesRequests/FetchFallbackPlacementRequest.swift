@@ -33,7 +33,7 @@ private struct FetchFallbackPlacementRequest: HTTPRequest {
 extension Backend.FallbackExecutor {
     func fetchFallbackPlacement<Content: AdaptyPlacementContent>(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
@@ -85,7 +85,7 @@ extension Backend.FallbackExecutor {
                 try await AdaptyPlacementChosen.decodePlacementResponse(
                     response,
                     withConfiguration: configuration,
-                    withProfileId: profileId,
+                    withUserId: userId,
                     withCached: cached
                 )
             }
@@ -100,7 +100,7 @@ extension Backend.FallbackExecutor {
 
             return try await fetchFallbackPlacement(
                 apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
+                userId: userId,
                 placementId: placementId,
                 paywallVariationId: paywallVariationId,
                 locale: .defaultPlacementLocale,

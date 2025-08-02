@@ -149,41 +149,43 @@ extension Adapty {
         return offer
     }
 
-    private func getProfileState() -> (profileId: String, ineligibleProductIds: Set<String>)? {
+    private func getProfileState() -> (userId: AdaptyUserId, ineligibleProductIds: Set<String>)? {
         guard let manager = profileManager else { return nil }
 
         return (
-            manager.profileId,
+            manager.userId,
             manager.backendIntroductoryOfferEligibilityStorage.getIneligibleProductIds()
         )
     }
 
     private func getIntroductoryOfferEligibility(vendorProductIds: [String]) async -> [String] {
-        guard let profileState = getProfileState() else { return [] }
-        let (profileId, ineligibleProductIds) = profileState
+        guard let (userId, ineligibleProductIds) = getProfileState() else { return [] }
 
         let vendorProductIds = vendorProductIds.filter { !ineligibleProductIds.contains($0) }
         guard vendorProductIds.isNotEmpty else { return [] }
 
         if !profileStorage.syncedTransactions {
             do {
-                try await syncTransactions(for: profileId)
+                try await syncTransactions(for: userId)
             } catch {
                 return []
             }
         }
 
-        let lastResponse = try? profileManager(with: profileId)?.backendIntroductoryOfferEligibilityStorage.getLastResponse()
+        let lastResponse = try? profileManager(withProfileId: userId)?
+            .backendIntroductoryOfferEligibilityStorage
+            .getLastResponse()
+
         do {
             let response = try
                 await httpSession.fetchIntroductoryOfferEligibility(
-                    profileId: profileId,
+                    userId: userId,
                     responseHash: lastResponse?.hash
                 ).flatValue()
 
             guard let response else { return lastResponse?.eligibleProductIds ?? [] }
 
-            if let manager = try? profileManager(with: profileId) {
+            if let manager = try? profileManager(withProfileId: userId) {
                 return manager.backendIntroductoryOfferEligibilityStorage.save(response)
             } else {
                 return response.value.filter(\.value).map(\.vendorId)

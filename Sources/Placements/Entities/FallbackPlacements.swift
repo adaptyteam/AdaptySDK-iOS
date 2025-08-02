@@ -20,7 +20,7 @@ struct FallbackPlacements: Sendable {
             throw .isNotFileUrl()
         }
         let decoder = FallbackPlacements.decoder()
-       
+
         do {
             head = try decoder.decode(Head.self, from: Data(contentsOf: url))
         } catch {
@@ -33,7 +33,11 @@ struct FallbackPlacements: Sendable {
         head.placementIds?.contains(id)
     }
 
-    func getPlacement<Content: AdaptyPlacementContent>(byPlacementId id: String, withVariationId: String?, profileId: String) -> AdaptyPlacementChosen<Content>? {
+    func getPlacement<Content: AdaptyPlacementContent>(
+        byPlacementId id: String,
+        withVariationId: String?,
+        userId: AdaptyUserId
+    ) -> AdaptyPlacementChosen<Content>? {
         guard contains(placementId: id) ?? true else { return nil }
 
         let draw: AdaptyPlacement.Draw<Content>?
@@ -41,7 +45,7 @@ struct FallbackPlacements: Sendable {
         do {
             draw = try FallbackPlacements.decodePlacementVariation(
                 Data(contentsOf: fileURL),
-                withProfileId: profileId,
+                withUserId: userId,
                 withPlacementId: id,
                 withVariationId: withVariationId,
                 version: version
@@ -77,7 +81,7 @@ private extension FallbackPlacements {
             let formatVersion = try container.decode(Int.self, forKey: .formatVersion)
 
             guard formatVersion == Adapty.fallbackFormatVersion else {
-                let error = formatVersion < Adapty.fallbackFormatVersion
+                let error = Adapty.fallbackFormatVersion > formatVersion
                     ? "The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard."
                     : "The fallback paywalls version is not correct. Please update the AdaptySDK."
                 log.error(error)
@@ -100,7 +104,7 @@ private extension FallbackPlacements {
 
     static func decodePlacementVariation<Content: AdaptyPlacementContent>(
         _ data: Data,
-        withProfileId profileId: String,
+        withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
         withVariationId variationId: String?,
         version: Int64
@@ -111,7 +115,7 @@ private extension FallbackPlacements {
         if let string = try? jsonDecoder.decode(Backend.Response.Data<String>.Placement.self, from: data).value {
             let draw: AdaptyPlacement.Draw<Content> = try decodePlacementVariation(
                 string.data(using: .utf8) ?? Data(),
-                withProfileId: profileId,
+                withUserId: userId,
                 withVariationId: variationId,
                 version: version
             )
@@ -126,7 +130,7 @@ private extension FallbackPlacements {
         guard let placement else { return nil }
 
         jsonDecoder.setPlacement(placement)
-        jsonDecoder.setProfileId(profileId)
+        jsonDecoder.setUserId(userId)
         if let variationId { jsonDecoder.setPlacementVariationId(variationId) }
 
         return try jsonDecoder.decode(
@@ -137,7 +141,7 @@ private extension FallbackPlacements {
 
     private static func decodePlacementVariation<Content: AdaptyPlacementContent>(
         _ data: Data,
-        withProfileId profileId: String,
+        withUserId userId: AdaptyUserId,
         withVariationId variationId: String?,
         version: Int64
     ) throws -> AdaptyPlacement.Draw<Content> {
@@ -149,7 +153,7 @@ private extension FallbackPlacements {
         ).value.replace(version: version)
 
         jsonDecoder.setPlacement(placement)
-        jsonDecoder.setProfileId(profileId)
+        jsonDecoder.setUserId(userId)
         if let variationId { jsonDecoder.setPlacementVariationId(variationId) }
 
         return try jsonDecoder.decode(

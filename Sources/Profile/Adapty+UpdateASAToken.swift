@@ -20,10 +20,10 @@ extension Adapty {
         else { return }
 
         Task {
-            let profileId = profile.value.profileId
+            let userId = profile.value.userId
 
             let response = try await httpSession.sendASAToken(
-                profileId: profileId,
+                userId: userId,
                 token: attributionToken,
                 responseHash: profile.hash
             )
@@ -32,7 +32,7 @@ extension Adapty {
                 profileManager?.saveResponse(profile)
             }
 
-            if profileStorage.profileId == profileId {
+            if profileStorage.isEqualProfileId(userId) {
                 // mark appleSearchAds attribution data as synced
                 profileStorage.setAppleSearchAdsSyncDate()
             }

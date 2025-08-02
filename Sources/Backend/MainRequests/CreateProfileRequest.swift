@@ -14,26 +14,25 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    let profileId: String
+    let userId: AdaptyUserId
     let parameters: AdaptyProfileParameters?
-    let customerUserId: String?
     let environmentMeta: Environment.Meta
 
     init(
-        profileId: String,
-        customerUserId: String?,
+        userId: AdaptyUserId,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta
     ) {
         endpoint = HTTPEndpoint(
             method: .post,
-            path: "/sdk/analytics/profiles/\(profileId)/"
+            path: "/sdk/analytics/profiles/\(userId.profileId)/"
         )
 
-        headers = HTTPHeaders().setBackendProfileId(profileId)
-        self.profileId = profileId
+        headers = HTTPHeaders()
+            .setUserProfileId(userId)
+
+        self.userId = userId
         self.parameters = parameters
-        self.customerUserId = customerUserId
         self.environmentMeta = environmentMeta
     }
 
@@ -49,14 +48,14 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         var container = encoder.container(keyedBy: Backend.CodingKeys.self)
         var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
         try dataObject.encode("adapty_analytics_profile", forKey: .type)
-        try dataObject.encode(profileId, forKey: .id)
+        try dataObject.encode(userId.profileId, forKey: .id)
 
         if let parameters {
             try dataObject.encode(parameters, forKey: .attributes)
         }
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
 
-        try attributesObject.encodeIfPresent(customerUserId, forKey: .customerUserId)
+        try attributesObject.encodeIfPresent(userId.customerId, forKey: .customerUserId)
         try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
         if parameters?.storeCountry == nil {
             try attributesObject.encodeIfPresent(environmentMeta.storefront?.countryCode, forKey: .storeCountry)
@@ -73,14 +72,12 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 
 extension Backend.MainExecutor {
     func createProfile(
-        profileId: String,
-        customerUserId: String?,
+        userId: AdaptyUserId,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = CreateProfileRequest(
-            profileId: profileId,
-            customerUserId: customerUserId,
+            userId: userId,
             parameters: parameters,
             environmentMeta: environmentMeta
         )
@@ -88,7 +85,7 @@ extension Backend.MainExecutor {
         let response = try await perform(
             request,
             requestName: .createProfile,
-            logParams: ["has_customer_user_id": customerUserId != nil]
+            logParams: ["customer_user_id": userId.customerId ?? "nil"]
         )
 
         return VH(response.body.value, hash: response.headers.getBackendResponseHash())

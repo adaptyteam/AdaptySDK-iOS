@@ -38,12 +38,12 @@ extension AdaptyPurchaseParameters.AppAccountTokenValue: CustomStringConvertible
 }
 
 extension AdaptyPurchaseParameters.AppAccountTokenValue {
-    func asUUID(customerUserId: String?) -> UUID? {
+    func asUUID(userId: AdaptyUserId?) -> UUID? {
         switch self {
         case .none:
             return nil
         case .customerUserId:
-            guard let customerUserId, let uuid = UUID(uuidString: customerUserId) else {
+            guard let customerUserId = userId?.customerId, let uuid = UUID(uuidString: customerUserId) else {
                 return nil
             }
             return uuid

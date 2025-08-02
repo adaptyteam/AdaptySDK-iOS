@@ -9,13 +9,13 @@ import Foundation
 
 protocol PurchaseValidator: AnyObject, Sendable {
     func validatePurchase(
-        profileId: String?,
+        userId: AdaptyUserId?,
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> VH<AdaptyProfile>
 
     func signSubscriptionOffer(
-        profileId: String,
+        userId: AdaptyUserId,
         vendorProductId: String,
         offerId: String
     ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature
@@ -30,13 +30,13 @@ extension Adapty: PurchaseValidator {
     }
 
     func reportTransaction(
-        profileId: String?,
+        userId: AdaptyUserId?,
         transactionId: String,
         variationId: String?
     ) async throws(AdaptyError) -> VH<AdaptyProfile> {
         do {
             let response = try await httpSession.reportTransaction(
-                profileId: profileId ?? profileStorage.profileId,
+                userId: userId ?? profileStorage.userId,
                 transactionId: transactionId,
                 variationId: variationId
             )
@@ -48,13 +48,13 @@ extension Adapty: PurchaseValidator {
     }
 
     func validatePurchase(
-        profileId: String?,
+        userId: AdaptyUserId?,
         transaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> VH<AdaptyProfile> {
         do {
             let response = try await httpSession.validateTransaction(
-                profileId: profileId ?? profileStorage.profileId,
+                userId: userId ?? profileStorage.userId,
                 purchasedTransaction: transaction,
                 reason: reason
             )
@@ -66,13 +66,13 @@ extension Adapty: PurchaseValidator {
     }
 
     func signSubscriptionOffer(
-        profileId: String,
+        userId: AdaptyUserId,
         vendorProductId: String,
         offerId: String
     ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature {
         do {
             let response = try await httpSession.signSubscriptionOffer(
-                profileId: profileId,
+                userId: userId,
                 vendorProductId: vendorProductId,
                 offerId: offerId
             )
