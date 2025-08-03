@@ -20,7 +20,7 @@ extension Adapty {
         else { return }
 
         Task {
-            let userId = profile.value.userId
+            let userId = profile.userId
 
             let response = try await httpSession.sendASAToken(
                 userId: userId,

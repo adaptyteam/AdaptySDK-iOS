@@ -9,7 +9,7 @@ import Foundation
 
 @AdaptyActor
 final class ProfileManager {
-    var userId: AdaptyUserId { profile.value.userId }
+    var userId: AdaptyUserId { profile.userId }
     var profile: VH<AdaptyProfile>
     var onceSentEnvironment: SentEnvironment
 
@@ -23,7 +23,7 @@ final class ProfileManager {
         profile: VH<AdaptyProfile>,
         sentEnvironment: SentEnvironment
     ) {
-        let userId = profile.value.userId
+        let userId = profile.userId
         self.profile = profile
         self.onceSentEnvironment = sentEnvironment
         self.storage = storage

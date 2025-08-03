@@ -28,7 +28,7 @@ final class ProfileStorage {
         if let profileId = userDefaults.string(forKey: Constants.profileIdKey) {
             AdaptyUserId(
                 profileId: profileId,
-                customerId: profile?.value.customerUserId
+                customerId: profile?.customerUserId
             )
         } else {
             createAnonymousUserId()
@@ -188,7 +188,7 @@ extension ProfileStorage {
         else { return nil }
 
         guard let customerUserId else { return profile }
-        guard customerUserId == profile.value.customerUserId else { return nil }
+        guard customerUserId == profile.customerUserId else { return nil }
         return profile
     }
 }

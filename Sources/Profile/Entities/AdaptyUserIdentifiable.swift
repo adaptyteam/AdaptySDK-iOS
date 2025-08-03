@@ -27,6 +27,9 @@ extension AdaptyUserIdentifiable {
     var profileId: String { userId.profileId }
 
     @AdaptyActor
+    var customerUserId: String? { userId.customerId }
+
+    @AdaptyActor
     func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
         userId.isEqualProfileId(other)
     }

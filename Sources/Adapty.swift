@@ -193,7 +193,7 @@ extension Adapty {
         case .none:
             break
         case let .current(manager):
-            guard manager.profile.value.customerUserId != newCustomerUserId else {
+            guard manager.profile.customerUserId != newCustomerUserId else {
                 return
             }
         case let .creating(userId, task):
@@ -203,7 +203,7 @@ extension Adapty {
             }
             task.cancel()
         }
-        
+
         let newUserId = AdaptyUserId(
             profileId: profileStorage.profileId,
             customerId: newCustomerUserId
@@ -220,24 +220,33 @@ extension Adapty {
     }
 
     func logout() async throws(AdaptyError) {
-        // TODO: throw error if current customerUserId is nil
-
-        if case let .creating(_, task) = sharedProfileManager {
+        switch sharedProfileManager {
+        case .none:
+            break
+        case let .current(manager):
+            guard manager.userId.isAnonymous else {
+                throw AdaptyError.unidentifiedUserLogout()
+            }
+        case let .creating(userId, task):
+            guard userId.isAnonymous else {
+                _ = try await task.profileManager
+                return
+            }
             task.cancel()
         }
 
         profileStorage.clearProfile()
 
-        let newAnonymusUserId = AdaptyUserId(
+        let newAnonymousUserId = AdaptyUserId(
             profileId: profileStorage.profileId,
             customerId: nil
         )
-        
-        log.verbose("logout \(newAnonymusUserId) ")
 
-        let task = Task { try await createNewProfileOnServer(newAnonymusUserId) }
+        log.verbose("logout \(newAnonymousUserId) ")
+
+        let task = Task { try await createNewProfileOnServer(newAnonymousUserId) }
         sharedProfileManager = .creating(
-            userId: newAnonymusUserId,
+            userId: newAnonymousUserId,
             task: task
         )
         _ = try await task.profileManager
