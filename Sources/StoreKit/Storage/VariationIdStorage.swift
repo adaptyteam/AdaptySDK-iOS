@@ -75,12 +75,12 @@ final class VariationIdStorage {
 }
 
 extension VariationIdStorage {
-    nonisolated func getPaywallVariationIds(for productId: String) async -> (String?, String?) {
-        await (paywallVariationsIds[productId], persistentPaywallVariationsIds[productId])
-    }
-
-    nonisolated func getVariationIds(for productId: String) async -> (String?, String?, String?) {
-        await (paywallVariationsIds[productId], persistentPaywallVariationsIds[productId], persistentOnboardingVariationsId)
+    nonisolated func getPurchasePayload(for productId: String) async -> PurchasePayload {
+        await .init(
+            paywallVariationId: paywallVariationsIds[productId],
+            persistentPaywallVariationId: persistentPaywallVariationsIds[productId],
+            persistentOnboardingVariationId: persistentOnboardingVariationsId
+        )
     }
 
     nonisolated func getOnboardingVariationId() async -> String? {

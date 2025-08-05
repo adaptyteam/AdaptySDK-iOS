@@ -34,7 +34,8 @@ public extension Adapty {
 
                 return try await manager.makePurchase(
                     userId: sdk.profileStorage.userId,
-                    product: product
+                    product: product,
+                    parameters: parameters
                 )
             }
 

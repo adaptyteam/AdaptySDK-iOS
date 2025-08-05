@@ -9,7 +9,7 @@ import Foundation
 
 private let log = Log.sk1ProductManager
 
-actor SK1ProductsManager: StoreKitProductsManager {
+actor SK1ProductsManager {
     private let apiKeyPrefix: String
     private let storage: ProductVendorIdsStorage
     private let session: Backend.MainExecutor

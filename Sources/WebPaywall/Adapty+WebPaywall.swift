@@ -129,7 +129,7 @@ public extension Adapty {
         ]
 
         if let offer = product.subscriptionOffer {
-            parameters["adapty_offer_category"] = offer.offerType.encodedValue
+            parameters["adapty_offer_category"] = offer.offerType.rawValue
             parameters["adapty_offer_type"] = offer.paymentMode.encodedValue ?? "unknown"
             let period = offer.subscriptionPeriod
             parameters["adapty_offer_period_units"] = period.unit.encodedValue

@@ -22,7 +22,7 @@ public final class Adapty {
 
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
-    let productsManager: StoreKitProductsManager
+    let productsManager__: StoreKitProductsManager
     var sk2Purchaser: SK2Purchaser?
     var sk1QueueManager: SK1QueueManager?
 
@@ -48,12 +48,12 @@ public final class Adapty {
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             self.receiptManager = StoreKitReceiptManager(session: httpSession)
             self.transactionManager = SK2TransactionManager(session: httpSession)
-            self.productsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
+            self.productsManager__ = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
             self.sk1QueueManager = nil
         } else {
             self.receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
             self.transactionManager = receiptManager
-            self.productsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
+            self.productsManager__ = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
             self.sk1QueueManager = nil
         }
 
@@ -63,13 +63,13 @@ public final class Adapty {
             if !observerMode {
                 self.sk2Purchaser = SK2Purchaser.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager,
+                    productsManager: productsManager__,
                     storage: variationIdStorage
                 )
 
                 self.sk1QueueManager = SK1QueueManager.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager,
+                    productsManager: productsManager__,
                     storage: variationIdStorage
                 )
             }
@@ -77,12 +77,12 @@ public final class Adapty {
             if observerMode {
                 SK1TransactionObserver.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager
+                    productsManager: productsManager__
                 )
             } else {
                 self.sk1QueueManager = SK1QueueManager.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager,
+                    productsManager: productsManager__,
                     storage: variationIdStorage
                 )
             }

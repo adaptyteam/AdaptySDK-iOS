@@ -26,18 +26,19 @@ extension SK2Transaction {
 
     var logParams: EventParameters {
         [
-            "product_id": unfProductID,
+            "product_id": self.unfProductID,
             "transaction_is_upgraded": isUpgraded,
-            "transaction_id": unfIdentifier,
-            "original_id": unfOriginalIdentifier,
+            "transaction_id": self.unfIdentifier,
+            "original_id": self.unfOriginalIdentifier,
         ]
     }
 
-    var unfOfferType: SK2Transaction.OfferType? {
+    var subscriptionOfferType: AdaptySubscriptionOfferType? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            return offer?.type
+            offer?.type.asSubscriptionOfferType
+        } else {
+            self.offerType?.asSubscriptionOfferType
         }
-        return offerType
     }
 
     var unfOfferId: String? {

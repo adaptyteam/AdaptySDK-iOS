@@ -10,14 +10,10 @@ import StoreKit
 extension SK1Product.SubscriptionOffer.PaymentMode {
     var asPaymentMode: AdaptySubscriptionOffer.PaymentMode {
         switch self {
-        case .payAsYouGo:
-            .payAsYouGo
-        case .payUpFront:
-            .payUpFront
-        case .freeTrial:
-            .freeTrial
-        @unknown default:
-            .unknown
+        case .payAsYouGo: .payAsYouGo
+        case .payUpFront: .payUpFront
+        case .freeTrial: .freeTrial
+        @unknown default: .unknown
         }
     }
 }

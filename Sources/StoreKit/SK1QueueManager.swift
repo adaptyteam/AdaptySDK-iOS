@@ -25,7 +25,8 @@ actor SK1QueueManager: Sendable {
 
     func makePurchase(
         userId: AdaptyUserId,
-        product: AdaptyPaywallProduct
+        product: AdaptyPaywallProduct,
+        parameters: AdaptyPurchaseParameters
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard SKPaymentQueue.canMakePayments(),
               let sk1Product = product.sk1Product
@@ -35,15 +36,17 @@ actor SK1QueueManager: Sendable {
 
         let variationId = product.variationId
 
-        let payment: SKPayment
+        let payment = SKMutablePayment(product: sk1Product)
+//        payment.simulatesAskToBuyInSandbox = true
 
-        switch product.subscriptionOffer {
-        case .none:
-            payment = SKPayment(product: sk1Product)
-        case let .some(offer):
+        if let uuid = parameters.appAccountToken.asUUID(userId: userId) {
+            payment.applicationUsername = uuid.uuidString
+        }
+
+        if let offer = product.subscriptionOffer {
             switch offer.offerIdentifier {
             case .introductory:
-                payment = SKPayment(product: sk1Product)
+                break
             case .winBack:
                 throw StoreKitManagerError.invalidOffer("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
             case let .promotional(offerId):
@@ -53,16 +56,12 @@ actor SK1QueueManager: Sendable {
                     offerId: offerId
                 )
 
-                payment = {
-                    let payment = SKMutablePayment(product: sk1Product)
-                    payment.applicationUsername = ""
-                    payment.paymentDiscount = SK1PaymentDiscount(
-                        offerId: offerId,
-                        signature: response
-                    )
-
-                    return payment
-                }()
+                payment.paymentDiscount = SK1PaymentDiscount(
+                    offerId: offerId,
+                    signature: response
+                )
+            case .code:
+                break
             }
         }
 
@@ -165,23 +164,17 @@ actor SK1QueueManager: Sendable {
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
         let productId = sk1Transaction.unfProductID
 
-        let (paywallVariationId, persistentPaywallVariationId, persistentOnboardingVariationId) = await storage.getVariationIds(for: productId)
-
         let purchasedTransaction: PurchasedTransaction =
             if let sk1Product = makePurchasesProduct[productId] {
                 PurchasedTransaction(
                     sk1Product: sk1Product,
-                    paywallVariationId: paywallVariationId,
-                    persistentPaywallVariationId: persistentPaywallVariationId,
-                    persistentOnboardingVariationId: persistentOnboardingVariationId,
-                    sk1Transaction: sk1Transaction
+                    sk1Transaction: sk1Transaction,
+                    payload: await storage.getPurchasePayload(for: productId)
                 )
             } else {
-                await productsManager.fillPurchasedTransaction(
-                    paywallVariationId: paywallVariationId,
-                    persistentPaywallVariationId: persistentPaywallVariationId,
-                    persistentOnboardingVariationId: persistentOnboardingVariationId,
-                    sk1Transaction: sk1Transaction
+                await productsManager.fillPurchasedTransactionSK1(
+                    sk1Transaction: sk1Transaction,
+                    payload: await storage.getPurchasePayload(for: productId)
                 )
             }
 

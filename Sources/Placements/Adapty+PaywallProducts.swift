@@ -22,14 +22,14 @@ public extension Adapty {
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
             if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                if let manager = sdk.productsManager as? SK2ProductsManager {
+                if let manager = sdk.productsManager__ as? SK2ProductsManager {
                     return try await sdk.getSK2PaywallProducts(
                         paywall: paywall,
                         productsManager: manager
                     )
                 }
             } else {
-                if let manager = sdk.productsManager as? SK1ProductsManager {
+                if let manager = sdk.productsManager__ as? SK1ProductsManager {
                     return try await sdk.getSK1PaywallProducts(
                         paywall: paywall,
                         productsManager: manager
@@ -46,14 +46,14 @@ public extension Adapty {
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
             if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                if let manager = sdk.productsManager as? SK2ProductsManager {
+                if let manager = sdk.productsManager__ as? SK2ProductsManager {
                     return try await sdk.getSK2PaywallProductsWithoutOffers(
                         paywall: paywall,
                         productsManager: manager
                     )
                 }
             } else {
-                if let manager = sdk.productsManager as? SK1ProductsManager {
+                if let manager = sdk.productsManager__ as? SK1ProductsManager {
                     return try await sdk.getSK1PaywallProductsWithoutOffers(
                         paywall: paywall,
                         productsManager: manager
@@ -77,7 +77,7 @@ public extension Adapty {
         let sdk = try await Adapty.activatedSDK
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            guard let manager = sdk.productsManager as? SK2ProductsManager else {
+            guard let manager = sdk.productsManager__ as? SK2ProductsManager else {
                 throw .cantMakePayments()
             }
             return try await sdk.getSK2PaywallProduct(
@@ -93,7 +93,7 @@ public extension Adapty {
             )
 
         } else {
-            guard let manager = sdk.productsManager as? SK1ProductsManager else {
+            guard let manager = sdk.productsManager__ as? SK1ProductsManager else {
                 throw .cantMakePayments()
             }
             return try await sdk.getSK1PaywallProduct(

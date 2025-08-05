@@ -1,0 +1,199 @@
+//
+//  PurchasedTransaction.SubscriptionOffer.swift
+//  AdaptySDK
+//
+//  Created by Aleksei Valiano on 08.09.2022.
+//
+
+import Foundation
+
+extension PurchasedTransaction {
+    struct SubscriptionOffer: Sendable {
+        let id: String?
+        let period: AdaptySubscriptionPeriod?
+        let paymentMode: AdaptySubscriptionOffer.PaymentMode
+        let offerType: AdaptySubscriptionOfferType?
+        let price: Decimal?
+
+        init(
+            id: String?,
+            period: AdaptySubscriptionPeriod? = nil,
+            paymentMode: AdaptySubscriptionOffer.PaymentMode = .unknown,
+            offerType: AdaptySubscriptionOfferType?,
+            price: Decimal? = nil
+        ) {
+            self.id = id
+            self.period = period
+            self.paymentMode = paymentMode
+            self.offerType = offerType
+            self.price = price
+        }
+
+        init(
+            identifier: AdaptySubscriptionOffer.Identifier,
+            period: AdaptySubscriptionPeriod?,
+            paymentMode: AdaptySubscriptionOffer.PaymentMode,
+            price: Decimal?
+        ) {
+            self.id = identifier.offerId
+            self.period = period
+            self.paymentMode = paymentMode
+            self.offerType = identifier.offerType
+            self.price = price
+        }
+    }
+}
+
+extension PurchasedTransaction.SubscriptionOffer: Encodable {
+    enum BackendCodingKeys: String, CodingKey {
+        case periodUnit = "period_unit"
+        case periodNumberOfUnits = "number_of_units"
+        case paymentMode = "type"
+        case offerType = "category"
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: BackendCodingKeys.self)
+        try container.encode(paymentMode, forKey: .paymentMode)
+        try container.encodeIfPresent(period?.unit, forKey: .periodUnit)
+        try container.encodeIfPresent(period?.numberOfUnits, forKey: .periodNumberOfUnits)
+        try container.encode(offerType?.rawValue ?? "unknown", forKey: .offerType)
+    }
+}
+
+extension PurchasedTransaction.SubscriptionOffer {
+    init?(
+        sk1Transaction: SK1TransactionWithIdentifier,
+        sk1Product: SK1Product?
+    ) {
+        let sk1ProductOffer: SK1Product.SubscriptionOffer
+
+        if let offerId = sk1Transaction.unfOfferId {
+            guard let value = sk1Product?.sk1ProductSubscriptionOffer(by: .promotional(offerId)) else {
+                self.init(id: offerId, offerType: .promotional)
+                return
+            }
+            sk1ProductOffer = value
+        } else {
+            guard let value = sk1Product?.sk1ProductSubscriptionOffer(by: .introductory) else {
+                return nil
+            }
+            sk1ProductOffer = value
+        }
+
+        self.init(
+            id: sk1ProductOffer.identifier,
+            period: sk1ProductOffer.subscriptionPeriod.asAdaptySubscriptionPeriod,
+            paymentMode: sk1ProductOffer.paymentMode.asPaymentMode,
+            offerType: .promotional,
+            price: sk1ProductOffer.price.decimalValue
+        )
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    init?(
+        sk1Transaction: SK1TransactionWithIdentifier,
+        sk2Product: SK2Product?
+    ) {
+        let sk2ProductOffer: SK2Product.SubscriptionOffer
+
+        if let offerId = sk1Transaction.unfOfferId {
+            guard let value = sk2Product?.sk2ProductSubscriptionOffer(by: .promotional(offerId)) else {
+                self.init(id: offerId, offerType: .promotional)
+                return
+            }
+            sk2ProductOffer = value
+        } else {
+            guard let value = sk2Product?.sk2ProductSubscriptionOffer(by: .introductory) else {
+                return nil
+            }
+            sk2ProductOffer = value
+        }
+
+        self.init(
+            id: sk2ProductOffer.id,
+            period: sk2ProductOffer.period.asAdaptySubscriptionPeriod,
+            paymentMode: sk2ProductOffer.paymentMode.asPaymentMode,
+            offerType: .promotional,
+            price: sk2ProductOffer.price
+        )
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    init?(
+        sk2Transaction: SK2Transaction,
+        sk1Product: SK1Product?
+    ) {
+        guard let offerIdentifier = sk2Transaction.subscriptionOfferIdentifier else { return nil }
+        let sk1ProductOffer = sk1Product?.sk1ProductSubscriptionOffer(by: offerIdentifier)
+        self.init(
+            identifier: offerIdentifier,
+            period: sk1ProductOffer?.subscriptionPeriod.asAdaptySubscriptionPeriod,
+            paymentMode: sk1ProductOffer?.paymentMode.asPaymentMode ?? .unknown,
+            price: sk1ProductOffer?.price.decimalValue,
+            for: sk2Transaction
+        )
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    init?(
+        sk2Transaction: SK2Transaction,
+        sk2Product: SK2Product?
+    ) {
+        guard let offerIdentifier = sk2Transaction.subscriptionOfferIdentifier else { return nil }
+        let sk2ProductOffer = sk2Product?.sk2ProductSubscriptionOffer(by: offerIdentifier)
+        self.init(
+            identifier: offerIdentifier,
+            period: sk2ProductOffer?.period.asAdaptySubscriptionPeriod,
+            paymentMode: sk2ProductOffer?.paymentMode.asPaymentMode ?? .unknown,
+            price: sk2ProductOffer?.price,
+            for: sk2Transaction
+        )
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    private init?(
+        identifier: AdaptySubscriptionOffer.Identifier,
+        period: AdaptySubscriptionPeriod?,
+        paymentMode: AdaptySubscriptionOffer.PaymentMode,
+        price: Decimal?,
+        for sk2Transaction: SK2Transaction,
+    ) {
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *),
+           let offer = sk2Transaction.offer
+        {
+            self.init(
+                productOfferPeriod: period,
+                price: price,
+                for: offer
+            )
+        } else {
+            self.init(
+                identifier: identifier,
+                period: period,
+                paymentMode: paymentMode,
+                price: price
+            )
+        }
+    }
+
+    @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
+    private init?(
+        productOfferPeriod: AdaptySubscriptionPeriod?,
+        price: Decimal?,
+        for sk2TransactionOffer: SK2Transaction.Offer,
+    ) {
+        var period: AdaptySubscriptionPeriod?
+        if #available(iOS 18.4, macOS 15.4, tvOS 18.4, watchOS 11.4, visionOS 2.4, *) {
+            period = sk2TransactionOffer.period?.asAdaptySubscriptionPeriod
+        }
+
+        self.init(
+            id: sk2TransactionOffer.id,
+            period: period ?? productOfferPeriod,
+            paymentMode: sk2TransactionOffer.paymentMode?.asPaymentMode ?? .unknown,
+            offerType: sk2TransactionOffer.type.asSubscriptionOfferType,
+            price: price
+        )
+    }
+}

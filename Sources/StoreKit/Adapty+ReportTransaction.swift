@@ -58,18 +58,14 @@ public extension Adapty {
 
             let purchasedTransaction =
                 if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                    await sdk.productsManager.fillPurchasedTransaction(
-                        paywallVariationId: variationId,
-                        persistentPaywallVariationId: nil,
-                        persistentOnboardingVariationId: nil,
-                        sk1Transaction: sk1Transaction
+                    await sdk.productsManager__.fillPurchasedTransactionSK1(
+                        sk1Transaction: sk1Transaction,
+                        payload: .init(paywallVariationId: variationId)
                     )
                 } else {
-                    await sdk.productsManager.fillPurchasedTransaction(
-                        paywallVariationId: variationId,
-                        persistentPaywallVariationId: nil,
-                        persistentOnboardingVariationId: nil,
-                        sk1Transaction: sk1Transaction
+                    await sdk.productsManager__.fillPurchasedTransactionSK1(
+                        sk1Transaction: sk1Transaction,
+                        payload: .init(paywallVariationId: variationId)
                     )
                 }
 
@@ -101,11 +97,9 @@ public extension Adapty {
         ]) { sdk throws(AdaptyError) in
             let userId = try await sdk.createdProfileManager.userId
 
-            let purchasedTransaction = await sdk.productsManager.fillPurchasedTransaction(
-                paywallVariationId: variationId,
-                persistentPaywallVariationId: nil,
-                persistentOnboardingVariationId: nil,
-                sk2Transaction: transaction
+            let purchasedTransaction = await sdk.productsManager__.fillPurchasedTransactionSK2(
+                sk2Transaction: transaction,
+                payload: .init(paywallVariationId: variationId)
             )
 
             _ = try await sdk.validatePurchase(

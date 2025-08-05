@@ -42,13 +42,9 @@ actor SK2Purchaser {
                     log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
 
                     Task.detached {
-                        let (paywallVariationId, persistentPaywallVariationId) = await storage.getPaywallVariationIds(for: sk2Transaction.productID)
-
-                        let purchasedTransaction = await productsManager.fillPurchasedTransaction(
-                            paywallVariationId: paywallVariationId,
-                            persistentPaywallVariationId: persistentPaywallVariationId,
-                            persistentOnboardingVariationId: nil,
-                            sk2Transaction: sk2Transaction
+                        let purchasedTransaction = await productsManager.fillPurchasedTransactionSK2(
+                            sk2Transaction: sk2Transaction,
+                            payload: storage.getPurchasePayload(for: sk2Transaction.productID)
                         )
 
                         do {
@@ -95,27 +91,14 @@ actor SK2Purchaser {
 
         var options = Set<Product.PurchaseOption>()
 
+        // options.insert(.simulatesAskToBuyInSandbox(true))
+
         if let uuid = parameters.appAccountToken.asUUID(userId: userId) {
             options.insert(.appAccountToken(uuid))
         }
 
-        switch product.subscriptionOffer {
-        case .none:
-            break
-        case let .some(offer):
+        if let offer = product.subscriptionOffer {
             switch offer.offerIdentifier {
-            case .introductory:
-                break
-
-            case let .winBack(offerId):
-                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                   let winBackOffer = sk2Product.unfWinBackOffer(byId: offerId)
-                {
-                    options.insert(.winBackOffer(winBackOffer))
-                } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
-                }
-
             case let .promotional(offerId):
                 let response = try await purchaseValidator.signSubscriptionOffer(
                     userId: userId,
@@ -132,13 +115,28 @@ actor SK2Purchaser {
                         timestamp: response.timestamp
                     )
                 )
+
+            case let .winBack(offerId):
+                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
+                   let winBackOffer = sk2Product.sk2ProductSubscriptionOffer(by: .winBack(offerId))
+                {
+                    options.insert(.winBackOffer(winBackOffer))
+                } else {
+                    throw StoreKitManagerError.invalidOffer("StoreKit2 Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
+                }
+
+            default:
+                break
             }
         }
 
         await storage.setPaywallVariationIds(product.variationId, for: sk2Product.id)
-        let persistentOnboardingVariationId = await storage.getOnboardingVariationId()
-
-        let result = try await makePurchase(sk2Product, options, product.variationId, persistentOnboardingVariationId)
+        let payload = PurchasePayload(
+            paywallVariationId: product.variationId,
+            persistentPaywallVariationId: product.variationId,
+            persistentOnboardingVariationId: await storage.getOnboardingVariationId()
+        )
+        let result = try await makePurchase(sk2Product, options, payload)
 
         switch result {
         case .pending:
@@ -154,8 +152,7 @@ actor SK2Purchaser {
     private func makePurchase(
         _ sk2Product: SK2Product,
         _ options: Set<Product.PurchaseOption>,
-        _ paywallVariationId: String?,
-        _ persistentOnboardingVariationId: String?
+        _ payload: PurchasePayload?
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         let stamp = Log.stamp
 
@@ -239,10 +236,8 @@ actor SK2Purchaser {
 
         let purchasedTransaction = PurchasedTransaction(
             sk2Product: sk2Product,
-            paywallVariationId: paywallVariationId,
-            persistentPaywallVariationId: paywallVariationId,
-            persistentOnboardingVariationId: persistentOnboardingVariationId,
-            sk2Transaction: sk2Transaction
+            sk2Transaction: sk2Transaction,
+            payload: payload
         )
 
         do {
