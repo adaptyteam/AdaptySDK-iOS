@@ -138,7 +138,7 @@ extension Adapty {
         } catch let error as AdaptyError {
             guard error.canUseFallbackServer else { throw error }
         } catch {
-            guard error is TimeoutError else { throw AdaptyError.unknown(error)}
+            guard error is TimeoutError else { throw AdaptyError.unknown(error) }
         }
 
         return try await fetchFallbackPlacement(
@@ -162,7 +162,7 @@ extension Adapty {
                 let value: Content = try await fetchPlacement(
                     placementId,
                     locale,
-                    forProfileId: profileId,
+                    forProfileId: profileId
                 )
                 return .success(value)
             } catch {
