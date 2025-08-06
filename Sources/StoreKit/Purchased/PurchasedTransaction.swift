@@ -15,8 +15,24 @@ struct PurchasedTransaction: Sendable {
     let priceLocale: String?
     let storeCountry: String?
     let subscriptionOffer: SubscriptionOffer?
-    let environment: String?
+    let environment: String
     let payload: PurchasePayload?
+
+    init(
+        product: AdaptyProduct?,
+        transaction: SKTransaction,
+        payload: PurchasePayload?
+    ) {
+        self.transactionId = transaction.unfIdentifier
+        self.originalTransactionId = transaction.unfOriginalIdentifier
+        self.vendorProductId = transaction.unfProductID
+        self.price = product?.price
+        self.priceLocale = product?.priceLocale.unfCurrencyCode
+        self.storeCountry = product?.priceLocale.unfRegionCode
+        self.subscriptionOffer = .init(transaction: transaction, product: product)
+        self.environment = transaction.unfEnvironment
+        self.payload = payload
+    }
 }
 
 extension PurchasedTransaction: Encodable {
@@ -47,87 +63,10 @@ extension PurchasedTransaction: Encodable {
         try container.encodeIfPresent(storeCountry, forKey: .storeCountry)
         try container.encodeIfPresent(subscriptionOffer?.id, forKey: .promotionalOfferId)
         try container.encodeIfPresent(subscriptionOffer, forKey: .subscriptionOffer)
-        try container.encodeIfPresent(environment, forKey: .environment)
+        try container.encode(environment, forKey: .environment)
 
         try container.encodeIfPresent(payload?.paywallVariationId, forKey: .paywallVariationId)
         try container.encodeIfPresent(payload?.persistentPaywallVariationId, forKey: .persistentPaywallVariationId)
         try container.encodeIfPresent(payload?.persistentOnboardingVariationId, forKey: .persistentOnboardingVariationId)
-    }
-}
-
-extension PurchasedTransaction {
-    init(
-        sk1Product: SK1Product?,
-        sk1Transaction: SK1TransactionWithIdentifier,
-        payload: PurchasePayload?
-    ) {
-        self.init(
-            transactionId: sk1Transaction.unfIdentifier,
-            originalTransactionId: sk1Transaction.unfOriginalIdentifier,
-            vendorProductId: sk1Transaction.unfProductID,
-            price: sk1Product?.price.decimalValue,
-            priceLocale: sk1Product?.priceLocale.unfCurrencyCode,
-            storeCountry: sk1Product?.priceLocale.unfRegionCode,
-            subscriptionOffer: .init(sk1Transaction: sk1Transaction, sk1Product: sk1Product),
-            environment: nil,
-            payload: payload
-        )
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(
-        sk2Product: SK2Product?,
-        sk1Transaction: SK1TransactionWithIdentifier,
-        payload: PurchasePayload?
-    ) {
-        self.init(
-            transactionId: sk1Transaction.unfIdentifier,
-            originalTransactionId: sk1Transaction.unfOriginalIdentifier,
-            vendorProductId: sk1Transaction.unfProductID,
-            price: sk2Product?.price,
-            priceLocale: sk2Product?.priceFormatStyle.locale.unfCurrencyCode,
-            storeCountry: sk2Product?.priceFormatStyle.locale.unfRegionCode,
-            subscriptionOffer: .init(sk1Transaction: sk1Transaction, sk2Product: sk2Product),
-            environment: nil,
-            payload: payload
-        )
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(
-        sk1Product: SK1Product?,
-        sk2Transaction: SK2Transaction,
-        payload: PurchasePayload?
-    ) {
-        self.init(
-            transactionId: sk2Transaction.unfIdentifier,
-            originalTransactionId: sk2Transaction.unfOriginalIdentifier,
-            vendorProductId: sk2Transaction.unfProductID,
-            price: sk1Product?.price.decimalValue,
-            priceLocale: sk1Product?.priceLocale.unfCurrencyCode,
-            storeCountry: sk1Product?.priceLocale.unfRegionCode,
-            subscriptionOffer: .init(sk2Transaction: sk2Transaction, sk1Product: sk1Product),
-            environment: sk2Transaction.unfEnvironment,
-            payload: payload
-        )
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    init(
-        sk2Product: SK2Product?,
-        sk2Transaction: SK2Transaction,
-        payload: PurchasePayload?
-    ) {
-        self.init(
-            transactionId: sk2Transaction.unfIdentifier,
-            originalTransactionId: sk2Transaction.unfOriginalIdentifier,
-            vendorProductId: sk2Transaction.unfProductID,
-            price: sk2Product?.price,
-            priceLocale: sk2Product?.priceFormatStyle.locale.unfCurrencyCode,
-            storeCountry: sk2Product?.priceFormatStyle.locale.unfRegionCode,
-            subscriptionOffer: .init(sk2Transaction: sk2Transaction, sk2Product: sk2Product),
-            environment: sk2Transaction.unfEnvironment,
-            payload: payload
-        )
     }
 }

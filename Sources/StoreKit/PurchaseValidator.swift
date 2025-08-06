@@ -10,7 +10,7 @@ import Foundation
 protocol PurchaseValidator: AnyObject, Sendable {
     func validatePurchase(
         userId: AdaptyUserId?,
-        transaction: PurchasedTransaction,
+        purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> VH<AdaptyProfile>
 
@@ -49,13 +49,13 @@ extension Adapty: PurchaseValidator {
 
     func validatePurchase(
         userId: AdaptyUserId?,
-        transaction: PurchasedTransaction,
+        purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> VH<AdaptyProfile> {
         do {
             let response = try await httpSession.validateTransaction(
                 userId: userId ?? profileStorage.userId,
-                purchasedTransaction: transaction,
+                purchasedTransaction: purchasedTransaction,
                 reason: reason
             )
             saveResponse(response, syncedTransaction: true)

@@ -14,7 +14,7 @@ actor StoreKitReceiptManager {
     private let refresher = ReceiptRefresher()
     private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, userId: AdaptyUserId)?
 
-    init(session: Backend.MainExecutor, refreshIfEmpty: Bool = false) {
+    init(session: Backend.MainExecutor, refreshIfEmpty: Bool) {
         self.session = session
 
         if refreshIfEmpty {
@@ -72,7 +72,7 @@ actor StoreKitReceiptManager {
     }
 }
 
-extension StoreKitReceiptManager: StoreKitTransactionManager {
+extension StoreKitReceiptManager {
     func syncTransactions(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
         let task: AdaptyResultTask<VH<AdaptyProfile>?>
         if let syncing, userId.isEqualProfileId(syncing.userId) {

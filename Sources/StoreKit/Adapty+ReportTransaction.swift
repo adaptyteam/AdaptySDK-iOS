@@ -30,6 +30,28 @@ public extension Adapty {
         }
     }
 
+    private func reportTransaction(
+        _ transaction: SKTransaction,
+        withVariationId variationId: String?
+    ) async throws(AdaptyError) {
+        let userId = try await createdProfileManager.userId
+
+        let productOrNil = try? await productsManager.fetchProduct(
+            id: transaction.unfProductID,
+            fetchPolicy: .returnCacheDataElseLoad
+        )
+
+        _ = try await validatePurchase(
+            userId: userId,
+            purchasedTransaction: .init(
+                product: productOrNil,
+                transaction: transaction,
+                payload: .init(paywallVariationId: variationId)
+            ),
+            reason: .setVariation
+        )
+    }
+
     /// Link purchased transaction with paywall's variationId.
     ///
     /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
@@ -53,26 +75,9 @@ public extension Adapty {
                 throw .wrongParamPurchasedTransaction()
             }
 
-            let sk1Transaction = SK1TransactionWithIdentifier(transaction, id: id)
-            let userId = try await sdk.createdProfileManager.userId
-
-            let purchasedTransaction =
-                if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                    await sdk.productsManager__.fillPurchasedTransactionSK1(
-                        sk1Transaction: sk1Transaction,
-                        payload: .init(paywallVariationId: variationId)
-                    )
-                } else {
-                    await sdk.productsManager__.fillPurchasedTransactionSK1(
-                        sk1Transaction: sk1Transaction,
-                        payload: .init(paywallVariationId: variationId)
-                    )
-                }
-
-            _ = try await sdk.validatePurchase(
-                userId: userId,
-                transaction: purchasedTransaction,
-                reason: .setVariation
+            try await sdk.reportTransaction(
+                SK1TransactionWithIdentifier(transaction, id: id),
+                withVariationId: variationId
             )
         }
     }
@@ -95,17 +100,9 @@ public extension Adapty {
             "variation_id": variationId,
             "transaction_id": transaction.unfIdentifier,
         ]) { sdk throws(AdaptyError) in
-            let userId = try await sdk.createdProfileManager.userId
-
-            let purchasedTransaction = await sdk.productsManager__.fillPurchasedTransactionSK2(
-                sk2Transaction: transaction,
-                payload: .init(paywallVariationId: variationId)
-            )
-
-            _ = try await sdk.validatePurchase(
-                userId: userId,
-                transaction: purchasedTransaction,
-                reason: .setVariation
+            try await sdk.reportTransaction(
+                transaction,
+                withVariationId: variationId
             )
         }
     }

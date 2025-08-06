@@ -31,13 +31,7 @@ extension SK2Product {
     }
 
     @inlinable
-    var unfPriceLocale: Locale {
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            return priceFormatStyle.locale
-        }
-
-        return .autoupdatingCurrent
-    }
+    var unfPriceLocale: Locale { priceFormatStyle.locale }
 
     @inlinable
     var unfPeriodLocale: Locale {

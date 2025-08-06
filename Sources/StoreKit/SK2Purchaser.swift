@@ -9,6 +9,7 @@ import StoreKit
 
 private let log = Log.sk2TransactionManager
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2Purchaser {
     private let purchaseValidator: PurchaseValidator
     private let storage: VariationIdStorage
@@ -24,13 +25,9 @@ actor SK2Purchaser {
     @AdaptyActor
     static func startObserving(
         purchaseValidator: PurchaseValidator,
-        productsManager: StoreKitProductsManager,
+        sk2ProductsManager: SK2ProductsManager,
         storage: VariationIdStorage
     ) -> SK2Purchaser? {
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *), !isObservingStarted else {
-            return nil
-        }
-
         Task {
             for await verificationResult in SK2Transaction.updates {
                 switch verificationResult {
@@ -42,15 +39,19 @@ actor SK2Purchaser {
                     log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
 
                     Task.detached {
-                        let purchasedTransaction = await productsManager.fillPurchasedTransactionSK2(
-                            sk2Transaction: sk2Transaction,
-                            payload: storage.getPurchasePayload(for: sk2Transaction.productID)
+                        let productOrNil = try? await sk2ProductsManager.fetchProduct(
+                            id: sk2Transaction.unfProductID,
+                            fetchPolicy: .returnCacheDataElseLoad
                         )
 
                         do {
                             _ = try await purchaseValidator.validatePurchase(
                                 userId: nil,
-                                transaction: purchasedTransaction,
+                                purchasedTransaction: .init(
+                                    product: productOrNil,
+                                    transaction: sk2Transaction,
+                                    payload: storage.getPurchasePayload(for: sk2Transaction.productID)
+                                ),
                                 reason: .sk2Updates
                             )
 
@@ -83,9 +84,7 @@ actor SK2Purchaser {
         product: AdaptyPaywallProduct,
         parameters: AdaptyPurchaseParameters
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
-              let sk2Product = product.sk2Product
-        else {
+        guard let sk2Product = product.sk2Product else {
             throw .cantMakePayments()
         }
 
@@ -234,16 +233,14 @@ actor SK2Purchaser {
 
         let sk2Transaction = sk2SignedTransaction.unsafePayloadValue
 
-        let purchasedTransaction = PurchasedTransaction(
-            sk2Product: sk2Product,
-            sk2Transaction: sk2Transaction,
-            payload: payload
-        )
-
         do {
             let response = try await purchaseValidator.validatePurchase(
                 userId: nil,
-                transaction: purchasedTransaction,
+                purchasedTransaction: .init(
+                    product: sk2Product.asAdaptyProduct,
+                    transaction: sk2Transaction,
+                    payload: payload
+                ),
                 reason: .purchasing
             )
 

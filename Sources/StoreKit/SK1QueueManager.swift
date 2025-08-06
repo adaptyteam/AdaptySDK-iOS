@@ -17,7 +17,11 @@ actor SK1QueueManager: Sendable {
     private var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchaseResult>]]()
     private var makePurchasesProduct = [String: SK1Product]()
 
-    fileprivate init(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager, storage: VariationIdStorage) {
+    fileprivate init(
+        purchaseValidator: PurchaseValidator,
+        productsManager: StoreKitProductsManager,
+        storage: VariationIdStorage
+    ) {
         self.purchaseValidator = purchaseValidator
         self.productsManager = productsManager
         self.storage = storage
@@ -164,25 +168,24 @@ actor SK1QueueManager: Sendable {
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
         let productId = sk1Transaction.unfProductID
 
-        let purchasedTransaction: PurchasedTransaction =
-            if let sk1Product = makePurchasesProduct[productId] {
-                PurchasedTransaction(
-                    sk1Product: sk1Product,
-                    sk1Transaction: sk1Transaction,
-                    payload: await storage.getPurchasePayload(for: productId)
-                )
-            } else {
-                await productsManager.fillPurchasedTransactionSK1(
-                    sk1Transaction: sk1Transaction,
-                    payload: await storage.getPurchasePayload(for: productId)
-                )
-            }
+        var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
+
+        if productOrNil == nil {
+            productOrNil = try? await productsManager.fetchProduct(
+                id: sk1Transaction.unfProductID,
+                fetchPolicy: .returnCacheDataElseLoad
+            )
+        }
 
         let result: AdaptyResult<AdaptyPurchaseResult>
         do {
             let response = try await purchaseValidator.validatePurchase(
                 userId: nil,
-                transaction: purchasedTransaction,
+                purchasedTransaction: .init(
+                    product: productOrNil,
+                    transaction: sk1Transaction,
+                    payload: await storage.getPurchasePayload(for: productId)
+                ),
                 reason: .purchasing
             )
 
@@ -271,7 +274,11 @@ extension SK1QueueManager {
     private static var observer: SK1PaymentTransactionObserver?
 
     @AdaptyActor
-    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager, storage: VariationIdStorage) -> SK1QueueManager? {
+    static func startObserving(
+        purchaseValidator: PurchaseValidator,
+        productsManager: StoreKitProductsManager,
+        storage: VariationIdStorage
+    ) -> SK1QueueManager? {
         guard observer == nil else { return nil }
 
         let manager = SK1QueueManager(

@@ -53,3 +53,13 @@ extension AdaptySK2Product {
         "(vendorProductId: \(vendorProductId), skProduct: \(skProduct))"
     }
 }
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+struct SK2ProductWrapper: AdaptySK2Product {
+    let skProduct: SK2Product
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension SK2Product {
+    var asAdaptyProduct: AdaptySK2Product { SK2ProductWrapper(skProduct: self) }
+}

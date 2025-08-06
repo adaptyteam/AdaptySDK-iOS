@@ -22,8 +22,8 @@ public final class Adapty {
 
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
-    let productsManager__: StoreKitProductsManager
-    var sk2Purchaser: SK2Purchaser?
+    let productsManager: StoreKitProductsManager
+    var purchaser: StorekitPurchaser?
     var sk1QueueManager: SK1QueueManager?
 
     package let observerMode: Bool
@@ -46,48 +46,49 @@ public final class Adapty {
         self.variationIdStorage = VariationIdStorage()
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            self.receiptManager = StoreKitReceiptManager(session: httpSession)
+            self.receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: false)
             self.transactionManager = SK2TransactionManager(session: httpSession)
-            self.productsManager__ = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
-            self.sk1QueueManager = nil
-        } else {
-            self.receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
-            self.transactionManager = receiptManager
-            self.productsManager__ = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
-            self.sk1QueueManager = nil
-        }
+            let sk2ProductsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
+            self.productsManager = sk2ProductsManager
 
-        self.sharedProfileManager = restoreProfileManager(configuration)
+            self.sharedProfileManager = restoreProfileManager(configuration)
 
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             if !observerMode {
-                self.sk2Purchaser = SK2Purchaser.startObserving(
+                self.purchaser = SK2Purchaser.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager__,
+                    sk2ProductsManager: sk2ProductsManager,
                     storage: variationIdStorage
                 )
 
                 self.sk1QueueManager = SK1QueueManager.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager__,
+                    productsManager: sk2ProductsManager,
                     storage: variationIdStorage
                 )
             }
+
         } else {
+            self.receiptManager = StoreKitReceiptManager(session: httpSession, refreshIfEmpty: true)
+            self.transactionManager = receiptManager
+            let sk1ProductsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
+            self.productsManager = sk1ProductsManager
+
+            self.sharedProfileManager = restoreProfileManager(configuration)
+
             if observerMode {
                 SK1TransactionObserver.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager__
+                    sk1ProductsManager: sk1ProductsManager
                 )
             } else {
                 self.sk1QueueManager = SK1QueueManager.startObserving(
                     purchaseValidator: self,
-                    productsManager: productsManager__,
+                    productsManager: sk1ProductsManager,
                     storage: variationIdStorage
                 )
+                self.purchaser = sk1QueueManager
             }
         }
-
         startSyncIPv4OnceIfNeeded()
     }
 

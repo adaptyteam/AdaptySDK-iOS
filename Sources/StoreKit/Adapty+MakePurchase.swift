@@ -29,19 +29,9 @@ public extension Adapty {
                 "app_account_token": parameters.appAccountToken.description,
             ]
         ) { sdk throws(AdaptyError) in
-            guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
-                guard let manager = sdk.sk1QueueManager else { throw .cantMakePayments() }
+            guard let purchaser = sdk.purchaser else { throw .cantMakePayments() }
 
-                return try await manager.makePurchase(
-                    userId: sdk.profileStorage.userId,
-                    product: product,
-                    parameters: parameters
-                )
-            }
-
-            guard let manager = sdk.sk2Purchaser else { throw .cantMakePayments() }
-
-            return try await manager.makePurchase(
+            return try await purchaser.makePurchase(
                 userId: sdk.profileStorage.userId,
                 product: product,
                 parameters: parameters

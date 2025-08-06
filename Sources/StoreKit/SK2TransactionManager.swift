@@ -10,7 +10,7 @@ import StoreKit
 private let log = Log.sk2TransactionManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-actor SK2TransactionManager: StoreKitTransactionManager {
+actor SK2TransactionManager {
     private let session: Backend.MainExecutor
 
     private var lastTransactionCached: SK2Transaction?

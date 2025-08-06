@@ -56,3 +56,5 @@ public protocol AdaptyProduct: Sendable, CustomStringConvertible {
     /// The period's language is determined by the preferred language set on the device.
     var localizedSubscriptionPeriod: String? { get }
 }
+
+

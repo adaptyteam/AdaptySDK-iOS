@@ -11,11 +11,14 @@ private let log = Log.sk1QueueManager
 
 actor SK1TransactionObserver: Sendable {
     private let purchaseValidator: PurchaseValidator
-    private let productsManager: StoreKitProductsManager
+    private let sk1ProductsManager: SK1ProductsManager
 
-    fileprivate init(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager) {
+    fileprivate init(
+        purchaseValidator: PurchaseValidator,
+        sk1ProductsManager: SK1ProductsManager
+    ) {
         self.purchaseValidator = purchaseValidator
-        self.productsManager = productsManager
+        self.sk1ProductsManager = sk1ProductsManager
     }
 
     fileprivate func updatedTransactions(_ transactions: [SKPaymentTransaction]) async {
@@ -37,14 +40,18 @@ actor SK1TransactionObserver: Sendable {
             let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction, id: id)
 
             Task.detached {
-                let transaction = await self.productsManager.fillPurchasedTransactionSK1(
-                    sk1Transaction: sk1Transaction,
-                    payload: nil
+                let productOrNil = try? await self.sk1ProductsManager.fetchProduct(
+                    id: sk1Transaction.unfProductID,
+                    fetchPolicy: .returnCacheDataElseLoad
                 )
 
                 _ = try await self.purchaseValidator.validatePurchase(
                     userId: nil,
-                    transaction: transaction,
+                    purchasedTransaction: .init(
+                        product: productOrNil,
+                        transaction: sk1Transaction,
+                        payload: nil
+                    ),
                     reason: .observing
                 )
             }
@@ -57,12 +64,15 @@ extension SK1TransactionObserver {
     private static var observer: ObserverWrapper?
 
     @AdaptyActor
-    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager) {
+    static func startObserving(
+        purchaseValidator: PurchaseValidator,
+        sk1ProductsManager: SK1ProductsManager
+    ) {
         guard observer == nil else { return }
 
         let observer = ObserverWrapper(SK1TransactionObserver(
             purchaseValidator: purchaseValidator,
-            productsManager: productsManager
+            sk1ProductsManager: sk1ProductsManager
         ))
 
         self.observer = observer
