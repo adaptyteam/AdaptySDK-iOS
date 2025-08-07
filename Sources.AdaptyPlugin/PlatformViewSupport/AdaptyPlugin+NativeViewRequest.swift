@@ -12,6 +12,19 @@ private let log = Log.plugin
 
 // TODO: refactor this
 public extension AdaptyPlugin {
+    static func executeCreateNativePaywallView(withJson jsonString: AdaptyJsonString) async -> AdaptyPaywall? {
+        do {
+            return try AdaptyPlugin.decoder.decode(
+                AdaptyPaywall.self,
+                from: jsonString.asAdaptyJsonData
+            )
+        } catch {
+            let error = AdaptyPluginError.decodingFailed(message: "Request params of method: create_native_onboarding_view is invalid", error)
+            log.error(error.message)
+            return nil
+        }
+    }
+    
     static func executeCreateNativeOnboardingView(withJson jsonString: AdaptyJsonString) async -> AdaptyOnboarding? {
         do {
             return try AdaptyPlugin.decoder.decode(

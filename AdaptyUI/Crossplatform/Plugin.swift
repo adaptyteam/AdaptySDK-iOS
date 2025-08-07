@@ -98,7 +98,7 @@ package extension AdaptyUI {
             )
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
-            cachePaywallController(vc, id: vc.id.uuidString)
+            cachePaywallController(vc, id: vc.id)
             return vc.toAdaptyUIView()
         }
 #endif
