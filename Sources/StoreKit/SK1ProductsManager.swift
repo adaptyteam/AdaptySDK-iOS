@@ -11,13 +11,13 @@ private let log = Log.sk1ProductManager
 
 actor SK1ProductsManager {
     private let apiKeyPrefix: String
-    private let storage: ProductVendorIdsStorage
+    private let storage: BackendProductStorage
     private let session: Backend.MainExecutor
 
     private var products = [String: SK1Product]()
     private let sk1ProductsFetcher = SK1ProductFetcher()
 
-    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: ProductVendorIdsStorage) {
+    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductStorage) {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
         self.storage = storage

@@ -170,7 +170,7 @@ extension PurchasedTransaction.SubscriptionOffer {
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    private init?(
+    init?(
         sk2Transaction: SK2Transaction,
         sk2Product: SK2Product?
     ) {

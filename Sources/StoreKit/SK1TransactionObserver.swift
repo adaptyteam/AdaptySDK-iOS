@@ -45,7 +45,7 @@ actor SK1TransactionObserver: Sendable {
                     fetchPolicy: .returnCacheDataElseLoad
                 )
 
-                _ = try await self.purchaseValidator.validatePurchase(
+                _ = try await self.purchaseValidator.validatePurchase_(
                     userId: nil,
                     purchasedTransaction: .init(
                         product: productOrNil,

@@ -179,7 +179,7 @@ actor SK1QueueManager: Sendable {
 
         let result: AdaptyResult<AdaptyPurchaseResult>
         do {
-            let response = try await purchaseValidator.validatePurchase(
+            let response = try await purchaseValidator.validatePurchase_(
                 userId: nil,
                 purchasedTransaction: .init(
                     product: productOrNil,

@@ -26,26 +26,30 @@ extension SK2Transaction {
 
     var logParams: EventParameters {
         [
-            "product_id": self.unfProductID,
+            "product_id": unfProductID,
             "transaction_is_upgraded": isUpgraded,
-            "transaction_id": self.unfIdentifier,
-            "original_id": self.unfOriginalIdentifier,
+            "transaction_id": unfIdentifier,
+            "original_id": unfOriginalIdentifier,
         ]
     }
 
     var subscriptionOfferType: AdaptySubscriptionOfferType? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            offer?.type.asSubscriptionOfferType
+            (offer?.type ?? offerType)?.asSubscriptionOfferType
         } else {
-            self.offerType?.asSubscriptionOfferType
+            offerType?.asSubscriptionOfferType
         }
     }
 
     var unfOfferId: String? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            return offer?.id
+            return offer?.id ?? offerID
         }
         return offerID
+    }
+
+    var isSandbox: Bool {
+        unfEnvironment == "sandbox"
     }
 
     var unfEnvironment: String {

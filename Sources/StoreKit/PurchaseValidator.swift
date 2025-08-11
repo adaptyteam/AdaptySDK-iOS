@@ -8,7 +8,7 @@
 import Foundation
 
 protocol PurchaseValidator: AnyObject, Sendable {
-    func validatePurchase(
+    func validatePurchase_(
         userId: AdaptyUserId?,
         purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
@@ -30,13 +30,13 @@ extension Adapty: PurchaseValidator {
     }
 
     func reportTransaction(
-        userId: AdaptyUserId?,
+        userId: AdaptyUserId,
         transactionId: String,
         variationId: String?
     ) async throws(AdaptyError) -> VH<AdaptyProfile> {
         do {
             let response = try await httpSession.reportTransaction(
-                userId: userId ?? profileStorage.userId,
+                userId: userId,
                 transactionId: transactionId,
                 variationId: variationId
             )
@@ -46,8 +46,30 @@ extension Adapty: PurchaseValidator {
             throw error.asAdaptyError
         }
     }
+    
+    func reportTransaction(
+        userId: AdaptyUserId,
+        transaction: SKTransaction,
+        variationId: String?
+    ) async throws(AdaptyError) {
 
-    func validatePurchase(
+        let productOrNil = try? await productsManager.fetchProduct(
+            id: transaction.unfProductID,
+            fetchPolicy: .returnCacheDataElseLoad
+        )
+
+        _ = try await validatePurchase_(
+            userId: userId,
+            purchasedTransaction: .init(
+                product: productOrNil,
+                transaction: transaction,
+                payload: .init(paywallVariationId: variationId)
+            ),
+            reason: .setVariation
+        )
+    }
+
+    func validatePurchase_(
         userId: AdaptyUserId?,
         purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason

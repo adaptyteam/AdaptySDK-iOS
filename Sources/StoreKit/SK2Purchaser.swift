@@ -45,7 +45,7 @@ actor SK2Purchaser {
                         )
 
                         do {
-                            _ = try await purchaseValidator.validatePurchase(
+                            _ = try await purchaseValidator.validatePurchase_(
                                 userId: nil,
                                 purchasedTransaction: .init(
                                     product: productOrNil,
@@ -234,7 +234,7 @@ actor SK2Purchaser {
         let sk2Transaction = sk2SignedTransaction.unsafePayloadValue
 
         do {
-            let response = try await purchaseValidator.validatePurchase(
+            let response = try await purchaseValidator.validatePurchase_(
                 userId: nil,
                 purchasedTransaction: .init(
                     product: sk2Product.asAdaptyProduct,

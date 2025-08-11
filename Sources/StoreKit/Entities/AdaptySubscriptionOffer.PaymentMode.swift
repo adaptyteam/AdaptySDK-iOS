@@ -16,7 +16,7 @@ public extension AdaptySubscriptionOffer {
     }
 }
 
-extension AdaptySubscriptionOffer.PaymentMode: Encodable {
+extension AdaptySubscriptionOffer.PaymentMode {
     private enum CodingValues: String {
         case payAsYouGo = "pay_as_you_go"
         case payUpFront = "pay_up_front"
@@ -35,7 +35,9 @@ extension AdaptySubscriptionOffer.PaymentMode: Encodable {
 
         return value.map { $0.rawValue }
     }
+}
 
+extension AdaptySubscriptionOffer.PaymentMode: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(encodedValue ?? CodingValues.unknown.rawValue)

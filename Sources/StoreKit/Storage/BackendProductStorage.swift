@@ -1,5 +1,5 @@
 //
-//  ProductVendorIdsStorage.swift
+//  BackendProductStorage.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 30.09.2022.
@@ -9,8 +9,8 @@ import Foundation
 
 private let log = Log.storage
 
-@ProductVendorIdsStorage.InternalActor
-final class ProductVendorIdsStorage {
+@BackendProductStorage.InternalActor
+final class BackendProductStorage {
     @globalActor
     actor InternalActor {
         package static let shared = InternalActor()

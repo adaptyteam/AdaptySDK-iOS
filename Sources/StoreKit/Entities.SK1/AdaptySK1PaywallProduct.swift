@@ -9,8 +9,11 @@ import StoreKit
 
 struct AdaptySK1PaywallProduct: AdaptySK1Product, AdaptyPaywallProduct, WebPaywallURLProviding {
     let skProduct: SK1Product
+    let backendProduct: BackendProduct
 
-    public let adaptyProductId: String
+    public var adaptyProductId: String { backendProduct.adaptyId }
+    public var accessLevelId: String { backendProduct.accessLevelId }
+    public var adaptyProductType: String { backendProduct.period.rawValue }
 
     public let paywallProductIndex: Int
 
@@ -28,14 +31,17 @@ struct AdaptySK1PaywallProduct: AdaptySK1Product, AdaptyPaywallProduct, WebPaywa
     let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
+        "(product: \(backendProduct), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
     }
 }
 
 struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, AdaptyPaywallProductWithoutDeterminingOffer, WebPaywallURLProviding {
     let skProduct: SK1Product
+    let backendProduct: BackendProduct
 
-    public let adaptyProductId: String
+    public var adaptyProductId: String { backendProduct.adaptyId }
+    public var accessLevelId: String { backendProduct.accessLevelId }
+    public var adaptyProductType: String { backendProduct.period.rawValue }
 
     public let paywallProductIndex: Int
 
@@ -51,6 +57,6 @@ struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, AdaptyP
     let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
+        "(product: \(backendProduct), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
     }
 }

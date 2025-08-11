@@ -65,8 +65,7 @@ public extension Adapty {
     }
 
     package nonisolated static func getPaywallProduct(
-        vendorProductId: String,
-        adaptyProductId: String,
+        backendProduct: BackendProduct,
         paywallProductIndex: Int,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
@@ -81,8 +80,7 @@ public extension Adapty {
                 throw .cantMakePayments()
             }
             return try await sdk.getSK2PaywallProduct(
-                vendorProductId: vendorProductId,
-                adaptyProductId: adaptyProductId,
+                backendProduct: backendProduct,
                 paywallProductIndex: paywallProductIndex,
                 subscriptionOfferIdentifier: subscriptionOfferIdentifier,
                 variationId: variationId,
@@ -97,8 +95,7 @@ public extension Adapty {
                 throw .cantMakePayments()
             }
             return try await sdk.getSK1PaywallProduct(
-                vendorProductId: vendorProductId,
-                adaptyProductId: adaptyProductId,
+                backendProduct: backendProduct,
                 paywallProductIndex: paywallProductIndex,
                 subscriptionOfferIdentifier: subscriptionOfferIdentifier,
                 variationId: variationId,

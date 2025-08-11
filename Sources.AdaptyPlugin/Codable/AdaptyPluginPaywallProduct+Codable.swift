@@ -10,8 +10,7 @@ import Foundation
 
 extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
-        let vendorProductId: String
-        let adaptyProductId: String
+        let backendProduct: BackendProduct
         let paywallProductIndex: Int
         let subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
         let variationId: String
@@ -21,8 +20,12 @@ extension Request {
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            vendorProductId = try container.decode(String.self, forKey: .vendorProductId)
-            adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
+            backendProduct = try BackendProduct(
+                adaptyId: container.decode(String.self, forKey: .adaptyProductId),
+                vendorId: container.decode(String.self, forKey: .vendorProductId),
+                accessLevelId: container.decode(String.self, forKey: .accessLevelId),
+                period: BackendProduct.Period(rawValue: container.decode(String.self, forKey: .adaptyProductType))
+            )
             paywallProductIndex = try container.decode(Int.self, forKey: .paywallProductIndex)
             subscriptionOfferIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOfferIdentifier)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
@@ -36,6 +39,8 @@ extension Request {
 private enum CodingKeys: String, CodingKey {
     case vendorProductId = "vendor_product_id"
     case adaptyProductId = "adapty_product_id"
+    case accessLevelId = "access_level_id"
+    case adaptyProductType = "product_type"
     case paywallProductIndex = "paywall_product_index"
     case paywallVariationId = "paywall_variation_id"
     case paywallABTestName = "paywall_ab_test_name"
@@ -62,6 +67,8 @@ extension Response {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(wrapped.vendorProductId, forKey: .vendorProductId)
             try container.encode(wrapped.adaptyProductId, forKey: .adaptyProductId)
+            try container.encode(wrapped.accessLevelId, forKey: .accessLevelId)
+            try container.encode(wrapped.adaptyProductType, forKey: .adaptyProductType)
             try container.encode(wrapped.paywallProductIndex, forKey: .paywallProductIndex)
             try container.encode(wrapped.variationId, forKey: .paywallVariationId)
             try container.encode(wrapped.paywallABTestName, forKey: .paywallABTestName)
