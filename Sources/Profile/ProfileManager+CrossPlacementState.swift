@@ -13,27 +13,28 @@ private extension Adapty {
         } catch {
             throw error.asAdaptyError
         }
-        try saveCrossPlacementState(state, forProfileId: profileId)
-    }
 
-    @AdaptyActor
-    private func saveCrossPlacementState(_ newState: CrossPlacementState, forProfileId profileId: String) throws(AdaptyError) {
         guard let manager = try profileManager(with: profileId) else {
-            throw AdaptyError.profileWasChanged()
+            throw .profileWasChanged()
         }
-
-        let storage = manager.storage
-        let oldState = storage.crossPlacementState
-        guard (oldState?.version ?? 0) < newState.version else { return }
-
-        Log.crossAB.verbose("updateProfile version = \(newState.version), newValue = \(newState.variationIdByPlacements), oldValue = \(oldState?.variationIdByPlacements.description ?? "DISABLED")")
-
-        storage.setCrossPlacementState(newState)
+        manager.saveCrossPlacementState(state)
     }
 }
 
 extension ProfileManager {
     func syncCrossPlacementState() async throws(AdaptyError) {
         try await Adapty.activatedSDK.syncCrossPlacementState(profileId: profileId)
+    }
+
+    func saveCrossPlacementState(_ newState: CrossPlacementState) {
+        let oldState = storage.crossPlacementState
+
+        if let oldState {
+            guard oldState.version < newState.version else { return }
+        }
+
+        Log.crossAB.verbose("updateProfile version = \(newState.version), newValue = \(newState.variationIdByPlacements), oldValue = \(oldState?.variationIdByPlacements.description ?? "DISABLED")")
+
+        storage.setCrossPlacementState(newState)
     }
 }
