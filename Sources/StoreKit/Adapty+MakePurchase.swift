@@ -27,31 +27,28 @@ public extension Adapty {
                 "product_id": product.vendorProductId,
             ]
         ) { sdk throws(AdaptyError) in
+            let appAccountToken: UUID? =
+                if let customerUserId = sdk.customerUserId {
+                    sdk.profileStorage.getAppAccountToken() ?? UUID(uuidString: customerUserId)
+                } else {
+                    nil
+                }
+
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
                 guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
 
                 return try await manager.makePurchase(
                     profileId: sdk.profileStorage.profileId,
+                    appAccountToken: appAccountToken,
                     product: product
                 )
             }
 
             guard let manager = sdk.sk2Purchaser else { throw AdaptyError.cantMakePayments() }
 
-            let profileId: String
-            let customerUserId: String?
-
-            if let profile = sdk.profileManager?.profile.value {
-                profileId = profile.profileId
-                customerUserId = profile.customerUserId
-            } else {
-                profileId = sdk.profileStorage.profileId
-                customerUserId = nil
-            }
-
             return try await manager.makePurchase(
-                profileId: profileId,
-                customerUserId: customerUserId,
+                profileId: sdk.profileStorage.profileId,
+                appAccountToken: appAccountToken,
                 product: product
             )
         }
