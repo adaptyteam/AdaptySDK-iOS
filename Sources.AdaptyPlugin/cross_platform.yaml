@@ -112,6 +112,7 @@ $requests:
     properties:
       method: { const: "adapty_ui_present_onboarding_view" }
       id: { type: string, description: "View Id" }
+      ios_presentation_style: { $ref: "#/$defs/AdaptyUI.IOSPresentationStyle" }
 
   AdaptyUIPresentOnboardingView.Response: #response
     type: object
@@ -130,6 +131,7 @@ $requests:
     properties:
       method: { const: "adapty_ui_present_paywall_view" }
       id: { type: string, description: "View Id" }
+      ios_presentation_style: { $ref: "#/$defs/AdaptyUI.IOSPresentationStyle" }
 
   AdaptyUIPresentPaywallView.Response: #response
     type: object
@@ -1474,6 +1476,12 @@ $defs:
       $ref: "#/$defs/AdaptyPurchaseParameters", 
       nullable: false 
     }
+
+  AdaptyUI.IOSPresentationStyle:
+    type: string
+    enum:
+      - full_screen
+      - page_sheet
 
   AdaptyUI.DialogConfiguration: #request
     type: object
