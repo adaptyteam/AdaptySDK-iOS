@@ -17,6 +17,7 @@ public struct AdaptyConfiguration: Sendable {
 
     let apiKey: String
     let customerUserId: String?
+    let appAccountToken: UUID?
     let observerMode: Bool
     let idfaCollectionDisabled: Bool
     let ipAddressCollectionDisabled: Bool

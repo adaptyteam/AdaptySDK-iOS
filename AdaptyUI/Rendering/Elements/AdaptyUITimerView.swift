@@ -182,7 +182,7 @@ struct AdaptyUITimerView: View, AdaptyTagResolver {
                 )
                 .multilineTextAlignment(timer.horizontalAlign)
                 .lineLimit(1)
-                .minimumScaleFactor(0.01)
+                .minimumScaleFactor(0.1)
         } else {
             Text("")
         }

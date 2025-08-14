@@ -14,9 +14,15 @@ public extension Adapty {
     ///
     /// - Parameters:
     ///   - customerUserId: User identifier in your system.
-    nonisolated static func identify(_ customerUserId: String) async throws(AdaptyError) {
-        try await withActivatedSDK(methodName: .identify, logParams: ["customerUserId": customerUserId]) { sdk throws(AdaptyError) in
-            try await sdk.identify(toCustomerUserId: customerUserId)
+    nonisolated static func identify(_ customerUserId: String, withAppAccountToken appAccountToken: UUID? = nil) async throws(AdaptyError) {
+        try await withActivatedSDK(
+            methodName: .identify,
+            logParams: [
+                "customer_user_id": customerUserId,
+                "app_account_token": appAccountToken?.uuidString
+            ]
+        ) { sdk throws(AdaptyError) in
+            try await sdk.identify(toCustomerUserId: customerUserId, withAppAccountToken: appAccountToken)
         }
     }
 

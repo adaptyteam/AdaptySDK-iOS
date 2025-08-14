@@ -42,7 +42,8 @@ public extension Adapty {
         let stamp = Log.stamp
         let logParams: EventParameters? = [
             "observer_mode": configuration.observerMode,
-            "has_customer_user_id": configuration.customerUserId != nil,
+            "customer_user_id": configuration.customerUserId,
+            "app_account_token": configuration.appAccountToken?.uuidString,
             "idfa_collection_disabled": configuration.idfaCollectionDisabled,
             "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
         ]

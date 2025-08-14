@@ -14,6 +14,7 @@ final class ProfileStorage: Sendable {
     private enum Constants {
         static let profileKey = "AdaptySDK_Purchaser_Info"
         static let profileIdKey = "AdaptySDK_Profile_Id"
+        static let appAccountTokenKey = "AdaptySDK_app_account_token"
         static let externalAnalyticsDisabledKey = "AdaptySDK_External_Analytics_Disabled"
         static let syncedTransactionsKey = "AdaptySDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "AdaptySDK_Apple_Search_Ads_Sync_Date"
@@ -30,6 +31,9 @@ final class ProfileStorage: Sendable {
         } else {
             createProfileId()
         }
+
+    static var appAccountToken: UUID? =
+        userDefaults.string(forKey: Constants.appAccountTokenKey).flatMap(UUID.init)
 
     private static func createProfileId() -> String {
         let identifier = UUID().uuidString.lowercased()
@@ -65,6 +69,20 @@ final class ProfileStorage: Sendable {
     }()
 
     var profileId: String { Self.profileId }
+
+    func getAppAccountToken() -> UUID? { Self.appAccountToken }
+
+    func setAppAccountToken(_ value: UUID?) {
+        guard Self.appAccountToken != value else { return }
+        Self.appAccountToken = value
+        if let value {
+            Self.userDefaults.set(value.uuidString, forKey: Constants.appAccountTokenKey)
+            log.debug("set appAccountToken = \(value).")
+        } else {
+            Self.userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
+            log.debug("clear appAccountToken")
+        }
+    }
 
     func getProfile() -> VH<AdaptyProfile>? { Self.profile }
 
@@ -151,6 +169,8 @@ final class ProfileStorage: Sendable {
             Self.profileId = createProfileId()
         }
 
+        userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
+        appAccountToken = nil
         userDefaults.removeObject(forKey: Constants.externalAnalyticsDisabledKey)
         externalAnalyticsDisabled = false
         userDefaults.removeObject(forKey: Constants.syncedTransactionsKey)
@@ -172,7 +192,7 @@ final class ProfileStorage: Sendable {
 }
 
 extension ProfileStorage {
-    func getProfile(profileId: String, withCustomerUserId customerUserId: String?) -> VH<AdaptyProfile>? {
+    func getProfile(withCustomerUserId customerUserId: String?) -> VH<AdaptyProfile>? {
         guard let profile = getProfile(),
               profile.value.profileId == profileId
         else { return nil }
