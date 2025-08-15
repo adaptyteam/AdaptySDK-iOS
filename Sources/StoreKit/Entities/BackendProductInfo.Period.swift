@@ -1,5 +1,5 @@
 //
-//  BackendProduct.Period.swift
+//  BackendProductInfo.Period.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 24.07.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension BackendProduct {
+package extension BackendProductInfo {
     enum Period: Sendable {
         case weekly
         case monthly
@@ -22,7 +22,7 @@ package extension BackendProduct {
     }
 }
 
-extension BackendProduct.Period {
+extension BackendProductInfo.Period {
     func expiresAt(startedAt: Date) -> Date? {
         let calendar = {
             var calendar = Calendar(identifier: .gregorian)
@@ -43,9 +43,9 @@ extension BackendProduct.Period {
     }
 }
 
-extension BackendProduct.Period: Hashable {}
+extension BackendProductInfo.Period: Hashable {}
 
-extension BackendProduct.Period: CustomStringConvertible {
+extension BackendProductInfo.Period: CustomStringConvertible {
     package init(rawValue: String) {
         self = switch rawValue {
         case "weekly": .weekly
@@ -80,7 +80,7 @@ extension BackendProduct.Period: CustomStringConvertible {
     package var description: String { rawValue }
 }
 
-extension BackendProduct.Period: Codable {
+extension BackendProductInfo.Period: Codable {
     package init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         try self.init(rawValue: container.decode(String.self))

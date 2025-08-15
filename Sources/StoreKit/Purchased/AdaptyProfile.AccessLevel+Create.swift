@@ -12,7 +12,7 @@ extension AdaptyProfile.AccessLevel {
     init?(
         sk2Transaction: SK2Transaction,
         sk2Product: SK2Product?,
-        backendPeriod: BackendProduct.Period?,
+        backendPeriod: BackendProductInfo.Period?,
         now: Date = Date()
     ) async {
         let productType = sk2Transaction.productType

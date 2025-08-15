@@ -12,7 +12,7 @@
 //    init(
 //        sk2Transaction: SK2Transaction,
 //        sk2Product: SK2Product?,
-//        backendPeriod: BackendProduct.Period?,
+//        productInfo: BackendProductInfo.Period?,
 //        now: Date = Date()
 //    ) {
 //        let isLifetime = backendPeriod == .lifetime

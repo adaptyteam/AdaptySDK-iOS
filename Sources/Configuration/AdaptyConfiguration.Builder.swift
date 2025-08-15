@@ -27,6 +27,7 @@ extension AdaptyConfiguration {
         self.init(
             apiKey: apiKey.trimmed,
             customerUserId: builder.customerUserId.trimmed.nonEmptyOrNil,
+            appAccountToken: builder.appAccountToken,
             observerMode: builder.observerMode ?? defaultValue.observerMode,
             idfaCollectionDisabled: builder.idfaCollectionDisabled ?? defaultValue.idfaCollectionDisabled,
             ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled ?? defaultValue.ipAddressCollectionDisabled,
@@ -49,6 +50,7 @@ extension AdaptyConfiguration {
         .init(
             apiKey: apiKey.trimmed,
             customerUserId: nil,
+            appAccountToken: nil,
             observerMode: nil,
             idfaCollectionDisabled: nil,
             ipAddressCollectionDisabled: nil,
@@ -69,6 +71,7 @@ public extension AdaptyConfiguration {
     final class Builder {
         public private(set) var apiKey: String
         public private(set) var customerUserId: String?
+        public private(set) var appAccountToken: UUID?
         public private(set) var observerMode: Bool?
         public private(set) var idfaCollectionDisabled: Bool?
         public private(set) var ipAddressCollectionDisabled: Bool?
@@ -88,6 +91,7 @@ public extension AdaptyConfiguration {
         init(
             apiKey: String,
             customerUserId: String?,
+            appAccountToken: UUID?,
             observerMode: Bool?,
             idfaCollectionDisabled: Bool?,
             ipAddressCollectionDisabled: Bool?,
@@ -103,6 +107,7 @@ public extension AdaptyConfiguration {
         ) {
             self.apiKey = apiKey
             self.customerUserId = customerUserId
+            self.appAccountToken = appAccountToken
             self.observerMode = observerMode
             self.idfaCollectionDisabled = idfaCollectionDisabled
             self.ipAddressCollectionDisabled = ipAddressCollectionDisabled
@@ -134,8 +139,9 @@ public extension AdaptyConfiguration.Builder {
 
     /// - Parameter customerUserId: User identifier in your system
     @discardableResult
-    func with(customerUserId id: String?) -> Self {
+    func with(customerUserId id: String?, withAppAccountToken token: UUID? = nil) -> Self {
         customerUserId = id
+        appAccountToken = id != nil ? token : nil
         return self
     }
 

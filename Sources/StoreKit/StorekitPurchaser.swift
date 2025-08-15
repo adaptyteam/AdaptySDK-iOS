@@ -10,8 +10,8 @@ import StoreKit
 protocol StorekitPurchaser: Actor, Sendable {
     func makePurchase(
         userId: AdaptyUserId,
-        product: AdaptyPaywallProduct,
-        parameters: AdaptyPurchaseParameters
+        appAccountToken: UUID?,
+        product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult
 }
 

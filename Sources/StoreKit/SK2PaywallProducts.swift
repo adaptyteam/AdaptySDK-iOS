@@ -21,13 +21,14 @@ extension Adapty {
         )
         .compactMap { sk2Product in
             let vendorId = sk2Product.id
-            guard let reference = paywall.products.first(where: { $0.backendProduct.vendorId == vendorId }) else {
+            guard let reference = paywall.products.first(where: { $0.productInfo.vendorId == vendorId }) else {
                 return nil
             }
 
             return AdaptySK2PaywallProductWithoutDeterminingOffer(
                 skProduct: sk2Product,
-                backendProduct: reference.backendProduct,
+                adaptyProductId: reference.adaptyProductId,
+                productInfo: reference.productInfo,
                 paywallProductIndex: reference.paywallProductIndex,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.placement.abTestName,
@@ -38,7 +39,8 @@ extension Adapty {
     }
 
     func getSK2PaywallProduct(
-        backendProduct: BackendProduct,
+        adaptyProductId: String,
+        productInfo: BackendProductInfo,
         paywallProductIndex: Int,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
@@ -47,7 +49,7 @@ extension Adapty {
         webPaywallBaseUrl: URL?,
         productsManager: SK2ProductsManager
     ) async throws(AdaptyError) -> AdaptySK2PaywallProduct {
-        let sk2Product = try await productsManager.fetchSK2Product(id: backendProduct.vendorId, fetchPolicy: .returnCacheDataElseLoad)
+        let sk2Product = try await productsManager.fetchSK2Product(id: productInfo.vendorId, fetchPolicy: .returnCacheDataElseLoad)
 
         let subscriptionOffer: AdaptySubscriptionOffer? =
             if let subscriptionOfferIdentifier {
@@ -62,7 +64,8 @@ extension Adapty {
 
         return AdaptySK2PaywallProduct(
             skProduct: sk2Product,
-            backendProduct: backendProduct,
+            adaptyProductId: adaptyProductId,
+            productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,
             subscriptionOffer: subscriptionOffer,
             variationId: variationId,
@@ -82,7 +85,7 @@ extension Adapty {
         )
         .compactMap { sk2Product in
             let vendorId = sk2Product.id
-            guard let reference = paywall.products.first(where: { $0.backendProduct.vendorId == vendorId }) else {
+            guard let reference = paywall.products.first(where: { $0.productInfo.vendorId == vendorId }) else {
                 return nil
             }
 
@@ -107,7 +110,8 @@ extension Adapty {
         return newProducts.map {
             AdaptySK2PaywallProduct(
                 skProduct: $0.product,
-                backendProduct: $0.reference.backendProduct,
+                adaptyProductId: $0.reference.adaptyProductId,
+                productInfo: $0.reference.productInfo,
                 paywallProductIndex: $0.reference.paywallProductIndex,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,

@@ -14,6 +14,7 @@ final class ProfileStorage {
     private enum Constants {
         static let profileKey = "AdaptySDK_Purchaser_Info"
         static let profileIdKey = "AdaptySDK_Profile_Id"
+        static let appAccountTokenKey = "AdaptySDK_app_account_token"
         static let externalAnalyticsDisabledKey = "AdaptySDK_External_Analytics_Disabled"
         static let syncedTransactionsKey = "AdaptySDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "AdaptySDK_Apple_Search_Ads_Sync_Date"
@@ -33,6 +34,9 @@ final class ProfileStorage {
         } else {
             createAnonymousUserId()
         }
+
+    static var appAccountToken: UUID? =
+        userDefaults.string(forKey: Constants.appAccountTokenKey).flatMap(UUID.init)
 
     private static func createAnonymousUserId() -> AdaptyUserId {
         let identifier = UUID().uuidString.lowercased()
@@ -71,6 +75,20 @@ final class ProfileStorage {
     }()
 
     var userId: AdaptyUserId { Self.userId }
+
+    func getAppAccountToken() -> UUID? { Self.appAccountToken }
+
+    func setAppAccountToken(_ value: UUID?) {
+        guard Self.appAccountToken != value else { return }
+        Self.appAccountToken = value
+        if let value {
+            Self.userDefaults.set(value.uuidString, forKey: Constants.appAccountTokenKey)
+            log.debug("set appAccountToken = \(value).")
+        } else {
+            Self.userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
+            log.debug("clear appAccountToken")
+        }
+    }
 
     func getProfile() -> VH<AdaptyProfile>? { Self.profile }
 
@@ -182,7 +200,7 @@ final class ProfileStorage {
 }
 
 extension ProfileStorage {
-    func getProfile(with customerUserId: String?) -> VH<AdaptyProfile>? {
+    func getProfile(withCustomerUserId customerUserId: String?) -> VH<AdaptyProfile>? {
         guard let profile = getProfile(),
               profile.isEqualProfileId(userId)
         else { return nil }

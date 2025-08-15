@@ -29,22 +29,20 @@ actor SK1QueueManager: Sendable {
 
     func makePurchase(
         userId: AdaptyUserId,
-        product: AdaptyPaywallProduct,
-        parameters: AdaptyPurchaseParameters
+        appAccountToken: UUID?,
+        product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard SKPaymentQueue.canMakePayments(),
-              let sk1Product = product.sk1Product
+              let product = product as? AdaptySK1PaywallProduct
         else {
             throw .cantMakePayments()
         }
 
-        let variationId = product.variationId
-
-        let payment = SKMutablePayment(product: sk1Product)
+        let payment = SKMutablePayment(product: product.skProduct)
 //        payment.simulatesAskToBuyInSandbox = true
 
-        if let uuid = parameters.appAccountToken.asUUID(userId: userId) {
-            payment.applicationUsername = uuid.uuidString
+        if let appAccountToken {
+            payment.applicationUsername = appAccountToken.uuidString.lowercased()
         }
 
         if let offer = product.subscriptionOffer {
@@ -69,13 +67,13 @@ actor SK1QueueManager: Sendable {
             }
         }
 
-        return try await addPayment(
-            payment,
-            for: sk1Product,
-            with: variationId
-        )
+        await productsManager.storeProductInfo(productInfo: [product.productInfo])
+        await storage.setPaywallVariationIds(product.variationId, for: product.vendorProductId)
+
+        return try await addPayment(payment, for: product.skProduct)
     }
 
+    @inlinable
     func makePurchase(
         product: AdaptyDeferredProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
@@ -85,11 +83,10 @@ actor SK1QueueManager: Sendable {
     @inlinable
     func addPayment(
         _ payment: SKPayment,
-        for underlying: SK1Product,
-        with variationId: String? = nil
+        for sk1Product: SK1Product
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withCheckedThrowingContinuation_ { continuation in
-            addPayment(payment, for: underlying, with: variationId) { result in
+            addPayment(payment, for: sk1Product) { result in
                 continuation.resume(with: result)
             }
         }
@@ -97,13 +94,12 @@ actor SK1QueueManager: Sendable {
 
     private func addPayment(
         _ payment: SKPayment,
-        for underlying: SK1Product,
-        with variationId: String? = nil,
+        for sk1Product: SK1Product,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         let productId = payment.productIdentifier
 
-        makePurchasesProduct[productId] = underlying
+        makePurchasesProduct[productId] = sk1Product
 
         if let handlers = makePurchasesCompletionHandlers[productId] {
             makePurchasesCompletionHandlers[productId] = handlers + [completion]
@@ -113,17 +109,15 @@ actor SK1QueueManager: Sendable {
         makePurchasesCompletionHandlers[productId] = [completion]
 
         Task {
-            await storage.setPaywallVariationIds(variationId, for: productId)
-
             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                 methodName: .addPayment,
                 params: [
                     "product_id": productId,
                 ]
             ))
-
-            SKPaymentQueue.default().add(payment)
         }
+
+        SKPaymentQueue.default().add(payment)
     }
 
     fileprivate func updatedTransactions(_ transactions: [SKPaymentTransaction]) async {

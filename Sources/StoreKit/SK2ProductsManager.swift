@@ -12,13 +12,13 @@ private let log = Log.sk2ProductManager
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2ProductsManager {
     private let apiKeyPrefix: String
-    private let storage: BackendProductStorage
+    private let storage: BackendProductInfoStorage
     private let session: Backend.MainExecutor
 
     private var products = [String: SK2Product]()
     private let sk2ProductsFetcher = SK2ProductFetcher()
 
-    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductStorage) {
+    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductInfoStorage) {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
         self.storage = storage
@@ -33,13 +33,17 @@ actor SK2ProductsManager {
         fetchingAllProducts = false
     }
 
+    func storeProductInfo(productInfo: [BackendProductInfo]) async {
+        await storage.set(productInfo: productInfo)
+    }
+    
     private func fetchAllProducts() async {
         guard !fetchingAllProducts else { return }
         fetchingAllProducts = true
 
         do {
-            let response = try await session.fetchAllProductVendorIds(apiKeyPrefix: apiKeyPrefix)
-            await storage.set(productVendorIds: response)
+            let response = try await session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
+            await storage.set(allProductInfo: response)
         } catch {
             guard !error.isCancelled else { return }
             Task.detached(priority: .utility) { [weak self] in

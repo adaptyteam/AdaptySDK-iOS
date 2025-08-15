@@ -66,7 +66,7 @@ enum APIRequestName: String {
 
     case fetchEventsConfig = "get_events_blacklist"
 
-    case fetchAllProductVendorIds = "get_products_ids"
+    case fetchAllProductInfo = "get_all_products_info"
     
     case reqisterInstall = "reqister_install"
 }

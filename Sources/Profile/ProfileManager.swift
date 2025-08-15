@@ -116,7 +116,7 @@ private extension Adapty {
         let response: VH<AdaptyProfile?>
         do {
             response = try await httpSession.syncProfile(
-                userId: old.value.userId,
+                userId: old.userId,
                 parameters: params,
                 environmentMeta: meta,
                 responseHash: old.hash
@@ -125,7 +125,7 @@ private extension Adapty {
             throw error.asAdaptyError
         }
 
-        if let manager = try profileManager(withProfileId: old.value.userId) {
+        if let manager = try profileManager(withProfileId: old.userId) {
             if let meta {
                 manager.onceSentEnvironment = meta.sentEnvironment
             }

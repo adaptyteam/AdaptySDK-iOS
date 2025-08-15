@@ -17,8 +17,7 @@ public extension Adapty {
     /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func makePurchase(
-        product: AdaptyPaywallProduct,
-        parameters: AdaptyPurchaseParameters = .default
+        product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
@@ -26,15 +25,21 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
-                "app_account_token": parameters.appAccountToken.description,
             ]
         ) { sdk throws(AdaptyError) in
             guard let purchaser = sdk.purchaser else { throw .cantMakePayments() }
 
+            let appAccountToken: UUID? =
+                if let customerUserId = sdk.userId?.customerId {
+                    sdk.profileStorage.getAppAccountToken() ?? UUID(uuidString: customerUserId)
+                } else {
+                    nil
+                }
+
             return try await purchaser.makePurchase(
                 userId: sdk.profileStorage.userId,
-                product: product,
-                parameters: parameters
+                appAccountToken: appAccountToken,
+                product: product
             )
         }
     }

@@ -10,7 +10,8 @@ import Foundation
 extension AdaptyPaywall {
     struct ProductReference: Sendable, Hashable {
         let paywallProductIndex: Int
-        let backendProduct: BackendProduct
+        let adaptyProductId: String
+        let productInfo: BackendProductInfo
         let promotionalOfferId: String?
         let winBackOfferId: String?
     }
@@ -18,7 +19,7 @@ extension AdaptyPaywall {
 
 extension AdaptyPaywall.ProductReference: CustomStringConvertible {
     public var description: String {
-        "(vendorId: \(backendProduct.vendorId), adaptyProductId: \(backendProduct.adaptyId), promotionalOfferId: \(promotionalOfferId ?? "nil")))"
+        "(vendorId: \(productInfo.vendorId), adaptyProductId: \(adaptyProductId), promotionalOfferId: \(promotionalOfferId ?? "nil")))"
     }
 }
 
@@ -36,12 +37,11 @@ extension AdaptyPaywall.ProductReference: Encodable {
     init(from container: KeyedDecodingContainer<CodingKeys>, index: Int) throws {
         self.paywallProductIndex = index
         self.winBackOfferId = try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
-
-        self.backendProduct = try BackendProduct(
-            adaptyId: container.decode(String.self, forKey: .adaptyProductId),
+        self.adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
+        self.productInfo = try BackendProductInfo(
             vendorId: container.decode(String.self, forKey: .vendorId),
             accessLevelId: container.decode(String.self, forKey: .accessLevelId),
-            period: container.decode(BackendProduct.Period.self, forKey: .backendProductPeriod)
+            period: container.decode(BackendProductInfo.Period.self, forKey: .backendProductPeriod)
         )
         self.promotionalOfferId =
             if (try? container.decode(Bool.self, forKey: .promotionalOfferEligibility)) ?? true {
@@ -53,11 +53,11 @@ extension AdaptyPaywall.ProductReference: Encodable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(backendProduct.vendorId, forKey: .vendorId)
-        try container.encode(backendProduct.adaptyId, forKey: .adaptyProductId)
+        try container.encode(productInfo.vendorId, forKey: .vendorId)
+        try container.encode(adaptyProductId, forKey: .adaptyProductId)
         try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
         try container.encodeIfPresent(winBackOfferId, forKey: .winBackOfferId)
-        try container.encode(backendProduct.accessLevelId, forKey: .accessLevelId)
-        try container.encode(backendProduct.period, forKey: .backendProductPeriod)
+        try container.encode(productInfo.accessLevelId, forKey: .accessLevelId)
+        try container.encode(productInfo.period, forKey: .backendProductPeriod)
     }
 }

@@ -9,11 +9,12 @@ import StoreKit
 
 struct AdaptySK1PaywallProduct: AdaptySK1Product, AdaptyPaywallProduct, WebPaywallURLProviding {
     let skProduct: SK1Product
-    let backendProduct: BackendProduct
 
-    public var adaptyProductId: String { backendProduct.adaptyId }
-    public var accessLevelId: String { backendProduct.accessLevelId }
-    public var adaptyProductType: String { backendProduct.period.rawValue }
+    public let adaptyProductId: String
+
+    let productInfo: BackendProductInfo
+    public var accessLevelId: String { productInfo.accessLevelId }
+    public var adaptyProductType: String { productInfo.period.rawValue }
 
     public let paywallProductIndex: Int
 
@@ -31,17 +32,18 @@ struct AdaptySK1PaywallProduct: AdaptySK1Product, AdaptyPaywallProduct, WebPaywa
     let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(product: \(backendProduct), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
+        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
     }
 }
 
 struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, AdaptyPaywallProductWithoutDeterminingOffer, WebPaywallURLProviding {
     let skProduct: SK1Product
-    let backendProduct: BackendProduct
 
-    public var adaptyProductId: String { backendProduct.adaptyId }
-    public var accessLevelId: String { backendProduct.accessLevelId }
-    public var adaptyProductType: String { backendProduct.period.rawValue }
+    public let adaptyProductId: String
+
+    let productInfo: BackendProductInfo
+    public var accessLevelId: String { productInfo.accessLevelId }
+    public var adaptyProductType: String { productInfo.period.rawValue }
 
     public let paywallProductIndex: Int
 
@@ -57,6 +59,6 @@ struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, AdaptyP
     let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(product: \(backendProduct), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
+        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
     }
 }

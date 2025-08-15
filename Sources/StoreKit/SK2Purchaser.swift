@@ -13,10 +13,16 @@ private let log = Log.sk2TransactionManager
 actor SK2Purchaser {
     private let purchaseValidator: PurchaseValidator
     private let storage: VariationIdStorage
+    private let sk2ProductManager: SK2ProductsManager
 
-    private init(purchaseValidator: PurchaseValidator, storage: VariationIdStorage) {
+    private init(
+        purchaseValidator: PurchaseValidator,
+        storage: VariationIdStorage,
+        sk2ProductManager: SK2ProductsManager
+    ) {
         self.purchaseValidator = purchaseValidator
         self.storage = storage
+        self.sk2ProductManager = sk2ProductManager
     }
 
     @AdaptyActor
@@ -75,16 +81,17 @@ actor SK2Purchaser {
 
         return SK2Purchaser(
             purchaseValidator: purchaseValidator,
-            storage: storage
+            storage: storage,
+            sk2ProductManager: sk2ProductsManager
         )
     }
 
     func makePurchase(
         userId: AdaptyUserId,
-        product: AdaptyPaywallProduct,
-        parameters: AdaptyPurchaseParameters
+        appAccountToken: UUID?,
+        product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        guard let sk2Product = product.sk2Product else {
+        guard let product = product as? AdaptySK2PaywallProduct else {
             throw .cantMakePayments()
         }
 
@@ -92,7 +99,7 @@ actor SK2Purchaser {
 
         // options.insert(.simulatesAskToBuyInSandbox(true))
 
-        if let uuid = parameters.appAccountToken.asUUID(userId: userId) {
+        if let uuid = appAccountToken {
             options.insert(.appAccountToken(uuid))
         }
 
@@ -117,7 +124,7 @@ actor SK2Purchaser {
 
             case let .winBack(offerId):
                 if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                   let winBackOffer = sk2Product.sk2ProductSubscriptionOffer(by: .winBack(offerId))
+                   let winBackOffer = product.skProduct.sk2ProductSubscriptionOffer(by: .winBack(offerId))
                 {
                     options.insert(.winBackOffer(winBackOffer))
                 } else {
@@ -129,26 +136,18 @@ actor SK2Purchaser {
             }
         }
 
-        await storage.setPaywallVariationIds(product.variationId, for: sk2Product.id)
+        await sk2ProductManager.storeProductInfo(productInfo: [product.productInfo])
+        await storage.setPaywallVariationIds(product.variationId, for: product.vendorProductId)
         let payload = PurchasePayload(
             paywallVariationId: product.variationId,
             persistentPaywallVariationId: product.variationId,
             persistentOnboardingVariationId: await storage.getOnboardingVariationId()
         )
-        let result = try await makePurchase(sk2Product, options, payload)
-
-        switch result {
-        case .pending:
-            break
-        default:
-            storage.removePaywallVariationIds(for: sk2Product.id)
-        }
-
-        return result
+        return try await makePurchase1(product.skProduct, options, payload)
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    private func makePurchase(
+    private func makePurchase1(
         _ sk2Product: SK2Product,
         _ options: Set<Product.PurchaseOption>,
         _ payload: PurchasePayload?
@@ -250,6 +249,8 @@ actor SK2Purchaser {
                 methodName: .finishTransaction,
                 params: sk2Transaction.logParams
             ))
+
+            storage.removePaywallVariationIds(for: sk2Product.id)
 
             log.info("Successfully purchased product: \(sk2Product.id) with transaction: \(sk2Transaction)")
             return .success(profile: response.value, transaction: sk2SignedTransaction)

@@ -72,10 +72,11 @@ public extension Adapty {
     ///   - completion: Result callback.
     nonisolated static func identify(
         _ customerUserId: String,
+        withAppAccountToken appAccountToken: UUID? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await identify(customerUserId)
+            try await identify(customerUserId, withAppAccountToken: appAccountToken)
         }
     }
 
@@ -299,11 +300,10 @@ public extension Adapty {
     ///   - completion: A result containing the ``AdaptyPurchaseResult`` object.
     nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
-        parameters: AdaptyPurchaseParameters = .default,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await makePurchase(product: product, parameters: parameters)
+            try await makePurchase(product: product)
         }
     }
 

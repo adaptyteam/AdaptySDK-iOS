@@ -8,6 +8,7 @@
 import StoreKit
 
 protocol StoreKitProductsManager: Actor, Sendable {
+    func storeProductInfo(productInfo: [BackendProductInfo]) async
     func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy) async throws(AdaptyError) -> AdaptyProduct?
 }
 

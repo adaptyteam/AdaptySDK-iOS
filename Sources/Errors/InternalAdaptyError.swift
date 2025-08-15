@@ -52,7 +52,7 @@ extension InternalAdaptyError {
         switch self {
         case let .unknown(src, _, _),
              let .activateOnceError(src),
-            let .unidentifiedUserLogout(src),
+             let .unidentifiedUserLogout(src),
              let .cantMakePayments(src),
              let .notActivated(src),
              let .profileWasChanged(src),

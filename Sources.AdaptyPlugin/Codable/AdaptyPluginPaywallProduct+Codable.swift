@@ -10,7 +10,8 @@ import Foundation
 
 extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
-        let backendProduct: BackendProduct
+        let adaptyProductId: String
+        let productInfo: BackendProductInfo
         let paywallProductIndex: Int
         let subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
         let variationId: String
@@ -20,11 +21,11 @@ extension Request {
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            backendProduct = try BackendProduct(
-                adaptyId: container.decode(String.self, forKey: .adaptyProductId),
+            adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
+            productInfo = try BackendProductInfo(
                 vendorId: container.decode(String.self, forKey: .vendorProductId),
                 accessLevelId: container.decode(String.self, forKey: .accessLevelId),
-                period: BackendProduct.Period(rawValue: container.decode(String.self, forKey: .adaptyProductType))
+                period: BackendProductInfo.Period(rawValue: container.decode(String.self, forKey: .adaptyProductType))
             )
             paywallProductIndex = try container.decode(Int.self, forKey: .paywallProductIndex)
             subscriptionOfferIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOfferIdentifier)

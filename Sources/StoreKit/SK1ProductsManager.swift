@@ -11,13 +11,13 @@ private let log = Log.sk1ProductManager
 
 actor SK1ProductsManager {
     private let apiKeyPrefix: String
-    private let storage: BackendProductStorage
+    private let storage: BackendProductInfoStorage
     private let session: Backend.MainExecutor
 
     private var products = [String: SK1Product]()
     private let sk1ProductsFetcher = SK1ProductFetcher()
 
-    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductStorage) {
+    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductInfoStorage) {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
         self.storage = storage
@@ -29,13 +29,17 @@ actor SK1ProductsManager {
         fetchingAllProducts = false
     }
 
+    func storeProductInfo(productInfo: [BackendProductInfo]) async {
+        await storage.set(productInfo: productInfo)
+    }
+
     private func fetchAllProducts() async {
         guard !fetchingAllProducts else { return }
         fetchingAllProducts = true
 
         do {
-            let response = try await session.fetchAllProductVendorIds(apiKeyPrefix: apiKeyPrefix)
-            await storage.set(productVendorIds: response)
+            let response = try await session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
+            await storage.set(allProductInfo: response)
         } catch {
             guard !error.isCancelled else { return }
             Task.detached(priority: .utility) { [weak self] in
