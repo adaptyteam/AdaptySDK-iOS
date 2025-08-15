@@ -72,10 +72,11 @@ public extension Adapty {
     ///   - completion: Result callback.
     nonisolated static func identify(
         _ customerUserId: String,
+        withAppAccountToken appAccountToken: UUID? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await identify(customerUserId)
+            try await identify(customerUserId, withAppAccountToken: appAccountToken)
         }
     }
 

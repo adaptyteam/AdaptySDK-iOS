@@ -25,6 +25,7 @@ actor SK1QueueManager: Sendable {
 
     func makePurchase(
         profileId: String,
+        appAccountToken: UUID?,
         product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         guard SKPaymentQueue.canMakePayments() else {
@@ -37,15 +38,16 @@ actor SK1QueueManager: Sendable {
 
         let variationId = product.variationId
 
-        let payment: SKPayment
+        var payment = SKMutablePayment(product: sk1Product)
 
-        switch product.subscriptionOffer {
-        case .none:
-            payment = SKPayment(product: sk1Product)
-        case let .some(offer):
+        if let appAccountToken {
+            payment.applicationUsername = appAccountToken.uuidString.lowercased()
+        }
+
+        if let offer = product.subscriptionOffer {
             switch offer.offerIdentifier {
             case .introductory:
-                payment = SKPayment(product: sk1Product)
+                break
             case .winBack:
                 throw StoreKitManagerError.invalidOffer("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
             case let .promotional(offerId):
@@ -55,16 +57,10 @@ actor SK1QueueManager: Sendable {
                     offerId: offerId
                 )
 
-                payment = {
-                    let payment = SKMutablePayment(product: sk1Product)
-                    payment.applicationUsername = ""
-                    payment.paymentDiscount = SK1PaymentDiscount(
-                        offerId: offerId,
-                        signature: response
-                    )
-
-                    return payment
-                }()
+                payment.paymentDiscount = SK1PaymentDiscount(
+                    offerId: offerId,
+                    signature: response
+                )
             }
         }
 

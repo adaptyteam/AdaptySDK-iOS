@@ -55,10 +55,7 @@ public final class Adapty: Sendable {
             self.sk1QueueManager = nil
         }
 
-        self.sharedProfileManager = restoreProfileManager(
-            profileId: profileStorage.profileId,
-            customerUserId: configuration.customerUserId
-        )
+        self.sharedProfileManager = restoreProfileManager(configuration)
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             if !observerMode {
@@ -95,30 +92,41 @@ public final class Adapty: Sendable {
     fileprivate var sharedProfileManager: ProfileManager.Shared?
 
     private func restoreProfileManager(
-        profileId: String,
-        customerUserId: String?
+        _ configuration: AdaptyConfiguration
     ) -> ProfileManager.Shared {
-        if let profile = profileStorage.getProfile(
-            profileId: profileId,
-            withCustomerUserId: customerUserId
-        ) {
-            .current(
-                ProfileManager(storage: profileStorage, profile: profile, sentEnvironment: .none)
-            )
-        } else {
-            .creating(
-                profileId: profileId,
-                withCustomerUserId: customerUserId,
-                task: Task {
-                    try await createNewProfileOnServer(profileId, customerUserId)
-                }
-            )
+        let profileId = profileStorage.profileId
+        let customerUserId = configuration.customerUserId
+        let appAccountToken = customerUserId != nil ? configuration.appAccountToken : nil
+        let oldAppAccountToken = profileStorage.getAppAccountToken()
+        profileStorage.setAppAccountToken(appAccountToken)
+
+        if let profile = profileStorage.getProfile(withCustomerUserId: customerUserId) {
+            guard let appAccountToken, appAccountToken != oldAppAccountToken else {
+                return .current(.init(
+                    storage: profileStorage,
+                    profile: profile,
+                    sentEnvironment: .none
+                ))
+            }
         }
+
+        return .creating(
+            profileId: profileId,
+            withCustomerUserId: customerUserId,
+            task: Task {
+                try await createNewProfileOnServer(
+                    profileId,
+                    customerUserId,
+                    appAccountToken
+                )
+            }
+        )
     }
 
     private func createNewProfileOnServer(
         _ profileId: String,
-        _ customerUserId: String?
+        _ customerUserId: String?,
+        _ appAccountToken: UUID?
     ) async throws(AdaptyError) -> ProfileManager {
         var isFirstLoop = true
 
@@ -141,19 +149,19 @@ public final class Adapty: Sendable {
                     response = try await httpSession.createProfile(
                         profileId: profileId,
                         customerUserId: customerUserId,
+                        appAccountToken: appAccountToken,
                         parameters: AdaptyProfileParameters(analyticsDisabled: analyticsDisabled),
                         environmentMeta: meta
                     )
                     createdProfile = response
                 }
 
-                guard profileId != response.value.profileId else {
-                    return (response, CrossPlacementState.defaultForNewUser)
+                var crossPlacementState = CrossPlacementState.defaultForNewUser
+                if profileId != response.value.profileId {
+                    crossPlacementState = try await httpSession.fetchCrossPlacementState(
+                        profileId: response.value.profileId
+                    )
                 }
-
-                let newProfileId = response.value.profileId
-                let crossPlacementState = try await httpSession.fetchCrossPlacementState(profileId: newProfileId)
-
                 return (response, crossPlacementState)
             }.result
 
@@ -173,16 +181,13 @@ public final class Adapty: Sendable {
                 profileStorage.setSyncedTransactions(false)
                 profileStorage.setProfile(createdProfile)
 
-                Log.crossAB.verbose("createProfile version = \(crossPlacementState.version), value = \(crossPlacementState.variationIdByPlacements)")
-
-                profileStorage.setCrossPlacementState(crossPlacementState)
-
                 let manager = ProfileManager(
                     storage: profileStorage,
                     profile: createdProfile,
                     sentEnvironment: meta.sentEnvironment
                 )
                 sharedProfileManager = .current(manager)
+                manager.saveCrossPlacementState(crossPlacementState)
                 return manager
 
             case .failure:
@@ -198,26 +203,38 @@ public final class Adapty: Sendable {
 }
 
 extension Adapty {
-    func identify(toCustomerUserId newCustomerUserId: String) async throws(AdaptyError) {
-        let profileId: String
+    func identify(
+        toCustomerUserId newCustomerUserId: String,
+        withAppAccountToken newAppAccountToken: UUID?
+    ) async throws(AdaptyError) {
+        let oldAppAccountToken = profileStorage.getAppAccountToken()
+        profileStorage.setAppAccountToken(newAppAccountToken)
+
         switch sharedProfileManager {
         case .none:
-            profileId = profileStorage.profileId
+            break
+
         case let .current(manager):
-            guard manager.profile.value.customerUserId != newCustomerUserId else {
-                return
+            if manager.profile.value.customerUserId == newCustomerUserId {
+                guard let newAppAccountToken, newAppAccountToken != oldAppAccountToken else {
+                    return
+                }
             }
-            profileId = manager.profileId
-        case let .creating(id, customerUserId, task):
-            guard customerUserId != newCustomerUserId else {
-                _ = try await task.profileManager
-                return
+
+        case let .creating(_, customerUserId, task):
+            if customerUserId == newCustomerUserId {
+                guard let newAppAccountToken, newAppAccountToken != oldAppAccountToken else {
+                    _ = try await task.profileManager
+                    return
+                }
             }
-            profileId = id
+
             task.cancel()
         }
 
-        let task = Task { try await createNewProfileOnServer(profileId, newCustomerUserId) }
+        let profileId = profileStorage.profileId
+
+        let task = Task { try await createNewProfileOnServer(profileId, newCustomerUserId, newAppAccountToken) }
         sharedProfileManager = .creating(
             profileId: profileId,
             withCustomerUserId: newCustomerUserId,
@@ -228,7 +245,18 @@ extension Adapty {
     }
 
     func logout() async throws(AdaptyError) {
-        if case let .creating(_, _, task) = sharedProfileManager {
+        switch sharedProfileManager {
+        case .none:
+            break
+        case let .current(manager):
+            if manager.profile.value.customerUserId == nil {
+                throw AdaptyError.unidentifiedUserLogout()
+            }
+        case let .creating(_, customerUserId, task):
+            if customerUserId == nil {
+                _ = try await task.profileManager
+                return
+            }
             task.cancel()
         }
 
@@ -236,7 +264,7 @@ extension Adapty {
 
         let profileId = profileStorage.profileId
 
-        let task = Task { try await createNewProfileOnServer(profileId, nil) }
+        let task = Task { try await createNewProfileOnServer(profileId, nil, nil) }
         sharedProfileManager = .creating(
             profileId: profileId,
             withCustomerUserId: nil,
@@ -269,6 +297,17 @@ private extension Task where Success == ProfileManager {
 }
 
 extension Adapty {
+    var customerUserId: String? {
+        switch sharedProfileManager {
+        case .none:
+            return nil
+        case let .current(manager):
+            return manager.profile.value.customerUserId
+        case let .creating(_, customerUserId, _):
+            return customerUserId
+        }
+    }
+
     var profileManager: ProfileManager? {
         if case let .current(manager) = sharedProfileManager {
             manager

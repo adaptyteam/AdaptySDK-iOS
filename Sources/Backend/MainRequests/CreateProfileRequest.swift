@@ -17,11 +17,13 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     let profileId: String
     let parameters: AdaptyProfileParameters?
     let customerUserId: String?
+    let appAccountToken: UUID?
     let environmentMeta: Environment.Meta
 
     init(
         profileId: String,
         customerUserId: String?,
+        appAccountToken: UUID?,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta
     ) {
@@ -34,11 +36,13 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         self.profileId = profileId
         self.parameters = parameters
         self.customerUserId = customerUserId
+        self.appAccountToken = appAccountToken
         self.environmentMeta = environmentMeta
     }
 
     enum CodingKeys: String, CodingKey {
         case customerUserId = "customer_user_id"
+        case appAccountToken = "store_account_token"
         case environmentMeta = "installation_meta"
         case storeCountry = "store_country"
         case ipV4Address = "ip_v4_address"
@@ -57,6 +61,7 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
 
         try attributesObject.encodeIfPresent(customerUserId, forKey: .customerUserId)
+        try attributesObject.encodeIfPresent(appAccountToken?.uuidString.lowercased(), forKey: .appAccountToken)
         try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
         if parameters?.storeCountry == nil {
             try attributesObject.encodeIfPresent(environmentMeta.storefront?.countryCode, forKey: .storeCountry)
@@ -75,12 +80,14 @@ extension Backend.MainExecutor {
     func createProfile(
         profileId: String,
         customerUserId: String?,
+        appAccountToken: UUID?,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = CreateProfileRequest(
             profileId: profileId,
             customerUserId: customerUserId,
+            appAccountToken: appAccountToken,
             parameters: parameters,
             environmentMeta: environmentMeta
         )
@@ -88,7 +95,10 @@ extension Backend.MainExecutor {
         let response = try await perform(
             request,
             requestName: .createProfile,
-            logParams: ["has_customer_user_id": customerUserId != nil]
+            logParams: [
+                "customer_user_id": customerUserId,
+                "app_account_token": appAccountToken?.uuidString
+            ]
         )
 
         return VH(response.body.value, hash: response.headers.getBackendResponseHash())
