@@ -103,7 +103,7 @@ public final class Adapty {
         let oldAppAccountToken = profileStorage.getAppAccountToken()
         profileStorage.setAppAccountToken(appAccountToken)
 
-        if let profile = profileStorage.getProfile(withCustomerUserId: configuration.customerUserId) {
+        if let profile = profileStorage.getProfile(withCustomerUserId: customerUserId) {
             guard let appAccountToken, appAccountToken != oldAppAccountToken else {
                 return .current(.init(
                     storage: profileStorage,
@@ -114,13 +114,16 @@ public final class Adapty {
         }
 
         let newUserId = AdaptyUserId(
-            profileId: profileStorage.profileId,
-            customerId: configuration.customerUserId
+            profileId: profileId,
+            customerId: customerUserId
         )
         return .creating(
             userId: newUserId,
             task: Task {
-                try await createNewProfileOnServer(newUserId, appAccountToken)
+                try await createNewProfileOnServer(
+                    newUserId,
+                    appAccountToken
+                )
             }
         )
     }
@@ -224,7 +227,6 @@ extension Adapty {
                     return
                 }
             }
-
             task.cancel()
         }
 
@@ -249,7 +251,7 @@ extension Adapty {
             break
         case let .current(manager):
             if manager.userId.isAnonymous {
-                throw AdaptyError.unidentifiedUserLogout()
+                throw .unidentifiedUserLogout()
             }
         case let .creating(userId, task):
             if userId.isAnonymous {

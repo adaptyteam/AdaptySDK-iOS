@@ -29,7 +29,7 @@ extension InternalAdaptyError: CustomStringConvertible {
             "AdaptyError.unknown(\(source), \(description), \(error))"
         case let .activateOnceError(source):
             "AdaptyError.activateOnceError(\(source))"
-        case let .unidentifiedUserLogout(soure):
+        case let .unidentifiedUserLogout(source):
             "AdaptyError.unidentifiedUserLogout(\(source))"
         case let .cantMakePayments(source):
             "AdaptyError.cantMakePayments(\(source))"

@@ -937,7 +937,7 @@ $defs:
     properties:
       api_key: { type: string }
       customer_user_id: { type: string }
-      app_account_token: { $ref: "#/$defs/UUID" }
+      app_account_token: { $ref: "#/$defs/UUID" , description: "used only if customer_user_id is not null"}
       observer_mode: { type: boolean, default: false }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }

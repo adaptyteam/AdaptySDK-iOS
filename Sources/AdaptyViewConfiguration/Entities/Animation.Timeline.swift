@@ -16,7 +16,7 @@ package extension AdaptyViewConfiguration.Animation {
             loop: nil,
             loopDelay: 0.0,
             pingPongDelay: 0.0,
-            loopCount: nil,
+            loopCount: nil
         )
         package let duration: TimeInterval
         package let interpolator: Interpolator

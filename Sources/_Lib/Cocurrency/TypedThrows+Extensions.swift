@@ -37,7 +37,7 @@ struct CheckedContinuationWrapper<T, E>: Sendable where E: Error {
     }
 }
 
-func withCheckedThrowingContinuation_<T, E>(
+func withCheckedThrowingContinuation_<T: Sendable, E>(
     isolation: isolated (any Actor)? = #isolation,
     function: String = #function,
     _ body: (CheckedContinuationWrapper<T, E>) -> Void

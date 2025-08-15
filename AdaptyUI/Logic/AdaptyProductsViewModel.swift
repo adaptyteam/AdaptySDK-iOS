@@ -115,13 +115,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
                 self.productsLoadingInProgress = false
-
-                if self.eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) {
-                    Task {
-                        try await Task.sleep(seconds: 2)
-                        self.loadProductsIfNeeded()
-                    }
-                }
+                self.retryLoadingProductsIfNeeded(error: error)
             }
         }
     }
@@ -153,13 +147,21 @@ package final class AdaptyProductsViewModel: ObservableObject {
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
                 self.productsLoadingInProgress = false
+                self.retryLoadingProductsIfNeeded(error: error)
+            }
+        }
+    }
 
-                if self.eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) {
-                    Task {
-                        try await Task.sleep(seconds: 2)
-                        self.loadProductsIfNeeded()
-                    }
-                }
+    private func retryLoadingProductsIfNeeded(error: Error) {
+        guard eventsHandler.event_didFailLoadingProducts(with: error.asAdaptyError) else { return }
+        
+        Task { [weak self] in
+            guard let self else { return }
+
+            try await Task.sleep(seconds: 2)
+
+            if self.eventsHandler.presentationState == .appeared {
+                self.loadProductsIfNeeded()
             }
         }
     }

@@ -180,6 +180,8 @@ final class ProfileStorage {
             profile = nil
         }
 
+        userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
+        appAccountToken = nil
         userDefaults.removeObject(forKey: Constants.externalAnalyticsDisabledKey)
         externalAnalyticsDisabled = false
         userDefaults.removeObject(forKey: Constants.syncedTransactionsKey)

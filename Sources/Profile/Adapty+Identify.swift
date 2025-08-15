@@ -20,7 +20,7 @@ public extension Adapty {
     ) async throws(AdaptyError) {
         let customerUserId = customerUserId.trimmed
         // TODO: throw error if customerUserId isEmpty
-        
+
         try await withActivatedSDK(methodName: .identify, logParams: [
             "customerUserId": customerUserId,
             "app_account_token": appAccountToken?.uuidString
