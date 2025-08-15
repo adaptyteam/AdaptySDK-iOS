@@ -19,6 +19,7 @@ extension WKWebView {
         config.mediaTypesRequiringUserActionForPlayback = []
 
         let webView = WKWebView(frame: .zero, configuration: config)
+        webView.isInspectable = true
 
         return webView
     }
