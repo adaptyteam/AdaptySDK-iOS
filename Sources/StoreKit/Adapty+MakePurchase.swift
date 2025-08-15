@@ -27,11 +27,19 @@ public extension Adapty {
                 "product_id": product.vendorProductId,
             ]
         ) { sdk throws(AdaptyError) in
+            let appAccountToken: UUID? =
+                if let customerUserId = sdk.customerUserId {
+                    sdk.profileStorage.getAppAccountToken() ?? UUID(uuidString: customerUserId)
+                } else {
+                    nil
+                }
+
             guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
                 guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
 
                 return try await manager.makePurchase(
                     profileId: sdk.profileStorage.profileId,
+                    appAccountToken: appAccountToken,
                     product: product
                 )
             }
@@ -40,6 +48,7 @@ public extension Adapty {
 
             return try await manager.makePurchase(
                 profileId: sdk.profileStorage.profileId,
+                appAccountToken: appAccountToken,
                 product: product
             )
         }
@@ -53,7 +62,9 @@ public extension Adapty {
     ///   - product: a ``AdaptyDeferredProduct`` object retrieved from the delegate.
     /// - Returns: The ``AdaptyPurchaseResult`` object.
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func makePurchase(product: AdaptyDeferredProduct) async throws(AdaptyError) -> AdaptyPurchaseResult {
+    nonisolated static func makePurchase(
+        product: AdaptyDeferredProduct
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePurchase,
             logParams: [

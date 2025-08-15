@@ -96,6 +96,8 @@ public extension AdaptyError {
         /// The user profile was changed during the operation.
         case profileWasChanged = 3006
         case unsupportedData = 3007
+        /// It is not possible to call `.logout` method for  unidentified user.
+        case unidentifiedUserLogout = 3020
         case fetchTimeoutError = 3101
 
         case operationInterrupted = 9000

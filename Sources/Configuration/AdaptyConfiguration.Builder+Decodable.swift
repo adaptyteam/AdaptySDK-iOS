@@ -11,6 +11,7 @@ extension AdaptyConfiguration.Builder: Decodable {
     private enum CodingKeys: String, CodingKey {
         case apiKey = "api_key"
         case customerUserId = "customer_user_id"
+        case appAccountToken = "app_account_token"
         case observerMode = "observer_mode"
         case idfaCollectionDisabled = "apple_idfa_collection_disabled"
         case ipAddressCollectionDisabled = "ip_address_collection_disabled"
@@ -52,6 +53,7 @@ extension AdaptyConfiguration.Builder: Decodable {
         try self.init(
             apiKey: container.decode(String.self, forKey: .apiKey),
             customerUserId: container.decodeIfPresent(String.self, forKey: .customerUserId),
+            appAccountToken: container.decodeIfPresent(UUID.self, forKey: .appAccountToken),
             observerMode: container.decodeIfPresent(Bool.self, forKey: .observerMode),
             idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled),
             ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),

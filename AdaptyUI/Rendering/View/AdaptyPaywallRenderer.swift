@@ -43,7 +43,7 @@ struct AdaptyPaywallRendererView: View {
         if let template = VC.Template(rawValue: viewConfiguration.templateId) {
             ZStack(alignment: .bottom) {
                 templateResolverView(template, screen: viewConfiguration.screen)
-                    .decorate(with: viewConfiguration.screen.background)
+                    .staticBackground(viewConfiguration.screen.background)
 
                 Color.black
                     .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)

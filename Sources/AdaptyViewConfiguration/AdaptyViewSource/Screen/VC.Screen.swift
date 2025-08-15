@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct Screen: Sendable, Hashable {
+    struct Screen: Sendable {
         let backgroundAssetId: String?
         let cover: Box?
         let content: Element

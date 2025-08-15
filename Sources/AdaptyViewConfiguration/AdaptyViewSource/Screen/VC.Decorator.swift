@@ -13,6 +13,7 @@ extension AdaptyViewSource {
         let backgroundAssetId: String?
         let borderAssetId: String?
         let borderThickness: Double?
+        let shadow: Shadow?
     }
 }
 
@@ -23,7 +24,8 @@ extension AdaptyViewSource.Localizer {
             background: from.backgroundAssetId.flatMap { try? background($0) },
             border: from.borderAssetId.map { (try? filling($0)) ?? AdaptyViewConfiguration.Border.default.filling }.map {
                 AdaptyViewConfiguration.Border(filling: $0, thickness: from.borderThickness ?? AdaptyViewConfiguration.Border.default.thickness)
-            }
+            },
+            shadow: from.shadow.flatMap { try? shadow($0) }
         )
     }
 }
@@ -35,6 +37,7 @@ extension AdaptyViewSource.Decorator: Decodable {
         case borderAssetId = "border"
         case borderThickness = "thickness"
         case shapeType = "type"
+        case shadow
     }
 
     init(from decoder: Decoder) throws {
@@ -57,5 +60,7 @@ extension AdaptyViewSource.Decorator: Decodable {
             borderAssetId = nil
             borderThickness = nil
         }
+
+        shadow = try container.decodeIfPresent(AdaptyViewSource.Shadow.self, forKey: .shadow)
     }
 }

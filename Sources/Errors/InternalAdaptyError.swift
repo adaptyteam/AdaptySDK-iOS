@@ -13,6 +13,7 @@ enum InternalAdaptyError: Error {
     case activateOnceError(AdaptyError.Source)
     case cantMakePayments(AdaptyError.Source)
     case notActivated(AdaptyError.Source)
+    case unidentifiedUserLogout(AdaptyError.Source)
 
     case profileWasChanged(AdaptyError.Source)
     case fetchFailed(AdaptyError.Source, String, error: Error)
@@ -28,6 +29,8 @@ extension InternalAdaptyError: CustomStringConvertible {
             "AdaptyError.unknown(\(source), \(description), \(error))"
         case let .activateOnceError(source):
             "AdaptyError.activateOnceError(\(source))"
+        case let .unidentifiedUserLogout(source):
+            "AdaptyError.unidentifiedUserLogout(\(source))"
         case let .cantMakePayments(source):
             "AdaptyError.cantMakePayments(\(source))"
         case let .notActivated(source):
@@ -49,6 +52,7 @@ extension InternalAdaptyError {
         switch self {
         case let .unknown(src, _, _),
              let .activateOnceError(src),
+             let .unidentifiedUserLogout(src),
              let .cantMakePayments(src),
              let .notActivated(src),
              let .profileWasChanged(src),
@@ -78,6 +82,7 @@ extension InternalAdaptyError: CustomNSError {
         switch self {
         case .unknown: .unknown
         case .activateOnceError: .activateOnceError
+        case .unidentifiedUserLogout: .unidentifiedUserLogout
         case .cantMakePayments: .cantMakePayments
         case .notActivated: .notActivated
         case .profileWasChanged: .profileWasChanged
@@ -105,6 +110,14 @@ extension InternalAdaptyError: CustomNSError {
 extension AdaptyError {
     static func activateOnceError(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         InternalAdaptyError.activateOnceError(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func unidentifiedUserLogout(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        InternalAdaptyError.unidentifiedUserLogout(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
     }
 
     static func cantMakePayments(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
