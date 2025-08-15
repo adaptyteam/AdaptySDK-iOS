@@ -19,6 +19,9 @@ extension WKWebView {
         config.mediaTypesRequiringUserActionForPlayback = []
 
         let webView = WKWebView(frame: .zero, configuration: config)
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = true
+        }
 
         return webView
     }
@@ -131,7 +134,7 @@ package final class AdaptyOnboardingUIView: UIView {
             self.placeholderView = placeholderView
         }
     }
-    
+
     package func callViewDidAppear() {
         viewModel.viewDidAppear()
     }
