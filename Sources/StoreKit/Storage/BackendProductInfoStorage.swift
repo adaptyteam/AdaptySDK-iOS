@@ -37,7 +37,11 @@ final class BackendProductInfoStorage {
     }
 
     var allProductVendorIds: [String]? { Self.allProductVendorIds }
-
+    
+    func productInfo(by id: String) -> BackendProductInfo? {
+        Self.allProductInfo?[id]
+    }
+    
     func set(allProductInfo: [BackendProductInfo]) {
         do {
             try Self.userDefaults.setJSON(allProductInfo, forKey: Constants.productInfoStorageKey)

@@ -21,8 +21,8 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            let profile = try await Adapty.reportTransaction(transactionId, withVariationId: variationId)
-            return .success(profile)
+            try await Adapty.reportTransaction(transactionId, withVariationId: variationId)
+            return .success()
         }
     }
 }

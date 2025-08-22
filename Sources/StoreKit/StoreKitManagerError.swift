@@ -14,6 +14,7 @@ enum StoreKitManagerError: Error {
     case refreshReceiptFailed(AdaptyError.Source, error: Error)
     case requestSKProductsFailed(AdaptyError.Source, error: Error)
     case productPurchaseFailed(AdaptyError.Source, transactionError: Error?)
+    case unknownTransactionId(AdaptyError.Source)
     case transactionUnverified(AdaptyError.Source, error: Error?)
     case invalidOffer(AdaptyError.Source, error: String)
     case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
@@ -43,6 +44,8 @@ extension StoreKitManagerError: CustomStringConvertible {
             } else {
                 "StoreKitManagerError.productPurchaseFailed(\(source))"
             }
+        case let .unknownTransactionId(source):
+            "StoreKitManagerError.unknownTransactionId(\(source))"
         case let .transactionUnverified(source, error):
             if let error {
                 "StoreKitManagerError.transactionUnverified(\(source), \(error))"
@@ -68,6 +71,7 @@ extension StoreKitManagerError {
              let .refreshReceiptFailed(src, _),
              let .requestSKProductsFailed(src, _),
              let .interrupted(src),
+             let .unknownTransactionId(src),
              let .transactionUnverified(src, _),
              let .invalidOffer(src, _),
              let .getSubscriptionInfoStatusFailed(src, _),
@@ -110,7 +114,7 @@ extension StoreKitManagerError {
     ) -> Self {
         .productPurchaseFailed(AdaptyError.Source(file: file, function: function, line: line), transactionError: error)
     }
-    
+
     static func paymentPendingError(
         file: String = #fileID,
         function: String = #function,
@@ -170,6 +174,14 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .interrupted(AdaptyError.Source(file: file, function: function, line: line))
+    }
+
+    static func unknownTransactionId(
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .unknownTransactionId(AdaptyError.Source(file: file, function: function, line: line))
     }
 
     static func transactionUnverified(

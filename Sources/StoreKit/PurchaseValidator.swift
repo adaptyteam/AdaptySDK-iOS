@@ -8,11 +8,15 @@
 import Foundation
 
 protocol PurchaseValidator: AnyObject, Sendable {
-    func validatePurchase_(
+    func reportTransaction(
         userId: AdaptyUserId?,
         purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
-    ) async throws(AdaptyError) -> VH<AdaptyProfile>
+    ) async throws(AdaptyError)
+
+    func validatePurchase(
+        _: PurchasedTransaction
+    ) async throws(AdaptyError) -> (AdaptyProfile, finishTransaction: Bool)
 
     func signSubscriptionOffer(
         userId: AdaptyUserId,
@@ -26,64 +30,68 @@ extension Adapty: PurchaseValidator {
         case setVariation
         case observing
         case purchasing
-        case sk2Updates
     }
 
     func reportTransaction(
         userId: AdaptyUserId,
         transactionId: String,
         variationId: String?
-    ) async throws(AdaptyError) -> VH<AdaptyProfile> {
+    ) async throws(AdaptyError) {
         do {
             let response = try await httpSession.reportTransaction(
                 userId: userId,
                 transactionId: transactionId,
                 variationId: variationId
             )
-            saveResponse(response, syncedTransaction: true)
-            return response
+
+            profileManager?.handleProfileResponse(response)
+
         } catch {
             throw error.asAdaptyError
         }
     }
-    
+
     func reportTransaction(
-        userId: AdaptyUserId,
-        transaction: SKTransaction,
-        variationId: String?
-    ) async throws(AdaptyError) {
-
-        let productOrNil = try? await productsManager.fetchProduct(
-            id: transaction.unfProductID,
-            fetchPolicy: .returnCacheDataElseLoad
-        )
-
-        _ = try await validatePurchase_(
-            userId: userId,
-            purchasedTransaction: .init(
-                product: productOrNil,
-                transaction: transaction,
-                payload: .init(paywallVariationId: variationId)
-            ),
-            reason: .setVariation
-        )
-    }
-
-    func validatePurchase_(
         userId: AdaptyUserId?,
         purchasedTransaction: PurchasedTransaction,
         reason: Adapty.ValidatePurchaseReason
-    ) async throws(AdaptyError) -> VH<AdaptyProfile> {
+    ) async throws(AdaptyError) {
         do {
             let response = try await httpSession.validateTransaction(
                 userId: userId ?? profileStorage.userId,
                 purchasedTransaction: purchasedTransaction,
                 reason: reason
             )
-            saveResponse(response, syncedTransaction: true)
-            return response
+
+            profileManager?.handleTransactionResponse(response)
         } catch {
             throw error.asAdaptyError
+        }
+    }
+
+    func validatePurchase(
+        _ purchasedTransaction: PurchasedTransaction
+    ) async throws(AdaptyError) -> (AdaptyProfile, finishTransaction: Bool) {
+        do {
+            let response = try await httpSession.validateTransaction(
+                userId: profileStorage.userId,
+                purchasedTransaction: purchasedTransaction,
+                reason: .purchasing
+            )
+
+            let profile = profileManager?.handleTransactionResponse(response)
+
+            return (
+                profile ?? profileWithOfflineAccessLevels(response.value),
+                finishTransaction: true
+            )
+
+        } catch {
+            if let profile = profileManager?.currentProfileWithOfflineAccessLevelsIfFeatureAvailable {
+                return (profile, finishTransaction: false)
+            } else {
+                throw error.asAdaptyError
+            }
         }
     }
 

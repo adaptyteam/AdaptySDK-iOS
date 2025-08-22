@@ -51,14 +51,14 @@ actor SK2Purchaser {
                         )
 
                         do {
-                            _ = try await purchaseValidator.validatePurchase_(
+                            try await purchaseValidator.reportTransaction(
                                 userId: nil,
                                 purchasedTransaction: .init(
                                     product: productOrNil,
                                     transaction: sk2Transaction,
                                     payload: storage.getPurchasePayload(for: sk2Transaction.productID)
                                 ),
-                                reason: .sk2Updates
+                                reason: .observing
                             )
 
                             await sk2Transaction.finish()
@@ -143,11 +143,11 @@ actor SK2Purchaser {
             persistentPaywallVariationId: product.variationId,
             persistentOnboardingVariationId: await storage.getOnboardingVariationId()
         )
-        return try await makePurchase1(product.skProduct, options, payload)
+        return try await makePurchase(product.skProduct, options, payload)
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    private func makePurchase1(
+    private func makePurchase(
         _ sk2Product: SK2Product,
         _ options: Set<Product.PurchaseOption>,
         _ payload: PurchasePayload?
@@ -233,27 +233,24 @@ actor SK2Purchaser {
         let sk2Transaction = sk2SignedTransaction.unsafePayloadValue
 
         do {
-            let response = try await purchaseValidator.validatePurchase_(
-                userId: nil,
-                purchasedTransaction: .init(
-                    product: sk2Product.asAdaptyProduct,
-                    transaction: sk2Transaction,
-                    payload: payload
-                ),
-                reason: .purchasing
-            )
-
-            await sk2Transaction.finish()
-
-            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                methodName: .finishTransaction,
-                params: sk2Transaction.logParams
+            let (profile, finishTransaction) = try await purchaseValidator.validatePurchase(.init(
+                product: sk2Product.asAdaptyProduct,
+                transaction: sk2Transaction,
+                payload: payload
             ))
 
-            storage.removePaywallVariationIds(for: sk2Product.id)
+            if finishTransaction {
+                await sk2Transaction.finish()
 
-            log.info("Successfully purchased product: \(sk2Product.id) with transaction: \(sk2Transaction)")
-            return .success(profile: response.value, transaction: sk2SignedTransaction)
+                await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                    methodName: .finishTransaction,
+                    params: sk2Transaction.logParams
+                ))
+                storage.removePaywallVariationIds(for: sk2Product.id)
+                log.info("Successfully purchased product: \(sk2Product.id) with transaction: \(sk2Transaction)")
+            }
+
+            return .success(profile: profile, transaction: sk2SignedTransaction)
         } catch {
             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Product.id)")
             throw StoreKitManagerError.transactionUnverified(error).asAdaptyError

@@ -178,7 +178,7 @@ extension Adapty {
             .getPlacementByLocale(locale,
                                   orDefaultLocale: true,
                                   withPlacementId: placementId,
-                                  withVariationId: manager.storage.crossPlacementState?.variationId(placementId: placementId))?
+                                  withVariationId: manager.crossPlacmentStorage.state?.variationId(placementId: placementId))?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -202,7 +202,7 @@ extension Adapty {
         while true {
             let (segmentId, cached, isTestUser, crossPlacementState, variationId) = try { () throws(AdaptyError) in
                 let manager = try profileManager(withProfileId: userId).orThrows
-                let crossPlacementState = manager.storage.crossPlacementState
+                let crossPlacementState = manager.crossPlacmentStorage.state
                 let variationId = crossPlacementState?.variationId(placementId: placementId)
                 let cached: Content? = manager.placementStorage
                     .getPlacementByLocale(
@@ -213,9 +213,9 @@ extension Adapty {
                     )?
                     .value
                 return (
-                    manager.profile.value.segmentId,
+                    manager.segmentId,
                     cached,
-                    manager.profile.value.isTestUser,
+                    manager.isTestUser,
                     crossPlacementState,
                     variationId
                 )
@@ -250,7 +250,7 @@ extension Adapty {
                             let manager = try? self.profileManager(withProfileId: draw.userId)
 
                             if let manager {
-                                guard let state = manager.storage.crossPlacementState else {
+                                guard let state = manager.crossPlacmentStorage.state else {
                                     // We are prohibited from participating in Cross AB Tests
                                     if draw.participatesInCrossPlacementABTest {
                                         Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
@@ -266,7 +266,7 @@ extension Adapty {
                             if crossPlacementState.canParticipateInABTest {
                                 if draw.participatesInCrossPlacementABTest {
                                     Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), BEGIN    -> variationId = \(draw.content.variationId), state = \(draw.variationIdByPlacements) DRAW")
-                                    manager?.storage.setCrossPlacementState(.init(
+                                    manager?.crossPlacmentStorage.setState(.init(
                                         variationIdByPlacements: draw.variationIdByPlacements,
                                         version: crossPlacementState.version
                                     ))
@@ -332,7 +332,7 @@ extension Adapty {
 
         func updateSegmentId(for userId: AdaptyUserId, oldSegmentId: String) async throws(AdaptyError) -> Bool {
             let manager = try profileManager(withProfileId: userId).orThrows
-            guard manager.profile.value.segmentId == oldSegmentId else { return true }
+            guard manager.segmentId == oldSegmentId else { return true }
             return await manager.getProfile().segmentId != oldSegmentId
         }
     }
@@ -347,7 +347,7 @@ extension Adapty {
             if let manager = try? profileManager(withProfileId: userId) {
                 manager.placementStorage.getPlacementWithFallback(
                     byPlacementId: placementId,
-                    withVariationId: withCrossPlacmentABTest ? manager.storage.crossPlacementState?.variationId(placementId: placementId) : nil,
+                    withVariationId: withCrossPlacmentABTest ? manager.crossPlacmentStorage.state?.variationId(placementId: placementId) : nil,
                     userId: userId,
                     locale: locale
                 )
@@ -375,10 +375,10 @@ extension Adapty {
         while true {
             params = {
                 guard let manager = try? profileManager(withProfileId: userId) else { return nil }
-                let variationId = manager.storage.crossPlacementState?.variationId(placementId: placementId)
+                let variationId = manager.crossPlacmentStorage.state?.variationId(placementId: placementId)
                 return (
                     cached: manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
-                    isTestUser: manager.profile.value.isTestUser,
+                    isTestUser: manager.isTestUser,
                     variationId: variationId
                 )
             }() ?? params

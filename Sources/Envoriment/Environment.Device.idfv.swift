@@ -30,7 +30,7 @@ extension Environment.Device {
                 let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict)
                 defer { IOObjectRelease(platformExpert) }
 
-                guard platformExpert != 0 else { return String?.none }
+                guard platformExpert != 0 else { return nil }
                 return IORegistryEntryCreateCFProperty(
                     platformExpert,
                     kIOPlatformUUIDKey as CFString,

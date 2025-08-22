@@ -54,6 +54,7 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
         case .refreshReceiptFailed: "Failed to refresh the purchase receipt."
         case .productPurchaseFailed: "Failed to complete the product purchase. Refer to the original error for more details."
         case .requestSKProductsFailed: "Failed to fetch product information from the StoreKit. Refer to the original error for more details."
+        case .unknownTransactionId: "Transaction identifier is nil"
         case let .transactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
                 "Transaction verification failed: \(customError.debugDescription)"

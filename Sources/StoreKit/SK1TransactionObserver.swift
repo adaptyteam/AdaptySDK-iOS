@@ -32,12 +32,10 @@ actor SK1TransactionObserver: Sendable {
             ))
 
             guard sk1Transaction.transactionState == .purchased else { continue }
-            guard let id = sk1Transaction.transactionIdentifier else {
+            guard let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) else {
                 log.error("received purchased transaction without identifier")
                 continue
             }
-
-            let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction, id: id)
 
             Task.detached {
                 let productOrNil = try? await self.sk1ProductsManager.fetchProduct(
@@ -45,7 +43,7 @@ actor SK1TransactionObserver: Sendable {
                     fetchPolicy: .returnCacheDataElseLoad
                 )
 
-                _ = try await self.purchaseValidator.validatePurchase_(
+                try await self.purchaseValidator.reportTransaction(
                     userId: nil,
                     purchasedTransaction: .init(
                         product: productOrNil,

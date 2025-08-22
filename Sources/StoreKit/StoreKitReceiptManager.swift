@@ -79,30 +79,27 @@ extension StoreKitReceiptManager {
             task = syncing.task
         } else {
             task = Task {
+                defer { syncing = nil }
+                let receipt: Data
                 do throws(AdaptyError) {
-                    let value = try await syncReceipt(for: userId)
-                    return .success(value)
+                    receipt = try await getReceipt()
                 } catch {
                     return .failure(error)
+                }
+
+                do throws(HTTPError) {
+                    let value = try await session.validateReceipt(
+                        userId: userId,
+                        receipt: receipt
+                    )
+                    return .success(value)
+                } catch {
+                    return .failure(error.asAdaptyError)
                 }
             }
             syncing = (task, userId)
         }
         return try await task.value.get()
-    }
-
-    private func syncReceipt(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
-        defer { syncing = nil }
-
-        let receipt = try await getReceipt()
-        do {
-            return try await session.validateReceipt(
-                userId: userId,
-                receipt: receipt
-            )
-        } catch {
-            throw error.asAdaptyError
-        }
     }
 }
 

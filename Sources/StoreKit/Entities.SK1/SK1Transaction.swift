@@ -39,7 +39,8 @@ struct SK1TransactionWithIdentifier: Sendable {
     let underlay: SK1Transaction
     private let id: String
 
-    init(_ underlay: SK1Transaction, id: String) {
+    init?(_ underlay: SK1Transaction) {
+        guard let id = underlay.transactionIdentifier else { return nil }
         self.underlay = underlay
         self.id = id
     }

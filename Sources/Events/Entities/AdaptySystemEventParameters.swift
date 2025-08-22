@@ -241,8 +241,9 @@ enum AppleMethodName: String {
     case fetchSK1Products = "fetch_sk1_products"
     case fetchSK2Products = "fetch_sk2_products"
 
-    case getAllSK1Transactions = "get_all_sk1_transactions"
     case getAllSK2Transactions = "get_all_sk2_transactions"
+    case getSK2CurrentEntitlements = "get_sk2_current_entitlements"
+    case getUnfinishedSK2Transactions = "get_unfinished_sk2_transactions"
 
     case getReceipt = "get_receipt"
     case refreshReceipt = "refresh_receipt"

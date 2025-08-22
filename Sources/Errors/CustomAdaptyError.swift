@@ -102,6 +102,7 @@ extension StoreKitManagerError: CustomAdaptyError {
         case .refreshReceiptFailed: .refreshReceiptFailed
         case .requestSKProductsFailed: .productRequestFailed
         case .productPurchaseFailed: .productPurchaseFailed
+        case .unknownTransactionId: .unknownTransactionId
         case let .transactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
                 customError.adaptyErrorCode

@@ -60,11 +60,15 @@ extension SK2Transaction {
         }
         #endif
 
-        switch environment {
-        case .production: return "production"
-        case .sandbox: return "sandbox"
-        case .xcode: return "xcode"
-        default: return environment.rawValue
+        return switch environment {
+        case .production: Self.productionEnvironment
+        case .sandbox: Self.sandboxEnvironment
+        case .xcode: Self.xcodeEnvironment
+        default: environment.rawValue
         }
     }
+
+    static let productionEnvironment = "production"
+    static let sandboxEnvironment = "sandbox"
+    static let xcodeEnvironment = "xcode"
 }

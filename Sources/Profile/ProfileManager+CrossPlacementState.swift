@@ -28,12 +28,12 @@ extension ProfileManager {
     }
 
     func saveCrossPlacementState(_ newState: CrossPlacementState) {
-        let oldState = storage.crossPlacementState
+        let oldState = crossPlacmentStorage.state
 
         guard newState.isNewerThan(oldState) else { return }
 
         Log.crossAB.verbose("updateProfile version = \(newState.version), newValue = \(newState.variationIdByPlacements), oldValue = \(oldState?.variationIdByPlacements.description ?? "DISABLED")")
 
-        storage.setCrossPlacementState(newState)
+        crossPlacmentStorage.setState(newState)
     }
 }

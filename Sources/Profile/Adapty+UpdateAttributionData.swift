@@ -57,7 +57,7 @@ public extension Adapty {
     ) async throws(AdaptyError) {
         let (userId, oldResponseHash) = try await { () async throws(AdaptyError) in
             let manager = try await createdProfileManager
-            return (manager.userId, manager.profile.hash)
+            return (manager.userId, manager.lastResponseHash)
         }()
 
         do {
@@ -68,9 +68,7 @@ public extension Adapty {
                 responseHash: oldResponseHash
             )
 
-            if let profile = response.flatValue() {
-                profileManager?.saveResponse(profile)
-            }
+            profileManager?.handleProfileResponse(response.flatValue())
 
         } catch {
             throw error.asAdaptyError

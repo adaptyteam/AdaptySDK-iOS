@@ -49,7 +49,6 @@ extension Adapty {
         productsManager: SK1ProductsManager,
         webPaywallBaseUrl: URL?
     ) async throws(AdaptyError) -> AdaptySK1PaywallProduct {
-
         let sk1Product = try await productsManager.fetchSK1Product(id: productInfo.vendorId, fetchPolicy: .returnCacheDataElseLoad)
 
         let subscriptionOffer: AdaptySubscriptionOffer? =
@@ -168,12 +167,10 @@ extension Adapty {
         let vendorProductIds = vendorProductIds.filter { !ineligibleProductIds.contains($0) }
         guard vendorProductIds.isNotEmpty else { return [] }
 
-        if !profileStorage.syncedTransactions {
-            do {
-                try await syncTransactions(for: userId)
-            } catch {
-                return []
-            }
+        do {
+            try await syncTransactionsIfNeed(for: userId)
+        } catch {
+            return []
         }
 
         let lastResponse = try? profileManager(withProfileId: userId)?

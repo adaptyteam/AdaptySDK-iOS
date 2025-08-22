@@ -11,7 +11,7 @@ public extension Adapty {
     package nonisolated static func reportTransaction(
         _ transactionId: String,
         withVariationId variationId: String?
-    ) async throws(AdaptyError) -> AdaptyProfile {
+    ) async throws(AdaptyError) {
         let variationId = variationId.trimmed.nonEmptyOrNil
         let transactionId = transactionId.trimmed
         // TODO: throw error if transactionId isEmpty
@@ -21,12 +21,41 @@ public extension Adapty {
             "transaction_id": transactionId,
         ]) { sdk throws(AdaptyError) in
             let userId = sdk.profileStorage.userId
-            let response = try await sdk.reportTransaction(
+            try await sdk.reportTransaction(
                 userId: userId,
                 transactionId: transactionId,
                 variationId: variationId
             )
-            return response.value
+        }
+    }
+
+    private static func _reportTransaction(
+        _ transaction: SKTransaction,
+        withVariationId variationId: String?
+    ) async throws(AdaptyError) {
+        let variationId = variationId.trimmed.nonEmptyOrNil
+        try await withActivatedSDK(methodName: .reportSK1Transaction, logParams: [
+            "variation_id": variationId,
+            "transaction_id": transaction.unfIdentifier,
+        ]) { sdk throws(AdaptyError) in
+            let userId = try await sdk.createdProfileManager.userId
+
+            let productOrNil = try? await sdk.productsManager.fetchProduct(
+                id: transaction.unfProductID,
+                fetchPolicy: .returnCacheDataElseLoad
+            )
+
+            let purchasedTransaction = PurchasedTransaction(
+                product: productOrNil,
+                transaction: transaction,
+                payload: .init(paywallVariationId: variationId)
+            )
+
+            try await sdk.reportTransaction(
+                userId: userId,
+                purchasedTransaction: purchasedTransaction,
+                reason: .setVariation
+            )
         }
     }
 
@@ -42,25 +71,13 @@ public extension Adapty {
         _ transaction: StoreKit.SKPaymentTransaction,
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
-        let variationId = variationId.trimmed.nonEmptyOrNil
-        try await withActivatedSDK(methodName: .reportSK1Transaction, logParams: [
-            "variation_id": variationId,
-            "transaction_id": transaction.transactionIdentifier,
-        ]) { sdk throws(AdaptyError) in
-            guard transaction.transactionState == .purchased || transaction.transactionState == .restored,
-                  let id = transaction.transactionIdentifier
-            else {
-                throw .wrongParamPurchasedTransaction()
-            }
-
-            let userId = try await sdk.createdProfileManager.userId
-
-            try await sdk.reportTransaction(
-                userId: userId,
-                transaction: SK1TransactionWithIdentifier(transaction, id: id),
-                variationId: variationId
-            )
+        guard transaction.transactionState == .purchased || transaction.transactionState == .restored,
+              let transaction = SK1TransactionWithIdentifier(transaction)
+        else {
+            throw .wrongParamPurchasedTransaction()
         }
+
+        return try await _reportTransaction(transaction, withVariationId: variationId)
     }
 
     /// Link purchased transaction with paywall's variationId.
@@ -76,19 +93,7 @@ public extension Adapty {
         _ transaction: StoreKit.Transaction,
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
-        let variationId = variationId.trimmed.nonEmptyOrNil
-        try await withActivatedSDK(methodName: .reportSK2Transaction, logParams: [
-            "variation_id": variationId,
-            "transaction_id": transaction.unfIdentifier,
-        ]) { sdk throws(AdaptyError) in
-            let userId = try await sdk.createdProfileManager.userId
-
-            try await sdk.reportTransaction(
-                userId: userId,
-                transaction: transaction,
-                variationId: variationId
-            )
-        }
+        try await _reportTransaction(transaction, withVariationId: variationId)
     }
 
     /// Link purchased transaction with paywall's variationId.
@@ -111,7 +116,7 @@ public extension Adapty {
             throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
         }
 
-        return try await reportTransaction(sk2Transaction, withVariationId: variationId)
+        return try await _reportTransaction(sk2Transaction, withVariationId: variationId)
     }
 
     /// Link product purchase result with paywall's variationId.

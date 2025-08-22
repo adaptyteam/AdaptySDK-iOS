@@ -19,7 +19,7 @@ extension AdaptyLog.Level: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self =
             switch CodingValues(rawValue: value.lowercased()) {
-            case .none: .default
+            case nil: .default
             case .error: .error
             case .warn: .warn
             case .info: .info

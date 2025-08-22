@@ -115,9 +115,9 @@ private extension AdaptyViewSource.TextAttributes? {
         _ other: AdaptyViewSource.TextAttributes?
     ) -> AdaptyViewSource.TextAttributes? {
         switch self {
-        case .none:
+        case nil:
             other
-        case let .some(value):
+        case let value?:
             value.add(other)
         }
     }

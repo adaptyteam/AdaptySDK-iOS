@@ -84,7 +84,7 @@ extension AdaptyViewConfiguration.Animation.Interpolator: Codable {
 
         let value = try container.decode(String.self)
         switch Values(rawValue: value) {
-        case .none:
+        case nil:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Interpolator name \(value)'"))
         case .easeInOut:
             self = .easeInOut

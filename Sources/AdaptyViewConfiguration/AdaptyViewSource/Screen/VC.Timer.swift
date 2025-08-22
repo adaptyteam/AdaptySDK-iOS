@@ -78,7 +78,7 @@ extension AdaptyViewSource.Timer: Decodable {
                 try .endedAt(container.decode(AdaptyViewSource.DateString.self, forKey: .endTime).utc)
             case BehaviorType.endAtLocalTime.rawValue:
                 try .endedAt(container.decode(AdaptyViewSource.DateString.self, forKey: .endTime).local)
-            case .none:
+            case nil:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .default)
             case BehaviorType.everyAppear.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .everyAppear)

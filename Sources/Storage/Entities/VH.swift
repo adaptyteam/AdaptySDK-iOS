@@ -34,11 +34,19 @@ struct VH<Value: Sendable>: Sendable {
     @inlinable
     func flatValue<T>() -> VH<T>? where Value == T? {
         switch value {
-        case .none:
-            .none
-        case let .some(v):
+        case nil:
+            nil
+        case let v?:
             VH<T>(v, hash: hash, time: time)
         }
+    }
+}
+
+extension VH {
+    @inlinable
+    func IsNotEqualHash(_ other: VH<Value>) -> Bool {
+        guard let hash = hash, let other = other.hash else { return true }
+        return hash != other
     }
 }
 

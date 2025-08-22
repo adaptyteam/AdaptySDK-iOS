@@ -25,7 +25,7 @@ public struct AdaptyProfile: Sendable {
     public let customAttributes: [String: any Sendable]
 
     /// The keys are access level identifiers configured by you in Adapty Dashboard. The values are Can be null if the customer has no access levels.
-    public let accessLevels: [String: AccessLevel]
+    public var accessLevels: [String: AccessLevel]
 
     /// The keys are product ids from a store. The values are information about subscriptions. Can be null if the customer has no subscriptions.
     public let subscriptions: [String: Subscription]
@@ -39,6 +39,13 @@ public struct AdaptyProfile: Sendable {
 extension AdaptyProfile {
     func isNewerOrEqualVersion(_ other: AdaptyProfile) -> Bool {
         version >= other.version
+    }
+}
+
+extension VH<AdaptyProfile> {
+    @inlinable
+    func isNewerOrEqualVersion(_ other: VH<AdaptyProfile>) -> Bool {
+        value.isNewerOrEqualVersion(other.value)
     }
 }
 

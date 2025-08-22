@@ -64,7 +64,7 @@ extension PlacementStorage {
         }
 
         switch (cachedA, cachedB) {
-        case let (.some(cached), _):
+        case let (cached?, _):
             if fallbackFile.version > cached.content.placement.version,
                let fallbacked: AdaptyPlacementChosen<Content> = fallbackFile.getPlacement(
                    byPlacementId: placementId,
@@ -79,7 +79,7 @@ extension PlacementStorage {
                 return cached
             }
 
-        case let (_, .some(cached)):
+        case let (_, cached?):
             let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil :
                 fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, userId: userId)
 

@@ -28,9 +28,7 @@ extension Adapty {
                 responseHash: profile.hash
             )
 
-            if let profile = response.flatValue() {
-                profileManager?.saveResponse(profile)
-            }
+            profileManager?.handleProfileResponse(response.flatValue())
 
             if profileStorage.isEqualProfileId(userId) {
                 // mark appleSearchAds attribution data as synced

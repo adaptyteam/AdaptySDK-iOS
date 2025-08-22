@@ -132,12 +132,8 @@ actor SK1QueueManager: Sendable {
 
             switch sk1Transaction.transactionState {
             case .purchased:
-                guard let id = sk1Transaction.transactionIdentifier else {
-                    log.error("received purchased transaction without identifier")
-                    return
-                }
+                await receivedPurchasedTransaction(sk1Transaction)
 
-                await receivedPurchasedTransaction(SK1TransactionWithIdentifier(sk1Transaction, id: id))
             case .failed:
                 SKPaymentQueue.default().finishTransaction(sk1Transaction)
                 await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
@@ -146,6 +142,7 @@ actor SK1QueueManager: Sendable {
                 ))
                 log.verbose("finish failed transaction \(sk1Transaction)")
                 receivedFailedTransaction(sk1Transaction)
+
             case .restored:
                 SKPaymentQueue.default().finishTransaction(sk1Transaction)
                 await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
@@ -153,52 +150,62 @@ actor SK1QueueManager: Sendable {
                     params: logParams
                 ))
                 log.verbose("finish restored transaction \(sk1Transaction)")
+
+            case .deferred:
+                log.error("received deferred transaction \(sk1Transaction)")
+
             default:
-                break
+                log.warn("received unknown state (\(sk1Transaction.transactionState)) for transaction \(sk1Transaction)")
             }
         }
     }
 
-    private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
+    private func receivedPurchasedTransaction(_ sk1Transaction: SK1Transaction) async {
         let productId = sk1Transaction.unfProductID
-
-        var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
-
-        if productOrNil == nil {
-            productOrNil = try? await productsManager.fetchProduct(
-                id: sk1Transaction.unfProductID,
-                fetchPolicy: .returnCacheDataElseLoad
-            )
-        }
-
         let result: AdaptyResult<AdaptyPurchaseResult>
-        do {
-            let response = try await purchaseValidator.validatePurchase_(
-                userId: nil,
-                purchasedTransaction: .init(
+        let finishTransaction: Bool
+
+        if let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) {
+            var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
+
+            if productOrNil == nil {
+                productOrNil = try? await productsManager.fetchProduct(
+                    id: sk1Transaction.unfProductID,
+                    fetchPolicy: .returnCacheDataElseLoad
+                )
+            }
+
+            do {
+                let (profile, finish) = try await purchaseValidator.validatePurchase(.init(
                     product: productOrNil,
                     transaction: sk1Transaction,
                     payload: await storage.getPurchasePayload(for: productId)
-                ),
-                reason: .purchasing
-            )
+                ))
+                finishTransaction = finish
+                result = .success(.success(profile: profile, transaction: sk1Transaction))
 
+            } catch {
+                finishTransaction = false
+                result = .failure(error)
+            }
+
+        } else {
+            finishTransaction = true
+            result = .failure(StoreKitManagerError.unknownTransactionId().asAdaptyError)
+        }
+
+        if finishTransaction {
             storage.removePaywallVariationIds(for: productId)
             makePurchasesProduct.removeValue(forKey: productId)
 
-            SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
+            SKPaymentQueue.default().finishTransaction(sk1Transaction)
 
             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                 methodName: .finishTransaction,
                 params: sk1Transaction.logParams
             ))
 
-            log.info("finish purchased transaction \(sk1Transaction.underlay)")
-
-            result = .success(.success(profile: response.value, transaction: sk1Transaction))
-
-        } catch {
-            result = .failure(error)
+            log.info("finish purchased transaction \(sk1Transaction)")
         }
 
         callMakePurchasesCompletionHandlers(productId, result)

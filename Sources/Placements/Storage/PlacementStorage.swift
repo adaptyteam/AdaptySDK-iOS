@@ -99,9 +99,9 @@ private extension AdaptyPlacementContent {
         }
 
         return switch (remoteConfigLocale, viewConfigurationLocale) {
-        case (.none, .none): .defaultPlacementLocale
-        case let (.some(locale), _),
-             let (_, .some(locale)): locale
+        case (nil, nil): .defaultPlacementLocale
+        case let (locale?, _),
+             let (_, locale?): locale
         }
     }
 

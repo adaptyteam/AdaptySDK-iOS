@@ -78,7 +78,6 @@ private extension Adapty.ValidatePurchaseReason {
         case .setVariation: "set_variation"
         case .observing: "observing"
         case .purchasing: "purchasing"
-        case .sk2Updates: "sk2_updates"
         }
     }
 }

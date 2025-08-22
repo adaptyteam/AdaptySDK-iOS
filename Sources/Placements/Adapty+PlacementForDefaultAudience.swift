@@ -114,7 +114,7 @@ extension Adapty {
             guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
             return (
                 manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
-                manager.profile.value.isTestUser
+                manager.isTestUser
             )
         }()
 

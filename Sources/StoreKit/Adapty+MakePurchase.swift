@@ -75,12 +75,12 @@ public extension Adapty {
     nonisolated static func restorePurchases() async throws(AdaptyError) -> AdaptyProfile {
         try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(AdaptyError) in
             let userId = sdk.profileStorage.userId
-            if let response = try await sdk.transactionManager.syncTransactions(for: userId) {
-                return response.value
+            if let profile = try await sdk.syncTransactions(for: userId) {
+                return profile
             }
 
             let manager = try await sdk.createdProfileManager
-            if manager.storage.isNotEqualProfileId(userId) {
+            if manager.isNotEqualProfileId(userId) {
                 throw .profileWasChanged()
             }
 

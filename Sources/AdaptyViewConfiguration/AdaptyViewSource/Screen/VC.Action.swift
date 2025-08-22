@@ -70,7 +70,7 @@ extension AdaptyViewSource.Action: Decodable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         switch try Types(rawValue: container.decode(String.self, forKey: .type)) {
-        case .none:
+        case nil:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.type], debugDescription: "unknown value"))
         case .openUrl:
             self = try .openUrl(container.decode(String.self, forKey: .url))

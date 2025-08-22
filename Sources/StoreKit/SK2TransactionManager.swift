@@ -14,6 +14,9 @@ actor SK2TransactionManager {
     private let session: Backend.MainExecutor
 
     private var lastTransactionCached: SK2Transaction?
+    private var verifiedCurrentEntitlementsCached: (value: [SK2Transaction], at: Date)?
+    private static let cacheDuration: TimeInterval = 60 * 5
+
     private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, userId: AdaptyUserId)?
 
     init(session: Backend.MainExecutor) {
@@ -26,11 +29,18 @@ actor SK2TransactionManager {
             task = syncing.task
         } else {
             task = Task {
-                do throws(AdaptyError) {
-                    let value = try await syncLastTransaction(for: userId)
+                defer { syncing = nil }
+                do throws(HTTPError) {
+                    guard let transaction = await getLastVerifiedTransaction()
+                    else { return .success(nil) }
+
+                    let value = try await session.syncTransaction(
+                        userId: userId,
+                        originalTransactionId: transaction.unfOriginalIdentifier
+                    )
                     return .success(value)
                 } catch {
-                    return .failure(error)
+                    return .failure(error.asAdaptyError)
                 }
             }
             syncing = (task, userId)
@@ -38,67 +48,105 @@ actor SK2TransactionManager {
         return try await task.value.get()
     }
 
-    private func syncLastTransaction(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
-        defer { syncing = nil }
-
-        let lastTransaction: SK2Transaction
-
+    private func getLastVerifiedTransaction() async -> SK2Transaction? {
         if let transaction = lastTransactionCached {
-            lastTransaction = transaction
-        } else if let transaction = await Self.lastTransaction {
+            return transaction
+        } else if let transaction = await Self.fetchLastVerifiedTransaction() {
             lastTransactionCached = transaction
-            lastTransaction = transaction
+            return transaction
         } else {
             return nil
         }
-
-        do {
-            return try await session.syncTransaction(
-                userId: userId,
-                originalTransactionId: lastTransaction.unfOriginalIdentifier
-            )
-        } catch {
-            throw error.asAdaptyError
-        }
     }
 
-    private static var lastTransaction: SK2Transaction? {
-        get async {
-            var lastTransaction: SK2Transaction?
-            let stamp = Log.stamp
+    private func getVerifiedCurrentEntitlements() async -> [SK2Transaction] {
+        if let cache = verifiedCurrentEntitlementsCached,
+           Date().timeIntervalSince(cache.at) < Self.cacheDuration
+        {
+            return cache.value
+        }
+        let transactions = await Self.fetchVerifiedCurrentEntitlements()
 
-            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getAllSK2Transactions, stamp: stamp))
-            log.verbose("call  SK2Transaction.all")
+        verifiedCurrentEntitlementsCached = (transactions, at: Date())
+        return transactions
+    }
+}
 
-            for await verificationResult in SK2Transaction.all {
-                guard case let .verified(transaction) = verificationResult else {
-                    continue
-                }
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension SK2TransactionManager {
+    private static func fetchUnfinishedTrunsactions() async -> [SK2SignedTransaction] {
+        let stamp = Log.stamp
 
-                log.verbose("found transaction original-id: \(transaction.originalID), purchase date:\(transaction.purchaseDate)")
+        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp))
+        log.verbose("call  SK2Transaction.unfinished")
 
-                guard let lasted = lastTransaction,
-                      transaction.purchaseDate < lasted.purchaseDate
-                else {
-                    lastTransaction = transaction
-                    continue
-                }
+        let signedTransactions = await SK2Transaction.unfinished.reduce(into: []) { $0.append($1) }
+
+        await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp, params: ["count": signedTransactions.count]))
+
+        log.verbose("SK2Transaction.unfinished.count = \(signedTransactions.count)")
+        return signedTransactions
+    }
+
+    private static func fetchVerifiedCurrentEntitlements() async -> [SK2Transaction] {
+        let stamp = Log.stamp
+
+        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp))
+        log.verbose("call  SK2Transaction.currentEntitlements")
+
+        let signedTransactions = await SK2Transaction.currentEntitlements.reduce(into: []) { $0.append($1) }
+        let transaction: [SK2Transaction] = signedTransactions.compactMap(\.verifiedTransaction)
+
+        await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp, params: ["total_count": signedTransactions.count, "verified_count": transaction.count]))
+
+        log.verbose("SK2Transaction.currentEntitlements total count: \(signedTransactions.count), verified count: \(transaction.count)")
+        return transaction
+    }
+
+    private static func fetchLastVerifiedTransaction() async -> SK2Transaction? {
+        var lastTransaction: SK2Transaction?
+        let stamp = Log.stamp
+
+        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getAllSK2Transactions, stamp: stamp))
+        log.verbose("call  SK2Transaction.all")
+
+        for await transaction in SK2Transaction.all.compactMap(\.verifiedTransaction) {
+            log.verbose("found transaction original-id: \(transaction.originalID), purchase date:\(transaction.purchaseDate)")
+
+            guard let lasted = lastTransaction,
+                  transaction.purchaseDate < lasted.purchaseDate
+            else {
+                lastTransaction = transaction
+                continue
+            }
+        }
+
+        let params: EventParameters? =
+            if let lastTransaction {
+                [
+                    "original_transaction_id": lastTransaction.unfOriginalIdentifier,
+                    "transaction_id": lastTransaction.unfIdentifier,
+                    "purchase_date": lastTransaction.purchaseDate,
+                ]
+            } else {
+                nil
             }
 
-            let params: EventParameters? =
-                if let lastTransaction {
-                    [
-                        "original_transaction_id": lastTransaction.unfOriginalIdentifier,
-                        "transaction_id": lastTransaction.unfIdentifier,
-                        "purchase_date": lastTransaction.purchaseDate,
-                    ]
-                } else {
-                    nil
-                }
+        await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getAllSK2Transactions, stamp: stamp, params: params))
 
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getAllSK2Transactions, stamp: stamp, params: params))
+        return lastTransaction
+    }
+}
 
-            return lastTransaction
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension SK2SignedTransaction {
+    var verifiedTransaction: SK2Transaction? {
+        switch self {
+        case let .unverified(transaction, _):
+            log.warn("found unverified transaction original-id: \(transaction.originalID), purchase date:\(transaction.purchaseDate), environment: \(transaction.unfEnvironment)")
+            return nil
+        case let .verified(transaction):
+            return transaction
         }
     }
 }

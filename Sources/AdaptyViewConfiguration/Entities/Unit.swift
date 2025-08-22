@@ -72,9 +72,9 @@ extension AdaptyViewConfiguration.Unit: Codable {
                 let value = try container.decode(Double.self, forKey: .value)
                 let unit = try container.decodeIfPresent(String.self, forKey: .unit)
                 switch unit {
-                case .some(CodingKeys.screen.rawValue):
+                case CodingKeys.screen.rawValue:
                     self = .screen(value)
-                case .some(CodingKeys.point.rawValue), .none:
+                case CodingKeys.point.rawValue, nil:
                     self = .point(value)
                 default:
                     throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit ?? "null")"))

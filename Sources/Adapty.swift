@@ -174,13 +174,12 @@ public final class Adapty {
 
             switch result {
             case let .success((createdProfile, crossPlacementState)):
-                if newUserId.isNotEqualProfileId(createdProfile) {
+                if newUserId.isNotEqualProfileId(createdProfile)  {
                     profileStorage.clearProfile(newProfile: createdProfile)
                 } else {
                     profileStorage.setProfile(createdProfile)
+                    profileStorage.setSyncedTransactionsHistory(false)
                 }
-
-                profileStorage.setSyncedTransactions(false)
 
                 let manager = ProfileManager(
                     storage: profileStorage,
@@ -212,10 +211,10 @@ extension Adapty {
         profileStorage.setAppAccountToken(newAppAccountToken)
 
         switch sharedProfileManager {
-        case .none:
+        case nil:
             break
         case let .current(manager):
-            if manager.profile.customerUserId == newCustomerUserId {
+            if manager.userId.customerId == newCustomerUserId {
                 guard let newAppAccountToken, newAppAccountToken != oldAppAccountToken else {
                     return
                 }
@@ -247,7 +246,7 @@ extension Adapty {
 
     func logout() async throws(AdaptyError) {
         switch sharedProfileManager {
-        case .none:
+        case nil:
             break
         case let .current(manager):
             if manager.userId.isAnonymous {
@@ -304,7 +303,7 @@ private extension Task where Success == ProfileManager {
 extension Adapty {
     var userId: AdaptyUserId? {
         switch sharedProfileManager {
-        case .none:
+        case nil:
             return nil
         case let .current(manager):
             return manager.userId
@@ -330,7 +329,7 @@ extension Adapty {
     var createdProfileManager: ProfileManager {
         get async throws(AdaptyError) {
             switch sharedProfileManager {
-            case .none:
+            case nil:
                 throw .notActivated()
             case let .current(manager):
                 return manager
@@ -354,9 +353,9 @@ extension ProfileManager? {
     var orThrows: ProfileManager {
         get throws(AdaptyError) {
             switch self {
-            case .none:
+            case nil:
                 throw .profileWasChanged()
-            case let .some(value):
+            case let value?:
                 value
             }
         }

@@ -16,9 +16,8 @@ final class ProfileStorage {
         static let profileIdKey = "AdaptySDK_Profile_Id"
         static let appAccountTokenKey = "AdaptySDK_app_account_token"
         static let externalAnalyticsDisabledKey = "AdaptySDK_External_Analytics_Disabled"
-        static let syncedTransactionsKey = "AdaptySDK_Synced_Bundle_Receipt"
+        static let syncedTransactionsHistoryKey = "AdaptySDK_Synced_Bundle_Receipt"
         static let appleSearchAdsSyncDateKey = "AdaptySDK_Apple_Search_Ads_Sync_Date"
-        static let crossPlacementStateKey = "AdaptySDK_Cross_Placement_State"
         static let lastOpenedWebPaywallKey = "AdaptySDK_Last_Opened_Web_Paywall"
         static let lastStartAcceleratedSyncProfileKey = "AdaptySDK_Last_Start_Accelerated_Sync_Profile"
     }
@@ -58,21 +57,12 @@ final class ProfileStorage {
     }()
 
     private static var externalAnalyticsDisabled: Bool = userDefaults.bool(forKey: Constants.externalAnalyticsDisabledKey)
-    private static var syncedTransactions: Bool = userDefaults.bool(forKey: Constants.syncedTransactionsKey)
+    private static var syncedTransactionsHistory: Bool = userDefaults.bool(forKey: Constants.syncedTransactionsHistoryKey)
     private static var appleSearchAdsSyncDate: Date? = userDefaults.object(forKey: Constants.appleSearchAdsSyncDateKey) as? Date
 
     private static var lastOpenedWebPaywallDate: Date? = userDefaults.object(forKey: Constants.lastOpenedWebPaywallKey) as? Date
 
     private static var lastStartAcceleratedSyncProfileDate: Date? = userDefaults.object(forKey: Constants.lastStartAcceleratedSyncProfileKey) as? Date
-
-    private static var crossPlacementState: CrossPlacementState? = {
-        do {
-            return try userDefaults.getJSON(CrossPlacementState.self, forKey: Constants.crossPlacementStateKey)
-        } catch {
-            log.warn(error.localizedDescription)
-            return nil
-        }
-    }()
 
     var userId: AdaptyUserId { Self.userId }
 
@@ -101,13 +91,13 @@ final class ProfileStorage {
         log.debug("set externalAnalyticsDisabled = \(value).")
     }
 
-    var syncedTransactions: Bool { Self.syncedTransactions }
+    var syncedTransactionsHistory: Bool { Self.syncedTransactionsHistory }
 
-    func setSyncedTransactions(_ value: Bool) {
-        guard Self.syncedTransactions != value else { return }
-        Self.syncedTransactions = value
-        Self.userDefaults.set(value, forKey: Constants.syncedTransactionsKey)
-        log.debug("set syncedTransactions = \(value).")
+    func setSyncedTransactionsHistory(_ value: Bool) {
+        guard Self.syncedTransactionsHistory != value else { return }
+        Self.syncedTransactionsHistory = value
+        Self.userDefaults.set(value, forKey: Constants.syncedTransactionsHistoryKey)
+        log.debug("set syncedTransactionsHistory = \(value).")
     }
 
     var appleSearchAdsSyncDate: Date? { Self.appleSearchAdsSyncDate }
@@ -117,19 +107,6 @@ final class ProfileStorage {
         Self.appleSearchAdsSyncDate = now
         Self.userDefaults.set(now, forKey: Constants.appleSearchAdsSyncDateKey)
         log.debug("set appleSearchAdsSyncDate = \(now).")
-    }
-
-    var crossPlacementState: CrossPlacementState? { Self.crossPlacementState }
-
-    func setCrossPlacementState(_ value: CrossPlacementState) {
-        do {
-            try Self.userDefaults.setJSON(value, forKey: Constants.crossPlacementStateKey)
-            Self.crossPlacementState = value
-            log.debug("saving crossPlacementState success.")
-            Log.crossAB.verbose("saving crossPlacementState success = \(value)")
-        } catch {
-            log.error("saving crossPlacementState fail. \(error.localizedDescription)")
-        }
     }
 
     var lastOpenedWebPaywallDate: Date? { Self.lastOpenedWebPaywallDate }
@@ -158,6 +135,20 @@ final class ProfileStorage {
         Self.setProfile(newProfile)
     }
 
+    func updateProfile(_ profile: VH<AdaptyProfile>) -> Bool {
+        guard let stored = getProfile() else {
+            Self.setProfile(profile)
+            return true
+        }
+        guard profile.isEqualProfileId(stored),
+              profile.IsNotEqualHash(stored),
+              profile.isNewerOrEqualVersion(stored)
+        else { return false }
+        
+        Self.setProfile(profile)
+        return true
+    }
+
     static func setProfile(_ newProfile: VH<AdaptyProfile>) {
         profile = newProfile
         do {
@@ -184,18 +175,17 @@ final class ProfileStorage {
         appAccountToken = nil
         userDefaults.removeObject(forKey: Constants.externalAnalyticsDisabledKey)
         externalAnalyticsDisabled = false
-        userDefaults.removeObject(forKey: Constants.syncedTransactionsKey)
-        syncedTransactions = false
+        userDefaults.removeObject(forKey: Constants.syncedTransactionsHistoryKey)
+        syncedTransactionsHistory = false
         userDefaults.removeObject(forKey: Constants.appleSearchAdsSyncDateKey)
         appleSearchAdsSyncDate = nil
         userDefaults.removeObject(forKey: Constants.profileKey)
-        userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
-        crossPlacementState = nil
         userDefaults.removeObject(forKey: Constants.lastOpenedWebPaywallKey)
         lastOpenedWebPaywallDate = nil
         userDefaults.removeObject(forKey: Constants.lastStartAcceleratedSyncProfileKey)
         lastStartAcceleratedSyncProfileDate = nil
 
+        CrossPlacementStorage.clear()
         BackendIntroductoryOfferEligibilityStorage.clear()
         PlacementStorage.clear()
     }

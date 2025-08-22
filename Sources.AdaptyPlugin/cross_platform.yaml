@@ -505,7 +505,7 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { $ref: "#/$defs/AdaptyProfile" }
+          success: { const: true }
 
   ### restorePurchases ###
   RestorePurchases.Request: #request

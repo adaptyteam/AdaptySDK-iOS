@@ -28,9 +28,9 @@ extension Adapty {
     package static var activatedSDK: Adapty {
         get async throws(AdaptyError) {
             switch shared {
-            case let .some(.activated(sdk)):
+            case let .activated(sdk)?:
                 return sdk
-            case let .some(.activating(task)):
+            case let .activating(task)?:
                 return await task.value
             default:
                 throw .notActivated()
@@ -39,7 +39,7 @@ extension Adapty {
     }
 
     static var optionalSDK: Adapty? { // TODO: Deprecated
-        if case let .some(.activated(sdk)) = shared {
+        if case let .activated(sdk)? = shared {
             sdk
         } else {
             nil

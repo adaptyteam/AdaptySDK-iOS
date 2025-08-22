@@ -80,7 +80,7 @@ extension Adapty {
     ) async throws(AdaptyError) -> AdaptyViewSource {
         let httpSession = httpSession
         let apiKeyPrefix = apiKeyPrefix
-        let isTestUser = profileManager?.profile.value.isTestUser ?? false
+        let isTestUser = profileManager?.isTestUser ?? false
 
         do {
             return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {

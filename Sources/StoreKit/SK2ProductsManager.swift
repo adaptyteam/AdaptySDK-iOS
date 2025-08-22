@@ -23,7 +23,7 @@ actor SK2ProductsManager {
         self.session = session
         self.storage = storage
         Task {
-            await fetchAllProducts()
+            await prefetchAllProducts()
         }
     }
 
@@ -37,19 +37,28 @@ actor SK2ProductsManager {
         await storage.set(productInfo: productInfo)
     }
     
-    private func fetchAllProducts() async {
+    func getProductInfo(vendorId: String) async -> BackendProductInfo? {
+        await storage.productInfo(by: vendorId)
+    }
+    
+    private func fetchProductsInfo() async throws(HTTPError) -> [BackendProductInfo] {
+        let response = try await session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
+        await storage.set(allProductInfo: response)
+        return response
+    }
+    
+    private func prefetchAllProducts() async {
         guard !fetchingAllProducts else { return }
         fetchingAllProducts = true
 
         do {
-            let response = try await session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
-            await storage.set(allProductInfo: response)
+            _ = try await fetchProductsInfo()
         } catch {
             guard !error.isCancelled else { return }
             Task.detached(priority: .utility) { [weak self] in
                 try? await Task.sleep(duration: .seconds(2))
                 await self?.finishFetchingAllProducts()
-                await self?.fetchAllProducts() // TODO: recursion ???
+                await self?.prefetchAllProducts() // TODO: recursion ???
             }
             return
         }
