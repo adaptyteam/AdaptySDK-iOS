@@ -87,7 +87,7 @@ extension Backend.MainExecutor {
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
         responseHash: String?
-    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile>? {
         let request = UpdateProfileRequest(
             userId: userId,
             parameters: parameters,
@@ -100,6 +100,7 @@ extension Backend.MainExecutor {
             requestName: .updateProfile
         )
 
-        return VH(response.body, hash: response.headers.getBackendResponseHash())
+        guard let profile = response.body else { return nil }
+        return VH(profile, hash: response.headers.getBackendResponseHash())
     }
 }

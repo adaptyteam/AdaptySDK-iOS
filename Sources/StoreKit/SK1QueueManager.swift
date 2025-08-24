@@ -10,7 +10,8 @@ import StoreKit
 private let log = Log.sk1QueueManager
 
 actor SK1QueueManager: Sendable {
-    private let purchaseValidator: PurchaseValidator
+    private let transactionSynchronizer: StoreKitTransactionSynchronizer
+    private let subscriptionOfferSigner: StoreKitSubscriptionOfferSigner
     private let productsManager: StoreKitProductsManager
     private let storage: VariationIdStorage
 
@@ -18,11 +19,13 @@ actor SK1QueueManager: Sendable {
     private var makePurchasesProduct = [String: SK1Product]()
 
     fileprivate init(
-        purchaseValidator: PurchaseValidator,
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
+        subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         productsManager: StoreKitProductsManager,
         storage: VariationIdStorage
     ) {
-        self.purchaseValidator = purchaseValidator
+        self.transactionSynchronizer = transactionSynchronizer
+        self.subscriptionOfferSigner = subscriptionOfferSigner
         self.productsManager = productsManager
         self.storage = storage
     }
@@ -52,10 +55,10 @@ actor SK1QueueManager: Sendable {
             case .winBack:
                 throw StoreKitManagerError.invalidOffer("StoreKit1 Does not support winBackOffer purchase").asAdaptyError
             case let .promotional(offerId):
-                let response = try await purchaseValidator.signSubscriptionOffer(
-                    userId: userId,
-                    vendorProductId: product.vendorProductId,
-                    offerId: offerId
+                let response = try await subscriptionOfferSigner.sign(
+                    offerId: offerId,
+                    subscriptionVendorId: product.vendorProductId,
+                    for: userId
                 )
 
                 payment.paymentDiscount = SK1PaymentDiscount(
@@ -163,7 +166,6 @@ actor SK1QueueManager: Sendable {
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1Transaction) async {
         let productId = sk1Transaction.unfProductID
         let result: AdaptyResult<AdaptyPurchaseResult>
-        let finishTransaction: Bool
 
         if let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) {
             var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
@@ -176,37 +178,35 @@ actor SK1QueueManager: Sendable {
             }
 
             do {
-                let (profile, finish) = try await purchaseValidator.validatePurchase(.init(
-                    product: productOrNil,
-                    transaction: sk1Transaction,
-                    payload: await storage.getPurchasePayload(for: productId)
-                ))
-                finishTransaction = finish
+                let profile = try await transactionSynchronizer.validate(
+                    purchasedTransaction: .init(
+                        product: productOrNil,
+                        transaction: sk1Transaction,
+                        payload: await storage.getPurchasePayload(for: productId)
+                    ),
+                    for: nil
+                )
                 result = .success(.success(profile: profile, transaction: sk1Transaction))
 
             } catch {
-                finishTransaction = false
                 result = .failure(error)
             }
 
         } else {
-            finishTransaction = true
             result = .failure(StoreKitManagerError.unknownTransactionId().asAdaptyError)
         }
 
-        if finishTransaction {
-            storage.removePaywallVariationIds(for: productId)
-            makePurchasesProduct.removeValue(forKey: productId)
+        storage.removePaywallVariationIds(for: productId)
+        makePurchasesProduct.removeValue(forKey: productId)
 
-            SKPaymentQueue.default().finishTransaction(sk1Transaction)
+        SKPaymentQueue.default().finishTransaction(sk1Transaction)
 
-            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                methodName: .finishTransaction,
-                params: sk1Transaction.logParams
-            ))
+        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+            methodName: .finishTransaction,
+            params: sk1Transaction.logParams
+        ))
 
-            log.info("finish purchased transaction \(sk1Transaction)")
-        }
+        log.info("finish purchased transaction \(sk1Transaction)")
 
         callMakePurchasesCompletionHandlers(productId, result)
     }
@@ -276,14 +276,16 @@ extension SK1QueueManager {
 
     @AdaptyActor
     static func startObserving(
-        purchaseValidator: PurchaseValidator,
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
+        subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         productsManager: StoreKitProductsManager,
         storage: VariationIdStorage
     ) -> SK1QueueManager? {
         guard observer == nil else { return nil }
 
         let manager = SK1QueueManager(
-            purchaseValidator: purchaseValidator,
+            transactionSynchronizer: transactionSynchronizer,
+            subscriptionOfferSigner: subscriptionOfferSigner,
             productsManager: productsManager,
             storage: storage
         )

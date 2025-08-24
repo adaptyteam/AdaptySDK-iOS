@@ -182,9 +182,7 @@ extension Adapty {
                 await httpSession.fetchIntroductoryOfferEligibility(
                     userId: userId,
                     responseHash: lastResponse?.hash
-                ).flatValue()
-
-            guard let response else { return lastResponse?.eligibleProductIds ?? [] }
+                )
 
             if let manager = try? profileManager(withProfileId: userId) {
                 return manager.backendIntroductoryOfferEligibilityStorage.save(response)

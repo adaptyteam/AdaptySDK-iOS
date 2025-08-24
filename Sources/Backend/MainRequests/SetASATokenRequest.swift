@@ -55,7 +55,7 @@ extension Backend.MainExecutor {
         userId: AdaptyUserId,
         token: String,
         responseHash: String?
-    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile>? {
         let request = SetASATokenRequest(
             userId: userId,
             token: token,
@@ -66,7 +66,7 @@ extension Backend.MainExecutor {
             requestName: .sendASAToken,
             logParams: ["token": token]
         )
-
-        return VH(response.body, hash: response.headers.getBackendResponseHash())
+        guard let profile = response.body else { return nil }
+        return VH(profile, hash: response.headers.getBackendResponseHash())
     }
 }

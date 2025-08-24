@@ -74,17 +74,9 @@ public extension Adapty {
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func restorePurchases() async throws(AdaptyError) -> AdaptyProfile {
         try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(AdaptyError) in
-            let userId = sdk.profileStorage.userId
-            if let profile = try await sdk.syncTransactions(for: userId) {
-                return profile
-            }
-
             let manager = try await sdk.createdProfileManager
-            if manager.isNotEqualProfileId(userId) {
-                throw .profileWasChanged()
-            }
-
-            return await manager.getProfile()
+            try await sdk.syncTransactions(for: manager.userId)
+            return await manager.fetchProfile()
         }
     }
 }

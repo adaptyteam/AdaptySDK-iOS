@@ -11,16 +11,19 @@ private let log = Log.sk2TransactionManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2Purchaser {
-    private let purchaseValidator: PurchaseValidator
+    private let transactionSynchronizer: StoreKitTransactionSynchronizer
+    private let subscriptionOfferSigner: StoreKitSubscriptionOfferSigner
     private let storage: VariationIdStorage
     private let sk2ProductManager: SK2ProductsManager
 
     private init(
-        purchaseValidator: PurchaseValidator,
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
+        subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         storage: VariationIdStorage,
         sk2ProductManager: SK2ProductsManager
     ) {
-        self.purchaseValidator = purchaseValidator
+        self.transactionSynchronizer = transactionSynchronizer
+        self.subscriptionOfferSigner = subscriptionOfferSigner
         self.storage = storage
         self.sk2ProductManager = sk2ProductManager
     }
@@ -30,7 +33,8 @@ actor SK2Purchaser {
 
     @AdaptyActor
     static func startObserving(
-        purchaseValidator: PurchaseValidator,
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
+        subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         sk2ProductsManager: SK2ProductsManager,
         storage: VariationIdStorage
     ) -> SK2Purchaser? {
@@ -51,13 +55,13 @@ actor SK2Purchaser {
                         )
 
                         do {
-                            try await purchaseValidator.reportTransaction(
-                                userId: nil,
+                            try await transactionSynchronizer.report(
                                 purchasedTransaction: .init(
                                     product: productOrNil,
                                     transaction: sk2Transaction,
                                     payload: storage.getPurchasePayload(for: sk2Transaction.productID)
                                 ),
+                                for: nil,
                                 reason: .observing
                             )
 
@@ -80,7 +84,8 @@ actor SK2Purchaser {
         isObservingStarted = true
 
         return SK2Purchaser(
-            purchaseValidator: purchaseValidator,
+            transactionSynchronizer: transactionSynchronizer,
+            subscriptionOfferSigner: subscriptionOfferSigner,
             storage: storage,
             sk2ProductManager: sk2ProductsManager
         )
@@ -106,10 +111,10 @@ actor SK2Purchaser {
         if let offer = product.subscriptionOffer {
             switch offer.offerIdentifier {
             case let .promotional(offerId):
-                let response = try await purchaseValidator.signSubscriptionOffer(
-                    userId: userId,
-                    vendorProductId: product.vendorProductId,
-                    offerId: offerId
+                let response = try await subscriptionOfferSigner.sign(
+                    offerId: offerId,
+                    subscriptionVendorId: product.vendorProductId,
+                    for: userId
                 )
 
                 options.insert(
@@ -143,14 +148,15 @@ actor SK2Purchaser {
             persistentPaywallVariationId: product.variationId,
             persistentOnboardingVariationId: await storage.getOnboardingVariationId()
         )
-        return try await makePurchase(product.skProduct, options, payload)
+        return try await makePurchase(product.skProduct, options, payload, for: userId)
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     private func makePurchase(
         _ sk2Product: SK2Product,
         _ options: Set<Product.PurchaseOption>,
-        _ payload: PurchasePayload?
+        _ payload: PurchasePayload?,
+        for userId: AdaptyUserId
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         let stamp = Log.stamp
 
@@ -233,27 +239,33 @@ actor SK2Purchaser {
         let sk2Transaction = sk2SignedTransaction.unsafePayloadValue
 
         do {
-            let (profile, finishTransaction) = try await purchaseValidator.validatePurchase(.init(
-                product: sk2Product.asAdaptyProduct,
-                transaction: sk2Transaction,
-                payload: payload
+            let profile = try await transactionSynchronizer.validate(
+                purchasedTransaction: .init(
+                    product: sk2Product.asAdaptyProduct,
+                    transaction: sk2Transaction,
+                    payload: payload
+                ),
+                for: userId
+            )
+
+            await sk2Transaction.finish()
+
+            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                methodName: .finishTransaction,
+                params: sk2Transaction.logParams
             ))
-
-            if finishTransaction {
-                await sk2Transaction.finish()
-
-                await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                    methodName: .finishTransaction,
-                    params: sk2Transaction.logParams
-                ))
-                storage.removePaywallVariationIds(for: sk2Product.id)
-                log.info("Successfully purchased product: \(sk2Product.id) with transaction: \(sk2Transaction)")
-            }
-
+            storage.removePaywallVariationIds(for: sk2Product.id)
+            log.info("Successfully purchased product: \(sk2Product.id) with transaction: \(sk2Transaction)")
             return .success(profile: profile, transaction: sk2SignedTransaction)
+
         } catch {
             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Product.id)")
-            throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
+
+            if let profile = await transactionSynchronizer.currentProfileWithOfflineAccessLevels {
+                return .success(profile: profile, transaction: sk2SignedTransaction)
+            } else {
+                throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
+            }
         }
     }
 }

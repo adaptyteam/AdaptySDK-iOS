@@ -131,8 +131,10 @@ final class ProfileStorage {
         Self.clearProfile(newProfile: newProfile)
     }
 
-    func setProfile(_ newProfile: VH<AdaptyProfile>) {
+    func setIdentifiedProfile(_ newProfile: VH<AdaptyProfile>) {
         Self.setProfile(newProfile)
+       // after identify need sync history of transactions
+        setSyncedTransactionsHistory(false)
     }
 
     func updateProfile(_ profile: VH<AdaptyProfile>) -> Bool {

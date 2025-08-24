@@ -83,9 +83,9 @@ private extension Adapty.ValidatePurchaseReason {
 }
 
 extension Backend.MainExecutor {
-    func syncTransaction(
-        userId: AdaptyUserId,
-        originalTransactionId: String
+    func syncTransactionsHistory(
+        originalTransactionId: String,
+        for userId: AdaptyUserId
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: userId,
@@ -104,10 +104,10 @@ extension Backend.MainExecutor {
         return VH(response.body.value, hash: response.headers.getBackendResponseHash())
     }
 
-    func reportTransaction(
-        userId: AdaptyUserId,
-        transactionId: String,
-        variationId: String?
+    func sendTransactionId(
+        _ transactionId: String,
+        with variationId: String?,
+        for userId: AdaptyUserId
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: userId,

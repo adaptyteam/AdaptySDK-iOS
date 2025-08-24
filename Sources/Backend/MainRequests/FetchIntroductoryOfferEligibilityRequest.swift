@@ -64,7 +64,7 @@ extension Backend.MainExecutor {
     func fetchIntroductoryOfferEligibility(
         userId: AdaptyUserId,
         responseHash: String?
-    ) async throws(HTTPError) -> VH<[BackendIntroductoryOfferEligibilityState]?> {
+    ) async throws(HTTPError) -> VH<[BackendIntroductoryOfferEligibilityState]> {
         let request = FetchIntroductoryOfferEligibilityRequest(
             userId: userId,
             responseHash: responseHash
@@ -74,6 +74,6 @@ extension Backend.MainExecutor {
             request,
             requestName: .fetchProductStates
         )
-        return VH(response.body, hash: response.headers.getBackendResponseHash())
+        return VH(response.body ?? [], hash: response.headers.getBackendResponseHash())
     }
 }

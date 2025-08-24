@@ -67,9 +67,7 @@ public extension Adapty {
                 attributionJson: attributionJson,
                 responseHash: oldResponseHash
             )
-
-            profileManager?.handleProfileResponse(response.flatValue())
-
+            handleProfileResponse(response)
         } catch {
             throw error.asAdaptyError
         }

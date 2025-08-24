@@ -10,14 +10,14 @@ import StoreKit
 private let log = Log.sk1QueueManager
 
 actor SK1TransactionObserver: Sendable {
-    private let purchaseValidator: PurchaseValidator
+    private let transactionSynchronizer: StoreKitTransactionSynchronizer
     private let sk1ProductsManager: SK1ProductsManager
 
     fileprivate init(
-        purchaseValidator: PurchaseValidator,
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
         sk1ProductsManager: SK1ProductsManager
     ) {
-        self.purchaseValidator = purchaseValidator
+        self.transactionSynchronizer = transactionSynchronizer
         self.sk1ProductsManager = sk1ProductsManager
     }
 
@@ -43,13 +43,13 @@ actor SK1TransactionObserver: Sendable {
                     fetchPolicy: .returnCacheDataElseLoad
                 )
 
-                try await self.purchaseValidator.reportTransaction(
-                    userId: nil,
+                try await self.transactionSynchronizer.report(
                     purchasedTransaction: .init(
                         product: productOrNil,
                         transaction: sk1Transaction,
                         payload: nil
                     ),
+                    for: nil,
                     reason: .observing
                 )
             }
@@ -63,13 +63,13 @@ extension SK1TransactionObserver {
 
     @AdaptyActor
     static func startObserving(
-        purchaseValidator: PurchaseValidator,
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
         sk1ProductsManager: SK1ProductsManager
     ) {
         guard observer == nil else { return }
 
         let observer = ObserverWrapper(SK1TransactionObserver(
-            purchaseValidator: purchaseValidator,
+            transactionSynchronizer: transactionSynchronizer,
             sk1ProductsManager: sk1ProductsManager
         ))
 

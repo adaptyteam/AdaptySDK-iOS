@@ -11,7 +11,7 @@ private let log = Log.sk2TransactionManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2TransactionManager {
-    private let session: Backend.MainExecutor
+     let httpSession: Backend.MainExecutor
 
     private var lastTransactionCached: SK2Transaction?
     private var verifiedCurrentEntitlementsCached: (value: [SK2Transaction], at: Date)?
@@ -19,8 +19,8 @@ actor SK2TransactionManager {
 
     private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, userId: AdaptyUserId)?
 
-    init(session: Backend.MainExecutor) {
-        self.session = session
+    init(httpSession: Backend.MainExecutor) {
+        self.httpSession = httpSession
     }
 
     func syncTransactions(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
@@ -34,9 +34,9 @@ actor SK2TransactionManager {
                     guard let transaction = await getLastVerifiedTransaction()
                     else { return .success(nil) }
 
-                    let value = try await session.syncTransaction(
-                        userId: userId,
-                        originalTransactionId: transaction.unfOriginalIdentifier
+                    let value = try await httpSession.syncTransactionsHistory(
+                        originalTransactionId: transaction.unfOriginalIdentifier,
+                        for: userId
                     )
                     return .success(value)
                 } catch {

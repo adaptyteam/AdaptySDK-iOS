@@ -333,7 +333,7 @@ extension Adapty {
         func updateSegmentId(for userId: AdaptyUserId, oldSegmentId: String) async throws(AdaptyError) -> Bool {
             let manager = try profileManager(withProfileId: userId).orThrows
             guard manager.segmentId == oldSegmentId else { return true }
-            return await manager.getProfile().segmentId != oldSegmentId
+            return await manager.fetchSegmentId() != oldSegmentId
         }
     }
 

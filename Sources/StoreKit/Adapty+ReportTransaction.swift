@@ -21,10 +21,10 @@ public extension Adapty {
             "transaction_id": transactionId,
         ]) { sdk throws(AdaptyError) in
             let userId = sdk.profileStorage.userId
-            try await sdk.reportTransaction(
-                userId: userId,
-                transactionId: transactionId,
-                variationId: variationId
+            try await sdk.sendTransactionId(
+                transactionId,
+                with: variationId,
+                for: userId
             )
         }
     }
@@ -51,9 +51,9 @@ public extension Adapty {
                 payload: .init(paywallVariationId: variationId)
             )
 
-            try await sdk.reportTransaction(
-                userId: userId,
+            try await sdk.report(
                 purchasedTransaction: purchasedTransaction,
+                for: userId,
                 reason: .setVariation
             )
         }
