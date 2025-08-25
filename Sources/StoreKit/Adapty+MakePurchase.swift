@@ -75,7 +75,7 @@ public extension Adapty {
     nonisolated static func restorePurchases() async throws(AdaptyError) -> AdaptyProfile {
         try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(AdaptyError) in
             let manager = try await sdk.createdProfileManager
-            try await sdk.syncTransactions(for: manager.userId)
+            try await sdk.syncTransactionHistory(for: manager.userId, forceSync: true)
             return await manager.fetchProfile()
         }
     }

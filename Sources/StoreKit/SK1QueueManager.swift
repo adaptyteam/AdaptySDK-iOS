@@ -135,19 +135,17 @@ actor SK1QueueManager: Sendable {
 
             switch sk1Transaction.transactionState {
             case .purchased:
-                await receivedPurchasedTransaction(sk1Transaction)
+                if let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) {
+                    await receivedPurchasedTransaction(sk1Transaction)
+                } else {
+                    await receivedFailedTransaction(sk1Transaction, error: StoreKitManagerError.unknownTransactionId().asAdaptyError)
+                }
 
             case .failed:
-                SKPaymentQueue.default().finishTransaction(sk1Transaction)
-                await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                    methodName: .finishTransaction,
-                    params: logParams
-                ))
-                log.verbose("finish failed transaction \(sk1Transaction)")
-                receivedFailedTransaction(sk1Transaction)
+                await receivedFailedTransaction(sk1Transaction, error: nil)
 
             case .restored:
-                SKPaymentQueue.default().finishTransaction(sk1Transaction)
+                await sk1Transaction.finish()
                 await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                     methodName: .finishTransaction,
                     params: logParams
@@ -163,64 +161,58 @@ actor SK1QueueManager: Sendable {
         }
     }
 
-    private func receivedPurchasedTransaction(_ sk1Transaction: SK1Transaction) async {
+    private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
         let productId = sk1Transaction.unfProductID
         let result: AdaptyResult<AdaptyPurchaseResult>
 
-        if let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) {
-            var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
+        var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
 
-            if productOrNil == nil {
-                productOrNil = try? await productsManager.fetchProduct(
-                    id: sk1Transaction.unfProductID,
-                    fetchPolicy: .returnCacheDataElseLoad
-                )
-            }
-
-            do {
-                let profile = try await transactionSynchronizer.validate(
-                    purchasedTransaction: .init(
-                        product: productOrNil,
-                        transaction: sk1Transaction,
-                        payload: await storage.getPurchasePayload(for: productId)
-                    ),
-                    for: nil
-                )
-                result = .success(.success(profile: profile, transaction: sk1Transaction))
-
-            } catch {
-                result = .failure(error)
-            }
-
-        } else {
-            result = .failure(StoreKitManagerError.unknownTransactionId().asAdaptyError)
+        if productOrNil == nil {
+            productOrNil = try? await productsManager.fetchProduct(
+                id: sk1Transaction.unfProductID,
+                fetchPolicy: .returnCacheDataElseLoad
+            )
         }
 
-        storage.removePaywallVariationIds(for: productId)
+        do {
+            let profile = try await transactionSynchronizer.validate(
+                purchasedTransaction: .init(
+                    product: productOrNil,
+                    transaction: sk1Transaction,
+                    payload: await storage.getPurchasePayload(for: productId)
+                ),
+                for: nil
+            )
+            makePurchasesProduct.removeValue(forKey: productId)
+            await transactionSynchronizer.finish(transaction: sk1Transaction)
+            log.info("finish purchased transaction \(sk1Transaction)")
+
+            result = .success(.success(profile: profile, transaction: sk1Transaction))
+        } catch {
+            result = .failure(error)
+        }
+
+        callMakePurchasesCompletionHandlers(productId, result)
+    }
+
+    private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction, error: AdaptyError? = nil) async {
+        let productId = sk1Transaction.unfProductID
+
         makePurchasesProduct.removeValue(forKey: productId)
-
-        SKPaymentQueue.default().finishTransaction(sk1Transaction)
-
+        storage.removePaywallVariationIds(for: productId)
+        await sk1Transaction.finish()
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .finishTransaction,
             params: sk1Transaction.logParams
         ))
 
-        log.info("finish purchased transaction \(sk1Transaction)")
-
-        callMakePurchasesCompletionHandlers(productId, result)
-    }
-
-    private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction) {
-        let productId = sk1Transaction.unfProductID
-        storage.removePaywallVariationIds(for: productId)
-        makePurchasesProduct.removeValue(forKey: productId)
-
         let result: AdaptyResult<AdaptyPurchaseResult>
         if (sk1Transaction.error as? SKError)?.isPurchaseCancelled ?? false {
+            log.verbose("finish canceled transaction \(sk1Transaction) ")
             result = .success(.userCancelled)
         } else {
-            let error = StoreKitManagerError.productPurchaseFailed(sk1Transaction.error).asAdaptyError
+            let error = error ?? StoreKitManagerError.productPurchaseFailed(sk1Transaction.error).asAdaptyError
+            log.verbose("finish failed transaction \(sk1Transaction) error: \(error)")
             result = .failure(error)
         }
         callMakePurchasesCompletionHandlers(productId, result)

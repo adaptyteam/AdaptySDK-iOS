@@ -12,7 +12,7 @@ private let log = Log.skReceiptManager
 actor StoreKitReceiptManager {
     let httpSession: Backend.MainExecutor
     private let refresher = ReceiptRefresher()
-    private var syncing: (task: AdaptyResultTask<VH<AdaptyProfile>?>, userId: AdaptyUserId)?
+    private var syncing: (task: AdaptyResultTask<Void>, userId: AdaptyUserId)?
 
     init(httpSession: Backend.MainExecutor, refreshIfEmpty: Bool) {
         self.httpSession = httpSession
@@ -73,8 +73,10 @@ actor StoreKitReceiptManager {
 }
 
 extension StoreKitReceiptManager {
-    func syncTransactions(for userId: AdaptyUserId) async throws(AdaptyError) -> VH<AdaptyProfile>? {
-        let task: AdaptyResultTask<VH<AdaptyProfile>?>
+
+    
+    func syncTransactionHistory(for userId: AdaptyUserId) async throws(AdaptyError) {
+        let task: AdaptyResultTask<Void>
         if let syncing, userId.isEqualProfileId(syncing.userId) {
             task = syncing.task
         } else {
@@ -88,18 +90,19 @@ extension StoreKitReceiptManager {
                 }
 
                 do throws(HTTPError) {
-                    let value = try await httpSession.validateReceipt(
+                    let response = try await httpSession.validateReceipt(
                         userId: userId,
                         receipt: receipt
                     )
-                    return .success(value)
+                    await Adapty.optionalSDK?.handleTransactionResponse(response)
+                    return .success(())
                 } catch {
                     return .failure(error.asAdaptyError)
                 }
             }
             syncing = (task, userId)
         }
-        return try await task.value.get()
+        try await task.value.get()
     }
 }
 

@@ -12,10 +12,6 @@ private let log = Log.sk2ProductManager
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProfile {
     func added(transactions: [SK2Transaction], productManager: SK2ProductsManager) async -> AdaptyProfile {
-//        var transactions = transactions
-//        if onlyXcodeEnvironment {
-//            transactions = transactions.filter { $0.unfEnvironment == SK2Transaction.xcodeEnvironment }
-//        }
         guard !transactions.isEmpty else { return self }
         var accessLevels = [String: AdaptyProfile.AccessLevel]()
         let products = try? await productManager.fetchSK2Products(

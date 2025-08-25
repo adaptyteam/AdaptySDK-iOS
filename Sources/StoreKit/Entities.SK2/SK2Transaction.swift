@@ -48,15 +48,11 @@ extension SK2Transaction {
         return offerID
     }
 
-    var isSandbox: Bool {
-        unfEnvironment == "sandbox"
-    }
-
     var unfEnvironment: String {
         #if !os(visionOS)
         guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
             let environment = environmentStringRepresentation
-            return environment.isEmpty ? "storekit2" : environment.lowercased()
+            return environment.lowercased()
         }
         #endif
 
@@ -64,7 +60,7 @@ extension SK2Transaction {
         case .production: Self.productionEnvironment
         case .sandbox: Self.sandboxEnvironment
         case .xcode: Self.xcodeEnvironment
-        default: environment.rawValue
+        default: environment.rawValue.lowercased()
         }
     }
 

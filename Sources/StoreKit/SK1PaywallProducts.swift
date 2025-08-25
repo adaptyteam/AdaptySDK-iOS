@@ -168,7 +168,7 @@ extension Adapty {
         guard vendorProductIds.isNotEmpty else { return [] }
 
         do {
-            try await syncTransactionsIfNeed(for: userId)
+            try await syncTransactionHistory(for: userId)
         } catch {
             return []
         }

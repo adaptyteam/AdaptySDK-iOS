@@ -34,7 +34,7 @@ final class ProfileManager {
         self.onceSentEnvironment = sentEnvironment
         self.storage = storage
 
-        Task { [weak self] in
+        Task { @AdaptyActor [weak self] in
             guard let sdk = Adapty.optionalSDK else { return }
             sdk.updateASATokenIfNeed(for: profile)
 
@@ -44,7 +44,7 @@ final class ProfileManager {
             if sentEnvironment == .none {
                 _ = await self?.fetchProfile()
             } else {
-                try? await sdk.syncTransactionsIfNeed(for: profile.userId)
+                try? await sdk.syncTransactionHistory(for: profile.userId)
             }
         }
     }
@@ -94,7 +94,7 @@ final class ProfileManager {
         return try await syncProfile(params: params)
     }
 
-    func fetchProfile(afterSyncTransactions: Bool = false) async -> AdaptyProfile {
+    func fetchProfile() async -> AdaptyProfile {
         if let profile = try? await syncProfile(params: nil) {
             return profile
         }
@@ -115,7 +115,7 @@ final class ProfileManager {
         do throws(HTTPError) {
             if params == nil, meta == nil {
                 Task { @AdaptyActor in
-                    try? await Adapty.optionalSDK?.syncTransactionsIfNeed(for: userId)
+                    try? await Adapty.optionalSDK?.syncTransactionHistory(for: userId)
                 }
                 response = try await httpSession.fetchProfile(
                     userId: old.userId,
@@ -169,28 +169,33 @@ extension Adapty {
         profileStorage.setSyncedTransactionsHistory(true)
     }
 
-    func syncTransactionsIfNeed(for userId: AdaptyUserId) async throws(AdaptyError) {
-        var needSync = !profileStorage.syncedTransactionsHistory
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            
-        }
-
-        guard needSync else { return }
-        try await syncTransactions(for: userId)
-    }
-
-    func syncTransactions(for userId: AdaptyUserId) async throws(AdaptyError) {
-        let response = try await transactionSynchronizer.syncTransactions(for: userId)
-        handleTransactionResponse(response)
+    func syncTransactionHistory(for userId: AdaptyUserId, forceSync: Bool = false) async throws(AdaptyError) {
+        try await transactionManager.syncUnfinishedTransactions()
+        guard forceSync || !profileStorage.syncedTransactionsHistory else { return }
+        try await transactionManager.syncTransactionHistory(for: userId)
     }
 
     func profileWithOfflineAccessLevels(_ serverProfile: AdaptyProfile) async -> AdaptyProfile {
-        //   let observerMode = observerMode
-
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
+        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
+//              !observerMode,
+              let transactionManager = transactionManager as? SK2TransactionManager,
+              let productsManager = productsManager as? SK2ProductsManager
+        else {
             return serverProfile
         }
-        // TODO: calculate
-        return serverProfile
+        var verifiedCurrentEntitlements = await transactionManager.getVerifiedCurrentEntitlements()
+
+        if await transactionManager.hasUnfinishedTransactions {
+            verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter {
+                $0.unfEnvironment == SK2Transaction.xcodeEnvironment
+            }
+        }
+
+        guard !verifiedCurrentEntitlements.isEmpty else { return serverProfile }
+
+        return await serverProfile.added(
+            transactions: verifiedCurrentEntitlements,
+            productManager: productsManager
+        )
     }
 }

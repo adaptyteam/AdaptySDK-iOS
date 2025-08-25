@@ -9,6 +9,7 @@ import Foundation
 
 private let log = Log.default
 
+@AdaptyActor
 extension Adapty {
     public static var isActivated: Bool { shared != nil }
 

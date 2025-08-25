@@ -21,7 +21,7 @@ public final class Adapty {
     let httpConfigsSession: Backend.ConfigsExecutor
 
     let receiptManager: StoreKitReceiptManager
-    let transactionSynchronizer: StoreKitTransactionManager
+    let transactionManager: StoreKitTransactionManager
     let productsManager: StoreKitProductsManager
     var purchaser: StorekitPurchaser?
     var sk1QueueManager: SK1QueueManager?
@@ -46,9 +46,19 @@ public final class Adapty {
         self.variationIdStorage = VariationIdStorage()
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            self.receiptManager = StoreKitReceiptManager(httpSession: httpSession, refreshIfEmpty: false)
-            self.transactionSynchronizer = SK2TransactionManager(httpSession: httpSession)
-            let sk2ProductsManager = SK2ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
+            self.receiptManager = StoreKitReceiptManager(
+                httpSession: httpSession,
+                refreshIfEmpty: false
+            )
+            self.transactionManager = SK2TransactionManager(
+                httpSession: httpSession,
+                storage: variationIdStorage
+            )
+            let sk2ProductsManager = SK2ProductsManager(
+                apiKeyPrefix: apiKeyPrefix,
+                session: httpSession,
+                storage: productVendorIdsStorage
+            )
             self.productsManager = sk2ProductsManager
 
             self.sharedProfileManager = restoreProfileManager(configuration)
@@ -70,9 +80,17 @@ public final class Adapty {
             }
 
         } else {
-            self.receiptManager = StoreKitReceiptManager(httpSession: httpSession, refreshIfEmpty: true)
-            self.transactionSynchronizer = receiptManager
-            let sk1ProductsManager = SK1ProductsManager(apiKeyPrefix: apiKeyPrefix, session: httpSession, storage: productVendorIdsStorage)
+            self.receiptManager = StoreKitReceiptManager(
+                httpSession: httpSession,
+                refreshIfEmpty: true
+            )
+            self.transactionManager = receiptManager
+            let sk1ProductsManager = SK1ProductsManager(
+                apiKeyPrefix: apiKeyPrefix,
+                session: httpSession,
+                storage: productVendorIdsStorage
+            )
+
             self.productsManager = sk1ProductsManager
 
             self.sharedProfileManager = restoreProfileManager(configuration)

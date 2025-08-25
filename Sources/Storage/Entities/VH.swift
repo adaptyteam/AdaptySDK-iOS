@@ -25,21 +25,6 @@ struct VH<Value: Sendable>: Sendable {
     init(_ value: Value, time: Date) {
         self.init(value, hash: nil, time: time)
     }
-
-//    @inlinable
-//    func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
-//        VH<U>(transform(value), hash: hash, time: time)
-//    }
-//
-//    @inlinable
-//    func flatValue<T>() -> VH<T>? where Value == T? {
-//        switch value {
-//        case nil:
-//            nil
-//        case let v?:
-//            VH<T>(v, hash: hash, time: time)
-//        }
-//    }
 }
 
 extension VH {

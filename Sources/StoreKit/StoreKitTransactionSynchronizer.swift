@@ -19,8 +19,12 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
         for: AdaptyUserId?
     ) async throws(AdaptyError) -> AdaptyProfile
 
-    var currentProfileWithOfflineAccessLevels: AdaptyProfile? { get async }
+    func finish(
+        transaction: SKTransaction
+    ) async
 
+    var currentProfileWithOfflineAccessLevels: AdaptyProfile? { get async }
+    func clearCache() async
 }
 
 extension Adapty: StoreKitTransactionSynchronizer {
@@ -28,6 +32,7 @@ extension Adapty: StoreKitTransactionSynchronizer {
         case setVariation
         case observing
         case purchasing
+        case unfinished
     }
 
     func sendTransactionId(
@@ -64,6 +69,17 @@ extension Adapty: StoreKitTransactionSynchronizer {
         }
     }
 
+    func finish(
+        transaction: SKTransaction
+    ) async {
+        variationIdStorage.removePaywallVariationIds(for: transaction.unfProductID)
+        await transaction.finish()
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+            methodName: .finishTransaction,
+            params: transaction.logParams
+        ))
+    }
+
     func validate(
         purchasedTransaction: PurchasedTransaction,
         for userId: AdaptyUserId?
@@ -86,11 +102,16 @@ extension Adapty: StoreKitTransactionSynchronizer {
         }
     }
 
+    func clearCache() async {
+        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
+              let manager = transactionManager as? SK2TransactionManager
+        else { return }
+        await manager.clearCache()
+    }
+
     var currentProfileWithOfflineAccessLevels: AdaptyProfile? {
         get async {
             await profileManager?.profileWithOfflineAccessLevels
         }
     }
-
- 
 }
