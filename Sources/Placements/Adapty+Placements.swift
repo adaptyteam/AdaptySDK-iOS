@@ -383,6 +383,10 @@ extension Adapty {
                 )
             }() ?? params
 
+            if let cached = params?.cached {
+                return cached
+            }
+
             do {
                 var chosen: AdaptyPlacementChosen<Content>
                 if let variationId = params?.variationId {
