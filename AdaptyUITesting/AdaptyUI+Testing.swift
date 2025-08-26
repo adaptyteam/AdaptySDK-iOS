@@ -180,4 +180,18 @@ public extension View {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+public extension AdaptyUI {
+    static func getOnboardingConfigurationForTesting(
+        forOnboarding onboarding: AdaptyOnboarding,
+        inspectWebView: Bool
+    ) throws -> OnboardingConfiguration {
+        try AdaptyUI.getOnboardingConfiguration(
+            forOnboarding: onboarding,
+            inspectWebView: inspectWebView
+        )
+    }
+}
+
 #endif

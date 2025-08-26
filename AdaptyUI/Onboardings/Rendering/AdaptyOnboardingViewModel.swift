@@ -20,14 +20,20 @@ private extension AdaptyUI {
 final class AdaptyOnboardingViewModel: ObservableObject {
     let logId: String
     let onboarding: AdaptyOnboarding
+    let inspectWebView: Bool
     var onMessage: ((AdaptyOnboardingsMessage) -> Void)?
     var onError: ((AdaptyUIError) -> Void)?
 
     private let webViewDelegate: AdaptyWebViewDelegate
 
-    init(logId: String, onboarding: AdaptyOnboarding) {
+    init(
+        logId: String,
+        onboarding: AdaptyOnboarding,
+        inspectWebView: Bool
+    ) {
         self.logId = logId
         self.onboarding = onboarding
+        self.inspectWebView = inspectWebView
         self.webViewDelegate = AdaptyWebViewDelegate(logId: logId)
     }
 
@@ -49,6 +55,10 @@ final class AdaptyOnboardingViewModel: ObservableObject {
             webViewDelegate,
             name: AdaptyUI.webViewEventMessageName
         )
+        
+        if #available(iOS 16.4, *) {
+            webView.isInspectable = inspectWebView
+        }
 
         self.webView = webView
     }
