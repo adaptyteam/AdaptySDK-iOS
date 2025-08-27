@@ -190,7 +190,7 @@ final class LifecycleManager {
 
             profileUpdateRegularTask?.cancel()
             self.profileUpdateRegularTask = self.scheduleProfileUpdate(skipFirstSleep: true)
-            
+
             Adapty.startRegisterInstallTaskIfNeeded()
 
             if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {

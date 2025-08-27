@@ -42,27 +42,32 @@ private extension CodingUserInfoKey {
     static let placementId = CodingUserInfoKey(rawValue: "adapty_placement_id")!
     static let placementVariationId = CodingUserInfoKey(rawValue: "adapty_placement_variation_id")!
     static let placement = CodingUserInfoKey(rawValue: "adapty_placement")!
+    static let requestlocale = CodingUserInfoKey(rawValue: "adapty_request_locale")!
 }
 
-extension CodingUserInfoContainer {
-    func setProfileId(_ value: String) {
-        userInfo[.profileId] = value
+extension CodingUserInfo {
+    mutating func setProfileId(_ value: String) {
+        self[.profileId] = value
     }
 
-    func setPlacement(_ value: AdaptyPlacement) {
-        userInfo[.placement] = value
+    mutating func setPlacement(_ value: AdaptyPlacement) {
+        self[.placement] = value
     }
 
-    func setPlacementId(_ value: String) {
-        userInfo[.placementId] = value
+    mutating func setPlacementId(_ value: String) {
+        self[.placementId] = value
     }
 
-    func setPlacementVariationId(_ value: String) {
-        userInfo[.placementVariationId] = value
+    mutating func setRequestLocale(_ value: AdaptyLocale) {
+        self[.requestlocale] = value
     }
 
-    package func enableEncodingViewConfiguration() {
-        userInfo[.enableEncodingViewConfiguration] = true
+    mutating func setPlacementVariationId(_ value: String) {
+        self[.placementVariationId] = value
+    }
+
+    package mutating func enableEncodingViewConfiguration() {
+        self[.enableEncodingViewConfiguration] = true
     }
 }
 
@@ -107,6 +112,10 @@ extension [CodingUserInfoKey: Any] {
         self[.placement] as? AdaptyPlacement
     }
 
+    var requestLocaleOrNil: AdaptyLocale? {
+        self[.requestlocale] as? AdaptyLocale
+    }
+
     var placementVariationIdOrNil: String? {
         self[.placementVariationId] as? String
     }
@@ -131,10 +140,8 @@ extension Backend.Response {
                 .container(keyedBy: Backend.CodingKeys.self)
                 .decode(Value.self, forKey: .data)
         }
-        
-        
     }
-    
+
     struct OptionalData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
         let value: Value?
 

@@ -111,6 +111,7 @@ extension AdaptyPlacementChosen {
         withConfiguration configuration: HTTPCodableConfiguration?,
         withProfileId profileId: String,
         withPlacementId placementId: String,
+        withRequestLocale requestLocale: AdaptyLocale,
         withCached cached: Content?,
         variationIdResolver: VariationIdResolver?
     ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
@@ -126,8 +127,9 @@ extension AdaptyPlacementChosen {
             return response.replaceBody(AdaptyPlacementChosen.restore(cached))
         }
 
-        jsonDecoder.setPlacement(placement)
-        jsonDecoder.setProfileId(profileId)
+        jsonDecoder.userInfo.setPlacement(placement)
+        jsonDecoder.userInfo.setProfileId(profileId)
+        jsonDecoder.userInfo.setRequestLocale(requestLocale)
 
         let draw = try jsonDecoder.decode(
             Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
@@ -143,7 +145,7 @@ extension AdaptyPlacementChosen {
             return response.replaceBody(AdaptyPlacementChosen.draw(draw))
         }
 
-        jsonDecoder.setPlacementVariationId(variationId)
+        jsonDecoder.userInfo.setPlacementVariationId(variationId)
 
         let variation = try jsonDecoder.decode(
             Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
@@ -155,7 +157,7 @@ extension AdaptyPlacementChosen {
 }
 
 extension Backend.MainExecutor {
-    func fetchPlacementVariations<Content: AdaptyPlacementContent>(
+    func fetchPlacementVariations<Content: PlacementContent>(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -198,6 +200,7 @@ extension Backend.MainExecutor {
                 withConfiguration: configuration,
                 withProfileId: profileId,
                 withPlacementId: placementId,
+                withRequestLocale: locale,
                 withCached: cached,
                 variationIdResolver: variationIdResolver
             )

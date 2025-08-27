@@ -31,7 +31,8 @@ private struct FetchFallbackPlacementRequest: HTTPRequest {
 }
 
 extension Backend.FallbackExecutor {
-    func fetchFallbackPlacement<Content: AdaptyPlacementContent>(
+    @inlinable
+    func fetchFallbackPlacement<Content: PlacementContent>(
         apiKeyPrefix: String,
         profileId: String,
         placementId: String,
@@ -40,6 +41,30 @@ extension Backend.FallbackExecutor {
         cached: Content?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
+        try await _fetchFallbackPlacement(
+            apiKeyPrefix,
+            profileId,
+            placementId,
+            paywallVariationId,
+            locale: locale,
+            locale,
+            cached,
+            disableServerCache,
+            timeoutInterval
+        )
+    }
+
+    private func _fetchFallbackPlacement<Content: PlacementContent>(
+        _ apiKeyPrefix: String,
+        _ profileId: String,
+        _ placementId: String,
+        _ paywallVariationId: String,
+        locale: AdaptyLocale,
+        _ requestLocale: AdaptyLocale,
+        _ cached: Content?,
+        _ disableServerCache: Bool,
+        _ timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let endpoint: HTTPEndpoint
         let requestName: APIRequestName
@@ -79,6 +104,7 @@ extension Backend.FallbackExecutor {
                     "builder_version": AdaptyViewConfiguration.builderVersion,
                     "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
                     "language_code": locale.languageCode,
+                    "request_locale": requestLocale.id,
                     "disable_server_cache": disableServerCache,
                 ]
             ) { @Sendable response in
@@ -86,6 +112,7 @@ extension Backend.FallbackExecutor {
                     response,
                     withConfiguration: configuration,
                     withProfileId: profileId,
+                    withRequestLocale: requestLocale,
                     withCached: cached
                 )
             }
@@ -98,15 +125,16 @@ extension Backend.FallbackExecutor {
                 throw error
             }
 
-            return try await fetchFallbackPlacement(
-                apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
-                placementId: placementId,
-                paywallVariationId: paywallVariationId,
+            return try await _fetchFallbackPlacement(
+                apiKeyPrefix,
+                profileId,
+                placementId,
+                paywallVariationId,
                 locale: .defaultPlacementLocale,
-                cached: cached,
-                disableServerCache: disableServerCache,
-                timeoutInterval: timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
+                requestLocale,
+                cached,
+                disableServerCache,
+                timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
             )
         }
     }
