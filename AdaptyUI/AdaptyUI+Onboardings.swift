@@ -20,13 +20,15 @@ public extension AdaptyUI {
 
         init(
             logId: String,
-            onboarding: AdaptyOnboarding
+            onboarding: AdaptyOnboarding,
+            inspectWebView: Bool
         ) {
             Log.ui.verbose("#\(logId)# init onboarding: \(onboarding.placement.id)")
 
             self.viewModel = AdaptyOnboardingViewModel(
                 logId: logId,
-                onboarding: onboarding
+                onboarding: onboarding,
+                inspectWebView: inspectWebView
             )
         }
     }
@@ -47,7 +49,8 @@ public extension AdaptyUI {
         
         return OnboardingConfiguration(
             logId: Log.stamp,
-            onboarding: onboarding
+            onboarding: onboarding,
+            inspectWebView: false
         )
     }
 
@@ -67,6 +70,28 @@ public extension AdaptyUI {
             configuration: onboardingConfiguration,
             delegate: delegate,
             statusBarStyle: statusBarStyle
+        )
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+package extension AdaptyUI {
+    static func getOnboardingConfiguration(
+        forOnboarding onboarding: AdaptyOnboarding,
+        inspectWebView: Bool
+    ) throws -> OnboardingConfiguration {
+        guard AdaptyUI.isActivated else {
+            let err = AdaptyUIError.adaptyNotActivated
+            Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
+            
+            throw err
+        }
+        
+        return OnboardingConfiguration(
+            logId: Log.stamp,
+            onboarding: onboarding,
+            inspectWebView: inspectWebView
         )
     }
 }
