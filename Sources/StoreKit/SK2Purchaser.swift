@@ -257,6 +257,7 @@ actor SK2Purchaser {
             await transactionSynchronizer.clearCache()
             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Product.id)")
             if let profile = await transactionSynchronizer.currentProfileWithOfflineAccessLevels {
+                await Adapty.callDelegate { $0.didLoadLatestProfile(profile) }
                 return .success(profile: profile, transaction: sk2SignedTransaction)
             } else {
                 throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
