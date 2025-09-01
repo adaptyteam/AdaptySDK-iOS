@@ -185,7 +185,7 @@ extension Adapty {
         }
         var verifiedCurrentEntitlements = await transactionManager.getVerifiedCurrentEntitlements()
 
-        if await transactionManager.hasUnfinishedTransactions {
+        if await !transactionManager.hasUnfinishedTransactions {
             verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter {
                 $0.unfEnvironment == SK2Transaction.xcodeEnvironment
             }
