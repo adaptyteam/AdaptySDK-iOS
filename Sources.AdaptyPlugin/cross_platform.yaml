@@ -288,7 +288,7 @@ $requests:
     properties:
       method: { const: "identify" }
       customer_user_id: { type: string }
-      app_account_token: { $ref: "#/$defs/UUID" }
+      parameters: { $ref: "#/$defs/CustomerIdentityParameters" } 
 
   Identify.Response: #response
     type: object
@@ -937,7 +937,7 @@ $defs:
     properties:
       api_key: { type: string }
       customer_user_id: { type: string }
-      app_account_token: { $ref: "#/$defs/UUID" , description: "used only if customer_user_id is not null"}
+      customer_identity_parameters: { $ref: "#/$defs/CustomerIdentityParameters" }    
       observer_mode: { type: boolean, default: false }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
@@ -960,6 +960,13 @@ $defs:
             { type: integer, description: "bytes" }
           memory_storage_count_limit: { type: integer }
           disk_storage_size_limit: { type: integer, description: "bytes" }
+
+  CustomerIdentityParameters: #request
+    type: object
+    properties:
+      app_account_token: { $ref: "#/$defs/UUID", description: "iOS Only" }
+      obfuscated_account_id: { type: string, description: "Android Only" }
+      obfuscated_profile_id: { type: string, description: "Android Only" }     
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -1089,6 +1096,7 @@ $defs:
       - variation_id
       - onboarding_builder
       - response_created_at
+      - request_locale
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       onboarding_id: { type: string }
@@ -1097,12 +1105,12 @@ $defs:
       remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
       onboarding_builder:
         type: object
-        required: [lang, config_url]
+        required: [config_url]
         properties:
-          lang: { $ref: "#/$defs/AdaptyLocale" }
           config_url: { type: string }
       payload_data: { type: string }
       response_created_at: { type: integer }
+      request_locale: { $ref: "#/$defs/AdaptyLocale" }
 
 
   AdaptyPaywall: #request #response
@@ -1114,6 +1122,7 @@ $defs:
       - variation_id
       - products
       - response_created_at
+      - request_locale
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       paywall_id: { type: string }
@@ -1127,6 +1136,7 @@ $defs:
       web_purchase_url: { type: string }
       payload_data: { type: string }
       response_created_at: { type: integer }
+      request_locale: { $ref: "#/$defs/AdaptyLocale" }
 
 
   AdaptyPlacement: #request #response
@@ -1505,8 +1515,6 @@ $defs:
           description: "Android Only",
         }
       is_offer_personalized: { type: boolean, description: "Android Only" }
-      obfuscated_account_id: { type: string, description: "Android Only" }
-      obfuscated_profile_id: { type: string, description: "Android Only" }
       
 
   AdaptySubscriptionUpdateParameters: #request # Android Only

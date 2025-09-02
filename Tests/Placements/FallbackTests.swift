@@ -59,7 +59,7 @@ struct FallbackTests {
         ])
     }
 
-    private func test<Content: AdaptyPlacementContent>(type: Content.Type, json: Json, placementIds: [String]) throws {
+    private func test<Content: PlacementContent>(type: Content.Type, json: Json, placementIds: [String]) throws {
         let fallback = try FallbackPlacements(fileURL: json.url)
 
         for placementId in placementIds {

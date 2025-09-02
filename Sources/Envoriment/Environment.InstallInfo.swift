@@ -71,7 +71,7 @@ extension Environment {
             try container.encode(osVersion, forKey: .osVersion)
             try container.encode("apple", forKey: .deviceBrand)
             try container.encode(deviceModel, forKey: .deviceModel)
-            if let screen = screen {
+            if let screen {
                 try container.encode(screen.width, forKey: .screenWidth)
                 try container.encode(screen.height, forKey: .screenHeight)
                 try container.encode(screen.scale, forKey: .screenScale)

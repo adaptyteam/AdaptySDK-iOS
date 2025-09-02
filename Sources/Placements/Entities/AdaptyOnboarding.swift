@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AdaptyOnboarding: AdaptyPlacementContent {
+public struct AdaptyOnboarding: PlacementContent {
     public let placement: AdaptyPlacement
 
     public let instanceIdentity: String
@@ -24,13 +24,19 @@ public struct AdaptyOnboarding: AdaptyPlacementContent {
     package let viewConfiguration: ViewConfiguration
 
     package var shouldTrackShown: Bool { placement.shouldTrackOnboardingShown }
+
+    var requestLocale: AdaptyLocale
+
+    package var requestLocaleIdentifier: String {
+        requestLocale.normalizedIdentifier
+    }
 }
 
 extension AdaptyOnboarding: CustomStringConvertible {
     public var description: String {
         "(placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration)"
             + (remoteConfig.map { ", remoteConfig: \($0)" } ?? "")
-            + ")"
+            + ", requestLocale: \(requestLocale.id))"
     }
 }
 
@@ -41,6 +47,7 @@ extension AdaptyOnboarding: Codable {
         case name = "onboarding_name"
         case remoteConfig = "remote_config"
         case viewConfiguration = "onboarding_builder"
+        case requestLocale = "request_locale"
     }
 
     public init(from decoder: Decoder) throws {
@@ -51,6 +58,7 @@ extension AdaptyOnboarding: Codable {
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig)
         viewConfiguration = try container.decode(ViewConfiguration.self, forKey: .viewConfiguration)
+        requestLocale = try decoder.userInfo.requestLocaleOrNil ?? container.decode(AdaptyLocale.self, forKey: .requestLocale)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -60,14 +68,7 @@ extension AdaptyOnboarding: Codable {
         try container.encode(variationId, forKey: .variationId)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)
         try container.encode(viewConfiguration, forKey: .viewConfiguration)
+        try container.encode(requestLocale, forKey: .requestLocale)
         try placement.encode(to: encoder)
-    }
-}
-
-extension Sequence<VH<AdaptyOnboarding>> {
-    var asOnboardingByPlacementId: [String: VH<AdaptyOnboarding>] {
-        Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
-            first.value.placement.isNewerThan(second.value.placement) ? first : second
-        })
     }
 }

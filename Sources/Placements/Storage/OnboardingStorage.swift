@@ -24,7 +24,13 @@ final class OnboardingStorage {
             return [:]
         }
         do {
-            return try userDefaults.getJSON([VH<AdaptyOnboarding>].self, forKey: Constants.onboardingStorageKey)?.asOnboardingByPlacementId ?? [:]
+            var userInfo = CodingUserInfo()
+            userInfo.setRequestLocale(.defaultPlacementLocale)
+            return try userDefaults.getJSON(
+                [VH<AdaptyOnboarding>].self,
+                forKey: Constants.onboardingStorageKey,
+                userInfo: userInfo
+            )?.asOnboardingByPlacementId ?? [:]
         } catch {
             log.error(error.localizedDescription)
             return [:]
@@ -53,5 +59,13 @@ final class OnboardingStorage {
         onboardingByPlacementId = [:]
         userDefaults.removeObject(forKey: Constants.onboardingStorageKey)
         log.debug("Clear onboarding's.")
+    }
+}
+
+private extension Sequence<VH<AdaptyOnboarding>> {
+    var asOnboardingByPlacementId: [String: VH<AdaptyOnboarding>] {
+        Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
+            first.value.placement.isNewerThan(second.value.placement) ? first : second
+        })
     }
 }

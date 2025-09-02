@@ -100,6 +100,7 @@ extension AdaptyPlacementChosen {
         _ response: HTTPDataResponse,
         withConfiguration configuration: HTTPCodableConfiguration?,
         withUserId userId: AdaptyUserId,
+        withRequestLocale requestLocale: AdaptyLocale,
         withCached cached: Content?
     ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
         let jsonDecoder = JSONDecoder()
@@ -114,7 +115,8 @@ extension AdaptyPlacementChosen {
             return response.replaceBody(AdaptyPlacementChosen.restore(cached))
         }
 
-        jsonDecoder.setPlacement(placement)
+        jsonDecoder.userInfo.setPlacement(placement)
+        jsonDecoder.userInfo.setRequestLocale(requestLocale)
 
         let variation = try jsonDecoder.decode(
             Backend.Response.Data<AdaptyPlacement.Variation>.self,
@@ -138,7 +140,7 @@ extension AdaptyPlacementChosen {
 }
 
 extension Backend.MainExecutor {
-    func fetchPlacement<Content: AdaptyPlacementContent>(
+    func fetchPlacement<Content: PlacementContent>(
         apiKeyPrefix: String,
         userId: AdaptyUserId,
         placementId: String,
@@ -176,6 +178,7 @@ extension Backend.MainExecutor {
                 response,
                 withConfiguration: configuration,
                 withUserId: userId,
+                withRequestLocale: locale,
                 withCached: cached
             )
         }

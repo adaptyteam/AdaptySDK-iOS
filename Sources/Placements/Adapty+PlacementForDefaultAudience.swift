@@ -72,7 +72,7 @@ extension Adapty {
         }
     }
 
-    private func getPlacementForDefaultAudience<Content: AdaptyPlacementContent>(
+    private func getPlacementForDefaultAudience<Content: PlacementContent>(
         _ placementId: String,
         _ locale: AdaptyLocale,
         _ fetchPolicy: AdaptyPlacementFetchPolicy
@@ -105,7 +105,7 @@ extension Adapty {
         return content
     }
 
-    private func fetchPlacementForDefaultAudience<Content: AdaptyPlacementContent>(
+    private func fetchPlacementForDefaultAudience<Content: PlacementContent>(
         _ userId: AdaptyUserId,
         _ placementId: String,
         _ locale: AdaptyLocale

@@ -7,12 +7,14 @@
 
 import Foundation
 
+#if compiler(>=6.1.0)
+package typealias CodingUserInfo = [CodingUserInfoKey: any Sendable]
+#else
+package typealias CodingUserInfo = [CodingUserInfoKey: Any]
+#endif
+
 package protocol CodingUserInfoContainer: AnyObject {
-    #if compiler(>=6.1.0)
-    var userInfo: [CodingUserInfoKey: any Sendable] { get set }
-    #else
-    var userInfo: [CodingUserInfoKey: Any] { get set }
-    #endif
+    var userInfo: CodingUserInfo { get set }
 }
 
 extension JSONDecoder: CodingUserInfoContainer {}

@@ -94,7 +94,7 @@ final class EventsManager {
                     userId: ProfileStorage.userId
                 )
             } catch .backend, .decoding {
-                configuration = .init(blacklist: Event.defaultBlackList, expiration: Date() + 24*60*60)
+                configuration = .init(blacklist: Event.defaultBlackList, expiration: Date() + 24 * 60 * 60)
             } catch {
                 throw EventsError.sending(error)
             }

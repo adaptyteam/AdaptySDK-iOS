@@ -31,7 +31,7 @@ extension Adapty {
 private let log = Log.fallbackPlacements
 
 extension PlacementStorage {
-    private func getPlacement<Content: AdaptyPlacementContent>(
+    private func getPlacement<Content: PlacementContent>(
         byPlacementId placementId: String,
         withVariationId variationId: String?,
         userId _: AdaptyUserId,
@@ -42,7 +42,7 @@ extension PlacementStorage {
         }
     }
 
-    func getPlacementWithFallback<Content: AdaptyPlacementContent>(
+    func getPlacementWithFallback<Content: PlacementContent>(
         byPlacementId placementId: String,
         withVariationId variationId: String?,
         userId: AdaptyUserId,
@@ -69,7 +69,8 @@ extension PlacementStorage {
                let fallbacked: AdaptyPlacementChosen<Content> = fallbackFile.getPlacement(
                    byPlacementId: placementId,
                    withVariationId: variationId,
-                   userId: userId
+                   userId: userId,
+                   requestLocale: locale
                )
             {
                 Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version)) same-variation")
@@ -80,11 +81,21 @@ extension PlacementStorage {
             }
 
         case let (_, cached?):
-            let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil :
-                fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, userId: userId)
+            let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
+                : fallbackFile.getPlacement(
+                    byPlacementId: placementId,
+                    withVariationId: variationId,
+                    userId: userId,
+                    requestLocale: locale
+                )
 
             let fallBackedB: AdaptyPlacementChosen<Content>? = (fallBackedA != nil || cached.content.placement.version >= fallbackFile.version) ? nil
-                : fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId)
+                : fallbackFile.getPlacement(
+                    byPlacementId: placementId,
+                    withVariationId: nil,
+                    userId: userId,
+                    requestLocale: locale
+                )
 
             if let fallBacked = fallBackedA ?? fallBackedB {
                 Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallBacked.content.variationId), version: \(fallBacked.content.placement.version))")
@@ -96,13 +107,27 @@ extension PlacementStorage {
             }
 
         default:
-            let fallBacked: AdaptyPlacementChosen<Content>? =
-                if let variationId {
-                    fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: variationId, userId: userId)
-                        ?? fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId)
-                } else {
-                    fallbackFile.getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId)
-                }
+            let fallBacked: AdaptyPlacementChosen<Content>?
+            if let variationId {
+                fallBacked = fallbackFile.getPlacement(
+                    byPlacementId: placementId,
+                    withVariationId: variationId,
+                    userId: userId,
+                    requestLocale: locale
+                ) ?? fallbackFile.getPlacement(
+                    byPlacementId: placementId,
+                    withVariationId: nil,
+                    userId: userId,
+                    requestLocale: locale
+                )
+            } else {
+                fallBacked = fallbackFile.getPlacement(
+                    byPlacementId: placementId,
+                    withVariationId: nil,
+                    userId: userId,
+                    requestLocale: locale
+                )
+            }
 
             guard let fallBacked else { return nil }
 

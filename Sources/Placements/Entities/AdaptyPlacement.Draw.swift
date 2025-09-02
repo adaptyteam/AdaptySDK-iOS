@@ -8,7 +8,7 @@
 import Foundation
 
 extension AdaptyPlacement {
-    struct Draw<Content: AdaptyPlacementContent>: Sendable {
+    struct Draw<Content: PlacementContent>: Sendable {
         let userId: AdaptyUserId
         var content: Content
         let placementAudienceVersionId: String

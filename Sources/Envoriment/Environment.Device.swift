@@ -8,9 +8,9 @@
 import Foundation
 
 #if canImport(UIKit)
-    import UIKit
+import UIKit
 #elseif canImport(AppKit)
-    import AppKit
+import AppKit
 #endif
 
 extension Environment {
@@ -60,25 +60,25 @@ extension Environment {
 
                 let result: ScreenInfo? = await MainActor.run {
                     #if canImport(UIKit)
-                        let mainScreen = UIScreen.main
-                        let nativeBounds = mainScreen.nativeBounds
-                        return ScreenInfo(
-                            width: Int(nativeBounds.width),
-                            height: Int(nativeBounds.height),
-                            scale: Double(mainScreen.scale)
-                        )
+                    let mainScreen = UIScreen.main
+                    let nativeBounds = mainScreen.nativeBounds
+                    return ScreenInfo(
+                        width: Int(nativeBounds.width),
+                        height: Int(nativeBounds.height),
+                        scale: Double(mainScreen.scale)
+                    )
                     #elseif canImport(AppKit)
-                        guard let mainScreen = NSScreen.main else { return nil }
-                        let frameInPoints = mainScreen.frame
-                        let scale = mainScreen.backingScaleFactor
-                        return ScreenInfo(
-                            width: Int(frameInPoints.width * scale),
-                            height: Int(frameInPoints.height * scale),
-                            scale: Double(scale)
-                        )
+                    guard let mainScreen = NSScreen.main else { return nil }
+                    let frameInPoints = mainScreen.frame
+                    let scale = mainScreen.backingScaleFactor
+                    return ScreenInfo(
+                        width: Int(frameInPoints.width * scale),
+                        height: Int(frameInPoints.height * scale),
+                        scale: Double(scale)
+                    )
 
                     #else
-                        return nil
+                    return nil
                     #endif
                 }
 
