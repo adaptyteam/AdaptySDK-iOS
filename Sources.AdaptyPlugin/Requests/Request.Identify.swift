@@ -13,15 +13,15 @@ extension Request {
         static let method = "identify"
 
         let customerUserId: String
-        let appAccountToken: UUID?
+        let parameters: CustomerIdentityParameters?
 
         enum CodingKeys: String, CodingKey {
             case customerUserId = "customer_user_id"
-            case appAccountToken = "app_account_token"
+            case parameters
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await Adapty.identify(customerUserId, withAppAccountToken: appAccountToken)
+            try await Adapty.identify(customerUserId, withAppAccountToken: parameters?.appAccountToken)
             return .success()
         }
     }

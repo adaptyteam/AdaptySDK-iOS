@@ -288,7 +288,7 @@ $requests:
     properties:
       method: { const: "identify" }
       customer_user_id: { type: string }
-      app_account_token: { $ref: "#/$defs/UUID" }
+      parameters: { $ref: "#/$defs/CustomerIdentityParameters" } 
 
   Identify.Response: #response
     type: object
@@ -937,7 +937,7 @@ $defs:
     properties:
       api_key: { type: string }
       customer_user_id: { type: string }
-      app_account_token: { $ref: "#/$defs/UUID" , description: "used only if customer_user_id is not null"}
+      customer_identity_parameters: { $ref: "#/$defs/CustomerIdentityParameters" }    
       observer_mode: { type: boolean, default: false }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
@@ -960,6 +960,13 @@ $defs:
             { type: integer, description: "bytes" }
           memory_storage_count_limit: { type: integer }
           disk_storage_size_limit: { type: integer, description: "bytes" }
+
+  CustomerIdentityParameters: #request
+    type: object
+    properties:
+      app_account_token: { $ref: "#/$defs/UUID", description: "iOS Only" }
+      obfuscated_account_id: { type: string, description: "Android Only" }
+      obfuscated_profile_id: { type: string, description: "Android Only" }     
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -1504,8 +1511,6 @@ $defs:
           description: "Android Only",
         }
       is_offer_personalized: { type: boolean, description: "Android Only" }
-      obfuscated_account_id: { type: string, description: "Android Only" }
-      obfuscated_profile_id: { type: string, description: "Android Only" }
       
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
