@@ -924,7 +924,7 @@ $defs:
     type: string
     format: uuid
     pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-    description: "UUID в формате RFC 4122"
+    description: "UUID in RFC 4122 format"
     example: "123e4567-e89b-12d3-a456-426614174000"
 
   Date: #response #request
