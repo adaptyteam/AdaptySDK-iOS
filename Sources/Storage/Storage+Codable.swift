@@ -15,12 +15,15 @@ extension Storage {
         return encoder
     }()
 
-    static let decoder: JSONDecoder = {
+    static let decoder: JSONDecoder = createDecoder()
+
+    @inlinable
+    static func createDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .formatted(Backend.dateFormatter)
         decoder.dataDecodingStrategy = .base64
         return decoder
-    }()
+    }
 
     @inlinable
     static func encode(_ value: some Encodable) throws -> Data {
@@ -31,6 +34,13 @@ extension Storage {
     static func decode<T>(_ type: T.Type, from data: Data) throws -> T? where T: Decodable {
         try decoder.decode(type, from: data)
     }
+
+    @inlinable
+    static func decode<T>(_ type: T.Type, from data: Data, userInfo: CodingUserInfo) throws -> T? where T: Decodable {
+        let decoder = createDecoder()
+        decoder.userInfo = userInfo
+        return try decoder.decode(type, from: data)
+    }
 }
 
 extension UserDefaults {
@@ -39,6 +49,11 @@ extension UserDefaults {
     }
 
     func getJSON<T: Decodable>(_ type: T.Type, forKey key: String) throws -> T? {
+        guard let data = data(forKey: key) else { return nil }
+        return try Storage.decode(type, from: data)
+    }
+
+    func getJSON<T: Decodable>(_ type: T.Type, forKey key: String, userInfo: CodingUserInfo) throws -> T? {
         guard let data = data(forKey: key) else { return nil }
         return try Storage.decode(type, from: data)
     }

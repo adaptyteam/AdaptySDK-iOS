@@ -24,7 +24,13 @@ final class PaywallStorage: Sendable {
             return [:]
         }
         do {
-            return try userDefaults.getJSON([VH<AdaptyPaywall>].self, forKey: Constants.paywallStorageKey)?.asPaywallByPlacementId ?? [:]
+            var userInfo = CodingUserInfo()
+            userInfo.setRequestLocale(.defaultPlacementLocale)
+            return try userDefaults.getJSON(
+                [VH<AdaptyPaywall>].self,
+                forKey: Constants.paywallStorageKey,
+                userInfo: userInfo
+            )?.asPaywallByPlacementId ?? [:]
         } catch {
             log.error(error.localizedDescription)
             return [:]
@@ -53,5 +59,13 @@ final class PaywallStorage: Sendable {
         paywallByPlacementId = [:]
         userDefaults.removeObject(forKey: Constants.paywallStorageKey)
         log.debug("Clear paywalls.")
+    }
+}
+
+private extension Sequence<VH<AdaptyPaywall>> {
+    var asPaywallByPlacementId: [String: VH<AdaptyPaywall>] {
+        Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
+            first.value.placement.version > second.value.placement.version ? first : second
+        })
     }
 }

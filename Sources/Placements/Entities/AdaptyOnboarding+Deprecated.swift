@@ -1,20 +1,11 @@
 //
-//  AdaptyPlacementContent.swift
-//  Adapty
+//  AdaptyOnboarding+Deprecated.swift
+//  AdaptySDK
 //
-//  Created by Aleksei Valiano on 08.04.2025.
+//  Created by Aleksei Valiano on 01.07.2025.
 //
 
-public protocol AdaptyPlacementContent: Sendable, Codable {
-    var placement: AdaptyPlacement { get }
-    var instanceIdentity: String { get }
-    var variationId: String { get }
-    var name: String { get }
-    var remoteConfig: AdaptyRemoteConfig? { get }
-    var hasViewConfiguration: Bool { get }
-}
-
-public extension AdaptyPlacementContent {
+public extension AdaptyOnboarding {
     @available(*, deprecated, renamed: "placement.id")
     var placementId: String { placement.id }
 
