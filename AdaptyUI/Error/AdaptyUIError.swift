@@ -21,7 +21,7 @@ public enum AdaptyUIError: Error {
     case webKit(Error)
 }
 
-extension AdaptyUIError {
+public extension AdaptyUIError {
     static let AdaptyUIErrorDomain = "AdaptyUIErrorDomain"
 
     enum Code: Int {
@@ -35,6 +35,8 @@ extension AdaptyUIError {
         case wrongComponentType = 4103
 
         case webKit = 4200
+        
+        case platformView = 4300
     }
 }
 
