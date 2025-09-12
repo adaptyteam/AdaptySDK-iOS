@@ -13,7 +13,7 @@ actor SK1QueueManager: Sendable {
     private let transactionSynchronizer: StoreKitTransactionSynchronizer
     private let subscriptionOfferSigner: StoreKitSubscriptionOfferSigner
     private let productsManager: StoreKitProductsManager
-    private let storage: VariationIdStorage
+    private let storage: PurchasePayloadStorage
 
     private var makePurchasesCompletionHandlers = [String: [AdaptyResultCompletion<AdaptyPurchaseResult>]]()
     private var makePurchasesProduct = [String: SK1Product]()
@@ -22,7 +22,7 @@ actor SK1QueueManager: Sendable {
         transactionSynchronizer: StoreKitTransactionSynchronizer,
         subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         productsManager: StoreKitProductsManager,
-        storage: VariationIdStorage
+        storage: PurchasePayloadStorage
     ) {
         self.transactionSynchronizer = transactionSynchronizer
         self.subscriptionOfferSigner = subscriptionOfferSigner
@@ -71,8 +71,8 @@ actor SK1QueueManager: Sendable {
         }
 
         await productsManager.storeProductInfo(productInfo: [product.productInfo])
-        await storage.setPaywallVariationIds(product.variationId, for: product.vendorProductId)
-
+        await storage.setPaywallVariationId(product.variationId, for: product.vendorProductId, userId: userId)
+        await storage.setPersistentPaywallVariationId(product.variationId, for: product.vendorProductId)
         return try await addPayment(payment, for: product.skProduct)
     }
 
@@ -145,7 +145,7 @@ actor SK1QueueManager: Sendable {
                 await receivedFailedTransaction(sk1Transaction, error: nil)
 
             case .restored:
-                await sk1Transaction.finish()
+                SKPaymentQueue.default().finishTransaction(sk1Transaction)
                 await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                     methodName: .finishTransaction,
                     params: logParams
@@ -175,16 +175,24 @@ actor SK1QueueManager: Sendable {
         }
 
         do {
+            
+         
             let profile = try await transactionSynchronizer.validate(
-                purchasedTransaction: .init(
+                .init(
                     product: productOrNil,
-                    transaction: sk1Transaction,
-                    payload: await storage.getPurchasePayload(for: productId)
+                    transaction: sk1Transaction
                 ),
-                for: nil
+                payload: await storage.purchasePayload(for: productId) // TODO: persistedPaywallVariationId
             )
+
+            await storage.removePurchasePayload(for: productId)
             makePurchasesProduct.removeValue(forKey: productId)
-            await transactionSynchronizer.finish(transaction: sk1Transaction)
+            SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
+            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                methodName: .finishTransaction,
+                params: sk1Transaction.logParams
+            ))
+
             log.info("finish purchased transaction \(sk1Transaction)")
 
             result = .success(.success(profile: profile, transaction: sk1Transaction))
@@ -197,10 +205,9 @@ actor SK1QueueManager: Sendable {
 
     private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction, error: AdaptyError? = nil) async {
         let productId = sk1Transaction.unfProductID
-
         makePurchasesProduct.removeValue(forKey: productId)
-        storage.removePaywallVariationIds(for: productId)
-        await sk1Transaction.finish()
+        await storage.removePurchasePayload(for: productId)
+        SKPaymentQueue.default().finishTransaction(sk1Transaction)
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .finishTransaction,
             params: sk1Transaction.logParams
@@ -271,7 +278,7 @@ extension SK1QueueManager {
         transactionSynchronizer: StoreKitTransactionSynchronizer,
         subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         productsManager: StoreKitProductsManager,
-        storage: VariationIdStorage
+        storage: PurchasePayloadStorage
     ) -> SK1QueueManager? {
         guard observer == nil else { return nil }
 

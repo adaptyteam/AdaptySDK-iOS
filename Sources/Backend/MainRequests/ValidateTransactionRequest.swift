@@ -33,39 +33,75 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
         case profileId = "profile_id"
         case originalTransactionId = "original_transaction_id"
         case transactionId = "transaction_id"
-        case variationId = "variation_id"
+        case paywallVariationId = "variation_id"
         case requestSource = "request_source"
+
+        case vendorProductId = "vendor_product_id"
+        case persistentPaywallVariationId = "variation_id_persistent"
+        case persistentOnboardingVariationId = "onboarding_variation_id"
+        case originalPrice = "original_price"
+        case discountPrice = "discount_price"
+        case priceLocale = "price_locale"
+        case storeCountry = "store_country"
+        case promotionalOfferId = "promotional_offer_id"
+        case subscriptionOffer = "offer"
+        case environment
+    }
+
+    enum SubscriptionOfferKeys: String, CodingKey {
+        case periodUnit = "period_unit"
+        case periodNumberOfUnits = "number_of_units"
+        case paymentMode = "type"
+        case offerType = "category"
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: Backend.CodingKeys.self)
-        var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
-        try dataObject.encode("adapty_purchase_app_store_original_transaction_id_validation_result", forKey: .type)
+        var perentContainer = encoder.container(keyedBy: Backend.CodingKeys.self)
+        var dataContainer = perentContainer.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
+        try dataContainer.encode("adapty_purchase_app_store_original_transaction_id_validation_result", forKey: .type)
+        var container = dataContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+
         switch requestSource {
         case let .restore(originalTransactionId):
-            var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-            try attributesObject.encode(userId.profileId, forKey: .profileId)
-            try attributesObject.encode(Adapty.ValidatePurchaseReason.restoreRawString, forKey: .requestSource)
-            try attributesObject.encode(originalTransactionId, forKey: .originalTransactionId)
+            try container.encode(userId.profileId, forKey: .profileId)
+            try container.encode(Adapty.ValidatePurchaseReason.restoreRawString, forKey: .requestSource)
+            try container.encode(originalTransactionId, forKey: .originalTransactionId)
         case let .report(transactionId, variationId):
-            var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-            try attributesObject.encode(userId.profileId, forKey: .profileId)
-            try attributesObject.encode(Adapty.ValidatePurchaseReason.reportRawString, forKey: .requestSource)
-            try attributesObject.encode(transactionId, forKey: .originalTransactionId)
-            try attributesObject.encode(transactionId, forKey: .transactionId)
-            try attributesObject.encodeIfPresent(variationId, forKey: .variationId)
-        case let .other(purchasedTransaction, reason):
-            try dataObject.encode(purchasedTransaction, forKey: .attributes)
-            var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-            try attributesObject.encode(userId.profileId, forKey: .profileId)
-            try attributesObject.encode(reason.rawString, forKey: .requestSource)
+            try container.encode(userId.profileId, forKey: .profileId)
+            try container.encode(Adapty.ValidatePurchaseReason.reportRawString, forKey: .requestSource)
+            try container.encode(transactionId, forKey: .originalTransactionId)
+            try container.encode(transactionId, forKey: .transactionId)
+            try container.encodeIfPresent(variationId, forKey: .paywallVariationId)
+        case let .other(info, payload, reason):
+            try container.encode(userId.profileId, forKey: .profileId)
+            try container.encode(reason.rawString, forKey: .requestSource)
+            try container.encode(info.transactionId, forKey: .transactionId)
+            try container.encode(info.originalTransactionId, forKey: .originalTransactionId)
+            try container.encode(info.vendorProductId, forKey: .vendorProductId)
+            try container.encodeIfPresent(info.price, forKey: .originalPrice)
+            try container.encodeIfPresent(info.subscriptionOffer?.price, forKey: .discountPrice)
+            try container.encodeIfPresent(info.priceLocale, forKey: .priceLocale)
+            try container.encodeIfPresent(info.storeCountry, forKey: .storeCountry)
+            try container.encodeIfPresent(info.subscriptionOffer?.id, forKey: .promotionalOfferId)
+            if let offer = info.subscriptionOffer {
+                var offerContainer = container.nestedContainer(keyedBy: SubscriptionOfferKeys.self, forKey: .subscriptionOffer)
+                try offerContainer.encode(offer.paymentMode, forKey: .paymentMode)
+                try offerContainer.encodeIfPresent(offer.period?.unit, forKey: .periodUnit)
+                try offerContainer.encodeIfPresent(offer.period?.numberOfUnits, forKey: .periodNumberOfUnits)
+                try offerContainer.encode(offer.offerType.rawValue, forKey: .offerType)
+            }
+            try container.encode(info.environment, forKey: .environment)
+
+            try container.encodeIfPresent(payload.paywallVariationId, forKey: .paywallVariationId)
+            try container.encodeIfPresent(payload.persistentPaywallVariationId, forKey: .persistentPaywallVariationId)
+            try container.encodeIfPresent(payload.persistentOnboardingVariationId, forKey: .persistentOnboardingVariationId)
         }
     }
 
     enum RequestSource: Sendable {
         case restore(originalTransactionId: String)
         case report(transactionId: String, variationId: String?)
-        case other(PurchasedTransaction, reason: Adapty.ValidatePurchaseReason)
+        case other(PurchasedTransactionInfo, PurchasePayload, reason: Adapty.ValidatePurchaseReason)
     }
 }
 
@@ -131,23 +167,23 @@ extension Backend.MainExecutor {
     }
 
     func validateTransaction(
-        userId: AdaptyUserId,
-        purchasedTransaction: PurchasedTransaction,
+        transactionInfo: PurchasedTransactionInfo,
+        payload: PurchasePayload,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
-            userId: userId,
-            requestSource: .other(purchasedTransaction, reason: reason)
+            userId: payload.userId,
+            requestSource: .other(transactionInfo, payload, reason: reason)
         )
         let logParams: EventParameters = [
-            "product_id": purchasedTransaction.vendorProductId,
-            "original_transaction_id": purchasedTransaction.originalTransactionId,
-            "transaction_id": purchasedTransaction.transactionId,
-            "variation_id": purchasedTransaction.payload?.paywallVariationId,
-            "variation_id_persistent": purchasedTransaction.payload?.persistentPaywallVariationId,
-            "onboarding_variation_id": purchasedTransaction.payload?.persistentOnboardingVariationId,
-            "promotional_offer_id": purchasedTransaction.subscriptionOffer?.id,
-            "environment": purchasedTransaction.environment,
+            "product_id": transactionInfo.vendorProductId,
+            "original_transaction_id": transactionInfo.originalTransactionId,
+            "transaction_id": transactionInfo.transactionId,
+            "variation_id": payload.paywallVariationId,
+            "variation_id_persistent": payload.persistentPaywallVariationId,
+            "onboarding_variation_id": payload.persistentOnboardingVariationId,
+            "promotional_offer_id": transactionInfo.subscriptionOffer?.id,
+            "environment": transactionInfo.environment,
             "request_source": reason.rawString,
         ]
         let response = try await perform(

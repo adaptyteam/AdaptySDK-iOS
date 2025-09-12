@@ -44,12 +44,11 @@ actor SK1TransactionObserver: Sendable {
                 )
 
                 try await self.transactionSynchronizer.report(
-                    purchasedTransaction: .init(
+                    .init(
                         product: productOrNil,
-                        transaction: sk1Transaction,
-                        payload: nil
+                        transaction: sk1Transaction
                     ),
-                    for: nil,
+                    payload: nil,
                     reason: .observing
                 )
             }

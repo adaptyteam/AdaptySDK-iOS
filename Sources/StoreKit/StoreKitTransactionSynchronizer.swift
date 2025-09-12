@@ -9,22 +9,29 @@ import Foundation
 
 protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
     func report(
-        purchasedTransaction: PurchasedTransaction,
-        for userId: AdaptyUserId?,
+        _: PurchasedTransactionInfo,
+        payload: PurchasePayload?,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError)
 
     func validate(
-        purchasedTransaction: PurchasedTransaction,
-        for: AdaptyUserId?
+        _: PurchasedTransactionInfo,
+        payload: PurchasePayload?
     ) async throws(AdaptyError) -> AdaptyProfile
 
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(
-        transaction: SKTransaction
+        transaction: SK2SignedTransaction,
+        recived: TransactionRecivedBy
     ) async
 
-    var currentProfileWithOfflineAccessLevels: AdaptyProfile? { get async }
-    func clearCache() async
+    func recalculateOfflineAccessLevels(with: SKTransaction) async -> AdaptyProfile?
+}
+
+enum TransactionRecivedBy {
+    case updates
+    case purchased
+    case unfinished
 }
 
 extension Adapty: StoreKitTransactionSynchronizer {
@@ -52,15 +59,37 @@ extension Adapty: StoreKitTransactionSynchronizer {
         }
     }
 
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    func finish(
+        transaction sk2SignedTransaction: SK2SignedTransaction,
+        recived _: TransactionRecivedBy
+    ) async {
+        switch sk2SignedTransaction {
+        case let .unverified(transaction, _):
+            await transaction.finish()
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                methodName: .finishTransaction,
+                params: transaction.logParams
+            ))
+        case let .verified(transaction):
+            await purchasePayloadStorage.removePurchasePayload(for: transaction.unfProductID)
+            await transaction.finish()
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                methodName: .finishTransaction,
+                params: transaction.logParams
+            ))
+        }
+    }
+
     func report(
-        purchasedTransaction: PurchasedTransaction,
-        for userId: AdaptyUserId?,
+        _ transactionInfo: PurchasedTransactionInfo,
+        payload: PurchasePayload?,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) {
         do {
             let response = try await httpSession.validateTransaction(
-                userId: userId ?? profileStorage.userId,
-                purchasedTransaction: purchasedTransaction,
+                transactionInfo: transactionInfo,
+                payload: payload ?? .init(userId: profileStorage.userId),
                 reason: reason
             )
             handleTransactionResponse(response)
@@ -69,49 +98,20 @@ extension Adapty: StoreKitTransactionSynchronizer {
         }
     }
 
-    func finish(
-        transaction: SKTransaction
-    ) async {
-        variationIdStorage.removePaywallVariationIds(for: transaction.unfProductID)
-        await transaction.finish()
-        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-            methodName: .finishTransaction,
-            params: transaction.logParams
-        ))
-    }
-
     func validate(
-        purchasedTransaction: PurchasedTransaction,
-        for userId: AdaptyUserId?
-
+        _ transactionInfo: PurchasedTransactionInfo,
+        payload: PurchasePayload?
     ) async throws(AdaptyError) -> AdaptyProfile {
         do {
             let response = try await httpSession.validateTransaction(
-                userId: profileStorage.userId,
-                purchasedTransaction: purchasedTransaction,
+                transactionInfo: transactionInfo,
+                payload: payload ?? .init(userId: profileStorage.userId),
                 reason: .purchasing
             )
-
-            if let profile = await profileManager?.handleTransactionResponse(response) {
-                return profile
-            }
+            handleTransactionResponse(response)
             return await profileWithOfflineAccessLevels(response.value)
-
         } catch {
             throw error.asAdaptyError
-        }
-    }
-
-    func clearCache() async {
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
-              let manager = transactionManager as? SK2TransactionManager
-        else { return }
-        await manager.clearCache()
-    }
-
-    var currentProfileWithOfflineAccessLevels: AdaptyProfile? {
-        get async {
-            await profileManager?.profileWithOfflineAccessLevels
         }
     }
 }

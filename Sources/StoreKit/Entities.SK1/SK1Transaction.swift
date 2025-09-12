@@ -33,12 +33,6 @@ extension SK1Transaction {
             "original_id": unfOriginalIdentifier,
         ]
     }
-
-    func finish() async {
-        await MainActor.run {
-            SKPaymentQueue.default().finishTransaction(self)
-        }
-    }
 }
 
 struct SK1TransactionWithIdentifier: Sendable {
@@ -65,11 +59,6 @@ struct SK1TransactionWithIdentifier: Sendable {
 
     @inlinable
     var logParams: EventParameters { underlay.logParams }
-    
-    @inlinable
-    func finish() async {
-        await underlay.finish()
-    }
 }
 
 private extension SKPaymentTransactionState {

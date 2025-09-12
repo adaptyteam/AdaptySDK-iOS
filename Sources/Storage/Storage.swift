@@ -68,7 +68,7 @@ final class Storage {
         ProfileStorage.clearProfile()
         await EventsStorage.clearAll()
         await BackendProductInfoStorage.clear()
-        await VariationIdStorage.clear()
+        await PurchasePayloadStorage.clear()
         userDefaults.set(hash, forKey: Constants.appKeyHash)
         log.verbose("changing apiKeyHash = \(hash).")
         return true

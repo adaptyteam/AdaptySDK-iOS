@@ -1,5 +1,5 @@
 //
-//  PurchasedTransaction.SubscriptionOffer.swift
+//  PurchasedSubscriptionOfferInfo.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 08.09.2022.
@@ -7,8 +7,7 @@
 
 import Foundation
 
-extension PurchasedTransaction {
-    struct SubscriptionOffer: Sendable {
+    struct PurchasedSubscriptionOfferInfo: Sendable {
         let id: String?
         let period: AdaptySubscriptionPeriod?
         let paymentMode: AdaptySubscriptionOffer.PaymentMode
@@ -28,26 +27,8 @@ extension PurchasedTransaction {
             self.price = price
         }
     }
-}
 
-extension PurchasedTransaction.SubscriptionOffer: Encodable {
-    enum BackendCodingKeys: String, CodingKey {
-        case periodUnit = "period_unit"
-        case periodNumberOfUnits = "number_of_units"
-        case paymentMode = "type"
-        case offerType = "category"
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: BackendCodingKeys.self)
-        try container.encode(paymentMode, forKey: .paymentMode)
-        try container.encodeIfPresent(period?.unit, forKey: .periodUnit)
-        try container.encodeIfPresent(period?.numberOfUnits, forKey: .periodNumberOfUnits)
-        try container.encode(offerType.rawValue, forKey: .offerType)
-    }
-}
-
-extension PurchasedTransaction.SubscriptionOffer {
+extension PurchasedSubscriptionOfferInfo {
     init?(
         transaction: SKTransaction,
         product: AdaptyProduct?

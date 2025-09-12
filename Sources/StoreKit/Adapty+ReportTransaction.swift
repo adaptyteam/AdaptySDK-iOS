@@ -45,15 +45,16 @@ public extension Adapty {
                 fetchPolicy: .returnCacheDataElseLoad
             )
 
-            let purchasedTransaction = PurchasedTransaction(
-                product: productOrNil,
-                transaction: transaction,
-                payload: .init(paywallVariationId: variationId)
-            )
-
             try await sdk.report(
-                purchasedTransaction: purchasedTransaction,
-                for: userId,
+                .init(
+                    product: productOrNil,
+                    transaction: transaction
+                ),
+                payload: .init(
+                    userId: userId,
+                    paywallVariationId: variationId,
+                    persistentOnboardingVariationId: await sdk.purchasePayloadStorage.onboardingVariationId()
+                ),
                 reason: .setVariation
             )
         }

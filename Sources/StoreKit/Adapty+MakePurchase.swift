@@ -28,16 +28,16 @@ public extension Adapty {
             ]
         ) { sdk throws(AdaptyError) in
             guard let purchaser = sdk.purchaser else { throw .cantMakePayments() }
-
+            let userId = sdk.userId ?? sdk.profileStorage.userId
             let appAccountToken: UUID? =
-                if let customerUserId = sdk.userId?.customerId {
-                    sdk.profileStorage.getAppAccountToken() ?? UUID(uuidString: customerUserId)
+                if let customerUserId = userId.customerId {
+                    sdk.profileStorage.appAccountToken() ?? UUID(uuidString: customerUserId)
                 } else {
                     nil
                 }
 
             return try await purchaser.makePurchase(
-                userId: sdk.profileStorage.userId,
+                userId: userId,
                 appAccountToken: appAccountToken,
                 product: product
             )

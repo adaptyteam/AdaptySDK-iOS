@@ -42,7 +42,8 @@ extension AdaptyConfiguration {
             logLevel: builder.logLevel,
             crossPlatformSDK: builder.crossPlatformSDK.map {
                 (name: $0.name.trimmed, version: $0.version.trimmed)
-            }
+            },
+            transactionFinishBehavior: builder.transactionFinishBehavior ?? defaultValue.transactionFinishBehavior
         )
     }
 
@@ -61,6 +62,7 @@ extension AdaptyConfiguration {
             backendConfigsBaseUrl: nil,
             backendUABaseUrl: nil,
             backendProxy: nil,
+            transactionFinishBehavior: nil,
             logLevel: nil,
             crossPlatformSDK: nil
         )
@@ -84,6 +86,8 @@ public extension AdaptyConfiguration {
         public private(set) var backendUABaseUrl: URL?
         public private(set) var backendProxy: (host: String, port: Int)?
 
+        public private(set) var transactionFinishBehavior: TransactionFinishBehavior?
+
         public private(set) var logLevel: AdaptyLog.Level?
 
         package private(set) var crossPlatformSDK: (name: String, version: String)?
@@ -102,6 +106,7 @@ public extension AdaptyConfiguration {
             backendConfigsBaseUrl: URL?,
             backendUABaseUrl: URL?,
             backendProxy: (host: String, port: Int)?,
+            transactionFinishBehavior: TransactionFinishBehavior?,
             logLevel: AdaptyLog.Level?,
             crossPlatformSDK: (name: String, version: String)?
         ) {
@@ -118,6 +123,7 @@ public extension AdaptyConfiguration {
             self.backendConfigsBaseUrl = backendConfigsBaseUrl
             self.backendUABaseUrl = backendUABaseUrl
             self.backendProxy = backendProxy
+            self.transactionFinishBehavior = transactionFinishBehavior
             self.logLevel = logLevel
             self.crossPlatformSDK = crossPlatformSDK
         }
@@ -206,6 +212,12 @@ public extension AdaptyConfiguration.Builder {
     @discardableResult
     func with(proxy host: String, port: Int) -> Self {
         backendProxy = (host: host.trimmed, port: port)
+        return self
+    }
+
+    @discardableResult
+    package func with(transactionFinishBehavior value: AdaptyConfiguration.TransactionFinishBehavior) -> Self {
+        transactionFinishBehavior = value
         return self
     }
 

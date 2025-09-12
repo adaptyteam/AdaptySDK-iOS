@@ -28,7 +28,7 @@ public final class Adapty {
 
     package let observerMode: Bool
 
-    let variationIdStorage: VariationIdStorage
+    let purchasePayloadStorage: PurchasePayloadStorage
 
     init(
         configuration: AdaptyConfiguration,
@@ -43,7 +43,8 @@ public final class Adapty {
         self.httpConfigsSession = backend.createConfigsExecutor()
 
         let productVendorIdsStorage = BackendProductInfoStorage()
-        self.variationIdStorage = VariationIdStorage()
+        await PurchasePayloadStorage.migration(for: ProfileStorage.userId)
+        self.purchasePayloadStorage = PurchasePayloadStorage()
 
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             self.receiptManager = StoreKitReceiptManager(
@@ -52,7 +53,7 @@ public final class Adapty {
             )
             self.transactionManager = SK2TransactionManager(
                 httpSession: httpSession,
-                storage: variationIdStorage
+                storage: purchasePayloadStorage
             )
             let sk2ProductsManager = SK2ProductsManager(
                 apiKeyPrefix: apiKeyPrefix,
@@ -68,14 +69,14 @@ public final class Adapty {
                     transactionSynchronizer: self,
                     subscriptionOfferSigner: self,
                     sk2ProductsManager: sk2ProductsManager,
-                    storage: variationIdStorage
+                    storage: purchasePayloadStorage
                 )
 
                 self.sk1QueueManager = SK1QueueManager.startObserving(
                     transactionSynchronizer: self,
                     subscriptionOfferSigner: self,
                     productsManager: sk2ProductsManager,
-                    storage: variationIdStorage
+                    storage: purchasePayloadStorage
                 )
             }
 
@@ -105,7 +106,7 @@ public final class Adapty {
                     transactionSynchronizer: self,
                     subscriptionOfferSigner: self,
                     productsManager: sk1ProductsManager,
-                    storage: variationIdStorage
+                    storage: purchasePayloadStorage
                 )
                 self.purchaser = sk1QueueManager
             }
@@ -121,7 +122,7 @@ public final class Adapty {
         let profileId = profileStorage.profileId
         let customerUserId = configuration.customerUserId
         let appAccountToken = customerUserId != nil ? configuration.appAccountToken : nil
-        let oldAppAccountToken = profileStorage.getAppAccountToken()
+        let oldAppAccountToken = profileStorage.appAccountToken()
         profileStorage.setAppAccountToken(appAccountToken)
 
         if let profile = profileStorage.getProfile(withCustomerUserId: customerUserId) {
@@ -155,7 +156,7 @@ public final class Adapty {
     ) async throws(AdaptyError) -> ProfileManager {
         var isFirstLoop = true
 
-        let analyticsDisabled = profileStorage.externalAnalyticsDisabled
+        let analyticsDisabled = (try? profileStorage.externalAnalyticsDisabled(for: newUserId)) ?? false
         var createdProfile: VH<AdaptyProfile>?
         while true {
             let meta = await Environment.Meta(includedAnalyticIds: !analyticsDisabled)
@@ -227,7 +228,7 @@ extension Adapty {
         toCustomerUserId newCustomerUserId: String,
         withAppAccountToken newAppAccountToken: UUID?
     ) async throws(AdaptyError) {
-        let oldAppAccountToken = profileStorage.getAppAccountToken()
+        let oldAppAccountToken = profileStorage.appAccountToken()
         profileStorage.setAppAccountToken(newAppAccountToken)
 
         switch sharedProfileManager {
@@ -324,11 +325,11 @@ extension Adapty {
     var userId: AdaptyUserId? {
         switch sharedProfileManager {
         case nil:
-            return nil
+            nil
         case let .current(manager):
-            return manager.userId
+            manager.userId
         case let .creating(userId, _):
-            return userId
+            userId
         }
     }
 

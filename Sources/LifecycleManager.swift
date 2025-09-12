@@ -60,12 +60,12 @@ final class LifecycleManager {
 
         let now = Date()
 
-        guard let lastOpenedWebPaywallAt = storage.lastOpenedWebPaywallDate else {
+        guard let lastOpenedWebPaywallAt = storage.lastOpenedWebPaywallDate() else {
             log.debug("LifecycleManager: \(stamp) calculateInterval: NO WEB PAYWALL")
             return defaultValue
         }
 
-        if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate, lastStartAcceleratedSyncAt > lastOpenedWebPaywallAt {
+        if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate(), lastStartAcceleratedSyncAt > lastOpenedWebPaywallAt {
             let timeLeft = now.timeIntervalSince(lastStartAcceleratedSyncAt)
 
             if timeLeft < profileUpdateAcceleratedDuration {

@@ -12,7 +12,7 @@ private let log = Log.sk2TransactionManager
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2TransactionManager {
     private let httpSession: Backend.MainExecutor
-    private let storage: VariationIdStorage
+    private let storage: PurchasePayloadStorage
 
     private var lastTransactionOriginalIdentifier: String?
     private var verifiedCurrentEntitlementsCached: (value: [SK2Transaction], at: Date)?
@@ -24,7 +24,7 @@ actor SK2TransactionManager {
 
     init(
         httpSession: Backend.MainExecutor,
-        storage: VariationIdStorage
+        storage: PurchasePayloadStorage
     ) {
         self.httpSession = httpSession
         self.storage = storage
@@ -124,15 +124,11 @@ private extension Adapty {
         while true {
             let unfinishedTranasactions = await manager.getUnfinishedTransactions()
             guard !unfinishedTranasactions.isEmpty else { return .success(()) }
-            for signedTransaction in unfinishedTranasactions {
-                switch signedTransaction {
+            for sk2SignedTransaction in unfinishedTranasactions {
+                switch sk2SignedTransaction {
                 case let .unverified(sk2Transaction, error):
                     log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID)) is unverified. Error: \(error.localizedDescription)")
-                    await sk2Transaction.finish()
-                    Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                        methodName: .finishTransaction,
-                        params: sk2Transaction.logParams
-                    ))
+                    await finish(transaction: sk2SignedTransaction, recived: .unfinished)
                 case let .verified(sk2Transaction):
                     let productOrNil = try? await productsManager.fetchProduct(
                         id: sk2Transaction.unfProductID,
@@ -141,16 +137,14 @@ private extension Adapty {
 
                     do {
                         try await report(
-                            purchasedTransaction: .init(
+                            .init(
                                 product: productOrNil,
-                                transaction: sk2Transaction,
-                                payload: variationIdStorage.getPurchasePayload(for: sk2Transaction.productID)
+                                transaction: sk2Transaction
                             ),
-                            for: nil,
+                            payload: purchasePayloadStorage.purchasePayload(for: sk2Transaction.productID),
                             reason: .unfinished
                         )
-
-                        await finish(transaction: sk2Transaction)
+                        await finish(transaction: sk2SignedTransaction, recived: .unfinished)
                         log.info("Synced unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductID)")
                     } catch {
                         log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductID)")

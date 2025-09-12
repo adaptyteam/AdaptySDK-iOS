@@ -34,9 +34,6 @@ final class ProfileStorage {
             createAnonymousUserId()
         }
 
-    static var appAccountToken: UUID? =
-        userDefaults.string(forKey: Constants.appAccountTokenKey).flatMap(UUID.init)
-
     private static func createAnonymousUserId() -> AdaptyUserId {
         let identifier = UUID().uuidString.lowercased()
         userDefaults.set(identifier, forKey: Constants.profileIdKey)
@@ -56,102 +53,7 @@ final class ProfileStorage {
         }
     }()
 
-    private static var externalAnalyticsDisabled: Bool = userDefaults.bool(forKey: Constants.externalAnalyticsDisabledKey)
-    private static var syncedTransactionsHistory: Bool = userDefaults.bool(forKey: Constants.syncedTransactionsHistoryKey)
-    private static var appleSearchAdsSyncDate: Date? = userDefaults.object(forKey: Constants.appleSearchAdsSyncDateKey) as? Date
-
-    private static var lastOpenedWebPaywallDate: Date? = userDefaults.object(forKey: Constants.lastOpenedWebPaywallKey) as? Date
-
-    private static var lastStartAcceleratedSyncProfileDate: Date? = userDefaults.object(forKey: Constants.lastStartAcceleratedSyncProfileKey) as? Date
-
-    var userId: AdaptyUserId { Self.userId }
-
-    func getAppAccountToken() -> UUID? { Self.appAccountToken }
-
-    func setAppAccountToken(_ value: UUID?) {
-        guard Self.appAccountToken != value else { return }
-        Self.appAccountToken = value
-        if let value {
-            Self.userDefaults.set(value.uuidString, forKey: Constants.appAccountTokenKey)
-            log.debug("set appAccountToken = \(value).")
-        } else {
-            Self.userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
-            log.debug("clear appAccountToken")
-        }
-    }
-
-    func getProfile() -> VH<AdaptyProfile>? { Self.profile }
-
-    var externalAnalyticsDisabled: Bool { Self.externalAnalyticsDisabled }
-
-    func setExternalAnalyticsDisabled(_ value: Bool) {
-        guard Self.externalAnalyticsDisabled != value else { return }
-        Self.externalAnalyticsDisabled = value
-        Self.userDefaults.set(value, forKey: Constants.externalAnalyticsDisabledKey)
-        log.debug("set externalAnalyticsDisabled = \(value).")
-    }
-
-    var syncedTransactionsHistory: Bool { Self.syncedTransactionsHistory }
-
-    func setSyncedTransactionsHistory(_ value: Bool) {
-        guard Self.syncedTransactionsHistory != value else { return }
-        Self.syncedTransactionsHistory = value
-        Self.userDefaults.set(value, forKey: Constants.syncedTransactionsHistoryKey)
-        log.debug("set syncedTransactionsHistory = \(value).")
-    }
-
-    var appleSearchAdsSyncDate: Date? { Self.appleSearchAdsSyncDate }
-
-    func setAppleSearchAdsSyncDate() {
-        let now = Date()
-        Self.appleSearchAdsSyncDate = now
-        Self.userDefaults.set(now, forKey: Constants.appleSearchAdsSyncDateKey)
-        log.debug("set appleSearchAdsSyncDate = \(now).")
-    }
-
-    var lastOpenedWebPaywallDate: Date? { Self.lastOpenedWebPaywallDate }
-
-    func setLastOpenedWebPaywallDate() {
-        let now = Date()
-        Self.lastOpenedWebPaywallDate = now
-        Self.userDefaults.set(now, forKey: Constants.lastOpenedWebPaywallKey)
-        log.debug("set lastOpenedWebPaywallDate = \(now).")
-    }
-
-    var lastStartAcceleratedSyncProfileDate: Date? { Self.lastStartAcceleratedSyncProfileDate }
-
-    func setLastStartAcceleratedSyncProfileDate() {
-        let now = Date()
-        Self.lastStartAcceleratedSyncProfileDate = now
-        Self.userDefaults.set(now, forKey: Constants.lastStartAcceleratedSyncProfileKey)
-        log.debug("set setLastStartAcceleratedSyncProfileDate = \(now).")
-    }
-
-    func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
-        Self.clearProfile(newProfile: newProfile)
-    }
-
-    func setIdentifiedProfile(_ newProfile: VH<AdaptyProfile>) {
-        Self.setProfile(newProfile)
-       // after identify need sync history of transactions
-        setSyncedTransactionsHistory(false)
-    }
-
-    func updateProfile(_ profile: VH<AdaptyProfile>) -> Bool {
-        guard let stored = getProfile() else {
-            Self.setProfile(profile)
-            return true
-        }
-        guard profile.isEqualProfileId(stored),
-              profile.IsNotEqualHash(stored),
-              profile.isNewerOrEqualVersion(stored)
-        else { return false }
-        
-        Self.setProfile(profile)
-        return true
-    }
-
-    static func setProfile(_ newProfile: VH<AdaptyProfile>) {
+    private static func setProfile(_ newProfile: VH<AdaptyProfile>) {
         profile = newProfile
         do {
             try userDefaults.setJSON(newProfile, forKey: Constants.profileKey)
@@ -159,6 +61,66 @@ final class ProfileStorage {
         } catch {
             log.error("saving profile fail. \(error.localizedDescription)")
         }
+    }
+
+    private static var appAccountToken: UUID? =
+        userDefaults.string(forKey: Constants.appAccountTokenKey).flatMap(UUID.init)
+
+    private static func setAppAccountToken(_ value: UUID?) {
+        guard appAccountToken != value else { return }
+        appAccountToken = value
+        if let value {
+            userDefaults.set(value.uuidString, forKey: Constants.appAccountTokenKey)
+            log.debug("set appAccountToken = \(value).")
+        } else {
+            userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
+            log.debug("clear appAccountToken")
+        }
+    }
+
+    private static var externalAnalyticsDisabled: Bool = userDefaults.bool(forKey: Constants.externalAnalyticsDisabledKey)
+
+    private static func setExternalAnalyticsDisabled(_ value: Bool) {
+        guard externalAnalyticsDisabled != value else { return }
+        externalAnalyticsDisabled = value
+        userDefaults.set(value, forKey: Constants.externalAnalyticsDisabledKey)
+        log.debug("set externalAnalyticsDisabled = \(value).")
+    }
+
+    private static var syncedTransactionsHistory: Bool = userDefaults.bool(forKey: Constants.syncedTransactionsHistoryKey)
+
+    private static func setSyncedTransactionsHistory(_ value: Bool) {
+        guard syncedTransactionsHistory != value else { return }
+        syncedTransactionsHistory = value
+        userDefaults.set(value, forKey: Constants.syncedTransactionsHistoryKey)
+        log.debug("set syncedTransactionsHistory = \(value).")
+    }
+
+    private static var appleSearchAdsSyncDate: Date? = userDefaults.object(forKey: Constants.appleSearchAdsSyncDateKey) as? Date
+
+    private static func setAppleSearchAdsSyncDate(_ value: Date) {
+        guard appleSearchAdsSyncDate != value else { return }
+        appleSearchAdsSyncDate = value
+        userDefaults.set(value, forKey: Constants.appleSearchAdsSyncDateKey)
+        log.debug("set appleSearchAdsSyncDate = \(value).")
+    }
+
+    private static var lastOpenedWebPaywallDate: Date? = userDefaults.object(forKey: Constants.lastOpenedWebPaywallKey) as? Date
+
+    private static func setLastOpenedWebPaywallDate(_ value: Date) {
+        guard lastOpenedWebPaywallDate != value else { return }
+        lastOpenedWebPaywallDate = value
+        userDefaults.set(value, forKey: Constants.lastOpenedWebPaywallKey)
+        log.debug("set lastOpenedWebPaywallDate = \(value).")
+    }
+
+    private static var lastStartAcceleratedSyncProfileDate: Date? = userDefaults.object(forKey: Constants.lastStartAcceleratedSyncProfileKey) as? Date
+
+    private static func setLastStartAcceleratedSyncProfileDate(_ value: Date) {
+        guard lastStartAcceleratedSyncProfileDate != value else { return }
+        lastStartAcceleratedSyncProfileDate = value
+        userDefaults.set(value, forKey: Constants.lastStartAcceleratedSyncProfileKey)
+        log.debug("set setLastStartAcceleratedSyncProfileDate = \(value).")
     }
 
     static func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
@@ -171,6 +133,7 @@ final class ProfileStorage {
         } else {
             userId = createAnonymousUserId()
             profile = nil
+            userDefaults.removeObject(forKey: Constants.profileKey)
         }
 
         userDefaults.removeObject(forKey: Constants.appAccountTokenKey)
@@ -181,7 +144,6 @@ final class ProfileStorage {
         syncedTransactionsHistory = false
         userDefaults.removeObject(forKey: Constants.appleSearchAdsSyncDateKey)
         appleSearchAdsSyncDate = nil
-        userDefaults.removeObject(forKey: Constants.profileKey)
         userDefaults.removeObject(forKey: Constants.lastOpenedWebPaywallKey)
         lastOpenedWebPaywallDate = nil
         userDefaults.removeObject(forKey: Constants.lastStartAcceleratedSyncProfileKey)
@@ -194,13 +156,100 @@ final class ProfileStorage {
 }
 
 extension ProfileStorage {
+    var userId: AdaptyUserId { Self.userId }
+
+    func getProfile() -> VH<AdaptyProfile>? { Self.profile }
+
+    func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
+        Self.clearProfile(newProfile: newProfile)
+    }
+
+    func setIdentifiedProfile(_ newProfile: VH<AdaptyProfile>) {
+        Self.setProfile(newProfile)
+        Self.setSyncedTransactionsHistory(false)
+    }
+
     func getProfile(withCustomerUserId customerUserId: String?) -> VH<AdaptyProfile>? {
-        guard let profile = getProfile(),
+        guard let profile = Self.profile,
               profile.isEqualProfileId(userId)
         else { return nil }
 
         guard let customerUserId else { return profile }
         guard customerUserId == profile.customerUserId else { return nil }
         return profile
+    }
+}
+
+extension ProfileStorage {
+    private func checkProfileId(_ otherUserId: AdaptyUserId) throws(WrongProfileIdError) {
+        guard Self.userId.isEqualProfileId(otherUserId) else { throw WrongProfileIdError() }
+    }
+
+    func updateProfile(_ profile: VH<AdaptyProfile>) throws(WrongProfileIdError) {
+        guard let stored = getProfile() else {
+            Self.setProfile(profile)
+            return
+        }
+        guard profile.isEqualProfileId(stored) else { throw WrongProfileIdError() }
+
+        guard profile.IsNotEqualHash(stored),
+              profile.isNewerOrEqualVersion(stored)
+        else { return }
+
+        Self.setProfile(profile)
+    }
+
+    func appAccountToken() -> UUID? {
+        return Self.appAccountToken
+    }
+
+    func setAppAccountToken(_ value: UUID?) {
+        Self.setAppAccountToken(value)
+    }
+
+    func externalAnalyticsDisabled(for userId: AdaptyUserId) throws(WrongProfileIdError) -> Bool {
+        try checkProfileId(userId)
+        return Self.externalAnalyticsDisabled
+    }
+
+    func setExternalAnalyticsDisabled(_ value: Bool, for userId: AdaptyUserId) throws(WrongProfileIdError) {
+        try checkProfileId(userId)
+        Self.setExternalAnalyticsDisabled(value)
+    }
+
+    func syncedTransactionsHistory(for userId: AdaptyUserId) throws(WrongProfileIdError) -> Bool {
+        try checkProfileId(userId)
+        return Self.syncedTransactionsHistory
+    }
+
+    func setSyncedTransactionsHistory(_ value: Bool, for userId: AdaptyUserId) throws(WrongProfileIdError) {
+        try checkProfileId(userId)
+        Self.setSyncedTransactionsHistory(value)
+    }
+
+    func appleSearchAdsSyncDate(for userId: AdaptyUserId) throws(WrongProfileIdError) -> Date? {
+        try checkProfileId(userId)
+        return Self.appleSearchAdsSyncDate
+    }
+
+    func setAppleSearchAdsSyncDate(for userId: AdaptyUserId) throws(WrongProfileIdError) {
+        try checkProfileId(userId)
+        Self.setAppleSearchAdsSyncDate(Date())
+    }
+
+    func lastOpenedWebPaywallDate() -> Date? {
+        Self.lastOpenedWebPaywallDate
+    }
+
+    func setLastOpenedWebPaywallDate()  {
+        Self.setLastOpenedWebPaywallDate(Date())
+    }
+
+    func lastStartAcceleratedSyncProfileDate() -> Date? {
+        Self.lastStartAcceleratedSyncProfileDate
+    }
+
+    func setLastStartAcceleratedSyncProfileDate() {
+        Self.setLastStartAcceleratedSyncProfileDate(Date())
     }
 }

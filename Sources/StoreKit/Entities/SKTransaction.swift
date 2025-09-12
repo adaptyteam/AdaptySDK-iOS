@@ -12,7 +12,6 @@ protocol SKTransaction: Sendable {
     var unfOfferId: String? { get }
     var unfEnvironment: String { get }
 
-    func finish() async
     var logParams: EventParameters { get }
 }
 

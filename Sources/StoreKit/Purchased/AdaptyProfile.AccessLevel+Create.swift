@@ -20,7 +20,7 @@ extension AdaptyProfile.AccessLevel {
         let isLifetime = backendPeriod == .lifetime
         var isRefund = sk2Transaction.revocationDate != nil
 
-        let offer = PurchasedTransaction.SubscriptionOffer(
+        let offer = PurchasedSubscriptionOfferInfo(
             sk2Transaction: sk2Transaction,
             sk2Product: sk2Product
         )
@@ -104,7 +104,7 @@ extension AdaptyProfile.AccessLevel {
     }
 }
 
-private extension PurchasedTransaction.SubscriptionOffer {
+private extension PurchasedSubscriptionOfferInfo {
     var activeIntroductoryOfferType: String? {
         (offerType == .introductory) ? paymentMode.encodedValue : nil
     }

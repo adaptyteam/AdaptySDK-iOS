@@ -23,6 +23,7 @@ extension AdaptyConfiguration.Builder: Decodable {
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
 
+        case transactionFinishBehavior = "transaction_finish_behavior"
         case logLevel = "log_level"
 
         case crossPlatformSDKName = "cross_platform_sdk_name"
@@ -66,6 +67,7 @@ extension AdaptyConfiguration.Builder: Decodable {
             backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl),
             backendUABaseUrl: container.decodeIfPresent(URL.self, forKey: .backendUABaseUrl),
             backendProxy: proxy,
+            transactionFinishBehavior: nil,
             logLevel: container.decodeIfPresent(AdaptyLog.Level.self, forKey: .logLevel),
             crossPlatformSDK: crossPlatformSDK
         )

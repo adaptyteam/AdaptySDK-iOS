@@ -27,3 +27,10 @@ extension AdaptyUserId: CustomStringConvertible {
         "(profileId: \(profileId), customerUserId: \(customerId ?? "nil")"
     }
 }
+
+extension AdaptyUserId: Codable {
+    enum CodingKeys: String, CodingKey {
+        case profileId = "profile_id"
+        case customerId = "customer_Id"
+    }
+}

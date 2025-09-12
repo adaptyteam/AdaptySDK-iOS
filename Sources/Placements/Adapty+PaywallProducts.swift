@@ -113,6 +113,6 @@ public extension Adapty {
     package nonisolated static func persistOnboardingVariationId(
         _ variationId: String
     ) async {
-        await Adapty.optionalSDK?.variationIdStorage.setOnboardingVariationId(variationId)
+        await Adapty.optionalSDK?.purchasePayloadStorage.setOnboardingVariationId(variationId)
     }
 }

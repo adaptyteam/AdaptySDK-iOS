@@ -15,7 +15,7 @@ extension Adapty {
     func updateASATokenIfNeed(for profile: VH<AdaptyProfile>) {
         guard
             #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),
-            profileStorage.appleSearchAdsSyncDate == nil, // check if this is an actual first sync
+            (try? profileStorage.appleSearchAdsSyncDate(for: profile.userId)) == nil, // check if this is an actual first sync
             let attributionToken = try? Adapty.getASAToken()
         else { return }
 
@@ -29,10 +29,8 @@ extension Adapty {
             )
             handleProfileResponse(response)
 
-            if profileStorage.isEqualProfileId(userId) {
-                // mark appleSearchAds attribution data as synced
-                profileStorage.setAppleSearchAdsSyncDate()
-            }
+            // mark appleSearchAds attribution data as synced
+            try? profileStorage.setAppleSearchAdsSyncDate(for: userId)
         }
     }
 
