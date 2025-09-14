@@ -141,7 +141,10 @@ private extension Adapty {
                                 product: productOrNil,
                                 transaction: sk2Transaction
                             ),
-                            payload: purchasePayloadStorage.purchasePayload(for: sk2Transaction.productID),
+                            payload: purchasePayloadStorage.purchasePayload(
+                                for: sk2Transaction.productID,
+                                orCreateFor: ProfileStorage.userId
+                            ),
                             reason: .unfinished
                         )
                         await finish(transaction: sk2SignedTransaction, recived: .unfinished)

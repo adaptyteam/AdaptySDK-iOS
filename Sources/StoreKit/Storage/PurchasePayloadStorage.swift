@@ -105,7 +105,13 @@ final class PurchasePayloadStorage {
 }
 
 extension PurchasePayloadStorage {
-    func purchasePayload(for productId: String) -> PurchasePayload? { Self.purchasePayload[productId] }
+    func purchasePayload(for productId: String, orCreateFor userId: AdaptyUserId) -> PurchasePayload {
+        Self.purchasePayload[productId] ?? .init(
+            userId: userId,
+            persistentPaywallVariationId: Self.persistentPaywallVariationsIds[productId],
+            persistentOnboardingVariationId: Self.persistentOnboardingVariationsId
+        )
+    }
 
     nonisolated func setPaywallVariationId(_ variationId: String, for productId: String, userId: AdaptyUserId) async {
         if await Self.setPaywallVariationId(variationId, for: productId, userId: userId) {
@@ -116,9 +122,7 @@ extension PurchasePayloadStorage {
                 ]
             ))
         }
-    }
-
-    nonisolated func setPersistentPaywallVariationId(_ variationId: String, for productId: String) async {
+        
         if await Self.setPersistentPaywallVariationId(variationId, for: productId) {
             await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                 eventName: "did_set_variations_ids_persistent",

@@ -61,7 +61,10 @@ actor SK2Purchaser {
                                     product: productOrNil,
                                     transaction: sk2Transaction
                                 ),
-                                payload: storage.purchasePayload(for: sk2Transaction.productID),
+                                payload: storage.purchasePayload(
+                                    for: sk2Transaction.productID,
+                                    orCreateFor: ProfileStorage.userId
+                                ),
                                 reason: .observing
                             )
                             await transactionSynchronizer.finish(transaction: sk2SignedTransaction, recived: .updates)

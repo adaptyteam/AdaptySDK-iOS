@@ -10,13 +10,13 @@ import Foundation
 protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
     func report(
         _: PurchasedTransactionInfo,
-        payload: PurchasePayload?,
+        payload: PurchasePayload,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError)
 
     func validate(
         _: PurchasedTransactionInfo,
-        payload: PurchasePayload?
+        payload: PurchasePayload
     ) async throws(AdaptyError) -> AdaptyProfile
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -83,13 +83,13 @@ extension Adapty: StoreKitTransactionSynchronizer {
 
     func report(
         _ transactionInfo: PurchasedTransactionInfo,
-        payload: PurchasePayload?,
+        payload: PurchasePayload,
         reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) {
         do {
             let response = try await httpSession.validateTransaction(
                 transactionInfo: transactionInfo,
-                payload: payload ?? .init(userId: profileStorage.userId),
+                payload: payload,
                 reason: reason
             )
             handleTransactionResponse(response)
@@ -100,12 +100,12 @@ extension Adapty: StoreKitTransactionSynchronizer {
 
     func validate(
         _ transactionInfo: PurchasedTransactionInfo,
-        payload: PurchasePayload?
+        payload: PurchasePayload
     ) async throws(AdaptyError) -> AdaptyProfile {
         do {
             let response = try await httpSession.validateTransaction(
                 transactionInfo: transactionInfo,
-                payload: payload ?? .init(userId: profileStorage.userId),
+                payload: payload,
                 reason: .purchasing
             )
             handleTransactionResponse(response)

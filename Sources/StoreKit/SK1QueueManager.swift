@@ -72,24 +72,23 @@ actor SK1QueueManager: Sendable {
 
         await productsManager.storeProductInfo(productInfo: [product.productInfo])
         await storage.setPaywallVariationId(product.variationId, for: product.vendorProductId, userId: userId)
-        await storage.setPersistentPaywallVariationId(product.variationId, for: product.vendorProductId)
-        return try await addPayment(payment, for: product.skProduct)
+        return try await addPayment(payment, with: product.skProduct)
     }
 
     @inlinable
     func makePurchase(
         product: AdaptyDeferredProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        try await addPayment(product.payment, for: product.skProduct)
+        try await addPayment(product.payment, with: product.skProduct)
     }
 
     @inlinable
     func addPayment(
         _ payment: SKPayment,
-        for sk1Product: SK1Product
+        with sk1Product: SK1Product
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withCheckedThrowingContinuation_ { continuation in
-            addPayment(payment, for: sk1Product) { result in
+            addPayment(payment, with: sk1Product) { result in
                 continuation.resume(with: result)
             }
         }
@@ -97,7 +96,7 @@ actor SK1QueueManager: Sendable {
 
     private func addPayment(
         _ payment: SKPayment,
-        for sk1Product: SK1Product,
+        with sk1Product: SK1Product,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         let productId = payment.productIdentifier
@@ -175,14 +174,15 @@ actor SK1QueueManager: Sendable {
         }
 
         do {
-            
-         
             let profile = try await transactionSynchronizer.validate(
                 .init(
                     product: productOrNil,
                     transaction: sk1Transaction
                 ),
-                payload: await storage.purchasePayload(for: productId) // TODO: persistedPaywallVariationId
+                payload: await storage.purchasePayload(
+                    for: productId,
+                    orCreateFor: ProfileStorage.userId
+                )
             )
 
             await storage.removePurchasePayload(for: productId)

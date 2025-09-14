@@ -48,7 +48,7 @@ actor SK1TransactionObserver: Sendable {
                         product: productOrNil,
                         transaction: sk1Transaction
                     ),
-                    payload: nil,
+                    payload: .init(userId: ProfileStorage.userId),
                     reason: .observing
                 )
             }
