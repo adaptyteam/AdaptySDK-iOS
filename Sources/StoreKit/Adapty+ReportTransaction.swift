@@ -41,7 +41,7 @@ public extension Adapty {
             let userId = try await sdk.createdProfileManager.userId
 
             let productOrNil = try? await sdk.productsManager.fetchProduct(
-                id: transaction.unfProductID,
+                id: transaction.unfProductId,
                 fetchPolicy: .returnCacheDataElseLoad
             )
 

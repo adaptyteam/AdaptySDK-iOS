@@ -45,7 +45,7 @@ extension Backend.MainExecutor {
             requestName: .signSubscriptionOffer,
             logParams: [
                 "product_id": vendorProductId,
-                "discount_id": offerId,
+                "discount_id": offerId
             ]
         )
 

@@ -7,12 +7,12 @@
 
 import Foundation
 
-struct PurchasePayload {
+struct PurchasePayload: Sendable, Hashable {
     let userId: AdaptyUserId
     let paywallVariationId: String?
     let persistentPaywallVariationId: String?
     let persistentOnboardingVariationId: String?
-    
+
     init(
         userId: AdaptyUserId,
         paywallVariationId: String? = nil,
@@ -23,6 +23,17 @@ struct PurchasePayload {
         self.paywallVariationId = paywallVariationId
         self.persistentPaywallVariationId = persistentPaywallVariationId
         self.persistentOnboardingVariationId = persistentOnboardingVariationId
+    }
+}
+
+extension PurchasePayload {
+    var logParams: EventParameters {
+        [
+            "user_id": userId,
+            "variation_id": paywallVariationId,
+            "persited_variation_id": persistentPaywallVariationId,
+            "onboarding_variation_id": persistentOnboardingVariationId
+        ].removeNil
     }
 }
 

@@ -39,7 +39,7 @@ actor SK1TransactionObserver: Sendable {
 
             Task.detached {
                 let productOrNil = try? await self.sk1ProductsManager.fetchProduct(
-                    id: sk1Transaction.unfProductID,
+                    id: sk1Transaction.unfProductId,
                     fetchPolicy: .returnCacheDataElseLoad
                 )
 

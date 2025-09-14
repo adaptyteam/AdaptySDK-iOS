@@ -83,7 +83,7 @@ extension AdaptyProfile.AccessLevel {
                 if let expiresAt, now > expiresAt { return false }
                 return true
             }(),
-            vendorProductId: sk2Transaction.unfProductID,
+            vendorProductId: sk2Transaction.unfProductId,
             store: "app_store",
             activatedAt: activatedAt,
             renewedAt: subscriptionRenewedAt,

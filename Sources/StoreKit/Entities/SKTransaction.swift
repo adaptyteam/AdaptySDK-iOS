@@ -8,11 +8,11 @@
 protocol SKTransaction: Sendable {
     var unfIdentifier: String { get }
     var unfOriginalIdentifier: String { get }
-    var unfProductID: String { get }
+    var unfProductId: String { get }
     var unfOfferId: String? { get }
     var unfEnvironment: String { get }
 
-    var logParams: EventParameters { get }
+    func logParams(other: EventParameters?) -> EventParameters
 }
 
 extension SK1TransactionWithIdentifier: SKTransaction {

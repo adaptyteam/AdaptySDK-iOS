@@ -22,11 +22,16 @@ extension SK2Transaction {
     var unfOriginalIdentifier: String { String(originalID) }
 
     @inlinable
-    var unfProductID: String { productID }
+    var unfProductId: String { productID }
+
+    func logParams(other: EventParameters?) -> EventParameters {
+        guard let other else { return logParams }
+        return logParams.merging(other) { _, new in new }
+    }
 
     var logParams: EventParameters {
         [
-            "product_id": unfProductID,
+            "product_id": unfProductId,
             "transaction_is_upgraded": isUpgraded,
             "transaction_id": unfIdentifier,
             "original_id": unfOriginalIdentifier,

@@ -127,11 +127,16 @@ private extension Adapty {
             for sk2SignedTransaction in unfinishedTranasactions {
                 switch sk2SignedTransaction {
                 case let .unverified(sk2Transaction, error):
-                    log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID)) is unverified. Error: \(error.localizedDescription)")
-                    await finish(transaction: sk2SignedTransaction, recived: .unfinished)
+                    log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
+                    await purchasePayloadStorage.removePurchasePayload(forTransaction: sk2Transaction)
+                    await sk2Transaction.finish()
+                    Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                        methodName: .finishTransaction,
+                        params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
+                    ))
                 case let .verified(sk2Transaction):
                     let productOrNil = try? await productsManager.fetchProduct(
-                        id: sk2Transaction.unfProductID,
+                        id: sk2Transaction.unfProductId,
                         fetchPolicy: .returnCacheDataElseLoad
                     )
 
@@ -142,15 +147,15 @@ private extension Adapty {
                                 transaction: sk2Transaction
                             ),
                             payload: purchasePayloadStorage.purchasePayload(
-                                for: sk2Transaction.productID,
+                                byTransaction: sk2Transaction,
                                 orCreateFor: ProfileStorage.userId
                             ),
                             reason: .unfinished
                         )
-                        await finish(transaction: sk2SignedTransaction, recived: .unfinished)
-                        log.info("Synced unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductID)")
+                        await finish(transaction: sk2Transaction, recived: .unfinished)
+                        log.info("Synced unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                     } catch {
-                        log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductID)")
+                        log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                         return .failure(error)
                     }
                 }
@@ -198,7 +203,7 @@ extension SK2TransactionManager {
         log.verbose("call  SK2Transaction.all")
 
         for await transaction in SK2Transaction.all.compactMap(\.verifiedTransaction) {
-            log.verbose("found transaction original-id: \(transaction.originalID), purchase date:\(transaction.purchaseDate)")
+            log.verbose("found transaction originalId: \(transaction.unfOriginalIdentifier), purchase date:\(transaction.purchaseDate)")
 
             guard let lasted = lastTransaction,
                   transaction.purchaseDate < lasted.purchaseDate
@@ -230,7 +235,7 @@ extension SK2SignedTransaction {
     var verifiedTransaction: SK2Transaction? {
         switch self {
         case let .unverified(transaction, _):
-            log.warn("found unverified transaction original-id: \(transaction.originalID), purchase date:\(transaction.purchaseDate), environment: \(transaction.unfEnvironment)")
+            log.warn("found unverified transaction originalId: \(transaction.unfOriginalIdentifier), purchase date:\(transaction.purchaseDate), environment: \(transaction.unfEnvironment)")
             return nil
         case let .verified(transaction):
             return transaction

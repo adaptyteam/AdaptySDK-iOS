@@ -15,13 +15,13 @@ extension AdaptyProfile {
         guard !transactions.isEmpty else { return self }
         var accessLevels = [String: AdaptyProfile.AccessLevel]()
         let products = try? await productManager.fetchSK2Products(
-            ids: Set(transactions.map { $0.unfProductID }),
+            ids: Set(transactions.map { $0.unfProductId }),
             fetchPolicy: .returnCacheDataElseLoad
         )
         for transaction in transactions {
-            let sk2Product = products?.first(where: { $0.id == transaction.unfProductID })
-            guard let productInfo = await productManager.getProductInfo(vendorId: transaction.unfProductID) else {
-                log.warn("Not found product info (productVendorId:\(transaction.unfProductID))")
+            let sk2Product = products?.first(where: { $0.id == transaction.unfProductId })
+            guard let productInfo = await productManager.getProductInfo(vendorId: transaction.unfProductId) else {
+                log.warn("Not found product info (productVendorId:\(transaction.unfProductId))")
                 continue
             }
             guard let accessLevel = await AdaptyProfile.AccessLevel(

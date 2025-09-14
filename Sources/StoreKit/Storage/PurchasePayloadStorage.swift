@@ -18,38 +18,50 @@ final class PurchasePayloadStorage {
 
     private enum Constants {
         static let deprecatedPaywallVariationsIds = "AdaptySDK_Cached_Variations_Ids"
-        static let purchasePayload = "AdaptySDK_Purchase_Payload"
+        static let purchasePayloadByProductId = "AdaptySDK_Purchase_Payload_By_Product"
+        static let purchasePayloadByTransactionId = "AdaptySDK_Purchase_Payload_By_Transaction"
         static let persistentPaywallVariationsIds = "AdaptySDK_Variations_Ids"
         static let persistentOnboardingVariationsId = "AdaptySDK_Onboarding_Variation_Id"
     }
 
     private static let userDefaults = Storage.userDefaults
 
-    private static var purchasePayload: [String: PurchasePayload] = (try? userDefaults.getJSON([String: PurchasePayload].self, forKey: Constants.purchasePayload)) ?? [:]
+    private static var purchasePayloadByProductId: [String: PurchasePayload] = (try? userDefaults.getJSON([String: PurchasePayload].self, forKey: Constants.purchasePayloadByProductId)) ?? [:]
 
-    private static func setPaywallVariationId(_ variationId: String, for productId: String, userId: AdaptyUserId) -> Bool {
-        purchasePayload[productId] = .init(
-            userId: userId,
-            paywallVariationId: variationId,
-            persistentPaywallVariationId: variationId,
-            persistentOnboardingVariationId: persistentOnboardingVariationsId
-        )
-        try? userDefaults.setJSON(purchasePayload, forKey: Constants.purchasePayload)
+    private static func setPurchasePayload(_ payload: PurchasePayload, forProductId productId: String) -> Bool {
+        guard payload != purchasePayloadByProductId.updateValue(payload, forKey: productId) else { return false }
+        try? userDefaults.setJSON(purchasePayloadByProductId, forKey: Constants.purchasePayloadByProductId)
         log.debug("Saving variationsIds for paywall")
         return true
     }
 
-    private static func removePurchasePayload(for productId: String) -> Bool {
-        guard purchasePayload.removeValue(forKey: productId) != nil else { return false }
-        try? userDefaults.setJSON(purchasePayload, forKey: Constants.purchasePayload)
+    private static func removePurchasePayload(forProductId productId: String) -> Bool {
+        guard purchasePayloadByProductId.removeValue(forKey: productId) != nil else { return false }
+        try? userDefaults.setJSON(purchasePayloadByProductId, forKey: Constants.purchasePayloadByProductId)
         log.debug("Remove purchase payload for productId = \(productId)")
+        return true
+    }
+
+    private static var purchasePayloadByTransactionId: [String: PurchasePayload] = (try? userDefaults.getJSON([String: PurchasePayload].self, forKey: Constants.purchasePayloadByTransactionId)) ?? [:]
+
+    private static func setPurchasePayload(_ payload: PurchasePayload, forTransactionId transactionId: String) -> Bool {
+        guard payload != purchasePayloadByTransactionId.updateValue(payload, forKey: transactionId) else { return false }
+        try? userDefaults.setJSON(purchasePayloadByTransactionId, forKey: Constants.purchasePayloadByTransactionId)
+        log.debug("Saving purchase payload for transactionId: \(transactionId)")
+        return true
+    }
+
+    private static func removePurchasePayload(forTransactionId transactionId: String) -> Bool {
+        guard purchasePayloadByTransactionId.removeValue(forKey: transactionId) != nil else { return false }
+        try? userDefaults.setJSON(purchasePayloadByTransactionId, forKey: Constants.purchasePayloadByTransactionId)
+        log.debug("Remove purchase payload for transactionId = \(transactionId)")
         return true
     }
 
     private static var persistentPaywallVariationsIds: [String: String] = userDefaults
         .dictionary(forKey: Constants.persistentPaywallVariationsIds) as? [String: String] ?? [:]
 
-    private static func setPersistentPaywallVariationId(_ variationId: String, for productId: String) -> Bool {
+    private static func setPersistentPaywallVariationId(_ variationId: String, forProductId productId: String) -> Bool {
         guard variationId != persistentPaywallVariationsIds.updateValue(variationId, forKey: productId) else { return false }
         userDefaults.set(persistentPaywallVariationsIds, forKey: Constants.persistentPaywallVariationsIds)
         return true
@@ -65,7 +77,7 @@ final class PurchasePayloadStorage {
     }
 
     static func migration(for userId: AdaptyUserId) {
-        guard userDefaults.object(forKey: Constants.purchasePayload) == nil else { return }
+        guard userDefaults.object(forKey: Constants.purchasePayloadByProductId) == nil else { return }
 
         let paywallVariationsIds = userDefaults
             .dictionary(forKey: Constants.deprecatedPaywallVariationsIds) as? [String: String]
@@ -78,12 +90,13 @@ final class PurchasePayloadStorage {
             PurchasePayload(
                 userId: userId,
                 paywallVariationId: variationId,
+                persistentPaywallVariationId: variationId,
                 persistentOnboardingVariationId: onboardingId
             )
         }
 
         do {
-            try userDefaults.setJSON(payloads, forKey: Constants.purchasePayload)
+            try userDefaults.setJSON(payloads, forKey: Constants.purchasePayloadByProductId)
             userDefaults.removeObject(forKey: Constants.deprecatedPaywallVariationsIds)
             log.info("PurchasePayloadStorage migration done")
         } catch {
@@ -92,12 +105,13 @@ final class PurchasePayloadStorage {
     }
 
     static func clear() {
-        purchasePayload = [:]
+        purchasePayloadByProductId = [:]
         persistentOnboardingVariationsId = nil
 
         userDefaults.removeObject(forKey: Constants.deprecatedPaywallVariationsIds)
         userDefaults.removeObject(forKey: Constants.persistentPaywallVariationsIds)
-        userDefaults.removeObject(forKey: Constants.purchasePayload)
+        userDefaults.removeObject(forKey: Constants.purchasePayloadByProductId)
+        userDefaults.removeObject(forKey: Constants.purchasePayloadByTransactionId)
         userDefaults.removeObject(forKey: Constants.persistentOnboardingVariationsId)
 
         log.debug("Clear variationsIds for paywalls and onboarding.")
@@ -105,55 +119,111 @@ final class PurchasePayloadStorage {
 }
 
 extension PurchasePayloadStorage {
-    func purchasePayload(for productId: String, orCreateFor userId: AdaptyUserId) -> PurchasePayload {
-        Self.purchasePayload[productId] ?? .init(
+    func purchasePayload(byProductId productId: String, orCreateFor userId: AdaptyUserId) -> PurchasePayload {
+        Self.purchasePayloadByProductId[productId] ?? .init(
             userId: userId,
             persistentPaywallVariationId: Self.persistentPaywallVariationsIds[productId],
             persistentOnboardingVariationId: Self.persistentOnboardingVariationsId
         )
     }
 
-    nonisolated func setPaywallVariationId(_ variationId: String, for productId: String, userId: AdaptyUserId) async {
-        if await Self.setPaywallVariationId(variationId, for: productId, userId: userId) {
+    func setPaywallVariationId(_ variationId: String, productId: String, userId: AdaptyUserId) {
+        if Self.setPurchasePayload(
+            .init(
+                userId: userId,
+                paywallVariationId: variationId,
+                persistentPaywallVariationId: variationId,
+                persistentOnboardingVariationId: Self.persistentOnboardingVariationsId
+            ),
+            forProductId: productId
+        ) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_set_variations_ids",
+                    params: [
+                        "payload_by_product": Self.purchasePayloadByProductId,
+                    ]
+                ))
+            }
+        }
+
+        if Self.setPersistentPaywallVariationId(variationId, forProductId: productId) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_set_variations_ids_persistent",
+                    params: [
+                        "variation_by_product": Self.persistentPaywallVariationsIds,
+                    ]
+                ))
+            }
+        }
+    }
+
+    func removePurchasePayload(forProductId productId: String) {
+        guard Self.removePurchasePayload(forProductId: productId) else { return }
+        Task {
             await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                 eventName: "did_set_variations_ids",
                 params: [
-                    "variation_by_product": Self.purchasePayload.mapValues(\.paywallVariationId),
-                ]
-            ))
-        }
-        
-        if await Self.setPersistentPaywallVariationId(variationId, for: productId) {
-            await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                eventName: "did_set_variations_ids_persistent",
-                params: [
-                    "variation_by_product": Self.persistentPaywallVariationsIds,
+                    "payload_by_product": Self.purchasePayloadByProductId,
                 ]
             ))
         }
     }
 
-    nonisolated func removePurchasePayload(for productId: String) async {
-        guard await Self.removePurchasePayload(for: productId) else { return }
+    func purchasePayload(byTransaction transaction: SKTransaction, orCreateFor userId: AdaptyUserId) -> PurchasePayload {
+        if let payload = Self.purchasePayloadByTransactionId[transaction.unfIdentifier] {
+            return payload
+        }
 
-        await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-            eventName: "did_set_variations_ids",
-            params: [
-                "variation_by_product": Self.purchasePayload.mapValues(\.paywallVariationId),
-            ]
-        ))
+        let payload = purchasePayload(byProductId: transaction.unfProductId, orCreateFor: userId)
+        setPurchasePayload(payload, forTransaction: transaction)
+        return payload
+    }
+
+    func setPurchasePayload(_ payload: PurchasePayload, forTransaction transaction: SKTransaction) {
+        if Self.setPurchasePayload(
+            payload,
+            forTransactionId: transaction.unfIdentifier
+        ) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_set_variations_ids",
+                    params: [
+                        "payload_by_transaction": Self.purchasePayloadByTransactionId,
+                    ]
+                ))
+            }
+        }
+        removePurchasePayload(forProductId: transaction.unfProductId)
+    }
+
+    func removePurchasePayload(forTransaction transaction: SKTransaction) {
+        if Self.removePurchasePayload(forTransactionId: transaction.unfIdentifier) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_set_variations_ids",
+                    params: [
+                        "payload_by_transaction": Self.purchasePayloadByTransactionId,
+                    ]
+                ))
+            }
+        }
+        removePurchasePayload(forProductId: transaction.unfProductId)
     }
 
     func onboardingVariationId() -> String? { Self.persistentOnboardingVariationsId }
 
-    nonisolated func setOnboardingVariationId(_ variationId: String) async {
-        if await Self.setPersistentOnboardingVariationId(variationId) {
-            await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                eventName: "did_set_onboarding_variations_id",
-                params: [
-                    "onboarding_variation_id": variationId,
-                ]
-            ))
+    func setOnboardingVariationId(_ variationId: String) {
+        if Self.setPersistentOnboardingVariationId(variationId) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_set_onboarding_variations_id",
+                    params: [
+                        "onboarding_variation_id": variationId,
+                    ]
+                ))
+            }
         }
     }
 }

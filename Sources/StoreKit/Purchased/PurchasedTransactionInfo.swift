@@ -23,7 +23,7 @@ struct PurchasedTransactionInfo: Sendable {
     ) {
         self.transactionId = transaction.unfIdentifier
         self.originalTransactionId = transaction.unfOriginalIdentifier
-        self.vendorProductId = transaction.unfProductID
+        self.vendorProductId = transaction.unfProductId
         self.price = product?.price
         self.priceLocale = product?.priceLocale.unfCurrencyCode
         self.storeCountry = product?.priceLocale.unfRegionCode

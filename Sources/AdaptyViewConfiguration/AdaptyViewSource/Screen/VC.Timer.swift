@@ -89,7 +89,7 @@ extension AdaptyViewSource.Timer: Decodable {
             case BehaviorType.custom.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .custom)
             default:
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.behavior], debugDescription: "unknown value '\(behavior ?? "null")'"))
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.behavior], debugDescription: "unknown value '\(behavior ?? "nil")'"))
             }
 
         format =

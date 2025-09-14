@@ -71,7 +71,7 @@ actor SK1QueueManager: Sendable {
         }
 
         await productsManager.storeProductInfo(productInfo: [product.productInfo])
-        await storage.setPaywallVariationId(product.variationId, for: product.vendorProductId, userId: userId)
+        await storage.setPaywallVariationId(product.variationId, productId: product.vendorProductId, userId: userId)
         return try await addPayment(payment, with: product.skProduct)
     }
 
@@ -161,14 +161,14 @@ actor SK1QueueManager: Sendable {
     }
 
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
-        let productId = sk1Transaction.unfProductID
+        let productId = sk1Transaction.unfProductId
         let result: AdaptyResult<AdaptyPurchaseResult>
 
         var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
 
         if productOrNil == nil {
             productOrNil = try? await productsManager.fetchProduct(
-                id: sk1Transaction.unfProductID,
+                id: sk1Transaction.unfProductId,
                 fetchPolicy: .returnCacheDataElseLoad
             )
         }
@@ -180,12 +180,12 @@ actor SK1QueueManager: Sendable {
                     transaction: sk1Transaction
                 ),
                 payload: await storage.purchasePayload(
-                    for: productId,
+                    byProductId: productId,
                     orCreateFor: ProfileStorage.userId
                 )
             )
 
-            await storage.removePurchasePayload(for: productId)
+            await storage.removePurchasePayload(forProductId: productId)
             makePurchasesProduct.removeValue(forKey: productId)
             SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
             await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
@@ -204,9 +204,9 @@ actor SK1QueueManager: Sendable {
     }
 
     private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction, error: AdaptyError? = nil) async {
-        let productId = sk1Transaction.unfProductID
+        let productId = sk1Transaction.unfProductId
         makePurchasesProduct.removeValue(forKey: productId)
-        await storage.removePurchasePayload(for: productId)
+        await storage.removePurchasePayload(forProductId: productId)
         SKPaymentQueue.default().finishTransaction(sk1Transaction)
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .finishTransaction,

@@ -77,7 +77,7 @@ extension AdaptyViewConfiguration.Unit: Codable {
                 case CodingKeys.point.rawValue, nil:
                     self = .point(value)
                 default:
-                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit ?? "null")"))
+                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit ?? "nil")"))
                 }
             }
         }

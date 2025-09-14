@@ -25,6 +25,17 @@ private enum CodingKeys: String, CodingKey {
 
 typealias EventParameters = [String: (any Sendable & Encodable)?]
 
+extension EventParameters {
+    var removeNil: EventParameters {
+        var result: EventParameters = [:]
+        for (key, value) in self {
+            guard let value = value else { continue }
+            result[key] = value
+        }
+        return result
+    }
+}
+
 private extension Encoder {
     func encode(_ params: EventParameters?) throws {
         guard let params else { return }

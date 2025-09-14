@@ -73,7 +73,7 @@ extension Backend.MainExecutor {
             request,
             requestName: .setAttributionData,
             logParams: [
-                "source": source,
+                "source": source
             ]
         )
 

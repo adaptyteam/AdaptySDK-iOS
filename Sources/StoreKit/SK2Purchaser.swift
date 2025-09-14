@@ -42,14 +42,19 @@ actor SK2Purchaser {
             for await sk2SignedTransaction in SK2Transaction.updates {
                 switch sk2SignedTransaction {
                 case let .unverified(sk2Transaction, error):
-                    log.error("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID)) is unverified. Error: \(error.localizedDescription)")
-                    await transactionSynchronizer.finish(transaction: sk2SignedTransaction, recived: .updates)
+                    log.error("Transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
+                    await storage.removePurchasePayload(forTransaction: sk2Transaction)
+                    await sk2Transaction.finish()
+                    Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                        methodName: .finishTransaction,
+                        params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
+                    ))
                 case let .verified(sk2Transaction):
-                    log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalID: \(sk2Transaction.unfOriginalIdentifier),  productID: \(sk2Transaction.unfProductID), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
+                    log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
 
                     Task.detached {
                         let productOrNil = try? await sk2ProductsManager.fetchProduct(
-                            id: sk2Transaction.unfProductID,
+                            id: sk2Transaction.unfProductId,
                             fetchPolicy: .returnCacheDataElseLoad
                         )
 
@@ -62,17 +67,17 @@ actor SK2Purchaser {
                                     transaction: sk2Transaction
                                 ),
                                 payload: storage.purchasePayload(
-                                    for: sk2Transaction.productID,
+                                    byTransaction: sk2Transaction,
                                     orCreateFor: ProfileStorage.userId
                                 ),
                                 reason: .observing
                             )
-                            await transactionSynchronizer.finish(transaction: sk2SignedTransaction, recived: .updates)
-                            log.info("Updated transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductID)")
+                            await transactionSynchronizer.finish(transaction: sk2Transaction, recived: .updates)
+                            log.info("Updated transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
 
                         } catch {
                             _ = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
-                            log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Transaction.productID)")
+                            log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                         }
                     }
                 }
@@ -139,7 +144,7 @@ actor SK2Purchaser {
         }
 
         await sk2ProductManager.storeProductInfo(productInfo: [product.productInfo])
-        await storage.setPaywallVariationId(product.variationId, for: product.vendorProductId, userId: userId)
+        await storage.setPaywallVariationId(product.variationId, productId: product.vendorProductId, userId: userId)
         let payload = PurchasePayload(
             userId: userId,
             paywallVariationId: product.variationId,
@@ -183,7 +188,7 @@ actor SK2Purchaser {
         switch purchaseResult {
         case let .success(verificationResult):
             switch verificationResult {
-            case .verified:
+            case let .verified(sk2Transaction):
                 await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                     methodName: .productPurchase,
                     stamp: stamp,
@@ -191,6 +196,7 @@ actor SK2Purchaser {
                         "verified": true,
                     ]
                 ))
+                await storage.setPurchasePayload(payload, forTransaction: sk2Transaction)
                 sk2SignedTransaction = verificationResult
             case let .unverified(sk2Transaction, error):
                 await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
@@ -198,8 +204,13 @@ actor SK2Purchaser {
                     stamp: stamp,
                     error: error.localizedDescription
                 ))
-                log.error("Unverified purchase transaction of product: \(sk2Transaction.unfProductID) \(error.localizedDescription)")
-                await transactionSynchronizer.finish(transaction: verificationResult, recived: .purchased)
+                log.error("Unverified purchase transaction of product: \(sk2Transaction.unfProductId) \(error.localizedDescription)")
+                await storage.removePurchasePayload(forTransaction: sk2Transaction)
+                await sk2Transaction.finish()
+                await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                    methodName: .finishTransaction,
+                    params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
+                ))
                 throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
             }
         case .pending:
@@ -247,7 +258,7 @@ actor SK2Purchaser {
                 payload: payload
             )
 
-            await transactionSynchronizer.finish(transaction: sk2SignedTransaction, recived: .purchased)
+            await transactionSynchronizer.finish(transaction: sk2Transaction, recived: .purchased)
             log.info("Successfully purchased product: \(sk2Product.id) with transaction: \(sk2Transaction)")
             return .success(profile: profile, transaction: sk2SignedTransaction)
 

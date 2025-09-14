@@ -21,7 +21,7 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(
-        transaction: SK2SignedTransaction,
+        transaction: SK2Transaction,
         recived: TransactionRecivedBy
     ) async
 
@@ -61,24 +61,15 @@ extension Adapty: StoreKitTransactionSynchronizer {
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(
-        transaction sk2SignedTransaction: SK2SignedTransaction,
+        transaction: SK2Transaction,
         recived _: TransactionRecivedBy
     ) async {
-        switch sk2SignedTransaction {
-        case let .unverified(transaction, _):
-            await transaction.finish()
-            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                methodName: .finishTransaction,
-                params: transaction.logParams
-            ))
-        case let .verified(transaction):
-            await purchasePayloadStorage.removePurchasePayload(for: transaction.unfProductID)
-            await transaction.finish()
-            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                methodName: .finishTransaction,
-                params: transaction.logParams
-            ))
-        }
+        await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)
+        await transaction.finish()
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+            methodName: .finishTransaction,
+            params: transaction.logParams
+        ))
     }
 
     func report(
