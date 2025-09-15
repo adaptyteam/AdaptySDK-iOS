@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyUIBuider
 
 package protocol AdaptyImageUrlObserver: Sendable {
     func extractedImageUrls(_: Set<URL>)

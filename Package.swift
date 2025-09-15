@@ -15,14 +15,14 @@ let package = Package(
             targets: ["Adapty"]
         ),
         .library(
-            name: "AdaptyUICore",
-            targets: ["AdaptyUICore"]
+            name: "AdaptyUIBuider",
+            targets: ["AdaptyUIBuider"]
         ),
-        .library(
+        .library( // deprecated
             name: "AdaptyUI",
             targets: ["AdaptyUI"]
         ),
-        .library(
+        .library( // need rename to AdaptyUIBuiderTools
             name: "AdaptyUITesting",
             targets: ["AdaptyUITesting"]
         ),
@@ -33,35 +33,35 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "AdaptyUIBuider",
+            dependencies: [],
+            path: "Sources.UIBuilder"
+        ),
+        .target(
             name: "Adapty",
-            dependencies: ["AdaptyUICore"],
+            dependencies: ["AdaptyUIBuider"],
             path: "Sources",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
-        .target(
-            name: "AdaptyUICore",
-            dependencies: [],
-            path: "Sources.AdaptyUICore"
-        ),
-        .target(
+        .target( // deprecated
             name: "AdaptyUI",
-            dependencies: ["Adapty", "AdaptyUICore"],
-            path: "AdaptyUI",
+            dependencies: ["AdaptyUIBuider", "Adapty"],
+            path: "Deprecated.AdaptyUI",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
             name: "AdaptyUITesting",
-            dependencies: ["Adapty", "AdaptyUICore", "AdaptyUI"],
-            path: "AdaptyUITesting"
+            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI"],
+            path: "Sources.UIBuilderTools"
         ),
         .target(
             name: "AdaptyPlugin",
-            dependencies: ["Adapty", "AdaptyUICore", "AdaptyUI"],
+            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI"],
             path: "Sources.AdaptyPlugin"
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["Adapty", "AdaptyUICore"],
+            dependencies: ["AdaptyUIBuider", "Adapty"],
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),

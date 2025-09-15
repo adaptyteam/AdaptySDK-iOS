@@ -17,7 +17,4 @@ extension AdaptyOnboarding.ViewConfiguration {
     nonisolated static let uiVersion = "2.0.0"
 }
 
-extension AdaptyViewConfiguration {
-    nonisolated static let formatVersion = "4.4.0"
-    nonisolated static let builderVersion = "4_4"
-}
+
