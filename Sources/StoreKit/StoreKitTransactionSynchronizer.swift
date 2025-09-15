@@ -67,7 +67,7 @@ extension Adapty: StoreKitTransactionSynchronizer {
     ) async {
         await transaction.finish()
         await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)
-        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.id)
+        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.unfIdentifier)
         Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .finishTransaction,
             params: transaction.logParams

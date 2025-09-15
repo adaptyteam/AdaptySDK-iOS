@@ -130,13 +130,13 @@ private extension Adapty {
                     log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
                     await sk2Transaction.finish()
                     await purchasePayloadStorage.removePurchasePayload(forTransaction: sk2Transaction)
-                    await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.id)
+                    await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
                     Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                         methodName: .finishTransaction,
                         params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
                     ))
                 case let .verified(sk2Transaction):
-                    if await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.id) { continue }
+                    if await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.unfIdentifier) { continue }
 
                     let productOrNil = try? await productsManager.fetchProduct(
                         id: sk2Transaction.unfProductId,
@@ -156,7 +156,7 @@ private extension Adapty {
                             reason: .unfinished
                         )
 
-                        guard await purchasePayloadStorage.canFinishSyncedTransaction(sk2Transaction.id) else {
+                        guard await purchasePayloadStorage.canFinishSyncedTransaction(sk2Transaction.unfIdentifier) else {
                             log.info("Unfinished transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
                             continue
                         }
