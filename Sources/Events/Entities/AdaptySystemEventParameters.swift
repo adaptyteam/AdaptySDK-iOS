@@ -168,6 +168,8 @@ enum MethodName: String {
     case setIntegrationIdentifiers = "set_integration_identifiers"
 
     case setVariationId = "set_variation_id"
+    case manualFinishTransaction = "manual_finish_transaction"
+
     case reportSK1Transaction = "report_transaction_sk1"
     case reportSK2Transaction = "report_transaction_sk2"
     case getPaywallProducts = "get_paywall_products"

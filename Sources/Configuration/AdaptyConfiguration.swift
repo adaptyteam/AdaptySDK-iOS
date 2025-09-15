@@ -28,3 +28,8 @@ public struct AdaptyConfiguration: Sendable {
     let crossPlatformSDK: (name: String, version: String)?
     let transactionFinishBehavior: TransactionFinishBehavior
 }
+
+extension AdaptyConfiguration {
+    @AdaptyActor
+    static var transactionFinishBehavior = Self.default.transactionFinishBehavior
+}

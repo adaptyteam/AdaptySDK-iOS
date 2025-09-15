@@ -32,6 +32,7 @@ enum TransactionRecivedBy {
     case updates
     case purchased
     case unfinished
+    case manual
 }
 
 extension Adapty: StoreKitTransactionSynchronizer {
@@ -64,8 +65,9 @@ extension Adapty: StoreKitTransactionSynchronizer {
         transaction: SK2Transaction,
         recived _: TransactionRecivedBy
     ) async {
-        await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)
         await transaction.finish()
+        await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)
+        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.id)
         Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .finishTransaction,
             params: transaction.logParams

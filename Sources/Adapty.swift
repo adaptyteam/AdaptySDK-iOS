@@ -46,6 +46,10 @@ public final class Adapty {
         await PurchasePayloadStorage.migration(for: ProfileStorage.userId)
         self.purchasePayloadStorage = PurchasePayloadStorage()
 
+        if configuration.transactionFinishBehavior != .manual {
+            _ = await PurchasePayloadStorage.removeAllUnfinishedTransactionState()
+        }
+
         if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
             self.receiptManager = StoreKitReceiptManager(
                 httpSession: httpSession,

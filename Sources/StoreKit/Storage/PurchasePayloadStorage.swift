@@ -22,6 +22,7 @@ final class PurchasePayloadStorage {
         static let purchasePayloadByTransactionId = "AdaptySDK_Purchase_Payload_By_Transaction"
         static let persistentPaywallVariationsIds = "AdaptySDK_Variations_Ids"
         static let persistentOnboardingVariationsId = "AdaptySDK_Onboarding_Variation_Id"
+        static let unfinishedTransactionState = "AdaptySDK_Unfinished_Transaction_State"
     }
 
     private static let userDefaults = Storage.userDefaults
@@ -76,6 +77,31 @@ final class PurchasePayloadStorage {
         return true
     }
 
+    private static var unfinishedTransactionState: [UInt64: Bool] = userDefaults
+        .dictionary(forKey: Constants.unfinishedTransactionState) as? [UInt64: Bool] ?? [:]
+
+    private static func setUnfinishedTransactionState(_ state: Bool, forTransactionId transactionId: UInt64) -> Bool {
+        guard state != unfinishedTransactionState.updateValue(state, forKey: transactionId) else { return false }
+        userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
+        log.debug("Saving state (\(state ? "unsynced" : "synced"))  for transactionId: \(transactionId)")
+        return true
+    }
+
+    private static func removeUnfinishedTransactionState(forTransactionId transactionId: UInt64) -> Bool {
+        guard unfinishedTransactionState.removeValue(forKey: transactionId) != nil else { return false }
+        userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
+        log.debug("Remove state for transactionId: \(transactionId)")
+        return true
+    }
+
+    static func removeAllUnfinishedTransactionState() -> Bool {
+        guard !unfinishedTransactionState.isEmpty else { return false }
+        unfinishedTransactionState = [:]
+        userDefaults.removeObject(forKey: Constants.unfinishedTransactionState)
+        log.debug("Remove all states for transaction")
+        return true
+    }
+
     static func migration(for userId: AdaptyUserId) {
         guard userDefaults.object(forKey: Constants.purchasePayloadByProductId) == nil else { return }
 
@@ -113,6 +139,7 @@ final class PurchasePayloadStorage {
         userDefaults.removeObject(forKey: Constants.purchasePayloadByProductId)
         userDefaults.removeObject(forKey: Constants.purchasePayloadByTransactionId)
         userDefaults.removeObject(forKey: Constants.persistentOnboardingVariationsId)
+        userDefaults.removeObject(forKey: Constants.unfinishedTransactionState)
 
         log.debug("Clear variationsIds for paywalls and onboarding.")
     }
@@ -221,6 +248,56 @@ extension PurchasePayloadStorage {
                     eventName: "did_set_onboarding_variations_id",
                     params: [
                         "onboarding_variation_id": variationId,
+                    ]
+                ))
+            }
+        }
+    }
+
+    func unfinishedTransactionIds() -> Set<UInt64> {
+        Set(Self.unfinishedTransactionState.keys)
+    }
+
+    func isSyncedTransaction(_ transactionId: UInt64) -> Bool {
+        Self.unfinishedTransactionState[transactionId] ?? false
+    }
+
+    func addUnfinishedTransaction(_ transactionId: UInt64) {
+        if Self.setUnfinishedTransactionState(false, forTransactionId: transactionId) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_change_unfinished_transaction",
+                    params: [
+                        "state": Self.unfinishedTransactionState,
+                    ]
+                ))
+            }
+        }
+    }
+
+    func canFinishSyncedTransaction(_ transactionId: UInt64) -> Bool {
+        guard Self.unfinishedTransactionState[transactionId] != nil else { return true }
+        if Self.setUnfinishedTransactionState(true, forTransactionId: transactionId) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_change_unfinished_transaction",
+                    params: [
+                        "state": Self.unfinishedTransactionState,
+                    ]
+                ))
+            }
+        }
+        return false
+    }
+
+    func removeUnfinishedTransaction(_ transactionId: UInt64) {
+        guard Self.unfinishedTransactionState[transactionId] != nil else { return }
+        if Self.removeUnfinishedTransactionState(forTransactionId: transactionId) {
+            Task {
+                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                    eventName: "did_change_unfinished_transaction",
+                    params: [
+                        "state": Self.unfinishedTransactionState,
                     ]
                 ))
             }

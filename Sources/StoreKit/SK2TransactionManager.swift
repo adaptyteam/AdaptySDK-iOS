@@ -128,13 +128,16 @@ private extension Adapty {
                 switch sk2SignedTransaction {
                 case let .unverified(sk2Transaction, error):
                     log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
-                    await purchasePayloadStorage.removePurchasePayload(forTransaction: sk2Transaction)
                     await sk2Transaction.finish()
+                    await purchasePayloadStorage.removePurchasePayload(forTransaction: sk2Transaction)
+                    await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.id)
                     Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                         methodName: .finishTransaction,
                         params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
                     ))
                 case let .verified(sk2Transaction):
+                    if await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.id) { continue }
+
                     let productOrNil = try? await productsManager.fetchProduct(
                         id: sk2Transaction.unfProductId,
                         fetchPolicy: .returnCacheDataElseLoad
@@ -152,8 +155,15 @@ private extension Adapty {
                             ),
                             reason: .unfinished
                         )
+
+                        guard await purchasePayloadStorage.canFinishSyncedTransaction(sk2Transaction.id) else {
+                            log.info("Unfinished transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
+                            continue
+                        }
+                        
                         await finish(transaction: sk2Transaction, recived: .unfinished)
-                        log.info("Synced unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
+                        
+                        log.info("Unfinished transaction synced: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                     } catch {
                         log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                         return .failure(error)

@@ -6,18 +6,34 @@
 //
 import StoreKit
 
+private let log = Log.sk2TransactionManager
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public struct AdaptyUnfinishedTransaction: Sendable {
     public let sk2SignedTransaction: VerificationResult<Transaction>
-    
-    public func finish() async {
-//        mark this transaction client finished
-//              do {
-//                  try await send to server backendPayload
-//              } catch {
-//                  return
-//              }
-//        await sk2Transaction.finish()
+
+    public func finish() async throws(AdaptyError) {
+        try await Adapty.withActivatedSDK(methodName: .manualFinishTransaction, logParams: [
+            "transaction_id": sk2Transaction.unfIdentifier,
+        ]) { sdk throws(AdaptyError) in
+            guard case let .verified(sk2Transaction) = sk2SignedTransaction else {
+                return
+            }
+            await sdk.manualFinishTransaction(sk2Transaction)
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+private extension Adapty {
+    func manualFinishTransaction(_ sk2Transaction: SK2Transaction) async {
+        let synced = await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.id)
+        await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.id)
+
+        if !synced { return }
+
+        await finish(transaction: sk2Transaction, recived: .manual)
+        log.info("Finished synced transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
     }
 }
 

@@ -63,6 +63,7 @@ public extension Adapty {
 
             await Storage.clearAllDataIfDifferent(apiKey: configuration.apiKey)
 
+            AdaptyConfiguration.transactionFinishBehavior = configuration.transactionFinishBehavior
             AdaptyConfiguration.callbackDispatchQueue = configuration.callbackDispatchQueue // TODO: Refactoring
             AdaptyConfiguration.idfaCollectionDisabled = configuration.idfaCollectionDisabled // TODO: Refactoring
             AdaptyConfiguration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
