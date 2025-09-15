@@ -30,8 +30,8 @@ public struct AdaptyUnfinishedTransaction: Sendable {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension Adapty {
     func manualFinishTransaction(_ sk2Transaction: SK2Transaction) async {
-        let synced = await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.id)
-        await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.id)
+        let synced = await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.unfIdentifier)
+        await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
 
         if !synced { return }
 

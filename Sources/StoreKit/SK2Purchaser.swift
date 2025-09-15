@@ -45,7 +45,7 @@ actor SK2Purchaser {
                     log.error("Transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
                     await sk2Transaction.finish()
                     await storage.removePurchasePayload(forTransaction: sk2Transaction)
-                    await storage.removeUnfinishedTransaction(sk2Transaction.id)
+                    await storage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
                     Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                         methodName: .finishTransaction,
                         params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
@@ -61,7 +61,7 @@ actor SK2Purchaser {
 
                         do {
                             if await AdaptyConfiguration.transactionFinishBehavior == .manual {
-                                await storage.addUnfinishedTransaction(sk2Transaction.id)
+                                await storage.addUnfinishedTransaction(sk2Transaction.unfIdentifier)
                             }
 
                             await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(sk2SignedTransaction: sk2SignedTransaction)) }
@@ -78,7 +78,7 @@ actor SK2Purchaser {
                                 reason: .observing
                             )
 
-                            guard await storage.canFinishSyncedTransaction(sk2Transaction.id) else {
+                            guard await storage.canFinishSyncedTransaction(sk2Transaction.unfIdentifier) else {
                                 log.info("Updated transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
                                 return
                             }
@@ -219,7 +219,7 @@ actor SK2Purchaser {
                 log.error("Unverified purchase transaction of product: \(sk2Transaction.unfProductId) \(error.localizedDescription)")
                 await sk2Transaction.finish()
                 await storage.removePurchasePayload(forTransaction: sk2Transaction)
-                await storage.removeUnfinishedTransaction(sk2Transaction.id)
+                await storage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
                 await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                     methodName: .finishTransaction,
                     params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
@@ -262,7 +262,7 @@ actor SK2Purchaser {
 
         do {
             if await AdaptyConfiguration.transactionFinishBehavior == .manual {
-                await storage.addUnfinishedTransaction(sk2Transaction.id)
+                await storage.addUnfinishedTransaction(sk2Transaction.unfIdentifier)
             }
 
             await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(sk2SignedTransaction: sk2SignedTransaction)) }
@@ -275,7 +275,7 @@ actor SK2Purchaser {
                 payload: payload
             )
 
-            guard await storage.canFinishSyncedTransaction(sk2Transaction.id) else {
+            guard await storage.canFinishSyncedTransaction(sk2Transaction.unfIdentifier) else {
                 log.info("Successfully purchased transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
                 return .success(profile: profile, transaction: sk2SignedTransaction)
             }
