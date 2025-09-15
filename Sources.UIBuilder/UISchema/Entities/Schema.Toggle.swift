@@ -11,13 +11,13 @@ extension Schema {
     struct Toggle: Sendable, Hashable {
         let onActions: [Schema.Action]
         let offActions: [Schema.Action]
-        let onCondition: AdaptyViewConfiguration.StateCondition
+        let onCondition: AdaptyUIConfiguration.StateCondition
         let colorAssetId: String?
     }
 }
 
 extension Schema.Localizer {
-    func toggle(_ from: Schema.Toggle) -> AdaptyViewConfiguration.Toggle {
+    func toggle(_ from: Schema.Toggle) -> AdaptyUIConfiguration.Toggle {
         .init(
             onActions: from.onActions.map(action),
             offActions: from.offActions.map(action),
@@ -71,7 +71,7 @@ extension Schema.Toggle: Decodable {
         try self.init(
             onActions: onActions,
             offActions: offActions,
-            onCondition: container.decode(AdaptyViewConfiguration.StateCondition.self, forKey: .onCondition),
+            onCondition: container.decode(AdaptyUIConfiguration.StateCondition.self, forKey: .onCondition),
             colorAssetId: colorAssetId
         )
     }

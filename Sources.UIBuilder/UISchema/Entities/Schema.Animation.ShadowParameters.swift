@@ -16,7 +16,7 @@ extension Schema.Animation {
 }
 
 extension Schema.Localizer {
-    func animationShadowParameters(_ from: Schema.Animation.ShadowParameters) throws -> AdaptyViewConfiguration.Animation.ShadowParameters {
+    func animationShadowParameters(_ from: Schema.Animation.ShadowParameters) throws -> AdaptyUIConfiguration.Animation.ShadowParameters {
         try .init(
             color: from.color.map(animationFillingValue),
             blurRadius: from.blurRadius,

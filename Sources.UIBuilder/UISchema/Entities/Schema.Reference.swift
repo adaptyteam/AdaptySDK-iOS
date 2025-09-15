@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema.Localizer {
-    func reference(_ id: String) throws -> AdaptyViewConfiguration.Element {
+    func reference(_ id: String) throws -> AdaptyUIConfiguration.Element {
         guard !self.elementIds.contains(id) else {
             throw Schema.LocalizerError.referenceCycle(id)
         }
@@ -16,7 +16,7 @@ extension Schema.Localizer {
             throw Schema.LocalizerError.unknownReference(id)
         }
         elementIds.insert(id)
-        let result: AdaptyViewConfiguration.Element
+        let result: AdaptyUIConfiguration.Element
         do {
             result = try element(value)
             elementIds.remove(id)

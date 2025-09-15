@@ -31,8 +31,8 @@ extension Schema.Element {
     struct Properties: Sendable {
         let elementId: String?
         let decorator: Schema.Decorator?
-        let padding: AdaptyViewConfiguration.EdgeInsets
-        let offset: AdaptyViewConfiguration.Offset
+        let padding: AdaptyUIConfiguration.EdgeInsets
+        let offset: AdaptyUIConfiguration.Offset
 
         let opacity: Double
         let onAppear: [Schema.Animation]
@@ -49,7 +49,7 @@ extension Schema.Element {
 }
 
 extension Schema.Localizer {
-    func element(_ from: Schema.Element) throws -> AdaptyViewConfiguration.Element {
+    func element(_ from: Schema.Element) throws -> AdaptyUIConfiguration.Element {
         switch from {
         case let .reference(id):
             try reference(id)
@@ -82,7 +82,7 @@ extension Schema.Localizer {
         }
     }
 
-    private func elementProperties(_ from: Schema.Element.Properties) throws -> AdaptyViewConfiguration.Element.Properties? {
+    private func elementProperties(_ from: Schema.Element.Properties) throws -> AdaptyUIConfiguration.Element.Properties? {
         guard !from.isZero else { return nil }
         return try .init(
             decorator: from.decorator.map(decorator),
@@ -198,14 +198,14 @@ extension Schema.Element.Properties: Decodable {
         let opacity = if container.contains(.visibility) && !container.contains(.opacity) {
             try container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true ? 1.0 : 0.0
         } else {
-            try container.decodeIfPresent(Double.self, forKey: .opacity) ?? AdaptyViewConfiguration.Element.Properties.defaultOpacity
+            try container.decodeIfPresent(Double.self, forKey: .opacity) ?? AdaptyUIConfiguration.Element.Properties.defaultOpacity
         }
 
         try self.init(
             elementId: container.decodeIfPresent(String.self, forKey: .elementId),
             decorator: container.decodeIfPresent(Schema.Decorator.self, forKey: .decorator),
-            padding: container.decodeIfPresent(AdaptyViewConfiguration.EdgeInsets.self, forKey: .padding) ?? AdaptyViewConfiguration.Element.Properties.defaultPadding,
-            offset: container.decodeIfPresent(AdaptyViewConfiguration.Offset.self, forKey: .offset) ?? AdaptyViewConfiguration.Element.Properties.defaultOffset,
+            padding: container.decodeIfPresent(AdaptyUIConfiguration.EdgeInsets.self, forKey: .padding) ?? AdaptyUIConfiguration.Element.Properties.defaultPadding,
+            offset: container.decodeIfPresent(AdaptyUIConfiguration.Offset.self, forKey: .offset) ?? AdaptyUIConfiguration.Element.Properties.defaultOffset,
             opacity: opacity,
             onAppear: onAppear
         )

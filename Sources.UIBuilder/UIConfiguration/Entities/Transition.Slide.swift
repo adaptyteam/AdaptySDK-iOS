@@ -1,0 +1,73 @@
+//
+//  Transition.Slide.swift
+//  AdaptyUIBuilder
+//
+//  Created by Aleksei Valiano on 16.01.2024
+//
+
+import Foundation
+
+package extension AdaptyUIConfiguration {
+    struct TransitionSlide: Sendable, Hashable {
+        static let `default` = AdaptyUIConfiguration.TransitionSlide(
+            startDelay: 0.0,
+            duration: 0.3,
+            interpolator: AdaptyUIConfiguration.Animation.Interpolator.default
+        )
+
+        package let startDelay: TimeInterval
+        package let duration: TimeInterval
+        package let interpolator: AdaptyUIConfiguration.Animation.Interpolator
+    }
+}
+
+#if DEBUG
+package extension AdaptyUIConfiguration.TransitionSlide {
+    static func create(
+        startDelay: TimeInterval = `default`.startDelay,
+        duration: TimeInterval = `default`.duration,
+        interpolator: AdaptyUIConfiguration.Animation.Interpolator = `default`.interpolator
+    ) -> Self {
+        .init(
+            startDelay: startDelay,
+            duration: duration,
+            interpolator: interpolator
+        )
+    }
+}
+#endif
+
+extension AdaptyUIConfiguration.TransitionSlide: Codable {
+    enum CodingKeys: String, CodingKey {
+        case type
+        case startDelay = "start_delay"
+        case duration
+        case interpolator
+    }
+
+    package init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay)).map { $0 / 1000.0 } ?? AdaptyUIConfiguration.TransitionSlide.default.startDelay
+        duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? AdaptyUIConfiguration.TransitionSlide.default.duration
+        interpolator = try (container.decodeIfPresent(AdaptyUIConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? AdaptyUIConfiguration.TransitionSlide.default.interpolator
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode("slide", forKey: .type)
+
+        if startDelay != Self.default.startDelay {
+            try container.encode(startDelay * 1000, forKey: .startDelay)
+        }
+
+        if duration != Self.default.duration {
+            try container.encode(duration * 1000, forKey: .duration)
+        }
+
+        if interpolator != Self.default.interpolator {
+            try container.encode(interpolator, forKey: .interpolator)
+        }
+    }
+}

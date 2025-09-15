@@ -29,10 +29,10 @@ extension Adapty {
         }
     }
 
-    static func sendImageUrlsToObserver(_ config: AdaptyViewSource) {
+    static func sendImageUrlsToObserver(_ schema: AdaptyUISchema) {
         Task {
             guard let observer = await holder.imageUrlObserver else { return }
-            let urls = config.extractImageUrls(config.responseLocale)
+            let urls = schema.extractImageUrls()
             guard urls.isNotEmpty else { return }
             observer.extractedImageUrls(urls)
         }

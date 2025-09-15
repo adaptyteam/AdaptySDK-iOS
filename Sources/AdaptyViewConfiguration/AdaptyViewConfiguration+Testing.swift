@@ -1,5 +1,5 @@
 //
-//  AdaptyViewConfiguration+Testing.swift
+//  AdaptyUIConfiguration+Testing.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 16.05.2024
@@ -10,7 +10,7 @@ import AdaptyUIBuider
 
 #if DEBUG
 
-package extension AdaptyViewConfiguration {
+package extension AdaptyUIConfiguration {
     static func create(
         templateId: String = "transparent",
         locale: String = "en",
@@ -24,10 +24,10 @@ package extension AdaptyViewConfiguration {
         let locale = AdaptyLocale(id: locale)
 
         let colors = colors
-            .mapValues { AdaptyViewSource.Asset.filling($0) }
+            .mapValues { AdaptyUISchema.Asset.filling($0) }
 
         let assets = Dictionary(
-            images.map { ($0, AdaptyViewSource.Asset.image(
+            images.map { ($0, AdaptyUISchema.Asset.image(
                 .url(
                     customId: $0,
                     URL(string: "https://unknown.image.com")!,
@@ -41,8 +41,8 @@ package extension AdaptyViewConfiguration {
         let jsonDecoder = JSONDecoder()
         Backend.configure(jsonDecoder: jsonDecoder)
         let screen =
-            if let element = try? jsonDecoder.decode(AdaptyViewSource.Element.self, from: data) {
-                AdaptyViewSource.Screen(
+            if let element = try? jsonDecoder.decode(AdaptyUISchema.Element.self, from: data) {
+                AdaptyUISchema.Screen(
                     backgroundAssetId: "$black",
                     cover: nil,
                     content: element,
@@ -51,12 +51,12 @@ package extension AdaptyViewConfiguration {
                     selectedAdaptyProductId: nil
                 )
             } else {
-                try jsonDecoder.decode(AdaptyViewSource.Screen.self, from: data)
+                try jsonDecoder.decode(AdaptyUISchema.Screen.self, from: data)
             }
 
-        return try AdaptyViewSource(
+        return try AdaptyUISchema(
             id: UUID().uuidString,
-            formatVersion: AdaptyViewConfiguration.formatVersion,
+            formatVersion: AdaptyUIConfiguration.formatVersion,
             templateId: templateId,
             templateRevision: 0,
             assets: assets,
@@ -79,7 +79,7 @@ package extension AdaptyViewConfiguration {
             defaultLocalization: nil,
             defaultScreen: screen,
             screens: [:],
-            referencedElements: [String: AdaptyViewSource.Element](screen.referencedElements, uniquingKeysWith: { _, _ in
+            referencedElements: [String: AdaptyUISchema.Element](screen.referencedElements, uniquingKeysWith: { _, _ in
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate element_id"))
             }),
             selectedProducts: selectedProducts

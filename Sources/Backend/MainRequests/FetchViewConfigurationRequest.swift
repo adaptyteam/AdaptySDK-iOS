@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import AdaptyUIBuider
 
 struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<AdaptyViewSource>
+    typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
 
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
@@ -23,8 +24,8 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
         headers = HTTPHeaders()
             .setPaywallBuilderLocale(locale)
-            .setPaywallBuilderVersion(AdaptyViewConfiguration.builderVersion)
-            .setPaywallBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
+            .setPaywallBuilderVersion(AdaptyUIConfiguration.builderVersion)
+            .setPaywallBuilderConfigurationFormatVersion(AdaptyUIConfiguration.formatVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
@@ -36,8 +37,8 @@ extension Backend.MainExecutor {
         paywallVariationId: String,
         locale: AdaptyLocale,
         disableServerCache: Bool
-    ) async throws(HTTPError) -> AdaptyViewSource {
-        let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
+    ) async throws(HTTPError) -> AdaptyUISchema {
+        let md5Hash = "{\"builder_version\":\"\(AdaptyUIConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
 
         let request = FetchViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -54,8 +55,8 @@ extension Backend.MainExecutor {
                 "api_prefix": apiKeyPrefix,
                 "variation_id": paywallVariationId,
                 "locale": locale,
-                "builder_version": AdaptyViewConfiguration.builderVersion,
-                "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
+                "builder_version": AdaptyUIConfiguration.builderVersion,
+                "builder_config_format_version": AdaptyUIConfiguration.formatVersion,
                 "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]

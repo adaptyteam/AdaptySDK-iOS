@@ -10,12 +10,12 @@ import Foundation
 extension Schema {
     enum Action: Sendable {
         case openUrl(String)
-        case action(AdaptyViewConfiguration.Action)
+        case action(AdaptyUIConfiguration.Action)
     }
 }
 
 extension Schema.Localizer {
-    func action(_ from: Schema.Action) -> AdaptyViewConfiguration.Action {
+    func action(_ from: Schema.Action) -> AdaptyUIConfiguration.Action {
         switch from {
         case let .openUrl(stringId):
             .openUrl(urlIfPresent(stringId))

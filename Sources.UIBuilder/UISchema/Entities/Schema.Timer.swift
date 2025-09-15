@@ -10,10 +10,10 @@ import Foundation
 extension Schema {
     struct Timer: Sendable, Hashable {
         let id: String
-        let state: AdaptyViewConfiguration.Timer.State
+        let state: AdaptyUIConfiguration.Timer.State
         let format: [Item]
         let actions: [Schema.Action]
-        let horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment
+        let horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment
         let defaultTextAttributes: TextAttributes?
 
         struct Item: Sendable, Hashable {
@@ -24,7 +24,7 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func timer(_ from: Schema.Timer) -> AdaptyViewConfiguration.Timer {
+    func timer(_ from: Schema.Timer) -> AdaptyUIConfiguration.Timer {
         .init(
             id: from.id,
             state: from.state,
@@ -34,7 +34,7 @@ extension Schema.Localizer {
                     defaultTextAttributes: from.defaultTextAttributes
                 ) else { return nil }
 
-                return AdaptyViewConfiguration.Timer.Item(
+                return AdaptyUIConfiguration.Timer.Item(
                     from: $0.from,
                     value: value
                 )
@@ -106,7 +106,7 @@ extension Schema.Timer: Decodable {
                 try container.decodeIfPresent([Schema.Action].self, forKey: .actions) ?? []
             }
 
-        horizontalAlign = try container.decodeIfPresent(AdaptyViewConfiguration.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
+        horizontalAlign = try container.decodeIfPresent(AdaptyUIConfiguration.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         let textAttributes = try Schema.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
     }

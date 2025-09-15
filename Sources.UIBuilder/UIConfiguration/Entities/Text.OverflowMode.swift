@@ -1,0 +1,37 @@
+//
+//  Text.OverflowMode.swift
+//  AdaptyUIBuilder
+//
+//  Created by Aleksei Valiano on 01.05.2024
+//
+
+import Foundation
+
+package extension AdaptyUIConfiguration.Text {
+    enum OverflowMode: String {
+        case scale
+        case unknown
+    }
+}
+
+extension AdaptyUIConfiguration.Text.OverflowMode: Codable {
+    package init(from decoder: Decoder) throws {
+        self =
+            switch try decoder.singleValueContainer().decode(String.self) {
+            case "scale":
+                .scale
+            default:
+                .unknown
+            }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .scale:
+            try container.encode("scale")
+        case .unknown:
+            try container.encode("unknown")
+        }
+    }
+}

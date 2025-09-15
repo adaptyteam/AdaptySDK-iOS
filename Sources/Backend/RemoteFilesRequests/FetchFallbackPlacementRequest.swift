@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyUIBuider
 
 private struct FetchFallbackPlacementRequest: HTTPRequest {
     let endpoint: HTTPEndpoint
@@ -72,7 +73,7 @@ extension Backend.FallbackExecutor {
         if Content.self == AdaptyPaywall.self {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(AdaptyViewConfiguration.builderVersion)/fallback.json"
+                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(AdaptyUIConfiguration.builderVersion)/fallback.json"
             )
             requestName = .fetchFallbackPaywall
         } else {
@@ -101,8 +102,8 @@ extension Backend.FallbackExecutor {
                     "api_prefix": apiKeyPrefix,
                     "placement_id": placementId,
                     "variation_id": paywallVariationId,
-                    "builder_version": AdaptyViewConfiguration.builderVersion,
-                    "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
+                    "builder_version": AdaptyUIConfiguration.builderVersion,
+                    "builder_config_format_version": AdaptyUIConfiguration.formatVersion,
                     "language_code": locale.languageCode,
                     "request_locale": requestLocale.id,
                     "disable_server_cache": disableServerCache,

@@ -12,14 +12,14 @@ extension Schema {
     struct Shadow: Sendable, Hashable {
         let colorAssetId: String
         let blurRadius: Double
-        let offset: AdaptyViewConfiguration.Offset
+        let offset: AdaptyUIConfiguration.Offset
     }
 }
 
 extension Schema.Localizer {
-    func shadow(_ from: Schema.Shadow) throws -> AdaptyViewConfiguration.Shadow {
+    func shadow(_ from: Schema.Shadow) throws -> AdaptyUIConfiguration.Shadow {
         .init(
-            filling: (try? filling(from.colorAssetId)) ?? AdaptyViewConfiguration.Shadow.default.filling,
+            filling: (try? filling(from.colorAssetId)) ?? AdaptyUIConfiguration.Shadow.default.filling,
             blurRadius: from.blurRadius,
             offset: from.offset
         )
@@ -37,8 +37,8 @@ extension Schema.Shadow: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         colorAssetId = try container.decode(String.self, forKey: .colorAssetId)
 
-        blurRadius = try container.decodeIfPresent(Double.self, forKey: .blurRadius) ?? AdaptyViewConfiguration.Shadow.default.blurRadius
+        blurRadius = try container.decodeIfPresent(Double.self, forKey: .blurRadius) ?? AdaptyUIConfiguration.Shadow.default.blurRadius
 
-        offset = try container.decodeIfPresent(AdaptyViewConfiguration.Offset.self, forKey: .offset) ?? AdaptyViewConfiguration.Shadow.default.offset
+        offset = try container.decodeIfPresent(AdaptyUIConfiguration.Offset.self, forKey: .offset) ?? AdaptyUIConfiguration.Shadow.default.offset
     }
 }

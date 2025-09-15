@@ -20,7 +20,7 @@ public struct AdaptyPaywall: PlacementContent, WebPaywallURLProviding {
 
     public let remoteConfig: AdaptyRemoteConfig?
 
-    /// If `true`, it is possible to fetch the view ``AdaptyViewConfiguration`` object and use it with ``AdaptyUI`` library.
+    /// If `true`, it is possible to fetch the view ``AdaptyUIConfiguration`` object and use it with ``AdaptyUI`` library.
     public var hasViewConfiguration: Bool { viewConfiguration != nil }
 
     let viewConfiguration: ViewConfiguration?

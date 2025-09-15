@@ -59,10 +59,6 @@ extension Adapty {
 
         trackEvent(event, for: draw.userId)
     }
-
-    package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyViewConfiguration) {
-        trackEvent(.paywallShowed(.init(variationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
-    }
 }
 
 public extension Adapty {

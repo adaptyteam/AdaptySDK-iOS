@@ -15,7 +15,7 @@ extension Schema.Animation {
 }
 
 extension Schema.Localizer {
-    func animationBorderParameters(_ from: Schema.Animation.BorderParameters) throws -> AdaptyViewConfiguration.Animation.BorderParameters {
+    func animationBorderParameters(_ from: Schema.Animation.BorderParameters) throws -> AdaptyUIConfiguration.Animation.BorderParameters {
         try .init(
             color: from.color.map(animationFillingValue),
             thickness: from.thickness

@@ -7,10 +7,11 @@
 //
 
 import Foundation
+import AdaptyUIBuider
 
 extension AdaptyPaywall {
     enum ViewConfiguration: Sendable {
-        case value(AdaptyViewSource)
+        case value(AdaptyUISchema)
         case json(AdaptyLocale, id: String, json: Data?)
     }
 }
@@ -31,10 +32,10 @@ extension AdaptyPaywall.ViewConfiguration {
     }
 }
 
-extension AdaptyViewSource {
+extension AdaptyUISchema {
     init(data: Data) throws(AdaptyError) {
         do {
-            self = try Storage.decoder.decode(AdaptyViewSource.self, from: data)
+            self = try Storage.decoder.decode(AdaptyUISchema.self, from: data)
         } catch {
             throw .decodingViewConfiguration(error)
         }
@@ -42,14 +43,14 @@ extension AdaptyViewSource {
 }
 
 extension AdaptyPaywall.ViewConfiguration: Codable {
-    typealias CodingKeys = AdaptyViewSource.ContainerCodingKeys
+    typealias CodingKeys = AdaptyUISchema.ContainerCodingKeys
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self =
             if container.contains(.container) {
-                try .value(AdaptyViewSource(from: decoder))
+                try .value(AdaptyUISchema(from: decoder))
             } else {
                 try .json(
                     container.decode(AdaptyLocale.self, forKey: .responseLocale),

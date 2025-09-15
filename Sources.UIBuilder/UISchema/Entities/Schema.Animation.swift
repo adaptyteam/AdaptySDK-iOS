@@ -8,14 +8,14 @@
 import Foundation
 
 extension Schema {
-    typealias Unit = AdaptyViewConfiguration.Unit
-    typealias Offset = AdaptyViewConfiguration.Offset
+    typealias Unit = AdaptyUIConfiguration.Unit
+    typealias Offset = AdaptyUIConfiguration.Offset
     enum Animation: Sendable {
-        typealias Range = AdaptyViewConfiguration.Animation.Range
-        typealias Timeline = AdaptyViewConfiguration.Animation.Timeline
-        typealias RotationParameters = AdaptyViewConfiguration.Animation.RotationParameters
-        typealias ScaleParameters = AdaptyViewConfiguration.Animation.ScaleParameters
-        typealias BoxParameters = AdaptyViewConfiguration.Animation.BoxParameters
+        typealias Range = AdaptyUIConfiguration.Animation.Range
+        typealias Timeline = AdaptyUIConfiguration.Animation.Timeline
+        typealias RotationParameters = AdaptyUIConfiguration.Animation.RotationParameters
+        typealias ScaleParameters = AdaptyUIConfiguration.Animation.ScaleParameters
+        typealias BoxParameters = AdaptyUIConfiguration.Animation.BoxParameters
 
         case opacity(Timeline, Animation.Range<Double>)
         case offset(Timeline, Animation.Range<Offset>)
@@ -29,7 +29,7 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func animation(_ from: Schema.Animation) throws -> AdaptyViewConfiguration.Animation {
+    func animation(_ from: Schema.Animation) throws -> AdaptyUIConfiguration.Animation {
         switch from {
         case let .opacity(timeline, value):
             .opacity(timeline, value)
@@ -50,7 +50,7 @@ extension Schema.Localizer {
         }
     }
 
-    func animationFillingValue(_ from: Schema.Animation.Range<String>) throws -> AdaptyViewConfiguration.Animation.Range<AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling>> {
+    func animationFillingValue(_ from: Schema.Animation.Range<String>) throws -> AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>> {
         try .init(
             start: filling(from.start),
             end: filling(from.end)

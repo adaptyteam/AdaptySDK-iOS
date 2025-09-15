@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyUIBuider
 
 private struct FetchPaywallVariationsRequest: HTTPRequest, BackendAPIRequestParameters {
     let endpoint: HTTPEndpoint
@@ -25,7 +26,7 @@ private struct FetchPaywallVariationsRequest: HTTPRequest, BackendAPIRequestPara
         crossPlacementEligible: Bool,
         disableServerCache: Bool
     ) {
-        let md5Hash = "{\"builder_version\":\"\(AdaptyViewConfiguration.builderVersion)\",\(crossPlacementEligible ? "\"cross_placement_eligibility\":true," : "")\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(AdaptyUIConfiguration.builderVersion)\",\(crossPlacementEligible ? "\"cross_placement_eligibility\":true," : "")\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
 
         endpoint = HTTPEndpoint(
             method: .get,
@@ -35,8 +36,8 @@ private struct FetchPaywallVariationsRequest: HTTPRequest, BackendAPIRequestPara
         headers = HTTPHeaders()
             .setPaywallLocale(locale)
             .setUserProfileId(userId)
-            .setPaywallBuilderVersion(AdaptyViewConfiguration.builderVersion)
-            .setPaywallBuilderConfigurationFormatVersion(AdaptyViewConfiguration.formatVersion)
+            .setPaywallBuilderVersion(AdaptyUIConfiguration.builderVersion)
+            .setPaywallBuilderConfigurationFormatVersion(AdaptyUIConfiguration.formatVersion)
             .setCrossPlacementEligibility(crossPlacementEligible)
             .setSegmentId(segmentId)
 
@@ -47,8 +48,8 @@ private struct FetchPaywallVariationsRequest: HTTPRequest, BackendAPIRequestPara
             "placement_id": placementId,
             "locale": locale,
             "segment_id": segmentId,
-            "builder_version": AdaptyViewConfiguration.builderVersion,
-            "builder_config_format_version": AdaptyViewConfiguration.formatVersion,
+            "builder_version": AdaptyUIConfiguration.builderVersion,
+            "builder_config_format_version": AdaptyUIConfiguration.formatVersion,
             "md5": md5Hash,
             "cross_placement_eligibility": crossPlacementEligible,
             "disable_server_cache": disableServerCache,

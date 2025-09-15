@@ -10,16 +10,16 @@ import Foundation
 extension Schema {
     struct Text: Sendable, Hashable {
         let stringId: StringId
-        let horizontalAlign: AdaptyViewConfiguration.HorizontalAlignment
+        let horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment
         let maxRows: Int?
-        let overflowMode: Set<AdaptyViewConfiguration.Text.OverflowMode>
+        let overflowMode: Set<AdaptyUIConfiguration.Text.OverflowMode>
         let defaultTextAttributes: TextAttributes?
     }
 }
 
 extension Schema.Localizer {
-    func text(_ textBlock: Schema.Text) -> AdaptyViewConfiguration.Text {
-        let value: AdaptyViewConfiguration.Text.Value =
+    func text(_ textBlock: Schema.Text) -> AdaptyUIConfiguration.Text {
+        let value: AdaptyUIConfiguration.Text.Value =
             switch textBlock.stringId {
             case let .basic(stringId):
                 .text(richText(
@@ -29,14 +29,14 @@ extension Schema.Localizer {
 
             case let .product(info):
                 if let adaptyProductId = info.adaptyProductId {
-                    .productText(AdaptyViewConfiguration.LazyLocalizedProductText(
+                    .productText(AdaptyUIConfiguration.LazyLocalizedProductText(
                         adaptyProductId: adaptyProductId,
                         suffix: info.suffix,
                         localizer: self,
                         defaultTextAttributes: textBlock.defaultTextAttributes
                     ))
                 } else {
-                    .selectedProductText(AdaptyViewConfiguration.LazyLocalizedUnknownProductText(
+                    .selectedProductText(AdaptyUIConfiguration.LazyLocalizedUnknownProductText(
                         productGroupId: info.productGroupId ?? Schema.StringId.Product.defaultProductGroupId,
                         suffix: info.suffix,
                         localizer: self,
@@ -45,7 +45,7 @@ extension Schema.Localizer {
                 }
             }
 
-        return AdaptyViewConfiguration.Text(
+        return AdaptyUIConfiguration.Text(
             value: value,
             horizontalAlign: textBlock.horizontalAlign,
             maxRows: textBlock.maxRows,
@@ -65,13 +65,13 @@ extension Schema.Text: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         stringId = try container.decode(Schema.StringId.self, forKey: .stringId)
-        horizontalAlign = try container.decodeIfPresent(AdaptyViewConfiguration.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
+        horizontalAlign = try container.decodeIfPresent(AdaptyUIConfiguration.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)
         overflowMode =
-            if let value = try? container.decode(AdaptyViewConfiguration.Text.OverflowMode.self, forKey: .overflowMode) {
+            if let value = try? container.decode(AdaptyUIConfiguration.Text.OverflowMode.self, forKey: .overflowMode) {
                 Set([value])
             } else {
-                try Set(container.decodeIfPresent([AdaptyViewConfiguration.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
+                try Set(container.decodeIfPresent([AdaptyUIConfiguration.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
             }
         let textAttributes = try Schema.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil

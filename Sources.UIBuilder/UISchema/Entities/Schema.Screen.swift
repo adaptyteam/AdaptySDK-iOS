@@ -19,9 +19,9 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func screen(_ from: Schema.Screen) throws -> AdaptyViewConfiguration.Screen {
+    func screen(_ from: Schema.Screen) throws -> AdaptyUIConfiguration.Screen {
         try .init(
-            background: from.backgroundAssetId.flatMap { try? background($0) } ?? AdaptyViewConfiguration.Screen.defaultBackground,
+            background: from.backgroundAssetId.flatMap { try? background($0) } ?? AdaptyUIConfiguration.Screen.defaultBackground,
             cover: from.cover.map(box),
             content: element(from.content),
             footer: from.footer.map(element),
@@ -30,7 +30,7 @@ extension Schema.Localizer {
         )
     }
 
-    func bottomSheet(_ from: Schema.Screen) throws -> AdaptyViewConfiguration.BottomSheet {
+    func bottomSheet(_ from: Schema.Screen) throws -> AdaptyUIConfiguration.BottomSheet {
         try .init(
             content: element(from.content)
         )

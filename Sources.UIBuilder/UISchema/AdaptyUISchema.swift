@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AdaptyUISchema: Sendable {
+package struct AdaptyUISchema: Sendable {
     let id: String
     let formatVersion: String
     let templateId: String
@@ -23,7 +23,7 @@ struct AdaptyUISchema: Sendable {
 }
 
 extension AdaptyUISchema: CustomStringConvertible {
-    var description: String {
+    package var description: String {
         "(id: \(id), formatVersion: \(formatVersion), templateId: \(templateId), templateRevision: \(templateRevision))"
     }
 }
@@ -49,7 +49,7 @@ extension AdaptyUISchema: Codable {
         case selected
     }
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let superContainer = try decoder.container(keyedBy: ContainerCodingKeys.self)
         id = try superContainer.decode(String.self, forKey: .id)
         responseLocaleId = try superContainer.decode(LocaleId.self, forKey: .responseLocaleId)
@@ -94,7 +94,7 @@ extension AdaptyUISchema: Codable {
         })
     }
 
-    func encode(to encoder: any Encoder) throws {
+    package func encode(to encoder: any Encoder) throws {
         var superContainer = encoder.container(keyedBy: ContainerCodingKeys.self)
         try superContainer.encode(id, forKey: .id)
         try superContainer.encode(responseLocaleId, forKey: .responseLocaleId)

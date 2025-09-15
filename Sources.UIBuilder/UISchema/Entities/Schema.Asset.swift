@@ -9,16 +9,16 @@ import Foundation
 
 extension Schema {
     enum Asset: Sendable {
-        case filling(AdaptyViewConfiguration.Filling)
-        case image(AdaptyViewConfiguration.ImageData)
-        case video(AdaptyViewConfiguration.VideoData)
-        case font(AdaptyViewConfiguration.Font)
+        case filling(AdaptyUIConfiguration.Filling)
+        case image(AdaptyUIConfiguration.ImageData)
+        case video(AdaptyUIConfiguration.VideoData)
+        case font(AdaptyUIConfiguration.Font)
         case unknown(String?)
     }
 }
 
 private extension Schema.Asset {
-    var asFilling: AdaptyViewConfiguration.Filling {
+    var asFilling: AdaptyUIConfiguration.Filling {
         get throws {
             guard case let .filling(value) = self else {
                 throw Schema.LocalizerError.wrongTypeAsset("color or any-gradient")
@@ -27,7 +27,7 @@ private extension Schema.Asset {
         }
     }
 
-    var asColor: AdaptyViewConfiguration.Color {
+    var asColor: AdaptyUIConfiguration.Color {
         get throws {
             guard case let .filling(.solidColor(value)) = self else {
                 throw Schema.LocalizerError.wrongTypeAsset("color")
@@ -36,7 +36,7 @@ private extension Schema.Asset {
         }
     }
 
-    var asImageData: AdaptyViewConfiguration.ImageData {
+    var asImageData: AdaptyUIConfiguration.ImageData {
         get throws {
             guard case let .image(value) = self else {
                 throw Schema.LocalizerError.wrongTypeAsset("image")
@@ -45,7 +45,7 @@ private extension Schema.Asset {
         }
     }
 
-    var asVideoData: AdaptyViewConfiguration.VideoData {
+    var asVideoData: AdaptyUIConfiguration.VideoData {
         get throws {
             guard case let .video(value) = self else {
                 throw Schema.LocalizerError.wrongTypeAsset("video")
@@ -54,7 +54,7 @@ private extension Schema.Asset {
         }
     }
 
-    var asFont: AdaptyViewConfiguration.Font {
+    var asFont: AdaptyUIConfiguration.Font {
         get throws {
             guard case let .font(value) = self else {
                 throw Schema.LocalizerError.wrongTypeAsset("font")
@@ -82,7 +82,7 @@ extension Schema.Localizer {
     }
 
     @inlinable
-    func background(_ assetId: String) throws -> AdaptyViewConfiguration.Background {
+    func background(_ assetId: String) throws -> AdaptyUIConfiguration.Background {
         switch try asset(assetId) {
         case let .filling(value):
             try .filling(.init(
@@ -100,39 +100,39 @@ extension Schema.Localizer {
     }
 
     @inlinable
-    func filling(_ assetId: String) throws -> AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Filling> {
-        try AdaptyViewConfiguration.Mode(
+    func filling(_ assetId: String) throws -> AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling> {
+        try AdaptyUIConfiguration.Mode(
             light: asset(assetId).asFilling,
             dark: assetOrNil(assetId, darkMode: true)?.asFilling
         )
     }
 
     @inlinable
-    func color(_ assetId: String) throws -> AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.Color> {
-        try AdaptyViewConfiguration.Mode(
+    func color(_ assetId: String) throws -> AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Color> {
+        try AdaptyUIConfiguration.Mode(
             light: asset(assetId).asColor,
             dark: try? assetOrNil(assetId, darkMode: true)?.asColor
         )
     }
 
     @inlinable
-    func imageData(_ assetId: String) throws -> AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.ImageData> {
-        try AdaptyViewConfiguration.Mode(
+    func imageData(_ assetId: String) throws -> AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.ImageData> {
+        try AdaptyUIConfiguration.Mode(
             light: asset(assetId).asImageData,
             dark: assetOrNil(assetId, darkMode: true)?.asImageData
         )
     }
 
     @inlinable
-    func videoData(_ assetId: String) throws -> AdaptyViewConfiguration.Mode<AdaptyViewConfiguration.VideoData> {
-        try AdaptyViewConfiguration.Mode(
+    func videoData(_ assetId: String) throws -> AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.VideoData> {
+        try AdaptyUIConfiguration.Mode(
             light: asset(assetId).asVideoData,
             dark: assetOrNil(assetId, darkMode: true)?.asVideoData
         )
     }
 
     @inlinable
-    func font(_ assetId: String) throws -> AdaptyViewConfiguration.Font {
+    func font(_ assetId: String) throws -> AdaptyUIConfiguration.Font {
         try asset(assetId).asFont
     }
 }
@@ -172,14 +172,14 @@ extension Schema.Asset: Codable {
         }
 
         switch type {
-        case let type where AdaptyViewConfiguration.Filling.assetType(type):
-            self = try .filling(AdaptyViewConfiguration.Filling(from: decoder))
-        case AdaptyViewConfiguration.Font.assetType:
-            self = try .font(AdaptyViewConfiguration.Font(from: decoder))
-        case AdaptyViewConfiguration.ImageData.assetType:
-            self = try .image(AdaptyViewConfiguration.ImageData(from: decoder))
-        case AdaptyViewConfiguration.VideoData.assetType:
-            self = try .video(AdaptyViewConfiguration.VideoData(from: decoder))
+        case let type where AdaptyUIConfiguration.Filling.assetType(type):
+            self = try .filling(AdaptyUIConfiguration.Filling(from: decoder))
+        case AdaptyUIConfiguration.Font.assetType:
+            self = try .font(AdaptyUIConfiguration.Font(from: decoder))
+        case AdaptyUIConfiguration.ImageData.assetType:
+            self = try .image(AdaptyUIConfiguration.ImageData(from: decoder))
+        case AdaptyUIConfiguration.VideoData.assetType:
+            self = try .video(AdaptyUIConfiguration.VideoData(from: decoder))
         default:
             self = .unknown("asset.type: \(type)")
         }

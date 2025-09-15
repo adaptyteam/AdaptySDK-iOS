@@ -34,7 +34,7 @@ extension AdaptyUISchema.Localizer: Hashable {
 }
 
 extension AdaptyUISchema.Localizer {
-    func localize() throws -> AdaptyViewConfiguration {
+    func localize() throws -> AdaptyUIConfiguration {
         elementIds.removeAll()
         return try .init(
             id: source.id,

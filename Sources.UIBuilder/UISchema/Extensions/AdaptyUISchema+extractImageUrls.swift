@@ -8,9 +8,13 @@
 import Foundation
 
 extension AdaptyUISchema {
+    package func extractImageUrls() -> Set<URL> {
+        extractImageUrls(forLocalId: responseLocaleId)
+    }
+
     func extractImageUrls(forLocalId localeId: LocaleId) -> Set<URL> {
         let assets: [String: Asset] =
-        if let localAssets = localization(by: localeId)?.assets {
+            if let localAssets = localization(by: localeId)?.assets {
                 localAssets.merging(self.assets, uniquingKeysWith: { current, _ in current })
             } else {
                 self.assets
