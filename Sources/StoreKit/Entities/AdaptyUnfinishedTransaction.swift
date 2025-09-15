@@ -16,9 +16,12 @@ public struct AdaptyUnfinishedTransaction: Sendable {
         try await Adapty.withActivatedSDK(methodName: .manualFinishTransaction, logParams: [
             "transaction_id": sk2Transaction.unfIdentifier,
         ]) { sdk throws(AdaptyError) in
+            guard !sdk.observerMode else { throw AdaptyError.notAllowedInObserveMode() }
+
             guard case let .verified(sk2Transaction) = sk2SignedTransaction else {
                 return
             }
+
             await sdk.manualFinishTransaction(sk2Transaction)
         }
     }

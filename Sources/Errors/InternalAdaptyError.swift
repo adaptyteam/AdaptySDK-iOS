@@ -12,6 +12,8 @@ enum InternalAdaptyError: Error {
     case unknown(AdaptyError.Source, String, error: Error)
     case activateOnceError(AdaptyError.Source)
     case cantMakePayments(AdaptyError.Source)
+    case notAllowedInObserveMode(AdaptyError.Source)
+
     case notActivated(AdaptyError.Source)
     case unidentifiedUserLogout(AdaptyError.Source)
 
@@ -33,6 +35,8 @@ extension InternalAdaptyError: CustomStringConvertible {
             "AdaptyError.unidentifiedUserLogout(\(source))"
         case let .cantMakePayments(source):
             "AdaptyError.cantMakePayments(\(source))"
+        case let .notAllowedInObserveMode(source):
+            "AdaptyError.notAllowedInObserveMode(\(source))"
         case let .notActivated(source):
             "AdaptyError.notActivated(\(source))"
         case let .profileWasChanged(source):
@@ -54,6 +58,7 @@ extension InternalAdaptyError {
              let .activateOnceError(src),
              let .unidentifiedUserLogout(src),
              let .cantMakePayments(src),
+             let .notAllowedInObserveMode(src),
              let .notActivated(src),
              let .profileWasChanged(src),
              let .fetchFailed(src, _, _),
@@ -84,6 +89,7 @@ extension InternalAdaptyError: CustomNSError {
         case .activateOnceError: .activateOnceError
         case .unidentifiedUserLogout: .unidentifiedUserLogout
         case .cantMakePayments: .cantMakePayments
+        case .notAllowedInObserveMode: .cantMakePayments
         case .notActivated: .notActivated
         case .profileWasChanged: .profileWasChanged
         case .fetchFailed: .networkFailed
@@ -122,6 +128,10 @@ extension AdaptyError {
 
     static func cantMakePayments(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         InternalAdaptyError.cantMakePayments(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func notAllowedInObserveMode(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.notAllowedInObserveMode(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
     }
 
     static func notActivated(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {

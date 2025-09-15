@@ -14,6 +14,7 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
         case .activateOnceError: "Adapty can only be activated once. Ensure that the SDK activation call is not made more than once."
         case .unidentifiedUserLogout: "Logout cannot be called for an unidentified user"
         case .cantMakePayments: "In-App Purchases are not available on this device. Please check your device settings."
+        case .notAllowedInObserveMode: "The operation is not allowed in observe mode."
         case .notActivated: "Adapty SDK is not initialized. You need to activate the SDK before using its methods."
         case .profileWasChanged: "The user was replaced with a different user in the SDK during the execution of the operation."
         case let .fetchFailed(_, description, _): description
