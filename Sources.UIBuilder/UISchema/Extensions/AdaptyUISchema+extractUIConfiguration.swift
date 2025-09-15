@@ -6,7 +6,7 @@
 //
 
 extension AdaptyUISchema {
-    func extractUIConfiguration() throws -> AdaptyUIConfiguration {
+    package func extractUIConfiguration() throws -> AdaptyUIConfiguration {
         try extractUIConfiguration(withLocaleId: responseLocaleId)
     }
 

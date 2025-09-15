@@ -18,7 +18,7 @@ private struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableRe
     init(apiKeyPrefix: String, paywallInstanceIdentity: String, locale: AdaptyLocale, disableServerCache: Bool) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(AdaptyUIConfiguration.builderVersion)/\(locale.languageCode)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(Adapty.uiBuilderVersion)/\(locale.languageCode)/fallback.json"
         )
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
@@ -46,8 +46,8 @@ extension Backend.FallbackExecutor {
                 logParams: [
                     "api_prefix": apiKeyPrefix,
                     "paywall_instance_id": paywallInstanceIdentity,
-                    "builder_version": AdaptyUIConfiguration.builderVersion,
-                    "builder_config_format_version": AdaptyUIConfiguration.formatVersion,
+                    "builder_version": Adapty.uiBuilderVersion,
+                    "builder_config_format_version": Adapty.uiSchemaVersion,
                     "language_code": locale.languageCode,
                     "disable_server_cache": disableServerCache,
                 ]

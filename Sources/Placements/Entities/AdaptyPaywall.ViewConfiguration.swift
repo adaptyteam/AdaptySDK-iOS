@@ -6,8 +6,8 @@
 //
 //
 
-import Foundation
 import AdaptyUIBuider
+import Foundation
 
 extension AdaptyPaywall {
     enum ViewConfiguration: Sendable {
@@ -20,7 +20,7 @@ extension AdaptyPaywall.ViewConfiguration {
     var responseLocale: AdaptyLocale {
         switch self {
         case let .json(locale, _, _): locale
-        case let .value(value): value.responseLocale
+        case let .value(value): AdaptyLocale(value.responseLocaleId)
         }
     }
 

@@ -23,7 +23,7 @@ extension Schema {
             content =
                 if
                     try container.decodeIfPresent(String.self, forKey: .platform).map({ $0 == "ios" }) ?? true,
-                    try container.decodeIfPresent(String.self, forKey: .version).map(AdaptyUIConfiguration.formatVersion.isSameOrNewerVersion) ?? true {
+                    try container.decodeIfPresent(String.self, forKey: .version).map(Schema.formatVersion.isSameOrNewerVersion) ?? true {
                     try container.decode(Schema.Element.self, forKey: .then)
                 } else {
                     try container.decode(Schema.Element.self, forKey: .else)

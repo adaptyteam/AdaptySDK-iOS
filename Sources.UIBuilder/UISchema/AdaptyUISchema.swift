@@ -8,12 +8,12 @@
 import Foundation
 
 package struct AdaptyUISchema: Sendable {
-    let id: String
+    package let id: String
     let formatVersion: String
     let templateId: String
     let templateRevision: Int64
     let assets: [String: Asset]
-    let responseLocaleId: LocaleId
+    package let responseLocaleId: LocaleId
     let localizations: [LocaleId: Localization]
     let defaultLocalization: Localization?
     let defaultScreen: Screen

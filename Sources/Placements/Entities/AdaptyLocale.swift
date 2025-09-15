@@ -8,7 +8,7 @@
 import Foundation
 
 struct AdaptyLocale: Sendable {
-    static let defaultPlacementLocale = AdaptyLocale(id: "en")
+    static let defaultPlacementLocale = AdaptyLocale("en")
 
     let id: String
     var languageCode: String {
@@ -19,7 +19,7 @@ struct AdaptyLocale: Sendable {
         id.replacingOccurrences(of: "_", with: "-")
     }
 
-    init(id: String) {
+    init(_ id: String) {
         self.id = id
     }
 
@@ -34,7 +34,7 @@ struct AdaptyLocale: Sendable {
 
 extension AdaptyLocale: ExpressibleByStringLiteral {
     init(stringLiteral value: String) {
-        self.init(id: value)
+        self.init(value)
     }
 }
 
@@ -48,7 +48,7 @@ extension AdaptyLocale: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)
-        self.init(id: value)
+        self.init(value)
     }
 
     func encode(to encoder: Encoder) throws {

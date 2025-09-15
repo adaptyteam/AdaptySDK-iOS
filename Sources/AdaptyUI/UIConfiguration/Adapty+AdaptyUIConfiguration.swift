@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 19.01.2023
 //
 
-import Foundation
 import AdaptyUIBuider
+import Foundation
 
 @AdaptyActor
 extension Adapty {
@@ -51,7 +51,7 @@ extension Adapty {
 
         let extractLocaleTask: AdaptyResultTask<AdaptyUIConfiguration> = Task {
             do {
-                return try .success(viewConfiguration.extractLocale())
+                return try .success(viewConfiguration.extractUIConfiguration())
             } catch {
                 return .failure(.decodingViewConfiguration(error))
             }

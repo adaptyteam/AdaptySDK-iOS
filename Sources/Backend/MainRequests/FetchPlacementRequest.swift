@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AdaptyUIBuider
 
 private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
     let endpoint: HTTPEndpoint
@@ -25,7 +24,7 @@ private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
         locale: AdaptyLocale,
         disableServerCache: Bool
     ) {
-        let md5Hash = "{\"builder_version\":\"\(AdaptyUIConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"store\":\"app_store\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"store\":\"app_store\"}".md5.hexString
 
         endpoint = HTTPEndpoint(
             method: .get,
@@ -35,8 +34,8 @@ private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
         headers = HTTPHeaders()
             .setPaywallLocale(locale)
             .setUserProfileId(userId)
-            .setPaywallBuilderVersion(AdaptyUIConfiguration.builderVersion)
-            .setPaywallBuilderConfigurationFormatVersion(AdaptyUIConfiguration.formatVersion)
+            .setPaywallBuilderVersion(Adapty.uiBuilderVersion)
+            .setPaywallBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
 
@@ -45,8 +44,8 @@ private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
             "placement_id": placementId,
             "variation_id": variationId,
             "locale": locale,
-            "builder_version": AdaptyUIConfiguration.builderVersion,
-            "builder_config_format_version": AdaptyUIConfiguration.formatVersion,
+            "builder_version": Adapty.uiBuilderVersion,
+            "builder_config_format_version": Adapty.uiSchemaVersion,
             "md5": md5Hash,
             "disable_server_cache": disableServerCache,
         ]

@@ -24,8 +24,8 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 
         headers = HTTPHeaders()
             .setPaywallBuilderLocale(locale)
-            .setPaywallBuilderVersion(AdaptyUIConfiguration.builderVersion)
-            .setPaywallBuilderConfigurationFormatVersion(AdaptyUIConfiguration.formatVersion)
+            .setPaywallBuilderVersion(Adapty.uiBuilderVersion)
+            .setPaywallBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
     }
@@ -38,7 +38,7 @@ extension Backend.MainExecutor {
         locale: AdaptyLocale,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyUISchema {
-        let md5Hash = "{\"builder_version\":\"\(AdaptyUIConfiguration.builderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
 
         let request = FetchViewConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -55,8 +55,8 @@ extension Backend.MainExecutor {
                 "api_prefix": apiKeyPrefix,
                 "variation_id": paywallVariationId,
                 "locale": locale,
-                "builder_version": AdaptyUIConfiguration.builderVersion,
-                "builder_config_format_version": AdaptyUIConfiguration.formatVersion,
+                "builder_version": Adapty.uiBuilderVersion,
+                "builder_config_format_version": Adapty.uiSchemaVersion,
                 "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]

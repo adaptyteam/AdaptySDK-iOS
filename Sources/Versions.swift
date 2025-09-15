@@ -6,11 +6,17 @@
 //
 
 import Foundation
+import AdaptyUIBuider
 
 extension Adapty {
     public nonisolated static let SDKVersion = "3.12.0"
     nonisolated static let fallbackFormatVersion = 9
     nonisolated static let userAcquisitionVersion = 1
+    
+    nonisolated static let uiSchemaVersion = AdaptyUISchema.formatVersion
+    nonisolated static let uiBuilderVersion = AdaptyUISchema.builderVersion
+
+
 }
 
 extension AdaptyOnboarding.ViewConfiguration {
