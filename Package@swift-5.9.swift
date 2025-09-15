@@ -15,6 +15,10 @@ let package = Package(
             targets: ["Adapty"]
         ),
         .library(
+            name: "AdaptyUICore",
+            targets: ["AdaptyUICore"]
+        ),
+        .library(
             name: "AdaptyUI",
             targets: ["AdaptyUI"]
         ),
@@ -30,7 +34,7 @@ let package = Package(
     targets: [
         .target(
             name: "Adapty",
-            dependencies: [],
+            dependencies: ["AdaptyUICore"],
             path: "Sources",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
@@ -38,8 +42,13 @@ let package = Package(
             ]
         ),
         .target(
+            name: "AdaptyUICore",
+            dependencies: [],
+            path: "Sources.AdaptyUICore"
+        ),
+        .target(
             name: "AdaptyUI",
-            dependencies: ["Adapty"],
+            dependencies: ["Adapty", "AdaptyUICore"],
             path: "AdaptyUI",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
@@ -48,17 +57,17 @@ let package = Package(
         ),
         .target(
             name: "AdaptyUITesting",
-            dependencies: ["Adapty", "AdaptyUI"],
+            dependencies: ["Adapty", "AdaptyUICore", "AdaptyUI"],
             path: "AdaptyUITesting"
         ),
         .target(
             name: "AdaptyPlugin",
-            dependencies: ["Adapty", "AdaptyUI"],
+            dependencies: ["Adapty", "AdaptyUICore", "AdaptyUI"],
             path: "Sources.AdaptyPlugin"
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["Adapty"],
+            dependencies: ["Adapty", "AdaptyUICore"],
             path: "Tests"
         ),
     ]
