@@ -65,10 +65,6 @@ actor SK2TransactionManager {
         return transactions
     }
 
-    fileprivate func getUnfinishedTransactions() async -> [SK2SignedTransaction] {
-        await Self.fetchUnfinishedTrunsactions()
-    }
-
     func syncTransactionHistory(for userId: AdaptyUserId) async throws(AdaptyError) {
         let task: AdaptyResultTask<Void>
         if let syncing = syncingTransactionsHistory, userId.isEqualProfileId(syncing.userId) {
@@ -122,7 +118,7 @@ private extension Adapty {
     func sendUnfinishedTransactions(manager: SK2TransactionManager) async -> AdaptyResult<Void> {
         guard !observerMode else { return .success(()) }
         while true {
-            let unfinishedTranasactions = await manager.getUnfinishedTransactions()
+            let unfinishedTranasactions = await SK2TransactionManager.fetchUnfinishedTrunsactions()
             guard !unfinishedTranasactions.isEmpty else { return .success(()) }
             for sk2SignedTransaction in unfinishedTranasactions {
                 switch sk2SignedTransaction {
@@ -160,9 +156,9 @@ private extension Adapty {
                             log.info("Unfinished transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
                             continue
                         }
-                        
+
                         await finish(transaction: sk2Transaction, recived: .unfinished)
-                        
+
                         log.info("Unfinished transaction synced: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                     } catch {
                         log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
@@ -175,8 +171,25 @@ private extension Adapty {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension SK2TransactionManager {
-    private static func fetchUnfinishedTrunsactions() async -> [SK2SignedTransaction] {
+extension Adapty {
+    func getUnfinishedTransaction() async throws(AdaptyError) -> [AdaptyUnfinishedTransaction] {
+        let transactions = await SK2TransactionManager.fetchUnfinishedTrunsactions()
+        let ids = await purchasePayloadStorage.unfinishedTransactionIds()
+        guard !ids.isEmpty, !transactions.isEmpty else { return [] }
+
+        return transactions.compactMap {
+            if ids.contains($0.unsafePayloadValue.unfIdentifier) {
+                AdaptyUnfinishedTransaction(sk2SignedTransaction: $0)
+            } else {
+                nil
+            }
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+private extension SK2TransactionManager {
+    static func fetchUnfinishedTrunsactions() async -> [SK2SignedTransaction] {
         let stamp = Log.stamp
 
         await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp))
@@ -205,7 +218,7 @@ extension SK2TransactionManager {
         return transaction
     }
 
-    fileprivate static func fetchLastVerifiedTransaction() async -> SK2Transaction? {
+    static func fetchLastVerifiedTransaction() async -> SK2Transaction? {
         var lastTransaction: SK2Transaction?
         let stamp = Log.stamp
 

@@ -352,6 +352,15 @@ public extension Adapty {
         }
     }
 
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    static func getUnfinishedTransaction(
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyUnfinishedTransaction]>
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await getUnfinishedTransaction()
+        }
+    }
+
     /// You can fetch the StoreKit receipt by calling this method
     ///
     /// If the receipt is not presented on the device, Adapty will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
@@ -605,6 +614,17 @@ public extension Adapty {
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
             try await updateRefundPreference(refundPreference)
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public extension AdaptyUnfinishedTransaction {
+    nonisolated func finish(
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await finish()
         }
     }
 }

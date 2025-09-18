@@ -216,7 +216,7 @@ public extension AdaptyConfiguration.Builder {
     }
 
     @discardableResult
-    package func with(transactionFinishBehavior value: AdaptyConfiguration.TransactionFinishBehavior) -> Self {
+    func with(transactionFinishBehavior value: AdaptyConfiguration.TransactionFinishBehavior) -> Self {
         transactionFinishBehavior = value
         return self
     }
