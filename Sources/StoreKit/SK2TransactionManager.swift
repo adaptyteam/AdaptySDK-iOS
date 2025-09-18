@@ -172,7 +172,7 @@ private extension Adapty {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Adapty {
-    func getUnfinishedTransaction() async throws(AdaptyError) -> [AdaptyUnfinishedTransaction] {
+    func getUnfinishedTransactions() async throws(AdaptyError) -> [AdaptyUnfinishedTransaction] {
         let transactions = await SK2TransactionManager.fetchUnfinishedTrunsactions()
         let ids = await purchasePayloadStorage.unfinishedTransactionIds()
         guard !ids.isEmpty, !transactions.isEmpty else { return [] }

@@ -179,7 +179,7 @@ enum MethodName: String {
     case makePurchase = "make_purchase"
     case openWebPaywall = "open_web_paywall"
     case createWebPaywallUrl = "create_web_paywall_url"
-    case getUnfinishedTransaction = "get_unfinished_transaction"
+    case getUnfinishedTransactions = "get_unfinished_transactions"
 
     case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
