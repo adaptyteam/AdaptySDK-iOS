@@ -353,11 +353,11 @@ public extension Adapty {
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    static func getUnfinishedTransaction(
+    static func getUnfinishedTransactions(
         _ completion: @escaping AdaptyResultCompletion<[AdaptyUnfinishedTransaction]>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await getUnfinishedTransaction()
+            try await getUnfinishedTransactions()
         }
     }
 
