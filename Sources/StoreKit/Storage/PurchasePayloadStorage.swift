@@ -264,6 +264,7 @@ extension PurchasePayloadStorage {
 
     func addUnfinishedTransaction(_ transactionId: String) {
         if Self.setUnfinishedTransactionState(false, forTransactionId: transactionId) {
+            log.debug("Storage after add state of unfinishedTransaction:\(transactionId) all:\(Self.unfinishedTransactionState)")
             Task {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                     eventName: "did_change_unfinished_transaction",
@@ -278,6 +279,8 @@ extension PurchasePayloadStorage {
     func canFinishSyncedTransaction(_ transactionId: String) -> Bool {
         guard Self.unfinishedTransactionState[transactionId] != nil else { return true }
         if Self.setUnfinishedTransactionState(true, forTransactionId: transactionId) {
+            log.debug("Storage after change state of unfinishedTransaction:\(transactionId) all: \(Self.unfinishedTransactionState)")
+
             Task {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                     eventName: "did_change_unfinished_transaction",
@@ -293,6 +296,7 @@ extension PurchasePayloadStorage {
     func removeUnfinishedTransaction(_ transactionId: String) {
         guard Self.unfinishedTransactionState[transactionId] != nil else { return }
         if Self.removeUnfinishedTransactionState(forTransactionId: transactionId) {
+            log.debug("Storage after remove state of unfinishedTransaction:\(transactionId) all: \(Self.unfinishedTransactionState)")
             Task {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                     eventName: "did_change_unfinished_transaction",
