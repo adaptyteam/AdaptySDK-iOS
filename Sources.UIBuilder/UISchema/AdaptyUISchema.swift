@@ -8,12 +8,10 @@
 import Foundation
 
 package struct AdaptyUISchema: Sendable {
-    package let id: String
     let formatVersion: String
     let templateId: String
     let templateRevision: Int64
     let assets: [String: Asset]
-    package let responseLocaleId: LocaleId
     let localizations: [LocaleId: Localization]
     let defaultLocalization: Localization?
     let defaultScreen: Screen
@@ -24,18 +22,11 @@ package struct AdaptyUISchema: Sendable {
 
 extension AdaptyUISchema: CustomStringConvertible {
     package var description: String {
-        "(id: \(id), formatVersion: \(formatVersion), templateId: \(templateId), templateRevision: \(templateRevision))"
+        "(formatVersion: \(formatVersion), templateId: \(templateId), templateRevision: \(templateRevision))"
     }
 }
 
 extension AdaptyUISchema: Codable {
-    enum ContainerCodingKeys: String, CodingKey {
-        case container = "paywall_builder_config"
-        case json
-        case responseLocaleId = "lang"
-        case id = "paywall_builder_id"
-    }
-
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
         case templateId = "template_id"
@@ -50,10 +41,7 @@ extension AdaptyUISchema: Codable {
     }
 
     package init(from decoder: Decoder) throws {
-        let superContainer = try decoder.container(keyedBy: ContainerCodingKeys.self)
-        id = try superContainer.decode(String.self, forKey: .id)
-        responseLocaleId = try superContainer.decode(LocaleId.self, forKey: .responseLocaleId)
-        let container = try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
         templateId = try container.decode(String.self, forKey: .templateId)
         templateRevision = try container.decode(Int64.self, forKey: .templateRevision)
@@ -95,11 +83,7 @@ extension AdaptyUISchema: Codable {
     }
 
     package func encode(to encoder: any Encoder) throws {
-        var superContainer = encoder.container(keyedBy: ContainerCodingKeys.self)
-        try superContainer.encode(id, forKey: .id)
-        try superContainer.encode(responseLocaleId, forKey: .responseLocaleId)
-
-        var container = superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .container)
+        var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(templateId, forKey: .templateId)
         try container.encode(templateRevision, forKey: .templateRevision)
         try container.encode(formatVersion, forKey: .formatVersion)

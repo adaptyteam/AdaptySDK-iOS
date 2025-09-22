@@ -10,12 +10,14 @@ import Foundation
 extension AdaptyUISchema {
     final class Localizer: @unchecked Sendable {
         let id = UUID()
+        let configuarationId: String
         let localization: Localization?
         let source: AdaptyUISchema
         let localeId: LocaleId
         var elementIds = Set<String>()
 
-        init(source: AdaptyUISchema, withLocaleId localeId: LocaleId) {
+        init(id: String, source: AdaptyUISchema, withLocaleId localeId: LocaleId) {
+            self.configuarationId = id
             self.source = source
             self.localization = source.localization(by: localeId)
             self.localeId = self.localization?.id ?? localeId
@@ -37,7 +39,7 @@ extension AdaptyUISchema.Localizer {
     func localize() throws -> AdaptyUIConfiguration {
         elementIds.removeAll()
         return try .init(
-            id: source.id,
+            id: configuarationId,
             locale: localeId,
             isRightToLeft: localization?.isRightToLeft ?? false,
             templateId: source.templateId,
@@ -48,5 +50,3 @@ extension AdaptyUISchema.Localizer {
         )
     }
 }
-
-

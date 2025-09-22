@@ -29,29 +29,28 @@ extension Adapty {
             throw .isNoViewConfigurationInPaywall()
         }
 
-        let viewConfiguration: AdaptyUISchema =
-            switch container {
-            case let .value(value): value
-            case let .json(locale, _, json):
-                if let value = try? json.map(AdaptyUISchema.init) {
-                    value
-                } else if let value = restoreViewConfiguration(locale, paywall) {
-                    value
-                } else {
-                    try await fetchViewConfiguration(
-                        paywallVariationId: paywall.variationId,
-                        paywallInstanceIdentity: paywall.instanceIdentity,
-                        locale: locale,
-                        loadTimeout: loadTimeout
-                    )
-                }
+        let schema: AdaptyUISchema =
+            if let value = try? container.schema {
+                value
+            } else if let value = restoreViewConfiguration(container.responseLocale, paywall) {
+                value
+            } else {
+                try await fetchViewConfiguration(
+                    paywallVariationId: paywall.variationId,
+                    paywallInstanceIdentity: paywall.instanceIdentity,
+                    locale: container.responseLocale,
+                    loadTimeout: loadTimeout
+                )
             }
 
-        Adapty.sendImageUrlsToObserver(viewConfiguration)
+        Adapty.sendImageUrlsToObserver(schema)
 
         let extractLocaleTask: AdaptyResultTask<AdaptyUIConfiguration> = Task {
             do {
-                return try .success(viewConfiguration.extractUIConfiguration())
+                return try .success(schema.extractUIConfiguration(
+                    id: container.id,
+                    withLocaleId: container.responseLocale.id
+                ))
             } catch {
                 return .failure(.decodingViewConfiguration(error))
             }
@@ -67,7 +66,7 @@ extension Adapty {
             paywall.placement.revision == cached.placement.revision,
             paywall.placement.version == cached.placement.version,
             let cachedViewConfiguration = cached.viewConfiguration,
-            case let .value(value) = cachedViewConfiguration
+            case let value = try? cachedViewConfiguration.schema
         else { return nil }
 
         return value
