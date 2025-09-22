@@ -9,6 +9,7 @@
 
 import Adapty
 import Foundation
+import AdaptyUIBuider
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
@@ -17,14 +18,14 @@ package final class AdaptyPaywallViewModel: ObservableObject {
     let eventsHandler: AdaptyEventsHandler
 
     @Published var paywall: AdaptyPaywallInterface
-    @Published var viewConfiguration: AdaptyViewConfiguration
+    @Published var viewConfiguration: AdaptyUIConfiguration
 
-    var onViewConfigurationUpdate: ((AdaptyViewConfiguration) -> Void)?
+    var onViewConfigurationUpdate: ((AdaptyUIConfiguration) -> Void)?
 
     package init(
         eventsHandler: AdaptyEventsHandler,
         paywall: AdaptyPaywallInterface,
-        viewConfiguration: AdaptyViewConfiguration
+        viewConfiguration: AdaptyUIConfiguration
     ) {
         self.eventsHandler = eventsHandler
         self.paywall = paywall

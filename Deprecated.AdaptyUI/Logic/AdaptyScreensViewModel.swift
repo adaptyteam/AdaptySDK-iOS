@@ -9,6 +9,7 @@
 
 import Adapty
 import Foundation
+import AdaptyUIBuider
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
@@ -29,14 +30,14 @@ package final class AdaptyBottomSheetViewModel: ObservableObject {
 package final class AdaptyScreensViewModel: ObservableObject {
     private var logId: String { eventsHandler.logId }
     private let eventsHandler: AdaptyEventsHandler
-    private let viewConfiguration: AdaptyViewConfiguration
+    private let viewConfiguration: AdaptyUIConfiguration
     let bottomSheetsViewModels: [AdaptyBottomSheetViewModel]
 
     @Published var presentedScreensStack = [String]()
 
     package init(
         eventsHandler: AdaptyEventsHandler,
-        viewConfiguration: AdaptyViewConfiguration
+        viewConfiguration: AdaptyUIConfiguration
     ) {
         self.eventsHandler = eventsHandler
         self.viewConfiguration = viewConfiguration

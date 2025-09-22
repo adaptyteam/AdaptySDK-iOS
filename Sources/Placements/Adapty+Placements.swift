@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 01.11.2023
 //
 
+import AdaptyUIBuider
 import Foundation
 
 private let log = Log.default
@@ -48,7 +49,7 @@ extension Adapty {
                 fetchPolicy: fetchPolicy,
                 loadTimeout: loadTimeout
             )
-            Adapty.sendImageUrlsToObserver(paywall)
+            AdaptyUIBuilder.sendImageUrlsToObserver(paywall)
 
             return paywall
         }

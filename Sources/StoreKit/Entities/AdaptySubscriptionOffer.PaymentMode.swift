@@ -24,7 +24,7 @@ extension AdaptySubscriptionOffer.PaymentMode {
         case unknown
     }
 
-    var encodedValue: String? {
+    package var encodedValue: String? {
         let value: CodingValues? =
             switch self {
             case .payAsYouGo: .payAsYouGo

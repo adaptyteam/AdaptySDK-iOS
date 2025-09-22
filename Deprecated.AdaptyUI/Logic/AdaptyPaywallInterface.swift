@@ -7,6 +7,7 @@
 
 import Adapty
 import Foundation
+import AdaptyUIBuider
 
 package enum AdaptyUIGetProductsResult: Sendable {
     case partial(products: [AdaptyPaywallProduct], failedIds: [String])
@@ -22,7 +23,7 @@ package protocol AdaptyPaywallInterface {
 
     func getPaywallProductsWithoutDeterminingOffer() async throws -> [AdaptyPaywallProductWithoutDeterminingOffer]
     func getPaywallProducts() async throws -> AdaptyUIGetProductsResult
-    func logShowPaywall(viewConfiguration: AdaptyViewConfiguration) async throws
+    func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async throws
 }
 
 extension AdaptyPaywall: AdaptyPaywallInterface {
@@ -45,7 +46,7 @@ extension AdaptyPaywall: AdaptyPaywallInterface {
         }
     }
 
-    package func logShowPaywall(viewConfiguration: AdaptyViewConfiguration) async throws {
+    package func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async throws {
         await Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration)
     }
 }

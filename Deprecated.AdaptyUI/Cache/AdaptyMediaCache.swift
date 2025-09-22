@@ -7,6 +7,7 @@
 
 import Adapty
 import Foundation
+import AdaptyUIBuider
 
 public extension AdaptyUI {
     struct MediaCacheConfiguration: Sendable {
@@ -93,7 +94,7 @@ extension AdaptyUI {
             guard !initialized else { return }
 
             Log.prefetcher.verbose("initialize")
-            Adapty.setImageUrlObserver(self)
+            AdaptyUIBuilder.setImageUrlObserver(self)
         }
 
         nonisolated func extractedImageUrls(_ urls: Set<URL>) {

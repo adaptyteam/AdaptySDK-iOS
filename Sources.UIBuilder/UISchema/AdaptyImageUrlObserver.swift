@@ -1,18 +1,17 @@
 //
 //  AdaptyImageUrlObserver.swift
-//  AdaptySDK
+//  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 03.04.2024
 //
 
 import Foundation
-import AdaptyUIBuider
 
 package protocol AdaptyImageUrlObserver: Sendable {
     func extractedImageUrls(_: Set<URL>)
 }
 
-extension Adapty {
+extension AdaptyUIBuilder {
     private actor Holder {
         private(set) var imageUrlObserver: AdaptyImageUrlObserver?
 
@@ -29,22 +28,12 @@ extension Adapty {
         }
     }
 
-    static func sendImageUrlsToObserver(_ schema: AdaptyUISchema) {
+    package static func sendImageUrlsToObserver(_ schema: AdaptyUISchema, forLocalId localeId: LocaleId) {
         Task {
             guard let observer = await holder.imageUrlObserver else { return }
-            let urls = schema.extractImageUrls()
+            let urls = schema.extractImageUrls(forLocalId: localeId)
             guard urls.isNotEmpty else { return }
             observer.extractedImageUrls(urls)
         }
-    }
-
-    private static func sendImageUrlsToObserver(_ config: AdaptyPaywall.ViewConfiguration) {
-        guard case let .value(value) = config else { return }
-        sendImageUrlsToObserver(value)
-    }
-
-    static func sendImageUrlsToObserver(_ paywall: AdaptyPaywall) {
-        guard let config = paywall.viewConfiguration else { return }
-        sendImageUrlsToObserver(config)
     }
 }

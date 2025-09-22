@@ -10,6 +10,7 @@
 import Adapty
 import SwiftUI
 import UIKit
+import AdaptyUIBuider
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
@@ -32,7 +33,7 @@ public extension AdaptyUI {
         package init(
             logId: String,
             paywall: AdaptyPaywallInterface,
-            viewConfiguration: AdaptyViewConfiguration,
+            viewConfiguration: AdaptyUIConfiguration,
             products: [AdaptyPaywallProduct]?,
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyTagResolver?,

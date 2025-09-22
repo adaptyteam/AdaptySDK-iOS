@@ -25,31 +25,31 @@ extension Adapty {
         paywall: AdaptyPaywall,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUIConfiguration {
-        guard let container = paywall.viewConfiguration else {
+        guard let viewConfig = paywall.viewConfiguration else {
             throw .isNoViewConfigurationInPaywall()
         }
 
         let schema: AdaptyUISchema =
-            if let value = try? container.schema {
+            if let value = try? viewConfig.schema {
                 value
-            } else if let value = restoreViewConfiguration(container.responseLocale, paywall) {
+            } else if let value = restoreViewConfiguration(viewConfig.responseLocale, paywall) {
                 value
             } else {
                 try await fetchViewConfiguration(
                     paywallVariationId: paywall.variationId,
                     paywallInstanceIdentity: paywall.instanceIdentity,
-                    locale: container.responseLocale,
+                    locale: viewConfig.responseLocale,
                     loadTimeout: loadTimeout
                 )
             }
 
-        Adapty.sendImageUrlsToObserver(schema)
+        AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: viewConfig.responseLocale.id)
 
         let extractLocaleTask: AdaptyResultTask<AdaptyUIConfiguration> = Task {
             do {
                 return try .success(schema.extractUIConfiguration(
-                    id: container.id,
-                    withLocaleId: container.responseLocale.id
+                    id: viewConfig.id,
+                    withLocaleId: viewConfig.responseLocale.id
                 ))
             } catch {
                 return .failure(.decodingViewConfiguration(error))

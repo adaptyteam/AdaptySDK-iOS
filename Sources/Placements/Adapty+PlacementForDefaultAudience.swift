@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 12.08.2024
 //
 
+import AdaptyUIBuider
 import Foundation
 
 extension Adapty {
@@ -41,7 +42,7 @@ extension Adapty {
                 fetchPolicy
             )
 
-            Adapty.sendImageUrlsToObserver(paywall)
+            AdaptyUIBuilder.sendImageUrlsToObserver(paywall)
             return paywall
         }
     }
