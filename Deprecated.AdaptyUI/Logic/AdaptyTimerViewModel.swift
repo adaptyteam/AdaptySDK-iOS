@@ -7,6 +7,7 @@
 
 import Adapty
 import SwiftUI
+import AdaptyUIBuider
 
 @MainActor
 package struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {

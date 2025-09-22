@@ -9,6 +9,7 @@
 
 import Adapty
 import SwiftUI
+import AdaptyUIBuider
 
 extension Double {
     var cgFloatValue: CGFloat { CGFloat(self) }

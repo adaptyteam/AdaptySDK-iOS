@@ -8,6 +8,7 @@
 import Adapty
 import AdaptyUI
 import Foundation
+import AdaptyUIBuider
 
 struct AdaptyMockPaywall: AdaptyPaywallInterface {
     var placementId: String { "mock" }
@@ -23,5 +24,5 @@ struct AdaptyMockPaywall: AdaptyPaywallInterface {
         .full(products: [])
     }
 
-    func logShowPaywall(viewConfiguration: AdaptyViewConfiguration) async throws {}
+    func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async throws {}
 }

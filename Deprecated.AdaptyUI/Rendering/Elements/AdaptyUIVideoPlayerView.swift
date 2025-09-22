@@ -11,6 +11,7 @@ import Adapty
 import AVKit
 import Combine
 import SwiftUI
+import AdaptyUIBuider
 
 extension VC.AspectRatio {
     var videoGravity: AVLayerVideoGravity {

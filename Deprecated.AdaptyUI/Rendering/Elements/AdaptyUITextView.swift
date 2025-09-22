@@ -9,6 +9,7 @@
 
 import Adapty
 import SwiftUI
+import AdaptyUIBuider
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUITextView: View {
@@ -249,7 +250,7 @@ extension VC.Text {
             return (value, .notApplicable)
         case let .productText(value):
             guard let underlying = productsInfoProvider.productInfo(by: value.adaptyProductId) else {
-                return (value.richText(byPaymentMode: .unknown), .notFound)
+                return (value.richText(), .notFound)
             }
 
             return (value.richText(byPaymentMode: underlying.paymentMode), .found(underlying))

@@ -9,6 +9,7 @@
 
 import Adapty
 import SwiftUI
+import AdaptyUIBuider
 
 @available(macOS 10.15, iOS 13.0, *)
 extension VC {

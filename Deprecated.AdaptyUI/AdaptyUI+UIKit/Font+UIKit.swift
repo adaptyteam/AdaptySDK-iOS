@@ -9,6 +9,7 @@
 
 import Adapty
 import UIKit
+import AdaptyUIBuider
 
 extension UIFont.Weight {
     static func fromInteger(_ value: Int) -> UIFont.Weight {

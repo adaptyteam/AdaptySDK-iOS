@@ -9,6 +9,7 @@
 
 import Adapty
 import UIKit
+import AdaptyUIBuider
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 protocol ProductInfoModel {
@@ -16,7 +17,7 @@ protocol ProductInfoModel {
     var adaptyProductId: String { get }
     var adaptyProduct: AdaptyPaywallProduct? { get }
 
-    var paymentMode: AdaptySubscriptionOffer.PaymentMode { get }
+    var paymentMode: PaymentModeValue { get }
 
     func stringByTag(_ tag: VC.ProductTag) -> VC.ProductTagReplacement?
 }
@@ -56,8 +57,8 @@ extension AdaptyPaywallProductWrapper: ProductInfoModel {
         }
     }
 
-    var paymentMode: AdaptySubscriptionOffer.PaymentMode {
-        adaptyProduct?.subscriptionOffer?.paymentMode ?? .unknown
+    var paymentMode: PaymentModeValue {
+        adaptyProduct?.subscriptionOffer?.paymentMode.encodedValue
     }
 
     func stringByTag(_ tag: VC.ProductTag) -> VC.ProductTagReplacement? {
