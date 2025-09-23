@@ -29,7 +29,7 @@ extension [String: String]: AdaptyTagResolver {
 @MainActor
 package protocol AdaptyUIBuilderObserverModeResolver: Sendable {
     func observerMode(
-        didInitiatePurchase product: AdaptyProductModel,
+        didInitiatePurchase product: ProductResolver,
         onStartPurchase: @escaping () -> Void,
         onFinishPurchase: @escaping () -> Void
     )
@@ -43,32 +43,21 @@ package protocol AdaptyUIBuilderLogic {
 
     func reportDidPerformAction(_ action: AdaptyUIBuilder.Action)
 
-    func reportDidSelectProduct(_ product: AdaptyProductModel)
+    func reportDidSelectProduct(_ product: ProductResolver)
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool
 
-    func getPaywall(
-        placementId: String,
-        locale: String?
-    ) async throws -> AdaptyPaywallModel
-
-    func getViewConfiguration(
-        paywall: AdaptyPaywallModel
-    ) async throws -> AdaptyUIConfiguration
-
     func logShowPaywall(
-        paywall: AdaptyPaywallModel,
         viewConfiguration: AdaptyUIConfiguration
     ) async throws
 
     func getProducts(
-        paywall: AdaptyPaywallModel,
         determineOffers: Bool
-    ) async throws -> [AdaptyProductModel]
+    ) async throws -> [ProductResolver]
 
-    func makePurchase(product: AdaptyProductModel) async
+    func makePurchase(product: ProductResolver) async
 
-    func openWebPaywall(for product: AdaptyProductModel) async
+    func openWebPaywall(for product: ProductResolver) async
 
     func restorePurchases() async
 

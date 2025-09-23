@@ -130,12 +130,7 @@ extension VC.Action {
         case let .openUrl(url):
             actionsViewModel.openUrlActionOccurred(url: url)
         case let .custom(id):
-            switch id {
-            case "$adapty_reload_data":
-                paywallViewModel.reloadData()
-            default:
-                actionsViewModel.customActionOccurred(id: id)
-            }
+            actionsViewModel.customActionOccurred(id: id)
         }
     }
 }

@@ -15,7 +15,7 @@ enum AdaptyPaywallProductWrapper {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyPaywallProductWrapper: AdaptyProductModel {
+extension AdaptyPaywallProductWrapper: ProductResolver {
     private var anyProduct: AdaptyPaywallProductWithoutDeterminingOffer {
         switch self {
         case .withoutOffer(let v): v
@@ -27,7 +27,6 @@ extension AdaptyPaywallProductWrapper: AdaptyProductModel {
         adaptyProduct?.subscriptionOffer?.paymentMode.encodedValue
     }
 
-    var vendorProductId: String { anyProduct.vendorProductId }
     var adaptyProductId: String { anyProduct.adaptyProductId }
 
     private var adaptyProduct: AdaptyPaywallProduct? {
@@ -37,7 +36,7 @@ extension AdaptyPaywallProductWrapper: AdaptyProductModel {
         }
     }
 
-    private func isApplicableForTag(_ tag: VC.ProductTag) -> Bool {
+    private func isApplicableForTag(_ tag: TextProductTag) -> Bool {
         switch tag {
         case .title, .price:
             return true
@@ -48,7 +47,7 @@ extension AdaptyPaywallProductWrapper: AdaptyProductModel {
         }
     }
 
-    func stringByTag(_ tag: VC.ProductTag) -> VC.ProductTagReplacement? {
+    func value(byTag tag: TextProductTag) -> TextTagValue? {
         guard isApplicableForTag(tag) else { return .notApplicable }
 
         let result: String?

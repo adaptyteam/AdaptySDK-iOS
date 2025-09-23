@@ -14,12 +14,33 @@ import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPaywallController {
+    var paywallPlacementId: String { paywallConfiguration.paywallPlacementId }
+
+    var paywallVariationId: String { paywallConfiguration.paywallVariationId }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyUI.PaywallConfiguration {
     var paywallPlacementId: String {
-        paywallConfiguration.paywallViewModel.paywall.placementId
+        guard
+            let logic = paywallViewModel.logic as? AdaptyUILogic,
+            let paywall = logic.paywall as? AdaptyPaywall
+        else {
+            return "unknown"
+        }
+
+        return paywall.placementId
     }
 
     var paywallVariationId: String {
-        paywallConfiguration.paywallViewModel.paywall.variationId
+        guard
+            let logic = paywallViewModel.logic as? AdaptyUILogic,
+            let paywall = logic.paywall as? AdaptyPaywall
+        else {
+            return "unknown"
+        }
+
+        return paywall.variationId
     }
 }
 

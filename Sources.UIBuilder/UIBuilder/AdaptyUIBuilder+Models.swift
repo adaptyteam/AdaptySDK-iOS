@@ -15,18 +15,9 @@ public extension AdaptyUIBuilder {
     }
 }
 
-public protocol AdaptyPaywallModel {
-    var placementId: String { get }
-    var variationId: String { get }
-    var locale: String? { get }
-    var vendorProductIds: [String] { get }
-}
-
-// TODO: check this
-package protocol AdaptyProductModel: Sendable {
-    var vendorProductId: String { get }
+public protocol ProductResolver: Sendable {
     var adaptyProductId: String { get }
-    var paymentMode: String? { get } // PaymentModeValue
+    var paymentMode: PaymentModeValue { get }
 
-    func stringByTag(_ tag: AdaptyUIConfiguration.ProductTag) -> VC.ProductTagReplacement?
+    func value(byTag tag: TextProductTag) -> TextTagValue?
 }

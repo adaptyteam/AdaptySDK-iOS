@@ -12,18 +12,18 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 protocol ProductsInfoProvider {
-    func selectedProductInfo(by groupId: String) -> AdaptyProductModel?
-    func productInfo(by productId: String) -> AdaptyProductModel?
+    func selectedProductInfo(by groupId: String) -> ProductResolver?
+    func productInfo(by productId: String) -> ProductResolver?
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProductsViewModel: ProductsInfoProvider {
-    func selectedProductInfo(by groupId: String) -> AdaptyProductModel? {
+    func selectedProductInfo(by groupId: String) -> ProductResolver? {
         guard let selectedProductId = selectedProductId(by: groupId) else { return nil }
         return productInfo(by: selectedProductId)
     }
 
-    func productInfo(by productId: String) -> AdaptyProductModel? {
+    func productInfo(by productId: String) -> ProductResolver? {
         products.first(where: { $0.adaptyProductId == productId })
     }
 }
@@ -39,10 +39,10 @@ package final class AdaptyProductsViewModel: ObservableObject {
     private let presentationViewModel: AdaptyPresentationViewModel
     private let observerModeResolver: AdaptyUIBuilderObserverModeResolver?
 
-    @Published private var paywallProductsWithoutOffer: [AdaptyProductModel]?
-    @Published private var paywallProducts: [AdaptyProductModel]?
+    @Published private var paywallProductsWithoutOffer: [ProductResolver]?
+    @Published private var paywallProducts: [ProductResolver]?
 
-    var products: [AdaptyProductModel] {
+    var products: [ProductResolver] {
         return
             paywallProducts ?? paywallProductsWithoutOffer ?? []
     }
@@ -57,7 +57,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
         logic: AdaptyUIBuilderLogic,
         presentationViewModel: AdaptyPresentationViewModel,
         paywallViewModel: AdaptyPaywallViewModel,
-        products: [any AdaptyProductModel]?,
+        products: [any ProductResolver]?,
         observerModeResolver: AdaptyUIBuilderObserverModeResolver?
     ) {
         self.logId = logId
@@ -107,7 +107,6 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
             do {
                 let productsResult = try await logic.getProducts(
-                    paywall: paywallViewModel.paywall,
                     determineOffers: determineOffers
                 )
                 if determineOffers {
@@ -162,13 +161,13 @@ package final class AdaptyProductsViewModel: ObservableObject {
         }
     }
 
-    private func purchaseProductInWeb(_ product: AdaptyProductModel) {
+    private func purchaseProductInWeb(_ product: ProductResolver) {
         Task { @MainActor [weak self] in
             await self?.logic.openWebPaywall(for: product)
         }
     }
 
-    private func purchaseProductWithStoreKit(_ product: AdaptyProductModel) {
+    private func purchaseProductWithStoreKit(_ product: ProductResolver) {
         let logId = logId
 
         if let observerModeResolver {

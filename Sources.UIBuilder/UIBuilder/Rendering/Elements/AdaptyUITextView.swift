@@ -81,7 +81,7 @@ extension Array where Element == VC.RichText.Item {
     func convertToSwiftUITextThrowingError(
         assetsResolver: AdaptyAssetsResolver,
         tagResolver: AdaptyTagResolver,
-        productInfo: AdaptyProductModel?,
+        productInfo: ProductResolver?,
         colorScheme: ColorScheme
     ) throws -> Text {
         try reduce(Text("")) { partialResult, item in
@@ -100,8 +100,8 @@ extension Array where Element == VC.RichText.Item {
 
                 if let customTagResult = tagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
-                } else if let productTag = VC.ProductTag(rawValue: value),
-                          let productTagResult = productInfo?.stringByTag(productTag)
+                } else if let productTag = TextProductTag(rawValue: value),
+                          let productTagResult = productInfo?.value(byTag: productTag)
                 {
                     switch productTagResult {
                     case .notApplicable:
@@ -149,7 +149,7 @@ extension VC.RichText {
     func convertToSwiftUIText(
         assetsResolver: AdaptyAssetsResolver,
         tagResolver: AdaptyTagResolver,
-        productInfo: AdaptyProductModel?,
+        productInfo: ProductResolver?,
         colorScheme: ColorScheme,
         placeholder: Bool = false
     ) -> Text {
@@ -239,7 +239,7 @@ extension VC.Text {
     enum ProductInfoContainer {
         case notApplicable
         case notFound
-        case found(AdaptyProductModel)
+        case found(ProductResolver)
     }
 
     func extract(productsInfoProvider: ProductsInfoProvider) -> (VC.RichText, ProductInfoContainer) {

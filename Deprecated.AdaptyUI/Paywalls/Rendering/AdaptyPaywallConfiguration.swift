@@ -12,24 +12,26 @@ import AdaptyUIBuider
 import SwiftUI
 import UIKit
 
-//@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-//struct AdaptyTagResolverHolder: AdaptyUIBuilderTagResolver {
-//    let tagResolver: AdaptyTagResolver?
-//    
-//    package func replacement(for tag: String) -> String? {
-//        tagResolver?.replacement(for: tag)
-//    }
-//}
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyTimerResolver = AdaptyUIBuider.AdaptyTimerResolver
 
-// TODO: check
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyTagResolver = AdaptyUIBuider.AdaptyTagResolver
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyAssetsResolver = AdaptyUIBuider.AdaptyAssetsResolver
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyCustomAsset = AdaptyUIBuider.AdaptyCustomAsset
+
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyObserverResolverHolder: AdaptyUIBuilderObserverModeResolver {
     let logId: String
     let observerModeResolver: AdaptyObserverModeResolver?
-    
+
     package func observerMode(
-        didInitiatePurchase product: AdaptyProductModel,
+        didInitiatePurchase product: ProductResolver,
         onStartPurchase: @escaping () -> Void,
         onFinishPurchase: @escaping () -> Void
     ) {
@@ -37,7 +39,7 @@ struct AdaptyObserverResolverHolder: AdaptyUIBuilderObserverModeResolver {
             Log.ui.error("#\(logId)# observerMode_didInitiatePurchase: WRONG INJECTION")
             return
         }
-        
+
         observerModeResolver?.observerMode(
             didInitiatePurchase: product,
             onStartPurchase: onStartPurchase,
@@ -53,9 +55,9 @@ public extension AdaptyUI {
         public var id: String { paywallViewModel.viewConfiguration.id }
         public var locale: String { paywallViewModel.viewConfiguration.locale }
         public var isRightToLeft: Bool { paywallViewModel.viewConfiguration.isRightToLeft }
-        
+
         package let eventsHandler: AdaptyEventsHandler
-        
+
         package let presentationViewModel: AdaptyPresentationViewModel
         package let paywallViewModel: AdaptyPaywallViewModel
         package let productsViewModel: AdaptyProductsViewModel
@@ -73,13 +75,12 @@ public extension AdaptyUI {
         fileprivate let tagResolver: AdaptyTagResolver?
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyAssetsResolver?
-        
-//        fileprivate let tagResolverHolder: AdaptyTagResolverHolder
+
         fileprivate let observerResolverHolder: AdaptyObserverResolverHolder
-        
+
         package init(
             logId: String,
-            paywall: AdaptyPaywallModel,
+            paywall: AdaptyPaywall,
             viewConfiguration: AdaptyUIConfiguration,
             products: [AdaptyPaywallProduct]?,
             observerModeResolver: AdaptyObserverModeResolver?,
@@ -102,8 +103,8 @@ public extension AdaptyUI {
             self.assetsResolver = assetsResolver
 
             eventsHandler = AdaptyEventsHandler(logId: logId)
-            logic = AdaptyUILogic(logId: logId, events: eventsHandler)
-            
+            logic = AdaptyUILogic(logId: logId, paywall: paywall, events: eventsHandler)
+
 //            tagResolverHolder = AdaptyTagResolverHolder(tagResolver: tagResolver)
             observerResolverHolder = AdaptyObserverResolverHolder(
                 logId: logId,
@@ -116,7 +117,6 @@ public extension AdaptyUI {
             paywallViewModel = AdaptyPaywallViewModel(
                 logId: logId,
                 logic: logic,
-                paywall: paywall,
                 viewConfiguration: viewConfiguration
             )
             productsViewModel = AdaptyProductsViewModel(
