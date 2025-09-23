@@ -1,17 +1,13 @@
 //
-//  AdaptyLog.Source.swift
-//  AdaptySDK
+//  Source.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 24.08.2024
 //
 
 import Foundation
 
-package extension Log {
-    typealias Source = AdaptyLog.Source
-}
-
-public extension AdaptyLog {
+public extension AdaptyLogger {
     struct Source: Equatable, Sendable {
         public let fileName: String
         public let functionName: String
@@ -19,6 +15,6 @@ public extension AdaptyLog {
     }
 }
 
-extension AdaptyLog.Source: CustomStringConvertible {
+extension AdaptyLogger.Source: CustomStringConvertible {
     public var description: String { "\(fileName)#\(lineNumber)" }
 }

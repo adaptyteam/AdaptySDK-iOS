@@ -7,26 +7,26 @@
 
 import Foundation
 
-    struct PurchasedSubscriptionOfferInfo: Sendable {
-        let id: String?
-        let period: AdaptySubscriptionPeriod?
-        let paymentMode: AdaptySubscriptionOffer.PaymentMode
-        let offerType: AdaptySubscriptionOfferType
-        let price: Decimal?
+struct PurchasedSubscriptionOfferInfo: Sendable {
+    let id: String?
+    let period: AdaptySubscriptionPeriod?
+    let paymentMode: AdaptySubscriptionOffer.PaymentMode
+    let offerType: AdaptySubscriptionOfferType
+    let price: Decimal?
 
-        fileprivate init(
-            identifier: AdaptySubscriptionOffer.Identifier,
-            period: AdaptySubscriptionPeriod? = nil,
-            paymentMode: AdaptySubscriptionOffer.PaymentMode = .unknown,
-            price: Decimal? = nil
-        ) {
-            self.id = identifier.offerId
-            self.period = period
-            self.paymentMode = paymentMode
-            self.offerType = identifier.offerType
-            self.price = price
-        }
+    fileprivate init(
+        identifier: AdaptySubscriptionOffer.Identifier,
+        period: AdaptySubscriptionPeriod? = nil,
+        paymentMode: AdaptySubscriptionOffer.PaymentMode = .unknown,
+        price: Decimal? = nil
+    ) {
+        self.id = identifier.offerId
+        self.period = period
+        self.paymentMode = paymentMode
+        self.offerType = identifier.offerType
+        self.price = price
     }
+}
 
 extension PurchasedSubscriptionOfferInfo {
     init?(
@@ -172,7 +172,7 @@ extension PurchasedSubscriptionOfferInfo {
         period: AdaptySubscriptionPeriod?,
         paymentMode: AdaptySubscriptionOffer.PaymentMode,
         price: Decimal?,
-        for sk2Transaction: SK2Transaction,
+        for sk2Transaction: SK2Transaction
     ) {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *),
            let offer = sk2Transaction.offer
@@ -198,12 +198,17 @@ extension PurchasedSubscriptionOfferInfo {
         identifier: AdaptySubscriptionOffer.Identifier,
         productOfferPeriod: AdaptySubscriptionPeriod?,
         price: Decimal?,
-        for sk2TransactionOffer: SK2Transaction.Offer,
+        for sk2TransactionOffer: SK2Transaction.Offer
     ) {
         var period: AdaptySubscriptionPeriod?
+
+        #if compiler(>=6.1)
         if #available(iOS 18.4, macOS 15.4, tvOS 18.4, watchOS 11.4, visionOS 2.4, *) {
             period = sk2TransactionOffer.period?.asAdaptySubscriptionPeriod
         }
+        #else
+        period = productOfferPeriod
+        #endif
 
         self.init(
             identifier: sk2TransactionOffer.subscriptionOfferIdentifier ?? identifier,

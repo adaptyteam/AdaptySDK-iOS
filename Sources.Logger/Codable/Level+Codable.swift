@@ -1,15 +1,15 @@
 //
-//  AdaptyLog.Level+Codable.swift
-//  AdaptySDK
+//  Level+Codable.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 22.08.2024
 //
 
 import Foundation
 
-extension AdaptyLog.Level: Codable {
+extension AdaptyLogger.Level: Codable {
     public init(from decoder: Decoder) throws {
-        self = try Log.Level(stringLiteral: decoder.singleValueContainer().decode(String.self))
+        self = try AdaptyLogger.Level(stringLiteral: decoder.singleValueContainer().decode(String.self))
     }
 
     public func encode(to encoder: Encoder) throws {

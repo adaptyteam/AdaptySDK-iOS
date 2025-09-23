@@ -1,13 +1,13 @@
 //
 //  Log.swift
-//  AdaptySDK
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 22.08.2024
 //
 
 import Foundation
 
-package enum Log {
+public enum AdaptyLogger {
     @globalActor
     package actor InternalActor {
         package static let shared = InternalActor()
@@ -20,7 +20,7 @@ package enum Log {
     }
 
     @InternalActor
-    static func set(level: Level) async {
+    package static func set(level: Level) async {
         self.level = level
     }
 
@@ -28,8 +28,8 @@ package enum Log {
     private(set) static var handler: Handler?
 
     @InternalActor
-    static func set(handler: Handler?) async {
-        Log.handler = handler
+    package static func set(handler: Handler?) async {
+        Self.handler = handler
     }
 
     @InternalActor
@@ -45,15 +45,15 @@ package enum Log {
     }
 }
 
-package extension Log.Category {
+package extension AdaptyLogger.Category {
     func write(
         _ message: String,
-        withLevel level: Log.Level,
+        withLevel level: AdaptyLogger.Level,
         file: String,
         function: String,
         line: UInt
     ) {
-        Log.write(record: .init(
+        AdaptyLogger.write(record: .init(
             date: Date(),
             level: level,
             message: message,
@@ -67,64 +67,64 @@ package extension Log.Category {
     }
 }
 
-package extension Log.Category {
-    func message(_ message: @autoclosure () -> String, withLevel level: Log.Level, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(level) else { return }
+package extension AdaptyLogger.Category {
+    func message(_ message: @autoclosure () -> String, withLevel level: AdaptyLogger.Level, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        guard AdaptyLogger.isLevel(level) else { return }
         write(message(), withLevel: level, file: file, function: function, line: line)
     }
 
-    func message(_ message: @autoclosure () -> Log.Message, withLevel level: Log.Level, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(level) else { return }
+    func message(_ message: @autoclosure () -> AdaptyLogger.Message, withLevel level: AdaptyLogger.Level, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        guard AdaptyLogger.isLevel(level) else { return }
         write(message().value, withLevel: level, file: file, function: function, line: line)
     }
 
     func error(_ message: @autoclosure () -> String, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.error) else { return }
+        guard AdaptyLogger.isLevel(.error) else { return }
         write(message(), withLevel: .error, file: file, function: function, line: line)
     }
 
-    func error(_ message: @autoclosure () -> Log.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.error) else { return }
+    func error(_ message: @autoclosure () -> AdaptyLogger.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        guard AdaptyLogger.isLevel(.error) else { return }
         write(message().value, withLevel: .error, file: file, function: function, line: line)
     }
 
     func warn(_ message: @autoclosure () -> String, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.warn) else { return }
+        guard AdaptyLogger.isLevel(.warn) else { return }
         write(message(), withLevel: .warn, file: file, function: function, line: line)
     }
 
-    func warn(_ message: @autoclosure () -> Log.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.warn) else { return }
+    func warn(_ message: @autoclosure () -> AdaptyLogger.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        guard AdaptyLogger.isLevel(.warn) else { return }
         write(message().value, withLevel: .warn, file: file, function: function, line: line)
     }
 
     func info(_ message: @autoclosure () -> String, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.info) else { return }
+        guard AdaptyLogger.isLevel(.info) else { return }
         write(message(), withLevel: .info, file: file, function: function, line: line)
     }
 
-    func info(_ message: @autoclosure () -> Log.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.info) else { return }
+    func info(_ message: @autoclosure () -> AdaptyLogger.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        guard AdaptyLogger.isLevel(.info) else { return }
         write(message().value, withLevel: .info, file: file, function: function, line: line)
     }
 
     func verbose(_ message: @autoclosure () -> String, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.verbose) else { return }
+        guard AdaptyLogger.isLevel(.verbose) else { return }
         write(message(), withLevel: .verbose, file: file, function: function, line: line)
     }
 
-    func verbose(_ message: @autoclosure () -> Log.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.verbose) else { return }
+    func verbose(_ message: @autoclosure () -> AdaptyLogger.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        guard AdaptyLogger.isLevel(.verbose) else { return }
         write(message().value, withLevel: .verbose, file: file, function: function, line: line)
     }
 
     func debug(_ message: @autoclosure () -> String, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.debug) else { return }
+        guard AdaptyLogger.isLevel(.debug) else { return }
         write(message(), withLevel: .debug, file: file, function: function, line: line)
     }
 
-    func debug(_ message: @autoclosure () -> Log.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
-        guard Log.isLevel(.debug) else { return }
+    func debug(_ message: @autoclosure () -> AdaptyLogger.Message, file: String = #fileID, function: String = #function, line: UInt = #line) {
+        guard AdaptyLogger.isLevel(.debug) else { return }
         write(message().value, withLevel: .debug, file: file, function: function, line: line)
     }
 }

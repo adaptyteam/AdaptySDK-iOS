@@ -1,13 +1,13 @@
 //
-//  AdaptyLog.Level+stringLiteral.swift
-//  AdaptySDK
+//  Level+stringLiteral.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 22.08.2024
 //
 
 import Foundation
 
-extension AdaptyLog.Level: ExpressibleByStringLiteral {
+extension AdaptyLogger.Level: ExpressibleByStringLiteral {
     enum CodingValues: String {
         case error
         case warn
@@ -41,6 +41,6 @@ extension AdaptyLog.Level: ExpressibleByStringLiteral {
     }
 }
 
-extension AdaptyLog.Level: CustomStringConvertible {
+extension AdaptyLogger.Level: CustomStringConvertible {
     public var description: String { stringLiteral.uppercased() }
 }

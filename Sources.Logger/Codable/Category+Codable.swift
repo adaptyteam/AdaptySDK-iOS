@@ -1,13 +1,13 @@
 //
-//  AdaptyLog.Category+Codable.swift
-//  AdaptySDK
+//  Category+Codable.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 24.08.2024
 //
 
 import Foundation
 
-extension AdaptyLog.Category: Codable {
+extension AdaptyLogger.Category: Codable {
     enum CodingKeys: String, CodingKey {
         case subsystem
         case version

@@ -6,10 +6,19 @@
 //
 
 import Adapty
+import AdaptyLogger
 
-extension Log {
-    static func Category(name: String) -> AdaptyLog.Category {
-        AdaptyLog.Category(subsystem: "io.adapty.ui", name: name)
+enum Log {
+    static var stamp: String {
+        AdaptyLogger.stamp
+    }
+
+    static func Category(name: String) -> AdaptyLogger.Category {
+        AdaptyLogger.Category(
+            subsystem: "io.adapty.ui",
+            version: Adapty.SDKVersion,
+            name: name
+        )
     }
 
     static let ui = Category(name: "ui")

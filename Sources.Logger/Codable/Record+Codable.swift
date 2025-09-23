@@ -1,13 +1,13 @@
 //
-//  AdaptyLog.Record+Codable.swift
-//  AdaptySDK
+//  Record+Codable.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 22.08.2024
 //
 
 import Foundation
 
-extension AdaptyLog.Record: Codable {
+extension AdaptyLogger.Record: Codable {
     enum CodingKeys: String, CodingKey {
         case date
         case level
@@ -19,10 +19,10 @@ extension AdaptyLog.Record: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         date = try Date(timeIntervalSince1970: container.decode(Double.self, forKey: .date) / 1000.0)
-        level = try container.decode(Log.Level.self, forKey: .level)
+        level = try container.decode(AdaptyLogger.Level.self, forKey: .level)
         message = try container.decode(String.self, forKey: .message)
-        category = try container.decode(Log.Category.self, forKey: .category)
-        source = try container.decode(Log.Source.self, forKey: .source)
+        category = try container.decode(AdaptyLogger.Category.self, forKey: .category)
+        source = try container.decode(AdaptyLogger.Source.self, forKey: .source)
     }
 
     public func encode(to encoder: Encoder) throws {

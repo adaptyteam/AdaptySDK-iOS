@@ -11,6 +11,10 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "AdaptyLogger",
+            targets: ["AdaptyLogger"]
+        ),
+        .library(
             name: "Adapty",
             targets: ["Adapty"]
         ),
@@ -33,35 +37,40 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "AdaptyUIBuider",
+            name: "AdaptyLogger",
             dependencies: [],
+            path: "Sources.Logger"
+        ),
+        .target(
+            name: "AdaptyUIBuider",
+            dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder"
         ),
         .target(
             name: "Adapty",
-            dependencies: ["AdaptyUIBuider"],
+            dependencies: ["AdaptyUIBuider", "AdaptyLogger"],
             path: "Sources",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target( // deprecated
             name: "AdaptyUI",
-            dependencies: ["AdaptyUIBuider", "Adapty"],
+            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyLogger"],
             path: "Deprecated.AdaptyUI",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
             name: "AdaptyUITesting",
-            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI"],
+            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.UIBuilderTools"
         ),
         .target(
             name: "AdaptyPlugin",
-            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI"],
+            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.AdaptyPlugin"
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuider", "Adapty"],
+            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyLogger"],
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),

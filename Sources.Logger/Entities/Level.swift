@@ -1,17 +1,13 @@
 //
-//  AdaptyLog.Level.swift
-//  AdaptySDK
+//  Level.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 23.10.2022.
 //
 
 import Foundation
 
-package extension Log {
-    typealias Level = AdaptyLog.Level
-}
-
-public extension AdaptyLog {
+public extension AdaptyLogger {
     enum Level: Int, Sendable {
         public static let `default` = Level.info
 
@@ -28,7 +24,7 @@ public extension AdaptyLog {
     }
 }
 
-extension AdaptyLog.Level: Comparable {
+extension AdaptyLogger.Level: Comparable {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
