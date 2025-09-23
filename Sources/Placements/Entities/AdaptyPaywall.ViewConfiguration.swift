@@ -44,7 +44,7 @@ extension AdaptyPaywall.ViewConfiguration {
                 return schema
             case let .packed(data):
                 do {
-                    return try Storage.decoder.decode(AdaptyUISchema.self, from: data)
+                    return try AdaptyUISchema(from: data)
                 } catch {
                     throw .decodingViewConfiguration(error)
                 }

@@ -12,7 +12,7 @@ import Foundation
 package extension AdaptyUIConfiguration {
     static func create(
         templateId: String = "transparent",
-        locale: LocaleId = "en",
+        locale: LocaleId = AdaptyUISchema.defaultLocaleId,
         isRightToLeft: Bool = false,
         images: [String] = [],
         colors: [String: Filling] = [:],
@@ -35,7 +35,7 @@ package extension AdaptyUIConfiguration {
             .merging(colors) { current, _ in current }
 
         let data = content.data(using: .utf8) ?? Data()
-        let jsonDecoder = JSONDecoder()
+        let jsonDecoder = AdaptyUISchema.jsonDecoder
         let screen =
             if let element = try? jsonDecoder.decode(AdaptyUISchema.Element.self, from: data) {
                 AdaptyUISchema.Screen(
@@ -79,10 +79,7 @@ package extension AdaptyUIConfiguration {
             selectedProducts: selectedProducts
         )
 
-        return try schema.extractUIConfiguration(
-            id: UUID().uuidString,
-            withLocaleId: locale
-        )
+        return try schema.extractUIConfiguration(withLocaleId: locale)
     }
 }
 
