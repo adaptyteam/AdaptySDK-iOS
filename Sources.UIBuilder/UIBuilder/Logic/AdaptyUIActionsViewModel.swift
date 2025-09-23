@@ -24,7 +24,7 @@ package final class AdaptyUIActionsViewModel: ObservableObject {
     }
 
     func closeActionOccurred() {
-        logic.didPerformAction(.close)
+        logic.reportDidPerformAction(.close)
     }
     
     func openUrlActionOccurred(url urlString: String?) {
@@ -32,11 +32,11 @@ package final class AdaptyUIActionsViewModel: ObservableObject {
             Log.ui.warn("#\(logId)# can't parse url: \(urlString ?? "null")")
             return
         }
-        logic.didPerformAction(.openURL(url: url))
+        logic.reportDidPerformAction(.openURL(url: url))
     }
     
     func customActionOccurred(id: String) {
-        logic.didPerformAction(.custom(id: id))
+        logic.reportDidPerformAction(.custom(id: id))
     }
 }
 

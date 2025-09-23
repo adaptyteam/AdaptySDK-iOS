@@ -26,7 +26,7 @@ let package = Package(
             name: "AdaptyUIBuiderApp",
             targets: ["AdaptyUIBuiderApp"]
         ),
-        .library( // deprecated
+        .library(
             name: "AdaptyUI",
             targets: ["AdaptyUI"]
         ),
@@ -49,6 +49,11 @@ let package = Package(
             name: "AdaptyUIBuider",
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder"
+        ),
+        .target(
+            name: "AdaptyUIBuiderApp",
+            dependencies: ["AdaptyUIBuider", "AdaptyLogger"],
+            path: "Sources.UIBuilderApp"
         ),
         .target(
             name: "Adapty",
@@ -80,11 +85,6 @@ let package = Package(
                 .process("Placements/fallback.json"),
                 .process("Placements/fallback_large.json"),
             ]
-        ),
-        .target(
-            name: "AdaptyUIBuilderApp",
-            dependencies: ["AdaptyUIBuider"],
-            path: "Sources.AdaptyUIBuilderApp"
         ),
     ]
 )

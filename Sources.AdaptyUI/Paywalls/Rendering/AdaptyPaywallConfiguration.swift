@@ -105,7 +105,6 @@ public extension AdaptyUI {
             eventsHandler = AdaptyEventsHandler(logId: logId)
             logic = AdaptyUILogic(logId: logId, paywall: paywall, events: eventsHandler)
 
-//            tagResolverHolder = AdaptyTagResolverHolder(tagResolver: tagResolver)
             observerResolverHolder = AdaptyObserverResolverHolder(
                 logId: logId,
                 observerModeResolver: observerModeResolver

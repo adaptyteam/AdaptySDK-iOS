@@ -60,6 +60,4 @@ package protocol AdaptyUIBuilderLogic {
     func openWebPaywall(for product: ProductResolver) async
 
     func restorePurchases() async
-
-    func didPerformAction(_ action: AdaptyUIBuilder.Action)
 }
