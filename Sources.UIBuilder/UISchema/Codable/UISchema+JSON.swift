@@ -14,11 +14,11 @@ package extension AdaptyUISchema {
         return decoder
     }
 
-    init(from jsonData: Data) throws {
+    public init(from jsonData: Data) throws {
         self = try AdaptyUISchema.jsonDecoder.decode(AdaptyUISchema.self, from: jsonData)
     }
 
-    init(from jsonData: String) throws {
+    public init(from jsonData: String) throws {
         try self.init(from: jsonData.data(using: .utf8) ?? Data())
     }
 }
