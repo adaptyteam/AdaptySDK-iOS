@@ -7,6 +7,7 @@
 
 import Adapty
 import AdaptyUI
+import AdaptyUIBuider
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -14,7 +15,7 @@ extension PaywallViewEvent {
     struct DidFailRendering: AdaptyPluginEvent {
         let id = "paywall_view_did_fail_rendering"
         let view: AdaptyUI.PaywallView
-        let error: AdaptyUIError
+        let error: AdaptyUIBuilderError
 
         enum CodingKeys: String, CodingKey {
             case id

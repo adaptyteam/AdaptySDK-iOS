@@ -7,6 +7,7 @@
 
 import Adapty
 import AdaptyUI
+import AdaptyUIBuider
 
 private let log = Log.plugin
 
@@ -159,7 +160,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIError
+        didFailRenderingWith error: AdaptyUIBuilderError
     ) {
         eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
             view: controller.toAdaptyUIView(),

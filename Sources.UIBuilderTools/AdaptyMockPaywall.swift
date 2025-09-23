@@ -7,22 +7,12 @@
 
 import Adapty
 import AdaptyUI
-import Foundation
 import AdaptyUIBuider
+import Foundation
 
-struct AdaptyMockPaywall: AdaptyPaywallInterface {
+struct AdaptyMockPaywall: AdaptyPaywallModel {
     var placementId: String { "mock" }
     var variationId: String { "mock" }
     var locale: String? { nil }
     var vendorProductIds: [String] { [] }
-
-    func getPaywallProductsWithoutDeterminingOffer() async throws -> [any AdaptyPaywallProductWithoutDeterminingOffer] {
-        []
-    }
-
-    func getPaywallProducts() async throws -> AdaptyUIGetProductsResult {
-        .full(products: [])
-    }
-
-    func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async throws {}
 }

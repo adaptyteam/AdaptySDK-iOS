@@ -1,0 +1,204 @@
+//
+//  AdaptyProductsViewModel.swift
+//
+//
+//  Created by Aleksey Goncharov on 27.05.2024.
+//
+
+#if canImport(UIKit)
+
+import Foundation
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+protocol ProductsInfoProvider {
+    func selectedProductInfo(by groupId: String) -> AdaptyProductModel?
+    func productInfo(by productId: String) -> AdaptyProductModel?
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyProductsViewModel: ProductsInfoProvider {
+    func selectedProductInfo(by groupId: String) -> AdaptyProductModel? {
+        guard let selectedProductId = selectedProductId(by: groupId) else { return nil }
+        return productInfo(by: selectedProductId)
+    }
+
+    func productInfo(by productId: String) -> AdaptyProductModel? {
+        products.first(where: { $0.adaptyProductId == productId })
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
+package final class AdaptyProductsViewModel: ObservableObject {
+    private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
+
+    private let logId: String
+    private let logic: AdaptyUIBuilderLogic
+    private let paywallViewModel: AdaptyPaywallViewModel
+    private let presentationViewModel: AdaptyPresentationViewModel
+    private let observerModeResolver: AdaptyUIBuilderObserverModeResolver?
+
+    @Published private var paywallProductsWithoutOffer: [AdaptyProductModel]?
+    @Published private var paywallProducts: [AdaptyProductModel]?
+
+    var products: [AdaptyProductModel] {
+        return
+            paywallProducts ?? paywallProductsWithoutOffer ?? []
+    }
+
+    @Published var selectedProductsIds: [String: String]
+    @Published var productsLoadingInProgress: Bool = false
+    @Published var purchaseInProgress: Bool = false
+    @Published var restoreInProgress: Bool = false
+
+    package init(
+        logId: String,
+        logic: AdaptyUIBuilderLogic,
+        presentationViewModel: AdaptyPresentationViewModel,
+        paywallViewModel: AdaptyPaywallViewModel,
+        products: [any AdaptyProductModel]?,
+        observerModeResolver: AdaptyUIBuilderObserverModeResolver?
+    ) {
+        self.logId = logId
+        self.logic = logic
+        self.presentationViewModel = presentationViewModel
+        self.paywallViewModel = paywallViewModel
+
+        paywallProducts = products
+        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
+
+        self.observerModeResolver = observerModeResolver
+    }
+
+    package func resetSelectedProducts() {
+        Log.ui.verbose("#\(logId)# resetSelectedProducts")
+        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
+    }
+
+    package func loadProductsIfNeeded() {
+        guard !productsLoadingInProgress, paywallProducts == nil else { return }
+        loadProducts(determineOffers: paywallProductsWithoutOffer != nil)
+    }
+
+    func selectedProductId(by groupId: String) -> String? {
+        selectedProductsIds[groupId]
+    }
+
+    func selectProduct(id: String, forGroupId groupId: String) {
+        selectedProductsIds[groupId] = id
+
+        if let selectedProduct = products.first(where: { $0.adaptyProductId == id }) {
+            logic.reportDidSelectProduct(selectedProduct)
+        }
+    }
+
+    func unselectProduct(forGroupId groupId: String) {
+        selectedProductsIds.removeValue(forKey: groupId)
+    }
+
+    private func loadProducts(determineOffers: Bool) {
+        productsLoadingInProgress = true
+        let logId = logId
+        Log.ui.verbose("#\(logId)# loadProducts determineOffers: \(determineOffers) begin")
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            do {
+                let productsResult = try await logic.getProducts(
+                    paywall: paywallViewModel.paywall,
+                    determineOffers: determineOffers
+                )
+                if determineOffers {
+                    self.paywallProducts = productsResult
+                } else {
+                    self.paywallProductsWithoutOffer = productsResult
+                    self.loadProducts(determineOffers: true)
+                }
+            } catch {
+                Log.ui.error("#\(logId)# loadProducts determineOffers: \(determineOffers) fail: \(error)")
+                self.productsLoadingInProgress = false
+                self.retryLoadingProductsIfNeeded(error: error)
+            }
+        }
+    }
+
+    private func retryLoadingProductsIfNeeded(error: Error) {
+        guard logic.reportDidFailLoadingProductsShouldRetry(with: error) else { return }
+
+        Task { [weak self] in
+            guard let self else { return }
+
+            try await Task.sleep(seconds: 2)
+
+            if self.presentationViewModel.presentationState == .appeared {
+                self.loadProductsIfNeeded()
+            }
+        }
+    }
+
+    // MARK: Actions
+
+    func purchaseSelectedProduct(
+        fromGroupId groupId: String,
+        provider: VC.PaymentServiceProvider
+    ) {
+        guard let productId = selectedProductId(by: groupId) else { return }
+        purchaseProduct(id: productId, provider: provider)
+    }
+
+    func purchaseProduct(id productId: String, provider: VC.PaymentServiceProvider) {
+        guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
+            Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
+            return
+        }
+
+        switch provider {
+        case .storeKit:
+            purchaseProductWithStoreKit(product)
+        case .openWebPaywall:
+            purchaseProductInWeb(product)
+        }
+    }
+
+    private func purchaseProductInWeb(_ product: AdaptyProductModel) {
+        Task { @MainActor [weak self] in
+            await self?.logic.openWebPaywall(for: product)
+        }
+    }
+
+    private func purchaseProductWithStoreKit(_ product: AdaptyProductModel) {
+        let logId = logId
+
+        if let observerModeResolver {
+            observerModeResolver.observerMode(
+                didInitiatePurchase: product,
+                onStartPurchase: { [weak self] in
+                    Log.ui.verbose("#\(logId)# observerDidStartPurchase")
+                    self?.purchaseInProgress = true
+                },
+                onFinishPurchase: { [weak self] in
+                    Log.ui.verbose("#\(logId)# observerDidFinishPurchase")
+                    self?.purchaseInProgress = false
+                }
+            )
+        } else {
+            Task { @MainActor [weak self] in
+                self?.purchaseInProgress = true
+                await self?.logic.makePurchase(product: product)
+                self?.purchaseInProgress = false
+            }
+        }
+    }
+
+    func restorePurchases() {
+        Task { @MainActor [weak self] in
+            self?.restoreInProgress = true
+            await self?.logic.restorePurchases()
+            self?.restoreInProgress = false
+        }
+    }
+}
+
+#endif

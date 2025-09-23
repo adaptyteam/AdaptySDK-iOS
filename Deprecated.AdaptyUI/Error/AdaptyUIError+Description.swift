@@ -19,12 +19,10 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUI SDK must be initialized before using its methods. Please call AdaptyUI.activate() first."
         case .activateOnce:
             "AdaptyUI SDK can only be activated once per application lifecycle. Multiple activation attempts are not allowed."
-        case let .unsupportedTemplate(templateId):
-            "The template with ID '\(templateId)' is not supported or not found. Please contact support."
-        case let .wrongComponentType(componentId):
-            "Invalid component type for component with ID '\(componentId)'. Please contact support."
         case let .webKit(error):
             "An internal WebKit error occurred: \(error). This may be related to web view initialization or rendering issues."
+        case .injectionConfiguration:
+            ""
         }
      }
 
@@ -38,12 +36,10 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUIError.adaptyUINotActivated (Code: 4003): AdaptyUI SDK is not initialized. Ensure AdaptyUI.activate() is called before any UI-related operations."
         case .activateOnce:
             "AdaptyUIError.activateOnce (Code: 4005): Multiple activation attempts detected. AdaptyUI SDK can only be activated once per application lifecycle. This is a configuration error that should be handled during app initialization."
-        case let .unsupportedTemplate(templateId):
-            "AdaptyUIError.unsupportedTemplate (Code: 4100): Template with ID '\(templateId)' is not available or not supported in the current configuration. This may indicate a missing template, version mismatch, or configuration issue. Please contact support."
-        case let .wrongComponentType(componentId):
-            "AdaptyUIError.wrongComponentType (Code: 4103): Component with ID '\(componentId)' has an invalid or unsupported type configuration. This typically indicates a template structure issue or version incompatibility. Please contact support."
         case let .webKit(error):
             "AdaptyUIError.webKit (Code: 4200): Internal WebKit error occurred - \(error). This may affect the UI rendering or functionality. Check the underlying WebKit error for more details about the specific rendering issue."
+        case .injectionConfiguration:
+            ""
         }
      }
 }

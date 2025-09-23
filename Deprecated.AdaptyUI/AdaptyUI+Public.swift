@@ -6,6 +6,7 @@
 //
 
 import Adapty
+import AdaptyUIBuider
 import Foundation
 
 /// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
@@ -18,26 +19,14 @@ public extension AdaptyUI {
         public static let `default` = Configuration(mediaCacheConfiguration: nil)
 
         /// Represents the Media Cache configuration used in AdaptyUI
-        let mediaCacheConfiguration: MediaCacheConfiguration?
+        let mediaCacheConfiguration: AdaptyUIBuilder.MediaCacheConfiguration?
 
         public init(
-            mediaCacheConfiguration: MediaCacheConfiguration?
+            mediaCacheConfiguration: AdaptyUIBuilder.MediaCacheConfiguration?
         ) {
             self.mediaCacheConfiguration = mediaCacheConfiguration
         }
     }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-public protocol AdaptyTagResolver: Sendable {
-    func replacement(for tag: String) -> String?
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-public protocol AdaptyTimerResolver: Sendable {
-    func timerEndAtDate(for timerId: String) -> Date
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -166,7 +155,7 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     ///   - error: an ``AdaptyError`` object representing the error.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIError
+        didFailRenderingWith error: AdaptyUIBuilderError
     )
 
     /// This method is invoked in case of errors during the products loading process.
@@ -258,8 +247,8 @@ public extension AdaptyUI {
         AdaptyUI.isActivated = true
         AdaptyUI.isObserverModeEnabled = await sdk.observerMode
 
-        AdaptyUI.configureMediaCache(configuration.mediaCacheConfiguration ?? .default)
-        ImageUrlPrefetcher.shared.initialize()
+        AdaptyUIBuilder.configureMediaCache(configuration.mediaCacheConfiguration ?? .default)
+        AdaptyUIBuilder.ImageUrlPrefetcher.shared.initialize()
 
         Log.ui.info("AdaptyUI activated successfully. [\(stamp)]")
 #else

@@ -7,8 +7,11 @@
 
 import AdaptyUIBuider
 
-extension Adapty {
-package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyUIConfiguration) {
-    trackEvent(.paywallShowed(.init(variationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
-}
+package extension Adapty {
+    static func logShowPaywall(
+        _ paywall: AdaptyPaywall,
+        viewConfiguration: AdaptyUIConfiguration
+    ) {
+        trackEvent(.paywallShowed(.init(variationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
+    }
 }

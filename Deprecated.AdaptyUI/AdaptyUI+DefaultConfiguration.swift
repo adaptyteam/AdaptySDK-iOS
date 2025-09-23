@@ -8,6 +8,7 @@
 #if canImport(UIKit)
 
 import Adapty
+import AdaptyUIBuider
 import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -54,7 +55,7 @@ public extension AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIError
+        didFailRenderingWith error: AdaptyUIBuilderError
     ) {}
 
     func paywallController(

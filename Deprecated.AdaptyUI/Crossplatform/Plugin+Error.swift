@@ -6,6 +6,7 @@
 //
 
 import Adapty
+import AdaptyUIBuider
 import Foundation
 
 package extension AdaptyUI {

@@ -6,6 +6,7 @@
 //
 
 import Adapty
+import AdaptyUIBuider
 import Foundation
 
 #if canImport(UIKit) && canImport(_Concurrency) && compiler(>=5.5.2)

@@ -5,7 +5,6 @@
 //  Created by Alexey Goncharov on 2023-01-23.
 //
 
-import Adapty
 import Foundation
 
 public enum AdaptyUIError: Error {
@@ -15,10 +14,9 @@ public enum AdaptyUIError: Error {
     case adaptyUINotActivated
     case activateOnce
 
-    case unsupportedTemplate(String)
-    case wrongComponentType(String)
-
     case webKit(Error)
+
+    case injectionConfiguration
 }
 
 extension AdaptyUIError {
@@ -31,10 +29,9 @@ extension AdaptyUIError {
         case adaptyUINotActivated = 4003
         case activateOnce = 4005
 
-        case unsupportedTemplate = 4100
-        case wrongComponentType = 4103
-
         case webKit = 4200
+
+        case injectionConfiguration = 4999
     }
 }
 
@@ -47,9 +44,36 @@ extension AdaptyUIError: CustomNSError {
         case .adaptyNotActivated: Code.adaptyNotActivated.rawValue
         case .adaptyUINotActivated: Code.adaptyUINotActivated.rawValue
         case .activateOnce: Code.activateOnce.rawValue
-        case .unsupportedTemplate: Code.unsupportedTemplate.rawValue
-        case .wrongComponentType: Code.wrongComponentType.rawValue
         case .webKit: Code.webKit.rawValue
+        case .injectionConfiguration: Code.injectionConfiguration.rawValue
         }
+    }
+}
+
+import Adapty
+
+struct AdaptyUIUnknownError: CustomAdaptyError {
+    let error: Error
+
+    init(error: Error) {
+        self.error = error
+    }
+
+    var originalError: Error? { error }
+    let adaptyErrorCode = AdaptyError.ErrorCode.unknown
+
+    var description: String { error.localizedDescription }
+    var debugDescription: String { error.localizedDescription }
+}
+
+extension Error {
+    var asAdaptyError: AdaptyError {
+        if let adaptyError = self as? AdaptyError {
+            return adaptyError
+        } else if let customError = self as? CustomAdaptyError {
+            return customError.asAdaptyError
+        }
+
+        return AdaptyError(AdaptyUIUnknownError(error: self))
     }
 }

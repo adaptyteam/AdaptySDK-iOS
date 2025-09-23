@@ -9,6 +9,7 @@
 
 import Adapty
 import AdaptyUI
+import AdaptyUIBuider
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -38,14 +39,16 @@ extension Request {
 
         @MainActor
         func executeInMainActor() async throws -> AdaptyJsonData {
-            try .success(await AdaptyUI.Plugin.createPaywallView(
+            let result: AdaptyUI.PaywallView = try await AdaptyUI.Plugin.createPaywallView(
                 paywall: paywall,
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,
                 timerResolver: customTimers,
                 assetsResolver: assetsResolver()
-            ))
+            )
+            
+            return .success(result)
         }
 
         @MainActor
