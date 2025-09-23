@@ -1,17 +1,13 @@
 //
-//  AdaptyLog.Record.swift
-//  AdaptySDK
+//  Record.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 22.08.2024
 //
 
 import Foundation
 
-package extension Log {
-    typealias Record = AdaptyLog.Record
-}
-
-public extension AdaptyLog {
+public extension AdaptyLogger {
     struct Record: Sendable {
         public let date: Date
         public let level: Level
@@ -21,7 +17,7 @@ public extension AdaptyLog {
     }
 }
 
-extension AdaptyLog.Record: CustomStringConvertible, CustomDebugStringConvertible {
+extension AdaptyLogger.Record: CustomStringConvertible, CustomDebugStringConvertible {
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .iso8601)

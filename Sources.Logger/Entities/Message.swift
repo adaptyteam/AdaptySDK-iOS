@@ -1,13 +1,13 @@
 //
-//  Log.Message.swift
-//  AdaptySDK
+//  Message.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 22.08.2024
 //
 
 import Foundation
 
-package extension Log {
+package extension AdaptyLogger {
     struct Message: Sendable, Hashable, ExpressibleByStringLiteral, ExpressibleByStringInterpolation {
         package typealias StringLiteralType = String
 

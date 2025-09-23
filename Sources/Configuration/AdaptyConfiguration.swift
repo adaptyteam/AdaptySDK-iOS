@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyLogger
 
 public struct AdaptyConfiguration: Sendable {
     static let `default` = (

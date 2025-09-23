@@ -1,13 +1,13 @@
 //
-//  AdaptyLog.Source+Codable.swift
-//  AdaptySDK
+//  Source+Codable.swift
+//  AdaptyLogger
 //
 //  Created by Aleksei Valiano on 24.08.2024
 //
 
 import Foundation
 
-extension AdaptyLog.Source: Codable {
+extension AdaptyLogger.Source: Codable {
     enum CodingKeys: String, CodingKey {
         case fileName = "file"
         case functionName = "function"

@@ -6,10 +6,11 @@
 //
 
 import Adapty
+import AdaptyLogger
 
-extension Log {
-    static func Category(name: String) -> AdaptyLog.Category {
-        AdaptyLog.Category(
+enum Log {
+    static func Category(name: String) -> AdaptyLogger.Category {
+        AdaptyLogger.Category(
             subsystem: "io.adapty",
             version: Adapty.SDKVersion,
             name: name
