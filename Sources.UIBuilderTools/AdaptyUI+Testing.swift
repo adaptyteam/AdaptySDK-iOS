@@ -12,6 +12,7 @@ import AdaptyUI
 import Foundation
 import SwiftUI
 import AdaptyUIBuider
+import AdaptyLogger
 
 public struct AdaptyViewConfigurationTestWrapper {
     var value: AdaptyUIConfiguration

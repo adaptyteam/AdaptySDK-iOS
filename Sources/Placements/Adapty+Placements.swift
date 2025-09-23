@@ -166,7 +166,7 @@ extension Adapty {
                 let value: Content = try await fetchPlacement(
                     placementId,
                     locale,
-                    forUserId: userId,
+                    forUserId: userId
                 )
                 return .success(value)
             } catch {
