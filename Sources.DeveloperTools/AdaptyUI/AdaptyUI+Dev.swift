@@ -20,15 +20,4 @@ public extension AdaptyUI {
             inspectWebView: inspectWebView
         )
     }
-
-    @available(*, deprecated, renamed: "dev_getOnboardingConfiguration")
-    static func getOnboardingConfigurationForTesting(
-        forOnboarding onboarding: AdaptyOnboarding,
-        inspectWebView: Bool
-    ) throws -> OnboardingConfiguration {
-        try dev_getOnboardingConfiguration(
-            forOnboarding: onboarding,
-            inspectWebView: inspectWebView
-        )
-    }
 }

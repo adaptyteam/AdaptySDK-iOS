@@ -14,10 +14,5 @@ public extension View {
     func dev_withScreenSize(_ value: CGSize) -> some View {
         withScreenSize(value)
     }
-    
-    @available(*, deprecated, renamed: "dev_withScreenSize")
-    func withScreenSizeTestingWrapper(_ value: CGSize) -> some View {
-        dev_withScreenSize(value)
-    }
 }
 #endif

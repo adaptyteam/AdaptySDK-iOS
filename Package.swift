@@ -30,9 +30,9 @@ let package = Package(
             name: "AdaptyUI",
             targets: ["AdaptyUI"]
         ),
-        .library( // need rename to AdaptyUIBuiderTools
-            name: "AdaptyUITesting",
-            targets: ["AdaptyUITesting"]
+        .library(
+            name: "AdaptyDeveloperTools",
+            targets: ["AdaptyDeveloperTools"]
         ),
         .library(
             name: "AdaptyPlugin",
@@ -68,7 +68,7 @@ let package = Package(
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
-            name: "AdaptyUITesting",
+            name: "AdaptyDeveloperTools",
             dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.DeveloperTools"
         ),

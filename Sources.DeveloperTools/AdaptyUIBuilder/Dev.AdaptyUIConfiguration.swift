@@ -7,32 +7,6 @@
 
 import AdaptyUIBuider
 
-@available(*, deprecated, renamed: "Dev.AdaptyUIConfiguration")
-public struct AdaptyViewConfigurationTestWrapper {
-    var wrapped: AdaptyUIConfiguration
-
-    @available(*, deprecated, renamed: "wrapped")
-    var value: AdaptyUIConfiguration { wrapped }
-
-#if DEBUG
-    static func create(
-        templateId: String = "basic",
-        locale: String = "en",
-        isRightToLeft: Bool = false,
-        content: String
-    ) throws -> Self {
-        try .init(wrapped:
-            Dev.AdaptyUIConfiguration.create(
-                templateId: templateId,
-                locale: locale,
-                isRightToLeft: isRightToLeft,
-                content: content
-            ).wrapped
-        )
-    }
-#endif
-}
-
 public extension Dev {
     struct AdaptyUIConfiguration {
         typealias Wrapped = AdaptyUIBuider.AdaptyUIConfiguration
