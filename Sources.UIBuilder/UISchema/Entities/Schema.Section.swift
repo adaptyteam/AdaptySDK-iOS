@@ -16,7 +16,7 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func section(_ from: Schema.Section) throws -> AdaptyUIConfiguration.Section {
+    func section(_ from: Schema.Section) throws -> VC.Section {
         try .init(
             id: from.id,
             index: from.index,

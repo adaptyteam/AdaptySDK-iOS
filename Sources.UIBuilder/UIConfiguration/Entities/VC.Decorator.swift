@@ -1,5 +1,5 @@
 //
-//  Decorator.swift
+//  VC.Decorator.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 27.03.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Decorator: Sendable, Hashable {
         static let defaultShapeType: ShapeType = .rectangle(cornerRadius: CornerRadius.zero)
         package let shapeType: ShapeType
@@ -18,12 +18,12 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Decorator {
+package extension VC.Decorator {
     static func create(
-        shapeType: AdaptyUIConfiguration.ShapeType = defaultShapeType,
-        background: AdaptyUIConfiguration.Background? = nil,
-        border: AdaptyUIConfiguration.Border? = nil,
-        shadow: AdaptyUIConfiguration.Shadow? = nil
+        shapeType: VC.ShapeType = defaultShapeType,
+        background: VC.Background? = nil,
+        border: VC.Border? = nil,
+        shadow: VC.Shadow? = nil
     ) -> Self {
         .init(
             shapeType: shapeType,

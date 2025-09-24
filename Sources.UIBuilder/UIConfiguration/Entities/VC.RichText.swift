@@ -1,5 +1,5 @@
 //
-//  RichText.swift
+//  VC.RichText.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct RichText: Sendable, Hashable {
+package extension VC {
+    struct RichText: Sendable, Hashable {
         static let empty = RichText(items: [], fallback: nil)
 
         package let items: [RichText.Item]
@@ -19,11 +19,11 @@ extension AdaptyUIConfiguration {
         package enum Item: Sendable {
             case text(String, TextAttributes)
             case tag(String, TextAttributes)
-            case image(AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.ImageData>?, TextAttributes)
+            case image(VC.Mode<VC.ImageData>?, TextAttributes)
         }
 
         package struct TextAttributes: Sendable, Hashable {
-            package let font: AdaptyUIConfiguration.Font
+            package let font: VC.Font
             package let size: Double
             package let txtColor: Mode<Filling>
             package let imageTintColor: Mode<Filling>?
@@ -34,7 +34,7 @@ extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.RichText.Item: Hashable {
+extension VC.RichText.Item: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .text(value, attributes):
@@ -54,10 +54,10 @@ extension AdaptyUIConfiguration.RichText.Item: Hashable {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.RichText {
+package extension VC.RichText {
     static func create(
-        items: [AdaptyUIConfiguration.RichText.Item],
-        fallback: [AdaptyUIConfiguration.RichText.Item]? = nil
+        items: [VC.RichText.Item],
+        fallback: [VC.RichText.Item]? = nil
     ) -> Self {
         .init(
             items: items,
@@ -66,13 +66,13 @@ package extension AdaptyUIConfiguration.RichText {
     }
 }
 
-package extension AdaptyUIConfiguration.RichText.TextAttributes {
+package extension VC.RichText.TextAttributes {
     static func create(
-        font: AdaptyUIConfiguration.Font,
+        font: VC.Font,
         size: Double? = nil,
-        txtColor: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>? = nil,
-        imgTintColor: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>? = nil,
-        background: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>? = nil,
+        txtColor: VC.Mode<VC.Filling>? = nil,
+        imgTintColor: VC.Mode<VC.Filling>? = nil,
+        background: VC.Mode<VC.Filling>? = nil,
         strike: Bool = false,
         underline: Bool = false
     ) -> Self {

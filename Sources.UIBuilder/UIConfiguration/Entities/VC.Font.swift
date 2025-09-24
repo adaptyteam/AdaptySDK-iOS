@@ -1,5 +1,5 @@
 //
-//  Font.swift
+//  VC.Font.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Font: CustomAsset, Sendable, Hashable {
         static let defaultFontColor = Color.black
         package static let `default` = Font(
@@ -30,7 +30,7 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Font {
+package extension VC.Font {
     static func create(
         customId: String? = `default`.customId,
         alias: String = `default`.alias,
@@ -38,7 +38,7 @@ package extension AdaptyUIConfiguration.Font {
         weight: Int = `default`.weight,
         italic: Bool = `default`.italic,
         defaultSize: Double = `default`.defaultSize,
-        defaultColor: AdaptyUIConfiguration.Filling = `default`.defaultColor
+        defaultColor: VC.Filling = `default`.defaultColor
     ) -> Self {
         .init(
             customId: customId,
@@ -53,7 +53,7 @@ package extension AdaptyUIConfiguration.Font {
 }
 #endif
 
-extension AdaptyUIConfiguration.Font: Codable {
+extension VC.Font: Codable {
     static let assetType = "font"
 
     enum CodingKeys: String, CodingKey {
@@ -78,14 +78,14 @@ extension AdaptyUIConfiguration.Font: Codable {
         if let v = (try? container.decode([String].self, forKey: .familyName))?.first {
             familyName = v
         } else {
-            familyName = try container.decodeIfPresent(String.self, forKey: .familyName) ?? AdaptyUIConfiguration.Font.default.familyName
+            familyName = try container.decodeIfPresent(String.self, forKey: .familyName) ?? VC.Font.default.familyName
         }
-        weight = try container.decodeIfPresent(Int.self, forKey: .weight) ?? AdaptyUIConfiguration.Font.default.weight
-        italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? AdaptyUIConfiguration.Font.default.italic
+        weight = try container.decodeIfPresent(Int.self, forKey: .weight) ?? VC.Font.default.weight
+        italic = try container.decodeIfPresent(Bool.self, forKey: .italic) ?? VC.Font.default.italic
 
-        defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? AdaptyUIConfiguration.Font.default.defaultSize
+        defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? VC.Font.default.defaultSize
 
-        defaultColor = try container.decodeIfPresent(AdaptyUIConfiguration.Color.self, forKey: .defaultColor).map { .solidColor($0) } ?? AdaptyUIConfiguration.Font.default.defaultColor
+        defaultColor = try container.decodeIfPresent(VC.Color.self, forKey: .defaultColor).map { .solidColor($0) } ?? VC.Font.default.defaultColor
     }
 
     package func encode(to encoder: any Encoder) throws {
@@ -95,19 +95,19 @@ extension AdaptyUIConfiguration.Font: Codable {
         try container.encodeIfPresent(customId, forKey: .customId)
 
         try container.encode(alias, forKey: .alias)
-        if familyName != AdaptyUIConfiguration.Font.default.familyName {
+        if familyName != VC.Font.default.familyName {
             try container.encode(familyName, forKey: .familyName)
         }
-        if weight != AdaptyUIConfiguration.Font.default.weight {
+        if weight != VC.Font.default.weight {
             try container.encode(weight, forKey: .weight)
         }
-        if italic != AdaptyUIConfiguration.Font.default.italic {
+        if italic != VC.Font.default.italic {
             try container.encode(italic, forKey: .italic)
         }
-        if defaultSize != AdaptyUIConfiguration.Font.default.defaultSize {
+        if defaultSize != VC.Font.default.defaultSize {
             try container.encode(defaultSize, forKey: .defaultSize)
         }
-        if case let .solidColor(color) = defaultColor, AdaptyUIConfiguration.Font.defaultFontColor != color {
+        if case let .solidColor(color) = defaultColor, VC.Font.defaultFontColor != color {
             try container.encode(color, forKey: .defaultColor)
         }
     }

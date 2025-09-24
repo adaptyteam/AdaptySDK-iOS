@@ -10,16 +10,16 @@ import Foundation
 extension Schema {
     struct Text: Sendable, Hashable {
         let stringId: StringId
-        let horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment
+        let horizontalAlign: VC.HorizontalAlignment
         let maxRows: Int?
-        let overflowMode: Set<AdaptyUIConfiguration.Text.OverflowMode>
+        let overflowMode: Set<VC.Text.OverflowMode>
         let defaultTextAttributes: TextAttributes?
     }
 }
 
 extension Schema.Localizer {
-    func text(_ textBlock: Schema.Text) -> AdaptyUIConfiguration.Text {
-        let value: AdaptyUIConfiguration.Text.Value =
+    func text(_ textBlock: Schema.Text) -> VC.Text {
+        let value: VC.Text.Value =
             switch textBlock.stringId {
             case let .basic(stringId):
                 .text(richText(
@@ -29,14 +29,14 @@ extension Schema.Localizer {
 
             case let .product(info):
                 if let adaptyProductId = info.adaptyProductId {
-                    .productText(AdaptyUIConfiguration.LazyLocalizedProductText(
+                    .productText(VC.LazyLocalizedProductText(
                         adaptyProductId: adaptyProductId,
                         suffix: info.suffix,
                         localizer: self,
                         defaultTextAttributes: textBlock.defaultTextAttributes
                     ))
                 } else {
-                    .selectedProductText(AdaptyUIConfiguration.LazyLocalizedUnknownProductText(
+                    .selectedProductText(VC.LazyLocalizedUnknownProductText(
                         productGroupId: info.productGroupId ?? Schema.StringId.Product.defaultProductGroupId,
                         suffix: info.suffix,
                         localizer: self,
@@ -45,7 +45,7 @@ extension Schema.Localizer {
                 }
             }
 
-        return AdaptyUIConfiguration.Text(
+        return VC.Text(
             value: value,
             horizontalAlign: textBlock.horizontalAlign,
             maxRows: textBlock.maxRows,
@@ -65,13 +65,13 @@ extension Schema.Text: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         stringId = try container.decode(Schema.StringId.self, forKey: .stringId)
-        horizontalAlign = try container.decodeIfPresent(AdaptyUIConfiguration.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
+        horizontalAlign = try container.decodeIfPresent(VC.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)
         overflowMode =
-            if let value = try? container.decode(AdaptyUIConfiguration.Text.OverflowMode.self, forKey: .overflowMode) {
+            if let value = try? container.decode(VC.Text.OverflowMode.self, forKey: .overflowMode) {
                 Set([value])
             } else {
-                try Set(container.decodeIfPresent([AdaptyUIConfiguration.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
+                try Set(container.decodeIfPresent([VC.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
             }
         let textAttributes = try Schema.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil

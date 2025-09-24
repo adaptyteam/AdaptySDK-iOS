@@ -1,5 +1,5 @@
 //
-//  Unit.swift
+//  VC.Unit.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 27.03.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum Unit: Sendable {
         package static let zero = Unit.point(0.0)
         case point(Double)
@@ -16,7 +16,7 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.Unit: Hashable {
+extension VC.Unit: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .point(value):
@@ -46,9 +46,9 @@ extension AdaptyUIConfiguration.Unit: Hashable {
     }
 }
 
-extension AdaptyUIConfiguration.Unit.SafeArea: Codable {}
+extension VC.Unit.SafeArea: Codable {}
 
-extension AdaptyUIConfiguration.Unit: Codable {
+extension VC.Unit: Codable {
     enum CodingKeys: String, CodingKey {
         case value
         case unit

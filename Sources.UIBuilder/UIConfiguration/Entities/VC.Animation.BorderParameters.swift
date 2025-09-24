@@ -1,5 +1,5 @@
 //
-//  Animation.BorderParameters.swift
+//  VC.Animation.BorderParameters.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 04.04.2025.
@@ -7,18 +7,18 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     struct BorderParameters: Sendable, Hashable {
-        package let color: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>>?
-        package let thickness: AdaptyUIConfiguration.Animation.Range<Double>?
+        package let color: VC.Animation.Range<VC.Mode<VC.Filling>>?
+        package let thickness: VC.Animation.Range<Double>?
     }
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Animation.BorderParameters {
+package extension VC.Animation.BorderParameters {
     static func create(
-        color: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>>? = nil,
-        thickness: AdaptyUIConfiguration.Animation.Range<Double>? = nil
+        color: VC.Animation.Range<VC.Mode<VC.Filling>>? = nil,
+        thickness: VC.Animation.Range<Double>? = nil
     ) -> Self {
         .init(
             color: color,

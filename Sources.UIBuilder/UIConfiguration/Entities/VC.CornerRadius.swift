@@ -1,5 +1,5 @@
 //
-//  CornerRadius.swift
+//  VC.CornerRadius.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 03.07.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct CornerRadius: Sendable, Hashable {
         static let defaultValue: Double = 0.0
         package let topLeading: Double
@@ -25,7 +25,7 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.CornerRadius {
+package extension VC.CornerRadius {
     static func create(
         same: Double = defaultValue
     ) -> Self {
@@ -48,8 +48,8 @@ package extension AdaptyUIConfiguration.CornerRadius {
 }
 #endif
 
-package extension AdaptyUIConfiguration.CornerRadius {
-    static let zero = AdaptyUIConfiguration.CornerRadius(same: 0.0)
+package extension VC.CornerRadius {
+    static let zero = VC.CornerRadius(same: 0.0)
     init(same value: Double) {
         self.init(topLeading: value, topTrailing: value, bottomTrailing: value, bottomLeading: value)
     }
@@ -63,7 +63,7 @@ package extension AdaptyUIConfiguration.CornerRadius {
     }
 }
 
-extension AdaptyUIConfiguration.CornerRadius: Codable {
+extension VC.CornerRadius: Codable {
     enum CodingKeys: String, CodingKey {
         case topLeading = "top_leading"
         case topTrailing = "top_trailing"
@@ -73,7 +73,7 @@ extension AdaptyUIConfiguration.CornerRadius: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        let defaultValue = AdaptyUIConfiguration.CornerRadius.defaultValue
+        let defaultValue = VC.CornerRadius.defaultValue
 
         if let value = try? container.decode(Double.self) {
             self.init(same: value)

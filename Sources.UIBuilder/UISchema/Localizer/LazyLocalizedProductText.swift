@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct LazyLocalizedProductText: Sendable, Hashable {
         package let adaptyProductId: String
         private let suffix: String?
@@ -85,7 +85,7 @@ private extension Schema.Localizer {
         byPaymentMode paymentMode: PaymentModeValue = nil,
         suffix: String?,
         defaultTextAttributes: Schema.TextAttributes?
-    ) -> AdaptyUIConfiguration.RichText {
+    ) -> VC.RichText {
         if let value = richText(
             stringId: Schema.StringId.Product.calculate(
                 adaptyProductId: adaptyProductId,

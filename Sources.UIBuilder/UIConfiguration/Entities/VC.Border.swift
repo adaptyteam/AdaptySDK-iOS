@@ -1,5 +1,5 @@
 //
-//  Border.swift
+//  VC.Border.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 27.03.2024
@@ -7,10 +7,10 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Border: Sendable, Hashable {
         static let `default` = Border(
-            filling: .same(.solidColor(AdaptyUIConfiguration.Color.transparent)),
+            filling: .same(.solidColor(VC.Color.transparent)),
             thickness: 1.0
         )
 
@@ -20,9 +20,9 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Border {
+package extension VC.Border {
     static func create(
-        filling: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling> = `default`.filling,
+        filling: VC.Mode<VC.Filling> = `default`.filling,
         thickness: Double = `default`.thickness
     ) -> Self {
         .init(filling: filling, thickness: thickness)

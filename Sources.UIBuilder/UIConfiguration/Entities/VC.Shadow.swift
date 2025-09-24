@@ -1,5 +1,5 @@
 //
-//  Shadow.swift
+//  VC.Shadow.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 12.03.2025
@@ -7,12 +7,12 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Shadow: Sendable, Hashable {
         static let `default` = Shadow(
-            filling: .same(.solidColor(AdaptyUIConfiguration.Color.transparent)),
+            filling: .same(.solidColor(VC.Color.transparent)),
             blurRadius: 0.0,
-            offset: AdaptyUIConfiguration.Offset.zero
+            offset: VC.Offset.zero
         )
         package let filling: Mode<Filling>
         package let blurRadius: Double
@@ -21,11 +21,11 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-    package extension AdaptyUIConfiguration.Shadow {
+    package extension VC.Shadow {
         static func create(
-            filling: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling> = `default`.filling,
+            filling: VC.Mode<VC.Filling> = `default`.filling,
             blurRadius: Double = `default`.blurRadius,
-            offset: AdaptyUIConfiguration.Offset = `default`.offset
+            offset: VC.Offset = `default`.offset
         ) -> Self {
             .init(
                 filling: filling,

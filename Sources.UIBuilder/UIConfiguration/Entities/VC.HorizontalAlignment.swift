@@ -1,5 +1,5 @@
 //
-//  HorizontalAlignment.swift
+//  VC.HorizontalAlignment.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 29.06.2023
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package enum HorizontalAlignment: String {
+package extension VC {
+    enum HorizontalAlignment: String {
         case leading
         case trailing
         case left
@@ -18,4 +18,4 @@ extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.HorizontalAlignment: Codable {}
+extension VC.HorizontalAlignment: Codable {}

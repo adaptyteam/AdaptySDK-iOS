@@ -1,5 +1,5 @@
 //
-//  GridItem.swift
+//  VC.GridItem.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 23.05.2024
@@ -7,26 +7,26 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct GridItem: Sendable, Hashable {
+package extension VC {
+    struct GridItem: Sendable, Hashable {
         static let defaultHorizontalAlignment: HorizontalAlignment = .center
         static let defaultVerticalAlignment: VerticalAlignment = .center
 
         package let length: Length
-        package let horizontalAlignment: AdaptyUIConfiguration.HorizontalAlignment
-        package let verticalAlignment: AdaptyUIConfiguration.VerticalAlignment
-        package let content: AdaptyUIConfiguration.Element
+        package let horizontalAlignment: VC.HorizontalAlignment
+        package let verticalAlignment: VC.VerticalAlignment
+        package let content: VC.Element
     }
 }
 
-extension AdaptyUIConfiguration.GridItem {
-    package enum Length: Sendable {
-        case fixed(AdaptyUIConfiguration.Unit)
+package extension VC.GridItem {
+    enum Length: Sendable {
+        case fixed(VC.Unit)
         case weight(Int)
     }
 }
 
-extension AdaptyUIConfiguration.GridItem.Length: Hashable {
+extension VC.GridItem.Length: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fixed(value):
@@ -40,12 +40,12 @@ extension AdaptyUIConfiguration.GridItem.Length: Hashable {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.GridItem {
+package extension VC.GridItem {
     static func create(
         length: Length,
-        horizontalAlignment: AdaptyUIConfiguration.HorizontalAlignment = defaultHorizontalAlignment,
-        verticalAlignment: AdaptyUIConfiguration.VerticalAlignment = defaultVerticalAlignment,
-        content: AdaptyUIConfiguration.Element
+        horizontalAlignment: VC.HorizontalAlignment = defaultHorizontalAlignment,
+        verticalAlignment: VC.VerticalAlignment = defaultVerticalAlignment,
+        content: VC.Element
     ) -> Self {
         .init(
             length: length,

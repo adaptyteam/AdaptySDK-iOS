@@ -8,14 +8,15 @@
 import Foundation
 
 extension Schema {
-    typealias Unit = AdaptyUIConfiguration.Unit
-    typealias Offset = AdaptyUIConfiguration.Offset
+    typealias Unit = VC.Unit
+    typealias Offset = VC.Offset
+
     enum Animation: Sendable {
-        typealias Range = AdaptyUIConfiguration.Animation.Range
-        typealias Timeline = AdaptyUIConfiguration.Animation.Timeline
-        typealias RotationParameters = AdaptyUIConfiguration.Animation.RotationParameters
-        typealias ScaleParameters = AdaptyUIConfiguration.Animation.ScaleParameters
-        typealias BoxParameters = AdaptyUIConfiguration.Animation.BoxParameters
+        typealias Range = VC.Animation.Range
+        typealias Timeline = VC.Animation.Timeline
+        typealias RotationParameters = VC.Animation.RotationParameters
+        typealias ScaleParameters = VC.Animation.ScaleParameters
+        typealias BoxParameters = VC.Animation.BoxParameters
 
         case opacity(Timeline, Animation.Range<Double>)
         case offset(Timeline, Animation.Range<Offset>)
@@ -29,7 +30,7 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func animation(_ from: Schema.Animation) throws -> AdaptyUIConfiguration.Animation {
+    func animation(_ from: Schema.Animation) throws -> VC.Animation {
         switch from {
         case let .opacity(timeline, value):
             .opacity(timeline, value)
@@ -50,7 +51,7 @@ extension Schema.Localizer {
         }
     }
 
-    func animationFillingValue(_ from: Schema.Animation.Range<String>) throws -> AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>> {
+    func animationFillingValue(_ from: Schema.Animation.Range<String>) throws -> VC.Animation.Range<VC.Mode<VC.Filling>> {
         try .init(
             start: filling(from.start),
             end: filling(from.end)

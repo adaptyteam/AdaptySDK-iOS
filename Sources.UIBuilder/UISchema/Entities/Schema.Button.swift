@@ -12,12 +12,12 @@ extension Schema {
         let actions: [Schema.Action]
         let normalState: Schema.Element
         let selectedState: Schema.Element?
-        let selectedCondition: AdaptyUIConfiguration.StateCondition?
+        let selectedCondition: VC.StateCondition?
     }
 }
 
 extension Schema.Localizer {
-    func button(_ from: Schema.Button) throws -> AdaptyUIConfiguration.Button {
+    func button(_ from: Schema.Button) throws -> VC.Button {
         try .init(
             actions: from.actions.map(action),
             normalState: element(from.normalState),
@@ -26,7 +26,7 @@ extension Schema.Localizer {
         )
     }
 
-    func buttonAction(_ from: AdaptyUIConfiguration.Action) -> AdaptyUIConfiguration.Action {
+    func buttonAction(_ from: VC.Action) -> VC.Action {
         guard case let .openUrl(stringId) = from else { return from }
         return .openUrl(urlIfPresent(stringId))
     }
@@ -52,7 +52,7 @@ extension Schema.Button: Decodable {
             actions: actions,
             normalState: container.decode(Schema.Element.self, forKey: .normalState),
             selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState),
-            selectedCondition: container.decodeIfPresent(AdaptyUIConfiguration.StateCondition.self, forKey: .selectedCondition)
+            selectedCondition: container.decodeIfPresent(VC.StateCondition.self, forKey: .selectedCondition)
         )
     }
 }

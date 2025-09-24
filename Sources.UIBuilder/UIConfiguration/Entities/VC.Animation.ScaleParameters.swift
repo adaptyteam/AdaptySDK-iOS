@@ -1,5 +1,5 @@
 //
-//  Animation.ScaleParameters.swift
+//  VC.Animation.ScaleParameters.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 20.03.2025
@@ -7,18 +7,18 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     struct ScaleParameters: Sendable, Hashable {
-        package let scale: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Point>
-        package let anchor: AdaptyUIConfiguration.Point
+        package let scale: VC.Animation.Range<VC.Point>
+        package let anchor: VC.Point
     }
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Animation.ScaleParameters {
+package extension VC.Animation.ScaleParameters {
     static func create(
-        scale: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Point>,
-        anchor: AdaptyUIConfiguration.Point = .center
+        scale: VC.Animation.Range<VC.Point>,
+        anchor: VC.Point = .center
     ) -> Self {
         .init(
             scale: scale,
@@ -28,7 +28,7 @@ package extension AdaptyUIConfiguration.Animation.ScaleParameters {
 }
 #endif
 
-extension AdaptyUIConfiguration.Animation.ScaleParameters: Codable {
+extension VC.Animation.ScaleParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case scale
         case anchor
@@ -36,8 +36,8 @@ extension AdaptyUIConfiguration.Animation.ScaleParameters: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        scale = try container.decode(AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Point>.self, forKey: .scale)
-        anchor = try container.decodeIfPresent(AdaptyUIConfiguration.Point.self, forKey: .anchor) ?? .center
+        scale = try container.decode(VC.Animation.Range<VC.Point>.self, forKey: .scale)
+        anchor = try container.decodeIfPresent(VC.Point.self, forKey: .anchor) ?? .center
     }
 
     package func encode(to encoder: any Encoder) throws {

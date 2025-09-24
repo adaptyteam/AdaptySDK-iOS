@@ -1,5 +1,5 @@
 //
-//  Color.swift
+//  VC.Color.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Color: CustomAsset, Sendable, Hashable {
         static let transparent = Color(customId: nil, data: 0x00000000)
         static let white = Color(customId: nil, data: 0xFFFFFFFF)
@@ -25,14 +25,14 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Color {
+package extension VC.Color {
     static func create(customId: String? = nil, data: UInt64) -> Self {
         .init(customId: customId, data: data)
     }
 }
 #endif
 
-extension AdaptyUIConfiguration.Color: Codable {
+extension VC.Color: Codable {
     static let assetType = "color"
 
     package init(from decoder: Decoder) throws {

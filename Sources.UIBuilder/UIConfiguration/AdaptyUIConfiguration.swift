@@ -25,8 +25,8 @@ package extension AdaptyUIConfiguration {
         locale: String,
         isRightToLeft: Bool = false,
         templateId: String,
-        screen: AdaptyUIConfiguration.Screen,
-        bottomSheets: [String: AdaptyUIConfiguration.BottomSheet] = [:],
+        screen: VC.Screen,
+        bottomSheets: [String: VC.BottomSheet] = [:],
         templateRevision: Int64 = 0,
         selectedProducts: [String: String] = [:]
     ) -> Self {

@@ -9,8 +9,8 @@
 
 import Adapty
 import AdaptyUI
-import UIKit
 import AdaptyUIBuider
+import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyCustomAsset {
@@ -50,11 +50,11 @@ extension AdaptyCustomAsset.Identifiable: Decodable {
 
         switch type {
         case .color:
-            let color = try container.decode(AdaptyUIConfiguration.Color.self, forKey: .value)
+            let color = try container.decode(VC.Color.self, forKey: .value)
             value = .asset(color.asCustomAsset)
 
         case .linearGradient:
-            let gradient = try AdaptyUIConfiguration.ColorGradient(from: decoder)
+            let gradient = try VC.ColorGradient(from: decoder)
             value = .asset(gradient.asCustomAsset)
 
         case .image:

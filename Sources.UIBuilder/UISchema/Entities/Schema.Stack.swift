@@ -9,9 +9,9 @@ import Foundation
 
 extension Schema {
     struct Stack: Sendable {
-        let type: AdaptyUIConfiguration.StackType
-        let horizontalAlignment: AdaptyUIConfiguration.HorizontalAlignment
-        let verticalAlignment: AdaptyUIConfiguration.VerticalAlignment
+        let type: VC.StackType
+        let horizontalAlignment: VC.HorizontalAlignment
+        let verticalAlignment: VC.VerticalAlignment
         let spacing: Double
         let items: [StackItem]
     }
@@ -23,7 +23,7 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    private func stackItem(_ from: Schema.StackItem) throws -> AdaptyUIConfiguration.StackItem {
+    private func stackItem(_ from: Schema.StackItem) throws -> VC.StackItem {
         switch from {
         case let .space(value):
             .space(value)
@@ -32,7 +32,7 @@ extension Schema.Localizer {
         }
     }
 
-    func stack(_ from: Schema.Stack) throws -> AdaptyUIConfiguration.Stack {
+    func stack(_ from: Schema.Stack) throws -> VC.Stack {
         try .init(
             type: from.type,
             horizontalAlignment: from.horizontalAlignment,
@@ -42,6 +42,7 @@ extension Schema.Localizer {
         )
     }
 }
+
 extension Schema.Stack: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
@@ -52,12 +53,12 @@ extension Schema.Stack: Decodable {
     }
 
     init(from decoder: Decoder) throws {
-        let def = AdaptyUIConfiguration.Stack.default
+        let def = VC.Stack.default
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            type: container.decode(AdaptyUIConfiguration.StackType.self, forKey: .type),
-            horizontalAlignment: container.decodeIfPresent(AdaptyUIConfiguration.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
-            verticalAlignment: container.decodeIfPresent(AdaptyUIConfiguration.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
+            type: container.decode(VC.StackType.self, forKey: .type),
+            horizontalAlignment: container.decodeIfPresent(VC.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? def.horizontalAlignment,
+            verticalAlignment: container.decodeIfPresent(VC.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
             items: container.decode([Schema.StackItem].self, forKey: .content)
         )
@@ -90,4 +91,4 @@ extension Schema.StackItem: Decodable {
     }
 }
 
-extension AdaptyUIConfiguration.StackType: Decodable {}
+extension VC.StackType: Decodable {}

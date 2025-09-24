@@ -1,5 +1,5 @@
 //
-//  Point.swift
+//  VC.Point.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 29.06.2023
@@ -7,17 +7,17 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Point: Sendable, Hashable {
         package let x: Double
         package let y: Double
     }
 }
 
-package extension AdaptyUIConfiguration.Point {
-    static let zero = AdaptyUIConfiguration.Point(x: 0.0, y: 0.0)
-    static let one = AdaptyUIConfiguration.Point(x: 1.0, y: 1.0)
-    static let center = AdaptyUIConfiguration.Point(x: 0.5, y: 0.5)
+package extension VC.Point {
+    static let zero = VC.Point(x: 0.0, y: 0.0)
+    static let one = VC.Point(x: 1.0, y: 1.0)
+    static let center = VC.Point(x: 0.5, y: 0.5)
 
     var isZero: Bool {
         x == 0.0 && y == 0.0
@@ -25,7 +25,7 @@ package extension AdaptyUIConfiguration.Point {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Point {
+package extension VC.Point {
     static func create(
         x: Double = 0.0,
         y: Double = 0.0
@@ -38,7 +38,7 @@ package extension AdaptyUIConfiguration.Point {
 }
 #endif
 
-extension AdaptyUIConfiguration.Point: Codable {
+extension VC.Point: Codable {
     enum CodingKeys: String, CodingKey {
         case x
         case y

@@ -1,5 +1,5 @@
 //
-//  Mode.swift
+//  VC.Mode.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 30.08.2024
@@ -8,7 +8,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum Mode<T>: Sendable, Hashable where T: Sendable, T: Hashable {
         case same(T)
         case different(light: T, dark: T)

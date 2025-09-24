@@ -1,5 +1,5 @@
 //
-//  VideoData.swift
+//  VC.VideoData.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 24.07.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct VideoData: CustomAsset, Sendable {
         package let customId: String?
         package let url: URL
@@ -16,16 +16,16 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.VideoData {
-    static func create(customId: String? = nil, url: URL, image: AdaptyUIConfiguration.ImageData) -> Self {
+package extension VC.VideoData {
+    static func create(customId: String? = nil, url: URL, image: VC.ImageData) -> Self {
         .init(customId: customId, url: url, image: image)
     }
 }
 #endif
 
-extension AdaptyUIConfiguration.VideoData: Hashable {}
+extension VC.VideoData: Hashable {}
 
-extension AdaptyUIConfiguration.VideoData: Codable {
+extension VC.VideoData: Codable {
     static let assetType = "video"
 
     private enum CodingKeys: String, CodingKey {
@@ -40,7 +40,7 @@ extension AdaptyUIConfiguration.VideoData: Codable {
 
         customId = try container.decodeIfPresent(String.self, forKey: .customId)
         url = try container.decode(URL.self, forKey: .url)
-        image = try container.decode(AdaptyUIConfiguration.ImageData.self, forKey: .image)
+        image = try container.decode(VC.ImageData.self, forKey: .image)
     }
 
     package func encode(to encoder: Encoder) throws {

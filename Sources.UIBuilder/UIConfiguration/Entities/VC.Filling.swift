@@ -1,5 +1,5 @@
 //
-//  Filling.swift
+//  VC.Filling.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 30.06.2023
@@ -7,14 +7,14 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum Filling: Sendable {
         static let `default` = Filling.solidColor(Color.black)
 
-        case solidColor(AdaptyUIConfiguration.Color)
-        case colorGradient(AdaptyUIConfiguration.ColorGradient)
+        case solidColor(VC.Color)
+        case colorGradient(VC.ColorGradient)
 
-        package var asSolidColor: AdaptyUIConfiguration.Color? {
+        package var asSolidColor: VC.Color? {
             switch self {
             case let .solidColor(value): value
             default: nil
@@ -23,7 +23,7 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.Filling: Hashable {
+extension VC.Filling: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .solidColor(value):
@@ -36,7 +36,7 @@ extension AdaptyUIConfiguration.Filling: Hashable {
     }
 }
 
-package extension AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling> {
+package extension VC.Mode<VC.Filling> {
     var hasColorGradient: Bool {
         switch self {
         case .same(.solidColor), .different(light: .solidColor, dark: .solidColor):
@@ -46,7 +46,7 @@ package extension AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling> {
         }
     }
 
-    var asSolidColor: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Color>? {
+    var asSolidColor: VC.Mode<VC.Color>? {
         switch self {
         case let .same(.solidColor(value)):
             .same(value)
@@ -58,9 +58,9 @@ package extension AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling> {
     }
 }
 
-extension AdaptyUIConfiguration.Filling: Codable {
+extension VC.Filling: Codable {
     static func assetType(_ type: String) -> Bool {
-        type == AdaptyUIConfiguration.Color.assetType || AdaptyUIConfiguration.ColorGradient.assetType(type)
+        type == VC.Color.assetType || VC.ColorGradient.assetType(type)
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -73,13 +73,13 @@ extension AdaptyUIConfiguration.Filling: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         switch try container.decode(String.self, forKey: .type) {
-        case AdaptyUIConfiguration.Color.assetType:
+        case VC.Color.assetType:
             self = try .solidColor(.init(
                 customId: container.decodeIfPresent(String.self, forKey: .customId),
-                data: container.decode(AdaptyUIConfiguration.Color.self, forKey: .value).data
+                data: container.decode(VC.Color.self, forKey: .value).data
             ))
-        case let type where AdaptyUIConfiguration.ColorGradient.assetType(type):
-            self = try .colorGradient(AdaptyUIConfiguration.ColorGradient(from: decoder))
+        case let type where VC.ColorGradient.assetType(type):
+            self = try .colorGradient(VC.ColorGradient(from: decoder))
         default:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.type], debugDescription: "unknown color assset type"))
         }
@@ -89,7 +89,7 @@ extension AdaptyUIConfiguration.Filling: Codable {
         switch self {
         case let .solidColor(color):
             var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(AdaptyUIConfiguration.Color.assetType, forKey: .type)
+            try container.encode(VC.Color.assetType, forKey: .type)
             try container.encodeIfPresent(color.customId, forKey: .customId)
             try container.encode(color, forKey: .value)
         case let .colorGradient(gradient):

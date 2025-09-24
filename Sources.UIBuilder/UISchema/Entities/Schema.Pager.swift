@@ -9,22 +9,22 @@ import Foundation
 
 extension Schema {
     struct Pager: Sendable {
-        let pageWidth: AdaptyUIConfiguration.Pager.Length
-        let pageHeight: AdaptyUIConfiguration.Pager.Length
-        let pagePadding: AdaptyUIConfiguration.EdgeInsets
+        let pageWidth: VC.Pager.Length
+        let pageHeight: VC.Pager.Length
+        let pagePadding: VC.EdgeInsets
         let spacing: Double
         let content: [Schema.Element]
         let pageControl: Schema.Pager.PageControl?
-        let animation: AdaptyUIConfiguration.Pager.Animation?
-        let interactionBehavior: AdaptyUIConfiguration.Pager.InteractionBehavior
+        let animation: VC.Pager.Animation?
+        let interactionBehavior: VC.Pager.InteractionBehavior
     }
 }
 
 extension Schema.Pager {
     struct PageControl: Sendable, Hashable {
-        let layout: AdaptyUIConfiguration.Pager.PageControl.Layout
-        let verticalAlignment: AdaptyUIConfiguration.VerticalAlignment
-        let padding: AdaptyUIConfiguration.EdgeInsets
+        let layout: VC.Pager.PageControl.Layout
+        let verticalAlignment: VC.VerticalAlignment
+        let padding: VC.EdgeInsets
         let dotSize: Double
         let spacing: Double
         let colorAssetId: String?
@@ -33,7 +33,7 @@ extension Schema.Pager {
 }
 
 extension Schema.Localizer {
-    func pager(_ from: Schema.Pager) throws -> AdaptyUIConfiguration.Pager {
+    func pager(_ from: Schema.Pager) throws -> VC.Pager {
         try .init(
             pageWidth: from.pageWidth,
             pageHeight: from.pageHeight,
@@ -46,15 +46,15 @@ extension Schema.Localizer {
         )
     }
 
-    private func pageControl(_ from: Schema.Pager.PageControl) -> AdaptyUIConfiguration.Pager.PageControl {
+    private func pageControl(_ from: Schema.Pager.PageControl) -> VC.Pager.PageControl {
         .init(
             layout: from.layout,
             verticalAlignment: from.verticalAlignment,
             padding: from.padding,
             dotSize: from.dotSize,
             spacing: from.spacing,
-            color: from.colorAssetId.flatMap { try? color($0) } ?? AdaptyUIConfiguration.Pager.PageControl.default.color,
-            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? AdaptyUIConfiguration.Pager.PageControl.default.selectedColor
+            color: from.colorAssetId.flatMap { try? color($0) } ?? VC.Pager.PageControl.default.color,
+            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? VC.Pager.PageControl.default.selectedColor
         )
     }
 }
@@ -73,15 +73,15 @@ extension Schema.Pager: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let def = AdaptyUIConfiguration.Pager.default
-        pageWidth = try container.decodeIfPresent(AdaptyUIConfiguration.Pager.Length.self, forKey: .pageWidth) ?? def.pageWidth
-        pageHeight = try container.decodeIfPresent(AdaptyUIConfiguration.Pager.Length.self, forKey: .pageHeight) ?? def.pageHeight
-        pagePadding = try container.decodeIfPresent(AdaptyUIConfiguration.EdgeInsets.self, forKey: .pagePadding) ?? def.pagePadding
+        let def = VC.Pager.default
+        pageWidth = try container.decodeIfPresent(VC.Pager.Length.self, forKey: .pageWidth) ?? def.pageWidth
+        pageHeight = try container.decodeIfPresent(VC.Pager.Length.self, forKey: .pageHeight) ?? def.pageHeight
+        pagePadding = try container.decodeIfPresent(VC.EdgeInsets.self, forKey: .pagePadding) ?? def.pagePadding
         spacing = try container.decodeIfPresent(Double.self, forKey: .spacing) ?? def.spacing
         content = try container.decode([Schema.Element].self, forKey: .content)
         pageControl = try container.decodeIfPresent(Schema.Pager.PageControl.self, forKey: .pageControl)
-        animation = try container.decodeIfPresent(AdaptyUIConfiguration.Pager.Animation.self, forKey: .animation)
-        interactionBehavior = try container.decodeIfPresent(AdaptyUIConfiguration.Pager.InteractionBehavior.self, forKey: .interactionBehavior) ?? def.interactionBehavior
+        animation = try container.decodeIfPresent(VC.Pager.Animation.self, forKey: .animation)
+        interactionBehavior = try container.decodeIfPresent(VC.Pager.InteractionBehavior.self, forKey: .interactionBehavior) ?? def.interactionBehavior
     }
 }
 
@@ -98,10 +98,10 @@ extension Schema.Pager.PageControl: Decodable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let def = AdaptyUIConfiguration.Pager.PageControl.default
-        layout = try container.decodeIfPresent(AdaptyUIConfiguration.Pager.PageControl.Layout.self, forKey: .layout) ?? def.layout
-        verticalAlignment = try container.decodeIfPresent(AdaptyUIConfiguration.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment
-        padding = try container.decodeIfPresent(AdaptyUIConfiguration.EdgeInsets.self, forKey: .padding) ?? def.padding
+        let def = VC.Pager.PageControl.default
+        layout = try container.decodeIfPresent(VC.Pager.PageControl.Layout.self, forKey: .layout) ?? def.layout
+        verticalAlignment = try container.decodeIfPresent(VC.VerticalAlignment.self, forKey: .verticalAlignment) ?? def.verticalAlignment
+        padding = try container.decodeIfPresent(VC.EdgeInsets.self, forKey: .padding) ?? def.padding
         dotSize = try container.decodeIfPresent(Double.self, forKey: .dotSize) ?? def.dotSize
         spacing = try container.decodeIfPresent(Double.self, forKey: .spacing) ?? def.spacing
         colorAssetId = try container.decodeIfPresent(String.self, forKey: .colorAssetId)
@@ -109,13 +109,13 @@ extension Schema.Pager.PageControl: Decodable {
     }
 }
 
-extension AdaptyUIConfiguration.Pager.Length: Decodable {
+extension VC.Pager.Length: Decodable {
     enum CodingKeys: String, CodingKey {
         case parent
     }
 
     package init(from decoder: Decoder) throws {
-        if let value = try? decoder.singleValueContainer().decode(AdaptyUIConfiguration.Unit.self) {
+        if let value = try? decoder.singleValueContainer().decode(VC.Unit.self) {
             self = .fixed(value)
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)

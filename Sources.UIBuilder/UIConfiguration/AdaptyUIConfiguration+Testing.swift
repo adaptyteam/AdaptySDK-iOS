@@ -21,10 +21,10 @@ package extension AdaptyUIConfiguration {
         selectedProducts: [String: String] = [:]
     ) throws -> Self {
         let colors = colors
-            .mapValues { AdaptyUISchema.Asset.filling($0) }
+            .mapValues { Schema.Asset.filling($0) }
 
         let assets = Dictionary(
-            images.map { ($0, AdaptyUISchema.Asset.image(
+            images.map { ($0, Schema.Asset.image(
                 .url(
                     customId: $0,
                     URL(string: "https://unknown.image.com")!,
@@ -37,8 +37,8 @@ package extension AdaptyUIConfiguration {
         let data = content.data(using: .utf8) ?? Data()
         let jsonDecoder = AdaptyUISchema.jsonDecoder
         let screen =
-            if let element = try? jsonDecoder.decode(AdaptyUISchema.Element.self, from: data) {
-                AdaptyUISchema.Screen(
+            if let element = try? jsonDecoder.decode(Schema.Element.self, from: data) {
+                Schema.Screen(
                     backgroundAssetId: "$black",
                     cover: nil,
                     content: element,
@@ -47,7 +47,7 @@ package extension AdaptyUIConfiguration {
                     selectedAdaptyProductId: nil
                 )
             } else {
-                try jsonDecoder.decode(AdaptyUISchema.Screen.self, from: data)
+                try jsonDecoder.decode(Schema.Screen.self, from: data)
             }
 
         let schema = try AdaptyUISchema(
@@ -73,7 +73,7 @@ package extension AdaptyUIConfiguration {
             defaultLocalization: nil,
             defaultScreen: screen,
             screens: [:],
-            referencedElements: [String: AdaptyUISchema.Element](screen.referencedElements, uniquingKeysWith: { _, _ in
+            referencedElements: [String: Schema.Element](screen.referencedElements, uniquingKeysWith: { _, _ in
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate element_id"))
             }),
             selectedProducts: selectedProducts

@@ -1,5 +1,5 @@
 //
-//  Box.swift
+//  VC.Box.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 25.03.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Box: Sendable, Hashable {
         static let defaultHorizontalAlignment: HorizontalAlignment = .center
         static let defaultVerticalAlignment: VerticalAlignment = .center
@@ -20,16 +20,16 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-package extension AdaptyUIConfiguration.Box {
+package extension VC.Box {
     enum Length: Sendable {
-        case fixed(AdaptyUIConfiguration.Unit)
-        case flexible(min: AdaptyUIConfiguration.Unit?, max: AdaptyUIConfiguration.Unit?)
-        case shrinkable(min: AdaptyUIConfiguration.Unit, max: AdaptyUIConfiguration.Unit?)
+        case fixed(VC.Unit)
+        case flexible(min: VC.Unit?, max: VC.Unit?)
+        case shrinkable(min: VC.Unit, max: VC.Unit?)
         case fillMax
     }
 }
 
-extension AdaptyUIConfiguration.Box.Length: Hashable {
+extension VC.Box.Length: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .fixed(value):
@@ -50,13 +50,13 @@ extension AdaptyUIConfiguration.Box.Length: Hashable {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Box {
+package extension VC.Box {
     static func create(
         width: Length? = nil,
         height: Length? = nil,
-        horizontalAlignment: AdaptyUIConfiguration.HorizontalAlignment = defaultHorizontalAlignment,
-        verticalAlignment: AdaptyUIConfiguration.VerticalAlignment = defaultVerticalAlignment,
-        content: AdaptyUIConfiguration.Element? = nil
+        horizontalAlignment: VC.HorizontalAlignment = defaultHorizontalAlignment,
+        verticalAlignment: VC.VerticalAlignment = defaultVerticalAlignment,
+        content: VC.Element? = nil
     ) -> Self {
         .init(
             width: width,

@@ -1,5 +1,5 @@
 //
-//  ShapeType.swift
+//  VC.ShapeType.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 03.07.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum ShapeType: Sendable {
         case rectangle(cornerRadius: CornerRadius)
         case circle
@@ -16,7 +16,7 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.ShapeType: Hashable {
+extension VC.ShapeType: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .rectangle(value):
@@ -32,7 +32,7 @@ extension AdaptyUIConfiguration.ShapeType: Hashable {
     }
 }
 
-extension AdaptyUIConfiguration.ShapeType: Codable {
+extension VC.ShapeType: Codable {
     enum Types: String {
         case circle
         case rectangle = "rect"
@@ -50,7 +50,7 @@ extension AdaptyUIConfiguration.ShapeType: Codable {
         case .curveDown:
             self = .curveDown
         case .rectangle:
-            self =  .rectangle(cornerRadius: AdaptyUIConfiguration.CornerRadius.zero)
+            self = .rectangle(cornerRadius: VC.CornerRadius.zero)
         case .circle:
             self = .circle
         }

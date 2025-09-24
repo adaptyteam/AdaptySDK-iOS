@@ -1,5 +1,5 @@
 //
-//  ColorGradient.swift
+//  VC.ColorGradient.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 29.06.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct ColorGradient: CustomAsset, Hashable, Sendable {
         package let customId: String?
         package let kind: Kind
@@ -17,9 +17,9 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-package extension AdaptyUIConfiguration.ColorGradient {
+package extension VC.ColorGradient {
     struct Item: Hashable, Sendable {
-        package let color: AdaptyUIConfiguration.Color
+        package let color: VC.Color
         package let p: Double
     }
 
@@ -31,13 +31,13 @@ package extension AdaptyUIConfiguration.ColorGradient {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.ColorGradient {
+package extension VC.ColorGradient {
     static func create(
         customId: String? = nil,
-        kind: AdaptyUIConfiguration.ColorGradient.Kind,
-        start: AdaptyUIConfiguration.Point,
-        end: AdaptyUIConfiguration.Point,
-        items: [AdaptyUIConfiguration.ColorGradient.Item]
+        kind: VC.ColorGradient.Kind,
+        start: VC.Point,
+        end: VC.Point,
+        items: [VC.ColorGradient.Item]
     ) -> Self {
         .init(
             customId: customId,
@@ -49,9 +49,9 @@ package extension AdaptyUIConfiguration.ColorGradient {
     }
 }
 
-package extension AdaptyUIConfiguration.ColorGradient.Item {
+package extension VC.ColorGradient.Item {
     static func create(
-        color: AdaptyUIConfiguration.Color,
+        color: VC.Color,
         p: Double
     ) -> Self {
         .init(
@@ -62,7 +62,7 @@ package extension AdaptyUIConfiguration.ColorGradient.Item {
 }
 #endif
 
-extension AdaptyUIConfiguration.ColorGradient: Codable {
+extension VC.ColorGradient: Codable {
     static func assetType(_ type: String) -> Bool {
         ContentType(rawValue: type) != nil
     }
@@ -79,19 +79,19 @@ extension AdaptyUIConfiguration.ColorGradient: Codable {
         let x1: Double
         let y1: Double
 
-        init(start: AdaptyUIConfiguration.Point, end: AdaptyUIConfiguration.Point) {
+        init(start: VC.Point, end: VC.Point) {
             x0 = start.x
             y0 = start.y
             x1 = end.x
             y1 = end.y
         }
 
-        var start: AdaptyUIConfiguration.Point {
-            AdaptyUIConfiguration.Point(x: x0, y: y0)
+        var start: VC.Point {
+            VC.Point(x: x0, y: y0)
         }
 
-        var end: AdaptyUIConfiguration.Point {
-            AdaptyUIConfiguration.Point(x: x1, y: y1)
+        var end: VC.Point {
+            VC.Point(x: x1, y: y1)
         }
     }
 
@@ -112,9 +112,9 @@ extension AdaptyUIConfiguration.ColorGradient: Codable {
         customId = try container.decodeIfPresent(String.self, forKey: .customId)
         kind =
             switch try container.decode(String.self, forKey: .type) {
-            case AdaptyUIConfiguration.ColorGradient.ContentType.colorRadialGradient.rawValue:
+            case VC.ColorGradient.ContentType.colorRadialGradient.rawValue:
                 .radial
-            case AdaptyUIConfiguration.ColorGradient.ContentType.colorConicGradient.rawValue:
+            case VC.ColorGradient.ContentType.colorConicGradient.rawValue:
                 .conic
             default:
                 .linear
@@ -130,16 +130,16 @@ extension AdaptyUIConfiguration.ColorGradient: Codable {
 
         switch kind {
         case .radial:
-            try container.encode(AdaptyUIConfiguration.ColorGradient.ContentType.colorRadialGradient.rawValue, forKey: .type)
+            try container.encode(VC.ColorGradient.ContentType.colorRadialGradient.rawValue, forKey: .type)
         case .conic:
-            try container.encode(AdaptyUIConfiguration.ColorGradient.ContentType.colorConicGradient.rawValue, forKey: .type)
+            try container.encode(VC.ColorGradient.ContentType.colorConicGradient.rawValue, forKey: .type)
         case .linear:
-            try container.encode(AdaptyUIConfiguration.ColorGradient.ContentType.colorLinearGradient.rawValue, forKey: .type)
+            try container.encode(VC.ColorGradient.ContentType.colorLinearGradient.rawValue, forKey: .type)
         }
     }
 }
 
-extension AdaptyUIConfiguration.ColorGradient.Item: Codable {
+extension VC.ColorGradient.Item: Codable {
     enum CodingKeys: String, CodingKey {
         case color
         case p
@@ -147,7 +147,7 @@ extension AdaptyUIConfiguration.ColorGradient.Item: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        color = try container.decode(AdaptyUIConfiguration.Color.self, forKey: .color)
+        color = try container.decode(VC.Color.self, forKey: .color)
         p = try container.decode(Double.self, forKey: .p)
     }
 

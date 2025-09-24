@@ -1,5 +1,5 @@
 //
-//  Color+HexString.swift
+//  VC.Color+HexString.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -7,10 +7,10 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration.Color {
-    package var asHexString: String { String(format: "#%08x", data) }
+package extension VC.Color {
+    var asHexString: String { String(format: "#%08x", data) }
 
-    package init(customId: String?, hex: String) throws {
+    init(customId: String?, hex: String) throws {
         guard hex.hasPrefix("#") else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Wrong format of hex color string, don`t found prefix '#'"))
         }

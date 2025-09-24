@@ -1,5 +1,5 @@
 //
-//  Toggle.swift
+//  VC.Toggle.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 30.05.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Toggle: Sendable, Hashable {
         package let onActions: [Action]
         package let offActions: [Action]
@@ -17,12 +17,12 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Toggle {
+package extension VC.Toggle {
     static func create(
-        onActions: [AdaptyUIConfiguration.Action],
-        offActions: [AdaptyUIConfiguration.Action],
-        onCondition: AdaptyUIConfiguration.StateCondition,
-        color: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Color>? = nil
+        onActions: [VC.Action],
+        offActions: [VC.Action],
+        onCondition: VC.StateCondition,
+        color: VC.Mode<VC.Color>? = nil
     ) -> Self {
         .init(
             onActions: onActions,
@@ -36,7 +36,7 @@ package extension AdaptyUIConfiguration.Toggle {
         sectionId: String,
         onIndex: Int = 0,
         offIndex: Int = -1,
-        color: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Color>? = nil
+        color: VC.Mode<VC.Color>? = nil
     ) -> Self {
         .init(
             onActions: [.switchSection(id: sectionId, index: onIndex)],

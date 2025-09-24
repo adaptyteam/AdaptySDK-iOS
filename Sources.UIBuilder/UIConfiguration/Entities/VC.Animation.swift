@@ -1,5 +1,5 @@
 //
-//  Animation.swift
+//  VC.Animation.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 16.01.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum Animation: Sendable {
         case opacity(Timeline, Animation.Range<Double>)
         case offset(Timeline, Animation.Range<Offset>)
@@ -20,7 +20,7 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     var timeline: Timeline {
         switch self {
         case let .opacity(timeline, _):
@@ -43,7 +43,7 @@ package extension AdaptyUIConfiguration.Animation {
     }
 }
 
-extension AdaptyUIConfiguration.Animation: Hashable {
+extension VC.Animation: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .opacity(timeline, value):

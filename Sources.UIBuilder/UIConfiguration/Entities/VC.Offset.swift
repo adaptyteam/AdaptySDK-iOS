@@ -1,5 +1,5 @@
 //
-//  Offset.swift
+//  VC.Offset.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 25.03.2024
@@ -7,16 +7,16 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Offset: Sendable, Hashable {
         package let x: Unit
         package let y: Unit
     }
 }
 
-package extension AdaptyUIConfiguration.Offset {
-    static let zero = AdaptyUIConfiguration.Offset(x: .zero, y: .zero)
-    static let one = AdaptyUIConfiguration.Offset(x: .point(1.0), y: .point(1.0))
+package extension VC.Offset {
+    static let zero = VC.Offset(x: .zero, y: .zero)
+    static let one = VC.Offset(x: .point(1.0), y: .point(1.0))
 
     var isZero: Bool {
         x.isZero && y.isZero
@@ -24,10 +24,10 @@ package extension AdaptyUIConfiguration.Offset {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Offset {
+package extension VC.Offset {
     static func create(
-        x: AdaptyUIConfiguration.Unit = .zero,
-        y: AdaptyUIConfiguration.Unit = .zero
+        x: VC.Unit = .zero,
+        y: VC.Unit = .zero
     ) -> Self {
         .init(
             x: x,
@@ -37,7 +37,7 @@ package extension AdaptyUIConfiguration.Offset {
 }
 #endif
 
-extension AdaptyUIConfiguration.Offset: Codable {
+extension VC.Offset: Codable {
     enum CodingKeys: String, CodingKey {
         case x
         case y
@@ -45,9 +45,9 @@ extension AdaptyUIConfiguration.Offset: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(AdaptyUIConfiguration.Unit.self) {
+        if let value = try? container.decode(VC.Unit.self) {
             self.init(x: .zero, y: value)
-        } else if let values = try? container.decode([AdaptyUIConfiguration.Unit].self) {
+        } else if let values = try? container.decode([VC.Unit].self) {
             switch values.count {
             case 0: self.init(x: .zero, y: .zero)
             case 1: self.init(x: .zero, y: values[0])
@@ -56,8 +56,8 @@ extension AdaptyUIConfiguration.Offset: Codable {
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             try self.init(
-                x: container.decodeIfPresent(AdaptyUIConfiguration.Unit.self, forKey: .x) ?? .zero,
-                y: container.decodeIfPresent(AdaptyUIConfiguration.Unit.self, forKey: .y) ?? .zero
+                x: container.decodeIfPresent(VC.Unit.self, forKey: .x) ?? .zero,
+                y: container.decodeIfPresent(VC.Unit.self, forKey: .y) ?? .zero
             )
         }
     }

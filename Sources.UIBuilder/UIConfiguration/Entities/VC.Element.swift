@@ -1,5 +1,5 @@
 //
-//  Element.swift
+//  VC.Element.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 27.03.2024
@@ -7,42 +7,42 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum Element: Sendable {
         case space(Int)
-        indirect case stack(AdaptyUIConfiguration.Stack, Properties?)
-        case text(AdaptyUIConfiguration.Text, Properties?)
-        case image(AdaptyUIConfiguration.Image, Properties?)
-        case video(AdaptyUIConfiguration.VideoPlayer, Properties?)
-        indirect case button(AdaptyUIConfiguration.Button, Properties?)
-        indirect case box(AdaptyUIConfiguration.Box, Properties?)
-        indirect case row(AdaptyUIConfiguration.Row, Properties?)
-        indirect case column(AdaptyUIConfiguration.Column, Properties?)
-        indirect case section(AdaptyUIConfiguration.Section, Properties?)
-        case toggle(AdaptyUIConfiguration.Toggle, Properties?)
-        case timer(AdaptyUIConfiguration.Timer, Properties?)
-        indirect case pager(AdaptyUIConfiguration.Pager, Properties?)
+        indirect case stack(VC.Stack, Properties?)
+        case text(VC.Text, Properties?)
+        case image(VC.Image, Properties?)
+        case video(VC.VideoPlayer, Properties?)
+        indirect case button(VC.Button, Properties?)
+        indirect case box(VC.Box, Properties?)
+        indirect case row(VC.Row, Properties?)
+        indirect case column(VC.Column, Properties?)
+        indirect case section(VC.Section, Properties?)
+        case toggle(VC.Toggle, Properties?)
+        case timer(VC.Timer, Properties?)
+        indirect case pager(VC.Pager, Properties?)
 
         case unknown(String, Properties?)
     }
 }
 
-package extension AdaptyUIConfiguration.Element {
+package extension VC.Element {
     struct Properties: Sendable, Hashable {
-        static let defaultPadding = AdaptyUIConfiguration.EdgeInsets(same: .point(0))
-        static let defaultOffset = AdaptyUIConfiguration.Offset.zero
+        static let defaultPadding = VC.EdgeInsets(same: .point(0))
+        static let defaultOffset = VC.Offset.zero
         static let defaultOpacity: Double = 1
 
-        package let decorator: AdaptyUIConfiguration.Decorator?
-        package let padding: AdaptyUIConfiguration.EdgeInsets
-        package let offset: AdaptyUIConfiguration.Offset
+        package let decorator: VC.Decorator?
+        package let padding: VC.EdgeInsets
+        package let offset: VC.Offset
 
         package let opacity: Double
-        package let onAppear: [AdaptyUIConfiguration.Animation]
+        package let onAppear: [VC.Animation]
     }
 }
 
-extension AdaptyUIConfiguration.Element: Hashable {
+extension VC.Element: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .space(value):
@@ -104,13 +104,13 @@ extension AdaptyUIConfiguration.Element: Hashable {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Element.Properties {
+package extension VC.Element.Properties {
     static func create(
-        decorator: AdaptyUIConfiguration.Decorator? = nil,
-        padding: AdaptyUIConfiguration.EdgeInsets = AdaptyUIConfiguration.Element.Properties.defaultPadding,
-        offset: AdaptyUIConfiguration.Offset = AdaptyUIConfiguration.Element.Properties.defaultOffset,
-        opacity: Double = AdaptyUIConfiguration.Element.Properties.defaultOpacity,
-        onAppear: [AdaptyUIConfiguration.Animation] = []
+        decorator: VC.Decorator? = nil,
+        padding: VC.EdgeInsets = VC.Element.Properties.defaultPadding,
+        offset: VC.Offset = VC.Element.Properties.defaultOffset,
+        opacity: Double = VC.Element.Properties.defaultOpacity,
+        onAppear: [VC.Animation] = []
     ) -> Self {
         .init(
             decorator: decorator,

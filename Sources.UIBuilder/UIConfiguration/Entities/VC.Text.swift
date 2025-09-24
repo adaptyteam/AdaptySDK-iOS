@@ -1,5 +1,5 @@
 //
-//  Text.swift
+//  VC.Text.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 01.05.2024
@@ -7,9 +7,9 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct Text: Sendable, Hashable {
-        static let `default` = AdaptyUIConfiguration.Text(
+package extension VC {
+    struct Text: Sendable, Hashable {
+        static let `default` = VC.Text(
             value: .text(.empty),
             horizontalAlign: .leading,
             maxRows: nil,
@@ -29,7 +29,7 @@ extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.Text.Value: Hashable {
+extension VC.Text.Value: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .text(value):
@@ -46,12 +46,12 @@ extension AdaptyUIConfiguration.Text.Value: Hashable {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Text {
+package extension VC.Text {
     static func create(
-        text: [AdaptyUIConfiguration.RichText.Item],
-        horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment = `default`.horizontalAlign,
+        text: [VC.RichText.Item],
+        horizontalAlign: VC.HorizontalAlignment = `default`.horizontalAlign,
         maxRows: Int? = `default`.maxRows,
-        overflowMode: Set<AdaptyUIConfiguration.Text.OverflowMode> = `default`.overflowMode
+        overflowMode: Set<VC.Text.OverflowMode> = `default`.overflowMode
     ) -> Self {
         .init(
             value: .text(.create(items: text)),
@@ -62,10 +62,10 @@ package extension AdaptyUIConfiguration.Text {
     }
 
     static func create(
-        text: AdaptyUIConfiguration.RichText,
-        horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment = `default`.horizontalAlign,
+        text: VC.RichText,
+        horizontalAlign: VC.HorizontalAlignment = `default`.horizontalAlign,
         maxRows: Int? = `default`.maxRows,
-        overflowMode: Set<AdaptyUIConfiguration.Text.OverflowMode> = `default`.overflowMode
+        overflowMode: Set<VC.Text.OverflowMode> = `default`.overflowMode
     ) -> Self {
         .init(
             value: .text(text),
@@ -76,10 +76,10 @@ package extension AdaptyUIConfiguration.Text {
     }
 
     static func create(
-        value: AdaptyUIConfiguration.Text.Value,
-        horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment = `default`.horizontalAlign,
+        value: VC.Text.Value,
+        horizontalAlign: VC.HorizontalAlignment = `default`.horizontalAlign,
         maxRows: Int? = `default`.maxRows,
-        overflowMode: Set<AdaptyUIConfiguration.Text.OverflowMode> = `default`.overflowMode
+        overflowMode: Set<VC.Text.OverflowMode> = `default`.overflowMode
     ) -> Self {
         .init(
             value: value,

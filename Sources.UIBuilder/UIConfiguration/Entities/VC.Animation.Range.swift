@@ -1,5 +1,5 @@
 //
-//  Animation.Range.swift
+//  VC.Animation.Range.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 04.04.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     struct Range<T>: Sendable, Hashable where T: Sendable, T: Hashable {
         package let start: T
         package let end: T
@@ -15,7 +15,7 @@ package extension AdaptyUIConfiguration.Animation {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Animation.Range {
+package extension VC.Animation.Range {
     static func create(
         start: T,
         end: T
@@ -28,7 +28,7 @@ package extension AdaptyUIConfiguration.Animation.Range {
 }
 #endif
 
-extension AdaptyUIConfiguration.Animation.Range: Codable where T: Codable {
+extension VC.Animation.Range: Codable where T: Codable {
     enum CodingKeys: String, CodingKey {
         case start
         case end

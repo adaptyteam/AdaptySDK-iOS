@@ -1,5 +1,5 @@
 //
-//  Animation.RotationParameters.swift
+//  VC.Animation.RotationParameters.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 20.03.2025
@@ -7,18 +7,18 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     struct RotationParameters: Sendable, Hashable {
-        package let angle: AdaptyUIConfiguration.Animation.Range<Double>
-        package let anchor: AdaptyUIConfiguration.Point
+        package let angle: VC.Animation.Range<Double>
+        package let anchor: VC.Point
     }
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Animation.RotationParameters {
+package extension VC.Animation.RotationParameters {
     static func create(
-        angle: AdaptyUIConfiguration.Animation.Range<Double>,
-        anchor: AdaptyUIConfiguration.Point = .center
+        angle: VC.Animation.Range<Double>,
+        anchor: VC.Point = .center
     ) -> Self {
         .init(
             angle: angle,
@@ -28,7 +28,7 @@ package extension AdaptyUIConfiguration.Animation.RotationParameters {
 }
 #endif
 
-extension AdaptyUIConfiguration.Animation.RotationParameters: Codable {
+extension VC.Animation.RotationParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case angle
         case anchor
@@ -36,8 +36,8 @@ extension AdaptyUIConfiguration.Animation.RotationParameters: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        angle = try container.decode(AdaptyUIConfiguration.Animation.Range<Double>.self, forKey: .angle)
-        anchor = try container.decodeIfPresent(AdaptyUIConfiguration.Point.self, forKey: .anchor) ?? .center
+        angle = try container.decode(VC.Animation.Range<Double>.self, forKey: .angle)
+        anchor = try container.decodeIfPresent(VC.Point.self, forKey: .anchor) ?? .center
     }
 
     package func encode(to encoder: any Encoder) throws {

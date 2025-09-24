@@ -1,5 +1,5 @@
 //
-//  Timer.swift
+//  VC.Timer.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 01.05.2024
@@ -7,13 +7,13 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct Timer: Sendable, Hashable {
         package let id: String
         package let state: State
         package let format: [Item]
         package let actions: [Action]
-        package let horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment
+        package let horizontalAlign: VC.HorizontalAlignment
 
         package func format(byValue: TimeInterval) -> RichText {
             let index =
@@ -26,7 +26,7 @@ package extension AdaptyUIConfiguration {
             return format[index].value
         }
 
-        init(id: String, state: State, format: [Item], actions: [Action], horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment) {
+        init(id: String, state: State, format: [Item], actions: [Action], horizontalAlign: VC.HorizontalAlignment) {
             self.id = id
             self.state = state
             self.format = format.sorted(by: { $0.from > $1.from })
@@ -54,7 +54,7 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.Timer.State: Hashable {
+extension VC.Timer.State: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .endedAt(value):
@@ -69,13 +69,13 @@ extension AdaptyUIConfiguration.Timer.State: Hashable {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Timer {
+package extension VC.Timer {
     static func create(
         id: String = UUID().uuidString,
         endedAt: Date,
-        format: AdaptyUIConfiguration.RichText,
-        actions: [AdaptyUIConfiguration.Action] = [],
-        horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment = .leading
+        format: VC.RichText,
+        actions: [VC.Action] = [],
+        horizontalAlign: VC.HorizontalAlignment = .leading
     ) -> Self {
         .create(
             id: id,
@@ -90,8 +90,8 @@ package extension AdaptyUIConfiguration.Timer {
         id: String = UUID().uuidString,
         endedAt: Date,
         format: [Item],
-        actions: [AdaptyUIConfiguration.Action] = [],
-        horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment = .leading
+        actions: [VC.Action] = [],
+        horizontalAlign: VC.HorizontalAlignment = .leading
     ) -> Self {
         .init(
             id: id,
@@ -106,9 +106,9 @@ package extension AdaptyUIConfiguration.Timer {
         id: String = UUID().uuidString,
         duration: TimeInterval,
         startBehavior: StartBehavior = .default,
-        format: AdaptyUIConfiguration.RichText,
-        actions: [AdaptyUIConfiguration.Action] = [],
-        horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment = .leading
+        format: VC.RichText,
+        actions: [VC.Action] = [],
+        horizontalAlign: VC.HorizontalAlignment = .leading
     ) -> Self {
         .create(
             id: id,
@@ -125,8 +125,8 @@ package extension AdaptyUIConfiguration.Timer {
         duration: TimeInterval,
         startBehavior: StartBehavior = .default,
         format: [Item],
-        actions: [AdaptyUIConfiguration.Action] = [],
-        horizontalAlign: AdaptyUIConfiguration.HorizontalAlignment = .leading
+        actions: [VC.Action] = [],
+        horizontalAlign: VC.HorizontalAlignment = .leading
     ) -> Self {
         .init(
             id: id,
@@ -138,10 +138,10 @@ package extension AdaptyUIConfiguration.Timer {
     }
 }
 
-package extension AdaptyUIConfiguration.Timer.Item {
+package extension VC.Timer.Item {
     static func create(
         from: TimeInterval,
-        value: AdaptyUIConfiguration.RichText
+        value: VC.RichText
     ) -> Self {
         .init(
             from: from,

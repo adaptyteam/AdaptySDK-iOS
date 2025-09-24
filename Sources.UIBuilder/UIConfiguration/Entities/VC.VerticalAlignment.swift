@@ -1,5 +1,5 @@
 //
-//  VerticalAlignment.swift
+//  VC.VerticalAlignment.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 25.03.2024
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package enum VerticalAlignment: String {
+package extension VC {
+    enum VerticalAlignment: String {
         case top
         case center
         case bottom
@@ -16,4 +16,4 @@ extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.VerticalAlignment: Codable {}
+extension VC.VerticalAlignment: Codable {}

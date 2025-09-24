@@ -1,5 +1,5 @@
 //
-//  Stack.swift
+//  VC.Stack.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 27.03.2024
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct Stack: Sendable, Hashable {
+package extension VC {
+    struct Stack: Sendable, Hashable {
         static let `default` = Stack(
             type: .vertical,
             horizontalAlignment: .center,
@@ -35,19 +35,19 @@ extension AdaptyUIConfiguration {
         }
     }
 
-    package enum StackItem: Sendable {
+    enum StackItem: Sendable {
         case space(Int)
         case element(Element)
     }
 
-    package enum StackType: String {
+    enum StackType: String {
         case vertical = "v_stack"
         case horizontal = "h_stack"
         case z = "z_stack"
     }
 }
 
-extension AdaptyUIConfiguration.StackItem: Hashable {
+extension VC.StackItem: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .space(value):
@@ -61,13 +61,13 @@ extension AdaptyUIConfiguration.StackItem: Hashable {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Stack {
+package extension VC.Stack {
     static func create(
-        type: AdaptyUIConfiguration.StackType = `default`.type,
-        horizontalAlignment: AdaptyUIConfiguration.HorizontalAlignment = `default`.horizontalAlignment,
-        verticalAlignment: AdaptyUIConfiguration.VerticalAlignment = `default`.verticalAlignment,
+        type: VC.StackType = `default`.type,
+        horizontalAlignment: VC.HorizontalAlignment = `default`.horizontalAlignment,
+        verticalAlignment: VC.VerticalAlignment = `default`.verticalAlignment,
         spacing: Double = `default`.spacing,
-        content: [AdaptyUIConfiguration.Element] = []
+        content: [VC.Element] = []
     ) -> Self {
         .init(
             type: type,
@@ -79,13 +79,13 @@ package extension AdaptyUIConfiguration.Stack {
     }
 }
 
-package extension AdaptyUIConfiguration.Stack {
+package extension VC.Stack {
     static func create(
-        type: AdaptyUIConfiguration.StackType = `default`.type,
-        horizontalAlignment: AdaptyUIConfiguration.HorizontalAlignment = `default`.horizontalAlignment,
-        verticalAlignment: AdaptyUIConfiguration.VerticalAlignment = `default`.verticalAlignment,
+        type: VC.StackType = `default`.type,
+        horizontalAlignment: VC.HorizontalAlignment = `default`.horizontalAlignment,
+        verticalAlignment: VC.VerticalAlignment = `default`.verticalAlignment,
         spacing: Double = `default`.spacing,
-        items: [AdaptyUIConfiguration.StackItem] = `default`.items
+        items: [VC.StackItem] = `default`.items
     ) -> Self {
         .init(
             type: type,

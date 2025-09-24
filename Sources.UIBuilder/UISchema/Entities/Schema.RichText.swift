@@ -58,9 +58,9 @@ extension Schema.Localizer {
     func richText(
         stringId: String,
         defaultTextAttributes: Schema.TextAttributes?
-    ) -> AdaptyUIConfiguration.RichText? {
+    ) -> VC.RichText? {
         guard let item = localization?.strings?[stringId] else { return nil }
-        return AdaptyUIConfiguration.RichText(
+        return VC.RichText(
             items: item.value.convert(
                 self,
                 defaultTextAttributes: defaultTextAttributes
@@ -83,7 +83,7 @@ private extension Schema.RichText {
     func convert(
         _ localizer: Schema.Localizer,
         defaultTextAttributes: Schema.TextAttributes?
-    ) -> [AdaptyUIConfiguration.RichText.Item] {
+    ) -> [VC.RichText.Item] {
         items.compactMap { item in
             switch item {
             case let .text(value, attributes):
@@ -130,10 +130,10 @@ private extension Schema.TextAttributes? {
 
     func convert(
         _ localizer: Schema.Localizer
-    ) -> AdaptyUIConfiguration.RichText.TextAttributes {
+    ) -> VC.RichText.TextAttributes {
         let attributes = self
-        let font = (try? attributes?.fontAssetId.map(localizer.font)) ?? AdaptyUIConfiguration.Font.default
-        return AdaptyUIConfiguration.RichText.TextAttributes(
+        let font = (try? attributes?.fontAssetId.map(localizer.font)) ?? VC.Font.default
+        return VC.RichText.TextAttributes(
             font: font,
             size: attributes?.size ?? font.defaultSize,
             txtColor: (try? attributes?.txtColorAssetId.map(localizer.filling)) ?? .same(font.defaultColor),

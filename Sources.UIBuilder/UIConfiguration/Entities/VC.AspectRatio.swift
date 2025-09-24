@@ -1,5 +1,5 @@
 //
-//  AspectRatio.swift
+//  VC.AspectRatio.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 25.03.2024
@@ -7,12 +7,12 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package enum AspectRatio: String {
+package extension VC {
+    enum AspectRatio: String {
         case fit
         case fill
         case stretch
     }
 }
 
-extension AdaptyUIConfiguration.AspectRatio: Codable {}
+extension VC.AspectRatio: Codable {}

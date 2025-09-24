@@ -1,5 +1,5 @@
 //
-//  Animation.Timeline.swift
+//  VC.Animation.Timeline.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 16.01.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     struct Timeline: Sendable, Hashable {
         static let `default` = Timeline(
             duration: 0.3,
@@ -34,11 +34,11 @@ package extension AdaptyUIConfiguration.Animation {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Animation.Timeline {
+package extension VC.Animation.Timeline {
     static func create(
         startDelay: TimeInterval = Self.default.startDelay,
         duration: TimeInterval = Self.default.duration,
-        interpolator: AdaptyUIConfiguration.Animation.Interpolator = Self.default.interpolator,
+        interpolator: VC.Animation.Interpolator = Self.default.interpolator,
         loop: Loop? = Self.default.loop,
         loopDelay: TimeInterval = Self.default.loopDelay,
         pingPongDelay: TimeInterval = Self.default.pingPongDelay,
@@ -57,7 +57,7 @@ package extension AdaptyUIConfiguration.Animation.Timeline {
 }
 #endif
 
-extension AdaptyUIConfiguration.Animation.Timeline: Codable {
+extension VC.Animation.Timeline: Codable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"
         case loop
@@ -82,7 +82,7 @@ extension AdaptyUIConfiguration.Animation.Timeline: Codable {
         loopCount = try container.decodeIfPresent(Int.self, forKey: .loopCount) ?? defaultValue.loopCount
 
         duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration)).map { $0 / 1000.0 } ?? defaultValue.duration
-        interpolator = try (container.decodeIfPresent(AdaptyUIConfiguration.Animation.Interpolator.self, forKey: .interpolator)) ?? .default
+        interpolator = try (container.decodeIfPresent(VC.Animation.Interpolator.self, forKey: .interpolator)) ?? .default
     }
 
     package func encode(to encoder: any Encoder) throws {
@@ -116,4 +116,4 @@ extension AdaptyUIConfiguration.Animation.Timeline: Codable {
     }
 }
 
-extension AdaptyUIConfiguration.Animation.Timeline.Loop: Codable {}
+extension VC.Animation.Timeline.Loop: Codable {}

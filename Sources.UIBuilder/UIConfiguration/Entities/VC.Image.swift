@@ -1,5 +1,5 @@
 //
-//  Image.swift
+//  VC.Image.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 25.03.2024
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct Image: Sendable, Hashable {
+package extension VC {
+    struct Image: Sendable, Hashable {
         static let defaultAspectRatio = AspectRatio.fit
 
         package let asset: Mode<ImageData>
@@ -18,11 +18,11 @@ extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Image {
+package extension VC.Image {
     static func create(
-        asset: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.ImageData>,
-        aspect: AdaptyUIConfiguration.AspectRatio = defaultAspectRatio,
-        tint: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.Filling>? = nil
+        asset: VC.Mode<VC.ImageData>,
+        aspect: VC.AspectRatio = defaultAspectRatio,
+        tint: VC.Mode<VC.Filling>? = nil
     ) -> Self {
         .init(
             asset: asset,

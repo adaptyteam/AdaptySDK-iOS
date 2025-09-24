@@ -1,5 +1,5 @@
 //
-//  StateCondition.swift
+//  VC.StateCondition.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 27.03.2024
@@ -7,14 +7,14 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum StateCondition: Sendable {
         case selectedSection(id: String, index: Int)
         case selectedProduct(id: String, groupId: String)
     }
 }
 
-extension AdaptyUIConfiguration.StateCondition: Hashable {
+extension VC.StateCondition: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .selectedSection(id, index):
@@ -29,7 +29,7 @@ extension AdaptyUIConfiguration.StateCondition: Hashable {
     }
 }
 
-extension AdaptyUIConfiguration.StateCondition: Codable {
+extension VC.StateCondition: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case productId = "product_id"

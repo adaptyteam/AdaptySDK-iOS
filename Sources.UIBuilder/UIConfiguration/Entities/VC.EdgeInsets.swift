@@ -1,5 +1,5 @@
 //
-//  EdgeInsets.swift
+//  VC.EdgeInsets.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 25.03.2024
@@ -7,31 +7,31 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     struct EdgeInsets: Sendable, Hashable {
-        package static let zero = AdaptyUIConfiguration.EdgeInsets(same: .point(0.0))
-        static let defaultValue: AdaptyUIConfiguration.Unit = .point(0.0)
+        package static let zero = VC.EdgeInsets(same: .point(0.0))
+        static let defaultValue: VC.Unit = .point(0.0)
 
-        package let leading: AdaptyUIConfiguration.Unit
-        package let top: AdaptyUIConfiguration.Unit
-        package let trailing: AdaptyUIConfiguration.Unit
-        package let bottom: AdaptyUIConfiguration.Unit
+        package let leading: VC.Unit
+        package let top: VC.Unit
+        package let trailing: VC.Unit
+        package let bottom: VC.Unit
     }
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.EdgeInsets {
+package extension VC.EdgeInsets {
     static func create(
-        same: AdaptyUIConfiguration.Unit = defaultValue
+        same: VC.Unit = defaultValue
     ) -> Self {
         .init(same: same)
     }
 
     static func create(
-        leading: AdaptyUIConfiguration.Unit = defaultValue,
-        top: AdaptyUIConfiguration.Unit = defaultValue,
-        trailing: AdaptyUIConfiguration.Unit = defaultValue,
-        bottom: AdaptyUIConfiguration.Unit = defaultValue
+        leading: VC.Unit = defaultValue,
+        top: VC.Unit = defaultValue,
+        trailing: VC.Unit = defaultValue,
+        bottom: VC.Unit = defaultValue
     ) -> Self {
         .init(
             leading: leading,
@@ -43,8 +43,8 @@ package extension AdaptyUIConfiguration.EdgeInsets {
 }
 #endif
 
-extension AdaptyUIConfiguration.EdgeInsets {
-    init(same: AdaptyUIConfiguration.Unit) {
+extension VC.EdgeInsets {
+    init(same: VC.Unit) {
         self.init(leading: same, top: same, trailing: same, bottom: same)
     }
 
@@ -53,7 +53,7 @@ extension AdaptyUIConfiguration.EdgeInsets {
     }
 }
 
-extension AdaptyUIConfiguration.EdgeInsets: Codable {
+extension VC.EdgeInsets: Codable {
     enum CodingKeys: String, CodingKey {
         case top
         case leading
@@ -64,9 +64,9 @@ extension AdaptyUIConfiguration.EdgeInsets: Codable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         let defaultValue = Self.defaultValue
-        if let value = try? container.decode(AdaptyUIConfiguration.Unit.self) {
+        if let value = try? container.decode(VC.Unit.self) {
             self.init(same: value)
-        } else if let values = try? container.decode([AdaptyUIConfiguration.Unit].self) {
+        } else if let values = try? container.decode([VC.Unit].self) {
             switch values.count {
             case 0: self.init(same: defaultValue)
             case 1: self.init(same: values[0])
@@ -77,10 +77,10 @@ extension AdaptyUIConfiguration.EdgeInsets: Codable {
         } else {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             try self.init(
-                leading: container.decodeIfPresent(AdaptyUIConfiguration.Unit.self, forKey: .leading) ?? defaultValue,
-                top: container.decodeIfPresent(AdaptyUIConfiguration.Unit.self, forKey: .top) ?? defaultValue,
-                trailing: container.decodeIfPresent(AdaptyUIConfiguration.Unit.self, forKey: .trailing) ?? defaultValue,
-                bottom: container.decodeIfPresent(AdaptyUIConfiguration.Unit.self, forKey: .bottom) ?? defaultValue
+                leading: container.decodeIfPresent(VC.Unit.self, forKey: .leading) ?? defaultValue,
+                top: container.decodeIfPresent(VC.Unit.self, forKey: .top) ?? defaultValue,
+                trailing: container.decodeIfPresent(VC.Unit.self, forKey: .trailing) ?? defaultValue,
+                bottom: container.decodeIfPresent(VC.Unit.self, forKey: .bottom) ?? defaultValue
             )
         }
     }

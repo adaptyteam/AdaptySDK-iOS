@@ -1,5 +1,5 @@
 //
-//  Row.swift
+//  VC.Row.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 23.05.2024
@@ -7,18 +7,18 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct Row: Sendable, Hashable {
+package extension VC {
+    struct Row: Sendable, Hashable {
         package let spacing: Double
         package let items: [GridItem]
     }
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Row {
+package extension VC.Row {
     static func create(
         spacing: Double = 0,
-        items: [AdaptyUIConfiguration.GridItem]
+        items: [VC.GridItem]
     ) -> Self {
         .init(
             spacing: spacing,

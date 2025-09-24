@@ -1,5 +1,5 @@
 //
-//  Background.swift
+//  VC.Background.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 30.06.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum Background: Sendable {
         static let `default` = Background.filling(.same(.default))
 
@@ -30,7 +30,7 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.Background: Hashable {
+extension VC.Background: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .filling(value):

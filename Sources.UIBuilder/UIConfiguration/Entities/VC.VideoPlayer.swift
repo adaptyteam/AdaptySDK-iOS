@@ -1,5 +1,5 @@
 //
-//  VideoPlayer.swift
+//  VC.VideoPlayer.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 24.07.2024
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct VideoPlayer: Hashable, Sendable {
+package extension VC {
+    struct VideoPlayer: Hashable, Sendable {
         static let defaultAspectRatio = AspectRatio.fit
 
         package let asset: Mode<VideoData>
@@ -19,10 +19,10 @@ extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.VideoPlayer {
+package extension VC.VideoPlayer {
     static func create(
-        asset: AdaptyUIConfiguration.Mode<AdaptyUIConfiguration.VideoData>,
-        aspect: AdaptyUIConfiguration.AspectRatio = defaultAspectRatio,
+        asset: VC.Mode<VC.VideoData>,
+        aspect: VC.AspectRatio = defaultAspectRatio,
         loop: Bool = true
     ) -> Self {
         .init(

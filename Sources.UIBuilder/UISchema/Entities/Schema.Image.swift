@@ -10,13 +10,13 @@ import Foundation
 extension Schema {
     struct Image: Sendable, Hashable {
         let assetId: String
-        let aspect: AdaptyUIConfiguration.AspectRatio
+        let aspect: VC.AspectRatio
         let tintAssetId: String?
     }
 }
 
 extension Schema.Localizer {
-    func image(_ from: Schema.Image) throws -> AdaptyUIConfiguration.Image {
+    func image(_ from: Schema.Image) throws -> VC.Image {
         try .init(
             asset: imageData(from.assetId),
             aspect: from.aspect,
@@ -35,7 +35,7 @@ extension Schema.Image: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         assetId = try container.decode(String.self, forKey: .assetId)
-        aspect = try container.decodeIfPresent(AdaptyUIConfiguration.AspectRatio.self, forKey: .aspect) ?? AdaptyUIConfiguration.Image.defaultAspectRatio
+        aspect = try container.decodeIfPresent(VC.AspectRatio.self, forKey: .aspect) ?? VC.Image.defaultAspectRatio
         tintAssetId = try container.decodeIfPresent(String.self, forKey: .tintAssetId)
     }
 }

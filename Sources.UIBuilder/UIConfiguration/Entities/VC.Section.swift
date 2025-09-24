@@ -1,5 +1,5 @@
 //
-//  Section.swift
+//  VC.Section.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 23.05.2024
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct Section: Sendable, Hashable {
+package extension VC {
+    struct Section: Sendable, Hashable {
         package let id: String
         package let index: Int
         package let content: [Element]
@@ -16,11 +16,11 @@ extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Section {
+package extension VC.Section {
     static func create(
         id: String = UUID().uuidString,
         index: Int = 0,
-        content: [AdaptyUIConfiguration.Element]
+        content: [VC.Element]
     ) -> Self {
         .init(
             id: id,

@@ -1,5 +1,5 @@
 //
-//  Animation.Interpolator.swift
+//  VC.Animation.Interpolator.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 16.01.2024
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     enum Interpolator: Sendable {
         static let `default` = Self.easeInOut
 
@@ -25,7 +25,7 @@ package extension AdaptyUIConfiguration.Animation {
     }
 }
 
-extension AdaptyUIConfiguration.Animation.Interpolator: Hashable {
+extension VC.Animation.Interpolator: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case .easeInOut:
@@ -58,7 +58,7 @@ extension AdaptyUIConfiguration.Animation.Interpolator: Hashable {
     }
 }
 
-extension AdaptyUIConfiguration.Animation.Interpolator: Codable {
+extension VC.Animation.Interpolator: Codable {
     enum Values: String {
         case easeInOut = "ease_in_out"
         case easeIn = "ease_in"

@@ -1,5 +1,5 @@
 //
-//  Screen.swift
+//  VC.Screen.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 28.03.2024
@@ -7,11 +7,11 @@
 
 import Foundation
 
-extension AdaptyUIConfiguration {
-    package struct Screen: Sendable, Hashable {
-        static let defaultBackground: AdaptyUIConfiguration.Background = .filling(.same(.solidColor(.black)))
+package extension VC {
+    struct Screen: Sendable, Hashable {
+        static let defaultBackground: VC.Background = .filling(.same(.solidColor(.black)))
 
-        package let background: AdaptyUIConfiguration.Background
+        package let background: VC.Background
         package let cover: Box?
         package let content: Element
         package let footer: Element?
@@ -21,13 +21,13 @@ extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Screen {
+package extension VC.Screen {
     static func create(
-        background: AdaptyUIConfiguration.Background = AdaptyUIConfiguration.Screen.defaultBackground,
-        cover: AdaptyUIConfiguration.Box? = nil,
-        content: AdaptyUIConfiguration.Element,
-        footer: AdaptyUIConfiguration.Element? = nil,
-        overlay: AdaptyUIConfiguration.Element? = nil,
+        background: VC.Background = VC.Screen.defaultBackground,
+        cover: VC.Box? = nil,
+        content: VC.Element,
+        footer: VC.Element? = nil,
+        overlay: VC.Element? = nil,
         selectedAdaptyProductId: String? = nil
     ) -> Self {
         .init(

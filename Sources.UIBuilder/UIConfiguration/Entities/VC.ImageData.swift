@@ -1,5 +1,5 @@
 //
-//  ImageData.swift
+//  VC.ImageData.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum ImageData: CustomAsset, Sendable {
         case raster(customId: String?, Data)
         case url(customId: String?, URL, previewRaster: Data?)
@@ -32,7 +32,7 @@ package extension AdaptyUIConfiguration {
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.ImageData {
+package extension VC.ImageData {
     static func create(customId: String? = nil, rasterData: Data) -> Self {
         .raster(customId: customId, rasterData)
     }
@@ -43,7 +43,7 @@ package extension AdaptyUIConfiguration.ImageData {
 }
 #endif
 
-extension AdaptyUIConfiguration.ImageData: Hashable {
+extension VC.ImageData: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .raster(customId, value):
@@ -59,7 +59,7 @@ extension AdaptyUIConfiguration.ImageData: Hashable {
     }
 }
 
-extension AdaptyUIConfiguration.ImageData: Codable {
+extension VC.ImageData: Codable {
     static let assetType = "image"
 
     private enum CodingKeys: String, CodingKey {

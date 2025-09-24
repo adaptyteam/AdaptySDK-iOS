@@ -1,5 +1,5 @@
 //
-//  Action.swift
+//  VC.Action.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 03.07.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration {
+package extension VC {
     enum Action: Sendable {
         case openUrl(String?)
         case restore
@@ -24,7 +24,7 @@ package extension AdaptyUIConfiguration {
     }
 }
 
-extension AdaptyUIConfiguration.Action: Hashable {
+extension VC.Action: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
         case let .openUrl(value):

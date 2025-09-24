@@ -1,5 +1,5 @@
 //
-//  Animation.BoxParameters.swift
+//  VC.Animation.BoxParameters.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 04.04.2025.
@@ -7,18 +7,18 @@
 
 import Foundation
 
-package extension AdaptyUIConfiguration.Animation {
+package extension VC.Animation {
     struct BoxParameters: Sendable, Hashable {
-        package let width: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Unit>?
-        package let height: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Unit>?
+        package let width: VC.Animation.Range<VC.Unit>?
+        package let height: VC.Animation.Range<VC.Unit>?
     }
 }
 
 #if DEBUG
-package extension AdaptyUIConfiguration.Animation.BoxParameters {
+package extension VC.Animation.BoxParameters {
     static func create(
-        width: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Unit>? = nil,
-        height: AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Unit>? = nil
+        width: VC.Animation.Range<VC.Unit>? = nil,
+        height: VC.Animation.Range<VC.Unit>? = nil
     ) -> Self {
         .init(
             width: width,
@@ -28,7 +28,7 @@ package extension AdaptyUIConfiguration.Animation.BoxParameters {
 }
 #endif
 
-extension AdaptyUIConfiguration.Animation.BoxParameters: Codable {
+extension VC.Animation.BoxParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case width
         case height
@@ -36,8 +36,8 @@ extension AdaptyUIConfiguration.Animation.BoxParameters: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        width = try container.decodeIfPresent(AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Unit>.self, forKey: .width)
-        height = try container.decodeIfPresent(AdaptyUIConfiguration.Animation.Range<AdaptyUIConfiguration.Unit>.self, forKey: .height)
+        width = try container.decodeIfPresent(VC.Animation.Range<VC.Unit>.self, forKey: .width)
+        height = try container.decodeIfPresent(VC.Animation.Range<VC.Unit>.self, forKey: .height)
 
         if width == nil && height == nil {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "The width and height parameters cannot be absent together."))

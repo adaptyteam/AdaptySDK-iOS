@@ -15,7 +15,7 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func column(_ from: Schema.Column) throws -> AdaptyUIConfiguration.Column {
+    func column(_ from: Schema.Column) throws -> VC.Column {
         try .init(
             spacing: from.spacing,
             items: from.items.map(gridItem)
