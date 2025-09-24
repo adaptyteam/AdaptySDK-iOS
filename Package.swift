@@ -70,7 +70,7 @@ let package = Package(
         .target(
             name: "AdaptyUITesting",
             dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI", "AdaptyLogger"],
-            path: "Sources.UIBuilderTools"
+            path: "Sources.DeveloperTools"
         ),
         .target(
             name: "AdaptyPlugin",
