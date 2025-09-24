@@ -62,10 +62,12 @@ actor SK2Purchaser {
                         )
 
                         do {
+                            var xxx = true
                             if await AdaptyConfiguration.transactionFinishBehavior == .manual {
-                                await storage.addUnfinishedTransaction(sk2Transaction.unfIdentifier)
+                                xxx = await storage.addUnfinishedTransaction(sk2Transaction.unfIdentifier)
                             }
 
+                            log.debug("###UDSTED### \(xxx)")
                             await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(sk2SignedTransaction: sk2SignedTransaction)) }
 
                             try await transactionSynchronizer.report(
@@ -218,9 +220,9 @@ actor SK2Purchaser {
                     stamp: stamp,
                     error: error.localizedDescription
                 ))
-               
+
                 await sk2Transaction.finish()
-                
+
                 log.error("Finish unverified purchase transaction: \(sk2Transaction) of product: \(sk2Transaction.unfProductId) error: \(error.localizedDescription)")
                 await storage.removePurchasePayload(forTransaction: sk2Transaction)
                 await storage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
@@ -265,9 +267,13 @@ actor SK2Purchaser {
         let sk2Transaction = sk2SignedTransaction.unsafePayloadValue
 
         do {
+            var xxx = true
+
             if await AdaptyConfiguration.transactionFinishBehavior == .manual {
-                await storage.addUnfinishedTransaction(sk2Transaction.unfIdentifier)
+                xxx = await storage.addUnfinishedTransaction(sk2Transaction.unfIdentifier)
             }
+
+            log.debug("###PURCHASED### \(xxx)")
 
             await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(sk2SignedTransaction: sk2SignedTransaction)) }
 

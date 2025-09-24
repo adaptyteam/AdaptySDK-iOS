@@ -81,12 +81,13 @@ final class PurchasePayloadStorage {
         .dictionary(forKey: Constants.unfinishedTransactionState) as? [String: Bool] ?? [:]
 
     private static func setUnfinishedTransactionState(synced: Bool, forTransactionId transactionId: String) -> Bool {
-        if unfinishedTransactionState[transactionId].map({ !$0 && synced }) ?? true {
+        let changing = unfinishedTransactionState[transactionId].map { !$0 && synced } ?? true
+        if changing {
             unfinishedTransactionState[transactionId] = synced
             userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
         }
         log.debug("Saving state (\(synced ? "unsynced" : "synced"))  for transactionId: \(transactionId)")
-        return true
+        return changing
     }
 
     private static func removeUnfinishedTransactionState(forTransactionId transactionId: String) -> Bool {
@@ -264,8 +265,9 @@ extension PurchasePayloadStorage {
         Self.unfinishedTransactionState[transactionId] ?? false
     }
 
-    func addUnfinishedTransaction(_ transactionId: String) {
-        if Self.setUnfinishedTransactionState(synced: false, forTransactionId: transactionId) {
+    func addUnfinishedTransaction(_ transactionId: String) -> Bool {
+        let added = Self.setUnfinishedTransactionState(synced: false, forTransactionId: transactionId)
+        if added {
             log.debug("Storage after add state of unfinishedTransaction:\(transactionId) all:\(Self.unfinishedTransactionState)")
             Task {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
@@ -276,6 +278,7 @@ extension PurchasePayloadStorage {
                 ))
             }
         }
+        return added
     }
 
     func canFinishSyncedTransaction(_ transactionId: String) -> Bool {
