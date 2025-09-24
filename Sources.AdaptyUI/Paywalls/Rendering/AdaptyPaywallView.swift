@@ -29,7 +29,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
     private let didStartRestore: (() -> Void)?
     private let didFinishRestore: ((AdaptyProfile) -> Void)?
     private let didFailRestore: ((AdaptyError) -> Void)?
-    private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+    private let didFailRendering: ((AdaptyUIError) -> Void)?
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
     private let didPartiallyLoadProducts: (([String]) -> Void)?
     private let showAlertItem: Binding<AlertItem?>
@@ -48,7 +48,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         didStartRestore: (() -> Void)? = nil,
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
-        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void,
+        didFailRendering: @escaping (AdaptyUIError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
         didPartiallyLoadProducts: (([String]) -> Void)? = nil,
         showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),

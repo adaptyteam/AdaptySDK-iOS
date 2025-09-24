@@ -185,6 +185,6 @@ extension OnboardingManager: AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIBuilderError
+        didFailRenderingWith error: AdaptyUIError
     ) {}
 }

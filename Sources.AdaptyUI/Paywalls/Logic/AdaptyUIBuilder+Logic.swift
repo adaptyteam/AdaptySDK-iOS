@@ -161,6 +161,10 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             events.event_didFailRestore(with: error.asAdaptyError)
         }
     }
+    
+    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
+        events.event_didFailRendering(with: error)
+    }
 }
 
 private extension AdaptyPaywall {

@@ -160,7 +160,7 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIBuilderError
+        didFailRenderingWith error: AdaptyUIError
     ) {
         eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
             view: controller.toAdaptyUIView(),

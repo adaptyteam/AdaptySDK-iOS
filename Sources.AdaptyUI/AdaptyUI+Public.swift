@@ -155,7 +155,7 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     ///   - error: an ``AdaptyError`` object representing the error.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIBuilderError
+        didFailRenderingWith error: AdaptyUIError
     )
 
     /// This method is invoked in case of errors during the products loading process.
