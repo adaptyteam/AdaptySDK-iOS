@@ -117,53 +117,51 @@ private extension Adapty {
 
     func sendUnfinishedTransactions(manager: SK2TransactionManager) async -> AdaptyResult<Void> {
         guard !observerMode else { return .success(()) }
-        while true {
-            let unfinishedTranasactions = await SK2TransactionManager.fetchUnfinishedTrunsactions()
-            guard !unfinishedTranasactions.isEmpty else { return .success(()) }
-            for sk2SignedTransaction in unfinishedTranasactions {
-                switch sk2SignedTransaction {
-                case let .unverified(sk2Transaction, error):
-                    log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
-                    await sk2Transaction.finish()
-                    await purchasePayloadStorage.removePurchasePayload(forTransaction: sk2Transaction)
-                    await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
-                    Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                        methodName: .finishTransaction,
-                        params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
-                    ))
-                case let .verified(sk2Transaction):
-                    if await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.unfIdentifier) { continue }
+        let unfinishedTranasactions = await SK2TransactionManager.fetchUnfinishedTrunsactions()
+        guard !unfinishedTranasactions.isEmpty else { return .success(()) }
+        for sk2SignedTransaction in unfinishedTranasactions {
+            switch sk2SignedTransaction {
+            case let .unverified(sk2Transaction, error):
+                log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
+                await sk2Transaction.finish()
+                await purchasePayloadStorage.removePurchasePayload(forTransaction: sk2Transaction)
+                await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
+                Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                    methodName: .finishTransaction,
+                    params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
+                ))
+            case let .verified(sk2Transaction):
+                if await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.unfIdentifier) { continue }
 
-                    let productOrNil = try? await productsManager.fetchProduct(
-                        id: sk2Transaction.unfProductId,
-                        fetchPolicy: .returnCacheDataElseLoad
+                let productOrNil = try? await productsManager.fetchProduct(
+                    id: sk2Transaction.unfProductId,
+                    fetchPolicy: .returnCacheDataElseLoad
+                )
+
+                do {
+                    try await report(
+                        .init(
+                            product: productOrNil,
+                            transaction: sk2Transaction
+                        ),
+                        payload: purchasePayloadStorage.purchasePayload(
+                            byTransaction: sk2Transaction,
+                            orCreateFor: ProfileStorage.userId
+                        ),
+                        reason: .unfinished
                     )
 
-                    do {
-                        try await report(
-                            .init(
-                                product: productOrNil,
-                                transaction: sk2Transaction
-                            ),
-                            payload: purchasePayloadStorage.purchasePayload(
-                                byTransaction: sk2Transaction,
-                                orCreateFor: ProfileStorage.userId
-                            ),
-                            reason: .unfinished
-                        )
-
-                        guard await purchasePayloadStorage.canFinishSyncedTransaction(sk2Transaction.unfIdentifier) else {
-                            log.info("Unfinished transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
-                            continue
-                        }
-
-                        await finish(transaction: sk2Transaction, recived: .unfinished)
-
-                        log.info("Unfinished transaction synced: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
-                    } catch {
-                        log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
-                        return .failure(error)
+                    guard await purchasePayloadStorage.canFinishSyncedTransaction(sk2Transaction.unfIdentifier) else {
+                        log.info("Unfinished transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
+                        continue
                     }
+
+                    await finish(transaction: sk2Transaction, recived: .unfinished)
+
+                    log.info("Unfinished transaction synced: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
+                } catch {
+                    log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
+                    return .failure(error)
                 }
             }
         }
