@@ -81,14 +81,9 @@ Adapty.makePurchase(product: product) { [weak self] result in
 - View and analyze data by attributes, such as status, channels, campaigns, and more.
 - Filter, group, and measure metrics by attribution, platform, custom users' segments, and more in a few clicks.
 
-## Examples of Adapty-Demo apps
+## Adapty-Demo apps
 
-This is a demo applications for Adapty. Before running the app, you will need to configure the project.
-
-### 1. [UIKit](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/UIKit-Demo)
-### 2. [SwiftUI](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples/SwiftUI-Demo)
-
-![Adapty: An example of the paywall is changed on the fly](https://adapty-portal-media-production.s3.amazonaws.com/github/swift-ui-example.jpg)
+[Here](Examples/) you can find a demo application for Adapty. Before running the app, you will need to configure the project.
 
 ## Mobile App Monetization's Largest Community
 
