@@ -165,6 +165,7 @@ private extension Adapty {
                 }
             }
         }
+        return .success(())
     }
 }
 
