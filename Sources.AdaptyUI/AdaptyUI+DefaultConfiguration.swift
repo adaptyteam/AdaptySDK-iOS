@@ -55,7 +55,7 @@ public extension AdaptyPaywallControllerDelegate {
 
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIBuilderError
+        didFailRenderingWith error: AdaptyUIError
     ) {}
 
     func paywallController(

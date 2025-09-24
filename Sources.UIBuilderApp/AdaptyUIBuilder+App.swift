@@ -82,8 +82,11 @@ public extension AdaptyUIBuilder {
             self.assetsResolver = assetsResolver
 
             eventsHandler = AdaptyEventsHandler(logId: logId)
-            logic = AdaptyUIBuilderAppLogic(logId: logId, products: products, events: eventsHandler)
-
+            logic = AdaptyUIBuilderAppLogic(
+                logId: logId,
+                products: products,
+                events: eventsHandler
+            )
             presentationViewModel = AdaptyPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
             actionsViewModel = AdaptyUIActionsViewModel(logId: logId, logic: logic)
@@ -98,8 +101,7 @@ public extension AdaptyUIBuilder {
                 logic: logic,
                 presentationViewModel: presentationViewModel,
                 paywallViewModel: paywallViewModel,
-                products: products,
-                observerModeResolver: nil
+                products: products
             )
             screensViewModel = AdaptyScreensViewModel(
                 logId: logId,

@@ -31,7 +31,9 @@ package final class AdaptyPaywallViewModel: ObservableObject {
 
     private var logShowPaywallCalled = false
 
-    func reportDidFailRendering(with error: AdaptyUIBuilderError) {}
+    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
+        logic.reportDidFailRendering(with: error)
+    }
 
     package func logShowPaywall() {
         guard !logShowPaywallCalled else { return }

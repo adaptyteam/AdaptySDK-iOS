@@ -155,7 +155,7 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     ///   - error: an ``AdaptyError`` object representing the error.
     func paywallController(
         _ controller: AdaptyPaywallController,
-        didFailRenderingWith error: AdaptyUIBuilderError
+        didFailRenderingWith error: AdaptyUIError
     )
 
     /// This method is invoked in case of errors during the products loading process.
@@ -191,6 +191,18 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
 }
 
 #endif
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyTimerResolver = AdaptyUIBuider.AdaptyTimerResolver
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyTagResolver = AdaptyUIBuider.AdaptyTagResolver
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyAssetsResolver = AdaptyUIBuider.AdaptyAssetsResolver
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public typealias AdaptyCustomAsset = AdaptyUIBuider.AdaptyCustomAsset
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public protocol AdaptyObserverModeResolver: Sendable {

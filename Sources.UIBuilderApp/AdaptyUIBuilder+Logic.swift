@@ -50,7 +50,11 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
         products
     }
 
-    func makePurchase(product: ProductResolver) async {
+    func makePurchase(
+        product: ProductResolver,
+        onStart: @escaping () -> Void,
+        onFinish: @escaping () -> Void
+    ) {
         events.event_didStartPurchase(product: product)
     }
 
@@ -59,4 +63,8 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     }
 
     func openWebPaywall(for product: any AdaptyUIBuider.ProductResolver) async {}
+    
+    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
+        events.event_didFailRendering(with: error)
+    }
 }

@@ -14,15 +14,18 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let paywall: AdaptyPaywall
     let events: AdaptyEventsHandler
+    let observerModeResolver: AdaptyObserverModeResolver?
 
     package init(
         logId: String,
         paywall: AdaptyPaywall,
-        events: AdaptyEventsHandler
+        events: AdaptyEventsHandler,
+        observerModeResolver: AdaptyObserverModeResolver?
     ) {
         self.logId = logId
         self.paywall = paywall
         self.events = events
+        self.observerModeResolver = observerModeResolver
     }
 
     func reportViewDidAppear() {
@@ -98,19 +101,39 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         return (wrappedProducts, failedProductIds)
     }
 
-    func makePurchase(product: ProductResolver) async {
+    func makePurchase(
+        product: ProductResolver,
+        onStart: @escaping () -> Void,
+        onFinish: @escaping () -> Void
+    ) {
         guard let adaptyProduct = product as? AdaptyPaywallProduct else {
             Log.ui.verbose("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return
         }
+        
+        if let observerModeResolver {
+            observerModeResolver.observerMode(
+                didInitiatePurchase: adaptyProduct,
+                onStartPurchase: onStart,
+                onFinishPurchase: onFinish
+            )
+        } else {
+            Task { @MainActor in
+                onStart()
+                await makePurchaseWithAdapty(product: adaptyProduct)
+                onFinish()
+            }
+        }
+    }
 
-        events.event_didStartPurchase(product: adaptyProduct)
+    private func makePurchaseWithAdapty(product: AdaptyPaywallProduct) async {
+        events.event_didStartPurchase(product: product)
 
         do {
-            let purchaseResult = try await Adapty.makePurchase(product: adaptyProduct)
+            let purchaseResult = try await Adapty.makePurchase(product: product)
 
             events.event_didFinishPurchase(
-                product: adaptyProduct,
+                product: product,
                 purchaseResult: purchaseResult
             )
         } catch {
@@ -118,12 +141,12 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
 
             if adaptyError.adaptyErrorCode == .paymentCancelled {
                 events.event_didFinishPurchase(
-                    product: adaptyProduct,
+                    product: product,
                     purchaseResult: .userCancelled
                 )
             } else {
                 events.event_didFailPurchase(
-                    product: adaptyProduct,
+                    product: product,
                     error: adaptyError
                 )
             }
@@ -160,6 +183,10 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         } catch {
             events.event_didFailRestore(with: error.asAdaptyError)
         }
+    }
+    
+    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
+        events.event_didFailRendering(with: error)
     }
 }
 

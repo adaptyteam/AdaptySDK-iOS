@@ -13,42 +13,6 @@ import SwiftUI
 import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyTimerResolver = AdaptyUIBuider.AdaptyTimerResolver
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyTagResolver = AdaptyUIBuider.AdaptyTagResolver
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyAssetsResolver = AdaptyUIBuider.AdaptyAssetsResolver
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyCustomAsset = AdaptyUIBuider.AdaptyCustomAsset
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-struct AdaptyObserverResolverHolder: AdaptyUIBuilderObserverModeResolver {
-    let logId: String
-    let observerModeResolver: AdaptyObserverModeResolver?
-
-    package func observerMode(
-        didInitiatePurchase product: ProductResolver,
-        onStartPurchase: @escaping () -> Void,
-        onFinishPurchase: @escaping () -> Void
-    ) {
-        guard let product = product as? AdaptyPaywallProduct else {
-            Log.ui.error("#\(logId)# observerMode_didInitiatePurchase: WRONG INJECTION")
-            return
-        }
-
-        observerModeResolver?.observerMode(
-            didInitiatePurchase: product,
-            onStartPurchase: onStartPurchase,
-            onFinishPurchase: onFinishPurchase
-        )
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     @MainActor
     final class PaywallConfiguration {
@@ -76,8 +40,6 @@ public extension AdaptyUI {
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyAssetsResolver?
 
-        fileprivate let observerResolverHolder: AdaptyObserverResolverHolder
-
         package init(
             logId: String,
             paywall: AdaptyPaywall,
@@ -103,10 +65,10 @@ public extension AdaptyUI {
             self.assetsResolver = assetsResolver
 
             eventsHandler = AdaptyEventsHandler(logId: logId)
-            logic = AdaptyUILogic(logId: logId, paywall: paywall, events: eventsHandler)
-
-            observerResolverHolder = AdaptyObserverResolverHolder(
+            logic = AdaptyUILogic(
                 logId: logId,
+                paywall: paywall,
+                events: eventsHandler,
                 observerModeResolver: observerModeResolver
             )
             presentationViewModel = AdaptyPresentationViewModel(logId: logId, logic: logic)
@@ -123,8 +85,7 @@ public extension AdaptyUI {
                 logic: logic,
                 presentationViewModel: presentationViewModel,
                 paywallViewModel: paywallViewModel,
-                products: products?.map { AdaptyPaywallProductWrapper.full($0) },
-                observerModeResolver: observerResolverHolder
+                products: products?.map { AdaptyPaywallProductWrapper.full($0) }
             )
             screensViewModel = AdaptyScreensViewModel(
                 logId: logId,

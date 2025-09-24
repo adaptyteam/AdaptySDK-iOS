@@ -16,7 +16,8 @@ public enum AdaptyUIError: Error {
 
     case webKit(Error)
 
-    case injectionConfiguration
+    case unsupportedTemplate(String)
+    case wrongComponentType(String)
 }
 
 extension AdaptyUIError {
@@ -31,7 +32,8 @@ extension AdaptyUIError {
 
         case webKit = 4200
 
-        case injectionConfiguration = 4999
+        case unsupportedTemplate = 4100
+        case wrongComponentType = 4103
     }
 }
 
@@ -45,7 +47,8 @@ extension AdaptyUIError: CustomNSError {
         case .adaptyUINotActivated: Code.adaptyUINotActivated.rawValue
         case .activateOnce: Code.activateOnce.rawValue
         case .webKit: Code.webKit.rawValue
-        case .injectionConfiguration: Code.injectionConfiguration.rawValue
+        case .unsupportedTemplate: Code.unsupportedTemplate.rawValue
+        case .wrongComponentType: Code.wrongComponentType.rawValue
         }
     }
 }
@@ -75,5 +78,18 @@ extension Error {
         }
 
         return AdaptyError(AdaptyUIUnknownError(error: self))
+    }
+}
+
+import AdaptyUIBuider
+
+extension AdaptyUIBuilderError {
+    var toAdaptyUIError: AdaptyUIError {
+        switch self {
+        case .unsupportedTemplate(let v):
+            .unsupportedTemplate(v)
+        case .wrongComponentType(let v):
+            .wrongComponentType(v)
+        }
     }
 }
