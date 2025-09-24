@@ -124,6 +124,8 @@ private extension Adapty {
             case let .unverified(sk2Transaction, error):
                 log.error("Unfinished transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
                 await sk2Transaction.finish()
+                log.warn("Finish unverified unfinished transaction: \(sk2Transaction) of product: \(sk2Transaction.unfProductId) error: \(error.localizedDescription)")
+
                 await purchasePayloadStorage.removePurchasePayload(forTransaction: sk2Transaction)
                 await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
                 Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
@@ -158,7 +160,7 @@ private extension Adapty {
 
                     await finish(transaction: sk2Transaction, recived: .unfinished)
 
-                    log.info("Unfinished transaction synced: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
+                    log.info("Finish unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId) after sync")
                 } catch {
                     log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                     return .failure(error)

@@ -44,6 +44,8 @@ actor SK2Purchaser {
                 case let .unverified(sk2Transaction, error):
                     log.error("Transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId)) is unverified. Error: \(error.localizedDescription)")
                     await sk2Transaction.finish()
+                    log.warn("Finish unverified updated transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId) error: \(error.localizedDescription)")
+
                     await storage.removePurchasePayload(forTransaction: sk2Transaction)
                     await storage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
                     Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
@@ -85,7 +87,7 @@ actor SK2Purchaser {
 
                             await transactionSynchronizer.finish(transaction: sk2Transaction, recived: .updates)
 
-                            log.info("Updated transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
+                            log.info("Finish updated transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
 
                         } catch {
                             _ = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
@@ -216,8 +218,10 @@ actor SK2Purchaser {
                     stamp: stamp,
                     error: error.localizedDescription
                 ))
-                log.error("Unverified purchase transaction of product: \(sk2Transaction.unfProductId) \(error.localizedDescription)")
+               
                 await sk2Transaction.finish()
+                
+                log.error("Finish unverified purchase transaction: \(sk2Transaction) of product: \(sk2Transaction.unfProductId) error: \(error.localizedDescription)")
                 await storage.removePurchasePayload(forTransaction: sk2Transaction)
                 await storage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
                 await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
@@ -281,7 +285,8 @@ actor SK2Purchaser {
             }
 
             await transactionSynchronizer.finish(transaction: sk2Transaction, recived: .purchased)
-            log.info("Successfully purchased transaction synced: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
+            log.info("Finish purchased transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId) after synce")
+
             return .success(profile: profile, transaction: sk2SignedTransaction)
 
         } catch {

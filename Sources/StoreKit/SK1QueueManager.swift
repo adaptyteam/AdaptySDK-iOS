@@ -149,7 +149,7 @@ actor SK1QueueManager: Sendable {
                     methodName: .finishTransaction,
                     params: logParams
                 ))
-                log.verbose("finish restored transaction \(sk1Transaction)")
+                log.verbose("Finish restored transaction \(sk1Transaction)")
 
             case .deferred:
                 log.error("received deferred transaction \(sk1Transaction)")
@@ -193,7 +193,7 @@ actor SK1QueueManager: Sendable {
                 params: sk1Transaction.logParams
             ))
 
-            log.info("finish purchased transaction \(sk1Transaction)")
+            log.info("Finish purchased transaction \(sk1Transaction) after sync")
 
             result = .success(.success(profile: profile, transaction: sk1Transaction))
         } catch {
@@ -215,11 +215,11 @@ actor SK1QueueManager: Sendable {
 
         let result: AdaptyResult<AdaptyPurchaseResult>
         if (sk1Transaction.error as? SKError)?.isPurchaseCancelled ?? false {
-            log.verbose("finish canceled transaction \(sk1Transaction) ")
+            log.info("Finish canceled transaction \(sk1Transaction) ")
             result = .success(.userCancelled)
         } else {
             let error = error ?? StoreKitManagerError.productPurchaseFailed(sk1Transaction.error).asAdaptyError
-            log.verbose("finish failed transaction \(sk1Transaction) error: \(error)")
+            log.verbose("Finish failed transaction \(sk1Transaction) error: \(error)")
             result = .failure(error)
         }
         callMakePurchasesCompletionHandlers(productId, result)
