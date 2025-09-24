@@ -47,7 +47,7 @@ extension Request {
                 timerResolver: customTimers,
                 assetsResolver: assetsResolver()
             )
-            
+
             return .success(result)
         }
 
@@ -55,7 +55,7 @@ extension Request {
         func assetsResolver() throws -> [String: AdaptyCustomAsset]? {
             guard let customAssets, !customAssets.isEmpty else { return nil }
 
-            var assetsResolver = [String: AdaptyCustomAsset]()
+            var assetsResolver: [String: AdaptyCustomAsset] = [:]
             assetsResolver.reserveCapacity(customAssets.count)
 
             for asset in customAssets {
