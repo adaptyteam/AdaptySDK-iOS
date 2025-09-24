@@ -23,10 +23,6 @@ let package = Package(
             targets: ["AdaptyUIBuider"]
         ),
         .library(
-            name: "AdaptyUIBuiderApp",
-            targets: ["AdaptyUIBuiderApp"]
-        ),
-        .library(
             name: "AdaptyUI",
             targets: ["AdaptyUI"]
         ),
@@ -49,11 +45,6 @@ let package = Package(
             name: "AdaptyUIBuider",
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder"
-        ),
-        .target(
-            name: "AdaptyUIBuiderApp",
-            dependencies: ["AdaptyUIBuider", "AdaptyLogger"],
-            path: "Sources.UIBuilderApp"
         ),
         .target(
             name: "Adapty",

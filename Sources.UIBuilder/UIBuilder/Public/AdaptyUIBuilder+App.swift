@@ -6,7 +6,6 @@
 //
 
 import AdaptyLogger
-import AdaptyUIBuider
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -32,18 +31,6 @@ public extension AdaptyUIBuilder {
         )
     }
 }
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyTimerResolver = AdaptyUIBuider.AdaptyTimerResolver
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyTagResolver = AdaptyUIBuider.AdaptyTagResolver
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyAssetsResolver = AdaptyUIBuider.AdaptyAssetsResolver
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyCustomAsset = AdaptyUIBuider.AdaptyCustomAsset
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUIBuilder {

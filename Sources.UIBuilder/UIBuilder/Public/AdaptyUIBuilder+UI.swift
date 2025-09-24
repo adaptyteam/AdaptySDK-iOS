@@ -5,7 +5,6 @@
 //  Created by Alexey Goncharov on 9/23/25.
 //
 
-import AdaptyUIBuider
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)

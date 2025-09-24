@@ -21,6 +21,7 @@ enum Log {
         )
     }
 
+    static let app = Category(name: "public")
     static let ui = Category(name: "ui")
     static let cache = Category(name: "AdaptyMediaCache")
     static let prefetcher = Category(name: "ImageUrlPrefetcher")
