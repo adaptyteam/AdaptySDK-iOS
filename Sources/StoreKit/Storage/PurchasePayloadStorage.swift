@@ -80,10 +80,12 @@ final class PurchasePayloadStorage {
     private static var unfinishedTransactionState: [String: Bool] = userDefaults
         .dictionary(forKey: Constants.unfinishedTransactionState) as? [String: Bool] ?? [:]
 
-    private static func setUnfinishedTransactionState(_ state: Bool, forTransactionId transactionId: String) -> Bool {
-        guard state != unfinishedTransactionState.updateValue(state, forKey: transactionId) else { return false }
-        userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
-        log.debug("Saving state (\(state ? "unsynced" : "synced"))  for transactionId: \(transactionId)")
+    private static func setUnfinishedTransactionState(synced: Bool, forTransactionId transactionId: String) -> Bool {
+        if unfinishedTransactionState[transactionId].map({ !$0 && synced }) ?? true {
+            unfinishedTransactionState[transactionId] = synced
+            userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
+        }
+        log.debug("Saving state (\(synced ? "unsynced" : "synced"))  for transactionId: \(transactionId)")
         return true
     }
 
@@ -263,7 +265,7 @@ extension PurchasePayloadStorage {
     }
 
     func addUnfinishedTransaction(_ transactionId: String) {
-        if Self.setUnfinishedTransactionState(false, forTransactionId: transactionId) {
+        if Self.setUnfinishedTransactionState(synced: false, forTransactionId: transactionId) {
             log.debug("Storage after add state of unfinishedTransaction:\(transactionId) all:\(Self.unfinishedTransactionState)")
             Task {
                 await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
@@ -278,7 +280,7 @@ extension PurchasePayloadStorage {
 
     func canFinishSyncedTransaction(_ transactionId: String) -> Bool {
         guard Self.unfinishedTransactionState[transactionId] != nil else { return true }
-        if Self.setUnfinishedTransactionState(true, forTransactionId: transactionId) {
+        if Self.setUnfinishedTransactionState(synced: true, forTransactionId: transactionId) {
             log.debug("Storage after change state of unfinishedTransaction:\(transactionId) all: \(Self.unfinishedTransactionState)")
 
             Task {
