@@ -37,7 +37,6 @@ package final class AdaptyProductsViewModel: ObservableObject {
     private let logic: AdaptyUIBuilderLogic
     private let paywallViewModel: AdaptyPaywallViewModel
     private let presentationViewModel: AdaptyPresentationViewModel
-    private let observerModeResolver: AdaptyUIBuilderObserverModeResolver?
 
     @Published private var paywallProductsWithoutOffer: [ProductResolver]?
     @Published private var paywallProducts: [ProductResolver]?
@@ -57,8 +56,7 @@ package final class AdaptyProductsViewModel: ObservableObject {
         logic: AdaptyUIBuilderLogic,
         presentationViewModel: AdaptyPresentationViewModel,
         paywallViewModel: AdaptyPaywallViewModel,
-        products: [any ProductResolver]?,
-        observerModeResolver: AdaptyUIBuilderObserverModeResolver?
+        products: [any ProductResolver]?
     ) {
         self.logId = logId
         self.logic = logic
@@ -67,8 +65,6 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
         paywallProducts = products
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
-
-        self.observerModeResolver = observerModeResolver
     }
 
     package func resetSelectedProducts() {
@@ -155,38 +151,14 @@ package final class AdaptyProductsViewModel: ObservableObject {
 
         switch provider {
         case .storeKit:
-            purchaseProductWithStoreKit(product)
-        case .openWebPaywall:
-            purchaseProductInWeb(product)
-        }
-    }
-
-    private func purchaseProductInWeb(_ product: ProductResolver) {
-        Task { @MainActor [weak self] in
-            await self?.logic.openWebPaywall(for: product)
-        }
-    }
-
-    private func purchaseProductWithStoreKit(_ product: ProductResolver) {
-        let logId = logId
-
-        if let observerModeResolver {
-            observerModeResolver.observerMode(
-                didInitiatePurchase: product,
-                onStartPurchase: { [weak self] in
-                    Log.ui.verbose("#\(logId)# observerDidStartPurchase")
-                    self?.purchaseInProgress = true
-                },
-                onFinishPurchase: { [weak self] in
-                    Log.ui.verbose("#\(logId)# observerDidFinishPurchase")
-                    self?.purchaseInProgress = false
-                }
+            logic.makePurchase(
+                product: product,
+                onStart: { [weak self] in self?.purchaseInProgress = true },
+                onFinish: { [weak self] in self?.purchaseInProgress = false }
             )
-        } else {
+        case .openWebPaywall:
             Task { @MainActor [weak self] in
-                self?.purchaseInProgress = true
-                await self?.logic.makePurchase(product: product)
-                self?.purchaseInProgress = false
+                await self?.logic.openWebPaywall(for: product)
             }
         }
     }

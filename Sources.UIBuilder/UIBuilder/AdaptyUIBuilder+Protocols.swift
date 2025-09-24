@@ -55,7 +55,11 @@ package protocol AdaptyUIBuilderLogic {
         determineOffers: Bool
     ) async throws -> [ProductResolver]
 
-    func makePurchase(product: ProductResolver) async
+    func makePurchase(
+        product: ProductResolver,
+        onStart: @escaping () -> Void,
+        onFinish: @escaping () -> Void
+    )
 
     func openWebPaywall(for product: ProductResolver) async
 
