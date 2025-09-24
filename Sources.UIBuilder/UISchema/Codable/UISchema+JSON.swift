@@ -7,18 +7,18 @@
 
 import Foundation
 
-package extension AdaptyUISchema {
-    static var jsonDecoder: JSONDecoder {
+public extension AdaptyUISchema {
+    package static var jsonDecoder: JSONDecoder {
         let decoder = JSONDecoder()
         decoder.dataDecodingStrategy = .base64
         return decoder
     }
 
-    public init(from jsonData: Data) throws {
+    init(from jsonData: Data) throws {
         self = try AdaptyUISchema.jsonDecoder.decode(AdaptyUISchema.self, from: jsonData)
     }
 
-    public init(from jsonData: String) throws {
+    init(from jsonData: String) throws {
         try self.init(from: jsonData.data(using: .utf8) ?? Data())
     }
 }

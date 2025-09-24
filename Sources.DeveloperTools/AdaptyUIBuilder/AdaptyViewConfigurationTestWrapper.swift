@@ -1,18 +1,11 @@
 //
-//  File.swift
-//
+//  AdaptyViewConfigurationTestWrapper.swift
+//  AdaptyDeveloperTools
 //
 //  Created by Aleksey Goncharov on 20.05.2024.
 //
 
-#if canImport(UIKit)
-
-import Adapty
-import AdaptyUI
-import Foundation
-import SwiftUI
 import AdaptyUIBuider
-import AdaptyLogger
 
 public struct AdaptyViewConfigurationTestWrapper {
     var value: AdaptyUIConfiguration
@@ -31,7 +24,7 @@ public extension AdaptyViewConfigurationTestWrapper {
             locale: locale,
             isRightToLeft: isRightToLeft,
             images: [
-                "star.fill", "beagle", "close", "coast-bg"
+                "star.fill", "beagle", "close", "coast-bg",
             ],
             colors: [
                 "$green_figma": .solidColor(.create(data: 0x3EBD78FF)),
@@ -135,66 +128,4 @@ public extension AdaptyViewConfigurationTestWrapper {
         return .init(value: configuration)
     }
 }
-#endif
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public struct AdaptyUITestRendererView: View {
-    let viewConfiguration: AdaptyUIConfiguration
-//    let paywallConfiguration: AdaptyUI.PaywallConfiguration
-
-    public init(
-        viewConfigurationWrapper: AdaptyViewConfigurationTestWrapper,
-        assetsResolver: AdaptyAssetsResolver?
-    ) {
-        viewConfiguration = viewConfigurationWrapper.value
-
-//        paywallConfiguration = AdaptyUI.PaywallConfiguration(
-//            logId: Log.stamp,
-//            paywall: AdaptyMockPaywall(),
-//            viewConfiguration: viewConfiguration,
-//            products: nil,
-//            observerModeResolver: nil,
-//            tagResolver: ["TEST_TAG": "Adapty"],
-//            timerResolver: nil,
-//            assetsResolver: assetsResolver
-//        )
-    }
-
-    public var body: some View {
-        EmptyView()
-//        AdaptyUIElementView(viewConfiguration.screen.content)
-//            .environmentObject(paywallConfiguration.eventsHandler)
-//            .environmentObject(paywallConfiguration.paywallViewModel)
-//            .environmentObject(paywallConfiguration.actionsViewModel)
-//            .environmentObject(paywallConfiguration.sectionsViewModel)
-//            .environmentObject(paywallConfiguration.productsViewModel)
-//            .environmentObject(paywallConfiguration.tagResolverViewModel)
-//            .environmentObject(paywallConfiguration.timerViewModel)
-//            .environmentObject(paywallConfiguration.screensViewModel)
-//            .environmentObject(paywallConfiguration.assetsViewModel)
-//            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public extension View {
-    func withScreenSizeTestingWrapper(_ value: CGSize) -> some View {
-        withScreenSize(value)
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-public extension AdaptyUI {
-    static func getOnboardingConfigurationForTesting(
-        forOnboarding onboarding: AdaptyOnboarding,
-        inspectWebView: Bool
-    ) throws -> OnboardingConfiguration {
-        try AdaptyUI.getOnboardingConfiguration(
-            forOnboarding: onboarding,
-            inspectWebView: inspectWebView
-        )
-    }
-}
-
 #endif
