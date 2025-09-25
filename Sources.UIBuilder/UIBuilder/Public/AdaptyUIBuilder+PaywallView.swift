@@ -1,5 +1,5 @@
 //
-//  AdaptyUIBuilder+UI.swift
+//  AdaptyUIBuilder+PaywallView.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 9/23/25.
@@ -133,7 +133,7 @@ public extension View {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-struct AdaptyPaywallView: View {
+public struct AdaptyPaywallView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
     private let paywallConfiguration: AdaptyUIBuilder.PaywallConfiguration
