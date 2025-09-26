@@ -19,8 +19,12 @@ let package = Package(
             targets: ["Adapty"]
         ),
         .library(
-            name: "AdaptyUIBuider",
-            targets: ["AdaptyUIBuider"]
+            name: "Adapty_KidsMode",
+            targets: ["Adapty_KidsMode"]
+        ),
+        .library(
+            name: "AdaptyUIBuilder",
+            targets: ["AdaptyUIBuilder"]
         ),
         .library(
             name: "AdaptyUI",
@@ -48,29 +52,38 @@ let package = Package(
         ),
         .target(
             name: "Adapty",
-            dependencies: ["AdaptyUIBuider", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
             path: "Sources",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
+            name: "Adapty_KidsMode",
+            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
+            path: "Sources.KidsMode",
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [
+                .define("ADAPTY_KIDS_MODE"),
+            ]
+        ),
+        .target(
             name: "AdaptyUI",
-            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
             path: "Sources.AdaptyUI",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
             name: "AdaptyDeveloperTools",
-            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.DeveloperTools"
         ),
         .target(
             name: "AdaptyPlugin",
-            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyUI", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.AdaptyPlugin"
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuider", "Adapty", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),

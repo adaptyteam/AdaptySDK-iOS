@@ -1,11 +1,3 @@
-#
-# Be sure to run `pod lib lint Adapty.podspec' to ensure this is a
-# valid spec before submitting.
-#
-# Any lines starting with a # are optional, but their use is encouraged
-# To learn more about a Podspec see https://guides.cocoapods.org/syntax/podspec.html
-#
-
 Pod::Spec.new do |s|
   s.name             = 'AdaptyUI'
   s.version          = '3.12.0'
@@ -25,18 +17,21 @@ AdaptyUI is an extension for AdaptySDK.
   s.documentation_url = "https://docs.adapty.io"
 
   s.ios.deployment_target = '13.0'
-  s.swift_version = '5.9'
+  s.swift_version = '6.0'
 
-  s.source_files = 'AdaptyUI/**/*.swift'
-  s.resource_bundles = {"AdaptyUI" => ["AdaptyUI/PrivacyInfo.xcprivacy"]}
+  s.source_files = 'Sources.AdaptyUI/**/*.swift'
+  s.resource_bundles = {"AdaptyUI" => ["Sources.AdaptyUI/PrivacyInfo.xcprivacy"]}
 
-  s.dependency 'Adapty', s.version.to_s
+  s.dependency 'Adapty/Core', s.version.to_s
+  s.dependency 'Adapty/Logger', s.version.to_s
+  s.dependency 'Adapty/UIBuilder', s.version.to_s
 
   s.frameworks = 'SwiftUI'
   s.ios.framework = 'UIKit'
 
   s.pod_target_xcconfig = {
-    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk -Xfrontend -enable-experimental-feature -Xfrontend StrictConcurrency'
+    'DEFINES_MODULE' => 'YES', 
+    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk'
   }
 
 end
