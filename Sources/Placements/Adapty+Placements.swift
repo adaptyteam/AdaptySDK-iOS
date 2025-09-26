@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 01.11.2023
 //
 
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import Foundation
 
 private let log = Log.default

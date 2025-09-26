@@ -1,6 +1,6 @@
 //
 //  AdaptyUI+AssetsResolver.swift
-//  AdaptyUI
+//  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 22.05.2025.
 //
@@ -18,7 +18,7 @@ extension VC.VideoData {
         let image: VC.ImageData.Resolved?
     }
 
-    func resolve(with resolver: AdaptyAssetsResolver) -> Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver) -> Resolved {
         guard let customId,
               case let .video(asset) = resolver.asset(for: customId)
         else { return resolved }
@@ -45,7 +45,7 @@ extension VC.ImageData {
         case remote(URL, preview: UIImage?)
     }
 
-    func resolve(with resolver: AdaptyAssetsResolver) -> Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver) -> Resolved {
         guard let customId,
               case let .image(asset) = resolver.asset(for: customId),
               let resolved = asset.resolved
@@ -66,7 +66,7 @@ extension VC.ImageData {
 extension VC.Font {
     typealias Resolved = UIFont
 
-    func resolve(with resolver: AdaptyAssetsResolver, withSize size: Double) -> Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver, withSize size: Double) -> Resolved {
         guard let customId,
               case let .font(value) = resolver.asset(for: customId)
         else { return resolved(withSize: size) }
@@ -94,7 +94,7 @@ extension VC.Filling {
         }
     }
 
-    func resolve(with resolver: AdaptyAssetsResolver) -> Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver) -> Resolved {
         guard let customId,
               let asset = resolver.asset(for: customId)
         else { return resolved }
@@ -121,7 +121,7 @@ extension VC.Filling {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.ColorGradient {
-    typealias Resolved = AdaptyCustomGradientAsset
+    typealias Resolved = AdaptyUICustomGradientAsset
 
     fileprivate var resolved: Resolved {
         switch kind {
@@ -152,7 +152,7 @@ extension VC.ColorGradient {
         return result
     }
 
-    package var asCustomAsset: AdaptyCustomAsset {
+    package var asCustomAsset: AdaptyUICustomAsset {
         .gradient(resolved)
     }
 }
@@ -161,7 +161,7 @@ extension VC.ColorGradient {
 extension VC.Color {
     typealias Resolved = SwiftUI.Color
 
-    func resolve(with resolver: AdaptyAssetsResolver) -> Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver) -> Resolved {
         guard let customId,
               case let .color(asset) = resolver.asset(for: customId)
         else { return resolved }
@@ -172,13 +172,13 @@ extension VC.Color {
         SwiftUI.Color(.sRGB, red: red, green: green, blue: blue, opacity: alpha)
     }
 
-    package var asCustomAsset: AdaptyCustomAsset {
+    package var asCustomAsset: AdaptyUICustomAsset {
         .color(.swiftUIColor(resolved))
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-private extension AdaptyCustomVideoAsset {
+private extension AdaptyUICustomVideoAsset {
     var resolved: VC.VideoData.Resolved {
         switch self {
         case let .file(url, preview),
@@ -194,7 +194,7 @@ private extension AdaptyCustomVideoAsset {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-private extension AdaptyCustomImageAsset {
+private extension AdaptyUICustomImageAsset {
     var resolved: VC.ImageData.Resolved? {
         switch self {
         case let .file(url):
@@ -209,7 +209,7 @@ private extension AdaptyCustomImageAsset {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-private extension AdaptyCustomColorAsset {
+private extension AdaptyUICustomColorAsset {
     var resolved: VC.Color.Resolved {
         switch self {
         case let .uiColor(color):

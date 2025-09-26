@@ -46,7 +46,7 @@ let package = Package(
             path: "Sources.Logger"
         ),
         .target(
-            name: "AdaptyUIBuider",
+            name: "AdaptyUIBuilder",
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder"
         ),

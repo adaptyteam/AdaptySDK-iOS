@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 19.01.2023
 //
 
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import Foundation
 
 @AdaptyActor

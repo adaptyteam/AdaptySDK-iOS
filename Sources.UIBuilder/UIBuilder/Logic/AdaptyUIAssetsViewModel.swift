@@ -1,6 +1,6 @@
 //
-//  AdaptyAssetsViewModel.swift
-//  Adapty
+//  AdaptyUIAssetsViewModel.swift
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 1/16/25.
 //
@@ -11,11 +11,11 @@ import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package class AdaptyAssetsViewModel: ObservableObject {
-    let assetsResolver: AdaptyAssetsResolver
+package class AdaptyUIAssetsViewModel: ObservableObject {
+    let assetsResolver: AdaptyUIAssetsResolver
 
     package init(
-        assetsResolver: AdaptyAssetsResolver
+        assetsResolver: AdaptyUIAssetsResolver
     ) {
         self.assetsResolver = assetsResolver
     }

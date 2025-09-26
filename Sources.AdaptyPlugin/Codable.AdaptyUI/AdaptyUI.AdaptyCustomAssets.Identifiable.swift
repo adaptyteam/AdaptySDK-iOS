@@ -9,25 +9,25 @@
 
 import Adapty
 import AdaptyUI
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyCustomAsset {
+extension AdaptyUICustomAsset {
     struct Identifiable {
         let id: String
         let value: Value
     }
 
     enum Value {
-        case asset(AdaptyCustomAsset)
+        case asset(AdaptyUICustomAsset)
         case imageFlutterAssetId(String)
         case videoFlutterAssetId(String)
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyCustomAsset.Identifiable: Decodable {
+extension AdaptyUICustomAsset.Identifiable: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case type

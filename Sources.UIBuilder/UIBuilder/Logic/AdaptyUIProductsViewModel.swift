@@ -1,6 +1,6 @@
 //
-//  AdaptyProductsViewModel.swift
-//
+//  AdaptyUIProductsViewModel.swift
+//  AdaptyUIBuilder
 //
 //  Created by Aleksey Goncharov on 27.05.2024.
 //
@@ -17,7 +17,7 @@ protocol ProductsInfoProvider {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyProductsViewModel: ProductsInfoProvider {
+extension AdaptyUIProductsViewModel: ProductsInfoProvider {
     func selectedProductInfo(by groupId: String) -> ProductResolver? {
         guard let selectedProductId = selectedProductId(by: groupId) else { return nil }
         return productInfo(by: selectedProductId)
@@ -30,13 +30,13 @@ extension AdaptyProductsViewModel: ProductsInfoProvider {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package final class AdaptyProductsViewModel: ObservableObject {
-    private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyProductsViewModel.Queue")
+package final class AdaptyUIProductsViewModel: ObservableObject {
+    private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyUIProductsViewModel.Queue")
 
     private let logId: String
     private let logic: AdaptyUIBuilderLogic
-    private let paywallViewModel: AdaptyPaywallViewModel
-    private let presentationViewModel: AdaptyPresentationViewModel
+    private let paywallViewModel: AdaptyUIPaywallViewModel
+    private let presentationViewModel: AdaptyUIPresentationViewModel
 
     @Published private var paywallProductsWithoutOffer: [ProductResolver]?
     @Published private var paywallProducts: [ProductResolver]?
@@ -54,8 +54,8 @@ package final class AdaptyProductsViewModel: ObservableObject {
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
-        presentationViewModel: AdaptyPresentationViewModel,
-        paywallViewModel: AdaptyPaywallViewModel,
+        presentationViewModel: AdaptyUIPresentationViewModel,
+        paywallViewModel: AdaptyUIPaywallViewModel,
         products: [any ProductResolver]?
     ) {
         self.logId = logId

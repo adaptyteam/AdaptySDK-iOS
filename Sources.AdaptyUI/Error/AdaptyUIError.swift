@@ -81,7 +81,7 @@ extension Error {
     }
 }
 
-import AdaptyUIBuider
+import AdaptyUIBuilder
 
 extension AdaptyUIBuilderError {
     var toAdaptyUIError: AdaptyUIError {

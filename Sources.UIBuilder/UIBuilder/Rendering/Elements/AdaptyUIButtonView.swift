@@ -16,11 +16,11 @@ struct AdaptyUIButtonView: View {
 
     private var button: VC.Button
 
-    @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
-    @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
+    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
+    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
-    @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
-    @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
+    @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
+    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
 
     init(_ button: VC.Button) {
         self.button = button
@@ -70,11 +70,11 @@ struct AdaptyUIButtonView: View {
 extension [VC.Action] {
     func fire(
         screenId: String,
-        paywallViewModel: AdaptyPaywallViewModel,
-        productsViewModel: AdaptyProductsViewModel,
+        paywallViewModel: AdaptyUIPaywallViewModel,
+        productsViewModel: AdaptyUIProductsViewModel,
         actionsViewModel: AdaptyUIActionsViewModel,
-        sectionsViewModel: AdaptySectionsViewModel,
-        screensViewModel: AdaptyScreensViewModel
+        sectionsViewModel: AdaptyUISectionsViewModel,
+        screensViewModel: AdaptyUIScreensViewModel
     ) {
         forEach {
             $0.fire(
@@ -94,11 +94,11 @@ extension [VC.Action] {
 extension VC.Action {
     func fire(
         screenId: String,
-        paywallViewModel: AdaptyPaywallViewModel,
-        productsViewModel: AdaptyProductsViewModel,
+        paywallViewModel: AdaptyUIPaywallViewModel,
+        productsViewModel: AdaptyUIProductsViewModel,
         actionsViewModel: AdaptyUIActionsViewModel,
-        sectionsViewModel: AdaptySectionsViewModel,
-        screensViewModel: AdaptyScreensViewModel
+        sectionsViewModel: AdaptyUISectionsViewModel,
+        screensViewModel: AdaptyUIScreensViewModel
     ) {
         switch self {
         case let .selectProduct(id, groupId):

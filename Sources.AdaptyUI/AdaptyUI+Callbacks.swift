@@ -6,7 +6,7 @@
 //
 
 import Adapty
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import Foundation
 
 #if canImport(UIKit) && canImport(_Concurrency) && compiler(>=5.5.2)
@@ -38,7 +38,7 @@ public extension AdaptyUI {
         loadTimeout: TimeInterval = 5.0,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
-        tagResolver: AdaptyTagResolver? = nil,
+        tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         _ completion: @escaping AdaptyResultCompletion<PaywallConfiguration>
     ) {

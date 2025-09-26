@@ -6,7 +6,7 @@
 //
 //
 
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import Foundation
 
 extension AdaptyPaywall {

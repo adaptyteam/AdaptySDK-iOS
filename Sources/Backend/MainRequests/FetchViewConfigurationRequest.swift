@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AdaptyUIBuider
+import AdaptyUIBuilder
 
 struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>

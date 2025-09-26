@@ -16,7 +16,7 @@ extension InsettableShape {
     func fill(
         _ filling: VC.Mode<VC.Filling>,
         colorScheme: ColorScheme,
-        assetsResolver: AdaptyAssetsResolver
+        assetsResolver: AdaptyUIAssetsResolver
     ) -> some View {
         switch filling.resolve(with: assetsResolver, colorScheme: colorScheme) {
         case let .solidColor(color):
@@ -56,7 +56,7 @@ extension InsettableShape {
     func stroke(
         filling: VC.Filling.Resolved?,
         lineWidth: CGFloat,
-        assetsResolver: AdaptyAssetsResolver
+        assetsResolver: AdaptyUIAssetsResolver
     ) -> some View {
         if let filling {
             switch filling {
@@ -103,7 +103,7 @@ extension VC.ShapeType {
     func swiftUIShapeFill(
         _ filling: VC.Mode<VC.Filling>,
         colorScheme: ColorScheme,
-        assetsResolver: AdaptyAssetsResolver
+        assetsResolver: AdaptyUIAssetsResolver
     ) -> some View {
         switch self {
         case let .rectangle(radii):
@@ -150,7 +150,7 @@ extension VC.ShapeType {
     func swiftUIShapeStroke(
         _ filling: VC.Filling.Resolved?,
         lineWidth: CGFloat,
-        assetsResolver: AdaptyAssetsResolver
+        assetsResolver: AdaptyUIAssetsResolver
     ) -> some View {
         switch self {
         case let .rectangle(radii):
@@ -238,7 +238,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     }
 
     @EnvironmentObject
-    private var assetsViewModel: AdaptyAssetsViewModel
+    private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 

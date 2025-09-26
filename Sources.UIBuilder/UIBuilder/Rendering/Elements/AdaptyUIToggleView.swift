@@ -16,12 +16,12 @@ struct AdaptyUIToggleView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
-    @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
-    @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
+    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
+    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
-    @EnvironmentObject var sectionsViewModel: AdaptySectionsViewModel
-    @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
-    @EnvironmentObject var assetsViewModel: AdaptyAssetsViewModel
+    @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
+    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
+    @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
 
     private var toggle: VC.Toggle
 

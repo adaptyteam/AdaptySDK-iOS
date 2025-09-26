@@ -9,7 +9,7 @@
 
 import Adapty
 import AdaptyUI
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -22,7 +22,7 @@ extension Request {
         let preloadProducts: Bool?
         let customTags: [String: String]?
         let customTimers: [String: Date]?
-        let customAssets: [AdaptyCustomAsset.Identifiable]?
+        let customAssets: [AdaptyUICustomAsset.Identifiable]?
 
         enum CodingKeys: String, CodingKey {
             case paywall
@@ -52,10 +52,10 @@ extension Request {
         }
 
         @MainActor
-        func assetsResolver() throws -> [String: AdaptyCustomAsset]? {
+        func assetsResolver() throws -> [String: AdaptyUICustomAsset]? {
             guard let customAssets, !customAssets.isEmpty else { return nil }
 
-            var assetsResolver: [String: AdaptyCustomAsset] = [:]
+            var assetsResolver: [String: AdaptyUICustomAsset] = [:]
             assetsResolver.reserveCapacity(customAssets.count)
 
             for asset in customAssets {

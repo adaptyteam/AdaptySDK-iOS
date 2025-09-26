@@ -1,6 +1,6 @@
 //
 //  Color+UIKit.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 6/4/25.
 //

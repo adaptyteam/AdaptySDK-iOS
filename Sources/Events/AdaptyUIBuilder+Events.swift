@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 15.09.2025.
 //
 
-import AdaptyUIBuider
+import AdaptyUIBuilder
 
 package extension Adapty {
     static func logShowPaywall(

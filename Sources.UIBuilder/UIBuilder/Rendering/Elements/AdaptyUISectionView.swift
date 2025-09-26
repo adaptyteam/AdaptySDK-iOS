@@ -11,7 +11,7 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUISectionView: View {
-    @EnvironmentObject var viewModel: AdaptySectionsViewModel
+    @EnvironmentObject var viewModel: AdaptyUISectionsViewModel
 
     var section: VC.Section
 

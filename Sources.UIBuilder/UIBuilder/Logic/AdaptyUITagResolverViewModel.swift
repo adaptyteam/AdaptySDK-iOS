@@ -1,6 +1,6 @@
 //
-//  AdaptyTagResolverViewModel.swift
-//
+//  AdaptyUITagResolverViewModel.swift
+//  AdaptyUIBuilder
 //
 //  Created by Aleksey Goncharov on 27.05.2024.
 //
@@ -30,10 +30,10 @@ public enum TextProductTag: String {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package final class AdaptyTagResolverViewModel: ObservableObject, AdaptyTagResolver {
-    let tagResolver: AdaptyTagResolver?
+package final class AdaptyUITagResolverViewModel: ObservableObject, AdaptyUITagResolver {
+    let tagResolver: AdaptyUITagResolver?
 
-    package init(tagResolver: AdaptyTagResolver?) {
+    package init(tagResolver: AdaptyUITagResolver?) {
         self.tagResolver = tagResolver
     }
 

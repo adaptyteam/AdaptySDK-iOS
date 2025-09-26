@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywallRenderer.swift
+//  AdaptyUIPaywallRenderer.swift
 //
 //
 //  Created by Aleksey Goncharov on 27.05.2024.
@@ -19,10 +19,10 @@ package extension VC {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyPaywallRendererView: View {
-    @EnvironmentObject var paywallViewModel: AdaptyPaywallViewModel
-    @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
-    @EnvironmentObject var screensViewModel: AdaptyScreensViewModel
+struct AdaptyUIPaywallRendererView: View {
+    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
+    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
+    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
 
     @ViewBuilder
     private func templateResolverView(_ template: VC.Template, screen: VC.Screen) -> some View {

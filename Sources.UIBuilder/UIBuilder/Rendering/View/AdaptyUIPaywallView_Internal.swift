@@ -1,6 +1,6 @@
 //
-//  AdaptyPaywallView_Internal.swift
-//
+//  AdaptyUIPaywallView_Internal.swift
+//  AdaptyUIBuilder
 //
 //  Created by Aleksey Goncharov on 17.06.2024.
 //
@@ -11,8 +11,8 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package struct AdaptyPaywallView_Internal: View {
-    @EnvironmentObject private var productsViewModel: AdaptyProductsViewModel
+package struct AdaptyUIPaywallView_Internal: View {
+    @EnvironmentObject private var productsViewModel: AdaptyUIProductsViewModel
 
     private let showDebugOverlay: Bool
 
@@ -24,7 +24,7 @@ package struct AdaptyPaywallView_Internal: View {
 
     package var body: some View {
         GeometryReader { proxy in
-            AdaptyPaywallRendererView()
+            AdaptyUIPaywallRendererView()
                 .withScreenSize(
                     CGSize(
                         width: proxy.size.width + proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing,

@@ -1,6 +1,6 @@
 //
 //  AdaptyUI+ColorSchemeResolver.swift
-//  AdaptyUI
+//  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 23.05.2025.
 //
@@ -21,35 +21,35 @@ extension VC.Mode {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Mode<VC.VideoData> {
-    func resolve(with resolver: AdaptyAssetsResolver, colorScheme: ColorScheme) -> VC.VideoData.Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver, colorScheme: ColorScheme) -> VC.VideoData.Resolved {
         usedColorScheme(colorScheme).resolve(with: resolver)
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Mode<VC.ImageData> {
-    func resolve(with resolver: AdaptyAssetsResolver, colorScheme: ColorScheme) -> VC.ImageData.Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver, colorScheme: ColorScheme) -> VC.ImageData.Resolved {
         usedColorScheme(colorScheme).resolve(with: resolver)
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Mode<VC.Font> {
-    func resolve(with resolver: AdaptyAssetsResolver, colorScheme: ColorScheme, withSize size: Double) -> VC.Font.Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver, colorScheme: ColorScheme, withSize size: Double) -> VC.Font.Resolved {
         usedColorScheme(colorScheme).resolve(with: resolver, withSize: size)
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Mode<VC.Filling> {
-    func resolve(with resolver: AdaptyAssetsResolver, colorScheme: ColorScheme) -> VC.Filling.Resolved {
+    func resolve(with resolver: AdaptyUIAssetsResolver, colorScheme: ColorScheme) -> VC.Filling.Resolved {
         usedColorScheme(colorScheme).resolve(with: resolver)
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Mode<VC.Color> {
-    func resolve(with resolver: AdaptyAssetsResolver, colorScheme: ColorScheme) -> SwiftUI.Color {
+    func resolve(with resolver: AdaptyUIAssetsResolver, colorScheme: ColorScheme) -> SwiftUI.Color {
         usedColorScheme(colorScheme).resolve(with: resolver)
     }
 }

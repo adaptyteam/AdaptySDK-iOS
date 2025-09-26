@@ -11,15 +11,15 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUITextView: View {
-    @EnvironmentObject var productsViewModel: AdaptyProductsViewModel
-    @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
+    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
+    @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel
 
     private var text: VC.Text
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @EnvironmentObject
-    private var assetsViewModel: AdaptyAssetsViewModel
+    private var assetsViewModel: AdaptyUIAssetsViewModel
 
     init(_ text: VC.Text) {
         self.text = text
@@ -79,8 +79,8 @@ extension AdaptyUIBuilder {
 @MainActor
 extension Array where Element == VC.RichText.Item {
     func convertToSwiftUITextThrowingError(
-        assetsResolver: AdaptyAssetsResolver,
-        tagResolver: AdaptyTagResolver,
+        assetsResolver: AdaptyUIAssetsResolver,
+        tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme
     ) throws -> Text {
@@ -147,8 +147,8 @@ extension Array where Element == VC.RichText.Item {
 @MainActor
 extension VC.RichText {
     func convertToSwiftUIText(
-        assetsResolver: AdaptyAssetsResolver,
-        tagResolver: AdaptyTagResolver,
+        assetsResolver: AdaptyUIAssetsResolver,
+        tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
         placeholder: Bool = false
@@ -276,7 +276,7 @@ extension AttributedString {
     static func createFrom(
         value: String,
         attributes: VC.RichText.TextAttributes?,
-        assetsResolver: AdaptyAssetsResolver,
+        assetsResolver: AdaptyUIAssetsResolver,
         colorScheme: ColorScheme
     ) -> AttributedString {
         var result = AttributedString(value)
@@ -315,7 +315,7 @@ extension UIFont {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension VC.RichText.TextAttributes {
-    func uiFont(_ assetsResolver: AdaptyAssetsResolver) -> UIFont {
+    func uiFont(_ assetsResolver: AdaptyUIAssetsResolver) -> UIFont {
         font.resolve(with: assetsResolver, withSize: size)
     }
 }

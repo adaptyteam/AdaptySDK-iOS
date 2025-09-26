@@ -8,7 +8,7 @@
 #if canImport(UIKit)
 
 import Adapty
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -105,7 +105,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
 
         paywallConfiguration.eventsHandler.didFinishWebPaymentNavigation = didFinishWebPaymentNavigation ?? { _, _ in }
 
-        return AdaptyPaywallView_Internal(
+        return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false
         )
         .environmentObject(paywallConfiguration.eventsHandler)

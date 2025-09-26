@@ -1,6 +1,6 @@
 //
 //  AdaptyUIBuilder+Logic.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 9/23/25.
 //
@@ -10,13 +10,13 @@ import Foundation
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     let logId: String
-    let events: AdaptyEventsHandler
+    let events: AdaptyUIEventsHandler
     let products: [ProductResolver]
 
     init(
         logId: String,
         products: [ProductResolver],
-        events: AdaptyEventsHandler
+        events: AdaptyUIEventsHandler
     ) {
         self.logId = logId
         self.events = events
@@ -61,7 +61,7 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
         events.event_didStartRestore()
     }
 
-    func openWebPaywall(for product: any AdaptyUIBuider.ProductResolver) async {}
+    func openWebPaywall(for product: any ProductResolver) async {}
     
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)

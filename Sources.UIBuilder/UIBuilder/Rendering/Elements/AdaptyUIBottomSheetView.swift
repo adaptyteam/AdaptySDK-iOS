@@ -1,6 +1,6 @@
 //
 //  AdaptyUIBottomSheetView.swift
-//
+//  AdaptyUIBuilder
 //
 //  Created by Aleksey Goncharov on 18.06.2024.
 //
@@ -23,7 +23,7 @@ extension AdaptyUIBuilder {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIBottomSheetView: View {
-    @EnvironmentObject var viewModel: AdaptyBottomSheetViewModel
+    @EnvironmentObject var viewModel: AdaptyUIBottomSheetViewModel
 
     @State private var offset: CGFloat = AdaptyUIBuilder.mainScreenBounds.height
 

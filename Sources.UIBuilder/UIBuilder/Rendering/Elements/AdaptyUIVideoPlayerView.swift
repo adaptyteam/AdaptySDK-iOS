@@ -84,7 +84,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoView: View {
     @EnvironmentObject
-    private var viewModel: AdaptyAssetsViewModel
+    private var viewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
@@ -140,7 +140,7 @@ struct AdaptyUIVideoView: View {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoColorSchemeSpecificView: View {
     @EnvironmentObject
-    private var viewModel: AdaptyAssetsViewModel
+    private var viewModel: AdaptyUIAssetsViewModel
     @EnvironmentObject
     private var playerManager: AdaptyUIVideoPlayerManager
 

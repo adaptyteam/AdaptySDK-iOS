@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AdaptyUIBuider
+import AdaptyUIBuilder
 
 private struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>

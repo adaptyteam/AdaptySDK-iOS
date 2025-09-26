@@ -1,6 +1,6 @@
 //
 //  AdaptyUIBuilder+PaywallView.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 9/23/25.
 //
@@ -9,7 +9,7 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-struct AdaptyPaywallViewModifier<Placeholder>: ViewModifier where Placeholder: View {
+struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
 
     private let isPresented: Binding<Bool>
@@ -55,7 +55,7 @@ struct AdaptyPaywallViewModifier<Placeholder>: ViewModifier where Placeholder: V
     @ViewBuilder
     private var paywallOrProgressView: some View {
         if let paywallConfiguration {
-            AdaptyPaywallView(
+            AdaptyUIPaywallView(
                 paywallConfiguration: paywallConfiguration,
                 didAppear: didAppear,
                 didDisappear: didDisappear,
@@ -114,7 +114,7 @@ public extension View {
         placeholderBuilder: @escaping (() -> Placeholder)
     ) -> some View {
         modifier(
-            AdaptyPaywallViewModifier<Placeholder>(
+            AdaptyUIPaywallViewModifier<Placeholder>(
                 isPresented: isPresented,
                 fullScreen: fullScreen,
                 paywallConfiguration: paywallConfiguration,
@@ -133,7 +133,7 @@ public extension View {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-public struct AdaptyPaywallView: View {
+public struct AdaptyUIPaywallView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
     private let paywallConfiguration: AdaptyUIBuilder.PaywallConfiguration
@@ -187,7 +187,7 @@ public struct AdaptyPaywallView: View {
         paywallConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
         paywallConfiguration.eventsHandler.didFailRendering = didFailRendering
 
-        return AdaptyPaywallView_Internal(
+        return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false
         )
         .environmentObject(paywallConfiguration.eventsHandler)

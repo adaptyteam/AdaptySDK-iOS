@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 9/22/25.
 //

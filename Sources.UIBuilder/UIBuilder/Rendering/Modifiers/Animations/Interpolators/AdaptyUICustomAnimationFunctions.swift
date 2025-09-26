@@ -1,6 +1,6 @@
 //
 //  AdaptyUICustomAnimationFunctions.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 3/21/25.
 //

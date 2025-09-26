@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import AdaptyUIBuider
+import AdaptyUIBuilder
 
 extension Adapty {
     public nonisolated static let SDKVersion = "3.12.0"

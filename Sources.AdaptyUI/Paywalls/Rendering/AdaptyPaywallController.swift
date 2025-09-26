@@ -8,7 +8,7 @@
 #if canImport(UIKit)
 
 import Adapty
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import SwiftUI
 import UIKit
 
@@ -170,7 +170,7 @@ public final class AdaptyPaywallController: UIViewController {
         }
 
         addSubSwiftUIView(
-            AdaptyPaywallView_Internal(
+            AdaptyUIPaywallView_Internal(
                 showDebugOverlay: showDebugOverlay
             )
             .environmentObject(paywallConfiguration.eventsHandler)

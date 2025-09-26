@@ -14,7 +14,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
     var background: VC.Background?
 
     @EnvironmentObject
-    private var assetsViewModel: AdaptyAssetsViewModel
+    private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 

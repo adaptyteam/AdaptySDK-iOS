@@ -139,13 +139,13 @@ extension VC.RichText {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-struct AdaptyUITimerView: View, AdaptyTagResolver {
+struct AdaptyUITimerView: View, AdaptyUITagResolver {
     @Environment(\.adaptyScreenId)
     private var screenId: String
 
-    @EnvironmentObject var viewModel: AdaptyTimerViewModel
-    @EnvironmentObject var customTagResolverViewModel: AdaptyTagResolverViewModel
-    @EnvironmentObject var assetsViewModel: AdaptyAssetsViewModel
+    @EnvironmentObject var viewModel: AdaptyUITimerViewModel
+    @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel
+    @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme

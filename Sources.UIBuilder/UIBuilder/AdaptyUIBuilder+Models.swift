@@ -1,6 +1,6 @@
 //
 //  AdaptyUIBuilder+Models.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 9/23/25.
 //

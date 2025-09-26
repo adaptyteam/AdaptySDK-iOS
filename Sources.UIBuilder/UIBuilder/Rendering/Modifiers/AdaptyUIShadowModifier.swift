@@ -1,6 +1,6 @@
 //
 //  AdaptyUIShadowModifier.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 3/21/25.
 //
@@ -10,7 +10,7 @@
 import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyShadowModifier: ViewModifier {
+struct AdaptyUIShadowModifier: ViewModifier {
     private let filling: VC.Mode<VC.Filling>
     private let blurRadius: Double
     private let offset: CGSize
@@ -26,7 +26,7 @@ struct AdaptyShadowModifier: ViewModifier {
     }
 
     @EnvironmentObject
-    private var assetsViewModel: AdaptyAssetsViewModel
+    private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenSize)
@@ -60,7 +60,7 @@ extension View {
     ) -> some View {
         if let filling, let blurRadius, let offset {
             self.modifier(
-                AdaptyShadowModifier(
+                AdaptyUIShadowModifier(
                     filling: filling,
                     blurRadius: blurRadius,
                     offset: offset

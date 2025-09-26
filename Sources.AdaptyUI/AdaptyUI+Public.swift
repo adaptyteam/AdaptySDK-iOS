@@ -6,7 +6,7 @@
 //
 
 import Adapty
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import Foundation
 
 /// AdaptyUI is a module intended to display paywalls created with the Paywall Builder.
@@ -193,16 +193,16 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
 #endif
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyTimerResolver = AdaptyUIBuider.AdaptyTimerResolver
+public typealias AdaptyTimerResolver = AdaptyUITimerResolver
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyTagResolver = AdaptyUIBuider.AdaptyTagResolver
+public typealias AdaptyTagResolver = AdaptyUITagResolver
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyAssetsResolver = AdaptyUIBuider.AdaptyAssetsResolver
+public typealias AdaptyAssetsResolver = AdaptyUIAssetsResolver
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public typealias AdaptyCustomAsset = AdaptyUIBuider.AdaptyCustomAsset
+public typealias AdaptyCustomAsset = AdaptyUICustomAsset
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public protocol AdaptyObserverModeResolver: Sendable {
@@ -291,9 +291,9 @@ public extension AdaptyUI {
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
-        tagResolver: AdaptyTagResolver? = nil,
+        tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
-        assetsResolver: AdaptyAssetsResolver? = nil
+        assetsResolver: AdaptyUIAssetsResolver? = nil
     ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyUINotActivated

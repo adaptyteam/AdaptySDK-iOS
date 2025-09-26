@@ -1,6 +1,6 @@
 //
-//  AdaptyTimerViewModel.swift
-//
+//  AdaptyUITimerViewModel.swift
+//  AdaptyUIBuilder
 //
 //  Created by Aleksey Goncharov on 04.06.2024.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @MainActor
-package struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
+package struct AdaptyUIDefaultTimerResolver: AdaptyUITimerResolver {
     package init() {}
 
     package func timerEndAtDate(for timerId: String) -> Date {
@@ -17,7 +17,7 @@ package struct AdaptyUIDefaultTimerResolver: AdaptyTimerResolver {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension [String: Date]: AdaptyTimerResolver {
+extension [String: Date]: AdaptyUITimerResolver {
     public func timerEndAtDate(for timerId: String) -> Date {
         self[timerId] ?? Date(timeIntervalSinceNow: 3600.0)
     }
@@ -27,28 +27,28 @@ extension [String: Date]: AdaptyTimerResolver {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package final class AdaptyTimerViewModel: ObservableObject {
+package final class AdaptyUITimerViewModel: ObservableObject {
     private let logId: String
 
     private static var globalTimers = [String: Date]()
     private var timers = [String: Date]()
 
-    private let timerResolver: AdaptyTimerResolver
+    private let timerResolver: AdaptyUITimerResolver
 
-    private let paywallViewModel: AdaptyPaywallViewModel
-    private let productsViewModel: AdaptyProductsViewModel
+    private let paywallViewModel: AdaptyUIPaywallViewModel
+    private let productsViewModel: AdaptyUIProductsViewModel
     private let actionsViewModel: AdaptyUIActionsViewModel
-    private let sectionsViewModel: AdaptySectionsViewModel
-    private let screensViewModel: AdaptyScreensViewModel
+    private let sectionsViewModel: AdaptyUISectionsViewModel
+    private let screensViewModel: AdaptyUIScreensViewModel
 
     package init(
         logId: String,
-        timerResolver: AdaptyTimerResolver,
-        paywallViewModel: AdaptyPaywallViewModel,
-        productsViewModel: AdaptyProductsViewModel,
+        timerResolver: AdaptyUITimerResolver,
+        paywallViewModel: AdaptyUIPaywallViewModel,
+        productsViewModel: AdaptyUIProductsViewModel,
         actionsViewModel: AdaptyUIActionsViewModel,
-        sectionsViewModel: AdaptySectionsViewModel,
-        screensViewModel: AdaptyScreensViewModel
+        sectionsViewModel: AdaptyUISectionsViewModel,
+        screensViewModel: AdaptyUIScreensViewModel
     ) {
         self.logId = logId
         self.timerResolver = timerResolver

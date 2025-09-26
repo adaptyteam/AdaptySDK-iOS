@@ -1,5 +1,5 @@
 //
-//  AdaptyImageUrlObserver.swift
+//  AdaptyUIImageUrlObserver.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 03.04.2024
@@ -7,22 +7,22 @@
 
 import Foundation
 
-package protocol AdaptyImageUrlObserver: Sendable {
+package protocol AdaptyUIImageUrlObserver: Sendable {
     func extractedImageUrls(_: Set<URL>)
 }
 
 extension AdaptyUIBuilder {
     private actor Holder {
-        private(set) var imageUrlObserver: AdaptyImageUrlObserver?
+        private(set) var imageUrlObserver: AdaptyUIImageUrlObserver?
 
-        func set(imageUrlObserver observer: AdaptyImageUrlObserver) {
+        func set(imageUrlObserver observer: AdaptyUIImageUrlObserver) {
             imageUrlObserver = observer
         }
     }
 
     private static let holder = Holder()
 
-    package nonisolated static func setImageUrlObserver(_ observer: AdaptyImageUrlObserver) {
+    package nonisolated static func setImageUrlObserver(_ observer: AdaptyUIImageUrlObserver) {
         Task {
             await holder.set(imageUrlObserver: observer)
         }

@@ -63,7 +63,7 @@ struct AdaptyUIPagerView: View {
     private static let pageControllTapAnimationDuration = 0.3
 
     @EnvironmentObject
-    private var assetsViewModel: AdaptyAssetsViewModel
+    private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
     @Environment(\.adaptyScreenSize)

@@ -1,6 +1,6 @@
 //
 //  Collection+Extensions.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 15.09.2025.
 //

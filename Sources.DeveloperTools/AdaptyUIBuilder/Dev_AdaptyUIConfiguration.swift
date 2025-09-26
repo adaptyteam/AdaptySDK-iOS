@@ -1,21 +1,19 @@
 //
-//  AdaptyViewConfigurationTestWrapper.swift
+//  Dev_AdaptyUIConfiguration.swift
 //  AdaptyDeveloperTools
 //
 //  Created by Aleksey Goncharov on 20.05.2024.
 //
 
-import AdaptyUIBuider
+import AdaptyUIBuilder
 
-public extension Dev {
-    struct AdaptyUIConfiguration {
-        typealias Wrapped = AdaptyUIBuider.AdaptyUIConfiguration
-        let wrapped: Wrapped
-    }
+public struct Dev_AdaptyUIConfiguration {
+    typealias Wrapped = AdaptyUIConfiguration
+    let wrapped: Wrapped
 }
 
 #if DEBUG
-public extension Dev.AdaptyUIConfiguration {
+public extension Dev_AdaptyUIConfiguration {
     static func create(
         templateId: String = "basic",
         locale: String = "en",

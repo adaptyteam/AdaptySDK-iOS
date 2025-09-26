@@ -1,6 +1,6 @@
 //
 //  AdaptyUIPropertyAnimator.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 6/6/25.
 //

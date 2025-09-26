@@ -57,7 +57,7 @@ struct AdaptyUIImageView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @EnvironmentObject
-    private var assetsViewModel: AdaptyAssetsViewModel
+    private var assetsViewModel: AdaptyUIAssetsViewModel
 
     @ViewBuilder
     private func rasterImage(

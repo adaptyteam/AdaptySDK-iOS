@@ -1,5 +1,5 @@
 //
-//  AdaptyVideoViewModel.swift
+//  AdaptyUIVideoViewModel.swift
 //
 //
 //  Created by Aleksey Goncharov on 15.08.2024.
@@ -49,7 +49,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     init(
         video: VC.VideoData,
         loop: Bool,
-        assetsResolver: AdaptyAssetsResolver,
+        assetsResolver: AdaptyUIAssetsResolver,
         onStateUpdated: @escaping (PlayerState) -> Void
     ) {
         let video = video.resolve(with: assetsResolver)

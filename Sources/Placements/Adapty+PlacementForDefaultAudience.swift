@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 12.08.2024
 //
 
-import AdaptyUIBuider
+import AdaptyUIBuilder
 import Foundation
 
 extension Adapty {

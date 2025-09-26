@@ -1,11 +1,10 @@
 //
 //  AdaptyUIBuilder+PaywallConfiguration.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 9/23/25.
 //
 
-import AdaptyLogger
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -15,9 +14,9 @@ public extension AdaptyUIBuilder {
         forSchema schema: AdaptyUISchema,
         localeId: LocaleId?,
         products: [ProductResolver],
-        tagResolver: AdaptyTagResolver?,
-        timerResolver: AdaptyTimerResolver?,
-        assetsResolver: AdaptyAssetsResolver?
+        tagResolver: AdaptyUITagResolver?,
+        timerResolver: AdaptyUITimerResolver?,
+        assetsResolver: AdaptyUIAssetsResolver?
     ) async throws -> PaywallConfiguration {
         let viewConfiguration = try schema.extractUIConfiguration(withLocaleId: localeId)
 
@@ -36,65 +35,65 @@ public extension AdaptyUIBuilder {
 public extension AdaptyUIBuilder {
     @MainActor
     final class PaywallConfiguration {
-        let eventsHandler: AdaptyEventsHandler
+        let eventsHandler: AdaptyUIEventsHandler
 
-        let presentationViewModel: AdaptyPresentationViewModel
-        let paywallViewModel: AdaptyPaywallViewModel
-        let productsViewModel: AdaptyProductsViewModel
+        let presentationViewModel: AdaptyUIPresentationViewModel
+        let paywallViewModel: AdaptyUIPaywallViewModel
+        let productsViewModel: AdaptyUIProductsViewModel
         let actionsViewModel: AdaptyUIActionsViewModel
-        let sectionsViewModel: AdaptySectionsViewModel
-        let tagResolverViewModel: AdaptyTagResolverViewModel
-        let timerViewModel: AdaptyTimerViewModel
-        let screensViewModel: AdaptyScreensViewModel
-        let assetsViewModel: AdaptyAssetsViewModel
+        let sectionsViewModel: AdaptyUISectionsViewModel
+        let tagResolverViewModel: AdaptyUITagResolverViewModel
+        let timerViewModel: AdaptyUITimerViewModel
+        let screensViewModel: AdaptyUIScreensViewModel
+        let assetsViewModel: AdaptyUIAssetsViewModel
 
         let logic: AdaptyUIBuilderAppLogic
 
         fileprivate let logId: String
-        fileprivate let tagResolver: AdaptyTagResolver?
-        fileprivate let timerResolver: AdaptyTimerResolver?
-        fileprivate let assetsResolver: AdaptyAssetsResolver?
+        fileprivate let tagResolver: AdaptyUITagResolver?
+        fileprivate let timerResolver: AdaptyUITimerResolver?
+        fileprivate let assetsResolver: AdaptyUIAssetsResolver?
 
         init(
             logId: String,
             viewConfiguration: AdaptyUIConfiguration,
             products: [ProductResolver],
-            tagResolver: AdaptyTagResolver?,
-            timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyAssetsResolver?
+            tagResolver: AdaptyUITagResolver?,
+            timerResolver: AdaptyUITimerResolver?,
+            assetsResolver: AdaptyUIAssetsResolver?
         ) {
             self.logId = logId
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
 
-            eventsHandler = AdaptyEventsHandler(logId: logId)
+            eventsHandler = AdaptyUIEventsHandler(logId: logId)
             logic = AdaptyUIBuilderAppLogic(
                 logId: logId,
                 products: products,
                 events: eventsHandler
             )
-            presentationViewModel = AdaptyPresentationViewModel(logId: logId, logic: logic)
-            tagResolverViewModel = AdaptyTagResolverViewModel(tagResolver: tagResolver)
+            presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
+            tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
             actionsViewModel = AdaptyUIActionsViewModel(logId: logId, logic: logic)
-            sectionsViewModel = AdaptySectionsViewModel(logId: logId)
-            paywallViewModel = AdaptyPaywallViewModel(
+            sectionsViewModel = AdaptyUISectionsViewModel(logId: logId)
+            paywallViewModel = AdaptyUIPaywallViewModel(
                 logId: logId,
                 logic: logic,
                 viewConfiguration: viewConfiguration
             )
-            productsViewModel = AdaptyProductsViewModel(
+            productsViewModel = AdaptyUIProductsViewModel(
                 logId: logId,
                 logic: logic,
                 presentationViewModel: presentationViewModel,
                 paywallViewModel: paywallViewModel,
                 products: products
             )
-            screensViewModel = AdaptyScreensViewModel(
+            screensViewModel = AdaptyUIScreensViewModel(
                 logId: logId,
                 viewConfiguration: viewConfiguration
             )
-            timerViewModel = AdaptyTimerViewModel(
+            timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 paywallViewModel: paywallViewModel,
@@ -103,7 +102,7 @@ public extension AdaptyUIBuilder {
                 sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )
-            assetsViewModel = AdaptyAssetsViewModel(
+            assetsViewModel = AdaptyUIAssetsViewModel(
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
             )
 
