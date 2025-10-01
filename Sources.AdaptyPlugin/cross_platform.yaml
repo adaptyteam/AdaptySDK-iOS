@@ -1410,7 +1410,9 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
-          jws_transaction: { type: string }
+          apple_jws_transaction: { type: string }
+          google_purchase_token: { type: string }
+
 
   AdaptyInstallationStatus: #response #event
     type: object
