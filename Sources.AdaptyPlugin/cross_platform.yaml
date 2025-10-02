@@ -1043,6 +1043,7 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      accessLevelId
       paywall_product_index: { type: integer }
       subscription_offer_identifier:
         { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
@@ -1121,6 +1122,8 @@ $defs:
     required:
       - placement
       - paywall_id
+      - access_level_id
+      - product_type
       - paywall_name
       - variation_id
       - products
@@ -1130,6 +1133,8 @@ $defs:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       paywall_id: { type: string }
       paywall_name: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       variation_id: { type: string }
       remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
       paywall_builder: { $ref: "#/$defs/AdaptyPaywall.ViewConfiguration" }
