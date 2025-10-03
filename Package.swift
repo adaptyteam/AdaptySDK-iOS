@@ -48,7 +48,10 @@ let package = Package(
         .target(
             name: "AdaptyUIBuilder",
             dependencies: ["AdaptyLogger"],
-            path: "Sources.UIBuilder"
+            path: "Sources.UIBuilder",
+            exclude: [
+                "adaptyui.v4.3.0.schema.yaml",
+            ],
         ),
         .target(
             name: "Adapty",
@@ -79,7 +82,10 @@ let package = Package(
         .target(
             name: "AdaptyPlugin",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
-            path: "Sources.AdaptyPlugin"
+            path: "Sources.AdaptyPlugin",
+            exclude: [
+                "cross_platform.yaml",
+            ]
         ),
         .testTarget(
             name: "AdaptyTests",
