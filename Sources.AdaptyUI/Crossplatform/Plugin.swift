@@ -5,9 +5,11 @@
 //  Created by Aleksey Goncharov on 13.11.2024.
 //
 
-#if canImport(UIKit)
 import Adapty
 import AdaptyUIBuilder
+
+#if canImport(UIKit)
+
 import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)

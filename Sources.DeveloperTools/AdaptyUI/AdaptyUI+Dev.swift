@@ -5,6 +5,8 @@
 //  Created by Aleksei Valiano on 24.09.2025.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import AdaptyUI
 
@@ -21,3 +23,5 @@ public extension AdaptyUI {
         )
     }
 }
+
+#endif

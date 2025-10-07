@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 9/23/25.
 //
 
+#if canImport(UIKit)
+
 import Foundation
 
 public extension AdaptyUIBuilder {
@@ -21,3 +23,5 @@ public protocol ProductResolver: Sendable {
 
     func value(byTag tag: TextProductTag) -> TextTagValue?
 }
+
+#endif

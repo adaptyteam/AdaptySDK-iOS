@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 9/22/25.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import AdaptyUIBuilder
 import Foundation
@@ -203,3 +205,5 @@ private extension AdaptyPaywall {
         }
     }
 }
+
+#endif

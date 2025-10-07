@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+#if canImport(UIKit)
+
 @MainActor
 package struct AdaptyUIDefaultTimerResolver: AdaptyUITimerResolver {
     package init() {}
@@ -22,8 +24,6 @@ extension [String: Date]: AdaptyUITimerResolver {
         self[timerId] ?? Date(timeIntervalSinceNow: 3600.0)
     }
 }
-
-#if canImport(UIKit)
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
