@@ -48,6 +48,7 @@ actor SK2ProductsManager {
                 await self.storage.set(allProductInfo: response)
                 let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
                 _ = try? await fetchSK2Products(ids: allProductVendorIds)
+                return
             } catch {
                 guard !error.isCancelled else { return }
                 try? await Task.sleep(duration: .seconds(2))
