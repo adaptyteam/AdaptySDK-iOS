@@ -14,16 +14,6 @@ extension AdaptyConfiguration {
 
         let defaultValue = AdaptyConfiguration.default
 
-        let defaultBackend =
-            switch builder.serverCluster ?? .default {
-            case .eu:
-                Backend.URLs.euPublicEnvironment
-            case .cn:
-                Backend.URLs.cnPublicEnvironment
-            default:
-                Backend.URLs.defaultPublicEnvironment
-            }
-
         self.init(
             apiKey: apiKey.trimmed,
             customerUserId: builder.customerUserId.trimmed.nonEmptyOrNil,
@@ -32,12 +22,14 @@ extension AdaptyConfiguration {
             idfaCollectionDisabled: builder.idfaCollectionDisabled ?? defaultValue.idfaCollectionDisabled,
             ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled ?? defaultValue.ipAddressCollectionDisabled,
             callbackDispatchQueue: builder.callbackDispatchQueue,
-            backend: .init(
-                baseUrl: builder.backendBaseUrl ?? defaultBackend.baseUrl,
-                fallbackUrl: builder.backendFallbackBaseUrl ?? defaultBackend.fallbackUrl,
-                configsUrl: builder.backendConfigsBaseUrl ?? defaultBackend.configsUrl,
-                uaUrl: builder.backendUABaseUrl ?? defaultBackend.uaUrl,
-                proxy: builder.backendProxy ?? defaultBackend.proxy
+            backend: Backend.Configuration(
+                cluster: builder.serverCluster ?? .default,
+                mainBaseUrl: builder.backendBaseUrl,
+                fallbackBaseUrl: builder.backendFallbackBaseUrl,
+                configsBaseUrl: builder.backendConfigsBaseUrl,
+                uaBaseUrl: builder.backendUABaseUrl,
+                proxy: builder.backendProxy,
+                protocolClasses: builder.urlProtocolClasses
             ),
             logLevel: builder.logLevel,
             crossPlatformSDK: builder.crossPlatformSDK.map {
@@ -64,7 +56,8 @@ extension AdaptyConfiguration {
             backendProxy: nil,
             transactionFinishBehavior: nil,
             logLevel: nil,
-            crossPlatformSDK: nil
+            crossPlatformSDK: nil,
+            urlProtocolClasses: nil
         )
     }
 }
@@ -79,7 +72,7 @@ public extension AdaptyConfiguration {
         public private(set) var ipAddressCollectionDisabled: Bool?
         public private(set) var callbackDispatchQueue: DispatchQueue?
 
-        public private(set) var serverCluster: ServerCluster?
+        public private(set) var serverCluster: AdaptyServerCluster?
         public private(set) var backendBaseUrl: URL?
         public private(set) var backendFallbackBaseUrl: URL?
         public private(set) var backendConfigsBaseUrl: URL?
@@ -87,7 +80,7 @@ public extension AdaptyConfiguration {
         public private(set) var backendProxy: (host: String, port: Int)?
 
         public private(set) var transactionFinishBehavior: TransactionFinishBehavior?
-
+        public private(set) var urlProtocolClasses: [AnyClass]?
         public private(set) var logLevel: AdaptyLog.Level?
 
         package private(set) var crossPlatformSDK: (name: String, version: String)?
@@ -100,7 +93,7 @@ public extension AdaptyConfiguration {
             idfaCollectionDisabled: Bool?,
             ipAddressCollectionDisabled: Bool?,
             callbackDispatchQueue: DispatchQueue?,
-            serverCluster: ServerCluster?,
+            serverCluster: AdaptyServerCluster?,
             backendBaseUrl: URL?,
             backendFallbackBaseUrl: URL?,
             backendConfigsBaseUrl: URL?,
@@ -108,7 +101,8 @@ public extension AdaptyConfiguration {
             backendProxy: (host: String, port: Int)?,
             transactionFinishBehavior: TransactionFinishBehavior?,
             logLevel: AdaptyLog.Level?,
-            crossPlatformSDK: (name: String, version: String)?
+            crossPlatformSDK: (name: String, version: String)?,
+            urlProtocolClasses: [AnyClass]?
         ) {
             self.apiKey = apiKey
             self.customerUserId = customerUserId
@@ -126,6 +120,7 @@ public extension AdaptyConfiguration {
             self.transactionFinishBehavior = transactionFinishBehavior
             self.logLevel = logLevel
             self.crossPlatformSDK = crossPlatformSDK
+            self.urlProtocolClasses = urlProtocolClasses
         }
 
         /// Call this method to get the ``AdaptyConfiguration`` object.
@@ -180,7 +175,7 @@ public extension AdaptyConfiguration.Builder {
     }
 
     @discardableResult
-    func with(serverCluster value: AdaptyConfiguration.ServerCluster) -> Self {
+    func with(serverCluster value: AdaptyServerCluster) -> Self {
         serverCluster = value
         return self
     }
@@ -230,6 +225,12 @@ public extension AdaptyConfiguration.Builder {
     @discardableResult
     package func with(crossplatformSDKName name: String, version: String) -> Self {
         crossPlatformSDK = (name: name, version: version)
+        return self
+    }
+
+    @discardableResult
+    package func with(urlProtocolClasses classes: [AnyClass]) -> Self {
+        urlProtocolClasses = classes
         return self
     }
 }

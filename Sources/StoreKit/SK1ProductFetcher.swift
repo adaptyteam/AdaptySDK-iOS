@@ -62,16 +62,14 @@ extension _SK1ProductFetcher: SKProductsRequestDelegate {
         let requestHash = request.hash
         let stamp = "SKR\(requestHash)"
         queue.async { [weak self] in
-            Task {
-                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
-                    methodName: .fetchSK1Products,
-                    stamp: stamp,
-                    params: [
-                        "products_ids": response.products.map { $0.productIdentifier },
-                        "invalid_products": response.invalidProductIdentifiers,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                methodName: .fetchSK1Products,
+                stamp: stamp,
+                params: [
+                    "products_ids": response.products.map { $0.productIdentifier },
+                    "invalid_products": response.invalidProductIdentifiers,
+                ]
+            ))
 
             if response.products.isEmpty {
                 log.verbose("SKProductsResponse don't have any product")

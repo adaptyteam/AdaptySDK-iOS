@@ -14,19 +14,23 @@ struct RemoteFilesBackend: HTTPCodableConfiguration {
     func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
     func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
 
-    init(apiKey _: String, baseURL url: URL, withProxy: (host: String, port: Int)? = nil) {
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 30
-        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+    init(with configuration: AdaptyConfiguration, baseURL url: URL) {
+        let backend = configuration.backend
 
-        if let (host, port) = withProxy {
-            configuration.connectionProxyDictionary = [
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForRequest = 30
+        sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        sessionConfiguration.protocolClasses = (backend.protocolClasses ?? []) + (sessionConfiguration.protocolClasses ?? [])
+
+        if let (host, port) = backend.proxy {
+            sessionConfiguration.connectionProxyDictionary = [
                 String(kCFNetworkProxiesHTTPEnable): NSNumber(value: 1),
                 String(kCFNetworkProxiesHTTPProxy): host,
                 String(kCFNetworkProxiesHTTPPort): port,
             ]
         }
-        baseURL = url
-        sessionConfiguration = configuration
+
+        self.baseURL = true ?  backend.fallbackBaseUrl : backend.configsBaseUrl
+        self.sessionConfiguration = sessionConfiguration
     }
 }
