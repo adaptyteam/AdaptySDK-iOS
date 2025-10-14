@@ -48,11 +48,11 @@ extension Adapty {
 
         Adapty.sendImageUrlsToObserver(viewConfiguration)
 
-        let extractLocaleTask: AdaptyResultTask<AdaptyViewConfiguration> = Task {
+        let extractLocaleTask = Task.detachedAsResultTask(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyViewConfiguration in
             do {
-                return try .success(viewConfiguration.extractLocale())
+                return try viewConfiguration.extractLocale()
             } catch {
-                return .failure(.decodingViewConfiguration(error))
+                throw AdaptyError.decodingViewConfiguration(error)
             }
         }
 

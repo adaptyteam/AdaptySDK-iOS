@@ -88,12 +88,10 @@ private extension FallbackPlacements {
                     : "The fallback paywalls version is not correct. Please update the AdaptySDK."
                 log.error(error)
 
-                Task(priority: .high) {
-                    await Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
-                        "in_version": formatVersion,
-                        "expected_version": Adapty.fallbackFormatVersion,
-                    ]))
-                }
+                Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
+                    "in_version": formatVersion,
+                    "expected_version": Adapty.fallbackFormatVersion,
+                ]))
 
                 throw AdaptyError.wrongVersionFallback(error)
             }

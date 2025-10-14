@@ -167,38 +167,32 @@ extension PurchasePayloadStorage {
             ),
             forProductId: productId
         ) {
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_set_variations_ids",
-                    params: [
-                        "payload_by_product": Self.purchasePayloadByProductId,
-                    ]
-                ))
-            }
-        }
-
-        if Self.setPersistentPaywallVariationId(variationId, forProductId: productId) {
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_set_variations_ids_persistent",
-                    params: [
-                        "variation_by_product": Self.persistentPaywallVariationsIds,
-                    ]
-                ))
-            }
-        }
-    }
-
-    func removePurchasePayload(forProductId productId: String) {
-        guard Self.removePurchasePayload(forProductId: productId) else { return }
-        Task {
-            await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                 eventName: "did_set_variations_ids",
                 params: [
                     "payload_by_product": Self.purchasePayloadByProductId,
                 ]
             ))
         }
+
+        if Self.setPersistentPaywallVariationId(variationId, forProductId: productId) {
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "did_set_variations_ids_persistent",
+                params: [
+                    "variation_by_product": Self.persistentPaywallVariationsIds,
+                ]
+            ))
+        }
+    }
+
+    func removePurchasePayload(forProductId productId: String) {
+        guard Self.removePurchasePayload(forProductId: productId) else { return }
+        Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+            eventName: "did_set_variations_ids",
+            params: [
+                "payload_by_product": Self.purchasePayloadByProductId,
+            ]
+        ))
     }
 
     func purchasePayload(byTransaction transaction: SKTransaction, orCreateFor userId: AdaptyUserId) -> PurchasePayload {
@@ -216,28 +210,24 @@ extension PurchasePayloadStorage {
             payload,
             forTransactionId: transaction.unfIdentifier
         ) {
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_set_variations_ids",
-                    params: [
-                        "payload_by_transaction": Self.purchasePayloadByTransactionId,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "did_set_variations_ids",
+                params: [
+                    "payload_by_transaction": Self.purchasePayloadByTransactionId,
+                ]
+            ))
         }
         removePurchasePayload(forProductId: transaction.unfProductId)
     }
 
     func removePurchasePayload(forTransaction transaction: SKTransaction) {
         if Self.removePurchasePayload(forTransactionId: transaction.unfIdentifier) {
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_set_variations_ids",
-                    params: [
-                        "payload_by_transaction": Self.purchasePayloadByTransactionId,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "did_set_variations_ids",
+                params: [
+                    "payload_by_transaction": Self.purchasePayloadByTransactionId,
+                ]
+            ))
         }
         removePurchasePayload(forProductId: transaction.unfProductId)
     }
@@ -246,14 +236,12 @@ extension PurchasePayloadStorage {
 
     func setOnboardingVariationId(_ variationId: String) {
         if Self.setPersistentOnboardingVariationId(variationId) {
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_set_onboarding_variations_id",
-                    params: [
-                        "onboarding_variation_id": variationId,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "did_set_onboarding_variations_id",
+                params: [
+                    "onboarding_variation_id": variationId,
+                ]
+            ))
         }
     }
 
@@ -269,14 +257,12 @@ extension PurchasePayloadStorage {
         let added = Self.setUnfinishedTransactionState(synced: false, forTransactionId: transactionId)
         if added {
             log.debug("Storage after add state of unfinishedTransaction:\(transactionId) all:\(Self.unfinishedTransactionState)")
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_change_unfinished_transaction",
-                    params: [
-                        "state": Self.unfinishedTransactionState,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "did_change_unfinished_transaction",
+                params: [
+                    "state": Self.unfinishedTransactionState,
+                ]
+            ))
         }
         return added
     }
@@ -286,14 +272,12 @@ extension PurchasePayloadStorage {
         if Self.setUnfinishedTransactionState(synced: true, forTransactionId: transactionId) {
             log.debug("Storage after change state of unfinishedTransaction:\(transactionId) all: \(Self.unfinishedTransactionState)")
 
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_change_unfinished_transaction",
-                    params: [
-                        "state": Self.unfinishedTransactionState,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "did_change_unfinished_transaction",
+                params: [
+                    "state": Self.unfinishedTransactionState,
+                ]
+            ))
         }
         return false
     }
@@ -302,14 +286,12 @@ extension PurchasePayloadStorage {
         guard Self.unfinishedTransactionState[transactionId] != nil else { return }
         if Self.removeUnfinishedTransactionState(forTransactionId: transactionId) {
             log.debug("Storage after remove state of unfinishedTransaction:\(transactionId) all: \(Self.unfinishedTransactionState)")
-            Task {
-                await Adapty.trackSystemEvent(AdaptyInternalEventParameters(
-                    eventName: "did_change_unfinished_transaction",
-                    params: [
-                        "state": Self.unfinishedTransactionState,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyInternalEventParameters(
+                eventName: "did_change_unfinished_transaction",
+                params: [
+                    "state": Self.unfinishedTransactionState,
+                ]
+            ))
         }
     }
 }

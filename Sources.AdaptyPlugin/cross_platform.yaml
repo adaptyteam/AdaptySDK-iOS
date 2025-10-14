@@ -976,6 +976,8 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - access_level_id
+      - product_type
       - paywall_product_index
       - paywall_variation_id
       - paywall_ab_test_name
@@ -987,6 +989,8 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       paywall_product_index: { type: integer }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
@@ -1520,8 +1524,8 @@ $defs:
     enum:
       - primary
       - secondary
-
-   AdaptyPurchaseParameters:  #request
+  
+  AdaptyPurchaseParameters:  #request
     type: object
     properties:
       subscription_update_params:

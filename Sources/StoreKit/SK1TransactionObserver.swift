@@ -25,7 +25,7 @@ actor SK1TransactionObserver: Sendable {
         for sk1Transaction in transactions {
             let logParams = sk1Transaction.logParams
 
-            await Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+            Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
                 eventName: "updated_transaction",
                 params: logParams,
                 error: sk1Transaction.error.map { "\($0.localizedDescription). Detail: \($0)" }

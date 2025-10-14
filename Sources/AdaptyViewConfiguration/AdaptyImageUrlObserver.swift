@@ -28,7 +28,7 @@ extension Adapty {
         }
     }
 
-    static func sendImageUrlsToObserver(_ config: AdaptyViewSource) {
+    nonisolated static func sendImageUrlsToObserver(_ config: AdaptyViewSource) {
         Task {
             guard let observer = await holder.imageUrlObserver else { return }
             let urls = config.extractImageUrls(config.responseLocale)

@@ -5,9 +5,9 @@
 //  Created by Aleksei Valiano on 30.07.2025.
 //
 
-struct AdaptyUserId: Sendable, Hashable {
-    let profileId: String
-    let customerId: String?
+package struct AdaptyUserId: Sendable, Hashable {
+    package let profileId: String
+    package let customerId: String?
 }
 
 extension AdaptyUserId {
@@ -23,7 +23,7 @@ extension AdaptyUserId {
 }
 
 extension AdaptyUserId: CustomStringConvertible {
-    var description: String {
+    package var description: String {
         "(profileId: \(profileId), customerUserId: \(customerId ?? "nil")"
     }
 }

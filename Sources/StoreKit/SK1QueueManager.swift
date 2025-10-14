@@ -110,14 +110,12 @@ actor SK1QueueManager: Sendable {
 
         makePurchasesCompletionHandlers[productId] = [completion]
 
-        Task {
-            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                methodName: .addPayment,
-                params: [
-                    "product_id": productId,
-                ]
-            ))
-        }
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+            methodName: .addPayment,
+            params: [
+                "product_id": productId,
+            ]
+        ))
 
         SKPaymentQueue.default().add(payment)
     }
@@ -126,7 +124,7 @@ actor SK1QueueManager: Sendable {
         for sk1Transaction in transactions {
             let logParams = sk1Transaction.logParams
 
-            await Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+            Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
                 eventName: "updated_transaction",
                 params: logParams,
                 error: sk1Transaction.error.map { "\($0.localizedDescription). Detail: \($0)" }
@@ -145,7 +143,7 @@ actor SK1QueueManager: Sendable {
 
             case .restored:
                 SKPaymentQueue.default().finishTransaction(sk1Transaction)
-                await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                     methodName: .finishTransaction,
                     params: logParams
                 ))
@@ -188,7 +186,7 @@ actor SK1QueueManager: Sendable {
             await storage.removePurchasePayload(forProductId: productId)
             makePurchasesProduct.removeValue(forKey: productId)
             SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
-            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                 methodName: .finishTransaction,
                 params: sk1Transaction.logParams
             ))
@@ -208,7 +206,7 @@ actor SK1QueueManager: Sendable {
         makePurchasesProduct.removeValue(forKey: productId)
         await storage.removePurchasePayload(forProductId: productId)
         SKPaymentQueue.default().finishTransaction(sk1Transaction)
-        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .finishTransaction,
             params: sk1Transaction.logParams
         ))
@@ -259,7 +257,7 @@ actor SK1QueueManager: Sendable {
             "result": result,
         ]
 
-        await Adapty.trackSystemEvent(
+        Adapty.trackSystemEvent(
             AdaptyAppleEventQueueHandlerParameters(
                 eventName: "store_payment",
                 params: logParams,

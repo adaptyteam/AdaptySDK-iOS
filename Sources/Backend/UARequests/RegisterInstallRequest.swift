@@ -52,7 +52,8 @@ extension Backend.UAExecutor {
             installInfo: installInfo
         )
         var attempt = 0
-        repeat {
+
+        while !Task.isCancelled {
             do {
                 let response = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil)
                 return response.body.value
@@ -63,7 +64,7 @@ extension Backend.UAExecutor {
                 attempt += 1
                 try? await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
             }
-
-        } while true
+        }
+        throw HTTPError.cancelled(request.endpoint)
     }
 }

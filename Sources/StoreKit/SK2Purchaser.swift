@@ -173,7 +173,7 @@ actor SK2Purchaser {
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         let stamp = Log.stamp
 
-        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .productPurchase,
             stamp: stamp,
             params: [
@@ -185,7 +185,7 @@ actor SK2Purchaser {
         do {
             purchaseResult = try await sk2Product.unfPurchase(options: options)
         } catch {
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,
                 stamp: stamp,
                 error: error.localizedDescription
@@ -199,7 +199,7 @@ actor SK2Purchaser {
         case let .success(verificationResult):
             switch verificationResult {
             case let .verified(sk2Transaction):
-                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                     methodName: .productPurchase,
                     stamp: stamp,
                     params: [
@@ -209,7 +209,7 @@ actor SK2Purchaser {
                 await storage.setPurchasePayload(payload, forTransaction: sk2Transaction)
                 sk2SignedTransaction = verificationResult
             case let .unverified(sk2Transaction, error):
-                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                     methodName: .productPurchase,
                     stamp: stamp,
                     error: error.localizedDescription
@@ -220,14 +220,14 @@ actor SK2Purchaser {
                 log.error("Finish unverified purchase transaction: \(sk2Transaction) of product: \(sk2Transaction.unfProductId) error: \(error.localizedDescription)")
                 await storage.removePurchasePayload(forTransaction: sk2Transaction)
                 await storage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
-                await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+                Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
                     methodName: .finishTransaction,
                     params: sk2Transaction.logParams(other: ["unverified": error.localizedDescription])
                 ))
                 throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
             }
         case .pending:
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,
                 stamp: stamp,
                 params: [
@@ -237,7 +237,7 @@ actor SK2Purchaser {
             log.info("Pending purchase product: \(sk2Product.id)")
             return .pending
         case .userCancelled:
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,
                 stamp: stamp,
                 params: [
@@ -247,7 +247,7 @@ actor SK2Purchaser {
             log.info("User cancelled purchase product: \(sk2Product.id)")
             return .userCancelled
         @unknown default:
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .productPurchase,
                 stamp: stamp,
                 params: [

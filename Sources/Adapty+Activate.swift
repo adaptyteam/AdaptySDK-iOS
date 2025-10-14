@@ -58,7 +58,7 @@ public extension Adapty {
             throw error
         }
 
-        let task = Task<Adapty, Never> { @AdaptyActor in
+        let task = Task<Adapty, Never>.detached { @AdaptyActor @Sendable () async -> Adapty in
             if let logLevel = configuration.logLevel { Adapty.logLevel = logLevel }
 
             await Storage.clearAllDataIfDifferent(apiKey: configuration.apiKey)
@@ -71,9 +71,7 @@ public extension Adapty {
             let environment = await Environment.instance
             let backend = Backend(with: configuration, environment: environment)
 
-            Task {
-                await eventsManager.set(backend: backend)
-            }
+            await eventsManager.set(backend: backend)
 
             let sdk = await Adapty(
                 configuration: configuration,

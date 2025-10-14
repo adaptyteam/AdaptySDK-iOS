@@ -193,12 +193,12 @@ private extension SK2TransactionManager {
     static func fetchUnfinishedTrunsactions() async -> [SK2SignedTransaction] {
         let stamp = Log.stamp
 
-        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp))
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp))
         log.verbose("call  SK2Transaction.unfinished")
 
         let signedTransactions = await SK2Transaction.unfinished.reduce(into: []) { $0.append($1) }
 
-        await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp, params: ["count": signedTransactions.count]))
+        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp, params: ["count": signedTransactions.count]))
 
         log.verbose("SK2Transaction.unfinished.count = \(signedTransactions.count)")
         return signedTransactions
@@ -207,13 +207,13 @@ private extension SK2TransactionManager {
     private static func fetchVerifiedCurrentEntitlements() async -> [SK2Transaction] {
         let stamp = Log.stamp
 
-        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp))
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp))
         log.verbose("call  SK2Transaction.currentEntitlements")
 
         let signedTransactions = await SK2Transaction.currentEntitlements.reduce(into: []) { $0.append($1) }
         let transaction: [SK2Transaction] = signedTransactions.compactMap(\.verifiedTransaction)
 
-        await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp, params: ["total_count": signedTransactions.count, "verified_count": transaction.count]))
+        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp, params: ["total_count": signedTransactions.count, "verified_count": transaction.count]))
 
         log.verbose("SK2Transaction.currentEntitlements total count: \(signedTransactions.count), verified count: \(transaction.count)")
         return transaction
@@ -223,7 +223,7 @@ private extension SK2TransactionManager {
         var lastTransaction: SK2Transaction?
         let stamp = Log.stamp
 
-        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getAllSK2Transactions, stamp: stamp))
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getAllSK2Transactions, stamp: stamp))
         log.verbose("call  SK2Transaction.all")
 
         for await transaction in SK2Transaction.all.compactMap(\.verifiedTransaction) {
@@ -248,7 +248,7 @@ private extension SK2TransactionManager {
                 nil
             }
 
-        await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getAllSK2Transactions, stamp: stamp, params: params))
+        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getAllSK2Transactions, stamp: stamp, params: params))
 
         return lastTransaction
     }

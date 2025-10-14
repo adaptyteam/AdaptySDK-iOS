@@ -35,9 +35,8 @@ actor StoreKitReceiptManager {
 
     private func bundleReceipt() throws(AdaptyError) -> Data {
         let stamp = Log.stamp
-        Task {
-            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getReceipt, stamp: stamp))
-        }
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getReceipt, stamp: stamp))
+
         do throws(AdaptyError) {
             guard let url = Bundle.main.appStoreReceiptURL else {
                 log.error("Receipt URL is nil.")
@@ -57,52 +56,45 @@ actor StoreKitReceiptManager {
                 throw StoreKitManagerError.receiptIsEmpty().asAdaptyError
             }
 
-            Task {
-                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getReceipt, stamp: stamp))
-            }
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getReceipt, stamp: stamp))
+
             log.verbose("Loaded receipt")
             return data
 
         } catch {
-            Task {
-                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getReceipt, stamp: stamp, error: error.localizedDescription))
-            }
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getReceipt, stamp: stamp, error: error.localizedDescription))
+
             throw error
         }
     }
 }
 
 extension StoreKitReceiptManager {
-
-    
     func syncTransactionHistory(for userId: AdaptyUserId) async throws(AdaptyError) {
         let task: AdaptyResultTask<Void>
         if let syncing, userId.isEqualProfileId(syncing.userId) {
             task = syncing.task
         } else {
-            task = Task {
-                defer { syncing = nil }
-                let receipt: Data
-                do throws(AdaptyError) {
-                    receipt = try await getReceipt()
-                } catch {
-                    return .failure(error)
-                }
-
-                do throws(HTTPError) {
-                    let response = try await httpSession.validateReceipt(
-                        userId: userId,
-                        receipt: receipt
-                    )
-                    await Adapty.optionalSDK?.handleTransactionResponse(response)
-                    return .success(())
-                } catch {
-                    return .failure(error.asAdaptyError)
-                }
+            task = Task.detachedAsResultTask { () async throws(AdaptyError) in
+                try await self.syncReceipt(for: userId)
             }
             syncing = (task, userId)
         }
         try await task.value.get()
+    }
+
+    private func syncReceipt(for userId: AdaptyUserId) async throws(AdaptyError) {
+        defer { syncing = nil }
+        let receipt = try await getReceipt()
+        do throws(HTTPError) {
+            let response = try await httpSession.validateReceipt(
+                userId: userId,
+                receipt: receipt
+            )
+            await Adapty.optionalSDK?.handleTransactionResponse(response)
+        } catch {
+            throw error.asAdaptyError
+        }
     }
 }
 
@@ -143,18 +135,14 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
             request.start()
 
             let stamp = "SKR\(request.hash)"
-            Task {
-                await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .refreshReceipt, stamp: stamp))
-            }
+            Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .refreshReceipt, stamp: stamp))
         }
     }
 
     private func completedRefresh(_ request: SKRequest, _ error: AdaptyError? = nil) {
         let stamp = "SKR\(request.hash)"
 
-        Task {
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .refreshReceipt, stamp: stamp, error: error?.description))
-        }
+        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .refreshReceipt, stamp: stamp, error: error?.description))
 
         queue.async { [weak self] in
             guard let self else { return }
