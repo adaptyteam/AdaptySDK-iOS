@@ -25,6 +25,7 @@ extension AdaptyProfile {
                 continue
             }
             guard let accessLevel = await AdaptyProfile.AccessLevel(
+                id: productInfo.accessLevelId,
                 sk2Transaction: transaction,
                 sk2Product: sk2Product,
                 backendPeriod: productInfo.period
