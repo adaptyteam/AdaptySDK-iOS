@@ -62,6 +62,7 @@ struct AdaptyUIButtonView: View {
         } label: {
             AdaptyUIElementView(currentStateView)
         }
+        .buttonStyle(.plain)
     }
 }
 
