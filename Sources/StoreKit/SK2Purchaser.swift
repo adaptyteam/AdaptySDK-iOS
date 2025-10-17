@@ -60,7 +60,7 @@ actor SK2Purchaser {
                         
                         guard !sk2Transaction.isXcodeEnvironment else {
                             log.verbose("Skip sending to backend for Xcode environment transaction \(sk2Transaction.id)")
-                            _ = try? await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
+                            _ = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
                             await transactionSynchronizer.attemptToFinish(transaction: sk2Transaction, logSource: "updated")
                             return
                         }
@@ -85,7 +85,7 @@ actor SK2Purchaser {
                            
                             await transactionSynchronizer.attemptToFinish(transaction: sk2Transaction, logSource: "updated")
                         } catch {
-                            _ = try? await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
+                            _ = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
                             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                         }
                     }
@@ -264,7 +264,7 @@ actor SK2Purchaser {
         guard !sk2Transaction.isXcodeEnvironment else {
             log.verbose("Skip validation on backend for Xcode environment transaction \(sk2Transaction.id)")
             await transactionSynchronizer.attemptToFinish(transaction: sk2Transaction, logSource: "purchased")
-            let profile = try await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
+            let profile = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
             return .success(profile: profile, transaction: sk2SignedTransaction)
         }
         
@@ -280,11 +280,8 @@ actor SK2Purchaser {
             return .success(profile: profile, transaction: sk2SignedTransaction)
         } catch {
             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Product.id)")
-            
-            let profile = try await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
+            let profile = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
             return .success(profile: profile, transaction: sk2SignedTransaction)
-            
-            //                throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
         }
     }
 }

@@ -22,11 +22,11 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func attemptToFinish(transaction: SK2Transaction, logSource: String) async
-    
+
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(transaction: SK2Transaction) async
 
-    func recalculateOfflineAccessLevels(with: SKTransaction) async throws(AdaptyError) -> AdaptyProfile
+    func recalculateOfflineAccessLevels(with: SKTransaction) async -> AdaptyProfile
 }
 
 extension Adapty: StoreKitTransactionSynchronizer {
@@ -63,9 +63,7 @@ extension Adapty: StoreKitTransactionSynchronizer {
             Log.sk2TransactionManager.info("Successfully \(logSource) transaction synced: \(transaction), manual finish required for product: \(transaction.unfProductId)")
         }
     }
-    
 
-    
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(transaction: SK2Transaction) async {
         await transaction.finish()

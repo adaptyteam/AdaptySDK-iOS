@@ -163,15 +163,12 @@ actor SK1QueueManager: Sendable {
 
         guard !sk1Transaction.isXcodeEnvironment else {
             log.verbose("Skip validation on backend for Xcode environment transaction \(sk1Transaction.unfIdentifier)")
-            let result: AdaptyResult<AdaptyPurchaseResult>
-            do throws(AdaptyError) {
-                let profile = try await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk1Transaction)
-                result = .success(.success(profile: profile, transaction: sk1Transaction))
-            } catch {
-                result = .failure(error)
-            }
             await finishTransaction(sk1Transaction: sk1Transaction, productId: productId)
-            callMakePurchasesCompletionHandlers(productId, result)
+            let profile = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk1Transaction)
+            callMakePurchasesCompletionHandlers(
+                productId,
+                .success(.success(profile: profile, transaction: sk1Transaction))
+            )
             return
         }
 

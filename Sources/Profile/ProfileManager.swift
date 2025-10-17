@@ -172,24 +172,20 @@ extension Adapty {
         _ = try? profileManager?.saveProfileAndStartNotifyTask(response)
     }
 
-    func recalculateOfflineAccessLevels(with: SKTransaction) async throws(AdaptyError) -> AdaptyProfile {
+    func recalculateOfflineAccessLevels(with: SKTransaction) async -> AdaptyProfile {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
             if let manger = profileManager {
                 return manger.currentProfile
             }
-            if let manager = offlineProfileManager {
-                return manager.currentProfile
-            }
-            throw .notActivated()
+            let manager = offlineProfileManager ?? OfflineProfileManager(userId: profileStorage.userId)
+            return manager.currentProfile
         }
         await (transactionManager as? SK2TransactionManager)?.clearCache()
         if let manger = profileManager {
             return await manger.notifyProfileDidChanged()
         }
-        if let manger = offlineProfileManager {
-            return await profileWithOfflineAccessLevels(manger.currentProfile)
-        }
-        throw AdaptyError.notActivated()
+        let manger = offlineProfileManager ?? OfflineProfileManager(userId: profileStorage.userId)
+        return await profileWithOfflineAccessLevels(manger.currentProfile)
     }
 
     func syncTransactionHistory(for userId: AdaptyUserId, forceSync: Bool = false) async throws(AdaptyError) {
