@@ -56,33 +56,34 @@ actor SK2Purchaser {
                     log.debug("Transaction \(sk2Transaction.unfIdentifier) (originalId: \(sk2Transaction.unfOriginalIdentifier),  productId: \(sk2Transaction.unfProductId), revocationDate:\(sk2Transaction.revocationDate?.description ?? "nil"), expirationDate:\(sk2Transaction.expirationDate?.description ?? "nil") \((sk2Transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(sk2Transaction.isUpgraded) ) ")
 
                     Task.detached {
-                        do {
-                            await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(sk2SignedTransaction: sk2SignedTransaction)) }
-                            
-                            if !sk2Transaction.isXcodeEnvironment {
-                                let productOrNil = try? await sk2ProductsManager.fetchProduct(
-                                    id: sk2Transaction.unfProductId,
-                                    fetchPolicy: .returnCacheDataElseLoad
-                                )
-                                
-                                try await transactionSynchronizer.report(
-                                    .init(
-                                        product: productOrNil,
-                                        transaction: sk2Transaction
-                                    ),
-                                    payload: storage.purchasePayload(
-                                        byTransaction: sk2Transaction,
-                                        orCreateFor: ProfileStorage.userId
-                                    ),
-                                    reason: .observing
-                                )
-                            } else {
-                                log.verbose("Skip sending to backend for Xcode environment transaction \(sk2Transaction.id)")
-                                _ = try? await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
-                            }
-                            
+                        await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(sk2SignedTransaction: sk2SignedTransaction)) }
+                        
+                        guard !sk2Transaction.isXcodeEnvironment else {
+                            log.verbose("Skip sending to backend for Xcode environment transaction \(sk2Transaction.id)")
+                            _ = try? await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
                             await transactionSynchronizer.attemptToFinish(transaction: sk2Transaction, logSource: "updated")
-                            
+                            return
+                        }
+                        
+                        do {
+                            let productOrNil = try? await sk2ProductsManager.fetchProduct(
+                                id: sk2Transaction.unfProductId,
+                                fetchPolicy: .returnCacheDataElseLoad
+                            )
+                                
+                            try await transactionSynchronizer.report(
+                                .init(
+                                    product: productOrNil,
+                                    transaction: sk2Transaction
+                                ),
+                                payload: storage.purchasePayload(
+                                    byTransaction: sk2Transaction,
+                                    orCreateFor: ProfileStorage.userId
+                                ),
+                                reason: .observing
+                            )
+                           
+                            await transactionSynchronizer.attemptToFinish(transaction: sk2Transaction, logSource: "updated")
                         } catch {
                             _ = try? await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk2Transaction)
                             log.error("Failed to validate transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")

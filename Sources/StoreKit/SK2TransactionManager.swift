@@ -135,29 +135,30 @@ private extension Adapty {
             case let .verified(sk2Transaction):
                 if await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.unfIdentifier) { continue }
 
+                guard !sk2Transaction.isXcodeEnvironment else {
+                    log.verbose("Skip backend sync for Xcode environment transaction \(sk2Transaction.id)")
+                    await attemptToFinish(transaction: sk2Transaction, logSource: "unfinished")
+                    continue
+                }
+
                 do {
-                    
-                    if !sk2Transaction.isXcodeEnvironment {
-                        let productOrNil = try? await productsManager.fetchProduct(
-                            id: sk2Transaction.unfProductId,
-                            fetchPolicy: .returnCacheDataElseLoad
-                        )
-                        
-                        try await report(
-                            .init(
-                                product: productOrNil,
-                                transaction: sk2Transaction
-                            ),
-                            payload: purchasePayloadStorage.purchasePayload(
-                                byTransaction: sk2Transaction,
-                                orCreateFor: ProfileStorage.userId
-                            ),
-                            reason: .unfinished
-                        )
-                    } else {
-                        log.verbose("Skip backend sync for Xcode environment transaction \(sk2Transaction.id)")
-                    }
-                    
+                    let productOrNil = try? await productsManager.fetchProduct(
+                        id: sk2Transaction.unfProductId,
+                        fetchPolicy: .returnCacheDataElseLoad
+                    )
+
+                    try await report(
+                        .init(
+                            product: productOrNil,
+                            transaction: sk2Transaction
+                        ),
+                        payload: purchasePayloadStorage.purchasePayload(
+                            byTransaction: sk2Transaction,
+                            orCreateFor: ProfileStorage.userId
+                        ),
+                        reason: .unfinished
+                    )
+
                     await attemptToFinish(transaction: sk2Transaction, logSource: "unfinished")
                 } catch {
                     log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
