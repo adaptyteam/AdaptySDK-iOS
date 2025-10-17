@@ -164,7 +164,8 @@ actor SK1QueueManager: Sendable {
         guard !sk1Transaction.isXcodeEnvironment else {
             log.verbose("Skip validation on backend for Xcode environment transaction \(sk1Transaction.unfIdentifier)")
             await finishTransaction(sk1Transaction: sk1Transaction, productId: productId)
-            let profile = await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk1Transaction)
+
+            let profile = await transactionSynchronizer.skipSyncXcodeSK1Transaction()
             callMakePurchasesCompletionHandlers(
                 productId,
                 .success(.success(profile: profile, transaction: sk1Transaction))
@@ -347,5 +348,16 @@ extension SK1QueueManager {
             return result
         }
         #endif
+    }
+}
+
+extension Adapty {
+    func skipSyncXcodeSK1Transaction() async -> AdaptyProfile {
+        if let manger = profileManager {
+            return manger.currentProfile
+        }
+
+        let manager = offlineProfileManager ?? OfflineProfileManager(userId: profileStorage.userId)
+        return manager.currentProfile
     }
 }

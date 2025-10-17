@@ -26,7 +26,10 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(transaction: SK2Transaction) async
 
-    func recalculateOfflineAccessLevels(with: SKTransaction) async -> AdaptyProfile
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    func recalculateOfflineAccessLevels() async -> AdaptyProfile
+    
+    func skipSyncXcodeSK1Transaction() async -> AdaptyProfile
 }
 
 extension Adapty: StoreKitTransactionSynchronizer {
