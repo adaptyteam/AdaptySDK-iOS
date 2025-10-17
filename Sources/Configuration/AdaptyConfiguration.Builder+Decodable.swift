@@ -61,7 +61,7 @@ extension AdaptyConfiguration.Builder: Decodable {
             idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled),
             ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),
             callbackDispatchQueue: nil,
-            serverCluster: container.decodeIfPresent(AdaptyConfiguration.ServerCluster.self, forKey: .serverCluster),
+            serverCluster: container.decodeIfPresent(AdaptyServerCluster.self, forKey: .serverCluster),
             backendBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendBaseUrl),
             backendFallbackBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl),
             backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl),
@@ -69,18 +69,10 @@ extension AdaptyConfiguration.Builder: Decodable {
             backendProxy: proxy,
             transactionFinishBehavior: nil,
             logLevel: container.decodeIfPresent(AdaptyLog.Level.self, forKey: .logLevel),
-            crossPlatformSDK: crossPlatformSDK
+            crossPlatformSDK: crossPlatformSDK,
+            urlProtocolClasses: nil
         )
     }
 }
 
-extension AdaptyConfiguration.ServerCluster: Decodable {
-    public init(from decoder: Decoder) throws {
-        self =
-            switch try decoder.singleValueContainer().decode(String.self) {
-            case "eu": .eu
-            case "cn": .cn
-            default: .default
-            }
-    }
-}
+

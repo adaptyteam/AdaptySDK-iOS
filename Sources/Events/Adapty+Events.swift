@@ -12,7 +12,11 @@ extension Adapty {
     static let eventsManager = EventsManager()
 
     @EventsManagerActor
-    static func trackEvent(_ event: Event, for userId: AdaptyUserId? = nil, date: Date = Date()) {
+    static func trackEvent(
+        _ event: Event,
+        for userId: AdaptyUserId? = nil,
+        date: Date = Date()
+    ) {
         Task.detached(priority: .utility) { @EventsManagerActor @Sendable in
             let userId =
                 if let userId {
@@ -30,7 +34,10 @@ extension Adapty {
         }
     }
 
-    package nonisolated static func trackSystemEvent(_ params: AdaptySystemEventParameters, for userId: AdaptyUserId? = nil) {
+    package nonisolated static func trackSystemEvent(
+        _ params: AdaptySystemEventParameters,
+        for userId: AdaptyUserId? = nil
+    ) {
         let now = Date()
         Task { @EventsManagerActor in
             trackEvent(
@@ -41,7 +48,9 @@ extension Adapty {
         }
     }
 
-    nonisolated static func trackEventIfNeed(_ chosen: AdaptyPlacementChosen<some PlacementContent>) {
+    nonisolated static func trackEventIfNeed(
+        _ chosen: AdaptyPlacementChosen<some PlacementContent>
+    ) {
         guard case let .draw(draw) = chosen else {
             return
         }
@@ -73,7 +82,7 @@ extension Adapty {
             trackEvent(event, for: draw.userId, date: now)
         }
     }
-    
+
     package nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) {
         let now = Date()
         Task { @EventsManagerActor in

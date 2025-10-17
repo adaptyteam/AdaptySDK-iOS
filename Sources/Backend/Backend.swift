@@ -20,15 +20,15 @@ package struct Backend: HTTPCodableConfiguration {
     func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
 
     init(with configuration: AdaptyConfiguration, environment: Environment) {
-        let baseUrls = configuration.backend
-        let apiKey = configuration.apiKey
+        let backend = configuration.backend
 
         let sessionConfiguration = URLSessionConfiguration.ephemeral
         sessionConfiguration.httpAdditionalHeaders = Request.globalHeadersWithStoreKit(configuration, environment)
         sessionConfiguration.timeoutIntervalForRequest = 30
         sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        sessionConfiguration.protocolClasses = (backend.protocolClasses ?? []) + (sessionConfiguration.protocolClasses ?? [])
 
-        if let (host, port) = baseUrls.proxy {
+        if let (host, port) = backend.proxy {
             sessionConfiguration.connectionProxyDictionary = [
                 String(kCFNetworkProxiesHTTPEnable): NSNumber(value: 1),
                 String(kCFNetworkProxiesHTTPProxy): host,
@@ -38,21 +38,22 @@ package struct Backend: HTTPCodableConfiguration {
 
         self.sessionConfiguration = sessionConfiguration
 
-        self.baseURL = baseUrls.baseUrl
+        self.baseURL = backend.mainBaseUrl
 
         self.fallback = RemoteFilesBackend(
-            apiKey: apiKey,
-            baseURL: baseUrls.fallbackUrl,
-            withProxy: baseUrls.proxy
+            with: configuration,
+            baseURL: backend.fallbackBaseUrl
         )
 
         self.configs = RemoteFilesBackend(
-            apiKey: apiKey,
-            baseURL: baseUrls.configsUrl,
-            withProxy: baseUrls.proxy
+            with: configuration,
+            baseURL: backend.configsBaseUrl
         )
 
-        self.ua = UABackend(with: configuration, environment: environment)
+        self.ua = UABackend(
+            with: configuration,
+            environment: environment
+        )
     }
 }
 

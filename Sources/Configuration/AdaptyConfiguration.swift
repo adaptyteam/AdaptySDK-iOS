@@ -12,7 +12,6 @@ public struct AdaptyConfiguration: Sendable {
         observerMode: false,
         idfaCollectionDisabled: false,
         ipAddressCollectionDisabled: false,
-        backend: Backend.URLs.defaultPublicEnvironment,
         transactionFinishBehavior: TransactionFinishBehavior.default
     )
 
@@ -23,7 +22,7 @@ public struct AdaptyConfiguration: Sendable {
     let idfaCollectionDisabled: Bool
     let ipAddressCollectionDisabled: Bool
     let callbackDispatchQueue: DispatchQueue?
-    let backend: Backend.URLs
+    let backend: Backend.Configuration
     let logLevel: AdaptyLog.Level?
     let crossPlatformSDK: (name: String, version: String)?
     let transactionFinishBehavior: TransactionFinishBehavior
