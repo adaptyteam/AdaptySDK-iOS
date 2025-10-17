@@ -11,7 +11,7 @@ protocol SKTransaction: Sendable {
     var unfProductId: String { get }
     var unfOfferId: String? { get }
     var unfEnvironment: String { get }
-
+    var isXcodeEnvironment: Bool { get }
     func logParams(other: EventParameters?) -> EventParameters
 }
 

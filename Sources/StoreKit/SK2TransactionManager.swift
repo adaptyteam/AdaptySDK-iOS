@@ -135,32 +135,30 @@ private extension Adapty {
             case let .verified(sk2Transaction):
                 if await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.unfIdentifier) { continue }
 
-                let productOrNil = try? await productsManager.fetchProduct(
-                    id: sk2Transaction.unfProductId,
-                    fetchPolicy: .returnCacheDataElseLoad
-                )
-
                 do {
-                    try await report(
-                        .init(
-                            product: productOrNil,
-                            transaction: sk2Transaction
-                        ),
-                        payload: purchasePayloadStorage.purchasePayload(
-                            byTransaction: sk2Transaction,
-                            orCreateFor: ProfileStorage.userId
-                        ),
-                        reason: .unfinished
-                    )
-
-                    guard await purchasePayloadStorage.canFinishSyncedTransaction(sk2Transaction.unfIdentifier) else {
-                        log.info("Unfinished transaction synced: \(sk2Transaction), manual finish required for product: \(sk2Transaction.unfProductId)")
-                        continue
+                    
+                    if !sk2Transaction.isXcodeEnvironment {
+                        let productOrNil = try? await productsManager.fetchProduct(
+                            id: sk2Transaction.unfProductId,
+                            fetchPolicy: .returnCacheDataElseLoad
+                        )
+                        
+                        try await report(
+                            .init(
+                                product: productOrNil,
+                                transaction: sk2Transaction
+                            ),
+                            payload: purchasePayloadStorage.purchasePayload(
+                                byTransaction: sk2Transaction,
+                                orCreateFor: ProfileStorage.userId
+                            ),
+                            reason: .unfinished
+                        )
+                    } else {
+                        log.verbose("Skip backend sync for Xcode environment transaction \(sk2Transaction.id)")
                     }
-
-                    await finish(transaction: sk2Transaction, recived: .unfinished)
-
-                    log.info("Finish unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId) after sync")
+                    
+                    await attemptToFinish(transaction: sk2Transaction, logSource: "unfinished")
                 } catch {
                     log.error("Failed to validate unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId)")
                     return .failure(error)
@@ -229,6 +227,7 @@ private extension SK2TransactionManager {
         for await transaction in SK2Transaction.all.compactMap(\.verifiedTransaction) {
             log.verbose("found transaction originalId: \(transaction.unfOriginalIdentifier), purchase date:\(transaction.purchaseDate)")
 
+            guard !transaction.isXcodeEnvironment else { continue }
             guard let lasted = lastTransaction,
                   transaction.purchaseDate < lasted.purchaseDate
             else {

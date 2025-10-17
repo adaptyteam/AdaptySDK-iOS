@@ -32,6 +32,12 @@ actor SK1TransactionObserver: Sendable {
             ))
 
             guard sk1Transaction.transactionState == .purchased else { continue }
+
+            guard !sk1Transaction.isXcodeEnvironment else {
+                log.verbose("Skip backend sync for Xcode environment transaction \(sk1Transaction.unfIdentifier ?? "")")
+                continue
+            }
+
             guard let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) else {
                 log.error("received purchased transaction without identifier")
                 continue

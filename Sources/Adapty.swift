@@ -67,7 +67,6 @@ public final class Adapty {
             self.productsManager = sk2ProductsManager
 
             self.sharedProfileManager = restoreProfileManager(configuration)
-
             if !observerMode {
                 self.purchaser = SK2Purchaser.startObserving(
                     transactionSynchronizer: self,
@@ -123,32 +122,41 @@ public final class Adapty {
     private func restoreProfileManager(
         _ configuration: AdaptyConfiguration
     ) -> ProfileManager.Shared {
-        let profileId = profileStorage.profileId
-        let customerUserId = configuration.customerUserId
-        let appAccountToken = customerUserId != nil ? configuration.appAccountToken : nil
-        let oldAppAccountToken = profileStorage.appAccountToken()
-        profileStorage.setAppAccountToken(appAccountToken)
-
-        if let profile = profileStorage.getProfile(withCustomerUserId: customerUserId) {
-            guard let appAccountToken, appAccountToken != oldAppAccountToken else {
-                return .current(.init(
-                    storage: profileStorage,
-                    profile: profile,
-                    sentEnvironment: .none
-                ))
-            }
-        }
+        let currentProfileId = profileStorage.profileId
+        let newCustomerUserId = configuration.customerUserId
+        let newAppAccountToken = newCustomerUserId != nil ? configuration.appAccountToken : nil
+        let currentAppAccountToken = profileStorage.appAccountToken()
+        profileStorage.setAppAccountToken(newAppAccountToken)
 
         let newUserId = AdaptyUserId(
-            profileId: profileId,
-            customerId: customerUserId
+            profileId: currentProfileId,
+            customerId: newCustomerUserId
         )
-        return .creating(
-            userId: newUserId,
-            task: createNewProfileOnServer(
-                newUserId,
-                appAccountToken
+
+        guard let currentProfile = profileStorage.profile else {
+            // no existing user found
+            return .creating(
+                next: .init(userId: newUserId),
+                task: createNewProfileOnServer(newUserId, newAppAccountToken)
             )
+        }
+
+        guard let next = OfflineProfileManager.ifNeedCreateNewUser(
+            currentProfile.value,
+            currentAppAccountToken,
+            newCustomerUserId,
+            newAppAccountToken
+        ) else {
+            return .current(.init(
+                storage: profileStorage,
+                profile: currentProfile,
+                sentEnvironment: .none
+            ))
+        }
+
+        return .creating(
+            next: next,
+            task: createNewProfileOnServer(next.userId, newAppAccountToken)
         )
     }
 
@@ -179,8 +187,8 @@ public final class Adapty {
                     return (response, crossPlacementState)
                 }
 
-                guard case let .creating(creatingUserId, _) = self.sharedProfileManager,
-                      newUserId == creatingUserId,
+                guard case let .creating(next, _) = self.sharedProfileManager,
+                      newUserId == next.userId,
                       !Task.isCancelled
                 else {
                     throw AdaptyError.profileWasChanged()
@@ -224,37 +232,52 @@ extension Adapty {
         toCustomerUserId newCustomerUserId: String,
         withAppAccountToken newAppAccountToken: UUID?
     ) async throws(AdaptyError) {
-        let oldAppAccountToken = profileStorage.appAccountToken()
+        let currentAppAccountToken = profileStorage.appAccountToken()
         profileStorage.setAppAccountToken(newAppAccountToken)
+        let currentProfileId = profileStorage.profileId
+        var next: OfflineProfileManager
 
         switch sharedProfileManager {
         case nil:
-            break
+            next = .init(userId: .init(profileId: currentProfileId, customerId: newCustomerUserId))
+
         case let .current(manager):
-            if manager.userId.customerId == newCustomerUserId {
-                guard let newAppAccountToken, newAppAccountToken != oldAppAccountToken else {
-                    return
-                }
+            if let value = OfflineProfileManager.ifNeedCreateNewUser(
+                manager.currentProfile,
+                currentAppAccountToken,
+                newCustomerUserId,
+                newAppAccountToken
+            ) {
+                next = value
+            } else {
+                return
             }
-        case let .creating(userId, task):
-            if userId.customerId == newCustomerUserId {
-                guard let newAppAccountToken, newAppAccountToken != oldAppAccountToken else {
-                    _ = try await task.profileManager
-                    return
-                }
+
+        case let .creating(manager, task):
+            if let value = OfflineProfileManager.ifNeedCreateNewUser(
+                manager.currentProfile,
+                currentAppAccountToken,
+                newCustomerUserId,
+                newAppAccountToken
+            ) {
+                next = value
+                task.cancel()
+            } else {
+                _ = try await task.profileManager
+                return
             }
-            task.cancel()
         }
 
-        let newUserId = AdaptyUserId(
-            profileId: profileStorage.profileId,
-            customerId: newCustomerUserId
-        )
-        log.verbose("start identify \(newUserId) ")
+        if next.userId.isNotEqualProfileId(currentProfileId) {
+            log.info("Fixed incorrect profileId form: \(next.userId.profileId) to: \(currentProfileId) ")
+            next = .init(userId: .init(profileId: currentProfileId, customerId: newCustomerUserId))
+        }
 
-        let task = createNewProfileOnServer(newUserId, newAppAccountToken)
+        log.verbose("start identify \(next.userId) ")
+
+        let task = createNewProfileOnServer(next.userId, newAppAccountToken)
         sharedProfileManager = .creating(
-            userId: newUserId,
+            next: next,
             task: task
         )
 
@@ -269,8 +292,8 @@ extension Adapty {
             if manager.userId.isAnonymous {
                 throw .unidentifiedUserLogout()
             }
-        case let .creating(userId, task):
-            if userId.isAnonymous {
+        case let .creating(creating, task):
+            if creating.userId.isAnonymous {
                 _ = try await task.profileManager
                 return
             }
@@ -288,7 +311,7 @@ extension Adapty {
 
         let task = createNewProfileOnServer(newAnonymousUserId, nil)
         sharedProfileManager = .creating(
-            userId: newAnonymousUserId,
+            next: .init(userId: newAnonymousUserId),
             task: task
         )
         _ = try await task.profileManager
@@ -298,7 +321,7 @@ extension Adapty {
 private extension ProfileManager {
     enum Shared {
         case current(ProfileManager)
-        case creating(userId: AdaptyUserId, task: Task<ProfileManager, Error>)
+        case creating(next: OfflineProfileManager, task: Task<ProfileManager, Error>)
     }
 }
 
@@ -324,13 +347,21 @@ extension Adapty {
             nil
         case let .current(manager):
             manager.userId
-        case let .creating(userId, _):
-            userId
+        case let .creating(next, _):
+            next.userId
         }
     }
 
     var profileManager: ProfileManager? {
         if case let .current(manager) = sharedProfileManager {
+            manager
+        } else {
+            nil
+        }
+    }
+
+    var offlineProfileManager: OfflineProfileManager? {
+        if case let .creating(manager, _) = sharedProfileManager {
             manager
         } else {
             nil

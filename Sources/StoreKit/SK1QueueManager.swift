@@ -160,18 +160,32 @@ actor SK1QueueManager: Sendable {
 
     private func receivedPurchasedTransaction(_ sk1Transaction: SK1TransactionWithIdentifier) async {
         let productId = sk1Transaction.unfProductId
-        let result: AdaptyResult<AdaptyPurchaseResult>
 
-        var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
-
-        if productOrNil == nil {
-            productOrNil = try? await productsManager.fetchProduct(
-                id: sk1Transaction.unfProductId,
-                fetchPolicy: .returnCacheDataElseLoad
-            )
+        guard !sk1Transaction.isXcodeEnvironment else {
+            log.verbose("Skip validation on backend for Xcode environment transaction \(sk1Transaction.unfIdentifier)")
+            let result: AdaptyResult<AdaptyPurchaseResult>
+            do throws(AdaptyError) {
+                let profile = try await transactionSynchronizer.recalculateOfflineAccessLevels(with: sk1Transaction)
+                result = .success(.success(profile: profile, transaction: sk1Transaction))
+            } catch {
+                result = .failure(error)
+            }
+            await finishTransaction(sk1Transaction: sk1Transaction, productId: productId)
+            callMakePurchasesCompletionHandlers(productId, result)
+            return
         }
 
+        let result: AdaptyResult<AdaptyPurchaseResult>
         do {
+            var productOrNil: AdaptyProduct? = makePurchasesProduct[productId]?.asAdaptyProduct
+
+            if productOrNil == nil {
+                productOrNil = try? await productsManager.fetchProduct(
+                    id: sk1Transaction.unfProductId,
+                    fetchPolicy: .returnCacheDataElseLoad
+                )
+            }
+
             let profile = try await transactionSynchronizer.validate(
                 .init(
                     product: productOrNil,
@@ -182,7 +196,16 @@ actor SK1QueueManager: Sendable {
                     orCreateFor: ProfileStorage.userId
                 )
             )
+            await finishTransaction(sk1Transaction: sk1Transaction, productId: productId)
+            result = .success(.success(profile: profile, transaction: sk1Transaction))
 
+        } catch {
+            result = .failure(error)
+        }
+
+        callMakePurchasesCompletionHandlers(productId, result)
+
+        func finishTransaction(sk1Transaction: SK1TransactionWithIdentifier, productId: String) async {
             await storage.removePurchasePayload(forProductId: productId)
             makePurchasesProduct.removeValue(forKey: productId)
             SKPaymentQueue.default().finishTransaction(sk1Transaction.underlay)
@@ -190,15 +213,8 @@ actor SK1QueueManager: Sendable {
                 methodName: .finishTransaction,
                 params: sk1Transaction.logParams
             ))
-
             log.info("Finish purchased transaction \(sk1Transaction) after sync")
-
-            result = .success(.success(profile: profile, transaction: sk1Transaction))
-        } catch {
-            result = .failure(error)
         }
-
-        callMakePurchasesCompletionHandlers(productId, result)
     }
 
     private func receivedFailedTransaction(_ sk1Transaction: SK1Transaction, error: AdaptyError? = nil) async {

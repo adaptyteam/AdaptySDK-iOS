@@ -20,25 +20,47 @@ extension AdaptyUserId {
 }
 
 extension AdaptyUserIdentifiable {
+    @inlinable
     var profileId: String { userId.profileId }
 
+    @inlinable
     var customerUserId: String? { userId.customerId }
 
+    @inlinable
+    func isEqualProfileId(_ other: String) -> Bool {
+        userId.isEqualProfileId(other)
+    }
+
+    @inlinable
+    func isNotEqualProfileId(_ other: String) -> Bool {
+        userId.isNotEqualProfileId(other)
+    }
+
+    @inlinable
     func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
         userId.isEqualProfileId(other)
     }
 
+    @inlinable
     func isNotEqualProfileId(_ other: AdaptyUserId) -> Bool {
-        !userId.isEqualProfileId(other)
+        userId.isNotEqualProfileId(other)
     }
 
+    @inlinable
     func isEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
         userId.isEqualProfileId(other.userId)
     }
 
+    @inlinable
     func isNotEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
-        !userId.isEqualProfileId(other.userId)
+        userId.isNotEqualProfileId(other.userId)
     }
+}
+
+extension AdaptyProfile: AdaptyUserIdentifiable {}
+
+extension VH<AdaptyProfile>: AdaptyUserIdentifiable {
+    var userId: AdaptyUserId { value.userId }
 }
 
 extension ProfileStorage {
@@ -55,10 +77,4 @@ extension ProfileManager {
     func isEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
         userId.isEqualProfileId(other.userId)
     }
-}
-
-extension AdaptyProfile: AdaptyUserIdentifiable {}
-
-extension VH<AdaptyProfile>: AdaptyUserIdentifiable {
-    var userId: AdaptyUserId { value.userId }
 }

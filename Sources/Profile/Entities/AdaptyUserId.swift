@@ -11,12 +11,25 @@ package struct AdaptyUserId: Sendable, Hashable {
 }
 
 extension AdaptyUserId {
+    @inlinable
     var isAnonymous: Bool { customerId == nil }
 
-    func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
-        profileId == other.profileId
+    @inlinable
+    func isEqualProfileId(_ other: String) -> Bool {
+        profileId == other
     }
 
+    @inlinable
+    func isNotEqualProfileId(_ other: String) -> Bool {
+        !isEqualProfileId(other)
+    }
+
+    @inlinable
+    func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
+        other.isEqualProfileId(profileId)
+    }
+
+    @inlinable
     func isNotEqualProfileId(_ other: AdaptyUserId) -> Bool {
         !isEqualProfileId(other)
     }

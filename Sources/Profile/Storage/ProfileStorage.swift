@@ -24,15 +24,23 @@ final class ProfileStorage {
 
     private static let userDefaults = Storage.userDefaults
 
-    static var userId: AdaptyUserId =
-        if let profileId = userDefaults.string(forKey: Constants.profileIdKey) {
-            AdaptyUserId(
-                profileId: profileId,
-                customerId: profile?.customerUserId
-            )
-        } else {
-            createAnonymousUserId()
+    static var userId: AdaptyUserId = {
+        guard let profileId = userDefaults.string(forKey: Constants.profileIdKey) else {
+            return createAnonymousUserId()
         }
+
+        guard let profile = profile, profile.isEqualProfileId(profileId) else {
+            return AdaptyUserId(
+                profileId: profileId,
+                customerId: nil
+            )
+        }
+
+        return AdaptyUserId(
+            profileId: profileId,
+            customerId: profile.customerUserId
+        )
+    }()
 
     private static func createAnonymousUserId() -> AdaptyUserId {
         let identifier = UUID().uuidString.lowercased()
@@ -54,6 +62,19 @@ final class ProfileStorage {
     }()
 
     private static func setProfile(_ newProfile: VH<AdaptyProfile>) {
+        let newProfileId = newProfile.profileId
+        if userId.isNotEqualProfileId(newProfileId) {
+            userDefaults.set(newProfileId, forKey: Constants.profileIdKey)
+            log.debug("set profileId: \(newProfileId)")
+        }
+        userId = newProfile.userId
+
+        if let profile = profile, profile.isEqualProfileId(newProfileId) {
+            guard profile.IsNotEqualHash(newProfile),
+                  profile.isNewerOrEqualVersion(newProfile)
+            else { return }
+        }
+
         profile = newProfile
         do {
             try userDefaults.setJSON(newProfile, forKey: Constants.profileKey)
@@ -126,9 +147,6 @@ final class ProfileStorage {
     static func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
         log.verbose("Clear profile")
         if let newProfile {
-            userId = newProfile.userId
-            userDefaults.set(userId.profileId, forKey: Constants.profileIdKey)
-            log.verbose("set profile \(userId) ")
             setProfile(newProfile)
         } else {
             userId = createAnonymousUserId()
@@ -156,9 +174,15 @@ final class ProfileStorage {
 }
 
 extension ProfileStorage {
+    @inlinable
     var userId: AdaptyUserId { Self.userId }
 
-    func getProfile() -> VH<AdaptyProfile>? { Self.profile }
+    var profile: VH<AdaptyProfile>? {
+        guard let profile = Self.profile, profile.isEqualProfileId(userId) else {
+            return nil
+        }
+        return profile
+    }
 
     func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
         Self.clearProfile(newProfile: newProfile)
@@ -168,15 +192,15 @@ extension ProfileStorage {
         Self.setProfile(newProfile)
         Self.setSyncedTransactionsHistory(false)
     }
+}
 
-    func getProfile(withCustomerUserId customerUserId: String?) -> VH<AdaptyProfile>? {
-        guard let profile = Self.profile,
-              profile.isEqualProfileId(userId)
-        else { return nil }
+extension ProfileStorage {
+    func appAccountToken() -> UUID? {
+        return Self.appAccountToken
+    }
 
-        guard let customerUserId else { return profile }
-        guard customerUserId == profile.customerUserId else { return nil }
-        return profile
+    func setAppAccountToken(_ value: UUID?) {
+        Self.setAppAccountToken(value)
     }
 }
 
@@ -185,26 +209,14 @@ extension ProfileStorage {
         guard Self.userId.isEqualProfileId(otherUserId) else { throw WrongProfileIdError() }
     }
 
+    func profile(for userId: AdaptyUserId) throws(WrongProfileIdError) -> VH<AdaptyProfile>? {
+        try checkProfileId(userId)
+        return profile
+    }
+    
     func updateProfile(_ profile: VH<AdaptyProfile>) throws(WrongProfileIdError) {
-        guard let stored = getProfile() else {
-            Self.setProfile(profile)
-            return
-        }
-        guard profile.isEqualProfileId(stored) else { throw WrongProfileIdError() }
-
-        guard profile.IsNotEqualHash(stored),
-              profile.isNewerOrEqualVersion(stored)
-        else { return }
-
+        try checkProfileId(profile.userId)
         Self.setProfile(profile)
-    }
-
-    func appAccountToken() -> UUID? {
-        return Self.appAccountToken
-    }
-
-    func setAppAccountToken(_ value: UUID?) {
-        Self.setAppAccountToken(value)
     }
 
     func externalAnalyticsDisabled(for userId: AdaptyUserId) throws(WrongProfileIdError) -> Bool {
@@ -236,12 +248,14 @@ extension ProfileStorage {
         try checkProfileId(userId)
         Self.setAppleSearchAdsSyncDate(Date())
     }
+}
 
+extension ProfileStorage { // TODO: need checkProfileId
     func lastOpenedWebPaywallDate() -> Date? {
         Self.lastOpenedWebPaywallDate
     }
 
-    func setLastOpenedWebPaywallDate()  {
+    func setLastOpenedWebPaywallDate() {
         Self.setLastOpenedWebPaywallDate(Date())
     }
 

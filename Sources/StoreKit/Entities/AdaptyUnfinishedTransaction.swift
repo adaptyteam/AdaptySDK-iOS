@@ -35,7 +35,7 @@ private extension Adapty {
 
         if !synced { return }
 
-        await finish(transaction: sk2Transaction, recived: .manual)
+        await finish(transaction: sk2Transaction)
         log.info("Finish unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId) after manual call method (already synchronized)")
     }
 }

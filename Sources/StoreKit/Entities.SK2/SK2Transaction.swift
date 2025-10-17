@@ -53,6 +53,16 @@ extension SK2Transaction {
         return offerID
     }
 
+    var isXcodeEnvironment: Bool {
+        #if !os(visionOS)
+        guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
+            return environmentStringRepresentation.lowercased() == "xcode"
+        }
+        #endif
+
+        return environment == .xcode
+    }
+
     var unfEnvironment: String {
         #if !os(visionOS)
         guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
