@@ -117,7 +117,7 @@ private extension Adapty {
 
     func sendUnfinishedTransactions(manager: SK2TransactionManager) async -> AdaptyResult<Void> {
         guard !observerMode else { return .success(()) }
-        let unfinishedTranasactions = await SK2TransactionManager.fetchUnfinishedTrunsactions()
+        let unfinishedTranasactions = await SK2TransactionManager.fetchUnfinishedTransactions()
         guard !unfinishedTranasactions.isEmpty else { return .success(()) }
         for sk2SignedTransaction in unfinishedTranasactions {
             switch sk2SignedTransaction {
@@ -173,7 +173,7 @@ private extension Adapty {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Adapty {
     func getUnfinishedTransactions() async throws(AdaptyError) -> [AdaptyUnfinishedTransaction] {
-        let transactions = await SK2TransactionManager.fetchUnfinishedTrunsactions()
+        let transactions = await SK2TransactionManager.fetchUnfinishedTransactions()
         let ids = await purchasePayloadStorage.unfinishedTransactionIds()
         guard !ids.isEmpty, !transactions.isEmpty else { return [] }
 
@@ -189,7 +189,7 @@ extension Adapty {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension SK2TransactionManager {
-    static func fetchUnfinishedTrunsactions() async -> [SK2SignedTransaction] {
+    static func fetchUnfinishedTransactions() async -> [SK2SignedTransaction] {
         let stamp = Log.stamp
 
         Adapty.trackSystemEvent(AdaptyAppleRequestParameters(methodName: .getUnfinishedSK2Transactions, stamp: stamp))
@@ -210,12 +210,17 @@ private extension SK2TransactionManager {
         log.verbose("call  SK2Transaction.currentEntitlements")
 
         let signedTransactions = await SK2Transaction.currentEntitlements.reduce(into: []) { $0.append($1) }
-        let transaction: [SK2Transaction] = signedTransactions.compactMap(\.verifiedTransaction)
+        let transactions: [SK2Transaction] = signedTransactions.compactMap(\.verifiedTransaction)
 
-        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp, params: ["total_count": signedTransactions.count, "verified_count": transaction.count]))
-
-        log.verbose("SK2Transaction.currentEntitlements total count: \(signedTransactions.count), verified count: \(transaction.count)")
-        return transaction
+        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp, params: ["total_count": signedTransactions.count, "verified_count": transactions.count]))
+        
+        let unfinishedConsumablesTransactions = await Self.fetchUnfinishedTransactions()
+            .compactMap(\.verifiedTransaction)
+            .filter { $0.productType == .consumable }
+        
+        log.verbose("SK2Transaction.currentEntitlements total count: \(signedTransactions.count), verified count: \(transactions.count), unfinished consumables: \(unfinishedConsumablesTransactions.count)")
+        
+        return transactions + unfinishedConsumablesTransactions
     }
 
     static func fetchLastVerifiedTransaction() async -> SK2Transaction? {
