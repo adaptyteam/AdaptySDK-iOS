@@ -16,13 +16,9 @@ actor HTTPErrorHandlerActor {
         self.handler = handler
     }
 
-    private func _call(_ error: HTTPError) {
-        handler(error)
-    }
-
     nonisolated func call(_ error: HTTPError) {
         Task.detached(priority: .utility) {
-            await self._call(error)
+            self.handler(error)
         }
     }
 }

@@ -16,18 +16,18 @@ private struct FetchCrossPlacementStateRequest: HTTPRequestWithDecodableResponse
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    init(profileId: String) {
+    init(userId: AdaptyUserId) {
         headers = HTTPHeaders()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
     }
 }
 
 extension Backend.MainExecutor {
     func fetchCrossPlacementState(
-        profileId: String
+        userId: AdaptyUserId
     ) async throws(HTTPError) -> CrossPlacementState {
         let request = FetchCrossPlacementStateRequest(
-            profileId: profileId
+            userId: userId
         )
 
         let response = try await perform(

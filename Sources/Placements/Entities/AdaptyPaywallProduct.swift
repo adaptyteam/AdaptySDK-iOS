@@ -8,7 +8,14 @@
 import StoreKit
 
 public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
+    /// An internal Adapty Product Identifier
     var adaptyProductId: String { get }
+
+    /// An access level id which was selected in Adapty Dashboard for this product, e.g. `premium`
+    var accessLevelId: String { get }
+
+    /// A product type which was selected in Adapty Dashboard for this product, e.g. `weekly`, `monthly`,  `annual`, etc.
+    var adaptyProductType: String { get }
 
     var paywallProductIndex: Int { get }
 

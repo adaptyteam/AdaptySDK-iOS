@@ -13,7 +13,7 @@ public extension Adapty {
     /// The `getProfile` method provides the most up-to-date result as it always tries to query the API. If for some reason (e.g. no internet connection), the Adapty SDK fails to retrieve information from the server, the data from cache will be returned. It is also important to note that the Adapty SDK updates AdaptyProfile cache on a regular basis, in order to keep this information as up-to-date as possible.
     nonisolated static func getProfile() async throws(AdaptyError) -> AdaptyProfile {
         try await withActivatedSDK(methodName: .getProfile) { sdk throws(AdaptyError) in
-            try await sdk.createdProfileManager.getProfile()
+            try await sdk.createdProfileManager.fetchProfile()
         }
     }
 

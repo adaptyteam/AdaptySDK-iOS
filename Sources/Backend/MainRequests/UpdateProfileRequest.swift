@@ -13,7 +13,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     let headers: HTTPHeaders
     let stamp = Log.stamp
 
-    let profileId: String
+    let userId: AdaptyUserId
     let parameters: AdaptyProfileParameters?
     let environmentMeta: Environment.Meta?
 
@@ -29,21 +29,21 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     }
 
     init(
-        profileId: String,
+        userId: AdaptyUserId,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
         responseHash: String?
     ) {
         endpoint = HTTPEndpoint(
             method: .patch,
-            path: "/sdk/analytics/profiles/\(profileId)/"
+            path: "/sdk/analytics/profiles/\(userId.profileId)/"
         )
 
         headers = HTTPHeaders()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setBackendResponseHash(responseHash)
 
-        self.profileId = profileId
+        self.userId = userId
         self.parameters = parameters
         self.environmentMeta = environmentMeta
     }
@@ -59,7 +59,7 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         var container = encoder.container(keyedBy: Backend.CodingKeys.self)
         var dataObject = container.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
         try dataObject.encode("adapty_analytics_profile", forKey: .type)
-        try dataObject.encode(profileId, forKey: .id)
+        try dataObject.encode(userId.profileId, forKey: .id)
 
         if let parameters {
             try dataObject.encode(parameters, forKey: .attributes)
@@ -82,35 +82,14 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
 }
 
 extension Backend.MainExecutor {
-    func syncProfile(
-        profileId: String,
+    func updateProfile(
+        userId: AdaptyUserId,
         parameters: AdaptyProfileParameters?,
         environmentMeta: Environment.Meta?,
         responseHash: String?
-    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
-        if parameters == nil, environmentMeta == nil {
-            try await fetchProfile(
-                profileId: profileId,
-                responseHash: responseHash
-            )
-        } else {
-            try await updateProfile(
-                profileId: profileId,
-                parameters: parameters,
-                environmentMeta: environmentMeta,
-                responseHash: responseHash
-            )
-        }
-    }
-
-    private func updateProfile(
-        profileId: String,
-        parameters: AdaptyProfileParameters?,
-        environmentMeta: Environment.Meta?,
-        responseHash: String?
-    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile>? {
         let request = UpdateProfileRequest(
-            profileId: profileId,
+            userId: userId,
             parameters: parameters,
             environmentMeta: environmentMeta,
             responseHash: responseHash
@@ -121,6 +100,7 @@ extension Backend.MainExecutor {
             requestName: .updateProfile
         )
 
-        return VH(response.body, hash: response.headers.getBackendResponseHash())
+        guard let profile = response.body else { return nil }
+        return VH(profile, hash: response.headers.getBackendResponseHash())
     }
 }

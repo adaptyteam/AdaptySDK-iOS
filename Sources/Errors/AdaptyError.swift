@@ -76,6 +76,8 @@ public extension AdaptyError {
         case productPurchaseFailed = 1006
         case refreshReceiptFailed = 1010
         case fetchSubscriptionStatusFailed = 1020
+        case paymentPendingError = 1050
+        case unknownTransactionId = 1030
 
         /// Adapty SDK is not activated.
         case notActivated = 2002

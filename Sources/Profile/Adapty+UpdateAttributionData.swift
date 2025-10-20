@@ -23,7 +23,7 @@ public extension Adapty {
             let data = try JSONSerialization.data(withJSONObject: attribution)
             attributionJson = String(decoding: data, as: UTF8.self)
         } catch {
-            throw AdaptyError.wrongAttributeData(error)
+            throw .wrongAttributeData(error)
         }
 
         try await updateAttribution(
@@ -36,6 +36,9 @@ public extension Adapty {
         _ attributionJson: String,
         source: String
     ) async throws(AdaptyError) {
+        let source = source.trimmed
+        // TODO: throw error if source isEmpty
+
         let logParams: EventParameters = [
             "source": source,
         ]
@@ -52,23 +55,19 @@ public extension Adapty {
         source: String,
         attributionJson: String
     ) async throws(AdaptyError) {
-        let (profileId, oldResponseHash) = try await { () async throws(AdaptyError) in
+        let (userId, oldResponseHash) = try await { () async throws(AdaptyError) in
             let manager = try await createdProfileManager
-            return (manager.profileId, manager.profile.hash)
+            return (manager.userId, manager.lastResponseHash)
         }()
 
         do {
             let response = try await httpSession.setAttributionData(
-                profileId: profileId,
+                userId: userId,
                 source: source,
                 attributionJson: attributionJson,
                 responseHash: oldResponseHash
             )
-
-            if let profile = response.flatValue() {
-                profileManager?.saveResponse(profile)
-            }
-
+            handleProfileResponse(response)
         } catch {
             throw error.asAdaptyError
         }

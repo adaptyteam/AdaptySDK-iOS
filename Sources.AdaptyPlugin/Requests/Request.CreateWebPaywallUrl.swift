@@ -32,8 +32,8 @@ extension Request {
             switch self {
             case .product(let product):
                 let product = try await Adapty.getPaywallProduct(
-                    vendorProductId: product.vendorProductId,
                     adaptyProductId: product.adaptyProductId,
+                    productInfo: product.productInfo,
                     paywallProductIndex: product.paywallProductIndex,
                     subscriptionOfferIdentifier: product.subscriptionOfferIdentifier,
                     variationId: product.variationId,

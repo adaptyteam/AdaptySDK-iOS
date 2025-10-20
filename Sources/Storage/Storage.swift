@@ -21,7 +21,7 @@ final class Storage {
 
     @AdaptyActor
     fileprivate static let appInstallation: (identifier: String, time: Date?, appLaunchCount: Int?) =
-        if let identifier = userDefaults.string(forKey: Constants.appInstallationIdentifier), !identifier.isEmpty {
+    if let identifier = userDefaults.string(forKey: Constants.appInstallationIdentifier).nonEmptyOrNil {
             continueSession(installIdentifier: identifier)
         } else {
             createAppInstallation()
@@ -65,10 +65,10 @@ final class Storage {
 
         if value == hash { return false }
 
-        ProfileStorage.clearProfile(newProfileId: nil)
+        ProfileStorage.clearProfile()
         await EventsStorage.clearAll()
-        await ProductVendorIdsStorage.clear()
-        await VariationIdStorage.clear()
+        await BackendProductInfoStorage.clear()
+        await PurchasePayloadStorage.clear()
         userDefaults.set(hash, forKey: Constants.appKeyHash)
         log.verbose("changing apiKeyHash = \(hash).")
         return true

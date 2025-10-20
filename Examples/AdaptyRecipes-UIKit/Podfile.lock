@@ -1,0 +1,22 @@
+PODS:
+  - Adapty (3.12.0)
+  - AdaptyUI (3.12.0):
+    - Adapty (= 3.12.0)
+
+DEPENDENCIES:
+  - Adapty (from `../../`)
+  - AdaptyUI (from `../../`)
+
+EXTERNAL SOURCES:
+  Adapty:
+    :path: "../../"
+  AdaptyUI:
+    :path: "../../"
+
+SPEC CHECKSUMS:
+  Adapty: 93144ce2aa735e10bdb2b1012b9dea923a82543f
+  AdaptyUI: a9fff903ead19ccf09861bc65a72e9a8eb012017
+
+PODFILE CHECKSUM: 235cfbef6b933d442daf00c8c0f0ceab2561282d
+
+COCOAPODS: 1.16.2

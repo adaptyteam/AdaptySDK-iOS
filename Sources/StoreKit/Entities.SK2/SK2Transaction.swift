@@ -22,44 +22,64 @@ extension SK2Transaction {
     var unfOriginalIdentifier: String { String(originalID) }
 
     @inlinable
-    var unfProductID: String { productID }
+    var unfProductId: String { productID }
+
+    func logParams(other: EventParameters?) -> EventParameters {
+        guard let other else { return logParams }
+        return logParams.merging(other) { _, new in new }
+    }
 
     var logParams: EventParameters {
         [
-            "product_id": unfProductID,
+            "product_id": unfProductId,
             "transaction_is_upgraded": isUpgraded,
             "transaction_id": unfIdentifier,
             "original_id": unfOriginalIdentifier,
         ]
     }
 
-    var unfOfferType: SK2Transaction.OfferType? {
+    var subscriptionOfferType: AdaptySubscriptionOfferType? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            return offer?.type
+            (offer?.type ?? offerType)?.asSubscriptionOfferType
+        } else {
+            offerType?.asSubscriptionOfferType
         }
-        return offerType
     }
 
     var unfOfferId: String? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            return offer?.id
+            return offer?.id ?? offerID
         }
         return offerID
+    }
+
+    var isXcodeEnvironment: Bool {
+        #if !os(visionOS)
+        guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
+            return environmentStringRepresentation.lowercased() == "xcode"
+        }
+        #endif
+
+        return environment == .xcode
     }
 
     var unfEnvironment: String {
         #if !os(visionOS)
         guard #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) else {
             let environment = environmentStringRepresentation
-            return environment.isEmpty ? "storekit2" : environment.lowercased()
+            return environment.lowercased()
         }
         #endif
 
-        switch environment {
-        case .production: return "production"
-        case .sandbox: return "sandbox"
-        case .xcode: return "xcode"
-        default: return environment.rawValue
+        return switch environment {
+        case .production: Self.productionEnvironment
+        case .sandbox: Self.sandboxEnvironment
+        case .xcode: Self.xcodeEnvironment
+        default: environment.rawValue.lowercased()
         }
     }
+
+    static let productionEnvironment = "production"
+    static let sandboxEnvironment = "sandbox"
+    static let xcodeEnvironment = "xcode"
 }

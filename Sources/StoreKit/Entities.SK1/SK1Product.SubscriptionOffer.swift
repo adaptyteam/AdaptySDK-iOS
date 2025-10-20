@@ -13,32 +13,25 @@ extension SK1Product {
     var introductoryOfferNotApplicable: Bool {
         if let period = subscriptionPeriod,
            period.numberOfUnits > 0,
-           introductoryPrice != nil {
-            false
-        } else {
-            true
+           introductoryPrice != nil
+        { false }
+        else
+        { true }
+    }
+
+    func sk1ProductSubscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> SubscriptionOffer? {
+        switch offerIdentifier {
+        case .introductory:
+            introductoryPrice
+        case let .promotional(id):
+            discounts.first(where: { $0.identifier == id })
+        case .winBack: nil
+        case .code: nil
         }
     }
 
-    private var unfIntroductoryOffer: SK1Product.SubscriptionOffer? {
-        introductoryPrice
-    }
-
-    private func unfPromotionalOffer(byId identifier: String) -> SK1Product.SubscriptionOffer? {
-        discounts.first(where: { $0.identifier == identifier })
-    }
-
     func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
-        let offer: SK1Product.SubscriptionOffer? =
-            switch offerIdentifier {
-            case .introductory:
-                unfIntroductoryOffer
-            case let .promotional(id):
-                unfPromotionalOffer(byId: id)
-            default:
-                nil
-            }
-        guard let offer else { return nil }
+        guard let offer: SubscriptionOffer = sk1ProductSubscriptionOffer(by: offerIdentifier) else { return nil }
 
         let locale = priceLocale
         let period = offer.subscriptionPeriod.asAdaptySubscriptionPeriod
@@ -55,4 +48,8 @@ extension SK1Product {
             localizedNumberOfPeriods: locale.localized(period: period, numberOfPeriods: offer.numberOfPeriods)
         )
     }
+}
+
+extension SK1Product.SubscriptionOffer {
+    typealias OfferType = SKProductDiscount.`Type`
 }

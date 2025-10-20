@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class OnboardingStorage: Sendable {
+final class OnboardingStorage {
     private enum Constants {
         static let onboardingStorageKey = "AdaptySDK_Cached_Onboarding"
         static let onboardingStorageVersionKey = "AdaptySDK_Cached_Onboarding_Version"
@@ -40,7 +40,7 @@ final class OnboardingStorage: Sendable {
     static func setOnboarding(_ onboarding: AdaptyOnboarding) {
         onboardingByPlacementId[onboarding.placement.id] = VH(onboarding, time: Date())
         let array = Array(onboardingByPlacementId.values)
-        guard !array.isEmpty else {
+        guard array.isNotEmpty else {
             userDefaults.removeObject(forKey: Constants.onboardingStorageKey)
             return
         }
@@ -65,7 +65,7 @@ final class OnboardingStorage: Sendable {
 private extension Sequence<VH<AdaptyOnboarding>> {
     var asOnboardingByPlacementId: [String: VH<AdaptyOnboarding>] {
         Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
-            first.value.placement.version > second.value.placement.version ? first : second
+            first.value.placement.isNewerThan(second.value.placement) ? first : second
         })
     }
 }

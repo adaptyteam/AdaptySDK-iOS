@@ -18,11 +18,12 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
     let queryItems: QueryItems
     let stamp = Log.stamp
 
-    init(vendorProductId: String, offerId: String, profileId: String) {
-        headers = HTTPHeaders().setBackendProfileId(profileId)
+    init(vendorProductId: String, offerId: String, userId: AdaptyUserId) {
+        headers = HTTPHeaders()
+            .setUserProfileId(userId)
 
         queryItems = QueryItems()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setVendorProductId(vendorProductId)
             .setOfferId(offerId)
     }
@@ -30,21 +31,21 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
 
 extension Backend.MainExecutor {
     func signSubscriptionOffer(
-        profileId: String,
+        userId: AdaptyUserId,
         vendorProductId: String,
         offerId: String
     ) async throws(HTTPError) -> AdaptySubscriptionOffer.Signature {
         let request = SignSubscriptionOfferRequest(
             vendorProductId: vendorProductId,
             offerId: offerId,
-            profileId: profileId
+            userId: userId
         )
         let response = try await perform(
             request,
             requestName: .signSubscriptionOffer,
             logParams: [
                 "product_id": vendorProductId,
-                "discount_id": offerId,
+                "discount_id": offerId
             ]
         )
 

@@ -24,7 +24,7 @@ extension AdaptyPlacement {
         }
 
         var isCrossPlacementTest: Bool {
-            !variationIdByPlacements.isEmpty
+            variationIdByPlacements.isNotEmpty
         }
 
         init(from decoder: Decoder) throws {
@@ -41,7 +41,8 @@ extension AdaptyPlacement {
             weight = try container.decode(Int.self, forKey: .weight)
 
             if container.contains(.crossPlacementInfo),
-               !((try? container.decodeNil(forKey: .crossPlacementInfo)) ?? true) {
+               !((try? container.decodeNil(forKey: .crossPlacementInfo)) ?? true)
+            {
                 let crossPlacementInfo = try container.nestedContainer(keyedBy: CrossPlacementCodingKeys.self, forKey: .crossPlacementInfo)
                 variationIdByPlacements = try crossPlacementInfo.decode([String: String].self, forKey: .variationIdByPlacements)
             } else {
@@ -54,12 +55,12 @@ extension AdaptyPlacement {
 extension [AdaptyPlacement.Variation] {
     func draw(
         placementAudienceVersionId: String,
-        profileId: String
+        userId: AdaptyUserId
     ) -> Int {
         let countVariations = self.count
         guard countVariations > 1 else { return 0 }
 
-        let data = Data("\(placementAudienceVersionId)-\(profileId)".md5.suffix(8))
+        let data = Data("\(placementAudienceVersionId)-\(userId.profileId)".md5.suffix(8))
         let value: UInt64 = data.withUnsafeBytes { $0.load(as: UInt64.self).bigEndian }
         var weight = Int(value % 100)
 

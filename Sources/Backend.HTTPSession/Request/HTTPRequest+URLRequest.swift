@@ -24,7 +24,7 @@ extension HTTPRequest {
             queryItems.append(contentsOf: additionalQueryItems)
         }
 
-        if !queryItems.isEmpty {
+        if queryItems.isNotEmpty {
             urlComponents.queryItems = queryItems
         }
 
@@ -54,7 +54,8 @@ extension HTTPRequest {
 
             if let contentType = dataRequest.contentType
                 ?? (configuration as? HTTPCodableConfiguration)?.defaultEncodedContentType,
-                request.value(forHTTPHeaderField: HeaderKey.contentType)?.isEmpty ?? true {
+                request.value(forHTTPHeaderField: HeaderKey.contentType).isEmpty
+            {
                 request.setValue(contentType, forHTTPHeaderField: HeaderKey.contentType)
             }
         }

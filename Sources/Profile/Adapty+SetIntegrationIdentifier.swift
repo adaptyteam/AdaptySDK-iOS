@@ -12,15 +12,17 @@ extension Adapty {
         key: String,
         value: String
     ) async throws(AdaptyError) {
+        let key = key.trimmed
+        let value = value.trimmed
+        // TODO: throw error if key isEmpty
+
         try await setIntegrationIdentifiers([key: value])
     }
 
     package nonisolated static func setIntegrationIdentifiers(
         _ keyValues: [String: String]
     ) async throws(AdaptyError) {
-        let logParams: EventParameters = keyValues
-
-        try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: logParams) { sdk throws(AdaptyError) in
+        try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: keyValues) { sdk throws(AdaptyError) in
             try await sdk.setIntegrationIdentifier(
                 keyValues: keyValues
             )
@@ -30,11 +32,11 @@ extension Adapty {
     func setIntegrationIdentifier(
         keyValues: [String: String]
     ) async throws(AdaptyError) {
-        let profileId = try await createdProfileManager.profileId
+        let userId = try await createdProfileManager.userId
 
         do {
             try await httpSession.setIntegrationIdentifier(
-                profileId: profileId,
+                userId: userId,
                 keyValues: keyValues
             )
         } catch {

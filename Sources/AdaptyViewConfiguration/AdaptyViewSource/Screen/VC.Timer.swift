@@ -78,7 +78,7 @@ extension AdaptyViewSource.Timer: Decodable {
                 try .endedAt(container.decode(AdaptyViewSource.DateString.self, forKey: .endTime).utc)
             case BehaviorType.endAtLocalTime.rawValue:
                 try .endedAt(container.decode(AdaptyViewSource.DateString.self, forKey: .endTime).local)
-            case .none:
+            case nil:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .default)
             case BehaviorType.everyAppear.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .everyAppear)
@@ -89,7 +89,7 @@ extension AdaptyViewSource.Timer: Decodable {
             case BehaviorType.custom.rawValue:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .custom)
             default:
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.behavior], debugDescription: "unknown value '\(behavior ?? "null")'"))
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.behavior], debugDescription: "unknown value '\(behavior ?? "nil")'"))
             }
 
         format =
@@ -108,7 +108,7 @@ extension AdaptyViewSource.Timer: Decodable {
 
         horizontalAlign = try container.decodeIfPresent(AdaptyViewConfiguration.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         let textAttributes = try AdaptyViewSource.TextAttributes(from: decoder)
-        defaultTextAttributes = textAttributes.isEmpty ? nil : textAttributes
+        defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 }
 

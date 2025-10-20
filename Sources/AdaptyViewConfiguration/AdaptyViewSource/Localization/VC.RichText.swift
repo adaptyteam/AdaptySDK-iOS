@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyViewSource {
-    struct TextAttributes: Sendable, Hashable {
+    struct TextAttributes: Sendable, Hashable, Emptiable {
         let fontAssetId: String?
         let size: Double?
         let txtColorAssetId: String?
@@ -29,7 +29,7 @@ extension AdaptyViewSource {
         }
     }
 
-    struct RichText: Sendable, Hashable {
+    struct RichText: Sendable, Hashable, Emptiable {
         let items: [RichText.Item]
 
         var isEmpty: Bool { items.isEmpty }
@@ -115,9 +115,9 @@ private extension AdaptyViewSource.TextAttributes? {
         _ other: AdaptyViewSource.TextAttributes?
     ) -> AdaptyViewSource.TextAttributes? {
         switch self {
-        case .none:
+        case nil:
             other
-        case let .some(value):
+        case let value?:
             value.add(other)
         }
     }
@@ -221,7 +221,7 @@ extension AdaptyViewSource.RichText.Item: Codable {
     func encode(to encoder: any Encoder) throws {
         switch self {
         case let .text(text, attributes):
-            guard let attributes, !attributes.isEmpty else {
+            guard let attributes = attributes.nonEmptyOrNil else {
                 var container = encoder.singleValueContainer()
                 try container.encode(text)
                 return
@@ -232,13 +232,13 @@ extension AdaptyViewSource.RichText.Item: Codable {
         case let .tag(tag, attributes):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(tag, forKey: .tag)
-            if let attributes, !attributes.isEmpty {
+            if let attributes = attributes.nonEmptyOrNil {
                 try container.encode(attributes, forKey: .attributes)
             }
         case let .image(image, attributes):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(image, forKey: .image)
-            if let attributes, !attributes.isEmpty {
+            if let attributes = attributes.nonEmptyOrNil {
                 try container.encode(attributes, forKey: .attributes)
             }
         case .unknown:

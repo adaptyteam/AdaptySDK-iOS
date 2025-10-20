@@ -14,14 +14,17 @@ extension Request {
         static let method = "adapty_ui_present_onboarding_view"
 
         let viewId: String
+        let presentationStyle: AdaptyUIViewPresentationStyle?
 
         enum CodingKeys: String, CodingKey {
             case viewId = "id"
+            case presentationStyle = "ios_presentation_style"
         }
 
         func execute() async throws -> AdaptyJsonData {
             try await AdaptyUI.Plugin.presentOnboardingView(
-                viewId: viewId
+                viewId: viewId,
+                presentationStyle: presentationStyle
             )
             return .success()
         }

@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @EventsManagerActor
-final class EventsStorage: Sendable {
+final class EventsStorage {
     static var all = Kind.allCases.map { EventsStorage(kind: $0) }
 
     private let kind: Kind
@@ -47,7 +47,7 @@ private enum Kind: Sendable, Hashable, CaseIterable {
 }
 
 @EventsManagerActor
-private final class AllEventsStorage: Sendable {
+private final class AllEventsStorage {
     private static let userDefaults = Storage.userDefaults
 
     static var eventsCount: [Kind: Int] = Dictionary(Kind.allCases.map {

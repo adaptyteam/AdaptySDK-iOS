@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class BackendIntroductoryOfferEligibilityStorage: Sendable {
+final class BackendIntroductoryOfferEligibilityStorage {
     private enum Constants {
         static let ineligibleProductIds = "AdaptySDK_Cached_Backend_Ineligible_Products"
     }

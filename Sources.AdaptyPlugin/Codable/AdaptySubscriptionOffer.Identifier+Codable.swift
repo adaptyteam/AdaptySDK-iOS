@@ -14,11 +14,9 @@ extension AdaptySubscriptionOffer.Identifier: Codable {
         case offerId = "id"
     }
 
-    private typealias OfferType = AdaptySubscriptionOffer.OfferType.CodingValues
-
     package init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let offerType = try container.decode(OfferType.self, forKey: .offerType)
+        let offerType = try container.decode(AdaptySubscriptionOfferType.self, forKey: .offerType)
         switch offerType {
         case .introductory:
             self = .introductory
@@ -26,20 +24,14 @@ extension AdaptySubscriptionOffer.Identifier: Codable {
             self = try .promotional(container.decode(String.self, forKey: .offerId))
         case .winBack:
             self = try .winBack(container.decode(String.self, forKey: .offerId))
+        case .code:
+            self = try .code(container.decodeIfPresent(String.self, forKey: .offerId))
         }
     }
 
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self {
-        case .introductory:
-            try container.encode(OfferType.introductory, forKey: .offerType)
-        case .promotional(let id):
-            try container.encode(OfferType.promotional, forKey: .offerType)
-            try container.encode(id, forKey: .offerId)
-        case .winBack(let id):
-            try container.encode(OfferType.winBack, forKey: .offerType)
-            try container.encode(id, forKey: .offerId)
-        }
+        try container.encode(offerType, forKey: .offerType)
+        try container.encodeIfPresent(offerId, forKey: .offerId)
     }
 }

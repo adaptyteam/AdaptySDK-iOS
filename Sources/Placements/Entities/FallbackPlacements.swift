@@ -17,14 +17,14 @@ struct FallbackPlacements: Sendable {
 
     init(fileURL url: URL) throws(AdaptyError) {
         guard url.isFileURL else {
-            throw AdaptyError.isNotFileUrl()
+            throw .isNotFileUrl()
         }
         let decoder = FallbackPlacements.decoder()
-       
+
         do {
             head = try decoder.decode(Head.self, from: Data(contentsOf: url))
         } catch {
-            throw AdaptyError.decodingFallback(error)
+            throw .decodingFallback(error)
         }
         fileURL = url
     }
@@ -36,7 +36,7 @@ struct FallbackPlacements: Sendable {
     func getPlacement<Content: PlacementContent>(
         byPlacementId id: String,
         withVariationId: String?,
-        profileId: String,
+        userId: AdaptyUserId,
         requestLocale: AdaptyLocale
     ) -> AdaptyPlacementChosen<Content>? {
         guard contains(placementId: id) ?? true else { return nil }
@@ -46,7 +46,7 @@ struct FallbackPlacements: Sendable {
         do {
             draw = try FallbackPlacements.decodePlacementVariation(
                 Data(contentsOf: fileURL),
-                withProfileId: profileId,
+                withUserId: userId,
                 withPlacementId: id,
                 withVariationId: withVariationId,
                 withRequestLocale: requestLocale,
@@ -83,17 +83,15 @@ private extension FallbackPlacements {
             let formatVersion = try container.decode(Int.self, forKey: .formatVersion)
 
             guard formatVersion == Adapty.fallbackFormatVersion else {
-                let error = formatVersion < Adapty.fallbackFormatVersion
+                let error = Adapty.fallbackFormatVersion > formatVersion
                     ? "The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard."
                     : "The fallback paywalls version is not correct. Please update the AdaptySDK."
                 log.error(error)
 
-                Task(priority: .high) {
-                    await Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
-                        "in_version": formatVersion,
-                        "expected_version": Adapty.fallbackFormatVersion,
-                    ]))
-                }
+                Adapty.trackSystemEvent(AdaptyInternalEventParameters(eventName: "fallback_wrong_version", params: [
+                    "in_version": formatVersion,
+                    "expected_version": Adapty.fallbackFormatVersion,
+                ]))
 
                 throw AdaptyError.wrongVersionFallback(error)
             }
@@ -106,7 +104,7 @@ private extension FallbackPlacements {
 
     static func decodePlacementVariation<Content: PlacementContent>(
         _ data: Data,
-        withProfileId profileId: String,
+        withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
         withVariationId variationId: String?,
         withRequestLocale requestLocale: AdaptyLocale,
@@ -114,7 +112,7 @@ private extension FallbackPlacements {
     ) throws -> AdaptyPlacement.Draw<Content>? {
         let jsonDecoder = FallbackPlacements.decoder()
         jsonDecoder.userInfo.setPlacementId(placementId)
-        jsonDecoder.userInfo.setProfileId(profileId)
+        jsonDecoder.userInfo.setUserId(userId)
         jsonDecoder.userInfo.setRequestLocale(requestLocale)
 
         if let variationId {

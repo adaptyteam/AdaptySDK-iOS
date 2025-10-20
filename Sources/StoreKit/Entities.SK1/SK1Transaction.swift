@@ -20,14 +20,25 @@ extension SK1Transaction {
     }
 
     @inlinable
-    var unfProductID: String { payment.productIdentifier }
+    var unfProductId: String { payment.productIdentifier }
 
     @inlinable
     var unfOfferId: String? { payment.paymentDiscount?.identifier }
 
+    func logParams(other: EventParameters?) -> EventParameters {
+        guard let other else { return logParams }
+        return logParams.merging(other) { _, new in new }
+    }
+
+    var isXcodeEnvironment: Bool {
+        guard let id = unfIdentifier else { return false }
+        
+        return id.count < 4
+    }
+
     var logParams: EventParameters {
         [
-            "product_id": unfProductID,
+            "product_id": unfProductId,
             "state": transactionState.stringValue,
             "transaction_id": unfIdentifier,
             "original_id": unfOriginalIdentifier,
@@ -39,7 +50,8 @@ struct SK1TransactionWithIdentifier: Sendable {
     let underlay: SK1Transaction
     private let id: String
 
-    init(_ underlay: SK1Transaction, id: String) {
+    init?(_ underlay: SK1Transaction) {
+        guard let id = underlay.transactionIdentifier else { return nil }
         self.underlay = underlay
         self.id = id
     }
@@ -51,13 +63,19 @@ struct SK1TransactionWithIdentifier: Sendable {
     var unfOriginalIdentifier: String { underlay.unfOriginalIdentifier ?? unfIdentifier }
 
     @inlinable
-    var unfProductID: String { underlay.unfProductID }
+    var unfProductId: String { underlay.unfProductId }
 
     @inlinable
     var unfOfferId: String? { underlay.unfOfferId }
 
     @inlinable
-    var logParams: EventParameters { underlay.logParams }
+    func logParams(other: EventParameters?) -> EventParameters { underlay.logParams(other: other) }
+
+    @inlinable
+    var logParams: EventParameters { underlay.logParams(other: nil) }
+
+    @inlinable
+    var isXcodeEnvironment: Bool { underlay.isXcodeEnvironment }
 }
 
 private extension SKPaymentTransactionState {

@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.11.0/schema"
+$id: "https://adapty.io/crossPlatform/3.12.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -112,6 +112,7 @@ $requests:
     properties:
       method: { const: "adapty_ui_present_onboarding_view" }
       id: { type: string, description: "View Id" }
+      ios_presentation_style: { $ref: "#/$defs/AdaptyUI.IOSPresentationStyle" }
 
   AdaptyUIPresentOnboardingView.Response: #response
     type: object
@@ -130,6 +131,7 @@ $requests:
     properties:
       method: { const: "adapty_ui_present_paywall_view" }
       id: { type: string, description: "View Id" }
+      ios_presentation_style: { $ref: "#/$defs/AdaptyUI.IOSPresentationStyle" }
 
   AdaptyUIPresentPaywallView.Response: #response
     type: object
@@ -288,7 +290,7 @@ $requests:
     properties:
       method: { const: "identify" }
       customer_user_id: { type: string }
-      app_account_token: { $ref: "#/$defs/UUID" }
+      parameters: { $ref: "#/$defs/CustomerIdentityParameters" } 
 
   Identify.Response: #response
     type: object
@@ -505,7 +507,7 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { $ref: "#/$defs/AdaptyProfile" }
+          success: { const: true }
 
   ### restorePurchases ###
   RestorePurchases.Request: #request
@@ -924,7 +926,7 @@ $defs:
     type: string
     format: uuid
     pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-    description: "UUID в формате RFC 4122"
+    description: "UUID in RFC 4122 format"
     example: "123e4567-e89b-12d3-a456-426614174000"
 
   Date: #response #request
@@ -937,10 +939,11 @@ $defs:
     properties:
       api_key: { type: string }
       customer_user_id: { type: string }
-      app_account_token: { $ref: "#/$defs/UUID" , description: "used only if customer_user_id is not null"}
+      customer_identity_parameters: { $ref: "#/$defs/CustomerIdentityParameters" }    
       observer_mode: { type: boolean, default: false }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
+      google_enable_pending_prepaid_plans: { type: boolean, default: false }
       ip_address_collection_disabled: { type: boolean, default: false }
       server_cluster: { type: string, enum: ["default", "eu", "cn"] }
       backend_base_url: { type: string }
@@ -961,11 +964,20 @@ $defs:
           memory_storage_count_limit: { type: integer }
           disk_storage_size_limit: { type: integer, description: "bytes" }
 
+  CustomerIdentityParameters: #request
+    type: object
+    properties:
+      app_account_token: { $ref: "#/$defs/UUID", description: "iOS Only" }
+      obfuscated_account_id: { type: string, description: "Android Only" }
+      obfuscated_profile_id: { type: string, description: "Android Only" }     
+
   AdaptyPaywallProduct.Response: #response
     type: object
     required:
       - vendor_product_id
       - adapty_product_id
+      - access_level_id
+      - product_type
       - paywall_product_index
       - paywall_variation_id
       - paywall_ab_test_name
@@ -977,6 +989,8 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       paywall_product_index: { type: integer }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
@@ -1026,6 +1040,8 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - access_level_id
+      - product_type
       - paywall_product_index
       - paywall_variation_id
       - paywall_ab_test_name
@@ -1033,6 +1049,8 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       paywall_product_index: { type: integer }
       subscription_offer_identifier:
         { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
@@ -1179,9 +1197,13 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - access_level_id
+      - product_type
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       promotional_offer_id: { type: string, description: "iOS Only" }
       win_back_offer_id: { type: string, description: "iOS Only" }
       base_plan_id: { type: string, description: "Android Only" }
@@ -1396,7 +1418,9 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
-          jws_transaction: { type: string }
+          apple_jws_transaction: { type: string }
+          google_purchase_token: { type: string }
+
 
   AdaptyInstallationStatus: #response #event
     type: object
@@ -1480,6 +1504,12 @@ $defs:
       nullable: false 
     }
 
+  AdaptyUI.IOSPresentationStyle:
+    type: string
+    enum:
+      - full_screen
+      - page_sheet
+
   AdaptyUI.DialogConfiguration: #request
     type: object
     required: [default_action]
@@ -1494,8 +1524,8 @@ $defs:
     enum:
       - primary
       - secondary
-
-   AdaptyPurchaseParameters:  #request
+  
+  AdaptyPurchaseParameters:  #request
     type: object
     properties:
       subscription_update_params:
@@ -1504,8 +1534,6 @@ $defs:
           description: "Android Only",
         }
       is_offer_personalized: { type: boolean, description: "Android Only" }
-      obfuscated_account_id: { type: string, description: "Android Only" }
-      obfuscated_profile_id: { type: string, description: "Android Only" }
       
 
   AdaptySubscriptionUpdateParameters: #request # Android Only

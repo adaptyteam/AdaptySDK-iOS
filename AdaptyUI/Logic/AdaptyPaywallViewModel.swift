@@ -32,24 +32,15 @@ package final class AdaptyPaywallViewModel: ObservableObject {
     }
 
     private var logShowPaywallCalled = false
-    
+
     func logShowPaywall() {
         guard !logShowPaywallCalled else { return }
         logShowPaywallCalled = true
-        
-        let logId = logId
-        Log.ui.verbose("#\(logId)# logShowPaywall begin")
 
-        Task {
-            do {
-                try await paywall.logShowPaywall(viewConfiguration: viewConfiguration)
-                Log.ui.verbose("#\(logId)# logShowPaywall success")
-            } catch {
-                Log.ui.error("#\(logId)# logShowPaywall fail: \(error)")
-            }
-        }
+        paywall.logShowPaywall()
+        Log.ui.verbose("#\(logId)# logShowPaywall")
     }
-    
+
     func resetLogShowPaywall() {
         Log.ui.verbose("#\(logId)# resetLogShowPaywall")
         logShowPaywallCalled = false
@@ -59,13 +50,13 @@ package final class AdaptyPaywallViewModel: ObservableObject {
         Task { @MainActor in
             do {
                 Log.ui.verbose("#\(logId)# paywall reloadData begin")
-                
+
                 let paywall = try await Adapty.getPaywall(placementId: paywall.placementId, locale: paywall.locale)
                 let viewConfiguration = try await Adapty.getViewConfiguration(paywall: paywall)
-                
+
                 self.paywall = paywall
                 self.viewConfiguration = viewConfiguration
-                
+
                 onViewConfigurationUpdate?(viewConfiguration)
             } catch {
                 Log.ui.error("#\(logId)# paywall reloadData fail: \(error)")

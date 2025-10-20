@@ -8,14 +8,21 @@
 import Foundation
 
 @AdaptyActor
-final class ProfileManager: Sendable {
-    nonisolated let profileId: String
-    var profile: VH<AdaptyProfile>
-    var onceSentEnvironment: SentEnvironment
+final class ProfileManager {
+    let userId: AdaptyUserId
 
-    let storage: ProfileStorage
+    private var cachedProfile: VH<AdaptyProfile>
+    private var onceSentEnvironment: SentEnvironment
+    private let storage: ProfileStorage
+
+    let crossPlacmentStorage = CrossPlacementStorage()
     let placementStorage = PlacementStorage()
     let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
+
+    var currentProfile: AdaptyProfile { cachedProfile.value }
+    var isTestUser: Bool { cachedProfile.value.isTestUser }
+    var segmentId: String { cachedProfile.value.segmentId }
+    var lastResponseHash: String? { cachedProfile.hash }
 
     @AdaptyActor
     init(
@@ -23,115 +30,191 @@ final class ProfileManager: Sendable {
         profile: VH<AdaptyProfile>,
         sentEnvironment: SentEnvironment
     ) {
-        let profileId = profile.value.profileId
-        self.profileId = profileId
-        self.profile = profile
+        self.userId = profile.userId
+        self.cachedProfile = profile
         self.onceSentEnvironment = sentEnvironment
         self.storage = storage
 
-        Task { [weak self] in
-            Adapty.optionalSDK?.updateASATokenIfNeed(for: profile)
+        Task { @AdaptyActor [weak self] in
+            guard let sdk = Adapty.optionalSDK else { return }
+            sdk.updateASATokenIfNeed(for: profile)
+
+            let currentProfile = await sdk.profileWithOfflineAccessLevels(profile.value)
+            Adapty.callDelegate { $0.didLoadLatestProfile(currentProfile) }
 
             if sentEnvironment == .none {
-                _ = await self?.getProfile()
+                _ = await self?.fetchProfile()
             } else {
-                self?.syncTransactionsIfNeed(for: profileId)
+                try? await sdk.syncTransactionHistory(for: profile.userId)
             }
-
-            Adapty.callDelegate { $0.didLoadLatestProfile(profile.value) }
         }
     }
-}
 
-extension ProfileManager {
-    nonisolated func syncTransactionsIfNeed(for profileId: String) { // TODO: extract this code from ProfileManager
-        Task { @AdaptyActor [weak self] in
-            guard let sdk = Adapty.optionalSDK,
-                  let self,
-                  !self.storage.syncedTransactions
-            else { return }
+    fileprivate func saveProfileAndStartNotifyTask(
+        _ profile: VH<AdaptyProfile>
+    ) throws(WrongProfileIdError) -> Task<AdaptyProfile, Never>? {
+        guard profile.isEqualProfileId(userId) else { throw WrongProfileIdError() }
 
-            try? await sdk.syncTransactions(for: profileId)
+        if profile.IsNotEqualHash(cachedProfile),
+           profile.isNewerOrEqualVersion(cachedProfile)
+        {
+            cachedProfile = profile
         }
+
+        do {
+            try storage.updateProfile(profile)
+        } catch {
+            return nil
+        }
+
+        return Task {
+            await notifyProfileDidChanged()
+        }
+    }
+
+    fileprivate func notifyProfileDidChanged() async -> AdaptyProfile {
+        let profile = await profileWithOfflineAccessLevels
+        Adapty.callDelegate { $0.didLoadLatestProfile(profile) }
+        return profile
+    }
+
+    /// The  profile with offline access levels
+    var profileWithOfflineAccessLevels: AdaptyProfile {
+        get async {
+            if let sdk = Adapty.optionalSDK {
+                await sdk.profileWithOfflineAccessLevels(cachedProfile.value)
+            } else {
+                cachedProfile.value
+            }
+        }
+    }
+
+    func fetchSegmentId() async -> String {
+        await fetchProfile().segmentId
     }
 
     func updateProfile(params: AdaptyProfileParameters) async throws(AdaptyError) -> AdaptyProfile {
-        try await syncProfile(params: params)
-    }
-
-    func getProfile() async -> AdaptyProfile {
-        syncTransactionsIfNeed(for: profileId)
-        return await (try? syncProfile(params: nil)) ?? profile.value
-    }
-
-    private func syncProfile(params: AdaptyProfileParameters?) async throws(AdaptyError) -> AdaptyProfile {
-        if let analyticsDisabled = params?.analyticsDisabled {
-            storage.setExternalAnalyticsDisabled(analyticsDisabled)
+        if let analyticsDisabled = params.analyticsDisabled {
+            try? storage.setExternalAnalyticsDisabled(analyticsDisabled, for: userId)
         }
-
-        let meta = await onceSentEnvironment.getValueIfNeedSend(
-            analyticsDisabled: (params?.analyticsDisabled ?? false) || storage.externalAnalyticsDisabled
-        )
-
-        return try await Adapty.activatedSDK.syncProfile(
-            profile: profile,
-            params: params,
-            environmentMeta: meta
-        )
+        return try await syncProfile(params: params)
     }
 
-    func saveResponse(_ newProfile: VH<AdaptyProfile>?) {
-        guard let newProfile,
-              profile.value.profileId == newProfile.value.profileId,
-              !profile.hash.nonOptionalIsEqual(newProfile.hash),
-              profile.value.version <= newProfile.value.version
-        else { return }
-
-        profile = newProfile
-        storage.setProfile(newProfile)
-
-        Adapty.callDelegate { $0.didLoadLatestProfile(newProfile.value) }
-    }
-}
-
-extension Adapty {
-    func syncTransactions(for profileId: String) async throws(AdaptyError) {
-        let response = try await transactionManager.syncTransactions(for: profileId)
-
-        if profileStorage.profileId == profileId {
-            profileStorage.setSyncedTransactions(true)
+    func fetchProfile() async -> AdaptyProfile {
+        if let profile = try? await syncProfile(params: nil) {
+            return profile
         }
-        profileManager?.saveResponse(response)
+        return await profileWithOfflineAccessLevels
     }
 
-    func saveResponse(_ newProfile: VH<AdaptyProfile>, syncedTransaction: Bool = false) {
-        if syncedTransaction, profileStorage.profileId == newProfile.value.profileId {
-            profileStorage.setSyncedTransactions(true)
-        }
-        profileManager?.saveResponse(newProfile)
-    }
-}
+    private func syncProfile(
+        params: AdaptyProfileParameters?
+    ) async throws(AdaptyError) -> AdaptyProfile {
+        let analyticsDisabled = (params?.analyticsDisabled ?? false)
+            || ((try? storage.externalAnalyticsDisabled(for: userId)) ?? false)
+        let meta = await onceSentEnvironment.getValueIfNeedSend(analyticsDisabled: analyticsDisabled)
 
-private extension Adapty {
-    func syncProfile(profile old: VH<AdaptyProfile>, params: AdaptyProfileParameters?, environmentMeta meta: Environment.Meta?) async throws(AdaptyError) -> AdaptyProfile {
-        let response: VH<AdaptyProfile?>
-        do {
-            response = try await httpSession.syncProfile(
-                profileId: old.value.profileId,
-                parameters: params,
-                environmentMeta: meta,
-                responseHash: old.hash
-            )
+        let httpSession = try await Adapty.activatedSDK.httpSession
+        let old = cachedProfile
+        let response: VH<AdaptyProfile>?
+
+        do throws(HTTPError) {
+            if params == nil, meta == nil {
+                Task { @AdaptyActor in
+                    try? await Adapty.optionalSDK?.syncTransactionHistory(for: userId)
+                }
+                response = try await httpSession.fetchProfile(
+                    userId: old.userId,
+                    responseHash: old.hash
+                )
+            } else {
+                response = try await httpSession.updateProfile(
+                    userId: old.userId,
+                    parameters: params,
+                    environmentMeta: meta,
+                    responseHash: old.hash
+                )
+
+                if let meta {
+                    onceSentEnvironment = meta.sentEnvironment
+                }
+            }
         } catch {
             throw error.asAdaptyError
         }
 
-        if let manager = try profileManager(with: old.value.profileId) {
-            if let meta {
-                manager.onceSentEnvironment = meta.sentEnvironment
-            }
-            manager.saveResponse(response.flatValue())
+        if let response,
+           let profile = try? await saveProfileAndStartNotifyTask(response)?.value
+        {
+            return profile
         }
-        return response.value ?? old.value
+
+        return await profileWithOfflineAccessLevels
+    }
+}
+
+extension Adapty {
+    /// Handles the server profile response.
+    /// If the profile is newer, it will be persisted and delivered to the delegate.
+    /// - Parameter response: Server response containing a profile. User ID comparison is not required.
+    /// - Returns: if the manager is working with the same user, returns Task
+    func handleProfileResponse(_ response: VH<AdaptyProfile>?) {
+        guard let response else { return }
+        _ = try? profileManager?.saveProfileAndStartNotifyTask(response)
+    }
+
+    /// Handles the server profile response.
+    /// If the profile is newer, it will be persisted and delivered to the delegate.
+    /// - Parameter response: Server response containing a profile. User ID comparison is not required.
+    /// - Returns: if the manager is working with the same user, returns Task
+    func handleTransactionResponse(_ response: VH<AdaptyProfile>) {
+        try? profileStorage.setSyncedTransactionsHistory(true, for: response.userId)
+        _ = try? profileManager?.saveProfileAndStartNotifyTask(response)
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    func recalculateOfflineAccessLevels() async -> AdaptyProfile {
+        await (transactionManager as? SK2TransactionManager)?.clearCache()
+        
+        if let manger = profileManager {
+            return await manger.notifyProfileDidChanged()
+        }
+        
+        let manger = offlineProfileManager ?? OfflineProfileManager(userId: profileStorage.userId)
+        return await profileWithOfflineAccessLevels(manger.currentProfile)
+    }
+
+    func syncTransactionHistory(for userId: AdaptyUserId, forceSync: Bool = false) async throws(AdaptyError) {
+        try await transactionManager.syncUnfinishedTransactions()
+
+        guard let syncedTransactionsHistory = try? profileStorage.syncedTransactionsHistory(for: userId) else {
+            return
+        }
+
+        guard forceSync || !syncedTransactionsHistory else { return }
+        try await transactionManager.syncTransactionHistory(for: userId)
+    }
+
+    func profileWithOfflineAccessLevels(_ serverProfile: AdaptyProfile) async -> AdaptyProfile {
+        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
+              let transactionManager = transactionManager as? SK2TransactionManager,
+              let productsManager = productsManager as? SK2ProductsManager
+        else {
+            return serverProfile
+        }
+        var verifiedCurrentEntitlements = await transactionManager.getVerifiedCurrentEntitlements()
+
+        if await !transactionManager.hasUnfinishedTransactions {
+            verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter {
+                $0.unfEnvironment == SK2Transaction.xcodeEnvironment
+            }
+        }
+
+        guard !verifiedCurrentEntitlements.isEmpty else { return serverProfile }
+
+        return await serverProfile.added(
+            transactions: verifiedCurrentEntitlements,
+            productManager: productsManager
+        )
     }
 }

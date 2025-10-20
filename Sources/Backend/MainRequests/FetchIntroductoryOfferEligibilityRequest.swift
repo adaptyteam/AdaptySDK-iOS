@@ -28,11 +28,13 @@ private struct FetchIntroductoryOfferEligibilityRequest: HTTPRequestWithDecodabl
         )
     }
 
-    init(profileId: String, responseHash: String?) {
+    init(userId: AdaptyUserId, responseHash: String?) {
         headers = HTTPHeaders()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setBackendResponseHash(responseHash)
-        queryItems = QueryItems().setBackendProfileId(profileId)
+
+        queryItems = QueryItems()
+            .setUserProfileId(userId)
     }
 }
 
@@ -60,11 +62,11 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendIntrodu
 
 extension Backend.MainExecutor {
     func fetchIntroductoryOfferEligibility(
-        profileId: String,
+        userId: AdaptyUserId,
         responseHash: String?
-    ) async throws(HTTPError) -> VH<[BackendIntroductoryOfferEligibilityState]?> {
+    ) async throws(HTTPError) -> VH<[BackendIntroductoryOfferEligibilityState]> {
         let request = FetchIntroductoryOfferEligibilityRequest(
-            profileId: profileId,
+            userId: userId,
             responseHash: responseHash
         )
 
@@ -72,6 +74,6 @@ extension Backend.MainExecutor {
             request,
             requestName: .fetchProductStates
         )
-        return VH(response.body, hash: response.headers.getBackendResponseHash())
+        return VH(response.body ?? [], hash: response.headers.getBackendResponseHash())
     }
 }

@@ -57,32 +57,22 @@ final class EventsManager {
 
         sending = true
 
-        Task(priority: .utility) { [weak self] in
-            var error: Error?
-            do {
-                try await self?.sendEvents(backendSession)
-            } catch let err {
-                error = err
-            }
+        Task.detached(priority: .utility) { @EventsManagerActor @Sendable [weak self] in
+            defer { self?.sending = false }
+            while !Task.isCancelled {
+                let interval: TaskDuration
+                do throws(EventsError) {
+                    try await self?.sendEvents(backendSession)
 
-            let interval: TaskDuration? =
-                if let error, !((error as? EventsError)?.isInterrupted ?? false) {
-                    .seconds(20)
-                } else if self?.hasEvents() ?? false {
-                    .seconds(1)
-                } else {
-                    nil
+                    guard self?.hasEvents() ?? false else { return }
+                    interval = .seconds(1)
+
+                } catch {
+                    guard !error.isInterrupted else { return }
+                    interval = .seconds(20)
                 }
 
-            guard let interval else {
-                self?.finishSending()
-                return
-            }
-
-            Task.detached(priority: .utility) { [weak self] in
-                try? await Task.sleep(duration: interval)
-                await self?.finishSending()
-                await self?.needSendEvents() // TODO: recursion ???
+                try await Task.sleep(duration: interval)
             }
         }
     }
@@ -91,7 +81,7 @@ final class EventsManager {
         if configuration.isExpired {
             do {
                 configuration = try await session.fetchEventsConfig(
-                    profileId: ProfileStorage.profileId
+                    userId: ProfileStorage.userId
                 )
             } catch .backend, .decoding {
                 configuration = .init(blacklist: Event.defaultBlackList, expiration: Date() + 24 * 60 * 60)
@@ -105,27 +95,23 @@ final class EventsManager {
             blackList: configuration.blacklist
         )
 
-        guard !events.elements.isEmpty else {
+        guard events.elements.isNotEmpty else {
             eventStorages.subtract(oldIndexes: events.endIndex)
             return
         }
 
         try await session.sendEvents(
-            profileId: ProfileStorage.profileId,
+            userId: ProfileStorage.userId,
             events: events.elements
         )
 
         eventStorages.subtract(oldIndexes: events.endIndex)
     }
-
-    private func finishSending() {
-        sending = false
-    }
 }
 
 @EventsManagerActor
 private extension [EventCollectionStorage] {
-    var hasEvents: Bool { contains { !$0.isEmpty } }
+    var hasEvents: Bool { contains { $0.isNotEmpty } }
 
     func getEvents(limit: Int, blackList: Set<String>) -> (elements: [Data], endIndex: [Int?]) {
         var limit = limit

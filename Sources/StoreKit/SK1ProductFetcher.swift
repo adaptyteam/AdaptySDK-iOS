@@ -49,13 +49,11 @@ private final class _SK1ProductFetcher: NSObject, @unchecked Sendable {
         requests[request.hash] = (productIds: productIds, retryCount: retryCount)
         request.start()
         let stamp = "SKR\(request.hash)"
-        Task {
-            await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
-                methodName: .fetchSK1Products,
-                stamp: stamp,
-                params: ["products_ids": productIds]
-            ))
-        }
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+            methodName: .fetchSK1Products,
+            stamp: stamp,
+            params: ["products_ids": productIds]
+        ))
     }
 }
 
@@ -64,16 +62,14 @@ extension _SK1ProductFetcher: SKProductsRequestDelegate {
         let requestHash = request.hash
         let stamp = "SKR\(requestHash)"
         queue.async { [weak self] in
-            Task {
-                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
-                    methodName: .fetchSK1Products,
-                    stamp: stamp,
-                    params: [
-                        "products_ids": response.products.map { $0.productIdentifier },
-                        "invalid_products": response.invalidProductIdentifiers,
-                    ]
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                methodName: .fetchSK1Products,
+                stamp: stamp,
+                params: [
+                    "products_ids": response.products.map { $0.productIdentifier },
+                    "invalid_products": response.invalidProductIdentifiers,
+                ]
+            ))
 
             if response.products.isEmpty {
                 log.verbose("SKProductsResponse don't have any product")
@@ -84,7 +80,7 @@ extension _SK1ProductFetcher: SKProductsRequestDelegate {
             }
 
             guard let self else { return }
-            if !response.invalidProductIdentifiers.isEmpty {
+            if response.invalidProductIdentifiers.isNotEmpty {
                 log.warn("InvalidProductIdentifiers: \(response.invalidProductIdentifiers.joined(separator: ", "))")
             }
 
@@ -108,12 +104,10 @@ extension _SK1ProductFetcher: SKProductsRequestDelegate {
 
     func requestDidFinish(_ request: SKRequest) {
         let stamp = "SKR\(request.hash)"
-        Task {
-            await Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
-                eventName: "fetch_products_did_finish",
-                stamp: stamp
-            ))
-        }
+        Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+            eventName: "fetch_products_did_finish",
+            stamp: stamp
+        ))
         request.cancel()
     }
 
@@ -122,13 +116,11 @@ extension _SK1ProductFetcher: SKProductsRequestDelegate {
         let requestHash = request.hash
         let stamp = "SKR\(requestHash)"
         queue.async { [weak self] in
-            Task {
-                await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
-                    methodName: .fetchSK1Products,
-                    stamp: stamp,
-                    error: "\(error.localizedDescription). Detail: \(error)"
-                ))
-            }
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+                methodName: .fetchSK1Products,
+                stamp: stamp,
+                error: "\(error.localizedDescription). Detail: \(error)"
+            ))
 
             log.error("Can't fetch products from Store \(error)")
             guard let self else { return }

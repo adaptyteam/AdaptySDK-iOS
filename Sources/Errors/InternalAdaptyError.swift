@@ -10,8 +10,11 @@ import StoreKit
 
 enum InternalAdaptyError: Error {
     case unknown(AdaptyError.Source, String, error: Error)
+    case taskCancelled(AdaptyError.Source)
     case activateOnceError(AdaptyError.Source)
     case cantMakePayments(AdaptyError.Source)
+    case notAllowedInObserveMode(AdaptyError.Source)
+
     case notActivated(AdaptyError.Source)
     case unidentifiedUserLogout(AdaptyError.Source)
 
@@ -27,12 +30,16 @@ extension InternalAdaptyError: CustomStringConvertible {
         switch self {
         case let .unknown(source, description, error: error):
             "AdaptyError.unknown(\(source), \(description), \(error))"
+        case .taskCancelled:
+            "AdaptyError.taskCancelled(\(source))"
         case let .activateOnceError(source):
             "AdaptyError.activateOnceError(\(source))"
         case let .unidentifiedUserLogout(source):
             "AdaptyError.unidentifiedUserLogout(\(source))"
         case let .cantMakePayments(source):
             "AdaptyError.cantMakePayments(\(source))"
+        case let .notAllowedInObserveMode(source):
+            "AdaptyError.notAllowedInObserveMode(\(source))"
         case let .notActivated(source):
             "AdaptyError.notActivated(\(source))"
         case let .profileWasChanged(source):
@@ -51,9 +58,11 @@ extension InternalAdaptyError {
     var source: AdaptyError.Source {
         switch self {
         case let .unknown(src, _, _),
+             let .taskCancelled(src),
              let .activateOnceError(src),
              let .unidentifiedUserLogout(src),
              let .cantMakePayments(src),
+             let .notAllowedInObserveMode(src),
              let .notActivated(src),
              let .profileWasChanged(src),
              let .fetchFailed(src, _, _),
@@ -81,9 +90,11 @@ extension InternalAdaptyError: CustomNSError {
     var adaptyErrorCode: AdaptyError.ErrorCode {
         switch self {
         case .unknown: .unknown
+        case .taskCancelled: .operationInterrupted
         case .activateOnceError: .activateOnceError
         case .unidentifiedUserLogout: .unidentifiedUserLogout
         case .cantMakePayments: .cantMakePayments
+        case .notAllowedInObserveMode: .cantMakePayments
         case .notActivated: .notActivated
         case .profileWasChanged: .profileWasChanged
         case .fetchFailed: .networkFailed
@@ -108,6 +119,10 @@ extension InternalAdaptyError: CustomNSError {
 }
 
 extension AdaptyError {
+    static func taskCancelled(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.taskCancelled(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
     static func activateOnceError(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         InternalAdaptyError.activateOnceError(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
     }
@@ -122,6 +137,10 @@ extension AdaptyError {
 
     static func cantMakePayments(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         InternalAdaptyError.cantMakePayments(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func notAllowedInObserveMode(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.notAllowedInObserveMode(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
     }
 
     static func notActivated(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {

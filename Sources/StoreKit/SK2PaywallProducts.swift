@@ -21,13 +21,14 @@ extension Adapty {
         )
         .compactMap { sk2Product in
             let vendorId = sk2Product.id
-            guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+            guard let reference = paywall.products.first(where: { $0.productInfo.vendorId == vendorId }) else {
                 return nil
             }
 
             return AdaptySK2PaywallProductWithoutDeterminingOffer(
                 skProduct: sk2Product,
                 adaptyProductId: reference.adaptyProductId,
+                productInfo: reference.productInfo,
                 paywallProductIndex: reference.paywallProductIndex,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.placement.abTestName,
@@ -38,8 +39,8 @@ extension Adapty {
     }
 
     func getSK2PaywallProduct(
-        vendorProductId: String,
         adaptyProductId: String,
+        productInfo: BackendProductInfo,
         paywallProductIndex: Int,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
@@ -48,14 +49,14 @@ extension Adapty {
         webPaywallBaseUrl: URL?,
         productsManager: SK2ProductsManager
     ) async throws(AdaptyError) -> AdaptySK2PaywallProduct {
-        let sk2Product = try await productsManager.fetchSK2Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
+        let sk2Product = try await productsManager.fetchSK2Product(id: productInfo.vendorId, fetchPolicy: .returnCacheDataElseLoad)
 
         let subscriptionOffer: AdaptySubscriptionOffer? =
             if let subscriptionOfferIdentifier {
                 if let offer = sk2Product.subscriptionOffer(by: subscriptionOfferIdentifier) {
                     offer
                 } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit2 product don't have offer id: `\(subscriptionOfferIdentifier.identifier ?? "nil")` with type:\(subscriptionOfferIdentifier.asOfferType.rawValue) ").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("StoreKit2 product don't have offer id: `\(subscriptionOfferIdentifier.offerId ?? "nil")` with type:\(subscriptionOfferIdentifier.offerType.rawValue) ").asAdaptyError
                 }
             } else {
                 nil
@@ -64,6 +65,7 @@ extension Adapty {
         return AdaptySK2PaywallProduct(
             skProduct: sk2Product,
             adaptyProductId: adaptyProductId,
+            productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,
             subscriptionOffer: subscriptionOffer,
             variationId: variationId,
@@ -83,7 +85,7 @@ extension Adapty {
         )
         .compactMap { sk2Product in
             let vendorId = sk2Product.id
-            guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+            guard let reference = paywall.products.first(where: { $0.productInfo.vendorId == vendorId }) else {
                 return nil
             }
 
@@ -109,6 +111,7 @@ extension Adapty {
             AdaptySK2PaywallProduct(
                 skProduct: $0.product,
                 adaptyProductId: $0.reference.adaptyProductId,
+                productInfo: $0.reference.productInfo,
                 paywallProductIndex: $0.reference.paywallProductIndex,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
@@ -147,9 +150,11 @@ extension Adapty {
         guard !tuple.determinedOffer else { return (tuple.product, tuple.reference, tuple.offer) }
 
         if let subscriptionGroupId = tuple.subscriptionGroupId,
-           let winBackOfferId = tuple.reference.winBackOfferId {
+           let winBackOfferId = tuple.reference.winBackOfferId
+        {
             if eligibleWinBackOfferIds[subscriptionGroupId]?.contains(winBackOfferId) ?? false,
-               let winBackOffer = winBackOffer(with: winBackOfferId, from: tuple.product) {
+               let winBackOffer = winBackOffer(with: winBackOfferId, from: tuple.product)
+            {
                 return (tuple.product, tuple.reference, winBackOffer)
             }
 
@@ -199,7 +204,7 @@ extension Adapty {
 
     private func winBackOfferExist(with offerId: String?, from sk2Product: SK2Product) -> Bool {
         guard let offerId else { return false }
-        guard sk2Product.unfWinBackOffer(byId: offerId) != nil else {
+        guard sk2Product.sk2ProductSubscriptionOffer(by: .winBack(offerId)) != nil else {
             log.warn("no win back offer found with id:\(offerId) in productId:\(sk2Product.id)")
             return false
         }

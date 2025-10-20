@@ -8,13 +8,13 @@
 import Foundation
 
 @AdaptyActor
-final class UserAcquisitionManager: Sendable {
+final class UserAcquisitionManager {
     private let storage: UserAcquisitionStorage
     private let executor: Backend.UAExecutor
     private let installTime: Date
     private let appLaunchCount: Int
 
-    private var registerInstallTask: Task<Void, any Error>?
+    private var registerInstallStarted = false
 
     private init?(_ sdk: Adapty) {
         let storage = UserAcquisitionStorage()
@@ -28,7 +28,6 @@ final class UserAcquisitionManager: Sendable {
         self.executor = sdk.backend.createUAExecutor()
         self.installTime = installTime
         self.appLaunchCount = appLaunchCount
-        self.registerInstallTask = nil
 
         if storage.hasRegistrationInstallResponse {
             let response = storage.registrationInstallResponse
@@ -39,21 +38,25 @@ final class UserAcquisitionManager: Sendable {
             Adapty.callDelegate { $0.onInstallationDetailsSuccess(details) }
 
         } else {
-            _ = startRegisterInstallTaskIfNeeded()
+            startRegisterInstallTaskIfNeeded()
         }
     }
 
-    func startRegisterInstallTaskIfNeeded(maxRetries: Int = 10) -> Bool {
+    func startRegisterInstallTaskIfNeeded(maxRetries: Int = 10) {
         guard
             !storage.hasRegistrationInstallResponse,
-            registerInstallTask == nil,
+            !registerInstallStarted,
             let sdk = Adapty.optionalSDK
-        else { return false }
+        else { return }
+
+        registerInstallStarted = true
 
         let installTime = installTime
         let appLaunchCount = appLaunchCount
 
-        registerInstallTask = Task { @AdaptyActor in
+        Task { @AdaptyActor in
+            defer { registerInstallStarted = false }
+
             let installInfo = await Environment.InstallInfo(
                 installTime: installTime,
                 appLaunchCount: appLaunchCount,
@@ -62,7 +65,7 @@ final class UserAcquisitionManager: Sendable {
 
             do throws(HTTPError) {
                 let response = try await executor.registerInstall(
-                    profileId: sdk.profileStorage.profileId,
+                    userId: sdk.profileStorage.userId,
                     installInfo: installInfo,
                     maxRetries: maxRetries
                 )
@@ -80,7 +83,6 @@ final class UserAcquisitionManager: Sendable {
                 Adapty.callDelegate { $0.onInstallationDetailsFail(error: error.asAdaptyError) }
             }
         }
-        return true
     }
 
     func getCurrentInstallationStatus() async -> AdaptyInstallationStatus {

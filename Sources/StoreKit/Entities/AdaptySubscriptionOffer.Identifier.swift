@@ -7,59 +7,62 @@
 
 import Foundation
 
-extension AdaptySubscriptionOffer {
-    package enum Identifier: Sendable, Hashable {
+package extension AdaptySubscriptionOffer {
+    enum Identifier: Sendable, Hashable {
         case introductory
         case promotional(String)
         case winBack(String)
+        case code(String?)
 
-        var identifier: String? {
+        package var offerId: String? {
             switch self {
-            case .introductory:
-                nil
+            case .introductory: nil
             case let .promotional(value),
-                 let .winBack(value):
-                value
+                 let .winBack(value): value
+            case let .code(value): value
             }
         }
 
-        var asOfferType: OfferType {
+        package var offerType: AdaptySubscriptionOfferType {
             switch self {
-            case .introductory:
-                .introductory
-            case .promotional:
-                .promotional
-            case .winBack:
-                .winBack
+            case .introductory: .introductory
+            case .promotional: .promotional
+            case .winBack: .winBack
+            case .code: .code
             }
         }
-    }
-
-    public enum OfferType: String, Sendable {
-        case introductory
-        case promotional
-        case winBack
     }
 }
 
-package extension AdaptySubscriptionOffer.OfferType {
-    enum CodingValues: String, Codable {
-        case introductory
-        case promotional
-        case winBack = "win_back"
+private extension AdaptySubscriptionOffer.Identifier {
+    init?(offerId: String?, offerType: AdaptySubscriptionOfferType) {
+        switch offerType {
+        case .introductory:
+            self = .introductory
+        case .promotional:
+            guard let offerId else { return nil }
+            self = .promotional(offerId)
+        case .winBack:
+            guard let offerId else { return nil }
+            self = .winBack(offerId)
+        case .code:
+            self = .code(offerId)
+        }
     }
+}
 
-    var encodedValue: String {
-        let value: CodingValues =
-            switch self {
-            case .introductory:
-                .introductory
-            case .promotional:
-                .promotional
-            case .winBack:
-                .winBack
-            }
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension SK2Transaction {
+    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
+        guard let offerType = subscriptionOfferType else { return nil }
+        return .init(offerId: unfOfferId, offerType: offerType)
+    }
+}
 
-        return value.rawValue
+@available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
+extension SK2Transaction.Offer {
+    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
+        guard let offerType = type.asSubscriptionOfferType else { return nil }
+        return .init(offerId: id, offerType: offerType)
     }
 }

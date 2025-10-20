@@ -18,6 +18,12 @@ extension Request {
             case params
         }
 
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let params = try container.decode(AdaptyProfileParameters.Builder.self, forKey: .params)
+            self.params = params.build()
+        }
+
         func execute() async throws -> AdaptyJsonData {
             try await Adapty.updateProfile(params: params)
             return .success()

@@ -20,7 +20,7 @@ private struct FetchFallbackPlacementVariationsRequest: HTTPRequest {
     ) {
         self.timeoutInterval =
             if let timeoutInterval {
-                max(0.5, timeoutInterval)
+                min(max(0.5, timeoutInterval), 60)
             } else {
                 nil
             }
@@ -35,7 +35,7 @@ private extension BackendExecutor {
     func performFetchFallbackPlacementVariationsRequest<Content: PlacementContent>(
         requestName: APIRequestName,
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale,
         cached: Content?,
@@ -47,7 +47,7 @@ private extension BackendExecutor {
         try await _performFetchFallbackPlacementVariationsRequest(
             requestName,
             apiKeyPrefix,
-            profileId,
+            userId,
             placementId,
             locale: locale,
             locale,
@@ -62,7 +62,7 @@ private extension BackendExecutor {
     private func _performFetchFallbackPlacementVariationsRequest<Content: PlacementContent>(
         _ requestName: APIRequestName,
         _ apiKeyPrefix: String,
-        _ profileId: String,
+        _ userId: AdaptyUserId,
         _ placementId: String,
         locale: AdaptyLocale,
         _ requestLocale: AdaptyLocale,
@@ -112,7 +112,7 @@ private extension BackendExecutor {
                 try await AdaptyPlacementChosen.decodePlacementVariationsResponse(
                     response,
                     withConfiguration: configuration,
-                    withProfileId: profileId,
+                    withUserId: userId,
                     withPlacementId: placementId,
                     withRequestLocale: requestLocale,
                     withCached: cached,
@@ -132,7 +132,7 @@ private extension BackendExecutor {
             return try await _performFetchFallbackPlacementVariationsRequest(
                 requestName,
                 apiKeyPrefix,
-                profileId,
+                userId,
                 placementId,
                 locale: .defaultPlacementLocale,
                 requestLocale,
@@ -149,7 +149,7 @@ private extension BackendExecutor {
 extension Backend.FallbackExecutor {
     func fetchFallbackPlacementVariations<Content: PlacementContent>(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale,
         cached: Content?,
@@ -167,7 +167,7 @@ extension Backend.FallbackExecutor {
         return try await performFetchFallbackPlacementVariationsRequest(
             requestName: requestName,
             apiKeyPrefix: apiKeyPrefix,
-            profileId: profileId,
+            userId: userId,
             placementId: placementId,
             locale: locale,
             cached: cached,
@@ -182,7 +182,7 @@ extension Backend.FallbackExecutor {
 extension Backend.ConfigsExecutor {
     func fetchPlacementVariationsForDefaultAudience<Content: PlacementContent>(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale,
         cached: Content?,
@@ -200,7 +200,7 @@ extension Backend.ConfigsExecutor {
         return try await performFetchFallbackPlacementVariationsRequest(
             requestName: requestName,
             apiKeyPrefix: apiKeyPrefix,
-            profileId: profileId,
+            userId: userId,
             placementId: placementId,
             locale: locale,
             cached: cached,

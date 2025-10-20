@@ -10,51 +10,49 @@ import Foundation
 private let log = Log.sk2ProductManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-actor SK2ProductsManager: StoreKitProductsManager {
+actor SK2ProductsManager {
     private let apiKeyPrefix: String
-    private let storage: ProductVendorIdsStorage
+    private let storage: BackendProductInfoStorage
     private let session: Backend.MainExecutor
 
     private var products = [String: SK2Product]()
     private let sk2ProductsFetcher = SK2ProductFetcher()
 
-    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: ProductVendorIdsStorage) {
+    init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductInfoStorage) {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
         self.storage = storage
         Task {
-            await fetchAllProducts()
+            await prefetchAllProducts()
         }
     }
 
     private var fetchingAllProducts = false
 
-    private func finishFetchingAllProducts() {
-        fetchingAllProducts = false
+    func storeProductInfo(productInfo: [BackendProductInfo]) async {
+        await storage.set(productInfo: productInfo)
     }
 
-    private func fetchAllProducts() async {
+    func getProductInfo(vendorId: String) async -> BackendProductInfo? {
+        await storage.productInfo(by: vendorId)
+    }
+
+    private func prefetchAllProducts() async {
         guard !fetchingAllProducts else { return }
+        defer { fetchingAllProducts = false }
         fetchingAllProducts = true
 
-        do {
-            let response = try await session.fetchAllProductVendorIds(apiKeyPrefix: apiKeyPrefix)
-            await storage.set(productVendorIds: response)
-        } catch {
-            guard !error.isCancelled else { return }
-            Task.detached(priority: .utility) { [weak self] in
+        while !Task.isCancelled {
+            do throws(HTTPError) {
+                let response = try await self.session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
+                await self.storage.set(allProductInfo: response)
+                let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
+                _ = try? await fetchSK2Products(ids: allProductVendorIds)
+                return
+            } catch {
+                guard !error.isCancelled else { return }
                 try? await Task.sleep(duration: .seconds(2))
-                await self?.finishFetchingAllProducts()
-                await self?.fetchAllProducts() // TODO: recursion ???
             }
-            return
-        }
-
-        let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
-
-        Task.detached(priority: .high) { [weak self] in
-            _ = try? await self?.fetchSK2Products(ids: allProductVendorIds)
-            await self?.finishFetchingAllProducts()
         }
     }
 }
@@ -87,7 +85,7 @@ extension SK2ProductsManager {
     func fetchSK2Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
         async throws(AdaptyError) -> [SK2Product]
     {
-        guard !productIds.isEmpty else {
+        guard productIds.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 
@@ -100,7 +98,7 @@ extension SK2ProductsManager {
 
         let products = try await sk2ProductsFetcher.fetchProducts(ids: productIds, retryCount: retryCount)
 
-        guard !products.isEmpty else {
+        guard products.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
         }
 

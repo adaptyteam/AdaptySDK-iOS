@@ -21,13 +21,14 @@ extension Adapty {
         .compactMap { sk1Product in
             let vendorId = sk1Product.productIdentifier
 
-            guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+            guard let reference = paywall.products.first(where: { $0.productInfo.vendorId == vendorId }) else {
                 return nil
             }
 
             return AdaptySK1PaywallProductWithoutDeterminingOffer(
                 skProduct: sk1Product,
                 adaptyProductId: reference.adaptyProductId,
+                productInfo: reference.productInfo,
                 paywallProductIndex: reference.paywallProductIndex,
                 variationId: paywall.variationId,
                 paywallABTestName: paywall.placement.abTestName,
@@ -38,8 +39,8 @@ extension Adapty {
     }
 
     func getSK1PaywallProduct(
-        vendorProductId: String,
         adaptyProductId: String,
+        productInfo: BackendProductInfo,
         paywallProductIndex: Int,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
         variationId: String,
@@ -48,14 +49,14 @@ extension Adapty {
         productsManager: SK1ProductsManager,
         webPaywallBaseUrl: URL?
     ) async throws(AdaptyError) -> AdaptySK1PaywallProduct {
-        let sk1Product = try await productsManager.fetchSK1Product(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
+        let sk1Product = try await productsManager.fetchSK1Product(id: productInfo.vendorId, fetchPolicy: .returnCacheDataElseLoad)
 
         let subscriptionOffer: AdaptySubscriptionOffer? =
             if let subscriptionOfferIdentifier {
                 if let offer = sk1Product.subscriptionOffer(by: subscriptionOfferIdentifier) {
                     offer
                 } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit1 product don't have offer id: `\(subscriptionOfferIdentifier.identifier ?? "nil")` with type:\(subscriptionOfferIdentifier.asOfferType.rawValue) ").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("StoreKit1 product don't have offer id: `\(subscriptionOfferIdentifier.offerId ?? "nil")` with type:\(subscriptionOfferIdentifier.offerType.rawValue) ").asAdaptyError
                 }
             } else {
                 nil
@@ -64,6 +65,7 @@ extension Adapty {
         return AdaptySK1PaywallProduct(
             skProduct: sk1Product,
             adaptyProductId: adaptyProductId,
+            productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,
             subscriptionOffer: subscriptionOffer,
             variationId: variationId,
@@ -91,7 +93,7 @@ extension Adapty {
 
         var products: [ProductTuple] = sk1Products.compactMap { sk1Product in
             let vendorId = sk1Product.productIdentifier
-            guard let reference = paywall.products.first(where: { $0.vendorId == vendorId }) else {
+            guard let reference = paywall.products.first(where: { $0.productInfo.vendorId == vendorId }) else {
                 return nil
             }
 
@@ -112,12 +114,13 @@ extension Adapty {
             return $0.product.productIdentifier
         }
 
-        if !vendorProductIds.isEmpty {
+        if vendorProductIds.isNotEmpty {
             let introductoryOfferEligibility = await getIntroductoryOfferEligibility(vendorProductIds: vendorProductIds)
             products = products.map {
                 guard !$0.determinedOffer else { return $0 }
                 return if let introductoryOffer = $0.product.subscriptionOffer(by: .introductory),
-                          introductoryOfferEligibility.contains($0.product.productIdentifier) {
+                          introductoryOfferEligibility.contains($0.product.productIdentifier)
+                {
                     (product: $0.product, reference: $0.reference, offer: introductoryOffer, determinedOffer: true)
                 } else {
                     (product: $0.product, reference: $0.reference, offer: nil, determinedOffer: true)
@@ -129,6 +132,7 @@ extension Adapty {
             AdaptySK1PaywallProduct(
                 skProduct: $0.product,
                 adaptyProductId: $0.reference.adaptyProductId,
+                productInfo: $0.reference.productInfo,
                 paywallProductIndex: $0.reference.paywallProductIndex,
                 subscriptionOffer: $0.offer,
                 variationId: paywall.variationId,
@@ -148,41 +152,39 @@ extension Adapty {
         return offer
     }
 
-    private func getProfileState() -> (profileId: String, ineligibleProductIds: Set<String>)? {
+    private func getProfileState() -> (userId: AdaptyUserId, ineligibleProductIds: Set<String>)? {
         guard let manager = profileManager else { return nil }
 
         return (
-            manager.profileId,
+            manager.userId,
             manager.backendIntroductoryOfferEligibilityStorage.getIneligibleProductIds()
         )
     }
 
     private func getIntroductoryOfferEligibility(vendorProductIds: [String]) async -> [String] {
-        guard let profileState = getProfileState() else { return [] }
-        let (profileId, ineligibleProductIds) = profileState
+        guard let (userId, ineligibleProductIds) = getProfileState() else { return [] }
 
         let vendorProductIds = vendorProductIds.filter { !ineligibleProductIds.contains($0) }
-        guard !vendorProductIds.isEmpty else { return [] }
+        guard vendorProductIds.isNotEmpty else { return [] }
 
-        if !profileStorage.syncedTransactions {
-            do {
-                try await syncTransactions(for: profileId)
-            } catch {
-                return []
-            }
+        do {
+            try await syncTransactionHistory(for: userId)
+        } catch {
+            return []
         }
 
-        let lastResponse = try? profileManager(with: profileId)?.backendIntroductoryOfferEligibilityStorage.getLastResponse()
+        let lastResponse = try? profileManager(withProfileId: userId)?
+            .backendIntroductoryOfferEligibilityStorage
+            .getLastResponse()
+
         do {
             let response = try
                 await httpSession.fetchIntroductoryOfferEligibility(
-                    profileId: profileId,
+                    userId: userId,
                     responseHash: lastResponse?.hash
-                ).flatValue()
+                )
 
-            guard let response else { return lastResponse?.eligibleProductIds ?? [] }
-
-            if let manager = try? profileManager(with: profileId) {
+            if let manager = try? profileManager(withProfileId: userId) {
                 return manager.backendIntroductoryOfferEligibilityStorage.save(response)
             } else {
                 return response.value.filter(\.value).map(\.vendorId)

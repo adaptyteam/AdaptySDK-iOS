@@ -27,27 +27,17 @@ public extension Adapty {
                 "product_id": product.vendorProductId,
             ]
         ) { sdk throws(AdaptyError) in
+            guard let purchaser = sdk.purchaser else { throw .cantMakePayments() }
+            let userId = sdk.userId ?? sdk.profileStorage.userId
             let appAccountToken: UUID? =
-                if let customerUserId = sdk.customerUserId {
-                    sdk.profileStorage.getAppAccountToken() ?? UUID(uuidString: customerUserId)
+                if let customerUserId = userId.customerId {
+                    sdk.profileStorage.appAccountToken() ?? UUID(uuidString: customerUserId)
                 } else {
                     nil
                 }
 
-            guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
-                guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
-
-                return try await manager.makePurchase(
-                    profileId: sdk.profileStorage.profileId,
-                    appAccountToken: appAccountToken,
-                    product: product
-                )
-            }
-
-            guard let manager = sdk.sk2Purchaser else { throw AdaptyError.cantMakePayments() }
-
-            return try await manager.makePurchase(
-                profileId: sdk.profileStorage.profileId,
+            return try await purchaser.makePurchase(
+                userId: userId,
                 appAccountToken: appAccountToken,
                 product: product
             )
@@ -71,7 +61,7 @@ public extension Adapty {
                 "product_id": product.vendorProductId,
             ]
         ) { sdk throws(AdaptyError) in
-            guard let manager = sdk.sk1QueueManager else { throw AdaptyError.cantMakePayments() }
+            guard let manager = sdk.sk1QueueManager else { throw .cantMakePayments() }
             return try await manager.makePurchase(product: product)
         }
     }
@@ -84,17 +74,9 @@ public extension Adapty {
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func restorePurchases() async throws(AdaptyError) -> AdaptyProfile {
         try await withActivatedSDK(methodName: .restorePurchases) { sdk throws(AdaptyError) in
-            let profileId = sdk.profileStorage.profileId
-            if let response = try await sdk.transactionManager.syncTransactions(for: profileId) {
-                return response.value
-            }
-
             let manager = try await sdk.createdProfileManager
-            if manager.profileId != profileId {
-                throw AdaptyError.profileWasChanged()
-            }
-
-            return await manager.getProfile()
+            try await sdk.syncTransactionHistory(for: manager.userId, forceSync: true)
+            return await manager.fetchProfile()
         }
     }
 }

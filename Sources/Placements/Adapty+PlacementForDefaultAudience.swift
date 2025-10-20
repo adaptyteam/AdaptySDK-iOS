@@ -24,7 +24,9 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws(AdaptyError) -> AdaptyPaywall {
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let placementId = placementId.trimmed
+        // TODO: throw error if placementId isEmpty
 
         let logParams: EventParameters = [
             "placement_id": placementId,
@@ -49,7 +51,9 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws(AdaptyError) -> AdaptyOnboarding {
-        let locale = locale.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let placementId = placementId.trimmed
+        // TODO: throw error if placementId isEmpty
 
         let logParams: EventParameters = [
             "placement_id": placementId,
@@ -74,15 +78,14 @@ extension Adapty {
         _ fetchPolicy: AdaptyPlacementFetchPolicy
     ) async throws(AdaptyError) -> Content {
         let manager = profileManager
-        let profileId = manager?.profileId ?? profileStorage.profileId
+        let userId = manager?.userId ?? profileStorage.userId
 
-        let fetchTask = Task.withResult { () async throws(AdaptyError) -> Content in
-            let content: Content = try await self.fetchPlacementForDefaultAudience(
-                profileId,
+        async let remote = await Result.from { () async throws(AdaptyError) -> Content in
+            try await self.fetchPlacementForDefaultAudience(
+                userId,
                 placementId,
                 locale
             )
-            return content
         }
 
         let cached: Content? = manager?
@@ -91,33 +94,31 @@ extension Adapty {
             .withFetchPolicy(fetchPolicy)?
             .value
 
-        let content =
-            if let cached {
-                cached
-            } else {
-                try await fetchTask.value.get()
-            }
-
-        return content
+        if let cached {
+            return cached
+        } else {
+            let result = await remote
+            return try result.get()
+        }
     }
 
     private func fetchPlacementForDefaultAudience<Content: PlacementContent>(
-        _ profileId: String,
+        _ userId: AdaptyUserId,
         _ placementId: String,
         _ locale: AdaptyLocale
     ) async throws(AdaptyError) -> Content {
         let (cached, isTestUser): (Content?, Bool) = {
-            guard let manager = tryProfileManagerOrNil(with: profileId) else { return (nil, false) }
+            guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
             return (
                 manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
-                manager.profile.value.isTestUser
+                manager.isTestUser
             )
         }()
 
         do {
             var chosen: AdaptyPlacementChosen<Content> = try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
                 apiKeyPrefix: apiKeyPrefix,
-                profileId: profileId,
+                userId: userId,
                 placementId: placementId,
                 locale: locale,
                 cached: cached,
@@ -127,7 +128,7 @@ extension Adapty {
                 timeoutInterval: nil
             )
 
-            if let manager = tryProfileManagerOrNil(with: profileId) {
+            if let manager = try? profileManager(withProfileId: userId) {
                 chosen = manager.placementStorage.savedPlacementChosen(chosen)
             }
 
@@ -136,7 +137,7 @@ extension Adapty {
 
         } catch {
             guard let content: Content = getCacheOrFallbackFilePlacement(
-                profileId,
+                userId,
                 placementId,
                 locale,
                 withCrossPlacmentABTest: false

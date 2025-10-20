@@ -29,9 +29,9 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
         )
     }
 
-    init(profileId: String, token: String, responseHash: String?) {
+    init(userId: AdaptyUserId, token: String, responseHash: String?) {
         headers = HTTPHeaders()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setBackendResponseHash(responseHash)
 
         self.token = token
@@ -52,12 +52,12 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
 
 extension Backend.MainExecutor {
     func sendASAToken(
-        profileId: String,
+        userId: AdaptyUserId,
         token: String,
         responseHash: String?
-    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile>? {
         let request = SetASATokenRequest(
-            profileId: profileId,
+            userId: userId,
             token: token,
             responseHash: responseHash
         )
@@ -66,7 +66,7 @@ extension Backend.MainExecutor {
             requestName: .sendASAToken,
             logParams: ["token": token]
         )
-
-        return VH(response.body, hash: response.headers.getBackendResponseHash())
+        guard let profile = response.body else { return nil }
+        return VH(profile, hash: response.headers.getBackendResponseHash())
     }
 }

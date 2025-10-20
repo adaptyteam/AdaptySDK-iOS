@@ -38,7 +38,7 @@ extension Backend {
 
 private extension CodingUserInfoKey {
     static let enableEncodingViewConfiguration = CodingUserInfoKey(rawValue: "adapty_encode_view_configuration")!
-    static let profileId = CodingUserInfoKey(rawValue: "adapty_profile_id")!
+    static let userId = CodingUserInfoKey(rawValue: "adapty_user_id")!
     static let placementId = CodingUserInfoKey(rawValue: "adapty_placement_id")!
     static let placementVariationId = CodingUserInfoKey(rawValue: "adapty_placement_variation_id")!
     static let placement = CodingUserInfoKey(rawValue: "adapty_placement")!
@@ -46,8 +46,8 @@ private extension CodingUserInfoKey {
 }
 
 extension CodingUserInfo {
-    mutating func setProfileId(_ value: String) {
-        self[.profileId] = value
+    mutating func setUserId(_ value: AdaptyUserId) {
+        self[.userId] = value
     }
 
     mutating func setPlacement(_ value: AdaptyPlacement) {
@@ -76,13 +76,13 @@ extension [CodingUserInfoKey: Any] {
         self[.enableEncodingViewConfiguration] as? Bool ?? false
     }
 
-    var profileId: String {
+    var userId: AdaptyUserId {
         get throws {
-            if let value = self[.profileId] as? String {
+            if let value = self[.userId] as? AdaptyUserId {
                 return value
             }
 
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.profileId) parameter"))
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.userId) parameter"))
         }
     }
 

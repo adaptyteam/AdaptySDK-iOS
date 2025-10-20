@@ -95,21 +95,23 @@ extension StoreKitManagerError: CustomAdaptyError {
 
     var adaptyErrorCode: AdaptyError.ErrorCode {
         if let code = convertErrorCode(skError) { return code }
-        switch self {
-        case .interrupted: return .operationInterrupted
-        case .noProductIDsFound: return .noProductIDsFound
-        case .receiptIsEmpty: return .cantReadReceipt
-        case .refreshReceiptFailed: return .refreshReceiptFailed
-        case .requestSKProductsFailed: return .productRequestFailed
-        case .productPurchaseFailed: return .productPurchaseFailed
+        return switch self {
+        case .interrupted: .operationInterrupted
+        case .noProductIDsFound: .noProductIDsFound
+        case .receiptIsEmpty: .cantReadReceipt
+        case .refreshReceiptFailed: .refreshReceiptFailed
+        case .requestSKProductsFailed: .productRequestFailed
+        case .productPurchaseFailed: .productPurchaseFailed
+        case .unknownTransactionId: .unknownTransactionId
         case let .transactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
-                return customError.adaptyErrorCode
+                customError.adaptyErrorCode
             } else {
-                return .networkFailed
+                .networkFailed
             }
-        case .invalidOffer: return .invalidOfferIdentifier
-        case .getSubscriptionInfoStatusFailed: return .fetchSubscriptionStatusFailed
+        case .invalidOffer: .invalidOfferIdentifier
+        case .getSubscriptionInfoStatusFailed: .fetchSubscriptionStatusFailed
+        case .paymentPendingError: .paymentPendingError
         }
     }
 

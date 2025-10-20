@@ -34,7 +34,7 @@ extension PlacementStorage {
     private func getPlacement<Content: PlacementContent>(
         byPlacementId placementId: String,
         withVariationId variationId: String?,
-        profileId _: String,
+        userId _: AdaptyUserId,
         locale: AdaptyLocale
     ) -> AdaptyPlacementChosen<Content>? {
         getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: variationId).map {
@@ -45,14 +45,14 @@ extension PlacementStorage {
     func getPlacementWithFallback<Content: PlacementContent>(
         byPlacementId placementId: String,
         withVariationId variationId: String?,
-        profileId: String,
+        userId: AdaptyUserId,
         locale: AdaptyLocale
     ) -> AdaptyPlacementChosen<Content>? {
         let cachedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
-            : getPlacement(byPlacementId: placementId, withVariationId: variationId, profileId: profileId, locale: locale)
+            : getPlacement(byPlacementId: placementId, withVariationId: variationId, userId: userId, locale: locale)
 
         let cachedB: AdaptyPlacementChosen<Content>? = cachedA != nil ? nil
-            : getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: profileId, locale: locale)
+            : getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId, locale: locale)
 
         let cached = cachedA ?? cachedB
 
@@ -64,12 +64,12 @@ extension PlacementStorage {
         }
 
         switch (cachedA, cachedB) {
-        case let (.some(cached), _):
-            if cached.content.placement.version < fallbackFile.version,
+        case let (cached?, _):
+            if fallbackFile.version > cached.content.placement.version,
                let fallbacked: AdaptyPlacementChosen<Content> = fallbackFile.getPlacement(
                    byPlacementId: placementId,
                    withVariationId: variationId,
-                   profileId: profileId,
+                   userId: userId,
                    requestLocale: locale
                )
             {
@@ -80,12 +80,12 @@ extension PlacementStorage {
                 return cached
             }
 
-        case let (_, .some(cached)):
+        case let (_, cached?):
             let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
                 : fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: variationId,
-                    profileId: profileId,
+                    userId: userId,
                     requestLocale: locale
                 )
 
@@ -93,7 +93,7 @@ extension PlacementStorage {
                 : fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
-                    profileId: profileId,
+                    userId: userId,
                     requestLocale: locale
                 )
 
@@ -112,19 +112,19 @@ extension PlacementStorage {
                 fallBacked = fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: variationId,
-                    profileId: profileId,
+                    userId: userId,
                     requestLocale: locale
                 ) ?? fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
-                    profileId: profileId,
+                    userId: userId,
                     requestLocale: locale
                 )
             } else {
                 fallBacked = fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
-                    profileId: profileId,
+                    userId: userId,
                     requestLocale: locale
                 )
             }

@@ -23,9 +23,9 @@ extension Adapty {
     private func getViewConfiguration(
         paywall: AdaptyPaywall,
         loadTimeout: TaskDuration
-    ) async throws -> AdaptyViewConfiguration {
+    ) async throws(AdaptyError) -> AdaptyViewConfiguration {
         guard let container = paywall.viewConfiguration else {
-            throw AdaptyError.isNoViewConfigurationInPaywall()
+            throw .isNoViewConfigurationInPaywall()
         }
 
         let viewConfiguration: AdaptyViewSource =
@@ -48,7 +48,7 @@ extension Adapty {
 
         Adapty.sendImageUrlsToObserver(viewConfiguration)
 
-        let extractLocaleTask = Task {
+        let extractLocaleTask = Task.detachedAsResultTask(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyViewConfiguration in
             do {
                 return try viewConfiguration.extractLocale()
             } catch {
@@ -56,7 +56,7 @@ extension Adapty {
             }
         }
 
-        return try await extractLocaleTask.value
+        return try await extractLocaleTask.value.get()
     }
 
     private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyViewSource? {
@@ -80,7 +80,7 @@ extension Adapty {
     ) async throws(AdaptyError) -> AdaptyViewSource {
         let httpSession = httpSession
         let apiKeyPrefix = apiKeyPrefix
-        let isTestUser = profileManager?.profile.value.isTestUser ?? false
+        let isTestUser = profileManager?.isTestUser ?? false
 
         do {
             return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
@@ -97,7 +97,7 @@ extension Adapty {
             }
         } catch {
             guard error is TimeoutError else {
-                throw AdaptyError.unknown(error)
+                throw .unknown(error)
             }
         }
 

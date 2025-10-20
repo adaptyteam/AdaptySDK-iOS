@@ -25,6 +25,17 @@ private enum CodingKeys: String, CodingKey {
 
 typealias EventParameters = [String: (any Sendable & Encodable)?]
 
+extension EventParameters {
+    var removeNil: EventParameters {
+        var result: EventParameters = [:]
+        for (key, value) in self {
+            guard let value = value else { continue }
+            result[key] = value
+        }
+        return result
+    }
+}
+
 private extension Encoder {
     func encode(_ params: EventParameters?) throws {
         guard let params else { return }
@@ -66,7 +77,7 @@ enum APIRequestName: String {
 
     case fetchEventsConfig = "get_events_blacklist"
 
-    case fetchAllProductVendorIds = "get_products_ids"
+    case fetchAllProductInfo = "get_all_products_info"
 
     case reqisterInstall = "reqister_install"
 }
@@ -141,7 +152,7 @@ private extension HTTPHeaders {
 
     var filtered: HTTPHeaders? {
         let filtered = filter { $0.key.lowercased().hasSuffix(Suffix.cacheStatus) }
-        return filtered.isEmpty ? nil : filtered
+        return filtered.nonEmptyOrNil
     }
 }
 
@@ -157,6 +168,8 @@ enum MethodName: String {
     case setIntegrationIdentifiers = "set_integration_identifiers"
 
     case setVariationId = "set_variation_id"
+    case manualFinishTransaction = "manual_finish_transaction"
+
     case reportSK1Transaction = "report_transaction_sk1"
     case reportSK2Transaction = "report_transaction_sk2"
     case getPaywallProducts = "get_paywall_products"
@@ -166,6 +179,7 @@ enum MethodName: String {
     case makePurchase = "make_purchase"
     case openWebPaywall = "open_web_paywall"
     case createWebPaywallUrl = "create_web_paywall_url"
+    case getUnfinishedTransactions = "get_unfinished_transactions"
 
     case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
@@ -241,8 +255,9 @@ enum AppleMethodName: String {
     case fetchSK1Products = "fetch_sk1_products"
     case fetchSK2Products = "fetch_sk2_products"
 
-    case getAllSK1Transactions = "get_all_sk1_transactions"
     case getAllSK2Transactions = "get_all_sk2_transactions"
+    case getSK2CurrentEntitlements = "get_sk2_current_entitlements"
+    case getUnfinishedSK2Transactions = "get_unfinished_sk2_transactions"
 
     case getReceipt = "get_receipt"
     case refreshReceipt = "refresh_receipt"

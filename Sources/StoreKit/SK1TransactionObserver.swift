@@ -10,43 +10,51 @@ import StoreKit
 private let log = Log.sk1QueueManager
 
 actor SK1TransactionObserver: Sendable {
-    private let purchaseValidator: PurchaseValidator
-    private let productsManager: StoreKitProductsManager
+    private let transactionSynchronizer: StoreKitTransactionSynchronizer
+    private let sk1ProductsManager: SK1ProductsManager
 
-    fileprivate init(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager) {
-        self.purchaseValidator = purchaseValidator
-        self.productsManager = productsManager
+    fileprivate init(
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
+        sk1ProductsManager: SK1ProductsManager
+    ) {
+        self.transactionSynchronizer = transactionSynchronizer
+        self.sk1ProductsManager = sk1ProductsManager
     }
 
     fileprivate func updatedTransactions(_ transactions: [SKPaymentTransaction]) async {
         for sk1Transaction in transactions {
             let logParams = sk1Transaction.logParams
 
-            await Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+            Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
                 eventName: "updated_transaction",
                 params: logParams,
                 error: sk1Transaction.error.map { "\($0.localizedDescription). Detail: \($0)" }
             ))
 
             guard sk1Transaction.transactionState == .purchased else { continue }
-            guard let id = sk1Transaction.transactionIdentifier else {
+
+            guard !sk1Transaction.isXcodeEnvironment else {
+                log.verbose("Skip backend sync for Xcode environment transaction \(sk1Transaction.unfIdentifier ?? "")")
+                continue
+            }
+
+            guard let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) else {
                 log.error("received purchased transaction without identifier")
                 continue
             }
 
-            let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction, id: id)
-
             Task.detached {
-                let transaction = await self.productsManager.fillPurchasedTransaction(
-                    paywallVariationId: nil,
-                    persistentPaywallVariationId: nil,
-                    persistentOnboardingVariationId: nil,
-                    sk1Transaction: sk1Transaction
+                let productOrNil = try? await self.sk1ProductsManager.fetchProduct(
+                    id: sk1Transaction.unfProductId,
+                    fetchPolicy: .returnCacheDataElseLoad
                 )
 
-                _ = try await self.purchaseValidator.validatePurchase(
-                    profileId: nil,
-                    transaction: transaction,
+                try await self.transactionSynchronizer.report(
+                    .init(
+                        product: productOrNil,
+                        transaction: sk1Transaction
+                    ),
+                    payload: .init(userId: ProfileStorage.userId),
                     reason: .observing
                 )
             }
@@ -59,12 +67,15 @@ extension SK1TransactionObserver {
     private static var observer: ObserverWrapper?
 
     @AdaptyActor
-    static func startObserving(purchaseValidator: PurchaseValidator, productsManager: StoreKitProductsManager) {
+    static func startObserving(
+        transactionSynchronizer: StoreKitTransactionSynchronizer,
+        sk1ProductsManager: SK1ProductsManager
+    ) {
         guard observer == nil else { return }
 
         let observer = ObserverWrapper(SK1TransactionObserver(
-            purchaseValidator: purchaseValidator,
-            productsManager: productsManager
+            transactionSynchronizer: transactionSynchronizer,
+            sk1ProductsManager: sk1ProductsManager
         ))
 
         self.observer = observer

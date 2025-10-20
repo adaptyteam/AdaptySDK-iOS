@@ -12,6 +12,10 @@ struct AdaptySK1PaywallProduct: AdaptySK1Product, AdaptyPaywallProduct, WebPaywa
 
     public let adaptyProductId: String
 
+    let productInfo: BackendProductInfo
+    public var accessLevelId: String { productInfo.accessLevelId }
+    public var adaptyProductType: String { productInfo.period.rawValue }
+
     public let paywallProductIndex: Int
 
     public let subscriptionOffer: AdaptySubscriptionOffer?
@@ -28,7 +32,7 @@ struct AdaptySK1PaywallProduct: AdaptySK1Product, AdaptyPaywallProduct, WebPaywa
     let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
+        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map { $0.description } ?? "nil") , skProduct:\(skProduct)"
     }
 }
 
@@ -36,6 +40,10 @@ struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, AdaptyP
     let skProduct: SK1Product
 
     public let adaptyProductId: String
+
+    let productInfo: BackendProductInfo
+    public var accessLevelId: String { productInfo.accessLevelId }
+    public var adaptyProductType: String { productInfo.period.rawValue }
 
     public let paywallProductIndex: Int
 
@@ -51,6 +59,6 @@ struct AdaptySK1PaywallProductWithoutDeterminingOffer: AdaptySK1Product, AdaptyP
     let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(vendorProductId: \(vendorProductId), paywallName: \(paywallName), adaptyProductId: \(adaptyProductId), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
+        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), skProduct:\(skProduct)"
     }
 }

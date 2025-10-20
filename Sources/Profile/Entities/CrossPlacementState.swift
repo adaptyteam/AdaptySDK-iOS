@@ -25,7 +25,18 @@ extension CrossPlacementState {
     func variationId(placementId: String) -> String? {
         variationIdByPlacements[placementId]
     }
+    
+    func isNewerThan(_ other: CrossPlacementState) -> Bool {
+        version > other.version
+    }
+    
+    func isNewerThan(_ other: CrossPlacementState?) -> Bool {
+        guard let other else { return true }
+        return isNewerThan(other)
+    }
 }
+
+
 
 extension CrossPlacementState: CustomStringConvertible {
     public var description: String {

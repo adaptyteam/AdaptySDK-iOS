@@ -17,12 +17,15 @@ struct UABackend: HTTPCodableConfiguration {
     func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
 
     init(with configuration: AdaptyConfiguration, environment: Environment) {
+        let backend = configuration.backend
+
         let sessionConfiguration = URLSessionConfiguration.ephemeral
         sessionConfiguration.httpAdditionalHeaders = Backend.Request.globalHeaders(configuration, environment)
         sessionConfiguration.timeoutIntervalForRequest = 30
         sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        sessionConfiguration.protocolClasses = (backend.protocolClasses ?? []) + (sessionConfiguration.protocolClasses ?? [])
 
-        if let (host, port) = configuration.backend.proxy {
+        if let (host, port) = backend.proxy {
             sessionConfiguration.connectionProxyDictionary = [
                 String(kCFNetworkProxiesHTTPEnable): NSNumber(value: 1),
                 String(kCFNetworkProxiesHTTPProxy): host,
@@ -31,7 +34,7 @@ struct UABackend: HTTPCodableConfiguration {
         }
 
         self.sessionConfiguration = sessionConfiguration
-        self.baseURL = configuration.backend.uaUrl
+        self.baseURL = backend.uaBaseUrl
     }
 }
 

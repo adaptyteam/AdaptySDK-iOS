@@ -20,7 +20,7 @@ private struct FetchFallbackPlacementRequest: HTTPRequest {
     ) {
         self.timeoutInterval =
             if let timeoutInterval {
-                max(0.5, timeoutInterval)
+                min(max(0.5, timeoutInterval), 60)
             } else {
                 nil
             }
@@ -34,7 +34,7 @@ extension Backend.FallbackExecutor {
     @inlinable
     func fetchFallbackPlacement<Content: PlacementContent>(
         apiKeyPrefix: String,
-        profileId: String,
+        userId: AdaptyUserId,
         placementId: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
@@ -44,7 +44,7 @@ extension Backend.FallbackExecutor {
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         try await _fetchFallbackPlacement(
             apiKeyPrefix,
-            profileId,
+            userId,
             placementId,
             paywallVariationId,
             locale: locale,
@@ -57,7 +57,7 @@ extension Backend.FallbackExecutor {
 
     private func _fetchFallbackPlacement<Content: PlacementContent>(
         _ apiKeyPrefix: String,
-        _ profileId: String,
+        _ userId: AdaptyUserId,
         _ placementId: String,
         _ paywallVariationId: String,
         locale: AdaptyLocale,
@@ -111,7 +111,7 @@ extension Backend.FallbackExecutor {
                 try await AdaptyPlacementChosen.decodePlacementResponse(
                     response,
                     withConfiguration: configuration,
-                    withProfileId: profileId,
+                    withUserId: userId,
                     withRequestLocale: requestLocale,
                     withCached: cached
                 )
@@ -127,7 +127,7 @@ extension Backend.FallbackExecutor {
 
             return try await _fetchFallbackPlacement(
                 apiKeyPrefix,
-                profileId,
+                userId,
                 placementId,
                 paywallVariationId,
                 locale: .defaultPlacementLocale,

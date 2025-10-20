@@ -43,7 +43,7 @@ extension AdaptyViewConfiguration.ShapeType: Codable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         switch try Types(rawValue: container.decode(String.self)) {
-        case .none:
+        case nil:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "unknown value"))
         case .curveUp:
             self = .curveUp

@@ -15,27 +15,22 @@ extension Adapty {
     func updateASATokenIfNeed(for profile: VH<AdaptyProfile>) {
         guard
             #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),
-            profileStorage.appleSearchAdsSyncDate == nil, // check if this is an actual first sync
+            (try? profileStorage.appleSearchAdsSyncDate(for: profile.userId)) == nil, // check if this is an actual first sync
             let attributionToken = try? Adapty.getASAToken()
         else { return }
 
         Task {
-            let profileId = profile.value.profileId
+            let userId = profile.userId
 
             let response = try await httpSession.sendASAToken(
-                profileId: profileId,
+                userId: userId,
                 token: attributionToken,
                 responseHash: profile.hash
             )
+            handleProfileResponse(response)
 
-            if let profile = response.flatValue() {
-                profileManager?.saveResponse(profile)
-            }
-
-            if profileStorage.profileId == profileId {
-                // mark appleSearchAds attribution data as synced
-                profileStorage.setAppleSearchAdsSyncDate()
-            }
+            // mark appleSearchAds attribution data as synced
+            try? profileStorage.setAppleSearchAdsSyncDate(for: userId)
         }
     }
 

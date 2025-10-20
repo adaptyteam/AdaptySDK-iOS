@@ -11,7 +11,7 @@ extension AdaptyConfiguration.Builder: Decodable {
     private enum CodingKeys: String, CodingKey {
         case apiKey = "api_key"
         case customerUserId = "customer_user_id"
-        case appAccountToken = "app_account_token"
+        case customerIdentityParameters = "customer_identity_parameters"
         case observerMode = "observer_mode"
         case idfaCollectionDisabled = "apple_idfa_collection_disabled"
         case ipAddressCollectionDisabled = "ip_address_collection_disabled"
@@ -23,6 +23,7 @@ extension AdaptyConfiguration.Builder: Decodable {
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
 
+        case transactionFinishBehavior = "transaction_finish_behavior"
         case logLevel = "log_level"
 
         case crossPlatformSDKName = "cross_platform_sdk_name"
@@ -50,33 +51,28 @@ extension AdaptyConfiguration.Builder: Decodable {
                 nil
             }
 
+        let customerIdentityParameters = try container.decodeIfPresent(CustomerIdentityParameters.self, forKey: .customerIdentityParameters)
+
         try self.init(
             apiKey: container.decode(String.self, forKey: .apiKey),
             customerUserId: container.decodeIfPresent(String.self, forKey: .customerUserId),
-            appAccountToken: container.decodeIfPresent(UUID.self, forKey: .appAccountToken),
+            appAccountToken: customerIdentityParameters?.appAccountToken,
             observerMode: container.decodeIfPresent(Bool.self, forKey: .observerMode),
             idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled),
             ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),
             callbackDispatchQueue: nil,
-            serverCluster: container.decodeIfPresent(AdaptyConfiguration.ServerCluster.self, forKey: .serverCluster),
+            serverCluster: container.decodeIfPresent(AdaptyServerCluster.self, forKey: .serverCluster),
             backendBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendBaseUrl),
             backendFallbackBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl),
             backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl),
             backendUABaseUrl: container.decodeIfPresent(URL.self, forKey: .backendUABaseUrl),
             backendProxy: proxy,
+            transactionFinishBehavior: nil,
             logLevel: container.decodeIfPresent(AdaptyLog.Level.self, forKey: .logLevel),
-            crossPlatformSDK: crossPlatformSDK
+            crossPlatformSDK: crossPlatformSDK,
+            urlProtocolClasses: nil
         )
     }
 }
 
-extension AdaptyConfiguration.ServerCluster: Decodable {
-    public init(from decoder: Decoder) throws {
-        self =
-            switch try decoder.singleValueContainer().decode(String.self) {
-            case "eu": .eu
-            case "cn": .cn
-            default: .default
-            }
-    }
-}
+

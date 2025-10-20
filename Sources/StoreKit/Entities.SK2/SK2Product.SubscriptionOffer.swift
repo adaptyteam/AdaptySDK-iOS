@@ -13,33 +13,25 @@ extension SK2Product {
         subscription?.introductoryOffer == nil
     }
 
-    private var unfIntroductoryOffer: SK2Product.SubscriptionOffer? {
-        subscription?.introductoryOffer
-    }
-
-    private func unfPromotionalOffer(byId identifier: String) -> SK2Product.SubscriptionOffer? {
-        subscription?.promotionalOffers.first(where: { $0.id == identifier })
-    }
-
-    func unfWinBackOffer(byId identifier: String) -> SK2Product.SubscriptionOffer? {
-        guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
-            return nil
+    func sk2ProductSubscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> SubscriptionOffer? {
+        switch offerIdentifier {
+        case .introductory:
+            subscription?.introductoryOffer
+        case let .promotional(offerId):
+            subscription?.promotionalOffers.first(where: { $0.id == offerId })
+        case let .winBack(offerId):
+            if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+                subscription?.winBackOffers.first { $0.id == offerId }
+            } else {
+                nil
+            }
+        case .code:
+            nil
         }
-
-        return subscription?.winBackOffers.first { $0.id == identifier }
     }
 
     func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
-        let offer: SK2Product.SubscriptionOffer? =
-            switch offerIdentifier {
-            case .introductory:
-                unfIntroductoryOffer
-            case let .promotional(id):
-                unfPromotionalOffer(byId: id)
-            case let .winBack(id):
-                unfWinBackOffer(byId: id)
-            }
-        guard let offer else { return nil }
+        guard let offer: SubscriptionOffer = sk2ProductSubscriptionOffer(by: offerIdentifier) else { return nil }
 
         let period = offer.period.asAdaptySubscriptionPeriod
         let periodLocale = unfPeriodLocale

@@ -54,3 +54,11 @@ extension AdaptySK1Product {
         "(vendorProductId: \(vendorProductId), skProduct: \(skProduct))"
     }
 }
+
+struct SK1ProductWrapper: AdaptySK1Product {
+    let skProduct: SK1Product
+}
+
+extension SK1Product {
+    var asAdaptyProduct: AdaptySK1Product { SK1ProductWrapper(skProduct: self) }
+}

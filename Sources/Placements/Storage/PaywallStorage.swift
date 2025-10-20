@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class PaywallStorage: Sendable {
+final class PaywallStorage {
     private enum Constants {
         static let paywallStorageKey = "AdaptySDK_Cached_Purchase_Containers"
         static let paywallStorageVersionKey = "AdaptySDK_Cached_Purchase_Containers_Version"
@@ -40,7 +40,7 @@ final class PaywallStorage: Sendable {
     static func setPaywall(_ paywall: AdaptyPaywall) {
         paywallByPlacementId[paywall.placement.id] = VH(paywall, time: Date())
         let array = Array(paywallByPlacementId.values)
-        guard !array.isEmpty else {
+        guard array.isNotEmpty else {
             userDefaults.removeObject(forKey: Constants.paywallStorageKey)
             return
         }
@@ -65,7 +65,7 @@ final class PaywallStorage: Sendable {
 private extension Sequence<VH<AdaptyPaywall>> {
     var asPaywallByPlacementId: [String: VH<AdaptyPaywall>] {
         Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
-            first.value.placement.version > second.value.placement.version ? first : second
+            first.value.placement.isNewerThan(second.value.placement) ? first : second
         })
     }
 }

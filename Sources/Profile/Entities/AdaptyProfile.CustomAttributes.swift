@@ -38,12 +38,14 @@ extension AdaptyProfile.CustomAttributeValue {
         }
     }
 
-    func validate() -> AdaptyError? {
+    func validateLenght() throws(AdaptyError) {
         switch self {
         case let .string(value):
-            (value.isEmpty || value.count > 50) ? .wrongStringValueOfCustomAttribute() : nil
-        default:
-            nil
+            if value.isEmpty || value.count > 50 { throw .wrongStringValueOfCustomAttribute() }
+        case .none:
+            break
+        case .double:
+            break
         }
     }
 }
@@ -59,18 +61,16 @@ extension AdaptyProfile.CustomAttributes {
         )
     }
 
-    static func validateKey(_ key: String) -> AdaptyError? {
+    static func validateKey(_ key: String) throws(AdaptyError) {
         if key.isEmpty || key.count > 30 || key.range(of: ".*[^A-Za-z0-9._-].*", options: .regularExpression) != nil {
-            return .wrongKeyOfCustomAttribute()
+            throw .wrongKeyOfCustomAttribute()
         }
-        return nil
     }
 
-    func validate() -> AdaptyError? {
+    func validateCount() throws(AdaptyError) {
         if filter({ $1.hasValue }).count > 30 {
-            return .wrongCountCustomAttributes()
+            throw .wrongCountCustomAttributes()
         }
-        return nil
     }
 }
 
@@ -80,7 +80,12 @@ extension AdaptyProfile.CustomAttributeValue: Codable {
         if container.decodeNil() {
             self = .none
         } else if let value = try? container.decode(String.self) {
-            self = .string(value)
+            if let value = value.trimmed.nonEmptyOrNil {
+                self = .string(value)
+                try validateLenght()
+            } else {
+                self = .none
+            }
         } else if let value = try? container.decode(Bool.self) {
             self = .double(value ? 1.0 : 0.0)
         } else if let value = try? container.decode(Double.self) {

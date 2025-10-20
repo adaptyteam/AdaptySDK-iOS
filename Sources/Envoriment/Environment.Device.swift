@@ -31,11 +31,7 @@ extension Environment {
             }
             IOObjectRelease(service)
 
-            if modelIdentifier?.isEmpty ?? false {
-                modelIdentifier = nil
-            }
-
-            return modelIdentifier ?? "unknown device"
+            return modelIdentifier.nonEmptyOrNil ?? "unknown device"
 
             #else
             var systemInfo = utsname()

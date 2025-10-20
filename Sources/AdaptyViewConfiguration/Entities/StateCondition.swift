@@ -46,7 +46,7 @@ extension AdaptyViewConfiguration.StateCondition: Codable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         switch try Types(rawValue: container.decode(String.self, forKey: .type)) {
-        case .none:
+        case nil:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.type], debugDescription: "unknown value"))
         case .selectedSection:
             self = try .selectedSection(

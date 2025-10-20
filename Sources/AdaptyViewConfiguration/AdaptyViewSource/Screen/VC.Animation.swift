@@ -86,7 +86,7 @@ extension AdaptyViewSource.Animation: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeName = try container.decode(String.self, forKey: .type)
         switch Types(rawValue: typeName) {
-        case .none:
+        case nil:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Unknown animation type with name \(typeName)'"))
         case .fade:
             self = try .opacity(.init(from: decoder), .init(start: 0.0, end: 1.0))

@@ -22,7 +22,7 @@ package protocol AdaptyPaywallInterface {
 
     func getPaywallProductsWithoutDeterminingOffer() async throws -> [AdaptyPaywallProductWithoutDeterminingOffer]
     func getPaywallProducts() async throws -> AdaptyUIGetProductsResult
-    func logShowPaywall(viewConfiguration: AdaptyViewConfiguration) async throws
+    func logShowPaywall()
 }
 
 extension AdaptyPaywall: AdaptyPaywallInterface {
@@ -45,7 +45,7 @@ extension AdaptyPaywall: AdaptyPaywallInterface {
         }
     }
 
-    package func logShowPaywall(viewConfiguration: AdaptyViewConfiguration) async throws {
-        await Adapty.logShowPaywall(self, viewConfiguration: viewConfiguration)
+    package func logShowPaywall() {
+        Adapty.logShowPaywall(self)
     }
 }

@@ -91,7 +91,7 @@ extension Environment.Device {
                 case .authorized:
                     ASIdentifierManager.shared().advertisingIdentifier.uuidString
                 default:
-                    String?.none
+                    nil
                 }
                 #else
                 return ASIdentifierManager.shared().advertisingIdentifier.uuidString

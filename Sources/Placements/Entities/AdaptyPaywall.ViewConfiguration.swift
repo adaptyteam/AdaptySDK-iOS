@@ -36,7 +36,7 @@ extension AdaptyViewSource {
         do {
             self = try Storage.decoder.decode(AdaptyViewSource.self, from: data)
         } catch {
-            throw AdaptyError.decodingViewConfiguration(error)
+            throw .decodingViewConfiguration(error)
         }
     }
 }

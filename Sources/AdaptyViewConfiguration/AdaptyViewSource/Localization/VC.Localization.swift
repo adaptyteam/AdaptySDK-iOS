@@ -54,7 +54,7 @@ extension AdaptyViewSource.Localization: Codable {
                 fallback: item.decodeIfPresent(AdaptyViewSource.RichText.self, forKey: .fallback)
             )
         }
-        self.strings = strings.isEmpty ? nil : strings
+        self.strings = strings.nonEmptyOrNil
     }
 
     func encode(to encoder: any Encoder) throws {
@@ -62,7 +62,7 @@ extension AdaptyViewSource.Localization: Codable {
         try container.encode(id, forKey: .id)
         try container.encodeIfPresent(isRightToLeft, forKey: .isRightToLeft)
 
-        if let assets, !assets.isEmpty {
+        if let assets = assets.nonEmptyOrNil {
             try container.encode(AdaptyViewSource.AssetsContainer(value: assets), forKey: .assets)
         }
 

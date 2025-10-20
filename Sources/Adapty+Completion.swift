@@ -134,7 +134,7 @@ public extension Adapty {
             let data = try JSONSerialization.data(withJSONObject: attribution)
             attributionJson = String(decoding: data, as: UTF8.self)
         } catch {
-            completion?(AdaptyError.wrongAttributeData(error))
+            completion?(.wrongAttributeData(error))
             return
         }
 
@@ -352,6 +352,15 @@ public extension Adapty {
         }
     }
 
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    static func getUnfinishedTransactions(
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyUnfinishedTransaction]>
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await getUnfinishedTransactions()
+        }
+    }
+
     /// You can fetch the StoreKit receipt by calling this method
     ///
     /// If the receipt is not presented on the device, Adapty will try to refresh it by using [SKReceiptRefreshRequest](https://developer.apple.com/documentation/storekit/skreceiptrefreshrequest)
@@ -390,7 +399,7 @@ public extension Adapty {
     @available(*, deprecated, renamed: "reportTransaction")
     nonisolated static func setVariationId(
         _ variationId: String,
-        forPurchasedTransaction sk1Transaction: SKPaymentTransaction
+        forPurchasedTransaction sk1Transaction: StoreKit.SKPaymentTransaction
     ) async throws(AdaptyError) {
         try await reportTransaction(sk1Transaction, withVariationId: variationId)
     }
@@ -423,7 +432,7 @@ public extension Adapty {
     @available(*, deprecated, renamed: "reportTransaction")
     nonisolated static func setVariationId(
         _ variationId: String,
-        forPurchasedTransaction transaction: SKPaymentTransaction,
+        forPurchasedTransaction transaction: StoreKit.SKPaymentTransaction,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
@@ -443,7 +452,7 @@ public extension Adapty {
     @available(*, deprecated, renamed: "reportTransaction")
     nonisolated static func setVariationId(
         _ variationId: String,
-        forPurchasedTransaction transaction: Transaction,
+        forPurchasedTransaction transaction: StoreKit.Transaction,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
@@ -460,7 +469,7 @@ public extension Adapty {
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
     ///   - completion: A result containing an optional error.
     nonisolated static func reportTransaction(
-        _ transaction: SKPaymentTransaction,
+        _ transaction: StoreKit.SKPaymentTransaction,
         withVariationId variationId: String? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
@@ -479,12 +488,50 @@ public extension Adapty {
     ///   - completion: A result containing an optional error.
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     nonisolated static func reportTransaction(
-        _ transaction: Transaction,
+        _ transaction: StoreKit.Transaction,
         withVariationId variationId: String? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
             try await reportTransaction(transaction, withVariationId: variationId)
+        }
+    }
+
+    /// Link purchased transaction with paywall's variationId.
+    ///
+    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+    ///
+    /// - Parameters:
+    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - transaction: A purchased verification result of transaction (note, that this method is suitable only for Store Kit version 2) [VerificationResult](https://developer.apple.com/documentation/storekit/verificationresult).
+    ///   - completion: A result containing an optional error.
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    nonisolated static func reportTransaction(
+        _ transaction: StoreKit.VerificationResult<StoreKit.Transaction>,
+        withVariationId variationId: String? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await reportTransaction(transaction, withVariationId: variationId)
+        }
+    }
+
+    /// Link product purchase result with paywall's variationId.
+    ///
+    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
+    ///
+    /// - Parameters:
+    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - purchaseResult: A product purchase result  (note, that this method is suitable only for Store Kit version 2) [Product.PurchaseResult](https://developer.apple.com/documentation/storekit/product/purchaseresult).
+    ///   - completion: A result containing an optional error.
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    nonisolated static func reportPurchaseResult(
+        _ purchaseResult: StoreKit.Product.PurchaseResult,
+        withVariationId variationId: String? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await reportPurchaseResult(purchaseResult, withVariationId: variationId)
         }
     }
 
@@ -567,6 +614,17 @@ public extension Adapty {
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
             try await updateRefundPreference(refundPreference)
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public extension AdaptyUnfinishedTransaction {
+    nonisolated func finish(
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await finish()
         }
     }
 }

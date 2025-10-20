@@ -11,9 +11,11 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .unknown(_, description, _): description
+        case .taskCancelled: "The operation was interrupted."
         case .activateOnceError: "Adapty can only be activated once. Ensure that the SDK activation call is not made more than once."
         case .unidentifiedUserLogout: "Logout cannot be called for an unidentified user"
         case .cantMakePayments: "In-App Purchases are not available on this device. Please check your device settings."
+        case .notAllowedInObserveMode: "The operation is not allowed in observe mode."
         case .notActivated: "Adapty SDK is not initialized. You need to activate the SDK before using its methods."
         case .profileWasChanged: "The user was replaced with a different user in the SDK during the execution of the operation."
         case let .fetchFailed(_, description, _): description
@@ -54,6 +56,7 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
         case .refreshReceiptFailed: "Failed to refresh the purchase receipt."
         case .productPurchaseFailed: "Failed to complete the product purchase. Refer to the original error for more details."
         case .requestSKProductsFailed: "Failed to fetch product information from the StoreKit. Refer to the original error for more details."
+        case .unknownTransactionId: "Transaction identifier is nil"
         case let .transactionUnverified(_, error):
             if let customError = error as? CustomAdaptyError {
                 "Transaction verification failed: \(customError.debugDescription)"
@@ -63,6 +66,7 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
         case let .invalidOffer(_, error):
             error
         case .getSubscriptionInfoStatusFailed: "Failed to retrieve subscription information."
+        case .paymentPendingError: "The payment is deferred."
         }
     }
 }

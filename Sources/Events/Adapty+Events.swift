@@ -11,29 +11,50 @@ extension Adapty {
     @EventsManagerActor
     static let eventsManager = EventsManager()
 
-    static func trackEvent(_ event: Event, for profileId: String? = nil) {
-        let now = Date()
-        let profileId = profileId ?? ProfileStorage.profileId
-        Task.detached(priority: .utility) {
+    @EventsManagerActor
+    static func trackEvent(
+        _ event: Event,
+        for userId: AdaptyUserId? = nil,
+        date: Date = Date()
+    ) {
+        Task.detached(priority: .utility) { @EventsManagerActor @Sendable in
+            let userId =
+                if let userId {
+                    userId
+                } else {
+                    await ProfileStorage.userId
+                }
             let event = await Event.Unpacked(
                 event: event,
-                profileId: profileId,
+                userId: userId,
                 environment: Environment.instance,
-                createdAt: now
+                createdAt: date
             )
-            try? await eventsManager.trackEvent(event)
+            try? eventsManager.trackEvent(event)
         }
     }
 
-    package static func trackSystemEvent(_ params: AdaptySystemEventParameters) {
-        trackEvent(.system(params))
+    package nonisolated static func trackSystemEvent(
+        _ params: AdaptySystemEventParameters,
+        for userId: AdaptyUserId? = nil
+    ) {
+        let now = Date()
+        Task { @EventsManagerActor in
+            trackEvent(
+                .system(params),
+                for: userId,
+                date: now
+            )
+        }
     }
 
-    static func trackEventIfNeed(_ chosen: AdaptyPlacementChosen<some PlacementContent>) {
+    nonisolated static func trackEventIfNeed(
+        _ chosen: AdaptyPlacementChosen<some PlacementContent>
+    ) {
         guard case let .draw(draw) = chosen else {
             return
         }
-
+        let now = Date()
         let event: Event
         if let paywall = draw.content as? AdaptyPaywall {
             event = .paywallVariationAssigned(.init(
@@ -57,11 +78,22 @@ extension Adapty {
             return
         }
 
-        trackEvent(event, for: draw.profileId)
+        Task { @EventsManagerActor in
+            trackEvent(event, for: draw.userId, date: now)
+        }
     }
 
-    package static func logShowPaywall(_ paywall: AdaptyPaywall, viewConfiguration: AdaptyViewConfiguration) {
-        trackEvent(.paywallShowed(.init(variationId: paywall.variationId, viewConfigurationId: viewConfiguration.id)))
+    package nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) {
+        let now = Date()
+        Task { @EventsManagerActor in
+            trackEvent(
+                .paywallShowed(.init(
+                    variationId: paywall.variationId,
+                    viewConfigurationId: paywall.viewConfiguration?.id
+                )),
+                date: now
+            )
+        }
     }
 }
 
@@ -70,7 +102,7 @@ public extension Adapty {
         do {
             let event = await Event.Unpacked(
                 event: event,
-                profileId: ProfileStorage.profileId,
+                userId: ProfileStorage.userId,
                 environment: Environment.instance
             )
             try await eventsManager.trackEvent(event)
@@ -116,12 +148,6 @@ public extension Adapty {
 
     nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws(AdaptyError) {
         try await withActivatedSDK(methodName: .logShowOnboarding) { _ throws(AdaptyError) in
-            guard params.screenOrder > 0 else {
-                let error = AdaptyError.wrongParamOnboardingScreenOrder()
-                Log.default.error(error.debugDescription)
-                throw error
-            }
-
             try await _trackEvent(.legacyOnboardingScreenShowed(params))
         }
     }

@@ -24,14 +24,14 @@ private struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
         )
     }
 
-    init(profileId: String, responseHash: String?) {
+    init(userId: AdaptyUserId, responseHash: String?) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/analytics/profiles/\(profileId)/"
+            path: "/sdk/analytics/profiles/\(userId.profileId)/"
         )
 
         headers = HTTPHeaders()
-            .setBackendProfileId(profileId)
+            .setUserProfileId(userId)
             .setBackendResponseHash(responseHash)
     }
 }
@@ -61,11 +61,11 @@ extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyProfile? 
 
 extension Backend.MainExecutor {
     func fetchProfile(
-        profileId: String,
+        userId: AdaptyUserId,
         responseHash: String?
-    ) async throws(HTTPError) -> VH<AdaptyProfile?> {
+    ) async throws(HTTPError) -> VH<AdaptyProfile>? {
         let request = FetchProfileRequest(
-            profileId: profileId,
+            userId: userId,
             responseHash: responseHash
         )
 
@@ -74,6 +74,7 @@ extension Backend.MainExecutor {
             requestName: .fetchProfile
         )
 
-        return VH(response.body, hash: response.headers.getBackendResponseHash())
+        guard let profile = response.body else { return nil }
+        return VH(profile, hash: response.headers.getBackendResponseHash())
     }
 }

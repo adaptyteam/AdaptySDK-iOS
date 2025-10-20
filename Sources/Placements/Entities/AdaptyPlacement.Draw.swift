@@ -9,7 +9,7 @@ import Foundation
 
 extension AdaptyPlacement {
     struct Draw<Content: PlacementContent>: Sendable {
-        let profileId: String
+        let userId: AdaptyUserId
         var content: Content
         let placementAudienceVersionId: String
         let variationIdByPlacements: [String: String]
@@ -17,18 +17,18 @@ extension AdaptyPlacement {
 }
 
 extension AdaptyPlacement.Draw {
-    var participatesInCrossPlacementABTest: Bool { !variationIdByPlacements.isEmpty }
+    var participatesInCrossPlacementABTest: Bool { variationIdByPlacements.isNotEmpty }
 }
 
 extension AdaptyPlacement.Draw: Decodable {
     init(from decoder: Decoder) throws {
-        let profileId = try decoder.userInfo.profileId
+        let userId = try decoder.userInfo.userId
         let placement = try decoder.userInfo.placement
         let placementAudienceVersionId = placement.audienceVersionId
 
         let variations = try [AdaptyPlacement.Variation](from: decoder)
 
-        guard !variations.isEmpty else {
+        guard variations.isNotEmpty else {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placements contents collection is empty"))
         }
 
@@ -41,7 +41,7 @@ extension AdaptyPlacement.Draw: Decodable {
         } else {
             index = variations.draw(
                 placementAudienceVersionId: placementAudienceVersionId,
-                profileId: profileId
+                userId: userId
             )
         }
 
@@ -54,7 +54,7 @@ extension AdaptyPlacement.Draw: Decodable {
         let content = try Self.content(from: decoder, index: index)
 
         self.init(
-            profileId: profileId,
+            userId: userId,
             content: content,
             placementAudienceVersionId: placementAudienceVersionId,
             variationIdByPlacements: variation.variationIdByPlacements

@@ -30,7 +30,7 @@ public struct AdaptyPaywall: PlacementContent, WebPaywallURLProviding {
     package var webPaywallBaseUrl: URL?
 
     /// Array of related products ids.
-    public var vendorProductIds: [String] { products.map { $0.vendorId } }
+    public var vendorProductIds: [String] { products.map { $0.productInfo.vendorId } }
 
     var requestLocale: AdaptyLocale
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct EventCollection<Element: Sendable>: Sendable {
+struct EventCollection<Element: Sendable>: Sendable, Emptiable {
     private(set) var elements: [Element]
     private(set) var startIndex: Int
     var endIndex: Int { endIndex(elements.count) }
@@ -16,7 +16,7 @@ struct EventCollection<Element: Sendable>: Sendable {
     func endIndex(_ count: Int) -> Int { startIndex + count - 1 }
 
     mutating func removeAll() {
-        guard !elements.isEmpty else { return }
+        guard elements.isNotEmpty else { return }
         startIndex += elements.count
         elements = []
     }

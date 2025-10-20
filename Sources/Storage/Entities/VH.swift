@@ -30,15 +30,13 @@ struct VH<Value: Sendable>: Sendable {
     func mapValue<U>(_ transform: (Value) -> U) -> VH<U> {
         VH<U>(transform(value), hash: hash, time: time)
     }
+}
 
+extension VH {
     @inlinable
-    func flatValue<T>() -> VH<T>? where Value == T? {
-        switch value {
-        case .none:
-            .none
-        case let .some(v):
-            VH<T>(v, hash: hash, time: time)
-        }
+    func IsNotEqualHash(_ other: VH<Value>) -> Bool {
+        guard let hash = hash, let other = other.hash else { return true }
+        return hash != other
     }
 }
 
