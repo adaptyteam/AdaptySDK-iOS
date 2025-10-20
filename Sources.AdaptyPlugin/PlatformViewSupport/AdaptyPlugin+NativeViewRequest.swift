@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 5/30/25.
 //
 
+#if canImport(UIKit)
+
 import Adapty
 import AdaptyUI
 import Foundation
@@ -45,3 +47,5 @@ public extension AdaptyPlugin {
         }
     }
 }
+
+#endif

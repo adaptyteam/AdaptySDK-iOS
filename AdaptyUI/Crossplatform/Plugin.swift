@@ -8,6 +8,12 @@
 import Adapty
 import Foundation
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+package enum AdaptyUIViewPresentationStyle: String, Codable {
+    case fullScreen = "full_screen"
+    case pageSheet = "page_sheet"
+}
+
 #if canImport(UIKit)
 import UIKit
 
@@ -31,12 +37,6 @@ fileprivate extension UIWindow {
         
         return topViewController
     }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-package enum AdaptyUIViewPresentationStyle: String, Codable {
-    case fullScreen = "full_screen"
-    case pageSheet = "page_sheet"
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
