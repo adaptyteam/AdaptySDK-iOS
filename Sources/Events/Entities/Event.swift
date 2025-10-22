@@ -12,7 +12,7 @@ enum Event: Sendable {
     case paywallShowed(AdaptyPaywallShowedParameters)
     case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)
     case onboardingVariationAssigned(AdaptyOnboardingVariationAssignedParameters)
-    case onboardingScreenShowed(AdaptyOnboardingScreenShowedParameters)
+    case onboardingScreenShowed(AdaptyUIOnboardingScreenShowedParameters)
     case legacyOnboardingScreenShowed(AdaptyOnboardingScreenParameters)
     case сonsentToCollectingRefundData(AdaptyConsentToCollectingDataParameters)
     case refundPreference(AdaptyRefundPreferenceParameters)

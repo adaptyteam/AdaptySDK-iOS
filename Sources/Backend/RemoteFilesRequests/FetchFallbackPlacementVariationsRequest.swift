@@ -20,7 +20,7 @@ private struct FetchFallbackPlacementVariationsRequest: HTTPRequest {
     ) {
         self.timeoutInterval =
             if let timeoutInterval {
-                max(0.5, timeoutInterval)
+                min(max(0.5, timeoutInterval), 60)
             } else {
                 nil
             }

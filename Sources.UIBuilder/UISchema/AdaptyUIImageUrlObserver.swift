@@ -28,7 +28,7 @@ extension AdaptyUIBuilder {
         }
     }
 
-    package static func sendImageUrlsToObserver(_ schema: AdaptyUISchema, forLocalId localeId: LocaleId) {
+    package nonisolated static func sendImageUrlsToObserver(_ schema: AdaptyUISchema, forLocalId localeId: LocaleId) {
         Task {
             guard let observer = await holder.imageUrlObserver else { return }
             let urls = schema.extractImageUrls(forLocalId: localeId)

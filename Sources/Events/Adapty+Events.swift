@@ -11,29 +11,53 @@ extension Adapty {
     @EventsManagerActor
     static let eventsManager = EventsManager()
 
-    static func trackEvent(_ event: Event, for userId: AdaptyUserId? = nil) {
-        let now = Date()
-        let userId = userId ?? ProfileStorage.userId
-        Task.detached(priority: .utility) {
-            let event = await Event.Unpacked(
-                event: event,
-                userId: userId,
-                environment: Environment.instance,
-                createdAt: now
-            )
-            try? await eventsManager.trackEvent(event)
+    @EventsManagerActor
+    static func trackEvent(
+        _ event: Event,
+        for userId: AdaptyUserId? = nil,
+        date: Date = Date()
+    ) async throws(AdaptyError) {
+        let userId =
+            if let userId {
+                userId
+            } else {
+                await ProfileStorage.userId
+            }
+
+        let event = await Event.Unpacked(
+            event: event,
+            userId: userId,
+            environment: Environment.instance,
+            createdAt: date
+        )
+        do {
+            try eventsManager.trackEvent(event)
+        } catch {
+            throw error.asAdaptyError
         }
     }
 
-    package static func trackSystemEvent(_ params: AdaptySystemEventParameters) {
-        trackEvent(.system(params))
+    package nonisolated static func trackSystemEvent(
+        _ params: AdaptySystemEventParameters,
+        for userId: AdaptyUserId? = nil,
+        date: Date = Date()
+    ) {
+        Task.detached(priority: .utility) {
+            try? await trackEvent(
+                .system(params),
+                for: userId,
+                date: date
+            )
+        }
     }
 
-    static func trackEventIfNeed(_ chosen: AdaptyPlacementChosen<some PlacementContent>) {
+    nonisolated static func trackEventIfNeed(
+        _ chosen: AdaptyPlacementChosen<some PlacementContent>,
+        date: Date = Date()
+    ) {
         guard case let .draw(draw) = chosen else {
             return
         }
-
         let event: Event
         if let paywall = draw.content as? AdaptyPaywall {
             event = .paywallVariationAssigned(.init(
@@ -57,24 +81,17 @@ extension Adapty {
             return
         }
 
-        trackEvent(event, for: draw.userId)
+        Task.detached(priority: .utility) {
+            try? await trackEvent(
+                event,
+                for: draw.userId,
+                date: date
+            )
+        }
     }
 }
 
 public extension Adapty {
-    private static func _trackEvent(_ event: Event) async throws(AdaptyError) {
-        do {
-            let event = await Event.Unpacked(
-                event: event,
-                userId: ProfileStorage.userId,
-                environment: Environment.instance
-            )
-            try await eventsManager.trackEvent(event)
-        } catch {
-            throw error.asAdaptyError
-        }
-    }
-
     /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
     ///
     /// Adapty helps you to measure the performance of the paywalls. We automatically collect all the metrics related to purchases except for paywall views. This is because only you know when the paywall was shown to a customer.
@@ -86,8 +103,15 @@ public extension Adapty {
     ///   - paywall: A ``AdaptyPaywall`` object.
     ///  - Throws: An ``AdaptyError`` object
     nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) async throws(AdaptyError) {
+        let now = Date()
         try await withActivatedSDK(methodName: .logShowPaywall) { _ throws(AdaptyError) in
-            try await _trackEvent(.paywallShowed(.init(variationId: paywall.variationId, viewConfigurationId: nil)))
+            try await trackEvent(
+                .paywallShowed(.init(
+                    variationId: paywall.variationId,
+                    viewConfigurationId: nil
+                )),
+                date: now
+            )
         }
     }
 
@@ -111,14 +135,12 @@ public extension Adapty {
     }
 
     nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenParameters) async throws(AdaptyError) {
+        let now = Date()
         try await withActivatedSDK(methodName: .logShowOnboarding) { _ throws(AdaptyError) in
-            try await _trackEvent(.legacyOnboardingScreenShowed(params))
-        }
-    }
-
-    package nonisolated static func logShowOnboarding(_ params: AdaptyOnboardingScreenShowedParameters) async throws(AdaptyError) {
-        try await withActivatedSDK(methodName: .logShowOnboardingScreen) { _ throws(AdaptyError) in
-            try await _trackEvent(.onboardingScreenShowed(params))
+            try await trackEvent(
+                .legacyOnboardingScreenShowed(params),
+                date: now
+            )
         }
     }
 
@@ -130,8 +152,12 @@ public extension Adapty {
     ///   - consent: `Bool` value whether user gave the consent or not.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func updateCollectingRefundDataConsent(_ consent: Bool) async throws(AdaptyError) {
+        let now = Date()
         try await withActivatedSDK(methodName: .updateCollectingRefundDataConsent) { _ throws(AdaptyError) in
-            try await _trackEvent(.сonsentToCollectingRefundData(.init(consent: consent)))
+            try await trackEvent(
+                .сonsentToCollectingRefundData(.init(consent: consent)),
+                date: now
+            )
         }
     }
 
@@ -143,8 +169,12 @@ public extension Adapty {
     ///   - refundPreference: ``AdaptyRefundPreference`` value.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func updateRefundPreference(_ refundPreference: AdaptyRefundPreference) async throws(AdaptyError) {
+        let now = Date()
         try await withActivatedSDK(methodName: .updateRefundPreference) { _ throws(AdaptyError) in
-            try await _trackEvent(.refundPreference(.init(refundPreference: refundPreference)))
+            try await trackEvent(
+                .refundPreference(.init(refundPreference: refundPreference)),
+                date: now
+            )
         }
     }
 }

@@ -30,6 +30,12 @@ extension SK1Transaction {
         return logParams.merging(other) { _, new in new }
     }
 
+    var isXcodeEnvironment: Bool {
+        guard let id = unfIdentifier else { return false }
+
+        return id.count < 4
+    }
+
     var logParams: EventParameters {
         [
             "product_id": unfProductId,
@@ -67,6 +73,9 @@ struct SK1TransactionWithIdentifier: Sendable {
 
     @inlinable
     var logParams: EventParameters { underlay.logParams(other: nil) }
+
+    @inlinable
+    var isXcodeEnvironment: Bool { underlay.isXcodeEnvironment }
 }
 
 private extension SKPaymentTransactionState {

@@ -15,7 +15,7 @@ actor SK2ProductFetcher {
         log.verbose("Called fetch SK2Products: \(productIds) retryCount:\(retryCount)")
 
         let stamp = Log.stamp
-        await Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
+        Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .fetchSK2Products,
             stamp: stamp,
             params: [
@@ -29,7 +29,7 @@ actor SK2ProductFetcher {
         } catch {
             log.error("Can't fetch SK2Products from Store \(error)")
 
-            await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+            Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .fetchSK2Products,
                 stamp: stamp,
                 error: "\(error.localizedDescription). Detail: \(error)"
@@ -46,7 +46,7 @@ actor SK2ProductFetcher {
             log.verbose("Found SK2Product \(sk2Product.id) \(sk2Product.displayName) \(sk2Product.displayPrice)")
         }
 
-        await Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
+        Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
             methodName: .fetchSK2Products,
             stamp: stamp,
             params: [

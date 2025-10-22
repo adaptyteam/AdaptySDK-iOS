@@ -16,16 +16,18 @@ private let log = Log.Category(name: "LifecycleManager")
 
 @AdaptyActor
 final class LifecycleManager {
-    private static let appOpenedSendInterval: TimeInterval = 60.0
-    private static let profileUpdateInterval: TimeInterval = 60.0
-    private static let profileUpdateShortInterval: TimeInterval = 10.0
+    private enum Constants {
+        static let appOpenedSendInterval: TimeInterval = 60.0
+        static let profileUpdateInterval: TimeInterval = 60.0
+        static let profileUpdateShortInterval: TimeInterval = 10.0
 
-    private static let profileUpdateAcceleratedInterval: TimeInterval = 3.0
-    private static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: TimeInterval = 60.0 * 20.0
-    private static let profileUpdateAcceleratedDuration: TimeInterval = 60.0 * 5.0
+        static let profileUpdateAcceleratedInterval: TimeInterval = 3.0
+        static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: TimeInterval = 60.0 * 20.0
+        static let profileUpdateAcceleratedDuration: TimeInterval = 60.0 * 5.0
 
-    private static let idfaStatusCheckDuration: TimeInterval = 600.0
-    private static let idfaStatusCheckInterval: TimeInterval = 5.0
+        static let idfaStatusCheckDuration: TimeInterval = 600.0
+        static let idfaStatusCheckInterval: TimeInterval = 5.0
+    }
 
     static let shared = LifecycleManager()
 
@@ -68,25 +70,25 @@ final class LifecycleManager {
         if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate(), lastStartAcceleratedSyncAt > lastOpenedWebPaywallAt {
             let timeLeft = now.timeIntervalSince(lastStartAcceleratedSyncAt)
 
-            if timeLeft < profileUpdateAcceleratedDuration {
-                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) < \(profileUpdateAcceleratedDuration) (last start)")
-                return profileUpdateAcceleratedInterval
+            if timeLeft < Constants.profileUpdateAcceleratedDuration {
+                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) < \(Constants.profileUpdateAcceleratedDuration) (last start)")
+                return Constants.profileUpdateAcceleratedInterval
             } else {
-                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) >= \(profileUpdateAcceleratedDuration) (last start)")
+                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) >= \(Constants.profileUpdateAcceleratedDuration) (last start)")
                 return defaultValue
             }
         } else {
             let timeLeftFromLastOpenedWebPaywall = now.timeIntervalSince(lastOpenedWebPaywallAt)
 
-            guard timeLeftFromLastOpenedWebPaywall < profileUpdateAcceleratedMaxCooldownAfterOpenWeb else {
-                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywall) >= \(profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown)")
+            guard timeLeftFromLastOpenedWebPaywall < Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb else {
+                log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywall) >= \(Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown)")
                 return defaultValue
             }
 
-            log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywall) < \(profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown) -> STORE TIME")
+            log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywall) < \(Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown) -> STORE TIME")
 
             storage.setLastStartAcceleratedSyncProfileDate()
-            return profileUpdateAcceleratedInterval
+            return Constants.profileUpdateAcceleratedInterval
         }
     }
 
@@ -97,7 +99,7 @@ final class LifecycleManager {
 
         return Task { @AdaptyActor [weak self] in
             if !skipFirstSleep {
-                try await Task.sleep(seconds: Self.profileUpdateInterval)
+                try await Task.sleep(seconds: Constants.profileUpdateInterval)
             }
 
             while true {
@@ -105,10 +107,10 @@ final class LifecycleManager {
 
                 do {
                     try await self?.syncProfile(logStamp: stamp)
-                    defaultUpdateInterval = Self.profileUpdateInterval
+                    defaultUpdateInterval = Constants.profileUpdateInterval
                 } catch {
                     log.warn("LifecycleManager: \(stamp) syncProfile Error: \(error)")
-                    defaultUpdateInterval = Self.profileUpdateShortInterval
+                    defaultUpdateInterval = Constants.profileUpdateShortInterval
                 }
 
                 let updateInterval = Self.calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: defaultUpdateInterval, logStamp: stamp)
@@ -191,15 +193,17 @@ final class LifecycleManager {
             profileUpdateRegularTask?.cancel()
             self.profileUpdateRegularTask = self.scheduleProfileUpdate(skipFirstSleep: true)
 
-            Adapty.startRegisterInstallTaskIfNeeded()
+            Adapty.applicationDidBecomeActive()
 
-            if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Self.appOpenedSendInterval {
+            if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Constants.appOpenedSendInterval {
                 log.verbose("handleDidBecomeActiveNotification SKIP")
                 return
             }
             appOpenedSentAt = Date()
 
-            Adapty.trackEvent(.appOpened)
+            Task.detached(priority: .utility) {
+                try? await Adapty.trackEvent(.appOpened)
+            }
             log.verbose("handleDidBecomeActiveNotification track")
 
             try? await syncCrossABState()
@@ -214,7 +218,7 @@ final class LifecycleManager {
 
             while true {
                 let now = Date()
-                if now.timeIntervalSince1970 - timerStartedAt.timeIntervalSince1970 > Self.idfaStatusCheckDuration {
+                if now.timeIntervalSince1970 - timerStartedAt.timeIntervalSince1970 > Constants.idfaStatusCheckDuration {
                     log.verbose("stop IdfaUpdateTimer")
                     return
                 }
@@ -227,7 +231,7 @@ final class LifecycleManager {
                     _ = try? await Adapty.getProfile()
                     return
                 case .notDetermined:
-                    try await Task.sleep(seconds: Self.idfaStatusCheckInterval)
+                    try await Task.sleep(seconds: Constants.idfaStatusCheckInterval)
                 case .denied, .notAvailable:
                     return
                 }

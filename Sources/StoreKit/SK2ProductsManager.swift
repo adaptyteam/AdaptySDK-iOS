@@ -29,45 +29,29 @@ actor SK2ProductsManager {
 
     private var fetchingAllProducts = false
 
-    private func finishFetchingAllProducts() {
-        fetchingAllProducts = false
-    }
-
     func storeProductInfo(productInfo: [BackendProductInfo]) async {
         await storage.set(productInfo: productInfo)
     }
-    
+
     func getProductInfo(vendorId: String) async -> BackendProductInfo? {
         await storage.productInfo(by: vendorId)
     }
-    
-    private func fetchProductsInfo() async throws(HTTPError) -> [BackendProductInfo] {
-        let response = try await session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
-        await storage.set(allProductInfo: response)
-        return response
-    }
-    
+
     private func prefetchAllProducts() async {
         guard !fetchingAllProducts else { return }
+        defer { fetchingAllProducts = false }
         fetchingAllProducts = true
 
-        do {
-            _ = try await fetchProductsInfo()
-        } catch {
-            guard !error.isCancelled else { return }
-            Task.detached(priority: .utility) { [weak self] in
+        while !Task.isCancelled {
+            do throws(HTTPError) {
+                let response = try await self.session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
+                await self.storage.set(allProductInfo: response)
+                let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
+                _ = try? await fetchSK2Products(ids: allProductVendorIds)
+            } catch {
+                guard !error.isCancelled else { return }
                 try? await Task.sleep(duration: .seconds(2))
-                await self?.finishFetchingAllProducts()
-                await self?.prefetchAllProducts() // TODO: recursion ???
             }
-            return
-        }
-
-        let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
-
-        Task.detached(priority: .high) { [weak self] in
-            _ = try? await self?.fetchSK2Products(ids: allProductVendorIds)
-            await self?.finishFetchingAllProducts()
         }
     }
 }

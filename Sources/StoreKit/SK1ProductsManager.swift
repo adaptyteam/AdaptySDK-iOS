@@ -25,36 +25,26 @@ actor SK1ProductsManager {
 
     private var fetchingAllProducts = false
 
-    private func finishFetchingAllProducts() {
-        fetchingAllProducts = false
-    }
-
     func storeProductInfo(productInfo: [BackendProductInfo]) async {
         await storage.set(productInfo: productInfo)
     }
 
     private func fetchAllProducts() async {
         guard !fetchingAllProducts else { return }
+        defer { fetchingAllProducts = false }
         fetchingAllProducts = true
 
-        do {
-            let response = try await session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
-            await storage.set(allProductInfo: response)
-        } catch {
-            guard !error.isCancelled else { return }
-            Task.detached(priority: .utility) { [weak self] in
+        while !Task.isCancelled {
+            do throws(HTTPError) {
+                let response = try await self.session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
+                await storage.set(allProductInfo: response)
+                let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
+                _ = try? await fetchSK1Products(ids: allProductVendorIds)
+                return
+            } catch {
+                guard !error.isCancelled else { return }
                 try? await Task.sleep(duration: .seconds(2))
-                await self?.finishFetchingAllProducts()
-                await self?.fetchAllProducts() // TODO: recursion ???
             }
-            return
-        }
-
-        let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
-
-        Task.detached(priority: .high) { [weak self] in
-            _ = try? await self?.fetchSK1Products(ids: allProductVendorIds)
-            await self?.finishFetchingAllProducts()
         }
     }
 }

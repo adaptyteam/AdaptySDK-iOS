@@ -11,6 +11,7 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .unknown(_, description, _): description
+        case .taskCancelled: "The operation was interrupted."
         case .activateOnceError: "Adapty can only be activated once. Ensure that the SDK activation call is not made more than once."
         case .unidentifiedUserLogout: "Logout cannot be called for an unidentified user"
         case .cantMakePayments: "In-App Purchases are not available on this device. Please check your device settings."

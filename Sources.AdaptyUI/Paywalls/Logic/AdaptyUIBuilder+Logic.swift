@@ -58,7 +58,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     package func logShowPaywall(
         viewConfiguration: AdaptyUIConfiguration
     ) async {
-        await Adapty.logShowPaywall(paywall, viewConfiguration: viewConfiguration)
+        try? await Adapty.logShowPaywallViaAdaptyUI(paywall)
     }
 
     package func getProducts(
@@ -112,7 +112,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             Log.ui.verbose("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return
         }
-        
+
         if let observerModeResolver {
             observerModeResolver.observerMode(
                 didInitiatePurchase: adaptyProduct,
@@ -186,7 +186,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             events.event_didFailRestore(with: error.asAdaptyError)
         }
     }
-    
+
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)
     }

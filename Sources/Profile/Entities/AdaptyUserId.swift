@@ -5,25 +5,38 @@
 //  Created by Aleksei Valiano on 30.07.2025.
 //
 
-struct AdaptyUserId: Sendable, Hashable {
-    let profileId: String
-    let customerId: String?
+package struct AdaptyUserId: Sendable, Hashable {
+    package let profileId: String
+    package let customerId: String?
 }
 
 extension AdaptyUserId {
+    @inlinable
     var isAnonymous: Bool { customerId == nil }
 
-    func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
-        profileId == other.profileId
+    @inlinable
+    func isEqualProfileId(_ other: String) -> Bool {
+        profileId == other
     }
 
+    @inlinable
+    func isNotEqualProfileId(_ other: String) -> Bool {
+        !isEqualProfileId(other)
+    }
+
+    @inlinable
+    func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
+        other.isEqualProfileId(profileId)
+    }
+
+    @inlinable
     func isNotEqualProfileId(_ other: AdaptyUserId) -> Bool {
         !isEqualProfileId(other)
     }
 }
 
 extension AdaptyUserId: CustomStringConvertible {
-    var description: String {
+    package var description: String {
         "(profileId: \(profileId), customerUserId: \(customerId ?? "nil")"
     }
 }

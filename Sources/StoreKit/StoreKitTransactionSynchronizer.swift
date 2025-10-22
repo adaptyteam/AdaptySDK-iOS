@@ -7,6 +7,7 @@
 
 import Foundation
 
+@AdaptyActor
 protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
     func report(
         _: PurchasedTransactionInfo,
@@ -20,19 +21,15 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
     ) async throws(AdaptyError) -> AdaptyProfile
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    func finish(
-        transaction: SK2Transaction,
-        recived: TransactionRecivedBy
-    ) async
+    func attemptToFinish(transaction: SK2Transaction, logSource: String) async
 
-    func recalculateOfflineAccessLevels(with: SKTransaction) async -> AdaptyProfile?
-}
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    func finish(transaction: SK2Transaction) async
 
-enum TransactionRecivedBy {
-    case updates
-    case purchased
-    case unfinished
-    case manual
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    func recalculateOfflineAccessLevels() async -> AdaptyProfile
+
+    func skipSyncXcodeSK1Transaction() async -> AdaptyProfile
 }
 
 extension Adapty: StoreKitTransactionSynchronizer {
@@ -61,10 +58,17 @@ extension Adapty: StoreKitTransactionSynchronizer {
     }
 
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    func finish(
-        transaction: SK2Transaction,
-        recived _: TransactionRecivedBy
-    ) async {
+    func attemptToFinish(transaction: SK2Transaction, logSource: String) async {
+        if await purchasePayloadStorage.canFinishSyncedTransaction(transaction.unfIdentifier) {
+            await finish(transaction: transaction)
+            Log.sk2TransactionManager.info("Finish \(logSource) transaction: \(transaction) for product: \(transaction.unfProductId)")
+        } else {
+            Log.sk2TransactionManager.info("Successfully \(logSource) transaction synced: \(transaction), manual finish required for product: \(transaction.unfProductId)")
+        }
+    }
+
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    func finish(transaction: SK2Transaction) async {
         await transaction.finish()
         await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)
         await purchasePayloadStorage.removeUnfinishedTransaction(transaction.unfIdentifier)

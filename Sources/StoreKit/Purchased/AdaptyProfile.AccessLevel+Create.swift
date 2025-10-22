@@ -10,6 +10,7 @@ import StoreKit
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProfile.AccessLevel {
     init?(
+        id: String,
         sk2Transaction: SK2Transaction,
         sk2Product: SK2Product?,
         backendPeriod: BackendProductInfo.Period?,
@@ -75,7 +76,7 @@ extension AdaptyProfile.AccessLevel {
         guard expiresAt != nil || isLifetime else { return nil }
 
         self.init(
-            id: UUID().uuidString,
+            id: id,
             isActive: {
                 if subscriprionNotEntitled { return false }
                 if isRefund { return false }

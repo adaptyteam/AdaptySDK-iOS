@@ -55,7 +55,7 @@ final class AdaptyOnboardingViewModel: ObservableObject {
             webViewDelegate,
             name: AdaptyUI.webViewEventMessageName
         )
-        
+
         if #available(iOS 16.4, *) {
             webView.isInspectable = inspectWebView
         }
@@ -127,13 +127,13 @@ final class AdaptyOnboardingViewModel: ObservableObject {
             switch event {
             case let .screenPresented(meta):
                 let isLatest = meta.screenIndex == meta.screensTotal - 1
-                let params = AdaptyOnboardingScreenShowedParameters(
+                let params = AdaptyUIOnboardingScreenShowedParameters(
                     variationId: variationId,
                     screenName: meta.screenClientId,
                     screenOrder: "\(meta.screenIndex)",
                     isLatestScreen: isLatest
                 )
-                try await Adapty.logShowOnboarding(params)
+                try await Adapty.logShowOnboardingViaAdaptyUI(params)
             default:
                 break
             }

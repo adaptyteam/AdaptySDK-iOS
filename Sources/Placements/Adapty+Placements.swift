@@ -161,17 +161,12 @@ extension Adapty {
     ) async throws(AdaptyError) -> Content {
         let manager = try profileManager(withProfileId: userId).orThrows
 
-        let fetchTask: AdaptyResultTask<Content> = Task {
-            do throws(AdaptyError) {
-                let value: Content = try await fetchPlacement(
-                    placementId,
-                    locale,
-                    forUserId: userId
-                )
-                return .success(value)
-            } catch {
-                return .failure(error)
-            }
+        async let remote = await Result.from { () async throws(AdaptyError) -> Content in
+            try await self.fetchPlacement(
+                placementId,
+                locale,
+                forUserId: userId
+            )
         }
 
         let cached: Content? = manager
@@ -186,11 +181,7 @@ extension Adapty {
         if let cached {
             return cached
         } else {
-            let result = await withTaskCancellationHandler {
-                await fetchTask.value
-            } onCancel: {
-                fetchTask.cancel()
-            }
+            let result = await remote
             return try result.get()
         }
     }
@@ -200,7 +191,7 @@ extension Adapty {
         _ locale: AdaptyLocale,
         forUserId userId: AdaptyUserId
     ) async throws(AdaptyError) -> Content {
-        while true {
+        while !Task.isCancelled {
             let (segmentId, cached, isTestUser, crossPlacementState, variationId) = try { () throws(AdaptyError) in
                 let manager = try profileManager(withProfileId: userId).orThrows
                 let crossPlacementState = manager.crossPlacmentStorage.state
@@ -224,7 +215,7 @@ extension Adapty {
 
             let requestWithSpecialVariation = variationId != nil
 
-            do {
+            do throws(HTTPError) {
                 var chosen: AdaptyPlacementChosen<Content>
 
                 if let variationId {
@@ -331,6 +322,8 @@ extension Adapty {
             }
         }
 
+        throw AdaptyError.taskCancelled()
+
         func updateSegmentId(for userId: AdaptyUserId, oldSegmentId: String) async throws(AdaptyError) -> Bool {
             let manager = try profileManager(withProfileId: userId).orThrows
             guard manager.segmentId == oldSegmentId else { return true }
@@ -374,7 +367,7 @@ extension Adapty {
         withTimeout timeoutInterval: TimeInterval?
     ) async throws(AdaptyError) -> Content {
         var params: (cached: Content?, isTestUser: Bool, variationId: String?)?
-        while true {
+        while !Task.isCancelled {
             params = {
                 guard let manager = try? profileManager(withProfileId: userId) else { return nil }
                 let variationId = manager.crossPlacmentStorage.state?.variationId(placementId: placementId)
@@ -389,7 +382,7 @@ extension Adapty {
                 return cached
             }
 
-            do {
+            do throws(HTTPError) {
                 var chosen: AdaptyPlacementChosen<Content>
                 if let variationId = params?.variationId {
                     chosen = try await httpFallbackSession.fetchFallbackPlacement(
@@ -431,6 +424,7 @@ extension Adapty {
                 }
             }
         }
+        throw AdaptyError.taskCancelled()
     }
 }
 

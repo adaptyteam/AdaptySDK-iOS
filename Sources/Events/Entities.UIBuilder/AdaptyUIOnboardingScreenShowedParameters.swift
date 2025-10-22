@@ -1,5 +1,5 @@
 //
-//  AdaptyOnboardingScreenShowedParameters.swift
+//  AdaptyUIOnboardingScreenShowedParameters.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 14.04.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-package struct AdaptyOnboardingScreenShowedParameters: Sendable {
+package struct AdaptyUIOnboardingScreenShowedParameters: Sendable {
     package let variationId: String
     package let screenName: String?
     package let screenOrder: String
@@ -26,7 +26,7 @@ package struct AdaptyOnboardingScreenShowedParameters: Sendable {
     }
 }
 
-extension AdaptyOnboardingScreenShowedParameters: Codable {
+extension AdaptyUIOnboardingScreenShowedParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case variationId = "variation_id"
         case screenName = "onboarding_screen_name"

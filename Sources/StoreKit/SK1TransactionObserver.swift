@@ -25,13 +25,19 @@ actor SK1TransactionObserver: Sendable {
         for sk1Transaction in transactions {
             let logParams = sk1Transaction.logParams
 
-            await Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
+            Adapty.trackSystemEvent(AdaptyAppleEventQueueHandlerParameters(
                 eventName: "updated_transaction",
                 params: logParams,
                 error: sk1Transaction.error.map { "\($0.localizedDescription). Detail: \($0)" }
             ))
 
             guard sk1Transaction.transactionState == .purchased else { continue }
+
+            guard !sk1Transaction.isXcodeEnvironment else {
+                log.verbose("Skip backend sync for Xcode environment transaction \(sk1Transaction.unfIdentifier ?? "")")
+                continue
+            }
+
             guard let sk1Transaction = SK1TransactionWithIdentifier(sk1Transaction) else {
                 log.error("received purchased transaction without identifier")
                 continue

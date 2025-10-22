@@ -1,5 +1,5 @@
 //
-//  withCheckedThrowingContinuation.swift
+//  TypedThrows+Extensions.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.07.2025.
@@ -55,18 +55,4 @@ func withCheckedThrowingContinuation_<E>(
     try await withCheckedContinuation(isolation: isolation, function: function) { (continuation: CheckedContinuation<Result<Void, E>, Never>) in
         body(.init(continuation: continuation))
     }.get()
-}
-
-extension Task {
-    @discardableResult
-    static func withResult(priority: TaskPriority? = nil, operation: sending @escaping @isolated(any) () async throws(Failure) -> Success) -> Task<Result<Success, Failure>, Never> {
-        Task<Result<Success, Failure>, Never>(priority: priority) { () async -> Result<Success, Failure> in
-            do throws(Failure) {
-                let value = try await operation()
-                return .success(value)
-            } catch {
-                return .failure(error)
-            }
-        }
-    }
 }

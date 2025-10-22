@@ -19,6 +19,7 @@ final class ProfileManager {
     let placementStorage = PlacementStorage()
     let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
 
+    var currentProfile: AdaptyProfile { cachedProfile.value }
     var isTestUser: Bool { cachedProfile.value.isTestUser }
     var segmentId: String { cachedProfile.value.segmentId }
     var lastResponseHash: String? { cachedProfile.hash }
@@ -171,10 +172,16 @@ extension Adapty {
         _ = try? profileManager?.saveProfileAndStartNotifyTask(response)
     }
 
-    func recalculateOfflineAccessLevels(with: SKTransaction) async -> AdaptyProfile? {
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else { return nil }
+    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+    func recalculateOfflineAccessLevels() async -> AdaptyProfile {
         await (transactionManager as? SK2TransactionManager)?.clearCache()
-        return await profileManager?.notifyProfileDidChanged()
+        
+        if let manger = profileManager {
+            return await manger.notifyProfileDidChanged()
+        }
+        
+        let manger = offlineProfileManager ?? OfflineProfileManager(userId: profileStorage.userId)
+        return await profileWithOfflineAccessLevels(manger.currentProfile)
     }
 
     func syncTransactionHistory(for userId: AdaptyUserId, forceSync: Bool = false) async throws(AdaptyError) {

@@ -6,53 +6,75 @@
 //
 
 protocol AdaptyUserIdentifiable {
-    @AdaptyActor
     var userId: AdaptyUserId { get }
 }
 
 extension AdaptyUserId {
-    @AdaptyActor
     func isEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
         isEqualProfileId(other.userId)
     }
 
-    @AdaptyActor
     func isNotEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
         !isEqualProfileId(other.userId)
     }
 }
 
 extension AdaptyUserIdentifiable {
-    @AdaptyActor
+    @inlinable
     var profileId: String { userId.profileId }
 
-    @AdaptyActor
+    @inlinable
     var customerUserId: String? { userId.customerId }
 
-    @AdaptyActor
+    @inlinable
+    func isEqualProfileId(_ other: String) -> Bool {
+        userId.isEqualProfileId(other)
+    }
+
+    @inlinable
+    func isNotEqualProfileId(_ other: String) -> Bool {
+        userId.isNotEqualProfileId(other)
+    }
+
+    @inlinable
     func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
         userId.isEqualProfileId(other)
     }
 
-    @AdaptyActor
+    @inlinable
     func isNotEqualProfileId(_ other: AdaptyUserId) -> Bool {
-        !userId.isEqualProfileId(other)
+        userId.isNotEqualProfileId(other)
     }
 
-    @AdaptyActor
+    @inlinable
     func isEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
         userId.isEqualProfileId(other.userId)
     }
 
-    @AdaptyActor
+    @inlinable
     func isNotEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
-        !userId.isEqualProfileId(other.userId)
+        userId.isNotEqualProfileId(other.userId)
     }
 }
 
 extension AdaptyProfile: AdaptyUserIdentifiable {}
-extension ProfileStorage: AdaptyUserIdentifiable {}
-extension ProfileManager: AdaptyUserIdentifiable {}
+
 extension VH<AdaptyProfile>: AdaptyUserIdentifiable {
     var userId: AdaptyUserId { value.userId }
+}
+
+extension ProfileStorage {
+    var profileId: String {
+        userId.profileId
+    }
+}
+
+extension ProfileManager {
+    func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
+        userId.isEqualProfileId(other)
+    }
+
+    func isEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
+        userId.isEqualProfileId(other.userId)
+    }
 }
