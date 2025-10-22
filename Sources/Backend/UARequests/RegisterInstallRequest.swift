@@ -52,12 +52,14 @@ extension Backend.UAExecutor {
             installInfo: installInfo
         )
         var attempt = 0
+
         while !Task.isCancelled {
             do {
                 let response = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil)
                 return response.body.value
             } catch {
                 guard attempt < maxRetries,
+                      !error.isCancelled,
                       UABackend.canRetryRequest(error)
                 else { throw error }
                 attempt += 1

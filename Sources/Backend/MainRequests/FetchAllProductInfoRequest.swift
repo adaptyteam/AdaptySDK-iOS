@@ -22,16 +22,31 @@ private struct FetchAllProductInfoRequest: HTTPRequestWithDecodableResponse {
 
 extension Backend.MainExecutor {
     func fetchProductInfo(
-        apiKeyPrefix: String
+        apiKeyPrefix: String,
+        maxRetries: Int = 5
     ) async throws(HTTPError) -> [BackendProductInfo] {
         let request = FetchAllProductInfoRequest(
             apiKeyPrefix: apiKeyPrefix
         )
-        let response = try await perform(
-            request,
-            requestName: .fetchAllProductInfo
-        )
+        var attempt = 0
+        while !Task.isCancelled {
+            do {
+                let response = try await perform(
+                    request,
+                    requestName: .fetchAllProductInfo
+                )
+                return response.body.value
+            } catch {
+                guard attempt < maxRetries,
+                      !error.isCancelled
+                else {
+                    throw error
+                }
+                attempt += 1
+                try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+            }
+        }
 
-        return response.body.value
+        throw HTTPError.cancelled(request.endpoint)
     }
 }

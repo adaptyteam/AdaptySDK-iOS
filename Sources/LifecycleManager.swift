@@ -102,7 +102,7 @@ final class LifecycleManager {
                 try await Task.sleep(seconds: Constants.profileUpdateInterval)
             }
 
-            while true {
+            while !Task.isCancelled {
                 let defaultUpdateInterval: TimeInterval
 
                 do {
@@ -117,6 +117,7 @@ final class LifecycleManager {
                 log.debug("LifecycleManager: \(stamp) update after: \(updateInterval) sec.")
                 try await Task.sleep(seconds: updateInterval)
             }
+            throw CancellationError()
         }
     }
 

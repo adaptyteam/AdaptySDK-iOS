@@ -45,7 +45,8 @@ final class UserAcquisitionManager {
     func startRegisterInstallTaskIfNeeded(maxRetries: Int = 10) {
         guard
             !storage.hasRegistrationInstallResponse,
-            !registerInstallStarted, let sdk = Adapty.optionalSDK
+            !registerInstallStarted,
+            let sdk = Adapty.optionalSDK
         else { return }
 
         registerInstallStarted = true
