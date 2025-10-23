@@ -47,8 +47,8 @@ package final class AdaptyUIEventsHandler: ObservableObject {
         didPerformAction?(action)
     }
 
-    func event_didSelectProduct(_ product: ProductResolver) {
-        Log.app.verbose("#\(logId)# event_didSelectProduct: \(product.adaptyProductId)")
+    func event_didSelectProduct(_ product: ProductResolver, automatic: Bool) {
+        Log.app.verbose("#\(logId)# event_didSelectProduct: \(product.adaptyProductId) automatic: \(automatic)")
         didSelectProduct?(product)
     }
 

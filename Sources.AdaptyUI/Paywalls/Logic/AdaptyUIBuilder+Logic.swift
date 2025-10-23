@@ -42,13 +42,18 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didPerformAction(action.adaptyUIAction)
     }
 
-    func reportDidSelectProduct(_ product: ProductResolver) {
-        guard let adaptyProduct = product as? AdaptyPaywallProductWithoutDeterminingOffer else {
-            Log.ui.verbose("#\(logId)# makePurchase error: product is not AdaptyPaywallProductWithoutDeterminingOffer")
+    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
+        guard let productWrapper = product as? AdaptyPaywallProductWrapper else {
+            Log.ui.verbose("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProductWrapper")
             return
         }
 
-        events.event_didSelectProduct(adaptyProduct)
+        switch productWrapper {
+        case .withoutOffer(let product):
+            events.event_didSelectProduct(product, automatic: automatic)
+        case .full(let product):
+            events.event_didSelectProduct(product, automatic: automatic)
+        }
     }
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {

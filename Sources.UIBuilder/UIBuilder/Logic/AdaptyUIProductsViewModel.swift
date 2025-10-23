@@ -67,8 +67,12 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
     }
 
+    private var groupIdsForAutoNotification = Set<String>()
+    
     package func resetSelectedProducts() {
         Log.ui.verbose("#\(logId)# resetSelectedProducts")
+
+        groupIdsForAutoNotification.removeAll()
         selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
     }
 
@@ -78,14 +82,25 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     }
 
     func selectedProductId(by groupId: String) -> String? {
-        selectedProductsIds[groupId]
+        guard let productId = selectedProductsIds[groupId] else {
+            return nil
+        }
+
+        if !groupIdsForAutoNotification.contains(groupId),
+           let selectedProduct = products.first(where: { $0.adaptyProductId == productId })
+        {
+            logic.reportDidSelectProduct(selectedProduct, automatic: true)
+            groupIdsForAutoNotification.insert(groupId)
+        }
+
+        return productId
     }
 
     func selectProduct(id: String, forGroupId groupId: String) {
         selectedProductsIds[groupId] = id
 
         if let selectedProduct = products.first(where: { $0.adaptyProductId == id }) {
-            logic.reportDidSelectProduct(selectedProduct)
+            logic.reportDidSelectProduct(selectedProduct, automatic: false)
         }
     }
 

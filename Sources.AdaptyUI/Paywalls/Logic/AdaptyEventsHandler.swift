@@ -62,8 +62,8 @@ package final class AdaptyEventsHandler: ObservableObject {
         didPerformAction?(action)
     }
 
-    func event_didSelectProduct(_ product: AdaptyPaywallProductWithoutDeterminingOffer) {
-        Log.ui.verbose("#\(logId)# event_didSelectProduct: \(product.vendorProductId)")
+    func event_didSelectProduct(_ product: AdaptyPaywallProductWithoutDeterminingOffer, automatic: Bool) {
+        Log.ui.verbose("#\(logId)# event_didSelectProduct: \(product.vendorProductId) automatic: \(automatic)")
         didSelectProduct?(product)
     }
 
