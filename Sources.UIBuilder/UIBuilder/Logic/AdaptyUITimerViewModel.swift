@@ -94,8 +94,9 @@ package final class AdaptyUITimerViewModel: ObservableObject {
                     return endAt
                 }
             case .custom:
-                timers[timer.id] = timerResolver.timerEndAtDate(for: timer.id)
-                return at
+                let resolved = timerResolver.timerEndAtDate(for: timer.id)
+                timers[timer.id] = resolved
+                return resolved
             }
         }
     }
