@@ -8,6 +8,12 @@
 import Adapty
 import AdaptyUIBuilder
 
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+package enum AdaptyUIViewPresentationStyle: String, Codable {
+    case fullScreen = "full_screen"
+    case pageSheet = "page_sheet"
+}
+
 #if canImport(UIKit)
 
 import UIKit
@@ -31,6 +37,16 @@ fileprivate extension UIWindow {
         }
         
         return topViewController
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyUIViewPresentationStyle {
+    var uiKitPresentationStyle: UIModalPresentationStyle {
+        switch self {
+        case .fullScreen: .overFullScreen
+        case .pageSheet: .pageSheet
+        }
     }
 }
 
@@ -99,13 +115,14 @@ package extension AdaptyUI {
             )
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
-            cachePaywallController(vc, id: vc.id.uuidString)
+            cachePaywallController(vc, id: vc.id)
             return vc.toAdaptyUIView()
         }
 #endif
 
         package static func presentPaywallView(
-            viewId: String
+            viewId: String,
+            presentationStyle: AdaptyUIViewPresentationStyle?
         ) async throws {
 #if canImport(UIKit)
             guard let vc = cachedPaywallController(viewId) else {
@@ -121,7 +138,7 @@ package extension AdaptyUI {
             }
             
             vc.modalPresentationCapturesStatusBarAppearance = true
-            vc.modalPresentationStyle = .overFullScreen
+            vc.modalPresentationStyle = presentationStyle?.uiKitPresentationStyle ?? .overFullScreen
             
             await withCheckedContinuation { continuation in
                 rootVC.present(vc, animated: true) {
@@ -206,7 +223,8 @@ package extension AdaptyUI.Plugin {
     }
     
     static func presentOnboardingView(
-        viewId: String
+        viewId: String,
+        presentationStyle: AdaptyUIViewPresentationStyle?
     ) async throws {
 #if canImport(UIKit)
         guard let vc = cachedOnboardingController(viewId) else {
@@ -222,8 +240,7 @@ package extension AdaptyUI.Plugin {
         }
         
         vc.modalPresentationCapturesStatusBarAppearance = true
-//        vc.modalPresentationStyle = .overFullScreen
-        vc.modalPresentationStyle = .formSheet // TODO: add param
+        vc.modalPresentationStyle = presentationStyle?.uiKitPresentationStyle ?? .overFullScreen
         
         await withCheckedContinuation { continuation in
             rootVC.present(vc, animated: true) {

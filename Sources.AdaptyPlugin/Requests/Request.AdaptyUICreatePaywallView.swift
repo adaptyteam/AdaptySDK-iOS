@@ -13,6 +13,41 @@ import AdaptyUIBuilder
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+public extension [AdaptyCustomAsset.Identifiable] {
+    @MainActor
+    func assetsResolver() throws -> [String: AdaptyCustomAsset]? {
+        guard !isEmpty else { return nil }
+
+        var assetsResolver = [String: AdaptyCustomAsset]()
+        assetsResolver.reserveCapacity(count)
+
+        for asset in self {
+            switch asset.value {
+            case .asset(let value):
+                assetsResolver[asset.id] = value
+            case .imageFlutterAssetId(let assetId):
+                assetsResolver[asset.id] = try .image(.file(url: url(assetId)))
+            case .videoFlutterAssetId(let assetId):
+                assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil))
+            }
+        }
+
+        return assetsResolver
+
+        func url(_ assetId: String) throws -> URL {
+            guard let assetIdToFileURL = AdaptyPlugin.assetIdToFileURL else {
+                throw AdaptyPluginInternalError.unregister("Unregister assetIdToFileURL in AdaptyPlugin")
+            }
+            guard let url = assetIdToFileURL(assetId) else {
+                throw AdaptyPluginInternalError.notExist("Asset \(assetId) not found")
+            }
+
+            return url
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
     struct AdaptyUICreatePaywallView: AdaptyPluginRequest {
         static let method = "adapty_ui_create_paywall_view"
@@ -72,7 +107,7 @@ extension Request {
             return assetsResolver
 
             func url(_ assetId: String) throws -> URL {
-                guard let assetIdToFileURL = Self.assetIdToFileURL else {
+                guard let assetIdToFileURL = AdaptyPlugin.assetIdToFileURL else {
                     throw AdaptyPluginInternalError.unregister("Unregister assetIdToFileURL in AdaptyPlugin")
                 }
                 guard let url = assetIdToFileURL(assetId) else {
@@ -82,17 +117,17 @@ extension Request {
                 return url
             }
         }
-
-        @MainActor
-        fileprivate static var assetIdToFileURL: (@MainActor (String) -> URL?)?
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPlugin {
     @MainActor
+    fileprivate static var assetIdToFileURL: (@MainActor (String) -> URL?)?
+
+    @MainActor
     static func register(createPaywallView: @MainActor @escaping (String) -> URL?) {
-        Request.AdaptyUICreatePaywallView.assetIdToFileURL = createPaywallView
+        assetIdToFileURL = createPaywallView
     }
 }
 

@@ -112,6 +112,7 @@ $requests:
     properties:
       method: { const: "adapty_ui_present_onboarding_view" }
       id: { type: string, description: "View Id" }
+      ios_presentation_style: { $ref: "#/$defs/AdaptyUI.IOSPresentationStyle" }
 
   AdaptyUIPresentOnboardingView.Response: #response
     type: object
@@ -130,6 +131,7 @@ $requests:
     properties:
       method: { const: "adapty_ui_present_paywall_view" }
       id: { type: string, description: "View Id" }
+      ios_presentation_style: { $ref: "#/$defs/AdaptyUI.IOSPresentationStyle" }
 
   AdaptyUIPresentPaywallView.Response: #response
     type: object
@@ -974,6 +976,8 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - access_level_id
+      - product_type
       - paywall_product_index
       - paywall_variation_id
       - paywall_ab_test_name
@@ -985,6 +989,8 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       paywall_product_index: { type: integer }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
@@ -1034,6 +1040,8 @@ $defs:
     required:
       - vendor_product_id
       - adapty_product_id
+      - access_level_id
+      - product_type
       - paywall_product_index
       - paywall_variation_id
       - paywall_ab_test_name
@@ -1041,6 +1049,8 @@ $defs:
     properties:
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
+      access_level_id: { type: string }
+      product_type: { type: string }
       paywall_product_index: { type: integer }
       subscription_offer_identifier:
         { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
@@ -1408,7 +1418,9 @@ $defs:
         properties:
           type: { type: string, const: "success" }
           profile: { $ref: "#/$defs/AdaptyProfile" }
-          jws_transaction: { type: string }
+          apple_jws_transaction: { type: string }
+          google_purchase_token: { type: string }
+
 
   AdaptyInstallationStatus: #response #event
     type: object
@@ -1492,6 +1504,12 @@ $defs:
       nullable: false 
     }
 
+  AdaptyUI.IOSPresentationStyle:
+    type: string
+    enum:
+      - full_screen
+      - page_sheet
+
   AdaptyUI.DialogConfiguration: #request
     type: object
     required: [default_action]
@@ -1506,8 +1524,8 @@ $defs:
     enum:
       - primary
       - secondary
-
-   AdaptyPurchaseParameters:  #request
+  
+  AdaptyPurchaseParameters:  #request
     type: object
     properties:
       subscription_update_params:

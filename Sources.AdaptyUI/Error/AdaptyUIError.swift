@@ -20,7 +20,7 @@ public enum AdaptyUIError: Error {
     case wrongComponentType(String)
 }
 
-extension AdaptyUIError {
+public extension AdaptyUIError {
     static let AdaptyUIErrorDomain = "AdaptyUIErrorDomain"
 
     enum Code: Int {
@@ -34,6 +34,8 @@ extension AdaptyUIError {
 
         case unsupportedTemplate = 4100
         case wrongComponentType = 4103
+        
+        case platformView = 4300
     }
 }
 

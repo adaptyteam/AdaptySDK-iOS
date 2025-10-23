@@ -332,7 +332,7 @@ class KingfisherManager: @unchecked Sendable {
                 retrievingContext.appendError(error, to: source)
                 startNewRetrieveTask(with: nextSource, retryContext: retryContext, downloadTaskUpdated: downloadTaskUpdated)
             } else {
-                // No other alternative source. Finish with error.
+                // No other alternative source. finish with error.
                 if retrievingContext.propagationErrors.isEmpty {
                     completionHandler?(.failure(error))
                 } else {
@@ -843,6 +843,7 @@ extension KingfisherManager {
                         continuation.resume(with: result)
                     }
                 )
+                
                 if Task.isCancelled {
                     downloadTask?.cancel()
                 } else {

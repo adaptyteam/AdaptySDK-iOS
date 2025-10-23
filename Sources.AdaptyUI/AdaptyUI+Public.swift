@@ -234,22 +234,15 @@ public extension AdaptyUI {
         Log.ui.verbose("Calling AdaptyUI activate [\(stamp)] with params: \(logParams)")
 
 #if canImport(UIKit)
+        let sdk: Adapty
 
-        let task = Task<Adapty, Error> { @AdaptyActor in
-            let sdk: Adapty
-
-            do {
-                sdk = try await Adapty.activatedSDK
-            } catch {
-                let err = AdaptyUIError.adaptyNotActivated
-                Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(error).")
-                throw err
-            }
-
-            return sdk
+        do {
+            sdk = try await Adapty.activatedSDK
+        } catch {
+            let err = AdaptyUIError.adaptyNotActivated
+            Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(error).")
+            throw err
         }
-
-        let sdk = try await task.value
 
         guard !AdaptyUI.isActivated else {
             let err = AdaptyUIError.activateOnce
