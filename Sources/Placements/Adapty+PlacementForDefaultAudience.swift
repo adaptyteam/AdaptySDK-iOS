@@ -91,7 +91,12 @@ extension Adapty {
 
         let cached: Content? = manager?
             .placementStorage
-            .getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: nil)?
+            .getPlacementById(
+                placementId,
+                withLocale: locale,
+                orDefaultLocale: true,
+                withVariationId: nil
+            )?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -111,7 +116,12 @@ extension Adapty {
         let (cached, isTestUser): (Content?, Bool) = {
             guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
             return (
-                manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
+                manager.placementStorage.getPlacementById(
+                    placementId,
+                    withLocale: locale,
+                    orDefaultLocale: false,
+                    withVariationId: nil
+                )?.value,
                 manager.isTestUser
             )
         }()

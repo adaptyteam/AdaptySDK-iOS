@@ -59,8 +59,8 @@ enum APIRequestName: String {
     case fetchPaywallVariationsForDefaultAudience = "get_paywall_variations_for_default_audience"
     case fetchOnboardingVariationsForDefaultAudience = "get_onboarding_variations_for_default_audience"
 
-    case fetchViewConfiguration = "get_paywall_builder"
-    case fetchFallbackViewConfiguration = "get_fallback_paywall_builder"
+    case fetchUISchema = "get_paywall_builder"
+    case fetchFallbackUISchema = "get_fallback_paywall_builder"
     case fetchCrossPlacementState = "get_cross_placement_state"
     case fetchOnboarding = "get_onboarding"
     case fetchPaywall = "get_paywall"

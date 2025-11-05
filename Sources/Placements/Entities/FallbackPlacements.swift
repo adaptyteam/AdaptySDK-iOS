@@ -33,6 +33,31 @@ struct FallbackPlacements: Sendable {
         head.placementIds?.contains(id)
     }
 
+    func restorePaywall(
+        _ id: String,
+        withVariationId variationId: String,
+        withInstanceIdentity: String,
+        withPlacementRevision: Int
+    ) -> AdaptyPaywall? {
+        guard let chosen: AdaptyPlacementChosen<AdaptyPaywall> = getPlacement(
+            byPlacementId: id,
+            withVariationId: variationId,
+            userId: AdaptyUserId(profileId: "", customerId: nil),
+            requestLocale: .defaultPlacementLocale
+        )
+        else { return nil }
+
+        let paywall = chosen.content
+
+        guard paywall.instanceIdentity == withInstanceIdentity,
+              paywall.placement.revision == withPlacementRevision
+        else {
+            return nil
+        }
+
+        return paywall
+    }
+
     func getPlacement<Content: PlacementContent>(
         byPlacementId id: String,
         withVariationId: String?,

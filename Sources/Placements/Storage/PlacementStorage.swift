@@ -31,34 +31,45 @@ final class PlacementStorage {
         }
     }
 
-    func getPlacementByLocale<Content: PlacementContent>(
-        _ locale: AdaptyLocale,
+    func restorePaywall(
+        _ placementId: String,
+        withVariationId: String,
+        withInstanceIdentity: String,
+        withPlacementVersion: Int64,
+        withPlacementRevision: Int
+    ) -> AdaptyPaywall? {
+        guard let paywall: AdaptyPaywall = Self.getPlacement(placementId)?.value,
+              paywall.variationId == withVariationId,
+              paywall.instanceIdentity == withInstanceIdentity,
+              paywall.placement.version == withPlacementVersion,
+              paywall.placement.revision == withPlacementRevision
+        else {
+            return nil
+        }
+
+        return paywall
+    }
+
+    func getPlacementById<Content: PlacementContent>(
+        _ placementId: String,
+        withLocale locale: AdaptyLocale,
         orDefaultLocale: Bool,
-        withPlacementId placementId: String,
-        withVariationId: String?
+        withVariationId variationId: String?
     ) -> VH<Content>? {
-        guard var content: VH<Content> = Self.getPlacement(placementId) else { return nil }
+        guard
+            var content: VH<Content> = Self.getPlacement(placementId),
+            content.has(variationId: variationId),
+            content.has(languageCode: locale, orDefault: orDefaultLocale)
+        else { return nil }
 
-        if let variationId = withVariationId, content.value.variationId != variationId {
-            return nil
-        }
-
-        let contentLocale = content.value.localeOrDefault
-
-        if contentLocale.equalLanguageCode(locale) {
-            content.requestLocale = locale
-            return content
-        } else if orDefaultLocale, contentLocale.equalLanguageCode(.defaultPlacementLocale) {
-            content.requestLocale = locale
-            return content
-        } else {
-            return nil
-        }
+        content.requestLocale = locale
+        return content
     }
 
     private func getNewerPlacement<Content: PlacementContent>(than content: Content) -> Content? {
         guard var cached: Content = Self.getPlacement(content.placement.id)?.value,
-              cached.equalLanguageCode(content),
+              cached.remoteConfig?.adaptyLocale == content.remoteConfig?.adaptyLocale,
+              cached.viewConfigurationLocale == content.viewConfigurationLocale,
               cached.variationId == content.variationId,
               cached.placement.isNewerThan(content.placement)
         else { return nil }

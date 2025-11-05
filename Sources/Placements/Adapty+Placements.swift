@@ -171,10 +171,12 @@ extension Adapty {
 
         let cached: Content? = manager
             .placementStorage
-            .getPlacementByLocale(locale,
-                                  orDefaultLocale: true,
-                                  withPlacementId: placementId,
-                                  withVariationId: manager.crossPlacmentStorage.state?.variationId(placementId: placementId))?
+            .getPlacementById(
+                placementId,
+                withLocale: locale,
+                orDefaultLocale: true,
+                withVariationId: manager.crossPlacmentStorage.state?.variationId(placementId: placementId)
+            )?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -197,10 +199,10 @@ extension Adapty {
                 let crossPlacementState = manager.crossPlacmentStorage.state
                 let variationId = crossPlacementState?.variationId(placementId: placementId)
                 let cached: Content? = manager.placementStorage
-                    .getPlacementByLocale(
-                        locale,
+                    .getPlacementById(
+                        placementId,
+                        withLocale: locale,
                         orDefaultLocale: false,
-                        withPlacementId: placementId,
                         withVariationId: variationId
                     )?
                     .value
@@ -372,7 +374,12 @@ extension Adapty {
                 guard let manager = try? profileManager(withProfileId: userId) else { return nil }
                 let variationId = manager.crossPlacmentStorage.state?.variationId(placementId: placementId)
                 return (
-                    cached: manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
+                    cached: manager.placementStorage.getPlacementById(
+                        placementId,
+                        withLocale: locale,
+                        orDefaultLocale: false,
+                        withVariationId: variationId
+                    )?.value,
                     isTestUser: manager.isTestUser,
                     variationId: variationId
                 )

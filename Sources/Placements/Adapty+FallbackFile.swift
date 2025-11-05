@@ -37,9 +37,14 @@ extension PlacementStorage {
         userId _: AdaptyUserId,
         locale: AdaptyLocale
     ) -> AdaptyPlacementChosen<Content>? {
-        getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: variationId).map {
-            AdaptyPlacementChosen.restore($0.value)
-        }
+        guard let placement: Content = getPlacementById(
+            placementId,
+            withLocale: locale,
+            orDefaultLocale: true,
+            withVariationId: variationId
+        )?.value
+        else { return nil }
+        return AdaptyPlacementChosen.restore(placement)
     }
 
     func getPlacementWithFallback<Content: PlacementContent>(
