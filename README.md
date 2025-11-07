@@ -34,7 +34,7 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 <a href="https://adapty.io/schedule-demo?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS_schedule-demo">Talk to Us to Learn More</a>
 </h3>
 
-## Integrate IAPs Within a Few Hours Without Server Coding
+## Integrate IAPs Within a few hours without server coding
 
 **Adapty handles everything, from free trials to refunds, in a simple, developer-friendly SDK.**
 
