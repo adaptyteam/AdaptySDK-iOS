@@ -51,18 +51,18 @@ final class ProfileManager {
     }
 
     fileprivate func saveProfileAndStartNotifyTask(
-        _ profile: VH<AdaptyProfile>
+        _ newProfile: VH<AdaptyProfile>
     ) throws(WrongProfileIdError) -> Task<AdaptyProfile, Never>? {
-        guard profile.isEqualProfileId(userId) else { throw WrongProfileIdError() }
+        guard newProfile.isEqualProfileId(userId) else { throw WrongProfileIdError() }
 
-        if profile.IsNotEqualHash(cachedProfile),
-           profile.isNewerOrEqualVersion(cachedProfile)
+        if newProfile.IsNotEqualHash(cachedProfile),
+           newProfile.isNewerOrEqualVersion(cachedProfile)
         {
-            cachedProfile = profile
+            cachedProfile = newProfile
         }
 
         do {
-            try storage.updateProfile(profile)
+            try storage.updateProfile(newProfile)
         } catch {
             return nil
         }
@@ -175,11 +175,11 @@ extension Adapty {
     @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func recalculateOfflineAccessLevels() async -> AdaptyProfile {
         await (transactionManager as? SK2TransactionManager)?.clearCache()
-        
+
         if let manger = profileManager {
             return await manger.notifyProfileDidChanged()
         }
-        
+
         let manger = offlineProfileManager ?? OfflineProfileManager(userId: profileStorage.userId)
         return await profileWithOfflineAccessLevels(manger.currentProfile)
     }
