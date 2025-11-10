@@ -296,7 +296,7 @@ public extension AdaptyUI {
             throw err
         }
 
-        let viewConfiguration = try await Adapty.getViewConfiguration(
+        let viewConfiguration = try await Adapty.getUIConfiguration(
             paywall: paywall,
             loadTimeout: loadTimeout
         )

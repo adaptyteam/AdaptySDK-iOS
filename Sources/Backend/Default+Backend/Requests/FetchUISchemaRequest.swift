@@ -1,14 +1,14 @@
 //
-//  FetchViewConfigurationRequest.swift
+//  FetchUISchemaRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
 //
 
-import Foundation
 import AdaptyUIBuilder
+import Foundation
 
-struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
+struct FetchUISchemaRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
 
     let endpoint: HTTPEndpoint
@@ -32,7 +32,7 @@ struct FetchViewConfigurationRequest: HTTPRequestWithDecodableResponse {
 }
 
 extension Backend.DefaultExecutor {
-    func fetchViewConfiguration(
+    func fetchUISchema(
         apiKeyPrefix: String,
         paywallVariationId: String,
         locale: AdaptyLocale,
@@ -40,7 +40,7 @@ extension Backend.DefaultExecutor {
     ) async throws(HTTPError) -> AdaptyUISchema {
         let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
 
-        let request = FetchViewConfigurationRequest(
+        let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallVariationId: paywallVariationId,
             locale: locale,
@@ -50,7 +50,7 @@ extension Backend.DefaultExecutor {
 
         let response = try await perform(
             request,
-            requestName: .fetchViewConfiguration,
+            requestName: .fetchUISchema,
             logParams: [
                 "api_prefix": apiKeyPrefix,
                 "variation_id": paywallVariationId,

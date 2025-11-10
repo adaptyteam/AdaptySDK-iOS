@@ -10,8 +10,8 @@ import Foundation
 
 extension AdaptyUIBuilder {
     static func sendImageUrlsToObserver(_ paywall: AdaptyPaywall) {
-        guard let viewConfig = paywall.viewConfiguration else { return }
-        guard case let .unpacked(schema) = viewConfig.schemaOrJson else { return }
-        sendImageUrlsToObserver(schema, forLocalId: viewConfig.responseLocale.id)
+        guard let viewConfiguration = paywall.viewConfiguration else { return }
+        guard case let .unpacked(schema) = viewConfiguration.schemaOrJson else { return }
+        sendImageUrlsToObserver(schema, forLocalId: viewConfiguration.locale.id)
     }
 }

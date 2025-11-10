@@ -1,14 +1,14 @@
 //
-//  FetchFallbackViewConfigurationRequest.swift
+//  FetchFallbackUISchemaRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
 //
 
-import Foundation
 import AdaptyUIBuilder
+import Foundation
 
-private struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableResponse {
+private struct FetchFallbackUISchemaRequest: HTTPRequestWithDecodableResponse {
     typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
 
     let endpoint: HTTPEndpoint
@@ -26,13 +26,13 @@ private struct FetchFallbackViewConfigurationRequest: HTTPRequestWithDecodableRe
 }
 
 extension Backend.FallbackExecutor {
-    func fetchFallbackViewConfiguration(
+    func fetchFallbackUISchema(
         apiKeyPrefix: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyUISchema {
-        let request = FetchFallbackViewConfigurationRequest(
+        let request = FetchFallbackUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
             locale: locale,
@@ -42,7 +42,7 @@ extension Backend.FallbackExecutor {
         do {
             let response = try await perform(
                 request,
-                requestName: .fetchFallbackViewConfiguration,
+                requestName: .fetchFallbackUISchema,
                 logParams: [
                     "api_prefix": apiKeyPrefix,
                     "paywall_instance_id": paywallInstanceIdentity,
@@ -60,7 +60,7 @@ extension Backend.FallbackExecutor {
             else {
                 throw error
             }
-            return try await fetchFallbackViewConfiguration(
+            return try await fetchFallbackUISchema(
                 apiKeyPrefix: apiKeyPrefix,
                 paywallInstanceIdentity: paywallInstanceIdentity,
                 locale: .defaultPlacementLocale,

@@ -10,46 +10,57 @@ import Foundation
 
 @AdaptyActor
 extension Adapty {
-    package nonisolated static func getViewConfiguration(
+    package nonisolated static func getUIConfiguration(
         paywall: AdaptyPaywall,
         loadTimeout: TimeInterval? = nil
     ) async throws -> AdaptyUIConfiguration {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
-        return try await activatedSDK.getViewConfiguration(
+        return try await activatedSDK.getUIConfiguration(
             paywall: paywall,
             loadTimeout: loadTimeout
         )
     }
 
-    private func getViewConfiguration(
+    private func getUIConfiguration(
         paywall: AdaptyPaywall,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUIConfiguration {
-        guard let viewConfig = paywall.viewConfiguration else {
+        guard let viewConfiguration = paywall.viewConfiguration else {
             throw .isNoViewConfigurationInPaywall()
         }
 
         let schema: AdaptyUISchema =
-            if let value = try? viewConfig.schema {
+            if let value = try? viewConfiguration.schema {
                 value
-            } else if let value = restoreViewConfiguration(viewConfig.responseLocale, paywall) {
+            } else if let restored = restore(
+                viewConfigurationLocale: viewConfiguration.locale,
+                placementId: paywall.placement.id,
+                paywallVariationId: paywall.variationId,
+                paywallInstanceIdentity: paywall.instanceIdentity,
+                placementRevision: paywall.placement.revision,
+                placementVersion: paywall.placement.version
+            ),
+                let vc = restored.viewConfiguration,
+                vc.locale == viewConfiguration.locale,
+                let value = try? vc.schema
+            {
                 value
             } else {
-                try await fetchViewConfiguration(
+                try await fetchUISchema(
                     paywallVariationId: paywall.variationId,
                     paywallInstanceIdentity: paywall.instanceIdentity,
-                    locale: viewConfig.responseLocale,
+                    locale: viewConfiguration.locale,
                     loadTimeout: loadTimeout
                 )
             }
 
-        AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: viewConfig.responseLocale.id)
+        AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: viewConfiguration.locale.id)
 
         let extractLocaleTask = Task.detachedAsResultTask(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyUIConfiguration in
             do {
                 return try schema.extractUIConfiguration(
-                    id: viewConfig.id,
-                    withLocaleId: viewConfig.responseLocale.id
+                    id: viewConfiguration.id,
+                    withLocaleId: viewConfiguration.locale.id
                 )
             } catch {
                 throw .decodingViewConfiguration(error)
@@ -59,20 +70,35 @@ extension Adapty {
         return try await extractLocaleTask.value.get()
     }
 
-    private func restoreViewConfiguration(_ locale: AdaptyLocale, _ paywall: AdaptyPaywall) -> AdaptyUISchema? {
-        guard
-            let cached: AdaptyPaywall = profileManager?.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: paywall.placement.id, withVariationId: paywall.variationId)?.value,
-            paywall.instanceIdentity == cached.instanceIdentity,
-            paywall.placement.revision == cached.placement.revision,
-            paywall.placement.version == cached.placement.version,
-            let cachedViewConfiguration = cached.viewConfiguration,
-            case let value = try? cachedViewConfiguration.schema
-        else { return nil }
+    private func restore(
+        viewConfigurationLocale: AdaptyLocale,
+        placementId: String,
+        paywallVariationId: String,
+        paywallInstanceIdentity: String,
+        placementRevision: Int,
+        placementVersion: Int64
+    ) -> AdaptyPaywall? {
+        if let cached: AdaptyPaywall = profileManager?.placementStorage.restorePaywall(
+            placementId,
+            withVariationId: paywallVariationId,
+            withInstanceIdentity: paywallInstanceIdentity,
+            withPlacementVersion: placementVersion,
+            withPlacementRevision: placementRevision
+        ) { return cached }
 
-        return value
+        if let fallbackFile = Adapty.fallbackPlacements,
+           fallbackFile.version == placementVersion,
+           let fallback: AdaptyPaywall = fallbackFile.restorePaywall(
+               placementId,
+               withVariationId: paywallVariationId,
+               withInstanceIdentity: paywallInstanceIdentity,
+               withPlacementRevision: placementRevision
+           ) { return fallback }
+
+        return nil
     }
 
-    private func fetchViewConfiguration(
+    private func fetchUISchema(
         paywallVariationId: String,
         paywallInstanceIdentity: String,
         locale: AdaptyLocale,
@@ -84,7 +110,7 @@ extension Adapty {
 
         do {
             return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
-                try await httpSession.fetchViewConfiguration(
+                try await httpSession.fetchUISchema(
                     apiKeyPrefix: apiKeyPrefix,
                     paywallVariationId: paywallVariationId,
                     locale: locale,
@@ -102,7 +128,7 @@ extension Adapty {
         }
 
         do {
-            return try await httpFallbackSession.fetchFallbackViewConfiguration(
+            return try await httpFallbackSession.fetchFallbackUISchema(
                 apiKeyPrefix: apiKeyPrefix,
                 paywallInstanceIdentity: paywallInstanceIdentity,
                 locale: locale,

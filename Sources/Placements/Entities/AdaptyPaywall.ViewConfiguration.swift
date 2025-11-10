@@ -12,7 +12,7 @@ import Foundation
 extension AdaptyPaywall {
     struct ViewConfiguration: Sendable {
         let id: String
-        let responseLocale: AdaptyLocale
+        let locale: AdaptyLocale
         let schemaOrJson: SchemaOrJson?
         enum SchemaOrJson: Sendable {
             case unpacked(AdaptyUISchema)
@@ -51,20 +51,26 @@ extension AdaptyPaywall.ViewConfiguration {
             }
         }
     }
+    
+    func has(languageCode otherLocale: AdaptyLocale, orDefault: Bool = false) -> Bool {
+        if locale.equalLanguageCode(otherLocale) { return true }
+        else if orDefault, locale.equalLanguageCode(.defaultPlacementLocale) { return true }
+        else { return false }
+    }
 }
 
 extension AdaptyPaywall.ViewConfiguration: Codable {
     enum CodingKeys: String, CodingKey {
         case value = "paywall_builder_config"
         case json
-        case responseLocale = "lang"
+        case locale = "lang"
         case id = "paywall_builder_id"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
-        responseLocale = try container.decode(AdaptyLocale.self, forKey: .responseLocale)
+        locale = try container.decode(AdaptyLocale.self, forKey: .locale)
 
         if container.contains(.value) {
             schemaOrJson = try .unpacked(container.decode(AdaptyUISchema.self, forKey: .value))
@@ -81,7 +87,7 @@ extension AdaptyPaywall.ViewConfiguration: Codable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(responseLocale, forKey: .responseLocale)
+        try container.encode(locale, forKey: .locale)
         try container.encode(id, forKey: .id)
 
         guard let schemaOrJson = schemaOrJson, encoder.userInfo.enabledEncodingViewConfiguration else { return }
