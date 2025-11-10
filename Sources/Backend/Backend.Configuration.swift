@@ -8,29 +8,12 @@
 import Foundation
 
 extension Backend {
-    enum Defaults: Sendable {
-        static let mainBaseUrl = URL(string: "https://api.adapty.io/api/v1")!
-        static let fallbackBaseUrl = URL(string: "https://fallback.adapty.io/api/v1")!
-        static let configsBaseUrl = URL(string: "https://configs-cdn.adapty.io/api/v1")!
-        static let uaBaseUrl = URL(string: "https://api-ua.adapty.io/api/v1")!
-
-        static func mainBaseUrl(by cluster: AdaptyServerCluster) -> URL {
-            switch cluster {
-            case .eu:
-                URL(string: "https://api-eu.adapty.io/api/v1")!
-            case .cn:
-                URL(string: "https://api-cn.adapty.io/api/v1")!
-            default:
-                mainBaseUrl
-            }
-        }
-    }
-
     struct Configuration {
-        let mainBaseUrl: URL
-        let fallbackBaseUrl: URL
-        let configsBaseUrl: URL
-        let uaBaseUrl: URL
+        let cluster: AdaptyServerCluster
+        let mainBaseUrl: URL?
+        let fallbackBaseUrl: URL?
+        let configsBaseUrl: URL?
+        let uaBaseUrl: URL?
         let proxy: (host: String, port: Int)?
         let protocolClasses: [AnyClass]?
 
@@ -43,10 +26,11 @@ extension Backend {
             proxy: (host: String, port: Int)? = nil,
             protocolClasses: [AnyClass]? = nil
         ) {
-            self.mainBaseUrl = mainBaseUrl ?? Defaults.mainBaseUrl(by: cluster)
-            self.fallbackBaseUrl = fallbackBaseUrl ?? Defaults.fallbackBaseUrl
-            self.configsBaseUrl = configsBaseUrl ?? Defaults.configsBaseUrl
-            self.uaBaseUrl = uaBaseUrl ?? Defaults.uaBaseUrl
+            self.cluster = cluster
+            self.mainBaseUrl = mainBaseUrl
+            self.fallbackBaseUrl = fallbackBaseUrl
+            self.configsBaseUrl = configsBaseUrl
+            self.uaBaseUrl = uaBaseUrl
             self.proxy = proxy
             self.protocolClasses = protocolClasses
         }

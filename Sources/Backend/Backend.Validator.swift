@@ -10,6 +10,7 @@ import Foundation
 extension Backend {
     private struct ErrorCodesResponse: Decodable {
         let codes: [String]?
+
         enum CodingKeys: String, CodingKey {
             case array = "errors"
             case code = "error_code"
@@ -54,18 +55,37 @@ extension Backend {
         return try jsonDecoder.decode(ErrorCodesResponse.self, from: data)
     }
 
+    private func backendUnavailableError(
+        _ response: HTTPDataResponse
+    ) -> BackendUnavailableError? {
+        switch response.statusCode {
+        case 401: return .unauthorized
+        case 429: return .tooManyRequests
+        case 444:
+            let min = response.body
+                .flatMap { String(data: $0, encoding: .utf8) }
+                .flatMap(Double.init)
+                .map { $0 * 60 }
+            return .temporarily(min ?? (24 * 60 * 60)) // 24h
+        default:
+            return nil
+        }
+    }
+
     @Sendable
     func validator(_ response: HTTPDataResponse) -> Error? {
-        guard let data = response.body.nonEmptyOrNil,
-              let errorCodes = try? errorCodesResponse(from: data, withConfiguration: self).codes.nonEmptyOrNil
-        else {
+        if let data = response.body.nonEmptyOrNil,
+           let errorCodes = try? errorCodesResponse(from: data, withConfiguration: defaultHTTPConfiguration).codes.nonEmptyOrNil
+        {
+            return BackendError(
+                body: String(data: data, encoding: .utf8) ?? "unknown",
+                errorCodes: errorCodes,
+                requestId: response.headers.getBackendRequestId()
+            )
+        } else if let error = backendUnavailableError(response) {
+            return error
+        } else {
             return HTTPResponse.statusCodeValidator(response)
         }
-
-        return BackendError(
-            body: String(data: data, encoding: .utf8) ?? "unknown",
-            errorCodes: errorCodes,
-            requestId: response.headers.getBackendRequestId()
-        )
     }
 }

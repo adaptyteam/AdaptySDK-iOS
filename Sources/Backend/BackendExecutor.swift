@@ -7,8 +7,10 @@
 
 import Foundation
 
+@BackendActor
 protocol BackendExecutor: Sendable {
     var session: HTTPSession { get }
+    nonisolated var baseURLFor: @BackendActor (HTTPEndpoint) async throws -> URL { get }
 }
 
 protocol BackendAPIRequestParameters: Sendable {
@@ -18,7 +20,22 @@ protocol BackendAPIRequestParameters: Sendable {
 }
 
 extension BackendExecutor {
-    @AdaptyActor
+    @BackendActor
+    private func fetchURLFor(
+        endpoint: HTTPEndpoint,
+        requestName: APIRequestName,
+        requestStamp stamp: String
+    ) async throws(HTTPError) -> URL {
+        do {
+            return try await baseURLFor(endpoint)
+        } catch {
+            let error = HTTPError.perform(endpoint, error: error)
+            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
+            throw error
+        }
+    }
+
+    @BackendActor
     @inlinable
     func perform<Request: HTTPRequestWithDecodableResponse & BackendAPIRequestParameters>(
         _ request: Request
@@ -26,7 +43,7 @@ extension BackendExecutor {
         try await perform(request, requestName: request.logName, logParams: request.logParams)
     }
 
-    @AdaptyActor
+    @BackendActor
     @inlinable
     func perform<Request: HTTPRequestWithDecodableResponse>(
         _ request: Request,
@@ -35,8 +52,13 @@ extension BackendExecutor {
     ) async throws(HTTPError) -> Request.Response {
         let stamp = request.stamp
         Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        let baseUrl = try await fetchURLFor(
+            endpoint: request.endpoint,
+            requestName: requestName,
+            requestStamp: stamp
+        )
         do {
-            let response: Request.Response = try await session.perform(request)
+            let response: Request.Response = try await session.perform(request, baseUrl: baseUrl)
             Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
             return response
         } catch {
@@ -45,7 +67,7 @@ extension BackendExecutor {
         }
     }
 
-    @AdaptyActor
+    @BackendActor
     @inlinable
     func perform(
         _ request: some HTTPRequest & BackendAPIRequestParameters
@@ -53,7 +75,7 @@ extension BackendExecutor {
         try await perform(request, requestName: request.logName, logParams: request.logParams)
     }
 
-    @AdaptyActor
+    @BackendActor
     @inlinable
     func perform(
         _ request: some HTTPRequest,
@@ -62,8 +84,13 @@ extension BackendExecutor {
     ) async throws(HTTPError) -> HTTPEmptyResponse {
         let stamp = request.stamp
         Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        let baseUrl = try await fetchURLFor(
+            endpoint: request.endpoint,
+            requestName: requestName,
+            requestStamp: stamp
+        )
         do {
-            let response: HTTPEmptyResponse = try await session.perform(request)
+            let response: HTTPEmptyResponse = try await session.perform(request, baseUrl: baseUrl)
             Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
             return response
         } catch {
@@ -72,7 +99,7 @@ extension BackendExecutor {
         }
     }
 
-    @AdaptyActor
+    @BackendActor
     @inlinable
     func perform<Body>(
         _ request: some HTTPRequest & BackendAPIRequestParameters,
@@ -81,7 +108,7 @@ extension BackendExecutor {
         try await perform(request, requestName: request.logName, logParams: request.logParams, withDecoder: decoder)
     }
 
-    @AdaptyActor
+    @BackendActor
     @inlinable
     func perform<Body>(
         _ request: some HTTPRequest,
@@ -91,8 +118,13 @@ extension BackendExecutor {
     ) async throws(HTTPError) -> HTTPResponse<Body> {
         let stamp = request.stamp
         Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: logParams))
+        let baseUrl = try await fetchURLFor(
+            endpoint: request.endpoint,
+            requestName: requestName,
+            requestStamp: stamp
+        )
         do {
-            let response: HTTPResponse<Body> = try await session.perform(request, withDecoder: decoder)
+            let response: HTTPResponse<Body> = try await session.perform(request, baseUrl: baseUrl, withDecoder: decoder)
             Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
             return response
         } catch {

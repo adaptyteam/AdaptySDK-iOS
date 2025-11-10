@@ -1,5 +1,5 @@
 //
-//  Adapty+Paywalls.swift
+//  Adapty+Placements.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.11.2023
@@ -246,7 +246,7 @@ extension Adapty {
                                     // We are prohibited from participating in Cross AB Tests
                                     if draw.participatesInCrossPlacementABTest {
                                         Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
-                                        throw ResponseDecodingError.crossPlacementABTestDisabled
+                                        throw PlacementDecodingError.crossPlacementABTestDisabled
                                     } else {
                                         Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.content.variationId) DRAW")
                                         return draw.content.variationId
@@ -312,7 +312,7 @@ extension Adapty {
                     throw error.asAdaptyError
                 }
 
-                if error.responseDecodingError([.notFoundVariationId, .crossPlacementABTestDisabled]) { continue }
+                if error.has(decodingError: [.notFoundVariationId, .crossPlacementABTestDisabled]) { continue }
 
                 guard Backend.wrongProfileSegmentId(error),
                       try await updateSegmentId(for: userId, oldSegmentId: segmentId)
@@ -417,7 +417,7 @@ extension Adapty {
                 return chosen.content
 
             } catch {
-                if error.responseDecodingError([.notFoundVariationId]) {
+                if error.has(decodingError: [.notFoundVariationId]) {
                     continue
                 } else {
                     throw error.asAdaptyError
@@ -465,9 +465,9 @@ private extension AdaptyError {
 }
 
 private extension HTTPError {
-    func responseDecodingError(_ decodingError: Set<ResponseDecodingError>) -> Bool {
+    func has(decodingError: Set<PlacementDecodingError>) -> Bool {
         guard case let .decoding(_, _, _, _, _, value) = self,
-              let value = value as? ResponseDecodingError
+              let value = value as? PlacementDecodingError
         else { return false }
 
         return decodingError.contains(value)

@@ -46,6 +46,7 @@ final class HTTPSession: Sendable {
 
     func perform<Body>(
         _ request: some HTTPRequest,
+        baseUrl: URL,
         withDecoder decoder: @escaping HTTPDecoder<Body>
     ) async throws(HTTPError) -> HTTPResponse<Body> {
         let state = _state
@@ -55,7 +56,7 @@ final class HTTPSession: Sendable {
         var urlRequest: URLRequest
 
         do {
-            urlRequest = try request.convertToURLRequest(configuration: configuration, additional: requestAdditional)
+            urlRequest = try request.convertToURLRequest(baseUrl: baseUrl, configuration: configuration, additional: requestAdditional)
             if let _requestSign {
                 urlRequest = try _requestSign(urlRequest, request.endpoint)
             }

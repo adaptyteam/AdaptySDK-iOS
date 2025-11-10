@@ -181,25 +181,25 @@ public extension AdaptyConfiguration.Builder {
     }
 
     @discardableResult
-    func with(backendBaseUrl url: URL) -> Self {
+    package func with(backendBaseUrl url: URL) -> Self {
         backendBaseUrl = url
         return self
     }
 
     @discardableResult
-    func with(backendFallbackBaseUrl url: URL) -> Self {
+    package func with(backendFallbackBaseUrl url: URL) -> Self {
         backendFallbackBaseUrl = url
         return self
     }
 
     @discardableResult
-    func with(backendConfigsBaseUrl url: URL) -> Self {
+    package func with(backendConfigsBaseUrl url: URL) -> Self {
         backendConfigsBaseUrl = url
         return self
     }
 
     @discardableResult
-    func with(backendUABaseUrl url: URL) -> Self {
+    package func with(backendUABaseUrl url: URL) -> Self {
         backendUABaseUrl = url
         return self
     }

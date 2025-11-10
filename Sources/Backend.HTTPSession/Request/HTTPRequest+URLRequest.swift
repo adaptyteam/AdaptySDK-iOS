@@ -12,8 +12,8 @@ private enum HeaderKey {
 }
 
 extension HTTPRequest {
-    func convertToURLRequest(configuration: HTTPConfiguration, additional: HTTPRequestAdditional?) throws -> URLRequest {
-        let preUrl = configuration.baseURL.appendingPathComponent(endpoint.path)
+    func convertToURLRequest(baseUrl: URL, configuration: HTTPConfiguration, additional: HTTPRequestAdditional?) throws -> URLRequest {
+        let preUrl = baseUrl.appendingPathComponent(endpoint.path)
 
         guard var urlComponents = URLComponents(url: preUrl, resolvingAgainstBaseURL: false) else {
             throw URLError(.badURL)

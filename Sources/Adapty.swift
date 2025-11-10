@@ -16,7 +16,7 @@ public final class Adapty {
     let apiKeyPrefix: String
 
     let backend: Backend
-    let httpSession: Backend.MainExecutor
+    let httpSession: Backend.DefaultExecutor
     let httpFallbackSession: Backend.FallbackExecutor
     let httpConfigsSession: Backend.ConfigsExecutor
 
@@ -38,7 +38,7 @@ public final class Adapty {
         self.apiKeyPrefix = String(configuration.apiKey.prefix(while: { $0 != "." }))
         self.backend = backend
         self.profileStorage = ProfileStorage()
-        self.httpSession = backend.createMainExecutor()
+        self.httpSession = backend.createDefaultExecutor()
         self.httpFallbackSession = backend.createFallbackExecutor()
         self.httpConfigsSession = backend.createConfigsExecutor()
 

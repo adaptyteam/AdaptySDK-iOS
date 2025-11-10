@@ -13,9 +13,15 @@ struct BackendError: Error, Hashable, Codable {
     let requestId: String?
 }
 
-enum ResponseDecodingError: Error, Hashable, Codable {
-    case crossPlacementABTestDisabled
-    case notFoundVariationId
+enum BackendUnavailableError: Error, Hashable, Codable {
+    case unauthorized
+    case tooManyRequests
+    case temporarily(TimeInterval)
+}
+
+enum BackendPerformError: Error, Hashable, Codable {
+    case blocked
+    case urlsIsEmpty
 }
 
 extension BackendError: CustomStringConvertible {
@@ -25,7 +31,6 @@ extension BackendError: CustomStringConvertible {
 }
 
 extension Backend {
-
     static func wrongProfileSegmentId(_ error: HTTPError) -> Bool {
         backendErrorCodes(error).contains("INCORRECT_SEGMENT_HASH_ERROR")
     }

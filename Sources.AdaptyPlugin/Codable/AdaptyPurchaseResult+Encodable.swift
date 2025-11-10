@@ -12,7 +12,7 @@ extension AdaptyPurchaseResult: Encodable {
     private enum CodingKeys: String, CodingKey {
         case resultType = "type"
         case profile
-        case jwsTransaction = "jws_transaction"
+        case jwsTransaction = "apple_jws_transaction"
     }
 
     public func encode(to encoder: any Encoder) throws {

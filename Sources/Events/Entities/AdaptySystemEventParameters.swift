@@ -75,7 +75,7 @@ enum APIRequestName: String {
     case setIntegrationIdentifier = "set_integration_identifier"
     case signSubscriptionOffer = "sign_offer"
 
-    case fetchEventsConfig = "get_events_blacklist"
+    case fetchNetworkConfig = "get_net_config"
 
     case fetchAllProductInfo = "get_all_products_info"
 

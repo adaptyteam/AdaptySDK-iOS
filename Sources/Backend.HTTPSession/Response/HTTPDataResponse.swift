@@ -22,8 +22,8 @@ extension HTTPDataResponse {
 }
 
 extension HTTPSession {
-    func perform(_ request: some HTTPRequest) async throws(HTTPError) -> HTTPDataResponse {
-        try await perform(request) { @Sendable response in
+    func perform(_ request: some HTTPRequest, baseUrl: URL) async throws(HTTPError) -> HTTPDataResponse {
+        try await perform(request, baseUrl: baseUrl) { @Sendable response in
             response
         }
     }

@@ -32,10 +32,11 @@ extension HTTPRequestWithDecodableResponse {
 
 extension HTTPSession {
     func perform<Request: HTTPRequestWithDecodableResponse>(
-        _ request: Request
+        _ request: Request,
+        baseUrl: URL
     ) async throws(HTTPError) -> Request.Response {
         let configuration = configuration as? HTTPCodableConfiguration
-        return try await perform(request) { @Sendable response in
+        return try await perform(request, baseUrl: baseUrl) { @Sendable response in
             try request.decodeDataResponse(response, withConfiguration: configuration)
         }
     }
