@@ -33,7 +33,7 @@ public struct AdaptyProfile: Sendable {
     /// The keys are product ids from the store. The values are arrays of information about consumables. Can be null if the customer has no purchases.
     public let nonSubscriptions: [String: [NonSubscription]]
 
-    let version: Int64
+    package let version: Int64
 }
 
 extension AdaptyProfile {

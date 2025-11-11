@@ -10,4 +10,5 @@ import Adapty
 public extension AdaptyProfile {
     var dev_segmentId: String { segmentId }
     var dev_isTestUser: Bool { isTestUser }
+    var dev_version: Int64 { version }
 }
