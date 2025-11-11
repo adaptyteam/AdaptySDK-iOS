@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'AdaptyPlugin'
-  s.version          = '3.13.0'
+  s.version          = '3.14.0'
   s.summary          = 'Common files for cross-platform SDKs Adapty'
 
   s.description      = <<-DESC
@@ -20,7 +20,7 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
 
   s.swift_version = '6.0'
 
-  s.source_files = 'Sources.AdaptyPlugin/**/*.{h,m,mm,swift}
+  s.source_files = 'Sources.AdaptyPlugin/**/*.{h,m,mm,swift}'
 
   s.dependency 'AdaptyLogger', s.version.to_s
   s.dependency 'AdaptyUIBuilder', s.version.to_s
