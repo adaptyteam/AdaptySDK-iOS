@@ -1,14 +1,14 @@
 PODS:
-  - Adapty (3.13.0):
-    - AdaptyLogger (= 3.13.0)
-    - AdaptyUIBuilder (= 3.13.0)
-  - AdaptyLogger (3.13.0)
-  - AdaptyUI (3.13.0):
-    - Adapty (= 3.13.0)
-    - AdaptyLogger (= 3.13.0)
-    - AdaptyUIBuilder (= 3.13.0)
-  - AdaptyUIBuilder (3.13.0):
-    - AdaptyLogger (= 3.13.0)
+  - Adapty (3.14.0):
+    - AdaptyLogger (= 3.14.0)
+    - AdaptyUIBuilder (= 3.14.0)
+  - AdaptyLogger (3.14.0)
+  - AdaptyUI (3.14.0):
+    - Adapty (= 3.14.0)
+    - AdaptyLogger (= 3.14.0)
+    - AdaptyUIBuilder (= 3.14.0)
+  - AdaptyUIBuilder (3.14.0):
+    - AdaptyLogger (= 3.14.0)
 
 DEPENDENCIES:
   - Adapty (from `../../`)
@@ -27,11 +27,11 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Adapty: 79004c3e262cb3fd7801cb1bf9f758e1cc98f2b8
-  AdaptyLogger: b319d0c162c15bceb890a53ce8cc57fedc0a3c55
-  AdaptyUI: dc04724b03407f38a5e71421c7c60fe320858ec8
-  AdaptyUIBuilder: d06b6e7d36c46d091d8d77650ef475b91dbbe1b4
+  Adapty: 98a8f36321e6fed8b584ea2a92be11294320288c
+  AdaptyLogger: 2264731f9473b7c3768164db6db17ed8440ef491
+  AdaptyUI: dda8bf3ee10aeab501375f83b64f1f1232fe6915
+  AdaptyUIBuilder: 705ea17bac3902796332336039b4e64c03c6a9ad
 
 PODFILE CHECKSUM: 9859d965038bbeec0631b3a5a99676e133e8d596
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.10.2
