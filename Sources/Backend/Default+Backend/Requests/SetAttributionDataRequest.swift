@@ -7,8 +7,7 @@
 
 import Foundation
 
-private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = AdaptyProfile?
+private struct SetAttributionDataRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/attribution/profile/set/data/"
@@ -16,21 +15,12 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
     let headers: HTTPHeaders
     let contentType: String? = "application/json"
     let stamp = Log.stamp
+    let logName = APIRequestName.setAttributionData
+    let logParams: EventParameters?
 
     let source: String
     let attributionJson: String
     let userId: AdaptyUserId
-
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeResponse(
-            response,
-            withConfiguration: configuration,
-            requestHeaders: headers
-        )
-    }
 
     init(userId: AdaptyUserId, source: String, attributionJson: String, responseHash: String?) {
         headers = HTTPHeaders()
@@ -40,6 +30,10 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
         self.source = source
         self.attributionJson = attributionJson
         self.userId = userId
+
+        logParams = [
+            "source": source
+        ]
     }
 
     enum CodingKeys: String, CodingKey {
@@ -56,6 +50,8 @@ private struct SetAttributionDataRequest: HTTPEncodableRequest, HTTPRequestWithD
     }
 }
 
+private typealias ResponseBody = AdaptyProfile?
+
 extension Backend.DefaultExecutor {
     func setAttributionData(
         userId: AdaptyUserId,
@@ -69,15 +65,7 @@ extension Backend.DefaultExecutor {
             attributionJson: attributionJson,
             responseHash: responseHash
         )
-        let response = try await perform(
-            request,
-            requestName: .setAttributionData,
-            logParams: [
-                "source": source
-            ]
-        )
-
-        guard let profile = response.body else { return nil }
-        return VH(profile, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>?.decoder)
+        return response.body
     }
 }

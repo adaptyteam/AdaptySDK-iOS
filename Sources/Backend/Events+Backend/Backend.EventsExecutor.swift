@@ -11,8 +11,7 @@ extension Backend {
     struct EventsExecutor: BackendExecutor {
         let networkManager: NetworkManager
         let session: HTTPSession
-        let baseURLFor: @BackendActor @Sendable (HTTPEndpoint) async throws -> URL
-        
+        let baseURLFor: @BackendActor @Sendable (BackendRequest) async throws -> URL
     }
 
     func createEventsExecutor() -> EventsExecutor {

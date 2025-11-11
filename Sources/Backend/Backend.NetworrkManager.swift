@@ -10,26 +10,61 @@ import Foundation
 extension Backend {
     @BackendActor
     final class NetworkManager {
-        let configuration: Backend.Configuration
-        var mainBaseUrlIndex: Int
+        private let cluster: AdaptyServerCluster
+        private let devBaseUrl: URL?
+        private let fallbackBaseUrl: URL
+        private let configsBaseUrl: URL
+        private let uaBaseUrl: URL
+//        private let executor: BackendExecutor
+
+        private var mainBaseUrlIndex: Int
         var currentState: NetworkState
-        var isBlocked = false
+        private var storage = NetworkStateStorage()
+        private var syncing: Task<Void, Never>?
+        private var isBlocked = false
 
         init(with configuration: Backend.Configuration) {
-            self.configuration = configuration
-            self.currentState = NetworkConfiguration.defaultState
-            self.mainBaseUrlIndex = 0
+            cluster = configuration.cluster
+            devBaseUrl = configuration.mainBaseUrl
+            fallbackBaseUrl = configuration.fallbackBaseUrl ?? NetworkConfiguration.fallbackBaseUrl(by: configuration.cluster)
+            configsBaseUrl = configuration.configsBaseUrl ?? NetworkConfiguration.configsBaseUrl(by: configuration.cluster)
+            uaBaseUrl = configuration.uaBaseUrl ?? NetworkConfiguration.uaBaseUrl(by: configuration.cluster)
+
+//            executor =
+            if let state = storage.networkState {
+                currentState = state
+            } else {
+                let state = NetworkConfiguration.defaultState
+                storage.setNetworkState(state)
+                currentState = state
+            }
+            mainBaseUrlIndex = 0
+        }
+
+        private func checkIsBlocked() throws(BackendPerformError) {
+            guard isBlocked else { return }
+            throw .blocked
+        }
+
+        private func sync() async {
+            let task: Task<Void, Never>
+            if let syncing {
+                task = syncing
+            } else {
+                task = Task.detached { try? await self.fetch() }
+                syncing = task
+            }
+            await task.value
+        }
+
+        private func fetch() async throws {
+            try checkIsBlocked()
         }
     }
 }
 
 extension Backend.NetworkManager {
-    private func checkIsBlocked() throws(BackendPerformError) {
-        guard isBlocked else { return }
-        throw .blocked
-    }
-
-    private func checkIsBlocked(_ endpoint: HTTPEndpoint) throws(BackendPerformError) {
+    private func checkIsBlocked(_ request: BackendRequest) throws(BackendPerformError) {
         try checkIsBlocked()
         // TODO:
     }
@@ -40,30 +75,39 @@ extension Backend.NetworkManager {
         return currentState
     }
 
-    func mainBaseUrl(_ endpoint: HTTPEndpoint) async throws(BackendPerformError) -> URL {
-        try checkIsBlocked(endpoint)
-        if let url = configuration.mainBaseUrl { return url }
-        guard let url = currentState.mainBaseUrl(by: configuration.cluster, withIndex: mainBaseUrlIndex) else {
+    func mainBaseUrl(_ request: BackendRequest) async throws(BackendPerformError) -> URL {
+        try checkIsBlocked(request)
+        if let url = devBaseUrl { return url }
+        guard let url = currentState.mainBaseUrl(by: cluster, withIndex: mainBaseUrlIndex) else {
             throw .urlsIsEmpty
         }
         return url
     }
 
-    func fallbackBaseUrl(_ endpoint: HTTPEndpoint) async throws(BackendPerformError) -> URL {
-        try checkIsBlocked(endpoint)
-        if let url = configuration.fallbackBaseUrl { return url }
-        return NetworkConfiguration.fallbackBaseUrl(by: configuration.cluster)
+    func fallbackBaseUrl(_ request: BackendRequest) async throws(BackendPerformError) -> URL {
+        try checkIsBlocked(request)
+        return fallbackBaseUrl
     }
 
-    func configsBaseUrl(_ endpoint: HTTPEndpoint) async throws(BackendPerformError) -> URL {
-        try checkIsBlocked(endpoint)
-        if let url = configuration.configsBaseUrl { return url }
-        return NetworkConfiguration.configsBaseUrl(by: configuration.cluster)
+    func configsBaseUrl(_ request: BackendRequest) async throws(BackendPerformError) -> URL {
+        try checkIsBlocked(request)
+        return configsBaseUrl
     }
 
-    func uaBaseUrl(_ endpoint: HTTPEndpoint) async throws(BackendPerformError) -> URL {
-        try checkIsBlocked(endpoint)
-        if let url = configuration.uaBaseUrl { return url }
-        return NetworkConfiguration.uaBaseUrl(by: configuration.cluster)
+    func uaBaseUrl(_ request: BackendRequest) async throws(BackendPerformError) -> URL {
+        try checkIsBlocked(request)
+        return uaBaseUrl
+    }
+}
+
+extension Backend.NetworkManager {
+    struct Executor: BackendExecutor {
+        let session: HTTPSession
+        let baseURLFor: @BackendActor @Sendable (BackendRequest) async throws -> URL
+
+        init(baseUrl: URL, httpConfiguration: HTTPCodableConfiguration) {
+            session = HTTPSession(configuration: httpConfiguration)
+            baseURLFor = { _ in baseUrl }
+        }
     }
 }

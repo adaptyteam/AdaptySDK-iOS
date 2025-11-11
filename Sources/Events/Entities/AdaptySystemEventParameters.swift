@@ -29,7 +29,7 @@ extension EventParameters {
     var removeNil: EventParameters {
         var result: EventParameters = [:]
         for (key, value) in self {
-            guard let value = value else { continue }
+            guard let value else { continue }
             result[key] = value
         }
         return result
@@ -80,6 +80,7 @@ enum APIRequestName: String {
     case fetchAllProductInfo = "get_all_products_info"
 
     case reqisterInstall = "reqister_install"
+    case sendEvents = "send_events"
 }
 
 struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {

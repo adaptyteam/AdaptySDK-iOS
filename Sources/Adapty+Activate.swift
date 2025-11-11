@@ -69,15 +69,10 @@ public extension Adapty {
             AdaptyConfiguration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
 
             let environment = await Environment.instance
-            let (networkManager, state) = await { @BackendActor in
-                let manager = Backend.NetworkManager(with: configuration.backend)
-                let state = manager.currentState
-                return (manager, state)
-            }()
 
-            let backend = Backend(with: configuration, networkManager: networkManager, environment: environment)
+            let backend = await Backend(with: configuration, environment: environment)
 
-            await eventsManager.set(backend: backend, with: .init(state))
+            await eventsManager.set(backend: backend)
 
             let sdk = await Adapty(
                 configuration: configuration,

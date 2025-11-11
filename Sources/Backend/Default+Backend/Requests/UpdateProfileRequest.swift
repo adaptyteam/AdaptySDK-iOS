@@ -7,26 +7,15 @@
 
 import Foundation
 
-private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = AdaptyProfile?
+private struct UpdateProfileRequest: BackendEncodableRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    let logName = APIRequestName.updateProfile
 
     let userId: AdaptyUserId
     let parameters: AdaptyProfileParameters?
     let environmentMeta: Environment.Meta?
-
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeResponse(
-            response,
-            withConfiguration: configuration,
-            requestHeaders: headers
-        )
-    }
 
     init(
         userId: AdaptyUserId,
@@ -81,6 +70,8 @@ private struct UpdateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
     }
 }
 
+private typealias ResponseBody = AdaptyProfile?
+
 extension Backend.DefaultExecutor {
     func updateProfile(
         userId: AdaptyUserId,
@@ -94,13 +85,7 @@ extension Backend.DefaultExecutor {
             environmentMeta: environmentMeta,
             responseHash: responseHash
         )
-
-        let response = try await perform(
-            request,
-            requestName: .updateProfile
-        )
-
-        guard let profile = response.body else { return nil }
-        return VH(profile, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>?.decoder)
+        return response.body
     }
 }

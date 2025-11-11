@@ -17,14 +17,13 @@ package struct Backend {
 
     init(
         with configuration: AdaptyConfiguration,
-        networkManager: NetworkManager,
         environment: Environment
-    ) {
-        self.networkManager = networkManager
-
+    ) async {
         defaultHTTPConfiguration = DefaultHTTPConfiguration(with: configuration, environment: environment)
         fallbackHTTPConfiguration = FallbackHTTPConfiguration(with: configuration)
         uaHTTPConfiguration = UAHTTPConfiguration(with: configuration, environment: environment)
+        
+        networkManager = await Backend.NetworkManager(with: configuration.backend)
     }
 
     enum Request {}

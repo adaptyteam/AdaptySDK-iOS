@@ -7,8 +7,7 @@
 
 import Foundation
 
-private struct FetchIntroductoryOfferEligibilityRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = [BackendIntroductoryOfferEligibilityState]?
+private struct FetchIntroductoryOfferEligibilityRequest: BackendRequest {
     let endpoint = HTTPEndpoint(
         method: .get,
         path: "/sdk/in-apps/products/"
@@ -16,17 +15,7 @@ private struct FetchIntroductoryOfferEligibilityRequest: HTTPRequestWithDecodabl
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
-
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeResponse(
-            response,
-            withConfiguration: configuration,
-            requestHeaders: headers
-        )
-    }
+    let logName = APIRequestName.fetchProductStates
 
     init(userId: AdaptyUserId, responseHash: String?) {
         headers = HTTPHeaders()
@@ -35,28 +24,6 @@ private struct FetchIntroductoryOfferEligibilityRequest: HTTPRequestWithDecodabl
 
         queryItems = QueryItems()
             .setUserProfileId(userId)
-    }
-}
-
-extension HTTPRequestWithDecodableResponse where ResponseBody == [BackendIntroductoryOfferEligibilityState]? {
-    @inlinable
-    static func decodeResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?,
-        requestHeaders: HTTPHeaders
-    ) throws -> HTTPResponse<[BackendIntroductoryOfferEligibilityState]?> {
-        guard !requestHeaders.hasSameBackendResponseHash(response.headers) else {
-            return response.replaceBody(nil)
-        }
-
-        let jsonDecoder = JSONDecoder()
-        configuration?.configure(jsonDecoder: jsonDecoder)
-
-        let body: [BackendIntroductoryOfferEligibilityState]? = try jsonDecoder.decode(
-            Backend.Response.Data<[BackendIntroductoryOfferEligibilityState]>.self,
-            responseBody: response.body
-        ).value
-        return response.replaceBody(body)
     }
 }
 
@@ -69,10 +36,9 @@ extension Backend.DefaultExecutor {
             userId: userId,
             responseHash: responseHash
         )
-
         let response = try await perform(
             request,
-            requestName: .fetchProductStates
+            withDecoder: [BackendIntroductoryOfferEligibilityState]?.decoder
         )
         return VH(response.body ?? [], hash: response.headers.getBackendResponseHash())
     }

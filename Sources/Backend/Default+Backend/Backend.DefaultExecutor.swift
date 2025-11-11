@@ -10,7 +10,7 @@ import Foundation
 extension Backend {
     struct DefaultExecutor: BackendExecutor {
         let session: HTTPSession
-        let baseURLFor: @BackendActor @Sendable (HTTPEndpoint) async throws -> URL
+        let baseURLFor: @BackendActor @Sendable (BackendRequest) async throws -> URL
     }
 
     func createDefaultExecutor() -> DefaultExecutor {

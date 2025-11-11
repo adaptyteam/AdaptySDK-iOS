@@ -7,12 +7,12 @@
 
 import Foundation
 
-private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<AdaptyProfile>
-
+private struct CreateProfileRequest: BackendEncodableRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    let logName = APIRequestName.createProfile
+    let logParams: EventParameters?
 
     let userId: AdaptyUserId
     let appAccountToken: UUID?
@@ -37,6 +37,11 @@ private struct CreateProfileRequest: HTTPEncodableRequest, HTTPRequestWithDecoda
         self.appAccountToken = appAccountToken
         self.parameters = parameters
         self.environmentMeta = environmentMeta
+
+        logParams = [
+            "customer_user_id": userId.customerId,
+            "app_account_token": appAccountToken?.uuidString
+        ]
     }
 
     enum CodingKeys: String, CodingKey {
@@ -88,16 +93,7 @@ extension Backend.DefaultExecutor {
             parameters: parameters,
             environmentMeta: environmentMeta
         )
-
-        let response = try await perform(
-            request,
-            requestName: .createProfile,
-            logParams: [
-                "customer_user_id": userId.customerId,
-                "app_account_token": appAccountToken?.uuidString
-            ]
-        )
-
-        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>.decoder)
+        return response.body
     }
 }

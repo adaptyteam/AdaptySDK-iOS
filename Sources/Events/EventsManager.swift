@@ -22,9 +22,10 @@ final class EventsManager {
     private var backendSession: Backend.EventsExecutor?
     private var sending: Bool = false
 
-    func set(backend: Backend, with configuration: EventsBackendConfiguration) {
+    func set(backend: Backend) async {
         backendSession = backend.createEventsExecutor()
-        self.configuration = configuration
+        let state = await backend.networkManager.currentState
+        configuration = .init(state)
         guard eventStorages.hasEvents || configuration.isExpired else { return }
         needSendEvents()
     }

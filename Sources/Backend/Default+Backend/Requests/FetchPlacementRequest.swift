@@ -7,7 +7,7 @@
 
 import Foundation
 
-private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
+private struct FetchPaywallRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let queryItems: QueryItems
@@ -52,7 +52,7 @@ private struct FetchPaywallRequest: HTTPRequest, BackendAPIRequestParameters {
     }
 }
 
-private struct FetchOnboardingRequest: HTTPRequest, BackendAPIRequestParameters {
+private struct FetchOnboardingRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let queryItems: QueryItems
@@ -94,51 +94,6 @@ private struct FetchOnboardingRequest: HTTPRequest, BackendAPIRequestParameters 
     }
 }
 
-extension AdaptyPlacementChosen {
-    @inlinable
-    static func decodePlacementResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?,
-        withUserId userId: AdaptyUserId,
-        withRequestLocale requestLocale: AdaptyLocale,
-        withCached cached: Content?
-    ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
-        let jsonDecoder = JSONDecoder()
-        configuration?.configure(jsonDecoder: jsonDecoder)
-
-        let placement = try jsonDecoder.decode(
-            Backend.Response.Meta<AdaptyPlacement>.self,
-            responseBody: response.body
-        ).value
-
-        if let cached, cached.placement.isNewerThan(placement) {
-            return response.replaceBody(AdaptyPlacementChosen.restore(cached))
-        }
-
-        jsonDecoder.userInfo.setPlacement(placement)
-        jsonDecoder.userInfo.setRequestLocale(requestLocale)
-
-        let variation = try jsonDecoder.decode(
-            Backend.Response.Data<AdaptyPlacement.Variation>.self,
-            responseBody: response.body
-        ).value
-
-        let content = try jsonDecoder.decode(
-            Backend.Response.Data<Content>.self,
-            responseBody: response.body
-        ).value
-
-        let draw = AdaptyPlacement.Draw<Content>(
-            userId: userId,
-            content: content,
-            placementAudienceVersionId: placement.audienceVersionId,
-            variationIdByPlacements: variation.variationIdByPlacements
-        )
-
-        return response.replaceBody(AdaptyPlacementChosen.draw(draw))
-    }
-}
-
 extension Backend.DefaultExecutor {
     func fetchPlacement<Content: PlacementContent>(
         apiKeyPrefix: String,
@@ -149,7 +104,7 @@ extension Backend.DefaultExecutor {
         cached: Content?,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        let request: HTTPRequest & BackendAPIRequestParameters =
+        let request: BackendRequest =
             if Content.self == AdaptyPaywall.self {
                 FetchPaywallRequest(
                     apiKeyPrefix: apiKeyPrefix,
@@ -171,17 +126,11 @@ extension Backend.DefaultExecutor {
                 )
             }
 
-        let configuration = session.configuration as? HTTPCodableConfiguration
-
-        let response = try await perform(request) { @Sendable response in
-            try await AdaptyPlacementChosen.decodePlacementResponse(
-                response,
-                withConfiguration: configuration,
-                withUserId: userId,
-                withRequestLocale: locale,
-                withCached: cached
-            )
-        }
+        let response = try await perform(request, withDecoder: AdaptyPlacementChosen.createDecoder(
+            withUserId: userId,
+            withRequestLocale: locale,
+            withCached: cached
+        ))
 
         return response.body
     }

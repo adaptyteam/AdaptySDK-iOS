@@ -7,16 +7,20 @@
 
 import Foundation
 
-private struct FetchFallbackPlacementRequest: HTTPRequest {
+private struct FetchFallbackPlacementRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
     let stamp = Log.stamp
     let timeoutInterval: TimeInterval?
+    let logName: APIRequestName
+    let logParams: EventParameters?
 
     init(
         endpoint: HTTPEndpoint,
         disableServerCache: Bool,
-        timeoutInterval: TimeInterval?
+        timeoutInterval: TimeInterval?,
+        logName: APIRequestName,
+        logParams: EventParameters
     ) {
         self.timeoutInterval =
             if let timeoutInterval {
@@ -27,6 +31,9 @@ private struct FetchFallbackPlacementRequest: HTTPRequest {
 
         self.endpoint = endpoint
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
+
+        self.logName = logName
+        self.logParams = logParams
     }
 }
 
@@ -83,39 +90,33 @@ extension Backend.FallbackExecutor {
             requestName = .fetchFallbackPaywall
         }
 
+        let logParams: EventParameters = [
+            "api_prefix": apiKeyPrefix,
+            "placement_id": placementId,
+            "variation_id": paywallVariationId,
+            "builder_version": Adapty.uiBuilderVersion,
+            "builder_config_format_version": Adapty.uiSchemaVersion,
+            "language_code": locale.languageCode,
+            "request_locale": requestLocale.id,
+            "disable_server_cache": disableServerCache,
+        ]
+
         let request = FetchFallbackPlacementRequest(
             endpoint: endpoint,
             disableServerCache: disableServerCache,
-            timeoutInterval: timeoutInterval
+            timeoutInterval: timeoutInterval,
+            logName: requestName,
+            logParams: logParams
         )
 
         let startRequestTime = Date()
 
         do {
-            let configuration = session.configuration as? HTTPCodableConfiguration
-
-            let response = try await perform(
-                request,
-                requestName: requestName,
-                logParams: [
-                    "api_prefix": apiKeyPrefix,
-                    "placement_id": placementId,
-                    "variation_id": paywallVariationId,
-                    "builder_version": Adapty.uiBuilderVersion,
-                    "builder_config_format_version": Adapty.uiSchemaVersion,
-                    "language_code": locale.languageCode,
-                    "request_locale": requestLocale.id,
-                    "disable_server_cache": disableServerCache,
-                ]
-            ) { @Sendable response in
-                try await AdaptyPlacementChosen.decodePlacementResponse(
-                    response,
-                    withConfiguration: configuration,
-                    withUserId: userId,
-                    withRequestLocale: requestLocale,
-                    withCached: cached
-                )
-            }
+            let response = try await perform(request, withDecoder: AdaptyPlacementChosen.createDecoder(
+                withUserId: userId,
+                withRequestLocale: requestLocale,
+                withCached: cached
+            ))
 
             return response.body
         } catch {

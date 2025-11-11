@@ -7,22 +7,11 @@
 
 import Foundation
 
-private struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = AdaptyProfile?
+private struct FetchProfileRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let stamp = Log.stamp
-
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeResponse(
-            response,
-            withConfiguration: configuration,
-            requestHeaders: headers
-        )
-    }
+    let logName = APIRequestName.fetchProfile
 
     init(userId: AdaptyUserId, responseHash: String?) {
         endpoint = HTTPEndpoint(
@@ -36,29 +25,6 @@ private struct FetchProfileRequest: HTTPRequestWithDecodableResponse {
     }
 }
 
-extension HTTPRequestWithDecodableResponse where ResponseBody == AdaptyProfile? {
-    @inlinable
-    static func decodeResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?,
-        requestHeaders: HTTPHeaders
-    ) throws -> HTTPResponse<AdaptyProfile?> {
-        guard !requestHeaders.hasSameBackendResponseHash(response.headers) else {
-            return response.replaceBody(nil)
-        }
-
-        let jsonDecoder = JSONDecoder()
-        configuration?.configure(jsonDecoder: jsonDecoder)
-
-        let body: ResponseBody = try jsonDecoder.decode(
-            Backend.Response.Data<AdaptyProfile>.self,
-            responseBody: response.body
-        ).value
-
-        return response.replaceBody(body)
-    }
-}
-
 extension Backend.DefaultExecutor {
     func fetchProfile(
         userId: AdaptyUserId,
@@ -68,13 +34,7 @@ extension Backend.DefaultExecutor {
             userId: userId,
             responseHash: responseHash
         )
-
-        let response = try await perform(
-            request,
-            requestName: .fetchProfile
-        )
-
-        guard let profile = response.body else { return nil }
-        return VH(profile, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>?.decoder)
+        return response.body
     }
 }

@@ -7,27 +7,17 @@
 
 import Foundation
 
-private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = AdaptyProfile?
+private struct SetASATokenRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/attribution/asa/"
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    let logName = APIRequestName.sendASAToken
+    let logParams: EventParameters?
 
     let token: String
-
-    func decodeDataResponse(
-        _ response: HTTPDataResponse,
-        withConfiguration configuration: HTTPCodableConfiguration?
-    ) throws -> Response {
-        try Self.decodeResponse(
-            response,
-            withConfiguration: configuration,
-            requestHeaders: headers
-        )
-    }
 
     init(userId: AdaptyUserId, token: String, responseHash: String?) {
         headers = HTTPHeaders()
@@ -35,6 +25,7 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
             .setBackendResponseHash(responseHash)
 
         self.token = token
+        logParams = ["token": token]
     }
 
     enum CodingKeys: String, CodingKey {
@@ -50,6 +41,7 @@ private struct SetASATokenRequest: HTTPEncodableRequest, HTTPRequestWithDecodabl
     }
 }
 
+private typealias ResponseBody = AdaptyProfile?
 extension Backend.DefaultExecutor {
     func sendASAToken(
         userId: AdaptyUserId,
@@ -61,12 +53,7 @@ extension Backend.DefaultExecutor {
             token: token,
             responseHash: responseHash
         )
-        let response = try await perform(
-            request,
-            requestName: .sendASAToken,
-            logParams: ["token": token]
-        )
-        guard let profile = response.body else { return nil }
-        return VH(profile, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>?.decoder)
+        return response.body
     }
 }

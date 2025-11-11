@@ -7,9 +7,7 @@
 
 import Foundation
 
-private struct RegisterInstallRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.OptionalData<RegistrationInstallResponse>
-
+private struct RegisterInstallRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/attribution/install"
@@ -17,20 +15,30 @@ private struct RegisterInstallRequest: HTTPEncodableRequest, HTTPRequestWithDeco
 
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    let logName = APIRequestName.reqisterInstall
+    var logParams: EventParameters?
 
     let installInfo: Environment.InstallInfo
 
-    init(userId: AdaptyUserId, installInfo: Environment.InstallInfo) {
+    init(
+        userId: AdaptyUserId,
+        installInfo: Environment.InstallInfo,
+        logParams: EventParameters? = nil
+    ) {
         headers = HTTPHeaders()
             .setUserProfileId(userId)
 
         self.installInfo = installInfo
+
+        self.logParams = logParams
     }
 
     func encode(to encoder: any Encoder) throws {
         try installInfo.encode(to: encoder)
     }
 }
+
+private typealias ResponseBody = Backend.Response.OptionalData<RegistrationInstallResponse>
 
 extension Backend.UAExecutor {
     private func exponentialBackoffDelay(
@@ -47,7 +55,7 @@ extension Backend.UAExecutor {
         installInfo: Environment.InstallInfo,
         maxRetries: Int = 5
     ) async throws(HTTPError) -> RegistrationInstallResponse? {
-        let request = RegisterInstallRequest(
+        var request = RegisterInstallRequest(
             userId: userId,
             installInfo: installInfo
         )
@@ -55,7 +63,8 @@ extension Backend.UAExecutor {
 
         while !Task.isCancelled {
             do {
-                let response = try await perform(request, requestName: .reqisterInstall, logParams: attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil)
+                request.logParams = attempt > 0 ? ["retry_attempt": attempt, "max_retries": maxRetries] : nil
+                let response: HTTPResponse<ResponseBody> = try await perform(request)
                 return response.body.value
             } catch {
                 guard attempt < maxRetries,

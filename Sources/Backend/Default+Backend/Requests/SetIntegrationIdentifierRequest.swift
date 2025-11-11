@@ -7,8 +7,7 @@
 
 import Foundation
 
-private struct SetIntegrationIdentifierRequest: HTTPEncodableRequest {
-    typealias ResponseBody = AdaptyProfile?
+private struct SetIntegrationIdentifierRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/integration/profile/set/integration-identifiers/"
@@ -18,6 +17,8 @@ private struct SetIntegrationIdentifierRequest: HTTPEncodableRequest {
     let contentType: String? = "application/json"
 
     let stamp = Log.stamp
+    let logName = APIRequestName.setIntegrationIdentifier
+    let logParams: EventParameters?
 
     let userId: AdaptyUserId
     let keyValues: [String: String]
@@ -28,6 +29,8 @@ private struct SetIntegrationIdentifierRequest: HTTPEncodableRequest {
 
         self.userId = userId
         self.keyValues = keyValues
+
+        logParams = keyValues
     }
 
     func encode(to encoder: Encoder) throws {
@@ -47,10 +50,6 @@ extension Backend.DefaultExecutor {
             userId: userId,
             keyValues: keyValues
         )
-        let _: HTTPEmptyResponse = try await perform(
-            request,
-            requestName: .setIntegrationIdentifier,
-            logParams: keyValues
-        )
+        let _: HTTPEmptyResponse = try await perform(request)
     }
 }

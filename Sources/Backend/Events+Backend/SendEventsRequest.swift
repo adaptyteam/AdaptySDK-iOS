@@ -7,13 +7,14 @@
 
 import Foundation
 
-struct SendEventsRequest: HTTPDataRequest {
+struct SendEventsRequest: BackendRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/events/"
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    var logName = APIRequestName.sendEvents
 
     let events: [Data]
 
@@ -61,7 +62,7 @@ extension Backend.EventsExecutor {
         let baseUrl: URL
 
         do {
-            baseUrl = try await baseURLFor(request.endpoint)
+            baseUrl = try await baseURLFor(request)
         } catch {
             throw EventsError.sending(HTTPError.perform(request.endpoint, error: error))
         }
@@ -69,7 +70,6 @@ extension Backend.EventsExecutor {
         do {
             let _: HTTPEmptyResponse = try await session.perform(request, baseUrl: baseUrl)
         } catch {
-            
             throw EventsError.sending(error)
         }
     }

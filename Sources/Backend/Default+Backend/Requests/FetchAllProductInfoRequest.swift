@@ -7,10 +7,10 @@
 
 import Foundation
 
-private struct FetchAllProductInfoRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<[BackendProductInfo]>
+private struct FetchAllProductInfoRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
+    let logName = APIRequestName.fetchAllProductInfo
 
     init(apiKeyPrefix: String) {
         endpoint = HTTPEndpoint(
@@ -19,6 +19,8 @@ private struct FetchAllProductInfoRequest: HTTPRequestWithDecodableResponse {
         )
     }
 }
+
+private typealias ResponseBody = Backend.Response.Data<[BackendProductInfo]>
 
 extension Backend.DefaultExecutor {
     func fetchProductInfo(
@@ -31,10 +33,7 @@ extension Backend.DefaultExecutor {
         var attempt = 0
         while !Task.isCancelled {
             do {
-                let response = try await perform(
-                    request,
-                    requestName: .fetchAllProductInfo
-                )
+                let response: HTTPResponse<ResponseBody> = try await perform(request)
                 return response.body.value
             } catch {
                 guard attempt < maxRetries,

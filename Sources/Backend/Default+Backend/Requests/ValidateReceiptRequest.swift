@@ -7,15 +7,14 @@
 
 import Foundation
 
-private struct ValidateReceiptRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<AdaptyProfile>
-
+private struct ValidateReceiptRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/in-apps/apple/receipt/validate/"
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    let logName = APIRequestName.validateReceipt
 
     let userId: AdaptyUserId
     let receipt: Data
@@ -53,12 +52,7 @@ extension Backend.DefaultExecutor {
             userId: userId,
             receipt: receipt
         )
-
-        let response = try await perform(
-            request,
-            requestName: .validateReceipt
-        )
-
-        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>.decoder)
+        return response.body
     }
 }

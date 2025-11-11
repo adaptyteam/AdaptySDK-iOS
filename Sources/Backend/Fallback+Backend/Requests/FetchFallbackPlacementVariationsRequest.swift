@@ -7,16 +7,20 @@
 
 import Foundation
 
-private struct FetchFallbackPlacementVariationsRequest: HTTPRequest {
+private struct FetchFallbackPlacementVariationsRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
     let queryItems: QueryItems
     let timeoutInterval: TimeInterval?
+    let logName: APIRequestName
+    let logParams: EventParameters?
 
     init(
         endpoint: HTTPEndpoint,
         disableServerCache: Bool,
-        timeoutInterval: TimeInterval?
+        timeoutInterval: TimeInterval?,
+        logName: APIRequestName,
+        logParams: EventParameters
     ) {
         self.timeoutInterval =
             if let timeoutInterval {
@@ -27,6 +31,9 @@ private struct FetchFallbackPlacementVariationsRequest: HTTPRequest {
 
         self.endpoint = endpoint
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
+
+        self.logName = logName
+        self.logParams = logParams
     }
 }
 
@@ -88,37 +95,29 @@ private extension BackendExecutor {
         let request = FetchFallbackPlacementVariationsRequest(
             endpoint: endpoint,
             disableServerCache: disableServerCache,
-            timeoutInterval: timeoutInterval
+            timeoutInterval: timeoutInterval,
+            logName: requestName,
+            logParams: [
+                "api_prefix": apiKeyPrefix,
+                "placement_id": placementId,
+                "language_code": locale.languageCode,
+                "request_locale": requestLocale.id,
+                "builder_version": Adapty.uiBuilderVersion,
+                "builder_config_format_version": Adapty.uiSchemaVersion,
+                "disable_server_cache": disableServerCache,
+            ]
         )
 
         let startRequestTime = Date()
 
         do {
-            let configuration = session.configuration as? HTTPCodableConfiguration
-
-            let response: HTTPResponse<AdaptyPlacementChosen> = try await perform(
-                request,
-                requestName: requestName,
-                logParams: [
-                    "api_prefix": apiKeyPrefix,
-                    "placement_id": placementId,
-                    "language_code": locale.languageCode,
-                    "request_locale": requestLocale.id,
-                    "builder_version": Adapty.uiBuilderVersion,
-                    "builder_config_format_version": Adapty.uiSchemaVersion,
-                    "disable_server_cache": disableServerCache,
-                ]
-            ) { @Sendable response in
-                try await AdaptyPlacementChosen.decodePlacementVariationsResponse(
-                    response,
-                    withConfiguration: configuration,
-                    withUserId: userId,
-                    withPlacementId: placementId,
-                    withRequestLocale: requestLocale,
-                    withCached: cached,
-                    variationIdResolver: variationIdResolver
-                )
-            }
+            let response = try await perform(request, withDecoder: AdaptyPlacementChosen.createDecoder(
+                withUserId: userId,
+                withPlacementId: placementId,
+                withRequestLocale: requestLocale,
+                withCached: cached,
+                variationIdResolver: variationIdResolver
+            ))
 
             return response.body
 

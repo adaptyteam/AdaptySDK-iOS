@@ -7,9 +7,7 @@
 
 import Foundation
 
-private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<AdaptyProfile>
-
+private struct ValidateTransactionRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/purchase/app-store/original-transaction-id/validate/"
@@ -17,16 +15,23 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
 
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    let logName = APIRequestName.validateTransaction
+    let logParams: EventParameters?
 
     let userId: AdaptyUserId
     let requestSource: RequestSource
 
-    init(userId: AdaptyUserId, requestSource: RequestSource) {
+    init(
+        userId: AdaptyUserId,
+        requestSource: RequestSource,
+        logParams: EventParameters
+    ) {
         headers = HTTPHeaders()
             .setUserProfileId(userId)
 
         self.userId = userId
         self.requestSource = requestSource
+        self.logParams = logParams
     }
 
     enum CodingKeys: String, CodingKey {
@@ -105,6 +110,8 @@ private struct ValidateTransactionRequest: HTTPEncodableRequest, HTTPRequestWith
     }
 }
 
+private typealias ResponseBody = Backend.Response.Data<AdaptyProfile>
+
 private extension Adapty.ValidatePurchaseReason {
     static let restoreRawString = "restore"
     static let reportRawString = "report_transaction"
@@ -126,19 +133,14 @@ extension Backend.DefaultExecutor {
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: userId,
-            requestSource: .restore(originalTransactionId: originalTransactionId)
+            requestSource: .restore(originalTransactionId: originalTransactionId),
+            logParams: [
+                "original_transaction_id": originalTransactionId,
+                "request_source": Adapty.ValidatePurchaseReason.restoreRawString,
+            ]
         )
-        let logParams: EventParameters = [
-            "original_transaction_id": originalTransactionId,
-            "request_source": Adapty.ValidatePurchaseReason.restoreRawString,
-        ]
-        let response = try await perform(
-            request,
-            requestName: .validateTransaction,
-            logParams: logParams
-        )
-
-        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>.decoder)
+        return response.body
     }
 
     func sendTransactionId(
@@ -148,22 +150,15 @@ extension Backend.DefaultExecutor {
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: userId,
-            requestSource: .report(transactionId: transactionId, variationId: variationId)
+            requestSource: .report(transactionId: transactionId, variationId: variationId),
+            logParams: [
+                "transaction_id": transactionId,
+                "variation_id": variationId,
+                "request_source": Adapty.ValidatePurchaseReason.reportRawString,
+            ]
         )
-
-        let logParams: EventParameters = [
-            "transaction_id": transactionId,
-            "variation_id": variationId,
-            "request_source": Adapty.ValidatePurchaseReason.reportRawString,
-        ]
-
-        let response = try await perform(
-            request,
-            requestName: .validateTransaction,
-            logParams: logParams
-        )
-
-        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>.decoder)
+        return response.body
     }
 
     func validateTransaction(
@@ -173,25 +168,20 @@ extension Backend.DefaultExecutor {
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: payload.userId,
-            requestSource: .other(transactionInfo, payload, reason: reason)
+            requestSource: .other(transactionInfo, payload, reason: reason),
+            logParams: [
+                "product_id": transactionInfo.vendorProductId,
+                "original_transaction_id": transactionInfo.originalTransactionId,
+                "transaction_id": transactionInfo.transactionId,
+                "variation_id": payload.paywallVariationId,
+                "variation_id_persistent": payload.persistentPaywallVariationId,
+                "onboarding_variation_id": payload.persistentOnboardingVariationId,
+                "promotional_offer_id": transactionInfo.subscriptionOffer?.id,
+                "environment": transactionInfo.environment,
+                "request_source": reason.rawString,
+            ]
         )
-        let logParams: EventParameters = [
-            "product_id": transactionInfo.vendorProductId,
-            "original_transaction_id": transactionInfo.originalTransactionId,
-            "transaction_id": transactionInfo.transactionId,
-            "variation_id": payload.paywallVariationId,
-            "variation_id_persistent": payload.persistentPaywallVariationId,
-            "onboarding_variation_id": payload.persistentOnboardingVariationId,
-            "promotional_offer_id": transactionInfo.subscriptionOffer?.id,
-            "environment": transactionInfo.environment,
-            "request_source": reason.rawString,
-        ]
-        let response = try await perform(
-            request,
-            requestName: .validateTransaction,
-            logParams: logParams
-        )
-
-        return VH(response.body.value, hash: response.headers.getBackendResponseHash())
+        let response = try await perform(request, withDecoder: VH<AdaptyProfile>.decoder)
+        return response.body
     }
 }

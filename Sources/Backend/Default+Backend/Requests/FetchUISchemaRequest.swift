@@ -8,15 +8,22 @@
 import AdaptyUIBuilder
 import Foundation
 
-struct FetchUISchemaRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
-
+struct FetchUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
+    let logName = APIRequestName.fetchUISchema
+    let logParams: EventParameters?
 
-    init(apiKeyPrefix: String, paywallVariationId: String, locale: AdaptyLocale, md5Hash: String, disableServerCache: Bool) {
+    init(
+        apiKeyPrefix: String,
+        paywallVariationId: String,
+        locale: AdaptyLocale,
+        md5Hash: String,
+        disableServerCache: Bool,
+        logParams: EventParameters?
+    ) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
@@ -28,8 +35,12 @@ struct FetchUISchemaRequest: HTTPRequestWithDecodableResponse {
             .setPaywallBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
+
+        self.logParams = logParams
     }
 }
+
+private typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
 
 extension Backend.DefaultExecutor {
     func fetchUISchema(
@@ -45,12 +56,7 @@ extension Backend.DefaultExecutor {
             paywallVariationId: paywallVariationId,
             locale: locale,
             md5Hash: md5Hash,
-            disableServerCache: disableServerCache
-        )
-
-        let response = try await perform(
-            request,
-            requestName: .fetchUISchema,
+            disableServerCache: disableServerCache,
             logParams: [
                 "api_prefix": apiKeyPrefix,
                 "variation_id": paywallVariationId,
@@ -62,6 +68,7 @@ extension Backend.DefaultExecutor {
             ]
         )
 
+        let response: HTTPResponse<ResponseBody> = try await perform(request)
         return response.body.value
     }
 }

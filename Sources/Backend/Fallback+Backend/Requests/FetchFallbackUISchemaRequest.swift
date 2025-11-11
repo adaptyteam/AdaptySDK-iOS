@@ -8,22 +8,33 @@
 import AdaptyUIBuilder
 import Foundation
 
-private struct FetchFallbackUISchemaRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
-
+private struct FetchFallbackUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
     let stamp = Log.stamp
+    let logName = APIRequestName.fetchFallbackUISchema
+    let logParams: EventParameters?
 
-    init(apiKeyPrefix: String, paywallInstanceIdentity: String, locale: AdaptyLocale, disableServerCache: Bool) {
+    init(
+        apiKeyPrefix: String,
+        paywallInstanceIdentity: String,
+        locale: AdaptyLocale,
+        disableServerCache: Bool,
+        logParams: EventParameters
+
+    ) {
         endpoint = HTTPEndpoint(
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(Adapty.uiBuilderVersion)/\(locale.languageCode)/fallback.json"
         )
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
+
+        self.logParams = logParams
     }
 }
+
+private typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
 
 extension Backend.FallbackExecutor {
     func fetchFallbackUISchema(
@@ -36,23 +47,19 @@ extension Backend.FallbackExecutor {
             apiKeyPrefix: apiKeyPrefix,
             paywallInstanceIdentity: paywallInstanceIdentity,
             locale: locale,
-            disableServerCache: disableServerCache
+            disableServerCache: disableServerCache,
+            logParams: [
+                "api_prefix": apiKeyPrefix,
+                "paywall_instance_id": paywallInstanceIdentity,
+                "builder_version": Adapty.uiBuilderVersion,
+                "builder_config_format_version": Adapty.uiSchemaVersion,
+                "language_code": locale.languageCode,
+                "disable_server_cache": disableServerCache,
+            ]
         )
 
         do {
-            let response = try await perform(
-                request,
-                requestName: .fetchFallbackUISchema,
-                logParams: [
-                    "api_prefix": apiKeyPrefix,
-                    "paywall_instance_id": paywallInstanceIdentity,
-                    "builder_version": Adapty.uiBuilderVersion,
-                    "builder_config_format_version": Adapty.uiSchemaVersion,
-                    "language_code": locale.languageCode,
-                    "disable_server_cache": disableServerCache,
-                ]
-            )
-
+            let response: HTTPResponse<ResponseBody> = try await perform(request)
             return response.body.value
         } catch {
             guard error.statusCode == 404,

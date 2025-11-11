@@ -16,10 +16,6 @@ extension AdaptyConfiguration.Builder: Decodable {
         case idfaCollectionDisabled = "apple_idfa_collection_disabled"
         case ipAddressCollectionDisabled = "ip_address_collection_disabled"
 
-        case backendBaseUrl = "backend_base_url"
-        case backendFallbackBaseUrl = "backend_fallback_base_url"
-        case backendConfigsBaseUrl = "backend_configs_base_url"
-        case backendUABaseUrl = "backend_ua_base_url"
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
 
@@ -62,10 +58,10 @@ extension AdaptyConfiguration.Builder: Decodable {
             ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),
             callbackDispatchQueue: nil,
             serverCluster: container.decodeIfPresent(AdaptyServerCluster.self, forKey: .serverCluster),
-            backendBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendBaseUrl),
-            backendFallbackBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendFallbackBaseUrl),
-            backendConfigsBaseUrl: container.decodeIfPresent(URL.self, forKey: .backendConfigsBaseUrl),
-            backendUABaseUrl: container.decodeIfPresent(URL.self, forKey: .backendUABaseUrl),
+            backendBaseUrl: nil,
+            backendFallbackBaseUrl: nil,
+            backendConfigsBaseUrl: nil,
+            backendUABaseUrl: nil,
             backendProxy: proxy,
             transactionFinishBehavior: nil,
             logLevel: container.decodeIfPresent(AdaptyLog.Level.self, forKey: .logLevel),
@@ -74,5 +70,3 @@ extension AdaptyConfiguration.Builder: Decodable {
         )
     }
 }
-
-

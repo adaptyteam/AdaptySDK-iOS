@@ -7,20 +7,22 @@
 
 import Foundation
 
-private struct FetchCrossPlacementStateRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<CrossPlacementState>
+private struct FetchCrossPlacementStateRequest: BackendRequest {
     let endpoint = HTTPEndpoint(
         method: .get,
         path: "/sdk/in-apps/profile/cross-placement-info/"
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
+    let logName = APIRequestName.fetchCrossPlacementState
 
     init(userId: AdaptyUserId) {
         headers = HTTPHeaders()
             .setUserProfileId(userId)
     }
 }
+
+private typealias ResponseBody = Backend.Response.Data<CrossPlacementState>
 
 extension Backend.DefaultExecutor {
     func fetchCrossPlacementState(
@@ -29,12 +31,7 @@ extension Backend.DefaultExecutor {
         let request = FetchCrossPlacementStateRequest(
             userId: userId
         )
-
-        let response = try await perform(
-            request,
-            requestName: .fetchCrossPlacementState
-        )
-
+        let response: HTTPResponse<ResponseBody> = try await perform(request)
         return response.body.value
     }
 }

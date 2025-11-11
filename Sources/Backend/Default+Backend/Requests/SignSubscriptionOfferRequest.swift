@@ -7,9 +7,7 @@
 
 import Foundation
 
-private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
-    typealias ResponseBody = Backend.Response.Data<AdaptySubscriptionOffer.Signature>
-
+private struct SignSubscriptionOfferRequest: BackendRequest {
     let endpoint = HTTPEndpoint(
         method: .get,
         path: "/sdk/in-apps/apple/subscription-offer/sign/"
@@ -17,6 +15,8 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
+    let logName = APIRequestName.signSubscriptionOffer
+    let logParams: EventParameters?
 
     init(vendorProductId: String, offerId: String, userId: AdaptyUserId) {
         headers = HTTPHeaders()
@@ -26,8 +26,15 @@ private struct SignSubscriptionOfferRequest: HTTPRequestWithDecodableResponse {
             .setUserProfileId(userId)
             .setVendorProductId(vendorProductId)
             .setOfferId(offerId)
+
+        logParams = [
+            "product_id": vendorProductId,
+            "discount_id": offerId
+        ]
     }
 }
+
+private typealias ResponseBody = Backend.Response.Data<AdaptySubscriptionOffer.Signature>
 
 extension Backend.DefaultExecutor {
     func signSubscriptionOffer(
@@ -40,15 +47,7 @@ extension Backend.DefaultExecutor {
             offerId: offerId,
             userId: userId
         )
-        let response = try await perform(
-            request,
-            requestName: .signSubscriptionOffer,
-            logParams: [
-                "product_id": vendorProductId,
-                "discount_id": offerId
-            ]
-        )
-
+        let response: HTTPResponse<ResponseBody> = try await perform(request)
         return response.body.value
     }
 }
