@@ -1,5 +1,5 @@
 //
-//  Backend.NetworrkManager.swift
+//  Backend.NetworkManager.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 02.11.2025.
@@ -187,7 +187,7 @@ extension Backend.NetworkManager {
 
     func fetchCurrentState() async -> NetworkState {
         if currentState.isExpired {
-            try? await fetch()
+            try? await sync()
         }
         return currentState
     }
@@ -200,7 +200,7 @@ extension Backend.NetworkManager {
         if let url = devBaseUrls?[kind] { return url }
 
         if currentState.isExpired {
-            try? await fetch()
+            try? await sync()
         }
 
         guard let url = currentState.mainBaseUrl(by: cluster, withIndex: mainBaseUrlIndex) else {

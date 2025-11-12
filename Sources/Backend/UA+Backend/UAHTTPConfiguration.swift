@@ -8,6 +8,8 @@
 import Foundation
 
 struct UAHTTPConfiguration: HTTPCodableConfiguration {
+    let sessionConfiguration: URLSessionConfiguration
+
     let defaultEncodedContentType = "application/json"
 
     func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
@@ -29,5 +31,6 @@ struct UAHTTPConfiguration: HTTPCodableConfiguration {
                 String(kCFNetworkProxiesHTTPPort): port,
             ]
         }
+        self.sessionConfiguration = sessionConfiguration
     }
 }

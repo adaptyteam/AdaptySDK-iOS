@@ -19,7 +19,7 @@ package struct Backend {
         with configuration: AdaptyConfiguration,
         environment: Environment
     ) async {
-        defaultHTTPConfiguration = DefaultHTTPConfiguration(with: configuration, environment: environment)
+        defaultHTTPConfiguration = MainHTTPConfiguration(with: configuration, environment: environment)
         fallbackHTTPConfiguration = FallbackHTTPConfiguration(with: configuration)
         uaHTTPConfiguration = UAHTTPConfiguration(with: configuration, environment: environment)
 

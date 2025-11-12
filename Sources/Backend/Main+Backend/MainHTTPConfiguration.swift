@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct DefaultHTTPConfiguration: HTTPCodableConfiguration {
+struct MainHTTPConfiguration: HTTPCodableConfiguration {
+    let sessionConfiguration: URLSessionConfiguration
+
     let defaultEncodedContentType = "application/vnd.api+json"
 
     func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
@@ -29,5 +31,7 @@ struct DefaultHTTPConfiguration: HTTPCodableConfiguration {
                 String(kCFNetworkProxiesHTTPPort): port,
             ]
         }
+
+        self.sessionConfiguration = sessionConfiguration
     }
 }
