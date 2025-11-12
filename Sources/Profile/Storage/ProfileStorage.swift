@@ -54,7 +54,8 @@ final class ProfileStorage {
 
     private static var profile: VH<AdaptyProfile>? = {
         do {
-            return try userDefaults.getJSON(VH<AdaptyProfile>.self, forKey: Constants.profileKey)
+            let restoredProfile = try userDefaults.getJSON(VH<AdaptyProfile>.self, forKey: Constants.profileKey)
+            return restoredProfile
         } catch {
             log.warn(error.localizedDescription)
             return nil
@@ -69,9 +70,9 @@ final class ProfileStorage {
         }
         userId = newProfile.userId
 
-        if let profile = profile, profile.isEqualProfileId(newProfileId) {
-            guard profile.IsNotEqualHash(newProfile),
-                  profile.isNewerOrEqualVersion(newProfile)
+        if let oldProfile = profile, oldProfile.isEqualProfileId(newProfileId) {
+            guard newProfile.IsNotEqualHash(oldProfile),
+                  newProfile.isNewerOrEqualVersion(oldProfile)
             else { return }
         }
 

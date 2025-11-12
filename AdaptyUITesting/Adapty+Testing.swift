@@ -11,4 +11,5 @@ import Foundation
 public extension AdaptyProfile {
     var testing_segmentId: String { segmentId }
     var testing_isTestUser: Bool { isTestUser }
+    var testing_version: Int64 { version }
 }
