@@ -56,17 +56,18 @@ extension Backend {
     }
 
     private func backendUnavailableError(
-        _ response: HTTPDataResponse
+        _ response: HTTPDataResponse,
+        _ now: Date = Date()
     ) -> BackendUnavailableError? {
         switch response.statusCode {
         case 401: return .unauthorized
-        case 429: return .tooManyRequests
+        case 429: return .blockedUntil(response.headers.getRetryAfter(now))
         case 444:
             let min = response.body
                 .flatMap { String(data: $0, encoding: .utf8) }
                 .flatMap(Double.init)
                 .map { $0 * 60 }
-            return .temporarily(min ?? (24 * 60 * 60)) // 24h
+            return .blockedUntil(now.addingTimeInterval(min ?? (24 * 60 * 60))) // 24h
         default:
             return nil
         }
@@ -77,15 +78,15 @@ extension Backend {
         if let data = response.body.nonEmptyOrNil,
            let errorCodes = try? errorCodesResponse(from: data, withConfiguration: defaultHTTPConfiguration).codes.nonEmptyOrNil
         {
-            return BackendError(
+            BackendError(
                 body: String(data: data, encoding: .utf8) ?? "unknown",
                 errorCodes: errorCodes,
                 requestId: response.headers.getBackendRequestId()
             )
         } else if let error = backendUnavailableError(response) {
-            return error
+            error
         } else {
-            return HTTPResponse.statusCodeValidator(response)
+            HTTPResponse.statusCodeValidator(response)
         }
     }
 }

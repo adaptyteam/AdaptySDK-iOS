@@ -42,7 +42,7 @@ private struct SetASATokenRequest: BackendEncodableRequest {
 }
 
 private typealias ResponseBody = AdaptyProfile?
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func sendASAToken(
         userId: AdaptyUserId,
         token: String,

@@ -10,11 +10,11 @@ import StoreKit
 private let log = Log.skReceiptManager
 
 actor StoreKitReceiptManager {
-    let httpSession: Backend.DefaultExecutor
+    let httpSession: Backend.MainExecutor
     private let refresher = ReceiptRefresher()
     private var syncing: (task: AdaptyResultTask<Void>, userId: AdaptyUserId)?
 
-    init(httpSession: Backend.DefaultExecutor, refreshIfEmpty: Bool) {
+    init(httpSession: Backend.MainExecutor, refreshIfEmpty: Bool) {
         self.httpSession = httpSession
 
         if refreshIfEmpty {

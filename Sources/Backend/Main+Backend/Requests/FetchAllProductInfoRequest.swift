@@ -22,7 +22,7 @@ private struct FetchAllProductInfoRequest: BackendRequest {
 
 private typealias ResponseBody = Backend.Response.Data<[BackendProductInfo]>
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func fetchProductInfo(
         apiKeyPrefix: String,
         maxRetries: Int = 5

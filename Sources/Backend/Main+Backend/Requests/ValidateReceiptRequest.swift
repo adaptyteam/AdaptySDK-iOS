@@ -43,7 +43,7 @@ private struct ValidateReceiptRequest: BackendEncodableRequest {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func validateReceipt(
         userId: AdaptyUserId,
         receipt: Data

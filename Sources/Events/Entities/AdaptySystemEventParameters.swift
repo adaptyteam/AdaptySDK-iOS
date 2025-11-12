@@ -102,6 +102,7 @@ struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {
     }
 }
 
+
 struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
     let name: APIRequestName
     let stamp: String

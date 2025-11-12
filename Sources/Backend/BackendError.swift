@@ -7,21 +7,15 @@
 
 import Foundation
 
-struct BackendError: Error, Hashable, Codable {
-    let body: String
+public struct BackendError: Error, Hashable, Codable {
+    public let body: String
     let errorCodes: [String]
     let requestId: String?
 }
 
-enum BackendUnavailableError: Error, Hashable, Codable {
+public enum BackendUnavailableError: Error, Hashable, Codable {
     case unauthorized
-    case tooManyRequests
-    case temporarily(TimeInterval)
-}
-
-enum BackendPerformError: Error, Hashable, Codable {
-    case blocked
-    case urlsIsEmpty
+    case blockedUntil(Date?)
 }
 
 extension BackendError: CustomStringConvertible {

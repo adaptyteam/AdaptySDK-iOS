@@ -6,7 +6,7 @@
 //
 import Foundation
 
-private struct FetchNetworkConfigRequest: BackendRequest {
+private struct FetchNetworkConfigurationRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
     let logName = APIRequestName.fetchNetworkConfig
@@ -21,14 +21,17 @@ private struct FetchNetworkConfigRequest: BackendRequest {
 
 private typealias ResponseBody = Backend.Response.Data<NetworkConfiguration>
 
-extension Backend.FallbackExecutor {
-    func fetchNetworkConfig(
+extension Backend.NetworkExecutor {
+    func fetchNetworkConfiguration(
         apiKeyPrefix: String
     ) async throws(HTTPError) -> NetworkConfiguration {
-        let request = FetchNetworkConfigRequest(
+        let request = FetchNetworkConfigurationRequest(
             apiKeyPrefix: apiKeyPrefix
         )
-        let response: HTTPResponse<ResponseBody> = try await perform(request)
+        let response: HTTPResponse<ResponseBody> = try await perform(
+            request,
+            withBaseUrl: baseUrl
+        )
         return response.body.value
     }
 }

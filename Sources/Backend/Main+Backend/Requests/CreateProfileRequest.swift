@@ -80,7 +80,7 @@ private struct CreateProfileRequest: BackendEncodableRequest {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func createProfile(
         userId: AdaptyUserId,
         appAccountToken: UUID?,

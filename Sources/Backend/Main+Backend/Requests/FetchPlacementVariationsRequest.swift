@@ -103,7 +103,7 @@ private struct FetchOnboardingVariationsRequest: BackendRequest {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func fetchPlacementVariations<Content: PlacementContent>(
         apiKeyPrefix: String,
         userId: AdaptyUserId,

@@ -52,7 +52,7 @@ private struct SetAttributionDataRequest: BackendEncodableRequest {
 
 private typealias ResponseBody = AdaptyProfile?
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func setAttributionData(
         userId: AdaptyUserId,
         source: String,

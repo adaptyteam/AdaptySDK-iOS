@@ -9,14 +9,15 @@ import Foundation
 
 extension Backend {
     struct FallbackExecutor: BackendExecutor {
+        let manager: NetworkManager
         let session: HTTPSession
-        let baseURLFor: @BackendActor @Sendable (BackendRequest) async throws -> URL
+        let kind = AdaptyServerKind.fallback
     }
 
     func createFallbackExecutor() -> FallbackExecutor {
         FallbackExecutor(
-            session: HTTPSession(configuration: fallbackHTTPConfiguration),
-            baseURLFor: networkManager.fallbackBaseUrl
+            manager: networkManager,
+            session: HTTPSession(configuration: fallbackHTTPConfiguration)
         )
     }
 }

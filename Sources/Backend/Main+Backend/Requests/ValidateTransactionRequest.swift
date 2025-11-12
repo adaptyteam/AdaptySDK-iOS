@@ -126,7 +126,7 @@ private extension Adapty.ValidatePurchaseReason {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func syncTransactionsHistory(
         originalTransactionId: String,
         for userId: AdaptyUserId

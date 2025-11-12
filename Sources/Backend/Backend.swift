@@ -22,8 +22,8 @@ package struct Backend {
         defaultHTTPConfiguration = DefaultHTTPConfiguration(with: configuration, environment: environment)
         fallbackHTTPConfiguration = FallbackHTTPConfiguration(with: configuration)
         uaHTTPConfiguration = UAHTTPConfiguration(with: configuration, environment: environment)
-        
-        networkManager = await Backend.NetworkManager(with: configuration.backend)
+
+        networkManager = await Backend.NetworkManager(with: configuration)
     }
 
     enum Request {}

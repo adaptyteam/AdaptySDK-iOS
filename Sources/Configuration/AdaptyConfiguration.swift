@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 23.04.2024.
 //
 
-import Foundation
 import AdaptyLogger
+import Foundation
 
 public struct AdaptyConfiguration: Sendable {
     static let `default` = (
@@ -32,4 +32,8 @@ public struct AdaptyConfiguration: Sendable {
 extension AdaptyConfiguration {
     @AdaptyActor
     static var transactionFinishBehavior = Self.default.transactionFinishBehavior
+
+    var apiKeyPrefix: String {
+        String(apiKey.prefix(while: { $0 != "." }))
+    }
 }

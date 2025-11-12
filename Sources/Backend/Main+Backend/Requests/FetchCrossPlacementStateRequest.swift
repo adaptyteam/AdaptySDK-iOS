@@ -24,7 +24,7 @@ private struct FetchCrossPlacementStateRequest: BackendRequest {
 
 private typealias ResponseBody = Backend.Response.Data<CrossPlacementState>
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func fetchCrossPlacementState(
         userId: AdaptyUserId
     ) async throws(HTTPError) -> CrossPlacementState {

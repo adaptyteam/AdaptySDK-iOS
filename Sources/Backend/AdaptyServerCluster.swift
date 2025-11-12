@@ -10,6 +10,10 @@ public enum AdaptyServerCluster: Sendable {
     case eu
     case cn
     case other(String)
+
+    static var all: [Self] {
+        [.default, .eu, .cn]
+    }
 }
 
 extension AdaptyServerCluster: LosslessStringConvertible {

@@ -41,7 +41,7 @@ private struct SetIntegrationIdentifierRequest: BackendEncodableRequest {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func setIntegrationIdentifier(
         userId: AdaptyUserId,
         keyValues: [String: String]

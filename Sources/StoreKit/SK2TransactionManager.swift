@@ -11,7 +11,7 @@ private let log = Log.sk2TransactionManager
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2TransactionManager {
-    private let httpSession: Backend.DefaultExecutor
+    private let httpSession: Backend.MainExecutor
     private let storage: PurchasePayloadStorage
 
     private var lastTransactionOriginalIdentifier: String?
@@ -23,7 +23,7 @@ actor SK2TransactionManager {
     private var syncingUnfinishedTransactions: AdaptyResultTask<Void>?
 
     init(
-        httpSession: Backend.DefaultExecutor,
+        httpSession: Backend.MainExecutor,
         storage: PurchasePayloadStorage
     ) {
         self.httpSession = httpSession

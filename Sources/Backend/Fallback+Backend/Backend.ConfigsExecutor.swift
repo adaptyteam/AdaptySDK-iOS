@@ -9,14 +9,15 @@ import Foundation
 
 extension Backend {
     struct ConfigsExecutor: BackendExecutor {
+        let manager: NetworkManager
         let session: HTTPSession
-        let baseURLFor: @BackendActor @Sendable (BackendRequest) async throws -> URL
+        let kind = AdaptyServerKind.configs
     }
 
     func createConfigsExecutor() -> ConfigsExecutor {
         ConfigsExecutor(
-            session: HTTPSession(configuration: defaultHTTPConfiguration),
-            baseURLFor: networkManager.configsBaseUrl
+            manager: networkManager,
+            session: HTTPSession(configuration: defaultHTTPConfiguration)
         )
     }
 }

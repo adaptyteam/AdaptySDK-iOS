@@ -72,7 +72,7 @@ private struct UpdateProfileRequest: BackendEncodableRequest {
 
 private typealias ResponseBody = AdaptyProfile?
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func updateProfile(
         userId: AdaptyUserId,
         parameters: AdaptyProfileParameters?,

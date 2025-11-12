@@ -25,7 +25,7 @@ private struct FetchProfileRequest: BackendRequest {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func fetchProfile(
         userId: AdaptyUserId,
         responseHash: String?

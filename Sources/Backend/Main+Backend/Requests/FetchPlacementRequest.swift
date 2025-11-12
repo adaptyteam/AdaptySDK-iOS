@@ -94,7 +94,7 @@ private struct FetchOnboardingRequest: BackendRequest {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func fetchPlacement<Content: PlacementContent>(
         apiKeyPrefix: String,
         userId: AdaptyUserId,

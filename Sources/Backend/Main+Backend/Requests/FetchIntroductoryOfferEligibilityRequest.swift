@@ -27,7 +27,7 @@ private struct FetchIntroductoryOfferEligibilityRequest: BackendRequest {
     }
 }
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func fetchIntroductoryOfferEligibility(
         userId: AdaptyUserId,
         responseHash: String?

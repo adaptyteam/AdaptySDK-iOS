@@ -80,7 +80,7 @@ final class EventsManager {
     }
 
     private func sendEvents(_ session: Backend.EventsExecutor) async throws(EventsError) {
-        let currentState = await session.networkManager.fetchCurrentState()
+        let currentState = await session.manager.fetchCurrentState()
         configuration = .init(currentState)
 
         let events = eventStorages.getEvents(

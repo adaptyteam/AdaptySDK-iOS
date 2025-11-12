@@ -36,7 +36,7 @@ private struct SignSubscriptionOfferRequest: BackendRequest {
 
 private typealias ResponseBody = Backend.Response.Data<AdaptySubscriptionOffer.Signature>
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func signSubscriptionOffer(
         userId: AdaptyUserId,
         vendorProductId: String,

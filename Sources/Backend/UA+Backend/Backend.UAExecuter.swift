@@ -9,14 +9,15 @@ import Foundation
 
 extension Backend {
     struct UAExecutor: BackendExecutor {
+        let manager: NetworkManager
         let session: HTTPSession
-        let baseURLFor: @BackendActor @Sendable (BackendRequest) async throws -> URL
+        let kind = AdaptyServerKind.ua
     }
 
     func createUAExecutor() -> UAExecutor {
         UAExecutor(
-            session: HTTPSession(configuration: uaHTTPConfiguration, responseValidator: validator),
-            baseURLFor: networkManager.uaBaseUrl
+            manager: networkManager,
+            session: HTTPSession(configuration: uaHTTPConfiguration, responseValidator: validator)
         )
     }
 }

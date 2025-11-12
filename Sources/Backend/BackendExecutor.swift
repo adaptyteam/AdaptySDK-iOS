@@ -7,23 +7,14 @@
 
 import Foundation
 
+private let log = Log.http
+
 @BackendActor
 protocol BackendExecutor: Sendable {
+    var manager: Backend.NetworkManager { get }
     var session: HTTPSession { get }
-    nonisolated var baseURLFor: @BackendActor (BackendRequest) async throws -> URL { get }
+    var kind: AdaptyServerKind { get }
 }
-
-protocol BackendRequest: Sendable, HTTPRequest {
-    var stamp: String { get }
-    var logName: APIRequestName { get }
-    var logParams: EventParameters? { get }
-}
-
-extension BackendRequest {
-    var logParams: EventParameters? { nil }
-}
-
-protocol BackendEncodableRequest: BackendRequest, HTTPEncodableRequest {}
 
 extension BackendExecutor {
     @BackendActor
@@ -49,18 +40,43 @@ extension BackendExecutor {
         withDecoder decoder: @escaping HTTPDecoder<Body>
     ) async throws(HTTPError) -> HTTPResponse<Body> {
         let stamp = request.stamp
-        let requestName = request.logName
-        Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: request.logParams))
 
         let baseUrl: URL
         do {
-            baseUrl = try await baseURLFor(request)
+            baseUrl = try await manager.baseUrl(request, for: kind)
         } catch {
-            let error = HTTPError.perform(request.endpoint, error: error)
-            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
-            throw error
+            let endpoint = request.endpoint
+            log.verbose("BLOCKED \(error) <-- \(endpoint.method) \(endpoint.path) [\(stamp)] \(request.logParams ?? [:])")
+            throw HTTPError.perform(request.endpoint, error: error)
         }
 
+        do {
+            return try await DefaultBackendExecutor.perform(
+                request,
+                withBaseUrl: baseUrl,
+                withSession: session,
+                withDecoder: decoder
+            )
+        } catch {
+            manager.handleNetworkState(kind, baseUrl, error)
+            throw error
+        }
+    }
+}
+
+enum DefaultBackendExecutor {
+    @BackendActor
+    @inlinable
+    static func perform<Body>(
+        _ request: some BackendRequest,
+        withBaseUrl baseUrl: URL,
+        withSession session: HTTPSession,
+        withDecoder decoder: @escaping HTTPDecoder<Body>
+    ) async throws(HTTPError) -> HTTPResponse<Body> {
+        let stamp = request.stamp
+        let requestName = request.logName
+
+        Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: request.logParams))
         do {
             let response: HTTPResponse<Body> = try await session.perform(request, withBaseUrl: baseUrl, withDecoder: decoder)
             Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))

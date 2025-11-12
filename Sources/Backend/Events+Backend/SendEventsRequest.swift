@@ -60,9 +60,8 @@ extension Backend.EventsExecutor {
         )
 
         let baseUrl: URL
-
         do {
-            baseUrl = try await baseURLFor(request)
+            baseUrl = try await manager.baseUrl(request, for: kind)
         } catch {
             throw EventsError.sending(HTTPError.perform(request.endpoint, error: error))
         }
@@ -70,6 +69,7 @@ extension Backend.EventsExecutor {
         do {
             let _: HTTPEmptyResponse = try await session.perform(request, baseUrl: baseUrl)
         } catch {
+            manager.handleNetworkState(kind, baseUrl, error)
             throw EventsError.sending(error)
         }
     }

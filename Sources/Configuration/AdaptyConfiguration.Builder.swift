@@ -24,10 +24,7 @@ extension AdaptyConfiguration {
             callbackDispatchQueue: builder.callbackDispatchQueue,
             backend: Backend.Configuration(
                 cluster: builder.serverCluster ?? .default,
-                mainBaseUrl: builder.backendBaseUrl,
-                fallbackBaseUrl: builder.backendFallbackBaseUrl,
-                configsBaseUrl: builder.backendConfigsBaseUrl,
-                uaBaseUrl: builder.backendUABaseUrl,
+                devBaseUrls: builder.devBaseUrls,
                 proxy: builder.backendProxy,
                 protocolClasses: builder.urlProtocolClasses
             ),
@@ -49,10 +46,7 @@ extension AdaptyConfiguration {
             ipAddressCollectionDisabled: nil,
             callbackDispatchQueue: nil,
             serverCluster: nil,
-            backendBaseUrl: nil,
-            backendFallbackBaseUrl: nil,
-            backendConfigsBaseUrl: nil,
-            backendUABaseUrl: nil,
+            devBaseUrls: [:],
             backendProxy: nil,
             transactionFinishBehavior: nil,
             logLevel: nil,
@@ -73,10 +67,7 @@ public extension AdaptyConfiguration {
         public private(set) var callbackDispatchQueue: DispatchQueue?
 
         public private(set) var serverCluster: AdaptyServerCluster?
-        public private(set) var backendBaseUrl: URL?
-        public private(set) var backendFallbackBaseUrl: URL?
-        public private(set) var backendConfigsBaseUrl: URL?
-        public private(set) var backendUABaseUrl: URL?
+        package private(set) var devBaseUrls: [AdaptyServerKind: URL]
         public private(set) var backendProxy: (host: String, port: Int)?
 
         public private(set) var transactionFinishBehavior: TransactionFinishBehavior?
@@ -94,10 +85,7 @@ public extension AdaptyConfiguration {
             ipAddressCollectionDisabled: Bool?,
             callbackDispatchQueue: DispatchQueue?,
             serverCluster: AdaptyServerCluster?,
-            backendBaseUrl: URL?,
-            backendFallbackBaseUrl: URL?,
-            backendConfigsBaseUrl: URL?,
-            backendUABaseUrl: URL?,
+            devBaseUrls: [AdaptyServerKind: URL],
             backendProxy: (host: String, port: Int)?,
             transactionFinishBehavior: TransactionFinishBehavior?,
             logLevel: AdaptyLog.Level?,
@@ -112,10 +100,7 @@ public extension AdaptyConfiguration {
             self.ipAddressCollectionDisabled = ipAddressCollectionDisabled
             self.callbackDispatchQueue = callbackDispatchQueue
             self.serverCluster = serverCluster ?? .default
-            self.backendBaseUrl = backendBaseUrl
-            self.backendFallbackBaseUrl = backendFallbackBaseUrl
-            self.backendConfigsBaseUrl = backendConfigsBaseUrl
-            self.backendUABaseUrl = backendUABaseUrl
+            self.devBaseUrls = devBaseUrls
             self.backendProxy = backendProxy
             self.transactionFinishBehavior = transactionFinishBehavior
             self.logLevel = logLevel
@@ -181,26 +166,8 @@ public extension AdaptyConfiguration.Builder {
     }
 
     @discardableResult
-    package func with(backendBaseUrl url: URL) -> Self {
-        backendBaseUrl = url
-        return self
-    }
-
-    @discardableResult
-    package func with(backendFallbackBaseUrl url: URL) -> Self {
-        backendFallbackBaseUrl = url
-        return self
-    }
-
-    @discardableResult
-    package func with(backendConfigsBaseUrl url: URL) -> Self {
-        backendConfigsBaseUrl = url
-        return self
-    }
-
-    @discardableResult
-    package func with(backendUABaseUrl url: URL) -> Self {
-        backendUABaseUrl = url
+    package func with(backendBaseUrl url: URL, for kind: AdaptyServerKind = .main) -> Self {
+        devBaseUrls[kind] = url
         return self
     }
 

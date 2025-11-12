@@ -42,7 +42,7 @@ struct FetchUISchemaRequest: BackendRequest {
 
 private typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
 
-extension Backend.DefaultExecutor {
+extension Backend.MainExecutor {
     func fetchUISchema(
         apiKeyPrefix: String,
         paywallVariationId: String,
