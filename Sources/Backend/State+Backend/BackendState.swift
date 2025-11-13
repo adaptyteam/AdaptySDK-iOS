@@ -47,7 +47,11 @@ extension BackendState {
             baseUrls = mainBaseUrls[.default]
         }
         guard let baseUrls, baseUrls.isNotEmpty else { return nil }
-        return baseUrls[min(index, baseUrls.endIndex)].appendingDefaultPathIfNeed
+        guard baseUrls.indices.contains(index) else {
+            return baseUrls.last?.appendingDefaultPathIfNeed
+        }
+        
+        return baseUrls[index].appendingDefaultPathIfNeed
     }
 }
 
