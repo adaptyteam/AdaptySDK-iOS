@@ -16,24 +16,24 @@ public enum AdaptyServerCluster: Sendable {
     }
 }
 
-extension AdaptyServerCluster: LosslessStringConvertible {
+extension AdaptyServerCluster: LosslessStringConvertible, RawRepresentable {
     private enum StringValue: String {
         case `default`
         case eu
         case cn
     }
 
-    public init?(_ value: String) {
-        let value = value.trimmed.lowercased()
-        self = switch StringValue(rawValue: value) {
+    public init?(rawValue: String) {
+        let rawValue = rawValue.trimmed.lowercased()
+        self = switch StringValue(rawValue: rawValue) {
         case .default: .default
         case .eu: .eu
         case .cn: .cn
-        default: .other(value)
+        default: .other(rawValue)
         }
     }
 
-    public var description: String {
+    public var rawValue: String {
         let value: StringValue
         switch self {
         case .default: value = .default
@@ -44,6 +44,12 @@ extension AdaptyServerCluster: LosslessStringConvertible {
         }
         return value.rawValue
     }
+
+    public init?(_ value: String) {
+        self.init(rawValue: value)
+    }
+
+    public var description: String { rawValue }
 }
 
 extension AdaptyServerCluster: Hashable {
@@ -55,11 +61,11 @@ extension AdaptyServerCluster: Hashable {
 extension AdaptyServerCluster: Codable {
     public init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self)
-        self = AdaptyServerCluster(value) ?? .default
+        self = AdaptyServerCluster(rawValue: value) ?? .default
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(description)
+        try container.encode(rawValue)
     }
 }

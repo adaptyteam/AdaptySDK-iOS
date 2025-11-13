@@ -60,10 +60,28 @@ extension BackendState: Codable {
         case extendSeconds = "retry_interval"
     }
 
+    struct SafeURL: Codable {
+        let url: URL?
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let str = try container.decode(String.self)
+            url = URL(string: str)
+        }
+    }
+
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         eventBlacklist = try container.decode(Set<String>.self, forKey: .eventBlacklist)
-        mainBaseUrls = try container.decode([AdaptyServerCluster: [URL]].self, forKey: .mainBaseUrls)
+
+        let mainBaseUrlsContainer = try container.nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .mainBaseUrls)
+        mainBaseUrls = try mainBaseUrlsContainer
+            .allKeys
+            .reduce(into: [:]) { result, key in
+                guard let cluster = AdaptyServerCluster(rawValue: key.stringValue) else { return }
+                result[cluster] = try mainBaseUrlsContainer.decode([String].self, forKey: key)
+                    .compactMap(URL.init)
+            }
         if container.contains(.expiresAt) {
             expiresAt = try Date(timeIntervalSince1970: (container.decode(Double.self, forKey: .expiresAt)) / 1000.0)
         } else {
@@ -76,7 +94,12 @@ extension BackendState: Codable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(eventBlacklist, forKey: .eventBlacklist)
-        try container.encode(mainBaseUrls, forKey: .mainBaseUrls)
+        var mainBaseUrlsContainer = container.nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .mainBaseUrls)
+        for (cluster, urls) in mainBaseUrls {
+            let key = AnyCodingKeys(stringValue: cluster.rawValue)
+            let urlStrings = urls.map(\.absoluteString)
+            try mainBaseUrlsContainer.encode(urlStrings, forKey: key)
+        }
         try container.encode(expiresAt.timeIntervalSince1970 * 1000.0, forKey: .expiresAt)
         try container.encode(extendSeconds * 1000.0, forKey: .extendSeconds)
     }

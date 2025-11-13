@@ -39,12 +39,10 @@ extension Error {
 //                 .networkConnectionLost, // ECONNRESET ??
                  .secureConnectionFailed: // TLS setup failed
                 return true
-
             // SSL
             case URLError.Code(rawValue: -1202), // serverCertificateUntrusted
                  URLError.Code(rawValue: -1205): // serverCertificateHasExpired
                 return true
-
             default:
                 break
             }

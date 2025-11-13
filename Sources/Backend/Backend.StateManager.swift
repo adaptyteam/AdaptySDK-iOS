@@ -77,6 +77,7 @@ extension Backend {
         }
 
         private func fetch() async throws {
+            defer { syncing = nil }
             let kind = StateExecutor.kind
             try checkIsBlocked(kind)
             do {
