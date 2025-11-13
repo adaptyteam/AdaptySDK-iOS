@@ -9,7 +9,7 @@ import Foundation
 
 extension Backend {
     struct UAExecutor: BackendExecutor {
-        let manager: NetworkManager
+        let manager: StateManager
         let session: HTTPSession
         let kind = AdaptyServerKind.ua
     }

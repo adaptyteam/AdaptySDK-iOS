@@ -11,7 +11,7 @@ struct EventsBackendConfiguration: Sendable {
     var blacklist: Set<String>
     let expiresAt: Date
 
-    init(_ state: NetworkState) {
+    init(_ state: BackendState) {
         blacklist = state.eventBlacklist
         expiresAt = state.expiresAt
     }

@@ -11,7 +11,7 @@ private let log = Log.http
 
 @BackendActor
 protocol BackendExecutor: Sendable {
-    var manager: Backend.NetworkManager { get }
+    var manager: Backend.StateManager { get }
     var session: HTTPSession { get }
     var kind: AdaptyServerKind { get }
 }

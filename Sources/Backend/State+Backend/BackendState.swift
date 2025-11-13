@@ -7,33 +7,24 @@
 
 import Foundation
 
-struct NetworkState: Sendable {
-    static var `default`: NetworkState {
-        .init(
-            eventBlacklist: Event.defaultBlackList,
-            mainBaseUrls: [
-                .default: [AdaptyServerKind.main.defaultBaseUrl(by: .default)],
-                .eu: [AdaptyServerKind.main.defaultBaseUrl(by: .eu)],
-                .cn: [AdaptyServerKind.main.defaultBaseUrl(by: .cn)]
-            ],
-            expiresAt: Date(timeIntervalSince1970: 0),
-            extendSeconds: 1800
-        )
-    }
-
+struct BackendState: Sendable {
     let eventBlacklist: Set<String>
     let mainBaseUrls: [AdaptyServerCluster: [URL]]
     let expiresAt: Date
     let extendSeconds: TimeInterval
 }
 
-extension NetworkState {
-    static func create(from: NetworkConfiguration, now: Date = Date()) -> Self {
+extension BackendState {
+    static func createDefault() -> Self {
         .init(
-            eventBlacklist: from.eventBlacklist,
-            mainBaseUrls: from.mainBaseUrls,
-            expiresAt: now.addingTimeInterval(from.expiresIn),
-            extendSeconds: from.extendSeconds
+            eventBlacklist: Event.defaultBlackList,
+            mainBaseUrls: [
+                .default: [Backend.defaultBaseUrl(kind: .main, by: .default)],
+                .eu: [Backend.defaultBaseUrl(kind: .main, by: .eu)],
+                .cn: [Backend.defaultBaseUrl(kind: .main, by: .cn)]
+            ],
+            expiresAt: Date(timeIntervalSince1970: 0),
+            extendSeconds: 1800
         )
     }
 
@@ -60,11 +51,12 @@ extension NetworkState {
     }
 }
 
-extension NetworkState: Codable {
+extension BackendState: Codable {
     enum CodingKeys: String, CodingKey {
         case eventBlacklist = "event_blacklist"
-        case mainBaseUrls = "base_urls"
+        case mainBaseUrls = "api_endpoints"
         case expiresAt = "expires_at"
+        case expiresIn = "expires_in"
         case extendSeconds = "retry_interval"
     }
 
@@ -72,7 +64,12 @@ extension NetworkState: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         eventBlacklist = try container.decode(Set<String>.self, forKey: .eventBlacklist)
         mainBaseUrls = try container.decode([AdaptyServerCluster: [URL]].self, forKey: .mainBaseUrls)
-        expiresAt = try Date(timeIntervalSince1970: (container.decode(Double.self, forKey: .expiresAt)) / 1000.0)
+        if container.contains(.expiresAt) {
+            expiresAt = try Date(timeIntervalSince1970: (container.decode(Double.self, forKey: .expiresAt)) / 1000.0)
+        } else {
+            let expiresIn = try container.decode(Double.self, forKey: .expiresIn) / 1000.0
+            expiresAt = Date().addingTimeInterval(expiresIn)
+        }
         extendSeconds = try container.decode(Double.self, forKey: .extendSeconds) / 1000.0
     }
 

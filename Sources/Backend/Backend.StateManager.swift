@@ -1,5 +1,5 @@
 //
-//  Backend.NetworkManager.swift
+//  Backend.StateManager.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 02.11.2025.
@@ -9,18 +9,16 @@ import Foundation
 
 extension Backend {
     @BackendActor
-    final class NetworkManager {
-        static let serverKind = AdaptyServerKind.fallback
-
+    final class StateManager {
         private let apiKeyPrefix: String
 
         private let cluster: AdaptyServerCluster
         private let devBaseUrls: [AdaptyServerKind: URL]?
-        private let executor: NetworkExecutor
+        private let executor: StateExecutor
 
         private var mainBaseUrlIndex: Int
-        var currentState: NetworkState
-        private var storage = NetworkStateStorage()
+        var currentState: BackendState
+        private var storage = BackendStateStorage()
         private var syncing: Task<Void, Never>?
         private var lastUnavailableError: BackendUnavailableError?
         private var uaLastUnavailableError: BackendUnavailableError?
@@ -31,17 +29,16 @@ extension Backend {
             cluster = backend.cluster
             devBaseUrls = backend.devBaseUrls
 
-            executor = NetworkExecutor(
-                baseUrl: Self.serverKind.baseUrl(dev: devBaseUrls, by: cluster),
-                session: .init(configuration: FallbackHTTPConfiguration(with: configuration)),
-                kind: Self.serverKind
+            executor = StateExecutor(
+                baseUrl: devBaseUrls[StateExecutor.kind, with: cluster],
+                session: .init(configuration: FallbackHTTPConfiguration(with: configuration))
             )
 
-            if let state = storage.networkState {
+            if let state = storage.state {
                 currentState = state
             } else {
-                let state = NetworkState.default
-                storage.setNetworkState(state)
+                let state = BackendState.createDefault()
+                storage.set(state: state)
                 currentState = state
             }
             mainBaseUrlIndex = 0
@@ -80,18 +77,17 @@ extension Backend {
         }
 
         private func fetch() async throws {
-            let kind = executor.kind
+            let kind = StateExecutor.kind
             try checkIsBlocked(kind)
             do {
-                let config = try await executor.fetchNetworkConfiguration(
+                currentState = try await executor.fetchBackendState(
                     apiKeyPrefix: apiKeyPrefix
                 )
-                currentState = NetworkState.create(from: config)
-                storage.setNetworkState(currentState)
+                storage.set(state: currentState)
                 mainBaseUrlIndex = 0
             } catch {
                 currentState = currentState.extended()
-                storage.setNetworkState(currentState)
+                storage.set(state: currentState)
                 _ = handleNetworkError(kind, error)
                 throw error
             }
@@ -111,7 +107,7 @@ extension Backend {
             _ kind: AdaptyServerKind,
             _ error: HTTPError
         ) -> Bool {
-            guard case .backend(let endpoint, let source, let statusCode, let headers, let metrics, let error) = error, let error = error as? BackendUnavailableError else {
+            guard case .backend(_, _, _, _, _, let error) = error, let error = error as? BackendUnavailableError else {
                 return false
             }
             switch kind {
@@ -163,9 +159,9 @@ extension HTTPError {
         switch self {
         case .perform:
             false
-        case .network(_, _, _, error: let error):
+        case .network(_, _, _, error: _):
             false
-        case .decoding(_, _, statusCode: let statusCode, headers: let headers, metrics: let metrics, error: let error):
+        case .decoding(_, _, statusCode: _, headers: _, metrics: _, error: _):
             false
         case .backend(_, _, let statusCode, _, _, _):
             switch statusCode {
@@ -178,16 +174,16 @@ extension HTTPError {
     }
 }
 
-extension Backend.NetworkManager {
+extension Backend.StateManager {
     private func checkIsBlocked(_ request: BackendRequest, for kind: AdaptyServerKind) throws(BackendUnavailableError) {
         try checkIsBlocked(kind)
         guard kind == .main else { return }
         // TODO:
     }
 
-    func fetchCurrentState() async -> NetworkState {
+    func fetchCurrentState() async -> BackendState {
         if currentState.isExpired {
-            try? await sync()
+            await sync()
         }
         return currentState
     }
@@ -195,12 +191,12 @@ extension Backend.NetworkManager {
     func baseUrl(_ request: BackendRequest, for kind: AdaptyServerKind) async throws(BackendUnavailableError) -> URL {
         try checkIsBlocked(request, for: kind)
         guard kind == .main else {
-            return kind.baseUrl(dev: devBaseUrls, by: cluster)
+            return devBaseUrls[kind, with: cluster]
         }
         if let url = devBaseUrls?[kind] { return url }
 
         if currentState.isExpired {
-            try? await sync()
+            await sync()
         }
 
         guard let url = currentState.mainBaseUrl(by: cluster, withIndex: mainBaseUrlIndex) else {

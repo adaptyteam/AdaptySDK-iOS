@@ -8,7 +8,7 @@
 import Foundation
 
 package struct Backend {
-    let networkManager: NetworkManager
+    let networkManager: StateManager
 
     let defaultHTTPConfiguration: HTTPCodableConfiguration
     let uaHTTPConfiguration: HTTPCodableConfiguration
@@ -23,7 +23,7 @@ package struct Backend {
         fallbackHTTPConfiguration = FallbackHTTPConfiguration(with: configuration)
         uaHTTPConfiguration = UAHTTPConfiguration(with: configuration, environment: environment)
 
-        networkManager = await Backend.NetworkManager(with: configuration)
+        networkManager = await Backend.StateManager(with: configuration)
     }
 
     enum Request {}

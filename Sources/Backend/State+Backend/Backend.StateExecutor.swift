@@ -1,5 +1,5 @@
 //
-//  Backend.NetworkExecutor.swift
+//  Backend.StateExecutor.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 12.11.2025.
@@ -8,14 +8,15 @@
 import Foundation
 
 extension Backend {
-    struct NetworkExecutor {
+    struct StateExecutor {
+        static let kind = AdaptyServerKind.fallback
         let baseUrl: URL
         let session: HTTPSession
-        let kind: AdaptyServerKind
+//        let kind = AdaptyServerKind.fallback
     }
 }
 
-extension Backend.NetworkExecutor {
+extension Backend.StateExecutor {
     @BackendActor
     @inlinable
     func perform<Body: Decodable & Sendable>(

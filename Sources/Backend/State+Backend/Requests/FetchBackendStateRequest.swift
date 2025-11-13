@@ -1,12 +1,12 @@
 //
-//  FetchNetworkConfigRequest.swift
+//  FetchBackendStateRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 13.10.2022.
 //
 import Foundation
 
-private struct FetchNetworkConfigurationRequest: BackendRequest {
+private struct FetchBackendStateRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
     let logName = APIRequestName.fetchNetworkConfig
@@ -19,13 +19,13 @@ private struct FetchNetworkConfigurationRequest: BackendRequest {
     }
 }
 
-private typealias ResponseBody = Backend.Response.Data<NetworkConfiguration>
+private typealias ResponseBody = Backend.Response.Data<BackendState>
 
-extension Backend.NetworkExecutor {
-    func fetchNetworkConfiguration(
+extension Backend.StateExecutor {
+    func fetchBackendState(
         apiKeyPrefix: String
-    ) async throws(HTTPError) -> NetworkConfiguration {
-        let request = FetchNetworkConfigurationRequest(
+    ) async throws(HTTPError) -> BackendState {
+        let request = FetchBackendStateRequest(
             apiKeyPrefix: apiKeyPrefix
         )
         let response: HTTPResponse<ResponseBody> = try await perform(
