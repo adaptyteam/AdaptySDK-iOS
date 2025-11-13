@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SendEventsRequest: BackendRequest {
+struct SendEventsRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/events/"
