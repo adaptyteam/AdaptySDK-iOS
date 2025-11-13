@@ -63,11 +63,11 @@ extension Backend {
         case 401: return .unauthorized
         case 429: return .blockedUntil(response.headers.getRetryAfter(now))
         case 444:
-            let min = response.body
+            let seconds = response.body
                 .flatMap { String(data: $0, encoding: .utf8) }
                 .flatMap(Double.init)
                 .map { $0 * 60 }
-            return .blockedUntil(now.addingTimeInterval(min ?? (24 * 60 * 60))) // 24h
+            return .blockedUntil(now.addingTimeInterval(seconds ?? (24 * 60 * 60))) // 24h
         default:
             return nil
         }

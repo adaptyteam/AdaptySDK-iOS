@@ -12,7 +12,6 @@ extension Backend {
         static let kind = AdaptyServerKind.fallback
         let baseUrl: URL
         let session: HTTPSession
-//        let kind = AdaptyServerKind.fallback
     }
 }
 

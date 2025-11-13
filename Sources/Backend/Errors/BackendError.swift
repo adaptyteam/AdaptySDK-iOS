@@ -13,11 +13,6 @@ public struct BackendError: Error, Hashable, Codable {
     let requestId: String?
 }
 
-public enum BackendUnavailableError: Error, Hashable, Codable {
-    case unauthorized
-    case blockedUntil(Date?)
-}
-
 extension BackendError: CustomStringConvertible {
     public var description: String {
         (requestId.map { "requestId: \($0), " } ?? "") + "body: \(body)"

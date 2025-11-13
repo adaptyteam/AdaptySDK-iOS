@@ -13,5 +13,3 @@ package enum AdaptyServerKind: Sendable, CaseIterable {
     case configs
     case ua
 }
-
-

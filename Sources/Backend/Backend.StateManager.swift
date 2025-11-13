@@ -99,7 +99,7 @@ extension Backend {
             _ error: HTTPError
         ) {
             let handled = handleNetworkError(kind, error)
-            guard !handled, kind == .main, error.isUnavailableBaseUrl else { return }
+            guard !handled, kind == .main, error.isServerUnavailable else { return }
             mainBaseUrlIndex += 1
         }
 
@@ -119,56 +119,6 @@ extension Backend {
                 return true
             default:
                 return false
-            }
-        }
-    }
-}
-
-extension BackendUnavailableError? {
-    func merge(other: BackendUnavailableError?) -> BackendUnavailableError? {
-        guard let other else { return self }
-        guard let self else { return other }
-
-        switch (self, other) {
-        case (.unauthorized, _):
-            return self
-        case (_, .unauthorized):
-            return other
-        case (.blockedUntil(let selfData), .blockedUntil(let otherData)):
-            guard let otherData else { return self }
-            guard let selfData, selfData < otherData else { return other }
-            return self
-        }
-    }
-}
-
-extension BackendUnavailableError {
-    var isBlocked: Bool {
-        switch self {
-        case .unauthorized:
-            return true
-        case .blockedUntil(let date):
-            guard let date else { return false }
-            return Date() < date
-        }
-    }
-}
-
-extension HTTPError {
-    var isUnavailableBaseUrl: Bool {
-        switch self {
-        case .perform:
-            false
-        case .network(_, _, _, error: _):
-            false
-        case .decoding(_, _, statusCode: _, headers: _, metrics: _, error: _):
-            false
-        case .backend(_, _, let statusCode, _, _, _):
-            switch statusCode {
-            case 500 ... 599:
-                true
-            default:
-                false
             }
         }
     }
